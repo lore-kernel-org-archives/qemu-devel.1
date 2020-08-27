@@ -5,74 +5,75 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9F3C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 01:33:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3566C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 01:33:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D52C2074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 01:33:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D1EB2074A
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 01:33:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bV3dX5A9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D52C2074A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0sqJi+a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D1EB2074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB6n4-0000fV-Lk
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 21:33:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52418)
+	id 1kB6nM-00015v-M7
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 21:33:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kB6m0-00086u-F7; Wed, 26 Aug 2020 21:32:16 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45044)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kB6jX-0004Zs-Gk
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 21:29:43 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:42505)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kB6ly-0006mX-OX; Wed, 26 Aug 2020 21:32:16 -0400
-Received: by mail-ot1-x341.google.com with SMTP id n23so3124596otq.11;
- Wed, 26 Aug 2020 18:32:14 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kB6jU-0006FW-EV
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 21:29:43 -0400
+Received: by mail-oi1-x243.google.com with SMTP id j7so3276086oij.9
+ for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 18:29:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=+Vvy84qV2hOJuHQtvex0dsqMf+bkQF+w9I4U2EXKhuc=;
- b=bV3dX5A980ahvZkf5Glh/ze6eyzII7LmffeQRF8yxf2HafDs4/qKX5y6tamFn6fShU
- b9Yk1UVrltN+vpuU19R/+8FdOuf/FpfXpXpDm688ZYNDr6jqkh21wilX+8jCAGvZZZsu
- 4Ffaxz3uU4YAL+Xr7Ibyvf3RLaiwnvX/KgOqI4EMbO2iZ5mZWt/tmpfjtcBlY2TIOGrt
- s4eLPmDaYZ5Dger5Z4AMuZpJqpXcwJDdM2qF2fWDNMKk4zY8jURkWWfWWhr8cpay4s+A
- WafNoWgwbBFG7vEhc8+IoYvUxiaSr8KZswKD61X4lQnql5rd0MJxbsbvF73lFcNuX9cR
- f6Sw==
+ bh=JmjKeYGLPW5C5CoFnmy4cHlpYVARDSgeDgC3BwYISss=;
+ b=J0sqJi+a2CvVH3jRjPL+AdQmTu6O3wRCymFgNER1K3ngMI/bgNpQFUT5cCdhVu4yXv
+ VtCYQTjHziOsKCdhuEj5uh5WppQZYeNlS0PfRxIJszGgW0tzm/2vZVHsCTLj6tdO58nU
+ 5InCPqf8Uv6Dk5GTOUiru7CX8o/Ga7acKQwYro4h6b948/uguG9uEhOF6Fa8F4mD0o8H
+ BHNn4yngeS6RokkzkXbrAA25rASaXkU2FykicqjyCDAspaIrws8Sat1b483Tltq+JJ1x
+ /VQ3fkGM8AxZlc5dTGSn1utRmsmoH9RX/FZYhYPREgkgzltlon4F4gUv/vp9JiBaj47L
+ gGVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=+Vvy84qV2hOJuHQtvex0dsqMf+bkQF+w9I4U2EXKhuc=;
- b=dcFkmoZ1cx8AHrUbSpkO4GHyx2D0iRDFms4mOUSWMtmSPWYH66nxA+9rwjEOfKzDgq
- 1GGYdypMDHl2lJmsHtbihzCzdCJwsDMsO0INEcI69OJ+sRAgo/DxTt7q3F8Z9mALt5KD
- MEcXooQPTIFbhTCbEZp8W0mWKM0s6E05w2ZEZWACe0MnceVR7SJoaMYKfrD1iG4qS9uF
- PufIKX5GuykN7oP10K/VPP8Wzl1VttHql4iEdIPjom99zrHLfArqLWqZ8r9UI0PtITmS
- sRCvsqRNn5F+UvND9XDrBYKU6hMuGBKnTJw6KjSAHLc5Ekf4n20GNInjPiRB/BpzGEAc
- 8sqg==
-X-Gm-Message-State: AOAM533ozIog3OlmJNLsPQd/dNMrOvM4nr2YZ6/8T0d5uqK7pR24i7GG
- qMv+jrcuOl6JzKSSe+ssXIigvxbDeEz41kxG3A4=
-X-Google-Smtp-Source: ABdhPJzW+zZ4xjNha9RBYxzGSKOVCwPla86WcApQQgzXIw5hueGXt9o9tT9SuMcFduiCiBkbu0VSyPUA3RFIQ9Jlopo=
-X-Received: by 2002:a9d:7c92:: with SMTP id q18mr8980457otn.333.1598491933254; 
- Wed, 26 Aug 2020 18:32:13 -0700 (PDT)
+ bh=JmjKeYGLPW5C5CoFnmy4cHlpYVARDSgeDgC3BwYISss=;
+ b=O8+EkPymvgGKPbWk/0hr/9CwkU1gW+7qBWVfhNzKbiWMQJ74p6WT1Wq6Su/luFN2Sp
+ njHKyOm6iWvfswJZXaKK7mFsRi4qZEVu0yZ65eGm7DhZ0T1g3hXfS6i2rIVvlYYzqeuW
+ ZBZfGjGb9bNa898lyfwzFyCoJVxrIM+6lHq8nEZ06KBDlfntJPavDYYhJ+/7mdURxN1d
+ d7QtznnzPUaWDQZ3AMYGzcZPYdj3XXEUoPcG+2RYNquU67C1DTO76IMz5tHcn+G4IPm/
+ Kt2DgvBqmkTeZP5eF4UAbhm47ofXsv+mK0zJCrzidg9jdc77sl50UPnO8ciGhTambuKQ
+ tsUw==
+X-Gm-Message-State: AOAM53155zo7AmWfYKVvsC9jfT1dPL958As83p0I1YjemEVzCtDBg9aZ
+ VQ83tTz6MZbzx+S6OEOEf08kBRDc/RItVjaftzw=
+X-Google-Smtp-Source: ABdhPJxcMAf7flbgkeatvbMipdyMCFr1NOx3XdBZYbhuEqZHFC5VBp8/pocLtaoQeF8Qibt5IB7gwdNUrNDfUVpVHxo=
+X-Received: by 2002:aca:1117:: with SMTP id 23mr5620209oir.97.1598491778891;
+ Wed, 26 Aug 2020 18:29:38 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200826184334.4120620-1-ehabkost@redhat.com>
- <20200826184334.4120620-6-ehabkost@redhat.com>
-In-Reply-To: <20200826184334.4120620-6-ehabkost@redhat.com>
+ <20200826184334.4120620-4-ehabkost@redhat.com>
+In-Reply-To: <20200826184334.4120620-4-ehabkost@redhat.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 27 Aug 2020 09:31:37 +0800
-Message-ID: <CAKXe6S++M2LOjMHG=omTr923qAVwbUOxOi9H4Qx7V=Rj=OZRCg@mail.gmail.com>
-Subject: Re: [PATCH 5/8] xlnx-zcu102: Use TYPE_ZCU102_MACHINE constant
+Date: Thu, 27 Aug 2020 09:29:03 +0800
+Message-ID: <CAKXe6SLU-UM5aGMG=cqE0b1X_NVRJC4pAta_jfGOtnG4cVCptA@mail.gmail.com>
+Subject: Re: [PATCH 3/8] amd_iommu: Use TYPE_AMD_IOMMU_PCI constant
 To: Eduardo Habkost <ehabkost@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,18 +95,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
  "Daniel P. Berrange" <berrange@redhat.com>,
- Alistair Francis <alistair@alistair23.me>,
- Qemu Developers <qemu-devel@nongnu.org>, qemu-arm@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+ Qemu Developers <qemu-devel@nongnu.org>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Eduardo Habkost <ehabkost@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8827=E6=
-=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=882:47=E5=86=99=E9=81=93=EF=BC=9A
+=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8A=E5=8D=882:48=E5=86=99=E9=81=93=EF=BC=9A
 >
 > This will make future conversion to use OBJECT_DECLARE* easier.
 >
@@ -114,29 +112,29 @@ Eduardo Habkost <ehabkost@redhat.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8827=E6=
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
 > ---
-> Cc: Alistair Francis <alistair@alistair23.me>
-> Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: qemu-arm@nongnu.org
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
 > Cc: qemu-devel@nongnu.org
 > ---
->  hw/arm/xlnx-zcu102.c | 2 +-
+>  hw/i386/amd_iommu.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
-> index 5997262459..672d9d4bd1 100644
-> --- a/hw/arm/xlnx-zcu102.c
-> +++ b/hw/arm/xlnx-zcu102.c
-> @@ -238,7 +238,7 @@ static void xlnx_zcu102_machine_class_init(ObjectClas=
-s *oc, void *data)
->  }
+> diff --git a/hw/i386/amd_iommu.c b/hw/i386/amd_iommu.c
+> index 087f601666..18411f1dec 100644
+> --- a/hw/i386/amd_iommu.c
+> +++ b/hw/i386/amd_iommu.c
+> @@ -1622,7 +1622,7 @@ static const TypeInfo amdvi =3D {
+>  };
 >
->  static const TypeInfo xlnx_zcu102_machine_init_typeinfo =3D {
-> -    .name       =3D MACHINE_TYPE_NAME("xlnx-zcu102"),
-> +    .name       =3D TYPE_ZCU102_MACHINE,
->      .parent     =3D TYPE_MACHINE,
->      .class_init =3D xlnx_zcu102_machine_class_init,
->      .instance_init =3D xlnx_zcu102_machine_instance_init,
+>  static const TypeInfo amdviPCI =3D {
+> -    .name =3D "AMDVI-PCI",
+> +    .name =3D TYPE_AMD_IOMMU_PCI,
+>      .parent =3D TYPE_PCI_DEVICE,
+>      .instance_size =3D sizeof(AMDVIPCIState),
+>      .interfaces =3D (InterfaceInfo[]) {
 > --
 > 2.26.2
 >
