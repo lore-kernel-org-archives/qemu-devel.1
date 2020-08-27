@@ -2,74 +2,89 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57922C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D66C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:28:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2152F207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:27:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2152F207CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id B9D8D22B4D
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:28:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EID4PErt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9D8D22B4D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59814 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNYC-0000CD-8S
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:27:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33484)
+	id 1kBNZB-0002Dc-Qj
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:28:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS2-00047n-3E
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:46 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:55889)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNS0-0000F2-2w
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:45 -0400
-Received: from localhost.localdomain ([82.252.135.186]) by
- mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MLz3X-1ju7a43Nb7-00HtDD; Thu, 27 Aug 2020 21:20:42 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 14/18] linux-user: fix target_to_host_timespec64()
-Date: Thu, 27 Aug 2020 21:20:14 +0200
-Message-Id: <20200827192018.2442099-15-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
-References: <20200827192018.2442099-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kBNT9-0006Tc-QH
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:21:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:38984
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kBNT1-0000Mh-8J
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:21:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598556106;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lNzykSHfQCEIpFJ5XM0092y7W6KXjPRMMDAtUoYUgf4=;
+ b=EID4PErtMaqb2Tln0RSD9gK65bSY89YpHU2b8uDz6p1hNrheuCQIufTb6etIx8ItYCW8ki
+ Jo6OcIZZN09TjeN5bD+v65uxDBLlKxealf+f0qLNq9qvBgfjYXepzbnRCZOQ9P+zmEKkF9
+ tJxQ2zrRJdMjhIDM4mifkPkj1NxPQRg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-wSMRzwu7O8iWm1Q9aYmmKg-1; Thu, 27 Aug 2020 15:21:44 -0400
+X-MC-Unique: wSMRzwu7O8iWm1Q9aYmmKg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4154A802B6B;
+ Thu, 27 Aug 2020 19:21:43 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DC820196F3;
+ Thu, 27 Aug 2020 19:21:42 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 08/53] opentitan: Rename memmap enum constants
+Date: Thu, 27 Aug 2020 15:20:37 -0400
+Message-Id: <20200827192122.658035-9-ehabkost@redhat.com>
+In-Reply-To: <20200827192122.658035-1-ehabkost@redhat.com>
+References: <20200827192122.658035-1-ehabkost@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:CxGRs9mXvVilNaZtC1+4zOwQ4YePjGTWdV1cfU3v0vhyS+jNciE
- lnxORXPq6DQNd552ZLo+YEp5Ffd69UW9teohj9FNtCDeHSsTpD7WzjEJMhuWjP3V61TREuO
- tHFU6DnpHH9OawT6tOJmbKm7hG8TUD+4Jb6zc68phWhs1eor5zXgdPX74ZGbYUIenRuDAba
- X/dsKZSR58XL9w6yM5eqQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:bLdgEUoafGc=:NOlUBAdb7Qe60cJJRELIv4
- 8WCz+MZfyvfhZ0BVGm81Fvv/PR1Ubb4oO5l9HN+4KzpdnirWwOzTxyRCnCOvsh/2YvB7DMrMV
- Xc/FBiagjOKAR5BNDUSzqG/q9Gd8LpQ+TtUHcjOKW+M0RHxu4i+WbPAhHGWGHqntVHbBoHN3M
- hwUd1UWJig0EAMNSAydZ062GU/iTSiC0RISjrDVxDXuE5VxofGZ8bW1asaZT+xO/l2FAMjo0t
- V7zJLuX4gScVwCe+aoO45comS5MQIjucGE5b3JK8NYsE+rb2pC8dLVsGpyGIRDXzL5C8f8tsn
- RCj85SaOV1CLoELAaYDo1FWgdUkP4e+zEMRuC/rpKG7Za3qtqvLZbRpFQg0IP6oRQuHGea6cS
- D62WBxnGnl8dVVFrHp22Mccy6B1j0WW1UwJyDRVrMyHiRw5oDns3BlIYE4hhoRPBuL3k2+Ti7
- cP0nz5BPQjssoO++vYlAxVOMO5+fSr75PxN0n2G0z1f8Hw8cZHUPyoViDdSvc5w1/QPRrXL64
- t3K3eQlpK91dFzcSELEtQcsd8Jz0HerO+YO18V0uRZUm2oYSMPXFecL+1Us1eUUXOaobeImO4
- 39pZxVUq1Q5LNc07ejKAbND5oJ4zqcJhf6NUnw/wzgx5yHZQSN3gtsmOi+WjyGmho/L22OtBf
- LU3+FzVBBgMqn69NNk5zFynCdU7QthjFISti6cJ/f7naOqC0tnAF3/RamfYFKAa5N/D9kSwRH
- CW5VMujbACnt51fvQrURl5rgek9unwuAiRpxOKQGgYrj8gmAU43z1p/bp5tdEwP4fppeO0W1P
- TE38jFuw/HV1ViC0ObFd68V6zLW3tFTJTaeYVm3UefLkedwv7l0vwDikAt6bmlhdqnbLabN
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,35 +97,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-in 32 bit mode, drop the padding in tv_nsec. If host is 64bit and target
-is 32bit, the padding bytes will be copied from the target and as the
-kernel checks the value, the syscall exits with EINVAL.
+Some of the enum constant names conflict with the QOM type check
+macros (IBEX_PLIC, IBEX_UART).  This needs to be addressed to
+allow us to transform the QOM type check macros into functions
+generated by OBJECT_DECLARE_TYPE().
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200827070449.2386007-1-laurent@vivier.eu>
-Fixes: c6c8d1026e75 ("linux-user/syscall: Add support for clock_gettime64/clock_settime64")
+Rename all the constants to IBEX_DEV_*, to avoid conflicts.
+
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Tested-By: Roman Bolshakov <r.bolshakov@yadro.com>
+Message-Id: <20200825192110.3528606-8-ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- linux-user/syscall.c | 2 ++
- 1 file changed, 2 insertions(+)
+ include/hw/riscv/opentitan.h | 38 ++++++++--------
+ hw/riscv/opentitan.c         | 84 ++++++++++++++++++------------------
+ 2 files changed, 61 insertions(+), 61 deletions(-)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index fd13e72305de..3b725bbe2513 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -1229,6 +1229,8 @@ static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
+diff --git a/include/hw/riscv/opentitan.h b/include/hw/riscv/opentitan.h
+index 8f29b9cbbf..835a80f896 100644
+--- a/include/hw/riscv/opentitan.h
++++ b/include/hw/riscv/opentitan.h
+@@ -49,25 +49,25 @@ typedef struct OpenTitanState {
+ } OpenTitanState;
+ 
+ enum {
+-    IBEX_ROM,
+-    IBEX_RAM,
+-    IBEX_FLASH,
+-    IBEX_UART,
+-    IBEX_GPIO,
+-    IBEX_SPI,
+-    IBEX_FLASH_CTRL,
+-    IBEX_RV_TIMER,
+-    IBEX_AES,
+-    IBEX_HMAC,
+-    IBEX_PLIC,
+-    IBEX_PWRMGR,
+-    IBEX_RSTMGR,
+-    IBEX_CLKMGR,
+-    IBEX_PINMUX,
+-    IBEX_ALERT_HANDLER,
+-    IBEX_NMI_GEN,
+-    IBEX_USBDEV,
+-    IBEX_PADCTRL,
++    IBEX_DEV_ROM,
++    IBEX_DEV_RAM,
++    IBEX_DEV_FLASH,
++    IBEX_DEV_UART,
++    IBEX_DEV_GPIO,
++    IBEX_DEV_SPI,
++    IBEX_DEV_FLASH_CTRL,
++    IBEX_DEV_RV_TIMER,
++    IBEX_DEV_AES,
++    IBEX_DEV_HMAC,
++    IBEX_DEV_PLIC,
++    IBEX_DEV_PWRMGR,
++    IBEX_DEV_RSTMGR,
++    IBEX_DEV_CLKMGR,
++    IBEX_DEV_PINMUX,
++    IBEX_DEV_ALERT_HANDLER,
++    IBEX_DEV_NMI_GEN,
++    IBEX_DEV_USBDEV,
++    IBEX_DEV_PADCTRL,
+ };
+ 
+ enum {
+diff --git a/hw/riscv/opentitan.c b/hw/riscv/opentitan.c
+index a8f0039e51..23ba3b4bfc 100644
+--- a/hw/riscv/opentitan.c
++++ b/hw/riscv/opentitan.c
+@@ -32,25 +32,25 @@ static const struct MemmapEntry {
+     hwaddr base;
+     hwaddr size;
+ } ibex_memmap[] = {
+-    [IBEX_ROM] =            {  0x00008000, 16 * KiB },
+-    [IBEX_RAM] =            {  0x10000000,  0x10000 },
+-    [IBEX_FLASH] =          {  0x20000000,  0x80000 },
+-    [IBEX_UART] =           {  0x40000000,  0x10000 },
+-    [IBEX_GPIO] =           {  0x40010000,  0x10000 },
+-    [IBEX_SPI] =            {  0x40020000,  0x10000 },
+-    [IBEX_FLASH_CTRL] =     {  0x40030000,  0x10000 },
+-    [IBEX_PINMUX] =         {  0x40070000,  0x10000 },
+-    [IBEX_RV_TIMER] =       {  0x40080000,  0x10000 },
+-    [IBEX_PLIC] =           {  0x40090000,  0x10000 },
+-    [IBEX_PWRMGR] =         {  0x400A0000,  0x10000 },
+-    [IBEX_RSTMGR] =         {  0x400B0000,  0x10000 },
+-    [IBEX_CLKMGR] =         {  0x400C0000,  0x10000 },
+-    [IBEX_AES] =            {  0x40110000,  0x10000 },
+-    [IBEX_HMAC] =           {  0x40120000,  0x10000 },
+-    [IBEX_ALERT_HANDLER] =  {  0x40130000,  0x10000 },
+-    [IBEX_NMI_GEN] =        {  0x40140000,  0x10000 },
+-    [IBEX_USBDEV] =         {  0x40150000,  0x10000 },
+-    [IBEX_PADCTRL] =        {  0x40160000,  0x10000 }
++    [IBEX_DEV_ROM] =            {  0x00008000, 16 * KiB },
++    [IBEX_DEV_RAM] =            {  0x10000000,  0x10000 },
++    [IBEX_DEV_FLASH] =          {  0x20000000,  0x80000 },
++    [IBEX_DEV_UART] =           {  0x40000000,  0x10000 },
++    [IBEX_DEV_GPIO] =           {  0x40010000,  0x10000 },
++    [IBEX_DEV_SPI] =            {  0x40020000,  0x10000 },
++    [IBEX_DEV_FLASH_CTRL] =     {  0x40030000,  0x10000 },
++    [IBEX_DEV_PINMUX] =         {  0x40070000,  0x10000 },
++    [IBEX_DEV_RV_TIMER] =       {  0x40080000,  0x10000 },
++    [IBEX_DEV_PLIC] =           {  0x40090000,  0x10000 },
++    [IBEX_DEV_PWRMGR] =         {  0x400A0000,  0x10000 },
++    [IBEX_DEV_RSTMGR] =         {  0x400B0000,  0x10000 },
++    [IBEX_DEV_CLKMGR] =         {  0x400C0000,  0x10000 },
++    [IBEX_DEV_AES] =            {  0x40110000,  0x10000 },
++    [IBEX_DEV_HMAC] =           {  0x40120000,  0x10000 },
++    [IBEX_DEV_ALERT_HANDLER] =  {  0x40130000,  0x10000 },
++    [IBEX_DEV_NMI_GEN] =        {  0x40140000,  0x10000 },
++    [IBEX_DEV_USBDEV] =         {  0x40150000,  0x10000 },
++    [IBEX_DEV_PADCTRL] =        {  0x40160000,  0x10000 }
+ };
+ 
+ static void opentitan_board_init(MachineState *machine)
+@@ -66,12 +66,12 @@ static void opentitan_board_init(MachineState *machine)
+     qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
+ 
+     memory_region_init_ram(main_mem, NULL, "riscv.lowrisc.ibex.ram",
+-        memmap[IBEX_RAM].size, &error_fatal);
++        memmap[IBEX_DEV_RAM].size, &error_fatal);
+     memory_region_add_subregion(sys_mem,
+-        memmap[IBEX_RAM].base, main_mem);
++        memmap[IBEX_DEV_RAM].base, main_mem);
+ 
+     if (machine->firmware) {
+-        riscv_load_firmware(machine->firmware, memmap[IBEX_RAM].base, NULL);
++        riscv_load_firmware(machine->firmware, memmap[IBEX_DEV_RAM].base, NULL);
      }
-     __get_user(host_ts->tv_sec, &target_ts->tv_sec);
-     __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
-+    /* in 32bit mode, this drops the padding */
-+    host_ts->tv_nsec = (long)(abi_long)host_ts->tv_nsec;
-     unlock_user_struct(target_ts, target_addr, 0);
-     return 0;
+ 
+     if (machine->kernel_filename) {
+@@ -115,28 +115,28 @@ static void lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
+ 
+     /* Boot ROM */
+     memory_region_init_rom(&s->rom, OBJECT(dev_soc), "riscv.lowrisc.ibex.rom",
+-                           memmap[IBEX_ROM].size, &error_fatal);
++                           memmap[IBEX_DEV_ROM].size, &error_fatal);
+     memory_region_add_subregion(sys_mem,
+-        memmap[IBEX_ROM].base, &s->rom);
++        memmap[IBEX_DEV_ROM].base, &s->rom);
+ 
+     /* Flash memory */
+     memory_region_init_rom(&s->flash_mem, OBJECT(dev_soc), "riscv.lowrisc.ibex.flash",
+-                           memmap[IBEX_FLASH].size, &error_fatal);
+-    memory_region_add_subregion(sys_mem, memmap[IBEX_FLASH].base,
++                           memmap[IBEX_DEV_FLASH].size, &error_fatal);
++    memory_region_add_subregion(sys_mem, memmap[IBEX_DEV_FLASH].base,
+                                 &s->flash_mem);
+ 
+     /* PLIC */
+     if (!sysbus_realize(SYS_BUS_DEVICE(&s->plic), errp)) {
+         return;
+     }
+-    sysbus_mmio_map(SYS_BUS_DEVICE(&s->plic), 0, memmap[IBEX_PLIC].base);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->plic), 0, memmap[IBEX_DEV_PLIC].base);
+ 
+     /* UART */
+     qdev_prop_set_chr(DEVICE(&(s->uart)), "chardev", serial_hd(0));
+     if (!sysbus_realize(SYS_BUS_DEVICE(&s->uart), errp)) {
+         return;
+     }
+-    sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart), 0, memmap[IBEX_UART].base);
++    sysbus_mmio_map(SYS_BUS_DEVICE(&s->uart), 0, memmap[IBEX_DEV_UART].base);
+     sysbus_connect_irq(SYS_BUS_DEVICE(&s->uart),
+                        0, qdev_get_gpio_in(DEVICE(&s->plic),
+                        IBEX_UART_TX_WATERMARK_IRQ));
+@@ -151,33 +151,33 @@ static void lowrisc_ibex_soc_realize(DeviceState *dev_soc, Error **errp)
+                        IBEX_UART_RX_OVERFLOW_IRQ));
+ 
+     create_unimplemented_device("riscv.lowrisc.ibex.gpio",
+-        memmap[IBEX_GPIO].base, memmap[IBEX_GPIO].size);
++        memmap[IBEX_DEV_GPIO].base, memmap[IBEX_DEV_GPIO].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.spi",
+-        memmap[IBEX_SPI].base, memmap[IBEX_SPI].size);
++        memmap[IBEX_DEV_SPI].base, memmap[IBEX_DEV_SPI].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.flash_ctrl",
+-        memmap[IBEX_FLASH_CTRL].base, memmap[IBEX_FLASH_CTRL].size);
++        memmap[IBEX_DEV_FLASH_CTRL].base, memmap[IBEX_DEV_FLASH_CTRL].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.rv_timer",
+-        memmap[IBEX_RV_TIMER].base, memmap[IBEX_RV_TIMER].size);
++        memmap[IBEX_DEV_RV_TIMER].base, memmap[IBEX_DEV_RV_TIMER].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.pwrmgr",
+-        memmap[IBEX_PWRMGR].base, memmap[IBEX_PWRMGR].size);
++        memmap[IBEX_DEV_PWRMGR].base, memmap[IBEX_DEV_PWRMGR].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.rstmgr",
+-        memmap[IBEX_RSTMGR].base, memmap[IBEX_RSTMGR].size);
++        memmap[IBEX_DEV_RSTMGR].base, memmap[IBEX_DEV_RSTMGR].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.clkmgr",
+-        memmap[IBEX_CLKMGR].base, memmap[IBEX_CLKMGR].size);
++        memmap[IBEX_DEV_CLKMGR].base, memmap[IBEX_DEV_CLKMGR].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.aes",
+-        memmap[IBEX_AES].base, memmap[IBEX_AES].size);
++        memmap[IBEX_DEV_AES].base, memmap[IBEX_DEV_AES].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.hmac",
+-        memmap[IBEX_HMAC].base, memmap[IBEX_HMAC].size);
++        memmap[IBEX_DEV_HMAC].base, memmap[IBEX_DEV_HMAC].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.pinmux",
+-        memmap[IBEX_PINMUX].base, memmap[IBEX_PINMUX].size);
++        memmap[IBEX_DEV_PINMUX].base, memmap[IBEX_DEV_PINMUX].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.alert_handler",
+-        memmap[IBEX_ALERT_HANDLER].base, memmap[IBEX_ALERT_HANDLER].size);
++        memmap[IBEX_DEV_ALERT_HANDLER].base, memmap[IBEX_DEV_ALERT_HANDLER].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.nmi_gen",
+-        memmap[IBEX_NMI_GEN].base, memmap[IBEX_NMI_GEN].size);
++        memmap[IBEX_DEV_NMI_GEN].base, memmap[IBEX_DEV_NMI_GEN].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.usbdev",
+-        memmap[IBEX_USBDEV].base, memmap[IBEX_USBDEV].size);
++        memmap[IBEX_DEV_USBDEV].base, memmap[IBEX_DEV_USBDEV].size);
+     create_unimplemented_device("riscv.lowrisc.ibex.padctrl",
+-        memmap[IBEX_PADCTRL].base, memmap[IBEX_PADCTRL].size);
++        memmap[IBEX_DEV_PADCTRL].base, memmap[IBEX_DEV_PADCTRL].size);
  }
+ 
+ static void lowrisc_ibex_soc_class_init(ObjectClass *oc, void *data)
 -- 
 2.26.2
 
