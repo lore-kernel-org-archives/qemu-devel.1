@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6E2C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35CA8C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81362207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81362207CD
+	by mail.kernel.org (Postfix) with ESMTPS id 0C282207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 19:23:32 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C282207CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBNUb-0000X7-LK
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:23:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33408)
+	id 1kBNUh-0000aV-4D
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 15:23:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRv-0003qf-MR
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:39 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:56617)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRy-0003zX-ME
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:42 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:55707)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRt-0000A9-Q8
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:39 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBNRw-0000Cj-9W
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 15:20:42 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MSbp1-1k0lN72dir-00SumF; Thu, 27 Aug 2020 21:20:28 +0200
+ id 1M1pk6-1k9BaR0PZg-002H6c; Thu, 27 Aug 2020 21:20:31 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/18] linux-user: syscall: ioctls: support
- DRM_IOCTL_I915_GETPARAM
-Date: Thu, 27 Aug 2020 21:20:03 +0200
-Message-Id: <20200827192018.2442099-4-laurent@vivier.eu>
+Subject: [PULL 05/18] linux-user: Add strace support for printing arguments of
+ truncate()/ftruncate() and getsid()
+Date: Thu, 27 Aug 2020 21:20:05 +0200
+Message-Id: <20200827192018.2442099-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200827192018.2442099-1-laurent@vivier.eu>
 References: <20200827192018.2442099-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:MXn0zVzwswKtcIarZsDaSOLtnC8aow9SWx4mBc5EyTfuO+ALaqa
- 13cd+SlYJJemq1+Ea1H1feBZ17vwccj++5yIRuL7oyxNbMgCRnD2hLEu81nCnyh53gneCKN
- dwlPU1fL9s+2BK9JaCbQ2W7vr+GD9touPtTp6nkT+pWtbhKVFgXOMQGUbdUuk5fWnLSR0g7
- wk3enMTlTp7/8napEaL3w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ezbO9ETbV40=:wuJoyiAXLNRNU07JUOr12i
- y4URvqmRtzytEShS58gUCQWrso5H4ebKNyQF5BnRMs+zewTCYujhiyJ6/kmVfsOxRsmJ6AySm
- CEY2hVJFizczdhEnk4nDjoAmG7AY/peO5HCEEGXc1BTsT90ukBI/k0l6JzztMigVQJfOJhko8
- CNib7qYA5UDZLF09TYnPwc1OEjTKKgjyN2JGi78icqT5RoyFxdeE9pe9pJNoWaQWxq3QkJ+Y9
- w+lIRSK5RUMqV9eLMCf7LIb1L8HjLB2L9BnCOjedgfUbKouPCwYDmBOfleunexKF5sz02xOqB
- 6Hc0nokKNkNso8Ya2e58s3gi1uDm+0dTffUPFHw4er74UJjnrEDRwWSIScdL6+OFIglCWfLUV
- VgHQhC0izHRpWtvDOVKongmVk1XUED+F8GNKBQIdTYwCT4NuSXx8X+CNF4pGIjr6RdRFFBwcm
- I60pzYm6vGsjPqDpllorYw5DOjBFAW4BDPMdp1cNPEBwNkmcfAEioj8qSkihzVM02vZgOTr9i
- ZaQhZNlErC/1rSfSUGyACvu4yxjwiBsDY8nT7710XKmMgt5qR7B3yMYdl5ARAPeA0cYvq9roh
- N8s5jEXC58W2jlR1JqWy46mhDIwmv89E5ucxb7/hZIC/ErOrh2AXKp89vIfxudyIGT2isF+tz
- KYisXr9OqnuO0MwBAslZokugHsehpWojXowiWfluDX3QiIkQNZV8Exl29OEhhm3Pmf+pXcbLy
- wJWBQuPYdfBGA3in7w1qUFQYB45SMmi9Z8QTNO4/Tbb2I9fvt2dEVYM8rC+E6rLIgwYLFmRGL
- bk42opoDxjK8hKwj5A2G6DB/oShxk03qhm3f5ngR6gua7sWXbd3zZUDbtFPPmM1CcNZ1VOk
-Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:AC9QzEiU3l5K7Y84OMrSLLlg1eupkhANdkWxJkdNf3NHRtFln7M
+ DuQym0UzeBlKpjTAxACsoXYIxEeNGNVEeg3PdEmNEKtyZcStYOnoeAp53VZhP8EkKq+zOMs
+ 4XiFysvuo3UWETSFfyzRITibSnojD66CM3Lhxl8CUXshC3aUgUDTdXt8xzDku0+aLJUiGks
+ q37/Ts3Cni9+GYpSmntwQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WFEFUMwL2Yc=:Y2sBk66PPQVyFSqgHnAinX
+ RKbM5O3Ub8M0pCGKAixI5NWa8mL2DaJuKemljx2b2q/MrMYSLqHybCgi4/9iNEDwlJhhaloLu
+ XLRW1V6jQAAyTIl61mKEiV5PdvcpsXTS9Tr38w7AILDs9VCYylqtEwUZanml5HYYbOwYIfvbh
+ K+8znLHonKzRnP/SWYy2XIcKF696YWVSHeJX/fI3RcLh3n8/0zEMI3pCKATXLcPcO7N+0m9RG
+ e6xIaWWr8U44zNA2xtYJXUZ1movPraZbTetE6/6CxMQnrp9cob4bJZDUnUM6VxqjjJ3fMRiNM
+ 4JDFFMoRrqtYWVoyuVhYpoaWwInLbYejZnO7rCBawjUa8U9zFG+GhDAlpNZgV0yqTZLSyspjh
+ RqxZZwtF8xFndAJBiY+ozpoOSqBJOT8q1l70dGkSG5VswnNJbkwpKoFl1HWZj7/FdC4HIkQCz
+ +4IgA8GUhWbIM8MHu27zaC027ZgZAwhdSQuqjRWP0WueSP3icMbzwQNUhNbP0PIlxjWt40lbi
+ hkl9tFy8HlEyY8ISG/u2LUG49hr4F0Vq7xaQkw0nByuJ94JnasUirUh27vdpQgFSaL0uKEtPj
+ HC5sDDgStUQgybYn4Gdi2XObeRhBTcpn72SESX4aT/AeW+kqfZbN9txfRPtLSHRH4hiEXyEeV
+ sAbGjqksO8XXuYRt73ojlsoJz0EALdKJ4lz1U1uxMpk6KtGOvXxqg+VeHWAESbuPMvG00aUKC
+ XvDr7u8MYt6n2nEMqjz07g4UYobnnHAvt76W9oiqdVnnR26nMNF+WPC4u2uwasqfL0XU2gMop
+ spIk4r362GcSVg9hJbFUhzgHxAvXlRO4ljZ+KU/Jpv3oZEpj7gdwgS2XTvR34kxc7WnQbK4
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 15:20:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -83,135 +83,239 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chen Gang <chengang@emindsoft.com.cn>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
+ Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Gang <chengang@emindsoft.com.cn>
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-Another DRM_IOCTL_I915 patches will be sent next.
+This patch implements strace argument printing functionality for following syscalls:
 
-Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
+    * truncate, ftruncate - truncate a file to a specified length
+
+        int truncate/truncate64(const char *path, off_t length)
+        int ftruncate/ftruncate64(int fd, off_t length)
+        man page: https://man7.org/linux/man-pages/man2/truncate.2.html
+
+    * getsid - get session ID
+
+        pid_t getsid(pid_t pid)
+        man page: https://man7.org/linux/man-pages/man2/getsid.2.html
+
+Implementation notes:
+
+    Syscalls truncate/truncate64 take string argument types and thus a
+    separate print function "print_truncate/print_truncate64" is stated in
+    file "strace.list". This function is defined and implemented in "strace.c"
+    by using an existing function used to print string arguments: "print_string()".
+    For syscall ftruncate64, a separate printing function was also stated in
+    "strace.c" as it requires a special kind of handling.
+    The other syscalls have only primitive argument types, so the rest of the
+    implementation was handled by stating an appropriate printing format in file
+    "strace.list".
+    Function "regpairs_aligned()" was cut & pasted from "syscall.c" to "qemu.h"
+    as it is used by functions "print_truncate64()" and "print_ftruncate64()"
+    to print the offset arguments of "truncate64()" and "ftruncate64()".
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200802133938.12055-1-chengang@emindsoft.com.cn>
+Message-Id: <20200811164553.27713-3-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h        |  3 +++
- linux-user/syscall.c       | 35 +++++++++++++++++++++++++++++++++++
- linux-user/syscall_defs.h  |  8 ++++++++
- linux-user/syscall_types.h |  4 ++++
- 4 files changed, 50 insertions(+)
+ linux-user/qemu.h      | 35 +++++++++++++++++++++++++++++++
+ linux-user/strace.c    | 47 ++++++++++++++++++++++++++++++++++++++++++
+ linux-user/strace.list | 10 ++++-----
+ linux-user/syscall.c   | 32 ----------------------------
+ 4 files changed, 87 insertions(+), 37 deletions(-)
 
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 0713ae131162..e2fc09b5a5ee 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -581,6 +581,9 @@
- #ifdef HAVE_DRM_H
-   IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
-                 MK_PTR(MK_STRUCT(STRUCT_drm_version)))
+diff --git a/linux-user/qemu.h b/linux-user/qemu.h
+index 63ddfe86fd8b..f431805e573f 100644
+--- a/linux-user/qemu.h
++++ b/linux-user/qemu.h
+@@ -706,6 +706,41 @@ static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
+ }
+ #endif /* TARGET_ABI_BITS != 32 */
+ 
 +
-+  IOCTL_SPECIAL(DRM_IOCTL_I915_GETPARAM, IOC_RW, do_ioctl_drm_i915,
-+                MK_PTR(MK_STRUCT(STRUCT_drm_i915_getparam)))
++/* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
++#ifdef TARGET_ARM
++static inline int regpairs_aligned(void *cpu_env, int num)
++{
++    return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
++}
++#elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
++static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
++#elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
++/*
++ * SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
++ * of registers which translates to the same as ARM/MIPS, because we start with
++ * r3 as arg1
++ */
++static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
++#elif defined(TARGET_SH4)
++/* SH4 doesn't align register pairs, except for p{read,write}64 */
++static inline int regpairs_aligned(void *cpu_env, int num)
++{
++    switch (num) {
++    case TARGET_NR_pread64:
++    case TARGET_NR_pwrite64:
++        return 1;
++
++    default:
++        return 0;
++    }
++}
++#elif defined(TARGET_XTENSA)
++static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
++#else
++static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
++#endif
++
+ /**
+  * preexit_cleanup: housekeeping before the guest exits
+  *
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 2dcc15496a6a..31c7be24ebfd 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -1962,6 +1962,53 @@ print_lseek(void *cpu_env, const struct syscallname *name,
+ }
  #endif
  
- #ifdef TARGET_TIOCSTART
++#ifdef TARGET_NR_truncate
++static void
++print_truncate(void *cpu_env, const struct syscallname *name,
++               abi_long arg0, abi_long arg1, abi_long arg2,
++               abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_string(arg0, 0);
++    print_raw_param(TARGET_ABI_FMT_ld, arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_truncate64
++static void
++print_truncate64(void *cpu_env, const struct syscallname *name,
++                 abi_long arg0, abi_long arg1, abi_long arg2,
++                 abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_string(arg0, 0);
++    if (regpairs_aligned(cpu_env, TARGET_NR_truncate64)) {
++        arg1 = arg2;
++        arg2 = arg3;
++    }
++    print_raw_param("%" PRIu64, target_offset64(arg1, arg2), 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_ftruncate64
++static void
++print_ftruncate64(void *cpu_env, const struct syscallname *name,
++                  abi_long arg0, abi_long arg1, abi_long arg2,
++                  abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_raw_param("%d", arg0, 0);
++    if (regpairs_aligned(cpu_env, TARGET_NR_ftruncate64)) {
++        arg1 = arg2;
++        arg2 = arg3;
++    }
++    print_raw_param("%" PRIu64, target_offset64(arg1, arg2), 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #if defined(TARGET_NR_socket)
+ static void
+ print_socket(void *cpu_env, const struct syscallname *name,
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index a04706a524ae..8e5303d03500 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -258,10 +258,10 @@
+ { TARGET_NR_ftime, "ftime" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_ftruncate
+-{ TARGET_NR_ftruncate, "ftruncate" , NULL, NULL, NULL },
++{ TARGET_NR_ftruncate, "ftruncate" , "%s(%d," TARGET_ABI_FMT_ld ")", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_ftruncate64
+-{ TARGET_NR_ftruncate64, "ftruncate64" , NULL, NULL, NULL },
++{ TARGET_NR_ftruncate64, "ftruncate64" , NULL, print_ftruncate64, NULL },
+ #endif
+ #ifdef TARGET_NR_futex
+ { TARGET_NR_futex, "futex" , NULL, print_futex, NULL },
+@@ -372,7 +372,7 @@
+ { TARGET_NR_getrusage, "getrusage" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getsid
+-{ TARGET_NR_getsid, "getsid" , NULL, NULL, NULL },
++{ TARGET_NR_getsid, "getsid" , "%s(%d)", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getsockname
+ { TARGET_NR_getsockname, "getsockname" , NULL, NULL, NULL },
+@@ -1535,10 +1535,10 @@
+ { TARGET_NR_tkill, "tkill" , NULL, print_tkill, NULL },
+ #endif
+ #ifdef TARGET_NR_truncate
+-{ TARGET_NR_truncate, "truncate" , NULL, NULL, NULL },
++{ TARGET_NR_truncate, "truncate" , NULL, print_truncate, NULL },
+ #endif
+ #ifdef TARGET_NR_truncate64
+-{ TARGET_NR_truncate64, "truncate64" , NULL, NULL, NULL },
++{ TARGET_NR_truncate64, "truncate64" , NULL, print_truncate64, NULL },
+ #endif
+ #ifdef TARGET_NR_tuxcall
+ { TARGET_NR_tuxcall, "tuxcall" , NULL, NULL, NULL },
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index e387246d7196..efaa0a7b8365 100644
+index 42107f37e397..ec7192112e9d 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -114,6 +114,7 @@
- #include <sound/asound.h>
- #ifdef HAVE_DRM_H
- #include <libdrm/drm.h>
-+#include <libdrm/i915_drm.h>
- #endif
- #include "linux_loop.h"
- #include "uname.h"
-@@ -5426,6 +5427,40 @@ static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
-     return -TARGET_ENOSYS;
+@@ -495,38 +495,6 @@ static inline int next_free_host_timer(void)
  }
- 
-+static abi_long do_ioctl_drm_i915_getparam(const IOCTLEntry *ie,
-+                                           struct drm_i915_getparam *gparam,
-+                                           int fd, abi_long arg)
-+{
-+    abi_long ret;
-+    int value;
-+    struct target_drm_i915_getparam *target_gparam;
-+
-+    if (!lock_user_struct(VERIFY_READ, target_gparam, arg, 0)) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    __get_user(gparam->param, &target_gparam->param);
-+    gparam->value = &value;
-+    ret = get_errno(safe_ioctl(fd, ie->host_cmd, gparam));
-+    put_user_s32(value, target_gparam->value);
-+
-+    unlock_user_struct(target_gparam, arg, 0);
-+    return ret;
-+}
-+
-+static abi_long do_ioctl_drm_i915(const IOCTLEntry *ie, uint8_t *buf_temp,
-+                                  int fd, int cmd, abi_long arg)
-+{
-+    switch (ie->host_cmd) {
-+    case DRM_IOCTL_I915_GETPARAM:
-+        return do_ioctl_drm_i915_getparam(ie,
-+                                          (struct drm_i915_getparam *)buf_temp,
-+                                          fd, arg);
-+    default:
-+        return -TARGET_ENOSYS;
-+    }
-+}
-+
  #endif
  
- IOCTLEntry ioctl_entries[] = {
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 9aa3bd724f0c..a6abc7e70be8 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1177,6 +1177,9 @@ struct target_rtc_pll_info {
- /* drm ioctls */
- #define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
+-/* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
+-#ifdef TARGET_ARM
+-static inline int regpairs_aligned(void *cpu_env, int num)
+-{
+-    return ((((CPUARMState *)cpu_env)->eabi) == 1) ;
+-}
+-#elif defined(TARGET_MIPS) && (TARGET_ABI_BITS == 32)
+-static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
+-#elif defined(TARGET_PPC) && !defined(TARGET_PPC64)
+-/* SysV AVI for PPC32 expects 64bit parameters to be passed on odd/even pairs
+- * of registers which translates to the same as ARM/MIPS, because we start with
+- * r3 as arg1 */
+-static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
+-#elif defined(TARGET_SH4)
+-/* SH4 doesn't align register pairs, except for p{read,write}64 */
+-static inline int regpairs_aligned(void *cpu_env, int num)
+-{
+-    switch (num) {
+-    case TARGET_NR_pread64:
+-    case TARGET_NR_pwrite64:
+-        return 1;
+-
+-    default:
+-        return 0;
+-    }
+-}
+-#elif defined(TARGET_XTENSA)
+-static inline int regpairs_aligned(void *cpu_env, int num) { return 1; }
+-#else
+-static inline int regpairs_aligned(void *cpu_env, int num) { return 0; }
+-#endif
+-
+ #define ERRNO_TABLE_SIZE 1200
  
-+/* drm i915 ioctls */
-+#define TARGET_DRM_IOCTL_I915_GETPARAM              TARGET_IOWRU('d', 0x46)
-+
- /* from asm/termbits.h */
- 
- #define TARGET_NCC 8
-@@ -2620,6 +2623,11 @@ struct target_drm_version {
-     abi_ulong desc;
- };
- 
-+struct target_drm_i915_getparam {
-+    int param;
-+    abi_ulong value;
-+};
-+
- #include "socket.h"
- 
- #include "errno_defs.h"
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 3f1f0334649b..12bf3484e2bd 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -325,6 +325,10 @@ STRUCT(drm_version,
-        TYPE_ULONG, /* desc_len */
-        TYPE_PTRVOID) /* desc */
- 
-+STRUCT(drm_i915_getparam,
-+       TYPE_INT, /* param */
-+       TYPE_PTRVOID) /* value */
-+
- STRUCT(file_clone_range,
-        TYPE_LONGLONG, /* src_fd */
-        TYPE_ULONGLONG, /* src_offset */
+ /* target_to_host_errno_table[] is initialized from
 -- 
 2.26.2
 
