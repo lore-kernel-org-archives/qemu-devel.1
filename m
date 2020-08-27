@@ -7,41 +7,40 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E371C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:27:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C609EC433E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:27:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D4FE02075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:27:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4FE02075B
+	by mail.kernel.org (Postfix) with ESMTPS id 9E02E2075B
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:27:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E02E2075B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBEBb-0002xz-W8
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:27:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56986)
+	id 1kBEBd-000345-Ha
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:27:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kBE7M-0002fF-30; Thu, 27 Aug 2020 05:22:48 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:56304 helo=huawei.com)
+ id 1kBE7O-0002m0-Qm; Thu, 27 Aug 2020 05:22:50 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4658 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kBE7I-0003FX-Td; Thu, 27 Aug 2020 05:22:47 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id A7D9F68216606540F837;
- Thu, 27 Aug 2020 17:22:40 +0800 (CST)
+ id 1kBE7L-0003G6-C9; Thu, 27 Aug 2020 05:22:50 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id B6E1D77AE83A698E6BD4;
+ Thu, 27 Aug 2020 17:22:42 +0800 (CST)
 Received: from huawei.com (10.174.187.31) by DGGEMS402-HUB.china.huawei.com
  (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 17:22:31 +0800
+ 17:22:33 +0800
 From: Yifei Jiang <jiangyifei@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH RFC v3 07/14] hw/riscv: PLIC update external interrupt by KVM
- when kvm enabled
-Date: Thu, 27 Aug 2020 17:21:30 +0800
-Message-ID: <20200827092137.479-8-jiangyifei@huawei.com>
+Subject: [PATCH RFC v3 10/14] target/riscv: Add sifive_plic vmstate
+Date: Thu, 27 Aug 2020 17:21:33 +0800
+Message-ID: <20200827092137.479-11-jiangyifei@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20200827092137.479-1-jiangyifei@huawei.com>
 References: <20200827092137.479-1-jiangyifei@huawei.com>
@@ -50,9 +49,9 @@ Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.187.31]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=jiangyifei@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 05:22:41
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=jiangyifei@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:12:47
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -82,103 +81,89 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Only support supervisor external interrupt currently.
+Add sifive_plic vmstate for supporting sifive_plic migration.
+Current vmstate framework only supports one structure parameter
+as num field to describe variable length arrays, so introduce
+num_enables.
 
 Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 ---
- hw/riscv/sifive_plic.c   | 31 ++++++++++++++++++++++---------
- target/riscv/kvm.c       | 19 +++++++++++++++++++
- target/riscv/kvm_riscv.h |  1 +
- 3 files changed, 42 insertions(+), 9 deletions(-)
+ hw/riscv/sifive_plic.c         | 24 +++++++++++++++++++++++-
+ include/hw/riscv/sifive_plic.h |  1 +
+ 2 files changed, 24 insertions(+), 1 deletion(-)
 
 diff --git a/hw/riscv/sifive_plic.c b/hw/riscv/sifive_plic.c
-index c20c192034..9c5a131e0f 100644
+index 9c5a131e0f..897dc289a0 100644
 --- a/hw/riscv/sifive_plic.c
 +++ b/hw/riscv/sifive_plic.c
-@@ -30,6 +30,8 @@
- #include "target/riscv/cpu.h"
- #include "sysemu/sysemu.h"
+@@ -32,6 +32,7 @@
  #include "hw/riscv/sifive_plic.h"
-+#include "sysemu/kvm.h"
-+#include "kvm_riscv.h"
+ #include "sysemu/kvm.h"
+ #include "kvm_riscv.h"
++#include "migration/vmstate.h"
  
  #define RISCV_DEBUG_PLIC 0
  
-@@ -146,15 +148,26 @@ static void sifive_plic_update(SiFivePLICState *plic)
-             continue;
-         }
-         int level = sifive_plic_irqs_pending(plic, addrid);
--        switch (mode) {
--        case PLICMode_M:
--            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_MEIP, BOOL_TO_MASK(level));
--            break;
--        case PLICMode_S:
--            riscv_cpu_update_mip(RISCV_CPU(cpu), MIP_SEIP, BOOL_TO_MASK(level));
--            break;
--        default:
--            break;
-+        if (kvm_enabled()) {
-+            if (mode == PLICMode_M) {
-+                continue;
-+            }
-+#ifdef CONFIG_KVM
-+            kvm_riscv_set_irq(RISCV_CPU(cpu), IRQ_S_EXT, level);
-+#endif
-+        } else {
-+            switch (mode) {
-+            case PLICMode_M:
-+                riscv_cpu_update_mip(RISCV_CPU(cpu),
-+                                     MIP_MEIP, BOOL_TO_MASK(level));
-+                break;
-+            case PLICMode_S:
-+                riscv_cpu_update_mip(RISCV_CPU(cpu),
-+                                     MIP_SEIP, BOOL_TO_MASK(level));
-+                break;
-+            default:
-+                break;
-+            }
-         }
-     }
+@@ -460,11 +461,12 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+                           TYPE_SIFIVE_PLIC, plic->aperture_size);
+     parse_hart_config(plic);
+     plic->bitfield_words = (plic->num_sources + 31) >> 5;
++    plic->num_enables = plic->bitfield_words * plic->num_addrs;
+     plic->source_priority = g_new0(uint32_t, plic->num_sources);
+     plic->target_priority = g_new(uint32_t, plic->num_addrs);
+     plic->pending = g_new0(uint32_t, plic->bitfield_words);
+     plic->claimed = g_new0(uint32_t, plic->bitfield_words);
+-    plic->enable = g_new0(uint32_t, plic->bitfield_words * plic->num_addrs);
++    plic->enable = g_new0(uint32_t, plic->num_enables);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
+     qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
  
-diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-index 69217add16..d510d23da1 100644
---- a/target/riscv/kvm.c
-+++ b/target/riscv/kvm.c
-@@ -452,3 +452,22 @@ void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
-     env->gpr[11] = cpu->env.fdt_addr;          /* a1 */
+@@ -484,12 +486,32 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+     msi_nonbroken = true;
  }
  
-+void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level)
-+{
-+    int ret;
-+    unsigned virq = level ? KVM_INTERRUPT_SET : KVM_INTERRUPT_UNSET;
++static const VMStateDescription vmstate_sifive_plic = {
++    .name = "riscv_sifive_plic",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++            VMSTATE_VARRAY_UINT32(source_priority, SiFivePLICState, num_sources, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(target_priority, SiFivePLICState, num_addrs, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(pending, SiFivePLICState, bitfield_words, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(claimed, SiFivePLICState, bitfield_words, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(enable, SiFivePLICState, num_enables, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_END_OF_LIST()
++        }
++};
 +
-+    if (irq != IRQ_S_EXT) {
-+        return;
-+    }
-+
-+    if (!kvm_enabled()) {
-+        return;
-+    }
-+
-+    ret = kvm_vcpu_ioctl(CPU(cpu), KVM_INTERRUPT, &virq);
-+    if (ret < 0) {
-+        perror("Set irq failed");
-+        abort();
-+    }
-+}
-diff --git a/target/riscv/kvm_riscv.h b/target/riscv/kvm_riscv.h
-index f38c82bf59..ed281bdce0 100644
---- a/target/riscv/kvm_riscv.h
-+++ b/target/riscv/kvm_riscv.h
-@@ -20,5 +20,6 @@
- #define QEMU_KVM_RISCV_H
+ static void sifive_plic_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
- void kvm_riscv_reset_vcpu(RISCVCPU *cpu);
-+void kvm_riscv_set_irq(RISCVCPU *cpu, int irq, int level);
+     device_class_set_props(dc, sifive_plic_properties);
+     dc->realize = sifive_plic_realize;
++    dc->vmsd = &vmstate_sifive_plic;
+ }
  
- #endif
+ static const TypeInfo sifive_plic_info = {
+diff --git a/include/hw/riscv/sifive_plic.h b/include/hw/riscv/sifive_plic.h
+index 4421e81249..130df0cf1c 100644
+--- a/include/hw/riscv/sifive_plic.h
++++ b/include/hw/riscv/sifive_plic.h
+@@ -49,6 +49,7 @@ typedef struct SiFivePLICState {
+     MemoryRegion mmio;
+     uint32_t num_addrs;
+     uint32_t bitfield_words;
++    uint32_t num_enables;
+     PLICAddr *addr_config;
+     uint32_t *source_priority;
+     uint32_t *target_priority;
 -- 
 2.19.1
 
