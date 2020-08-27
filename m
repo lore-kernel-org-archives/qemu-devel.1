@@ -4,43 +4,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FE4C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:30:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F04FC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:31:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D7EE20738
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:30:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D7EE20738
+	by mail.kernel.org (Postfix) with ESMTPS id 31E1920738
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:31:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31E1920738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58412 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBEEl-0000El-Ov
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:30:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57066)
+	id 1kBEG5-0001Vj-GH
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:31:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kBE7P-0002nW-79; Thu, 27 Aug 2020 05:22:51 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:34552 helo=huawei.com)
+ id 1kBE7Q-0002rn-Nk; Thu, 27 Aug 2020 05:22:52 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4661 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kBE7L-0003GB-LB; Thu, 27 Aug 2020 05:22:50 -0400
+ id 1kBE7L-0003G3-Jw; Thu, 27 Aug 2020 05:22:52 -0400
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 0A16A5BD47C6198FEF0F;
- Thu, 27 Aug 2020 17:22:43 +0800 (CST)
+ by Forcepoint Email with ESMTP id A9564DBC4605A4C958E9;
+ Thu, 27 Aug 2020 17:22:42 +0800 (CST)
 Received: from huawei.com (10.174.187.31) by DGGEMS402-HUB.china.huawei.com
  (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
  17:22:32 +0800
 From: Yifei Jiang <jiangyifei@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH RFC v3 08/14] target/riscv: Handler KVM_EXIT_RISCV_SBI exit
-Date: Thu, 27 Aug 2020 17:21:31 +0800
-Message-ID: <20200827092137.479-9-jiangyifei@huawei.com>
+Subject: [PATCH RFC v3 09/14] target/riscv: Add host cpu type
+Date: Thu, 27 Aug 2020 17:21:32 +0800
+Message-ID: <20200827092137.479-10-jiangyifei@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20200827092137.479-1-jiangyifei@huawei.com>
 References: <20200827092137.479-1-jiangyifei@huawei.com>
@@ -49,9 +49,9 @@ Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.187.31]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=jiangyifei@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:28:14
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=jiangyifei@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:12:47
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -81,157 +81,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Use char-fe handler console sbi call, which implement early
-console io while apply 'earlycon=sbi' into kernel parameters.
+Currently, host cpu is inherited simply.
 
 Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 ---
- target/riscv/kvm.c                 | 42 ++++++++++++++++-
- target/riscv/sbi_ecall_interface.h | 72 ++++++++++++++++++++++++++++++
- 2 files changed, 113 insertions(+), 1 deletion(-)
- create mode 100644 target/riscv/sbi_ecall_interface.h
+ target/riscv/cpu.c | 6 ++++++
+ target/riscv/cpu.h | 1 +
+ 2 files changed, 7 insertions(+)
 
-diff --git a/target/riscv/kvm.c b/target/riscv/kvm.c
-index d510d23da1..b49df6dd9c 100644
---- a/target/riscv/kvm.c
-+++ b/target/riscv/kvm.c
-@@ -38,6 +38,8 @@
- #include "qemu/log.h"
- #include "hw/loader.h"
- #include "kvm_riscv.h"
-+#include "sbi_ecall_interface.h"
-+#include "chardev/char-fe.h"
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 266e70cc47..d8c32a8f84 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -179,6 +179,10 @@ static void rv32_imafcu_nommu_cpu_init(Object *obj)
  
- static __u64 kvm_riscv_reg_id(__u64 type, __u64 idx)
- {
-@@ -435,9 +437,47 @@ bool kvm_arch_stop_on_emulation_error(CPUState *cs)
-     return true;
- }
+ #endif
  
-+static int kvm_riscv_handle_sbi(struct kvm_run *run)
++static void riscv_host_cpu_init(Object *obj)
 +{
-+    int ret = 0;
-+    unsigned char ch;
-+    switch (run->riscv_sbi.extension_id) {
-+    case SBI_EXT_0_1_CONSOLE_PUTCHAR:
-+        ch = run->riscv_sbi.args[0];
-+        qemu_chr_fe_write(serial_hd(0)->be, &ch, sizeof(ch));
-+        break;
-+    case SBI_EXT_0_1_CONSOLE_GETCHAR:
-+        ret = qemu_chr_fe_read_all(serial_hd(0)->be, &ch, sizeof(ch));
-+        if (ret == sizeof(ch)) {
-+            run->riscv_sbi.args[0] = ch;
-+        } else {
-+            run->riscv_sbi.args[0] = -1;
-+        }
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP,
-+                      "%s: un-handled SBI EXIT, specific reasons is %lu\n",
-+                      __func__, run->riscv_sbi.extension_id);
-+        ret = -1;
-+        break;
-+    }
-+    return ret;
 +}
 +
- int kvm_arch_handle_exit(CPUState *cs, struct kvm_run *run)
+ static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
  {
--    return 0;
-+    int ret = 0;
-+    switch (run->exit_reason) {
-+    case KVM_EXIT_RISCV_SBI:
-+        ret = kvm_riscv_handle_sbi(run);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: un-handled exit reason %d\n",
-+                      __func__, run->exit_reason);
-+        ret = -1;
-+        break;
-+    }
-+    return ret;
- }
+     ObjectClass *oc;
+@@ -635,10 +639,12 @@ static const TypeInfo riscv_cpu_type_infos[] = {
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rvxx_sifive_e_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32_imafcu_nommu_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rvxx_sifive_u_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_HOST,             riscv_host_cpu_init),
+ #elif defined(TARGET_RISCV64)
+     DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rvxx_sifive_e_cpu_init),
+     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rvxx_sifive_u_cpu_init),
++    DEFINE_CPU(TYPE_RISCV_CPU_HOST,             riscv_host_cpu_init),
+ #endif
+ };
  
- void kvm_riscv_reset_vcpu(RISCVCPU *cpu)
-diff --git a/target/riscv/sbi_ecall_interface.h b/target/riscv/sbi_ecall_interface.h
-new file mode 100644
-index 0000000000..fb1a3fa8f2
---- /dev/null
-+++ b/target/riscv/sbi_ecall_interface.h
-@@ -0,0 +1,72 @@
-+/*
-+ * SPDX-License-Identifier: BSD-2-Clause
-+ *
-+ * Copyright (c) 2019 Western Digital Corporation or its affiliates.
-+ *
-+ * Authors:
-+ *   Anup Patel <anup.patel@wdc.com>
-+ */
-+
-+#ifndef __SBI_ECALL_INTERFACE_H__
-+#define __SBI_ECALL_INTERFACE_H__
-+
-+/* clang-format off */
-+
-+/* SBI Extension IDs */
-+#define SBI_EXT_0_1_SET_TIMER           0x0
-+#define SBI_EXT_0_1_CONSOLE_PUTCHAR     0x1
-+#define SBI_EXT_0_1_CONSOLE_GETCHAR     0x2
-+#define SBI_EXT_0_1_CLEAR_IPI           0x3
-+#define SBI_EXT_0_1_SEND_IPI            0x4
-+#define SBI_EXT_0_1_REMOTE_FENCE_I      0x5
-+#define SBI_EXT_0_1_REMOTE_SFENCE_VMA   0x6
-+#define SBI_EXT_0_1_REMOTE_SFENCE_VMA_ASID 0x7
-+#define SBI_EXT_0_1_SHUTDOWN            0x8
-+#define SBI_EXT_BASE                    0x10
-+#define SBI_EXT_TIME                    0x54494D45
-+#define SBI_EXT_IPI                     0x735049
-+#define SBI_EXT_RFENCE                  0x52464E43
-+#define SBI_EXT_HSM                     0x48534D
-+
-+/* SBI function IDs for BASE extension*/
-+#define SBI_EXT_BASE_GET_SPEC_VERSION   0x0
-+#define SBI_EXT_BASE_GET_IMP_ID         0x1
-+#define SBI_EXT_BASE_GET_IMP_VERSION    0x2
-+#define SBI_EXT_BASE_PROBE_EXT          0x3
-+#define SBI_EXT_BASE_GET_MVENDORID      0x4
-+#define SBI_EXT_BASE_GET_MARCHID        0x5
-+#define SBI_EXT_BASE_GET_MIMPID         0x6
-+
-+/* SBI function IDs for TIME extension*/
-+#define SBI_EXT_TIME_SET_TIMER          0x0
-+
-+/* SBI function IDs for IPI extension*/
-+#define SBI_EXT_IPI_SEND_IPI            0x0
-+
-+/* SBI function IDs for RFENCE extension*/
-+#define SBI_EXT_RFENCE_REMOTE_FENCE_I       0x0
-+#define SBI_EXT_RFENCE_REMOTE_SFENCE_VMA    0x1
-+#define SBI_EXT_RFENCE_REMOTE_SFENCE_VMA_ASID  0x2
-+#define SBI_EXT_RFENCE_REMOTE_HFENCE_GVMA   0x3
-+#define SBI_EXT_RFENCE_REMOTE_HFENCE_GVMA_VMID 0x4
-+#define SBI_EXT_RFENCE_REMOTE_HFENCE_VVMA   0x5
-+#define SBI_EXT_RFENCE_REMOTE_HFENCE_VVMA_ASID 0x6
-+
-+/* SBI function IDs for HSM extension */
-+#define SBI_EXT_HSM_HART_START          0x0
-+#define SBI_EXT_HSM_HART_STOP           0x1
-+#define SBI_EXT_HSM_HART_GET_STATUS     0x2
-+
-+#define SBI_HSM_HART_STATUS_STARTED     0x0
-+#define SBI_HSM_HART_STATUS_STOPPED     0x1
-+#define SBI_HSM_HART_STATUS_START_PENDING   0x2
-+#define SBI_HSM_HART_STATUS_STOP_PENDING    0x3
-+
-+#define SBI_SPEC_VERSION_MAJOR_OFFSET   24
-+#define SBI_SPEC_VERSION_MAJOR_MASK     0x7f
-+#define SBI_SPEC_VERSION_MINOR_MASK     0xffffff
-+#define SBI_EXT_VENDOR_START            0x09000000
-+#define SBI_EXT_VENDOR_END              0x09FFFFFF
-+/* clang-format on */
-+
-+#endif
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index d4cafe37e1..7795e7ae13 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -42,6 +42,7 @@
+ #define TYPE_RISCV_CPU_SIFIVE_E51       RISCV_CPU_TYPE_NAME("sifive-e51")
+ #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
+ #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
++#define TYPE_RISCV_CPU_HOST             RISCV_CPU_TYPE_NAME("host")
+ 
+ #define RV32 ((target_ulong)1 << (TARGET_LONG_BITS - 2))
+ #define RV64 ((target_ulong)2 << (TARGET_LONG_BITS - 2))
 -- 
 2.19.1
 
