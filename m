@@ -2,103 +2,72 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD71BC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7131AC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:05:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A75FB22B4E
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 06:57:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ikLRy5Hf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A75FB22B4E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 439FB20786
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:05:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439FB20786
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBBr0-0002Cs-Ub
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 02:57:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53620)
+	id 1kBByZ-0003pv-FH
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:05:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
- id 1kBBqE-0001eO-H3
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:56:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39479
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
- id 1kBBq9-0002G9-Jo
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 02:56:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598511412;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=rPJ5+y1fY3rbEC4eXpcba4ftNw0KTE3K0N9tI7jMnxk=;
- b=ikLRy5HflvgaMDAaTDYXq8ialOkfXt5oppNRwyzZcIqyoE8DbOHaeXS3gPNDSe7tA182cn
- 5F1+0Dzg0tFyxplmQXd7qHwZA/NQTuIpj4gsaWlJ4xmOmplOv21+/k32YT1PrkyRvKGdS4
- 768uUnshTrbuZhih4B3UmbgMReKLeJE=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-ASVLqu2IPByhbBnoEuqzbg-1; Thu, 27 Aug 2020 02:56:50 -0400
-X-MC-Unique: ASVLqu2IPByhbBnoEuqzbg-1
-Received: by mail-qk1-f199.google.com with SMTP id 1so3904558qki.22
- for <qemu-devel@nongnu.org>; Wed, 26 Aug 2020 23:56:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=rPJ5+y1fY3rbEC4eXpcba4ftNw0KTE3K0N9tI7jMnxk=;
- b=ZPbOrcV5JJfh4moHA7OqlMUUMp3NwRTYWyAMKgrPdWY06OEoanPmQ+sncr4Eata2r7
- TJrrFRVzrhki8SUtaldXGVENTo42XkXzBaKfk8o9QSB7HUyCtQUOUC7/kBvoAdGNf/v2
- Ha828vU5kyreRZ3NEk5+3dVbyxDhTOYleurcxGEq65UANB94jb6mD3F90iwTM90ouBoZ
- GwrDmKi49LcJ12UPl53dGq0cHn+N4UBzvJnoE6eezjoRiHH1XI2aj+S62ts3BgVBrvwH
- EkhQz1LeJx79npZrmifuln1qoxXxdf5lJq70b2OzhcOhPxUEZjKQxJRU1PBd1666qSLt
- r5Jw==
-X-Gm-Message-State: AOAM531sEHecYkVdsdOTcL/ScRdL6Ael818GSKjrwy3Z5Qe7qt3enJ0y
- HsBShBJu/FgjxPANwdlcsSWLDBORRP6+itAf/hP31FcI18cZ1iWCqlI6SHlNTtNXSBCUIdUvfxk
- MF4QqY09lm6nbatvklp7IVfv3d80CTcc=
-X-Received: by 2002:ad4:4dc5:: with SMTP id cw5mr17529773qvb.238.1598511410287; 
- Wed, 26 Aug 2020 23:56:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxhfGICCROP5tIO8I+7hBk1ClW7mqG/ldbOpvgXCIGMXnYdOO94Kjxmjgg+k5at1c/g/nxTGvyY0FIXwRZDMEI=
-X-Received: by 2002:ad4:4dc5:: with SMTP id cw5mr17529758qvb.238.1598511410063; 
- Wed, 26 Aug 2020 23:56:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBBxx-0003JS-6e
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:04:57 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:34337)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBBxv-00032a-Gl
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:04:56 -0400
+Received: from localhost.localdomain ([82.252.135.186]) by
+ mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1M7KG2-1kGfbr3nQa-007mk5; Thu, 27 Aug 2020 09:04:52 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] linux-user: fix target_to_host_timespec64()
+Date: Thu, 27 Aug 2020 09:04:49 +0200
+Message-Id: <20200827070449.2386007-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200625191651.5817-1-eperezma@redhat.com>
- <20200826143651.7915-1-eperezma@redhat.com>
- <20200826143651.7915-13-eperezma@redhat.com>
- <CAE2XoE9kFuavzHzTWvCony77iHk1_+kjrYj-budDVTdgKfTeaQ@mail.gmail.com>
-In-Reply-To: <CAE2XoE9kFuavzHzTWvCony77iHk1_+kjrYj-budDVTdgKfTeaQ@mail.gmail.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Thu, 27 Aug 2020 08:56:14 +0200
-Message-ID: <CAJaqyWf-v8rx1V5WenepqYVWbN+z7CxWyr=vYe+H=T6DgQJDUQ@mail.gmail.com>
-Subject: Re: [RFC v6 12/13] intel_iommu: Do not notify regular iotlb to
- device-iotlb notifiers
-To: luoyonggang@gmail.com
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eperezma@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:56:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:G7OPZrBRQRQHcu2wyT9YPc1XscLC/AwcuwWuQiwmf1BNv3Ng/DO
+ 1ONMMaXsDCiuXW+RCX4DgQ8b4iPQZPkI0vY1Z7H53JYYdA6CsNACn4f8DRse+0cigo+FsRB
+ YHBpYLYsnz6PFjEwX1liTUWftNxK59GrmNX9tHBwsI1BBTGk6UVYzuDnx0Ucuxy3wnYFksh
+ N2deTP2yuPIm/qdoNfB/g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:wZURAucVs3U=:jqWGFYK/MTnm4STATtTiQN
+ Zhkk9JXVj6Ia+tAMTBuSrenIsQXqvJNHPoGX29u7qOEUcNHI3/yu6pJmvd9BgsaXOoDo77G+X
+ g4gqagRl/6L3js24jxJO/hyVGWeVDsbNx7xdQB2xR2l5dQDEScwJKlA8FKFhyO2J5bs9gQoBi
+ N1TSe8wjqS3q98lcNQJK2JKyV7a6RJQcj1lYITym03c9eUP9oZ5KkwMqmlcP9tmFKDffOwrU2
+ a04H4sUZNnpkWDWUosnArLWRyYpe8R5c2eo1bKl+MT3A/QteJVgSPpV/orNcp7vvyc/ZWa1YJ
+ t9CmiCkhk0RhzCerk9N7H2gJ/n76SYQSdPQgnOfDtI07zRB6QXJYMd0F3bv/01Hn2oA+4NA0C
+ Onyo3dtjPV4h9GppiBTvBolxwPcXXaqzTage9gFz/8VikQ2kbs6F64TFJ0LA2xf6jrSn2JuuM
+ oa6r8IbcErqIMjbU6rFor4xXnjC/m4WYne3gwvnT8SZwXnQ3edEmSCcqnS23dG3v76aXgBBqo
+ SkUdworVw6c5Ho2e2BmCOcGeWD6wEqZPwaCx4ISmKFrdptAI2wmaRgc6Ic1Nn/IrGvBgLLi7e
+ /W3pKGBRB5R11SL3qVl5KUZxNMAu2tUIsIx48c5QKJDeb5dqbHMicTUhPj0J7/1GPC7/chMBH
+ fDTISXTH8miiSTgc/7rdent6UNZO+VzYyFbyqpPAJoixMJVz9w1IuK4z5SaS0LYPW6+qGOw5T
+ o61S920Bhnt9TrSeinS8c39iJbAn+1LBcgElcAnOoEegtMSD9YK+EKFk94U15MPW15pRxaIZu
+ cZ9Y7w7UlSvACQhqI66bRiGn0eqiwWI2pdCKQwNOxANsBMgdPThQCHqSxV4wS0qVOl8nTX0
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 03:04:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,78 +80,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm@nongnu.org, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Aug 26, 2020 at 6:52 PM =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <=
-luoyonggang@gmail.com> wrote:
->
->
->
-> On Wed, Aug 26, 2020 at 10:42 PM Eugenio P=C3=A9rez <eperezma@redhat.com>=
- wrote:
->>
->> This improves performance in case of netperf with vhost-net:
->> * TCP_STREAM: From 9049.59Mbit/s to 9049.59Mbit/s (13%)
->
-> What's improvement ? they are the same
->
+in 32 bit mode, drop the padding in tv_nsec. If host is 64bit and target
+is 32bit, the padding bytes will be copied from the target and as the
+kernel checks the value, the syscall exits with EINVAL.
 
-Ouch, it was from 1923.6 Mbit/s to 2175.13 Mbit/s. Thanks for notify
-it, will fix in next revision!
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
->>
->> * TCP_RR: From 8464.73 trans/s to 8932.703333 trans/s (5.5%)
->> * UDP_RR: From 8562.08 trans/s to 9005.62/s (5.1%)
->> * UDP_STREAM: No change observed (insignificant 0.1% improvement)
->>
->> Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
->> ---
->>  hw/i386/intel_iommu.c | 6 ++++++
->>  1 file changed, 6 insertions(+)
->>
->> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
->> index ddb828da1f..7620a1abbf 100644
->> --- a/hw/i386/intel_iommu.c
->> +++ b/hw/i386/intel_iommu.c
->> @@ -1960,6 +1960,12 @@ static void vtd_iotlb_domain_invalidate(IntelIOMM=
-UState *s, uint16_t domain_id)
->>      vtd_iommu_unlock(s);
->>
->>      QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
->> +        if (vtd_as->iommu.iommu_notify_flags & IOMMU_NOTIFIER_DEVIOTLB)=
- {
->> +            /* If IOMMU memory region is DEVICE IOTLB type, it does not=
- make
->> +             * sense to send regular IOMMU notifications. */
->> +            continue;
->> +        }
->> +
->>          if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
->>                                        vtd_as->devfn, &ce) &&
->>              domain_id =3D=3D vtd_get_domain_id(s, &ce)) {
->> --
->> 2.18.1
->>
->>
->
->
-> --
->          =E6=AD=A4=E8=87=B4
-> =E7=A4=BC
-> =E7=BD=97=E5=8B=87=E5=88=9A
-> Yours
->     sincerely,
-> Yonggang Luo
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index c82b73e03234..9d7376734ad4 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -1253,6 +1253,8 @@ static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
+     }
+     __get_user(host_ts->tv_sec, &target_ts->tv_sec);
+     __get_user(host_ts->tv_nsec, &target_ts->tv_nsec);
++    /* in 32bit mode, this drops the padding */
++    host_ts->tv_nsec = (long)(abi_long)host_ts->tv_nsec;
+     unlock_user_struct(target_ts, target_addr, 0);
+     return 0;
+ }
+-- 
+2.26.2
 
 
