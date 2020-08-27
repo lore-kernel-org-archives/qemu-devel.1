@@ -2,82 +2,83 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA88BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61A52C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:42:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 957E0207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:41:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 26890207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:42:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UFHEkq0F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 957E0207CD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZEyfOVQn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26890207CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBI9w-0002x3-RZ
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 09:41:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48342)
+	id 1kBIAf-0004RQ-E1
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 09:42:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI8d-0000bv-Qe
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23856)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI93-0001dJ-BT
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:49 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60057
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI8b-0006Ie-Rn
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:23 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI91-0006LA-6J
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598535620;
+ s=mimecast20190719; t=1598535646;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=2hxtoHQ3TAiSaMzzff4e9bxIZ7e3A0BQ7Rr2LIxo2Wg=;
- b=UFHEkq0FWxHbk40XpySkFyIdBxFG1Z25/lOGOCOZPidCOGIsSHCox/KiiNQzC/Q6FSeeoD
- LsSorwbU79JWy1UVT5hbK+vcXDH38ar9EtlTC8NKhAMWxEWsMWKYmB7FkAJGabp2e6jooo
- vOziadH0Vrgxgy5PQkVbUTBkzpRsJxM=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=/ClDOcff+wtkvg45OPGxJst3ciUDP9rU2GNJXIg6PAc=;
+ b=ZEyfOVQnlCQBeE3H3gqeWch0fdbGVvqbyhScjTqdxMHQMNijAfArcYWV95SZ7l7CXdlB33
+ dCT75Rb99OqIwoUNTcV9w9HzLQcBCiVGU6n5gfrKQUWTBhb27WWqbCJxDU18GEWT5SD1Ye
+ nbc34Yxx/XpmmAnGtlu8SQ+BoA1isQA=
 Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
  [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-go8haRsMMnewsqCm_xx_5A-1; Thu, 27 Aug 2020 09:40:19 -0400
-X-MC-Unique: go8haRsMMnewsqCm_xx_5A-1
-Received: by mail-wr1-f70.google.com with SMTP id i6so1545082wru.23
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 06:40:18 -0700 (PDT)
+ us-mta-61-P_rE05lTO-m9gLnUqIbupA-1; Thu, 27 Aug 2020 09:40:44 -0400
+X-MC-Unique: P_rE05lTO-m9gLnUqIbupA-1
+Received: by mail-wr1-f70.google.com with SMTP id d15so1555111wrp.10
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 06:40:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
- :content-disposition;
- bh=2hxtoHQ3TAiSaMzzff4e9bxIZ7e3A0BQ7Rr2LIxo2Wg=;
- b=ttOzZ1EOyfsKbOPkQRfQsCIDcKfpgzCBlNvvmll9xGWoZkBt7nCn0lzBpWps28ptF4
- /gvU6dJt1wXmY6et+tOInEJd8gkSq4eYcfgXAnWsj58bHPUMSAeMJ5iL3SbUs84LK/tH
- zFlwHjQey0icqUuKDmVUKFqehNDYEfMlkpAzQTM2qiEDc4q0DUFTMJrDVLFIJ2njG9pK
- hvcPNy5ltfJ8hPYMA5cePypO+6BiTGGyTQcU9LsuktHX6qricWxd0ztKQTXhdG5flEgP
- 5YKtFhVUviTfMjdYd3UAA6N8mCbOayENX1AimyrlMLp4U8ZZEr3qWTTJNMRiMgEXxzkA
- Q1GQ==
-X-Gm-Message-State: AOAM530NkITrEwTwN4EYGl5a68omBoJO96jPgdr4TSJwkapPmcBedODm
- uvfw8oCAR7RZv0O6dO2Dnw+XqkvwAGPY6uJ6U8w61otM94nHA0TFxUDCJqFBkjM2/tAnDngF/z1
- yX+3OThFeIQpXObY=
-X-Received: by 2002:a1c:98c7:: with SMTP id
- a190mr12580951wme.131.1598535613875; 
- Thu, 27 Aug 2020 06:40:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyyhGYe1V3G2/qfArTFBNf7f4Am3sTx/qUBm7XRb0A2DwH/Vb9WMvvHdrKwe4EkE17wQVvuiA==
-X-Received: by 2002:a1c:98c7:: with SMTP id
- a190mr12580928wme.131.1598535613618; 
- Thu, 27 Aug 2020 06:40:13 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=/ClDOcff+wtkvg45OPGxJst3ciUDP9rU2GNJXIg6PAc=;
+ b=mo/eX+VrD6Ue5x7iObwnFoUnVhgsrH9VCzWgQKOiH6UTruTrVsl6I9rvrAILkVaL0c
+ eC8qz9Nhwau8UJVO2ump42ZR4U0uyYCyc6+MW1oO2xlbZQikXQx0R54u6VZvFY7bcMT7
+ dnVCdixWDZc97DS9s/shwhPKMZVJC8SAXWrmHbbpNkpSE7JGfKL3ni1Z2JTYalCxwCzb
+ FNKxw0fwB09YVQmzD1P98/mvrNsUjpAq+qOQEi4oXbv5WsBIegRP+jDq9qQuYn+asxbN
+ PzbxWFdrP0XJaCJd26ko/ss5Zn664hW4IWDJUipkZT/dE4VzFnrYMb9so2eZTvKvyCab
+ tLzg==
+X-Gm-Message-State: AOAM530M2or8mI8orljQRqBQOqJ6FQwN7DYKs4UT82TN2YO8RQRLXh1x
+ IuvWmVBQ4WLPxii6mvwf86ViaLE7rU6DGhnF/NH09rWZCRKMrxPair7649/lxf6cfQp22pZS7Yi
+ G5/R/N3rG+CUFaj0=
+X-Received: by 2002:adf:fa8f:: with SMTP id h15mr17215136wrr.365.1598535642879; 
+ Thu, 27 Aug 2020 06:40:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJywa6yMwaH70voVF213MlHbmVeYQUkPS3Czv/pBqLCaYXMIb+rBh9foOdEbkEqRIApv+1c5Tg==
+X-Received: by 2002:adf:fa8f:: with SMTP id h15mr17215120wrr.365.1598535642649; 
+ Thu, 27 Aug 2020 06:40:42 -0700 (PDT)
 Received: from redhat.com ([192.117.173.58])
- by smtp.gmail.com with ESMTPSA id o128sm5470180wmo.39.2020.08.27.06.40.10
+ by smtp.gmail.com with ESMTPSA id l21sm4769314wmj.25.2020.08.27.06.40.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 06:40:12 -0700 (PDT)
-Date: Thu, 27 Aug 2020 09:40:08 -0400
+ Thu, 27 Aug 2020 06:40:42 -0700 (PDT)
+Date: Thu, 27 Aug 2020 09:40:37 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/13] virtio,pc,acpi: features, fixes
-Message-ID: <20200827133954.2118749-1-mst@redhat.com>
+Subject: [PULL 07/13] virtio-pci: add virtio_pci_optimal_num_queues() helper
+Message-ID: <20200827133954.2118749-8-mst@redhat.com>
+References: <20200827133954.2118749-1-mst@redhat.com>
 MIME-Version: 1.0
+In-Reply-To: <20200827133954.2118749-1-mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
@@ -86,16 +87,16 @@ X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:10:07
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,100 +110,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Cornelia Huck <cohuck@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 8e49197ca5e76fdb8928833b2649ef13fc5aab2f:
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-  Merge remote-tracking branch 'remotes/hdeller/tags/target-hppa-v3-pull-request' into staging (2020-08-26 22:23:53 +0100)
+Multi-queue devices achieve the best performance when each vCPU has a
+dedicated queue. This ensures that virtqueue used notifications are
+handled on the same vCPU that submitted virtqueue buffers.  When another
+vCPU handles the the notification an IPI will be necessary to wake the
+submission vCPU and this incurs a performance overhead.
 
-are available in the Git repository at:
+Provide a helper function that virtio-pci devices will use in later
+patches to automatically select the optimal number of queues.
 
-  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
+The function handles guests with large numbers of CPUs by limiting the
+number of queues to fit within the following constraints:
+1. The maximum number of MSI-X vectors.
+2. The maximum number of virtqueues.
 
-for you to fetch changes up to e1647539b1d04f121b70f1f6f438976477450f10:
-
-  tests/bios-tables-test: add smbios cpu speed test (2020-08-27 08:29:13 -0400)
-
-----------------------------------------------------------------
-virtio,pc,acpi: features, fixes
-
-better number of queues for vhost
-smbios speed options
-acpi fixes
-
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20200818143348.310613-4-stefanha@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/virtio-pci.h |  9 +++++++++
+ hw/virtio/virtio-pci.c | 32 ++++++++++++++++++++++++++++++++
+ 2 files changed, 41 insertions(+)
 
-----------------------------------------------------------------
-Ani Sinha (1):
-      Introduce a new flag for i440fx to disable PCI hotplug on the root bus
-
-Michael S. Tsirkin (5):
-      acpi: allow DSDT changes
-      i386/acpi: fix inconsistent QEMU/OVMF device paths
-      arm/acpi: fix an out of spec _UID for PCI root
-      disassemble-aml: -o actually works
-      acpi: update expected DSDT files with _UID changes
-
-Stefan Hajnoczi (5):
-      virtio-pci: add virtio_pci_optimal_num_queues() helper
-      virtio-scsi: introduce a constant for fixed virtqueues
-      virtio-scsi-pci: default num_queues to -smp N
-      virtio-blk-pci: default num_queues to -smp N
-      vhost-user-blk-pci: default num_queues to -smp N
-
-Ying Fang (2):
-      hw/smbios: add options for type 4 max-speed and current-speed
-      tests/bios-tables-test: add smbios cpu speed test
-
- hw/virtio/virtio-pci.h             |   9 ++++++++
- include/hw/acpi/pcihp.h            |   2 +-
- include/hw/virtio/vhost-user-blk.h |   2 ++
- include/hw/virtio/virtio-blk.h     |   2 ++
- include/hw/virtio/virtio-scsi.h    |   5 +++++
- hw/acpi/pcihp.c                    |  23 +++++++++++++++++++-
- hw/acpi/piix4.c                    |   5 ++++-
- hw/arm/virt-acpi-build.c           |   2 +-
- hw/block/vhost-user-blk.c          |   6 +++++-
- hw/block/virtio-blk.c              |   6 +++++-
- hw/core/machine.c                  |   8 ++++++-
- hw/i386/acpi-build.c               |   4 ++--
- hw/scsi/vhost-scsi.c               |   3 ++-
- hw/scsi/vhost-user-scsi.c          |   5 +++--
- hw/scsi/virtio-scsi.c              |  13 ++++++++----
- hw/smbios/smbios.c                 |  36 +++++++++++++++++++++++++++----
- hw/virtio/vhost-scsi-pci.c         |   9 ++++++--
- hw/virtio/vhost-user-blk-pci.c     |   4 ++++
- hw/virtio/vhost-user-scsi-pci.c    |   9 ++++++--
- hw/virtio/virtio-blk-pci.c         |   7 ++++++-
- hw/virtio/virtio-pci.c             |  32 ++++++++++++++++++++++++++++
- hw/virtio/virtio-scsi-pci.c        |   9 ++++++--
- tests/qtest/bios-tables-test.c     |  42 +++++++++++++++++++++++++++++++++++++
- qemu-options.hx                    |   2 +-
- tests/data/acpi/disassemle-aml.sh  |  11 +++++++---
- tests/data/acpi/pc/DSDT            | Bin 4934 -> 4934 bytes
- tests/data/acpi/pc/DSDT.acpihmat   | Bin 6258 -> 6258 bytes
- tests/data/acpi/pc/DSDT.bridge     | Bin 6793 -> 6793 bytes
- tests/data/acpi/pc/DSDT.cphp       | Bin 5397 -> 5397 bytes
- tests/data/acpi/pc/DSDT.dimmpxm    | Bin 6587 -> 6587 bytes
- tests/data/acpi/pc/DSDT.ipmikcs    | Bin 5006 -> 5006 bytes
- tests/data/acpi/pc/DSDT.memhp      | Bin 6293 -> 6293 bytes
- tests/data/acpi/pc/DSDT.numamem    | Bin 4940 -> 4940 bytes
- tests/data/acpi/q35/DSDT           | Bin 7678 -> 7678 bytes
- tests/data/acpi/q35/DSDT.acpihmat  | Bin 9002 -> 9002 bytes
- tests/data/acpi/q35/DSDT.bridge    | Bin 7695 -> 7695 bytes
- tests/data/acpi/q35/DSDT.cphp      | Bin 8141 -> 8141 bytes
- tests/data/acpi/q35/DSDT.dimmpxm   | Bin 9331 -> 9331 bytes
- tests/data/acpi/q35/DSDT.ipmibt    | Bin 7753 -> 7753 bytes
- tests/data/acpi/q35/DSDT.memhp     | Bin 9037 -> 9037 bytes
- tests/data/acpi/q35/DSDT.mmio64    | Bin 8808 -> 8808 bytes
- tests/data/acpi/q35/DSDT.numamem   | Bin 7684 -> 7684 bytes
- tests/data/acpi/q35/DSDT.tis       | Bin 8283 -> 8283 bytes
- tests/data/acpi/virt/DSDT          | Bin 5205 -> 5200 bytes
- tests/data/acpi/virt/DSDT.memhp    | Bin 6566 -> 6561 bytes
- tests/data/acpi/virt/DSDT.numamem  | Bin 5205 -> 5200 bytes
- 46 files changed, 225 insertions(+), 31 deletions(-)
+diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+index e2eaaa9182..91096f0291 100644
+--- a/hw/virtio/virtio-pci.h
++++ b/hw/virtio/virtio-pci.h
+@@ -243,4 +243,13 @@ typedef struct VirtioPCIDeviceTypeInfo {
+ /* Register virtio-pci type(s).  @t must be static. */
+ void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t);
+ 
++/**
++ * virtio_pci_optimal_num_queues:
++ * @fixed_queues: number of queues that are always present
++ *
++ * Returns: The optimal number of queues for a multi-queue device, excluding
++ * @fixed_queues.
++ */
++unsigned virtio_pci_optimal_num_queues(unsigned fixed_queues);
++
+ #endif
+diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+index ccdf54e81c..fc69570dcc 100644
+--- a/hw/virtio/virtio-pci.c
++++ b/hw/virtio/virtio-pci.c
+@@ -19,6 +19,7 @@
+ 
+ #include "exec/memop.h"
+ #include "standard-headers/linux/virtio_pci.h"
++#include "hw/boards.h"
+ #include "hw/virtio/virtio.h"
+ #include "migration/qemu-file-types.h"
+ #include "hw/pci/pci.h"
+@@ -2058,6 +2059,37 @@ void virtio_pci_types_register(const VirtioPCIDeviceTypeInfo *t)
+     g_free(base_name);
+ }
+ 
++unsigned virtio_pci_optimal_num_queues(unsigned fixed_queues)
++{
++    /*
++     * 1:1 vq to vCPU mapping is ideal because the same vCPU that submitted
++     * virtqueue buffers can handle their completion. When a different vCPU
++     * handles completion it may need to IPI the vCPU that submitted the
++     * request and this adds overhead.
++     *
++     * Virtqueues consume guest RAM and MSI-X vectors. This is wasteful in
++     * guests with very many vCPUs and a device that is only used by a few
++     * vCPUs. Unfortunately optimizing that case requires manual pinning inside
++     * the guest, so those users might as well manually set the number of
++     * queues. There is no upper limit that can be applied automatically and
++     * doing so arbitrarily would result in a sudden performance drop once the
++     * threshold number of vCPUs is exceeded.
++     */
++    unsigned num_queues = current_machine->smp.cpus;
++
++    /*
++     * The maximum number of MSI-X vectors is PCI_MSIX_FLAGS_QSIZE + 1, but the
++     * config change interrupt and the fixed virtqueues must be taken into
++     * account too.
++     */
++    num_queues = MIN(num_queues, PCI_MSIX_FLAGS_QSIZE - fixed_queues);
++
++    /*
++     * There is a limit to how many virtqueues a device can have.
++     */
++    return MIN(num_queues, VIRTIO_QUEUE_MAX - fixed_queues);
++}
++
+ /* virtio-pci-bus */
+ 
+ static void virtio_pci_bus_new(VirtioBusState *bus, size_t bus_size,
+-- 
+MST
 
 
