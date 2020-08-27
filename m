@@ -2,87 +2,87 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6158C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA88BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A59C6207CD
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:41:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 957E0207CD
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 13:41:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RrQ/m6/z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A59C6207CD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UFHEkq0F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 957E0207CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBI9r-0002iv-Ux
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 09:41:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48394)
+	id 1kBI9w-0002x3-RZ
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 09:41:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI8n-0000tV-5y
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31350)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI8d-0000bv-Qe
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23856)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI8l-0006JJ-5b
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:32 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kBI8b-0006Ie-Rn
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 09:40:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598535630;
+ s=mimecast20190719; t=1598535620;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=O+Jdn5rlTkIqQs4IBOaacsbGO+yrRT0GNqOf9hAByzs=;
- b=RrQ/m6/zE8GuypwEc+PAdt6ISnoHFrQg3POR6KMI4JMqvlZJVDHwPS3J6BUPp11B7Tuc6y
- iNu1qiBZuo255wTO2cHkt315OjHC1EYerkpXdY6jywNrN1oc+wUqq6LTQUBuGF+ESUXeO6
- iHnwMLjKQ3Rns6mboi7jxmPaJXhTZLk=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-U-ds8ZnrNc-TAe_YBezcgA-1; Thu, 27 Aug 2020 09:40:27 -0400
-X-MC-Unique: U-ds8ZnrNc-TAe_YBezcgA-1
-Received: by mail-wm1-f72.google.com with SMTP id c198so2144770wme.5
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 06:40:27 -0700 (PDT)
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+ bh=2hxtoHQ3TAiSaMzzff4e9bxIZ7e3A0BQ7Rr2LIxo2Wg=;
+ b=UFHEkq0FWxHbk40XpySkFyIdBxFG1Z25/lOGOCOZPidCOGIsSHCox/KiiNQzC/Q6FSeeoD
+ LsSorwbU79JWy1UVT5hbK+vcXDH38ar9EtlTC8NKhAMWxEWsMWKYmB7FkAJGabp2e6jooo
+ vOziadH0Vrgxgy5PQkVbUTBkzpRsJxM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-511-go8haRsMMnewsqCm_xx_5A-1; Thu, 27 Aug 2020 09:40:19 -0400
+X-MC-Unique: go8haRsMMnewsqCm_xx_5A-1
+Received: by mail-wr1-f70.google.com with SMTP id i6so1545082wru.23
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 06:40:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=O+Jdn5rlTkIqQs4IBOaacsbGO+yrRT0GNqOf9hAByzs=;
- b=Zn+a8IW1bOpb/G843Xo1yzUAg7jdRkqR6AWbxZiR1lh0td3DKK7cQ0pbQ1ADS88vPn
- MfYqUutkHR6RDQRx1UIeXrGXqcbhkTokpedQHUYYnHjeMqe7eBXqJkLTMZpkl/IPDCtG
- EX1tg82s41Yo3l9DhFlD9DlwcSflh5qsbh+Zs1S6fY8eX0WpAZqrlSA6j1FlY+cL+mwH
- 2bWCHFarGOx7cI1DC34fgHMMLvKQGqlFYYRbTXfG2+I2hqJhW/f8JqHivzZDTuugk6BK
- 3jBCkI7S8tAAoSwWtGRrRBQId5/s96+x6y1YC6Sf3a+P4vocOM50xasGt8JG8rNp3T+4
- Fz3Q==
-X-Gm-Message-State: AOAM530Y3xw/ZSGGjd9slzqNu4ovRsmVGZHBsd8kkB/m+cA9BFjMdXpO
- smDAxmGgeWvg4Bzn78ToAzUyqlwjATX9aXy01GuLgTClBjq5kTwOF105FsGnMdbTWQRCFdc/WQs
- s8jQC5rVXaVN+alQ=
-X-Received: by 2002:adf:f58e:: with SMTP id f14mr13441169wro.251.1598535626064; 
- Thu, 27 Aug 2020 06:40:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxeO1yNHlhNkeNFLrV26p2lSO6onfx+3qz1X8T4LR9OMNB4I7I3jKaQ9XLpa0+nxIqwc2HH0g==
-X-Received: by 2002:adf:f58e:: with SMTP id f14mr13441156wro.251.1598535625877; 
- Thu, 27 Aug 2020 06:40:25 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+ :content-disposition;
+ bh=2hxtoHQ3TAiSaMzzff4e9bxIZ7e3A0BQ7Rr2LIxo2Wg=;
+ b=ttOzZ1EOyfsKbOPkQRfQsCIDcKfpgzCBlNvvmll9xGWoZkBt7nCn0lzBpWps28ptF4
+ /gvU6dJt1wXmY6et+tOInEJd8gkSq4eYcfgXAnWsj58bHPUMSAeMJ5iL3SbUs84LK/tH
+ zFlwHjQey0icqUuKDmVUKFqehNDYEfMlkpAzQTM2qiEDc4q0DUFTMJrDVLFIJ2njG9pK
+ hvcPNy5ltfJ8hPYMA5cePypO+6BiTGGyTQcU9LsuktHX6qricWxd0ztKQTXhdG5flEgP
+ 5YKtFhVUviTfMjdYd3UAA6N8mCbOayENX1AimyrlMLp4U8ZZEr3qWTTJNMRiMgEXxzkA
+ Q1GQ==
+X-Gm-Message-State: AOAM530NkITrEwTwN4EYGl5a68omBoJO96jPgdr4TSJwkapPmcBedODm
+ uvfw8oCAR7RZv0O6dO2Dnw+XqkvwAGPY6uJ6U8w61otM94nHA0TFxUDCJqFBkjM2/tAnDngF/z1
+ yX+3OThFeIQpXObY=
+X-Received: by 2002:a1c:98c7:: with SMTP id
+ a190mr12580951wme.131.1598535613875; 
+ Thu, 27 Aug 2020 06:40:13 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyyhGYe1V3G2/qfArTFBNf7f4Am3sTx/qUBm7XRb0A2DwH/Vb9WMvvHdrKwe4EkE17wQVvuiA==
+X-Received: by 2002:a1c:98c7:: with SMTP id
+ a190mr12580928wme.131.1598535613618; 
+ Thu, 27 Aug 2020 06:40:13 -0700 (PDT)
 Received: from redhat.com ([192.117.173.58])
- by smtp.gmail.com with ESMTPSA id c10sm5045320wmk.30.2020.08.27.06.40.23
+ by smtp.gmail.com with ESMTPSA id o128sm5470180wmo.39.2020.08.27.06.40.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 27 Aug 2020 06:40:25 -0700 (PDT)
-Date: Thu, 27 Aug 2020 09:40:21 -0400
+ Thu, 27 Aug 2020 06:40:12 -0700 (PDT)
+Date: Thu, 27 Aug 2020 09:40:08 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/13] arm/acpi: fix an out of spec _UID for PCI root
-Message-ID: <20200827133954.2118749-4-mst@redhat.com>
-References: <20200827133954.2118749-1-mst@redhat.com>
+Subject: [PULL 00/13] virtio,pc,acpi: features, fixes
+Message-ID: <20200827133954.2118749-1-mst@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200827133954.2118749-1-mst@redhat.com>
 X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
 X-Mutt-Fcc: =sent
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
@@ -109,63 +109,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vitaly Cheptsov <vit9696@protonmail.com>, qemu-stable@nongnu.org,
- Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm@nongnu.org,
- Igor Mammedov <imammedo@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On ARM/virt machine type QEMU currently reports an incorrect _UID in
-ACPI.
+The following changes since commit 8e49197ca5e76fdb8928833b2649ef13fc5aab2f:
 
-The particular node in question is the primary PciRoot (PCI0 in ACPI),
-which gets assigned PCI0 in ACPI UID and 0 in the
-DevicePath. This is due to the _UID assigned to it by build_dsdt in
-hw/arm/virt-acpi-build.c Which does not correspond to the primary PCI
-identifier given by pcibus_num in hw/pci/pci.c
+  Merge remote-tracking branch 'remotes/hdeller/tags/target-hppa-v3-pull-request' into staging (2020-08-26 22:23:53 +0100)
 
-In UEFI v2.8, section "10.4.2 Rules with ACPI _HID and _UID" ends with
-the paragraph,
+are available in the Git repository at:
 
-    Root PCI bridges will use the plug and play ID of PNP0A03, This will
-    be stored in the ACPI Device Path _HID field, or in the Expanded
-    ACPI Device Path _CID field to match the ACPI name space. The _UID
-    in the ACPI Device Path structure must match the _UID in the ACPI
-    name space.
+  git://git.kernel.org/pub/scm/virt/kvm/mst/qemu.git tags/for_upstream
 
-(See especially the last sentence.)
+for you to fetch changes up to e1647539b1d04f121b70f1f6f438976477450f10:
 
-A similar bug has been reported on i386, on that architecture it has
-been reported to confuse at least macOS which uses ACPI UIDs to build
-the DevicePath for NVRAM boot options, while OVMF firmware gets them via
-an internal channel through QEMU.  When UEFI firmware and ACPI have
-different values, this makes the underlying operating system unable to
-report its boot option.
+  tests/bios-tables-test: add smbios cpu speed test (2020-08-27 08:29:13 -0400)
 
-Cc: qemu-stable@nongnu.org
-Reported-by: Vitaly Cheptsov <vit9696@protonmail.com>
+----------------------------------------------------------------
+virtio,pc,acpi: features, fixes
+
+better number of queues for vhost
+smbios speed options
+acpi fixes
+
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Laszlo Ersek <lersek@redhat.com>
----
- hw/arm/virt-acpi-build.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index 91f0df7b13..0a482ff6f7 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -170,7 +170,7 @@ static void acpi_dsdt_add_pci(Aml *scope, const MemMapEntry *memmap,
-     aml_append(dev, aml_name_decl("_CID", aml_string("PNP0A03")));
-     aml_append(dev, aml_name_decl("_SEG", aml_int(0)));
-     aml_append(dev, aml_name_decl("_BBN", aml_int(0)));
--    aml_append(dev, aml_name_decl("_UID", aml_string("PCI0")));
-+    aml_append(dev, aml_name_decl("_UID", aml_int(0)));
-     aml_append(dev, aml_name_decl("_STR", aml_unicode("PCIe 0 Device")));
-     aml_append(dev, aml_name_decl("_CCA", aml_int(1)));
- 
--- 
-MST
+----------------------------------------------------------------
+Ani Sinha (1):
+      Introduce a new flag for i440fx to disable PCI hotplug on the root bus
+
+Michael S. Tsirkin (5):
+      acpi: allow DSDT changes
+      i386/acpi: fix inconsistent QEMU/OVMF device paths
+      arm/acpi: fix an out of spec _UID for PCI root
+      disassemble-aml: -o actually works
+      acpi: update expected DSDT files with _UID changes
+
+Stefan Hajnoczi (5):
+      virtio-pci: add virtio_pci_optimal_num_queues() helper
+      virtio-scsi: introduce a constant for fixed virtqueues
+      virtio-scsi-pci: default num_queues to -smp N
+      virtio-blk-pci: default num_queues to -smp N
+      vhost-user-blk-pci: default num_queues to -smp N
+
+Ying Fang (2):
+      hw/smbios: add options for type 4 max-speed and current-speed
+      tests/bios-tables-test: add smbios cpu speed test
+
+ hw/virtio/virtio-pci.h             |   9 ++++++++
+ include/hw/acpi/pcihp.h            |   2 +-
+ include/hw/virtio/vhost-user-blk.h |   2 ++
+ include/hw/virtio/virtio-blk.h     |   2 ++
+ include/hw/virtio/virtio-scsi.h    |   5 +++++
+ hw/acpi/pcihp.c                    |  23 +++++++++++++++++++-
+ hw/acpi/piix4.c                    |   5 ++++-
+ hw/arm/virt-acpi-build.c           |   2 +-
+ hw/block/vhost-user-blk.c          |   6 +++++-
+ hw/block/virtio-blk.c              |   6 +++++-
+ hw/core/machine.c                  |   8 ++++++-
+ hw/i386/acpi-build.c               |   4 ++--
+ hw/scsi/vhost-scsi.c               |   3 ++-
+ hw/scsi/vhost-user-scsi.c          |   5 +++--
+ hw/scsi/virtio-scsi.c              |  13 ++++++++----
+ hw/smbios/smbios.c                 |  36 +++++++++++++++++++++++++++----
+ hw/virtio/vhost-scsi-pci.c         |   9 ++++++--
+ hw/virtio/vhost-user-blk-pci.c     |   4 ++++
+ hw/virtio/vhost-user-scsi-pci.c    |   9 ++++++--
+ hw/virtio/virtio-blk-pci.c         |   7 ++++++-
+ hw/virtio/virtio-pci.c             |  32 ++++++++++++++++++++++++++++
+ hw/virtio/virtio-scsi-pci.c        |   9 ++++++--
+ tests/qtest/bios-tables-test.c     |  42 +++++++++++++++++++++++++++++++++++++
+ qemu-options.hx                    |   2 +-
+ tests/data/acpi/disassemle-aml.sh  |  11 +++++++---
+ tests/data/acpi/pc/DSDT            | Bin 4934 -> 4934 bytes
+ tests/data/acpi/pc/DSDT.acpihmat   | Bin 6258 -> 6258 bytes
+ tests/data/acpi/pc/DSDT.bridge     | Bin 6793 -> 6793 bytes
+ tests/data/acpi/pc/DSDT.cphp       | Bin 5397 -> 5397 bytes
+ tests/data/acpi/pc/DSDT.dimmpxm    | Bin 6587 -> 6587 bytes
+ tests/data/acpi/pc/DSDT.ipmikcs    | Bin 5006 -> 5006 bytes
+ tests/data/acpi/pc/DSDT.memhp      | Bin 6293 -> 6293 bytes
+ tests/data/acpi/pc/DSDT.numamem    | Bin 4940 -> 4940 bytes
+ tests/data/acpi/q35/DSDT           | Bin 7678 -> 7678 bytes
+ tests/data/acpi/q35/DSDT.acpihmat  | Bin 9002 -> 9002 bytes
+ tests/data/acpi/q35/DSDT.bridge    | Bin 7695 -> 7695 bytes
+ tests/data/acpi/q35/DSDT.cphp      | Bin 8141 -> 8141 bytes
+ tests/data/acpi/q35/DSDT.dimmpxm   | Bin 9331 -> 9331 bytes
+ tests/data/acpi/q35/DSDT.ipmibt    | Bin 7753 -> 7753 bytes
+ tests/data/acpi/q35/DSDT.memhp     | Bin 9037 -> 9037 bytes
+ tests/data/acpi/q35/DSDT.mmio64    | Bin 8808 -> 8808 bytes
+ tests/data/acpi/q35/DSDT.numamem   | Bin 7684 -> 7684 bytes
+ tests/data/acpi/q35/DSDT.tis       | Bin 8283 -> 8283 bytes
+ tests/data/acpi/virt/DSDT          | Bin 5205 -> 5200 bytes
+ tests/data/acpi/virt/DSDT.memhp    | Bin 6566 -> 6561 bytes
+ tests/data/acpi/virt/DSDT.numamem  | Bin 5205 -> 5200 bytes
+ 46 files changed, 225 insertions(+), 31 deletions(-)
 
 
