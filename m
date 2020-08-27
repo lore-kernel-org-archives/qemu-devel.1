@@ -2,71 +2,119 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47CD5C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEFAC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:37:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04EFD207F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:35:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04EFD207F7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id A1C0520738
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 09:37:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YuNr+pG9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C0520738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBEJf-0000Cr-2V
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:35:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59592)
+	id 1kBELq-0001Vs-Qn
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 05:37:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBEIg-00071o-Jp
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:34:30 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4276 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1kBELH-0000zT-39
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:37:11 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:59036
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBEIc-0004i2-MH
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:34:30 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 8F0B695C92B2FF4CD25E;
- Thu, 27 Aug 2020 17:34:20 +0800 (CST)
-Received: from [127.0.0.1] (10.174.186.4) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
- 17:34:14 +0800
-Subject: Re: [PATCH v5 11/12] migration/dirtyrate: Implement
- qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
-To: David Edmondson <dme@dme.org>, <quintela@redhat.com>, <eblake@redhat.com>, 
- <dgilbert@redhat.com>, <berrange@redhat.com>
-References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
- <1598260480-64862-12-git-send-email-zhengchuan@huawei.com>
- <m2wo1lk8j9.fsf@dme.org>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <1a23d60c-186b-d5b5-c43a-a8512826409b@huawei.com>
-Date: Thu, 27 Aug 2020 17:34:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1kBELD-00055W-Rl
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 05:37:10 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 07R9VfBj032413
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:37:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=4DwvKU+klFJRrmZu4dlvRVnUY3gvooEZ199bNOhdDIA=;
+ b=YuNr+pG9duMPgynx7FJ7vj1Wzg50ERKtjlj9ngsm8x5q9luLjjedRHGegal29K/OTuNR
+ RJqTwjsZzKFQ5uK/nUWguaWnFHApglBFUVbjx/oL3GW5HxQG4Ab8h4cGzBM9GUc+JQN7
+ zxCgeZHkkgmQzRMDKkCJ+hUC9JDWvp2WzqfjpKEQCApqRCzMvngh7GoKvWyPpIc8svRW
+ aEiWXnUxKDsIXrvfJ736QdSuBNsB4b5O7Z1z/TsTSQYlCF0enIGX4P3oYDzPKeBQuC2F
+ DBUDABhAxFIGfhuTJK4gH0klNUGNkBdnHVuZgDnuIvGkF1GWwaLmVaKeuJYCGel3uyV+ UA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 336a2k8ej5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:37:06 -0400
+Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07R9Vhar032597
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 05:37:06 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.106])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 336a2k8eha-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 27 Aug 2020 05:37:06 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+ by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07R9IAeY029591;
+ Thu, 27 Aug 2020 09:32:03 GMT
+Received: from b06cxnps4075.portsmouth.uk.ibm.com
+ (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
+ by ppma04fra.de.ibm.com with ESMTP id 332ujjuch8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 27 Aug 2020 09:32:03 +0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+ by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 07R9W0XA28508424
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 27 Aug 2020 09:32:00 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 86BB94204B;
+ Thu, 27 Aug 2020 09:32:00 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E72EB42059;
+ Thu, 27 Aug 2020 09:31:59 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+ by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Thu, 27 Aug 2020 09:31:59 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/4] pc-bios: s390x: Fix bootmap.c zipl component entry
+ data handling
+Date: Thu, 27 Aug 2020 05:31:49 -0400
+Message-Id: <20200827093152.3026-2-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200827093152.3026-1-frankja@linux.ibm.com>
+References: <20200827093152.3026-1-frankja@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <m2wo1lk8j9.fsf@dme.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.4]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=zhengchuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 02:09:23
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -63
-X-Spam_score: -6.4
-X-Spam_bar: ------
-X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.239,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-08-27_02:2020-08-27,
+ 2020-08-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ malwarescore=0 adultscore=0 mlxlogscore=999 mlxscore=0 impostorscore=0
+ priorityscore=1501 suspectscore=1 bulkscore=0 spamscore=0 clxscore=1015
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008270068
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 05:32:06
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,163 +127,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- fangying1@huawei.com
+Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com,
+ david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The two main types of zipl component entries are execute and
+load/data. The last member of the component entry struct therefore
+denotes either a PSW or an address. Let's make this a bit more clear
+by introducing a union and cleaning up the code that uses that struct
+member.
 
+The execute type component entries written by zipl contain short PSWs,
+not addresses. Let's mask them and only pass the address part to
+jump_to_IPL_code(uint64_t address) because it expects an address as
+visible by the name of the argument.
 
-On 2020/8/26 18:26, David Edmondson wrote:
-> On Monday, 2020-08-24 at 17:14:39 +08, Chuan Zheng wrote:
-> 
->> Implement qmp_cal_dirty_rate()/qmp_get_dirty_rate() function which could be called
->>
->> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
->> ---
->>  migration/dirtyrate.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
->>  qapi/migration.json   | 44 ++++++++++++++++++++++++++++++++++++++++++++
->>  2 files changed, 89 insertions(+)
->>
->> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
->> index 9f52f5f..08c46d3 100644
->> --- a/migration/dirtyrate.c
->> +++ b/migration/dirtyrate.c
->> @@ -62,6 +62,28 @@ static int dirtyrate_set_state(int *state, int old_state, int new_state)
->>      }
->>  }
->>  
->> +static struct DirtyRateInfo *query_dirty_rate_info(void)
->> +{
->> +    int64_t dirty_rate = DirtyStat.dirty_rate;
->> +    struct DirtyRateInfo *info = g_malloc0(sizeof(DirtyRateInfo));
->> +
->> +    if (CalculatingState == DIRTY_RATE_STATUS_MEASURED) {
->> +        info->dirty_rate = dirty_rate;
->> +    } else {
->> +        info->dirty_rate = -1;
->> +    }
->> +
->> +    info->status = CalculatingState;
->> +    /*
->> +     * Only support query once for each calculation,
->> +     * reset as DIRTY_RATE_STATUS_UNSTARTED after query
->> +     */
->> +    (void)dirtyrate_set_state(&CalculatingState, CalculatingState,
->> +                              DIRTY_RATE_STATUS_UNSTARTED);
-> 
-> Is there a reason for this restriction? Removing it would require
-> clarifying the state model, I suppose.
-> 
-We only support query once for each calculation.
-Otherwise, it could always query dirtyrate, but maybe the dirtyrate is calculated
-long time ago.
+Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+---
+ pc-bios/s390-ccw/bootmap.c | 5 +++--
+ pc-bios/s390-ccw/bootmap.h | 7 ++++++-
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
->> +
->> +    return info;
->> +}
->> +
->>  static void reset_dirtyrate_stat(void)
->>  {
->>      DirtyStat.total_dirty_samples = 0;
->> @@ -378,3 +400,26 @@ void *get_dirtyrate_thread(void *arg)
->>                                DIRTY_RATE_STATUS_MEASURED);
->>      return NULL;
->>  }
->> +
->> +void qmp_calc_dirty_rate(int64_t calc_time, Error **errp)
->> +{
->> +    static struct DirtyRateConfig config;
->> +    QemuThread thread;
->> +
->> +    /*
->> +     * We don't begin calculating thread only when it's in calculating status.
-> 
-> "If the dirty rate is already being measured, don't attempt to start."
-> 
->> +     */
->> +    if (CalculatingState == DIRTY_RATE_STATUS_MEASURING) {
-> 
-> Should this return an error to the caller?
-> 
->> +        return;
->> +    }
->> +
->> +    config.sample_period_seconds = get_sample_page_period(calc_time);
-> 
-> If the specified sample period is outside the min/max, should an error
-> be returned to the caller?
-> 
->> +    config.sample_pages_per_gigabytes = DIRTYRATE_DEFAULT_SAMPLE_PAGES;
->> +    qemu_thread_create(&thread, "get_dirtyrate", get_dirtyrate_thread,
->> +                       (void *)&config, QEMU_THREAD_DETACHED);
->> +}
->> +
->> +struct DirtyRateInfo *qmp_query_dirty_rate(Error **errp)
->> +{
->> +    return query_dirty_rate_info();
->> +}
->> diff --git a/qapi/migration.json b/qapi/migration.json
->> index d640165..826bfd7 100644
->> --- a/qapi/migration.json
->> +++ b/qapi/migration.json
->> @@ -1737,3 +1737,47 @@
->>  ##
->>  { 'enum': 'DirtyRateStatus',
->>    'data': [ 'unstarted', 'measuring', 'measured'] }
->> +
->> +##
->> +# @DirtyRateInfo:
->> +#
->> +# Information about current dirty page rate of vm.
->> +#
->> +# @dirty-rate: @dirtyrate describing the dirty page rate of vm
->> +#          in units of MB/s.
->> +#          If this field return '-1', it means querying is not
->> +#          start or not complete.
->> +#
->> +# @status: status containing dirtyrate query status includes
->> +#          'unstarted' or 'measuring' or 'measured'
->> +#
->> +# Since: 5.2
->> +#
->> +##
->> +{ 'struct': 'DirtyRateInfo',
->> +  'data': {'dirty-rate': 'int64',
->> +           'status': 'DirtyRateStatus'} }
->> +
->> +##
->> +# @calc-dirty-rate:
->> +#
->> +# start calculating dirty page rate for vm
->> +#
->> +# @calc-time: time in units of second for sample dirty pages
->> +#
->> +# Since: 5.2
->> +#
->> +# Example:
->> +#   {"command": "cal-dirty-rate", "data": {"calc-time": 1} }
-> 
-> "cal-dirty-rate" -> "calc-dirty-rate".
-> 
->> +#
->> +##
->> +{ 'command': 'calc-dirty-rate', 'data': {'calc-time': 'int64'} }
->> +
->> +##
->> +# @query-dirty-rate:
->> +#
->> +# query dirty page rate in units of MB/s for vm
->> +#
->> +# Since: 5.2
->> +##
->> +{ 'command': 'query-dirty-rate', 'returns': 'DirtyRateInfo' }
->> -- 
->> 1.8.3.1
-> 
-> dme.
-> 
+diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+index 97205674e5..8747c4ea26 100644
+--- a/pc-bios/s390-ccw/bootmap.c
++++ b/pc-bios/s390-ccw/bootmap.c
+@@ -10,6 +10,7 @@
+ 
+ #include "libc.h"
+ #include "s390-ccw.h"
++#include "s390-arch.h"
+ #include "bootmap.h"
+ #include "virtio.h"
+ #include "bswap.h"
+@@ -436,7 +437,7 @@ static void zipl_load_segment(ComponentEntry *entry)
+     char *blk_no = &err_msg[30]; /* where to print blockno in (those ZZs) */
+ 
+     blockno = entry->data.blockno;
+-    address = entry->load_address;
++    address = entry->compdat.load_addr;
+ 
+     debug_print_int("loading segment at block", blockno);
+     debug_print_int("addr", address);
+@@ -514,7 +515,7 @@ static void zipl_run(ScsiBlockPtr *pte)
+     IPL_assert(entry->component_type == ZIPL_COMP_ENTRY_EXEC, "No EXEC entry");
+ 
+     /* should not return */
+-    jump_to_IPL_code(entry->load_address);
++    jump_to_IPL_code(entry->compdat.load_psw & PSW_MASK_SHORT_ADDR);
+ }
+ 
+ static void ipl_scsi(void)
+diff --git a/pc-bios/s390-ccw/bootmap.h b/pc-bios/s390-ccw/bootmap.h
+index 12a0166aae..3946aa3f8d 100644
+--- a/pc-bios/s390-ccw/bootmap.h
++++ b/pc-bios/s390-ccw/bootmap.h
+@@ -64,11 +64,16 @@ typedef struct BootMapTable {
+     BootMapPointer entry[];
+ } __attribute__ ((packed)) BootMapTable;
+ 
++typedef union ComponentEntryData {
++    uint64_t load_psw;
++    uint64_t load_addr;
++} ComponentEntryData;
++
+ typedef struct ComponentEntry {
+     ScsiBlockPtr data;
+     uint8_t pad[7];
+     uint8_t component_type;
+-    uint64_t load_address;
++    ComponentEntryData compdat;
+ } __attribute((packed)) ComponentEntry;
+ 
+ typedef struct ComponentHeader {
+-- 
+2.25.1
 
 
