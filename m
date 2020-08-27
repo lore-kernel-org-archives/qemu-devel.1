@@ -2,99 +2,89 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5972DC433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59478C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:17:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F8FC22CF6
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:15:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23CB622B40
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 11:17:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y/nMY+Bp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F8FC22CF6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RzQQCeC9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23CB622B40
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBFs1-0003GP-8I
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:15:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52874)
+	id 1kBFu0-0005I5-F9
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 07:17:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBFoz-0000Wv-V7
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:11:57 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:32931)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBFoy-00009B-Dw
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:11:57 -0400
-Received: by mail-pf1-x442.google.com with SMTP id u20so3239733pfn.0
- for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 04:11:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=bdzM5DdLA8liq6AhFdEDRbk2jBC0vtPtllwcfjpUt9I=;
- b=y/nMY+BpwqKrY7vMJ7ECvZPyj1u902fYlQdjfB5MNqeJOg8D1z6fhgrsNe+bIJpzka
- zgAiJFkYBknLe0aQckvrfwOX0CafAcc5tLOAJAp3pO3WLz0gNbcYwUr6fnTQdSGlWovo
- SlGwhjltgyE8FAUkXZ9FEU3rNZgIy6rEYe8d5v72ZWvQtgcYBwxfV3SYyoq49TQloMYL
- +F0hQuP3J/qMdeucEtHnUjLmtjErtcdkYbzpWdXhU7gNdDMxQYUShbGOEUmEtZvvQyFj
- ttaA+QPkMQUGkvXFLr7/qoaazT+BfIx/ZlGDWbvjv4Rcb8UwT64S9oPST/N9eGkyBu+d
- KDiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=bdzM5DdLA8liq6AhFdEDRbk2jBC0vtPtllwcfjpUt9I=;
- b=B9sCNvAM+x7VUvHXvARysJl0Kji6o4pDRyzlRCmaIozC26LBhyCoUGpdGjRxmKFpHj
- 9eoVUAW0hnB2TFNDGuTeLyDPW/SckOKibIYqjc3aFkurvJCY/R7WKIVY86CNoXpfIso2
- QjB7fUqUQppafCxuknV+5CEDJfsJbuxgNhTePDgOCtw0wSBmAW9rBreAaRR6MVkxNi+u
- Ey0ZvW3i8a8YCfaQZlcWh9k/dx/n+3zQuVjx8V/4ujfUd1RSi9rJUc+a052lQEKE2phM
- YE3ukXN7MsVGIaZnynqtBD4CKA9Q+DkvrlPwZ4PPq8SCIlcUhdFPFS8ZS1ymUALdkkM7
- hO6Q==
-X-Gm-Message-State: AOAM532mdMUG3Rn2rACl2sU5pAYRogYjthWH0szHNi7AoZxYU1TmB5mk
- v/Fs1pqzSSvEvkGFiVbzH4cqePPZbAgwFQ==
-X-Google-Smtp-Source: ABdhPJwJTvuGjqpOuzE3zfa0GezzGJSfND8sawyRg9FbMpZo5T5biB3bIVEh2OYFvY3DswvO8aeEEw==
-X-Received: by 2002:a63:ee0d:: with SMTP id e13mr13903793pgi.337.1598526714445; 
- Thu, 27 Aug 2020 04:11:54 -0700 (PDT)
-Received: from [192.168.101.174] ([75.147.178.105])
- by smtp.gmail.com with ESMTPSA id 8sm1810360pjx.14.2020.08.27.04.11.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 27 Aug 2020 04:11:53 -0700 (PDT)
-Subject: Re: [PATCH 64/77] target/microblaze: Convert mbar to decodetree
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-References: <20200825205950.730499-1-richard.henderson@linaro.org>
- <20200825205950.730499-65-richard.henderson@linaro.org>
- <20200827092413.GL2954729@toto>
- <7e242b2a-d582-059c-f282-9e001653b627@linaro.org>
- <20200827100834.GM2954729@toto>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9317325a-de01-50b1-2ab3-8d6d5faf5a9d@linaro.org>
-Date: Thu, 27 Aug 2020 04:11:51 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kBFtG-0004AK-J4
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:16:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34877
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kBFtE-0000mg-60
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 07:16:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598526978;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=UaJ9FIRlEa+ZpnwXZCF1dherHLU9UGuonkm1N6ye2K4=;
+ b=RzQQCeC9uzvYaJ0C2oISUv+f7IOwVLQXo0rndnyi3Uo3qWRZ/E1oOqUvYRwyrmBU1I2kq9
+ NK9C+L0m3r6zSRPmiFfrfYNVi45UyJ0vEyytwsZEBm/7EtiMtd07ewl3f3t9Rr0VRGH4KV
+ HARhvD90ArgKaYdcSjdR2AjpZBGPdPQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-188--gy-qDtkMjawdd6OoXjbHg-1; Thu, 27 Aug 2020 07:16:16 -0400
+X-MC-Unique: -gy-qDtkMjawdd6OoXjbHg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD87A185FD78;
+ Thu, 27 Aug 2020 11:16:15 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.110.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5981378370;
+ Thu, 27 Aug 2020 11:16:12 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/7] migration: improve error reporting of block driver
+ state name
+Date: Thu, 27 Aug 2020 12:16:00 +0100
+Message-Id: <20200827111606.1408275-2-berrange@redhat.com>
+In-Reply-To: <20200827111606.1408275-1-berrange@redhat.com>
+References: <20200827111606.1408275-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200827100834.GM2954729@toto>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -38
-X-Spam_score: -3.9
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:13:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-1.782,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,28 +97,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/27/20 3:08 AM, Edgar E. Iglesias wrote:
->> Ok.  I assume this follows a write to something like an interrupt controller
->> register?
-> 
-> yes, kind of. It's a memory store to a device that raises an interrupt as a
-> result of that store. The interrupt propagates to the CPU and on real HW if
-> the pipeline depth of the core is small, it gets taken within a couple of
-> cycles after the barrier completes. In QEMU, that delay can become very long
-> if we don't break the TB.
+With blockdev, a BlockDriverState may not have a device name,
+so using a node name is required as an alternative.
 
-Ok, yeah, same idea.  The data store alters the set of interrupts pending.
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ migration/savevm.c         | 12 ++++++------
+ tests/qemu-iotests/267.out |  4 ++--
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-> Architecturally, it would be wrong to make such assumptions about the pipeline
-> but there's code out there already..
+diff --git a/migration/savevm.c b/migration/savevm.c
+index a843d202b5..304d98ff78 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2682,7 +2682,7 @@ int save_snapshot(const char *name, Error **errp)
+ 
+     if (!bdrv_all_can_snapshot(&bs)) {
+         error_setg(errp, "Device '%s' is writable but does not support "
+-                   "snapshots", bdrv_get_device_name(bs));
++                   "snapshots", bdrv_get_device_or_node_name(bs));
+         return ret;
+     }
+ 
+@@ -2691,7 +2691,7 @@ int save_snapshot(const char *name, Error **errp)
+         ret = bdrv_all_delete_snapshot(name, &bs1, errp);
+         if (ret < 0) {
+             error_prepend(errp, "Error while deleting snapshot on device "
+-                          "'%s': ", bdrv_get_device_name(bs1));
++                          "'%s': ", bdrv_get_device_or_node_name(bs1));
+             return ret;
+         }
+     }
+@@ -2766,7 +2766,7 @@ int save_snapshot(const char *name, Error **errp)
+     ret = bdrv_all_create_snapshot(sn, bs, vm_state_size, &bs);
+     if (ret < 0) {
+         error_setg(errp, "Error while creating snapshot on '%s'",
+-                   bdrv_get_device_name(bs));
++                   bdrv_get_device_or_node_name(bs));
+         goto the_end;
+     }
+ 
+@@ -2884,14 +2884,14 @@ int load_snapshot(const char *name, Error **errp)
+     if (!bdrv_all_can_snapshot(&bs)) {
+         error_setg(errp,
+                    "Device '%s' is writable but does not support snapshots",
+-                   bdrv_get_device_name(bs));
++                   bdrv_get_device_or_node_name(bs));
+         return -ENOTSUP;
+     }
+     ret = bdrv_all_find_snapshot(name, &bs);
+     if (ret < 0) {
+         error_setg(errp,
+                    "Device '%s' does not have the requested snapshot '%s'",
+-                   bdrv_get_device_name(bs), name);
++                   bdrv_get_device_or_node_name(bs), name);
+         return ret;
+     }
+ 
+@@ -2920,7 +2920,7 @@ int load_snapshot(const char *name, Error **errp)
+     ret = bdrv_all_goto_snapshot(name, &bs, errp);
+     if (ret < 0) {
+         error_prepend(errp, "Could not load snapshot '%s' on '%s': ",
+-                      name, bdrv_get_device_name(bs));
++                      name, bdrv_get_device_or_node_name(bs));
+         goto err_drain;
+     }
+ 
+diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
+index d6d80c099f..215902b3ad 100644
+--- a/tests/qemu-iotests/267.out
++++ b/tests/qemu-iotests/267.out
+@@ -81,11 +81,11 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+ Testing: -blockdev driver=file,filename=TEST_DIR/t.IMGFMT,node-name=file
+ QEMU X.Y.Z monitor - type 'help' for more information
+ (qemu) savevm snap0
+-Error: Device '' is writable but does not support snapshots
++Error: Device 'file' is writable but does not support snapshots
+ (qemu) info snapshots
+ No available block device supports snapshots
+ (qemu) loadvm snap0
+-Error: Device '' is writable but does not support snapshots
++Error: Device 'file' is writable but does not support snapshots
+ (qemu) quit
+ 
+ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=134217728
+-- 
+2.26.2
 
-Yes indeed.
-
-
-r~
 
