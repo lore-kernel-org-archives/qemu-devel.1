@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE96C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B1DDC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:33:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 373852080C
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:32:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA35D22BF5
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 10:33:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PPEfis1s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 373852080C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hf3mrt+/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA35D22BF5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBFCd-0001wX-GG
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 06:32:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43614)
+	id 1kBFDc-0002zr-3b
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 06:33:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kBFBl-0000zF-8o
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:31:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26900)
+ id 1kBFCq-0002Du-5j
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:32:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42810)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kBFBi-0003Ym-Ua
- for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:31:24 -0400
+ id 1kBFCn-0003ct-Fd
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 06:32:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598524281;
+ s=mimecast20190719; t=1598524348;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JCmoPz+03Jq7jT2ERM4E5F0duoJ3rGMFg6YE1yrQmc0=;
- b=PPEfis1sgd2Q+rRV606TJbhqgp/u2PqIWlkAmuatxUCwTKHnzEPlQHWNLuz/tvrHarB7e4
- 19nuBhI2MCamJ7baW5W6mS8xTNCNoazQte8wU3wvnvtGODk+XmkVGMe1tFX4wMb8siG8vS
- haDyz/B9PTZGD7+//XeOMhrU/EsKCTU=
+ bh=dj1kfo+Ot5uOUTdc6mT13cpfwFDS1qNkq2WBO+dt8OQ=;
+ b=hf3mrt+/XfLT4w/HNfXhBODyWYPcX4FZGepvmIuoPz2cwjKXC6V+4llFDl06DnpXpsK7Wr
+ K9aw9I9K5vwfwdPsZMxPPx6SoJQV+gDzfbk59iJ6jetgh2W0+emmtm5OIS7rEyBiii6u2x
+ 4a12Ry4C1DHKNGbkoc80Rin+39RcK0o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-adw8b6SYPYOFnjEv6wR9gg-1; Thu, 27 Aug 2020 06:31:19 -0400
-X-MC-Unique: adw8b6SYPYOFnjEv6wR9gg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-93-_gELFAhHOc2SysR0eAaPtQ-1; Thu, 27 Aug 2020 06:32:26 -0400
+X-MC-Unique: _gELFAhHOc2SysR0eAaPtQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7DF02FD00;
- Thu, 27 Aug 2020 10:31:17 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81526802B7E;
+ Thu, 27 Aug 2020 10:32:25 +0000 (UTC)
 Received: from redhat.com (ovpn-114-113.ams2.redhat.com [10.36.114.113])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DB75C19C58;
- Thu, 27 Aug 2020 10:31:12 +0000 (UTC)
-Date: Thu, 27 Aug 2020 11:31:10 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1A13F7E72E;
+ Thu, 27 Aug 2020 10:32:01 +0000 (UTC)
+Date: Thu, 27 Aug 2020 11:31:58 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Lukas Straub <lukasstraub2@web.de>
-Subject: Re: [PATCH v7 1/8] Introduce yank feature
-Message-ID: <20200827103110.GJ192458@redhat.com>
+Subject: Re: [PATCH v7 2/8] block/nbd.c: Add yank feature
+Message-ID: <20200827103158.GK192458@redhat.com>
 References: <cover.1596528468.git.lukasstraub2@web.de>
- <0092d4fe5f64078a18db3790c46c508416dbdb6b.1596528468.git.lukasstraub2@web.de>
+ <331864b96d198a6cfabd050581e94bc3452362aa.1596528468.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <0092d4fe5f64078a18db3790c46c508416dbdb6b.1596528468.git.lukasstraub2@web.de>
+In-Reply-To: <331864b96d198a6cfabd050581e94bc3452362aa.1596528468.git.lukasstraub2@web.de>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -86,7 +86,7 @@ X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,23 +109,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 04, 2020 at 10:11:34AM +0200, Lukas Straub wrote:
-> The yank feature allows to recover from hanging qemu by "yanking"
-> at various parts. Other qemu systems can register themselves and
-> multiple yank functions. Then all yank functions for selected
-> instances can be called by the 'yank' out-of-band qmp command.
-> Available instances can be queried by a 'query-yank' oob command.
+On Tue, Aug 04, 2020 at 10:11:37AM +0200, Lukas Straub wrote:
+> Register a yank function which shuts down the socket and sets
+> s->state = NBD_CLIENT_QUIT. This is the same behaviour as if an
+> error occured.
 > 
 > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
 > Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->  include/qemu/yank.h |  80 +++++++++++++++++++
->  qapi/misc.json      |  45 +++++++++++
->  util/Makefile.objs  |   1 +
->  util/yank.c         | 184 ++++++++++++++++++++++++++++++++++++++++++++
->  4 files changed, 310 insertions(+)
->  create mode 100644 include/qemu/yank.h
->  create mode 100644 util/yank.c
+>  block/nbd.c | 129 ++++++++++++++++++++++++++++++++--------------------
+>  1 file changed, 80 insertions(+), 49 deletions(-)
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
