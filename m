@@ -2,75 +2,69 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DA2C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 02:48:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00638C433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 03:07:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB5C92075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 02:48:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB5C92075B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id CB05E2076C
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 03:07:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB05E2076C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kB7xr-0000ls-4U
-	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 22:48:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34594)
+	id 1kB8Fw-0006EI-1K
+	for qemu-devel@archiver.kernel.org; Wed, 26 Aug 2020 23:07:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kB7xF-0008LH-IU
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 22:47:57 -0400
-Resent-Date: Wed, 26 Aug 2020 22:47:57 -0400
-Resent-Message-Id: <E1kB7xF-0008LH-IU@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21378)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kB7xC-00015R-NM
- for qemu-devel@nongnu.org; Wed, 26 Aug 2020 22:47:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1598496304; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ZlAhrrFT6fWYse+5ySUsG4cadouBs6uaDar6rewJ/63tOVae2Bk3LbUyBJWpqi2Bo5WKKtfwgHY26X8F2eJIKzvAQkt7IdvEstCrlnmap2Ojc9tQ2tkzBUP+fxdOnj7cuS9HrC/ZBS1QPi7lpfQmLrQrBv+EZXVFZrFzRmqamy8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1598496304;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=C6PGhJ7/A1K3P9FF5/Ucp9BC6zR8dd/24xfVrq766ps=; 
- b=DJb3po1rvT5SsVdaCKOZyEOA5koUVEdpFnOeFVslInlRI8t/42y+JrvJOXL3Hj5tFbVxAsl4mN5lDudM1yyGR3lkpTqQVM/Bdink6ZYTkTSaW2F242mR5374C29NrfBxA0+k7dQGtI6AIucXWTwlXnX6icqrhfQiebATEd9TPOk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 159849630278063.384078810005576;
- Wed, 26 Aug 2020 19:45:02 -0700 (PDT)
-Subject: Re: [PATCH] meson: Mingw64 gcc doesn't recognize system include_type
- for sdl2
-Message-ID: <159849630227.9089.3159324073181264054@66eaa9a8a123>
-In-Reply-To: <20200825001649.1811-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1kB8FM-0005mx-Rb
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 23:06:40 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:49796 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
+ id 1kB8FK-0006xK-JN
+ for qemu-devel@nongnu.org; Wed, 26 Aug 2020 23:06:40 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id BE1E33EB540013107354;
+ Thu, 27 Aug 2020 11:06:27 +0800 (CST)
+Received: from [127.0.0.1] (10.174.187.46) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Thu, 27 Aug 2020
+ 11:06:19 +0800
+Subject: Re: [PATCH 08/12] migration/colo: Plug memleaks in
+ colo_process_incoming_thread
+To: Li Qiang <liq3ea@gmail.com>
+References: <20200814160241.7915-1-pannengyuan@huawei.com>
+ <20200814160241.7915-9-pannengyuan@huawei.com>
+ <CAKXe6SJfvxo8k+an27YkNP9aA-pQvNJ=CqDgxfw7DyCfE-GRBw@mail.gmail.com>
+From: Pan Nengyuan <pannengyuan@huawei.com>
+Message-ID: <0f13b812-0248-3aad-ad9b-9a82a2f3e978@huawei.com>
+Date: Thu, 27 Aug 2020 11:06:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
+In-Reply-To: <CAKXe6SJfvxo8k+an27YkNP9aA-pQvNJ=CqDgxfw7DyCfE-GRBw@mail.gmail.com>
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: luoyonggang@gmail.com
-Date: Wed, 26 Aug 2020 19:45:02 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 22:47:52
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.187.46]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32;
+ envelope-from=pannengyuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/26 23:06:29
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -63
+X-Spam_score: -6.4
+X-Spam_bar: ------
+X-Spam_report: (-6.4 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.239,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,38 +77,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: pbonzini@redhat.com, luoyonggang@gmail.com, qemu-devel@nongnu.org
+Cc: zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ Juan Quintela <quintela@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ "Dr.
+ David Alan Gilbert" <dgilbert@redhat.com>, Euler Robot <euler.robot@huawei.com>,
+ Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgyNTAwMTY0OS4xODEx
-LTEtbHVveW9uZ2dhbmdAZ21haWwuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA4MjUwMDE2NDkuMTgx
-MS0xLWx1b3lvbmdnYW5nQGdtYWlsLmNvbQpTdWJqZWN0OiBbUEFUQ0hdIG1lc29uOiBNaW5ndzY0
-IGdjYyBkb2Vzbid0IHJlY29nbml6ZSBzeXN0ZW0gaW5jbHVkZV90eXBlIGZvciBzZGwyCgo9PT0g
-VEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9k
-ZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRp
-ZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNr
-IGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3
-ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3
-LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwODI2MTg0MzM0
-LjQxMjA2MjAtMS1laGFia29zdEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDA4MjYxODQzMzQu
-NDEyMDYyMC0xLWVoYWJrb3N0QHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0
-ZXN0Jwo3MDBjZGM4IG1lc29uOiBNaW5ndzY0IGdjYyBkb2Vzbid0IHJlY29nbml6ZSBzeXN0ZW0g
-aW5jbHVkZV90eXBlIGZvciBzZGwyCgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjogTWlzc2lu
-ZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDkg
-bGluZXMgY2hlY2tlZAoKQ29tbWl0IDcwMGNkYzg0ZjRhZSAobWVzb246IE1pbmd3NjQgZ2NjIGRv
-ZXNuJ3QgcmVjb2duaXplIHN5c3RlbSBpbmNsdWRlX3R5cGUgZm9yIHNkbDIpIGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3
-aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3
-Lm9yZy9sb2dzLzIwMjAwODI1MDAxNjQ5LjE4MTEtMS1sdW95b25nZ2FuZ0BnbWFpbC5jb20vdGVz
-dGluZy5jaGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21h
-dGljYWxseSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlv
-dXIgZmVlZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+
+
+On 2020/8/26 20:37, Li Qiang wrote:
+> Pan Nengyuan <pannengyuan@huawei.com> 于2020年8月14日周五 下午6:52写道：
+>>
+>> 'local_err' forgot to free in colo_process_incoming_thread error path.
+>> Fix that.
+>>
+>> Reported-by: Euler Robot <euler.robot@huawei.com>
+>> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>> ---
+>> Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
+>> Cc: Juan Quintela <quintela@redhat.com>
+>> Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>> ---
+>>  migration/colo.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/migration/colo.c b/migration/colo.c
+>> index ea7d1e9d4e..17b5afc6b5 100644
+>> --- a/migration/colo.c
+>> +++ b/migration/colo.c
+>> @@ -870,6 +870,7 @@ void *colo_process_incoming_thread(void *opaque)
+>>      replication_start_all(REPLICATION_MODE_SECONDARY, &local_err);
+>>      if (local_err) {
+>>          qemu_mutex_unlock_iothread();
+>> +        error_report_err(local_err);
+>>          goto out;
+>>      }
+>>  #else
+>> @@ -882,6 +883,7 @@ void *colo_process_incoming_thread(void *opaque)
+>>      colo_send_message(mis->to_src_file, COLO_MESSAGE_CHECKPOINT_READY,
+>>                        &local_err);
+>>      if (local_err) {
+>> +        error_report_err(local_err);
+>>          goto out;
+>>      }
+>>
+> 
+> Could we arrange 'error_report_err' in 'out' label?
+> Like this:
+> 
+> if (local_err) {
+>     error_report_err(local_err);
+> }
+
+Similar to the other place in the same function, I didn't arrange them in 'out' label:
+
+    while (mis->state == MIGRATION_STATUS_COLO) {
+        colo_wait_handle_message(mis, fb, bioc, &local_err);
+        if (local_err) {
+            error_report_err(local_err);
+            break;
+        }
+
+But I think it's a good idea to arrange them in 'out' label. I will change it.
+
+Thanks.
+
+> 
+> Thanks,
+> Li Qiang
+> 
+> 
+> 
+>> --
+>> 2.18.2
+>>
+>>
+> .
+> 
+
 
