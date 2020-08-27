@@ -2,66 +2,87 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98982C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 14:54:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA13CC433E1
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 14:55:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68DF22054F
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 14:54:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9434722B4E
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 14:55:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="dySgZDCs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68DF22054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="btuOfrm+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9434722B4E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBJIi-0002oJ-NU
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 10:54:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42546)
+	id 1kBJIy-0003CB-QU
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 10:55:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kBJI7-00020V-3d; Thu, 27 Aug 2020 10:54:15 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:48156)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kBJI4-0008DY-2q; Thu, 27 Aug 2020 10:54:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
- s=20170329; 
- h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
- bh=CsStH3FMmC5mlj+gkUTkxfQvf6o67kvPhrCOEM9vntE=; 
- b=dySgZDCscgsZZjWx2BKH0G5xW72ALgjBz0HTsD3oe24GHBhDa9soSSJtJUGP6RmzBJyyoays37q6KBRtBvljiE40OJdNexFSgXvk2lR6YWTCoEMIbJI98cY1QzwOUzcXUWgqQJwoPH4TCK+t7hTWd9QLmdiMMtQuP99S2JHq2E5AYIlDE1H+a8/ktWRvCb4Xfm9uSFkV4avh3s0kmJmozs4a+9gyHJnBFN+WKWxwVyzxeXlqGEg0aswGCoP+GxdMve2rocp4uYIK6S3FzoAm/A6qZnQIboKPjfznxUWneufJC4mNFV6n4tt5fr/rja9FjZi/W13NUfcmQ9mtQgxJjA==;
-Received: from 92.red-79-158-239.dynamicip.rima-tde.net ([79.158.239.92]
- helo=perseus.local) by fanzine.igalia.com with esmtpsa 
- (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1kBJHx-00023s-Lv; Thu, 27 Aug 2020 16:54:05 +0200
-Received: from berto by perseus.local with local (Exim 4.92)
- (envelope-from <berto@igalia.com>)
- id 1kBJHj-0006x9-WE; Thu, 27 Aug 2020 16:53:52 +0200
-From: Alberto Garcia <berto@igalia.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] qcow2: Skip copy-on-write when allocating a zero cluster
-Date: Thu, 27 Aug 2020 16:53:50 +0200
-Message-Id: <20200827145350.26686-1-berto@igalia.com>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <slp@redhat.com>) id 1kBJIJ-0002Fr-3D
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 10:54:27 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:36887
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <slp@redhat.com>) id 1kBJIG-0008El-QS
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 10:54:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598540064;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=hulzSRTtOv3ETP7tY5V3fQYPmAn/sJswJpFi9qH5rxQ=;
+ b=btuOfrm+eUHqMYfwFTBEkVAOnCq3eq8Mb4cBwCZeAr1hUsH+83wlHVicYSVF11wt91O3RB
+ YYgK6TBhtAmcqG/n3hHVD/ZepTfIOiGd+oMFvxsxI0HG5/KcAfJ7s9rva8vRcp0ZihaXeE
+ 6D3L4Tp16eP8m0bPOXKLL+jwxau0BdI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-77-XbcKLPfBOAexr7oEbpJkxQ-1; Thu, 27 Aug 2020 10:54:19 -0400
+X-MC-Unique: XbcKLPfBOAexr7oEbpJkxQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 46D8C18BA282;
+ Thu, 27 Aug 2020 14:54:18 +0000 (UTC)
+Received: from localhost (ovpn-113-131.rdu2.redhat.com [10.10.113.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F41785D9F1;
+ Thu, 27 Aug 2020 14:54:12 +0000 (UTC)
+Date: Thu, 27 Aug 2020 16:54:11 +0200
+From: Sergio Lopez <slp@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH v6 11/20] microvm/acpi: use seabios with acpi=on
+Message-ID: <20200827145411.uptnlveyo4v7lekj@mhamilton>
+References: <20200826105254.28496-1-kraxel@redhat.com>
+ <20200826105254.28496-12-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
- helo=fanzine.igalia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 10:54:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200826105254.28496-12-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=slp@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="53pjgifjc2w2eu3r"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=slp@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 00:53:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,155 +95,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Alberto Garcia <berto@igalia.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>,
+ qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit c8bb23cbdbe32f5c326365e0a82e1b0e68cdcd8a when a write
-request results in a new allocation QEMU first tries to see if the
-rest of the cluster outside the written area contains only zeroes.
+--53pjgifjc2w2eu3r
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In that case, instead of doing a normal copy-on-write operation and
-writing explicit zero buffers to disk, the code zeroes the whole
-cluster efficiently using pwrite_zeroes() with BDRV_REQ_NO_FALLBACK.
+On Wed, Aug 26, 2020 at 12:52:45PM +0200, Gerd Hoffmann wrote:
+> With acpi=3Doff continue to use qboot.
+>=20
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> ---
+>  hw/i386/microvm.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 
-This improves performance very significantly but it only happens when
-we are writing to an area that was completely unallocated before. Zero
-clusters (QCOW2_CLUSTER_ZERO_*) are treated like normal clusters and
-are therefore slower to allocate.
+Reviewed-by: Sergio Lopez <slp@redhat.com>
 
-This happens because the code uses bdrv_is_allocated_above() rather
-bdrv_block_status_above(). The former is not as accurate for this
-purpose but it is faster. However in the case of qcow2 the underlying
-call does already report zero clusters just fine so there is no reason
-why we cannot use that information.
 
-After testing 4KB writes on an image that only contains zero clusters
-this patch results in almost five times more IOPS.
+> diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+> index ca0c9983f137..54510a03f754 100644
+> --- a/hw/i386/microvm.c
+> +++ b/hw/i386/microvm.c
+> @@ -52,6 +52,7 @@
+>  #include "hw/xen/start_info.h"
+> =20
+>  #define MICROVM_QBOOT_FILENAME "qboot.rom"
+> +#define MICROVM_BIOS_FILENAME  "bios-microvm.bin"
+> =20
+>  static void microvm_set_rtc(MicrovmMachineState *mms, ISADevice *s)
+>  {
+> @@ -174,7 +175,9 @@ static void microvm_devices_init(MicrovmMachineState =
+*mms)
+>      }
+> =20
+>      if (bios_name =3D=3D NULL) {
+> -        bios_name =3D MICROVM_QBOOT_FILENAME;
+> +        bios_name =3D x86_machine_is_acpi_enabled(x86ms)
+> +            ? MICROVM_BIOS_FILENAME
+> +            : MICROVM_QBOOT_FILENAME;
+>      }
+>      x86_bios_rom_init(get_system_memory(), true);
+>  }
+> --=20
+> 2.27.0
+>=20
 
-Signed-off-by: Alberto Garcia <berto@igalia.com>
----
-v2:
-- Add new, simpler API: bdrv_is_unallocated_or_zero_above()
+--53pjgifjc2w2eu3r
+Content-Type: application/pgp-signature; name="signature.asc"
 
- include/block/block.h |  2 ++
- block/io.c            | 24 ++++++++++++++++++++++++
- block/qcow2.c         | 37 +++++++++++++++++++++----------------
- 3 files changed, 47 insertions(+), 16 deletions(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/include/block/block.h b/include/block/block.h
-index 6e36154061..477a72b2e9 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -496,6 +496,8 @@ int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
- int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
-                             bool include_base, int64_t offset, int64_t bytes,
-                             int64_t *pnum);
-+int bdrv_is_unallocated_or_zero_above(BlockDriverState *bs, int64_t offset,
-+                                      int64_t bytes);
- 
- bool bdrv_is_read_only(BlockDriverState *bs);
- int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
-diff --git a/block/io.c b/block/io.c
-index ad3a51ed53..94faa3f9d7 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2557,6 +2557,30 @@ int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
-                                    offset, bytes, pnum, map, file);
- }
- 
-+/*
-+ * Check @bs (and its backing chain) to see if the range defined
-+ * by @offset and @bytes is unallocated or known to read as zeroes.
-+ * Return 1 if that is the case, 0 otherwise and -errno on error.
-+ * This test is meant to be fast rather than accurate so returning 0
-+ * does not guarantee non-zero data.
-+ */
-+int bdrv_is_unallocated_or_zero_above(BlockDriverState *bs, int64_t offset,
-+                                      int64_t bytes)
-+{
-+    int ret;
-+    int64_t pnum = bytes;
-+
-+    ret = bdrv_common_block_status_above(bs, NULL, false, offset,
-+                                         bytes, &pnum, NULL, NULL);
-+
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-+    return (pnum == bytes) &&
-+        ((ret & BDRV_BLOCK_ZERO) || (!(ret & BDRV_BLOCK_ALLOCATED)));
-+}
-+
- int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-                                    int64_t bytes, int64_t *pnum)
- {
-diff --git a/block/qcow2.c b/block/qcow2.c
-index da56b1a4df..29bea548db 100644
---- a/block/qcow2.c
-+++ b/block/qcow2.c
-@@ -2391,26 +2391,28 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
-     return false;
- }
- 
--static bool is_unallocated(BlockDriverState *bs, int64_t offset, int64_t bytes)
--{
--    int64_t nr;
--    return !bytes ||
--        (!bdrv_is_allocated_above(bs, NULL, false, offset, bytes, &nr) &&
--         nr == bytes);
--}
--
--static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
-+/*
-+ * Return 1 if the COW regions read as zeroes, 0 if not, < 0 on error.
-+ * Note that returning 0 does not guarantee non-zero data.
-+ */
-+static int is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
- {
-     /*
-      * This check is designed for optimization shortcut so it must be
-      * efficient.
--     * Instead of is_zero(), use is_unallocated() as it is faster (but not
--     * as accurate and can result in false negatives).
-+     * Instead of is_zero(), use bdrv_is_unallocated_or_zero_above() as
-+     * it is faster (but not as accurate and can result in false negatives).
-      */
--    return is_unallocated(bs, m->offset + m->cow_start.offset,
--                          m->cow_start.nb_bytes) &&
--           is_unallocated(bs, m->offset + m->cow_end.offset,
--                          m->cow_end.nb_bytes);
-+    int ret;
-+
-+    ret = bdrv_is_unallocated_or_zero_above(bs, m->offset + m->cow_start.offset,
-+                                            m->cow_start.nb_bytes);
-+    if (ret <= 0) {
-+        return ret;
-+    }
-+
-+    return bdrv_is_unallocated_or_zero_above(bs, m->offset + m->cow_end.offset,
-+                                             m->cow_end.nb_bytes);
- }
- 
- static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-@@ -2436,7 +2438,10 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
-             continue;
-         }
- 
--        if (!is_zero_cow(bs, m)) {
-+        ret = is_zero_cow(bs, m);
-+        if (ret < 0) {
-+            return ret;
-+        } else if (ret == 0) {
-             continue;
-         }
- 
--- 
-2.20.1
+iQIzBAABCAAdFiEEvtX891EthoCRQuii9GknjS8MAjUFAl9HyRIACgkQ9GknjS8M
+AjX1KxAAnOEoeB0aqyCUoyzjz3ZigyRQ5fzH9cRBhqYIKyt9yEOwP5+BHp2pjYVh
+X/CyJusfnnPD0pyRhAVu0QlEYl9EIEPf2aO2RAchaxDFpSGMSNcziP6ViG9k2ipr
+l8D2CVyFW0spbcJL3fDXPSkEEo9W+vFlsmB68WM1FoTF/MMnaRmFEr+aQnFI16SI
+tqAax8WwC/FIlotlvprL8iaViHH+ziWnDdzP0rSHsBHd5TbAvbUS6f5Y4yi0wEBy
+aZYEE6xm037/k65F1s+agKq4RHpJ80ARuZA0z5wTXpL9/y8P1SM06bDwleSIWzoF
+IUJw8reFujMW0mF4PiH8QlrV4Pp9sokG1AZFfO9Jhnp2o8xXphLRBAAcMqogZN+l
+BUQzTdsZPXW8vpdgB8x8n5YRKc/5aAPj1qNZy6gha1Azq66SNodQjk0PaQ58OkKY
+kUQ03SlUx7OoCOOr8Wy/0RZf+4TR1qEiyzHnYTSLqktnH3R4BysXV2cb9cLZpE7S
+x8knBEpcDCCC5u6Ig1H/6Uw2HANbrV0kbJZ93N+IY/mmAnkhJo4fe+KAaO1Zaeci
+Nt+7jHiFqPQoZOmA1G6ADf2rweWb8hY1BlMs0618X2Yp586Ji8GpianEjfuhdaAG
+wXt/oXRAAJEhyWRyA30PpgOz/KACxw3RgugtZOuZ/qoYoNw5uP4=
+=PI1W
+-----END PGP SIGNATURE-----
+
+--53pjgifjc2w2eu3r--
 
 
