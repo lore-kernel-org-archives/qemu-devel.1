@@ -2,73 +2,97 @@ Return-Path: <SRS0=k4hX=CF=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96909C433E1
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC5BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:29:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6256922BEA
-	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6256922BEA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 756ED22BEA
+	for <qemu-devel@archiver.kernel.org>; Thu, 27 Aug 2020 07:29:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="irylW0Yb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 756ED22BEA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBCL8-0003Am-Mh
-	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:28:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54162)
+	id 1kBCM2-0004B6-PV
+	for qemu-devel@archiver.kernel.org; Thu, 27 Aug 2020 03:29:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kBBuL-00035O-CH; Thu, 27 Aug 2020 03:01:13 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:47832 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kBBuH-0002m2-Oq; Thu, 27 Aug 2020 03:01:13 -0400
-Received: from DGGEMM402-HUB.china.huawei.com (unknown [172.30.72.53])
- by Forcepoint Email with ESMTP id 6506E1FDF67428F7D126;
- Thu, 27 Aug 2020 15:00:56 +0800 (CST)
-Received: from DGGEMM424-HUB.china.huawei.com (10.1.198.41) by
- DGGEMM402-HUB.china.huawei.com (10.3.20.210) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Thu, 27 Aug 2020 15:00:56 +0800
-Received: from DGGEMM511-MBX.china.huawei.com ([169.254.1.141]) by
- dggemm424-hub.china.huawei.com ([10.1.198.41]) with mapi id 14.03.0487.000;
- Thu, 27 Aug 2020 15:00:47 +0800
-From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: RE: [PATCH v2 09/10] hw/intc: Remove redundant statement in
- exynos4210_combiner_read()
-Thread-Topic: [PATCH v2 09/10] hw/intc: Remove redundant statement in
- exynos4210_combiner_read()
-Thread-Index: AQHWetKNgmqjr7ls9UKOtUz3l3Xb5qlIPmkAgAM/MOA=
-Date: Thu, 27 Aug 2020 07:00:46 +0000
-Message-ID: <7412CDE03601674DA8197E2EBD8937E83B8E58BD@dggemm511-mbx.china.huawei.com>
-References: <20200825112447.126308-1-kuhn.chenqun@huawei.com>
- <20200825112447.126308-10-kuhn.chenqun@huawei.com>
- <CAFEAcA_SLjM28bHH8WxBdHAFdLgE6zgqNAj9EpOVp77WL-iqKg@mail.gmail.com>
-In-Reply-To: <CAFEAcA_SLjM28bHH8WxBdHAFdLgE6zgqNAj9EpOVp77WL-iqKg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.187.50]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBC4D-0005bU-VX
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:11:29 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34219)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kBC4B-0003oc-VK
+ for qemu-devel@nongnu.org; Thu, 27 Aug 2020 03:11:25 -0400
+Received: by mail-wr1-x441.google.com with SMTP id f7so4291897wrw.1
+ for <qemu-devel@nongnu.org>; Thu, 27 Aug 2020 00:11:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=dme-org.20150623.gappssmtp.com; s=20150623;
+ h=to:cc:subject:in-reply-to:references:from:date:message-id
+ :mime-version; bh=KlssIaCmydO2Kg8rJrK8/pP8mqF/5JVAB5ryn3q5dMk=;
+ b=irylW0YbRomELYP21X8GHbUv3xesEY21JBvP63PXWMjiRVODCnFwQRr8DSPOv9ccwu
+ yjkzqm+crClCTL7Vl9aNe9xHwoJkUrySG1Ezmv7Fsqo+Jiec5BI98kSRfx6//lS1Q71L
+ hh7oVCX/PNYYr8o1x/YoUD16ee5OGSpykZFC2YNqOVmMi4xxvNPSp32BoGKn9NXpXUS9
+ t/K9IVbizm7kfKmg4BW1O4zLWbubhO2ZeeLCvLtfRALThc7RQGYQ0x5D4gO8ufhQTif8
+ x4LHD0Gp3KTz7EFsIoZ1hqWvEx95pBq3zJkApuyTO2IjrHDWfestRslWE81mIoSch9ly
+ 8Avw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
+ :message-id:mime-version;
+ bh=KlssIaCmydO2Kg8rJrK8/pP8mqF/5JVAB5ryn3q5dMk=;
+ b=JbPkUS0oiFnAbBDLqWLyMlYfjGLrJ5k/yFPMpNWNfz7lYt3Q1lZ9wJbxpvCeE8hjHi
+ 1/PscsymElA27LC0XsiJPsi3fGCtYFK3qqv6Y9HWIkzxfFEgULM5fAqLlyQP/DsIw6MW
+ HmwjwxpzSXS3Jzul/5qUzAxl1Y9mEoH9Op7mmzUOHdcnnYNUhzpIV15OCVEldVUIWG3B
+ ukdxKZulTjrSsVZD3dcjU0CQ1DXNHfKTEEcRklGiOn4BO21FCgAHP84zlRblm+XFnEXv
+ 7GorAuH8q/myVmV+mD+wisWTZN8Pu0WmBAoLjKEJyu9kFbGUglmLFoGbFkMM05yvvvB1
+ 3Gwg==
+X-Gm-Message-State: AOAM5312PaYj6wniG/DswlPYY3C0EhGkugeTg9qD34AowH/kPL1CX36C
+ zB9pfFxT3UmyW60OwB3NqvQvOg==
+X-Google-Smtp-Source: ABdhPJxuNzYVppPii5zbjox8GL7w915z4HJPqq61w5SVV6sFKQc+R4O6Biju6AmN8xLrkwDfX/6c3Q==
+X-Received: by 2002:adf:8b12:: with SMTP id n18mr9075590wra.85.1598512281950; 
+ Thu, 27 Aug 2020 00:11:21 -0700 (PDT)
+Received: from disaster-area.hh.sledj.net
+ (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
+ [2001:8b0:bb71:7140:64::dea8])
+ by smtp.gmail.com with ESMTPSA id m10sm3065761wmi.9.2020.08.27.00.11.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 27 Aug 2020 00:11:21 -0700 (PDT)
+Received: from localhost (disaster-area.hh.sledj.net [local])
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 67f9e09b;
+ Thu, 27 Aug 2020 07:11:20 +0000 (UTC)
+To: Zheng Chuan <zhengchuan@huawei.com>, "Dr. David Alan Gilbert"
+ <dgilbert@redhat.com>
+Subject: Re: [PATCH v5 06/12] migration/dirtyrate: Record hash results for
+ each sampled page
+In-Reply-To: <a86e273f-8bca-e789-d868-cb3832c162b4@huawei.com>
+References: <1598260480-64862-1-git-send-email-zhengchuan@huawei.com>
+ <1598260480-64862-7-git-send-email-zhengchuan@huawei.com>
+ <m2eentlogl.fsf@dme.org> <20200826123016.GA2727@work-vm>
+ <a86e273f-8bca-e789-d868-cb3832c162b4@huawei.com>
+X-HGTTG: heart-of-gold
+From: David Edmondson <dme@dme.org>
+Date: Thu, 27 Aug 2020 08:11:20 +0100
+Message-ID: <m2lfi0k1gn.fsf@dme.org>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.255;
- envelope-from=kuhn.chenqun@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/27 03:00:57
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+Received-SPF: neutral client-ip=2a00:1450:4864:20::441;
+ envelope-from=dme@dme.org; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,71 +105,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>, Pannengyuan <pannengyuan@huawei.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- Igor Mitsyanko <i.mitsyanko@gmail.com>, Euler Robot <euler.robot@huawei.com>
+Cc: berrange@redhat.com, zhang.zhanghailiang@huawei.com, quintela@redhat.com,
+ qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
+ ann.zhuangyanying@huawei.com, fangying1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiBTdWJqZWN0OiBSZTogW1BBVENIIHYyIDA5LzEwXSBody9pbnRjOiBSZW1vdmUgcmVkdW5kYW50
-IHN0YXRlbWVudCBpbg0KPiBleHlub3M0MjEwX2NvbWJpbmVyX3JlYWQoKQ0KPiANCj4gT24gVHVl
-LCAyNSBBdWcgMjAyMCBhdCAxMjoyNiwgQ2hlbiBRdW4gPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29t
-PiB3cm90ZToNCj4gPg0KPiA+IENsYW5nIHN0YXRpYyBjb2RlIGFuYWx5emVyIHNob3cgd2Fybmlu
-ZzoNCj4gPiBody9pbnRjL2V4eW5vczQyMTBfY29tYmluZXIuYzoyMzE6OTogd2FybmluZzogVmFs
-dWUgc3RvcmVkIHRvICd2YWwnIGlzIG5ldmVyDQo+IHJlYWQNCj4gPiAgICAgICAgIHZhbCA9IHMt
-PnJlZ19zZXRbb2Zmc2V0ID4+IDJdOw0KPiA+DQo+ID4gVGhlIGRlZmF1bHQgdmFsdWUgb2YgJ3Zh
-bCcgaXMgJzAnLCBzbyB3ZSBjYW4gYnJlYWsgdGhlICdkZWZhdWx0JyBicmFuY2ggYW5kIHJldHVy
-bg0KPiAndmFsJy4NCj4gPg0KPiA+IFJlcG9ydGVkLWJ5OiBFdWxlciBSb2JvdCA8ZXVsZXIucm9i
-b3RAaHVhd2VpLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBDaGVuIFF1biA8a3Vobi5jaGVucXVu
-QGh1YXdlaS5jb20+DQo+ID4gLS0tDQo+ID4gQ2M6IElnb3IgTWl0c3lhbmtvIDxpLm1pdHN5YW5r
-b0BnbWFpbC5jb20+DQo+ID4gQ2M6IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJv
-Lm9yZz4NCj4gPiAtLS0NCj4gPiAgaHcvaW50Yy9leHlub3M0MjEwX2NvbWJpbmVyLmMgfCAzICst
-LQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDIgZGVsZXRpb25zKC0pDQo+
-ID4NCj4gPiBkaWZmIC0tZ2l0IGEvaHcvaW50Yy9leHlub3M0MjEwX2NvbWJpbmVyLmMNCj4gPiBi
-L2h3L2ludGMvZXh5bm9zNDIxMF9jb21iaW5lci5jIGluZGV4IGI4NTYxZTQxODAuLmUyZTc0NWJi
-YWEgMTAwNjQ0DQo+ID4gLS0tIGEvaHcvaW50Yy9leHlub3M0MjEwX2NvbWJpbmVyLmMNCj4gPiAr
-KysgYi9ody9pbnRjL2V4eW5vczQyMTBfY29tYmluZXIuYw0KPiA+IEBAIC0yMjgsOCArMjI4LDcg
-QEAgZXh5bm9zNDIxMF9jb21iaW5lcl9yZWFkKHZvaWQgKm9wYXF1ZSwgaHdhZGRyDQo+IG9mZnNl
-dCwgdW5zaWduZWQgc2l6ZSkNCj4gPiAgICAgICAgICAgICAgaHdfZXJyb3IoImV4eW5vczQyMTAu
-Y29tYmluZXI6IG92ZXJmbG93IG9mIHJlZ19zZXQgYnkgMHgiDQo+ID4gICAgICAgICAgICAgICAg
-ICAgICAgVEFSR0VUX0ZNVF9wbHggIm9mZnNldFxuIiwgb2Zmc2V0KTsNCj4gPiAgICAgICAgICB9
-DQo+ID4gLSAgICAgICAgdmFsID0gcy0+cmVnX3NldFtvZmZzZXQgPj4gMl07DQo+ID4gLSAgICAg
-ICAgcmV0dXJuIDA7DQo+ID4gKyAgICAgICAgYnJlYWs7DQo+ID4gICAgICB9DQo+ID4gICAgICBy
-ZXR1cm4gdmFsOw0KPiA+ICB9DQo+IA0KPiBUaGUgY29kZSBhcyBpdCBzdGFuZHMgaXMgZGVmaW5p
-dGVseSB3cm9uZywgYnV0IEknbSBub3Qgc3VyZSB0aGlzIGlzIHRoZSBjb3JyZWN0IGZpeC4NCj4g
-U3VyZWx5IHRoZSBpbnRlbnRpb24gbXVzdCBoYXZlIGJlZW4gdG8gcmV0dXJuIHRoZSBhY3R1YWwg
-cmVnaXN0ZXIgdmFsdWUgZnJvbQ0KPiB0aGUgcmVnX3NldFtdIGFycmF5LCBub3QgdG8gcmV0dXJu
-IDAgPw0KPiANCj4gSSBzdXNwZWN0IHRoZSBjb3JyZWN0IGZpeCBoZXJlIGlzIHNpbXBseSB0byBk
-ZWxldGUgdGhlICJyZXR1cm4gMCIgbGluZSBhbmQgbGVhdmUNCj4gdGhlIGFzc2lnbm1lbnQgdG8g
-dmFsIGFzIGl0IGlzLg0KDQpIaSBQZXRlciwNCiAgSSB0aGluayB5b3UncmUgcmlnaHQuDQoNCj4g
-SWRlYWxseSB5b3Ugc2hvdWxkIGNoZWNrIHRoZSBoL3cgZGF0YXNoZWV0IHRvIGNvbmZpcm0uDQog
-SSBjaGVja2VkIHRoZSBFeHlub3MgNDIxMCBkYXRhc2hlZXQgYW5kIGZvdW5kIHRoYXQgJ0ludGVy
-cnVwdCBDb21iaW5lciBPcGVyYXRpb24nIGhhZCBvbmx5IGZpdmUgdHlwZXMgb2YgcmVnaXN0ZXJz
-Lg0KDQpSZWdpc3RlciAgICAgICAgICAgICBEZXNjcmlwdGlvbiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICBUeXBlDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpJ
-RVNSKDAvMS8yLzMpICAgSW50ZXJydXB0IEVuYWJsZSBTZXQgUmVnaXN0ZXIgZm9yIEdyb3VwICgw
-fjMvIDQgfjcvIDh+IDExLyAxMn4gMTUpICAgICAgICAgUlcNCklFQ1IoMC8xLzIvMykgICBJbnRl
-cnJ1cHQgRW5hYmxlIENsZWFyIFJlZ2lzdGVyIGZvciBHcm91cCAoMH4zLyA0IH43LyA4fiAxMS8g
-MTJ+IDE1KSAgICAgICBSVw0KSVNUUigwLzEvMi8zKSAgIEludGVycnVwdCBTdGF0dXMgUmVnaXN0
-ZXIgZm9yIEdyb3VwICgwfjMvIDQgfjcvIDh+IDExLyAxMn4gMTUpICAgICAgICAgICAgIFINCklN
-U1IoMC8xLzIvMykgIEludGVycnVwdCBNYXNrZWQgU3RhdHVzIFJlZ2lzdGVyIGZvciBHcm91cCgw
-fjMvIDQgfjcvIDh+IDExLyAxMn4gMTUpICAgICAgIFINCkNJUFNSMCAgICAgICAgQ29tYmluZWQg
-SW50ZXJydXB0IFBlbmRpbmcgU3RhdHVzMCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICBSDQoNClRoZSBleHlub3M0MjEwX2NvbWJpbmVyX3dyaXRlKCkgZnVuY3Rpb24gaGFzIHdyaXRl
-IG9wZXJhdGlvbnMgZm9yIElFU1IgYW5kIElFQ1IuDQpUaGUgQ0lQU1IsIElTVFIsIGFuZCBJTVNS
-IHJlYWQgb3BlcmF0aW9ucyBhcmUgc3BlY2lmaWVkIGluIHRoZSBleHlub3M0MjEwX2NvbWJpbmVy
-X3JlYWQoKSBmdW5jdGlvbi4NCg0KU28sIFRoaXMgJ2RlZmF1bHQnIGJyYW5jaCBpbiBleHlub3M0
-MjEwX2NvbWJpbmVyX3JlYWQoKSBmdW5jdGlvbiByZWFkIG9wZXJhdGlvbiBpcyBvbmx5IGZvciBJ
-RVNSIGFuZCBJRUNSLg0KDQpBbmQsIGluIHRoZSBleHlub3M0MjEwX2NvbWJpbmVyX3dyaXRlIGZ1
-bmN0aW9uLCB0aGUgZGVmYXVsdCBhc3NpZ25tZW50IHN0YXRlbWVudCBmb3IgSUVTUiBhbmQgSUVD
-UiBpcyAiIHMtPnJlZ19zZXRbb2Zmc2V0ID4+IDJdID0gdmFsOyIuDQpUaGVyZWZvcmUsIGlmIHdl
-IHJlYWQgdGhlIHR3byByZWdpc3RlcihJRVNSIGFuZCBJRUNSKSB2YWx1ZXMsIHdlIGNhbiBkaXJl
-Y3RseSB1c2UgdGhpcyBhc3NpZ25tZW50IHN0YXRlbWVudCAidmFsID0gcy0+cmVnX3NldFtvZmZz
-ZXQgPj4gMl07Ii4NCg0KUGxlYXNlIGNvbmZpcm0gdGhhdCBpZiB0aGVyZSBpcyBubyBwcm9ibGVt
-LCBJIHdpbGwgbW9kaWZ5IGl0IGluIGxhdGVyIHZlcnNpb24uDQoNClRoYW5rcywNCkNoZW4gUXVu
-DQoNCg0KDQoNCg==
+On Thursday, 2020-08-27 at 14:28:03 +08, Zheng Chuan wrote:
+
+>>>> +static struct RamblockDirtyInfo *
+>>>> +alloc_ramblock_dirty_info(int *block_index,
+>>>> +                          struct RamblockDirtyInfo *block_dinfo)
+>>>> +{
+>>>> +    struct RamblockDirtyInfo *info = NULL;
+>>>> +    int index = *block_index;
+>>>> +
+>>>> +    if (!block_dinfo) {
+>>>> +        index = 0;
+>>>> +        block_dinfo = g_try_new(struct RamblockDirtyInfo, 1);
+>>>> +    } else {
+>>>> +        index++;
+>>>> +        block_dinfo = g_try_realloc(block_dinfo, (index + 1) *
+>>>> +                                    sizeof(struct RamblockDirtyInfo));
+>>>
+>>> g_try_renew() instead of g_try_realloc()?
+>>>
+> Hi,
+> I am not sure that because there only one place in qemu to use g_try_renew.
+> Could you tell me why, because i think g_try_realloc will also return NULL when error happen:)
+
+Only suggested because it would make the two branches of the code more
+similar.
+
+dme.
+-- 
+And you can't hold me down, 'cause I belong to the hurricane.
 
