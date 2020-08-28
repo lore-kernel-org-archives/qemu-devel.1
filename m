@@ -2,82 +2,85 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACAC5C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:51:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDFADC433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:51:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7322C207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:51:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95993207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:51:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JdH2Kdau"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7322C207DF
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VWEyKo1I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95993207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBfiV-0002LO-Jz
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:50:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52150)
+	id 1kBfiu-0003Rx-Qa
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:51:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfFa-0002dw-VH
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:21:06 -0400
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:38386)
+ id 1kBfFg-0002r9-1h
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:21:12 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42431)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfFY-0005SW-Vb
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:21:06 -0400
-Received: by mail-pf1-x429.google.com with SMTP id d22so739663pfn.5
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:21:04 -0700 (PDT)
+ id 1kBfFd-0005TN-UX
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:21:11 -0400
+Received: by mail-pl1-x643.google.com with SMTP id j11so523010plk.9
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:21:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=S1J1OXIAUboVyh3Ty609ni6o6b4zaR4IGzxYSfN+fuo=;
- b=JdH2KdauXdi8ZY56ME2elaPcQKpTJbJ4NBo/3Hz2mLwkV63pe+7ChJRUxCZdUSs917
- my+7TzPUr9xaAJDL2GGKddmh+7HTTiJq+eDgLgDWbJcNqs3jPc3F9qiqWOPqWFitaDSc
- 6JyBCkzeoZxUW0w2MJaaHJ3ipfeUO9EFFI89S4wd+wvRM7gHZ4ipNGGzdrfp47HmlAfO
- ZtjZ5/U4z87NlFtBvU9vn9LNB/LrA4AxS5qTW7JpHay6ViHGXODreR+c209uj8BVgD4q
- N4hSJxVUq2gqh8RKDocFTpWrH5RjglGk4nB/xMPmwEu0btdpG7yGAciG1feool3YVpaw
- /OVA==
+ bh=Wk3q7sRIifjFiJkV8x6Kj24R0PtPBhZ5iMsj3wtsB2s=;
+ b=VWEyKo1IJT+wLwHf4D8H58tQVobWN1I+Dzw/6zCBbeaJ9xaQUhQhHp311DrUM9KGRx
+ 9xdKCV2xvF2+EJ2C5ulwFTztEqC0Dx9HXBljC36OwvZychiHZT7A6B9YqTNCv9MTBwDu
+ Aokz20W7wiA5qssEc5az4MfNiR0+qS/Cni6KQzDDObgq1DPf9pskSEqaIfLMaXj1+7f3
+ rMfSj+5g6wsgV3AXKUnS7eB3b8ADBil4n2fHV6K3MzGK2qEprG7Y+oslktb0W0ZBVenx
+ CBdF14r2XnAVS5JrBCFhTxi/JuDpZAcRliT/Hrraj8SxP+5yHfQVN+k941mh6NyeiSo6
+ 2uWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=S1J1OXIAUboVyh3Ty609ni6o6b4zaR4IGzxYSfN+fuo=;
- b=IX8K43L7ccb7ylPwZsHA41v6w1H5diL9zwUSz73ERMJJAm4huM0tJMkEptyLSnBWh6
- N035N7HlfRK3Gd08vlCr9BTA2E4H2ZOyM429ZTobrKkNjJ2ERt86WHNNPRzc3h/wRuEX
- PcERNk0qX9akWhJwaxJzvneePC5pvrjqtCwzr9TZdVFiL+Pqpt1pwuXaE+1hXSr/RJEl
- A31/P3tdgMGqmvD4M8VhvwdK5N71CkGtGl4F1iQowOGrNqpcwhN/1v7bLPG6vP3J4CDj
- zveBONKdJCyEKhiD6ouw5DsJSh//bBi6oHCvpX48HrCHSjrwJYnEsiaRIFiMsxhUv+bs
- hkQA==
-X-Gm-Message-State: AOAM532l3eC9cdELfcGbeGeKnoHg1pmndfTkjA+hvWQNZ8kgYB/KQ3G1
- PWaFOogeByhoMQS3vijo0xKRDujnS06gAg==
-X-Google-Smtp-Source: ABdhPJzqG95jYdNgZB3Zf4SyxQmadZVRk0zSxCpnFYPJE1pgt062gZzpHbGkhBZD41nLdm+1sXFikw==
-X-Received: by 2002:a62:27c7:: with SMTP id n190mr1483381pfn.128.1598624463015; 
- Fri, 28 Aug 2020 07:21:03 -0700 (PDT)
+ bh=Wk3q7sRIifjFiJkV8x6Kj24R0PtPBhZ5iMsj3wtsB2s=;
+ b=IqVEwhCJjS/li1PwVMAv07MLijsQj534wj1wEggkADrenCj/1Eq+AaojCuzzeS2i6c
+ ehBtiQrwqi56rcKg/AH/1Q2RF/BTXU5eEBG1VUrwB2fntgih3awPvbLBfNzk/I3dSPX4
+ S4oYDFWiVfRctPbUUSXGFHpU/203gIpjBF5PBDlk1Tzd/2sP4Gs5MD5bwsPP4LA0YKbI
+ TPw7UHAXpzFuFUWqPh0TsCcErobPxE1OqkG6qsVdTbo77+/BG00MgDQ1JsI9HC8DRZYw
+ ugfYbyBDUOd551TwE25Aem8jaYSpNOQD10QMOc3J3FvDFffBW/mQXauYe93rBEstzj7Z
+ 1S0A==
+X-Gm-Message-State: AOAM530fF9d3IQR+XJmxp5LEagAdnoA+My7aStDYBBrPBnV5ODZU6P4w
+ fDwgGNA6M/x8BeSAbzBOF7JyWqfxWWw2CA==
+X-Google-Smtp-Source: ABdhPJxEHeEVEvclJf8ZSKB+EduEmHJWjB6uZq5PvxDm0LugvhMmhpuMVJsuStj+2gI85ESjuKc6hg==
+X-Received: by 2002:a17:902:bd43:: with SMTP id
+ b3mr1444730plx.276.1598624468199; 
+ Fri, 28 Aug 2020 07:21:08 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.21.01
+ by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.21.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 07:21:02 -0700 (PDT)
+ Fri, 28 Aug 2020 07:21:07 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 72/76] target/microblaze: Convert dec_stream to decodetree
-Date: Fri, 28 Aug 2020 07:19:25 -0700
-Message-Id: <20200828141929.77854-73-richard.henderson@linaro.org>
+Subject: [PATCH v2 76/76] target/microblaze: Reduce linux-user address space
+ to 32-bit
+Date: Fri, 28 Aug 2020 07:19:29 -0700
+Message-Id: <20200828141929.77854-77-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
 References: <20200828141929.77854-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::429;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x429.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,130 +107,181 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+User-space programs cannot use the 64-bit lwea/swea instructions.
+We can improve code generation and runtime by restricting the
+user-only address space to 32-bit.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/insns.decode |  6 ++++
- target/microblaze/translate.c  | 64 ++++++++++++++++++++++++++--------
- 2 files changed, 55 insertions(+), 15 deletions(-)
+ target/microblaze/cpu-param.h | 15 +++++++++++++++
+ target/microblaze/cpu.h       |  2 +-
+ target/microblaze/helper.c    |  4 ++--
+ target/microblaze/translate.c | 28 +++++++++++++++++++++++++++-
+ 4 files changed, 45 insertions(+), 4 deletions(-)
 
-diff --git a/target/microblaze/insns.decode b/target/microblaze/insns.decode
-index 43c9e16819..fb0f0e6838 100644
---- a/target/microblaze/insns.decode
-+++ b/target/microblaze/insns.decode
-@@ -159,6 +159,9 @@ flt             010110 ..... ..... ----- 0101 000 0000  @typea0
- fint            010110 ..... ..... ----- 0110 000 0000  @typea0
- fsqrt           010110 ..... ..... 00000 0111 000 0000  @typea0
+diff --git a/target/microblaze/cpu-param.h b/target/microblaze/cpu-param.h
+index 4abbc62d50..4d8297fa94 100644
+--- a/target/microblaze/cpu-param.h
++++ b/target/microblaze/cpu-param.h
+@@ -8,9 +8,24 @@
+ #ifndef MICROBLAZE_CPU_PARAM_H
+ #define MICROBLAZE_CPU_PARAM_H 1
  
-+get             011011 rd:5  00000 0 ctrl:5 000000 imm:4
-+getd            010011 rd:5  00000 rb:5  0 ctrl:5  00000
++/*
++ * While system mode can address up to 64 bits of address space,
++ * this is done via the lea/sea instructions, which are system-only
++ * (as they also bypass the mmu).
++ *
++ * We can improve the user-only experience by only exposing 32 bits
++ * of address space.
++ */
++#ifdef CONFIG_USER_ONLY
++#define TARGET_LONG_BITS 32
++#define TARGET_PHYS_ADDR_SPACE_BITS 32
++#define TARGET_VIRT_ADDR_SPACE_BITS 32
++#else
+ #define TARGET_LONG_BITS 64
+ #define TARGET_PHYS_ADDR_SPACE_BITS 64
+ #define TARGET_VIRT_ADDR_SPACE_BITS 64
++#endif
 +
- idiv            010010 ..... ..... ..... 000 0000 0000  @typea
- idivu           010010 ..... ..... ..... 000 0000 0010  @typea
+ /* FIXME: MB uses variable pages down to 1K but linux only uses 4k.  */
+ #define TARGET_PAGE_BITS 12
+ #define NB_MMU_MODES 3
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 4298f242a6..d11b6fa995 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -242,7 +242,7 @@ struct CPUMBState {
+     uint32_t pc;
+     uint32_t msr;    /* All bits of MSR except MSR[C] and MSR[CC] */
+     uint32_t msr_c;  /* MSR[C], in low bit; other bits must be 0 */
+-    uint64_t ear;
++    target_ulong ear;
+     uint32_t esr;
+     uint32_t fsr;
+     uint32_t btr;
+diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
+index 1667822fb7..48547385b0 100644
+--- a/target/microblaze/helper.c
++++ b/target/microblaze/helper.c
+@@ -303,8 +303,8 @@ void mb_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+     iflags = cpu->env.iflags;
  
-@@ -201,6 +204,9 @@ pcmpbf          100000 ..... ..... ..... 100 0000 0000  @typea
- pcmpeq          100010 ..... ..... ..... 100 0000 0000  @typea
- pcmpne          100011 ..... ..... ..... 100 0000 0000  @typea
+     qemu_log_mask(CPU_LOG_INT,
+-                  "Unaligned access addr=" TARGET_FMT_lx
+-                  " pc=%x iflags=%x\n", addr, cpu->env.pc, iflags);
++                  "Unaligned access addr=" TARGET_FMT_lx " pc=%x iflags=%x\n",
++                  (target_ulong)addr, cpu->env.pc, iflags);
  
-+put             011011 00000 ra:5  1 ctrl:5 000000 imm:4
-+putd            010011 00000 ra:5  rb:5  1 ctrl:5  00000
-+
- rsub            000001 ..... ..... ..... 000 0000 0000  @typea
- rsubc           000011 ..... ..... ..... 000 0000 0000  @typea
- rsubk           000101 ..... ..... ..... 000 0000 0000  @typea
+     esr = ESR_EC_UNALIGNED_DATA;
+     if (likely(iflags & ESR_ESS_FLAG)) {
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 582f5a1577..2c87d671ae 100644
+index 8c287457a9..a377818b5e 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -1560,33 +1560,68 @@ static void dec_null(DisasContext *dc)
+@@ -687,6 +687,7 @@ static TCGv compute_ldst_addr_typeb(DisasContext *dc, int ra, int imm)
+     return ret;
  }
  
- /* Insns connected to FSL or AXI stream attached devices.  */
--static void dec_stream(DisasContext *dc)
-+static bool do_get(DisasContext *dc, int rd, int rb, int imm, int ctrl)
++#ifndef CONFIG_USER_ONLY
+ static TCGv compute_ldst_addr_ea(DisasContext *dc, int ra, int rb)
  {
-     TCGv_i32 t_id, t_ctrl;
--    int ctrl;
+     int addr_size = dc->cpu->cfg.addr_size;
+@@ -712,6 +713,7 @@ static TCGv compute_ldst_addr_ea(DisasContext *dc, int ra, int rb)
+     }
+     return ret;
+ }
++#endif
  
+ static void record_unaligned_ess(DisasContext *dc, int rd,
+                                  MemOp size, bool store)
+@@ -776,8 +778,12 @@ static bool trans_lbuea(DisasContext *dc, arg_typea *arg)
      if (trap_userspace(dc, true)) {
--        return;
-+        return true;
+         return true;
      }
- 
-     t_id = tcg_temp_new_i32();
--    if (dc->type_b) {
--        tcg_gen_movi_i32(t_id, dc->imm & 0xf);
--        ctrl = dc->imm >> 10;
-+    if (rb) {
-+        tcg_gen_andi_i32(t_id, cpu_R[rb], 0xf);
-     } else {
--        tcg_gen_andi_i32(t_id, cpu_R[dc->rb], 0xf);
--        ctrl = dc->imm >> 5;
-+        tcg_gen_movi_i32(t_id, imm);
-     }
- 
-     t_ctrl = tcg_const_i32(ctrl);
--
--    if (dc->rd == 0) {
--        gen_helper_put(t_id, t_ctrl, cpu_R[dc->ra]);
--    } else {
--        gen_helper_get(cpu_R[dc->rd], t_id, t_ctrl);
--    }
-+    gen_helper_get(reg_for_write(dc, rd), t_id, t_ctrl);
-     tcg_temp_free_i32(t_id);
-     tcg_temp_free_i32(t_ctrl);
++#ifdef CONFIG_USER_ONLY
 +    return true;
-+}
-+
-+static bool trans_get(DisasContext *dc, arg_get *arg)
-+{
-+    return do_get(dc, arg->rd, 0, arg->imm, arg->ctrl);
-+}
-+
-+static bool trans_getd(DisasContext *dc, arg_getd *arg)
-+{
-+    return do_get(dc, arg->rd, arg->rb, 0, arg->ctrl);
-+}
-+
-+static bool do_put(DisasContext *dc, int ra, int rb, int imm, int ctrl)
-+{
-+    TCGv_i32 t_id, t_ctrl;
-+
-+    if (trap_userspace(dc, true)) {
-+        return true;
-+    }
-+
-+    t_id = tcg_temp_new_i32();
-+    if (rb) {
-+        tcg_gen_andi_i32(t_id, cpu_R[rb], 0xf);
-+    } else {
-+        tcg_gen_movi_i32(t_id, imm);
-+    }
-+
-+    t_ctrl = tcg_const_i32(ctrl);
-+    gen_helper_put(t_id, t_ctrl, reg_for_read(dc, ra));
-+    tcg_temp_free_i32(t_id);
-+    tcg_temp_free_i32(t_ctrl);
-+    return true;
-+}
-+
-+static bool trans_put(DisasContext *dc, arg_put *arg)
-+{
-+    return do_put(dc, arg->ra, 0, arg->imm, arg->ctrl);
-+}
-+
-+static bool trans_putd(DisasContext *dc, arg_putd *arg)
-+{
-+    return do_put(dc, arg->ra, arg->rb, 0, arg->ctrl);
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_load(dc, arg->rd, addr, MO_UB, MMU_NOMMU_IDX, false);
++#endif
  }
  
- static struct decoder_info {
-@@ -1596,7 +1631,6 @@ static struct decoder_info {
-     };
-     void (*dec)(DisasContext *dc);
- } decinfo[] = {
--    {DEC_STREAM, dec_stream},
-     {{0, 0}, dec_null}
- };
+ static bool trans_lbui(DisasContext *dc, arg_typeb *arg)
+@@ -803,8 +809,12 @@ static bool trans_lhuea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_load(dc, arg->rd, addr, MO_TEUW, MMU_NOMMU_IDX, false);
++#endif
+ }
+ 
+ static bool trans_lhui(DisasContext *dc, arg_typeb *arg)
+@@ -830,8 +840,12 @@ static bool trans_lwea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_load(dc, arg->rd, addr, MO_TEUL, MMU_NOMMU_IDX, false);
++#endif
+ }
+ 
+ static bool trans_lwi(DisasContext *dc, arg_typeb *arg)
+@@ -910,8 +924,12 @@ static bool trans_sbea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_store(dc, arg->rd, addr, MO_UB, MMU_NOMMU_IDX, false);
++#endif
+ }
+ 
+ static bool trans_sbi(DisasContext *dc, arg_typeb *arg)
+@@ -937,8 +955,12 @@ static bool trans_shea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_store(dc, arg->rd, addr, MO_TEUW, MMU_NOMMU_IDX, false);
++#endif
+ }
+ 
+ static bool trans_shi(DisasContext *dc, arg_typeb *arg)
+@@ -964,8 +986,12 @@ static bool trans_swea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_store(dc, arg->rd, addr, MO_TEUL, MMU_NOMMU_IDX, false);
++#endif
+ }
+ 
+ static bool trans_swi(DisasContext *dc, arg_typeb *arg)
+@@ -1818,7 +1844,7 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+     }
+ 
+     qemu_fprintf(f, "\nesr=0x%04x fsr=0x%02x btr=0x%08x edr=0x%x\n"
+-                 "ear=0x%016" PRIx64 " slr=0x%x shr=0x%x\n",
++                 "ear=0x" TARGET_FMT_lx " slr=0x%x shr=0x%x\n",
+                  env->esr, env->fsr, env->btr, env->edr,
+                  env->ear, env->slr, env->shr);
  
 -- 
 2.25.1
