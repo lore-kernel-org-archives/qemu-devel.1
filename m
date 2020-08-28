@@ -2,128 +2,97 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C91C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 16:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D093C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 16:31:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84CDC2080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 16:29:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 52B5320872
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 16:31:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="AFA9xSa2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84CDC2080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XH9vtymB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B5320872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44072 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBhFn-0000Wd-Ln
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 12:29:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56904)
+	id 1kBhHY-00023J-Hl
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 12:31:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kBhFE-0008PB-1i; Fri, 28 Aug 2020 12:28:52 -0400
-Received: from mail-eopbgr130104.outbound.protection.outlook.com
- ([40.107.13.104]:48014 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kBhF9-00074H-S4; Fri, 28 Aug 2020 12:28:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mGi89byRA6Dqkd/jQu4Ui2h1JeN0yiWbdv7BYVmMzGFrRKZ/VH+EEn/n4+fJ3HTqqL3zbIZvv6+T7V2EHw5pEDvz9C3O9Hh4OZavjEYlSWFckHLGoJpxKY1vifSdKjYCU9kJQnBBBPqI6X3CU+Cz1/+ERABEWmAnKxfacHnaaSh27/m9bmUggUQXqo0YmjYmYjYSHtRIwTWd8M9ygz+HZkxrBflm2Ot3ubjDR+jYo5isN9P26d6AfCDh30UU4wN/xgfnZLpIG3s9dEW78jAmMnz1VFIBK263eY3sUOb3GnxPpykLSp1E5FULGvYscEqXUG6uGG+Q2P43qwnUPiAg2g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=24p3HBhex2pqwtFnhm+1+eMJQFFmDRZVbtSJNXXhuE4=;
- b=ln2A+yyIhFB638y10Qt8/RuNt8Nv+UOAhT4xzvUIBFDrt1KMZ1ppnxYIgpnDWuKatp7S3/mL0Dr93Kde/tro6cRtNrwzk9gOPRN0rrROGy25zMmEahO79EwnNeWQ6osW4LjqU9B2FYxeCelLGqMEMz61Lsmg0fCVQ8odpV6lvlgsRkyroczwWOMh8r8KeAb6LywpLXHFoV8l92SGYqTm5PAqrchL8YdqGmhW/3AuJISPdJ6Ku+iR6hJpqJtuMOjyGeTBqOgmmRduDL3uWM+t1CfIxlrjofHFfRIwieyPMFNuscOoW2Zd9hWmrF+LhaRFHskDAoaPKVClGAT4jPgX9A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=24p3HBhex2pqwtFnhm+1+eMJQFFmDRZVbtSJNXXhuE4=;
- b=AFA9xSa2FezwxMG+tSRwvCDuyBDNCpOrbq+Q+j2jtuPG1ua+eF4DXnUACcFx/Tyzm5o/Bosv5hb3sWqmxaEwhGucByxLZ14kS4KMIhHFxs38hMnYW9ijmNvgYFgOLHMEfW9rtmCGWeTykLLNvNA0id+UbGQHLoObBJfDE4VtM4E=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR0801MB1673.eurprd08.prod.outlook.com (2603:10a6:3:86::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Fri, 28 Aug
- 2020 16:28:42 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::b5e5:e4d:ed88:5a3a]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::b5e5:e4d:ed88:5a3a%9]) with mapi id 15.20.3305.032; Fri, 28 Aug 2020
- 16:28:42 +0000
-Subject: Re: [PATCH v7 4/4] block: apply COR-filter to block-stream jobs
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- armbru@redhat.com, jsnow@redhat.com, eblake@redhat.com, den@openvz.org
-References: <1598257914-887267-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1598257914-887267-5-git-send-email-andrey.shinkevich@virtuozzo.com>
- <2eef369e-a79d-57c9-f8c8-40be9c3aaa2c@virtuozzo.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <5a2bfe27-3589-5735-a3f8-cbcfc9cdbe75@virtuozzo.com>
-Date: Fri, 28 Aug 2020 19:28:39 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <2eef369e-a79d-57c9-f8c8-40be9c3aaa2c@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-GB
-X-ClientProxiedBy: AM4P190CA0015.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:200:56::25) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kBhG4-0000lW-Dy
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 12:29:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36356)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kBhG1-00078A-0v
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 12:29:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598632178;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Oj70SR5yRx8s61PouPdCkmzG5fMK3F9VGr7E3S5+PRU=;
+ b=XH9vtymBoL/VxfrbFWM4u9UxYgDATclf2VIvZnrwP3GVurQutOVKk4R+RxizLWJzFDY9+R
+ 2HeEYA55cPq1nwcfMFvPcHLZygwu+4KSVj+wdFpx9oy8wqMN7qxjDPN7yqMxkwDiE3viVo
+ jr8AlgL94FKP2ld1s+JKiM9P36q0ZCY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-321-EvXXwac1NYC-_9AqE0aF5Q-1; Fri, 28 Aug 2020 12:29:36 -0400
+X-MC-Unique: EvXXwac1NYC-_9AqE0aF5Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99DB0107B798;
+ Fri, 28 Aug 2020 16:29:35 +0000 (UTC)
+Received: from localhost (unknown [10.10.67.254])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 44F39756A6;
+ Fri, 28 Aug 2020 16:29:32 +0000 (UTC)
+Date: Fri, 28 Aug 2020 12:29:31 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
+ decode
+Message-ID: <20200828162931.GL642093@habkost.net>
+References: <20200826143849.59f6970b@redhat.com>
+ <20200826125059.GN168515@redhat.com>
+ <20200826153034.115126cb@redhat.com>
+ <20200826133638.GO168515@redhat.com>
+ <20200826160258.0e9047f4@redhat.com>
+ <20200826150340.GP168515@redhat.com>
+ <20200827190314.717ec788@imammedo-mac>
+ <20200827190752.GK642093@habkost.net>
+ <20200827225526.0b1f6d32@imammedo-mac>
+ <20200828085533.GC224144@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.22) by
- AM4P190CA0015.EURP190.PROD.OUTLOOK.COM (2603:10a6:200:56::25) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.19 via Frontend Transport; Fri, 28 Aug 2020 16:28:41 +0000
-X-Originating-IP: [109.252.114.22]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 04b47e30-eff0-4db5-8cea-08d84b6f6d55
-X-MS-TrafficTypeDiagnostic: HE1PR0801MB1673:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0801MB167313DC84ADD1E7BA896E59F4520@HE1PR0801MB1673.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5MC60gJ0wWMZFJcrWMHds5d6RCWuAVpPmnP5pKtSZWFY69c6wVR57RGOVK1AlcUCXjaWOaAd4E3kR5a4mnAv88ydULkW2955ibq50PXlYM2Ax+mHK29THoBcaegGfSIiJvmhChazE5YdFfA2sB8daURMrYYQOause/HqebNvVlicmWtHR4XgsYaE9i2JGoD0WGw4MHaWrk064MoHfTlSCe3Xfn/ON5PbuEzHuPgQjuHEx3uwnBv0Rk7F3eIp3wgHEk+7W3EVncyGde7Zti6GkdoGiUE00jMg7RcOyclJQ//F810BZnLqdprhybH0A/CSsEql30UNqs3Z4LRDQA+x10BK2f5RyCjHCQP4jKemvA2lSkVGmqBo92YKdeUV+pDD
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(136003)(376002)(366004)(346002)(39840400004)(107886003)(83380400001)(5660300002)(4326008)(6512007)(8676002)(2906002)(6486002)(36756003)(316002)(8936002)(86362001)(956004)(2616005)(31696002)(31686004)(44832011)(26005)(478600001)(16526019)(186003)(66946007)(53546011)(66556008)(66476007)(6506007)(52116002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: S9s4mX6DRQYhP5V5IlR64jGk5Cp7BhKO//hLehebJh/tijIfacHWDJLBGOzsbCx8azIUIPUFimV8v8t+hpzr8Axfy+UK5a2QeS97lTIsEMhHj06rAUycIKNRLUl51DifQkGUH0INiuoo8ghxB8VFwaFqmx8E0at9K3nSk8DuVfSeNErz4XdJf26bj3r9zDiKcdt59y9dkuQBdEmD0zXf46YZY+MirQThckqgGXBNf7HCQ+M1+IphLTzsnr0KnPC880YVmUjEMQE4VxJr01Pwt75gcSS/ILd03MewrcUcuvlZYAvjltyIy1DneWWVbd3eJuqDZNPSF+bd0EjwgbQwtlHRUP6pcWsqo0TARfS5PhllCGlVcyv7lVV/j3vv5x+ZQnalC8rbBvMT9WBhonugfgvIiDwsTXw7rLWKAOMKcPhKgfBitx5I/1UIndjEZOH2c8gzhkY1vM1kAQgrnz6KrObjLXobOuRv1K8477rMjehEdLJf5QLtRMaIymcIROyzttvnvD0Qpn8fj348+ab23w1JrNU8f3WM5edU2kTFYJcDobbY9TpCiPibrC+n3cIXE1Rqnl47TcWWlm1z0qQf5QMDjdM9FHDtrzbkpj7ziyeRnSHaTVYaYEbssIOo6FLgSb9P8RJH5g2GiWbRalLAjA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 04b47e30-eff0-4db5-8cea-08d84b6f6d55
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2020 16:28:42.5189 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SpH8uQHY39ckFMNGEyJgV98QMSUZ9AMf4Z2WG1pCmnob5XnJ0FSy3yUZJ2IjJOkBsqMj8hHQXW/KAY7q0fSKcVMednuKnbF9oxtfDBqFD8Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1673
-Received-SPF: pass client-ip=40.107.13.104;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR01-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 12:28:44
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -35
-X-Spam_score: -3.6
+In-Reply-To: <20200828085533.GC224144@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 11:36:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.809, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,68 +105,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: mst@redhat.com, Michal Privoznik <mprivozn@redhat.com>,
+ qemu-devel@nongnu.org, Babu Moger <babu.moger@amd.com>, pbonzini@redhat.com,
+ Igor Mammedov <imammedo@redhat.com>, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24.08.2020 14:30, Vladimir Sementsov-Ogievskiy wrote:
-> 24.08.2020 11:31, Andrey Shinkevich wrote:
->> This patch completes the series with the COR-filter insertion for
->> block-stream operations. Adding the filter makes it possible for copied
->> regions to be discarded in backing files during the block-stream job,
->> what will reduce the disk overuse.
->> The COR-filter insertion incurs changes in the iotests case
->> 245:test_block_stream_4 that reopens the backing chain during a
->> block-stream job. There are changes in the iotests #030 as well.
->> The iotests case 030:test_stream_parallel was deleted due to multiple
->> conflicts between the concurrent job operations over the same backing
->> chain. The base backing node for one job is the top node for another
->> job. It may change due to the filter node inserted into the backing
->> chain while both jobs are running. Another issue is that the parts of
->> the backing chain are being frozen by the running job and may not be
->> changed by the concurrent job when needed. The concept of the parallel
->> jobs with common nodes is considered vital no more.
->>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>   block/stream.c             | 58 
->> +++++++++++++++++++++++++++++++++++-----------
->>   tests/qemu-iotests/030     | 50 
->> ++++-----------------------------------
->>   tests/qemu-iotests/030.out |  4 ++--
->>   tests/qemu-iotests/245     | 19 +++++++++++----
->>   4 files changed, 65 insertions(+), 66 deletions(-)
->>
->> diff --git a/block/stream.c b/block/stream.c
->> index 8bf6b6d..e927fed 100644
->> --- a/block/stream.c
->> +++ b/block/stream.c
-...
->> @@ -307,5 +332,10 @@ fail:
->>       if (bs_read_only) {
->>           bdrv_reopen_set_read_only(bs, true, NULL);
->>       }
->> -    bdrv_unfreeze_backing_chain(bs, above_base);
->> +    if () {
->> +        bdrv_unfreeze_backing_chain(cor_filter_bs, above_base);
->> +        bdrv_cor_filter_drop(cor_filter_bs);
->> +    } else {
->> +        bdrv_unfreeze_backing_chain(bs, above_base);
->
-> as I see, in this case chain is not yet frozen
->
+On Fri, Aug 28, 2020 at 09:55:33AM +0100, Daniel P. Berrangé wrote:
+> On Thu, Aug 27, 2020 at 10:55:26PM +0200, Igor Mammedov wrote:
+> > On Thu, 27 Aug 2020 15:07:52 -0400
+> > Eduardo Habkost <ehabkost@redhat.com> wrote:
+> > 
+> > > On Thu, Aug 27, 2020 at 07:03:14PM +0200, Igor Mammedov wrote:
+> > > > On Wed, 26 Aug 2020 16:03:40 +0100
+> > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > > > 
+> > > > > On Wed, Aug 26, 2020 at 04:02:58PM +0200, Igor Mammedov wrote:
+> > > > > > On Wed, 26 Aug 2020 14:36:38 +0100
+> > > > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > > > > > 
+> > > > > > > On Wed, Aug 26, 2020 at 03:30:34PM +0200, Igor Mammedov wrote:
+> > > > > > > > On Wed, 26 Aug 2020 13:50:59 +0100
+> > > > > > > > Daniel P. Berrangé <berrange@redhat.com> wrote:
+> > > > > > > >   
+> > > > > > > > > On Wed, Aug 26, 2020 at 02:38:49PM +0200, Igor Mammedov wrote:  
+> > > > > > > > > > On Fri, 21 Aug 2020 17:12:19 -0500
+> > > > > > > > > > Babu Moger <babu.moger@amd.com> wrote:
+> > > > > > > > > >     
+> > > > > > > > > > > To support some of the complex topology, we introduced EPYC mode apicid decode.
+> > > > > > > > > > > But, EPYC mode decode is running into problems. Also it can become quite a
+> > > > > > > > > > > maintenance problem in the future. So, it was decided to remove that code and
+> > > > > > > > > > > use the generic decode which works for majority of the topology. Most of the
+> > > > > > > > > > > SPECed configuration would work just fine. With some non-SPECed user inputs,
+> > > > > > > > > > > it will create some sub-optimal configuration.
+> > > > > > > > > > > Here is the discussion thread.
+> > > > > > > > > > > https://lore.kernel.org/qemu-devel/c0bcc1a6-1d84-a6e7-e468-d5b437c1b254@amd.com/
+> > > > > > > > > > > 
+> > > > > > > > > > > This series removes all the EPYC mode specific apicid changes and use the generic
+> > > > > > > > > > > apicid decode.    
+> > > > > > > > > > 
+> > > > > > > > > > the main difference between EPYC and all other CPUs is that
+> > > > > > > > > > it requires numa configuration (it's not optional)
+> > > > > > > > > > so we need an extra patch on top of this series to enfoce that, i.e:
+> > > > > > > > > > 
+> > > > > > > > > >  if (epyc && !numa) 
+> > > > > > > > > >     error("EPYC cpu requires numa to be configured")    
+> > > > > > > > > 
+> > > > > > > > > Please no. This will break 90% of current usage of the EPYC CPU in
+> > > > > > > > > real world QEMU deployments. That is way too user hostile to introduce
+> > > > > > > > > as a requirement.
+> > > > > > > > > 
+> > > > > > > > > Why do we need to force this ?  People have been successfuly using
+> > > > > > > > > EPYC CPUs without NUMA in QEMU for years now.
+> > > > > > > > > 
+> > > > > > > > > It might not match behaviour of bare metal silicon, but that hasn't
+> > > > > > > > > obviously caused the world to come crashing down.  
+> > > > > > > > So far it produces warning in linux kernel (RHBZ1728166),
+> > > > > > > > (resulting performance might be suboptimal), but I haven't seen
+> > > > > > > > anyone reporting crashes yet.
+> > > > > > > > 
+> > > > > > > > 
+> > > > > > > > What other options do we have?
+> > > > > > > > Perhaps we can turn on strict check for new machine types only,
+> > > > > > > > so old configs can keep broken topology (CPUID),
+> > > > > > > > while new ones would require -numa and produce correct topology.  
+> > > > > > > 
+> > > > > > > No, tieing this to machine types is not viable either. That is still
+> > > > > > > going to break essentially every single management application that
+> > > > > > > exists today using QEMU.
+> > > > > > for that we have deprecation process, so users could switch to new CLI
+> > > > > > that would be required.
+> > > > > 
+> > > > > We could, but I don't find the cost/benefit tradeoff is compelling.
+> > > > > 
+> > > > > There are so many places where we diverge from what bare metal would
+> > > > > do, that I don't see a good reason to introduce this breakage, even
+> > > > > if we notify users via a deprecation message. 
+> > > > I find (3) and (4) good enough reasons to use deprecation.
+> > > > 
+> > > > > If QEMU wants to require NUMA for EPYC, then QEMU could internally
+> > > > > create a single NUMA node if none was specified for new machine
+> > > > > types, such that there is no visible change or breakage to any
+> > > > > mgmt apps.  
+> > > > 
+> > > > (1) for configs that started without -numa &&|| without -smp dies>1,
+> > > >       QEMU can do just that (enable auto_enable_numa).
+> > > 
+> > > Why exactly do we need auto_enable_numa with dies=1?
+> > > 
+> > > If I understand correctly, Babu said earlier in this thread[1]
+> > > that we don't need auto_enable_numa.
+> > > 
+> > > [1] https://lore.kernel.org/qemu-devel/11489e5f-2285-ddb4-9c35-c9f522d603a0@amd.com/
+> > 
+> > in case of 1 die, -numa is not must have as it's one numa node only.
+> > Though having auto_enable_numa, will allow to reuse the CPU.node-id property
+> > to compose CPUID_Fn8000001E_ECX. i.e only code one path vs numa|non-numa variant.
+> > 
+> >  
+> > > > (2) As for configs that are out of spec, I do not care much (junk in - junk out)
+> > > > (though not having to spend time on bug reports and debug issues, just to say
+> > > > it's not supported in the end, makes deprecation sound like a reasonable
+> > > > choice)
+> > > > 
+> > > > (3) However if config matches bare metal i.e. CPU has more than 1 die and within
+> > > > dies limits (spec wise), QEMU has to produce valid CPUs.
+> > > > In this case QEMU can't make up multiple numa nodes and mappings of RAM/CPUs
+> > > > on user's behalf. That's where we have to error out and ask for explicit
+> > > > numa configuration.
+> > > > 
+> > > > For such configs, current code (since 5.0), will produce in the best case
+> > > > performance issues  due to mismatching data in APICID, CPUID and ACPI tables,
+> > > > in the worst case issues might be related to invalid APIC ID if running on EPYC host
+> > > > and HW takes in account subfields of APIC ID (according to Babu real CPU uses
+> > > > die_id(aka node_id) internally).
+> > > > I'd rather error out on nonsense configs earlier than debug such issues
+> > > > and than error out anyways later (upsetting more users).
+> > > > 
+> > > 
+> > > The requirements are not clear to me.  Is this just about making
+> > > CPU die_id match the NUMA node ID, or are there additional
+> > > constraints?
+> > die_id is per socket numa node index, so it's not numa node id in
+> > a sense we use it in qemu
+> > (that's where all the confusion started that led to current code)
+> > 
+> > I understood that each die in EPYC chip is a numa node, which encodes
+> > NUMA node ID (system wide) in CPUID_Fn8000001E_ECX, that's why I
+> > wrote earlier that EPYC makes -numa non optional.
+> 
+> AFAIK, that isnt a hard requirement.  In bare metal EPYC machine I
+> have used, the BIOS lets you choose whether the dies are exposed as
+> 1, 2 or 4 NUMA nodes. So there's no fixed  die == numa node mapping
+> that I see.
 
-When cor_filter_bs is NULL, only bs - above_base chain is frozen at this 
-point.
+If you change that setting, will all CPUID bits be kept the same,
+or the die topology seen by the OS will change?
 
-Andrey
+-- 
+Eduardo
 
-
->> +    }
->>   }
->> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
->> index 1cdd7e2..fec9d89 100755
->> --- a/tests/qemu-iotests/030
->> +++ b/tests/qemu-iotests/030
-...
 
