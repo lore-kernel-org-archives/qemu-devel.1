@@ -2,82 +2,84 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56830C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:22:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6251CC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:23:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1921720838
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:22:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 268F720838
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:23:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JsBA9fHN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1921720838
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sThXLve0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 268F720838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59914 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60276 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBnhs-0002fu-56
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:22:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54752)
+	id 1kBni0-0002ow-CZ
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:23:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
- id 1kBnh2-0001cK-Oz; Fri, 28 Aug 2020 19:22:00 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:34525)
+ id 1kBnh3-0001cV-ME; Fri, 28 Aug 2020 19:22:01 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:32962)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
- id 1kBnh1-0006JG-4t; Fri, 28 Aug 2020 19:22:00 -0400
-Received: by mail-ej1-x642.google.com with SMTP id d26so1267441ejr.1;
- Fri, 28 Aug 2020 16:21:58 -0700 (PDT)
+ id 1kBnh2-0006JM-6Y; Fri, 28 Aug 2020 19:22:01 -0400
+Received: by mail-ej1-x644.google.com with SMTP id a21so1271947ejp.0;
+ Fri, 28 Aug 2020 16:21:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aAsYTNWSCWRXVEcWjShTIqNNma8HoiTz3K1aeOYl0LU=;
- b=JsBA9fHN87R4CJbqSR/sCkhq89VnonGVEhaA0XyybxqapB6k6ujt0y/8Oi6Y183hLA
- dIonOhAFz3fQLUKCTQFi19sd+P5r5GB6S43ClsYXU5bILaV7XrO/RuiyEeArfQrEmFoy
- X2KHqgfXSbUexDIw6snC95W0KDxjLU47sypZlr79M011717V+MYyIR259C/CDMyRcRMu
- 4+mnjqMb35wgTfef/NlKUohnqpkpR+3VbCjiJGdYyYLtZzL1lwjvnZUhfctwKvZcXmGi
- je3L+KqDVHXuZiZtKni5IS1MrrxdBbdF/qpQ71eSsxWDICteCOoNav0i4yZ+2sE2bSFS
- Dqpg==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=LGDBKWC08oc7KjFCWYV40h60UwUROAE9zpPW6K9PPWM=;
+ b=sThXLve0gHWuAnVPWSG9o+PuBba9m7C7kbw0hc+O37Br/z4GEqv4XgGInAm+SZ64uS
+ HorBCg01u141eTxI7ij24wGUXHlgWqwetp67udBSUYpL630Ea0rPvvKkjDtAOUAEK9u7
+ r+Ms293bv3PfpZPT9db42vtdYcbJjCrhajWMty4nuBBhBY263JptzgpHkhV7UITAWjBF
+ u3+e6ohUPIP5RQQ9Mw2iMigq75hP0ROIsvQMMH8GAMpSuOuzXqnzw/esj4/PArhepOEz
+ h0rkgbfy2B06YaEHApxjQFIu8VEN96KHyG7vpONw1czPJ56oCD0I2lW0mtuAIq531hEG
+ Jzzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aAsYTNWSCWRXVEcWjShTIqNNma8HoiTz3K1aeOYl0LU=;
- b=Ia7ZMxwQ08/z98fWoDvkauTmgPqMn5A+xGcwVMapYbYNVZ9DfUHCydyC4n0zIjlAtP
- 3uXxV43NWjPB6a43ihLvRSGD4uc9NyIAlFKEWLaj2AGvPSgJlG8HRjyY16DSn/kShlDk
- TbS+IvbwmpSSEqtBgL/1t7MiEeePt1O4xy6OeRVDla4rGSNnnr4dbsIZygp7OKdEVZKl
- rGnLXpgi3C/kZ3Eya7hEVIL7o++Kd1af/TTLXrpHEcjJg3mPVcdLCVvqnEaNsq+i23/J
- caLHf6It2qM7Pwnsn2wvuUEntFU1WjshZ3M0h70V2wLL546vqPbgYkQGRVAEDdbY3fEl
- ocBw==
-X-Gm-Message-State: AOAM532Mq+OO3qecpsE5DCA9rSLdOE7ZRZvkEygjUx/QJcdSy84WDsh2
- iaCMnu1IKEVpbvnt2tfQrOesIgvukU8n5A==
-X-Google-Smtp-Source: ABdhPJwengIBcAZgALHNXc4RfijziCN6X3lAVMUclhDZmJ+PFGkuF8dEYnztuCcdAinttUSzWg3Xow==
-X-Received: by 2002:a17:906:d8b1:: with SMTP id
- qc17mr1074151ejb.362.1598656916593; 
- Fri, 28 Aug 2020 16:21:56 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=LGDBKWC08oc7KjFCWYV40h60UwUROAE9zpPW6K9PPWM=;
+ b=HFY9JvpCKAU4UnVOlxs9M8NGAtKK0gkBbGxR8l2N4UC4avyHZKrBI9jsvvuJqgze0f
+ ha/Q8RyY/G0X/lS+Ns4wYXg53lt8SkMgxoKHhunhYgjt27eIx2Y2FrP0QMMmoyxxrMSw
+ 3WDKUk4Llbfeq9rcEEBrlMuPqFRxx3VkE+5hsKKeF4PBFetyB31xTx+Id4tbSz+5YY3J
+ YZABY/fv7ejzIkChrJwXdlUjO5Uj7hAwwdUJQD/heWMhW1CN1EXM4R4QXw946nOa9D+m
+ hO5BZ9KR8Us/VjBvr1r5kcetSlkKXd2XzKCBZITyTA1EMYyRkN9nsD7sZJowNA4aZcTV
+ WZfw==
+X-Gm-Message-State: AOAM533us+9K2fh+Ch8K9BQkXr2rM3uKvSROIWcUiso7H5yaev2DTBBA
+ 7eRNIWumvBiVFjpJ4qucdb2Cl9tyKfdhYTn0
+X-Google-Smtp-Source: ABdhPJyYqngonIu/Ibcvlj8WIIPNDeky7d+0btmqqDjd0bENZciN3E9Mkvw2AW5FZ905YklBMf2qnQ==
+X-Received: by 2002:a17:906:bb0e:: with SMTP id
+ jz14mr1118079ejb.525.1598656918180; 
+ Fri, 28 Aug 2020 16:21:58 -0700 (PDT)
 Received: from localhost.localdomain (109-186-204-55.bb.netvision.net.il.
  [109.186.204.55])
- by smtp.gmail.com with ESMTPSA id j21sm523436eja.109.2020.08.28.16.21.53
+ by smtp.gmail.com with ESMTPSA id j21sm523436eja.109.2020.08.28.16.21.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 16:21:54 -0700 (PDT)
+ Fri, 28 Aug 2020 16:21:57 -0700 (PDT)
 From: Nir Soffer <nirsof@gmail.com>
 X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/5] iotest.FilePath fixes and cleanups
-Date: Sat, 29 Aug 2020 02:21:47 +0300
-Message-Id: <20200828232152.205833-1-nsoffer@redhat.com>
+Subject: [PATCH v3 1/5] qemu-iotests: Fix FilePaths cleanup
+Date: Sat, 29 Aug 2020 02:21:48 +0300
+Message-Id: <20200828232152.205833-2-nsoffer@redhat.com>
 X-Mailer: git-send-email 2.26.2
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200828232152.205833-1-nsoffer@redhat.com>
+References: <20200828232152.205833-1-nsoffer@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=nirsof@gmail.com; helo=mail-ej1-x642.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=nirsof@gmail.com; helo=mail-ej1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,38 +108,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix some issues introduced when iotests.FilePaths was added and merge it ba=
-ck=0D
-into FilePath keeping the option to create multiple file names.=0D
-=0D
-Changes since v2:=0D
-- Improve dosting to show how sockets should be created [Max]=0D
-=0D
-v2 was here:=0D
-https://lists.nongnu.org/archive/html/qemu-block/2020-08/msg00780.html=0D
-=0D
-Changes since v1:=0D
-- Remove unwanted submodule change [Eric]=0D
-- Add Fixes: tag=0D
-=0D
-v1 was here:=0D
-https://lists.nongnu.org/archive/html/qemu-block/2020-08/msg00773.html=0D
-=0D
-Nir Soffer (5):=0D
-  qemu-iotests: Fix FilePaths cleanup=0D
-  qemu-iotests: Fix FilePaths docstring=0D
-  qemu-iotests: Support varargs syntax in FilePaths=0D
-  qemu-iotests: Merge FilePaths and FilePath=0D
-  qemu-iotests: Simplify FilePath __init__=0D
-=0D
- tests/qemu-iotests/194        |  4 +--=0D
- tests/qemu-iotests/208        |  2 +-=0D
- tests/qemu-iotests/222        |  2 +-=0D
- tests/qemu-iotests/257        | 10 +++----=0D
- tests/qemu-iotests/iotests.py | 53 ++++++++++++++++++-----------------=0D
- 5 files changed, 36 insertions(+), 35 deletions(-)=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+If os.remove() fails to remove one of the paths, for example if the file
+was removed by the test, the cleanup loop would exit silently, without
+removing the rest of the files.
+
+Fixes: de263986b5dc
+Signed-off-by: Nir Soffer <nsoffer@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ tests/qemu-iotests/iotests.py | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index e197c73ca5..2fd5c916fa 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -468,11 +468,11 @@ class FilePaths:
+         return self.paths
+ 
+     def __exit__(self, exc_type, exc_val, exc_tb):
+-        try:
+-            for path in self.paths:
++        for path in self.paths:
++            try:
+                 os.remove(path)
+-        except OSError:
+-            pass
++            except OSError:
++                pass
+         return False
+ 
+ class FilePath(FilePaths):
+-- 
+2.26.2
+
 
