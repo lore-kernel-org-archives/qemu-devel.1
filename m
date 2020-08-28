@@ -2,71 +2,71 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C81F6C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A496C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:10:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90B072098B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C80722098B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:10:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QMiInzWI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90B072098B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ev/+NCYn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C80722098B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBZST-0002D9-OM
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 04:10:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57778)
+	id 1kBZSX-0002Ml-2C
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 04:10:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRU-0000Wo-43
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30222)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRV-0000Z5-In
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25404)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRR-0003S0-Vu
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:08:59 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRS-0003RW-17
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598602137;
+ s=mimecast20190719; t=1598602136;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wq5Pda4Lt5SRqI7o7hjLCdVq24fwCUMV/EoS3UXA+x0=;
- b=QMiInzWI8hpZ66lIFMDmj/n6fmeXXkkXvIUR7d0SP8Qm62nAnRCsMw7DFhJxeCp/LANCRO
- 0c8bGB1FxoGBJTmFc6at46rkTyN2zulyKfO2flW4n7gAWQAiT7W9uc35R6l6vgxeUeTndL
- I4gggYizq1bR4peX4Y4lOIMYh33BEdU=
+ bh=sJ/vUDTa8rToYl7gXD645Fj7KHedX4qEsoI1hsq6SB8=;
+ b=ev/+NCYn/Snzsf7bIA9fUpL3STqBOXgIIaj6jY3Ez8ZPh1lAY8bOycf+YwEqDPVuJ9qXei
+ rJIpf4EXmEHW4PXUoyL64GtZ7bR26neGH/Ogf2vQFG4lPBKiveD2G73Euh6dZvnbykHygv
+ xuEDCrQkEF5VIaqD+/498PuS0iOH73k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-XAhWLOpNOnWABZPyBsbQPA-1; Fri, 28 Aug 2020 04:08:53 -0400
-X-MC-Unique: XAhWLOpNOnWABZPyBsbQPA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-271-g39lbK9uMz-VlT-n_rl2DA-1; Fri, 28 Aug 2020 04:08:53 -0400
+X-MC-Unique: g39lbK9uMz-VlT-n_rl2DA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1223C801FDB;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D752C10082E7;
  Fri, 28 Aug 2020 08:08:52 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 311697D4EC;
- Fri, 28 Aug 2020 08:08:50 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4CFCF19D7C;
+ Fri, 28 Aug 2020 08:08:52 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 6E96131E88; Fri, 28 Aug 2020 10:08:46 +0200 (CEST)
+ id 83CA931FBC; Fri, 28 Aug 2020 10:08:46 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/18] scripts: Add u2f-setup-gen script
-Date: Fri, 28 Aug 2020 10:08:41 +0200
-Message-Id: <20200828080845.28287-15-kraxel@redhat.com>
+Subject: [PULL 16/18] hw/usb: Add U2F device autoscan to passthru mode
+Date: Fri, 28 Aug 2020 10:08:43 +0200
+Message-Id: <20200828080845.28287-17-kraxel@redhat.com>
 In-Reply-To: <20200828080845.28287-1-kraxel@redhat.com>
 References: <20200828080845.28287-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -106,196 +106,198 @@ Sender: "Qemu-devel"
 
 From: César Belley <cesar.belley@lse.epita.fr>
 
-This patch adds the script used to generate setup directories, needed
-for the device u2f-emulated configuration in directory mode:
+This patch adds an autoscan to let u2f-passthru choose the first U2F
+device it finds.
 
-    python u2f-setup-gen.py $DIR
-    qemu -usb -device u2f-emulated,dir=$DIR
+The autoscan is performed using libudev with an enumeration of all the
+hidraw devices present on the host.
+
+The first device which happens to be a U2F device is taken to do the
+passtru.
 
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
-Message-id: 20200826114209.28821-11-cesar.belley@lse.epita.fr
+Message-id: 20200826114209.28821-13-cesar.belley@lse.epita.fr
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- scripts/u2f-setup-gen.py | 170 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 170 insertions(+)
- create mode 100755 scripts/u2f-setup-gen.py
+ docs/u2f.txt          |   9 ++++
+ hw/usb/u2f-passthru.c | 113 +++++++++++++++++++++++++++++++++++++-----
+ hw/usb/meson.build    |   2 +-
+ 3 files changed, 110 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/u2f-setup-gen.py b/scripts/u2f-setup-gen.py
-new file mode 100755
-index 000000000000..2122598fed8e
---- /dev/null
-+++ b/scripts/u2f-setup-gen.py
-@@ -0,0 +1,170 @@
-+#!/usr/bin/env python3
-+#
-+# Libu2f-emu setup directory generator for USB U2F key emulation.
-+#
-+# Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
-+# Written by César Belley <cesar.belley@lse.epita.fr>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2
-+# or, at your option, any later version.  See the COPYING file in
-+# the top-level directory.
+diff --git a/docs/u2f.txt b/docs/u2f.txt
+index f60052882ec3..8f44994818a2 100644
+--- a/docs/u2f.txt
++++ b/docs/u2f.txt
+@@ -42,6 +42,10 @@ on libu2f-emu: configuring and building:
+ 
+     ./configure --enable-u2f && make
+ 
++The pass-through mode is built by default on Linux. To take advantage
++of the autoscan option it provides, make sure you have a working libudev
++installed on the host.
 +
-+import sys
-+import os
-+from random import randint
-+from typing import Tuple
+ 
+ 3. Using u2f-emulated
+ 
+@@ -90,6 +94,11 @@ On the host specify the u2f-passthru device with a suitable hidraw:
+ 
+     qemu -usb -device u2f-passthru,hidraw=/dev/hidraw0
+ 
++Alternately, the u2f-passthru device can autoscan to take the first
++U2F device it finds on the host (this requires a working libudev):
 +
-+from cryptography.hazmat.backends import default_backend
-+from cryptography.hazmat.primitives.asymmetric import ec
-+from cryptography.hazmat.primitives.serialization import Encoding, \
-+    NoEncryption, PrivateFormat, PublicFormat
-+from OpenSSL import crypto
++    qemu -usb -device u2f-passthru
 +
+ 
+ 5. Libu2f-emu
+ 
+diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
+index 74d4ae6e9294..e9c8aa459586 100644
+--- a/hw/usb/u2f-passthru.c
++++ b/hw/usb/u2f-passthru.c
+@@ -378,6 +378,84 @@ static bool u2f_passthru_is_u2f_device(int fd)
+                   sizeof(u2f_hid_report_desc_header)) == 0;
+ }
+ 
++#ifdef CONFIG_LIBUDEV
++static int u2f_passthru_open_from_device(struct udev_device *device)
++{
++    const char *devnode = udev_device_get_devnode(device);
 +
-+def write_setup_dir(dirpath: str, privkey_pem: bytes, cert_pem: bytes,
-+                    entropy: bytes, counter: int) -> None:
-+    """
-+    Write the setup directory.
++    int fd = qemu_open(devnode, O_RDWR);
++    if (fd < 0) {
++        return -1;
++    } else if (!u2f_passthru_is_u2f_device(fd)) {
++        qemu_close(fd);
++        return -1;
++    }
++    return fd;
++}
 +
-+    Args:
-+        dirpath: The directory path.
-+        key_pem: The private key PEM.
-+        cert_pem: The certificate PEM.
-+        entropy: The 48 bytes of entropy.
-+        counter: The counter value.
-+    """
-+    # Directory
-+    os.mkdir(dirpath)
++static int u2f_passthru_open_from_enumerate(struct udev *udev,
++                                            struct udev_enumerate *enumerate)
++{
++    struct udev_list_entry *devices, *entry;
++    int ret, fd;
 +
-+    # Private key
-+    with open(f'{dirpath}/private-key.pem', 'bw') as f:
-+        f.write(privkey_pem)
++    ret = udev_enumerate_scan_devices(enumerate);
++    if (ret < 0) {
++        return -1;
++    }
 +
-+    # Certificate
-+    with open(f'{dirpath}/certificate.pem', 'bw') as f:
-+        f.write(cert_pem)
++    devices = udev_enumerate_get_list_entry(enumerate);
++    udev_list_entry_foreach(entry, devices) {
++        struct udev_device *device;
++        const char *syspath = udev_list_entry_get_name(entry);
 +
-+    # Entropy
-+    with open(f'{dirpath}/entropy', 'wb') as f:
-+        f.write(entropy)
++        if (syspath == NULL) {
++            continue;
++        }
 +
-+    # Counter
-+    with open(f'{dirpath}/counter', 'w') as f:
-+        f.write(f'{str(counter)}\n')
++        device = udev_device_new_from_syspath(udev, syspath);
++        if (device == NULL) {
++            continue;
++        }
 +
++        fd = u2f_passthru_open_from_device(device);
++        udev_device_unref(device);
++        if (fd >= 0) {
++            return fd;
++        }
++    }
++    return -1;
++}
 +
-+def generate_ec_key_pair() -> Tuple[str, str]:
-+    """
-+    Generate an ec key pair.
++static int u2f_passthru_open_from_scan(void)
++{
++    struct udev *udev;
++    struct udev_enumerate *enumerate;
++    int ret, fd = -1;
 +
-+    Returns:
-+        The private and public key PEM.
-+    """
-+    # Key generation
-+    privkey = ec.generate_private_key(ec.SECP256R1, default_backend())
-+    pubkey = privkey.public_key()
++    udev = udev_new();
++    if (udev == NULL) {
++        return -1;
++    }
 +
-+    # PEM serialization
-+    privkey_pem = privkey.private_bytes(encoding=Encoding.PEM,
-+                                        format=PrivateFormat.TraditionalOpenSSL,
-+                                        encryption_algorithm=NoEncryption())
-+    pubkey_pem = pubkey.public_bytes(encoding=Encoding.PEM,
-+                                     format=PublicFormat.SubjectPublicKeyInfo)
-+    return privkey_pem, pubkey_pem
++    enumerate = udev_enumerate_new(udev);
++    if (enumerate == NULL) {
++        udev_unref(udev);
++        return -1;
++    }
 +
++    ret = udev_enumerate_add_match_subsystem(enumerate, "hidraw");
++    if (ret >= 0) {
++        fd = u2f_passthru_open_from_enumerate(udev, enumerate);
++    }
 +
-+def generate_certificate(privkey_pem: str, pubkey_pem: str) -> str:
-+    """
-+    Generate a x509 certificate from a key pair.
++    udev_enumerate_unref(enumerate);
++    udev_unref(udev);
 +
-+    Args:
-+        privkey_pem: The private key PEM.
-+        pubkey_pem: The public key PEM.
++    return fd;
++}
++#endif
 +
-+    Returns:
-+        The certificate PEM.
-+    """
-+    # Convert key pair
-+    privkey = crypto.load_privatekey(crypto.FILETYPE_PEM, privkey_pem)
-+    pubkey = crypto.load_publickey(crypto.FILETYPE_PEM, pubkey_pem)
-+
-+    # New x509v3 certificate
-+    cert = crypto.X509()
-+    cert.set_version(0x2)
-+
-+    # Serial number
-+    cert.set_serial_number(randint(1, 2 ** 64))
-+
-+    # Before / After
-+    cert.gmtime_adj_notBefore(0)
-+    cert.gmtime_adj_notAfter(4 * (365 * 24 * 60 * 60))
-+
-+    # Public key
-+    cert.set_pubkey(pubkey)
-+
-+    # Subject name and issueer
-+    cert.get_subject().CN = "U2F emulated"
-+    cert.set_issuer(cert.get_subject())
-+
-+    # Extensions
-+    cert.add_extensions([
-+        crypto.X509Extension(b"subjectKeyIdentifier",
-+                             False, b"hash", subject=cert),
-+    ])
-+    cert.add_extensions([
-+        crypto.X509Extension(b"authorityKeyIdentifier",
-+                             False, b"keyid:always", issuer=cert),
-+    ])
-+    cert.add_extensions([
-+        crypto.X509Extension(b"basicConstraints", True, b"CA:TRUE")
-+    ])
-+
-+    # Signature
-+    cert.sign(privkey, 'sha256')
-+
-+    return crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
-+
-+
-+def generate_setup_dir(dirpath: str) -> None:
-+    """
-+    Generates the setup directory.
-+
-+    Args:
-+        dirpath: The directory path.
-+    """
-+    # Key pair
-+    privkey_pem, pubkey_pem = generate_ec_key_pair()
-+
-+    # Certificate
-+    certificate_pem = generate_certificate(privkey_pem, pubkey_pem)
-+
-+    # Entropy
-+    entropy = os.urandom(48)
-+
-+    # Counter
-+    counter = 0
-+
-+    # Write
-+    write_setup_dir(dirpath, privkey_pem, certificate_pem, entropy, counter)
-+
-+
-+def main() -> None:
-+    """
-+    Main function
-+    """
-+    # Dir path
-+    if len(sys.argv) != 2:
-+        sys.stderr.write(f'Usage: {sys.argv[0]} <setup_dir>\n')
-+        exit(2)
-+    dirpath = sys.argv[1]
-+
-+    # Dir non existence
-+    if os.path.exists(dirpath):
-+        sys.stderr.write(f'Directory: {dirpath} already exists.\n')
-+        exit(1)
-+
-+    generate_setup_dir(dirpath)
-+
-+
-+if __name__ == '__main__':
-+    main()
+ static void u2f_passthru_unrealize(U2FKeyState *base)
+ {
+     U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
+@@ -392,22 +470,31 @@ static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
+     int fd;
+ 
+     if (key->hidraw == NULL) {
++#ifdef CONFIG_LIBUDEV
++        fd = u2f_passthru_open_from_scan();
++        if (fd < 0) {
++            error_setg(errp, "%s: Failed to find a U2F USB device",
++                       TYPE_U2F_PASSTHRU);
++            return;
++        }
++#else
+         error_setg(errp, "%s: Missing hidraw", TYPE_U2F_PASSTHRU);
+         return;
+-    }
++#endif
++    } else {
++        fd = qemu_open(key->hidraw, O_RDWR);
++        if (fd < 0) {
++            error_setg(errp, "%s: Failed to open %s", TYPE_U2F_PASSTHRU,
++                       key->hidraw);
++            return;
++        }
+ 
+-    fd = qemu_open(key->hidraw, O_RDWR);
+-    if (fd < 0) {
+-        error_setg(errp, "%s: Failed to open %s", TYPE_U2F_PASSTHRU,
+-                   key->hidraw);
+-        return;
+-    }
+-
+-    if (!u2f_passthru_is_u2f_device(fd)) {
+-        qemu_close(fd);
+-        error_setg(errp, "%s: Passed hidraw does not represent "
+-                   "a U2F HID device", TYPE_U2F_PASSTHRU);
+-        return;
++        if (!u2f_passthru_is_u2f_device(fd)) {
++            qemu_close(fd);
++            error_setg(errp, "%s: Passed hidraw does not represent "
++                       "a U2F HID device", TYPE_U2F_PASSTHRU);
++            return;
++        }
+     }
+     key->hidraw_fd = fd;
+     u2f_passthru_reset(key);
+diff --git a/hw/usb/meson.build b/hw/usb/meson.build
+index a25109b88c91..b7c7ff23bfbd 100644
+--- a/hw/usb/meson.build
++++ b/hw/usb/meson.build
+@@ -52,7 +52,7 @@ endif
+ 
+ # U2F
+ softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: files('u2f.c'))
+-softmmu_ss.add(when: ['CONFIG_LINUX', 'CONFIG_USB_U2F'], if_true: files('u2f-passthru.c'))
++softmmu_ss.add(when: ['CONFIG_LINUX', 'CONFIG_USB_U2F'], if_true: [libudev, files('u2f-passthru.c')])
+ if u2f.found()
+   softmmu_ss.add(when: 'CONFIG_USB_U2F', if_true: [u2f, files('u2f-emulated.c')])
+ endif
 -- 
 2.27.0
 
