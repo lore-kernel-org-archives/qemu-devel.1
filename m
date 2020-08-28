@@ -2,98 +2,91 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BA5AC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56830C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:22:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F032120838
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:18:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1921720838
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:22:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NW79tk1K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F032120838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JsBA9fHN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1921720838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBndB-00080T-7W
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:18:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53824)
+	id 1kBnhs-0002fu-56
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:22:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBncT-00076e-TI
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:17:17 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42263)
+ (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
+ id 1kBnh2-0001cK-Oz; Fri, 28 Aug 2020 19:22:00 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:34525)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBncS-0005p6-Es
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:17:17 -0400
-Received: by mail-pf1-x442.google.com with SMTP id 17so1387722pfw.9
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 16:17:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=WKPuF6nu4k/2N4sO+8gvg9BI3JXuK9p6B4RQgnxh8h8=;
- b=NW79tk1KpnlqiWJXb0vUr20f376PEiJWAA2xuBcXIShPy/9VBu+CkMGgur1WHBFuka
- 49dqQIAKStoRg4pnlHKOHjgf03lITChPKG8aNrSjDNTuTjMtFnJKO7MYUHhU05M+D0PB
- RwOL6GalmucfTCp2VF+QekLy9Wfw63k5fAzMvHIp3kGo3LUdgNSxTTcKvk1mh/wIsNgj
- fu7oJC55Y0wKar1Mxmq8GnL0BzSH9TqVUpJaXk20VVIa6bN4XeWEzXHW7b7N3pUa7HVk
- F1XWSrKz4NCKMSEO3UNZen7zvp9zZt289CUFc2UQugGZbCn8rVK/PSaNY1g+/WfgQFTJ
- VGFg==
+ (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
+ id 1kBnh1-0006JG-4t; Fri, 28 Aug 2020 19:22:00 -0400
+Received: by mail-ej1-x642.google.com with SMTP id d26so1267441ejr.1;
+ Fri, 28 Aug 2020 16:21:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=aAsYTNWSCWRXVEcWjShTIqNNma8HoiTz3K1aeOYl0LU=;
+ b=JsBA9fHN87R4CJbqSR/sCkhq89VnonGVEhaA0XyybxqapB6k6ujt0y/8Oi6Y183hLA
+ dIonOhAFz3fQLUKCTQFi19sd+P5r5GB6S43ClsYXU5bILaV7XrO/RuiyEeArfQrEmFoy
+ X2KHqgfXSbUexDIw6snC95W0KDxjLU47sypZlr79M011717V+MYyIR259C/CDMyRcRMu
+ 4+mnjqMb35wgTfef/NlKUohnqpkpR+3VbCjiJGdYyYLtZzL1lwjvnZUhfctwKvZcXmGi
+ je3L+KqDVHXuZiZtKni5IS1MrrxdBbdF/qpQ71eSsxWDICteCOoNav0i4yZ+2sE2bSFS
+ Dqpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=WKPuF6nu4k/2N4sO+8gvg9BI3JXuK9p6B4RQgnxh8h8=;
- b=cSgunstqRsrq9Q9tjCmA1VdPePQ/xe7kS3BexRDv7wBVNdKAZeYMXIjHG+CL5qo3+E
- r0q+ytGpIGGN817KNuSkwkyGYAYLgTklfhgfnqPuaJkneNTUA61AeN3CIwH6hcYeB5Hf
- cSNWw53n3Tei3PwuO1PY3W4f/byA92/H21gd0R3nPeXMZEAzPtF6ZpbduUoaJU3XETHN
- ALKeQEw1uQdCabvDKSlcBqzKDmqkv9GDmo0ILcqSos6nVjHGWzzcIlf4o7JXRuWt7xnV
- fgHbH7caLOhALjbkd2rFMzLWhIokidrbLF+15kPpUYkMNuKvjS8Kw/4L/nRMr2vdrjTt
- /Vlw==
-X-Gm-Message-State: AOAM533eXxS/nUooqkha4Eqyq/6+kiu3ge4NpHsKyzj9RUhX2EWWyQtG
- KtqrEZIBbFAQDwFZFyYdUEKq9x67DAqLOQ==
-X-Google-Smtp-Source: ABdhPJxD6WdhO7+AqCQNuRbCegcbf3T5cEnQbz1oUgDwJKF0Lh+d5O2yMbnXRsiRifCx6ViZChEEjQ==
-X-Received: by 2002:aa7:92cb:: with SMTP id k11mr1016253pfa.233.1598656634658; 
- Fri, 28 Aug 2020 16:17:14 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id a12sm471811pfr.217.2020.08.28.16.17.13
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Aug 2020 16:17:13 -0700 (PDT)
-Subject: Re: [PATCH v2 42/45] target/arm/vec_helper: Handle oprsz less than 16
- bytes in indexed operations
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20200828183354.27913-1-peter.maydell@linaro.org>
- <20200828183354.27913-43-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <637fa692-1cd6-9860-d895-199a531f8385@linaro.org>
-Date: Fri, 28 Aug 2020 16:17:12 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ bh=aAsYTNWSCWRXVEcWjShTIqNNma8HoiTz3K1aeOYl0LU=;
+ b=Ia7ZMxwQ08/z98fWoDvkauTmgPqMn5A+xGcwVMapYbYNVZ9DfUHCydyC4n0zIjlAtP
+ 3uXxV43NWjPB6a43ihLvRSGD4uc9NyIAlFKEWLaj2AGvPSgJlG8HRjyY16DSn/kShlDk
+ TbS+IvbwmpSSEqtBgL/1t7MiEeePt1O4xy6OeRVDla4rGSNnnr4dbsIZygp7OKdEVZKl
+ rGnLXpgi3C/kZ3Eya7hEVIL7o++Kd1af/TTLXrpHEcjJg3mPVcdLCVvqnEaNsq+i23/J
+ caLHf6It2qM7Pwnsn2wvuUEntFU1WjshZ3M0h70V2wLL546vqPbgYkQGRVAEDdbY3fEl
+ ocBw==
+X-Gm-Message-State: AOAM532Mq+OO3qecpsE5DCA9rSLdOE7ZRZvkEygjUx/QJcdSy84WDsh2
+ iaCMnu1IKEVpbvnt2tfQrOesIgvukU8n5A==
+X-Google-Smtp-Source: ABdhPJwengIBcAZgALHNXc4RfijziCN6X3lAVMUclhDZmJ+PFGkuF8dEYnztuCcdAinttUSzWg3Xow==
+X-Received: by 2002:a17:906:d8b1:: with SMTP id
+ qc17mr1074151ejb.362.1598656916593; 
+ Fri, 28 Aug 2020 16:21:56 -0700 (PDT)
+Received: from localhost.localdomain (109-186-204-55.bb.netvision.net.il.
+ [109.186.204.55])
+ by smtp.gmail.com with ESMTPSA id j21sm523436eja.109.2020.08.28.16.21.53
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Aug 2020 16:21:54 -0700 (PDT)
+From: Nir Soffer <nirsof@gmail.com>
+X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/5] iotest.FilePath fixes and cleanups
+Date: Sat, 29 Aug 2020 02:21:47 +0300
+Message-Id: <20200828232152.205833-1-nsoffer@redhat.com>
+X-Mailer: git-send-email 2.26.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-In-Reply-To: <20200828183354.27913-43-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=nirsof@gmail.com; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -28
-X-Spam_score: -2.9
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.809,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,25 +99,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Nir Soffer <nsoffer@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/28/20 11:33 AM, Peter Maydell wrote:
-> In the gvec helper functions for indexed operations, for AArch32
-> Neon the oprsz (total size of the vector) can be less than 16 bytes
-> if the operation is on a D reg. Since the inner loop in these
-> helpers always goes from 0 to segment, we must clamp it based
-> on oprsz to avoid processing a full 16 byte segment when asked to
-> handle an 8 byte wide vector.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/vec_helper.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
-
+Fix some issues introduced when iotests.FilePaths was added and merge it ba=
+ck=0D
+into FilePath keeping the option to create multiple file names.=0D
+=0D
+Changes since v2:=0D
+- Improve dosting to show how sockets should be created [Max]=0D
+=0D
+v2 was here:=0D
+https://lists.nongnu.org/archive/html/qemu-block/2020-08/msg00780.html=0D
+=0D
+Changes since v1:=0D
+- Remove unwanted submodule change [Eric]=0D
+- Add Fixes: tag=0D
+=0D
+v1 was here:=0D
+https://lists.nongnu.org/archive/html/qemu-block/2020-08/msg00773.html=0D
+=0D
+Nir Soffer (5):=0D
+  qemu-iotests: Fix FilePaths cleanup=0D
+  qemu-iotests: Fix FilePaths docstring=0D
+  qemu-iotests: Support varargs syntax in FilePaths=0D
+  qemu-iotests: Merge FilePaths and FilePath=0D
+  qemu-iotests: Simplify FilePath __init__=0D
+=0D
+ tests/qemu-iotests/194        |  4 +--=0D
+ tests/qemu-iotests/208        |  2 +-=0D
+ tests/qemu-iotests/222        |  2 +-=0D
+ tests/qemu-iotests/257        | 10 +++----=0D
+ tests/qemu-iotests/iotests.py | 53 ++++++++++++++++++-----------------=0D
+ 5 files changed, 36 insertions(+), 35 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
