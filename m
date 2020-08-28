@@ -2,86 +2,98 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A3AC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:05:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F78C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:06:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76B762086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:05:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44F152086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:06:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bpCHr+TI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76B762086A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AjAXh/tb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44F152086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBnQu-0007CS-NV
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:05:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50754)
+	id 1kBnS0-0008IP-EC
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:06:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBnQ9-0006kJ-NC
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:04:33 -0400
-Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:45269)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kBnQv-0007LM-2l
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:05:21 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:41068)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBnQ7-000463-VV
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:04:33 -0400
-Received: by mail-ej1-x62d.google.com with SMTP id i26so838586ejb.12
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 16:04:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kBnQt-0004DD-4e
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:05:20 -0400
+Received: by mail-pg1-x544.google.com with SMTP id w186so1119131pgb.8
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 16:05:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=gXLJC6wTlNAA7Tvfuig79tyOmjObCV5q3ulQ0JoSn1s=;
- b=bpCHr+TIeQ76gZ38vI+Ekwb/lQerM1pi6XwG6gk3Mb/hcIzx5uCCCZhBj4zN0syO5S
- +ESItDw9a0jQtvLK/eV+hqKm/ZEdHd+dIfAJB505ar9xo/DmhUfSpqwKOIevygw15yuB
- /rEz43gYGouU4QS+Wprb7lzK9m5ggen7Y0DUsKO0vDQ3zd52/ZAhx5C3WaE+sF3pqEaQ
- wMXZlNZwlpM5bnXRKn+jgzLr9zlgETBPNfaycaas0DljVDqkirlTRzVaoziKSt31wmYP
- T1z6dAMeJuV2s/jgiWLHYe/Rp1KuNxrFHNVeNxAs9vnCcaGLV1Hnot3iCQ70YksUMlhh
- 1agg==
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=65HSA4NvUoLzX9D+wRRBDPsFW095WmkNdu8aJBd8NJI=;
+ b=AjAXh/tbk3c+x2A0A9jbPV7jZvKzBdusT2mJHQY4coHJSwIOt3qG3mYqh8aUAIUTLV
+ 4kkJDfouA8VeXC5kePjRCasEd4+dcoTE3T8nshJik1YALrpCE0XqNTBI+ffS5TbusGAE
+ a7WEe+H/OyvbKHTwr5UfdQwQ2y0t8C1L9f1zKKZ+pBPQas2MHLCdyy/1vdVowwbRslWi
+ Em/y2hNf4ErNRJKnNDd540AlR8g4rmwm4Zjoursu/gsDXc0BCRs7w4PlOzRvrX83Xc2r
+ CRKNKdqhukR9IoHPKTt2ai/rxdH8qdr8t13EehMOqByLeP9Ed+jn7ntAeymTs57ri8eI
+ YEpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=gXLJC6wTlNAA7Tvfuig79tyOmjObCV5q3ulQ0JoSn1s=;
- b=Ed6+ApjS7IjsX2AU/ZbNh+oJABmYI16svTYIw+P4XWZAOwUGI+PDkQL1iv65ouoQda
- jruNnJNno6jwu1m2Rp5VrqQ7F0T4BpYhHv2m+BnESWykZsWwN/qTZhaZYCcSRlESy+m0
- TZKTLtSgvjI1++UEwOhJn1NfImaNL7kzf719rir1H4ttikUIrN0lwUhz4RS9xepnpUmW
- CkZQEO6EU58xq44yAJeTUqXNh7KUnc98PWL7Kce+15/C4esVj3GNpBgJWhnOk9/Kx+10
- rmIafCuP1bz6rAYBCnHzY1BcdaCxablXDZZ5P74yohm/SnUKMVz7mnEjsJSFjNmYup6J
- OYsA==
-X-Gm-Message-State: AOAM533smhFRRsze8pnjukkeZH+a5YVUBIquCidVG73NtlKDUR08ASsA
- jLJO7cXgGriahJGZOyP4I/oH7yOThRYYDhKEuMYn1Q==
-X-Google-Smtp-Source: ABdhPJwcbK89BU1x0BcnKAnJCQvQw4GjtSIHIYgYUr7vKxigDLyDyOHEu66KQLTrESs/5zbQAIjvyWWzIWfUg+wYpPI=
-X-Received: by 2002:a17:906:f28b:: with SMTP id
- gu11mr1004570ejb.407.1598655870397; 
- Fri, 28 Aug 2020 16:04:30 -0700 (PDT)
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=65HSA4NvUoLzX9D+wRRBDPsFW095WmkNdu8aJBd8NJI=;
+ b=XvsOsFIefR2zFqyDr9qZprKl2zMBtjoYisZdmRmVxk4n71k5jalemdZO4zFJce3fjq
+ EJVxSmyD3FXHDjSQ5fl46eWXy8MRhQi4vCVLmtFgukEwW1OJK6/Uqt22pTgQKStazXMe
+ z23X5SYWtpPuiZBPAiSXt0xRb4DTUqYTJlo4/SSf7lOABrJAR0J2980wFR0bahoLeI1m
+ SJNO04mhVYR1wlWq0ECs8hzcNbVZgjIEbugF8HHgkYb/u1i3yeGxf0j80WB5mwwnhRUG
+ UMD9T+t4OzUPUBLvgRB5kS7tEZkRDeav09aRoZXsjHPc984Yoc4qlrR9eG/4WO5y1I2j
+ iFUQ==
+X-Gm-Message-State: AOAM531XVhjwPxgrOhwOA6zsrzvdcRrmv3cs71XjzLPch0el4ZUJdooF
+ 71WVUgib+XOo2x2vzP7pPHwk31TBqas6ww==
+X-Google-Smtp-Source: ABdhPJyEluBvTyR1J9brIgsr9a64eI+jiwXpVHJ8m3VelE5pbLbbXalvDC6q8fP+bMizDcb68aQ2aA==
+X-Received: by 2002:a63:500e:: with SMTP id e14mr749584pgb.36.1598655917325;
+ Fri, 28 Aug 2020 16:05:17 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id g25sm482297pfk.37.2020.08.28.16.05.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 28 Aug 2020 16:05:16 -0700 (PDT)
+Subject: Re: [PATCH v2 35/45] target/arm: Implement fp16 for Neon pairwise fp
+ ops
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200828183354.27913-1-peter.maydell@linaro.org>
+ <20200828183354.27913-36-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <94dee46b-3ee6-d1dc-c0e6-e5d83acac363@linaro.org>
+Date: Fri, 28 Aug 2020 16:05:14 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200828133753.2622286-1-laurent@vivier.eu>
-In-Reply-To: <20200828133753.2622286-1-laurent@vivier.eu>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 29 Aug 2020 00:04:18 +0100
-Message-ID: <CAFEAcA_sCGWuHuca4LwwQ0MSODUH5hShC=NEyYo7zFgo5ENHgA@mail.gmail.com>
-Subject: Re: [PULL 00/18] Linux user for 5.2 patches
-To: Laurent Vivier <laurent@vivier.eu>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62d.google.com
+In-Reply-To: <20200828183354.27913-36-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -28
+X-Spam_score: -2.9
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.809,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,43 +106,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 28 Aug 2020 at 14:39, Laurent Vivier <laurent@vivier.eu> wrote:
->
-> The following changes since commit 25f6dc28a3a8dd231c2c092a0e65bd796353c769:
->
->   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-08-26' =
-> into staging (2020-08-26 10:28:36 +0100)
->
-> are available in the Git repository at:
->
->   git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request
->
-> for you to fetch changes up to cac46eb021fbbac77f1f98223b19608f31fc2236:
->
->   linux-user: Add support for utimensat_time64() and semtimedop_time64() (202=
-> 0-08-28 15:24:42 +0200)
->
-> ----------------------------------------------------------------
-> add utimensat_time64, semtimedop_time64, rt_sigtimedwait_time64,
->     sched_rr_get_interval_time64, clock_nanosleep_time64, clock_adjtime64,
->     mq_timedsend_time64, mq_timedreceive_time64
-> fix semop, semtimedop, clock_nanosleep, mq_timedsend, target_to_host_timespec=
-> 64
-> fix tembits.h
-> add more strace function
-> Add upport DRM_IOCTL_I915_GETPARAM
-> detect mismatched ELF ABI in qemu-mips[n32][el]
+On 8/28/20 11:33 AM, Peter Maydell wrote:
+> Convert the Neon pairwise fp ops to use a single gvic-style
+> helper to do the full operation instead of one helper call
+> for each 32-bit part. This allows us to use the same
+> framework to implement the fp16.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  target/arm/helper.h             |  7 +++++
+>  target/arm/vec_helper.c         | 45 +++++++++++++++++++++++++++++++++
+>  target/arm/translate-neon.c.inc | 42 ++++++++++++------------------
+>  3 files changed, 68 insertions(+), 26 deletions(-)
 
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Applied, thanks.
+r~
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
