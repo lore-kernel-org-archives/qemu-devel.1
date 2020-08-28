@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E731C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:08:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 107C2C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:09:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE9DE2086A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:08:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAF1F207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:09:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bf7o4+4U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE9DE2086A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OG9xdzC3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAF1F207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBcFe-0003Mh-4H
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 07:08:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39426)
+	id 1kBcG0-0004ID-0Z
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 07:09:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39544)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kBcEl-0001u9-99
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:08:03 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:33937)
+ id 1kBcF3-0002Zf-Ck
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:08:21 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:39876
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kBcEj-0000OP-NQ
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:08:02 -0400
+ id 1kBcF1-0000Q0-Mi
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:08:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598612880;
+ s=mimecast20190719; t=1598612899;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vgvH5LZTKouaCaPhOVmtES5ueNB/zwfdlXhtvdNj5No=;
- b=Bf7o4+4U/LyR5vUN/cQCKifetBgwmpXl9BVCxjOWtk7jpFaW4BrkZygLoUAO9e4x4jwnHi
- iFyRNQkM+aXRyGoA6jMxfYLxITlWlYpy39RemH8pT5kpoca7Rd4Rdy/Qn8nb+sCfUR0eT9
- 6hpaODhqEIkunI3HtNft7Xw907WSZEM=
+ bh=K4Sd4urd4/78OYOeMr4+d6SJ48/8cvfRv6qKwG++E0w=;
+ b=OG9xdzC3UwP0fs/juMswUkJuKeoP+Unkp2tQJU8V4hRPrZcmyYkE/XCqbUbMVqtkZqGbKt
+ j2f/UlBxaow+jLwUSpTQL4qxPV6tu/0qeURub29Ewe/UYTRksM0wREECnd8EYOZhBqM9lv
+ eIGyeXJ/j8e+pgODqLwWN/zy7GO8lG4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-21-PdwtHMs-NdCFlKL2BKSgXA-1; Fri, 28 Aug 2020 07:07:58 -0400
-X-MC-Unique: PdwtHMs-NdCFlKL2BKSgXA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-69-uVHx-ZY9P0yqiwStwjVxMQ-1; Fri, 28 Aug 2020 07:08:17 -0400
+X-MC-Unique: uVHx-ZY9P0yqiwStwjVxMQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 095C1100746C
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:07:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C9851084CA1
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:08:16 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E885A19C59;
- Fri, 28 Aug 2020 11:07:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3AB9C747BD;
+ Fri, 28 Aug 2020 11:08:09 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/16] meson: declare tasn1 dependency
-Date: Fri, 28 Aug 2020 15:07:20 +0400
-Message-Id: <20200828110734.1638685-3-marcandre.lureau@redhat.com>
+Subject: [PATCH 04/16] meson: convert qht-bench
+Date: Fri, 28 Aug 2020 15:07:22 +0400
+Message-Id: <20200828110734.1638685-5-marcandre.lureau@redhat.com>
 In-Reply-To: <20200828110734.1638685-1-marcandre.lureau@redhat.com>
 References: <20200828110734.1638685-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0.001
@@ -73,7 +74,8 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.81;
- envelope-from=marcandre.lureau@redhat.com; helo=us-smtp-1.mimecast.com
+ envelope-from=marcandre.lureau@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 01:02:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
@@ -103,27 +105,38 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
+This is required by test-qht-par unit test.
+
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- meson.build | 5 +++++
- 1 file changed, 5 insertions(+)
+ tests/Makefile.include | 1 -
+ tests/meson.build      | 4 ++++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 74f8ea0c2e..2002728487 100644
---- a/meson.build
-+++ b/meson.build
-@@ -401,6 +401,11 @@ libdaxctl = not_found
- if 'CONFIG_LIBDAXCTL' in config_host
-   libdaxctl = declare_dependency(link_args: config_host['LIBDAXCTL_LIBS'].split())
- endif
-+tasn1 = not_found
-+if 'CONFIG_TASN1' in config_host
-+  tasn1 = declare_dependency(compile_args: config_host['TASN1_CFLAGS'].split(),
-+                             link_args: config_host['TASN1_LIBS'].split())
-+endif
- 
- # Create config-host.h
- 
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 9599990a83..9751a86b4c 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -201,7 +201,6 @@ tests/test-rcu-slist$(EXESUF): tests/test-rcu-slist.o $(test-util-obj-y)
+ tests/test-qdist$(EXESUF): tests/test-qdist.o $(test-util-obj-y)
+ tests/test-qht$(EXESUF): tests/test-qht.o $(test-util-obj-y)
+ tests/test-qht-par$(EXESUF): tests/test-qht-par.o tests/qht-bench$(EXESUF) $(test-util-obj-y)
+-tests/qht-bench$(EXESUF): tests/qht-bench.o $(test-util-obj-y)
+ tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
+ tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
+ tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
+diff --git a/tests/meson.build b/tests/meson.build
+index 3c1586f110..c45ade551c 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -1,3 +1,7 @@
++qht_bench = executable('qht-bench',
++                       sources: files('qht-bench.c'),
++                       dependencies: [qemuutil])
++
+ test_qapi_outputs = [
+   'qapi-builtin-types.c',
+   'qapi-builtin-types.h',
 -- 
 2.26.2
 
