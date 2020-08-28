@@ -2,101 +2,120 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0094DC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEA7C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:38:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BD270207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:37:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZOio9+35"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD270207DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 412F3207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:38:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 412F3207DF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBeZD-0002fM-Th
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:37:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36012)
+	id 1kBeaU-0004RF-5w
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:38:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBeYK-0001kd-Gu
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:36:24 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40749)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBeYI-00074d-LA
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:36:24 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id kx11so510291pjb.5
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 06:36:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=tFSSgs9QRwmKeuCKPJUn4j6hT0jhHfFpLFIOY65jDc4=;
- b=ZOio9+35BLRQTASsqD7BM6QeuGOWsxTyOjIVIldshVlCaGjPpOA/CD+30YI7489J/x
- 3lnN1WBInxZ6UeZdffzFand0Vv8V7LPGkLHG7WQ5SNcOcoGm3pmwPx03pnL6VdUgh+4i
- A16b+KCTNWSJo92EOrKXA1SieKP+f7hlFQ3Lx+TzCNRrcQCtFmyhOrx1b1BavZLPoPpc
- Gjj6fYH7i/yz6+O95cgTn2LIFjhse4EdtZrx74HwCfGuUTJKjcISvHVXXk3V8L5KdLO5
- IHaK7Hxh9VfBw4lAl72tkp/+3+Sbjbc4ryUpnrJxbUsmD58iWaOwZoufTuchh3l2wOUS
- kc4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tFSSgs9QRwmKeuCKPJUn4j6hT0jhHfFpLFIOY65jDc4=;
- b=mYkNH6cxUIiLMCCrQg2Kt7dvZIfUATYuzWW/7hQiv0OrJg5ZA0jS70xxo4ol0XeV8Y
- uMsltYYw5E8SXyRqJzSuzOmYXwEGL92Ikxjn6tKIt3A/y1EoxKK3BxOZrQRVVnQVhpUv
- O5/QaadqIWAaIwHeS815Up02Co1jHqtOe9cz0CqO7gRs5uupBBgAUhVGFLntrz1fVZhp
- mG8LwXVLc7E4BZF9nWOiO8xvmNm1MbjnjMa6HXSB22HL36EcmBdXBEEWnLUvEyRzuLY1
- Cg3ek8vSWuDQGu+2g11K7hHHObvB+mscFfA3X2fPP3WsKQJ+Cd+SJIN6ZUeE28iDt+Jg
- SQNw==
-X-Gm-Message-State: AOAM533AEKl6loIfUN2I57WWZEDmlfxj54kciBb+Mvz4IWL5Kkjvt9mB
- KJ98So+oWhy9TtLYQSVkNRyQSnAIR3Y/mg==
-X-Google-Smtp-Source: ABdhPJw6tgOMzJcCYss1Q0f5eq0D+pE9hJuCTxAtYA+5q7PP8FUZZhMa+JPS3Znv+dKHoMD8kLRS0w==
-X-Received: by 2002:a17:90a:630c:: with SMTP id
- e12mr1222289pjj.17.1598621780771; 
- Fri, 28 Aug 2020 06:36:20 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 37sm1448909pjo.8.2020.08.28.06.36.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Aug 2020 06:36:19 -0700 (PDT)
-Subject: Re: [PATCH 00/77] target/microblaze improvements
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-References: <20200825205950.730499-1-richard.henderson@linaro.org>
- <20200827091128.GK2954729@toto>
- <1628c0ac-db22-ef9d-22e2-6a167ceaaf55@linaro.org>
- <20200827102217.GN2954729@toto>
- <5a787d85-a75f-60cf-0c99-a40c84222b35@linaro.org>
- <20200827170948.GO2954729@toto>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f555646c-f725-1328-7e42-75d4047a4e9a@linaro.org>
-Date: Fri, 28 Aug 2020 06:36:17 -0700
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBeYP-0001u1-VS
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:36:29 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:50683)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBeYN-00074v-WC
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:36:29 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MiuGK-1kqVfv1pBc-00exEp; Fri, 28 Aug 2020 15:36:23 +0200
+Subject: Re: [PULL 00/18] Linux user for 5.2 patches
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200827192018.2442099-1-laurent@vivier.eu>
+ <CAFEAcA99NybkNUT7dpECnHftOz5VrQCwZJqQkuO3sUAMseoYGQ@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <70c094cd-24c8-b239-fa59-4b6f24aea65c@vivier.eu>
+Date: Fri, 28 Aug 2020 15:36:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200827170948.GO2954729@toto>
+In-Reply-To: <CAFEAcA99NybkNUT7dpECnHftOz5VrQCwZJqQkuO3sUAMseoYGQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -28
-X-Spam_score: -2.9
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:tMvB9ukei/2pk1vsuDqu5Ooe8lNQIy+cxpw7Y/WBcc3JJXy7usW
+ eo3jVdiQshHJp1rXRiNkc5vw7sFE9fJQ3E4UP5oYd6gXKX75gxw/kV2YG3C0Sd/xgn8gz87
+ 0ZmrTtfGdUhPUJBAvgubXZwiodIEtYBtI9j5uTH8MFeoACXi1m0/50RmRFJu3rdjRCI2fyr
+ cfdILi/6rWGQ85nAfeY/g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ds43A8IAmIs=:Vn8Jvdl63YBMBlYMxcs+yN
+ z0cq6szR3UotvlHhAhscEI4+mhMBCQLlMnoh8zraAO1JT/zH6hmgMiyDX8n1PhH6EyUISJOYU
+ vxBcU/yFVsTu6vqkXNaieypYvndXSyoLiUTWv8glcBXKSUiUotZ6ThfHuVtpN6awIozXAbHGX
+ JEmgv6NgsWfHrpWdF+6PpW1gXh8851kNw6vvwNhDEk0SQPHh3Y/F/qaeefZr2sB/6wcv6lZS0
+ LG8Rsbvsz1zbuCnwqZFljcgZTZ0gBNmzsUhXZ8ofeZ8kLNDLsSE6wD5SHbz/HUReX5EMu4Uf3
+ 7GDfqD/0oRuhB8pQxefmnF8t+NvjY1DKaZww8INe04OTAoGiJ+0rAIWMgR4zaCXHt4xzGirmE
+ 1p3EoWNcE2weOJo5pzjE8jkd5Xik53SnYokhGrhSyMqcLXpgfnMyE023jB/SmegFc7RzMIkJZ
+ 6+Zf/TPi+usJuWcNLrLWXONtUBHh+1ooykK9wj8z/Ne3R9eNsyJw9nI4hseqOM+/d+DxGV6al
+ //wEmh2hYpsLJPrkcGQ6um5qiocyZs1hw0DZyidDJJ9woaguj3Ph4G9mvy9LqgQauo3GxshIA
+ jTTn3RY7srT9vwVKbg5xze6SLaLcfMLIjKdec3x7GZzrX5W49cRUrsbiBhrE4/8DnSWxdtKZX
+ NBkDB+9XXfJ4eu4+cqIjxHVMoVi5fkACo24wbB4sV8lwzMBKgIfRaa6xy2qgop3Ex2ST0xF4V
+ lIwl/ksQ0q9Ied7kZL0dFAAHsNbPHAPLxvtnDv4XEz3/kZaUeed69Xj/USsCbXbzny0ThbiQG
+ v7QPegrO7vpr7VL4zOUr+ANXdZxicZvhXIKm5ShjU/l2+6UDZgDSWE0BgpkoXWSH0/vUpk8
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 09:36:25
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.809,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.809,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,58 +128,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Riku Voipio <riku.voipio@iki.fi>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/27/20 10:09 AM, Edgar E. Iglesias wrote:
-> It seems to be getting out of sync when getting a slave-error and the core
-> is not setup to take exceptions for slave errors. Looks like a pre-existing
-> bug where we're restoring CPU state without taking the exception.
-> The following fixes that particular case in my runs.
+Le 28/08/2020 à 14:11, Peter Maydell a écrit :
+> On Thu, 27 Aug 2020 at 20:23, Laurent Vivier <laurent@vivier.eu> wrote:
+>>
+>> The following changes since commit 25f6dc28a3a8dd231c2c092a0e65bd796353c769:
+>>
+>>   Merge remote-tracking branch 'remotes/maxreitz/tags/pull-block-2020-08-26' =
+>> into staging (2020-08-26 10:28:36 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request
+>>
+>> for you to fetch changes up to aa26eb42f5eaec54257aaceaeda50b9aa98756a5:
+>>
+>>   linux-user: Add support for utimensat_time64() and semtimedop_time64() (202=
+>> 0-08-27 12:29:51 +0200)
+>>
+>> ----------------------------------------------------------------
+>> add utimensat_time64, semtimedop_time64, rt_sigtimedwait_time64,
+>>     sched_rr_get_interval_time64, clock_nanosleep_time64, clock_adjtime64,
+>>     mq_timedsend_time64, mq_timedreceive_time64
+>> fix semop, semtimedop, clock_nanosleep, mq_timedsend, target_to_host_timespec=
+>> 64
+>> fix tembits.h
+>> add more strace function
+>> Add upport DRM_IOCTL_I915_GETPARAM
+>> detect mismatched ELF ABI in qemu-mips[n32][el]
 > 
+> Hi; this fails to build with clang:
 > 
-> I'm on a backported QEMU 5.1 so thing may look different in master.
-> 
-> diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-> index 831ff2cac1..0cae51c2df 100644
-> --- a/target/microblaze/op_helper.c
-> +++ b/target/microblaze/op_helper.c
-> @@ -432,22 +432,19 @@ void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
->      cpu = MICROBLAZE_CPU(cs);
->      env = &cpu->env;
->  
-> -    cpu_restore_state(cs, retaddr, true);
-> -    if (!(env->msr & MSR_EE)) {
-> +    if (!cpu->cfg.iopb_bus_exception || !(env->msr & MSR_EE)) {
->          return;
->      }
->  
-> +    cpu_restore_state(cs, retaddr, true);
-> +
->      env->ear = addr;
->      if (access_type == MMU_INST_FETCH) {
-> -        if ((env->pvr.regs[2] & PVR2_IOPB_BUS_EXC_MASK)) {
-> -            env->esr = ESR_EC_INSN_BUS;
-> -            helper_raise_exception(env, EXCP_HW_EXCP);
-> -        }
-> +        env->esr = ESR_EC_INSN_BUS;
-> +        helper_raise_exception(env, EXCP_HW_EXCP);
->      } else {
-> -        if ((env->pvr.regs[2] & PVR2_DOPB_BUS_EXC_MASK)) {
-> -            env->esr = ESR_EC_DATA_BUS;
-> -            helper_raise_exception(env, EXCP_HW_EXCP);
-> -        }
-> +        env->esr = ESR_EC_DATA_BUS;
-> +        helper_raise_exception(env, EXCP_HW_EXCP);
->      }
->  }
+> ../../linux-user/syscall.c:1181:24: error: unused function
+> 'copy_from_user_timeval64' [-Werror,-Wunused-function]
+> static inline abi_long copy_from_user_timeval64(struct timeval *tv,
+>                        ^
+> 1 error generated.
 
-Thanks for the pointer.  I've re-written this section to use
-cpu_loop_exit_restore(), so that the restore is at the end.  The new patch will
-appear in v2, just before iflags is added to the restore state.
+I've added the missing #ifdef and I'm going to resend the PR.
 
+Thanks,
+Laurent
 
-r~
 
