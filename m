@@ -2,82 +2,83 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09BBAC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2E61C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB39720757
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:36:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB42C20757
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:37:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rRcLMnk0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB39720757
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="w9NqW6o/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB42C20757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBfUp-00088P-3I
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:36:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51458)
+	id 1kBfVf-0001hj-ST
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:37:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfEv-00017i-JK
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:25 -0400
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:46555)
+ id 1kBfEd-0000YI-0n
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:07 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:37658)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfEt-0005Eo-Gd
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:25 -0400
-Received: by mail-pf1-x42a.google.com with SMTP id t185so723067pfd.13
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:22 -0700 (PDT)
+ id 1kBfEb-00057A-1P
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:06 -0400
+Received: by mail-pg1-x541.google.com with SMTP id 5so529341pgl.4
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=wXHheAujwG3J7OkJDdVOIKAESxqo8RAwt5jkuy5HApE=;
- b=rRcLMnk0BuRSGAIPpb/sgknemybd7UCwpH3jjRfjTom1E3gQ3EGGr/u1pIxjMtpE/A
- nZEBRF9JD2J/FINUIpDIMFHlkeKWtOkcq6nWrPT7UJH4LOoCeyI02QpRorz8WQ3c+1mb
- VmSMTffUBE0CH3nvO/Y09TYllPKMjSmVcm4uC7d9NmHlRbOiu52vjf+2RzOvLN/yC9tE
- Rtkdz6JZnFCJ/IybgcKUxoxPyrz17R06Vh/xzMCAct46uiOJwKH9hhDTb9c9ANA3Fg9t
- 6sba8DsrGgARoFw6lqhj3MxM//ohiiUf5BCIjcxikJ0Rgl8ejFDpzpJvMKNgsUYusyx3
- /l9w==
+ bh=7NCItsGikAjoxCQbtrtcdgvM3OCnFXhPqNO+3OzZ5UY=;
+ b=w9NqW6o/d7xpN7WyjF8XV2hXkg3mEhZ/pa4ceYASlCwZvWbQDnG6ThRCKRTCVtxnbJ
+ 7J60iN4D83usBnCCpKMt0eY9olEdUEZGEKoRS3TiZ2Wd+jpJ4T4ZoeSAN3BQydFvZcc9
+ +H6a45JiryEu2nnEd/OZQDgDV0BDimi7MW5S1HcX9Bq8CjaH39d2lkZyFkdBXEe0TrVh
+ GxsVNDu1DD60pGaqDICGtbHCHv9MFcEM+SPCAw1d2rJtqfLfc7OUwueYpO4vAIis8sw+
+ TERKySKI8eE7htAJ877GP4N1dEd19FQNOpd4r/Fm/u21BB5ZVTCq5TLhDBMKL0U48dN/
+ y4lQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=wXHheAujwG3J7OkJDdVOIKAESxqo8RAwt5jkuy5HApE=;
- b=S+lk9i8hQ3kGHM2GJOGY5+s/7ejeaTaC8OxzEZBqMaD5eRiPFF9JAFzW1RCACul3fg
- +tt5V48xsiKVw9/NsNfmc8kM0tymPU/SkEMYFaIZcl/pMlm1Hhq0PfMZLOIfXBIjyva/
- uTUBbLAAHI6W/z7eQLCEI8RHhsFRF0wUZpVBp+R2ZJZtM5CadyzDUovnCD93sEO2ZFPd
- KKHobK5Z1ZloooklO4WhY9xcx+6P/CDBxp+gfB2Cx7wCfK2yneA+4wMyfILSjXXS7UY2
- /9fv+kgM0A7HdYTyBa7dbaoog/yUMBSttwCjseBOm8As/RRa77IQeVLZ8fLDyaAUSwNo
- qSYA==
-X-Gm-Message-State: AOAM5331gm7VIfHoZ4Th0kfDyOatloW9xC8DTLkvyNoRzZUdtAORVQSb
- tinJv/BsYAAH23RsX+YvSrkQm3YolEzuug==
-X-Google-Smtp-Source: ABdhPJzm1rHCH9MSsU1d3J6bRZ8ILG2jhS2i4ae3DV4JoCHW4jUSq7zhNyllC7AXEYtj7RlYlDBiaQ==
-X-Received: by 2002:a65:60ce:: with SMTP id r14mr1449898pgv.85.1598624421014; 
- Fri, 28 Aug 2020 07:20:21 -0700 (PDT)
+ bh=7NCItsGikAjoxCQbtrtcdgvM3OCnFXhPqNO+3OzZ5UY=;
+ b=jH0GBm1iqAHEgBOnZCLe+kIvEWx9scbr6rU2HNnAT0ApoQuvAhc4JYbO9meFSA7EXh
+ BSrI7qxMwveV5QoqncahWerNj6dYfFEduRNiGYypoZjF5JS+gyjIty0MDTsd87EpXFWc
+ vDA3ZlUPUlg1ldEnveQjZPZ+TqvAomC9u0G7IAVjDWzJav2DUkw8todM2gahuKncc7wQ
+ y0h3Lm0cEYu5dPswqRzBGT98ibCcoUk5B+pvnc650nY2kCN2z/cwwNOyo4bPwlhFlZhT
+ 79fCDl0/C6L0+XQg/pxSjwdHqF7YlvOChohO9Ub/cIpUPC7pqKnH2ODTAtMOtswCatsD
+ nxKg==
+X-Gm-Message-State: AOAM530BerA4wSargxV4yupIn3N9FnxZZ+puScW1ZMfstEewjWUl+Lrq
+ lvYl6QsxxMHODNzhwopX2+DJXDr8go/m2g==
+X-Google-Smtp-Source: ABdhPJwuHdhedwg/DoBjiBYV1g9B1wthNgkxpxHYi1AnPWosKzSHOrOVvJq4srwlHLCXvmDfJGXspA==
+X-Received: by 2002:a63:4c11:: with SMTP id z17mr1408895pga.152.1598624403254; 
+ Fri, 28 Aug 2020 07:20:03 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.20.20
+ by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.20.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 07:20:20 -0700 (PDT)
+ Fri, 28 Aug 2020 07:20:02 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 39/76] target/microblaze: Convert dec_pattern to decodetree
-Date: Fri, 28 Aug 2020 07:18:52 -0700
-Message-Id: <20200828141929.77854-40-richard.henderson@linaro.org>
+Subject: [PATCH v2 24/76] target/microblaze: Tidy mb_tcg_init
+Date: Fri, 28 Aug 2020 07:18:37 -0700
+Message-Id: <20200828141929.77854-25-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
 References: <20200828141929.77854-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42a;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42a.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,136 +105,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+All of the tcg globals can be recorded in the same table.
+Drop the "r" prefix from "rpc" and "rmsr".  Obviates the
+need for regnames[], which was incorrectly not const.
+
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/insns.decode |  4 ++
- target/microblaze/translate.c  | 67 +++++++++-------------------------
- 2 files changed, 22 insertions(+), 49 deletions(-)
+ target/microblaze/translate.c | 62 +++++++++++++++--------------------
+ 1 file changed, 27 insertions(+), 35 deletions(-)
 
-diff --git a/target/microblaze/insns.decode b/target/microblaze/insns.decode
-index a611cc83a7..16519f05dc 100644
---- a/target/microblaze/insns.decode
-+++ b/target/microblaze/insns.decode
-@@ -44,6 +44,10 @@ addikc          001110 ..... ..... ................     @typeb
- cmp             000101 ..... ..... ..... 000 0000 0001  @typea
- cmpu            000101 ..... ..... ..... 000 0000 0011  @typea
- 
-+pcmpbf          100000 ..... ..... ..... 100 0000 0000  @typea
-+pcmpeq          100010 ..... ..... ..... 100 0000 0000  @typea
-+pcmpne          100011 ..... ..... ..... 100 0000 0000  @typea
-+
- rsub            000001 ..... ..... ..... 000 0000 0000  @typea
- rsubc           000011 ..... ..... ..... 000 0000 0000  @typea
- rsubk           000101 ..... ..... ..... 000 0000 0000  @typea
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 8da477457d..7ebf0e1e7d 100644
+index 9aa63ddcc5..e709884f2d 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -279,6 +279,10 @@ static bool do_typeb_val(DisasContext *dc, arg_typeb *arg, bool side_effects,
-     static bool trans_##NAME(DisasContext *dc, arg_typea *a) \
-     { return do_typea(dc, a, SE, FN); }
+@@ -95,14 +95,6 @@ typedef struct DisasContext {
+     int singlestep_enabled;
+ } DisasContext;
  
-+#define DO_TYPEA_CFG(NAME, CFG, SE, FN) \
-+    static bool trans_##NAME(DisasContext *dc, arg_typea *a) \
-+    { return dc->cpu->cfg.CFG && do_typea(dc, a, SE, FN); }
-+
- #define DO_TYPEBI(NAME, SE, FNI) \
-     static bool trans_##NAME(DisasContext *dc, arg_typeb *a) \
-     { return do_typeb_imm(dc, a, SE, FNI); }
-@@ -350,6 +354,20 @@ static void gen_cmpu(TCGv_i32 out, TCGv_i32 ina, TCGv_i32 inb)
- DO_TYPEA(cmp, false, gen_cmp)
- DO_TYPEA(cmpu, false, gen_cmpu)
- 
-+static void gen_pcmpeq(TCGv_i32 out, TCGv_i32 ina, TCGv_i32 inb)
-+{
-+    tcg_gen_setcond_i32(TCG_COND_EQ, out, ina, inb);
-+}
-+
-+static void gen_pcmpne(TCGv_i32 out, TCGv_i32 ina, TCGv_i32 inb)
-+{
-+    tcg_gen_setcond_i32(TCG_COND_NE, out, ina, inb);
-+}
-+
-+DO_TYPEA_CFG(pcmpbf, use_pcmp_instr, false, gen_helper_pcmpbf)
-+DO_TYPEA_CFG(pcmpeq, use_pcmp_instr, false, gen_pcmpeq)
-+DO_TYPEA_CFG(pcmpne, use_pcmp_instr, false, gen_pcmpne)
-+
- /* No input carry, but output carry. */
- static void gen_rsub(TCGv_i32 out, TCGv_i32 ina, TCGv_i32 inb)
- {
-@@ -413,49 +431,10 @@ static bool trans_zero(DisasContext *dc, arg_zero *arg)
-     return false;
- }
- 
--static void dec_pattern(DisasContext *dc)
+-static const char *regnames[] =
 -{
--    unsigned int mode;
+-    "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
+-    "r8", "r9", "r10", "r11", "r12", "r13", "r14", "r15",
+-    "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23",
+-    "r24", "r25", "r26", "r27", "r28", "r29", "r30", "r31",
+-};
 -
--    if (trap_illegal(dc, !dc->cpu->cfg.use_pcmp_instr)) {
--        return;
--    }
--
--    mode = dc->opcode & 3;
--    switch (mode) {
--        case 0:
--            /* pcmpbf.  */
--            if (dc->rd)
--                gen_helper_pcmpbf(cpu_R[dc->rd], cpu_R[dc->ra], cpu_R[dc->rb]);
--            break;
--        case 2:
--            if (dc->rd) {
--                tcg_gen_setcond_i32(TCG_COND_EQ, cpu_R[dc->rd],
--                                   cpu_R[dc->ra], cpu_R[dc->rb]);
--            }
--            break;
--        case 3:
--            if (dc->rd) {
--                tcg_gen_setcond_i32(TCG_COND_NE, cpu_R[dc->rd],
--                                   cpu_R[dc->ra], cpu_R[dc->rb]);
--            }
--            break;
--        default:
--            cpu_abort(CPU(dc->cpu),
--                      "unsupported pattern insn opcode=%x\n", dc->opcode);
--            break;
--    }
--}
--
- static void dec_and(DisasContext *dc)
+ static inline void t_sync_flags(DisasContext *dc)
  {
-     unsigned int not;
+     /* Synch the tb dependent flags between translator and runtime.  */
+@@ -1846,36 +1838,36 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
  
--    if (!dc->type_b && (dc->imm & (1 << 10))) {
--        dec_pattern(dc);
--        return;
--    }
--
-     not = dc->opcode & (1 << 1);
- 
-     if (!dc->rd)
-@@ -469,22 +448,12 @@ static void dec_and(DisasContext *dc)
- 
- static void dec_or(DisasContext *dc)
+ void mb_tcg_init(void)
  {
--    if (!dc->type_b && (dc->imm & (1 << 10))) {
--        dec_pattern(dc);
--        return;
--    }
--
-     if (dc->rd)
-         tcg_gen_or_i32(cpu_R[dc->rd], cpu_R[dc->ra], *(dec_alu_op_b(dc)));
+-    int i;
++#define R(X)  { &cpu_R[X], offsetof(CPUMBState, regs[X]), "r" #X }
++#define SP(X) { &cpu_##X, offsetof(CPUMBState, X), #X }
+ 
+-    cpu_iflags = tcg_global_mem_new_i32(cpu_env,
+-                    offsetof(CPUMBState, iflags),
+-                    "iflags");
+-    cpu_imm = tcg_global_mem_new_i32(cpu_env,
+-                    offsetof(CPUMBState, imm),
+-                    "imm");
+-    cpu_btarget = tcg_global_mem_new_i32(cpu_env,
+-                     offsetof(CPUMBState, btarget),
+-                     "btarget");
+-    cpu_btaken = tcg_global_mem_new_i32(cpu_env,
+-                     offsetof(CPUMBState, btaken),
+-                     "btaken");
+-    cpu_res_addr = tcg_global_mem_new(cpu_env,
+-                     offsetof(CPUMBState, res_addr),
+-                     "res_addr");
+-    cpu_res_val = tcg_global_mem_new_i32(cpu_env,
+-                     offsetof(CPUMBState, res_val),
+-                     "res_val");
+-    for (i = 0; i < ARRAY_SIZE(cpu_R); i++) {
+-        cpu_R[i] = tcg_global_mem_new_i32(cpu_env,
+-                          offsetof(CPUMBState, regs[i]),
+-                          regnames[i]);
++    static const struct {
++        TCGv_i32 *var; int ofs; char name[8];
++    } i32s[] = {
++        R(0),  R(1),  R(2),  R(3),  R(4),  R(5),  R(6),  R(7),
++        R(8),  R(9),  R(10), R(11), R(12), R(13), R(14), R(15),
++        R(16), R(17), R(18), R(19), R(20), R(21), R(22), R(23),
++        R(24), R(25), R(26), R(27), R(28), R(29), R(30), R(31),
++
++        SP(pc),
++        SP(msr),
++        SP(imm),
++        SP(iflags),
++        SP(btaken),
++        SP(btarget),
++        SP(res_val),
++    };
++
++#undef R
++#undef SP
++
++    for (int i = 0; i < ARRAY_SIZE(i32s); ++i) {
++        *i32s[i].var =
++          tcg_global_mem_new_i32(cpu_env, i32s[i].ofs, i32s[i].name);
+     }
+ 
+-    cpu_pc =
+-        tcg_global_mem_new_i32(cpu_env, offsetof(CPUMBState, pc), "rpc");
+-    cpu_msr =
+-        tcg_global_mem_new_i32(cpu_env, offsetof(CPUMBState, msr), "rmsr");
++    cpu_res_addr =
++        tcg_global_mem_new(cpu_env, offsetof(CPUMBState, res_addr), "res_addr");
  }
  
- static void dec_xor(DisasContext *dc)
- {
--    if (!dc->type_b && (dc->imm & (1 << 10))) {
--        dec_pattern(dc);
--        return;
--    }
--
-     if (dc->rd)
-         tcg_gen_xor_i32(cpu_R[dc->rd], cpu_R[dc->ra], *(dec_alu_op_b(dc)));
- }
+ void restore_state_to_opc(CPUMBState *env, TranslationBlock *tb,
 -- 
 2.25.1
 
