@@ -2,99 +2,60 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BA84C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 21:33:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C499FC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 21:35:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60AC52080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 21:33:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ize3Zkph"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60AC52080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 929AF2080C
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 21:35:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 929AF2080C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBm08-0000I2-JF
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 17:33:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37428)
+	id 1kBm1Z-0001Gz-Qw
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 17:35:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kBlzW-0008Gq-QT
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 17:32:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54351
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kBlzU-0002SX-B8
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 17:32:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598650374;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Ju53stWfwMFcuCbUFJMwgiR9+btMQqApWQd7azRtlZ0=;
- b=Ize3ZkphnTX0K4fP/DoK6gQx28wSwnfZ/vlRJiFQ2zhGKb+zu+nxAj2aVpiAOcPTzlOaQ1
- cJduijbrZO+apbFOyct6+o/i8cnN4zYW/PGArZFsClagFfTs3bUxCnmLa8ZbW/ShqABMBh
- 5mJF8NPRktyTU1xiYCNzAeF5I2u+H4Y=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-l-fwx0faNwOc7M-CjPhDVw-1; Fri, 28 Aug 2020 17:32:52 -0400
-X-MC-Unique: l-fwx0faNwOc7M-CjPhDVw-1
-Received: by mail-ej1-f70.google.com with SMTP id dr9so1131349ejc.19
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 14:32:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Ju53stWfwMFcuCbUFJMwgiR9+btMQqApWQd7azRtlZ0=;
- b=Hr/01fSq/bZEd44gnwh0Le18OT5u6JLlbBB6lkuY35sLqjXRsc65U3bhXiASUviyUA
- 9e1SpWkhP+Pzih8CqtbBojGJTpsmwldVhEPAAZukfDjzg6+LSVlPdM757oEzOBnnutIt
- UujfMOUsZcHzDcezWdAaeQYO9Ks/OGe5xP7vHnr5vGPyJ1/A5yxYoQPWNQiPg+9qiu4z
- kkUxLx7ZOpuCw+Y5odvQ6y7M+0FPsW3ChfZYCccTD2SgccwQ3Q29chiCgWvkXOeWRWyp
- 9ALQ/EECEr1KXS0cftGj57MMeOSW8yh7TtC6K6DR2Qbww1z7yYsJl7UtcgVde4STyMuR
- 2OBg==
-X-Gm-Message-State: AOAM532j6tCX4rZfDyiNdi64f42yGWF7LXJVTT0LslwmvBviug1kR8Ia
- 2dliQ55dxZ/E9pFgAG7Ee124IMp3/8d4oBp+Q0g/tBVC1uyxYQ0TLGcnSA5KeoBUXiikzC1J9ZF
- pNOrGNU0+Oy5vYipOr7V8A9K3B37hdPs=
-X-Received: by 2002:a17:906:c001:: with SMTP id
- e1mr775182ejz.390.1598650371115; 
- Fri, 28 Aug 2020 14:32:51 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzwf1W+3WMAWE+n+OyrTJWWZziCvmWyxy95z1fdSDq4eYEIonHlaDF2AbIEvOtZ4tvIT310X0WgOxqSsFU7vkc=
-X-Received: by 2002:a17:906:c001:: with SMTP id
- e1mr775166ejz.390.1598650370876; 
- Fri, 28 Aug 2020 14:32:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mwilck@suse.com>) id 1kBm0g-0000nz-Ir
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 17:34:10 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44036)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mwilck@suse.com>) id 1kBm0e-0002XE-Hv
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 17:34:10 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 67E93ACE1;
+ Fri, 28 Aug 2020 21:34:38 +0000 (UTC)
+Message-ID: <519e0296a7d61d5e9e8d258a855eb42a57c641c5.camel@suse.com>
+Subject: Re: [PATCH v3] virtio-rng: return available data with O_NONBLOCK
+From: Martin Wilck <mwilck@suse.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>, Laurent Vivier <lvivier@redhat.com>
+Date: Fri, 28 Aug 2020 23:34:04 +0200
+In-Reply-To: <20200826082613-mutt-send-email-mst@kernel.org>
+References: <20200811142821.12323-1-mwilck@suse.com>
+ <4ae4f348-c186-f7e4-f7e3-b1f1e4a4b408@redhat.com>
+ <20200826082613-mutt-send-email-mst@kernel.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+User-Agent: Evolution 3.36.5 
 MIME-Version: 1.0
-References: <20200828173841.33505-1-pbonzini@redhat.com>
- <CAE2XoE8TWB_qnqYjNe=qUEebO0xktfWai77c-ab938XBoeqesQ@mail.gmail.com>
-In-Reply-To: <CAE2XoE8TWB_qnqYjNe=qUEebO0xktfWai77c-ab938XBoeqesQ@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Fri, 28 Aug 2020 23:32:39 +0200
-Message-ID: <CABgObfYHjKFgoxPKBGg-HwVA-5ZL8-Rw1hv2Wxu1-Uabxkfmfw@mail.gmail.com>
-Subject: Re: [PATCH] meson: move zlib detection to meson
-To: luoyonggang@gmail.com
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000079fb7b05adf6cba1"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 16:27:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=mwilck@suse.com;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 14:36:18
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,47 +68,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
- qemu-level <qemu-devel@nongnu.org>
+Cc: Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>,
+ Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000079fb7b05adf6cba1
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Wed, 2020-08-26 at 08:26 -0400, Michael S. Tsirkin wrote:
+> On Tue, Aug 11, 2020 at 04:42:32PM +0200, Laurent Vivier wrote:
+> > On 11/08/2020 16:28, mwilck@suse.com wrote:
+> > > From: Martin Wilck <mwilck@suse.com>
+> > > 
+> > > If a program opens /dev/hwrng with O_NONBLOCK and uses poll() and
+> > > non-blocking read() to retrieve random data, it ends up in a
+> > > tight
+> > > loop with poll() always returning POLLIN and read() returning
+> > > EAGAIN.
+> > > This repeats forever until some process makes a blocking read()
+> > > call.
+> > > The reason is that virtio_read() always returns 0 in non-blocking 
+> > > mode,
+> > > even if data is available. Worse, it fetches random data from the
+> > > hypervisor after every non-blocking call, without ever using this
+> > > data.
+> > > 
+> > > The following test program illustrates the behavior and can be
+> > > used
+> > > for testing and experiments. The problem will only be seen if all
+> > > tasks use non-blocking access; otherwise the blocking reads will
+> > > "recharge" the random pool and cause other, non-blocking reads to
+> > > succeed at least sometimes.
+> > > 
+> > > /* Whether to use non-blocking mode in a task, problem occurs if
+> > > CONDITION is 1 */
+> > > //#define CONDITION (getpid() % 2 != 0)
+> > > 
+> > > static volatile sig_atomic_t stop;
+> > > static void handler(int sig __attribute__((unused))) { stop = 1;
+> > > }
+> > > 
+> > > static void loop(int fd, int sec)
+> > > {
+> > > 	struct pollfd pfd = { .fd = fd, .events  = POLLIN, };
+> > > 	unsigned long errors = 0, eagains = 0, bytes = 0, succ = 0;
+> > > 	int size, rc, rd;
+> > > 
+> > > 	srandom(getpid());
+> > > 	if (CONDITION && fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) |
+> > > O_NONBLOCK) == -1)
+> > > 		perror("fcntl");
+> > > 	size = MINBUFSIZ + random() % (MAXBUFSIZ - MINBUFSIZ + 1);
+> > > 
+> > > 	for(;;) {
+> > > 		char buf[size];
+> > > 
+> > > 		if (stop)
+> > > 			break;
+> > > 		rc = poll(&pfd, 1, sec);
+> > > 		if (rc > 0) {
+> > > 			rd = read(fd, buf, sizeof(buf));
+> > > 			if (rd == -1 && errno == EAGAIN)
+> > > 				eagains++;
+> > > 			else if (rd == -1)
+> > > 				errors++;
+> > > 			else {
+> > > 				succ++;
+> > > 				bytes += rd;
+> > > 				write(1, buf, sizeof(buf));
+> > > 			}
+> > > 		} else if (rc == -1) {
+> > > 			if (errno != EINTR)
+> > > 				perror("poll");
+> > > 			break;
+> > > 		} else
+> > > 			fprintf(stderr, "poll: timeout\n");
+> > > 	}
+> > > 	fprintf(stderr,
+> > > 		"pid %d %sblocking, bufsize %d, %d seconds, %lu bytes
+> > > read, %lu success, %lu eagain, %lu errors\n",
+> > > 		getpid(), CONDITION ? "non-" : "", size, sec, bytes,
+> > > succ, eagains, errors);
+> > > }
+> > > 
+> > > int main(void)
+> > > {
+> > > 	int fd;
+> > > 
+> > > 	fork(); fork();
+> > > 	fd = open("/dev/hwrng", O_RDONLY);
+> > > 	if (fd == -1) {
+> > > 		perror("open");
+> > > 		return 1;
+> > > 	};
+> > > 	signal(SIGALRM, handler);
+> > > 	alarm(SECONDS);
+> > > 	loop(fd, SECONDS);
+> > > 	close(fd);
+> > > 	wait(NULL);
+> > > 	return 0;
+> > > }
+> > > 
+> > > void loop(int fd)
+> > > {
+> > >         struct pollfd pfd0 = { .fd = fd, .events  = POLLIN, };
+> > >         int rc;
+> > >         unsigned int n;
+> > > 
+> > >         for (n = LOOPS; n > 0; n--) {
+> > >                 struct pollfd pfd = pfd0;
+> > >                 char buf[SIZE];
+> > > 
+> > >                 rc = poll(&pfd, 1, 1);
+> > >                 if (rc > 0) {
+> > >                         int rd = read(fd, buf, sizeof(buf));
+> > > 
+> > >                         if (rd == -1)
+> > >                                 perror("read");
+> > >                         else
+> > >                                 printf("read %d bytes\n", rd);
+> > >                 } else if (rc == -1)
+> > >                         perror("poll");
+> > >                 else
+> > >                         fprintf(stderr, "timeout\n");
+> > > 
+> > >         }
+> > > }
+> > > 
+> > > int main(void)
+> > > {
+> > >         int fd;
+> > > 
+> > >         fd = open("/dev/hwrng", O_RDONLY|O_NONBLOCK);
+> > >         if (fd == -1) {
+> > >                 perror("open");
+> > >                 return 1;
+> > >         };
+> > >         loop(fd);
+> > >         close(fd);
+> > >         return 0;
+> > > }
+> > > 
+> > > This can be observed in the real word e.g. with nested qemu/KVM
+> > > virtual
+> > > machines, if both the "outer" and "inner" VMs have a virtio-rng
+> > > device.
+> > > If the "inner" VM requests random data, qemu running in the
+> > > "outer" VM
+> > > uses this device in a non-blocking manner like the test program
+> > > above.
+> > > 
+> > > Fix it by returning available data if a previous hypervisor call
+> > > has
+> > > completed. I tested this patch with the program above, and with
+> > > rng-tools.
+> > > 
+> > > v2 -> v3: Simplified the implementation as suggested by Laurent
+> > > Vivier
+> > > 
+> > > Signed-off-by: Martin Wilck <mwilck@suse.com>
+> > > ---
+> > >  drivers/char/hw_random/virtio-rng.c | 4 ++--
+> > >  1 file changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/drivers/char/hw_random/virtio-rng.c
+> > > b/drivers/char/hw_random/virtio-rng.c
+> > > index a90001e02bf7..8eaeceecb41e 100644
+> > > --- a/drivers/char/hw_random/virtio-rng.c
+> > > +++ b/drivers/char/hw_random/virtio-rng.c
+> > > @@ -65,7 +65,7 @@ static int virtio_read(struct hwrng *rng, void
+> > > *buf, size_t size, bool wait)
+> > >  		register_buffer(vi, buf, size);
+> > >  	}
+> > >  
+> > > -	if (!wait)
+> > > +	if (!wait && !completion_done(&vi->have_data))
+> > >  		return 0;
+> > >  
+> > >  	ret = wait_for_completion_killable(&vi->have_data);
+> > > @@ -74,7 +74,7 @@ static int virtio_read(struct hwrng *rng, void
+> > > *buf, size_t size, bool wait)
+> > >  
+> > >  	vi->busy = false;
+> > >  
+> > > -	return vi->data_avail;
+> > > +	return min_t(size_t, size, vi->data_avail);
+> > >  }
+> > >  
+> > >  static void virtio_cleanup(struct hwrng *rng)
+> > > 
+> > 
+> > Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+> 
+> Laurent didn't we agree the real fix is private buffers in the
+> driver,
+> and copying out from there?
+> 
 
-Il ven 28 ago 2020, 23:13 =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyon=
-ggang@gmail.com> ha
-scritto:
+Can we perhaps proceed with this for now? AFAICS the private buffer
+implementation would be a larger effort, while we have the issues with
+nested VMs getting no entropy today.
 
-> -  --disable-zlib-test) zlib=3D"no"
->> +  --disable-zlib-test)
->>
-> Why not remove this no-op
->
+Thanks
+Martin
 
-Because I did not want to introduce visible changes.
-
-Paolo
-
---00000000000079fb7b05adf6cba1
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><br><br><div class=3D"gmail_quote" dir=3D"auto"><div dir=
-=3D"ltr" class=3D"gmail_attr">Il ven 28 ago 2020, 23:13 =E7=BD=97=E5=8B=87=
-=E5=88=9A(Yonggang Luo) &lt;<a href=3D"mailto:luoyonggang@gmail.com">luoyon=
-ggang@gmail.com</a>&gt; ha scritto:</div><blockquote class=3D"gmail_quote" =
-style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex"><di=
-v dir=3D"ltr"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" =
-style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);pa=
-dding-left:1ex">-=C2=A0 --disable-zlib-test) zlib=3D&quot;no&quot;<br>
-+=C2=A0 --disable-zlib-test)<br></blockquote><div>Why not remove this no-op=
-=C2=A0</div></div></div></blockquote></div><div dir=3D"auto"><br></div><div=
- dir=3D"auto">Because I did not want to introduce visible changes.</div><di=
-v dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div></div>
-
---00000000000079fb7b05adf6cba1--
 
 
