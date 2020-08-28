@@ -2,91 +2,65 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90954C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:19:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E4BC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:20:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57B31207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C17A520872
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:20:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oImM6asA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57B31207DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gI5iHOOo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C17A520872
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBeIM-0000oB-K2
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:19:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58148)
+	id 1kBeIb-0001NF-0T
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:20:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kBeHl-0008W9-9D
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:19:17 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:41506)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
- id 1kBeHj-0004Oz-Pg
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:19:17 -0400
-Received: by mail-lj1-x241.google.com with SMTP id f26so1256572ljc.8
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 06:19:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=hgN8r/CRyBxvOK+TVAegx67yWSlkhaeXjKw7dOXe6mU=;
- b=oImM6asAfvisoZProu5t0TW1HWXbn5uKPdoWCWfAyyfnk6r+7c6tM8Q3L9WWi6gsHA
- z4EK2gJvCPkwLSB489bmV0k46aqILxLaFQMwmFn1ngQLJqXSf+Cj6gyfV+iznPuyBE9R
- dpU6EeyjirX52bJxTvvvqbber+Ic7AiUg9QWWTOsK73bcsISaA4Dxod5bsfFMB3qQR4y
- pXxYxdtTIYdBNYHO/heyCJNCdNH4RdwvMaW0xR6dLv+WyvZ4Bq5MgnkB8aOAhe2DtPHS
- +iEmKUufs1nq9y3T48RCPuGTZwjSZv7mLQtCEEFiwyhIoAeb+3K8N/bcpgxQ4BjAvWww
- T3Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=hgN8r/CRyBxvOK+TVAegx67yWSlkhaeXjKw7dOXe6mU=;
- b=mcYYb4WOAsG8Mbbng6UmoGWjAjEMzME860iSZwjpfKFUOK15mcFxMUZH3LrhSzh0U2
- MDnKX9hZQJIyzr/b/1gAT2CpVsCbTiApCp+fRvyuAyiALJfRqVLtTvBdynHo8kqE3fhk
- zRhwHAl2YkvD7uHK+hkGCsNIyTWaPUEgCG5IJNMH8BsJauD4h7ilit21gKpF3LxUcdGf
- ypdUGEsfe+6D2517CjcdUeeZ+mcz6POIqJvYbL53OpS4q23ennXP93MQ/9quq2+SqEWu
- yUr8UomZowUAmt9jhRgk3g/qDyAaF3+0tLGUB3urmntGFVjNJAIBEcQumX2F1SQwY4dQ
- lhSw==
-X-Gm-Message-State: AOAM530W+GU3ToZqlVwcUpmuQhpFkVIEHWCxraUWkJ8T/BgGxf9slq4z
- UUd7t03YDfNoyFPub/dvQbU=
-X-Google-Smtp-Source: ABdhPJyvsysPL0CHLyfDpAw1cudws2ZiAOC+rnvyb1f+7cla+LR8NMaSdaVDjUy7QG4wf1nB0mauqA==
-X-Received: by 2002:a2e:b00c:: with SMTP id y12mr900022ljk.18.1598620754062;
- Fri, 28 Aug 2020 06:19:14 -0700 (PDT)
-Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
- by smtp.gmail.com with ESMTPSA id 1sm202520ljr.6.2020.08.28.06.19.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 06:19:13 -0700 (PDT)
-Date: Fri, 28 Aug 2020 15:19:12 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 00/77] target/microblaze improvements
-Message-ID: <20200828131912.GU2954729@toto>
-References: <20200825205950.730499-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kBeHu-0000Ds-6M; Fri, 28 Aug 2020 09:19:26 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:48967)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kBeHr-0004P3-UB; Fri, 28 Aug 2020 09:19:25 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BdKtp3kK7z9sTC; Fri, 28 Aug 2020 23:19:14 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1598620754;
+ bh=wF0mu/aSv7U+JgvulayvwcMK4i+owkrDLQraXMUnyUM=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=gI5iHOOoGtSaLuM1k+gVxm46QlaHw1lcbxg4NUSHkft0+sOUpMs43MWdRJZvF00Z+
+ Q80+pv7rAoc5I5Ko83q4dNq9kMtdhVkPx0Z935+TrUqAuMrsyU5FXNi1YgQ/MRch1k
+ E7KRO57giHkDts4r68xh2wLKT62ZwOvuk+oD1RUU=
+Date: Fri, 28 Aug 2020 23:17:41 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH 0/3] spapr NVDIMM: consider 'nvdimm' machine option
+Message-ID: <20200828131741.GA36360@yekko.fritz.box>
+References: <20200825215749.213536-1-danielhb413@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="LQksG6bCIzRHxTLp"
 Content-Disposition: inline
-In-Reply-To: <20200825205950.730499-1-richard.henderson@linaro.org>
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x241.google.com
+In-Reply-To: <20200825215749.213536-1-danielhb413@gmail.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
- DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- FSL_HELO_FAKE=3.425, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,54 +73,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Aug 25, 2020 at 01:58:33PM -0700, Richard Henderson wrote:
-> Well, this is larger than I expected.
-> 
-> I started off thinking conversion to decodetree would be quick,
-> after I reviewed the mttcg patches last week.  Then I realized
-> that this could also use conversion to the generic translation loop.
-> Then I realized that there were a number of bugs, and some
-> inefficiencies, that could be fixed by using tcg exception unwind
-> properly.
-> 
-> Hopefully most of these are small and easy to understand.
-> 
-> I begin by adding enough stuff to test/tcg to make use of a
-> self-built musl cross-environment.  I'll note that linuxtest
-> does not pass before or after this patch set -- I think that
-> linux-user/microblaze/signal.c needs work -- but that the
-> other tests do work.
-> 
-> I also have an old copy of a microblaze system test image,
-> which I think used to be hosted on our wiki.  After basic kernel
-> boot, it contains a "selftest" script which runs a bunch of
-> user-land isa tests.  That still works fine too.
-> 
-> HOWEVER: That's not nearly complete.  There are cpu config options
-> that aren't default and I don't know how to change or test.
-> 
-> In addition, the manual is really not clear on what's supposed to
-> happen under various edge conditions, especially with MSR[EE] unset.
-> E.g. unaligned access: Does the insn get nop-ed out?  Do the low
-> bits of the address get ignored?  Right now (before and after) the
-> access simply happens unaligned, which doesn't seem correct.
-> I assume the reason for having this configure option is to reduce
-> the size of the FPGA so that the unaligned access handling hw
-> simply isn't present.
-> 
-> Lemme know what you think.
-> 
 
-It looks like our tests pass after adressing the issues I've mentioned
-so far. Don't know whats going on with the tcg_gen_lookup_and_goto_ptr
-issue, I'll double-check next week to make sure I didn't mess something
-up.
+--LQksG6bCIzRHxTLp
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks,
-Edgar
+On Tue, Aug 25, 2020 at 06:57:46PM -0300, Daniel Henrique Barboza wrote:
+> This series aims to solve bug [1].
+>=20
+> First patch is a trivial cleanup, feel free to squash into
+> patch 02. Patch 02 attempts a code simplification to put
+> all NVDIMM related logic in the same function.
+>=20
+> Patch 03 is where the actual fix is implemented. My initial
+> approach here was to make the handling of '-machine nvdimm' for
+> pSeries similar to how it is handled elsewhere, but I wasn't
+> able to accomplish that without either (1) breaking up existing
+> pseries-5.1 guests that didn't care about this option or (2)
+> make pseries-5.1 and pseries-5.2+ machines to have different
+> semantics for it.
+>=20
+> I ended up doing what I was sure was sensible: if the user puts
+> '-machine nvdimm=3Doff', we must comply to that.
+
+Applied to ppc-for-5.2, thanks.
+
+>=20
+>=20
+> [1] https://bugzilla.redhat.com/show_bug.cgi?id=3D1848887
+>=20
+> Daniel Henrique Barboza (3):
+>   ppc/spapr_nvdimm: use g_autofree in spapr_nvdimm_validate_opts()
+>   spapr, spapr_nvdimm: fold NVDIMM validation in the same place
+>   ppc/spapr_nvdimm: do not enable support with 'nvdimm=3Doff'
+>=20
+>  hw/ppc/spapr.c                | 18 ++++++------------
+>  hw/ppc/spapr_nvdimm.c         | 31 +++++++++++++++++++++++++++----
+>  include/hw/ppc/spapr_nvdimm.h |  4 ++--
+>  3 files changed, 35 insertions(+), 18 deletions(-)
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--LQksG6bCIzRHxTLp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9JA/MACgkQbDjKyiDZ
+s5LpLw/8DS6S93n0m7HgByo2T1fQk3wo8yzM+OroltDmxCU4ipNKMYW74bZRM9dF
+CbGDuUCn/NXLfKpV/yV9DlYOJMSmMhtNwClCMotYzUsZ1JpjP6k17Di/sXI2hhRP
+gbjErJ4U0t9C5Hr+vj/rcB7C6YhJvu1yGEY0bwyj/qhb0AmOgLxZ5MnOqmg7fwfs
+70J/+OuiWoObauCNw4uRcMINZRE+wQUbV+Urs5lWYj+9e3LR6vqyHB02wMGH+Qwv
+W0Aojh/UfDSzmTUwp0LVB7E7+ln9mFe91D95rMfmS8pDSxMhnojZGAw5iFafhWd5
+JhE40Qrx8eTA93d3/38f6kSwpphX87caW5v20OcktjYeE5GiA8teZOfZIPlu9SjJ
+Buz/yZrkmwDu1Tofdj7a7uJq8zeMJvfZMlJ2HrrDL+OVrFbEdZoMzaOHpym9A7Ix
+j4hIYLShZ8xOTUtPClaSdIddfB+mg+6nDb/9LYhPouX1u5zoxAcG8ckGzASw7/0Y
+MCNWcnjGGbBzQ5YSuGf5XJRq0kPyqfZ1EWWtzw7Atp3T0h8B+/VwGUCDOEA97Jmy
+bCUwJU+airw1pVfUM8cTezhxw0qk9Q6nj1he/2PKGqP6gsWTJgGX6MAExkKgQYcR
+ViqT3SekxUXMabqffclPHAqTl8RQKcEF2Eu3jpWF0o8dXYdugPE=
+=0WF1
+-----END PGP SIGNATURE-----
+
+--LQksG6bCIzRHxTLp--
 
