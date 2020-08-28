@@ -2,89 +2,123 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,RCVD_ILLEGAL_IP,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F262C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:54:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2D09C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:01:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14F4F20776
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:54:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83C1020936
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:01:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GryS6awY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14F4F20776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="gWBJqKUH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83C1020936
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBia7-0006pj-8y
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 13:54:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49158)
+	id 1kBigr-0000kl-L6
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 14:01:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBiZZ-0006OA-IV
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:53:57 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:33040)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBiZX-00013G-T6
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:53:57 -0400
-Received: by mail-pl1-x644.google.com with SMTP id h2so29894plr.0
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 10:53:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ESRQ16shKiPsdhAFOwhgeGelAes/sl5sAKot+LF0/gE=;
- b=GryS6awYUfmCDP9wUFtRSGDLduscdYTmcHUydeBW5Xyef3f1hr1Evlxz8gyglcy4W0
- RMNpMiBwcSQC7G6BIoC6ONDRKAjWP4zjKlse2zeBVY3kphLBhfstnC8Mq5qJBsC8YJ5F
- Fg/kMzq9YjMjsUcPeYlQYg67wZmENdXfM1u60PhAgOzdXvCEkokan//LH+40bTq3LCfe
- AE81gUsRugrbqTIBhPeBvytsdzV3o2u48gzdm3oohAZZUsY4S6mIcTTyQaikZWB0JHPr
- mWrrCDbiMEt6nERXPIo1j728LO0W8CoN/XU1/WZ2IZ0quJNydY3w/fIa2jOwyeHPp6BE
- sJtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=ESRQ16shKiPsdhAFOwhgeGelAes/sl5sAKot+LF0/gE=;
- b=IzEJsDzDSKq4ssrlmLXUMp9i8C7snD42Xf3mtZ/pd6DhZHVyCMBZ0mvN9B6S0Wbire
- 2aPKbJQIWBfJLnbGb0lmZXAHU7QZ85m51NKrwwIFgLpBapZPnzobeZETd6ykd1mns7at
- m3U8UIF8/umk9qqPa3Gzrq7f8O8HOLWWVyK2IedSxrS++snA17DUWB11f02f4Yx/oinF
- 59FXNxI02QzhKgbLkQnTK+l7D1ELmq8WsRB5y11012zfTi9UxDMa0p889q9EO4hqy112
- BLSMIWvmz5qYI0gnGCPlqaXXOJT8IAKIkWSWcmpK5MY4C+g1OvnYpARhuruK2UjoaVyL
- +pbQ==
-X-Gm-Message-State: AOAM531HzZflDSe/8lcpgQ1qUYVfKx/o1njwWj1wc7DpuxQdSzKU8Dvs
- oIkRt6hlrkmEYAcMXM6/xXE2Hm2Jg4mELw==
-X-Google-Smtp-Source: ABdhPJzets8BgtrMeJvG/HKDl3DIFJ5CYdO0lHekHRXS602UXL9/m/Cz2sc/t7Z+8LUPp7aUeWBenw==
-X-Received: by 2002:a17:902:9693:: with SMTP id n19mr44953plp.33.1598637233849; 
- Fri, 28 Aug 2020 10:53:53 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id u2sm79721pjj.57.2020.08.28.10.53.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 10:53:53 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] softfloat: Define comparison operations for bfloat16
-Date: Fri, 28 Aug 2020 10:53:51 -0700
-Message-Id: <20200828175351.435119-1-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1kBifs-0000Bp-E2
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:00:28 -0400
+Received: from mail-eopbgr770080.outbound.protection.outlook.com
+ ([40.107.77.80]:47148 helo=NAM02-SN1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1kBifn-0001ta-HN
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:00:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=flxgrylqJX02z+BPQwNO/INQdMEBf26+tvT6Ty1hEtrmoRWu6twnoGMmVz8yrvUqiwVcedODIV16+M9xivtGbh3b5830Yk28yxIay9C8xAU/PpSJJstFwGsKT625d5aNjyMSp4tBT5GZ3WQyNPBO11TulO0fUqu2W1PNcSmvXJAsLc77bXzkgcdRad2yiCRwk9x30WnWQ0/H1TxUwEvchKRJw/6oLlhigkuxHQcTYWHSUUySZeNOGc/dPdAA0qo1ladUZLWHFbaPAB4kzDOgdjoO+f/OqPsxym58ggJ6xpMCgHZhpGXFKbxJQ5V/jO4e98QyLi26VkwOUcKMGkoKjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C3mwFt3QdJcSZtDVFVzsvu5SO2564TUbKEkQCUEKQyE=;
+ b=T+aFyCtUOpkv/V1pKwhQNxLzFXkfHnKIw96N4XiqdNS8uECkzoly7lfEF/B/grSCYBxuYY1ql7mAMRisBZ4vak+OJO+sy29D1xSkamCHC0/gN1J8Xtepqnr+3MNfQq8ye5AMY85sY1au33RrTMkRH/HLIxz8371aUVzaBzXixAT2h06x8gGOPRDMgSvMKE2a68m7gLi5Za7Y2fs5QFk4SugTlv9u1vP/zzV22TROp6hb6QqRqOOdJIBrgKmLu1kHx/LMQn6FpLlZAuWoloiLhuzdkO6jpp9nYVgzJA1htkeMSk6DcUhJK31apLY9hnzZCSG2Z8DOUZ5fDhqvE4S+OA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C3mwFt3QdJcSZtDVFVzsvu5SO2564TUbKEkQCUEKQyE=;
+ b=gWBJqKUHGDm6ZWOmoRqwCQESwAfFN2RydHQT8YIs7A9jBCH3t3qfQTu07cO8zs4Jt2GIeG3aWAsvFqUzO42aJ7PE4SP6iLMF4xJKdWJE++W7RdoXe4gZPUz3QYuSnaeC7SAEo7L5M6E0o00u2I39oJjeux/ErcL6tKamOd8EitA=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN6PR12MB2734.namprd12.prod.outlook.com (2603:10b6:805:76::23)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.22; Fri, 28 Aug
+ 2020 18:00:19 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3326.023; Fri, 28 Aug 2020
+ 18:00:19 +0000
+From: Babu Moger <babu.moger@amd.com>
+To: ehabkost@redhat.com,
+	babu.moger@amd.com
+Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
+ decode
+Date: Fri, 28 Aug 2020 13:00:05 -0500
+Message-Id: <20200828180005.4809-1-babu.moger@amd.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200828164554.GM642093@habkost.net>
+References: <20200828164554.GM642093@habkost.net>
+Content-Type: text/plain
+X-ClientProxiedBy: SA0PR11CA0055.namprd11.prod.outlook.com
+ (2603:10b6:806:d0::30) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from 255.255.255.255 (255.255.255.255) by
+ SA0PR11CA0055.namprd11.prod.outlook.com (2603:10b6:806:d0::30) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.19 via Frontend Transport; Fri, 28 Aug 2020 18:00:18 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 58e0ca18-bc89-42e2-fd14-08d84b7c3969
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2734:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR12MB2734AD551D75C81442BC224295520@SN6PR12MB2734.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:221;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 7IjMP2hASYwiX7+21uuF/HGKKLwRMNP769qZAwDxPoBEjbDFka0httx4oofuKMm+UsjGEtYaCyANkECyT9efqxBY9Fxw4pIwUXdp7MFhPwbEEAaJBqtGyvMlrqAq6edBV3EJXp6D28aIBw4zv4eBA4hZc8+7PWVS80U2YZQMxJQXU0xTo4nAF5sZR5hn/VeLt86VY+PuepU8Bhpq8iEv+hesu5mRq+McsziJLo5k7PYNXNWPtBgaZ0XPHDf7K7X8KHYs+MhSymWFKw9gptsjIvuOSgm2QKuC0662EpIHBnwbgQ5r47ytjHMFvkVL6+rY5EZVHmiRSs+DGznS/WMJDxotqCEjDuitY48CIY9pnc/V9S6YwpiNmCX14cucycvD
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(136003)(366004)(396003)(39860400002)(376002)(346002)(26005)(4326008)(8936002)(66556008)(6486002)(8676002)(186003)(36756003)(1076003)(30864003)(66476007)(66946007)(5660300002)(44832011)(956004)(2616005)(86362001)(6666004)(83380400001)(52116002)(478600001)(16576012)(316002)(2906002)(41533002)(579004);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: PnDLJ6EMCsFoCTLjFcTSR5/ctCyDfNdme25LWoLJhgC7v2sO1Yloea79bdnli2SbCQnMvyeME/TCMYXZZ3nKDnJM8kG05oMCMWxc9g+kzNOTdDSwOUvrZ+vDwMNykEathyk298LV75193CyvPkRL3FQHD28S+75o6JFJehRyZkx5ngNXcKOIZydt0XPDaVz1NQRawuYpOvkn1M8opiuKtTvH0AyTthSTxbSFsZ9OgcAXGNWKSNaMaI+v2a2ZDi/oD5WExp78gICcvlstRLxkyAQ2wJLADeODAfBHSEbEaU74ofWnzw6zHsm6nMHgrptlNjnYwJ6Bw744Sjc8qBrl/bkdm6LLu7cXMsInc1QBV5KNnFD6UgvZxfn38qUUysNYaPEI+yThZ7RZqkmSMIiEajUdn3CLjhyuVsNVCo87Kb2hGP39q/08CUFevo+Q2mNbBiSSk/mSBNstGic+6iCYw+YUqPQgBrUe7fqvTG1M5Y5d8PhuzAxwO4oXXuCiCUpu3J8ELDboWzaOmku9lfQt7SWD5n5ikH6LX/s3lRCf2RKERbAJvdfDGBM0EGqqUJbmXTivr9jP1WdxNsi2UjUuxjUk7atW+chTWZJbx2WQ1R/lj1YNTe9egWl8ws4tzbKdZoeAEYOJErkjg1NnYDRpog==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 58e0ca18-bc89-42e2-fd14-08d84b7c3969
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2020 18:00:19.0216 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Eu3jiqzxf7zMayIkHG+ZrLO8vZFU2yJkNsOvz++BFJjU8TKNOfSfG8Y9kdJ92AcU
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2734
+Received-SPF: none client-ip=40.107.77.80; envelope-from=Babu.Moger@amd.com;
+ helo=NAM02-SN1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 14:00:21
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: 4
+X-Spam_score: 0.4
+X-Spam_bar: /
+X-Spam_report: (0.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001, RCVD_ILLEGAL_IP=1.3,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,71 +131,1137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhiwei_liu@c-sky.com
+Cc: berrange@redhat.com, mst@redhat.com, mprivozn@redhat.com,
+ qemu-devel@nongnu.org, pbonzini@redhat.com, imammedo@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These operations were missed in Zhiwei's bfloat16 implementation.
+Responding to Eduardo's question. Some emails are not comming to my
+mailbox for some reason. Responding git send-email --in-reply-to.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- include/fpu/softfloat.h | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 1233f98014..78ad5ca738 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -479,6 +479,47 @@ static inline bfloat16 bfloat16_set_sign(bfloat16 a, int sign)
-     return (a & 0x7fff) | (sign << 15);
- }
- 
-+static inline bool bfloat16_eq(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool bfloat16_le(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare(a, b, s) <= float_relation_equal;
-+}
-+
-+static inline bool bfloat16_lt(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare(a, b, s) < float_relation_equal;
-+}
-+
-+static inline bool bfloat16_unordered(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare(a, b, s) == float_relation_unordered;
-+}
-+
-+static inline bool bfloat16_eq_quiet(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare_quiet(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool bfloat16_le_quiet(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare_quiet(a, b, s) <= float_relation_equal;
-+}
-+
-+static inline bool bfloat16_lt_quiet(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare_quiet(a, b, s) < float_relation_equal;
-+}
-+
-+static inline bool bfloat16_unordered_quiet(bfloat16 a, bfloat16 b,
-+                                           float_status *s)
-+{
-+    return bfloat16_compare_quiet(a, b, s) == float_relation_unordered;
-+}
-+
- #define bfloat16_zero 0
- #define bfloat16_half 0x3f00
- #define bfloat16_one 0x3f80
--- 
-2.25.1
+>> > > > I understood that each die in EPYC chip is a numa node, which encodes
+>> > > > NUMA node ID (system wide) in CPUID_Fn8000001E_ECX, that's why I
+>> > > > wrote earlier that EPYC makes -numa non optional.
+>> > > 
+>> > > AFAIK, that isnt a hard requirement.  In bare metal EPYC machine I
+>> > > have used, the BIOS lets you choose whether the dies are exposed as
+>> > > 1, 2 or 4 NUMA nodes. So there's no fixed  die == numa node mapping
+>> > > that I see.
+>> > 
+>> > If you change that setting, will all CPUID bits be kept the same,
+>> > or the die topology seen by the OS will change?
+>> 
+>> I don't know offhand, and don't currently have access to the hardware.
+>> All I know is that I was able to change between 1, 2 and 4 NUMA nodes
+>> and that was reflected in numactl display, I didn't check the CPUID
+>> when I was testing previously.
+>
+>Babu, do you know the answer here?
+>
+>If CPUID is kept the same with 1, 2 and 4 NUMA nodes, then having
+>NUMA configured is not a requirement at all.
 
+Yes. The CPUID are kept the same with 1, 2 and 4 NUMA nodes.
+So, having numa configered in not a requirement. Following are the
+details of NPS2 and NPS4. Seing the same behaviour with NPS1 also.
+
+NPS2:
+================================
+#lscpu
+Architecture:        x86_64
+CPU op-mode(s):      32-bit, 64-bit
+Byte Order:          Little Endian
+CPU(s):              256
+On-line CPU(s) list: 0-255
+Thread(s) per core:  2
+Core(s) per socket:  64
+Socket(s):           2
+NUMA node(s):        4
+Vendor ID:           AuthenticAMD
+CPU family:          23
+Model:               49
+Model name:          AMD EPYC 7742 64-Core Processor
+Stepping:            0
+CPU MHz:             1785.033
+CPU max MHz:         2250.0000
+CPU min MHz:         1500.0000
+BogoMIPS:            4491.51
+Virtualization:      AMD-V
+L1d cache:           32K
+L1i cache:           32K
+L2 cache:            512K
+L3 cache:            16384K
+NUMA node0 CPU(s):   0-31,128-159
+NUMA node1 CPU(s):   32-63,160-191
+NUMA node2 CPU(s):   64-95,192-223
+NUMA node3 CPU(s):   96-127,224-255
+
+#cpuid -l 0x8000001e -r
+
+CPU 0:
+   0x8000001e 0x00: eax=0x00000000 ebx=0x00000100 ecx=0x00000000 edx=0x00000000
+CPU 1:
+   0x8000001e 0x00: eax=0x00000002 ebx=0x00000101 ecx=0x00000000 edx=0x00000000
+CPU 2:
+   0x8000001e 0x00: eax=0x00000004 ebx=0x00000102 ecx=0x00000000 edx=0x00000000
+CPU 3:
+   0x8000001e 0x00: eax=0x00000006 ebx=0x00000103 ecx=0x00000000 edx=0x00000000
+CPU 4:
+   0x8000001e 0x00: eax=0x00000008 ebx=0x00000104 ecx=0x00000000 edx=0x00000000
+CPU 5:
+   0x8000001e 0x00: eax=0x0000000a ebx=0x00000105 ecx=0x00000000 edx=0x00000000
+CPU 6:
+   0x8000001e 0x00: eax=0x0000000c ebx=0x00000106 ecx=0x00000000 edx=0x00000000
+CPU 7:
+   0x8000001e 0x00: eax=0x0000000e ebx=0x00000107 ecx=0x00000000 edx=0x00000000
+CPU 8:
+   0x8000001e 0x00: eax=0x00000010 ebx=0x00000108 ecx=0x00000000 edx=0x00000000
+CPU 9:
+   0x8000001e 0x00: eax=0x00000012 ebx=0x00000109 ecx=0x00000000 edx=0x00000000
+CPU 10:
+   0x8000001e 0x00: eax=0x00000014 ebx=0x0000010a ecx=0x00000000 edx=0x00000000
+CPU 11:
+   0x8000001e 0x00: eax=0x00000016 ebx=0x0000010b ecx=0x00000000 edx=0x00000000
+CPU 12:
+   0x8000001e 0x00: eax=0x00000018 ebx=0x0000010c ecx=0x00000000 edx=0x00000000
+CPU 13:
+   0x8000001e 0x00: eax=0x0000001a ebx=0x0000010d ecx=0x00000000 edx=0x00000000
+CPU 14:
+   0x8000001e 0x00: eax=0x0000001c ebx=0x0000010e ecx=0x00000000 edx=0x00000000
+CPU 15:
+   0x8000001e 0x00: eax=0x0000001e ebx=0x0000010f ecx=0x00000000 edx=0x00000000
+CPU 16:
+   0x8000001e 0x00: eax=0x00000020 ebx=0x00000110 ecx=0x00000000 edx=0x00000000
+CPU 17:
+   0x8000001e 0x00: eax=0x00000022 ebx=0x00000111 ecx=0x00000000 edx=0x00000000
+CPU 18:
+   0x8000001e 0x00: eax=0x00000024 ebx=0x00000112 ecx=0x00000000 edx=0x00000000
+CPU 19:
+   0x8000001e 0x00: eax=0x00000026 ebx=0x00000113 ecx=0x00000000 edx=0x00000000
+CPU 20:
+   0x8000001e 0x00: eax=0x00000028 ebx=0x00000114 ecx=0x00000000 edx=0x00000000
+CPU 21:
+   0x8000001e 0x00: eax=0x0000002a ebx=0x00000115 ecx=0x00000000 edx=0x00000000
+CPU 22:
+   0x8000001e 0x00: eax=0x0000002c ebx=0x00000116 ecx=0x00000000 edx=0x00000000
+CPU 23:
+   0x8000001e 0x00: eax=0x0000002e ebx=0x00000117 ecx=0x00000000 edx=0x00000000
+CPU 24:
+   0x8000001e 0x00: eax=0x00000030 ebx=0x00000118 ecx=0x00000000 edx=0x00000000
+CPU 25:
+   0x8000001e 0x00: eax=0x00000032 ebx=0x00000119 ecx=0x00000000 edx=0x00000000
+CPU 26:
+   0x8000001e 0x00: eax=0x00000034 ebx=0x0000011a ecx=0x00000000 edx=0x00000000
+CPU 27:
+   0x8000001e 0x00: eax=0x00000036 ebx=0x0000011b ecx=0x00000000 edx=0x00000000
+CPU 28:
+   0x8000001e 0x00: eax=0x00000038 ebx=0x0000011c ecx=0x00000000 edx=0x00000000
+CPU 29:
+   0x8000001e 0x00: eax=0x0000003a ebx=0x0000011d ecx=0x00000000 edx=0x00000000
+CPU 30:
+   0x8000001e 0x00: eax=0x0000003c ebx=0x0000011e ecx=0x00000000 edx=0x00000000
+CPU 31:
+   0x8000001e 0x00: eax=0x0000003e ebx=0x0000011f ecx=0x00000000 edx=0x00000000
+CPU 32:
+   0x8000001e 0x00: eax=0x00000040 ebx=0x00000120 ecx=0x00000000 edx=0x00000000
+CPU 33:
+   0x8000001e 0x00: eax=0x00000042 ebx=0x00000121 ecx=0x00000000 edx=0x00000000
+CPU 34:
+   0x8000001e 0x00: eax=0x00000044 ebx=0x00000122 ecx=0x00000000 edx=0x00000000
+CPU 35:
+   0x8000001e 0x00: eax=0x00000046 ebx=0x00000123 ecx=0x00000000 edx=0x00000000
+CPU 36:
+   0x8000001e 0x00: eax=0x00000048 ebx=0x00000124 ecx=0x00000000 edx=0x00000000
+CPU 37:
+   0x8000001e 0x00: eax=0x0000004a ebx=0x00000125 ecx=0x00000000 edx=0x00000000
+CPU 38:
+   0x8000001e 0x00: eax=0x0000004c ebx=0x00000126 ecx=0x00000000 edx=0x00000000
+CPU 39:
+   0x8000001e 0x00: eax=0x0000004e ebx=0x00000127 ecx=0x00000000 edx=0x00000000
+CPU 40:
+   0x8000001e 0x00: eax=0x00000050 ebx=0x00000128 ecx=0x00000000 edx=0x00000000
+CPU 41:
+   0x8000001e 0x00: eax=0x00000052 ebx=0x00000129 ecx=0x00000000 edx=0x00000000
+CPU 42:
+   0x8000001e 0x00: eax=0x00000054 ebx=0x0000012a ecx=0x00000000 edx=0x00000000
+CPU 43:
+   0x8000001e 0x00: eax=0x00000056 ebx=0x0000012b ecx=0x00000000 edx=0x00000000
+CPU 44:
+   0x8000001e 0x00: eax=0x00000058 ebx=0x0000012c ecx=0x00000000 edx=0x00000000
+CPU 45:
+   0x8000001e 0x00: eax=0x0000005a ebx=0x0000012d ecx=0x00000000 edx=0x00000000
+CPU 46:
+   0x8000001e 0x00: eax=0x0000005c ebx=0x0000012e ecx=0x00000000 edx=0x00000000
+CPU 47:
+   0x8000001e 0x00: eax=0x0000005e ebx=0x0000012f ecx=0x00000000 edx=0x00000000
+CPU 48:
+   0x8000001e 0x00: eax=0x00000060 ebx=0x00000130 ecx=0x00000000 edx=0x00000000
+CPU 49:
+   0x8000001e 0x00: eax=0x00000062 ebx=0x00000131 ecx=0x00000000 edx=0x00000000
+CPU 50:
+   0x8000001e 0x00: eax=0x00000064 ebx=0x00000132 ecx=0x00000000 edx=0x00000000
+CPU 51:
+   0x8000001e 0x00: eax=0x00000066 ebx=0x00000133 ecx=0x00000000 edx=0x00000000
+CPU 52:
+   0x8000001e 0x00: eax=0x00000068 ebx=0x00000134 ecx=0x00000000 edx=0x00000000
+CPU 53:
+   0x8000001e 0x00: eax=0x0000006a ebx=0x00000135 ecx=0x00000000 edx=0x00000000
+CPU 54:
+   0x8000001e 0x00: eax=0x0000006c ebx=0x00000136 ecx=0x00000000 edx=0x00000000
+CPU 55:
+   0x8000001e 0x00: eax=0x0000006e ebx=0x00000137 ecx=0x00000000 edx=0x00000000
+CPU 56:
+   0x8000001e 0x00: eax=0x00000070 ebx=0x00000138 ecx=0x00000000 edx=0x00000000
+CPU 57:
+   0x8000001e 0x00: eax=0x00000072 ebx=0x00000139 ecx=0x00000000 edx=0x00000000
+CPU 58:
+   0x8000001e 0x00: eax=0x00000074 ebx=0x0000013a ecx=0x00000000 edx=0x00000000
+CPU 59:
+   0x8000001e 0x00: eax=0x00000076 ebx=0x0000013b ecx=0x00000000 edx=0x00000000
+CPU 60:
+   0x8000001e 0x00: eax=0x00000078 ebx=0x0000013c ecx=0x00000000 edx=0x00000000
+CPU 61:
+   0x8000001e 0x00: eax=0x0000007a ebx=0x0000013d ecx=0x00000000 edx=0x00000000
+CPU 62:
+   0x8000001e 0x00: eax=0x0000007c ebx=0x0000013e ecx=0x00000000 edx=0x00000000
+CPU 63:
+   0x8000001e 0x00: eax=0x0000007e ebx=0x0000013f ecx=0x00000000 edx=0x00000000
+CPU 64:
+   0x8000001e 0x00: eax=0x00000080 ebx=0x00000100 ecx=0x00000001 edx=0x00000000
+CPU 65:
+   0x8000001e 0x00: eax=0x00000082 ebx=0x00000101 ecx=0x00000001 edx=0x00000000
+CPU 66:
+   0x8000001e 0x00: eax=0x00000084 ebx=0x00000102 ecx=0x00000001 edx=0x00000000
+CPU 67:
+   0x8000001e 0x00: eax=0x00000086 ebx=0x00000103 ecx=0x00000001 edx=0x00000000
+CPU 68:
+   0x8000001e 0x00: eax=0x00000088 ebx=0x00000104 ecx=0x00000001 edx=0x00000000
+CPU 69:
+   0x8000001e 0x00: eax=0x0000008a ebx=0x00000105 ecx=0x00000001 edx=0x00000000
+CPU 70:
+   0x8000001e 0x00: eax=0x0000008c ebx=0x00000106 ecx=0x00000001 edx=0x00000000
+CPU 71:
+   0x8000001e 0x00: eax=0x0000008e ebx=0x00000107 ecx=0x00000001 edx=0x00000000
+CPU 72:
+   0x8000001e 0x00: eax=0x00000090 ebx=0x00000108 ecx=0x00000001 edx=0x00000000
+CPU 73:
+   0x8000001e 0x00: eax=0x00000092 ebx=0x00000109 ecx=0x00000001 edx=0x00000000
+CPU 74:
+   0x8000001e 0x00: eax=0x00000094 ebx=0x0000010a ecx=0x00000001 edx=0x00000000
+CPU 75:
+   0x8000001e 0x00: eax=0x00000096 ebx=0x0000010b ecx=0x00000001 edx=0x00000000
+CPU 76:
+   0x8000001e 0x00: eax=0x00000098 ebx=0x0000010c ecx=0x00000001 edx=0x00000000
+CPU 77:
+   0x8000001e 0x00: eax=0x0000009a ebx=0x0000010d ecx=0x00000001 edx=0x00000000
+CPU 78:
+   0x8000001e 0x00: eax=0x0000009c ebx=0x0000010e ecx=0x00000001 edx=0x00000000
+CPU 79:
+   0x8000001e 0x00: eax=0x0000009e ebx=0x0000010f ecx=0x00000001 edx=0x00000000
+CPU 80:
+   0x8000001e 0x00: eax=0x000000a0 ebx=0x00000110 ecx=0x00000001 edx=0x00000000
+CPU 81:
+   0x8000001e 0x00: eax=0x000000a2 ebx=0x00000111 ecx=0x00000001 edx=0x00000000
+CPU 82:
+   0x8000001e 0x00: eax=0x000000a4 ebx=0x00000112 ecx=0x00000001 edx=0x00000000
+CPU 83:
+   0x8000001e 0x00: eax=0x000000a6 ebx=0x00000113 ecx=0x00000001 edx=0x00000000
+CPU 84:
+   0x8000001e 0x00: eax=0x000000a8 ebx=0x00000114 ecx=0x00000001 edx=0x00000000
+CPU 85:
+   0x8000001e 0x00: eax=0x000000aa ebx=0x00000115 ecx=0x00000001 edx=0x00000000
+CPU 86:
+   0x8000001e 0x00: eax=0x000000ac ebx=0x00000116 ecx=0x00000001 edx=0x00000000
+CPU 87:
+   0x8000001e 0x00: eax=0x000000ae ebx=0x00000117 ecx=0x00000001 edx=0x00000000
+CPU 88:
+   0x8000001e 0x00: eax=0x000000b0 ebx=0x00000118 ecx=0x00000001 edx=0x00000000
+CPU 89:
+   0x8000001e 0x00: eax=0x000000b2 ebx=0x00000119 ecx=0x00000001 edx=0x00000000
+CPU 90:
+   0x8000001e 0x00: eax=0x000000b4 ebx=0x0000011a ecx=0x00000001 edx=0x00000000
+CPU 91:
+   0x8000001e 0x00: eax=0x000000b6 ebx=0x0000011b ecx=0x00000001 edx=0x00000000
+CPU 92:
+   0x8000001e 0x00: eax=0x000000b8 ebx=0x0000011c ecx=0x00000001 edx=0x00000000
+CPU 93:
+   0x8000001e 0x00: eax=0x000000ba ebx=0x0000011d ecx=0x00000001 edx=0x00000000
+CPU 94:
+   0x8000001e 0x00: eax=0x000000bc ebx=0x0000011e ecx=0x00000001 edx=0x00000000
+CPU 95:
+   0x8000001e 0x00: eax=0x000000be ebx=0x0000011f ecx=0x00000001 edx=0x00000000
+CPU 96:
+   0x8000001e 0x00: eax=0x000000c0 ebx=0x00000120 ecx=0x00000001 edx=0x00000000
+CPU 97:
+   0x8000001e 0x00: eax=0x000000c2 ebx=0x00000121 ecx=0x00000001 edx=0x00000000
+CPU 98:
+   0x8000001e 0x00: eax=0x000000c4 ebx=0x00000122 ecx=0x00000001 edx=0x00000000
+CPU 99:
+   0x8000001e 0x00: eax=0x000000c6 ebx=0x00000123 ecx=0x00000001 edx=0x00000000
+CPU 100:
+   0x8000001e 0x00: eax=0x000000c8 ebx=0x00000124 ecx=0x00000001 edx=0x00000000
+CPU 101:
+   0x8000001e 0x00: eax=0x000000ca ebx=0x00000125 ecx=0x00000001 edx=0x00000000
+CPU 102:
+   0x8000001e 0x00: eax=0x000000cc ebx=0x00000126 ecx=0x00000001 edx=0x00000000
+CPU 103:
+   0x8000001e 0x00: eax=0x000000ce ebx=0x00000127 ecx=0x00000001 edx=0x00000000
+CPU 104:
+   0x8000001e 0x00: eax=0x000000d0 ebx=0x00000128 ecx=0x00000001 edx=0x00000000
+CPU 105:
+   0x8000001e 0x00: eax=0x000000d2 ebx=0x00000129 ecx=0x00000001 edx=0x00000000
+CPU 106:
+   0x8000001e 0x00: eax=0x000000d4 ebx=0x0000012a ecx=0x00000001 edx=0x00000000
+CPU 107:
+   0x8000001e 0x00: eax=0x000000d6 ebx=0x0000012b ecx=0x00000001 edx=0x00000000
+CPU 108:
+   0x8000001e 0x00: eax=0x000000d8 ebx=0x0000012c ecx=0x00000001 edx=0x00000000
+CPU 109:
+   0x8000001e 0x00: eax=0x000000da ebx=0x0000012d ecx=0x00000001 edx=0x00000000
+CPU 110:
+   0x8000001e 0x00: eax=0x000000dc ebx=0x0000012e ecx=0x00000001 edx=0x00000000
+CPU 111:
+   0x8000001e 0x00: eax=0x000000de ebx=0x0000012f ecx=0x00000001 edx=0x00000000
+CPU 112:
+   0x8000001e 0x00: eax=0x000000e0 ebx=0x00000130 ecx=0x00000001 edx=0x00000000
+CPU 113:
+   0x8000001e 0x00: eax=0x000000e2 ebx=0x00000131 ecx=0x00000001 edx=0x00000000
+CPU 114:
+   0x8000001e 0x00: eax=0x000000e4 ebx=0x00000132 ecx=0x00000001 edx=0x00000000
+CPU 115:
+   0x8000001e 0x00: eax=0x000000e6 ebx=0x00000133 ecx=0x00000001 edx=0x00000000
+CPU 116:
+   0x8000001e 0x00: eax=0x000000e8 ebx=0x00000134 ecx=0x00000001 edx=0x00000000
+CPU 117:
+   0x8000001e 0x00: eax=0x000000ea ebx=0x00000135 ecx=0x00000001 edx=0x00000000
+CPU 118:
+   0x8000001e 0x00: eax=0x000000ec ebx=0x00000136 ecx=0x00000001 edx=0x00000000
+CPU 119:
+   0x8000001e 0x00: eax=0x000000ee ebx=0x00000137 ecx=0x00000001 edx=0x00000000
+CPU 120:
+   0x8000001e 0x00: eax=0x000000f0 ebx=0x00000138 ecx=0x00000001 edx=0x00000000
+CPU 121:
+   0x8000001e 0x00: eax=0x000000f2 ebx=0x00000139 ecx=0x00000001 edx=0x00000000
+CPU 122:
+   0x8000001e 0x00: eax=0x000000f4 ebx=0x0000013a ecx=0x00000001 edx=0x00000000
+CPU 123:
+   0x8000001e 0x00: eax=0x000000f6 ebx=0x0000013b ecx=0x00000001 edx=0x00000000
+CPU 124:
+   0x8000001e 0x00: eax=0x000000f8 ebx=0x0000013c ecx=0x00000001 edx=0x00000000
+CPU 125:
+   0x8000001e 0x00: eax=0x000000fa ebx=0x0000013d ecx=0x00000001 edx=0x00000000
+CPU 126:
+   0x8000001e 0x00: eax=0x000000fc ebx=0x0000013e ecx=0x00000001 edx=0x00000000
+CPU 127:
+   0x8000001e 0x00: eax=0x000000fe ebx=0x0000013f ecx=0x00000001 edx=0x00000000
+CPU 128:
+   0x8000001e 0x00: eax=0x00000001 ebx=0x00000100 ecx=0x00000000 edx=0x00000000
+CPU 129:
+   0x8000001e 0x00: eax=0x00000003 ebx=0x00000101 ecx=0x00000000 edx=0x00000000
+CPU 130:
+   0x8000001e 0x00: eax=0x00000005 ebx=0x00000102 ecx=0x00000000 edx=0x00000000
+CPU 131:
+   0x8000001e 0x00: eax=0x00000007 ebx=0x00000103 ecx=0x00000000 edx=0x00000000
+CPU 132:
+   0x8000001e 0x00: eax=0x00000009 ebx=0x00000104 ecx=0x00000000 edx=0x00000000
+CPU 133:
+   0x8000001e 0x00: eax=0x0000000b ebx=0x00000105 ecx=0x00000000 edx=0x00000000
+CPU 134:
+   0x8000001e 0x00: eax=0x0000000d ebx=0x00000106 ecx=0x00000000 edx=0x00000000
+CPU 135:
+   0x8000001e 0x00: eax=0x0000000f ebx=0x00000107 ecx=0x00000000 edx=0x00000000
+CPU 136:
+   0x8000001e 0x00: eax=0x00000011 ebx=0x00000108 ecx=0x00000000 edx=0x00000000
+CPU 137:
+   0x8000001e 0x00: eax=0x00000013 ebx=0x00000109 ecx=0x00000000 edx=0x00000000
+CPU 138:
+   0x8000001e 0x00: eax=0x00000015 ebx=0x0000010a ecx=0x00000000 edx=0x00000000
+CPU 139:
+   0x8000001e 0x00: eax=0x00000017 ebx=0x0000010b ecx=0x00000000 edx=0x00000000
+CPU 140:
+   0x8000001e 0x00: eax=0x00000019 ebx=0x0000010c ecx=0x00000000 edx=0x00000000
+CPU 141:
+   0x8000001e 0x00: eax=0x0000001b ebx=0x0000010d ecx=0x00000000 edx=0x00000000
+CPU 142:
+   0x8000001e 0x00: eax=0x0000001d ebx=0x0000010e ecx=0x00000000 edx=0x00000000
+CPU 143:
+   0x8000001e 0x00: eax=0x0000001f ebx=0x0000010f ecx=0x00000000 edx=0x00000000
+CPU 144:
+   0x8000001e 0x00: eax=0x00000021 ebx=0x00000110 ecx=0x00000000 edx=0x00000000
+CPU 145:
+   0x8000001e 0x00: eax=0x00000023 ebx=0x00000111 ecx=0x00000000 edx=0x00000000
+CPU 146:
+   0x8000001e 0x00: eax=0x00000025 ebx=0x00000112 ecx=0x00000000 edx=0x00000000
+CPU 147:
+   0x8000001e 0x00: eax=0x00000027 ebx=0x00000113 ecx=0x00000000 edx=0x00000000
+CPU 148:
+   0x8000001e 0x00: eax=0x00000029 ebx=0x00000114 ecx=0x00000000 edx=0x00000000
+CPU 149:
+   0x8000001e 0x00: eax=0x0000002b ebx=0x00000115 ecx=0x00000000 edx=0x00000000
+CPU 150:
+   0x8000001e 0x00: eax=0x0000002d ebx=0x00000116 ecx=0x00000000 edx=0x00000000
+CPU 151:
+   0x8000001e 0x00: eax=0x0000002f ebx=0x00000117 ecx=0x00000000 edx=0x00000000
+CPU 152:
+   0x8000001e 0x00: eax=0x00000031 ebx=0x00000118 ecx=0x00000000 edx=0x00000000
+CPU 153:
+   0x8000001e 0x00: eax=0x00000033 ebx=0x00000119 ecx=0x00000000 edx=0x00000000
+CPU 154:
+   0x8000001e 0x00: eax=0x00000035 ebx=0x0000011a ecx=0x00000000 edx=0x00000000
+CPU 155:
+   0x8000001e 0x00: eax=0x00000037 ebx=0x0000011b ecx=0x00000000 edx=0x00000000
+CPU 156:
+   0x8000001e 0x00: eax=0x00000039 ebx=0x0000011c ecx=0x00000000 edx=0x00000000
+CPU 157:
+   0x8000001e 0x00: eax=0x0000003b ebx=0x0000011d ecx=0x00000000 edx=0x00000000
+CPU 158:
+   0x8000001e 0x00: eax=0x0000003d ebx=0x0000011e ecx=0x00000000 edx=0x00000000
+CPU 159:
+   0x8000001e 0x00: eax=0x0000003f ebx=0x0000011f ecx=0x00000000 edx=0x00000000
+CPU 160:
+   0x8000001e 0x00: eax=0x00000041 ebx=0x00000120 ecx=0x00000000 edx=0x00000000
+CPU 161:
+   0x8000001e 0x00: eax=0x00000043 ebx=0x00000121 ecx=0x00000000 edx=0x00000000
+CPU 162:
+   0x8000001e 0x00: eax=0x00000045 ebx=0x00000122 ecx=0x00000000 edx=0x00000000
+CPU 163:
+   0x8000001e 0x00: eax=0x00000047 ebx=0x00000123 ecx=0x00000000 edx=0x00000000
+CPU 164:
+   0x8000001e 0x00: eax=0x00000049 ebx=0x00000124 ecx=0x00000000 edx=0x00000000
+CPU 165:
+   0x8000001e 0x00: eax=0x0000004b ebx=0x00000125 ecx=0x00000000 edx=0x00000000
+CPU 166:
+   0x8000001e 0x00: eax=0x0000004d ebx=0x00000126 ecx=0x00000000 edx=0x00000000
+CPU 167:
+   0x8000001e 0x00: eax=0x0000004f ebx=0x00000127 ecx=0x00000000 edx=0x00000000
+CPU 168:
+   0x8000001e 0x00: eax=0x00000051 ebx=0x00000128 ecx=0x00000000 edx=0x00000000
+CPU 169:
+   0x8000001e 0x00: eax=0x00000053 ebx=0x00000129 ecx=0x00000000 edx=0x00000000
+CPU 170:
+   0x8000001e 0x00: eax=0x00000055 ebx=0x0000012a ecx=0x00000000 edx=0x00000000
+CPU 171:
+   0x8000001e 0x00: eax=0x00000057 ebx=0x0000012b ecx=0x00000000 edx=0x00000000
+CPU 172:
+   0x8000001e 0x00: eax=0x00000059 ebx=0x0000012c ecx=0x00000000 edx=0x00000000
+CPU 173:
+   0x8000001e 0x00: eax=0x0000005b ebx=0x0000012d ecx=0x00000000 edx=0x00000000
+CPU 174:
+   0x8000001e 0x00: eax=0x0000005d ebx=0x0000012e ecx=0x00000000 edx=0x00000000
+CPU 175:
+   0x8000001e 0x00: eax=0x0000005f ebx=0x0000012f ecx=0x00000000 edx=0x00000000
+CPU 176:
+   0x8000001e 0x00: eax=0x00000061 ebx=0x00000130 ecx=0x00000000 edx=0x00000000
+CPU 177:
+   0x8000001e 0x00: eax=0x00000063 ebx=0x00000131 ecx=0x00000000 edx=0x00000000
+CPU 178:
+   0x8000001e 0x00: eax=0x00000065 ebx=0x00000132 ecx=0x00000000 edx=0x00000000
+CPU 179:
+   0x8000001e 0x00: eax=0x00000067 ebx=0x00000133 ecx=0x00000000 edx=0x00000000
+CPU 180:
+   0x8000001e 0x00: eax=0x00000069 ebx=0x00000134 ecx=0x00000000 edx=0x00000000
+CPU 181:
+   0x8000001e 0x00: eax=0x0000006b ebx=0x00000135 ecx=0x00000000 edx=0x00000000
+CPU 182:
+   0x8000001e 0x00: eax=0x0000006d ebx=0x00000136 ecx=0x00000000 edx=0x00000000
+CPU 183:
+   0x8000001e 0x00: eax=0x0000006f ebx=0x00000137 ecx=0x00000000 edx=0x00000000
+CPU 184:
+   0x8000001e 0x00: eax=0x00000071 ebx=0x00000138 ecx=0x00000000 edx=0x00000000
+CPU 185:
+   0x8000001e 0x00: eax=0x00000073 ebx=0x00000139 ecx=0x00000000 edx=0x00000000
+CPU 186:
+   0x8000001e 0x00: eax=0x00000075 ebx=0x0000013a ecx=0x00000000 edx=0x00000000
+CPU 187:
+   0x8000001e 0x00: eax=0x00000077 ebx=0x0000013b ecx=0x00000000 edx=0x00000000
+CPU 188:
+   0x8000001e 0x00: eax=0x00000079 ebx=0x0000013c ecx=0x00000000 edx=0x00000000
+CPU 189:
+   0x8000001e 0x00: eax=0x0000007b ebx=0x0000013d ecx=0x00000000 edx=0x00000000
+CPU 190:
+   0x8000001e 0x00: eax=0x0000007d ebx=0x0000013e ecx=0x00000000 edx=0x00000000
+CPU 191:
+   0x8000001e 0x00: eax=0x0000007f ebx=0x0000013f ecx=0x00000000 edx=0x00000000
+CPU 192:
+   0x8000001e 0x00: eax=0x00000081 ebx=0x00000100 ecx=0x00000001 edx=0x00000000
+CPU 193:
+   0x8000001e 0x00: eax=0x00000083 ebx=0x00000101 ecx=0x00000001 edx=0x00000000
+CPU 194:
+   0x8000001e 0x00: eax=0x00000085 ebx=0x00000102 ecx=0x00000001 edx=0x00000000
+CPU 195:
+   0x8000001e 0x00: eax=0x00000087 ebx=0x00000103 ecx=0x00000001 edx=0x00000000
+CPU 196:
+   0x8000001e 0x00: eax=0x00000089 ebx=0x00000104 ecx=0x00000001 edx=0x00000000
+CPU 197:
+   0x8000001e 0x00: eax=0x0000008b ebx=0x00000105 ecx=0x00000001 edx=0x00000000
+CPU 198:
+   0x8000001e 0x00: eax=0x0000008d ebx=0x00000106 ecx=0x00000001 edx=0x00000000
+CPU 199:
+   0x8000001e 0x00: eax=0x0000008f ebx=0x00000107 ecx=0x00000001 edx=0x00000000
+CPU 200:
+   0x8000001e 0x00: eax=0x00000091 ebx=0x00000108 ecx=0x00000001 edx=0x00000000
+CPU 201:
+   0x8000001e 0x00: eax=0x00000093 ebx=0x00000109 ecx=0x00000001 edx=0x00000000
+CPU 202:
+   0x8000001e 0x00: eax=0x00000095 ebx=0x0000010a ecx=0x00000001 edx=0x00000000
+CPU 203:
+   0x8000001e 0x00: eax=0x00000097 ebx=0x0000010b ecx=0x00000001 edx=0x00000000
+CPU 204:
+   0x8000001e 0x00: eax=0x00000099 ebx=0x0000010c ecx=0x00000001 edx=0x00000000
+CPU 205:
+   0x8000001e 0x00: eax=0x0000009b ebx=0x0000010d ecx=0x00000001 edx=0x00000000
+CPU 206:
+   0x8000001e 0x00: eax=0x0000009d ebx=0x0000010e ecx=0x00000001 edx=0x00000000
+CPU 207:
+   0x8000001e 0x00: eax=0x0000009f ebx=0x0000010f ecx=0x00000001 edx=0x00000000
+CPU 208:
+   0x8000001e 0x00: eax=0x000000a1 ebx=0x00000110 ecx=0x00000001 edx=0x00000000
+CPU 209:
+   0x8000001e 0x00: eax=0x000000a3 ebx=0x00000111 ecx=0x00000001 edx=0x00000000
+CPU 210:
+   0x8000001e 0x00: eax=0x000000a5 ebx=0x00000112 ecx=0x00000001 edx=0x00000000
+CPU 211:
+   0x8000001e 0x00: eax=0x000000a7 ebx=0x00000113 ecx=0x00000001 edx=0x00000000
+CPU 212:
+   0x8000001e 0x00: eax=0x000000a9 ebx=0x00000114 ecx=0x00000001 edx=0x00000000
+CPU 213:
+   0x8000001e 0x00: eax=0x000000ab ebx=0x00000115 ecx=0x00000001 edx=0x00000000
+CPU 214:
+   0x8000001e 0x00: eax=0x000000ad ebx=0x00000116 ecx=0x00000001 edx=0x00000000
+CPU 215:
+   0x8000001e 0x00: eax=0x000000af ebx=0x00000117 ecx=0x00000001 edx=0x00000000
+CPU 216:
+   0x8000001e 0x00: eax=0x000000b1 ebx=0x00000118 ecx=0x00000001 edx=0x00000000
+CPU 217:
+   0x8000001e 0x00: eax=0x000000b3 ebx=0x00000119 ecx=0x00000001 edx=0x00000000
+CPU 218:
+   0x8000001e 0x00: eax=0x000000b5 ebx=0x0000011a ecx=0x00000001 edx=0x00000000
+CPU 219:
+   0x8000001e 0x00: eax=0x000000b7 ebx=0x0000011b ecx=0x00000001 edx=0x00000000
+CPU 220:
+   0x8000001e 0x00: eax=0x000000b9 ebx=0x0000011c ecx=0x00000001 edx=0x00000000
+CPU 221:
+   0x8000001e 0x00: eax=0x000000bb ebx=0x0000011d ecx=0x00000001 edx=0x00000000
+CPU 222:
+   0x8000001e 0x00: eax=0x000000bd ebx=0x0000011e ecx=0x00000001 edx=0x00000000
+CPU 223:
+   0x8000001e 0x00: eax=0x000000bf ebx=0x0000011f ecx=0x00000001 edx=0x00000000
+CPU 224:
+   0x8000001e 0x00: eax=0x000000c1 ebx=0x00000120 ecx=0x00000001 edx=0x00000000
+CPU 225:
+   0x8000001e 0x00: eax=0x000000c3 ebx=0x00000121 ecx=0x00000001 edx=0x00000000
+CPU 226:
+   0x8000001e 0x00: eax=0x000000c5 ebx=0x00000122 ecx=0x00000001 edx=0x00000000
+CPU 227:
+   0x8000001e 0x00: eax=0x000000c7 ebx=0x00000123 ecx=0x00000001 edx=0x00000000
+CPU 228:
+   0x8000001e 0x00: eax=0x000000c9 ebx=0x00000124 ecx=0x00000001 edx=0x00000000
+CPU 229:
+   0x8000001e 0x00: eax=0x000000cb ebx=0x00000125 ecx=0x00000001 edx=0x00000000
+CPU 230:
+   0x8000001e 0x00: eax=0x000000cd ebx=0x00000126 ecx=0x00000001 edx=0x00000000
+CPU 231:
+   0x8000001e 0x00: eax=0x000000cf ebx=0x00000127 ecx=0x00000001 edx=0x00000000
+CPU 232:
+   0x8000001e 0x00: eax=0x000000d1 ebx=0x00000128 ecx=0x00000001 edx=0x00000000
+CPU 233:
+   0x8000001e 0x00: eax=0x000000d3 ebx=0x00000129 ecx=0x00000001 edx=0x00000000
+CPU 234:
+   0x8000001e 0x00: eax=0x000000d5 ebx=0x0000012a ecx=0x00000001 edx=0x00000000
+CPU 235:
+   0x8000001e 0x00: eax=0x000000d7 ebx=0x0000012b ecx=0x00000001 edx=0x00000000
+CPU 236:
+   0x8000001e 0x00: eax=0x000000d9 ebx=0x0000012c ecx=0x00000001 edx=0x00000000
+CPU 237:
+   0x8000001e 0x00: eax=0x000000db ebx=0x0000012d ecx=0x00000001 edx=0x00000000
+CPU 238:
+   0x8000001e 0x00: eax=0x000000dd ebx=0x0000012e ecx=0x00000001 edx=0x00000000
+CPU 239:
+   0x8000001e 0x00: eax=0x000000df ebx=0x0000012f ecx=0x00000001 edx=0x00000000
+CPU 240:
+   0x8000001e 0x00: eax=0x000000e1 ebx=0x00000130 ecx=0x00000001 edx=0x00000000
+CPU 241:
+   0x8000001e 0x00: eax=0x000000e3 ebx=0x00000131 ecx=0x00000001 edx=0x00000000
+CPU 242:
+   0x8000001e 0x00: eax=0x000000e5 ebx=0x00000132 ecx=0x00000001 edx=0x00000000
+CPU 243:
+   0x8000001e 0x00: eax=0x000000e7 ebx=0x00000133 ecx=0x00000001 edx=0x00000000
+CPU 244:
+   0x8000001e 0x00: eax=0x000000e9 ebx=0x00000134 ecx=0x00000001 edx=0x00000000
+CPU 245:
+   0x8000001e 0x00: eax=0x000000eb ebx=0x00000135 ecx=0x00000001 edx=0x00000000
+CPU 246:
+   0x8000001e 0x00: eax=0x000000ed ebx=0x00000136 ecx=0x00000001 edx=0x00000000
+CPU 247:
+   0x8000001e 0x00: eax=0x000000ef ebx=0x00000137 ecx=0x00000001 edx=0x00000000
+CPU 248:
+   0x8000001e 0x00: eax=0x000000f1 ebx=0x00000138 ecx=0x00000001 edx=0x00000000
+CPU 249:
+   0x8000001e 0x00: eax=0x000000f3 ebx=0x00000139 ecx=0x00000001 edx=0x00000000
+CPU 250:
+   0x8000001e 0x00: eax=0x000000f5 ebx=0x0000013a ecx=0x00000001 edx=0x00000000
+CPU 251:
+   0x8000001e 0x00: eax=0x000000f7 ebx=0x0000013b ecx=0x00000001 edx=0x00000000
+CPU 252:
+   0x8000001e 0x00: eax=0x000000f9 ebx=0x0000013c ecx=0x00000001 edx=0x00000000
+CPU 253:
+   0x8000001e 0x00: eax=0x000000fb ebx=0x0000013d ecx=0x00000001 edx=0x00000000
+CPU 254:
+   0x8000001e 0x00: eax=0x000000fd ebx=0x0000013e ecx=0x00000001 edx=0x00000000
+CPU 255:
+   0x8000001e 0x00: eax=0x000000ff ebx=0x0000013f ecx=0x00000001 edx=0x00000000
+[root@rome NPS]#
+
+
+NPS4:
+================================
+Architecture:        x86_64
+CPU op-mode(s):      32-bit, 64-bit
+Byte Order:          Little Endian
+CPU(s):              256
+On-line CPU(s) list: 0-255
+Thread(s) per core:  2
+Core(s) per socket:  64
+Socket(s):           2
+NUMA node(s):        8
+Vendor ID:           AuthenticAMD
+CPU family:          23
+Model:               49
+Model name:          AMD EPYC 7742 64-Core Processor
+Stepping:            0
+CPU MHz:             1862.249
+CPU max MHz:         2250.0000
+CPU min MHz:         1500.0000
+BogoMIPS:            4491.24
+Virtualization:      AMD-V
+L1d cache:           32K
+L1i cache:           32K
+L2 cache:            512K
+L3 cache:            16384K
+NUMA node0 CPU(s):   0-15,128-143
+NUMA node1 CPU(s):   16-31,144-159
+NUMA node2 CPU(s):   32-47,160-175
+NUMA node3 CPU(s):   48-63,176-191
+NUMA node4 CPU(s):   64-79,192-207
+NUMA node5 CPU(s):   80-95,208-223
+NUMA node6 CPU(s):   96-111,224-239
+NUMA node7 CPU(s):   112-127,240-255
+
+#cpuid -l 0x8000001e -r
+
+CPU 0:
+   0x8000001e 0x00: eax=0x00000000 ebx=0x00000100 ecx=0x00000000 edx=0x00000000
+CPU 1:
+   0x8000001e 0x00: eax=0x00000002 ebx=0x00000101 ecx=0x00000000 edx=0x00000000
+CPU 2:
+   0x8000001e 0x00: eax=0x00000004 ebx=0x00000102 ecx=0x00000000 edx=0x00000000
+CPU 3:
+   0x8000001e 0x00: eax=0x00000006 ebx=0x00000103 ecx=0x00000000 edx=0x00000000
+CPU 4:
+   0x8000001e 0x00: eax=0x00000008 ebx=0x00000104 ecx=0x00000000 edx=0x00000000
+CPU 5:
+   0x8000001e 0x00: eax=0x0000000a ebx=0x00000105 ecx=0x00000000 edx=0x00000000
+CPU 6:
+   0x8000001e 0x00: eax=0x0000000c ebx=0x00000106 ecx=0x00000000 edx=0x00000000
+CPU 7:
+   0x8000001e 0x00: eax=0x0000000e ebx=0x00000107 ecx=0x00000000 edx=0x00000000
+CPU 8:
+   0x8000001e 0x00: eax=0x00000010 ebx=0x00000108 ecx=0x00000000 edx=0x00000000
+CPU 9:
+   0x8000001e 0x00: eax=0x00000012 ebx=0x00000109 ecx=0x00000000 edx=0x00000000
+CPU 10:
+   0x8000001e 0x00: eax=0x00000014 ebx=0x0000010a ecx=0x00000000 edx=0x00000000
+CPU 11:
+   0x8000001e 0x00: eax=0x00000016 ebx=0x0000010b ecx=0x00000000 edx=0x00000000
+CPU 12:
+   0x8000001e 0x00: eax=0x00000018 ebx=0x0000010c ecx=0x00000000 edx=0x00000000
+CPU 13:
+   0x8000001e 0x00: eax=0x0000001a ebx=0x0000010d ecx=0x00000000 edx=0x00000000
+CPU 14:
+   0x8000001e 0x00: eax=0x0000001c ebx=0x0000010e ecx=0x00000000 edx=0x00000000
+CPU 15:
+   0x8000001e 0x00: eax=0x0000001e ebx=0x0000010f ecx=0x00000000 edx=0x00000000
+CPU 16:
+   0x8000001e 0x00: eax=0x00000020 ebx=0x00000110 ecx=0x00000000 edx=0x00000000
+CPU 17:
+   0x8000001e 0x00: eax=0x00000022 ebx=0x00000111 ecx=0x00000000 edx=0x00000000
+CPU 18:
+   0x8000001e 0x00: eax=0x00000024 ebx=0x00000112 ecx=0x00000000 edx=0x00000000
+CPU 19:
+   0x8000001e 0x00: eax=0x00000026 ebx=0x00000113 ecx=0x00000000 edx=0x00000000
+CPU 20:
+   0x8000001e 0x00: eax=0x00000028 ebx=0x00000114 ecx=0x00000000 edx=0x00000000
+CPU 21:
+   0x8000001e 0x00: eax=0x0000002a ebx=0x00000115 ecx=0x00000000 edx=0x00000000
+CPU 22:
+   0x8000001e 0x00: eax=0x0000002c ebx=0x00000116 ecx=0x00000000 edx=0x00000000
+CPU 23:
+   0x8000001e 0x00: eax=0x0000002e ebx=0x00000117 ecx=0x00000000 edx=0x00000000
+CPU 24:
+   0x8000001e 0x00: eax=0x00000030 ebx=0x00000118 ecx=0x00000000 edx=0x00000000
+CPU 25:
+   0x8000001e 0x00: eax=0x00000032 ebx=0x00000119 ecx=0x00000000 edx=0x00000000
+CPU 26:
+   0x8000001e 0x00: eax=0x00000034 ebx=0x0000011a ecx=0x00000000 edx=0x00000000
+CPU 27:
+   0x8000001e 0x00: eax=0x00000036 ebx=0x0000011b ecx=0x00000000 edx=0x00000000
+CPU 28:
+   0x8000001e 0x00: eax=0x00000038 ebx=0x0000011c ecx=0x00000000 edx=0x00000000
+CPU 29:
+   0x8000001e 0x00: eax=0x0000003a ebx=0x0000011d ecx=0x00000000 edx=0x00000000
+CPU 30:
+   0x8000001e 0x00: eax=0x0000003c ebx=0x0000011e ecx=0x00000000 edx=0x00000000
+CPU 31:
+   0x8000001e 0x00: eax=0x0000003e ebx=0x0000011f ecx=0x00000000 edx=0x00000000
+CPU 32:
+   0x8000001e 0x00: eax=0x00000040 ebx=0x00000120 ecx=0x00000000 edx=0x00000000
+CPU 33:
+   0x8000001e 0x00: eax=0x00000042 ebx=0x00000121 ecx=0x00000000 edx=0x00000000
+CPU 34:
+   0x8000001e 0x00: eax=0x00000044 ebx=0x00000122 ecx=0x00000000 edx=0x00000000
+CPU 35:
+   0x8000001e 0x00: eax=0x00000046 ebx=0x00000123 ecx=0x00000000 edx=0x00000000
+CPU 36:
+   0x8000001e 0x00: eax=0x00000048 ebx=0x00000124 ecx=0x00000000 edx=0x00000000
+CPU 37:
+   0x8000001e 0x00: eax=0x0000004a ebx=0x00000125 ecx=0x00000000 edx=0x00000000
+CPU 38:
+   0x8000001e 0x00: eax=0x0000004c ebx=0x00000126 ecx=0x00000000 edx=0x00000000
+CPU 39:
+   0x8000001e 0x00: eax=0x0000004e ebx=0x00000127 ecx=0x00000000 edx=0x00000000
+CPU 40:
+   0x8000001e 0x00: eax=0x00000050 ebx=0x00000128 ecx=0x00000000 edx=0x00000000
+CPU 41:
+   0x8000001e 0x00: eax=0x00000052 ebx=0x00000129 ecx=0x00000000 edx=0x00000000
+CPU 42:
+   0x8000001e 0x00: eax=0x00000054 ebx=0x0000012a ecx=0x00000000 edx=0x00000000
+CPU 43:
+   0x8000001e 0x00: eax=0x00000056 ebx=0x0000012b ecx=0x00000000 edx=0x00000000
+CPU 44:
+   0x8000001e 0x00: eax=0x00000058 ebx=0x0000012c ecx=0x00000000 edx=0x00000000
+CPU 45:
+   0x8000001e 0x00: eax=0x0000005a ebx=0x0000012d ecx=0x00000000 edx=0x00000000
+CPU 46:
+   0x8000001e 0x00: eax=0x0000005c ebx=0x0000012e ecx=0x00000000 edx=0x00000000
+CPU 47:
+   0x8000001e 0x00: eax=0x0000005e ebx=0x0000012f ecx=0x00000000 edx=0x00000000
+CPU 48:
+   0x8000001e 0x00: eax=0x00000060 ebx=0x00000130 ecx=0x00000000 edx=0x00000000
+CPU 49:
+   0x8000001e 0x00: eax=0x00000062 ebx=0x00000131 ecx=0x00000000 edx=0x00000000
+CPU 50:
+   0x8000001e 0x00: eax=0x00000064 ebx=0x00000132 ecx=0x00000000 edx=0x00000000
+CPU 51:
+   0x8000001e 0x00: eax=0x00000066 ebx=0x00000133 ecx=0x00000000 edx=0x00000000
+CPU 52:
+   0x8000001e 0x00: eax=0x00000068 ebx=0x00000134 ecx=0x00000000 edx=0x00000000
+CPU 53:
+   0x8000001e 0x00: eax=0x0000006a ebx=0x00000135 ecx=0x00000000 edx=0x00000000
+CPU 54:
+   0x8000001e 0x00: eax=0x0000006c ebx=0x00000136 ecx=0x00000000 edx=0x00000000
+CPU 55:
+   0x8000001e 0x00: eax=0x0000006e ebx=0x00000137 ecx=0x00000000 edx=0x00000000
+CPU 56:
+   0x8000001e 0x00: eax=0x00000070 ebx=0x00000138 ecx=0x00000000 edx=0x00000000
+CPU 57:
+   0x8000001e 0x00: eax=0x00000072 ebx=0x00000139 ecx=0x00000000 edx=0x00000000
+CPU 58:
+   0x8000001e 0x00: eax=0x00000074 ebx=0x0000013a ecx=0x00000000 edx=0x00000000
+CPU 59:
+   0x8000001e 0x00: eax=0x00000076 ebx=0x0000013b ecx=0x00000000 edx=0x00000000
+CPU 60:
+   0x8000001e 0x00: eax=0x00000078 ebx=0x0000013c ecx=0x00000000 edx=0x00000000
+CPU 61:
+   0x8000001e 0x00: eax=0x0000007a ebx=0x0000013d ecx=0x00000000 edx=0x00000000
+CPU 62:
+   0x8000001e 0x00: eax=0x0000007c ebx=0x0000013e ecx=0x00000000 edx=0x00000000
+CPU 63:
+   0x8000001e 0x00: eax=0x0000007e ebx=0x0000013f ecx=0x00000000 edx=0x00000000
+CPU 64:
+   0x8000001e 0x00: eax=0x00000080 ebx=0x00000100 ecx=0x00000001 edx=0x00000000
+CPU 65:
+   0x8000001e 0x00: eax=0x00000082 ebx=0x00000101 ecx=0x00000001 edx=0x00000000
+CPU 66:
+   0x8000001e 0x00: eax=0x00000084 ebx=0x00000102 ecx=0x00000001 edx=0x00000000
+CPU 67:
+   0x8000001e 0x00: eax=0x00000086 ebx=0x00000103 ecx=0x00000001 edx=0x00000000
+CPU 68:
+   0x8000001e 0x00: eax=0x00000088 ebx=0x00000104 ecx=0x00000001 edx=0x00000000
+CPU 69:
+   0x8000001e 0x00: eax=0x0000008a ebx=0x00000105 ecx=0x00000001 edx=0x00000000
+CPU 70:
+   0x8000001e 0x00: eax=0x0000008c ebx=0x00000106 ecx=0x00000001 edx=0x00000000
+CPU 71:
+   0x8000001e 0x00: eax=0x0000008e ebx=0x00000107 ecx=0x00000001 edx=0x00000000
+CPU 72:
+   0x8000001e 0x00: eax=0x00000090 ebx=0x00000108 ecx=0x00000001 edx=0x00000000
+CPU 73:
+   0x8000001e 0x00: eax=0x00000092 ebx=0x00000109 ecx=0x00000001 edx=0x00000000
+CPU 74:
+   0x8000001e 0x00: eax=0x00000094 ebx=0x0000010a ecx=0x00000001 edx=0x00000000
+CPU 75:
+   0x8000001e 0x00: eax=0x00000096 ebx=0x0000010b ecx=0x00000001 edx=0x00000000
+CPU 76:
+   0x8000001e 0x00: eax=0x00000098 ebx=0x0000010c ecx=0x00000001 edx=0x00000000
+CPU 77:
+   0x8000001e 0x00: eax=0x0000009a ebx=0x0000010d ecx=0x00000001 edx=0x00000000
+CPU 78:
+   0x8000001e 0x00: eax=0x0000009c ebx=0x0000010e ecx=0x00000001 edx=0x00000000
+CPU 79:
+   0x8000001e 0x00: eax=0x0000009e ebx=0x0000010f ecx=0x00000001 edx=0x00000000
+CPU 80:
+   0x8000001e 0x00: eax=0x000000a0 ebx=0x00000110 ecx=0x00000001 edx=0x00000000
+CPU 81:
+   0x8000001e 0x00: eax=0x000000a2 ebx=0x00000111 ecx=0x00000001 edx=0x00000000
+CPU 82:
+   0x8000001e 0x00: eax=0x000000a4 ebx=0x00000112 ecx=0x00000001 edx=0x00000000
+CPU 83:
+   0x8000001e 0x00: eax=0x000000a6 ebx=0x00000113 ecx=0x00000001 edx=0x00000000
+CPU 84:
+   0x8000001e 0x00: eax=0x000000a8 ebx=0x00000114 ecx=0x00000001 edx=0x00000000
+CPU 85:
+   0x8000001e 0x00: eax=0x000000aa ebx=0x00000115 ecx=0x00000001 edx=0x00000000
+CPU 86:
+   0x8000001e 0x00: eax=0x000000ac ebx=0x00000116 ecx=0x00000001 edx=0x00000000
+CPU 87:
+   0x8000001e 0x00: eax=0x000000ae ebx=0x00000117 ecx=0x00000001 edx=0x00000000
+CPU 88:
+   0x8000001e 0x00: eax=0x000000b0 ebx=0x00000118 ecx=0x00000001 edx=0x00000000
+CPU 89:
+   0x8000001e 0x00: eax=0x000000b2 ebx=0x00000119 ecx=0x00000001 edx=0x00000000
+CPU 90:
+   0x8000001e 0x00: eax=0x000000b4 ebx=0x0000011a ecx=0x00000001 edx=0x00000000
+CPU 91:
+   0x8000001e 0x00: eax=0x000000b6 ebx=0x0000011b ecx=0x00000001 edx=0x00000000
+CPU 92:
+   0x8000001e 0x00: eax=0x000000b8 ebx=0x0000011c ecx=0x00000001 edx=0x00000000
+CPU 93:
+   0x8000001e 0x00: eax=0x000000ba ebx=0x0000011d ecx=0x00000001 edx=0x00000000
+CPU 94:
+   0x8000001e 0x00: eax=0x000000bc ebx=0x0000011e ecx=0x00000001 edx=0x00000000
+CPU 95:
+   0x8000001e 0x00: eax=0x000000be ebx=0x0000011f ecx=0x00000001 edx=0x00000000
+CPU 96:
+   0x8000001e 0x00: eax=0x000000c0 ebx=0x00000120 ecx=0x00000001 edx=0x00000000
+CPU 97:
+   0x8000001e 0x00: eax=0x000000c2 ebx=0x00000121 ecx=0x00000001 edx=0x00000000
+CPU 98:
+   0x8000001e 0x00: eax=0x000000c4 ebx=0x00000122 ecx=0x00000001 edx=0x00000000
+CPU 99:
+   0x8000001e 0x00: eax=0x000000c6 ebx=0x00000123 ecx=0x00000001 edx=0x00000000
+CPU 100:
+   0x8000001e 0x00: eax=0x000000c8 ebx=0x00000124 ecx=0x00000001 edx=0x00000000
+CPU 101:
+   0x8000001e 0x00: eax=0x000000ca ebx=0x00000125 ecx=0x00000001 edx=0x00000000
+CPU 102:
+   0x8000001e 0x00: eax=0x000000cc ebx=0x00000126 ecx=0x00000001 edx=0x00000000
+CPU 103:
+   0x8000001e 0x00: eax=0x000000ce ebx=0x00000127 ecx=0x00000001 edx=0x00000000
+CPU 104:
+   0x8000001e 0x00: eax=0x000000d0 ebx=0x00000128 ecx=0x00000001 edx=0x00000000
+CPU 105:
+   0x8000001e 0x00: eax=0x000000d2 ebx=0x00000129 ecx=0x00000001 edx=0x00000000
+CPU 106:
+   0x8000001e 0x00: eax=0x000000d4 ebx=0x0000012a ecx=0x00000001 edx=0x00000000
+CPU 107:
+   0x8000001e 0x00: eax=0x000000d6 ebx=0x0000012b ecx=0x00000001 edx=0x00000000
+CPU 108:
+   0x8000001e 0x00: eax=0x000000d8 ebx=0x0000012c ecx=0x00000001 edx=0x00000000
+CPU 109:
+   0x8000001e 0x00: eax=0x000000da ebx=0x0000012d ecx=0x00000001 edx=0x00000000
+CPU 110:
+   0x8000001e 0x00: eax=0x000000dc ebx=0x0000012e ecx=0x00000001 edx=0x00000000
+CPU 111:
+   0x8000001e 0x00: eax=0x000000de ebx=0x0000012f ecx=0x00000001 edx=0x00000000
+CPU 112:
+   0x8000001e 0x00: eax=0x000000e0 ebx=0x00000130 ecx=0x00000001 edx=0x00000000
+CPU 113:
+   0x8000001e 0x00: eax=0x000000e2 ebx=0x00000131 ecx=0x00000001 edx=0x00000000
+CPU 114:
+   0x8000001e 0x00: eax=0x000000e4 ebx=0x00000132 ecx=0x00000001 edx=0x00000000
+CPU 115:
+   0x8000001e 0x00: eax=0x000000e6 ebx=0x00000133 ecx=0x00000001 edx=0x00000000
+CPU 116:
+   0x8000001e 0x00: eax=0x000000e8 ebx=0x00000134 ecx=0x00000001 edx=0x00000000
+CPU 117:
+   0x8000001e 0x00: eax=0x000000ea ebx=0x00000135 ecx=0x00000001 edx=0x00000000
+CPU 118:
+   0x8000001e 0x00: eax=0x000000ec ebx=0x00000136 ecx=0x00000001 edx=0x00000000
+CPU 119:
+   0x8000001e 0x00: eax=0x000000ee ebx=0x00000137 ecx=0x00000001 edx=0x00000000
+CPU 120:
+   0x8000001e 0x00: eax=0x000000f0 ebx=0x00000138 ecx=0x00000001 edx=0x00000000
+CPU 121:
+   0x8000001e 0x00: eax=0x000000f2 ebx=0x00000139 ecx=0x00000001 edx=0x00000000
+CPU 122:
+   0x8000001e 0x00: eax=0x000000f4 ebx=0x0000013a ecx=0x00000001 edx=0x00000000
+CPU 123:
+   0x8000001e 0x00: eax=0x000000f6 ebx=0x0000013b ecx=0x00000001 edx=0x00000000
+CPU 124:
+   0x8000001e 0x00: eax=0x000000f8 ebx=0x0000013c ecx=0x00000001 edx=0x00000000
+CPU 125:
+   0x8000001e 0x00: eax=0x000000fa ebx=0x0000013d ecx=0x00000001 edx=0x00000000
+CPU 126:
+   0x8000001e 0x00: eax=0x000000fc ebx=0x0000013e ecx=0x00000001 edx=0x00000000
+CPU 127:
+   0x8000001e 0x00: eax=0x000000fe ebx=0x0000013f ecx=0x00000001 edx=0x00000000
+CPU 128:
+   0x8000001e 0x00: eax=0x00000001 ebx=0x00000100 ecx=0x00000000 edx=0x00000000
+CPU 129:
+   0x8000001e 0x00: eax=0x00000003 ebx=0x00000101 ecx=0x00000000 edx=0x00000000
+CPU 130:
+   0x8000001e 0x00: eax=0x00000005 ebx=0x00000102 ecx=0x00000000 edx=0x00000000
+CPU 131:
+   0x8000001e 0x00: eax=0x00000007 ebx=0x00000103 ecx=0x00000000 edx=0x00000000
+CPU 132:
+   0x8000001e 0x00: eax=0x00000009 ebx=0x00000104 ecx=0x00000000 edx=0x00000000
+CPU 133:
+   0x8000001e 0x00: eax=0x0000000b ebx=0x00000105 ecx=0x00000000 edx=0x00000000
+CPU 134:
+   0x8000001e 0x00: eax=0x0000000d ebx=0x00000106 ecx=0x00000000 edx=0x00000000
+CPU 135:
+   0x8000001e 0x00: eax=0x0000000f ebx=0x00000107 ecx=0x00000000 edx=0x00000000
+CPU 136:
+   0x8000001e 0x00: eax=0x00000011 ebx=0x00000108 ecx=0x00000000 edx=0x00000000
+CPU 137:
+   0x8000001e 0x00: eax=0x00000013 ebx=0x00000109 ecx=0x00000000 edx=0x00000000
+CPU 138:
+   0x8000001e 0x00: eax=0x00000015 ebx=0x0000010a ecx=0x00000000 edx=0x00000000
+CPU 139:
+   0x8000001e 0x00: eax=0x00000017 ebx=0x0000010b ecx=0x00000000 edx=0x00000000
+CPU 140:
+   0x8000001e 0x00: eax=0x00000019 ebx=0x0000010c ecx=0x00000000 edx=0x00000000
+CPU 141:
+   0x8000001e 0x00: eax=0x0000001b ebx=0x0000010d ecx=0x00000000 edx=0x00000000
+CPU 142:
+   0x8000001e 0x00: eax=0x0000001d ebx=0x0000010e ecx=0x00000000 edx=0x00000000
+CPU 143:
+   0x8000001e 0x00: eax=0x0000001f ebx=0x0000010f ecx=0x00000000 edx=0x00000000
+CPU 144:
+   0x8000001e 0x00: eax=0x00000021 ebx=0x00000110 ecx=0x00000000 edx=0x00000000
+CPU 145:
+   0x8000001e 0x00: eax=0x00000023 ebx=0x00000111 ecx=0x00000000 edx=0x00000000
+CPU 146:
+   0x8000001e 0x00: eax=0x00000025 ebx=0x00000112 ecx=0x00000000 edx=0x00000000
+CPU 147:
+   0x8000001e 0x00: eax=0x00000027 ebx=0x00000113 ecx=0x00000000 edx=0x00000000
+CPU 148:
+   0x8000001e 0x00: eax=0x00000029 ebx=0x00000114 ecx=0x00000000 edx=0x00000000
+CPU 149:
+   0x8000001e 0x00: eax=0x0000002b ebx=0x00000115 ecx=0x00000000 edx=0x00000000
+CPU 150:
+   0x8000001e 0x00: eax=0x0000002d ebx=0x00000116 ecx=0x00000000 edx=0x00000000
+CPU 151:
+   0x8000001e 0x00: eax=0x0000002f ebx=0x00000117 ecx=0x00000000 edx=0x00000000
+CPU 152:
+   0x8000001e 0x00: eax=0x00000031 ebx=0x00000118 ecx=0x00000000 edx=0x00000000
+CPU 153:
+   0x8000001e 0x00: eax=0x00000033 ebx=0x00000119 ecx=0x00000000 edx=0x00000000
+CPU 154:
+   0x8000001e 0x00: eax=0x00000035 ebx=0x0000011a ecx=0x00000000 edx=0x00000000
+CPU 155:
+   0x8000001e 0x00: eax=0x00000037 ebx=0x0000011b ecx=0x00000000 edx=0x00000000
+CPU 156:
+   0x8000001e 0x00: eax=0x00000039 ebx=0x0000011c ecx=0x00000000 edx=0x00000000
+CPU 157:
+   0x8000001e 0x00: eax=0x0000003b ebx=0x0000011d ecx=0x00000000 edx=0x00000000
+CPU 158:
+   0x8000001e 0x00: eax=0x0000003d ebx=0x0000011e ecx=0x00000000 edx=0x00000000
+CPU 159:
+   0x8000001e 0x00: eax=0x0000003f ebx=0x0000011f ecx=0x00000000 edx=0x00000000
+CPU 160:
+   0x8000001e 0x00: eax=0x00000041 ebx=0x00000120 ecx=0x00000000 edx=0x00000000
+CPU 161:
+   0x8000001e 0x00: eax=0x00000043 ebx=0x00000121 ecx=0x00000000 edx=0x00000000
+CPU 162:
+   0x8000001e 0x00: eax=0x00000045 ebx=0x00000122 ecx=0x00000000 edx=0x00000000
+CPU 163:
+   0x8000001e 0x00: eax=0x00000047 ebx=0x00000123 ecx=0x00000000 edx=0x00000000
+CPU 164:
+   0x8000001e 0x00: eax=0x00000049 ebx=0x00000124 ecx=0x00000000 edx=0x00000000
+CPU 165:
+   0x8000001e 0x00: eax=0x0000004b ebx=0x00000125 ecx=0x00000000 edx=0x00000000
+CPU 166:
+   0x8000001e 0x00: eax=0x0000004d ebx=0x00000126 ecx=0x00000000 edx=0x00000000
+CPU 167:
+   0x8000001e 0x00: eax=0x0000004f ebx=0x00000127 ecx=0x00000000 edx=0x00000000
+CPU 168:
+   0x8000001e 0x00: eax=0x00000051 ebx=0x00000128 ecx=0x00000000 edx=0x00000000
+CPU 169:
+   0x8000001e 0x00: eax=0x00000053 ebx=0x00000129 ecx=0x00000000 edx=0x00000000
+CPU 170:
+   0x8000001e 0x00: eax=0x00000055 ebx=0x0000012a ecx=0x00000000 edx=0x00000000
+CPU 171:
+   0x8000001e 0x00: eax=0x00000057 ebx=0x0000012b ecx=0x00000000 edx=0x00000000
+CPU 172:
+   0x8000001e 0x00: eax=0x00000059 ebx=0x0000012c ecx=0x00000000 edx=0x00000000
+CPU 173:
+   0x8000001e 0x00: eax=0x0000005b ebx=0x0000012d ecx=0x00000000 edx=0x00000000
+CPU 174:
+   0x8000001e 0x00: eax=0x0000005d ebx=0x0000012e ecx=0x00000000 edx=0x00000000
+CPU 175:
+   0x8000001e 0x00: eax=0x0000005f ebx=0x0000012f ecx=0x00000000 edx=0x00000000
+CPU 176:
+   0x8000001e 0x00: eax=0x00000061 ebx=0x00000130 ecx=0x00000000 edx=0x00000000
+CPU 177:
+   0x8000001e 0x00: eax=0x00000063 ebx=0x00000131 ecx=0x00000000 edx=0x00000000
+CPU 178:
+   0x8000001e 0x00: eax=0x00000065 ebx=0x00000132 ecx=0x00000000 edx=0x00000000
+CPU 179:
+   0x8000001e 0x00: eax=0x00000067 ebx=0x00000133 ecx=0x00000000 edx=0x00000000
+CPU 180:
+   0x8000001e 0x00: eax=0x00000069 ebx=0x00000134 ecx=0x00000000 edx=0x00000000
+CPU 181:
+   0x8000001e 0x00: eax=0x0000006b ebx=0x00000135 ecx=0x00000000 edx=0x00000000
+CPU 182:
+   0x8000001e 0x00: eax=0x0000006d ebx=0x00000136 ecx=0x00000000 edx=0x00000000
+CPU 183:
+   0x8000001e 0x00: eax=0x0000006f ebx=0x00000137 ecx=0x00000000 edx=0x00000000
+CPU 184:
+   0x8000001e 0x00: eax=0x00000071 ebx=0x00000138 ecx=0x00000000 edx=0x00000000
+CPU 185:
+   0x8000001e 0x00: eax=0x00000073 ebx=0x00000139 ecx=0x00000000 edx=0x00000000
+CPU 186:
+   0x8000001e 0x00: eax=0x00000075 ebx=0x0000013a ecx=0x00000000 edx=0x00000000
+CPU 187:
+   0x8000001e 0x00: eax=0x00000077 ebx=0x0000013b ecx=0x00000000 edx=0x00000000
+CPU 188:
+   0x8000001e 0x00: eax=0x00000079 ebx=0x0000013c ecx=0x00000000 edx=0x00000000
+CPU 189:
+   0x8000001e 0x00: eax=0x0000007b ebx=0x0000013d ecx=0x00000000 edx=0x00000000
+CPU 190:
+   0x8000001e 0x00: eax=0x0000007d ebx=0x0000013e ecx=0x00000000 edx=0x00000000
+CPU 191:
+   0x8000001e 0x00: eax=0x0000007f ebx=0x0000013f ecx=0x00000000 edx=0x00000000
+CPU 192:
+   0x8000001e 0x00: eax=0x00000081 ebx=0x00000100 ecx=0x00000001 edx=0x00000000
+CPU 193:
+   0x8000001e 0x00: eax=0x00000083 ebx=0x00000101 ecx=0x00000001 edx=0x00000000
+CPU 194:
+   0x8000001e 0x00: eax=0x00000085 ebx=0x00000102 ecx=0x00000001 edx=0x00000000
+CPU 195:
+   0x8000001e 0x00: eax=0x00000087 ebx=0x00000103 ecx=0x00000001 edx=0x00000000
+CPU 196:
+   0x8000001e 0x00: eax=0x00000089 ebx=0x00000104 ecx=0x00000001 edx=0x00000000
+CPU 197:
+   0x8000001e 0x00: eax=0x0000008b ebx=0x00000105 ecx=0x00000001 edx=0x00000000
+CPU 198:
+   0x8000001e 0x00: eax=0x0000008d ebx=0x00000106 ecx=0x00000001 edx=0x00000000
+CPU 199:
+   0x8000001e 0x00: eax=0x0000008f ebx=0x00000107 ecx=0x00000001 edx=0x00000000
+CPU 200:
+   0x8000001e 0x00: eax=0x00000091 ebx=0x00000108 ecx=0x00000001 edx=0x00000000
+CPU 201:
+   0x8000001e 0x00: eax=0x00000093 ebx=0x00000109 ecx=0x00000001 edx=0x00000000
+CPU 202:
+   0x8000001e 0x00: eax=0x00000095 ebx=0x0000010a ecx=0x00000001 edx=0x00000000
+CPU 203:
+   0x8000001e 0x00: eax=0x00000097 ebx=0x0000010b ecx=0x00000001 edx=0x00000000
+CPU 204:
+   0x8000001e 0x00: eax=0x00000099 ebx=0x0000010c ecx=0x00000001 edx=0x00000000
+CPU 205:
+   0x8000001e 0x00: eax=0x0000009b ebx=0x0000010d ecx=0x00000001 edx=0x00000000
+CPU 206:
+   0x8000001e 0x00: eax=0x0000009d ebx=0x0000010e ecx=0x00000001 edx=0x00000000
+CPU 207:
+   0x8000001e 0x00: eax=0x0000009f ebx=0x0000010f ecx=0x00000001 edx=0x00000000
+CPU 208:
+   0x8000001e 0x00: eax=0x000000a1 ebx=0x00000110 ecx=0x00000001 edx=0x00000000
+CPU 209:
+   0x8000001e 0x00: eax=0x000000a3 ebx=0x00000111 ecx=0x00000001 edx=0x00000000
+CPU 210:
+   0x8000001e 0x00: eax=0x000000a5 ebx=0x00000112 ecx=0x00000001 edx=0x00000000
+CPU 211:
+   0x8000001e 0x00: eax=0x000000a7 ebx=0x00000113 ecx=0x00000001 edx=0x00000000
+CPU 212:
+   0x8000001e 0x00: eax=0x000000a9 ebx=0x00000114 ecx=0x00000001 edx=0x00000000
+CPU 213:
+   0x8000001e 0x00: eax=0x000000ab ebx=0x00000115 ecx=0x00000001 edx=0x00000000
+CPU 214:
+   0x8000001e 0x00: eax=0x000000ad ebx=0x00000116 ecx=0x00000001 edx=0x00000000
+CPU 215:
+   0x8000001e 0x00: eax=0x000000af ebx=0x00000117 ecx=0x00000001 edx=0x00000000
+CPU 216:
+   0x8000001e 0x00: eax=0x000000b1 ebx=0x00000118 ecx=0x00000001 edx=0x00000000
+CPU 217:
+   0x8000001e 0x00: eax=0x000000b3 ebx=0x00000119 ecx=0x00000001 edx=0x00000000
+CPU 218:
+   0x8000001e 0x00: eax=0x000000b5 ebx=0x0000011a ecx=0x00000001 edx=0x00000000
+CPU 219:
+   0x8000001e 0x00: eax=0x000000b7 ebx=0x0000011b ecx=0x00000001 edx=0x00000000
+CPU 220:
+   0x8000001e 0x00: eax=0x000000b9 ebx=0x0000011c ecx=0x00000001 edx=0x00000000
+CPU 221:
+   0x8000001e 0x00: eax=0x000000bb ebx=0x0000011d ecx=0x00000001 edx=0x00000000
+CPU 222:
+   0x8000001e 0x00: eax=0x000000bd ebx=0x0000011e ecx=0x00000001 edx=0x00000000
+CPU 223:
+   0x8000001e 0x00: eax=0x000000bf ebx=0x0000011f ecx=0x00000001 edx=0x00000000
+CPU 224:
+   0x8000001e 0x00: eax=0x000000c1 ebx=0x00000120 ecx=0x00000001 edx=0x00000000
+CPU 225:
+   0x8000001e 0x00: eax=0x000000c3 ebx=0x00000121 ecx=0x00000001 edx=0x00000000
+CPU 226:
+   0x8000001e 0x00: eax=0x000000c5 ebx=0x00000122 ecx=0x00000001 edx=0x00000000
+CPU 227:
+   0x8000001e 0x00: eax=0x000000c7 ebx=0x00000123 ecx=0x00000001 edx=0x00000000
+CPU 228:
+   0x8000001e 0x00: eax=0x000000c9 ebx=0x00000124 ecx=0x00000001 edx=0x00000000
+CPU 229:
+   0x8000001e 0x00: eax=0x000000cb ebx=0x00000125 ecx=0x00000001 edx=0x00000000
+CPU 230:
+   0x8000001e 0x00: eax=0x000000cd ebx=0x00000126 ecx=0x00000001 edx=0x00000000
+CPU 231:
+   0x8000001e 0x00: eax=0x000000cf ebx=0x00000127 ecx=0x00000001 edx=0x00000000
+CPU 232:
+   0x8000001e 0x00: eax=0x000000d1 ebx=0x00000128 ecx=0x00000001 edx=0x00000000
+CPU 233:
+   0x8000001e 0x00: eax=0x000000d3 ebx=0x00000129 ecx=0x00000001 edx=0x00000000
+CPU 234:
+   0x8000001e 0x00: eax=0x000000d5 ebx=0x0000012a ecx=0x00000001 edx=0x00000000
+CPU 235:
+   0x8000001e 0x00: eax=0x000000d7 ebx=0x0000012b ecx=0x00000001 edx=0x00000000
+CPU 236:
+   0x8000001e 0x00: eax=0x000000d9 ebx=0x0000012c ecx=0x00000001 edx=0x00000000
+CPU 237:
+   0x8000001e 0x00: eax=0x000000db ebx=0x0000012d ecx=0x00000001 edx=0x00000000
+CPU 238:
+   0x8000001e 0x00: eax=0x000000dd ebx=0x0000012e ecx=0x00000001 edx=0x00000000
+CPU 239:
+   0x8000001e 0x00: eax=0x000000df ebx=0x0000012f ecx=0x00000001 edx=0x00000000
+CPU 240:
+   0x8000001e 0x00: eax=0x000000e1 ebx=0x00000130 ecx=0x00000001 edx=0x00000000
+CPU 241:
+   0x8000001e 0x00: eax=0x000000e3 ebx=0x00000131 ecx=0x00000001 edx=0x00000000
+CPU 242:
+   0x8000001e 0x00: eax=0x000000e5 ebx=0x00000132 ecx=0x00000001 edx=0x00000000
+CPU 243:
+   0x8000001e 0x00: eax=0x000000e7 ebx=0x00000133 ecx=0x00000001 edx=0x00000000
+CPU 244:
+   0x8000001e 0x00: eax=0x000000e9 ebx=0x00000134 ecx=0x00000001 edx=0x00000000
+CPU 245:
+   0x8000001e 0x00: eax=0x000000eb ebx=0x00000135 ecx=0x00000001 edx=0x00000000
+CPU 246:
+   0x8000001e 0x00: eax=0x000000ed ebx=0x00000136 ecx=0x00000001 edx=0x00000000
+CPU 247:
+   0x8000001e 0x00: eax=0x000000ef ebx=0x00000137 ecx=0x00000001 edx=0x00000000
+CPU 248:
+   0x8000001e 0x00: eax=0x000000f1 ebx=0x00000138 ecx=0x00000001 edx=0x00000000
+CPU 249:
+   0x8000001e 0x00: eax=0x000000f3 ebx=0x00000139 ecx=0x00000001 edx=0x00000000
+CPU 250:
+   0x8000001e 0x00: eax=0x000000f5 ebx=0x0000013a ecx=0x00000001 edx=0x00000000
+CPU 251:
+   0x8000001e 0x00: eax=0x000000f7 ebx=0x0000013b ecx=0x00000001 edx=0x00000000
+CPU 252:
+   0x8000001e 0x00: eax=0x000000f9 ebx=0x0000013c ecx=0x00000001 edx=0x00000000
+CPU 253:
+   0x8000001e 0x00: eax=0x000000fb ebx=0x0000013d ecx=0x00000001 edx=0x00000000
+CPU 254:
+   0x8000001e 0x00: eax=0x000000fd ebx=0x0000013e ecx=0x00000001 edx=0x00000000
+CPU 255:
+   0x8000001e 0x00: eax=0x000000ff ebx=0x0000013f ecx=0x00000001 edx=0x00000000
 
