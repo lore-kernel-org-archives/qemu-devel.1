@@ -2,88 +2,90 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AE9C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F7DC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:55:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 821B720848
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D7CA420848
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:55:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QqOxxtDV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 821B720848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qLeGHQN8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7CA420848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBfmv-0002am-Oq
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:55:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55980)
+	id 1kBfn8-00033K-3v
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:55:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kBfUR-0007k8-Oe
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:36:28 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:46346)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kBfFV-0002QK-Rd
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:21:01 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33318)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kBfUN-0007WV-HV
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:36:27 -0400
-Received: by mail-pg1-x544.google.com with SMTP id 31so532499pgy.13
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:36:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=vrtca1Egu3GlCs3POIM/UT++uYMXxpY0pUg5GFEkSkA=;
- b=QqOxxtDVPgo6v9ApWg28UApJhpzZp1FiofPnKTFOVhkbgmYKo3pjL15FDqVrkJxiM0
- 96KBAjeYVMiePdZyNa6lMpacFAYOdJRDyKsBFr43E58hF1D4ufvQ5cF7e8tXasUrT6Vc
- 9cbRFD7K3DSRoI75ue8FNEJjZbFonnL4U+PHH7JgJjBecizhqzoeALFVRWDsNwByuDY+
- 86iWozz5I8I1MIk0GIz4NQ8EkQ6rayAd2MgbCvC2tVK0Y5Ix5N8vfPmUXCrNRqWnTXTQ
- W5MtYKdwFEqX8hvNO5dLiBiaB6pX5nK1mqhKbvdx+QyeiKkCnQBfR5BRU/R10592B2Ao
- a6yg==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kBfFT-0005RI-Ur
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:21:01 -0400
+Received: by mail-pl1-x642.google.com with SMTP id h2so540833plr.0
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=JAaLtIFS218jhrIntO1CQBLV81E0LrWrKQYBwcRx/ss=;
+ b=qLeGHQN8piX0iQLsD4gji7uRrL4cecjHuSY0wXonxtlxgn3Nu7DXVUHSQMwzPrJcdm
+ O6saoHhKqfrjj355bqUWjLvQSn8CrvsopWGUEfMB7IiXP8Y/TtWKKmyc+tFyWHC4962P
+ KlmEhhq1/rxbB/9Pow1f1GgAeTD+a8ZVcTsiNWahqTonYWkv+IDe+JfmpCvDG2IYWS0d
+ Rq6Im67ouWoxE6t6lN2NSAXKv2pM/skQVE+XlEqlZ2ZblMQkGP8Zo+bAfXk8LzrLqwfa
+ V27LTPx6jrnHeR6BvQ4PVv//QM3IcMUJdUvh3LfOcof1JMkazYOzqraHUdZAOhcg3/Pd
+ t5pA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=vrtca1Egu3GlCs3POIM/UT++uYMXxpY0pUg5GFEkSkA=;
- b=LL6m8lvkkAMOPK/SCeTXMscMC4sv3HHIR/rqogjlU7fiVMHVU/+kEiwhVv+siENitc
- CIeDBl/EIBTB8O9ssJcfeEU9UGMHcWA3PcZsAmShH6f1dvrrC3srhI+Rz710Vz7+yJRo
- 4RTDZku0WeclHv0Zli9Q3WFGRibfhjrNLuRBIfg/95Hn/g9SLvTGTfb9KMmORaFC73JO
- tBQ9qHf6l8ZrNQ83FcZR+3jNvKJe829FUYjszSn8WpJWKcXFYU+RMrp6J22hO8r5WHt8
- 2ONaFr7TzRb67n16kAtxRcHX6xVE3g7HVGLFPWyD/VgF+GpG/MIL1h5TSnKemoYlg+4P
- j2ZQ==
-X-Gm-Message-State: AOAM532jlMnyQZ3pVkjJPj9p5Z+lcp3/H29CBF0ule/2u2+uc5DfT/x8
- v+KhJTR04FD8niEqUk7riTzZbDlF0TtXZw==
-X-Google-Smtp-Source: ABdhPJwWQhLOQ/TQJmpLcARWxetmokHrbdCk+oVdcSTpy7HgCIhAEkDDaMFdcZY+WauNhnfK/xNwkA==
-X-Received: by 2002:a65:690f:: with SMTP id s15mr1493987pgq.124.1598625381445; 
- Fri, 28 Aug 2020 07:36:21 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id l4sm1836807pgk.74.2020.08.28.07.36.19
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=JAaLtIFS218jhrIntO1CQBLV81E0LrWrKQYBwcRx/ss=;
+ b=es6pQ3mbq4K5E5fhfNT7MmiJP3VDJo55gf+KY6Yfv32/gxZH/PpYKi7fYNXa/ZvfbW
+ Zs5OTSsIZjKHF/Aru42dyTLeAVvRROjlrkRcCty9TWsAivqXCMnhDu4qA2HW5VHQaCqe
+ D16HFNgqNutqUahxdZIC3MF1PHLn5sFqCHKEn+1Qx7ulITR98NMR5B3W7QrTcfU6He3K
+ 35Is+nn/ojSKceQz19pTZPEtJL3pt1UzPcPBhV6TzQOdWE808u/nhPIJ1Fgz0BrHcZJw
+ GjEKlsgzbJw0Bz4uRtTSHZ4BrepIXL2bEQWyFRdIyqXgtPkNNAq9aQ+cYNPiVXCILU0w
+ jFGQ==
+X-Gm-Message-State: AOAM532nTtUY1NEBoBcm9v4Jo1A5xzUfo8gS8wi5H8kaQfz1lKdoEISe
+ SrDmD8jYFu+N2bQLfUxeop7cWCu+gju0SQ==
+X-Google-Smtp-Source: ABdhPJyQWxp6kvmZbkgHM/nznqhHuVxcUqyXU0LpyvOkwQFufOlWU3CAcoOt/XCNwPffxvsYl7jPcQ==
+X-Received: by 2002:a17:902:988f:: with SMTP id
+ s15mr1506833plp.26.1598624458291; 
+ Fri, 28 Aug 2020 07:20:58 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.20.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 07:36:20 -0700 (PDT)
-From: luoyonggang@gmail.com
+ Fri, 28 Aug 2020 07:20:57 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2] configure: Fix include and linkage issue on msys2
-Date: Fri, 28 Aug 2020 22:36:02 +0800
-Message-Id: <20200828143602.160-1-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.27.0.windows.1
+Subject: [PATCH v2 68/76] target/microblaze: Convert dec_rts to decodetree
+Date: Fri, 28 Aug 2020 07:19:21 -0700
+Message-Id: <20200828141929.77854-69-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
+References: <20200828141929.77854-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -98,115 +100,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: edgar.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
-
-On msys2, the -I/e/path/to/qemu -L/e/path/to/qemu are not recognized by the compiler
-Cause $PWD are result posix style path such as /e/path/to/qemu that can not be recognized
-by mingw gcc, and `pwd -W` are result Windows style path such as E:/path/to/qemu that can
-be recognized by the mingw gcc. So we replace all $PWD with $build_path that can
-building qemu under msys2/mingw environment.
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- configure | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+ target/microblaze/insns.decode |  5 ++++
+ target/microblaze/translate.c  | 51 +++++++++++++++-------------------
+ 2 files changed, 28 insertions(+), 28 deletions(-)
 
-diff --git a/configure b/configure
-index 6ecaff429b..f7e0b3bc33 100755
---- a/configure
-+++ b/configure
-@@ -13,8 +13,13 @@ export CCACHE_RECACHE=yes
+diff --git a/target/microblaze/insns.decode b/target/microblaze/insns.decode
+index e6a61f147a..8906058a29 100644
+--- a/target/microblaze/insns.decode
++++ b/target/microblaze/insns.decode
+@@ -202,6 +202,11 @@ rsubic          001011 ..... ..... ................     @typeb
+ rsubik          001101 ..... ..... ................     @typeb
+ rsubikc         001111 ..... ..... ................     @typeb
  
- # make source path absolute
- source_path=$(cd "$(dirname -- "$0")"; pwd)
-+build_path=$PWD
-+if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
-+source_path=$(cd "$(dirname -- "$0")"; pwd -W)
-+build_path=`pwd -W`
-+fi
- 
--if test "$PWD" = "$source_path"
-+if test "$build_path" = "$source_path"
- then
-     echo "Using './build' as the directory for build output"
- 
-@@ -346,7 +351,12 @@ ld_has() {
-     $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
++rtbd            101101 10010 ..... ................     @typeb_bc
++rtid            101101 10001 ..... ................     @typeb_bc
++rted            101101 10100 ..... ................     @typeb_bc
++rtsd            101101 10000 ..... ................     @typeb_bc
++
+ sb              110100 ..... ..... ..... 0000 000 0000  @typea
+ sbr             110100 ..... ..... ..... 0100 000 0000  @typea
+ sbea            110100 ..... ..... ..... 0001 000 0000  @typea
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index b8dcef8f1c..6c1855b29a 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -1252,6 +1252,29 @@ static bool trans_mbar(DisasContext *dc, arg_mbar *arg)
+     return true;
  }
  
--if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
-+check_valid_build_path="[[:space:]:]"
-+if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
-+check_valid_build_path="[[:space:]]"
-+fi
++static bool do_rts(DisasContext *dc, arg_typeb_bc *arg, int to_set)
++{
++    if (trap_userspace(dc, to_set)) {
++        return true;
++    }
++    dc->tb_flags_to_set |= to_set;
++    setup_dslot(dc, true);
 +
-+if printf %s\\n "$source_path" "$build_path" | grep -q "$check_valid_build_path";
- then
-   error_exit "main directory cannot contain spaces nor colons"
- fi
-@@ -944,7 +954,7 @@ Linux)
-   linux="yes"
-   linux_user="yes"
-   kvm="yes"
--  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
-+  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I${build_path}/linux-headers $QEMU_INCLUDES"
-   libudev="yes"
- ;;
- esac
-@@ -4284,7 +4294,7 @@ EOF
-               symlink "$source_path/dtc/Makefile" "dtc/Makefile"
-           fi
-           fdt_cflags="-I${source_path}/dtc/libfdt"
--          fdt_ldflags="-L$PWD/dtc/libfdt"
-+          fdt_ldflags="-L${build_path}/dtc/libfdt"
-           fdt_libs="$fdt_libs"
-       elif test "$fdt" = "yes" ; then
-           # Not a git build & no libfdt found, prompt for system install
-@@ -5269,7 +5279,7 @@ case "$capstone" in
-     else
-       LIBCAPSTONE=libcapstone.a
-     fi
--    capstone_libs="-L$PWD/capstone -lcapstone"
-+    capstone_libs="-L${build_path}/capstone -lcapstone"
-     capstone_cflags="-I${source_path}/capstone/include"
-     ;;
++    dc->jmp_cond = TCG_COND_ALWAYS;
++    dc->jmp_dest = -1;
++    tcg_gen_addi_i32(cpu_btarget, reg_for_read(dc, arg->ra), arg->imm);
++    return true;
++}
++
++#define DO_RTS(NAME, IFLAG) \
++    static bool trans_##NAME(DisasContext *dc, arg_typeb_bc *arg) \
++    { return do_rts(dc, arg, IFLAG); }
++
++DO_RTS(rtbd, DRTB_FLAG)
++DO_RTS(rtid, DRTI_FLAG)
++DO_RTS(rted, DRTE_FLAG)
++DO_RTS(rtsd, 0)
++
+ static bool trans_zero(DisasContext *dc, arg_zero *arg)
+ {
+     /* If opcode_0_illegal, trap.  */
+@@ -1527,33 +1550,6 @@ static inline void do_rte(DisasContext *dc)
+     dc->tb_flags &= ~DRTE_FLAG;
+ }
  
-@@ -6269,8 +6279,8 @@ case "$slirp" in
-       git_submodules="${git_submodules} slirp"
-     fi
-     mkdir -p slirp
--    slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
--    slirp_libs="-L$PWD/slirp -lslirp"
-+    slirp_cflags="-I${source_path}/slirp/src -I${build_path}/slirp/src"
-+    slirp_libs="-L${build_path}/slirp -lslirp"
-     if test "$mingw32" = "yes" ; then
-       slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
-     fi
-@@ -8211,7 +8221,7 @@ fi
- mv $cross config-meson.cross
- 
- rm -rf meson-private meson-info meson-logs
--NINJA=${ninja:-$PWD/ninjatool} $meson setup \
-+NINJA=${ninja:-${build_path}/ninjatool} $meson setup \
-         --prefix "${pre_prefix}$prefix" \
-         --libdir "${pre_prefix}$libdir" \
-         --libexecdir "${pre_prefix}$libexecdir" \
-@@ -8231,7 +8241,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
- 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
- 	-Dgettext=$gettext -Dxkbcommon=$xkbcommon \
-         $cross_arg \
--        "$PWD" "$source_path"
-+        "$build_path" "$source_path"
- 
- if test "$?" -ne 0 ; then
-     error_exit "meson setup failed"
+-static void dec_rts(DisasContext *dc)
+-{
+-    unsigned int b_bit, i_bit, e_bit;
+-
+-    i_bit = dc->ir & (1 << 21);
+-    b_bit = dc->ir & (1 << 22);
+-    e_bit = dc->ir & (1 << 23);
+-
+-    if (trap_userspace(dc, i_bit || b_bit || e_bit)) {
+-        return;
+-    }
+-
+-    setup_dslot(dc, true);
+-
+-    if (i_bit) {
+-        dc->tb_flags |= DRTI_FLAG;
+-    } else if (b_bit) {
+-        dc->tb_flags |= DRTB_FLAG;
+-    } else if (e_bit) {
+-        dc->tb_flags |= DRTE_FLAG;
+-    }
+-
+-    dc->jmp_cond = TCG_COND_ALWAYS;
+-    dc->jmp_dest = -1;
+-    tcg_gen_add_i32(cpu_btarget, cpu_R[dc->ra], *dec_alu_op_b(dc));
+-}
+-
+ static void dec_null(DisasContext *dc)
+ {
+     if (trap_illegal(dc, true)) {
+@@ -1601,7 +1597,6 @@ static struct decoder_info {
+     };
+     void (*dec)(DisasContext *dc);
+ } decinfo[] = {
+-    {DEC_RTS, dec_rts},
+     {DEC_MSR, dec_msr},
+     {DEC_STREAM, dec_stream},
+     {{0, 0}, dec_null}
 -- 
-2.27.0.windows.1
+2.25.1
 
 
