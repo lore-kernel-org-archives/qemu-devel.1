@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E075C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE70C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:53:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 299102075B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:52:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 055662075B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:53:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VJD8IUlk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 299102075B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HwKlMaUi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 055662075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBjUW-0005eH-8B
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 14:52:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59016)
+	id 1kBjUm-0005x2-31
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 14:53:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBjCm-0002fO-JT
+ id 1kBjCm-0002gG-T7
  for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:28 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:40729)
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:32824)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBjCg-000604-FS
+ id 1kBjCh-00060c-L5
  for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:28 -0400
-Received: by mail-wm1-x344.google.com with SMTP id k20so105808wmi.5
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:34:21 -0700 (PDT)
+Received: by mail-wr1-x442.google.com with SMTP id o4so85091wrn.0
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:34:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=cOh7GY0pCWe5s/t9AlUFMrvjleZvUswRo8NiK3ZWQJY=;
- b=VJD8IUlkhn6qJWaoowXbizmhXMnBHttNlMzj1KvM2qd0m1U2tli3ZMI/7DUWFqI4gC
- 39lGyEODXGJJP3jitEObWf017Lq+sKw8S4nSaYkLxT3nfVfYnOTwS2FkFSVjRHy5o5lM
- QGUmX1XGuClMnUsMBUJ+wwJEvxmTjtdcUQ5b12cHEi+9Icbq68grjJw0SgU8U+rQYwm3
- RHvAKCn4FOjAXmBO5IuYbQc6uNCk02T7ySU7qwW5s3s6hVBNn6m0dh0Nreu6Te1wOHrI
- RHdWfNry4lE1Vpfv+xlp2YgmGbTeATqF5zeGf6z0faA/WLU/9+NeLuattmSvgxXJNmgh
- X/VA==
+ bh=fO4bxaTwEV/w3CMo+SSdfW5rxADm6yGqbOxhWupxuUI=;
+ b=HwKlMaUikwZD9Z9ToLszsuD8jJbM0kk50AybXBAdnMOIH7nPlUSIZe12rLqtmJYcJm
+ mBWdQ/F8SOwMXaVoeJAIRUMWSqo2IvLrKGmssQxOBjjXty5zfYx6aG85zi20ypXaa7Yi
+ Y5JpvJ6zjXoevwtlPVFs1NBNO85gB4pujpjBQNrlYHDjG/fzmhG8IVyYiPT/VmodR3ID
+ Z9xuIUMKxQDGUqZN+CXWCDceQLqvRrdn6ziwxEn9yuCt/B1Bre+aQ2TcB4AHy0pbHDor
+ u6ai/Q5KG3dfcoeRreQ+Bp1iY+Yqe912IOgrkjz8OhBk85MZT+IOAdHHb2KySSP7T9ZA
+ 1Z+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cOh7GY0pCWe5s/t9AlUFMrvjleZvUswRo8NiK3ZWQJY=;
- b=Cb3ZYZsrkJEyjczcWQfU0Uh3gEMJoGBxVW9RanVRSXzPWTwU+IZkpBNY+HDqoA6vyG
- L73LznTAA+EqVJ9ZT9rYSrj3UohF5oX/3g6wn28/QxCvfb60nHEQEg8Mh5PUMLgzlbfq
- Td/snGuW/kwVwD5UxL4amGOrJU5KOn/XLkLdIRJonvz7qxKue2eupEFW6CfQ0ifRup7q
- 621N8y8mweFrrnWX9lSHXculWsJveheSX4rSu/wNIO2D+0DDt7p1dlISapUYsaeOzG12
- kUGOdUHlmHDIWQm2xJnktFwFteA+4eZV9BgHsKSSAGS3M8v3/Kz3Z8LwoQICVB0M9v/G
- /0wQ==
-X-Gm-Message-State: AOAM533Rr0dk1KyQb3hzABPkPhehMSotTtmRFXDUPudlNB5dmD9MBKLe
- 1s93jdBKo9Wc/JkELEhhVmK88A==
-X-Google-Smtp-Source: ABdhPJyeTgZjsNzll7nVj9zK5rcb0s+pInaiM97upqo7GsXyQaacxvs2k4sKbNQUNTB9nhieTeLhgw==
-X-Received: by 2002:a1c:f70e:: with SMTP id v14mr45064wmh.74.1598639660995;
- Fri, 28 Aug 2020 11:34:20 -0700 (PDT)
+ bh=fO4bxaTwEV/w3CMo+SSdfW5rxADm6yGqbOxhWupxuUI=;
+ b=OGUhghCKfp1LtdvkbYnWuvsrunitygjP8B+A/5fwjgrJBnxnfcUDXhXib3188yJVEK
+ fQ1uLwHAflJaeGf6jD4SpRLRzPJUXFBBN9Ih1v2WcjOHQpmqh4zdYGGRrIxwIsZ3m05u
+ nqtluHelufzsiwzp+Q1yOBmYegTS0tlLBdwB20oy8XtWNu1gLADaLhck1xO+X93B49Ei
+ y9nccxVG2g2HwkLOR1uOHCA8/gV42OdvtJbJYbRdtXb7ld9f12T7mRb3oCC4ZDvlyuf1
+ 5JJgX+WDD1wDWE9YipeVTeNmGi81d/I4/xm6TjMcLwqgROuTKNJSHCMpRaCZNUSwcpZc
+ s1Aw==
+X-Gm-Message-State: AOAM53254G2zXB1pDviyKWjbping3xBt3bnxq49iqmEUjUFAWgNNOkpD
+ z43mUowkEf94vV81xJedXy3EIg==
+X-Google-Smtp-Source: ABdhPJxVpf2PxZtq6/E8SM5FUcmXTI/O7q80gaShaWsZWnWbMTGSHxp3+O6rpiK+fqXnu4vnTb86rQ==
+X-Received: by 2002:a5d:420b:: with SMTP id n11mr259999wrq.11.1598639662059;
+ Fri, 28 Aug 2020 11:34:22 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s20sm356251wmh.21.2020.08.28.11.34.19
+ by smtp.gmail.com with ESMTPSA id s20sm356251wmh.21.2020.08.28.11.34.21
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 11:34:20 -0700 (PDT)
+ Fri, 28 Aug 2020 11:34:21 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 20/45] target/arm: Implement new VFP fp16 insn VMOVX
-Date: Fri, 28 Aug 2020 19:33:29 +0100
-Message-Id: <20200828183354.27913-21-peter.maydell@linaro.org>
+Subject: [PATCH v2 21/45] target/arm: Implement VFP fp16 VMOV between gp and
+ halfprec registers
+Date: Fri, 28 Aug 2020 19:33:30 +0100
+Message-Id: <20200828183354.27913-22-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200828183354.27913-1-peter.maydell@linaro.org>
 References: <20200828183354.27913-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,49 +105,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fp16 extension includes a new instruction VMOVX, which copies the
-upper 16 bits of a 32-bit source VFP register into the lower 16
-bits of the destination and zeroes the high half of the destination.
-Implement it.
+Implement the VFP fp16 variant of VMOV that transfers a 16-bit
+value between a general purpose register and a VFP register.
+
+Note that Rt == 15 is UNPREDICTABLE; since this insn is v8 and later
+only we have no need to replicate the old "updates CPSR.NZCV"
+behaviour that the singleprec version of this insn does.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/vfp-uncond.decode   |  3 +++
- target/arm/translate-vfp.c.inc | 25 +++++++++++++++++++++++++
- 2 files changed, 28 insertions(+)
+ target/arm/vfp.decode          |  1 +
+ target/arm/translate-vfp.c.inc | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+)
 
-diff --git a/target/arm/vfp-uncond.decode b/target/arm/vfp-uncond.decode
-index 39dc8f6373a..8891ab3d549 100644
---- a/target/arm/vfp-uncond.decode
-+++ b/target/arm/vfp-uncond.decode
-@@ -75,5 +75,8 @@ VCVT        1111 1110 1.11 11 rm:2 .... 1010 op:1 1.0 .... \
- VCVT        1111 1110 1.11 11 rm:2 .... 1011 op:1 1.0 .... \
-             vm=%vm_dp vd=%vd_sp sz=3
+diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
+index 9a79e99f1b0..51f143b4a51 100644
+--- a/target/arm/vfp.decode
++++ b/target/arm/vfp.decode
+@@ -74,6 +74,7 @@ VDUP         ---- 1110 1 b:1 q:1 0 .... rt:4 1011 . 0 e:1 1 0000 \
+              vn=%vn_dp
  
-+VMOVX       1111 1110 1.11 0000 .... 1010 01 . 0 .... \
-+            vd=%vd_sp vm=%vm_sp
-+
- VINS        1111 1110 1.11 0000 .... 1010 11 . 0 .... \
-             vd=%vd_sp vm=%vm_sp
+ VMSR_VMRS    ---- 1110 111 l:1 reg:4 rt:4 1010 0001 0000
++VMOV_half    ---- 1110 000 l:1 .... rt:4 1001 . 001 0000    vn=%vn_sp
+ VMOV_single  ---- 1110 000 l:1 .... rt:4 1010 . 001 0000    vn=%vn_sp
+ 
+ VMOV_64_sp   ---- 1100 010 op:1 rt2:4 rt:4 1010 00.1 ....   vm=%vm_sp
 diff --git a/target/arm/translate-vfp.c.inc b/target/arm/translate-vfp.c.inc
-index bda3dd25136..4b26156eccc 100644
+index 4b26156eccc..28e0dba5f14 100644
 --- a/target/arm/translate-vfp.c.inc
 +++ b/target/arm/translate-vfp.c.inc
-@@ -3482,3 +3482,28 @@ static bool trans_VINS(DisasContext *s, arg_VINS *a)
-     tcg_temp_free_i32(rd);
+@@ -809,6 +809,40 @@ static bool trans_VMSR_VMRS(DisasContext *s, arg_VMSR_VMRS *a)
      return true;
  }
-+
-+static bool trans_VMOVX(DisasContext *s, arg_VINS *a)
+ 
++static bool trans_VMOV_half(DisasContext *s, arg_VMOV_single *a)
 +{
-+    TCGv_i32 rm;
++    TCGv_i32 tmp;
 +
 +    if (!dc_isar_feature(aa32_fp16_arith, s)) {
 +        return false;
 +    }
 +
-+    if (s->vec_len != 0 || s->vec_stride != 0) {
++    if (a->rt == 15) {
++        /* UNPREDICTABLE; we choose to UNDEF */
 +        return false;
 +    }
 +
@@ -154,14 +156,26 @@ index bda3dd25136..4b26156eccc 100644
 +        return true;
 +    }
 +
-+    /* Set Vd to high half of Vm */
-+    rm = tcg_temp_new_i32();
-+    neon_load_reg32(rm, a->vm);
-+    tcg_gen_shri_i32(rm, rm, 16);
-+    neon_store_reg32(rm, a->vd);
-+    tcg_temp_free_i32(rm);
++    if (a->l) {
++        /* VFP to general purpose register */
++        tmp = tcg_temp_new_i32();
++        neon_load_reg32(tmp, a->vn);
++        tcg_gen_andi_i32(tmp, tmp, 0xffff);
++        store_reg(s, a->rt, tmp);
++    } else {
++        /* general purpose register to VFP */
++        tmp = load_reg(s, a->rt);
++        tcg_gen_andi_i32(tmp, tmp, 0xffff);
++        neon_store_reg32(tmp, a->vn);
++        tcg_temp_free_i32(tmp);
++    }
++
 +    return true;
 +}
++
+ static bool trans_VMOV_single(DisasContext *s, arg_VMOV_single *a)
+ {
+     TCGv_i32 tmp;
 -- 
 2.20.1
 
