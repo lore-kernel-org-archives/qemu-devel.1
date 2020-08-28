@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1297C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C673C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:41:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DC0B207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:41:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DC0B207DF
+	by mail.kernel.org (Postfix) with ESMTPS id C30C4207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:41:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C30C4207DF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBecx-0002lD-L0
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:41:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36894)
+	id 1kBedB-0002zd-0a
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:41:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea9-00041l-Ob
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:17 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:60771)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea7-0003vf-Ce
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:15 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:43989)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea7-0007HA-3f
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:17 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea2-0007GT-Dn
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:15 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MUl4z-1k2gQu2QbJ-00Qg2V; Fri, 28 Aug 2020 15:38:06 +0200
+ id 1MVJZv-1k4L7u1RX5-00SKCT; Fri, 28 Aug 2020 15:38:01 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/18] linux-user: Add strace support for printing arguments
- for ioctls used for terminals and serial lines
-Date: Fri, 28 Aug 2020 15:37:46 +0200
-Message-Id: <20200828133753.2622286-12-laurent@vivier.eu>
+Subject: [PULL 08/18] linux-user: Add strace support for printing arguments of
+ some clock and time functions
+Date: Fri, 28 Aug 2020 15:37:43 +0200
+Message-Id: <20200828133753.2622286-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200828133753.2622286-1-laurent@vivier.eu>
 References: <20200828133753.2622286-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OfUFSBpm2VR7XPGxzZ7e8xz1nAelExVYE7Pe3fGgOI44tiGI6f+
- AfAwTjch9uGZQ7xVDe0pS2SxpRr+/113IVWaFjobTunDU0GQsRMqhZ7zuxDc80bWK7OD9vW
- TdthtuCwQwNd+xrU9cQis6Oc1vACN9HibX4ocprzkgBerM+baUyr0kWkQ5QPLTGMTDdXlZP
- TTV6FFSrFLwMp6un8eSUA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FshvhUZA+3Y=:anyHnDESc60UjRwHcaQ2XJ
- c9Y+y2uI5dafbRKR5nHzpJsINTK8vLo2nOmpCz3GMDnr/ja+di4HlWCb63HheAcqkRZaRq337
- CJuurT+wwclKfKZNbFblEeta54wZVV4u81l0WgoaJmrKt/++0ZXwwqlsvUIUnHjNyjJtxb76U
- gh5OGuxQYfpFBwnXgEZS86AT3cQCl/MPyt7ysBKE20AbzadoPdXLMbKO+oKxtb7CNTVEU6bz0
- poS55HdjtuAsraFS0dtbfQy2ZOHOvVlTPJKAifcd4R/LhKIAEGsuogsOfY1losPxW30OYx4Gd
- 5pgGBdOpWPQ7dFc2mcvaWzS5Ziwy2pbYeMJAX3EK5IDw8Ux8jBO/15ks7FcU7iO+gBa4t6nbq
- hhZOoLelPL7YsDh16/AsU8thNZVyQmJgz1JToap2M6xAf0D+Ir/nNTFkhVfgOOS5KAt0F5kMj
- 8ZDDaGDg2Y9aKz0ja/40gdDf1TewDDhX1s3AbVcHQwltbVOtepd+/moS6w+I/sDnulH0Med8+
- gBWbaBGmm0FAQNgAKMfWqyFYpJXnU41+BII+AQdxi4u0gvI3IWH32eXdhz4elLDy+ZKa3SquB
- wtJM0Sx8ypZsAyRpXINfDPUWCkOq1AAuXOypLE00hgp8GAjmEc9w5LaOy4jR+suf5fGEpTpBG
- KxMFqIh8H7/9F8qqOipQn1uPSYv+NDSrTgekqdTlYKwzguhG2nEsSK8u96XvXcKKThaSoiYoG
- vX3yMIrF/4o5KIvZgsmClft5xeh71IUblgFRkQLWgCR5Gg4BvdmJCPjbA+67mkfFgGGvlC2FZ
- HNHCGENWPjAB97WhV4Doe7iGTDShF5VVZ945/+jVS9AdaZZ9OfDO0bZg3aGJAcgeb/c+SZ1
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:iEJpGzD5lrfY0lensSLTAF9dqqoytXwggtwgf6uIGvFx9c9eB9/
+ Gpe1z8wQE/RI+bANJztMnkY3/bz+n7e/VR4aAnfv/z8mM9PYhMq4szLIsrqHaeSzoNvzIGc
+ NB9Om4Dhe2TvmXlb0LtQhX70tazSQCEVpLKp9bf/1E+clJDe86k/hu0dnCZx5xkD8WKTKLP
+ tpYlRsXWQMZq2PH1W66kw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:PdZMOMUgnp4=:UUppgM32M+CQfgLgB/GpaK
+ gqfIoJJLmjXLUFPB1x5N/dPw/ZWJDSPl2E1amH+9+esY68wFnJMOzXHVZEOslSNGc5+iMNdeJ
+ TDiZc01U6Kwd/DEWi7sgLpGMNZ8Wv5VP4tP2gzB9VQEhISkgxi+pIqLFya6YhioZFAPHqEhHe
+ FFFYOkkAeMywj/HrhpfGWDiU9FgeRbRXTBfmqtnuy5T07k3GVnlSLuZuWgXqoqYvwpFJggh5o
+ Qcm8w9SpOVgn8Ynzc2kv4H/0KHmAvQL1rXl+pfEulbO36JnRXCIS5zauI5oFQooX16u27mNWS
+ UGm8qM4yY6MX6iBC9TTmPVa4r17YVh6q8cauJ09vhoEQzyaFzZIifAY9GskMgaYcrEXZ+6cTJ
+ 0t6j/j3Gou8TfO7YMAVw08mbrC6L0xqWDlh6Ob5eD9xXyuvCslICbhUvjdN3k32O9TaalcJgv
+ 4KtAGVdwWVdNbWIsh8Rt8VvNUPqjhKNy9iKIRnD3VuaH2I2RlRQQCDU7vJqZ2l8dLYtAVSAEZ
+ MgKgrsrdcMC2kmvBeHRNhr8uxq89iYckP2mQfxCnk5E9z17id3+VS+ufZCZXlbe53KS9I5lPk
+ uyHbnL86cEyRVqolHQc8hH+etOdWqe2Y+K1FHwlt0BbI7McXYCrvWKcrflkALZvj9JM/deFzT
+ CGOgVgSBZyV4CbjAlBKfQysTFImS+ctZfbDAS3mJn9B7nNUbkWs7zVa587csoS3CX/PiZzDqy
+ lP/UxkrwenlI3Z2f2ACG0FeP7JXni0rWIBCCtsQHjaW0KhCl8CPo4pFhBUHHBq0zvIp8aAkqT
+ ea+TpNJHzaso7xe3LhWz+L2Q98VjBO3MWKfxLL+RbSoRfQcyu4k3JjHwcF1PDyGYuJI3Hdn
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 09:38:02
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 09:38:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -91,346 +91,480 @@ Sender: "Qemu-devel"
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-Functions "print_ioctl()" and "print_syscall_ret_ioctl()" are used
-to print arguments of "ioctl()" with "-strace". These functions
-use "thunk_print()", which is defined in "thunk.c", to print the
-contents of ioctl's third arguments that are not basic types.
+This patch implements strace argument printing functionality for following syscalls:
 
-However, this function doesn't handle ioctls of group ioctl_tty which
-are used for terminals and serial lines. These ioctls use a type
-"struct termios" which thunk type is defined in a non standard
-way using "STRUCT_SPECIAL()". This means that this type is not decoded
-regularly using "thunk_convert()" and uses special converting functions
-"target_to_host_termios()" and "host_to_target_termios()", which are defined
-in "syscall.c" to decode it's values.
+    * clock_getres, clock_gettime, clock_settime - clock and time functions
 
-For simillar reasons, this type is also not printed regularly using
-"thunk_print()". That is the reason why a separate printing function
-"print_termios()" is defined in file "strace.c". This function decodes
-and prints flag values of the "termios" structure.
+        int clock_getres(clockid_t clockid, struct timespec *res)
+        int clock_gettime(clockid_t clockid, struct timespec *tp)
+        int clock_settime(clockid_t clockid, const struct timespec *tp)
+        man page: https://man7.org/linux/man-pages/man2/clock_getres.2.html
+
+    * gettimeofday - get time
+
+        int gettimeofday(struct timeval *tv, struct timezone *tz)
+        man page: https://man7.org/linux/man-pages/man2/gettimeofday.2.html
+
+    * getitimer, setitimer - get or set value of an interval timer
+
+        int getitimer(int which, struct itimerval *curr_value)
+        int setitimer(int which, const struct itimerval *new_value,
+                      struct itimerval *old_value)
+        man page: https://man7.org/linux/man-pages/man2/getitimer.2.html
 
 Implementation notes:
 
-    Function "print_termios()" was implemented in "strace.c" using
-    an existing function "print_flags()" to print flag values of
-    "struct termios" fields. Also, recently implemented function
-    "print_enums()" was also used to print enumareted values which
-    are contained in the fields of 'struct termios'.
+    All of the syscalls have some structue types as argument types and thus
+    a separate printing function was stated in file "strace.list" for each
+    of them. All of these functions use existing functions for their
+    appropriate structure types ("print_timeval()" and "print_timezone()").
 
-    These flag values were defined using an existing macro "FLAG_TARGET()"
-    that generates aproppriate target flag values and string representations
-    of these flags. Also, the recently defined macro "ENUM_TARGET()" was
-    used to generate aproppriate enumarated values and their respective
-    string representations.
+    Functions "print_timespec()" and "print_itimerval()" were added in this
+    patch so that they can be used to print types "struct timespec" and
+    "struct itimerval" used by some of the syscalls. Function "print_itimerval()"
+    uses the existing function "print_timeval()" to print fields of the
+    structure "struct itimerval" that are of type "struct timeval".
 
-    Function "print_termios()" was declared in "qemu.h" so that it can
-    be accessed in "syscall.c". Type "StructEntry" defined in
-    "exec/user/thunk.h" contains information that is used to decode
-    structure values. Field "void print(void *arg)" was added in this
-    structure as a special print function. Also, function "thunk_print()"
-    was changed a little so that it uses this special print function
-    in case it is defined. This printing function was instantiated with
-    the defined "print_termios()" in "syscall.c" in "struct_termios_def".
+    Function "print_enums()", which was introduced in the previous patch, is used
+    to print the interval timer type which is the first argument of "getitimer()"
+    and "setitimer()". Also, this function is used to print the clock id which
+    is the first argument of "clock_getres()" and "clock_gettime()". For that
+    reason, the existing function "print_clockid()" was removed in this patch.
+    Existing function "print_clock_adjtime()" was also changed for this reason
+    to use "print_enums()".
+
+    The existing function "print_timeval()" was changed a little so that it
+    prints the field names beside the values.
+
+    Syscalls "clock_getres()" and "clock_gettime()" have the same number
+    and types of arguments and thus their print functions "print_clock_getres"
+    and "print_clock_gettime" share a common definition in file "strace.c".
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200723210233.349690-4-Filip.Bozuta@syrmia.com>
+Message-Id: <20200811164553.27713-6-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- include/exec/user/thunk.h |   1 +
- linux-user/qemu.h         |   1 +
- linux-user/strace.c       | 195 ++++++++++++++++++++++++++++++++++++++
- linux-user/syscall.c      |   1 +
- thunk.c                   |  23 +++--
- 5 files changed, 212 insertions(+), 9 deletions(-)
+ linux-user/strace.c    | 287 +++++++++++++++++++++++++++++++----------
+ linux-user/strace.list |  17 ++-
+ 2 files changed, 232 insertions(+), 72 deletions(-)
 
-diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
-index 7992475c9f8a..a5bbb2c73331 100644
---- a/include/exec/user/thunk.h
-+++ b/include/exec/user/thunk.h
-@@ -55,6 +55,7 @@ typedef struct {
-     int *field_offsets[2];
-     /* special handling */
-     void (*convert[2])(void *dst, const void *src);
-+    void (*print)(void *arg);
-     int size[2];
-     int align[2];
-     const char *name;
-diff --git a/linux-user/qemu.h b/linux-user/qemu.h
-index f431805e573f..a69a0bd347c2 100644
---- a/linux-user/qemu.h
-+++ b/linux-user/qemu.h
-@@ -706,6 +706,7 @@ static inline uint64_t target_offset64(uint64_t word0, uint64_t word1)
- }
- #endif /* TARGET_ABI_BITS != 32 */
- 
-+void print_termios(void *arg);
- 
- /* ARM EABI and MIPS expect 64bit types aligned even on pairs or registers */
- #ifdef TARGET_ARM
 diff --git a/linux-user/strace.c b/linux-user/strace.c
-index c7ef948b9451..4f77b0cf76eb 100644
+index d0731b888d29..c7ef948b9451 100644
 --- a/linux-user/strace.c
 +++ b/linux-user/strace.c
-@@ -1226,6 +1226,140 @@ UNUSED static struct flags falloc_flags[] = {
+@@ -78,7 +78,9 @@ UNUSED static void print_string(abi_long, int);
+ UNUSED static void print_buf(abi_long addr, abi_long len, int last);
+ UNUSED static void print_raw_param(const char *, abi_long, int);
+ UNUSED static void print_timeval(abi_ulong, int);
++UNUSED static void print_timespec(abi_ulong, int);
+ UNUSED static void print_timezone(abi_ulong, int);
++UNUSED static void print_itimerval(abi_ulong, int);
+ UNUSED static void print_number(abi_long, int);
+ UNUSED static void print_signal(abi_ulong, int);
+ UNUSED static void print_sockaddr(abi_ulong, abi_long, int);
+@@ -582,69 +584,6 @@ print_fdset(int n, abi_ulong target_fds_addr)
+ }
  #endif
+ 
+-#ifdef TARGET_NR_clock_adjtime
+-/* IDs of the various system clocks */
+-#define TARGET_CLOCK_REALTIME              0
+-#define TARGET_CLOCK_MONOTONIC             1
+-#define TARGET_CLOCK_PROCESS_CPUTIME_ID    2
+-#define TARGET_CLOCK_THREAD_CPUTIME_ID     3
+-#define TARGET_CLOCK_MONOTONIC_RAW         4
+-#define TARGET_CLOCK_REALTIME_COARSE       5
+-#define TARGET_CLOCK_MONOTONIC_COARSE      6
+-#define TARGET_CLOCK_BOOTTIME              7
+-#define TARGET_CLOCK_REALTIME_ALARM        8
+-#define TARGET_CLOCK_BOOTTIME_ALARM        9
+-#define TARGET_CLOCK_SGI_CYCLE             10
+-#define TARGET_CLOCK_TAI                   11
+-
+-static void
+-print_clockid(int clockid, int last)
+-{
+-    switch (clockid) {
+-    case TARGET_CLOCK_REALTIME:
+-        qemu_log("CLOCK_REALTIME");
+-        break;
+-    case TARGET_CLOCK_MONOTONIC:
+-        qemu_log("CLOCK_MONOTONIC");
+-        break;
+-    case TARGET_CLOCK_PROCESS_CPUTIME_ID:
+-        qemu_log("CLOCK_PROCESS_CPUTIME_ID");
+-        break;
+-    case TARGET_CLOCK_THREAD_CPUTIME_ID:
+-        qemu_log("CLOCK_THREAD_CPUTIME_ID");
+-        break;
+-    case TARGET_CLOCK_MONOTONIC_RAW:
+-        qemu_log("CLOCK_MONOTONIC_RAW");
+-        break;
+-    case TARGET_CLOCK_REALTIME_COARSE:
+-        qemu_log("CLOCK_REALTIME_COARSE");
+-        break;
+-    case TARGET_CLOCK_MONOTONIC_COARSE:
+-        qemu_log("CLOCK_MONOTONIC_COARSE");
+-        break;
+-    case TARGET_CLOCK_BOOTTIME:
+-        qemu_log("CLOCK_BOOTTIME");
+-        break;
+-    case TARGET_CLOCK_REALTIME_ALARM:
+-        qemu_log("CLOCK_REALTIME_ALARM");
+-        break;
+-    case TARGET_CLOCK_BOOTTIME_ALARM:
+-        qemu_log("CLOCK_BOOTTIME_ALARM");
+-        break;
+-    case TARGET_CLOCK_SGI_CYCLE:
+-        qemu_log("CLOCK_SGI_CYCLE");
+-        break;
+-    case TARGET_CLOCK_TAI:
+-        qemu_log("CLOCK_TAI");
+-        break;
+-    default:
+-        qemu_log("%d", clockid);
+-        break;
+-    }
+-    qemu_log("%s", get_comma(last));
+-}
+-#endif
+-
+ /*
+  * Sysycall specific output functions
+  */
+@@ -843,6 +782,81 @@ print_syscall_ret_adjtimex(void *cpu_env, const struct syscallname *name,
+ }
+ #endif
+ 
++#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
++static void
++print_syscall_ret_clock_gettime(void *cpu_env, const struct syscallname *name,
++                                abi_long ret, abi_long arg0, abi_long arg1,
++                                abi_long arg2, abi_long arg3, abi_long arg4,
++                                abi_long arg5)
++{
++    if (!print_syscall_err(ret)) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_timespec(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#define print_syscall_ret_clock_getres     print_syscall_ret_clock_gettime
++#endif
++
++#ifdef TARGET_NR_gettimeofday
++static void
++print_syscall_ret_gettimeofday(void *cpu_env, const struct syscallname *name,
++                               abi_long ret, abi_long arg0, abi_long arg1,
++                               abi_long arg2, abi_long arg3, abi_long arg4,
++                               abi_long arg5)
++{
++    if (!print_syscall_err(ret)) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_timeval(arg0, 0);
++        print_timezone(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#endif
++
++#ifdef TARGET_NR_getitimer
++static void
++print_syscall_ret_getitimer(void *cpu_env, const struct syscallname *name,
++                            abi_long ret, abi_long arg0, abi_long arg1,
++                            abi_long arg2, abi_long arg3, abi_long arg4,
++                            abi_long arg5)
++{
++    if (!print_syscall_err(ret)) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (");
++        print_itimerval(arg1, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#endif
++
++
++#ifdef TARGET_NR_getitimer
++static void
++print_syscall_ret_setitimer(void *cpu_env, const struct syscallname *name,
++                            abi_long ret, abi_long arg0, abi_long arg1,
++                            abi_long arg2, abi_long arg3, abi_long arg4,
++                            abi_long arg5)
++{
++    if (!print_syscall_err(ret)) {
++        qemu_log(TARGET_ABI_FMT_ld, ret);
++        qemu_log(" (old_value = ");
++        print_itimerval(arg2, 1);
++        qemu_log(")");
++    }
++
++    qemu_log("\n");
++}
++#endif
++
+ #if defined(TARGET_NR_listxattr) || defined(TARGET_NR_llistxattr) \
+  || defined(TARGGET_NR_flistxattr)
+ static void
+@@ -1221,6 +1235,43 @@ UNUSED static struct flags mlockall_flags[] = {
+     FLAG_END,
  };
  
-+UNUSED static struct flags termios_iflags[] = {
-+    FLAG_TARGET(IGNBRK),
-+    FLAG_TARGET(BRKINT),
-+    FLAG_TARGET(IGNPAR),
-+    FLAG_TARGET(PARMRK),
-+    FLAG_TARGET(INPCK),
-+    FLAG_TARGET(ISTRIP),
-+    FLAG_TARGET(INLCR),
-+    FLAG_TARGET(IGNCR),
-+    FLAG_TARGET(ICRNL),
-+    FLAG_TARGET(IUCLC),
-+    FLAG_TARGET(IXON),
-+    FLAG_TARGET(IXANY),
-+    FLAG_TARGET(IXOFF),
-+    FLAG_TARGET(IMAXBEL),
-+    FLAG_TARGET(IUTF8),
-+    FLAG_END,
-+};
++/* IDs of the various system clocks */
++#define TARGET_CLOCK_REALTIME              0
++#define TARGET_CLOCK_MONOTONIC             1
++#define TARGET_CLOCK_PROCESS_CPUTIME_ID    2
++#define TARGET_CLOCK_THREAD_CPUTIME_ID     3
++#define TARGET_CLOCK_MONOTONIC_RAW         4
++#define TARGET_CLOCK_REALTIME_COARSE       5
++#define TARGET_CLOCK_MONOTONIC_COARSE      6
++#define TARGET_CLOCK_BOOTTIME              7
++#define TARGET_CLOCK_REALTIME_ALARM        8
++#define TARGET_CLOCK_BOOTTIME_ALARM        9
++#define TARGET_CLOCK_SGI_CYCLE             10
++#define TARGET_CLOCK_TAI                   11
 +
-+UNUSED static struct flags termios_oflags[] = {
-+    FLAG_TARGET(OPOST),
-+    FLAG_TARGET(OLCUC),
-+    FLAG_TARGET(ONLCR),
-+    FLAG_TARGET(OCRNL),
-+    FLAG_TARGET(ONOCR),
-+    FLAG_TARGET(ONLRET),
-+    FLAG_TARGET(OFILL),
-+    FLAG_TARGET(OFDEL),
-+    FLAG_END,
-+};
-+
-+UNUSED static struct enums termios_oflags_NLDLY[] = {
-+    ENUM_TARGET(NL0),
-+    ENUM_TARGET(NL1),
++UNUSED static struct enums clockids[] = {
++    ENUM_TARGET(CLOCK_REALTIME),
++    ENUM_TARGET(CLOCK_MONOTONIC),
++    ENUM_TARGET(CLOCK_PROCESS_CPUTIME_ID),
++    ENUM_TARGET(CLOCK_THREAD_CPUTIME_ID),
++    ENUM_TARGET(CLOCK_MONOTONIC_RAW),
++    ENUM_TARGET(CLOCK_REALTIME_COARSE),
++    ENUM_TARGET(CLOCK_MONOTONIC_COARSE),
++    ENUM_TARGET(CLOCK_BOOTTIME),
++    ENUM_TARGET(CLOCK_REALTIME_ALARM),
++    ENUM_TARGET(CLOCK_BOOTTIME_ALARM),
++    ENUM_TARGET(CLOCK_SGI_CYCLE),
++    ENUM_TARGET(CLOCK_TAI),
 +    ENUM_END,
 +};
 +
-+UNUSED static struct enums termios_oflags_CRDLY[] = {
-+    ENUM_TARGET(CR0),
-+    ENUM_TARGET(CR1),
-+    ENUM_TARGET(CR2),
-+    ENUM_TARGET(CR3),
++UNUSED static struct enums itimer_types[] = {
++    ENUM_GENERIC(ITIMER_REAL),
++    ENUM_GENERIC(ITIMER_VIRTUAL),
++    ENUM_GENERIC(ITIMER_PROF),
 +    ENUM_END,
 +};
 +
-+UNUSED static struct enums termios_oflags_TABDLY[] = {
-+    ENUM_TARGET(TAB0),
-+    ENUM_TARGET(TAB1),
-+    ENUM_TARGET(TAB2),
-+    ENUM_TARGET(TAB3),
-+    ENUM_END,
-+};
+ /*
+  * print_xxx utility functions.  These are used to print syscall
+  * parameters in certain format.  All of these have parameter
+@@ -1439,13 +1490,34 @@ print_timeval(abi_ulong tv_addr, int last)
+             print_pointer(tv_addr, last);
+             return;
+         }
+-        qemu_log("{" TARGET_ABI_FMT_ld "," TARGET_ABI_FMT_ld "}%s",
+-            tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
++        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
++                 ",tv_usec = " TARGET_ABI_FMT_ld "}%s",
++                 tswapal(tv->tv_sec), tswapal(tv->tv_usec), get_comma(last));
+         unlock_user(tv, tv_addr, 0);
+     } else
+         qemu_log("NULL%s", get_comma(last));
+ }
+ 
++static void
++print_timespec(abi_ulong ts_addr, int last)
++{
++    if (ts_addr) {
++        struct target_timespec *ts;
 +
-+UNUSED static struct enums termios_oflags_VTDLY[] = {
-+    ENUM_TARGET(VT0),
-+    ENUM_TARGET(VT1),
-+    ENUM_END,
-+};
++        ts = lock_user(VERIFY_READ, ts_addr, sizeof(*ts), 1);
++        if (!ts) {
++            print_pointer(ts_addr, last);
++            return;
++        }
++        qemu_log("{tv_sec = " TARGET_ABI_FMT_ld
++                 ",tv_nsec = " TARGET_ABI_FMT_ld "}%s",
++                 tswapal(ts->tv_sec), tswapal(ts->tv_nsec), get_comma(last));
++        unlock_user(ts, ts_addr, 0);
++    } else {
++        qemu_log("NULL%s", get_comma(last));
++    }
++}
 +
-+UNUSED static struct enums termios_oflags_FFDLY[] = {
-+    ENUM_TARGET(FF0),
-+    ENUM_TARGET(FF1),
-+    ENUM_END,
-+};
-+
-+UNUSED static struct enums termios_oflags_BSDLY[] = {
-+    ENUM_TARGET(BS0),
-+    ENUM_TARGET(BS1),
-+    ENUM_END,
-+};
-+
-+UNUSED static struct enums termios_cflags_CBAUD[] = {
-+    ENUM_TARGET(B0),
-+    ENUM_TARGET(B50),
-+    ENUM_TARGET(B75),
-+    ENUM_TARGET(B110),
-+    ENUM_TARGET(B134),
-+    ENUM_TARGET(B150),
-+    ENUM_TARGET(B200),
-+    ENUM_TARGET(B300),
-+    ENUM_TARGET(B600),
-+    ENUM_TARGET(B1200),
-+    ENUM_TARGET(B1800),
-+    ENUM_TARGET(B2400),
-+    ENUM_TARGET(B4800),
-+    ENUM_TARGET(B9600),
-+    ENUM_TARGET(B19200),
-+    ENUM_TARGET(B38400),
-+    ENUM_TARGET(B57600),
-+    ENUM_TARGET(B115200),
-+    ENUM_TARGET(B230400),
-+    ENUM_TARGET(B460800),
-+    ENUM_END,
-+};
-+
-+UNUSED static struct enums termios_cflags_CSIZE[] = {
-+    ENUM_TARGET(CS5),
-+    ENUM_TARGET(CS6),
-+    ENUM_TARGET(CS7),
-+    ENUM_TARGET(CS8),
-+    ENUM_END,
-+};
-+
-+UNUSED static struct flags termios_cflags[] = {
-+    FLAG_TARGET(CSTOPB),
-+    FLAG_TARGET(CREAD),
-+    FLAG_TARGET(PARENB),
-+    FLAG_TARGET(PARODD),
-+    FLAG_TARGET(HUPCL),
-+    FLAG_TARGET(CLOCAL),
-+    FLAG_TARGET(CRTSCTS),
-+    FLAG_END,
-+};
-+
-+UNUSED static struct flags termios_lflags[] = {
-+    FLAG_TARGET(ISIG),
-+    FLAG_TARGET(ICANON),
-+    FLAG_TARGET(XCASE),
-+    FLAG_TARGET(ECHO),
-+    FLAG_TARGET(ECHOE),
-+    FLAG_TARGET(ECHOK),
-+    FLAG_TARGET(ECHONL),
-+    FLAG_TARGET(NOFLSH),
-+    FLAG_TARGET(TOSTOP),
-+    FLAG_TARGET(ECHOCTL),
-+    FLAG_TARGET(ECHOPRT),
-+    FLAG_TARGET(ECHOKE),
-+    FLAG_TARGET(FLUSHO),
-+    FLAG_TARGET(PENDIN),
-+    FLAG_TARGET(IEXTEN),
-+    FLAG_TARGET(EXTPROC),
-+    FLAG_END,
-+};
-+
- UNUSED static struct flags mlockall_flags[] = {
-     FLAG_TARGET(MCL_CURRENT),
-     FLAG_TARGET(MCL_FUTURE),
-@@ -1553,6 +1687,67 @@ print_itimerval(abi_ulong it_addr, int last)
+ static void
+ print_timezone(abi_ulong tz_addr, int last)
+ {
+@@ -1465,6 +1537,22 @@ print_timezone(abi_ulong tz_addr, int last)
      }
  }
  
-+void
-+print_termios(void *arg)
++static void
++print_itimerval(abi_ulong it_addr, int last)
 +{
-+    const struct target_termios *target = arg;
-+
-+    target_tcflag_t iflags = tswap32(target->c_iflag);
-+    target_tcflag_t oflags = tswap32(target->c_oflag);
-+    target_tcflag_t cflags = tswap32(target->c_cflag);
-+    target_tcflag_t lflags = tswap32(target->c_lflag);
-+
-+    qemu_log("{");
-+
-+    qemu_log("c_iflag = ");
-+    print_flags(termios_iflags, iflags, 0);
-+
-+    qemu_log("c_oflag = ");
-+    target_tcflag_t oflags_clean =  oflags & ~(TARGET_NLDLY | TARGET_CRDLY |
-+                                               TARGET_TABDLY | TARGET_BSDLY |
-+                                               TARGET_VTDLY | TARGET_FFDLY);
-+    print_flags(termios_oflags, oflags_clean, 0);
-+    if (oflags & TARGET_NLDLY) {
-+        print_enums(termios_oflags_NLDLY, oflags & TARGET_NLDLY, 0);
++    if (it_addr) {
++        qemu_log("{it_interval=");
++        print_timeval(it_addr +
++                      offsetof(struct target_itimerval, it_interval), 0);
++        qemu_log("it_value=");
++        print_timeval(it_addr +
++                      offsetof(struct target_itimerval, it_value), 0);
++        qemu_log("}%s", get_comma(last));
++    } else {
++        qemu_log("NULL%s", get_comma(last));
 +    }
-+    if (oflags & TARGET_CRDLY) {
-+        print_enums(termios_oflags_CRDLY, oflags & TARGET_CRDLY, 0);
-+    }
-+    if (oflags & TARGET_TABDLY) {
-+        print_enums(termios_oflags_TABDLY, oflags & TARGET_TABDLY, 0);
-+    }
-+    if (oflags & TARGET_BSDLY) {
-+        print_enums(termios_oflags_BSDLY, oflags & TARGET_BSDLY, 0);
-+    }
-+    if (oflags & TARGET_VTDLY) {
-+        print_enums(termios_oflags_VTDLY, oflags & TARGET_VTDLY, 0);
-+    }
-+    if (oflags & TARGET_FFDLY) {
-+        print_enums(termios_oflags_FFDLY, oflags & TARGET_FFDLY, 0);
-+    }
-+
-+    qemu_log("c_cflag = ");
-+    if (cflags & TARGET_CBAUD) {
-+        print_enums(termios_cflags_CBAUD, cflags & TARGET_CBAUD, 0);
-+    }
-+    if (cflags & TARGET_CSIZE) {
-+        print_enums(termios_cflags_CSIZE, cflags & TARGET_CSIZE, 0);
-+    }
-+    target_tcflag_t cflags_clean = cflags & ~(TARGET_CBAUD | TARGET_CSIZE);
-+    print_flags(termios_cflags, cflags_clean, 0);
-+
-+    qemu_log("c_lflag = ");
-+    print_flags(termios_lflags, lflags, 0);
-+
-+    qemu_log("c_cc = ");
-+    qemu_log("\"%s\",", target->c_cc);
-+
-+    qemu_log("c_line = ");
-+    print_raw_param("\'%c\'", target->c_line, 1);
-+
-+    qemu_log("}");
 +}
 +
  #undef UNUSED
  
  #ifdef TARGET_NR_accept
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 3a7eced7d858..78e404c23cad 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -5710,6 +5710,7 @@ static const StructEntry struct_termios_def = {
-     .convert = { host_to_target_termios, target_to_host_termios },
-     .size = { sizeof(struct target_termios), sizeof(struct host_termios) },
-     .align = { __alignof__(struct target_termios), __alignof__(struct host_termios) },
-+    .print = print_termios,
- };
+@@ -1577,7 +1665,7 @@ print_clock_adjtime(void *cpu_env, const struct syscallname *name,
+                     abi_long arg3, abi_long arg4, abi_long arg5)
+ {
+     print_syscall_prologue(name);
+-    print_clockid(arg0, 0);
++    print_enums(clockids, arg0, 0);
+     print_pointer(arg1, 1);
+     print_syscall_epilogue(name);
+ }
+@@ -1907,6 +1995,19 @@ print_futimesat(void *cpu_env, const struct syscallname *name,
+ }
+ #endif
  
- static bitmask_transtbl mmap_flags_tbl[] = {
-diff --git a/thunk.c b/thunk.c
-index c5d971974783..0718325d86e3 100644
---- a/thunk.c
-+++ b/thunk.c
-@@ -404,19 +404,24 @@ const argtype *thunk_print(void *arg, const argtype *type_ptr)
-             const int *arg_offsets;
- 
-             se = struct_entries + *type_ptr++;
--            a = arg;
- 
--            field_types = se->field_types;
--            arg_offsets = se->field_offsets[0];
-+            if (se->print != NULL) {
-+                se->print(arg);
-+            } else {
-+                a = arg;
- 
--            qemu_log("{");
--            for (i = 0; i < se->nb_fields; i++) {
--                if (i > 0) {
--                    qemu_log(",");
-+                field_types = se->field_types;
-+                arg_offsets = se->field_offsets[0];
++#ifdef TARGET_NR_gettimeofday
++static void
++print_gettimeofday(void *cpu_env, const struct syscallname *name,
++                   abi_long arg0, abi_long arg1, abi_long arg2,
++                   abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_pointer(arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
 +
-+                qemu_log("{");
-+                for (i = 0; i < se->nb_fields; i++) {
-+                    if (i > 0) {
-+                        qemu_log(",");
-+                    }
-+                    field_types = thunk_print(a + arg_offsets[i], field_types);
-                 }
--                field_types = thunk_print(a + arg_offsets[i], field_types);
-+                qemu_log("}");
-             }
--            qemu_log("}");
-         }
-         break;
-     default:
+ #ifdef TARGET_NR_settimeofday
+ static void
+ print_settimeofday(void *cpu_env, const struct syscallname *name,
+@@ -1920,6 +2021,60 @@ print_settimeofday(void *cpu_env, const struct syscallname *name,
+ }
+ #endif
+ 
++#if defined(TARGET_NR_clock_gettime) || defined(TARGET_NR_clock_getres)
++static void
++print_clock_gettime(void *cpu_env, const struct syscallname *name,
++                    abi_long arg0, abi_long arg1, abi_long arg2,
++                    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_enums(clockids, arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#define print_clock_getres     print_clock_gettime
++#endif
++
++#ifdef TARGET_NR_clock_settime
++static void
++print_clock_settime(void *cpu_env, const struct syscallname *name,
++                    abi_long arg0, abi_long arg1, abi_long arg2,
++                    abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_enums(clockids, arg0, 0);
++    print_timespec(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_getitimer
++static void
++print_getitimer(void *cpu_env, const struct syscallname *name,
++                abi_long arg0, abi_long arg1, abi_long arg2,
++                abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_enums(itimer_types, arg0, 0);
++    print_pointer(arg1, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
++#ifdef TARGET_NR_setitimer
++static void
++print_setitimer(void *cpu_env, const struct syscallname *name,
++                abi_long arg0, abi_long arg1, abi_long arg2,
++                abi_long arg3, abi_long arg4, abi_long arg5)
++{
++    print_syscall_prologue(name);
++    print_enums(itimer_types, arg0, 0);
++    print_itimerval(arg1, 0);
++    print_pointer(arg2, 1);
++    print_syscall_epilogue(name);
++}
++#endif
++
+ #ifdef TARGET_NR_link
+ static void
+ print_link(void *cpu_env, const struct syscallname *name,
+diff --git a/linux-user/strace.list b/linux-user/strace.list
+index d0ea7f3464b8..084048ab96dd 100644
+--- a/linux-user/strace.list
++++ b/linux-user/strace.list
+@@ -83,16 +83,18 @@
+ { TARGET_NR_clock_adjtime, "clock_adjtime" , NULL, print_clock_adjtime, NULL },
+ #endif
+ #ifdef TARGET_NR_clock_getres
+-{ TARGET_NR_clock_getres, "clock_getres" , NULL, NULL, NULL },
++{ TARGET_NR_clock_getres, "clock_getres" , NULL, print_clock_getres,
++                          print_syscall_ret_clock_getres },
+ #endif
+ #ifdef TARGET_NR_clock_gettime
+-{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, NULL, NULL },
++{ TARGET_NR_clock_gettime, "clock_gettime" , NULL, print_clock_gettime,
++                           print_syscall_ret_clock_gettime },
+ #endif
+ #ifdef TARGET_NR_clock_nanosleep
+ { TARGET_NR_clock_nanosleep, "clock_nanosleep" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_clock_settime
+-{ TARGET_NR_clock_settime, "clock_settime" , NULL, NULL, NULL },
++{ TARGET_NR_clock_settime, "clock_settime" , NULL, print_clock_settime, NULL },
+ #endif
+ #ifdef TARGET_NR_clone
+ { TARGET_NR_clone, "clone" , NULL, print_clone, NULL },
+@@ -315,7 +317,8 @@
+ { TARGET_NR_gethostname, "gethostname" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_getitimer
+-{ TARGET_NR_getitimer, "getitimer" , NULL, NULL, NULL },
++{ TARGET_NR_getitimer, "getitimer" , NULL, print_getitimer,
++                       print_syscall_ret_getitimer },
+ #endif
+ #ifdef TARGET_NR_get_kernel_syms
+ { TARGET_NR_get_kernel_syms, "get_kernel_syms" , NULL, NULL, NULL },
+@@ -388,7 +391,8 @@
+ { TARGET_NR_gettid, "gettid" , "%s()", NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_gettimeofday
+-{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, NULL, NULL },
++{ TARGET_NR_gettimeofday, "gettimeofday" , NULL, print_gettimeofday,
++                          print_syscall_ret_gettimeofday },
+ #endif
+ #ifdef TARGET_NR_getuid
+ { TARGET_NR_getuid, "getuid" , "%s()", NULL, NULL },
+@@ -1291,7 +1295,8 @@
+ { TARGET_NR_sethostname, "sethostname" , NULL, NULL, NULL },
+ #endif
+ #ifdef TARGET_NR_setitimer
+-{ TARGET_NR_setitimer, "setitimer" , NULL, NULL, NULL },
++{ TARGET_NR_setitimer, "setitimer" , NULL, print_setitimer,
++                       print_syscall_ret_setitimer },
+ #endif
+ #ifdef TARGET_NR_set_mempolicy
+ { TARGET_NR_set_mempolicy, "set_mempolicy" , NULL, NULL, NULL },
 -- 
 2.26.2
 
