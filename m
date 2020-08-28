@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6856C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:44:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26269C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:44:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80F18207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:44:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F18207DF
+	by mail.kernel.org (Postfix) with ESMTPS id ECE31207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:44:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECE31207DF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBeg8-0000Qc-Oh
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:44:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36918)
+	id 1kBegS-0001E9-8j
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:44:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBeaA-000438-6x
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:18 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:57583)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea7-0003ug-0Q
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:15 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:58003)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea4-0007Gn-5i
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:17 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea1-0007GP-US
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:14 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MfL5v-1knTVi2CAF-00gtWz; Fri, 28 Aug 2020 15:38:10 +0200
+ id 1MjgfT-1krtLK2NI3-00lF85; Fri, 28 Aug 2020 15:37:57 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/18] linux-user: Add support for 'clock_nanosleep_time64()'
- and 'clock_adjtime64()'
-Date: Fri, 28 Aug 2020 15:37:51 +0200
-Message-Id: <20200828133753.2622286-17-laurent@vivier.eu>
+Subject: [PULL 03/18] linux-user: syscall: ioctls: support
+ DRM_IOCTL_I915_GETPARAM
+Date: Fri, 28 Aug 2020 15:37:38 +0200
+Message-Id: <20200828133753.2622286-4-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200828133753.2622286-1-laurent@vivier.eu>
 References: <20200828133753.2622286-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZTvxMMF6HYm5sSFMS4zNbaPrJTpHJ7aTsgTjtoMEEhZIwy+tkxN
- 4jdlIBBeauj32t9gHtoFODbtb8izKucfHACBEq7XBOKUvrJMQ8sN+5nkB9qSilONBqBB3f6
- cqdw2S/CXDiyAU506x06yxDhGSDh7AEsYueXK5Nk2A8ZQ6NMe8ZbfH1lFanXdq72iGhNy62
- 5Y2jmjgoTf48AZbBDeHhw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FIYYG54jq5U=:/CHiEjA2P9kFhOopxO8BT0
- XuRQydrrQ7uQK6b2f64DHSPvx7KzQxuMLbkdwuBhFtekRB0KVx1EjBfAKlMz9nGSLd85u1kQR
- hMG2HFU9j8t76g6v8SUbnA7RaLapSyXWesOebmABeu3t1AQ6F4BqKwBU/WojR7TzD1enjap19
- 3CL4hXugcUIbc8uagHBcl5eIsxyxdWspuFw5zIb/kDUX7NCV5P+ZsmwNxjWt2+YNfKm9RFOcM
- L5ItyZM4SlzTQ01f2jSpg2KG2iKV1F6A2v8krkUsQDB2EVwlXVr56yItecCqJTeuKpfpcaNO9
- JEn5oetefQYzJ4g0cquTEoWM3i9bGoWCzH2N2sTbUyE70liUNCF0vZ/ywP3cAsspeHPKd/lhG
- Za6TjBSZtxc/EtbXygfw5BqZgd20jGEMdoyn6SE/e9WCRUE8XgS6oxwQ78VHiFC0fMHUtTk1C
- gAWP5AG0cvOav04bSLO+Zb5UH2buJQWt0KXiZ//XWDeN9bJpuIoU2HHW6OBACyMv8Q/sAcpop
- 9RxacIoDdKQdoMxlWtgR9FTISL0Qo8tj8MW5p/8AfIWod8Oo4msPUdLCItuuKBKXr093bEugD
- iGvHQuy/SQfk3sJ1WslQChFgFs0SAwrLb2ocVSkrYd9M03QyFODYizW6dCprmgN4rIs8tCnlQ
- 962ROrmaLG26vORZ6vqMK66SVNdNldFISypap3jdvUMs9k/nsMvdIZxSXL5W957LMUB8ZgHvv
- F9nd8T//TIwn3O8k/Q1BW1Vhw4o/RhLU1by8xkJT+2Ox33SS2hj5w/xliOwkY4YlJRCXvCy/q
- bwDkLBFwpfLBKZhQ4q9C3dRpwillynvElBm3qk/w5oH5iwpe42epNOlvBDTTbMAE+MgkQG0
+X-Provags-ID: V03:K1:lAIY65guFB1Puqf6q/sorcQRSPUysKUSNRL5W3qlbwERtBgEJMM
+ k3xXyQxsz/CDF1vok2WLRNkAFX1eBGC/vmG/0so7zxyDjF4movtIXE9is8u2OJ1INo9nDO+
+ hWmyJuxNWLX2qN7jXOM3tNPcDuJssvmKnzzio1ea+oxt7LsTpaJ5IdNY3Epvp5gVAiAiNTi
+ rAk7Oi/x9wM0XohjaiY7A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:rS07zzFIxLo=:MYpfr0Q0S3ShtDHvyrC/kp
+ C1YrTAZXE70bb4/sOtAmKj75O6jO09npmTw/kYOr+WyPvAKZGQT3NGodH57mM56yyr7IKfipe
+ tia8W0ATEdz0DJ0NDm1CWmdUkvRM55k1+wh7Mpn/HOS6fwT26tL9jjmLkNXy7E/UcHxtLZfwR
+ ef/YtUpKkwsd7NskqnqsKu+Fj8S/I9wGJ68Z+4vbaT9MMVYyZ95n1oCxK3ixe48izH1cN+Ejz
+ h+6sSDII4Lk+Z6xRKGZj2Vlu2l6WNh0YyiDVCsRKic/yzsgISOPXyMxOz2OPVSOXLr8AKZ8ep
+ GwL6DGBXvCva7yAnk6peg8sfr3knE3Royz9lolqLP44NDE9Fpfp8lt9AGlwTdt18/hCkA6IHa
+ AkzCIIJ90+VRHPdc2wPCdiVA2egfyxqtpo8UFFv9JLtgZ66DAX2nDleAH9AkgOvl0M9I4gxXy
+ qPOCg1R2kSpvHDAN+o+VTlqZ5pES0kh2iBUXHm+TepCdN6yv7vVBvTAC66XjLE+nDxRA9f3yQ
+ 3Iz4P3H2wKa8zM3Xso0VDm4hoK0ND4YzAGcom9U9QMWqwL09HlNq9uOvEPvHWa0tB+7ZMpBB+
+ 4Ky6p2tYD1izCp106vXV2VmHjFJA+hapsMgvnQ39ROWJ9yjmPazWbx2akA0lQIpTL7NJ+ckqF
+ CFMeq/Nrw5ftAHuIb6cbaxCQLtUUa15PNCIU+L184zKQ+zi7MaU06IGcuV/wrf/UwVPnLBUxm
+ v3+fhQWejQXoL7XFH5vSy2kkiRB/TMsb+9XmlmMfD7Y+O/IjrIvp0uVI0ZtKcu7SCBNfRtC8o
+ glIiBvZv9dHuVXWTKW0YwDeveiRPdI7dnhU4knY2b02pbgqafZGyG9UAdZWjxBf5otw0fNx
 Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 09:38:08
@@ -83,290 +83,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>,
- Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: Chen Gang <chengang@emindsoft.com.cn>, Riku Voipio <riku.voipio@iki.fi>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+From: Chen Gang <chengang@emindsoft.com.cn>
 
-This patch implements functionality for following time64 syscall:
+Another DRM_IOCTL_I915 patches will be sent next.
 
-*clock_nanosleep_time64()
-
-    This is a year 2038 safe vairant of syscall:
-    int clock_nanosleep(clockid_t clockid, int flags,
-                        const struct timespec *request,
-                        struct timespec *remain)
-    --high-resolution sleep with specifiable clock--
-    man page: https://man7.org/linux/man-pages/man2/clock_nanosleep.2.html
-
-*clock_adjtime64()
-
-    This is a year 2038 safe variant of syscall:
-    int clock_adjtime(clockid_t clk_id, struct timex *buf)
-    --tune kernel clock--
-    man page: https://man7.org/linux/man-pages/man2/clock_adjtime.2.html
-
-Implementation notes:
-
-    Syscall 'clock_nanosleep_time64()' was implemented similarly
-    to syscall 'clock_nanosleep()' except that 'host_to_target_timespec64()'
-    and 'target_to_host_timespec64()' were used instead of the regular
-    'host_to_target_timespec()' and 'target_to_host_timespec()'.
-
-    For 'clock_adjtime64()' a 64-bit target kernel version of 'struct timex'
-    was defined in 'syscall_defs.h': 'struct target__kernel_timex'.
-    This type was used to convert the values of 64-bit timex type between
-    host and target. For this purpose a 64-bit timex converting functions
-    'target_to_host_timex64()' and 'host_to_target_timex64()'. An existing
-    function 'copy_to_user_timeval64()' was used to convert the field
-    'time' which if of type 'struct timeval' from host to target.
-    Function 'copy_from_user_timveal64()' was added in this patch and
-    used to convert the 'time' field from target to host.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+Signed-off-by: Chen Gang <chengang@emindsoft.com.cn>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200824192116.65562-2-Filip.Bozuta@syrmia.com>
-[lv: add missing ifdef's]
+Message-Id: <20200802133938.12055-1-chengang@emindsoft.com.cn>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c      | 142 +++++++++++++++++++++++++++++++++++++-
- linux-user/syscall_defs.h |  31 +++++++++
- 2 files changed, 170 insertions(+), 3 deletions(-)
+ linux-user/ioctls.h        |  3 +++
+ linux-user/syscall.c       | 35 +++++++++++++++++++++++++++++++++++
+ linux-user/syscall_defs.h  |  8 ++++++++
+ linux-user/syscall_types.h |  4 ++++
+ 4 files changed, 50 insertions(+)
 
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 0713ae131162..e2fc09b5a5ee 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -581,6 +581,9 @@
+ #ifdef HAVE_DRM_H
+   IOCTL_SPECIAL(DRM_IOCTL_VERSION, IOC_RW, do_ioctl_drm,
+                 MK_PTR(MK_STRUCT(STRUCT_drm_version)))
++
++  IOCTL_SPECIAL(DRM_IOCTL_I915_GETPARAM, IOC_RW, do_ioctl_drm_i915,
++                MK_PTR(MK_STRUCT(STRUCT_drm_i915_getparam)))
+ #endif
+ 
+ #ifdef TARGET_TIOCSTART
 diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index b28c8edb421e..6fd3099cd687 100644
+index e387246d7196..efaa0a7b8365 100644
 --- a/linux-user/syscall.c
 +++ b/linux-user/syscall.c
-@@ -774,7 +774,8 @@ safe_syscall4(int, accept4, int, fd, struct sockaddr *, addr, socklen_t *, len,
- safe_syscall2(int, nanosleep, const struct timespec *, req,
-               struct timespec *, rem)
+@@ -114,6 +114,7 @@
+ #include <sound/asound.h>
+ #ifdef HAVE_DRM_H
+ #include <libdrm/drm.h>
++#include <libdrm/i915_drm.h>
  #endif
--#ifdef TARGET_NR_clock_nanosleep
-+#if defined(TARGET_NR_clock_nanosleep) || \
-+    defined(TARGET_NR_clock_nanosleep_time64)
- safe_syscall4(int, clock_nanosleep, const clockid_t, clock, int, flags,
-               const struct timespec *, req, struct timespec *, rem)
- #endif
-@@ -1177,8 +1178,27 @@ static inline abi_long copy_to_user_timeval(abi_ulong target_tv_addr,
-     return 0;
+ #include "linux_loop.h"
+ #include "uname.h"
+@@ -5426,6 +5427,40 @@ static abi_long do_ioctl_drm(const IOCTLEntry *ie, uint8_t *buf_temp,
+     return -TARGET_ENOSYS;
  }
  
-+#if defined(TARGET_NR_clock_adjtime64) && defined(CONFIG_CLOCK_ADJTIME)
-+static inline abi_long copy_from_user_timeval64(struct timeval *tv,
-+                                                abi_ulong target_tv_addr)
++static abi_long do_ioctl_drm_i915_getparam(const IOCTLEntry *ie,
++                                           struct drm_i915_getparam *gparam,
++                                           int fd, abi_long arg)
 +{
-+    struct target__kernel_sock_timeval *target_tv;
++    abi_long ret;
++    int value;
++    struct target_drm_i915_getparam *target_gparam;
 +
-+    if (!lock_user_struct(VERIFY_READ, target_tv, target_tv_addr, 1)) {
++    if (!lock_user_struct(VERIFY_READ, target_gparam, arg, 0)) {
 +        return -TARGET_EFAULT;
 +    }
 +
-+    __get_user(tv->tv_sec, &target_tv->tv_sec);
-+    __get_user(tv->tv_usec, &target_tv->tv_usec);
++    __get_user(gparam->param, &target_gparam->param);
++    gparam->value = &value;
++    ret = get_errno(safe_ioctl(fd, ie->host_cmd, gparam));
++    put_user_s32(value, target_gparam->value);
 +
-+    unlock_user_struct(target_tv, target_tv_addr, 0);
-+
-+    return 0;
-+}
-+#endif
-+
- static inline abi_long copy_to_user_timeval64(abi_ulong target_tv_addr,
--                                             const struct timeval *tv)
-+                                              const struct timeval *tv)
- {
-     struct target__kernel_sock_timeval *target_tv;
- 
-@@ -1222,7 +1242,8 @@ static inline abi_long target_to_host_timespec(struct timespec *host_ts,
-     defined(TARGET_NR_timer_settime64) || \
-     defined(TARGET_NR_mq_timedsend_time64) || \
-     defined(TARGET_NR_mq_timedreceive_time64) || \
--    (defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD))
-+    (defined(TARGET_NR_timerfd_settime64) && defined(CONFIG_TIMERFD)) || \
-+    defined(TARGET_NR_clock_nanosleep_time64)
- static inline abi_long target_to_host_timespec64(struct timespec *host_ts,
-                                                  abi_ulong target_addr)
- {
-@@ -6953,6 +6974,87 @@ static inline abi_long host_to_target_timex(abi_long target_addr,
- }
- #endif
- 
-+
-+#if defined(TARGET_NR_clock_adjtime64) && defined(CONFIG_CLOCK_ADJTIME)
-+static inline abi_long target_to_host_timex64(struct timex *host_tx,
-+                                              abi_long target_addr)
-+{
-+    struct target__kernel_timex *target_tx;
-+
-+    if (copy_from_user_timeval64(&host_tx->time, target_addr +
-+                                 offsetof(struct target__kernel_timex,
-+                                          time))) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    if (!lock_user_struct(VERIFY_READ, target_tx, target_addr, 1)) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    __get_user(host_tx->modes, &target_tx->modes);
-+    __get_user(host_tx->offset, &target_tx->offset);
-+    __get_user(host_tx->freq, &target_tx->freq);
-+    __get_user(host_tx->maxerror, &target_tx->maxerror);
-+    __get_user(host_tx->esterror, &target_tx->esterror);
-+    __get_user(host_tx->status, &target_tx->status);
-+    __get_user(host_tx->constant, &target_tx->constant);
-+    __get_user(host_tx->precision, &target_tx->precision);
-+    __get_user(host_tx->tolerance, &target_tx->tolerance);
-+    __get_user(host_tx->tick, &target_tx->tick);
-+    __get_user(host_tx->ppsfreq, &target_tx->ppsfreq);
-+    __get_user(host_tx->jitter, &target_tx->jitter);
-+    __get_user(host_tx->shift, &target_tx->shift);
-+    __get_user(host_tx->stabil, &target_tx->stabil);
-+    __get_user(host_tx->jitcnt, &target_tx->jitcnt);
-+    __get_user(host_tx->calcnt, &target_tx->calcnt);
-+    __get_user(host_tx->errcnt, &target_tx->errcnt);
-+    __get_user(host_tx->stbcnt, &target_tx->stbcnt);
-+    __get_user(host_tx->tai, &target_tx->tai);
-+
-+    unlock_user_struct(target_tx, target_addr, 0);
-+    return 0;
++    unlock_user_struct(target_gparam, arg, 0);
++    return ret;
 +}
 +
-+static inline abi_long host_to_target_timex64(abi_long target_addr,
-+                                              struct timex *host_tx)
++static abi_long do_ioctl_drm_i915(const IOCTLEntry *ie, uint8_t *buf_temp,
++                                  int fd, int cmd, abi_long arg)
 +{
-+    struct target__kernel_timex *target_tx;
-+
-+   if (copy_to_user_timeval64(target_addr +
-+                              offsetof(struct target__kernel_timex, time),
-+                              &host_tx->time)) {
-+        return -TARGET_EFAULT;
++    switch (ie->host_cmd) {
++    case DRM_IOCTL_I915_GETPARAM:
++        return do_ioctl_drm_i915_getparam(ie,
++                                          (struct drm_i915_getparam *)buf_temp,
++                                          fd, arg);
++    default:
++        return -TARGET_ENOSYS;
 +    }
-+
-+    if (!lock_user_struct(VERIFY_WRITE, target_tx, target_addr, 0)) {
-+        return -TARGET_EFAULT;
-+    }
-+
-+    __put_user(host_tx->modes, &target_tx->modes);
-+    __put_user(host_tx->offset, &target_tx->offset);
-+    __put_user(host_tx->freq, &target_tx->freq);
-+    __put_user(host_tx->maxerror, &target_tx->maxerror);
-+    __put_user(host_tx->esterror, &target_tx->esterror);
-+    __put_user(host_tx->status, &target_tx->status);
-+    __put_user(host_tx->constant, &target_tx->constant);
-+    __put_user(host_tx->precision, &target_tx->precision);
-+    __put_user(host_tx->tolerance, &target_tx->tolerance);
-+    __put_user(host_tx->tick, &target_tx->tick);
-+    __put_user(host_tx->ppsfreq, &target_tx->ppsfreq);
-+    __put_user(host_tx->jitter, &target_tx->jitter);
-+    __put_user(host_tx->shift, &target_tx->shift);
-+    __put_user(host_tx->stabil, &target_tx->stabil);
-+    __put_user(host_tx->jitcnt, &target_tx->jitcnt);
-+    __put_user(host_tx->calcnt, &target_tx->calcnt);
-+    __put_user(host_tx->errcnt, &target_tx->errcnt);
-+    __put_user(host_tx->stbcnt, &target_tx->stbcnt);
-+    __put_user(host_tx->tai, &target_tx->tai);
-+
-+    unlock_user_struct(target_tx, target_addr, 1);
-+    return 0;
 +}
-+#endif
 +
- static inline abi_long target_to_host_sigevent(struct sigevent *host_sevp,
-                                                abi_ulong target_addr)
- {
-@@ -9940,6 +10042,21 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-             }
-         }
-         return ret;
-+#endif
-+#if defined(TARGET_NR_clock_adjtime64) && defined(CONFIG_CLOCK_ADJTIME)
-+    case TARGET_NR_clock_adjtime64:
-+        {
-+            struct timex htx;
-+
-+            if (target_to_host_timex64(&htx, arg2) != 0) {
-+                return -TARGET_EFAULT;
-+            }
-+            ret = get_errno(clock_adjtime(arg1, &htx));
-+            if (!is_error(ret) && host_to_target_timex64(arg2, &htx)) {
-+                    return -TARGET_EFAULT;
-+            }
-+        }
-+        return ret;
  #endif
-     case TARGET_NR_getpgid:
-         return get_errno(getpgid(arg1));
-@@ -11911,6 +12028,25 @@ static abi_long do_syscall1(void *cpu_env, int num, abi_long arg1,
-         return ret;
-     }
- #endif
-+#ifdef TARGET_NR_clock_nanosleep_time64
-+    case TARGET_NR_clock_nanosleep_time64:
-+    {
-+        struct timespec ts;
-+
-+        if (target_to_host_timespec64(&ts, arg3)) {
-+            return -TARGET_EFAULT;
-+        }
-+
-+        ret = get_errno(safe_clock_nanosleep(arg1, arg2,
-+                                             &ts, arg4 ? &ts : NULL));
-+
-+        if (ret == -TARGET_EINTR && arg4 && arg2 != TIMER_ABSTIME &&
-+            host_to_target_timespec64(arg4, &ts)) {
-+            return -TARGET_EFAULT;
-+        }
-+        return ret;
-+    }
-+#endif
  
- #if defined(TARGET_NR_set_tid_address) && defined(__NR_set_tid_address)
-     case TARGET_NR_set_tid_address:
+ IOCTLEntry ioctl_entries[] = {
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index a6abc7e70be8..9d07991176b8 100644
+index 9aa3bd724f0c..a6abc7e70be8 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -294,6 +294,37 @@ struct target_timex {
-     abi_int:32; abi_int:32; abi_int:32;
+@@ -1177,6 +1177,9 @@ struct target_rtc_pll_info {
+ /* drm ioctls */
+ #define TARGET_DRM_IOCTL_VERSION      TARGET_IOWRU('d', 0x00)
+ 
++/* drm i915 ioctls */
++#define TARGET_DRM_IOCTL_I915_GETPARAM              TARGET_IOWRU('d', 0x46)
++
+ /* from asm/termbits.h */
+ 
+ #define TARGET_NCC 8
+@@ -2620,6 +2623,11 @@ struct target_drm_version {
+     abi_ulong desc;
  };
  
-+struct target__kernel_timex {
-+    abi_uint modes;               /* Mode selector */
-+    abi_int: 32;                  /* pad */
-+    abi_llong offset;             /* Time offset */
-+    abi_llong freq;               /* Frequency offset */
-+    abi_llong maxerror;           /* Maximum error (microseconds) */
-+    abi_llong esterror;           /* Estimated error (microseconds) */
-+    abi_int status;               /* Clock command/status */
-+    abi_int: 32;                  /* pad */
-+    abi_llong constant;           /* PLL (phase-locked loop) time constant */
-+    abi_llong precision;          /* Clock precision (microseconds, ro) */
-+    abi_llong tolerance;          /* Clock freq. tolerance (ppm, ro) */
-+    struct target__kernel_sock_timeval time;  /* Current time */
-+    abi_llong tick;               /* Microseconds between clock ticks */
-+    abi_llong ppsfreq;            /* PPS (pulse per second) frequency */
-+    abi_llong jitter;             /* PPS jitter (ro); nanoseconds */
-+    abi_int shift;                /* PPS interval duration (seconds) */
-+    abi_int: 32;                  /* pad */
-+    abi_llong stabil;             /* PPS stability */
-+    abi_llong jitcnt;             /* PPS jitter limit exceeded (ro) */
-+    abi_llong calcnt;             /* PPS calibration intervals */
-+    abi_llong errcnt;             /* PPS calibration errors */
-+    abi_llong stbcnt;             /* PPS stability limit exceeded */
-+    abi_int tai;                  /* TAI offset */
-+
-+    /* Further padding bytes to allow for future expansion */
-+    abi_int:32; abi_int:32; abi_int:32; abi_int:32;
-+    abi_int:32; abi_int:32; abi_int:32; abi_int:32;
-+    abi_int:32; abi_int:32; abi_int:32;
++struct target_drm_i915_getparam {
++    int param;
++    abi_ulong value;
 +};
 +
- typedef abi_long target_clock_t;
+ #include "socket.h"
  
- #define TARGET_HZ 100
+ #include "errno_defs.h"
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 3f1f0334649b..12bf3484e2bd 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -325,6 +325,10 @@ STRUCT(drm_version,
+        TYPE_ULONG, /* desc_len */
+        TYPE_PTRVOID) /* desc */
+ 
++STRUCT(drm_i915_getparam,
++       TYPE_INT, /* param */
++       TYPE_PTRVOID) /* value */
++
+ STRUCT(file_clone_range,
+        TYPE_LONGLONG, /* src_fd */
+        TYPE_ULONGLONG, /* src_offset */
 -- 
 2.26.2
 
