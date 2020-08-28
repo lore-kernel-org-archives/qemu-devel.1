@@ -2,91 +2,93 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 236AAC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7EC9C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:47:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C7B83207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:46:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5491F20848
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:47:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nGd0FEkc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7B83207DF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="RpvpC7zB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5491F20848
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBfdl-0002K6-2g
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:46:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51736)
+	id 1kBfex-0003If-7G
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:47:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfFE-0001eS-82
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:44 -0400
-Received: from mail-pf1-x436.google.com ([2607:f8b0:4864:20::436]:45328)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfFB-0005KT-3c
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:43 -0400
-Received: by mail-pf1-x436.google.com with SMTP id k15so723866pfc.12
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=QQQ2WFgIL0ZEv9AAY/hbIBgOjAfsOiOu/hJOwBASNX8=;
- b=nGd0FEkcAJSFcRp4wIGs9vlxhy/de10JrKrdhB4CNCrWaiH2jjpmvEjvM0fxFYPGmc
- JkO8CndmQg3pxKlxhO61jiYP0iMWXzu1IvWxmoXbbn29vhDJpQONXEXIsxyARqeWMkv8
- eO3GrzFMqzrmF6nQmi1wQYzexJ9QHMU5isMepTcuIawt8/QamWe00K+YbChphJMMOFmd
- ZdiaScBZlGcy5xZN6nuLaqFdKNivV8s2aWMio6sfDrOlPMJUV4HTD/lv2j9+nxIu1NbI
- 9oN/yY1i4onsxxCJRQ4UROn1t4TC9RThwNI7JZD7YPgKofkbqacL6LuJKpX7YEqmPySY
- aG4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=QQQ2WFgIL0ZEv9AAY/hbIBgOjAfsOiOu/hJOwBASNX8=;
- b=J0CiWl9MHAfxBQ69hoI2UWn0btK6AyjtlBzbwm/AHASpT+FB6eYeWwklBRGNEs4X8Z
- jexEOJqICRosurpy8YG+DzVs8dFxQCSqhYA84QwNTFivoGz4PJJMt0PcAXQd5eHL9EVQ
- W+CGlsCPoszwdn1ygc+fVKTWnt2IKL1CtJb6EmVH7Mp6r5pmnQa/ReC843Mhg4RWbw89
- Dpze1+9NUU7R8AyIY8SMzXpRGOPs9WzQdgJNfTuXv4F+S17X/m4t+YlI5zhpiw7TgnNM
- 6u9uc9Q4mFkzi/1My8FZU9IIElkv0ws8BGO51nElmo1itjWCU59MW4/7gYb48bOdJSJD
- 8GSA==
-X-Gm-Message-State: AOAM532u7U2PX/3R5iiKxhoIvPD2ZzFuWib5+3bT/jEodFupVYIfMxec
- Mp9pW5+EqhMwCHUV+VOMVyLw7InlwkfWhg==
-X-Google-Smtp-Source: ABdhPJx+X+ToUtq7tESVNC+FIsh1utQQ0dpZylUJKPEYb7LnbB2nCPzNMy5eB/LN1we6FYIpH0SfLg==
-X-Received: by 2002:a63:8543:: with SMTP id u64mr1427842pgd.350.1598624438542; 
- Fri, 28 Aug 2020 07:20:38 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.20.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 07:20:37 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 53/76] target/microblaze: Convert dec_load and dec_store to
- decodetree
-Date: Fri, 28 Aug 2020 07:19:06 -0700
-Message-Id: <20200828141929.77854-54-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
-References: <20200828141929.77854-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1kBfGf-0005Iw-Uf; Fri, 28 Aug 2020 10:22:14 -0400
+Received: from mout.web.de ([212.227.15.14]:39035)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1kBfGc-0005YY-RE; Fri, 28 Aug 2020 10:22:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1598624523;
+ bh=GOP/1i5s4LEm39BzLINUFTGBh+Kzxo61hu8aGXaWR6E=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=RpvpC7zBqrERHxmKYm+5uKsuZf96DfZfaHUbXXnozgch4h9dfqDM/WVBvzpx+7yQ8
+ qzPYgAd2mE1BtqIchvTRVTr2JnouPZdpcXGJiSX4Vx7JqcPzRPDdYODwXmilcTkv82
+ 6hS0SP+h4/F6fqDNMx10vIS+p2wkc6f429DqhF9M=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.134]) by smtp.web.de (mrweb001
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MaJc8-1jrwYN1IKm-00Jrr1; Fri, 28
+ Aug 2020 16:22:03 +0200
+Date: Fri, 28 Aug 2020 16:21:45 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v7 1/8] Introduce yank feature
+Message-ID: <20200828162145.21d082af@luklap>
+In-Reply-To: <871rjs9ser.fsf@dusky.pond.sub.org>
+References: <cover.1596528468.git.lukasstraub2@web.de>
+ <0092d4fe5f64078a18db3790c46c508416dbdb6b.1596528468.git.lukasstraub2@web.de>
+ <871rjs9ser.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::436;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x436.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; boundary="Sig_/BrmbCTzCnw0zXIxt0z_i.JT";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:Fjd+wfXLHL7j0489B3wF4G8T+P3KHmssbJERnuDUK3MboNEmfnx
+ PFOdxD+bmSyquXogGCejaWCI0VK8SniYKsLQFcGcO6V+JguvRpqwKeUgG2l+oUO5y+RxhLm
+ ZVsbD3ZJllL8Nhg4BlOKa7QbSJYco0BHO4W8TDbxl7rUqla7Cg8mlUII+lWkcljLrP5Q0Kr
+ +HhoaUTfwOClif38fV56A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:S/9WKTsAA7Y=:dR6KOZ5c7eE9UYlMQkiTWI
+ foB1zgPbjzSSLyFlArc38UyElfIxNfRNbA4iPC4VTShZI6efuBjoRsfwLOIXbhay3OcTIEE1L
+ ncWyioYr00u1aErq2FxFkBaeVCediiCsG6kFzVql6JntWGk3aIq4Nvp3b+zHUgk5fb8AmlCLX
+ lp0qSy7D07aJss3JAI8rt+QC5WDWHyXTHjtz38GK1jIiy34UTCFaahghoWFmSBR6ose8TMjvA
+ n7KctIbVVgecIuzo4Olu7uWCwECPyrPxsmemLNZXyyOlKpAFT18LU8xDITtuj0ChFLZB7ubeG
+ ZfsQju2sdZb+QV30tidHu+JJnW9fES7s6l/i9Pn5EiTi3E/MoEYSkhtwBI+US4DGfvNP2ewIB
+ h61IA9rhfgHNYJRV/3pcDISWOpLb+K8nKvXTB9ESw/I9x92bn8vGcNhN+bZ6IipgX4wxwNKMX
+ tiWzMLn1V0U2eWFTbpez68koC1QJQATRvmhsgIHOam7/zI+oRNLcYw7aSk6BHGaLPtm+pzSP1
+ JMh4NArXmsW5MXkhJTAeZPzoNGpQRdK/U4AiEUtsu5I1uNO2GX3fkWujDW9iwLaWew16zbvR6
+ 8htNtFgkNBPstL0FW/6LirxwvjnzdYaiMaUYNwPeJ3FsufMxy30CSrZb5iwu4svNZB3fZQcXG
+ IUN2HvFpjHeXRqnwIJtCQRyx0wsBGGYzW/nJeh1Mxs12TdquB2PbpVHly1CmpALGH3/obvFlC
+ fFh+7DQUSiqN+xaHHJalViWRvE4EAaKh0kJyose0ssnXQf47g7aXSDHLeotn6JMaSqKtpfrMB
+ fOSXRjGC5aP6AHOl/6j9m8ZShtuElzEJDezlNTy4qf4oKhrLtb7i3cpLRSdUZdqudAFxogozj
+ HOunAmgpc5au8oco7r9flX2azzy+DReWnJVS3lhbQq/QRXAozKdg3jhSh41QaeSs67wnmiOXa
+ FIm9kQeYEtt4yQkCWumd8R8zaFBmW2OVmUIT0GLUa47OKCh4+mHHnNRe4q2L4T250Faf7Twgz
+ SWdrHgQJNhrp/RcnjB9ws+YTE/N9Fhf+Ay4FjIJNZU2YZj1qtZ4sbiVUb7mC2r3n5lqJZj6oa
+ vCuCdXMx/bUxvatagCVMKGx5rf8S+rXd3DEXQGX5Agr4CuevbI09+drkvohCDjduVs4d4GEnp
+ 5h4Gh0aNS8IsC/A0fk5OFM36/rkPCDRrnlftDEsiA3UVCFn5lYjqIB/PVE5OXA7NFZVzQfCma
+ GQyj1NnDdc1Py1SNcSguX8wUQEnNzXvksLOzrfQ==
+Received-SPF: pass client-ip=212.227.15.14; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 10:22:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,823 +102,590 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David
+ Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/microblaze/insns.decode |  32 ++
- target/microblaze/translate.c  | 723 +++++++++++++++++++--------------
- 2 files changed, 456 insertions(+), 299 deletions(-)
+--Sig_/BrmbCTzCnw0zXIxt0z_i.JT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/target/microblaze/insns.decode b/target/microblaze/insns.decode
-index 87e8f5679b..47b92b9cbc 100644
---- a/target/microblaze/insns.decode
-+++ b/target/microblaze/insns.decode
-@@ -100,6 +100,22 @@ idivu           010010 ..... ..... ..... 000 0000 0010  @typea
- 
- imm             101100 00000 00000 imm:16
- 
-+lbu             110000 ..... ..... ..... 0000 000 0000  @typea
-+lbur            110000 ..... ..... ..... 0100 000 0000  @typea
-+lbuea           110000 ..... ..... ..... 0001 000 0000  @typea
-+lbui            111000 ..... ..... ................     @typeb
-+
-+lhu             110001 ..... ..... ..... 0000 000 0000  @typea
-+lhur            110001 ..... ..... ..... 0100 000 0000  @typea
-+lhuea           110001 ..... ..... ..... 0001 000 0000  @typea
-+lhui            111001 ..... ..... ................     @typeb
-+
-+lw              110010 ..... ..... ..... 0000 000 0000  @typea
-+lwr             110010 ..... ..... ..... 0100 000 0000  @typea
-+lwea            110010 ..... ..... ..... 0001 000 0000  @typea
-+lwx             110010 ..... ..... ..... 1000 000 0000  @typea
-+lwi             111010 ..... ..... ................     @typeb
-+
- mul             010000 ..... ..... ..... 000 0000 0000  @typea
- mulh            010000 ..... ..... ..... 000 0000 0001  @typea
- mulhu           010000 ..... ..... ..... 000 0000 0011  @typea
-@@ -123,6 +139,22 @@ rsubic          001011 ..... ..... ................     @typeb
- rsubik          001101 ..... ..... ................     @typeb
- rsubikc         001111 ..... ..... ................     @typeb
- 
-+sb              110100 ..... ..... ..... 0000 000 0000  @typea
-+sbr             110100 ..... ..... ..... 0100 000 0000  @typea
-+sbea            110100 ..... ..... ..... 0001 000 0000  @typea
-+sbi             111100 ..... ..... ................     @typeb
-+
-+sh              110101 ..... ..... ..... 0000 000 0000  @typea
-+shr             110101 ..... ..... ..... 0100 000 0000  @typea
-+shea            110101 ..... ..... ..... 0001 000 0000  @typea
-+shi             111101 ..... ..... ................     @typeb
-+
-+sw              110110 ..... ..... ..... 0000 000 0000  @typea
-+swr             110110 ..... ..... ..... 0100 000 0000  @typea
-+swea            110110 ..... ..... ..... 0001 000 0000  @typea
-+swx             110110 ..... ..... ..... 1000 000 0000  @typea
-+swi             111110 ..... ..... ................     @typeb
-+
- sext8           100100 ..... ..... 00000 000 0110 0000  @typea0
- sext16          100100 ..... ..... 00000 000 0110 0001  @typea0
- 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index a55e110171..d2baa7db0e 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -105,6 +105,17 @@ static inline void t_sync_flags(DisasContext *dc)
-     }
- }
- 
-+static inline void sync_jmpstate(DisasContext *dc)
-+{
-+    if (dc->jmp == JMP_DIRECT || dc->jmp == JMP_DIRECT_CC) {
-+        if (dc->jmp == JMP_DIRECT) {
-+            tcg_gen_movi_i32(cpu_btaken, 1);
-+        }
-+        dc->jmp = JMP_INDIRECT;
-+        tcg_gen_movi_i32(cpu_btarget, dc->jmp_pc);
-+    }
-+}
-+
- static void gen_raise_exception(DisasContext *dc, uint32_t index)
- {
-     TCGv_i32 tmp = tcg_const_i32(index);
-@@ -668,6 +679,419 @@ static bool trans_wdic(DisasContext *dc, arg_wdic *a)
- DO_TYPEA(xor, false, tcg_gen_xor_i32)
- DO_TYPEBI(xori, false, tcg_gen_xori_i32)
- 
-+static TCGv compute_ldst_addr_typea(DisasContext *dc, int ra, int rb)
-+{
-+    TCGv ret = tcg_temp_new();
-+
-+    /* If any of the regs is r0, set t to the value of the other reg.  */
-+    if (ra && rb) {
-+        TCGv_i32 tmp = tcg_temp_new_i32();
-+        tcg_gen_add_i32(tmp, cpu_R[ra], cpu_R[rb]);
-+        tcg_gen_extu_i32_tl(ret, tmp);
-+        tcg_temp_free_i32(tmp);
-+    } else if (ra) {
-+        tcg_gen_extu_i32_tl(ret, cpu_R[ra]);
-+    } else if (rb) {
-+        tcg_gen_extu_i32_tl(ret, cpu_R[rb]);
-+    } else {
-+        tcg_gen_movi_tl(ret, 0);
-+    }
-+
-+    if ((ra == 1 || rb == 1) && dc->cpu->cfg.stackprot) {
-+        gen_helper_stackprot(cpu_env, ret);
-+    }
-+    return ret;
-+}
-+
-+static TCGv compute_ldst_addr_typeb(DisasContext *dc, int ra, int imm)
-+{
-+    TCGv ret = tcg_temp_new();
-+
-+    /* If any of the regs is r0, set t to the value of the other reg.  */
-+    if (ra) {
-+        TCGv_i32 tmp = tcg_temp_new_i32();
-+        tcg_gen_addi_i32(tmp, cpu_R[ra], imm);
-+        tcg_gen_extu_i32_tl(ret, tmp);
-+        tcg_temp_free_i32(tmp);
-+    } else {
-+        tcg_gen_movi_tl(ret, (uint32_t)imm);
-+    }
-+
-+    if (ra == 1 && dc->cpu->cfg.stackprot) {
-+        gen_helper_stackprot(cpu_env, ret);
-+    }
-+    return ret;
-+}
-+
-+static TCGv compute_ldst_addr_ea(DisasContext *dc, int ra, int rb)
-+{
-+    int addr_size = dc->cpu->cfg.addr_size;
-+    TCGv ret = tcg_temp_new();
-+
-+    if (addr_size == 32 || ra == 0) {
-+        if (rb) {
-+            tcg_gen_extu_i32_tl(ret, cpu_R[rb]);
-+        } else {
-+            tcg_gen_movi_tl(ret, 0);
-+        }
-+    } else {
-+        if (rb) {
-+            tcg_gen_concat_i32_i64(ret, cpu_R[rb], cpu_R[ra]);
-+        } else {
-+            tcg_gen_extu_i32_tl(ret, cpu_R[ra]);
-+            tcg_gen_shli_tl(ret, ret, 32);
-+        }
-+        if (addr_size < 64) {
-+            /* Mask off out of range bits.  */
-+            tcg_gen_andi_i64(ret, ret, MAKE_64BIT_MASK(0, addr_size));
-+        }
-+    }
-+    return ret;
-+}
-+
-+static bool do_load(DisasContext *dc, int rd, TCGv addr, MemOp mop,
-+                    int mem_index, bool rev)
-+{
-+    TCGv_i32 v;
-+    MemOp size = mop & MO_SIZE;
-+
-+    /*
-+     * When doing reverse accesses we need to do two things.
-+     *
-+     * 1. Reverse the address wrt endianness.
-+     * 2. Byteswap the data lanes on the way back into the CPU core.
-+     */
-+    if (rev) {
-+        if (size > MO_8) {
-+            mop ^= MO_BSWAP;
-+        }
-+        if (size < MO_32) {
-+            tcg_gen_xori_tl(addr, addr, 3 - size);
-+        }
-+    }
-+
-+    t_sync_flags(dc);
-+    sync_jmpstate(dc);
-+
-+    /*
-+     * Microblaze gives MMU faults priority over faults due to
-+     * unaligned addresses. That's why we speculatively do the load
-+     * into v. If the load succeeds, we verify alignment of the
-+     * address and if that succeeds we write into the destination reg.
-+     */
-+    v = tcg_temp_new_i32();
-+    tcg_gen_qemu_ld_i32(v, addr, mem_index, mop);
-+
-+    /* TODO: Convert to CPUClass::do_unaligned_access.  */
-+    if (dc->cpu->cfg.unaligned_exceptions && size > MO_8) {
-+        TCGv_i32 t0 = tcg_const_i32(0);
-+        TCGv_i32 treg = tcg_const_i32(rd);
-+        TCGv_i32 tsize = tcg_const_i32((1 << size) - 1);
-+
-+        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
-+        gen_helper_memalign(cpu_env, addr, treg, t0, tsize);
-+
-+        tcg_temp_free_i32(t0);
-+        tcg_temp_free_i32(treg);
-+        tcg_temp_free_i32(tsize);
-+    }
-+
-+    if (rd) {
-+        tcg_gen_mov_i32(cpu_R[rd], v);
-+    }
-+
-+    tcg_temp_free_i32(v);
-+    tcg_temp_free(addr);
-+    return true;
-+}
-+
-+static bool trans_lbu(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_UB, dc->mem_index, false);
-+}
-+
-+static bool trans_lbur(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_UB, dc->mem_index, true);
-+}
-+
-+static bool trans_lbuea(DisasContext *dc, arg_typea *arg)
-+{
-+    if (trap_userspace(dc, true)) {
-+        return true;
-+    }
-+    TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_UB, MMU_NOMMU_IDX, false);
-+}
-+
-+static bool trans_lbui(DisasContext *dc, arg_typeb *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typeb(dc, arg->ra, arg->imm);
-+    return do_load(dc, arg->rd, addr, MO_UB, dc->mem_index, false);
-+}
-+
-+static bool trans_lhu(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_TEUW, dc->mem_index, false);
-+}
-+
-+static bool trans_lhur(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_TEUW, dc->mem_index, true);
-+}
-+
-+static bool trans_lhuea(DisasContext *dc, arg_typea *arg)
-+{
-+    if (trap_userspace(dc, true)) {
-+        return true;
-+    }
-+    TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_TEUW, MMU_NOMMU_IDX, false);
-+}
-+
-+static bool trans_lhui(DisasContext *dc, arg_typeb *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typeb(dc, arg->ra, arg->imm);
-+    return do_load(dc, arg->rd, addr, MO_TEUW, dc->mem_index, false);
-+}
-+
-+static bool trans_lw(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_TEUL, dc->mem_index, false);
-+}
-+
-+static bool trans_lwr(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_TEUL, dc->mem_index, true);
-+}
-+
-+static bool trans_lwea(DisasContext *dc, arg_typea *arg)
-+{
-+    if (trap_userspace(dc, true)) {
-+        return true;
-+    }
-+    TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
-+    return do_load(dc, arg->rd, addr, MO_TEUL, MMU_NOMMU_IDX, false);
-+}
-+
-+static bool trans_lwi(DisasContext *dc, arg_typeb *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typeb(dc, arg->ra, arg->imm);
-+    return do_load(dc, arg->rd, addr, MO_TEUL, dc->mem_index, false);
-+}
-+
-+static bool trans_lwx(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+
-+    /* lwx does not throw unaligned access errors, so force alignment */
-+    tcg_gen_andi_tl(addr, addr, ~3);
-+
-+    t_sync_flags(dc);
-+    sync_jmpstate(dc);
-+
-+    tcg_gen_qemu_ld_i32(cpu_res_val, addr, dc->mem_index, MO_TEUL);
-+    tcg_gen_mov_tl(cpu_res_addr, addr);
-+    tcg_temp_free(addr);
-+
-+    if (arg->rd) {
-+        tcg_gen_mov_i32(cpu_R[arg->rd], cpu_res_val);
-+    }
-+
-+    /* No support for AXI exclusive so always clear C */
-+    tcg_gen_movi_i32(cpu_msr_c, 0);
-+    return true;
-+}
-+
-+static bool do_store(DisasContext *dc, int rd, TCGv addr, MemOp mop,
-+                     int mem_index, bool rev)
-+{
-+    MemOp size = mop & MO_SIZE;
-+
-+    /*
-+     * When doing reverse accesses we need to do two things.
-+     *
-+     * 1. Reverse the address wrt endianness.
-+     * 2. Byteswap the data lanes on the way back into the CPU core.
-+     */
-+    if (rev) {
-+        if (size > MO_8) {
-+            mop ^= MO_BSWAP;
-+        }
-+        if (size < MO_32) {
-+            tcg_gen_xori_tl(addr, addr, 3 - size);
-+        }
-+    }
-+
-+    t_sync_flags(dc);
-+    sync_jmpstate(dc);
-+
-+    tcg_gen_qemu_st_i32(reg_for_read(dc, rd), addr, mem_index, mop);
-+
-+    /* TODO: Convert to CPUClass::do_unaligned_access.  */
-+    if (dc->cpu->cfg.unaligned_exceptions && size > MO_8) {
-+        TCGv_i32 t1 = tcg_const_i32(1);
-+        TCGv_i32 treg = tcg_const_i32(rd);
-+        TCGv_i32 tsize = tcg_const_i32((1 << size) - 1);
-+
-+        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
-+        /* FIXME: if the alignment is wrong, we should restore the value
-+         *        in memory. One possible way to achieve this is to probe
-+         *        the MMU prior to the memaccess, thay way we could put
-+         *        the alignment checks in between the probe and the mem
-+         *        access.
-+         */
-+        gen_helper_memalign(cpu_env, addr, treg, t1, tsize);
-+
-+        tcg_temp_free_i32(t1);
-+        tcg_temp_free_i32(treg);
-+        tcg_temp_free_i32(tsize);
-+    }
-+
-+    tcg_temp_free(addr);
-+    return true;
-+}
-+
-+static bool trans_sb(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_UB, dc->mem_index, false);
-+}
-+
-+static bool trans_sbr(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_UB, dc->mem_index, true);
-+}
-+
-+static bool trans_sbea(DisasContext *dc, arg_typea *arg)
-+{
-+    if (trap_userspace(dc, true)) {
-+        return true;
-+    }
-+    TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_UB, MMU_NOMMU_IDX, false);
-+}
-+
-+static bool trans_sbi(DisasContext *dc, arg_typeb *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typeb(dc, arg->ra, arg->imm);
-+    return do_store(dc, arg->rd, addr, MO_UB, dc->mem_index, false);
-+}
-+
-+static bool trans_sh(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_TEUW, dc->mem_index, false);
-+}
-+
-+static bool trans_shr(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_TEUW, dc->mem_index, true);
-+}
-+
-+static bool trans_shea(DisasContext *dc, arg_typea *arg)
-+{
-+    if (trap_userspace(dc, true)) {
-+        return true;
-+    }
-+    TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_TEUW, MMU_NOMMU_IDX, false);
-+}
-+
-+static bool trans_shi(DisasContext *dc, arg_typeb *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typeb(dc, arg->ra, arg->imm);
-+    return do_store(dc, arg->rd, addr, MO_TEUW, dc->mem_index, false);
-+}
-+
-+static bool trans_sw(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_TEUL, dc->mem_index, false);
-+}
-+
-+static bool trans_swr(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_TEUL, dc->mem_index, true);
-+}
-+
-+static bool trans_swea(DisasContext *dc, arg_typea *arg)
-+{
-+    if (trap_userspace(dc, true)) {
-+        return true;
-+    }
-+    TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
-+    return do_store(dc, arg->rd, addr, MO_TEUL, MMU_NOMMU_IDX, false);
-+}
-+
-+static bool trans_swi(DisasContext *dc, arg_typeb *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typeb(dc, arg->ra, arg->imm);
-+    return do_store(dc, arg->rd, addr, MO_TEUL, dc->mem_index, false);
-+}
-+
-+static bool trans_swx(DisasContext *dc, arg_typea *arg)
-+{
-+    TCGv addr = compute_ldst_addr_typea(dc, arg->ra, arg->rb);
-+    TCGLabel *swx_done = gen_new_label();
-+    TCGLabel *swx_fail = gen_new_label();
-+    TCGv_i32 tval;
-+
-+    t_sync_flags(dc);
-+    sync_jmpstate(dc);
-+
-+    /* swx does not throw unaligned access errors, so force alignment */
-+    tcg_gen_andi_tl(addr, addr, ~3);
-+
-+    /*
-+     * Compare the address vs the one we used during lwx.
-+     * On mismatch, the operation fails.  On match, addr dies at the
-+     * branch, but we know we can use the equal version in the global.
-+     * In either case, addr is no longer needed.
-+     */
-+    tcg_gen_brcond_tl(TCG_COND_NE, cpu_res_addr, addr, swx_fail);
-+    tcg_temp_free(addr);
-+
-+    /*
-+     * Compare the value loaded during lwx with current contents of
-+     * the reserved location.
-+     */
-+    tval = tcg_temp_new_i32();
-+
-+    tcg_gen_atomic_cmpxchg_i32(tval, cpu_res_addr, cpu_res_val,
-+                               reg_for_write(dc, arg->rd),
-+                               dc->mem_index, MO_TEUL);
-+
-+    tcg_gen_brcond_i32(TCG_COND_NE, cpu_res_val, tval, swx_fail);
-+    tcg_temp_free_i32(tval);
-+
-+    /* Success */
-+    tcg_gen_movi_i32(cpu_msr_c, 0);
-+    tcg_gen_br(swx_done);
-+
-+    /* Failure */
-+    gen_set_label(swx_fail);
-+    tcg_gen_movi_i32(cpu_msr_c, 1);
-+
-+    gen_set_label(swx_done);
-+
-+    /*
-+     * Prevent the saved address from working again without another ldx.
-+     * Akin to the pseudocode setting reservation = 0.
-+     */
-+    tcg_gen_movi_tl(cpu_res_addr, -1);
-+    return true;
-+}
-+
- static bool trans_zero(DisasContext *dc, arg_zero *arg)
- {
-     /* If opcode_0_illegal, trap.  */
-@@ -887,303 +1311,6 @@ static void dec_msr(DisasContext *dc)
-     }
- }
- 
--static inline void sync_jmpstate(DisasContext *dc)
--{
--    if (dc->jmp == JMP_DIRECT || dc->jmp == JMP_DIRECT_CC) {
--        if (dc->jmp == JMP_DIRECT) {
--            tcg_gen_movi_i32(cpu_btaken, 1);
--        }
--        dc->jmp = JMP_INDIRECT;
--        tcg_gen_movi_i32(cpu_btarget, dc->jmp_pc);
--    }
--}
--
--static inline void compute_ldst_addr(DisasContext *dc, bool ea, TCGv t)
--{
--    /* Should be set to true if r1 is used by loadstores.  */
--    bool stackprot = false;
--    TCGv_i32 t32;
--
--    /* All load/stores use ra.  */
--    if (dc->ra == 1 && dc->cpu->cfg.stackprot) {
--        stackprot = true;
--    }
--
--    /* Treat the common cases first.  */
--    if (!dc->type_b) {
--        if (ea) {
--            int addr_size = dc->cpu->cfg.addr_size;
--
--            if (addr_size == 32) {
--                tcg_gen_extu_i32_tl(t, cpu_R[dc->rb]);
--                return;
--            }
--
--            tcg_gen_concat_i32_i64(t, cpu_R[dc->rb], cpu_R[dc->ra]);
--            if (addr_size < 64) {
--                /* Mask off out of range bits.  */
--                tcg_gen_andi_i64(t, t, MAKE_64BIT_MASK(0, addr_size));
--            }
--            return;
--        }
--
--        /* If any of the regs is r0, set t to the value of the other reg.  */
--        if (dc->ra == 0) {
--            tcg_gen_extu_i32_tl(t, cpu_R[dc->rb]);
--            return;
--        } else if (dc->rb == 0) {
--            tcg_gen_extu_i32_tl(t, cpu_R[dc->ra]);
--            return;
--        }
--
--        if (dc->rb == 1 && dc->cpu->cfg.stackprot) {
--            stackprot = true;
--        }
--
--        t32 = tcg_temp_new_i32();
--        tcg_gen_add_i32(t32, cpu_R[dc->ra], cpu_R[dc->rb]);
--        tcg_gen_extu_i32_tl(t, t32);
--        tcg_temp_free_i32(t32);
--
--        if (stackprot) {
--            gen_helper_stackprot(cpu_env, t);
--        }
--        return;
--    }
--    /* Immediate.  */
--    t32 = tcg_temp_new_i32();
--    tcg_gen_addi_i32(t32, cpu_R[dc->ra], dec_alu_typeb_imm(dc));
--    tcg_gen_extu_i32_tl(t, t32);
--    tcg_temp_free_i32(t32);
--
--    if (stackprot) {
--        gen_helper_stackprot(cpu_env, t);
--    }
--    return;
--}
--
--static void dec_load(DisasContext *dc)
--{
--    TCGv_i32 v;
--    TCGv addr;
--    unsigned int size;
--    bool rev = false, ex = false, ea = false;
--    int mem_index = dc->mem_index;
--    MemOp mop;
--
--    mop = dc->opcode & 3;
--    size = 1 << mop;
--    if (!dc->type_b) {
--        ea = extract32(dc->ir, 7, 1);
--        rev = extract32(dc->ir, 9, 1);
--        ex = extract32(dc->ir, 10, 1);
--    }
--    mop |= MO_TE;
--    if (rev) {
--        mop ^= MO_BSWAP;
--    }
--
--    if (trap_illegal(dc, size > 4)) {
--        return;
--    }
--
--    if (trap_userspace(dc, ea)) {
--        return;
--    }
--
--    t_sync_flags(dc);
--    addr = tcg_temp_new();
--    compute_ldst_addr(dc, ea, addr);
--    /* Extended addressing bypasses the MMU.  */
--    mem_index = ea ? MMU_NOMMU_IDX : mem_index;
--
--    /*
--     * When doing reverse accesses we need to do two things.
--     *
--     * 1. Reverse the address wrt endianness.
--     * 2. Byteswap the data lanes on the way back into the CPU core.
--     */
--    if (rev && size != 4) {
--        /* Endian reverse the address. t is addr.  */
--        switch (size) {
--            case 1:
--            {
--                tcg_gen_xori_tl(addr, addr, 3);
--                break;
--            }
--
--            case 2:
--                /* 00 -> 10
--                   10 -> 00.  */
--                tcg_gen_xori_tl(addr, addr, 2);
--                break;
--            default:
--                cpu_abort(CPU(dc->cpu), "Invalid reverse size\n");
--                break;
--        }
--    }
--
--    /* lwx does not throw unaligned access errors, so force alignment */
--    if (ex) {
--        tcg_gen_andi_tl(addr, addr, ~3);
--    }
--
--    /* If we get a fault on a dslot, the jmpstate better be in sync.  */
--    sync_jmpstate(dc);
--
--    /* Verify alignment if needed.  */
--    /*
--     * Microblaze gives MMU faults priority over faults due to
--     * unaligned addresses. That's why we speculatively do the load
--     * into v. If the load succeeds, we verify alignment of the
--     * address and if that succeeds we write into the destination reg.
--     */
--    v = tcg_temp_new_i32();
--    tcg_gen_qemu_ld_i32(v, addr, mem_index, mop);
--
--    if (dc->cpu->cfg.unaligned_exceptions && size > 1) {
--        TCGv_i32 t0 = tcg_const_i32(0);
--        TCGv_i32 treg = tcg_const_i32(dc->rd);
--        TCGv_i32 tsize = tcg_const_i32(size - 1);
--
--        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
--        gen_helper_memalign(cpu_env, addr, treg, t0, tsize);
--
--        tcg_temp_free_i32(t0);
--        tcg_temp_free_i32(treg);
--        tcg_temp_free_i32(tsize);
--    }
--
--    if (ex) {
--        tcg_gen_mov_tl(cpu_res_addr, addr);
--        tcg_gen_mov_i32(cpu_res_val, v);
--    }
--    if (dc->rd) {
--        tcg_gen_mov_i32(cpu_R[dc->rd], v);
--    }
--    tcg_temp_free_i32(v);
--
--    if (ex) { /* lwx */
--        /* no support for AXI exclusive so always clear C */
--        tcg_gen_movi_i32(cpu_msr_c, 0);
--    }
--
--    tcg_temp_free(addr);
--}
--
--static void dec_store(DisasContext *dc)
--{
--    TCGv addr;
--    TCGLabel *swx_skip = NULL;
--    unsigned int size;
--    bool rev = false, ex = false, ea = false;
--    int mem_index = dc->mem_index;
--    MemOp mop;
--
--    mop = dc->opcode & 3;
--    size = 1 << mop;
--    if (!dc->type_b) {
--        ea = extract32(dc->ir, 7, 1);
--        rev = extract32(dc->ir, 9, 1);
--        ex = extract32(dc->ir, 10, 1);
--    }
--    mop |= MO_TE;
--    if (rev) {
--        mop ^= MO_BSWAP;
--    }
--
--    if (trap_illegal(dc, size > 4)) {
--        return;
--    }
--
--    trap_userspace(dc, ea);
--
--    t_sync_flags(dc);
--    /* If we get a fault on a dslot, the jmpstate better be in sync.  */
--    sync_jmpstate(dc);
--    /* SWX needs a temp_local.  */
--    addr = ex ? tcg_temp_local_new() : tcg_temp_new();
--    compute_ldst_addr(dc, ea, addr);
--    /* Extended addressing bypasses the MMU.  */
--    mem_index = ea ? MMU_NOMMU_IDX : mem_index;
--
--    if (ex) { /* swx */
--        TCGv_i32 tval;
--
--        /* swx does not throw unaligned access errors, so force alignment */
--        tcg_gen_andi_tl(addr, addr, ~3);
--
--        tcg_gen_movi_i32(cpu_msr_c, 1);
--        swx_skip = gen_new_label();
--        tcg_gen_brcond_tl(TCG_COND_NE, cpu_res_addr, addr, swx_skip);
--
--        /*
--         * Compare the value loaded at lwx with current contents of
--         * the reserved location.
--         */
--        tval = tcg_temp_new_i32();
--
--        tcg_gen_atomic_cmpxchg_i32(tval, addr, cpu_res_val,
--                                   cpu_R[dc->rd], mem_index,
--                                   mop);
--
--        tcg_gen_brcond_i32(TCG_COND_NE, cpu_res_val, tval, swx_skip);
--        tcg_gen_movi_i32(cpu_msr_c, 0);
--        tcg_temp_free_i32(tval);
--    }
--
--    if (rev && size != 4) {
--        /* Endian reverse the address. t is addr.  */
--        switch (size) {
--            case 1:
--            {
--                tcg_gen_xori_tl(addr, addr, 3);
--                break;
--            }
--
--            case 2:
--                /* 00 -> 10
--                   10 -> 00.  */
--                /* Force addr into the temp.  */
--                tcg_gen_xori_tl(addr, addr, 2);
--                break;
--            default:
--                cpu_abort(CPU(dc->cpu), "Invalid reverse size\n");
--                break;
--        }
--    }
--
--    if (!ex) {
--        tcg_gen_qemu_st_i32(cpu_R[dc->rd], addr, mem_index, mop);
--    }
--
--    /* Verify alignment if needed.  */
--    if (dc->cpu->cfg.unaligned_exceptions && size > 1) {
--        TCGv_i32 t1 = tcg_const_i32(1);
--        TCGv_i32 treg = tcg_const_i32(dc->rd);
--        TCGv_i32 tsize = tcg_const_i32(size - 1);
--
--        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
--        /* FIXME: if the alignment is wrong, we should restore the value
--         *        in memory. One possible way to achieve this is to probe
--         *        the MMU prior to the memaccess, thay way we could put
--         *        the alignment checks in between the probe and the mem
--         *        access.
--         */
--        gen_helper_memalign(cpu_env, addr, treg, t1, tsize);
--
--        tcg_temp_free_i32(t1);
--        tcg_temp_free_i32(treg);
--        tcg_temp_free_i32(tsize);
--    }
--
--    if (ex) {
--        gen_set_label(swx_skip);
--    }
--
--    tcg_temp_free(addr);
--}
--
- static inline void eval_cc(DisasContext *dc, unsigned int cc,
-                            TCGv_i32 d, TCGv_i32 a)
- {
-@@ -1491,8 +1618,6 @@ static struct decoder_info {
-     };
-     void (*dec)(DisasContext *dc);
- } decinfo[] = {
--    {DEC_LD, dec_load},
--    {DEC_ST, dec_store},
-     {DEC_BR, dec_br},
-     {DEC_BCC, dec_bcc},
-     {DEC_RTS, dec_rts},
--- 
-2.25.1
+On Thu, 27 Aug 2020 14:37:00 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
+> I apologize for not reviewing this much earlier.
+>=20
+> Lukas Straub <lukasstraub2@web.de> writes:
+>=20
+> > The yank feature allows to recover from hanging qemu by "yanking"
+> > at various parts. Other qemu systems can register themselves and
+> > multiple yank functions. Then all yank functions for selected
+> > instances can be called by the 'yank' out-of-band qmp command.
+> > Available instances can be queried by a 'query-yank' oob command.
+> >
+> > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> > Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> >  include/qemu/yank.h |  80 +++++++++++++++++++
+> >  qapi/misc.json      |  45 +++++++++++
+> >  util/Makefile.objs  |   1 +
+> >  util/yank.c         | 184 ++++++++++++++++++++++++++++++++++++++++++++
+> >  4 files changed, 310 insertions(+)
+> >  create mode 100644 include/qemu/yank.h
+> >  create mode 100644 util/yank.c
+> >
+> > diff --git a/include/qemu/yank.h b/include/qemu/yank.h
+> > new file mode 100644
+> > index 0000000000..cd184fcd05
+> > --- /dev/null
+> > +++ b/include/qemu/yank.h
+> > @@ -0,0 +1,80 @@
+> > +/*
+> > + * QEMU yank feature
+> > + *
+> > + * Copyright (c) Lukas Straub <lukasstraub2@web.de>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> > + * See the COPYING file in the top-level directory.
+> > + */
+> > +
+> > +#ifndef YANK_H
+> > +#define YANK_H
+> > +
+> > +typedef void (YankFn) (void *opaque); =20
+>=20
+> No space before parameter lists, please.
+
+Ok, I will fix this in the next version.
+
+> > +
+> > +/**
+> > + * yank_register_instance: Register a new instance.
+> > + *
+> > + * This registers a new instance for yanking. Must be called before an=
+y yank
+> > + * function is registered for this instance.
+> > + *
+> > + * This function is thread-safe.
+> > + *
+> > + * @instance_name: The globally unique name of the instance.
+> > + * @errp: ...
+> > + */
+> > +void yank_register_instance(const char *instance_name, Error **errp);
+> > +
+> > +/**
+> > + * yank_unregister_instance: Unregister a instance.
+> > + *
+> > + * This unregisters a instance. Must be called only after every yank f=
+unction
+> > + * of the instance has been unregistered.
+> > + *
+> > + * This function is thread-safe.
+> > + *
+> > + * @instance_name: The name of the instance.
+> > + */
+> > +void yank_unregister_instance(const char *instance_name);
+> > +
+> > +/**
+> > + * yank_register_function: Register a yank function
+> > + *
+> > + * This registers a yank function. All limitations of qmp oob commands=
+ apply
+> > + * to the yank function as well. =20
+>=20
+> The restrictions are documented in docs/devel/qapi-code-gen.txt under
+> "An OOB-capable command handler must satisfy the following conditions".
+> Let's point there,
+
+I will fix this in the next version.
+
+> > + *
+> > + * This function is thread-safe.
+> > + *
+> > + * @instance_name: The name of the instance
+> > + * @func: The yank function
+> > + * @opaque: Will be passed to the yank function
+> > + */
+> > +void yank_register_function(const char *instance_name,
+> > +                            YankFn *func,
+> > +                            void *opaque); =20
+>=20
+> Pardon my ignorance... can you explain to me why a yank instance may
+> have multiple functions?
+>
+> > +
+> > +/**
+> > + * yank_unregister_function: Unregister a yank function
+> > + *
+> > + * This unregisters a yank function.
+> > + *
+> > + * This function is thread-safe.
+> > + *
+> > + * @instance_name: The name of the instance
+> > + * @func: func that was passed to yank_register_function
+> > + * @opaque: opaque that was passed to yank_register_function
+> > + */
+> > +void yank_unregister_function(const char *instance_name,
+> > +                              YankFn *func,
+> > +                              void *opaque);
+> > +
+> > +/**
+> > + * yank_unregister_function: Generic yank function for iochannel =20
+>=20
+> Pasto, should be
+>=20
+>     * yank_generic_iochannel: ...
+
+I will fix this in the next version.
+
+> > + *
+> > + * This is a generic yank function which will call qio_channel_shutdow=
+n on the
+> > + * provided QIOChannel.
+> > + *
+> > + * @opaque: QIOChannel to shutdown
+> > + */
+> > +void yank_generic_iochannel(void *opaque);
+> > +#endif
+> > diff --git a/qapi/misc.json b/qapi/misc.json
+> > index 9d32820dc1..0d6a8f20b7 100644
+> > --- a/qapi/misc.json
+> > +++ b/qapi/misc.json
+> > @@ -1615,3 +1615,48 @@
+> >  ##
+> >  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+> >
+> > +##
+> > +# @YankInstances:
+> > +#
+> > +# @instances: List of yank instances.
+> > +#
+> > +# Yank instances are named after the following schema:
+> > +# "blockdev:<node-name>", "chardev:<chardev-name>" and "migration"
+> > +#
+> > +# Since: 5.1
+> > +##
+> > +{ 'struct': 'YankInstances', 'data': {'instances': ['str'] } } =20
+>=20
+> I'm afraid this is a problematic QMP interface.
+>=20
+> By making YankInstances a struct, you keep the door open to adding more
+> members, which is good.
+>=20
+> But by making its 'instances' member a ['str'], you close the door to
+> using anything but a single string for the individual instances.  Not so
+> good.
+>=20
+> The single string encodes information which QMP client will need to
+> parse from the string.  We frown on that in QMP.  Use QAPI complex types
+> capabilities for structured data.
+>=20
+> Could you use something like this instead?
+>=20
+> { 'enum': 'YankInstanceType',
+>   'data': { 'block-node', 'chardev', 'migration' } }
+>=20
+> { 'struct': 'YankInstanceBlockNode',
+>   'data': { 'node-name': 'str' } }
+>=20
+> { 'struct': 'YankInstanceChardev',
+>   'data' { 'label': 'str' } }
+>=20
+> { 'union': 'YankInstance',
+>   'base': { 'type': 'YankInstanceType' },
+>   'discriminator': 'type',
+>   'data': {
+>       'block-node': 'YankInstanceBlockNode',
+>       'chardev': 'YankInstanceChardev' } }
+>=20
+> { 'command': 'yank',
+>   'data': { 'instances': ['YankInstance'] },
+>   'allow-oob': true }
+>=20
+> If you're confident nothing will ever be added to YankInstanceBlockNode
+> and YankInstanceChardev, you could use str instead.
+
+As Daniel said, this has already been discussed.
+
+> > +
+> > +##
+> > +# @yank:
+> > +#
+> > +# Recover from hanging qemu by yanking the specified instances. =20
+>=20
+> What's an "instance", and what does it mean to "yank" it?
+>=20
+> The documentation of YankInstances above gives a clue on what an
+> "instance" is: presumably a block node, a character device or the
+> migration job.
+>=20
+> I guess a YankInstance is whatever the code chooses to make one, and the
+> current code makes these three kinds.
+>=20
+> Does it make every block node a YankInstance?  If not, which ones?
+>=20
+> Does it make every character device a YankInstance?  If not, which ones?
+>=20
+> Does it make migration always a YankInstance?  If not, when?
+
+The yank function is generic so anything more specific than "instance"
+doesn't fit. But you are right, I'll improve the documentation here and
+list what is currently implemented for yanking and what yanking does in
+each case.
+
+> > +#
+> > +# Takes @YankInstances as argument.
+> > +#
+> > +# Returns: nothing.
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "yank", "arguments": { "instances": ["blockdev:nbd0"=
+] } }
+> > +# <- { "return": {} }
+> > +#
+> > +# Since: 5.1
+> > +##
+> > +{ 'command': 'yank', 'data': 'YankInstances', 'allow-oob': true }
+> > +
+> > +##
+> > +# @query-yank:
+> > +#
+> > +# Query yank instances.
+> > +#
+> > +# Returns: @YankInstances
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "query-yank" }
+> > +# <- { "return": { "instances": ["blockdev:nbd0"] } }
+> > +#
+> > +# Since: 5.1
+> > +##
+> > +{ 'command': 'query-yank', 'returns': 'YankInstances', 'allow-oob': tr=
+ue }
+> > diff --git a/util/Makefile.objs b/util/Makefile.objs
+> > index cc5e37177a..13faa98425 100644
+> > --- a/util/Makefile.objs
+> > +++ b/util/Makefile.objs
+> > @@ -45,6 +45,7 @@ util-obj-$(CONFIG_GIO) +=3D dbus.o
+> >  dbus.o-cflags =3D $(GIO_CFLAGS)
+> >  dbus.o-libs =3D $(GIO_LIBS)
+> >  util-obj-$(CONFIG_USER_ONLY) +=3D selfmap.o
+> > +util-obj-y +=3D yank.o
+> >
+> >  #######################################################################
+> >  # code used by both qemu system emulation and qemu-img
+> > diff --git a/util/yank.c b/util/yank.c
+> > new file mode 100644
+> > index 0000000000..b0cd27728b
+> > --- /dev/null
+> > +++ b/util/yank.c
+> > @@ -0,0 +1,184 @@
+> > +/*
+> > + * QEMU yank feature
+> > + *
+> > + * Copyright (c) Lukas Straub <lukasstraub2@web.de>
+> > + *
+> > + * This work is licensed under the terms of the GNU GPL, version 2 or =
+later.
+> > + * See the COPYING file in the top-level directory.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> > +#include "qemu/thread.h"
+> > +#include "qemu/queue.h"
+> > +#include "qapi/qapi-commands-misc.h"
+> > +#include "io/channel.h"
+> > +#include "qemu/yank.h"
+> > +
+> > +struct YankFuncAndParam {
+> > +    YankFn *func;
+> > +    void *opaque;
+> > +    QLIST_ENTRY(YankFuncAndParam) next;
+> > +};
+> > +
+> > +struct YankInstance {
+> > +    char *name;
+> > +    QLIST_HEAD(, YankFuncAndParam) yankfns;
+> > +    QLIST_ENTRY(YankInstance) next;
+> > +};
+> > +
+> > +static QemuMutex lock; =20
+>=20
+> Please give the variable a more telling name, such as @yank_lock, and
+> document what exactly the lock protects.  I can guess it's just the list
+> that immediately follows, but I prefer to be explicit when it comes to
+> locking.
+
+I will fix this in the next version.
+
+> > +static QLIST_HEAD(yankinst_list, YankInstance) head
+> > +    =3D QLIST_HEAD_INITIALIZER(head); =20
+>=20
+> Please give the variable a more telling name, such as
+> @yank_instance_list.
+>=20
+> I doubt there is a need to name the struct.  This should do:
+>=20
+>    static QLIST_HEAD(, YankInstance) yank_instance_list
+
+I will fix this in the next version.
+
+> > +
+> > +static struct YankInstance *yank_find_instance(const char *name)
+> > +{
+> > +    struct YankInstance *tmp, *instance;
+> > +    instance =3D NULL;
+> > +    QLIST_FOREACH(tmp, &head, next) {
+> > +        if (!strcmp(tmp->name, name)) {
+> > +            instance =3D tmp;
+> > +        }
+> > +    }
+> > +    return instance;
+> > +} =20
+>=20
+> Suggest
+>=20
+>    static struct YankInstance *yank_find_instance(const char *name)
+>    {
+>        struct YankInstance *instance;
+>=20
+>        QLIST_FOREACH(instance, &head, next) {
+>            if (!strcmp(instance->name, name)) {
+>                return instance;
+>            }
+>        }
+>        return NULL;
+>    }
+
+I will fix this in the next version.
+
+> > +
+> > +void yank_register_instance(const char *instance_name, Error **errp)
+> > +{
+> > +    struct YankInstance *instance;
+> > +
+> > +    qemu_mutex_lock(&lock);
+> > +
+> > +    if (yank_find_instance(instance_name)) {
+> > +        error_setg(errp, "duplicate yank instance name: '%s'", instanc=
+e_name); =20
+>=20
+> Rather long line, suggest to wrap before the last argument.
+
+I will fix this in the next version.
+
+> > +        qemu_mutex_unlock(&lock);
+> > +        return;
+> > +    }
+> > +
+> > +    instance =3D g_slice_new(struct YankInstance);
+> > +    instance->name =3D g_strdup(instance_name);
+> > +    QLIST_INIT(&instance->yankfns);
+> > +    QLIST_INSERT_HEAD(&head, instance, next);
+> > +
+> > +    qemu_mutex_unlock(&lock);
+> > +}
+> > +
+> > +void yank_unregister_instance(const char *instance_name)
+> > +{
+> > +    struct YankInstance *instance;
+> > +
+> > +    qemu_mutex_lock(&lock);
+> > +    instance =3D yank_find_instance(instance_name);
+> > +    assert(instance);
+> > +
+> > +    assert(QLIST_EMPTY(&instance->yankfns));
+> > +    QLIST_REMOVE(instance, next);
+> > +    g_free(instance->name);
+> > +    g_slice_free(struct YankInstance, instance);
+> > +
+> > +    qemu_mutex_unlock(&lock);
+> > +}
+> > +
+> > +void yank_register_function(const char *instance_name,
+> > +                            YankFn *func,
+> > +                            void *opaque)
+> > +{
+> > +    struct YankInstance *instance;
+> > +    struct YankFuncAndParam *entry;
+> > +
+> > +    qemu_mutex_lock(&lock);
+> > +    instance =3D yank_find_instance(instance_name);
+> > +    assert(instance);
+> > +
+> > +    entry =3D g_slice_new(struct YankFuncAndParam);
+> > +    entry->func =3D func;
+> > +    entry->opaque =3D opaque;
+> > +
+> > +    QLIST_INSERT_HEAD(&instance->yankfns, entry, next);
+> > +    qemu_mutex_unlock(&lock);
+> > +}
+> > +
+> > +void yank_unregister_function(const char *instance_name,
+> > +                              YankFn *func,
+> > +                              void *opaque)
+> > +{
+> > +    struct YankInstance *instance;
+> > +    struct YankFuncAndParam *entry;
+> > +
+> > +    qemu_mutex_lock(&lock);
+> > +    instance =3D yank_find_instance(instance_name);
+> > +    assert(instance);
+> > +
+> > +    QLIST_FOREACH(entry, &instance->yankfns, next) {
+> > +        if (entry->func =3D=3D func && entry->opaque =3D=3D opaque) {
+> > +            QLIST_REMOVE(entry, next);
+> > +            g_slice_free(struct YankFuncAndParam, entry);
+> > +            qemu_mutex_unlock(&lock);
+> > +            return;
+> > +        }
+> > +    }
+> > +
+> > +    abort();
+> > +}
+> > +
+> > +void yank_generic_iochannel(void *opaque)
+> > +{
+> > +    QIOChannel *ioc =3D QIO_CHANNEL(opaque);
+> > +
+> > +    qio_channel_shutdown(ioc, QIO_CHANNEL_SHUTDOWN_BOTH, NULL);
+> > +}
+> > +
+> > +void qmp_yank(strList *instances,
+> > +              Error **errp)
+> > +{
+> > +    strList *tmp;
+> > +    struct YankInstance *instance;
+> > +    struct YankFuncAndParam *entry;
+> > +
+> > +    qemu_mutex_lock(&lock);
+> > +    tmp =3D instances;
+> > +    for (; tmp; tmp =3D tmp->next) { =20
+>=20
+> Make that
+>=20
+>        for (tail =3D instances; tail; tail =3D tail->next) {
+
+I will fix this in the next version.
+
+> > +        instance =3D yank_find_instance(tmp->value);
+> > +        if (!instance) {
+> > +            error_set(errp, ERROR_CLASS_DEVICE_NOT_FOUND,
+> > +                      "Instance '%s' not found", tmp->value);
+> > +            qemu_mutex_unlock(&lock);
+> > +            return;
+> > +        }
+> > +    }
+> > +    tmp =3D instances;
+> > +    for (; tmp; tmp =3D tmp->next) { =20
+>=20
+> Likewise.
+>=20
+> > +        instance =3D yank_find_instance(tmp->value);
+> > +        assert(instance);
+> > +        QLIST_FOREACH(entry, &instance->yankfns, next) {
+> > +            entry->func(entry->opaque);
+> > +        }
+> > +    }
+> > +    qemu_mutex_unlock(&lock);
+> > +}
+> > +
+> > +YankInstances *qmp_query_yank(Error **errp)
+> > +{
+> > +    struct YankInstance *instance;
+> > +    YankInstances *ret;
+> > +
+> > +    ret =3D g_new0(YankInstances, 1);
+> > +    ret->instances =3D NULL;
+> > +
+> > +    qemu_mutex_lock(&lock);
+> > +    QLIST_FOREACH(instance, &head, next) {
+> > +        strList *entry;
+> > +        entry =3D g_new0(strList, 1);
+> > +        entry->value =3D g_strdup(instance->name);
+> > +        entry->next =3D ret->instances;
+> > +        ret->instances =3D entry;
+> > +    }
+> > +    qemu_mutex_unlock(&lock);
+> > +
+> > +    return ret;
+> > +}
+> > +
+> > +static void __attribute__((__constructor__)) yank_init(void)
+> > +{
+> > +    qemu_mutex_init(&lock);
+> > +}
+> > --
+> > 2.20.1 =20
+>=20
+> The two QMP commands permit out-of-band execution ('allow-oob': true).
+> OOB is easy to get wrong, but I figure you have a legitimate use case.
+> Let's review the restrictions documented in
+> docs/devel/qapi-code-gen.txt:
+>=20
+>     An OOB-capable command handler must satisfy the following conditions:
+>=20
+>     - It terminates quickly.
+>     - It does not invoke system calls that may block.
+>     - It does not access guest RAM that may block when userfaultfd is
+>       enabled for postcopy live migration.
+>     - It takes only "fast" locks, i.e. all critical sections protected by
+>       any lock it takes also satisfy the conditions for OOB command
+>       handler code.
+>=20
+> Since the command handlers take &lock, the restrictions apply to the
+> other critical sections protected by &lock as well.  I believe these are
+> all okay: they do nothing but allocate, initialize and free memory.
+>=20
+> The restrictions also apply to the YankFn callbacks, but you documented
+> that.  Okay.
+>=20
+> The one such callback included in this patch is
+> yank_generic_iochannel(), which is a thin wrapper around
+> qio_channel_shutdown(), which in turn runs the io_shutdown method.
+> Thus, the restructions also apply to all the io_shutdown methods.
+> That's not documented.
+>=20
+> Daniel, should it be documented?
+>=20
+This is already done in patch 6.
+
+Thank you for you review.
+
+Regards,
+Lukas Straub
+
+--Sig_/BrmbCTzCnw0zXIxt0z_i.JT
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl9JEvkACgkQNasLKJxd
+slgXsQ/+L/kHaLz6AB//ocZ7smVyILj9Ak6qzLkfk8s4j7/Oy/TXqc0FpUKLw+qC
+e3+FEOuqG2eRvqP8ndUu2Z1CRZRBCnscJV9DLgQ49CLHvDGxYwmZtfEx1UI5WPWp
+q1s5wgznhP+FJ0iXzL3+3TctBJdD3j/SQlpJL+oyOSZ5tT5h2UScXIp/Sdp6Wz1H
+TkjRs2wav/wjywHJCZltk+au8YSPFZYeNvwrDbNXx1evvtbRCAUN538SUNbPW5G5
+Fx90eA5i2JZOy/Rdbblw3NtHjK2TGaVrT/RAbT2lq68n6/YV9VzW1IM4PohWEa6B
+QH8Ba7Zch9VyQKxw7BwzvDHftciWFVhTh12JalkCarh8/8snx4vj30/S7Ufc9XQ+
+k8+lrPMoPqcEOl5i/s8vrUfhQc72d1xkZ8CjvPfL0ODX75NB99nNpm49gxUWsOxK
+Ps9cr1APE0Szjm8JSMT7XtH4rsBdWfzbrTjhEg2bNdbZDJQX5cTXs2XWiPoRDreD
+eMVDmpcOQEgN7kPftYbYPklnwqUWgV0z3NgebtCztQ1oqUsK8xWoRfskCXR29gxX
+fluNF3ixlCzhH+GEkmC0g+oRBk34P6pJFb4eNR8angux07OUJm2FVnBJ2KhZGbS9
+aA5XGGjVtpSg+Q9MHp9oqCep55a49jqt0DPGDMo/2rpJOl37veI=
+=XFhF
+-----END PGP SIGNATURE-----
+
+--Sig_/BrmbCTzCnw0zXIxt0z_i.JT--
 
