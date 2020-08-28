@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E3CC433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6928C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:45:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29FC92075B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:45:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 762132075B
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:45:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OfaXH9av"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29FC92075B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SxubAn0t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 762132075B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBjNi-0003u6-AZ
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 14:45:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59112)
+	id 1kBjNr-0004EE-HI
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 14:45:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBjCp-0002n4-H5
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:31 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41787)
+ id 1kBjCo-0002lY-TX
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:30 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38681)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBjCm-00061p-7x
+ id 1kBjCl-00061Q-4V
  for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:30 -0400
-Received: by mail-wr1-x442.google.com with SMTP id w5so47014wrp.8
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:34:27 -0700 (PDT)
+Received: by mail-wm1-x344.google.com with SMTP id t14so114789wmi.3
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:34:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=LATnJEWO7P/MKdEPBDLegkR2imAlvCK9m77w5J9GprA=;
- b=OfaXH9avmFC+6lAjPrkqOaiZKPTTZ541dGcFZJqvbazLttMGcIvUw2TkvS9OsmpYBR
- XW+pOXJJeOZeud5bIzVjdZ+tdaCh+qkopRFCdYZAji8+6x4WMKl/Vh0bXzfAfjlP75sa
- IhYlobyZfkY5leMiZHwRTFcza3pFxXytoqe8FBAgLnh5mp0GUkyrFMHd3aVfSRO0l9ll
- 7tgFz7B2dQglQWxtXVkYoKGVg7SEYaN9fFD3Wkx62f952OqRT6RYxapO8BCtNW0oxkeB
- oKM7cEfl5/yD8tTUWNmGKQyspHXzZxAOdABGWacG53xdlqDN7k3MHLcVlNpEA8xD92K3
- dbIA==
+ bh=X35NeqBctB9mslvjbHDeW7p7u1Isiz5hswfcsubx4hw=;
+ b=SxubAn0tbMmA12D/zBBdAmu9w7RlgU52vVlzcNRfnIDs9WtNjzh5wX+LKzfe743KkE
+ EB5emIOOGzgl48MHyIAfRhaTz+kLXD70MA89FrOJX4uO3KhKzYPt5MNu0pCQumdRE4H0
+ g0Ix0yNLa6GyG00X9GcGMPX5+1qAiEEldnVuRY/dc0vVi0URikF9x0RfWGwliHgDqYgy
+ F0TTxrHfCP8aqbJYKn7Px4WSEKYyG224Rlw+rpKo6pvxLzdyKyI5iUrlwETsxmokdeHQ
+ 2lyyJqhJJVepC62QwjfvrqZxIuFDJWGgn0UsB/6wmM9iB9vBX/X8VHK1k7LGFoh0CuN6
+ Ezjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=LATnJEWO7P/MKdEPBDLegkR2imAlvCK9m77w5J9GprA=;
- b=BFrW4eGdrnyqOg07AigDeqn/5fLdg/OG5C56vDw1OEBgN49dBUrGV9IacZGTJTLPFA
- 5WtZ3HHmcaQRcCpSeTws3WiAqoRfrwe09DYPK7SCoh0kVyZ7DGKH+I8FhTjv5XO38gRp
- I2Ox3RpwY3XBUcPWAtHQu//yahqqzIUFpt/f61NPKO2+SWiUEzxnL6KUrJWvjgtPGaoe
- TYHlUKYBGuKvSDf07C3PyJAdUAbUIZONAFeQMr44sgZgOrw3SpKxRBXtzSDXUxJSIPYP
- w76M556ssOxcNNGj7mYWGViCZOuf+BmoYDZknru5XxC87A08p3/myn/56yVwM4Me2K5K
- BwTg==
-X-Gm-Message-State: AOAM53214FICpwkmyb6ZlD5B4MaHFfhkya96EtgzLgztf7HCEV9b2478
- wHb57VnJ2eROe8WoV4MdqlgsKDtykhaWivmn
-X-Google-Smtp-Source: ABdhPJwS46x2U17pP2vR2CGDdvtaQC1o0p+/oztuBv5rLOU64ZhU4JdTWbPPhDHU8BgSEp3IhZMJRw==
-X-Received: by 2002:adf:edd0:: with SMTP id v16mr267891wro.271.1598639666902; 
- Fri, 28 Aug 2020 11:34:26 -0700 (PDT)
+ bh=X35NeqBctB9mslvjbHDeW7p7u1Isiz5hswfcsubx4hw=;
+ b=Av8h1Fp87prmWjphxjKjGi3840vun4tkI2Hf529r3ZYN6unua/hudS2sUbWVkcUWA+
+ 2HLHS55UDXvbX9heOZ78zWhY+swKvhsr9Uqun+CK1Qg4lN25QSxvi0gShqQ8p/kpynlG
+ H5sTbTgi6pUd+liOik2+LjIM1VtFhGGQb6F9TQdKDtwMD/ERzhXNneD+pXM5fh4Sa3+i
+ bhGFWFihucTBeY+hCR4cSvvQDBFSeaKxtJ+J+qDlae8qOkPnqiWJOC/stn4KjUFAdBfp
+ vNfnYUGh/NJafBpMPALIwnGK6kzdPJJQMTNLn0C4Ls/O5mpFVwUMtL62u7vmg0oavX2Z
+ pDaA==
+X-Gm-Message-State: AOAM533PQJy+3wilOSlfDCodWh6AAJxezW/vjDCRC91NS9HxzbDvnBt0
+ VqMIU2ceNHMjCYTOyqNzeAUSIw==
+X-Google-Smtp-Source: ABdhPJwni1cj4H+rqAEyat8m7Yi4D5+2E8M7g3pvbhkw6+TP5xqIdJqrYqyYkEb8HzynlHb835h5ww==
+X-Received: by 2002:a1c:e1d6:: with SMTP id y205mr41505wmg.92.1598639665695;
+ Fri, 28 Aug 2020 11:34:25 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s20sm356251wmh.21.2020.08.28.11.34.25
+ by smtp.gmail.com with ESMTPSA id s20sm356251wmh.21.2020.08.28.11.34.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 11:34:26 -0700 (PDT)
+ Fri, 28 Aug 2020 11:34:25 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 25/45] target/arm: Implement fp16 for Neon VABS,
- VNEG of floats
-Date: Fri, 28 Aug 2020 19:33:34 +0100
-Message-Id: <20200828183354.27913-26-peter.maydell@linaro.org>
+Subject: [PATCH v2 24/45] target/arm: Implement fp16 for Neon VRECPE,
+ VRSQRTE using gvec
+Date: Fri, 28 Aug 2020 19:33:33 +0100
+Message-Id: <20200828183354.27913-25-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200828183354.27913-1-peter.maydell@linaro.org>
 References: <20200828183354.27913-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,69 +105,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rewrite Neon VABS/VNEG of floats to use gvec logical AND and XOR, so
-that we can implement the fp16 version of the insns.
+We already have gvec helpers for floating point VRECPE and
+VRQSRTE, so convert the Neon decoder to use them and
+add the fp16 support.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/translate-neon.c.inc | 34 +++++++++++++++++++++++++++------
- 1 file changed, 28 insertions(+), 6 deletions(-)
+ target/arm/translate-neon.c.inc | 29 +++++++++++++++++++++++++++--
+ 1 file changed, 27 insertions(+), 2 deletions(-)
 
 diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
-index 872f093a1fc..a1bf8dcee09 100644
+index 9d0959517fa..872f093a1fc 100644
 --- a/target/arm/translate-neon.c.inc
 +++ b/target/arm/translate-neon.c.inc
-@@ -3741,22 +3741,44 @@ static bool trans_VCNT(DisasContext *s, arg_2misc *a)
-     return do_2misc(s, a, gen_helper_neon_cnt_u8);
- }
- 
-+static void gen_VABS_F(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
-+                       uint32_t oprsz, uint32_t maxsz)
-+{
-+    tcg_gen_gvec_andi(vece, rd_ofs, rm_ofs,
-+                      vece == MO_16 ? 0x7fff : 0x7fffffff,
-+                      oprsz, maxsz);
-+}
-+
- static bool trans_VABS_F(DisasContext *s, arg_2misc *a)
- {
--    if (a->size != 2) {
-+    if (a->size == 1) {
-+        if (!dc_isar_feature(aa32_fp16_arith, s)) {
-+            return false;
-+        }
-+    } else if (a->size != 2) {
-         return false;
+@@ -3857,13 +3857,38 @@ static bool do_2misc_fp(DisasContext *s, arg_2misc *a,
+         return do_2misc_fp(s, a, FUNC);                         \
      }
--    /* TODO: FP16 : size == 1 */
--    return do_2misc(s, a, gen_helper_vfp_abss);
-+    return do_2misc_vec(s, a, gen_VABS_F);
-+}
+ 
+-DO_2MISC_FP(VRECPE_F, gen_helper_recpe_f32)
+-DO_2MISC_FP(VRSQRTE_F, gen_helper_rsqrte_f32)
+ DO_2MISC_FP(VCVT_FS, gen_helper_vfp_sitos)
+ DO_2MISC_FP(VCVT_FU, gen_helper_vfp_uitos)
+ DO_2MISC_FP(VCVT_SF, gen_helper_vfp_tosizs)
+ DO_2MISC_FP(VCVT_UF, gen_helper_vfp_touizs)
+ 
++#define DO_2MISC_FP_VEC(INSN, HFUNC, SFUNC)                             \
++    static void gen_##INSN(unsigned vece, uint32_t rd_ofs,              \
++                           uint32_t rm_ofs,                             \
++                           uint32_t oprsz, uint32_t maxsz)              \
++    {                                                                   \
++        static gen_helper_gvec_2_ptr * const fns[4] = {                 \
++            NULL, HFUNC, SFUNC, NULL,                                   \
++        };                                                              \
++        TCGv_ptr fpst;                                                  \
++        fpst = fpstatus_ptr(vece == 1 ? FPST_STD_F16 : FPST_STD);       \
++        tcg_gen_gvec_2_ptr(rd_ofs, rm_ofs, fpst, oprsz, maxsz, 0,       \
++                           fns[vece]);                                  \
++        tcg_temp_free_ptr(fpst);                                        \
++    }                                                                   \
++    static bool trans_##INSN(DisasContext *s, arg_2misc *a)             \
++    {                                                                   \
++        if (a->size == 0 ||                                             \
++            (a->size == 1 && !dc_isar_feature(aa32_fp16_arith, s)))     \
++        {                                                               \
++            return false;                                               \
++        }                                                               \
++        return do_2misc_vec(s, a, gen_##INSN);                          \
++    }
 +
-+static void gen_VNEG_F(unsigned vece, uint32_t rd_ofs, uint32_t rm_ofs,
-+                       uint32_t oprsz, uint32_t maxsz)
-+{
-+    tcg_gen_gvec_xori(vece, rd_ofs, rm_ofs,
-+                      vece == MO_16 ? 0x8000 : 0x80000000,
-+                      oprsz, maxsz);
- }
- 
- static bool trans_VNEG_F(DisasContext *s, arg_2misc *a)
++DO_2MISC_FP_VEC(VRECPE_F, gen_helper_gvec_frecpe_h, gen_helper_gvec_frecpe_s)
++DO_2MISC_FP_VEC(VRSQRTE_F, gen_helper_gvec_frsqrte_h, gen_helper_gvec_frsqrte_s)
++
+ static bool trans_VRINTX(DisasContext *s, arg_2misc *a)
  {
--    if (a->size != 2) {
-+    if (a->size == 1) {
-+        if (!dc_isar_feature(aa32_fp16_arith, s)) {
-+            return false;
-+        }
-+    } else if (a->size != 2) {
-         return false;
-     }
--    /* TODO: FP16 : size == 1 */
--    return do_2misc(s, a, gen_helper_vfp_negs);
-+    return do_2misc_vec(s, a, gen_VNEG_F);
- }
- 
- static bool trans_VRECPE(DisasContext *s, arg_2misc *a)
+     if (!arm_dc_feature(s, ARM_FEATURE_V8)) {
 -- 
 2.20.1
 
