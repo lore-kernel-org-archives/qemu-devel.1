@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A6BC433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:41:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C532DC433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:42:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A96C120737
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:41:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 929FF20737
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 18:42:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VP5Z8Eqd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96C120737
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ya31YZ8f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 929FF20737
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBjJq-00058H-RF
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 14:41:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58900)
+	id 1kBjKi-0006iW-NS
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 14:42:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBjCj-0002X1-A0
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:25 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42996)
+ id 1kBjCd-0002Hw-Nc
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:19 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41784)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBjCc-0005yo-PL
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:24 -0400
-Received: by mail-wr1-x443.google.com with SMTP id c18so42299wrm.9
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:34:18 -0700 (PDT)
+ id 1kBjCX-0005x6-3X
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:19 -0400
+Received: by mail-wr1-x443.google.com with SMTP id w5so46361wrp.8
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:34:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=SpjNLpXsFoj6kxewsPo7gjZ4twjnVkm0kk0XSYVH8rY=;
- b=VP5Z8EqdS5lhxOl+Y28w5eD3/KldhPftK7i4fgR1jItfcLRUyzVZiSJDPNFXHCgB/o
- GrAOjIGhD5XZEPmajc7w2Lv0dymRShJeNVLCorrLhwaxfXKPm+abq/0yMJ8GPSrzcVEl
- CXa1FZPDmqUP9q9SHQkxSBO6HPqe1gZqeso9RGCXZKD6OYKvQxu4zC21HJOARggOsOIJ
- dTKNr1cVkiW8+/Cti0RH2qkhygDO2giUJp3MAjip54FuI4pp/iVYKwHeCxc4ZRi0+/fg
- ABQNts6sklmXQqmOUYaQDf4W8Sbo6dYLngX/x1dyMFqheKUDvR7gVyLKobCPTuyP1Lie
- RLlQ==
+ bh=CYOYh3fW4PMtwewY4tYeCU7uwNMTYjLcjrUorSe/iMI=;
+ b=ya31YZ8f5yFp00c6dD9HQ88r9RGZmTwgM00z70UaI2YV8ftstFV8jvbWIdelG0AjfQ
+ TKZ9Ygy2oUCChYvVV6zzdMnMUv27VrpA4vgGMZEenFLjlYnB7vbkEh5uoATlojiWQiT5
+ SHcooCTYUJetKWXs7BE2TE4k6TSMJEgkfbPFR06e9ao5K4gUeJyBB5W+LaeeR7swh/KS
+ i67tcTwLAAfPVVWOc7KobuheKeVcjCt+I4q10BrtGsyEzYDcqsGeiPVzYhFclXzZmb/m
+ ryvk6m6ySjH3TNdCxjoEkddjN55Wem+8W1NYkcuCzdKKKPb1xbfTI6DPsJ5m7rTkFrcb
+ EGAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=SpjNLpXsFoj6kxewsPo7gjZ4twjnVkm0kk0XSYVH8rY=;
- b=SRdqVZHLSZHYCTJqMoU3N/ofnGNMWtJa15Ve/rL/qDw+QXMKjlvdRjT3hw583o6od+
- Q6pB3fOpGcYsBqQbynCX5CygKPKXV8eF0RnblX6zM/oIU2RClcNaluAPlJWo4+MSRx7H
- 2T26HyXEZjd7DvFrJvcJj8xlMVl/luk66E+GF6XaZIJz/oKQvcXVpPdc58ZYStvEeYdt
- QV4LVoIN8oVPf/lqPWFRQ0QLv0+6+QK+7jeed76ZwubH+fyRkApaLCrrDr4D1u9RhLMg
- YY9BKItH9CrIt8xwlxzjhZbvxbZzs4TnnAPshL5GdbYqXGNPP9OWqZ8H+8Z3o9cV/4ti
- GpxA==
-X-Gm-Message-State: AOAM530dnu7j5/wMkdrilbZJ0xC5r/0BjJjy46EDkzGyS0XzZGxplJQ6
- BK5oDuxoOvqcE65jUC3/5zvLJw==
-X-Google-Smtp-Source: ABdhPJxjWSbwvs/HwYIADF7zL+On0S0KbABaVf7YbJpz2OZIcWdXW1O1cPEgZKa9qNsgXC1k5EhX5A==
-X-Received: by 2002:a5d:4ccb:: with SMTP id c11mr250573wrt.159.1598639657426; 
- Fri, 28 Aug 2020 11:34:17 -0700 (PDT)
+ bh=CYOYh3fW4PMtwewY4tYeCU7uwNMTYjLcjrUorSe/iMI=;
+ b=ah5jBiaDmqJspFmVvA85it9Jen7uIK6T/imzmLIE0yYqK6PM1KXQGS3QqlOlpSXa0Z
+ QVMlil8AHLlsP98H1qi9OnC84UoeuFqXf4jPNAt+Xw4tZ7WMpqPxoqWc+udY4182vQFK
+ iaQoP5Wqz0vETRENAaO5gCP1IsXRC5FqQGC/s+w56DJWHFKpY5ilo3evFDH/Ju1hHjVa
+ xEVktrt45LmXFYrJ5wbwUnFeIEJuJfR6U7GYr6NN/hzwVfZVWlLL2IBXFmc7EqfO66vZ
+ WcqI9rl7BxHE11/N226e1KQlmVXivV03Zuz/+fVUS2l4r2cPejzUh2DICvXGh6xC0bsu
+ +xCg==
+X-Gm-Message-State: AOAM5302uvzguxClc7a8lQmXTE+QC1oEHrLfj80q8CfmV02cNcZP0w/w
+ 7IyWxuCnTxwi7H9uxgliuEMflQ==
+X-Google-Smtp-Source: ABdhPJx+2eyjjEUcrRYS/3PuknQXLSlnOrO6aXY9yhhvt1XmozUxkn4n01+C6/CzRZXpaL/yBnxJsw==
+X-Received: by 2002:a5d:61d2:: with SMTP id q18mr263136wrv.404.1598639648946; 
+ Fri, 28 Aug 2020 11:34:08 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s20sm356251wmh.21.2020.08.28.11.34.16
+ by smtp.gmail.com with ESMTPSA id s20sm356251wmh.21.2020.08.28.11.34.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 11:34:16 -0700 (PDT)
+ Fri, 28 Aug 2020 11:34:08 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 17/45] target/arm: Implement VFP fp16 VSEL
-Date: Fri, 28 Aug 2020 19:33:26 +0100
-Message-Id: <20200828183354.27913-18-peter.maydell@linaro.org>
+Subject: [PATCH v2 10/45] target/arm: Implement VFP fp16 VCMP
+Date: Fri, 28 Aug 2020 19:33:19 +0100
+Message-Id: <20200828183354.27913-11-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200828183354.27913-1-peter.maydell@linaro.org>
 References: <20200828183354.27913-1-peter.maydell@linaro.org>
@@ -104,84 +104,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement the fp16 versions of the VFP VSEL instruction.
+Implement fp16 version of VCMP.
 
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/vfp-uncond.decode   |  6 ++++--
- target/arm/translate-vfp.c.inc | 16 ++++++++++++----
- 2 files changed, 16 insertions(+), 6 deletions(-)
+ target/arm/helper.h            |  2 ++
+ target/arm/vfp.decode          |  2 ++
+ target/arm/vfp_helper.c        | 15 +++++++------
+ target/arm/translate-vfp.c.inc | 39 ++++++++++++++++++++++++++++++++++
+ 4 files changed, 51 insertions(+), 7 deletions(-)
 
-diff --git a/target/arm/vfp-uncond.decode b/target/arm/vfp-uncond.decode
-index b7cd9d11ed5..8ba7b1703e0 100644
---- a/target/arm/vfp-uncond.decode
-+++ b/target/arm/vfp-uncond.decode
-@@ -44,10 +44,12 @@
- @vfp_dnm_s   ................................ vm=%vm_sp vn=%vn_sp vd=%vd_sp
- @vfp_dnm_d   ................................ vm=%vm_dp vn=%vn_dp vd=%vd_dp
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 37739b0e788..18afad634c9 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -134,8 +134,10 @@ DEF_HELPER_1(vfp_absd, f64, f64)
+ DEF_HELPER_2(vfp_sqrth, f16, f16, env)
+ DEF_HELPER_2(vfp_sqrts, f32, f32, env)
+ DEF_HELPER_2(vfp_sqrtd, f64, f64, env)
++DEF_HELPER_3(vfp_cmph, void, f16, f16, env)
+ DEF_HELPER_3(vfp_cmps, void, f32, f32, env)
+ DEF_HELPER_3(vfp_cmpd, void, f64, f64, env)
++DEF_HELPER_3(vfp_cmpeh, void, f16, f16, env)
+ DEF_HELPER_3(vfp_cmpes, void, f32, f32, env)
+ DEF_HELPER_3(vfp_cmped, void, f64, f64, env)
  
-+VSEL        1111 1110 0. cc:2 .... .... 1001 .0.0 .... \
-+            vm=%vm_sp vn=%vn_sp vd=%vd_sp sz=1
- VSEL        1111 1110 0. cc:2 .... .... 1010 .0.0 .... \
--            vm=%vm_sp vn=%vn_sp vd=%vd_sp dp=0
-+            vm=%vm_sp vn=%vn_sp vd=%vd_sp sz=2
- VSEL        1111 1110 0. cc:2 .... .... 1011 .0.0 .... \
--            vm=%vm_dp vn=%vn_dp vd=%vd_dp dp=1
-+            vm=%vm_dp vn=%vn_dp vd=%vd_dp sz=3
+diff --git a/target/arm/vfp.decode b/target/arm/vfp.decode
+index c898183771b..b213da4b55d 100644
+--- a/target/arm/vfp.decode
++++ b/target/arm/vfp.decode
+@@ -176,6 +176,8 @@ VSQRT_hp     ---- 1110 1.11 0001 .... 1001 11.0 ....        @vfp_dm_ss
+ VSQRT_sp     ---- 1110 1.11 0001 .... 1010 11.0 ....        @vfp_dm_ss
+ VSQRT_dp     ---- 1110 1.11 0001 .... 1011 11.0 ....        @vfp_dm_dd
  
- VMAXNM_hp   1111 1110 1.00 .... .... 1001 .0.0 ....         @vfp_dnm_s
- VMINNM_hp   1111 1110 1.00 .... .... 1001 .1.0 ....         @vfp_dnm_s
++VCMP_hp      ---- 1110 1.11 010 z:1 .... 1001 e:1 1.0 .... \
++             vd=%vd_sp vm=%vm_sp
+ VCMP_sp      ---- 1110 1.11 010 z:1 .... 1010 e:1 1.0 .... \
+              vd=%vd_sp vm=%vm_sp
+ VCMP_dp      ---- 1110 1.11 010 z:1 .... 1011 e:1 1.0 .... \
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index cc7fb6ddb6a..55aa38f0ce8 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -330,19 +330,20 @@ static void softfloat_to_vfp_compare(CPUARMState *env, FloatRelation cmp)
+ }
+ 
+ /* XXX: check quiet/signaling case */
+-#define DO_VFP_cmp(p, type) \
+-void VFP_HELPER(cmp, p)(type a, type b, CPUARMState *env)  \
++#define DO_VFP_cmp(P, FLOATTYPE, ARGTYPE, FPST) \
++void VFP_HELPER(cmp, P)(ARGTYPE a, ARGTYPE b, CPUARMState *env)  \
+ { \
+     softfloat_to_vfp_compare(env, \
+-        type ## _compare_quiet(a, b, &env->vfp.fp_status)); \
++        FLOATTYPE ## _compare_quiet(a, b, &env->vfp.FPST)); \
+ } \
+-void VFP_HELPER(cmpe, p)(type a, type b, CPUARMState *env) \
++void VFP_HELPER(cmpe, P)(ARGTYPE a, ARGTYPE b, CPUARMState *env) \
+ { \
+     softfloat_to_vfp_compare(env, \
+-        type ## _compare(a, b, &env->vfp.fp_status)); \
++        FLOATTYPE ## _compare(a, b, &env->vfp.FPST)); \
+ }
+-DO_VFP_cmp(s, float32)
+-DO_VFP_cmp(d, float64)
++DO_VFP_cmp(h, float16, dh_ctype_f16, fp_status_f16)
++DO_VFP_cmp(s, float32, float32, fp_status)
++DO_VFP_cmp(d, float64, float64, fp_status)
+ #undef DO_VFP_cmp
+ 
+ /* Integer to float and float to integer conversions */
 diff --git a/target/arm/translate-vfp.c.inc b/target/arm/translate-vfp.c.inc
-index 583e7ccdb20..869b67b2b93 100644
+index c864178ad4e..00a6363e1e1 100644
 --- a/target/arm/translate-vfp.c.inc
 +++ b/target/arm/translate-vfp.c.inc
-@@ -190,18 +190,22 @@ static bool vfp_access_check(DisasContext *s)
- static bool trans_VSEL(DisasContext *s, arg_VSEL *a)
- {
-     uint32_t rd, rn, rm;
--    bool dp = a->dp;
-+    int sz = a->sz;
+@@ -2325,6 +2325,45 @@ DO_VFP_2OP(VSQRT, hp, gen_VSQRT_hp)
+ DO_VFP_2OP(VSQRT, sp, gen_VSQRT_sp)
+ DO_VFP_2OP(VSQRT, dp, gen_VSQRT_dp)
  
-     if (!dc_isar_feature(aa32_vsel, s)) {
-         return false;
-     }
- 
--    if (dp && !dc_isar_feature(aa32_fpdp_v2, s)) {
-+    if (sz == 3 && !dc_isar_feature(aa32_fpdp_v2, s)) {
++static bool trans_VCMP_hp(DisasContext *s, arg_VCMP_sp *a)
++{
++    TCGv_i32 vd, vm;
++
++    if (!dc_isar_feature(aa32_fp16_arith, s)) {
 +        return false;
 +    }
 +
-+    if (sz == 1 && !dc_isar_feature(aa32_fp16_arith, s)) {
-         return false;
-     }
- 
-     /* UNDEF accesses to D16-D31 if they don't exist */
--    if (dp && !dc_isar_feature(aa32_simd_r32, s) &&
-+    if (sz == 3 && !dc_isar_feature(aa32_simd_r32, s) &&
-         ((a->vm | a->vn | a->vd) & 0x10)) {
-         return false;
-     }
-@@ -214,7 +218,7 @@ static bool trans_VSEL(DisasContext *s, arg_VSEL *a)
-         return true;
-     }
- 
--    if (dp) {
-+    if (sz == 3) {
-         TCGv_i64 frn, frm, dest;
-         TCGv_i64 tmp, zero, zf, nf, vf;
- 
-@@ -307,6 +311,10 @@ static bool trans_VSEL(DisasContext *s, arg_VSEL *a)
-             tcg_temp_free_i32(tmp);
-             break;
-         }
-+        /* For fp16 the top half is always zeroes */
-+        if (sz == 1) {
-+            tcg_gen_andi_i32(dest, dest, 0xffff);
-+        }
-         neon_store_reg32(dest, rd);
-         tcg_temp_free_i32(frn);
-         tcg_temp_free_i32(frm);
++    /* Vm/M bits must be zero for the Z variant */
++    if (a->z && a->vm != 0) {
++        return false;
++    }
++
++    if (!vfp_access_check(s)) {
++        return true;
++    }
++
++    vd = tcg_temp_new_i32();
++    vm = tcg_temp_new_i32();
++
++    neon_load_reg32(vd, a->vd);
++    if (a->z) {
++        tcg_gen_movi_i32(vm, 0);
++    } else {
++        neon_load_reg32(vm, a->vm);
++    }
++
++    if (a->e) {
++        gen_helper_vfp_cmpeh(vd, vm, cpu_env);
++    } else {
++        gen_helper_vfp_cmph(vd, vm, cpu_env);
++    }
++
++    tcg_temp_free_i32(vd);
++    tcg_temp_free_i32(vm);
++
++    return true;
++}
++
+ static bool trans_VCMP_sp(DisasContext *s, arg_VCMP_sp *a)
+ {
+     TCGv_i32 vd, vm;
 -- 
 2.20.1
 
