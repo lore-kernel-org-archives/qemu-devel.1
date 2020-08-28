@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ECF5C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEC3AC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:13:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDD8E207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:13:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BAAA9207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:13:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3aIz5L3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDD8E207DF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZEXbZhTC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAAA9207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBcK0-0004ZB-9l
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 07:13:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39994)
+	id 1kBcK3-0004ic-V2
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 07:13:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kBcGZ-00061P-RU
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:09:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22903
+ id 1kBcFe-0003sN-B9
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:08:58 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48095
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kBcGX-0000eF-An
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:09:55 -0400
+ id 1kBcFc-0000Tl-HM
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:08:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598612992;
+ s=mimecast20190719; t=1598612935;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=knDwBoTRIu/6pmdzHFuI+i2z60A8pL5efZSsvt2zSuU=;
- b=P3aIz5L3AyqMUsocDbWctrPLtR3UBt5imXYtEsSuLpe2WKXQWdYj60fE6XMIG73nn77mgt
- /MoGlWcSpk2jzBoFh7WznWkuBuXx4mk2dsVAPDQ5ZTaHgFkGJq4KmBGTSNO5qa3FXcRrIN
- CcGdOxo+cYfW5eS5HKIQoQ0kDyaictA=
+ bh=D67rxr493mJ/+CrDQejHYaadXcG/Kd/ccjywrf2LIbs=;
+ b=ZEXbZhTCfg0npfg82KO8oCdYkt8CcNssBhLhCQZWt7xoIcVzMfn2jhq5/jY2t9lnQ82Z8a
+ j3xXJL3zCp1tr3ydoTaE8bdnIlR0krrkZtpBTjJ+XZIjgztOkBXIqEdIxRiTs2D2oYKm0p
+ dUtMkd8xxtKj4+wJVsKQ71gWyptmLxI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56--xEDqYb1OL2ESPKjG-BFLA-1; Fri, 28 Aug 2020 07:09:50 -0400
-X-MC-Unique: -xEDqYb1OL2ESPKjG-BFLA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-559-f_xT4PWgONipY9p6DLRxPQ-1; Fri, 28 Aug 2020 07:08:53 -0400
+X-MC-Unique: f_xT4PWgONipY9p6DLRxPQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E020801AAB
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:09:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDAEC100746C
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:08:52 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6752C10027A6;
- Fri, 28 Aug 2020 11:09:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8B34119C59;
+ Fri, 28 Aug 2020 11:08:48 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 15/16] meson: fix migration/stress compilation with glib>=2.30
-Date: Fri, 28 Aug 2020 15:07:33 +0400
-Message-Id: <20200828110734.1638685-16-marcandre.lureau@redhat.com>
+Subject: [PATCH 08/16] meson: remove old socket_scm_helper rule
+Date: Fri, 28 Aug 2020 15:07:26 +0400
+Message-Id: <20200828110734.1638685-9-marcandre.lureau@redhat.com>
 In-Reply-To: <20200828110734.1638685-1-marcandre.lureau@redhat.com>
 References: <20200828110734.1638685-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120;
+Received-SPF: pass client-ip=207.211.31.120;
  envelope-from=marcandre.lureau@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 04:08:58
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 00:28:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
@@ -104,52 +104,25 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-gettid() was introduced with glibc 2.30.
+It was covered already in commit d3ca592b3c10 ("meson: convert check-block")
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 ---
- meson.build              | 3 +++
- tests/migration/stress.c | 2 ++
- 2 files changed, 5 insertions(+)
+ tests/Makefile.include | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 421f53083e..a8e074f4fa 100644
---- a/meson.build
-+++ b/meson.build
-@@ -408,6 +408,8 @@ if 'CONFIG_TASN1' in config_host
- endif
- keyutils = dependency('keyutils', required: false)
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index eea91772fa..2a6f29d1b5 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -66,7 +66,6 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+ 	rmdir $(INITRD_WORK_DIR)
  
-+has_gettid = cc.has_function('gettid')
-+
- # Create config-host.h
+ tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-obj-y) libvhost-user.a
+-tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
  
- config_host_data.set('CONFIG_SDL', sdl.found())
-@@ -418,6 +420,7 @@ config_host_data.set('CONFIG_VNC_PNG', png.found())
- config_host_data.set('CONFIG_VNC_SASL', sasl.found())
- config_host_data.set('CONFIG_XKBCOMMON', xkbcommon.found())
- config_host_data.set('CONFIG_KEYUTILS', keyutils.found())
-+config_host_data.set('CONFIG_GETTID', has_gettid)
- config_host_data.set('QEMU_VERSION', '"@0@"'.format(meson.project_version()))
- config_host_data.set('QEMU_VERSION_MAJOR', meson.project_version().split('.')[0])
- config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1])
-diff --git a/tests/migration/stress.c b/tests/migration/stress.c
-index 05d85051e3..0c72a420be 100644
---- a/tests/migration/stress.c
-+++ b/tests/migration/stress.c
-@@ -29,10 +29,12 @@ const char *argv0;
+ SPEED = quick
  
- #define PAGE_SIZE 4096
- 
-+#ifndef CONFIG_GETTID
- static int gettid(void)
- {
-     return syscall(SYS_gettid);
- }
-+#endif
- 
- static __attribute__((noreturn)) void exit_failure(void)
- {
 -- 
 2.26.2
 
