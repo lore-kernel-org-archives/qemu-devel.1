@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A6C7C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:14:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9F84C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:16:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20E1D208D5
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:14:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACA1820838
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:16:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gW55q9yS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20E1D208D5
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nf9s4MBe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA1820838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47540 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBnZM-0004G2-9Y
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:14:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52626)
+	id 1kBnbJ-0005lI-RB
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:16:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBnYo-0003iG-NF
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:13:30 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33744)
+ id 1kBnaY-0005Ax-UC
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:15:18 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38044)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBnYn-0005IV-A5
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:13:30 -0400
-Received: by mail-pg1-x542.google.com with SMTP id o13so1142455pgf.0
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 16:13:28 -0700 (PDT)
+ id 1kBnaX-0005Sg-Gy
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:15:18 -0400
+Received: by mail-pf1-x444.google.com with SMTP id d22so1394812pfn.5
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 16:15:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:references:from:message-id:date:user-agent:mime-version
  :in-reply-to:content-language:content-transfer-encoding;
- bh=G96Swk1Bj3MHCv5uo/EPexivUAIliibw0hEPmaMVLWo=;
- b=gW55q9ySiu1bS3RLSRJ71G8Q923l9JZYXrRFJ2eeQze0ySy7V5a7qqoNdri9WHZVu5
- H3ZNWMAekWCWcstQMj/X1WPk1Q/mDcXVnBKr9u8gQi9NvU+D4dEOjh4wRg4TFHCYaHWE
- t87TK7Kj7v0POCN8BeLVCKyCk/h2qxdae4ssrsGO1fMmNscvFDOr3cxUhBkrTsrARd4D
- 0RvzmQc/dBoqJzKdwuHp3jPJ+JQ/qcKX78ycalkYMr+wh3Hfhi0Sf5g+2GecitZUgD6y
- H4XTsBpRyh45xfGH+qAHIER4CBegrfS984ntBEFbJ2XKSqbTWuPKdsQZSgwaxM1wAq23
- rTbw==
+ bh=43WSVJzarsL3eZt2zG/DYCCayJJNxtwu/41CXWtyY8c=;
+ b=nf9s4MBe+EU/Mx9cmnB7sa4YyHFcm9xv77nJ7tp2Zd9FurISWNWYp7fHkAMAdw7lvo
+ ij1zSGe7DHoIOJype3pqGAYaroPWd6J6USy6CqOjfOBLTAgNmMBKtrrsmNeZYTjbUCRp
+ H+2oHTmwrqtldJNah/qiN1k4OCdcg7SEpuTSBoqMmt68X3YokOnDU/uJ5JPbh58Hg0/V
+ k/YW8gKfVtLGOruMKGEJ9Top2BE6Xsh6t+wszNP8gAhuZHtpbSnVIY7OsMWqFxsz+6ce
+ a1fp8ttCxvDzkBhy1cWCRLjxkQcpt03EfJKIUVJxlNIpXnPRs3UivUwBPohvvF/tjsVn
+ 0yrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=G96Swk1Bj3MHCv5uo/EPexivUAIliibw0hEPmaMVLWo=;
- b=BoSs7Yd++WEoIHXZhrHmiuis2X78wzr15kO/L199vG7j6rTQMwU2kTPdJjIs9rVkTb
- qtkT/qTxDhT3SM14SxEZmUM8BOBA31VceI20DSfm3NfFXsg1mY6h9kG9hxz3m4gQgjIb
- Cf1j9y1NNVIDlKwQv3vMbPu+LsK6/AqrWGkNN4oqSzdgjpCmL86T8QCx0PYRg0vBv640
- BfXeSvjCjEyypkjkqIGmaAUOM2ggk8i4ifHEUm3CnHO3DArWmqB7z0zmvoVunUX85bmv
- cod9CQk/1y2ITmWBXqWKylD1PVaoVJDGhPYJX22SMAA5aAqSoFRS1ElISX0wZlAFgjUb
- dJ7Q==
-X-Gm-Message-State: AOAM533Y2Do9FthKdYFIM9vW5QymN/t66/pP/BcI+0KXSnWp5bD8aXwa
- Xdrp/a4/jjEWH/HNHn0pX9RHiE+50/RXww==
-X-Google-Smtp-Source: ABdhPJwph51YLyzqkRD+Zq2Za6tI1yQ1u4bBgx16MqejoTW3HBKNx3nVyXX2DN+5AJEACX3O4BDY5g==
-X-Received: by 2002:a63:b24b:: with SMTP id t11mr737266pgo.233.1598656407582; 
- Fri, 28 Aug 2020 16:13:27 -0700 (PDT)
+ bh=43WSVJzarsL3eZt2zG/DYCCayJJNxtwu/41CXWtyY8c=;
+ b=DU28OUw6Is4p2gR7VKDnWbkiof4mmrOZgA6PDTmEDFSIrDWvRzXrhWLhZr5/qDOk4q
+ 3wBGKka6KePuQx4jhh1w9MHDy8CdA6fTKqLDHrYxD/olESsup8VB/dP39HAHwlCB+6pw
+ L6Ib2CqIGYFeu75aD9dwCwrrkf/9OGJy01x/AVSyLaByoPx5ccHoXC22Eyr0OZ9ejiLG
+ 4LpfgbSYFTpLorwUVHZXzu5tDGqtKC7iig3YEh9hpU+2YfusHG1cenTTw+I4tjnGaau+
+ UvQku0yNrX1vfqNVUj012mBCy0MhvRjamTowX8GohBPdVokIhcZ/nBUCzw2b7hmdyPjE
+ YEqA==
+X-Gm-Message-State: AOAM530avcy9ZxRqlYUzLcMMjK4S4urH88PJaC70yXHroFtjIlgTo/Xd
+ bbwsntP1mmFZsP76kVL6T5jfW7TLpUCeqQ==
+X-Google-Smtp-Source: ABdhPJxKdlae02kWTuCp03LQIuRPDiSXhhuPlW62qNnJRzQLHeIj7y4yfPps2ISupYZs+LViuJxqdg==
+X-Received: by 2002:aa7:8c42:: with SMTP id e2mr1016889pfd.181.1598656515947; 
+ Fri, 28 Aug 2020 16:15:15 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id x19sm505288pfq.43.2020.08.28.16.13.26
+ by smtp.gmail.com with ESMTPSA id c143sm497501pfb.84.2020.08.28.16.15.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Aug 2020 16:13:26 -0700 (PDT)
-Subject: Re: [PATCH v2 39/45] target/arm: Implement fp16 for Neon VCVT with
- rounding modes
+ Fri, 28 Aug 2020 16:15:15 -0700 (PDT)
+Subject: Re: [PATCH v2 40/45] target/arm: Implement fp16 for Neon
+ VRINT-with-specified-rounding-mode
 To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
  qemu-devel@nongnu.org
 References: <20200828183354.27913-1-peter.maydell@linaro.org>
- <20200828183354.27913-40-peter.maydell@linaro.org>
+ <20200828183354.27913-41-peter.maydell@linaro.org>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <d2321e5f-a96d-57fb-aa28-497b213df11a@linaro.org>
-Date: Fri, 28 Aug 2020 16:13:24 -0700
+Message-ID: <cf4cad38-a1da-ac71-ea60-667b2389abf8@linaro.org>
+Date: Fri, 28 Aug 2020 16:15:13 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200828183354.27913-40-peter.maydell@linaro.org>
+In-Reply-To: <20200828183354.27913-41-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -28
@@ -111,15 +111,16 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/28/20 11:33 AM, Peter Maydell wrote:
-> Convert the Neon VCVT with-specified-rounding-mode instructions
-> to gvec, and use this to implement fp16 support for them.
+> Convert the Neon VRINT-with-specified-rounding-mode insns to gvec,
+> and use this to implement the fp16 versions.
 > 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  target/arm/helper.h             |   5 ++
->  target/arm/vec_helper.c         |  23 +++++++
->  target/arm/translate-neon.c.inc | 103 +++++++++++---------------------
->  3 files changed, 64 insertions(+), 67 deletions(-)
+>  target/arm/helper.h             |  4 +-
+>  target/arm/vec_helper.c         | 21 +++++++++++
+>  target/arm/vfp_helper.c         | 17 ---------
+>  target/arm/translate-neon.c.inc | 67 +++------------------------------
+>  4 files changed, 30 insertions(+), 79 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
