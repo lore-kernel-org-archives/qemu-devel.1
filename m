@@ -2,85 +2,87 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 026BAC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:08:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B882C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:08:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1D3E207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:08:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FB0D207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 11:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RT4UHRnv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1D3E207DF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TgwUWFqT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FB0D207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBcFE-0002Z0-0z
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 07:08:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39328)
+	id 1kBcFV-0002yO-Qs
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 07:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kBcEX-0001d7-NW
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:07:49 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:56422
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kBcEe-0001il-L3
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:07:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23077)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
- id 1kBcEV-0000NK-7q
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:07:48 -0400
+ id 1kBcEb-0000Nf-Qs
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 07:07:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598612865;
+ s=mimecast20190719; t=1598612872;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=+WGJ9vUMr0j8FvZHWjtFOeajR576tFt25ckBZ1qJg2k=;
- b=RT4UHRnvK09Wzw+Q1OPif4l2fX47ElkDboRRkrefS3Fw08LoSPzd0RPwfoChv4oKOl4Ml/
- 3yRAeXbrdSQeX7kPj4ds09NvwXUaB5PoaV4l1wO40P5ndfhZlNR06zyPlJYCgrKu4ZkgkB
- Fk1m+jbuzEuXLrWemSWrwnaepSOYAA8=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TDYi72xiOxaVPRwJw8viMTlmYaQgiX+KXSwGMtlZHCI=;
+ b=TgwUWFqTURS8MfsIDhslbuN1TzRRRRCNUIrQ5vBNZAQNZFVhWD8wiByWoXtvLJzOo6G+OX
+ zN5KzvUrNGKj5KzSispvdHTKLKSjY6TCCVTM+u55JnGFxaj1PH2zAWQzXIK6HWj9Xs4pCa
+ FJKWBRnYIvAqZbnV11IODlfJzR+FDgw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-156-lwYpoTnGPQyIz6gXT8uXJA-1; Fri, 28 Aug 2020 07:07:41 -0400
-X-MC-Unique: lwYpoTnGPQyIz6gXT8uXJA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-410-z5bL0senMwaeKQzMYV-7uA-1; Fri, 28 Aug 2020 07:07:50 -0400
+X-MC-Unique: z5bL0senMwaeKQzMYV-7uA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD3261007474
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:07:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E04CD80EF9D
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:07:49 +0000 (UTC)
 Received: from localhost (unknown [10.36.110.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3941960FC2;
- Fri, 28 Aug 2020 11:07:36 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8705560BA7;
+ Fri, 28 Aug 2020 11:07:45 +0000 (UTC)
 From: marcandre.lureau@redhat.com
 To: qemu-devel@nongnu.org
-Subject: [PATCH 00/16] meson: convert unit tests in tests/Makefile.include
-Date: Fri, 28 Aug 2020 15:07:18 +0400
-Message-Id: <20200828110734.1638685-1-marcandre.lureau@redhat.com>
+Subject: [PATCH 01/16] meson: build qapi tests library
+Date: Fri, 28 Aug 2020 15:07:19 +0400
+Message-Id: <20200828110734.1638685-2-marcandre.lureau@redhat.com>
+In-Reply-To: <20200828110734.1638685-1-marcandre.lureau@redhat.com>
+References: <20200828110734.1638685-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=205.139.110.61;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124;
  envelope-from=marcandre.lureau@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 07:07:45
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 04:08:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,54 +102,210 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>=0D
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Hi,=0D
-=0D
-This series convert the unit tests from tests/Makefile.include to meson.=0D
-=0D
-Based-on: <20200823111757.72002-2-thuth@redhat.com>=0D
-=0D
-Marc-Andr=C3=A9 Lureau (16):=0D
-  meson: build qapi tests library=0D
-  meson: declare tasn1 dependency=0D
-  meson: declare keyutils dependency=0D
-  meson: convert qht-bench=0D
-  tests: qga has virtio-serial by default when host has it=0D
-  meson: convert the unit tests=0D
-  meson: move keyutils dependency check=0D
-  meson: remove old socket_scm_helper rule=0D
-  meson: convert vhost-user-bridge=0D
-  meson: convert atomic*-bench=0D
-  tests/Makefile.include: update check-build=0D
-  tests: do not print benchmark output to stdout=0D
-  meson: convert the speed tests=0D
-  tests/migration/stress: remove unused exit_success=0D
-  meson: fix migration/stress compilation with glib>=3D2.30=0D
-  meson: convert migration/initrd-stress=0D
-=0D
- Makefile                         |   2 +-=0D
- configure                        |  25 ---=0D
- meson.build                      |  10 +=0D
- scripts/mtest2make.py            |   3 +-=0D
- tests/Makefile.include           | 368 +------------------------------=0D
- tests/benchmark-crypto-cipher.c  |   8 +-=0D
- tests/benchmark-crypto-hash.c    |   2 +-=0D
- tests/benchmark-crypto-hmac.c    |   8 +-=0D
- tests/include/meson.build        |  13 ++=0D
- tests/meson.build                | 253 +++++++++++++++++++++=0D
- tests/migration/initrd-stress.sh |  10 +=0D
- tests/migration/meson.build      |  14 ++=0D
- tests/migration/stress.c         |  15 +-=0D
- tests/test-crypto-secret.c       |  10 +-=0D
- tests/test-qga.c                 |   4 +-=0D
- 15 files changed, 325 insertions(+), 420 deletions(-)=0D
- create mode 100644 tests/include/meson.build=0D
- create mode 100755 tests/migration/initrd-stress.sh=0D
- create mode 100644 tests/migration/meson.build=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+- builds QAPI builtins types/visitor to fix a linking issue with
+  unresolved symbols in the static library.
+
+- work around a meson limitation on generated file output directories.
+
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ tests/Makefile.include    | 79 +--------------------------------------
+ tests/include/meson.build | 13 +++++++
+ tests/meson.build         | 44 ++++++++++++++++++++++
+ 3 files changed, 58 insertions(+), 78 deletions(-)
+ create mode 100644 tests/include/meson.build
+
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index a9746c2ecb..9e72cfefbe 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -34,23 +34,6 @@ endif
+ ifneq ($(wildcard config-host.mak),)
+ export SRC_PATH
+ 
+-# TODO don't duplicate $(SRC_PATH)/Makefile's qapi-py here
+-qapi-py = $(SRC_PATH)/scripts/qapi/__init__.py \
+-$(SRC_PATH)/scripts/qapi/commands.py \
+-$(SRC_PATH)/scripts/qapi/common.py \
+-$(SRC_PATH)/scripts/qapi/doc.py \
+-$(SRC_PATH)/scripts/qapi/error.py \
+-$(SRC_PATH)/scripts/qapi/events.py \
+-$(SRC_PATH)/scripts/qapi/expr.py \
+-$(SRC_PATH)/scripts/qapi/gen.py \
+-$(SRC_PATH)/scripts/qapi/introspect.py \
+-$(SRC_PATH)/scripts/qapi/parser.py \
+-$(SRC_PATH)/scripts/qapi/schema.py \
+-$(SRC_PATH)/scripts/qapi/source.py \
+-$(SRC_PATH)/scripts/qapi/types.py \
+-$(SRC_PATH)/scripts/qapi/visit.py \
+-$(SRC_PATH)/scripts/qapi-gen.py
+-
+ # Get the list of all supported sysemu targets
+ SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
+    $(wildcard $(SRC_PATH)/default-configs/*-softmmu.mak)))
+@@ -164,36 +147,13 @@ ifeq ($(CONFIG_BLOCK)$(CONFIG_REPLICATION)$(CONFIG_POSIX),yyy)
+ check-unit-y += tests/test-replication$(EXESUF)
+ endif
+ 
+-generated-files-y += tests/test-qapi-types.h
+-generated-files-y += tests/include/test-qapi-types-sub-module.h
+-generated-files-y += tests/test-qapi-types-sub-sub-module.h
+-generated-files-y += tests/test-qapi-visit.h
+-generated-files-y += tests/include/test-qapi-visit-sub-module.h
+-generated-files-y += tests/test-qapi-visit-sub-sub-module.h
+-generated-files-y += tests/test-qapi-commands.h
+-generated-files-y += tests/test-qapi-init-commands.h
+-generated-files-y += tests/include/test-qapi-commands-sub-module.h
+-generated-files-y += tests/test-qapi-commands-sub-sub-module.h
+-generated-files-y += tests/test-qapi-emit-events.h
+-generated-files-y += tests/test-qapi-events.h
+-generated-files-y += tests/include/test-qapi-events-sub-module.h
+-generated-files-y += tests/test-qapi-events-sub-sub-module.h
+-generated-files-y += tests/test-qapi-introspect.h
+-
+ QEMU_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
+ 
+ 
+ # Deps that are common to various different sets of tests below
+ test-util-obj-y = libqemuutil.a
+ test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
+-test-qapi-obj-y = tests/test-qapi-types.o \
+-	tests/include/test-qapi-types-sub-module.o \
+-	tests/test-qapi-types-sub-sub-module.o \
+-	tests/test-qapi-visit.o \
+-	tests/include/test-qapi-visit-sub-module.o \
+-	tests/test-qapi-visit-sub-sub-module.o \
+-	tests/test-qapi-introspect.o \
+-	$(test-qom-obj-y)
++test-qapi-obj-y = $(test-qom-obj-y) tests/libtestqapi.a
+ benchmark-crypto-obj-$(CONFIG_BLOCK) = $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj-y)
+ test-crypto-obj-$(CONFIG_BLOCK) = $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj-y)
+ test-io-obj-$(CONFIG_BLOCK) = $(io-obj-y) $(test-crypto-obj-y)
+@@ -264,42 +224,6 @@ tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
+ tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-obj-y) \
+ 	$(test-block-obj-y)
+ 
+-tests/test-qapi-types.c tests/test-qapi-types.h \
+-tests/include/test-qapi-types-sub-module.c \
+-tests/include/test-qapi-types-sub-module.h \
+-tests/test-qapi-types-sub-sub-module.c \
+-tests/test-qapi-types-sub-sub-module.h \
+-tests/test-qapi-visit.c tests/test-qapi-visit.h \
+-tests/include/test-qapi-visit-sub-module.c \
+-tests/include/test-qapi-visit-sub-module.h \
+-tests/test-qapi-visit-sub-sub-module.c \
+-tests/test-qapi-visit-sub-sub-module.h \
+-tests/test-qapi-commands.h tests/test-qapi-commands.c \
+-tests/include/test-qapi-commands-sub-module.h \
+-tests/include/test-qapi-commands-sub-module.c \
+-tests/test-qapi-commands-sub-sub-module.h \
+-tests/test-qapi-commands-sub-sub-module.c \
+-tests/test-qapi-emit-events.c tests/test-qapi-emit-events.h \
+-tests/test-qapi-events.c tests/test-qapi-events.h \
+-tests/test-qapi-init-commands.c \
+-tests/test-qapi-init-commands.h \
+-tests/include/test-qapi-events-sub-module.c \
+-tests/include/test-qapi-events-sub-module.h \
+-tests/test-qapi-events-sub-sub-module.c \
+-tests/test-qapi-events-sub-sub-module.h \
+-tests/test-qapi-introspect.c tests/test-qapi-introspect.h: \
+-tests/test-qapi-gen-timestamp ;
+-tests/test-qapi-gen-timestamp: \
+-		$(SRC_PATH)/tests/qapi-schema/qapi-schema-test.json \
+-		$(SRC_PATH)/tests/qapi-schema/include/sub-module.json \
+-		$(SRC_PATH)/tests/qapi-schema/sub-sub-module.json \
+-		$(qapi-py)
+-	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+-		-o tests -p "test-" $<, \
+-		"GEN","$(@:%-timestamp=%)")
+-	@rm -f tests/test-qapi-doc.texi
+-	@>$@
+-
+ tests/test-string-output-visitor$(EXESUF): tests/test-string-output-visitor.o $(test-qapi-obj-y)
+ tests/test-string-input-visitor$(EXESUF): tests/test-string-input-visitor.o $(test-qapi-obj-y)
+ tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $(test-qapi-obj-y) tests/test-qapi-emit-events.o tests/test-qapi-events.o
+@@ -532,7 +456,6 @@ check-build: build-unit
+ 
+ check-clean:
+ 	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
+-	rm -f tests/test-qapi-gen-timestamp
+ 	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+ 
+ check: check-unit
+diff --git a/tests/include/meson.build b/tests/include/meson.build
+new file mode 100644
+index 0000000000..835872643e
+--- /dev/null
++++ b/tests/include/meson.build
+@@ -0,0 +1,13 @@
++# an extra target to workaround meson limitation on output files location
++test_qapi_outputs_extra = [
++  'test-qapi-commands-sub-module.c',
++  'test-qapi-commands-sub-module.h',
++  'test-qapi-events-sub-module.c',
++  'test-qapi-events-sub-module.h',
++  'test-qapi-types-sub-module.c',
++  'test-qapi-types-sub-module.h',
++  'test-qapi-visit-sub-module.c',
++  'test-qapi-visit-sub-module.h',
++]
++
++test_qapi_outputs_extra = custom_target('QAPI test include', output: test_qapi_outputs_extra, command: 'true')
+diff --git a/tests/meson.build b/tests/meson.build
+index fe2c6d8e6b..3c1586f110 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -1,3 +1,47 @@
++test_qapi_outputs = [
++  'qapi-builtin-types.c',
++  'qapi-builtin-types.h',
++  'qapi-builtin-visit.c',
++  'qapi-builtin-visit.h',
++  'test-qapi-commands-sub-sub-module.c',
++  'test-qapi-commands-sub-sub-module.h',
++  'test-qapi-commands.c',
++  'test-qapi-commands.h',
++  'test-qapi-emit-events.c',
++  'test-qapi-emit-events.h',
++  'test-qapi-events-sub-sub-module.c',
++  'test-qapi-events-sub-sub-module.h',
++  'test-qapi-events.c',
++  'test-qapi-events.h',
++  'test-qapi-init-commands.c',
++  'test-qapi-init-commands.h',
++  'test-qapi-introspect.c',
++  'test-qapi-introspect.h',
++  'test-qapi-types-sub-sub-module.c',
++  'test-qapi-types-sub-sub-module.h',
++  'test-qapi-types.c',
++  'test-qapi-types.h',
++  'test-qapi-visit-sub-sub-module.c',
++  'test-qapi-visit-sub-sub-module.h',
++  'test-qapi-visit.c',
++  'test-qapi-visit.h',
++]
++
++# meson doesn't like generated output in other directories:
++subdir('include')
++
++test_qapi_files = custom_target('Test QAPI files',
++                                output: test_qapi_outputs,
++                                input: files('qapi-schema/qapi-schema-test.json',
++                                             'qapi-schema/include/sub-module.json',
++                                             'qapi-schema/sub-sub-module.json'),
++                                command: [ qapi_gen, '-o', meson.current_build_dir(),
++                                           '-b', '-p', 'test-', '@INPUT0@' ],
++                                depend_files: qapi_gen_depends)
++
++libtestqapi = static_library('testqapi', sources: [test_qapi_files, test_qapi_outputs_extra])
++testqapi = declare_dependency(link_with: libtestqapi)
++
+ if have_system and 'CONFIG_POSIX' in config_host
+   subdir('qemu-iotests')
+ endif
+-- 
+2.26.2
 
 
