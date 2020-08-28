@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 922ACC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F3C5C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55BFA207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:43:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55BFA207DF
+	by mail.kernel.org (Postfix) with ESMTPS id 65244207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 13:43:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65244207DF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42410 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBeeo-000662-Gz
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:43:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36952)
+	id 1kBeet-0006KQ-Id
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 09:43:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBeaB-00046g-Ht
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:19 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:51211)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea9-00040z-Dh
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:17 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:54001)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea7-0007HE-Ea
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:19 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kBea7-0007HC-7A
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 09:38:17 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mft3h-1kmvGX3CdF-00gLIh; Fri, 28 Aug 2020 15:38:05 +0200
+ id 1MqZE0-1kyErW21iK-00mcpm; Fri, 28 Aug 2020 15:38:06 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 10/18] linux-user: Add missing termbits types and values
- definitions
-Date: Fri, 28 Aug 2020 15:37:45 +0200
-Message-Id: <20200828133753.2622286-11-laurent@vivier.eu>
+Subject: [PULL 12/18] linux-user: detect mismatched ELF ABI in
+ qemu-mips[n32][el]
+Date: Fri, 28 Aug 2020 15:37:47 +0200
+Message-Id: <20200828133753.2622286-13-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200828133753.2622286-1-laurent@vivier.eu>
 References: <20200828133753.2622286-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:xLI06DhKxWQ0VCMm1ABLs3/1sWTREUDmmCUcqrmhm/HEDPrGYzp
- wuqb12DBSPGkXmeUFmCDZu0hb45iA/OxY/l7eWl1jh3jtb/gxpl0vcnR/KOGr+7a8QgZPot
- 1NqaZZGbVuVotO2GfCqKYjl9hy4sft79mSrni7sY/4UI42zLxVn1J3XyXC8b2HPyXIuziAA
- hXeWg1061YADqcac16ZIg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:caTmLkfX+AI=:PhIj7eQAWlKAsJQewSfi28
- S5u1DnQwCPCondNhn7vrYTCo0ZYdlc9TVgCshc7v1NEyZF3bychnxAPrJdql7+EsW7jYGZFup
- 3Idnx8ypC35oudzvEsZbxRw8DuXAWn2zsWLcsB2k+dBEi2EUtyK2rlaDq6IhdhZNU6Fj5E2/X
- 0wUR68LWUgBWP+y6Ay6MHzYpmFMW8nlm/XaN2LQ1sAd4RqGbjgM9Z19HBF0CXBTX4WIf1WZfi
- KSPTodNCUOYORmly6qk4klSl+QWFSab7U1RLDELMYL8oiTzKgdCs8lJsAQNenHWXms102mAy7
- xQTfWP/FI8F21/jHpODN6amkAOcJemzxau241nfPGuFxYw9h8V6lAsSaeNWLzBGvsov2VX5EF
- DugMZrnyl9vHIxnSd7LllhLhCaOI2RJ59s4nx4xI74HXUZEJQrjAiS8Zj1J27EwTrOdhRDouX
- QbfDMoDh/m4VKWPen3Ldg1vEJbUiv1ogOFdUlsG0PdRyFKpOyp1WnL+ZmwhlVonsN2pBVTrbh
- 0cQM7Q3cMSlolzf8CgRuqf7qN0Qep9e/nJtwr4nu1idLkK08nttzuHS/Lm4yi16K5TdOasqYC
- N734oGpUbwrpA1Nf8JdRPkImEcUse94qj1Ekz3SM2po10u9y04lHNicKwkziEj4mKuzyHUa2L
- 2bMHbxsirpR4gHwbT9ZqT0TsbrlGpLwgGJ2uRRNyr1rGFOWOsOE5s2n42xT5wPXgyXBNLboJe
- 2bLHOLRgyFUcdE6wZpvjab6V715nyYLPCUYbPm89niIs4rHPwY0913QrXgb1Gi8lb9vl3WsOx
- QAjUpyoo6mPXCp71EnkKcrsQV856hJyUgF6rzbMrQCjL6ltnrDIqkAw2s+iBjVxQ0OUYEuJ
+X-Provags-ID: V03:K1:nErqG+xrP5ehjIzp/14dthCCJVsrY4T3lftaSCNosmlNNcX8UYT
+ FXYeaex3aqmdRKpGIbb10pjzh2PD/cfib8okzQ0+6dUKQ++xNHVmWfbCJyNvh0EgoKZu0Xq
+ x9lMMyMjvKeJaiBGL9OQasJ8QH2RKfUiDsXioOY2PXUXDs7PZHVTw2YgWo2j40Pw+7v0FaM
+ HpsHqExWHxbcR4uQc7gng==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:aocaX+l7jwM=:rr6Y4SevKA75oRw+gmrJcR
+ JSQOx4rrGChdmxVGMBc8EQgR0fq4OThgg5tsfYo8cB6NLLigBU48d76hZOM7Y9ZsSwJk3f5EM
+ Fn7O886oKhXd/1CIrfIV0dXY6SJsqte1dnKPlfFamib8/xWSte7sg0dxHuURtUrzC0By+2gRU
+ VcokWoZto62HMJUc88sYmPppJBo4wmq2PlfzkEJtdWhFCLgjBigAmji09BmFDceBkM6La0jrB
+ bSaPEJJwHzTx181DoNCmE8zgBqAiN9UDwjHXxkmoXCuAfvbUw2SrZ4oSb0rbAuf1eumRu9UgE
+ d6PHu2jdqV4eciKkQThb4/KvV3G+xLIYQ4pZmBx/J8XG6witt+zIWksh6rE7XuPQxrWADcEC5
+ dDl9VG4qV2SHzPilCNdERJftVmDUYMDAW0lX5anNRNnH4mUTo0Du6FEXFBJtWHSbp44J0RfH+
+ mXSi9xVxjugL8mD/gyeLOG0dYDz4Gp4hFz3HlFV47BwT325lXxLjbsjReNcMfdmfmfy+JyOsu
+ g2XNP0nqaWgLlc7FMWPxMvE9y/VigDZqpbywLEM8j2QzHdpBPyEnUmxryFcrqixN/JzOPQYe2
+ TXkQjxGMLDc+nRkOaHptkJtqAKVSD0sk+M+kuFa46P2H1T6phstt2Y62T9cMwExiA8DQtCiaF
+ A7K3SjqVpI8XFjv0/PYs7d9pWCnO+zNxPbtnmye0WSAobdbGbfd74MriYgG15nxBcQl7Qn/j9
+ 2gDIOir4KKUl8PlReVCOyHojzjfXhhmpmPBR2ZNwJiw1OhAaWHPYTzUnU9Fp5ZKdwKPNsAyo0
+ nz+yzO/kSihZpAgrURH1vaXEbG1fgfb7GD4RetBhEKhKkJYpkh3ZusCCnssepMLO4IR1KYT
 Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 09:38:08
@@ -83,459 +84,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Max Filippov <jcmvbkbc@gmail.com>, Riku Voipio <riku.voipio@iki.fi>,
- Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: =?UTF-8?q?Carlo=20Marcelo=20Arenas=20Bel=C3=B3n?= <carenas@gmail.com>,
+ Riku Voipio <riku.voipio@iki.fi>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+From: Carlo Marcelo Arenas Belón <carenas@gmail.com>
 
-This patch introduces missing target types ('target_flag_t', 'target_cc_t',
-'target_speed_t') in a few 'termibts.h' header files. Also, two missing
-values ('TARGET_IUTF8' and 'TARGET_EXTPROC') were also added. These values
-were also added in file 'syscall.c' in bitmask tables 'iflag_tbl[]' and
-'lflag_tbl[]' which are used to convert values of 'struct termios' between
-target and host.
+MIPS provides 2 ILP32 ABIs, and therefore 4 possible qemu-mips binaries
+with 2 pairs using the same endianess and bitness.
 
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Reviewed-by: Max Filippov <jcmvbkbc@gmail.com>
+This could lead to an O32 image loading in the N32 binary or vice versa
+and in cryptic errors (if lucky that the CPU doesn't match the FPU used)
+like :
+
+  qemu: Unexpected FPU mode       (o32 ELF loaded to qemu-mipsn32[el])
+  ELF binary's NaN mode not supported by CPU    (n32 -> qemu-mips[el])
+
+Add an ABI check macro that could be used while checking the ELF header
+that relies in the ABI2 flag to identify n32 binaries and abort instead
+early with a more descriptive error :
+
+  Invalid ELF image for this architecture
+
+Signed-off-by: Carlo Marcelo Arenas Belón <carenas@gmail.com>
 Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200723210233.349690-3-Filip.Bozuta@syrmia.com>
-[lv: keep TARGET_NCCS definition in xtensa/termbits.h]
+Message-Id: <20200823101703.18451-1-carenas@gmail.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/alpha/termbits.h   |  1 +
- linux-user/cris/termbits.h    | 18 ++++++++----
- linux-user/hppa/termbits.h    | 17 +++++++----
- linux-user/mips/termbits.h    | 17 +++++++----
- linux-user/ppc/termbits.h     | 21 ++++++++-----
- linux-user/sh4/termbits.h     | 19 ++++++++----
- linux-user/sparc/termbits.h   | 18 ++++++++----
- linux-user/sparc64/termbits.h | 18 ++++++++----
- linux-user/syscall.c          | 34 ++++++++++++----------
- linux-user/xtensa/termbits.h  | 55 ++++++++++++++++++-----------------
- 10 files changed, 132 insertions(+), 86 deletions(-)
+ linux-user/elfload.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-diff --git a/linux-user/alpha/termbits.h b/linux-user/alpha/termbits.h
-index a71425174a97..4a4b1e96f21c 100644
---- a/linux-user/alpha/termbits.h
-+++ b/linux-user/alpha/termbits.h
-@@ -159,6 +159,7 @@ struct target_termios {
- #define TARGET_FLUSHO	0x00800000
- #define TARGET_PENDIN	0x20000000
- #define TARGET_IEXTEN	0x00000400
-+#define TARGET_EXTPROC  0x10000000
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index fe9dfe795ddd..69936dcd4595 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -918,6 +918,12 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs, const CPUPPCState *en
  
- #define TARGET_FIOCLEX		TARGET_IO('f', 1)
- #define TARGET_FIONCLEX	TARGET_IO('f', 2)
-diff --git a/linux-user/cris/termbits.h b/linux-user/cris/termbits.h
-index 475ee70fed37..0c8d8fc05164 100644
---- a/linux-user/cris/termbits.h
-+++ b/linux-user/cris/termbits.h
-@@ -5,13 +5,17 @@
+ #define elf_check_arch(x) ((x) == EM_MIPS || (x) == EM_NANOMIPS)
  
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
++#ifdef TARGET_ABI_MIPSN32
++#define elf_check_abi(x) ((x) & EF_MIPS_ABI2)
++#else
++#define elf_check_abi(x) (!((x) & EF_MIPS_ABI2))
++#endif
 +
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
+ static inline void init_thread(struct target_pt_regs *regs,
+                                struct image_info *infop)
+ {
+@@ -1487,6 +1493,10 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
+ #define elf_check_arch(x) ((x) == ELF_ARCH)
+ #endif
  
- /* c_iflag bits */
-@@ -29,6 +33,7 @@ struct target_termios {
- #define TARGET_IXANY   0004000
- #define TARGET_IXOFF   0010000
- #define TARGET_IMAXBEL 0020000
-+#define TARGET_IUTF8   0040000
- 
- /* c_oflag bits */
- #define TARGET_OPOST   0000001
-@@ -118,6 +123,7 @@ struct target_termios {
- #define TARGET_FLUSHO  0010000
- #define TARGET_PENDIN  0040000
- #define TARGET_IEXTEN  0100000
-+#define TARGET_EXTPROC 0200000
- 
- /* c_cc character offsets */
- #define TARGET_VINTR	0
-diff --git a/linux-user/hppa/termbits.h b/linux-user/hppa/termbits.h
-index 8fba839dd4e6..11fd4eed6232 100644
---- a/linux-user/hppa/termbits.h
-+++ b/linux-user/hppa/termbits.h
-@@ -5,13 +5,17 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
++#ifndef elf_check_abi
++#define elf_check_abi(x) (1)
++#endif
 +
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
- /* c_iflag bits */
-@@ -120,6 +124,7 @@ struct target_termios {
- #define TARGET_FLUSHO  0010000
- #define TARGET_PENDIN  0040000
- #define TARGET_IEXTEN  0100000
-+#define TARGET_EXTPROC 0200000
- 
- /* c_cc character offsets */
- #define TARGET_VINTR    0
-diff --git a/linux-user/mips/termbits.h b/linux-user/mips/termbits.h
-index 3287cf6df8b8..e8b4b58d878d 100644
---- a/linux-user/mips/termbits.h
-+++ b/linux-user/mips/termbits.h
-@@ -5,13 +5,17 @@
- 
- #define TARGET_NCCS 23
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
- /* c_iflag bits */
-@@ -133,6 +137,7 @@ struct target_termios {
- #define TARGET_PENDIN  0040000
- #define TARGET_TOSTOP  0100000
- #define TARGET_ITOSTOP TARGET_TOSTOP
-+#define TARGET_EXTPROC 0200000
- 
- /* c_cc character offsets */
- #define TARGET_VINTR	0
-diff --git a/linux-user/ppc/termbits.h b/linux-user/ppc/termbits.h
-index 19e4c6eda86c..7066d1e5523d 100644
---- a/linux-user/ppc/termbits.h
-+++ b/linux-user/ppc/termbits.h
-@@ -5,15 +5,19 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
--    unsigned char c_line;                    /* line discipline */
--    unsigned int c_ispeed;		/* input speed */
--    unsigned int c_ospeed;		/* output speed */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
-+    target_speed_t c_ispeed;               /* input speed */
-+    target_speed_t c_ospeed;               /* output speed */
- };
- 
- /* c_cc character offsets */
-@@ -158,6 +162,7 @@ struct target_termios {
- #define TARGET_FLUSHO	0x00800000
- #define TARGET_PENDIN	0x20000000
- #define TARGET_IEXTEN	0x00000400
-+#define TARGET_EXTPROC  0x10000000
- 
- /* ioctls */
- 
-diff --git a/linux-user/sh4/termbits.h b/linux-user/sh4/termbits.h
-index dd125b6a2b2a..f91b5c51cf83 100644
---- a/linux-user/sh4/termbits.h
-+++ b/linux-user/sh4/termbits.h
-@@ -5,15 +5,20 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--	unsigned int c_iflag;			/* input mode flags */
--	unsigned int c_oflag;			/* output mode flags */
--	unsigned int c_cflag;			/* control mode flags */
--	unsigned int c_lflag;			/* local mode flags */
--	unsigned char c_line;			/* line discipline */
--	unsigned char c_cc[TARGET_NCCS];	/* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
-+
- /* c_cc characters */
- #define TARGET_VINTR 0
- #define TARGET_VQUIT 1
-@@ -150,6 +155,8 @@ struct target_termios {
- #define TARGET_FLUSHO	0010000
- #define TARGET_PENDIN	0040000
- #define TARGET_IEXTEN	0100000
-+#define TARGET_EXTPROC  0200000
-+
- 
- /* tcflow() and TCXONC use these */
- #define TARGET_TCOOFF		0
-diff --git a/linux-user/sparc/termbits.h b/linux-user/sparc/termbits.h
-index f85219ed7112..704bee1c427e 100644
---- a/linux-user/sparc/termbits.h
-+++ b/linux-user/sparc/termbits.h
-@@ -5,15 +5,20 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
-+
- /* c_cc characters */
- #define TARGET_VINTR    0
- #define TARGET_VQUIT    1
-@@ -170,6 +175,7 @@ struct target_termios {
- #define TARGET_FLUSHO	0x00002000
- #define TARGET_PENDIN	0x00004000
- #define TARGET_IEXTEN	0x00008000
-+#define TARGET_EXTPROC  0x00010000
- 
- /* ioctls */
- 
-diff --git a/linux-user/sparc64/termbits.h b/linux-user/sparc64/termbits.h
-index 11b5abcf8439..1ab1e80db548 100644
---- a/linux-user/sparc64/termbits.h
-+++ b/linux-user/sparc64/termbits.h
-@@ -5,15 +5,20 @@
- 
- #define TARGET_NCCS 19
- 
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    unsigned int c_iflag;               /* input mode flags */
--    unsigned int c_oflag;               /* output mode flags */
--    unsigned int c_cflag;               /* control mode flags */
--    unsigned int c_lflag;               /* local mode flags */
--    unsigned char c_line;                    /* line discipline */
--    unsigned char c_cc[TARGET_NCCS];                /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
-+
- /* c_cc characters */
- #define TARGET_VINTR    0
- #define TARGET_VQUIT    1
-@@ -170,6 +175,7 @@ struct target_termios {
- #define TARGET_FLUSHO	0x00002000
- #define TARGET_PENDIN	0x00004000
- #define TARGET_IEXTEN	0x00008000
-+#define TARGET_EXTPROC  0x00010000
- 
- /* ioctls */
- 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index 027dea35af41..3a7eced7d858 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -5549,6 +5549,7 @@ static const bitmask_transtbl iflag_tbl[] = {
-         { TARGET_IXANY, TARGET_IXANY, IXANY, IXANY },
-         { TARGET_IXOFF, TARGET_IXOFF, IXOFF, IXOFF },
-         { TARGET_IMAXBEL, TARGET_IMAXBEL, IMAXBEL, IMAXBEL },
-+        { TARGET_IUTF8, TARGET_IUTF8, IUTF8, IUTF8},
-         { 0, 0, 0, 0 }
- };
- 
-@@ -5616,22 +5617,23 @@ static const bitmask_transtbl cflag_tbl[] = {
- };
- 
- static const bitmask_transtbl lflag_tbl[] = {
--	{ TARGET_ISIG, TARGET_ISIG, ISIG, ISIG },
--	{ TARGET_ICANON, TARGET_ICANON, ICANON, ICANON },
--	{ TARGET_XCASE, TARGET_XCASE, XCASE, XCASE },
--	{ TARGET_ECHO, TARGET_ECHO, ECHO, ECHO },
--	{ TARGET_ECHOE, TARGET_ECHOE, ECHOE, ECHOE },
--	{ TARGET_ECHOK, TARGET_ECHOK, ECHOK, ECHOK },
--	{ TARGET_ECHONL, TARGET_ECHONL, ECHONL, ECHONL },
--	{ TARGET_NOFLSH, TARGET_NOFLSH, NOFLSH, NOFLSH },
--	{ TARGET_TOSTOP, TARGET_TOSTOP, TOSTOP, TOSTOP },
--	{ TARGET_ECHOCTL, TARGET_ECHOCTL, ECHOCTL, ECHOCTL },
--	{ TARGET_ECHOPRT, TARGET_ECHOPRT, ECHOPRT, ECHOPRT },
--	{ TARGET_ECHOKE, TARGET_ECHOKE, ECHOKE, ECHOKE },
--	{ TARGET_FLUSHO, TARGET_FLUSHO, FLUSHO, FLUSHO },
--	{ TARGET_PENDIN, TARGET_PENDIN, PENDIN, PENDIN },
--	{ TARGET_IEXTEN, TARGET_IEXTEN, IEXTEN, IEXTEN },
--	{ 0, 0, 0, 0 }
-+  { TARGET_ISIG, TARGET_ISIG, ISIG, ISIG },
-+  { TARGET_ICANON, TARGET_ICANON, ICANON, ICANON },
-+  { TARGET_XCASE, TARGET_XCASE, XCASE, XCASE },
-+  { TARGET_ECHO, TARGET_ECHO, ECHO, ECHO },
-+  { TARGET_ECHOE, TARGET_ECHOE, ECHOE, ECHOE },
-+  { TARGET_ECHOK, TARGET_ECHOK, ECHOK, ECHOK },
-+  { TARGET_ECHONL, TARGET_ECHONL, ECHONL, ECHONL },
-+  { TARGET_NOFLSH, TARGET_NOFLSH, NOFLSH, NOFLSH },
-+  { TARGET_TOSTOP, TARGET_TOSTOP, TOSTOP, TOSTOP },
-+  { TARGET_ECHOCTL, TARGET_ECHOCTL, ECHOCTL, ECHOCTL },
-+  { TARGET_ECHOPRT, TARGET_ECHOPRT, ECHOPRT, ECHOPRT },
-+  { TARGET_ECHOKE, TARGET_ECHOKE, ECHOKE, ECHOKE },
-+  { TARGET_FLUSHO, TARGET_FLUSHO, FLUSHO, FLUSHO },
-+  { TARGET_PENDIN, TARGET_PENDIN, PENDIN, PENDIN },
-+  { TARGET_IEXTEN, TARGET_IEXTEN, IEXTEN, IEXTEN },
-+  { TARGET_EXTPROC, TARGET_EXTPROC, EXTPROC, EXTPROC},
-+  { 0, 0, 0, 0 }
- };
- 
- static void target_to_host_termios (void *dst, const void *src)
-diff --git a/linux-user/xtensa/termbits.h b/linux-user/xtensa/termbits.h
-index d1e09e61a69b..ce6fb081e355 100644
---- a/linux-user/xtensa/termbits.h
-+++ b/linux-user/xtensa/termbits.h
-@@ -15,40 +15,42 @@
- 
- #include <linux/posix_types.h>
- 
--typedef unsigned char   cc_t;
--typedef unsigned int    speed_t;
--typedef unsigned int    tcflag_t;
--
- #define TARGET_NCCS 19
-+
-+typedef unsigned char   target_cc_t;        /* cc_t */
-+typedef unsigned int    target_speed_t;     /* speed_t */
-+typedef unsigned int    target_tcflag_t;    /* tcflag_t */
-+
- struct target_termios {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_tcflag_t c_iflag;               /* input mode flags */
-+    target_tcflag_t c_oflag;               /* output mode flags */
-+    target_tcflag_t c_cflag;               /* control mode flags */
-+    target_tcflag_t c_lflag;               /* local mode flags */
-+    target_cc_t c_line;                    /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS];         /* control characters */
- };
- 
-+
- struct target_termios2 {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
--    speed_t c_ispeed;       /* input speed */
--    speed_t c_ospeed;       /* output speed */
-+    target_tcflag_t c_iflag;       /* input mode flags */
-+    target_tcflag_t c_oflag;       /* output mode flags */
-+    target_tcflag_t c_cflag;       /* control mode flags */
-+    target_tcflag_t c_lflag;       /* local mode flags */
-+    target_cc_t c_line;            /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_speed_t c_ispeed;       /* input speed */
-+    target_speed_t c_ospeed;       /* output speed */
- };
- 
- struct target_ktermios {
--    tcflag_t c_iflag;       /* input mode flags */
--    tcflag_t c_oflag;       /* output mode flags */
--    tcflag_t c_cflag;       /* control mode flags */
--    tcflag_t c_lflag;       /* local mode flags */
--    cc_t c_line;            /* line discipline */
--    cc_t c_cc[TARGET_NCCS]; /* control characters */
--    speed_t c_ispeed;       /* input speed */
--    speed_t c_ospeed;       /* output speed */
-+    target_tcflag_t c_iflag;       /* input mode flags */
-+    target_tcflag_t c_oflag;       /* output mode flags */
-+    target_tcflag_t c_cflag;       /* control mode flags */
-+    target_tcflag_t c_lflag;       /* local mode flags */
-+    target_cc_t c_line;            /* line discipline */
-+    target_cc_t c_cc[TARGET_NCCS]; /* control characters */
-+    target_speed_t c_ispeed;       /* input speed */
-+    target_speed_t c_ospeed;       /* output speed */
- };
- 
- /* c_cc characters */
-@@ -195,6 +197,7 @@ struct target_ktermios {
- #define TARGET_FLUSHO   0010000
- #define TARGET_PENDIN   0040000
- #define TARGET_IEXTEN   0100000
-+#define TARGET_EXTPROC  0200000
- 
- /* tcflow() and TCXONC use these */
- 
+ #ifndef ELF_HWCAP
+ #define ELF_HWCAP 0
+ #endif
+@@ -1644,6 +1654,7 @@ static bool elf_check_ident(struct elfhdr *ehdr)
+ static bool elf_check_ehdr(struct elfhdr *ehdr)
+ {
+     return (elf_check_arch(ehdr->e_machine)
++            && elf_check_abi(ehdr->e_flags)
+             && ehdr->e_ehsize == sizeof(struct elfhdr)
+             && ehdr->e_phentsize == sizeof(struct elf_phdr)
+             && (ehdr->e_type == ET_EXEC || ehdr->e_type == ET_DYN));
 -- 
 2.26.2
 
