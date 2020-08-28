@@ -2,90 +2,85 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48F20C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 19:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B2A2C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 19:05:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1272520776
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 19:05:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BEEF20776
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 19:05:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="del1U37O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1272520776
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pWJWQAnI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BEEF20776
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41472 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBjgU-0001pD-7f
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 15:05:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59540)
+	id 1kBjgX-0001ua-Bb
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 15:05:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBjD7-0003Q6-UE
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:50 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37750)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kBjXb-0003Y6-HQ; Fri, 28 Aug 2020 14:55:59 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:46354)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBjD1-000669-RQ
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 14:34:49 -0400
-Received: by mail-wr1-x441.google.com with SMTP id y3so66907wrl.4
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 11:34:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=hE3x5UYpTv4DTAsoywo/5Ti5Qf5DuCUIVQT2wDt49Fo=;
- b=del1U37Omwl17tNv4Zn0bmRZ8UNBpyX/1+pc8BdozEL0Nc8Y2YByu/phuHRXeFaSCO
- E+88gJBiUFb4AVRn9h1j1DHIYcFYQpBWshuBN2hKo3HjsJFyGzJ5nHroUx0mw4bJIUR/
- 6em0g8PYtCdO3GDrItO1inf7DwViv/uLUmNAd8Ol7+zCmQO8k4RWxVIqAvGlCBbV3KCn
- 2n6G9OnFJ65Y/Q2/cw8nFse39hpjfwtXKAIgC4hQGCYRX0iPjY8lQxR6Ma7lTixfREe6
- M+IM2GEWrLkgnB66Z/UxdDcufx8e5tNII6S1Xhm/wnyHIO2gb+inCx6GuSQar20vIkjq
- 3tJw==
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kBjXY-0000WW-PA; Fri, 28 Aug 2020 14:55:59 -0400
+Received: by mail-il1-x143.google.com with SMTP id c6so1522704ilo.13;
+ Fri, 28 Aug 2020 11:55:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GlKzTO5F2KNBvSeehU+dY+HZdAprZs32LYHqu1SBBZE=;
+ b=pWJWQAnIFFEMvp7byXaJD5HhyMw6LsNNCErCXPqGAdJMX64cQD7vFDK89ZIvkF5JfK
+ WwDpIOZ5uTIkvayACsx+z/f2jVA+MNiezAU+khTAgiu2g/3Q4pgg7FO4tXc6eRwYRBoE
+ PG/CcH+NS6vhNimsAkFXL62vVhE1Oc7RHZkajCg3aIvkWQIxlPiSu1Q98ePDS5Kw5UQ/
+ StdYKrduQBGI8ejkDp1IxT+ksa8glNeqxxdpselE0qrdrmW6HGTdIfLtMOvRS0ysSlJu
+ NQ5DjF6+fB1fV7qRn6ZZawp/+nVumHBxEHIC4dskNK+Ds6xj+XHbk1+tucDf4kc8Xe/R
+ +QkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=hE3x5UYpTv4DTAsoywo/5Ti5Qf5DuCUIVQT2wDt49Fo=;
- b=alphyw/gwMq5x1TX9ZFIrJOAbciCpKv9VP+rYV4DiC47UfV2BkqVJxwMEVWhJA84w9
- Ff1KlvtWoSPWf9nDoOJ286evqq/6j6iL2Hsz376qX+W4CpTwl+Q1nryR3F2bQXCzoyPF
- WtUmjm1/fI+RMOULO919DgSSrD1ZUA3ruRaDd1DOoO0ug8SC/ivTfw6amG548XYIpOzo
- 1EwN6L6tP4rWosJODw0D74TkFYuwjTGJWlFLt6AmU61xkh9uLUYSIUr0tsl2rUyq0qSa
- 8NfC468cwjsE14B/Q56q77Iu2ObHoiLg5YjQ6egEXzICma9+D1x4Qnv+xeo8M6hFsr2X
- /zvQ==
-X-Gm-Message-State: AOAM532G29s1s1cY8QqP7CLjQ9w37aMwbOXc2Wt4xT92/w6KDf8HLqvy
- ciuwbNfHhZ1gX4KZGUcXwpIXTA==
-X-Google-Smtp-Source: ABdhPJyopbOd6OJBrOBEbRXciXOkiwen11dw6O2RBgcIohQBNDTtsyVl3g1VzyYTz2ntiQ6SgsxWiw==
-X-Received: by 2002:a5d:6610:: with SMTP id n16mr261588wru.363.1598639682467; 
- Fri, 28 Aug 2020 11:34:42 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id s20sm356251wmh.21.2020.08.28.11.34.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 11:34:41 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 38/45] target/arm: Implement fp16 for Neon VCVT fixed-point
-Date: Fri, 28 Aug 2020 19:33:47 +0100
-Message-Id: <20200828183354.27913-39-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200828183354.27913-1-peter.maydell@linaro.org>
-References: <20200828183354.27913-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GlKzTO5F2KNBvSeehU+dY+HZdAprZs32LYHqu1SBBZE=;
+ b=cyr/vXVDrdX5sN+0tOljbhWLwkguUgjnKZeVZHWPIhQSG2D56DWYu/Edr70AUs0+hN
+ 24HBr56BumTox+9h6ZUM5OW+3hEbkZDV40C9mCb0Js4Ia1Oj+9VL3H5L7etKv2sMbqey
+ 4dETiEjSLV41SSPOT2DRTojcwTH+uQY+CJPNQHCHfCj2NBs9AIeMO4MVkTOu1V5PdvFC
+ O6osXs0MPHCwLR1jK0PXWu4TaSxNMfRbclUrR/ou1zzp9PTAgqC5gNQqsHkaGIAhR+l7
+ bjeLSC8aBOwXec1FvLuKtdVJpF7CAtjjLtsOQgGLGQlvvPcTiG1mRAogWObEach646t8
+ lc7A==
+X-Gm-Message-State: AOAM532yqVMmfqYL8KK79tSwPleHZGb79m2JYvnT+Q9duN3DUjPycod3
+ BaB3qjR4D/UiWmHv5ZjxZsqx3isXINIvUbmBiq8=
+X-Google-Smtp-Source: ABdhPJzr1bNaOSrZ3gkzvf7BBMr/FpWMXZXGEjPKMfWmzXObSIpANuM0VY8qFMbNlvHD4xBRQc8Vnx02EhT25TuSDWg=
+X-Received: by 2002:a05:6e02:13f1:: with SMTP id
+ w17mr253539ilj.131.1598640955031; 
+ Fri, 28 Aug 2020 11:55:55 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
+References: <20200828113931.3252489-1-edgar.iglesias@gmail.com>
+ <20200828113931.3252489-2-edgar.iglesias@gmail.com>
+In-Reply-To: <20200828113931.3252489-2-edgar.iglesias@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 28 Aug 2020 11:45:07 -0700
+Message-ID: <CAKmqyKOoEh-grrCesQWRy_KD0DfsCAYR3BnCNXW7kFk1RK7BgA@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] target/microblaze: Use CPU properties to
+ conditionalize bus exceptions
+To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,94 +95,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: figlesia@xilinx.com, Peter Maydell <peter.maydell@linaro.org>,
+ Edgar Iglesias <edgar.iglesias@xilinx.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Francisco Iglesias <frasse.iglesias@gmail.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Implement fp16 for the Neon VCVT insns which convert between
-float and fixed-point.
+On Fri, Aug 28, 2020 at 4:41 AM Edgar E. Iglesias
+<edgar.iglesias@gmail.com> wrote:
+>
+> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+>
+> Use CPU properties, instead of PVR fields, to conditionalize
+> bus exceptions.
+>
+> Fixes: 2867a96ffb ("target/microblaze: Add props enabling exceptions on failed bus accesses")
+> Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/helper.h             | 5 +++++
- target/arm/neon-dp.decode       | 8 +++++++-
- target/arm/vec_helper.c         | 4 ++++
- target/arm/translate-neon.c.inc | 5 +++++
- 4 files changed, 21 insertions(+), 1 deletion(-)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-diff --git a/target/arm/helper.h b/target/arm/helper.h
-index 09e0fa052ef..8c98bc40eb3 100644
---- a/target/arm/helper.h
-+++ b/target/arm/helper.h
-@@ -628,6 +628,11 @@ DEF_HELPER_FLAGS_4(gvec_vcvt_uf, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_vcvt_fs, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_vcvt_fu, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- 
-+DEF_HELPER_FLAGS_4(gvec_vcvt_sh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_vcvt_uh, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_vcvt_hs, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+DEF_HELPER_FLAGS_4(gvec_vcvt_hu, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-+
- DEF_HELPER_FLAGS_4(gvec_frecpe_h, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_frecpe_s, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
- DEF_HELPER_FLAGS_4(gvec_frecpe_d, TCG_CALL_NO_RWG, void, ptr, ptr, ptr, i32)
-diff --git a/target/arm/neon-dp.decode b/target/arm/neon-dp.decode
-index 686f9fbf46a..1e9e8592917 100644
---- a/target/arm/neon-dp.decode
-+++ b/target/arm/neon-dp.decode
-@@ -254,6 +254,8 @@ VMINNM_fp_3s     1111 001 1 0 . 1 . .... .... 1111 ... 1 .... @3same_fp
- # We use size=0 for fp32 and size=1 for fp16 to match the 3-same encodings.
- @2reg_vcvt       .... ... . . . 1 ..... .... .... . q:1 . . .... \
-                  &2reg_shift vm=%vm_dp vd=%vd_dp size=0 shift=%neon_rshift_i5
-+@2reg_vcvt_f16   .... ... . . . 11 .... .... .... . q:1 . . .... \
-+                 &2reg_shift vm=%vm_dp vd=%vd_dp size=1 shift=%neon_rshift_i4
- 
- VSHR_S_2sh       1111 001 0 1 . ...... .... 0000 . . . 1 .... @2reg_shr_d
- VSHR_S_2sh       1111 001 0 1 . ...... .... 0000 . . . 1 .... @2reg_shr_s
-@@ -370,7 +372,11 @@ VSHLL_U_2sh      1111 001 1 1 . ...... .... 1010 . 0 . 1 .... @2reg_shll_h
- VSHLL_U_2sh      1111 001 1 1 . ...... .... 1010 . 0 . 1 .... @2reg_shll_b
- 
- # VCVT fixed<->float conversions
--# TODO: FP16 fixed<->float conversions are opc==0b1100 and 0b1101
-+VCVT_SH_2sh      1111 001 0 1 . ...... .... 1100 0 . . 1 .... @2reg_vcvt_f16
-+VCVT_UH_2sh      1111 001 1 1 . ...... .... 1100 0 . . 1 .... @2reg_vcvt_f16
-+VCVT_HS_2sh      1111 001 0 1 . ...... .... 1101 0 . . 1 .... @2reg_vcvt_f16
-+VCVT_HU_2sh      1111 001 1 1 . ...... .... 1101 0 . . 1 .... @2reg_vcvt_f16
-+
- VCVT_SF_2sh      1111 001 0 1 . ...... .... 1110 0 . . 1 .... @2reg_vcvt
- VCVT_UF_2sh      1111 001 1 1 . ...... .... 1110 0 . . 1 .... @2reg_vcvt
- VCVT_FS_2sh      1111 001 0 1 . ...... .... 1111 0 . . 1 .... @2reg_vcvt
-diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
-index 6d83953ee8f..ea401910f37 100644
---- a/target/arm/vec_helper.c
-+++ b/target/arm/vec_helper.c
-@@ -1863,5 +1863,9 @@ DO_VCVT_FIXED(gvec_vcvt_sf, helper_vfp_sltos, uint32_t)
- DO_VCVT_FIXED(gvec_vcvt_uf, helper_vfp_ultos, uint32_t)
- DO_VCVT_FIXED(gvec_vcvt_fs, helper_vfp_tosls_round_to_zero, uint32_t)
- DO_VCVT_FIXED(gvec_vcvt_fu, helper_vfp_touls_round_to_zero, uint32_t)
-+DO_VCVT_FIXED(gvec_vcvt_sh, helper_vfp_shtoh, uint16_t)
-+DO_VCVT_FIXED(gvec_vcvt_uh, helper_vfp_uhtoh, uint16_t)
-+DO_VCVT_FIXED(gvec_vcvt_hs, helper_vfp_toshh_round_to_zero, uint16_t)
-+DO_VCVT_FIXED(gvec_vcvt_hu, helper_vfp_touhh_round_to_zero, uint16_t)
- 
- #undef DO_VCVT_FIXED
-diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
-index 50fcf4159ea..b3b1d46e958 100644
---- a/target/arm/translate-neon.c.inc
-+++ b/target/arm/translate-neon.c.inc
-@@ -1657,6 +1657,11 @@ DO_FP_2SH(VCVT_UF, gen_helper_gvec_vcvt_uf)
- DO_FP_2SH(VCVT_FS, gen_helper_gvec_vcvt_fs)
- DO_FP_2SH(VCVT_FU, gen_helper_gvec_vcvt_fu)
- 
-+DO_FP_2SH(VCVT_SH, gen_helper_gvec_vcvt_sh)
-+DO_FP_2SH(VCVT_UH, gen_helper_gvec_vcvt_uh)
-+DO_FP_2SH(VCVT_HS, gen_helper_gvec_vcvt_hs)
-+DO_FP_2SH(VCVT_HU, gen_helper_gvec_vcvt_hu)
-+
- static uint64_t asimd_imm_const(uint32_t imm, int cmode, int op)
- {
-     /*
--- 
-2.20.1
+Alistair
 
+> ---
+>  target/microblaze/op_helper.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
+> index f3b17a95b3..13ac476199 100644
+> --- a/target/microblaze/op_helper.c
+> +++ b/target/microblaze/op_helper.c
+> @@ -490,12 +490,12 @@ void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+>
+>      env->sregs[SR_EAR] = addr;
+>      if (access_type == MMU_INST_FETCH) {
+> -        if ((env->pvr.regs[2] & PVR2_IOPB_BUS_EXC_MASK)) {
+> +        if (cpu->cfg.iopb_bus_exception) {
+>              env->sregs[SR_ESR] = ESR_EC_INSN_BUS;
+>              helper_raise_exception(env, EXCP_HW_EXCP);
+>          }
+>      } else {
+> -        if ((env->pvr.regs[2] & PVR2_DOPB_BUS_EXC_MASK)) {
+> +        if (cpu->cfg.dopb_bus_exception) {
+>              env->sregs[SR_ESR] = ESR_EC_DATA_BUS;
+>              helper_raise_exception(env, EXCP_HW_EXCP);
+>          }
+> --
+> 2.25.1
+>
+>
 
