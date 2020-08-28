@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC549C433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:34:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCD24C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:34:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 767E520639
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:34:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6712B20639
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:34:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h2uppks3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 767E520639
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C90A5R8D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6712B20639
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33550 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBfSa-0003GL-K7
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:34:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51162)
+	id 1kBfSg-0003Pd-K4
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:34:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfEa-0000Sf-Nb
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:04 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:40437)
+ id 1kBfEj-0000oz-S0
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:13 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37201)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfEY-00056q-Fn
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:04 -0400
-Received: by mail-pf1-x443.google.com with SMTP id c142so665850pfb.7
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:01 -0700 (PDT)
+ id 1kBfEh-000580-7U
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:13 -0400
+Received: by mail-pl1-x642.google.com with SMTP id c15so532368plq.4
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=lL2TV9fvxAuHwerQiahLV44CD3Djc67HSq2e2+fPjhU=;
- b=h2uppks3xwpxy0Qhl+Zy4+9XnKx24TIktbuQqHcf6HqhMTz/3UKyZSw5JE/AgmRAtJ
- gIE67Kdgf9GNjlpuT/lp4RKDjVJAQYnUjAWjo5ebClujJiifUMAfAmlT5+L4jvGFr7Ns
- wlzONaiDg0n/UXDVsgdlF1qHcaj7cO0Wo83jxwWb3OAp5Y3r9+rR4WIU09pQsDQfOePx
- Q6KUXZw2LQKY2J4kHACfH32SAJccXpjPdQ1m6BqFHltXy8rBgMWr6HSePGS7ddRYMxBC
- L4/Bc8Gg5aLXWU5rEvZFaoIwjE1Fq+HwIgfs5Nv44LvxuPKa4VLKNe+mjrRMEDcxgM9R
- qwKw==
+ bh=M605GjYj/TsAqS9LhAzYjh6MlBkWbkHJca8j+nbMmp4=;
+ b=C90A5R8DLgUJBCdsjL2hy+NBefTC39cLQCeTj0KP2c7wrBO0A3CYDZJnZyTg8hGmVw
+ /sFnXlnQ80gODQOxNI9E566y2yN5Rm7ggWjfWP6DfzcQk8xLfNLBCfE2U2q8WqY0EAc5
+ 1KNy3hTj4s9PiUt2uIs2tWKMAgTHcpLxQwFI3LGmCe72LszCcT+ZBaV5Wmf1FP4F6EB1
+ mgp3VPKqXYW5qTgiVCP56Sdpl6sv51UCigGlBnU3DaQHPTMl4ai7YIVWY4IUUgfumZxo
+ uK9ytMBVuzOc1gpX8w4l4NXoC/CNgY6wgm75pHww0hZjBhBKjX2lg2UDQu4ovc+7/R3o
+ IQZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lL2TV9fvxAuHwerQiahLV44CD3Djc67HSq2e2+fPjhU=;
- b=njCYbhvnn9jw1m7+PZuzawpkpkIRJE8PcA1WO27rZCmxiShEKmt5/cjPW3aUPn6Xli
- FuXG/JfOl4MwiO0/mnOBG+h2DS/EjtEw+DqCRIhfRWGfe9AhXnTF1uGssdBJY+YTNrVd
- 6KeERiO80w+WzYyL0vrYfY2Ns1cLd1Zp7X2zAl9Q1MhSuuINpOFsPD2s2XLU1/VUXKCO
- DP5mfioL+d9QfyUXQfk2KpyvczRn6HbRs/hBk9KPrbNHUX8R3H3CKeR8j6/fl1jTM7/Z
- oSg5ZqPWBbBMBDF80X/JiR3Cdm9+PtVpKhL+fxSaQKiJhKzTZSXw8NkQyFhVbBTFKaSf
- M09g==
-X-Gm-Message-State: AOAM530iPzeHwd2J4Rzx1Uuxx4mUZMZP66qxPFyj9IuZOnXJNNgI6UlS
- QcS48xOm4e+h/9aVAuW4ciIcvr0aJJeVEA==
-X-Google-Smtp-Source: ABdhPJwn2x+bbDIUYpU+7ZbNV9fFwyXpdPGNczjYslNn5aDu9eOCK/3uPiHEIVK39J8II3b1Q7c39A==
-X-Received: by 2002:a63:50c:: with SMTP id 12mr1426504pgf.173.1598624400550;
- Fri, 28 Aug 2020 07:20:00 -0700 (PDT)
+ bh=M605GjYj/TsAqS9LhAzYjh6MlBkWbkHJca8j+nbMmp4=;
+ b=oUC2nlwh3wugRDjOLF0douyEI2u4PNW7Uf6HCPG4DSoM4xnEAs66maQxQBGhbfsyKd
+ BaW8i6NvnPCG7ejVVzH0DBN0B5r1Oh+SMe7UbYRPL08qKJfIw0bt/pkzRsVL2o63XF+B
+ RDx7Xx4dmbys7yNxh137H8z0T2ZsW4zvkn1iykCadzH4ihiWzbPyRBj8pP6tMZNo0IHh
+ hfp9vs/bYXqWoK6LEET0wEQtGavxdTwoQdSRIaqr3nM/uRKu8XEPAONQDfWtqmAcyZAX
+ xdhuKD/DfXH9auMyeXEr3GBIyJZu8TyLRRgcHufBpTVQNfvOT8/8/XrbkFCLEH+7mIvh
+ ae6w==
+X-Gm-Message-State: AOAM531AKtloaX44ny7Be1uQ6vpj2On+UJOPKPO3meFZgCHNOixqjZPg
+ Eke6GxYowG+q7XUBWg6nrgWmJ6njNUc6Cg==
+X-Google-Smtp-Source: ABdhPJwLBcIkZowF61uMdZPhr76mrieIvjNEY5JXToMtKkpWXZe6Bl2QXh9FevDyiA8ste3dW7di8g==
+X-Received: by 2002:a17:902:a50d:: with SMTP id
+ s13mr1474484plq.135.1598624409436; 
+ Fri, 28 Aug 2020 07:20:09 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.19.59
+ by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.20.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 07:19:59 -0700 (PDT)
+ Fri, 28 Aug 2020 07:20:08 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 22/76] target/microblaze: Remove helper_debug and env->debug
-Date: Fri, 28 Aug 2020 07:18:35 -0700
-Message-Id: <20200828141929.77854-23-richard.henderson@linaro.org>
+Subject: [PATCH v2 29/76] target/microblaze: Convert to translator_loop
+Date: Fri, 28 Aug 2020 07:18:42 -0700
+Message-Id: <20200828141929.77854-30-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
 References: <20200828141929.77854-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,121 +105,339 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is not used, and seems redundant with -d cpu.
+Part two of conversion to the generic translator_loop.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/cpu.h       |  1 -
- target/microblaze/helper.h    |  1 -
- target/microblaze/op_helper.c | 23 -----------------------
- target/microblaze/translate.c | 16 ++--------------
- 4 files changed, 2 insertions(+), 39 deletions(-)
+ target/microblaze/translate.c | 289 ++++++++++++++++++----------------
+ 1 file changed, 149 insertions(+), 140 deletions(-)
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index b88acba12b..7708c9a3d3 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -229,7 +229,6 @@ typedef struct CPUMBState CPUMBState;
- #define STREAM_NONBLOCK  (1 << 4)
- 
- struct CPUMBState {
--    uint32_t debug;
-     uint32_t btaken;
-     uint32_t btarget;
-     uint32_t bimm;
-diff --git a/target/microblaze/helper.h b/target/microblaze/helper.h
-index 820711366d..9309142f8d 100644
---- a/target/microblaze/helper.h
-+++ b/target/microblaze/helper.h
-@@ -1,5 +1,4 @@
- DEF_HELPER_FLAGS_2(raise_exception, TCG_CALL_NO_WG, noreturn, env, i32)
--DEF_HELPER_1(debug, void, env)
- DEF_HELPER_FLAGS_3(carry, TCG_CALL_NO_RWG_SE, i32, i32, i32, i32)
- DEF_HELPER_2(cmp, i32, i32, i32)
- DEF_HELPER_2(cmpu, i32, i32, i32)
-diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-index dc2bec0c99..d79202c3f8 100644
---- a/target/microblaze/op_helper.c
-+++ b/target/microblaze/op_helper.c
-@@ -71,29 +71,6 @@ void helper_raise_exception(CPUMBState *env, uint32_t index)
-     cpu_loop_exit(cs);
- }
- 
--void helper_debug(CPUMBState *env)
--{
--    int i;
--
--    qemu_log("PC=%08x\n", env->pc);
--    qemu_log("rmsr=%x resr=%x rear=%" PRIx64 " "
--             "debug[%x] imm=%x iflags=%x\n",
--             env->msr, env->esr, env->ear,
--             env->debug, env->imm, env->iflags);
--    qemu_log("btaken=%d btarget=%x mode=%s(saved=%s) eip=%d ie=%d\n",
--             env->btaken, env->btarget,
--             (env->msr & MSR_UM) ? "user" : "kernel",
--             (env->msr & MSR_UMS) ? "user" : "kernel",
--             (bool)(env->msr & MSR_EIP),
--             (bool)(env->msr & MSR_IE));
--    for (i = 0; i < 32; i++) {
--        qemu_log("r%2.2d=%8.8x ", i, env->regs[i]);
--        if ((i + 1) % 4 == 0)
--            qemu_log("\n");
--    }
--    qemu_log("\n\n");
--}
--
- static inline uint32_t compute_carry(uint32_t a, uint32_t b, uint32_t cin)
- {
-     uint32_t cout = 0;
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 9a00a78b8a..ecfa6b86a4 100644
+index 45b1555f85..6a9710d76d 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -53,7 +53,6 @@
- #define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
- #define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
+@@ -1595,172 +1595,181 @@ static inline void decode(DisasContext *dc, uint32_t ir)
+     }
+ }
  
--static TCGv_i32 env_debug;
- static TCGv_i32 cpu_R[32];
- static TCGv_i32 cpu_pc;
- static TCGv_i32 cpu_msr;
-@@ -1675,13 +1674,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-         tcg_gen_insn_start(dc->pc);
-         num_insns++;
- 
--#if SIM_COMPAT
--        if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)) {
--            tcg_gen_movi_i32(cpu_pc, dc->pc);
--            gen_helper_debug();
--        }
--#endif
--
-         if (unlikely(cpu_breakpoint_test(cs, dc->pc, BP_ANY))) {
-             gen_raise_exception_sync(dc, EXCP_DEBUG);
-             /* The address covered by the breakpoint must be included in
-@@ -1824,10 +1816,9 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-     qemu_fprintf(f, "IN: PC=%x %s\n",
-                  env->pc, lookup_symbol(env->pc));
-     qemu_fprintf(f, "rmsr=%x resr=%x rear=%" PRIx64 " "
--                 "debug=%x imm=%x iflags=%x fsr=%x rbtr=%x\n",
-+                 "imm=%x iflags=%x fsr=%x rbtr=%x\n",
-                  env->msr, env->esr, env->ear,
--                 env->debug, env->imm, env->iflags, env->fsr,
--                 env->btr);
-+                 env->imm, env->iflags, env->fsr, env->btr);
-     qemu_fprintf(f, "btaken=%d btarget=%x mode=%s(saved=%s) eip=%d ie=%d\n",
-                  env->btaken, env->btarget,
-                  (env->msr & MSR_UM) ? "user" : "kernel",
-@@ -1857,9 +1848,6 @@ void mb_tcg_init(void)
+-/* generate intermediate code for basic block 'tb'.  */
+-void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
++static void mb_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
  {
-     int i;
+-    CPUMBState *env = cs->env_ptr;
+-    MicroBlazeCPU *cpu = env_archcpu(env);
+-    uint32_t pc_start;
+-    struct DisasContext ctx;
+-    struct DisasContext *dc = &ctx;
+-    uint32_t page_start, org_flags;
+-    uint32_t npc;
+-    int num_insns;
++    DisasContext *dc = container_of(dcb, DisasContext, base);
++    MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
++    int bound;
  
--    env_debug = tcg_global_mem_new_i32(cpu_env,
--                    offsetof(CPUMBState, debug),
--                    "debug0");
-     env_iflags = tcg_global_mem_new_i32(cpu_env,
-                     offsetof(CPUMBState, iflags),
-                     "iflags");
+-    pc_start = tb->pc;
+     dc->cpu = cpu;
+-    org_flags = dc->synced_flags = dc->tb_flags = tb->flags;
+-
+-    dc->jmp = 0;
++    dc->synced_flags = dc->tb_flags = dc->base.tb->flags;
+     dc->delayed_branch = !!(dc->tb_flags & D_FLAG);
+-    if (dc->delayed_branch) {
+-        dc->jmp = JMP_INDIRECT;
+-    }
+-    dc->base.pc_first = pc_start;
+-    dc->base.pc_next = pc_start;
+-    dc->base.singlestep_enabled = cs->singlestep_enabled;
++    dc->jmp = dc->delayed_branch ? JMP_INDIRECT : JMP_NOJMP;
+     dc->cpustate_changed = 0;
+     dc->abort_at_next_insn = 0;
+-    dc->base.is_jmp = DISAS_NEXT;
+-    dc->base.tb = tb;
+ 
+-    if (pc_start & 3) {
+-        cpu_abort(cs, "Microblaze: unaligned PC=%x\n", pc_start);
++    bound = -(dc->base.pc_first | TARGET_PAGE_MASK) / 4;
++    dc->base.max_insns = MIN(dc->base.max_insns, bound);
++}
++
++static void mb_tr_tb_start(DisasContextBase *dcb, CPUState *cs)
++{
++}
++
++static void mb_tr_insn_start(DisasContextBase *dcb, CPUState *cs)
++{
++    tcg_gen_insn_start(dcb->pc_next);
++}
++
++static bool mb_tr_breakpoint_check(DisasContextBase *dcb, CPUState *cs,
++                                   const CPUBreakpoint *bp)
++{
++    DisasContext *dc = container_of(dcb, DisasContext, base);
++
++    gen_raise_exception_sync(dc, EXCP_DEBUG);
++
++    /*
++     * The address covered by the breakpoint must be included in
++     * [tb->pc, tb->pc + tb->size) in order to for it to be
++     * properly cleared -- thus we increment the PC here so that
++     * the logic setting tb->size below does the right thing.
++     */
++    dc->base.pc_next += 4;
++    return true;
++}
++
++static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
++{
++    DisasContext *dc = container_of(dcb, DisasContext, base);
++    CPUMBState *env = cs->env_ptr;
++
++    /* TODO: This should raise an exception, not terminate qemu. */
++    if (dc->base.pc_next & 3) {
++        cpu_abort(cs, "Microblaze: unaligned PC=%x\n",
++                  (uint32_t)dc->base.pc_next);
+     }
+ 
+-    page_start = pc_start & TARGET_PAGE_MASK;
+-    num_insns = 0;
++    dc->clear_imm = 1;
++    decode(dc, cpu_ldl_code(env, dc->base.pc_next));
++    if (dc->clear_imm) {
++        dc->tb_flags &= ~IMM_FLAG;
++    }
++    dc->base.pc_next += 4;
+ 
+-    gen_tb_start(tb);
+-    do
+-    {
+-        tcg_gen_insn_start(dc->base.pc_next);
+-        num_insns++;
+-
+-        if (unlikely(cpu_breakpoint_test(cs, dc->base.pc_next, BP_ANY))) {
+-            gen_raise_exception_sync(dc, EXCP_DEBUG);
+-            /* The address covered by the breakpoint must be included in
+-               [tb->pc, tb->pc + tb->size) in order to for it to be
+-               properly cleared -- thus we increment the PC here so that
+-               the logic setting tb->size below does the right thing.  */
+-            dc->base.pc_next += 4;
+-            break;
++    if (dc->delayed_branch && --dc->delayed_branch == 0) {
++        if (dc->tb_flags & DRTI_FLAG) {
++            do_rti(dc);
+         }
+-
+-        /* Pretty disas.  */
+-        LOG_DIS("%8.8x:\t", (uint32_t)dc->base.pc_next);
+-
+-        if (num_insns == max_insns && (tb_cflags(tb) & CF_LAST_IO)) {
+-            gen_io_start();
++        if (dc->tb_flags & DRTB_FLAG) {
++            do_rtb(dc);
+         }
+-
+-        dc->clear_imm = 1;
+-        decode(dc, cpu_ldl_code(env, dc->base.pc_next));
+-        if (dc->clear_imm)
+-            dc->tb_flags &= ~IMM_FLAG;
+-        dc->base.pc_next += 4;
+-
+-        if (dc->delayed_branch) {
+-            dc->delayed_branch--;
+-            if (!dc->delayed_branch) {
+-                if (dc->tb_flags & DRTI_FLAG)
+-                    do_rti(dc);
+-                 if (dc->tb_flags & DRTB_FLAG)
+-                    do_rtb(dc);
+-                if (dc->tb_flags & DRTE_FLAG)
+-                    do_rte(dc);
+-                /* Clear the delay slot flag.  */
+-                dc->tb_flags &= ~D_FLAG;
+-                /* If it is a direct jump, try direct chaining.  */
+-                if (dc->jmp == JMP_INDIRECT) {
+-                    TCGv_i32 tmp_pc = tcg_const_i32(dc->base.pc_next);
+-                    eval_cond_jmp(dc, cpu_btarget, tmp_pc);
+-                    tcg_temp_free_i32(tmp_pc);
+-                    dc->base.is_jmp = DISAS_JUMP;
+-                } else if (dc->jmp == JMP_DIRECT) {
+-                    t_sync_flags(dc);
+-                    gen_goto_tb(dc, 0, dc->jmp_pc);
+-                } else if (dc->jmp == JMP_DIRECT_CC) {
+-                    TCGLabel *l1 = gen_new_label();
+-                    t_sync_flags(dc);
+-                    /* Conditional jmp.  */
+-                    tcg_gen_brcondi_i32(TCG_COND_NE, cpu_btaken, 0, l1);
+-                    gen_goto_tb(dc, 1, dc->base.pc_next);
+-                    gen_set_label(l1);
+-                    gen_goto_tb(dc, 0, dc->jmp_pc);
+-                }
+-                break;
+-            }
++        if (dc->tb_flags & DRTE_FLAG) {
++            do_rte(dc);
+         }
+-        if (dc->base.singlestep_enabled) {
+-            break;
+-        }
+-    } while (!dc->base.is_jmp && !dc->cpustate_changed
+-             && !tcg_op_buf_full()
+-             && !singlestep
+-             && (dc->base.pc_next - page_start < TARGET_PAGE_SIZE)
+-             && num_insns < max_insns);
+-
+-    npc = dc->base.pc_next;
+-    if (dc->jmp == JMP_DIRECT || dc->jmp == JMP_DIRECT_CC) {
+-        if (dc->tb_flags & D_FLAG) {
+-            dc->base.is_jmp = DISAS_UPDATE;
+-            tcg_gen_movi_i32(cpu_pc, npc);
+-            sync_jmpstate(dc);
+-        } else
+-            npc = dc->jmp_pc;
++        /* Clear the delay slot flag.  */
++        dc->tb_flags &= ~D_FLAG;
++        dc->base.is_jmp = DISAS_JUMP;
+     }
+ 
+-    /* Force an update if the per-tb cpu state has changed.  */
+-    if (dc->base.is_jmp == DISAS_NEXT
+-        && (dc->cpustate_changed || org_flags != dc->tb_flags)) {
++    /* Force an exit if the per-tb cpu state has changed.  */
++    if (dc->base.is_jmp == DISAS_NEXT && dc->cpustate_changed) {
+         dc->base.is_jmp = DISAS_UPDATE;
+-        tcg_gen_movi_i32(cpu_pc, npc);
++        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
+     }
+-    t_sync_flags(dc);
++}
++
++static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
++{
++    DisasContext *dc = container_of(dcb, DisasContext, base);
++
++    assert(!dc->abort_at_next_insn);
+ 
+     if (dc->base.is_jmp == DISAS_NORETURN) {
+-        /* nothing more to generate */
+-    } else if (unlikely(cs->singlestep_enabled)) {
+-        TCGv_i32 tmp = tcg_const_i32(EXCP_DEBUG);
+-
+-        if (dc->base.is_jmp != DISAS_JUMP) {
+-            tcg_gen_movi_i32(cpu_pc, npc);
+-        }
+-        gen_helper_raise_exception(cpu_env, tmp);
+-        tcg_temp_free_i32(tmp);
+-    } else {
+-        switch (dc->base.is_jmp) {
+-            case DISAS_NEXT:
+-                gen_goto_tb(dc, 1, npc);
+-                break;
+-            case DISAS_JUMP:
+-            case DISAS_UPDATE:
+-                /* indicate that the hash table must be used
+-                   to find the next TB */
+-                tcg_gen_exit_tb(NULL, 0);
+-                break;
+-            default:
+-                g_assert_not_reached();
+-        }
++        /* We have already exited the TB. */
++        return;
+     }
+-    gen_tb_end(tb, num_insns);
+ 
+-    tb->size = dc->base.pc_next - pc_start;
+-    tb->icount = num_insns;
++    t_sync_flags(dc);
++    if (dc->tb_flags & D_FLAG) {
++        sync_jmpstate(dc);
++        dc->jmp = JMP_NOJMP;
++    }
+ 
++    switch (dc->base.is_jmp) {
++    case DISAS_TOO_MANY:
++        assert(dc->jmp == JMP_NOJMP);
++        gen_goto_tb(dc, 0, dc->base.pc_next);
++        return;
++
++    case DISAS_UPDATE:
++        assert(dc->jmp == JMP_NOJMP);
++        if (unlikely(cs->singlestep_enabled)) {
++            gen_raise_exception(dc, EXCP_DEBUG);
++        } else {
++            tcg_gen_exit_tb(NULL, 0);
++        }
++        return;
++
++    case DISAS_JUMP:
++        switch (dc->jmp) {
++        case JMP_INDIRECT:
++            {
++                TCGv_i32 tmp_pc = tcg_const_i32(dc->base.pc_next);
++                eval_cond_jmp(dc, cpu_btarget, tmp_pc);
++                tcg_temp_free_i32(tmp_pc);
++
++                if (unlikely(cs->singlestep_enabled)) {
++                    gen_raise_exception(dc, EXCP_DEBUG);
++                } else {
++                    tcg_gen_exit_tb(NULL, 0);
++                }
++            }
++            return;
++
++        case JMP_DIRECT_CC:
++            {
++                TCGLabel *l1 = gen_new_label();
++                tcg_gen_brcondi_i32(TCG_COND_NE, cpu_btaken, 0, l1);
++                gen_goto_tb(dc, 1, dc->base.pc_next);
++                gen_set_label(l1);
++            }
++            /* fall through */
++
++        case JMP_DIRECT:
++            gen_goto_tb(dc, 0, dc->jmp_pc);
++            return;
++        }
++        /* fall through */
++
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static void mb_tr_disas_log(const DisasContextBase *dcb, CPUState *cs)
++{
+ #ifdef DEBUG_DISAS
+ #if !SIM_COMPAT
+-    if (qemu_loglevel_mask(CPU_LOG_TB_IN_ASM)
+-        && qemu_log_in_addr_range(pc_start)) {
+-        FILE *logfile = qemu_log_lock();
+-        qemu_log("--------------\n");
+-        log_target_disas(cs, pc_start, dc->base.pc_next - pc_start);
+-        qemu_log_unlock(logfile);
+-    }
++    qemu_log("IN: %s\n", lookup_symbol(dcb->pc_first));
++    log_target_disas(cs, dcb->pc_first, dcb->tb->size);
+ #endif
+ #endif
+-    assert(!dc->abort_at_next_insn);
++}
++
++static const TranslatorOps mb_tr_ops = {
++    .init_disas_context = mb_tr_init_disas_context,
++    .tb_start           = mb_tr_tb_start,
++    .insn_start         = mb_tr_insn_start,
++    .breakpoint_check   = mb_tr_breakpoint_check,
++    .translate_insn     = mb_tr_translate_insn,
++    .tb_stop            = mb_tr_tb_stop,
++    .disas_log          = mb_tr_disas_log,
++};
++
++void gen_intermediate_code(CPUState *cpu, TranslationBlock *tb, int max_insns)
++{
++    DisasContext dc;
++    translator_loop(&mb_tr_ops, &dc.base, cpu, tb, max_insns);
+ }
+ 
+ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
 -- 
 2.25.1
 
