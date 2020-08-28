@@ -2,88 +2,90 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2497C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA8ACC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:33:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74224208C9
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:28:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 951D02074A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:33:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e3s5QwfX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74224208C9
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kzXe3gn4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 951D02074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBiAz-0005pt-Iz
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 13:28:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41690)
+	id 1kBiFj-0007oj-OW
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 13:33:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kBiAI-0004xW-JU
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:27:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50605)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kBiAG-0005vv-MW
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:27:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598635667;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=sb0vIvEhk4mOndzudq5cMYFeIJ+5CecJwgZC1qopfvE=;
- b=e3s5QwfXKmAzABk7Jp7mOijUc57XnjwvxxY/V8nodzYEuubBmNlPVQKx49AZckNrLCZaz7
- eNaD2CZtgTzXm+UlSrAt2MOi0hPUQu70Y7Gv2F8DHczXR/eMy7Plkn8xVjEgESPpPDn+im
- ++CTcKM2JChh41YsjcLs6gRHL+EaYfw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-214-PkuSR6gEMC2lGw8fSk-xOw-1; Fri, 28 Aug 2020 13:27:45 -0400
-X-MC-Unique: PkuSR6gEMC2lGw8fSk-xOw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A89681074656;
- Fri, 28 Aug 2020 17:27:44 +0000 (UTC)
-Received: from localhost (unknown [10.10.67.254])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B55B07A3B9;
- Fri, 28 Aug 2020 17:27:41 +0000 (UTC)
-Date: Fri, 28 Aug 2020 13:27:41 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v5 7/8] Revert "hw/386: Add EPYC mode topology decoding
- functions"
-Message-ID: <20200828172741.GO642093@habkost.net>
-References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
- <159804798309.39954.1879996211709102099.stgit@naples-babu.amd.com>
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kBiF4-0007KB-8R; Fri, 28 Aug 2020 13:32:46 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:37420)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kBiF2-0006T2-Jo; Fri, 28 Aug 2020 13:32:45 -0400
+Received: by mail-ej1-x641.google.com with SMTP id e23so192596ejb.4;
+ Fri, 28 Aug 2020 10:32:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=UAV2VxiPeh/k1imQq8wDb2V7tbs05yxU2LPT+Ks9Xbc=;
+ b=kzXe3gn404XKyNMCE5fChTdiWYauCsZkbrlAhrU+dikQVUR8Qm0ujAZ5ccGVURgIGg
+ yO0tPCb3Ke2gOkUzUEf79JxneT1r5+rJS8sj+HFYP5oL+7DozuDnL+qNUjcvISF6/a05
+ Ofkf9MpGO8/F/Gp2Spy/FVGeiHHnhhsjJuFmMswzx+8o6GMHFE+BVZ90ESTR7CRBFnvC
+ dRn2ysXdB6AFMslzDn4IyvvYF2dBBqopnbBeZT6XaJNtg5lbv832DLKfS6K5vrPe6dFO
+ E2LoX0bvCQRcYuaDTrYwYAiP0XqRy6kbQCzZqK+fR6rWN5yLTVZOi0xJAOmrbhdoBagl
+ Nqbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=UAV2VxiPeh/k1imQq8wDb2V7tbs05yxU2LPT+Ks9Xbc=;
+ b=kdk8ZY6tWKoSwkPnrzuIXy05RZ/d2xNLVEQ4InoLEv7s4pY+DdvimgZMaBCcXmUtIB
+ 9hp79HbRswzhF9wkHZQdaf9sUiiw2LD1Q+RgRdwbC4yeqDMWWENsdU0H9Vr9u5fANs6L
+ HeMzRH4Lwx4h9isY+AHiN3gRjvBxvEgsEH5ryqtYcEH/9mXf7wyMiYqxeUoSz9IwB1RG
+ bP45oGuf1gUiObnqSOfof2WhwlSGBb3k5ej8HQvIW8XS0dcAvKhUy0n16oiqqsvOgkKs
+ k3ZA+sW9QAdXZFUv96p22ua1fUgfTTbEH7jvAxFavbzPErMwnB43+ln5m2JKbq9bDGjS
+ mMVA==
+X-Gm-Message-State: AOAM531YhUvGILJtgfE6e0wrnWC+4vULifkwQrkw/RHE0NeAOhONPoH+
+ SicZwt3Gn3/n9nENyhggF+rSp/o4JDg=
+X-Google-Smtp-Source: ABdhPJx/UAnH+mKAvSRKOZjCCpLvUBsqpkRP764bqp1m+paCXbs2h0L985lfIA/YR855qE2pD7+pFA==
+X-Received: by 2002:a17:906:6c8b:: with SMTP id
+ s11mr2959036ejr.310.1598635961728; 
+ Fri, 28 Aug 2020 10:32:41 -0700 (PDT)
+Received: from localhost.localdomain ([2001:b07:6468:f312:287e:2203:f280:c08])
+ by smtp.gmail.com with ESMTPSA id
+ do6sm1590865ejc.35.2020.08.28.10.32.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Aug 2020 10:32:40 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] block: always link with zlib
+Date: Fri, 28 Aug 2020 19:32:48 +0200
+Message-Id: <20200828173248.24556-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <159804798309.39954.1879996211709102099.stgit@naples-babu.amd.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 12:40:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,42 +98,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, imammedo@redhat.com,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 21, 2020 at 05:13:03PM -0500, Babu Moger wrote:
-> Remove the EPYC specific apicid decoding and use the generic
-> default decoding.
-> 
-> This reverts commit 7568b205555a6405042f62c64af3268f4330aed5.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
-> ---
-[...]
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index 19198e3e7f..b29686220e 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -388,7 +388,7 @@ static void encode_topo_cpuid8000001e(X86CPUTopoInfo *topo_info, X86CPU *cpu,
->      unsigned long dies = topo_info->dies_per_pkg;
->      int shift;
->  
-> -    x86_topo_ids_from_apicid_epyc(cpu->apic_id, topo_info, &topo_ids);
-> +    x86_topo_ids_from_apicid(cpu->apic_id, topo_info, &topo_ids);
+The qcow2 driver needs the zlib dependency.  While emulators
+provided it through the migration code, this is not true of
+the tools.  Move the dependency from the qcow1 rule directly
+into block_ss so that it is included unconditionally.
 
-This was not part of commit 7568b205555a6405042f62c64af3268f4330aed5.
-I suggest doing this change as a separate patch, to make review easier.
+Fixes build with --disable-qcow1.
 
-That line was addd by commit dd08ef0318e2
-("target/i386: Cleanup and use the EPYC mode topology functions").
-Wouldn't it be simpler to revert that commit?  If there are parts
-of commit dd08ef0318e2 we want to keep, they can be re-added
-in a separate patch.
+Reported-by: Thomas Huth <thuth@redhat.com>
+Cc: qemu-block@nongnu.org
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ block/meson.build | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/block/meson.build b/block/meson.build
+index 4dbbfe60b4..a3e56b7cd1 100644
+--- a/block/meson.build
++++ b/block/meson.build
+@@ -40,9 +40,9 @@ block_ss.add(files(
+   'vmdk.c',
+   'vpc.c',
+   'write-threshold.c',
+-), zstd)
++), zstd, zlib)
+ 
+-block_ss.add(when: [zlib, 'CONFIG_QCOW1'], if_true: files('qcow.c'))
++block_ss.add(when: 'CONFIG_QCOW1', if_true: files('qcow.c'))
+ block_ss.add(when: 'CONFIG_VDI', if_true: files('vdi.c'))
+ block_ss.add(when: 'CONFIG_CLOOP', if_true: files('cloop.c'))
+ block_ss.add(when: 'CONFIG_BOCHS', if_true: files('bochs.c'))
 -- 
-Eduardo
+2.26.2
 
 
