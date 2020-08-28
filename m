@@ -2,93 +2,98 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F127C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4545C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:25:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 132CF20838
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:25:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8349A20838
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 23:25:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="su84LV7F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 132CF20838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JZGjG6Wa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8349A20838
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBnkF-0005Zo-81
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:25:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54786)
+	id 1kBnkR-0005yH-Nw
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 19:25:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
- id 1kBnh7-0001iu-Eu; Fri, 28 Aug 2020 19:22:05 -0400
-Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:36942)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kBnjZ-0004so-AX
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:24:37 -0400
+Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:39582)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
- id 1kBnh5-0006Jm-L6; Fri, 28 Aug 2020 19:22:05 -0400
-Received: by mail-ej1-x644.google.com with SMTP id e23so1236447ejb.4;
- Fri, 28 Aug 2020 16:22:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=lJC7yqn+aYrJFGPSXOQj9C6bCyzL+YLObXLu10CJu2E=;
- b=su84LV7FrdSKS48qJv2WmNLin8ZufKiPUyyoDfSWX/fDrIJXAk+NTlLBfOHePm0Z+l
- TS39fgkb8GUFp5p4JdrM7Mnv18L6rW5Z+nECrCwSMnRJbRG2jIrA/pgeEX/oOoXWyqTK
- khJHsMhu1QCcQAtgXJuX2H/63mu0TtqDRWe+a0MLcnLJla9JQp1Mi4uh9Gp0S4Swzpvq
- s9w2jutwPbGJccPDEKcJAAR8qITRvFnyi1uVdJ7hID0HwHODqZFAPjNbDZnwGWZ+0W1U
- 7X6NgdQos1aqKVilFM6ANLUpVXlZrCZi5bnenHTriKpAbzJYNQhHU2lcO/FvKyM1bOz2
- ujsA==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kBnjX-0006Zb-BS
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 19:24:36 -0400
+Received: by mail-pg1-x52f.google.com with SMTP id v15so1140803pgh.6
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 16:24:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=q+pP85zdMcUhyvw6vFDHSObf7McM1ef8XS7oy20daaw=;
+ b=JZGjG6WaXZJDQ+b2nDF47ndUWsV8yW+q2ECYei/hTMxXKuWI9t4aoFuHHZgEz17tad
+ 30t9Q5ycWMvIqLRZ9DB1XOCOte0c958tLFpg9j+KB9s6NdRz1F1kcdkaKGq9PXRlzi0I
+ ItKofLgOoMoizwovHNcCtaUGqqHdCayUZtClnytyLx3CGEDGCnwUi7YDAV2CyaKc3+1h
+ iI6I9He3x9Mec8YrVl/s2CLvpK13pBEiJ2AddIKMStzmbSOnu+TfDioO8RRSor4q0fuu
+ 0QVBAOP1L/9GSkjcwlwdIhRHXi8uzZBVWXNYN0SWkoZNVM1+gUmTB1kOdjbPSVsxHiSb
+ aLgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=lJC7yqn+aYrJFGPSXOQj9C6bCyzL+YLObXLu10CJu2E=;
- b=jRb4gh0Bioc+npRP0qu3NdMLXoP+8gF4eDYdI2xZw/s7XN7Bp/zyWmfPLtl85MyDCs
- Gb/4O6jVz8U3M6ewhFQRMGuOZgpeg618DM0WAnxktlqjLnEg8ci9yLbqT9vSR6IHtmqm
- ZBxjlfkbtt3a03NOEeCSROh9b6HYjXqyPRr3gIUvWteOUtaPjzHUx4NaM2tr7p0gWKsO
- h+Q44IRvoj+GVYNBvatci6T4shuDKOXHBDMpzJB72AO6n99zJxafFlccumFjs/JbGqOs
- pEu9hSlgySPQc7FOtlZnnbRf4qE4KN575icGzih6ho1Yq9+6iT2zrRSjMicp4OSd78rE
- AaTQ==
-X-Gm-Message-State: AOAM53091z33z8fqfKmtscHEn/MmipuCbuoupMKUWjVXMfOvUfvwFLGg
- oqlg7Dt2qlMZTU4uKr+BzZnIvceSkuExEgEx
-X-Google-Smtp-Source: ABdhPJx4XJONk+930Fjs84XWBG3u3JLQM+pUYFNhVfR1YtxkhoV7558nqVqcEVRUEGm7gvsWO+RQmg==
-X-Received: by 2002:a17:906:289a:: with SMTP id
- o26mr1086286ejd.309.1598656921636; 
- Fri, 28 Aug 2020 16:22:01 -0700 (PDT)
-Received: from localhost.localdomain (109-186-204-55.bb.netvision.net.il.
- [109.186.204.55])
- by smtp.gmail.com with ESMTPSA id j21sm523436eja.109.2020.08.28.16.22.00
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 16:22:01 -0700 (PDT)
-From: Nir Soffer <nirsof@gmail.com>
-X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/5] qemu-iotests: Support varargs syntax in FilePaths
-Date: Sat, 29 Aug 2020 02:21:50 +0300
-Message-Id: <20200828232152.205833-4-nsoffer@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200828232152.205833-1-nsoffer@redhat.com>
-References: <20200828232152.205833-1-nsoffer@redhat.com>
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=q+pP85zdMcUhyvw6vFDHSObf7McM1ef8XS7oy20daaw=;
+ b=aEaCz9WZg2CAFH2Mu2R5AMXYGS/KhkwqMPBCUoutDCcciqxhe/84kxESvbz6vR0ACn
+ f7DXkn80Bh5Nwwu/sAfD36tXEDT5tkPox+lF9OUiXzPyvhxrga9AbFLb9QzbVp4ud0uv
+ eVr0Cpuc7H5U1NjT/NhgNidSV0BQ6imO/D6RB86mkikz3SN4117f3SvaeBdwTdWn6z3I
+ rf7XoBpiVmcW7HzG6oMdTkzIQtsmrMSxcvlOFMF+aRzG5TOkH5NeaRsIsK464t8LTprR
+ m3sK6Exi08pQ9NuYZdJuaaJwK9OiohFp/puNQfHzP+z1nMgQYJRw0ekB2UkT5jvH41Ls
+ 1ArQ==
+X-Gm-Message-State: AOAM533dfqOXYrYCkCDsff7Q+w9I9woYg90vsxLwgE+gIg/+//nTgCQ0
+ fDZDsgK2fYVE3XkNdZEfBY9i/OEltG9VxA==
+X-Google-Smtp-Source: ABdhPJy61qd2sEjephrk8yr94I6C0hwjl5GP3qHrsJVMH17Z2cjSny/s0DapDUAhPN1UjMQ7Sa+l8Q==
+X-Received: by 2002:aa7:850b:: with SMTP id v11mr1078907pfn.240.1598657073314; 
+ Fri, 28 Aug 2020 16:24:33 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id w10sm346435pjq.46.2020.08.28.16.24.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 28 Aug 2020 16:24:32 -0700 (PDT)
+Subject: Re: [PATCH v2 43/45] target/arm/vec_helper: Add gvec fp indexed
+ multiply-and-add operations
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200828183354.27913-1-peter.maydell@linaro.org>
+ <20200828183354.27913-44-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a9995eb6-6cb6-f041-ea09-9104e9dc293e@linaro.org>
+Date: Fri, 28 Aug 2020 16:24:30 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::644;
- envelope-from=nirsof@gmail.com; helo=mail-ej1-x644.google.com
+In-Reply-To: <20200828183354.27913-44-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -28
+X-Spam_score: -2.9
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.809,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,111 +106,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- John Snow <jsnow@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Nir Soffer <nsoffer@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Accept variable number of names instead of a sequence:
+On 8/28/20 11:33 AM, Peter Maydell wrote:
+> +#define float16_nop(N, M, S) (M)
+> +#define float32_nop(N, M, S) (M)
+> +#define float64_nop(N, M, S) (M)
+>  
+> +DO_FMUL_IDX(gvec_fmul_idx_h, nop, float16, H2)
+> +DO_FMUL_IDX(gvec_fmul_idx_s, nop, float32, H4)
+> +DO_FMUL_IDX(gvec_fmul_idx_d, nop, float64, )
+> +
+> +/*
+> + * Non-fused multiply-accumulate operations, for Neon. NB that unlike
+> + * the fused ops below they assume accumulate both from and into Vd.
+> + */
+> +DO_FMUL_IDX(gvec_fmla_nf_idx_h, add, float16, H2)
+> +DO_FMUL_IDX(gvec_fmla_nf_idx_s, add, float32, H4)
+> +DO_FMUL_IDX(gvec_fmls_nf_idx_h, sub, float16, H2)
+> +DO_FMUL_IDX(gvec_fmls_nf_idx_s, sub, float32, H4)
+> +
+> +#undef float16_nop
+> +#undef float32_nop
+> +#undef float64_nop
 
-    with FilePaths("a", "b", "c") as (a, b, c):
+This floatN_nop stuff is pretty ugly.
 
-The disadvantage is that base_dir must be used as kwarg:
+Better to pass in either floatN_mul, or the floatN_muladd_nf helpers that you
+added earlier.  Although I guess you're missing float64_muladd_nf so far.
 
-    with FilePaths("a", "b", base_dir=soc_dir) as (sock1, sock2):
 
-But this is more clear and calling optional argument as positional
-arguments is bad idea anyway.
-
-Signed-off-by: Nir Soffer <nsoffer@redhat.com>
-Reviewed-by: Max Reitz <mreitz@redhat.com>
----
- tests/qemu-iotests/194        |  4 ++--
- tests/qemu-iotests/257        | 10 ++++------
- tests/qemu-iotests/iotests.py |  8 ++++----
- 3 files changed, 10 insertions(+), 12 deletions(-)
-
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index da7c4265ec..08389f474e 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -26,8 +26,8 @@ iotests.script_initialize(supported_fmts=['qcow2', 'qed', 'raw'],
- 
- with iotests.FilePath('source.img') as source_img_path, \
-      iotests.FilePath('dest.img') as dest_img_path, \
--     iotests.FilePaths(['migration.sock', 'nbd.sock'], iotests.sock_dir) as \
--         [migration_sock_path, nbd_sock_path], \
-+     iotests.FilePaths('migration.sock', 'nbd.sock', base_dir=iotests.sock_dir) \
-+        as (migration_sock_path, nbd_sock_path), \
-      iotests.VM('source') as source_vm, \
-      iotests.VM('dest') as dest_vm:
- 
-diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-index e1e6077219..a9aa65bbe3 100755
---- a/tests/qemu-iotests/257
-+++ b/tests/qemu-iotests/257
-@@ -275,10 +275,9 @@ def test_bitmap_sync(bsync_mode, msync_mode='bitmap', failure=None):
-                         an incomplete backup. Testing limitations prevent
-                         testing competing writes.
-     """
--    with iotests.FilePaths(['img', 'bsync1', 'bsync2',
--                            'fbackup0', 'fbackup1', 'fbackup2']) as \
--                            (img_path, bsync1, bsync2,
--                             fbackup0, fbackup1, fbackup2), \
-+    with iotests.FilePaths(
-+            'img', 'bsync1', 'bsync2', 'fbackup0', 'fbackup1', 'fbackup2') as \
-+            (img_path, bsync1, bsync2, fbackup0, fbackup1, fbackup2), \
-          iotests.VM() as vm:
- 
-         mode = "Mode {:s}; Bitmap Sync {:s}".format(msync_mode, bsync_mode)
-@@ -441,8 +440,7 @@ def test_backup_api():
-     """
-     Test malformed and prohibited invocations of the backup API.
-     """
--    with iotests.FilePaths(['img', 'bsync1']) as \
--         (img_path, backup_path), \
-+    with iotests.FilePaths('img', 'bsync1') as (img_path, backup_path), \
-          iotests.VM() as vm:
- 
-         log("\n=== API failure tests ===\n")
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 4abfe63662..0d22ad5b03 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -455,7 +455,7 @@ class FilePaths:
- 
-     Example usage:
- 
--        with FilePaths(['a.img', 'b.img']) as (img_a, img_b):
-+        with FilePaths('a.img', 'b.img') as (img_a, img_b):
-             # Use img_a and img_b here...
- 
-         # a.img and b.img are automatically removed here.
-@@ -463,10 +463,10 @@ class FilePaths:
-     By default images are created in iotests.test_dir. To create socket use
-     iotests.sock_dir:
- 
--       with FilePaths(['a.sock'], base_dir=iotests.sock_dir) as (sock,):
-+       with FilePaths('a.sock', base_dir=iotests.sock_dir) as (sock,):
- 
-     """
--    def __init__(self, names, base_dir=test_dir):
-+    def __init__(self, *names, base_dir=test_dir):
-         self.paths = []
-         for name in names:
-             self.paths.append(os.path.join(base_dir, file_pattern(name)))
-@@ -487,7 +487,7 @@ class FilePath(FilePaths):
-     FilePath is a specialization of FilePaths that takes a single filename.
-     """
-     def __init__(self, name, base_dir=test_dir):
--        super(FilePath, self).__init__([name], base_dir)
-+        super(FilePath, self).__init__(name, base_dir=base_dir)
- 
-     def __enter__(self):
-         return self.paths[0]
--- 
-2.26.2
-
+r~
 
