@@ -2,85 +2,90 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F94FC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE6BC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:39:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 410672074A
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:38:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22F562074A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:39:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YgCOGzp+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 410672074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a7xvf/ba"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22F562074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBiKi-0001RE-El
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 13:38:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44828)
+	id 1kBiM0-0002J4-8v
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 13:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBiJz-00012V-P2
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:37:51 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:46827)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kBiKj-0001Zk-9O
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:38:37 -0400
+Received: from mail-wm1-x336.google.com ([2a00:1450:4864:20::336]:40138)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kBiJy-0007Mc-1u
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:37:51 -0400
-Received: by mail-ed1-x542.google.com with SMTP id a12so1161783eds.13
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 10:37:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=53MJDahnUPbN0P9xKBU1hm+aXP9Ho56kl9fpgkafNPQ=;
- b=YgCOGzp+BO55pkBgYL4LU9bHnE7VbGceqopneKrHyLyLOsDHx5ppkP3fDJ2pD/Np7/
- vjusVArISY/6oaODBeQUin31SEKDCOrGZW708Wnn406pB+ZBsBjm5C21hc0AQmW+2Y6/
- HeMOlT08rqLTT0EjNBQyKABz5IGSUYNP5ZkyJl2jhG0TXbmrwCbWrD/szpABSKteasJF
- CCZ9UBuafldgTf3IiBuWUCEVSMx7gyx/3T3njULUHD2cNWK+EodSdfdVeIf3NrULum3c
- iWvTXPeeVt33yfd5A0PtvSZLgWx74fddirJVwxIhn1M2fcOu9KPbUT+V4GRHn4MXQoyO
- ozkg==
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kBiKh-0007Pt-NM
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:38:36 -0400
+Received: by mail-wm1-x336.google.com with SMTP id k20so138839wmi.5
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 10:38:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/VauukO+yWTDNWGaSiD/K8ASNkuBz1lbLcMe1Hzzu2A=;
+ b=a7xvf/baTaUc7+Ss5QEGSDnifhtmWinoTQOpgXfVUZipgu6QbMDvCSVPDtQfV99v+0
+ /n8jlHV1xcgVOv069vlxi408aAhelFh9ZE+amMmIR3VLJj1MiUmLZ0/08xDKPcUx+veB
+ AlY5QFFJ3nR2ogBCszB/EjaIROQDcvEmDWL84qAvz7OOe+d16FqPWM7EfCzvfSP0a/YG
+ Pyhl5vzZkF80+j56RUE9SjolWMPQNojcSK8nMF2d/8dgtkPWmxN7h73WIxpsVTGkQAK0
+ DDVxu9/Edup3/K0F5IgzbbfAz6SL8iyh7BUJLffTemM5wJ1Xjo2nA+kiBGE2AiAFSjAr
+ J1rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=53MJDahnUPbN0P9xKBU1hm+aXP9Ho56kl9fpgkafNPQ=;
- b=KlL8xmFZ0j8ARNzjLqcxML+hW+3DO61mSmJrXibJQiykExavr30s/j49sAg+dhpW/T
- 3+UyeKWnRztcTjyR6g0mwK8nkGXlm6aa7SI9d1OFFAXTjgKI3MM6DbSmFkyTID4r2a3E
- bUU2Gv+Q67eLAW/qoHSg3I+59jrhzrfphMf2H94+l4Rx6S7/x2PZIO40mte21cGG/539
- vkNm2W/3Ry1687JAJoreRIzYB+P9uFpraH21Wwy0vjGYB68TrzAljvV26KeMzLThqC3h
- RyaI389HCthsqtTGJ90qU+v+/uOE3nPc3qs1GtCIaRMJ1qMF7i01OmeW+WIp10RkZ+GW
- 3UsQ==
-X-Gm-Message-State: AOAM533wJHIP8uiJ3q2GUpniZ+wDgbO4ufa/w/MLh7wdziXUP0j9BUhE
- I5u545ZGXDfjlNRN4uOHuCGpbQ0/jJo0xtNw/LjpZ0+Ub1kVjA==
-X-Google-Smtp-Source: ABdhPJzzULXRgbVUJTWXJWKWHUyB7PfpkyxI8R3IwfbyIHeDw1jjUzVluSsTNlB6PUrPZpANsFasAn+rks83bkK3LFc=
-X-Received: by 2002:a50:8f45:: with SMTP id 63mr3154032edy.52.1598636267662;
- Fri, 28 Aug 2020 10:37:47 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=/VauukO+yWTDNWGaSiD/K8ASNkuBz1lbLcMe1Hzzu2A=;
+ b=GI2uY9LQC79zkjYfjs4rYSYPgz/yG8Qn+J3KLvw7ScJlBOXAKW3wNxbGctCsLPINjW
+ esv3DXPMN43MC5H/wuQu+X/i397NoIzuo168F3sUnc8Kyv/H72v3GLaZmiTG31ML1beO
+ 6bMJUc01Xl21zMtcgWRYWbTqwVQrwls9MvGQqYUtvo88i1upq8OIxXQ7yBb7dFUW2VaD
+ MzBsOHLfgqn8DbdVzf3iaJAH/ZrZ6+h9cKTJf0bVBAjeP6Prp+W5VJxU9Ks6B9XDAE5G
+ TmrLRq6ZZBP8Eu1RpKKBOsgyu9VocbL4VafshpHP0/PtmPkPA5g9v2dxAFn6nhq3QQ2A
+ hy9g==
+X-Gm-Message-State: AOAM530HeetNXhvPMtRoANYFx92rDAyAcMa5HTmQq8NfAD9cT9I5eZef
+ bNQgJjQ6skxJvosacFSED6dHZJxWq1M=
+X-Google-Smtp-Source: ABdhPJxbc84IM+s7gMvluhxYQm/OlE/LG1UWyr+9cnJ6TpGgIADYZi/TiGswZd5rdJBb5jTuXJDUig==
+X-Received: by 2002:a1c:2003:: with SMTP id g3mr172353wmg.99.1598636313890;
+ Fri, 28 Aug 2020 10:38:33 -0700 (PDT)
+Received: from localhost.localdomain ([2001:b07:6468:f312:c924:73d2:e509:7a3f])
+ by smtp.gmail.com with ESMTPSA id 70sm143136wme.15.2020.08.28.10.38.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Aug 2020 10:38:33 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] meson: move zlib detection to meson
+Date: Fri, 28 Aug 2020 19:38:41 +0200
+Message-Id: <20200828173841.33505-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200828092413.22206-1-peter.maydell@linaro.org>
-In-Reply-To: <20200828092413.22206-1-peter.maydell@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Fri, 28 Aug 2020 18:37:36 +0100
-Message-ID: <CAFEAcA_OXnkUrVXBXsgfgHkajgvZdXGKKBh=p=oBgJqwJHgbVw@mail.gmail.com>
-Subject: Re: [PULL 00/35] target-arm queue
-To: QEMU Developers <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::336;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-wm1-x336.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,48 +98,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 28 Aug 2020 at 10:24, Peter Maydell <peter.maydell@linaro.org> wrote:
->
-> Nothing earth-shaking in here, just a lot of refactoring and cleanup
-> and a few bugfixes. I suspect I'll have another pullreq to come in
-> the early part of next week...
->
-> The following changes since commit 19591e9e0938ea5066984553c256a043bd5d822f:
->
->   Merge remote-tracking branch 'remotes/mst/tags/for_upstream' into staging (2020-08-27 16:59:02 +0100)
->
-> are available in the Git repository at:
->
->   https://git.linaro.org/people/pmaydell/qemu-arm.git tags/pull-target-arm-20200828
->
-> for you to fetch changes up to ed78849d9711805bda37ee026018d6ee7a606d0e:
->
->   target/arm: Convert sq{, r}dmulh to gvec for aa64 advsimd (2020-08-28 10:02:50 +0100)
->
-> ----------------------------------------------------------------
-> target-arm queue:
->  * target/arm: Cleanup and refactoring preparatory to SVE2
->  * armsse: Define ARMSSEClass correctly
->  * hw/misc/unimp: Improve information provided in log messages
->  * hw/qdev-clock: Avoid calling qdev_connect_clock_in after DeviceRealize
->  * hw/arm/xilinx_zynq: Call qdev_connect_clock_in() before DeviceRealize
->  * hw/net/allwinner-sun8i-emac: Use AddressSpace for DMA transfers
->  * hw/sd/allwinner-sdhost: Use AddressSpace for DMA transfers
->  * target/arm: Fill in the WnR syndrome bit in mte_check_fail
->  * target/arm: Clarify HCR_EL2 ARMCPRegInfo type
->  * hw/arm/musicpal: Use AddressSpace for DMA transfers
->  * hw/clock: Minor cleanups
->  * hw/arm/sbsa-ref: fix typo breaking PCIe IRQs
->
+Meson includes the same logic that tries to look for -lz if
+pkg-config (and cmake) cannot find zlib.  The undocumented
+--disable-zlib-test option becomes a no-op.
 
-Applied, thanks.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Makefile    |  2 +-
+ configure   | 32 +-------------------------------
+ meson.build |  6 +-----
+ 3 files changed, 3 insertions(+), 37 deletions(-)
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+diff --git a/Makefile b/Makefile
+index 81794d5c34..1520a2eab5 100644
+--- a/Makefile
++++ b/Makefile
+@@ -132,7 +132,7 @@ configure: ;
+ 
+ $(call set-vpath, $(SRC_PATH))
+ 
+-LIBS+=-lz $(LIBS_TOOLS)
++LIBS+=$(LIBS_TOOLS)
+ 
+ SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
+ 
+diff --git a/configure b/configure
+index 6ecaff429b..e035eb2868 100755
+--- a/configure
++++ b/configure
+@@ -501,7 +501,6 @@ opengl=""
+ opengl_dmabuf="no"
+ cpuid_h="no"
+ avx2_opt=""
+-zlib="yes"
+ capstone=""
+ lzo=""
+ snappy=""
+@@ -1423,7 +1422,7 @@ for opt do
+   ;;
+   --enable-usb-redir) usb_redir="yes"
+   ;;
+-  --disable-zlib-test) zlib="no"
++  --disable-zlib-test)
+   ;;
+   --disable-lzo) lzo="no"
+   ;;
+@@ -3898,30 +3897,6 @@ if ! compile_prog "$glib_cflags -Werror" "$glib_libs" ; then
+     fi
+ fi
+ 
+-#########################################
+-# zlib check
+-
+-if test "$zlib" != "no" ; then
+-    if $pkg_config --exists zlib; then
+-        zlib_cflags=$($pkg_config --cflags zlib)
+-        zlib_libs=$($pkg_config --libs zlib)
+-        QEMU_CFLAGS="$zlib_cflags $QEMU_CFLAGS"
+-        LIBS="$zlib_libs $LIBS"
+-    else
+-        cat > $TMPC << EOF
+-#include <zlib.h>
+-int main(void) { zlibVersion(); return 0; }
+-EOF
+-        if compile_prog "" "-lz" ; then
+-            zlib_libs=-lz
+-            LIBS="$LIBS $zlib_libs"
+-        else
+-            error_exit "zlib check failed" \
+-                "Make sure to have the zlib libs and headers installed."
+-        fi
+-    fi
+-fi
+-
+ ##########################################
+ # SHA command probe for modules
+ if test "$modules" = yes; then
+@@ -7129,11 +7104,6 @@ fi
+ if test "$posix_memalign" = "yes" ; then
+   echo "CONFIG_POSIX_MEMALIGN=y" >> $config_host_mak
+ fi
+-if test "$zlib" != "no" ; then
+-    echo "CONFIG_ZLIB=y" >> $config_host_mak
+-    echo "ZLIB_CFLAGS=$zlib_cflags" >> $config_host_mak
+-    echo "ZLIB_LIBS=$zlib_libs" >> $config_host_mak
+-fi
+ if test "$spice" = "yes" ; then
+   echo "CONFIG_SPICE=y" >> $config_host_mak
+   echo "SPICE_CFLAGS=$spice_cflags" >> $config_host_mak
+diff --git a/meson.build b/meson.build
+index 74f8ea0c2e..35e6f8688d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -134,11 +134,7 @@ if 'CONFIG_AUTH_PAM' in config_host
+   pam = cc.find_library('pam')
+ endif
+ libaio = cc.find_library('aio', required: false)
+-zlib = not_found
+-if 'CONFIG_ZLIB' in config_host
+-  zlib = declare_dependency(compile_args: config_host['ZLIB_CFLAGS'].split(),
+-                            link_args: config_host['ZLIB_LIBS'].split())
+-endif
++zlib = dependency('zlib', required: true)
+ linux_io_uring = not_found
+ if 'CONFIG_LINUX_IO_URING' in config_host
+   linux_io_uring = declare_dependency(compile_args: config_host['LINUX_IO_URING_CFLAGS'].split(),
+-- 
+2.26.2
 
--- PMM
 
