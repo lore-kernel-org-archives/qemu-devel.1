@@ -2,89 +2,89 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3748CC433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 05:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C637C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 05:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEFB42080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 05:03:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01C8F20CC7
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 05:14:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZPXNPWvg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEFB42080C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbVUOFil"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C8F20CC7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBWXp-0006Vp-8y
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 01:03:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53472)
+	id 1kBWiG-0000Z2-Au
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 01:14:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBWXI-0005zt-4Z
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 01:02:48 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22874
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBWhm-00007P-0J
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 01:13:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21635)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBWXE-0007zn-Gf
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 01:02:46 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBWhj-0000o1-Qh
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 01:13:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598590962;
+ s=mimecast20190719; t=1598591614;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=Io6yvH2RvXJsrjsS5gf7crzETU2p3vbCTvSVa5tuu14=;
- b=ZPXNPWvgNDNv2dMiz/fONTasflt1d9juWDwYXAhaAUWekoW/SUjSgkDAGolDWJeiX6AGMM
- AH8Irj16CrhjDkr9HuZuy1PW6Ahw4L8MFpgw1n6XWyrarmM9ITr6a+F0i8vmcTyvfnDU/w
- PjdnZSY1dlyoSmHfuD5pKouvzr5jyjc=
+ bh=kCSA7cooby10BdoZhoj8/HJRjz4Gto6ALAWNus2lpd4=;
+ b=DbVUOFilmlnn/874HgONFQh+rCC1kSjyM1GX3ZXL672VbpZv39Cx9N2RR3n5Qr6j8P1GaZ
+ 8O3x1Xdco2D/DvhymTm+TMB+YC+kTceuTI/lqHTmEmTwvWGewVImKBzyT2ldUzDe7DxURP
+ 2voHv+gT7kl7yuj2Dxm6JH5ndaaLmkk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-mMPhyQ6LNQCNc_R47wIljg-1; Fri, 28 Aug 2020 01:02:40 -0400
-X-MC-Unique: mMPhyQ6LNQCNc_R47wIljg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-536--nzf2s7qMrGv9U02UyDOog-1; Fri, 28 Aug 2020 01:13:27 -0400
+X-MC-Unique: -nzf2s7qMrGv9U02UyDOog-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04CF55202;
- Fri, 28 Aug 2020 05:02:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C42221005E6A;
+ Fri, 28 Aug 2020 05:13:26 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1D451672CD;
- Fri, 28 Aug 2020 05:02:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 39E4919D61;
+ Fri, 28 Aug 2020 05:13:20 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 30EBE9D5A; Fri, 28 Aug 2020 07:02:32 +0200 (CEST)
-Date: Fri, 28 Aug 2020 07:02:32 +0200
+ id 535B89D5A; Fri, 28 Aug 2020 07:13:19 +0200 (CEST)
+Date: Fri, 28 Aug 2020 07:13:19 +0200
 From: Gerd Hoffmann <kraxel@redhat.com>
-To: Sergio Lopez <slp@redhat.com>
-Subject: Re: [PATCH v6 03/20] seabios: add bios-microvm.bin binary
-Message-ID: <20200828050232.jykyjztkwaplkhsu@sirius.home.kraxel.org>
-References: <20200826105254.28496-1-kraxel@redhat.com>
- <20200826105254.28496-4-kraxel@redhat.com>
- <20200827144854.vz7yhakvks5xoh63@mhamilton>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 0/3] Fixes 20200825 patches
+Message-ID: <20200828051319.n5f2vq7idrcgefia@sirius.home.kraxel.org>
+References: <20200825062008.6502-1-kraxel@redhat.com>
+ <128e42b3-3b0f-744b-91be-f4c52837c3a2@redhat.com>
+ <CAFEAcA8m13LKgeiBJGy=XKLzP8zOqqxeEG8R0w=0jG-GprBEVA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200827144854.vz7yhakvks5xoh63@mhamilton>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <CAFEAcA8m13LKgeiBJGy=XKLzP8zOqqxeEG8R0w=0jG-GprBEVA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 01:02:42
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 00:15:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,34 +97,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Shannon Zhao <shannon.zhaosl@gmail.com>,
- qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Thomas Huth <thuth@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Laurent Vivier <laurent@vivier.eu>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 27, 2020 at 04:48:54PM +0200, Sergio Lopez wrote:
-> On Wed, Aug 26, 2020 at 12:52:37PM +0200, Gerd Hoffmann wrote:
-> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-> > ---
-> >  pc-bios/bios-microvm.bin | Bin 0 -> 131072 bytes
-> >  1 file changed, 0 insertions(+), 0 deletions(-)
-> >  create mode 100644 pc-bios/bios-microvm.bin
+On Thu, Aug 27, 2020 at 11:23:58AM +0100, Peter Maydell wrote:
+> On Thu, 27 Aug 2020 at 08:20, Thomas Huth <thuth@redhat.com> wrote:
+> > Peter, what is still missing that you could use the gitlab CI as gating
+> > tests, too?
 > 
-> Without reproducible builds (which we should probably consider having
-> for everything inside "pc-bios", but that's outside the scope of this
-> series), this one is hard to debug.
+> I think we're waiting on a respin of the scripts from
+> Cleber, aren't we?
+> 
+> Also we need figure out how to handle the conflict between
+> "gitlab's git repo is mirrored (by perodic push?) from
+> git.qemu.org" and "test by pushing to the gitlab staging
+> branch", because the former overwrites the changes that
+> the latter makes.
 
-We have roms/Makefile for firmware builds.  "make -C roms bios" will
-build seabios binaries (you need the seabios submodule initialized for
-this).
-
-And, yes, seabios builds are reproducible.  If you build with the same
-compiler (rhel-7 gcc 4.8.5) you should end up with the same binary.
+Pushing to a qemu fork runs CI too, so the staging branch doesn't have
+to live in the official qemu-project repo.
 
 take care,
   Gerd
