@@ -2,97 +2,88 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B25C2C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF805C433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:06:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 791B820776
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:00:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EF4520848
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 17:06:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jQR+QMSf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 791B820776
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cDQ1XqQP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EF4520848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBhjy-0001yz-Lo
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 13:00:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34810)
+	id 1kBhpU-00053I-Lu
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 13:06:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBhis-0001RK-JO
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 12:59:30 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36320)
+ id 1kBhof-0003Xb-Lu
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:05:29 -0400
+Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:44043)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBhiq-00028m-S0
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 12:59:30 -0400
-Received: by mail-pl1-x643.google.com with SMTP id y6so780323plt.3
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 09:59:28 -0700 (PDT)
+ id 1kBhod-000307-Uy
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 13:05:29 -0400
+Received: by mail-pg1-x536.google.com with SMTP id m34so712153pgl.11
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 10:05:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=KPZsSQvXc1iyhQ4OI19z388LQtAJQ5cTeGI4HV7TyOg=;
- b=jQR+QMSfTXjYuw1bprcZKJZkDWHhKf0tPNF9xfOQmhvcl9i5Isrcq9G9GTjj8c4tb+
- vLmXHWD6H9E5zGMSQuYHNgild8TnYu02jtwO/qhtIYKhFvCcDdBdH0+oCoUk0GjUbjOr
- UvDffsvyn4Sc8QDZGlvvRTxFEjT0/se5/GfC9FyiQiAVwQlYnadNblrIzTRNkALeZsL/
- +rMBdr+80VhCH/VB/1YvcC8IxSnCWve0tMOMq8cyEuZHFDYA3oKyS1B7XMkh+I+2QsVZ
- sLbXeqypmujwN87f8wPKuzRRXzDL+6dVVO7TOnaClBd2JanSC5qM5kGKnJfRDEq/DB4n
- IWaA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=o+wKj1Jv8fml/03sdKVYIYEOnnCMhd3pvDGOCXnWYO8=;
+ b=cDQ1XqQPoHGaRI0qavA9lB9PbfUmtXSiGwSumx1v1Gjlpof0VGOzp7oZI0ia+B0+Yn
+ x8b/T39k4NO1U9RrlxE9dFL751wNUMkvQAUGH158vEE/MhUFarkquN0dJ4PZ8WxQyo5A
+ zvHdxitXEzUizih5/GoYQUcau+QqAJLdOncMirI0qhRJddyxWZG6N3mT11shQhZ65L/n
+ W8KI//A/mS2DMrXTnWN5gKtcA3oGPHhA+AxgTOtpIl/OznxPZjszXOb2vwcV3fVT4Scd
+ AfTT2LcHicnaYrW4VbkwIsrieFfwzl56ostdzTu3n+0edXwjvT1hIxJg1lrUCH7XNbQn
+ VHew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=KPZsSQvXc1iyhQ4OI19z388LQtAJQ5cTeGI4HV7TyOg=;
- b=k/VFLZEHeS8cuEvGqIlmgMwukawqQP9nJ5Smu3inMFF3JEVu+QTDPHGartmPej9W+d
- hgqTYIglAPfiKsrHf7caSZvCtjfvAjTkiHwILPrGX0ZGy63hp1WS4CWdxTey9N2K2TB/
- gNbHrA3rT6A5hQLwONWNTVZMux3YiLPvcfaw+ndYS1uoZrCrjTSheTtw2zDEOHTHzkRV
- ZW2XLTB+ZRajBUANW+wnG5t2hQ3HY9AuKX5EcbdpP3SuFkMUqrQsQZlv6lOKf3LMtqXU
- sjwR7k+FK3HgBogLfv+yi5EuRP+U6tZOsNQ2cX40nqzgYd4dM3XwzHHLd0X2ofN4A6JT
- cBCA==
-X-Gm-Message-State: AOAM531PFVc8O94R2xEfI2Rd052aX1nNYXu3+cETW0YzjN8jp2jWz/Gy
- erES9SMCXUGZ+0UGax9idF6iSA==
-X-Google-Smtp-Source: ABdhPJzqDxfXeIaWzWpN3P5m2bG0TniYAwjHvN5LAzxkpt1oR5gT8T72g6tHxDCnSvVpQcX0qNQTAA==
-X-Received: by 2002:a17:902:44f:: with SMTP id
- 73mr2104211ple.178.1598633967319; 
- Fri, 28 Aug 2020 09:59:27 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id a69sm2331385pfa.116.2020.08.28.09.59.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Aug 2020 09:59:26 -0700 (PDT)
-Subject: Re: [PATCH 1/2] crypto: fix build without gcrypt and gnutls
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200828132716.279782-1-berrange@redhat.com>
- <20200828132716.279782-2-berrange@redhat.com>
- <0a1a8958-691f-d16d-2f6b-6392e6a20966@linaro.org>
- <20200828152318.GO224144@redhat.com>
+ bh=o+wKj1Jv8fml/03sdKVYIYEOnnCMhd3pvDGOCXnWYO8=;
+ b=XZt4xcAlOHC8aoZ21FLUIceqFxgh2Benqaq61vt+PMB66KidZYQEczB36YJ3FNwmWr
+ 9CccOIfdD+EGP51W1n1FRCFQHJsbPg8LIAGWcUfnyxgOMrZ9sKOoccSUfcwlqTinM5iZ
+ mg41VxSzFkTIxX6jMMJE9rbkucNJVoZ7gHmKzs33j0S8JRdcfmZH8iJie2yTuUC7ZTEE
+ wgdbveu1Suw0Bel60Q2nsLMUNfPxDtAoErLk4jDLu3Q0LIwHKkdvYP5Pf6XdIziq1eMx
+ eh9dG1dxw9s4DkDvf5MFz5ordXTfCQzITA/X918vYYaE3IRVd3PUMwsGctkIlTuOm6r3
+ 12dg==
+X-Gm-Message-State: AOAM531Wdz37m/9r+T3vxTiaHMk+T1Jc5GHVoKM9cmdSgefmtZ8xTfFm
+ t7uFkHp+tjz0h4sa29q1aF9XmoTFQuLDjw==
+X-Google-Smtp-Source: ABdhPJzipkwevFDC0UUInWR5bFM2NGvtiTqlu5YiG9iCbBDye6wDU79YkKpYjxdTQCsi14klHXMQag==
+X-Received: by 2002:a63:b24b:: with SMTP id t11mr1742974pgo.233.1598634325641; 
+ Fri, 28 Aug 2020 10:05:25 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id q12sm2277495pff.196.2020.08.28.10.05.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 28 Aug 2020 10:05:24 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <013504f4-e962-bcdd-edc6-f225d4db87a4@linaro.org>
-Date: Fri, 28 Aug 2020 09:59:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/16] crypto/cipher: Class hierarchy cleanups
+Date: Fri, 28 Aug 2020 10:05:07 -0700
+Message-Id: <20200828170523.418603-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200828152318.GO224144@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::536;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x536.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -28
-X-Spam_score: -2.9
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.809,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -107,43 +98,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/28/20 8:23 AM, Daniel P. Berrangé wrote:
-> On Fri, Aug 28, 2020 at 08:13:26AM -0700, Richard Henderson wrote:
->> On 8/28/20 6:27 AM, Daniel P. Berrangé wrote:
->>> If nettle is disabled and gcrypt enabled, the compiler and linker flags
->>> needed for gcrypt are not passed.
->>>
->>> Gnutls was also not added as a dependancy wen gcrypt is enabled.
->>>
->>> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
->>
->> This still needs something else.  I get
->>
->> Linking target qemu-x86_64
->> /usr/bin/ld: libqemuutil.a(crypto_init.c.o): in function `qcrypto_init':
->> /home/rth/qemu/bld-g/../qemu/crypto/init.c:111: undefined reference to
->> `gnutls_global_init'
->> /usr/bin/ld: /home/rth/qemu/bld-g/../qemu/crypto/init.c:113: undefined
->> reference to `gnutls_strerror'
->> collect2: error: ld returned 1 exit status
->> make: *** [Makefile.ninja:1570: qemu-x86_64] Error 1
-> 
-> Can you tell me what  configure args you're using and host OS distro
+Mostly this is intended to cleanup the class hierarchy
+used for the ciphers.  We currently have multiple levels
+of dispatch, and multiple separate allocations.  The final
+patches rearrange this to one level of indirect call, and
+all memory allocated contiguously.
 
-../qemu/configure --enable-gcrypt \
-  --target-list=x86_64-softmmu,x86_64-linux-user
+But on the way there are a number of other misc cleanups.
 
-On ubuntu 20 (focal).
+Changes in v2:
+  * Dropped move of QCryptoCipher typedef.
+  * Moved QCryptoCipherDriver typedef to include/crypto/cipher.h.
+  * Renamed included files to *.c.inc.
+  * Fixed errors with old versions of nettle and gcrypt.
+
+Based-on: <20200828132716.279782-1-berrange@redhat.com>
+("crypto: fix build with gcrypt")
+
+which does at least allow *-softmmu builds to complete,
+though I still have issues with *-linux-user.
 
 
 r~
+
+
+Richard Henderson (16):
+  crypto: Assume blocksize is a power of 2
+  crypto: Rename cipher include files to .c.inc
+  crypto: Remove redundant includes
+  crypto/nettle: Fix xts_encrypt arguments
+  crypto: Move QCryptoCipherDriver typedef to crypto/cipher.h
+  crypto: Use the correct const type for driver
+  crypto: Allocate QCryptoCipher with the subclass
+  crypto: Move cipher->driver init to qcrypto_*_cipher_ctx_new
+  crypto: Constify cipher data tables
+  crypto/builtin: Remove odd-sized AES block handling
+  crypto/builtin: Merge qcrypto_cipher_aes_{ecb,xts}_{en,de}crypt
+  crypto/builtin: Move AES_cbc_encrypt into cipher-builtin.inc.c
+  crypto/builtin: Split and simplify AES_encrypt_cbc
+  crypto/builtin: Split QCryptoCipherBuiltin into subclasses
+  crypto/nettle: Split QCryptoCipherNettle into subclasses
+  crypto/gcrypt: Split QCryptoCipherGcrypt into subclasses
+
+ crypto/afalgpriv.h                            |   3 +
+ crypto/cipherpriv.h                           |   6 +-
+ include/crypto/aes.h                          |   4 -
+ include/crypto/cipher.h                       |   4 +-
+ crypto/aes.c                                  |  51 --
+ crypto/cipher-afalg.c                         |  25 +-
+ crypto/cipher-builtin.c                       | 532 ------------
+ crypto/cipher-nettle.c                        | 733 -----------------
+ crypto/cipher.c                               |  44 +-
+ crypto/cipher-builtin.c.inc                   | 435 ++++++++++
+ .../{cipher-gcrypt.c => cipher-gcrypt.c.inc}  | 509 ++++++------
+ crypto/cipher-nettle.c.inc                    | 760 ++++++++++++++++++
+ 12 files changed, 1481 insertions(+), 1625 deletions(-)
+ delete mode 100644 crypto/cipher-builtin.c
+ delete mode 100644 crypto/cipher-nettle.c
+ create mode 100644 crypto/cipher-builtin.c.inc
+ rename crypto/{cipher-gcrypt.c => cipher-gcrypt.c.inc} (52%)
+ create mode 100644 crypto/cipher-nettle.c.inc
+
+-- 
+2.25.1
+
 
