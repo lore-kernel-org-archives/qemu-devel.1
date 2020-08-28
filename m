@@ -2,98 +2,93 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49631C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 15:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDED5C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 15:24:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B6562075B
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 15:14:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B904E20757
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 15:24:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J10VVrWf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B6562075B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SKEihcft"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B904E20757
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBg58-0005FH-9N
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 11:14:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38332)
+	id 1kBgEw-0000py-W8
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 11:24:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBg4N-0004UX-OR
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 11:13:35 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:53608)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBg4M-00053C-4b
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 11:13:35 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id nv17so628528pjb.3
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 08:13:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=0OBMjIW/lFPIlNgz0b0Ud3zUgNRsC/sa1j91GvakNV4=;
- b=J10VVrWflOVYze8K2Teg05p1QLhMkupd3EE86I4ZXhBxkZfmq/U6ayP0u/jDNtb038
- t/wpHCsF/0RiCbWX4JM/bruqaLRFMBxyklbWbh3h+uAYfUctRoTIIKyaQ0QnftjRdHj7
- W6qu7rgR78w6SKlyLlS/nYRhYx2hwIMQscL0M/forySXmbMJNzKQEKEZ5WRLNX+O6fB7
- IMd2lExQiYSfCf+dk0ycli+dbob25L2D6GKRmaJQXgvu40rckPU6G7pWjttkjEV7DdbI
- 5/OpvdumEub1NXQePaRucLWqK6nTTMzwE6ApgzjQRn+d0AramOQnsMpPquM5STb7iC7n
- pMww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0OBMjIW/lFPIlNgz0b0Ud3zUgNRsC/sa1j91GvakNV4=;
- b=T0V8SkICCp5jvhGw7MH0jOrKpUITp3r9fBKOzQeO4QvSqf9EDUTDOcI4NbHf62HfLz
- ymJdxsC/INJrDht2PWWWAAZ6I0o8V5ySd28Z/Av9jvsTzxfyXyXzocnGfVyfW9k68IJ7
- QOzupgyjlCFyoD/BBLeSbNjtBvZWFvxsgIrA75A/uYVxcHpL7Dw9LSIxAClY5MAj0DTY
- wBrPkWEzRPB3WWXPYpHqd3YsWiAwrnn/YBYybvV934Bdb7rgliVtnWkzH8opQqlIKD9C
- nYhduNXetjpnexrladnBHVZHa1PgxyUvOMo/5A02BUqfTzU5UUJ6gV/jzuOXqqgkmddL
- EB2w==
-X-Gm-Message-State: AOAM5319JEKbEKh+1r7OABKIYR6eh4fiDVTvFXDH1nG+57XmOXpm6UEp
- 3KzpGOVnhmTZe7cCNd10mUHSNg==
-X-Google-Smtp-Source: ABdhPJxnsQRtujCGiM/BUy6uMOFKaFPozkBOK/EuL6DMCAsVpqFLkR1LdQdiwQJiI1jvUoPhM3vCsg==
-X-Received: by 2002:a17:90a:e604:: with SMTP id
- j4mr1586169pjy.215.1598627609907; 
- Fri, 28 Aug 2020 08:13:29 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id mp24sm1540931pjb.42.2020.08.28.08.13.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Aug 2020 08:13:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kBgEA-00009R-9Z
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 11:23:42 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:41393
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kBgE7-0006Qt-DW
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 11:23:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598628217;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4gSX2e/pHNUSDvIav7EAhuhKsr+ZKQ+sQhUcotIqSLU=;
+ b=SKEihcft3MK9MKKCWFFQUyr16wKrkckWDkelR/cfrFrJ/0NULr9D8/wPWRSOZVcx9YvyKC
+ phxU4ZIx+0bcC2pg5GUQqMerAbFaq0ZJljpn73Zi/SngX7UZnrMWwVY11IWzby0c8MsiDr
+ TTP76Saxe6J168eeE534SZl+PwTbv1Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-226-OVtQjMxLNjqvfJdp0Diqvg-1; Fri, 28 Aug 2020 11:23:27 -0400
+X-MC-Unique: OVtQjMxLNjqvfJdp0Diqvg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 633F4425D9;
+ Fri, 28 Aug 2020 15:23:26 +0000 (UTC)
+Received: from redhat.com (ovpn-112-47.ams2.redhat.com [10.36.112.47])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A50D119C59;
+ Fri, 28 Aug 2020 15:23:21 +0000 (UTC)
+Date: Fri, 28 Aug 2020 16:23:18 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>
 Subject: Re: [PATCH 1/2] crypto: fix build without gcrypt and gnutls
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org
+Message-ID: <20200828152318.GO224144@redhat.com>
 References: <20200828132716.279782-1-berrange@redhat.com>
  <20200828132716.279782-2-berrange@redhat.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0a1a8958-691f-d16d-2f6b-6392e6a20966@linaro.org>
-Date: Fri, 28 Aug 2020 08:13:26 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ <0a1a8958-691f-d16d-2f6b-6392e6a20966@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200828132716.279782-2-berrange@redhat.com>
+In-Reply-To: <0a1a8958-691f-d16d-2f6b-6392e6a20966@linaro.org>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.809,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 07:07:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,34 +101,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/28/20 6:27 AM, Daniel P. Berrangé wrote:
-> If nettle is disabled and gcrypt enabled, the compiler and linker flags
-> needed for gcrypt are not passed.
+On Fri, Aug 28, 2020 at 08:13:26AM -0700, Richard Henderson wrote:
+> On 8/28/20 6:27 AM, Daniel P. Berrangé wrote:
+> > If nettle is disabled and gcrypt enabled, the compiler and linker flags
+> > needed for gcrypt are not passed.
+> > 
+> > Gnutls was also not added as a dependancy wen gcrypt is enabled.
+> > 
+> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 > 
-> Gnutls was also not added as a dependancy wen gcrypt is enabled.
+> This still needs something else.  I get
 > 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> Linking target qemu-x86_64
+> /usr/bin/ld: libqemuutil.a(crypto_init.c.o): in function `qcrypto_init':
+> /home/rth/qemu/bld-g/../qemu/crypto/init.c:111: undefined reference to
+> `gnutls_global_init'
+> /usr/bin/ld: /home/rth/qemu/bld-g/../qemu/crypto/init.c:113: undefined
+> reference to `gnutls_strerror'
+> collect2: error: ld returned 1 exit status
+> make: *** [Makefile.ninja:1570: qemu-x86_64] Error 1
 
-This still needs something else.  I get
+Can you tell me what  configure args you're using and host OS distro
 
-Linking target qemu-x86_64
-/usr/bin/ld: libqemuutil.a(crypto_init.c.o): in function `qcrypto_init':
-/home/rth/qemu/bld-g/../qemu/crypto/init.c:111: undefined reference to
-`gnutls_global_init'
-/usr/bin/ld: /home/rth/qemu/bld-g/../qemu/crypto/init.c:113: undefined
-reference to `gnutls_strerror'
-collect2: error: ld returned 1 exit status
-make: *** [Makefile.ninja:1570: qemu-x86_64] Error 1
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-
-r~
 
