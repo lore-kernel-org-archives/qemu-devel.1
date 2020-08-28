@@ -2,79 +2,87 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F779C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C0BC433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B469020776
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:17:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 482592086A
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:44:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JBWWv+Hj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B469020776
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RvXGTfcJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 482592086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBZZT-0007aS-UD
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 04:17:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57912)
+	id 1kBZzT-0004zc-Gx
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 04:44:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRZ-0000kL-F3
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:05 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49913
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kBZyX-0004XV-E6
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:43:09 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34551
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRS-0003Rc-2p
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:05 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kBZyT-0007aY-VO
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:43:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598602136;
+ s=mimecast20190719; t=1598604183;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4FAgqbOoChHUalvFenlqqEy3ehfL0sTPRx5XtHq0V9o=;
- b=JBWWv+Hjhqzd7XZ+bRCYrbFREHPYfXLV63vwE90z1vEhveY1YoQKjFjoVq5vkG+//DNzhC
- s0rEV3uWhB8o0NHmoOTEKYXhg+jUY9o7opzUGkgGVi58xGcWRnKmCef27YJWEmCdgPzzwG
- mAG4mqZkwnKVnAAZAyFDDNMpy2Uxz8c=
+ bh=QAbsxV5fYKoCQrg7yuswaDQfZhHoaBYUH2XOgrtqs2s=;
+ b=RvXGTfcJC7AMbqNxqbubw8OsorwovpBOBSkKYD2sCN8m+rXJxINwRo8xA28ATVZ9mE+2l5
+ bvmvpPAvKXixUwQWGN07J+ae8vvuF4bYSDsxvv3J4RTIiLAXq3Fi0JzLYpoImPa2o1TkXG
+ L1aj6iWHD+Jfy3Uemwmh9cGNwbROhs0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-pUkdWiLPMcGR4jYQsa-9pA-1; Fri, 28 Aug 2020 04:08:52 -0400
-X-MC-Unique: pUkdWiLPMcGR4jYQsa-9pA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-160-PK8kU-QPPT-hFdubkmIL8A-1; Fri, 28 Aug 2020 04:43:00 -0400
+X-MC-Unique: PK8kU-QPPT-hFdubkmIL8A-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D283A425D4;
- Fri, 28 Aug 2020 08:08:51 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
- [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E11037D4E9;
- Fri, 28 Aug 2020 08:08:50 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 4473F31E66; Fri, 28 Aug 2020 10:08:46 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 10/18] hw/usb: Add U2F key emulated mode
-Date: Fri, 28 Aug 2020 10:08:37 +0200
-Message-Id: <20200828080845.28287-11-kraxel@redhat.com>
-In-Reply-To: <20200828080845.28287-1-kraxel@redhat.com>
-References: <20200828080845.28287-1-kraxel@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6C2841007471;
+ Fri, 28 Aug 2020 08:42:59 +0000 (UTC)
+Received: from localhost (unknown [10.43.2.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DFC65D9F3;
+ Fri, 28 Aug 2020 08:42:51 +0000 (UTC)
+Date: Fri, 28 Aug 2020 10:42:49 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Babu Moger <babu.moger@amd.com>
+Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use generic
+ decode
+Message-ID: <20200828104249.04c39c12@redhat.com>
+In-Reply-To: <f58e6200-b058-5f59-addc-13ca602ce745@amd.com>
+References: <159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com>
+ <20200824184112.GB2688@work-vm>
+ <f602852c-b6af-694e-3e32-47974722e144@amd.com>
+ <20200825081504.GA2646@work-vm>
+ <20200825163846.10185087@redhat.com>
+ <20200825152521.GA3574@work-vm>
+ <20200826144324.56335302@redhat.com>
+ <20200826141046.GB2727@work-vm>
+ <20200827231907.10cfe4b7@imammedo-mac>
+ <f58e6200-b058-5f59-addc-13ca602ce745@amd.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 03:48:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,456 +105,234 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>,
- Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Cc: "ehabkost@redhat.com" <ehabkost@redhat.com>,
+ "mst@redhat.com" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "rth@twiddle.net" <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: César Belley <cesar.belley@lse.epita.fr>
+On Thu, 27 Aug 2020 17:58:01 -0500
+Babu Moger <babu.moger@amd.com> wrote:
 
-This patch adds the U2F key emulated mode.
+> > -----Original Message-----
+> > From: Igor Mammedov <imammedo@redhat.com>
+> > Sent: Thursday, August 27, 2020 4:19 PM
+> > To: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Cc: ehabkost@redhat.com; mst@redhat.com; qemu-devel@nongnu.org;
+> > Moger, Babu <Babu.Moger@amd.com>; pbonzini@redhat.com;
+> > rth@twiddle.net
+> > Subject: Re: [PATCH v5 0/8] Remove EPYC mode apicid decode and use
+> > generic decode
+> > 
+> > On Wed, 26 Aug 2020 15:10:46 +0100
+> > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> >   
+> > > * Igor Mammedov (imammedo@redhat.com) wrote:  
+> > > > On Tue, 25 Aug 2020 16:25:21 +0100
+> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+> > > >  
+> > > > > * Igor Mammedov (imammedo@redhat.com) wrote:  
+> > > > > > On Tue, 25 Aug 2020 09:15:04 +0100 "Dr. David Alan Gilbert"
+> > > > > > <dgilbert@redhat.com> wrote:
+> > > > > >  
+> > > > > > > * Babu Moger (babu.moger@amd.com) wrote:  
+> > > > > > > > Hi Dave,
+> > > > > > > >
+> > > > > > > > On 8/24/20 1:41 PM, Dr. David Alan Gilbert wrote:  
+> > > > > > > > > * Babu Moger (babu.moger@amd.com) wrote:  
+> > > > > > > > >> To support some of the complex topology, we introduced EPYC  
+> > mode apicid decode.  
+> > > > > > > > >> But, EPYC mode decode is running into problems. Also it
+> > > > > > > > >> can become quite a maintenance problem in the future. So,
+> > > > > > > > >> it was decided to remove that code and use the generic
+> > > > > > > > >> decode which works for majority of the topology. Most of
+> > > > > > > > >> the SPECed configuration would work just fine. With some  
+> > non-SPECed user inputs, it will create some sub-optimal configuration.  
+> > > > > > > > >> Here is the discussion thread.
+> > > > > > > > >> https://nam11.safelinks.protection.outlook.com/?url=https
+> > > > > > > > >> %3A%2F%2Flore.kernel.org%2Fqemu-devel%2Fc0bcc1a6-  
+> > 1d84-a6e  
+> > > > > > > > >> 7-e468-  
+> > d5b437c1b254%40amd.com%2F&amp;data=02%7C01%7Cbabu.  
+> > > > > > > > >>  
+> > moger%40amd.com%7C9b15ee395daa4935640408d84acedf13%7C3dd8  
+> > > > > > > > >>  
+> > 961fe4884e608e11a82d994e183d%7C0%7C0%7C637341599663177545  
+> > > > > > > > >>  
+> > &amp;sdata=4okYGU%2F8QTYqEOZEd1EBC%2BEsIIrEV59HZrHzpbsR8s  
+> > > > > > > > >> U%3D&amp;reserved=0
+> > > > > > > > >>
+> > > > > > > > >> This series removes all the EPYC mode specific apicid changes  
+> > and use the generic  
+> > > > > > > > >> apicid decode.  
+> > > > > > > > >
+> > > > > > > > > Hi Babu,
+> > > > > > > > >   This does simplify things a lot!
+> > > > > > > > > One worry, what happens about a live migration of a VM from  
+> > an old qemu  
+> > > > > > > > > that was using the node-id to a qemu with this new scheme?  
+> > > > > > > >
+> > > > > > > > The node_id which we introduced was only used internally. This  
+> > wasn't  
+> > > > > > > > exposed outside. I don't think live migration will be an issue.  
+> > > > > > >
+> > > > > > > Didn't it become part of the APIC ID visible to the guest?  
+> > > > > >
+> > > > > > Daniel asked similar question wrt hard error on start up, when
+> > > > > > CLI is not sufficient to create EPYC cpu.
+> > > > > >
+> > > > > >  
+> > https://nam11.safelinks.protection.outlook.com/?url=https%3A%2F%  
+> > > > > > 2Fwww.mail-archive.com%2Fqemu-  
+> > devel%40nongnu.org%2Fmsg728536.htm  
+> > > > > >  
+> > l&amp;data=02%7C01%7Cbabu.moger%40amd.com%7C9b15ee395daa49356
+> > 404  
+> > > > > >  
+> > 08d84acedf13%7C3dd8961fe4884e608e11a82d994e183d%7C0%7C0%7C63734
+> > 1  
+> > > > > >  
+> > 599663177545&amp;sdata=OnHz23W4F4TdYwlxPZwC%2B8YRY1K3qJ5U9Sfdo
+> > Oc  
+> > > > > > GXtw%3D&amp;reserved=0
+> > > > > >
+> > > > > > Migration might fall into the same category.
+> > > > > > Also looking at the history, 5.0 commit
+> > > > > >   247b18c593ec29 target/i386: Enable new apic id encoding for
+> > > > > > EPYC based cpus models silently broke APIC ID (without versioning),  
+> > for all EPYC models (that's were 1 new and 1 old one).  
+> > > > > >
+> > > > > > (I'm not aware of somebody complaining about it)
+> > > > > >
+> > > > > > Another commit ed78467a21459, changed CPUID_8000_001E without  
+> > versioning as well.  
+> > > > > >
+> > > > > >
+> > > > > > With current EPYC apicid code, if all starts align (no numa or 1
+> > > > > > numa node only on CLI and no -smp dies=) it might produce a valid  
+> > CPU (apicid+CPUID_8000_001E).  
+> > > > > > No numa is gray area, since EPYC spec implies that it has to be numa  
+> > machine in case of real EPYC cpus.  
+> > > > > > Multi-node configs would be correct only if user assigns cpus to
+> > > > > > numa nodes by duplicating internal node_id algorithm that this series  
+> > removes.  
+> > > > > >
+> > > > > > There might be other broken cases that I don't recall anymore
+> > > > > > (should be mentioned in previous versions of this series)
+> > > > > >
+> > > > > >
+> > > > > > To summarize from migration pov (ignoring ed78467a21459 change):
+> > > > > >
+> > > > > >  1) old qemu pre-5.0 ==>  qemu 5.0, 5.1 - broken migration  
+> > > > >
+> > > > > Oh ....
+> > > > >  
+> > > > > >  2) with this series (lets call it qemu 5.2)
+> > > > > >      pre-5.0 ==> qemu 5.2 - should work as series basically rollbacks  
+> > current code to pre-5.0  
+> > > > > >      qemu 5.0, 5.1 ==> qemu 5.2 - broken
+> > > > > >
+> > > > > > It's all about picking which poison to choose, I'd preffer 2nd
+> > > > > > case as it lets drop a lot of complicated code that doesn't work
+> > > > > > as expected.  
+> > > > >
+> > > > > I think that would make our lives easier for other reasons; so I'm
+> > > > > happy to go with that.  
+> > > >
+> > > > to make things less painful for users, me wonders if there is a way
+> > > > to block migration if epyc and specific QEMU versions are used?  
+> > >
+> > > We have no way to block based on version - and that's a pretty painful
+> > > thing to do; we can block based on machine type.
+> > >
+> > > But before we get there; can we understand in which combinations that
+> > > things break and why exactly - would it break on a 1 or 2 vCPU guest -
+> > > or would it only break when we get to the point the upper bits start
+> > > being used for example?  Why exaclty would it break - i.e. is it going
+> > > to change the name of sections in the migration stream - or are the
+> > > values we need actually going to migrate OK?  
+> > 
+> > it's values of APIC ID, where 4.2 and 5.0 QEMU use different values if numa is
+> > enabled.
+> > I'd expect guest to be very confused in when this happens.
+> > 
+> > here is an example:
+> > qemu-4.2 -cpu EPYC -smp 8,sockets=1,cores=8 -numa node,cpus=0-3 -numa
+> > node,cpus=4-7
+> > 
+> > (QEMU) qom-get path=/machine/unattached/device[8] property=apic-id {
+> >     "return": 7
+> > }
+> > 
+> > vs
+> > 
+> > qemu-5.1 -cpu EPYC -smp 8,sockets=1,cores=8 -numa node,cpus=0-3 -numa
+> > node,cpus=4-7
+> > (QEMU) qom-get path=/machine/unattached/device[8] property=apic-id {
+> >     "return": 15
+> > }
+> > 
+> > we probably can't do anything based on machine type versions, as
+> > 4.2 and older versions on qemu-5.0 and newer use different algorithm to
+> > calculate apic-id.
+> > 
+> > Hence was suggestion to leave 5.0/5.1 with broken apic id and revert back to
+> > 4.2 algorithm, which should encode APIC ID correctly when '-smp dies' is
+> > used.  
+> 
+> That is correct. When we revert all the node_id related changes, we will
+> go back to 4.2 algorithm. It will work fine with user passing "-smp
+> dies=n". It also keeps the code simple. That is why I kept the decoding of
+> 0x8000001e like this below. This will also match apicid decoding.
+> 
+> *ecx = ((topo_info->dies_per_pkg - 1) << 8) |  ((cpu->apic_id >>
+> apicid_die_offset(topo_info)) & 0xFF);
+that will work when there is no -numa on CLI, when -numa is used,
+we should use node id that user provided.
+like you did in previous revision
+   "[PATCH v4 1/3] i386: Simplify CPUID_8000_001E for AMD"
 
-The emulated mode consists of completely emulating the behavior of a
-U2F device through software part. Libu2f-emu is used for that.
+> Still not clear if we need to add a warning when numa nodes != dies.
+> Worried about adding that check and remove it again later.
+Since there is objection wrt making it error and I'd go with warning for now,
+it makes life of person who have to figure what's wrong a bit easier.
 
-The emulated mode is associated with a device inheriting from
-u2f-key base.
+> What about auto_enable_numa? Do we still need it?
+>
+> 
+> I can send the patches tomorrow if these things are clarified.
+> Thanks
+With auto_enable_numa it would be cleaner as you can reuse
+the same numa code to set 0x8000001e.ecx vs hardcodding it as above.
 
-To work, an emulated U2F device must have differents elements which
-can be given in different ways. This is detailed in docs/u2f.txt.
+Maybe post series without auto_enable_numa so we fix migration
+regression ASAP and then switch to auto_enable_numa on top.
 
-The Ephemeral one is the simplest way to configure, it lets the device
-generate all the elements it needs for a single use of the lifetime
-of the device:
 
-    qemu -usb -device u2f-emulated
-
-For more information about libu2f-emu see this page:
-https://github.com/MattGorko/libu2f-emu.
-
-Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
-Message-id: 20200826114209.28821-7-cesar.belley@lse.epita.fr
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- hw/usb/u2f-emulated.c | 405 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 405 insertions(+)
- create mode 100644 hw/usb/u2f-emulated.c
-
-diff --git a/hw/usb/u2f-emulated.c b/hw/usb/u2f-emulated.c
-new file mode 100644
-index 000000000000..9e1b829f3d32
---- /dev/null
-+++ b/hw/usb/u2f-emulated.c
-@@ -0,0 +1,405 @@
-+/*
-+ * U2F USB Emulated device.
-+ *
-+ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
-+ * Written by César Belley <cesar.belley@lse.epita.fr>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "qemu/thread.h"
-+#include "qemu/main-loop.h"
-+#include "qapi/error.h"
-+#include "hw/usb.h"
-+#include "hw/qdev-properties.h"
-+
-+#include <u2f-emu/u2f-emu.h>
-+
-+#include "u2f.h"
-+
-+/* Counter which sync with a file */
-+struct synced_counter {
-+    /* Emulated device counter */
-+    struct u2f_emu_vdev_counter vdev_counter;
-+
-+    /* Private attributes */
-+    uint32_t value;
-+    FILE *fp;
-+};
-+
-+static void counter_increment(struct u2f_emu_vdev_counter *vdev_counter)
-+{
-+    struct synced_counter *counter = (struct synced_counter *)vdev_counter;
-+    ++counter->value;
-+
-+    /* Write back */
-+    if (fseek(counter->fp, 0, SEEK_SET) == -1) {
-+        return;
-+    }
-+    fprintf(counter->fp, "%u\n", counter->value);
-+}
-+
-+static uint32_t counter_read(struct u2f_emu_vdev_counter *vdev_counter)
-+{
-+    struct synced_counter *counter = (struct synced_counter *)vdev_counter;
-+    return counter->value;
-+}
-+
-+typedef struct U2FEmulatedState U2FEmulatedState;
-+
-+#define PENDING_OUT_NUM 32
-+
-+struct U2FEmulatedState {
-+    U2FKeyState base;
-+
-+    /* U2F virtual emulated device */
-+    u2f_emu_vdev *vdev;
-+    QemuMutex vdev_mutex;
-+
-+    /* Properties */
-+    char *dir;
-+    char *cert;
-+    char *privkey;
-+    char *entropy;
-+    char *counter;
-+    struct synced_counter synced_counter;
-+
-+    /* Pending packets received from the guest */
-+    uint8_t pending_out[PENDING_OUT_NUM][U2FHID_PACKET_SIZE];
-+    uint8_t pending_out_start;
-+    uint8_t pending_out_end;
-+    uint8_t pending_out_num;
-+    QemuMutex pending_out_mutex;
-+
-+    /* Emulation thread and sync */
-+    QemuCond key_cond;
-+    QemuMutex key_mutex;
-+    QemuThread key_thread;
-+    bool stop_thread;
-+    EventNotifier notifier;
-+};
-+
-+#define TYPE_U2F_EMULATED "u2f-emulated"
-+#define EMULATED_U2F_KEY(obj) \
-+    OBJECT_CHECK(U2FEmulatedState, (obj), TYPE_U2F_EMULATED)
-+
-+static void u2f_emulated_reset(U2FEmulatedState *key)
-+{
-+    key->pending_out_start = 0;
-+    key->pending_out_end = 0;
-+    key->pending_out_num = 0;
-+}
-+
-+static void u2f_pending_out_add(U2FEmulatedState *key,
-+                                const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    int index;
-+
-+    if (key->pending_out_num >= PENDING_OUT_NUM) {
-+        return;
-+    }
-+
-+    index = key->pending_out_end;
-+    key->pending_out_end = (index + 1) % PENDING_OUT_NUM;
-+    ++key->pending_out_num;
-+
-+    memcpy(&key->pending_out[index], packet, U2FHID_PACKET_SIZE);
-+}
-+
-+static uint8_t *u2f_pending_out_get(U2FEmulatedState *key)
-+{
-+    int index;
-+
-+    if (key->pending_out_num == 0) {
-+        return NULL;
-+    }
-+
-+    index  = key->pending_out_start;
-+    key->pending_out_start = (index + 1) % PENDING_OUT_NUM;
-+    --key->pending_out_num;
-+
-+    return key->pending_out[index];
-+}
-+
-+static void u2f_emulated_recv_from_guest(U2FKeyState *base,
-+                                    const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    U2FEmulatedState *key = EMULATED_U2F_KEY(base);
-+
-+    qemu_mutex_lock(&key->pending_out_mutex);
-+    u2f_pending_out_add(key, packet);
-+    qemu_mutex_unlock(&key->pending_out_mutex);
-+
-+    qemu_mutex_lock(&key->key_mutex);
-+    qemu_cond_signal(&key->key_cond);
-+    qemu_mutex_unlock(&key->key_mutex);
-+}
-+
-+static void *u2f_emulated_thread(void* arg)
-+{
-+    U2FEmulatedState *key = arg;
-+    uint8_t packet[U2FHID_PACKET_SIZE];
-+    uint8_t *packet_out = NULL;
-+
-+
-+    while (true) {
-+        /* Wait signal */
-+        qemu_mutex_lock(&key->key_mutex);
-+        qemu_cond_wait(&key->key_cond, &key->key_mutex);
-+        qemu_mutex_unlock(&key->key_mutex);
-+
-+        /* Exit thread check */
-+        if (key->stop_thread) {
-+            key->stop_thread = false;
-+            break;
-+        }
-+
-+        qemu_mutex_lock(&key->pending_out_mutex);
-+        packet_out = u2f_pending_out_get(key);
-+        if (packet_out == NULL) {
-+            qemu_mutex_unlock(&key->pending_out_mutex);
-+            continue;
-+        }
-+        memcpy(packet, packet_out, U2FHID_PACKET_SIZE);
-+        qemu_mutex_unlock(&key->pending_out_mutex);
-+
-+        qemu_mutex_lock(&key->vdev_mutex);
-+        u2f_emu_vdev_send(key->vdev, U2F_EMU_USB, packet,
-+                          U2FHID_PACKET_SIZE);
-+
-+        /* Notify response */
-+        if (u2f_emu_vdev_has_response(key->vdev, U2F_EMU_USB)) {
-+            event_notifier_set(&key->notifier);
-+        }
-+        qemu_mutex_unlock(&key->vdev_mutex);
-+    }
-+    return NULL;
-+}
-+
-+static ssize_t u2f_emulated_read(const char *path, char *buffer,
-+                                 size_t buffer_len)
-+{
-+    int fd;
-+    ssize_t ret;
-+
-+    fd = qemu_open(path, O_RDONLY);
-+    if (fd < 0) {
-+        return -1;
-+    }
-+
-+    ret = read(fd, buffer, buffer_len);
-+    close(fd);
-+
-+    return ret;
-+}
-+
-+static bool u2f_emulated_setup_counter(const char *path,
-+                                       struct synced_counter *counter)
-+{
-+    int fd, ret;
-+    FILE *fp;
-+
-+    fd = qemu_open(path, O_RDWR);
-+    if (fd < 0) {
-+        return false;
-+    }
-+    fp = fdopen(fd, "r+");
-+    if (fp == NULL) {
-+        close(fd);
-+        return false;
-+    }
-+    ret = fscanf(fp, "%u", &counter->value);
-+    if (ret == EOF) {
-+        fclose(fp);
-+        return false;
-+    }
-+    counter->fp = fp;
-+    counter->vdev_counter.counter_increment = counter_increment;
-+    counter->vdev_counter.counter_read = counter_read;
-+
-+    return true;
-+}
-+
-+static u2f_emu_rc u2f_emulated_setup_vdev_manualy(U2FEmulatedState *key)
-+{
-+    ssize_t ret;
-+    char cert_pem[4096], privkey_pem[2048];
-+    struct u2f_emu_vdev_setup setup_info;
-+
-+    /* Certificate */
-+    ret = u2f_emulated_read(key->cert, cert_pem, sizeof(cert_pem));
-+    if (ret < 0) {
-+        return -1;
-+    }
-+
-+    /* Private key */
-+    ret = u2f_emulated_read(key->privkey, privkey_pem, sizeof(privkey_pem));
-+    if (ret < 0) {
-+        return -1;
-+    }
-+
-+    /* Entropy */
-+    ret = u2f_emulated_read(key->entropy, (char *)&setup_info.entropy,
-+                            sizeof(setup_info.entropy));
-+    if (ret < 0) {
-+        return -1;
-+    }
-+
-+    /* Counter */
-+    if (!u2f_emulated_setup_counter(key->counter, &key->synced_counter)) {
-+        return -1;
-+    }
-+
-+    /* Setup */
-+    setup_info.certificate = cert_pem;
-+    setup_info.private_key = privkey_pem;
-+    setup_info.counter = (struct u2f_emu_vdev_counter *)&key->synced_counter;
-+
-+    return u2f_emu_vdev_new(&key->vdev, &setup_info);
-+}
-+
-+static void u2f_emulated_event_handler(EventNotifier *notifier)
-+{
-+    U2FEmulatedState *key = container_of(notifier, U2FEmulatedState, notifier);
-+    size_t packet_size;
-+    uint8_t *packet_in = NULL;
-+
-+    event_notifier_test_and_clear(&key->notifier);
-+    qemu_mutex_lock(&key->vdev_mutex);
-+    while (u2f_emu_vdev_has_response(key->vdev, U2F_EMU_USB)) {
-+        packet_size = u2f_emu_vdev_get_response(key->vdev, U2F_EMU_USB,
-+                                                &packet_in);
-+        if (packet_size == U2FHID_PACKET_SIZE) {
-+            u2f_send_to_guest(&key->base, packet_in);
-+        }
-+        u2f_emu_vdev_free_response(packet_in);
-+    }
-+    qemu_mutex_unlock(&key->vdev_mutex);
-+}
-+
-+static void u2f_emulated_realize(U2FKeyState *base, Error **errp)
-+{
-+    U2FEmulatedState *key = EMULATED_U2F_KEY(base);
-+    u2f_emu_rc rc;
-+
-+    if (key->cert != NULL || key->privkey != NULL || key->entropy != NULL
-+        || key->counter != NULL) {
-+        if (key->cert != NULL && key->privkey != NULL
-+            && key->entropy != NULL && key->counter != NULL) {
-+            rc = u2f_emulated_setup_vdev_manualy(key);
-+        } else {
-+            error_setg(errp, "%s: cert, priv, entropy and counter "
-+                       "parameters must be provided to manualy configure "
-+                       "the emulated device", TYPE_U2F_EMULATED);
-+            return;
-+        }
-+    } else if (key->dir != NULL) {
-+        rc = u2f_emu_vdev_new_from_dir(&key->vdev, key->dir);
-+    } else {
-+        rc = u2f_emu_vdev_new_ephemeral(&key->vdev);
-+    }
-+
-+    if (rc != U2F_EMU_OK) {
-+        error_setg(errp, "%s: Failed to setup the key", TYPE_U2F_EMULATED);
-+        return;
-+    }
-+
-+    if (event_notifier_init(&key->notifier, false) < 0) {
-+        error_setg(errp, "%s: Failed to initialize notifier",
-+                   TYPE_U2F_EMULATED);
-+        return;
-+    }
-+    /* Notifier */
-+    event_notifier_set_handler(&key->notifier, u2f_emulated_event_handler);
-+
-+    /* Synchronization */
-+    qemu_cond_init(&key->key_cond);
-+    qemu_mutex_init(&key->vdev_mutex);
-+    qemu_mutex_init(&key->pending_out_mutex);
-+    qemu_mutex_init(&key->key_mutex);
-+    u2f_emulated_reset(key);
-+
-+    /* Thread */
-+    key->stop_thread = false;
-+    qemu_thread_create(&key->key_thread, "u2f-key", u2f_emulated_thread,
-+                       key, QEMU_THREAD_JOINABLE);
-+}
-+
-+static void u2f_emulated_unrealize(U2FKeyState *base)
-+{
-+    U2FEmulatedState *key = EMULATED_U2F_KEY(base);
-+
-+    /* Thread */
-+    key->stop_thread = true;
-+    qemu_cond_signal(&key->key_cond);
-+    qemu_thread_join(&key->key_thread);
-+
-+    /* Notifier */
-+    event_notifier_set_handler(&key->notifier, NULL);
-+    event_notifier_cleanup(&key->notifier);
-+
-+    /* Synchronization */
-+    qemu_cond_destroy(&key->key_cond);
-+    qemu_mutex_destroy(&key->vdev_mutex);
-+    qemu_mutex_destroy(&key->key_mutex);
-+    qemu_mutex_destroy(&key->pending_out_mutex);
-+
-+    /* Vdev */
-+    u2f_emu_vdev_free(key->vdev);
-+    if (key->synced_counter.fp != NULL) {
-+        fclose(key->synced_counter.fp);
-+    }
-+}
-+
-+static Property u2f_emulated_properties[] = {
-+    DEFINE_PROP_STRING("dir", U2FEmulatedState, dir),
-+    DEFINE_PROP_STRING("cert", U2FEmulatedState, cert),
-+    DEFINE_PROP_STRING("privkey", U2FEmulatedState, privkey),
-+    DEFINE_PROP_STRING("entropy", U2FEmulatedState, entropy),
-+    DEFINE_PROP_STRING("counter", U2FEmulatedState, counter),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void u2f_emulated_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    U2FKeyClass *kc = U2F_KEY_CLASS(klass);
-+
-+    kc->realize = u2f_emulated_realize;
-+    kc->unrealize = u2f_emulated_unrealize;
-+    kc->recv_from_guest = u2f_emulated_recv_from_guest;
-+    dc->desc = "QEMU U2F emulated key";
-+    device_class_set_props(dc, u2f_emulated_properties);
-+}
-+
-+static const TypeInfo u2f_key_emulated_info = {
-+    .name = TYPE_U2F_EMULATED,
-+    .parent = TYPE_U2F_KEY,
-+    .instance_size = sizeof(U2FEmulatedState),
-+    .class_init = u2f_emulated_class_init
-+};
-+
-+static void u2f_key_emulated_register_types(void)
-+{
-+    type_register_static(&u2f_key_emulated_info);
-+}
-+
-+type_init(u2f_key_emulated_register_types)
--- 
-2.27.0
+> 
+> > 
+> >   
+> > > Dave
+> > >
+> > >  
+> > > > > > PS:
+> > > > > >  I didn't review it yet, but with this series we aren't  making
+> > > > > > up internal node_ids that should match user provided numa node ids  
+> > somehow.  
+> > > > > >  It seems series lost the patch that would enforce numa in case
+> > > > > > -smp dies>1,  but otherwise it heads in the right direction.  
+> > > > >
+> > > > > Dave
+> > > > >  
+> > > > > > >
+> > > > > > > Dave
+> > > > > > >  
+> > > > > >  
+> > > >  
+> 
 
 
