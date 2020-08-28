@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9E57C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF249C433E7
 	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:44:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0B8D20757
+	by mail.kernel.org (Postfix) with ESMTPS id B55F5207DF
 	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:44:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vWxvfLJx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0B8D20757
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p8ZolXJM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B55F5207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBfcI-0007pm-Vp
+	id 1kBfcJ-0007pj-0i
 	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:44:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51712)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfFD-0001bm-3r
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:43 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:41738)
+ id 1kBfFG-0001kw-Lz
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:46 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:43802)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfFA-0005IR-OL
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:42 -0400
-Received: by mail-pl1-x643.google.com with SMTP id 10so524337plg.8
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:38 -0700 (PDT)
+ id 1kBfFE-0005M0-G5
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:46 -0400
+Received: by mail-pg1-x530.google.com with SMTP id d19so517472pgl.10
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=R2cuEf3Qt/jcGcIZclz+3Hjy1ReL2CdcRjCqzKw0P3k=;
- b=vWxvfLJxBpRPSsuqGep2SiXPgGL6pOvxL7YlkQ0SZRuQ4m6u9+R1TQQOwbWCurhaVx
- 8fetg63TUXNpY5LUR3Z6uo4UKuCv462o5Kbl7iSkhFNUDaRIxioscXPO5cV1d2qUNfRX
- MQmdSzhGa8gttSFQF06xXqGXqS49hcx7zjEyiYyIgIsa0oZmDOBkWIShyGGDp2RuJJKN
- Q07nD7VZtcW93bX/MHO4Rpapeu0WCDtPf1ejadxvjdw5vLpX+V3hL3+r1k/rL7ztT6Na
- hxs29deB5LkyH6NF5ETtqTVqPdTdlTk4z1IDBPGWIZ25VlwBvOx3vBFSNpofecoCGUeG
- pHVg==
+ bh=3LLfQYgaXzGwswhNrhZmalAI0pGPTZAeATntMFf9mBA=;
+ b=p8ZolXJMtqbWdxp2TgJ/MnsPREszLC/33VQrSwh/b8ogsPMlQ8KcP5tzn9J8AbN0dQ
+ yxYJKhALzwWMqQ1MMXPrCpq9fGc0lkgoOmAezD/Oqd2OV0Y5lqn41yo59kr0gYtNCSYE
+ RwsSZRwTTC4I+RQckRdhdxkrXLYmDK307bVykHhddYdxE1hTT34lw3bkLVsFF8TixdFP
+ vIol+jvuMURUOvRX1W5z5M++mL5B40xj7t2HvI2yylFrziA9dB4V56FHOV3lFqbWAGYI
+ UChJYzlQP/111ERmIebkgxtp9Yv2rlEIvUFYG8bnypLhLlhwOMTZeMNBeu7fmtl7LNZ6
+ Kt8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=R2cuEf3Qt/jcGcIZclz+3Hjy1ReL2CdcRjCqzKw0P3k=;
- b=NjfvwEgAXtTw0tXLAufKX8s+B9o+pJ6DOgenRjO4HWGNmbJVzg2sJwsKv5HwqT/P4l
- 8YF8EXkvjzFReO4Yvg2uU2juzYtkzL8y9d8J/mDqJBYJpK93F8NoCe/5U9/eACoGmAkT
- QKGd8dudfOAs1YH2Ag1zPmc4psDzb5aJGEiFzaQXrfabd0OcZYPrbZYmObhVFH0zSbjJ
- 67Y7esgkcToSVtroImx32TD22uikXPHo2h3U9zm0Al1GsIoTJh9ZHVdc+b89z5Dcd75R
- FFMKmM+IvscOK96o/tmPPapTIb6BX13HPHy3UhMsnRJDIEMhCagaPqG9Zn2luxWeOjet
- zcRQ==
-X-Gm-Message-State: AOAM532Sy0IRFJkD/vwkwbiOIOug/KYpgnog8hhkxL3VdgaV0zPTXRNo
- SPDP/LlUj5sILD1SRIIKWsNtaCjhVF9WHQ==
-X-Google-Smtp-Source: ABdhPJyMx1j+0htr3/y3SeYDDotgr0E2Ub2rqIwRGfWNNSmF59ahCdY1kB/qNBEU1n5/d+hmK4dW3Q==
-X-Received: by 2002:a17:90b:4c46:: with SMTP id
- np6mr1434791pjb.201.1598624437388; 
- Fri, 28 Aug 2020 07:20:37 -0700 (PDT)
+ bh=3LLfQYgaXzGwswhNrhZmalAI0pGPTZAeATntMFf9mBA=;
+ b=ptCRVC8lUCoFuQk6LWtM8o/dAhTruLoXQOVyiTkhcNOlA9z2HqAxM7jH12FOU7z0XZ
+ odpcCnsLRt8gmQqtBdyhh81MGlCVPU4l5UaU9dmk0khoRASxeY4sNeU9vRY/vk7NmSpd
+ 6E1VbgiwJr0eXmT1COtg1AX/y7pDqhtUkvsoKi5jJoiezz0ZlEjgTKNYMVz3CdnXuhAu
+ QX4dbXF3WvlQNKd12pYcA8txTZVWVWO7Sw3d+vV8uH7ip9pZ1WW10zC8Mw0x4CloKqqG
+ zC9oswAv8wPYpzZiPlBq5e13gQiZLMtEGPPOg05XpXQWnLY8jqyJOEtdxy0dqraN7rmc
+ kXVA==
+X-Gm-Message-State: AOAM5314ldZZ3VbqL3AnvTMk9ncJ/NTEvZLndngs+HtggtmdsBeoQ+eu
+ GP8m02rBh4yqoErIGWgUZoVbo5/ZsV2WKg==
+X-Google-Smtp-Source: ABdhPJwsVEky0fu16E3PpltYrPj8dOZ5WhkrOJVX63zvXyuIZ5V44rukcfVjAosyX365dBnAPR3R+Q==
+X-Received: by 2002:a65:64d9:: with SMTP id t25mr1496544pgv.70.1598624442623; 
+ Fri, 28 Aug 2020 07:20:42 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.20.36
+ by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.20.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 07:20:36 -0700 (PDT)
+ Fri, 28 Aug 2020 07:20:41 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 52/76] target/microblaze: Fix cpu unwind for stackprot
-Date: Fri, 28 Aug 2020 07:19:05 -0700
-Message-Id: <20200828141929.77854-53-richard.henderson@linaro.org>
+Subject: [PATCH v2 56/76] target/microblaze: Fix no-op
+ mb_cpu_transaction_failed
+Date: Fri, 28 Aug 2020 07:19:09 -0700
+Message-Id: <20200828141929.77854-57-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
 References: <20200828141929.77854-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::530;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x530.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,54 +100,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com
+Cc: edgar.iglesias@xilinx.com, "Edgar E . Iglesias" <edgar.iglesias@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Restore the correct PC when an exception must be raised.
+Do not call cpu_restore_state when no exception will be
+delivered.  This can lead to inconsistent cpu state.
 
+Reported-by: Edgar E. Iglesias <edgar.iglesias@gmail.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/helper.h    | 2 +-
- target/microblaze/op_helper.c | 6 +++++-
- 2 files changed, 6 insertions(+), 2 deletions(-)
+ target/microblaze/op_helper.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/target/microblaze/helper.h b/target/microblaze/helper.h
-index 64816c89e1..a473c1867b 100644
---- a/target/microblaze/helper.h
-+++ b/target/microblaze/helper.h
-@@ -26,7 +26,7 @@ DEF_HELPER_4(mmu_write, void, env, i32, i32, i32)
- #endif
- 
- DEF_HELPER_5(memalign, void, env, tl, i32, i32, i32)
--DEF_HELPER_2(stackprot, void, env, tl)
-+DEF_HELPER_FLAGS_2(stackprot, TCG_CALL_NO_WG, void, env, tl)
- 
- DEF_HELPER_2(get, i32, i32, i32)
- DEF_HELPER_3(put, void, i32, i32, i32)
 diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-index 2c59d4492d..a99c467364 100644
+index a99c467364..e6dcc79243 100644
 --- a/target/microblaze/op_helper.c
 +++ b/target/microblaze/op_helper.c
-@@ -389,12 +389,16 @@ void helper_memalign(CPUMBState *env, target_ulong addr,
- void helper_stackprot(CPUMBState *env, target_ulong addr)
+@@ -419,32 +419,33 @@ void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+                                int mmu_idx, MemTxAttrs attrs,
+                                MemTxResult response, uintptr_t retaddr)
  {
-     if (addr < env->slr || addr > env->shr) {
-+        CPUState *cs = env_cpu(env);
+-    MicroBlazeCPU *cpu;
+-    CPUMBState *env;
++    MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
++    CPUMBState *env = &cpu->env;
 +
-         qemu_log_mask(CPU_LOG_INT, "Stack protector violation at "
-                       TARGET_FMT_lx " %x %x\n",
-                       addr, env->slr, env->shr);
-+
-         env->ear = addr;
-         env->esr = ESR_EC_STACKPROT;
--        helper_raise_exception(env, EXCP_HW_EXCP);
-+        cs->exception_index = EXCP_HW_EXCP;
-+        cpu_loop_exit_restore(cs, GETPC());
-     }
- }
+     qemu_log_mask(CPU_LOG_INT, "Transaction failed: vaddr 0x%" VADDR_PRIx
+                   " physaddr 0x" TARGET_FMT_plx " size %d access type %s\n",
+                   addr, physaddr, size,
+                   access_type == MMU_INST_FETCH ? "INST_FETCH" :
+                   (access_type == MMU_DATA_LOAD ? "DATA_LOAD" : "DATA_STORE"));
+-    cpu = MICROBLAZE_CPU(cs);
+-    env = &cpu->env;
  
+-    cpu_restore_state(cs, retaddr, true);
+     if (!(env->msr & MSR_EE)) {
+         return;
+     }
+ 
+-    env->ear = addr;
+     if (access_type == MMU_INST_FETCH) {
+-        if ((env->pvr.regs[2] & PVR2_IOPB_BUS_EXC_MASK)) {
+-            env->esr = ESR_EC_INSN_BUS;
+-            helper_raise_exception(env, EXCP_HW_EXCP);
++        if (!cpu->cfg.iopb_bus_exception) {
++            return;
+         }
++        env->esr = ESR_EC_INSN_BUS;
+     } else {
+-        if ((env->pvr.regs[2] & PVR2_DOPB_BUS_EXC_MASK)) {
+-            env->esr = ESR_EC_DATA_BUS;
+-            helper_raise_exception(env, EXCP_HW_EXCP);
++        if (!cpu->cfg.dopb_bus_exception) {
++            return;
+         }
++        env->esr = ESR_EC_DATA_BUS;
+     }
++
++    env->ear = addr;
++    cs->exception_index = EXCP_HW_EXCP;
++    cpu_loop_exit_restore(cs, retaddr);
+ }
+ #endif
 -- 
 2.25.1
 
