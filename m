@@ -2,83 +2,84 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDC20C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC308C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:52:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95DD7207DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:51:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7560B207DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 14:52:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UjTFJePM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95DD7207DF
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ex+D2ogw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7560B207DF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60934 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBfiz-0003eD-SM
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:51:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51852)
+	id 1kBfjy-0005GY-Gg
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 10:52:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfFK-0001vJ-IK
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:50 -0400
-Received: from mail-pj1-x1034.google.com ([2607:f8b0:4864:20::1034]:53636)
+ id 1kBfFc-0002iX-Pa
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:21:08 -0400
+Received: from mail-pl1-x62f.google.com ([2607:f8b0:4864:20::62f]:45383)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBfFI-0005P3-8M
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:20:50 -0400
-Received: by mail-pj1-x1034.google.com with SMTP id nv17so560367pjb.3
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:20:47 -0700 (PDT)
+ id 1kBfFa-0005Sp-Ey
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 10:21:08 -0400
+Received: by mail-pl1-x62f.google.com with SMTP id bh1so518757plb.12
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 07:21:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=dhPjtBgff700YZBSMkaaY04bVR10cqOe0Tp7e7EeDiY=;
- b=UjTFJePMwXKLiaMV7nb1fuDoSX8LvQV5pmwUrlfNGRC6S8GWrmdx83VY7C8NbvKG1c
- 8iDdvxjCqKL/5BL+QUDHPV13ZL/E5L/Tp4vFQ8VGCmLUigSKaIcS7R8jaKUyohp9ajg0
- z52iYV6xApadvxi5iIe5nDCa93wmKQtgNw8M8wrHT2ttjqaIf3XmzQcGdyg6oF7Fd2Cz
- 3j45Blg+Ur0xKha4oqVEHrOghbGJE5TYc+mYqw9NQxljNx1vhnv+gFjg+5meQuW2m6kW
- 1p+Sz4eeDLzpu0G6+IriyEfcpjrIq7pX2AgnTDlKT8xY6srstVMBfG/IxW6GfJ0pJo5K
- 1DvQ==
+ bh=zQ9LiTwiYvU/OCqUdtOQYyrZ4M1sgpr0usqmybWZ6o4=;
+ b=Ex+D2ogwLJMPuO5oFexWCKIPEJAFgy1CCQfilYMTWk2N8P2Cemj65W9Eya0OdTlhqU
+ x3O73dRK4IUrejO1YH51YnbKjs26Rrxu1E2dxlUz52BMqR6Tmd9QgkgP0Ssr8hUMja5x
+ b5hZz4B6rHIdNcyMKSE4jIfW8b854fsQkSdfDHq0rt9Y7RklZAATn/GSBgRuqZU83aXu
+ qpYqCKBq/xveOVgbjtomg1vkh7/YWLKZ6TC9Z9Uij+iXvFotLxA6L2quo9X2fKRnU8de
+ nMr/ieMeY5cPQH+V1P/BhaFOAWo6p6xoB80tpwjv0Ufb4v2VldJS3geIxjhq/jHbyuu2
+ yx7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=dhPjtBgff700YZBSMkaaY04bVR10cqOe0Tp7e7EeDiY=;
- b=f0KqHZ8qubDH1Xt5EUuncsNdJ0oHz7U/vIUI6NXgF3HypI4S0UL1I1WdLgeHDsz2AS
- wkBxH51U8ggyhZp1fplQ/8kPvR6cE9AKVwikrPtP+Oq/ghTaerqf36LIc0TpztGRH4YT
- SQIDSlY5G2H4vUsIGTg1Yx67WgeNA9x1J79YGVX+wOUo0EgrO5XVkuOOPcORTvkO6vW+
- rNPcQZOyzSHw1BGoQ98LFyAS4O9Ydu3hjKEaGqq1tqEItT5K5OR0NhotN49PMjSPmSTG
- 38ZaCzhVRWXpMBF0TEUUMl0wPtj+eLN4cPXPC+I18hXwG5A9ahaK4pfUGFbfbULrOzh7
- n44g==
-X-Gm-Message-State: AOAM532xqfINomBGnRZ74eSIo7hivCvsbbwM+uEkQ3CqIDypDW1TBwO2
- cRkLKy11fkiPCKu9HOB8Hk71RG54C7iotA==
-X-Google-Smtp-Source: ABdhPJwh3UIzYau4kYEEhlt9zizeEafimvK4lxBbHv1g1HSXnYvnwuEyUExX9qnBC5y2CHYT5YzZpA==
-X-Received: by 2002:a17:902:a982:: with SMTP id
- bh2mr1471302plb.182.1598624446254; 
- Fri, 28 Aug 2020 07:20:46 -0700 (PDT)
+ bh=zQ9LiTwiYvU/OCqUdtOQYyrZ4M1sgpr0usqmybWZ6o4=;
+ b=eECGQVjGB+RAyhRO+QY6FZ154Qwj5BVJRYAgV29fOdpzMlXTJwnqLWfq1dYYxH5+hv
+ LOyVaLMmBeWBduc84MO2rQkDPbeQaTlqLrSTMQi0ofweZrVol8h8JVDeIg/Xi1fSPvmU
+ 4h9H8m7B7psoAqVJlXoxsfR2yKhwxV7kBzIJ6EwEqoujsWHt+giXjTn/0eoGg+lHZhKx
+ NGafgaU3jcxZ2ZGz2FwBozBZ9KWc92rOtwIUP+e0au6pkRWwSx/k2BfGe5W7VMec3qX3
+ x7R+IL11LxJliIzpNceGZIEIyo2r18Bbr3tN9uiw1DsZsDNTd2k3HIqN4ZDxc3Ai3kR2
+ Csrg==
+X-Gm-Message-State: AOAM531e/EUWuY20UJa1q4/kVR0iW+Nzo69CNJ3W/CW0xJOFUVdDCLDy
+ /VAcdtPn2VXpx0NeJIEkkpdkV5a8I/ZnPA==
+X-Google-Smtp-Source: ABdhPJztQDavifwSEsBAkhZe5pWYPCK1wfHSwPFCAdsh5pf1kfwfPsKui11DBcQ3XARQv3C/VeBNAA==
+X-Received: by 2002:a17:902:24c:: with SMTP id
+ 70mr1473884plc.284.1598624464645; 
+ Fri, 28 Aug 2020 07:21:04 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.20.45
+ by smtp.gmail.com with ESMTPSA id j3sm1403080pjw.23.2020.08.28.07.21.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 07:20:45 -0700 (PDT)
+ Fri, 28 Aug 2020 07:21:04 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 59/76] target/microblaze: Use cc->do_unaligned_access
-Date: Fri, 28 Aug 2020 07:19:12 -0700
-Message-Id: <20200828141929.77854-60-richard.henderson@linaro.org>
+Subject: [PATCH v2 73/76] target/microblaze: Remove last of old decoder
+Date: Fri, 28 Aug 2020 07:19:26 -0700
+Message-Id: <20200828141929.77854-74-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
 References: <20200828141929.77854-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1034;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1034.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::62f;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,259 +106,223 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes the problem in which unaligned stores succeeded,
-but then we raised the exception after modifying memory.
-Store the ESS for the unaligned data access in the iflags
-for the insn, so that it can be found during unwind.
+All instructions have been convered.  Issue sigill if decodetree
+does not match.  Remove argument decode from DisasContext.
+Remove microblaze-decode.h.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/cpu.h       | 10 ++++-
- target/microblaze/helper.h    |  1 -
- target/microblaze/cpu.c       |  1 +
- target/microblaze/helper.c    | 28 ++++++++++++++
- target/microblaze/op_helper.c | 21 ----------
- target/microblaze/translate.c | 72 +++++++++++++----------------------
- 6 files changed, 64 insertions(+), 69 deletions(-)
+ target/microblaze/microblaze-decode.h | 59 ----------------------
+ target/microblaze/translate.c         | 73 +--------------------------
+ 2 files changed, 1 insertion(+), 131 deletions(-)
+ delete mode 100644 target/microblaze/microblaze-decode.h
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 83fadd36a5..63b8d93d41 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -79,10 +79,13 @@ typedef struct CPUMBState CPUMBState;
+diff --git a/target/microblaze/microblaze-decode.h b/target/microblaze/microblaze-decode.h
+deleted file mode 100644
+index 17b2f29fff..0000000000
+--- a/target/microblaze/microblaze-decode.h
++++ /dev/null
+@@ -1,59 +0,0 @@
+-/*
+- *  MicroBlaze insn decoding macros.
+- *
+- *  Copyright (c) 2009 Edgar E. Iglesias <edgar.iglesias@gmail.com>
+- *
+- * This library is free software; you can redistribute it and/or
+- * modify it under the terms of the GNU Lesser General Public
+- * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
+- *
+- * This library is distributed in the hope that it will be useful,
+- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+- * Lesser General Public License for more details.
+- *
+- * You should have received a copy of the GNU Lesser General Public
+- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
+- */
+-
+-#ifndef TARGET_MICROBLAZE_MICROBLAZE_DECODE_H
+-#define TARGET_MICROBLAZE_MICROBLAZE_DECODE_H
+-
+-/* Convenient binary macros.  */
+-#define HEX__(n) 0x##n##LU
+-#define B8__(x) ((x&0x0000000FLU)?1:0) \
+-                 + ((x&0x000000F0LU)?2:0) \
+-                 + ((x&0x00000F00LU)?4:0) \
+-                 + ((x&0x0000F000LU)?8:0) \
+-                 + ((x&0x000F0000LU)?16:0) \
+-                 + ((x&0x00F00000LU)?32:0) \
+-                 + ((x&0x0F000000LU)?64:0) \
+-                 + ((x&0xF0000000LU)?128:0)
+-#define B8(d) ((unsigned char)B8__(HEX__(d)))
+-
+-/* Decode logic, value and mask.  */
+-#define DEC_ADD     {B8(00000000), B8(00110001)}
+-#define DEC_SUB     {B8(00000001), B8(00110001)}
+-#define DEC_AND     {B8(00100001), B8(00110101)}
+-#define DEC_XOR     {B8(00100010), B8(00110111)}
+-#define DEC_OR      {B8(00100000), B8(00110111)}
+-#define DEC_BIT     {B8(00100100), B8(00111111)}
+-#define DEC_MSR     {B8(00100101), B8(00111111)}
+-
+-#define DEC_BARREL  {B8(00010001), B8(00110111)}
+-#define DEC_MUL     {B8(00010000), B8(00110111)}
+-#define DEC_DIV     {B8(00010010), B8(00110111)}
+-#define DEC_FPU     {B8(00010110), B8(00111111)}
+-
+-#define DEC_LD      {B8(00110000), B8(00110100)}
+-#define DEC_ST      {B8(00110100), B8(00110100)}
+-#define DEC_IMM     {B8(00101100), B8(00111111)}
+-
+-#define DEC_BR      {B8(00100110), B8(00110111)}
+-#define DEC_BCC     {B8(00100111), B8(00110111)}
+-#define DEC_RTS     {B8(00101101), B8(00111111)}
+-
+-#define DEC_STREAM  {B8(00010011), B8(00110111)}
+-
+-#endif
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 2c87d671ae..8f69ca50b2 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -24,7 +24,6 @@
+ #include "exec/exec-all.h"
+ #include "tcg/tcg-op.h"
+ #include "exec/helper-proto.h"
+-#include "microblaze-decode.h"
+ #include "exec/cpu_ldst.h"
+ #include "exec/helper-gen.h"
+ #include "exec/translator.h"
+@@ -65,13 +64,7 @@ typedef struct DisasContext {
+     bool r0_set;
  
- /* Exception State Register (ESR) Fields */
- #define          ESR_DIZ       (1<<11) /* Zone Protection */
-+#define          ESR_W         (1<<11) /* Unaligned word access */
- #define          ESR_S         (1<<10) /* Store instruction */
+     /* Decoder.  */
+-    int type_b;
+-    uint32_t ir;
+     uint32_t ext_imm;
+-    uint8_t opcode;
+-    uint8_t rd, ra, rb;
+-    uint16_t imm;
+-
+     unsigned int cpustate_changed;
+     unsigned int tb_flags;
+     unsigned int tb_flags_to_set;
+@@ -82,8 +75,6 @@ typedef struct DisasContext {
  
- #define          ESR_ESS_FSL_OFFSET     5
+     /* Immediate branch-taken destination, or -1 for indirect. */
+     uint32_t jmp_dest;
+-
+-    int abort_at_next_insn;
+ } DisasContext;
  
-+#define          ESR_ESS_MASK  (0x7f << 5)
-+
- #define          ESR_EC_FSL             0
- #define          ESR_EC_UNALIGNED_DATA  1
- #define          ESR_EC_ILLEGAL_OP      2
-@@ -256,9 +259,11 @@ struct CPUMBState {
-     /* Internal flags.  */
- #define IMM_FLAG        (1 << 0)
- #define BIMM_FLAG       (1 << 1)
--/* MSR_EE               (1 << 8)  */
-+#define ESR_ESS_FLAG    (1 << 2)  /* indicates ESR_ESS_MASK is present */
-+/* MSR_EE               (1 << 8)  -- these 3 are not in iflags but tb_flags */
- /* MSR_UM               (1 << 11) */
- /* MSR_VM               (1 << 13) */
-+/* ESR_ESS_MASK         [11:5]    -- unwind into iflags for unaligned excp */
- #define DRTI_FLAG	(1 << 16)
- #define DRTE_FLAG	(1 << 17)
- #define DRTB_FLAG	(1 << 18)
-@@ -330,6 +335,9 @@ struct MicroBlazeCPU {
- 
- void mb_cpu_do_interrupt(CPUState *cs);
- bool mb_cpu_exec_interrupt(CPUState *cs, int int_req);
-+void mb_cpu_do_unaligned_access(CPUState *cs, vaddr vaddr,
-+                                MMUAccessType access_type,
-+                                int mmu_idx, uintptr_t retaddr);
- void mb_cpu_dump_state(CPUState *cpu, FILE *f, int flags);
- hwaddr mb_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
- int mb_cpu_gdb_read_register(CPUState *cpu, GByteArray *buf, int reg);
-diff --git a/target/microblaze/helper.h b/target/microblaze/helper.h
-index a473c1867b..3980fba797 100644
---- a/target/microblaze/helper.h
-+++ b/target/microblaze/helper.h
-@@ -25,7 +25,6 @@ DEF_HELPER_3(mmu_read, i32, env, i32, i32)
- DEF_HELPER_4(mmu_write, void, env, i32, i32, i32)
- #endif
- 
--DEF_HELPER_5(memalign, void, env, tl, i32, i32, i32)
- DEF_HELPER_FLAGS_2(stackprot, TCG_CALL_NO_WG, void, env, tl)
- 
- DEF_HELPER_2(get, i32, i32, i32)
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 1eabf5cc3f..67017ecc33 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -317,6 +317,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
-     cc->class_by_name = mb_cpu_class_by_name;
-     cc->has_work = mb_cpu_has_work;
-     cc->do_interrupt = mb_cpu_do_interrupt;
-+    cc->do_unaligned_access = mb_cpu_do_unaligned_access;
-     cc->cpu_exec_interrupt = mb_cpu_exec_interrupt;
-     cc->dump_state = mb_cpu_dump_state;
-     cc->set_pc = mb_cpu_set_pc;
-diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
-index 06f4322e09..0e3be251a7 100644
---- a/target/microblaze/helper.c
-+++ b/target/microblaze/helper.c
-@@ -296,3 +296,31 @@ bool mb_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
-     }
-     return false;
- }
-+
-+void mb_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
-+                                MMUAccessType access_type,
-+                                int mmu_idx, uintptr_t retaddr)
-+{
-+    MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
-+    uint32_t esr, iflags;
-+
-+    /* Recover the pc and iflags from the corresponding insn_start.  */
-+    cpu_restore_state(cs, retaddr, true);
-+    iflags = cpu->env.iflags;
-+
-+    qemu_log_mask(CPU_LOG_INT,
-+                  "Unaligned access addr=" TARGET_FMT_lx
-+                  " pc=%x iflags=%x\n", addr, cpu->env.pc, iflags);
-+
-+    esr = ESR_EC_UNALIGNED_DATA;
-+    if (likely(iflags & ESR_ESS_FLAG)) {
-+        esr |= iflags & ESR_ESS_MASK;
-+    } else {
-+        qemu_log_mask(LOG_UNIMP, "Unaligned access without ESR_ESS_FLAG\n");
-+    }
-+
-+    cpu->env.ear = addr;
-+    cpu->env.esr = esr;
-+    cs->exception_index = EXCP_HW_EXCP;
-+    cpu_loop_exit(cs);
-+}
-diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-index e6dcc79243..4614e99db3 100644
---- a/target/microblaze/op_helper.c
-+++ b/target/microblaze/op_helper.c
-@@ -365,27 +365,6 @@ uint32_t helper_pcmpbf(uint32_t a, uint32_t b)
-     return 0;
+ static int typeb_imm(DisasContext *dc, int x)
+@@ -184,21 +175,6 @@ static bool trap_userspace(DisasContext *dc, bool cond)
+     return cond_user;
  }
  
--void helper_memalign(CPUMBState *env, target_ulong addr,
--                     uint32_t dr, uint32_t wr,
--                     uint32_t mask)
+-static int32_t dec_alu_typeb_imm(DisasContext *dc)
 -{
--    if (addr & mask) {
--            qemu_log_mask(CPU_LOG_INT,
--                          "unaligned access addr=" TARGET_FMT_lx
--                          " mask=%x, wr=%d dr=r%d\n",
--                          addr, mask, wr, dr);
--            env->ear = addr;
--            env->esr = ESR_EC_UNALIGNED_DATA | (wr << 10) | (dr & 31) << 5;
--            if (mask == 3) {
--                env->esr |= 1 << 11;
--            }
--            if (!(env->msr & MSR_EE)) {
--                return;
--            }
--            helper_raise_exception(env, EXCP_HW_EXCP);
+-    tcg_debug_assert(dc->type_b);
+-    return typeb_imm(dc, (int16_t)dc->imm);
+-}
+-
+-static inline TCGv_i32 *dec_alu_op_b(DisasContext *dc)
+-{
+-    if (dc->type_b) {
+-        tcg_gen_movi_i32(cpu_imm, dec_alu_typeb_imm(dc));
+-        return &cpu_imm;
+-    }
+-    return &cpu_R[dc->rb];
+-}
+-
+ static TCGv_i32 reg_for_read(DisasContext *dc, int reg)
+ {
+     if (likely(reg != 0)) {
+@@ -1549,16 +1525,6 @@ static void do_rte(DisasContext *dc)
+     dc->tb_flags &= ~DRTE_FLAG;
+ }
+ 
+-static void dec_null(DisasContext *dc)
+-{
+-    if (trap_illegal(dc, true)) {
+-        return;
+-    }
+-    qemu_log_mask(LOG_GUEST_ERROR, "unknown insn pc=%x opc=%x\n",
+-                  (uint32_t)dc->base.pc_next, dc->opcode);
+-    dc->abort_at_next_insn = 1;
+-}
+-
+ /* Insns connected to FSL or AXI stream attached devices.  */
+ static bool do_get(DisasContext *dc, int rd, int rb, int imm, int ctrl)
+ {
+@@ -1624,40 +1590,6 @@ static bool trans_putd(DisasContext *dc, arg_putd *arg)
+     return do_put(dc, arg->ra, arg->rb, 0, arg->ctrl);
+ }
+ 
+-static struct decoder_info {
+-    struct {
+-        uint32_t bits;
+-        uint32_t mask;
+-    };
+-    void (*dec)(DisasContext *dc);
+-} decinfo[] = {
+-    {{0, 0}, dec_null}
+-};
+-
+-static void old_decode(DisasContext *dc, uint32_t ir)
+-{
+-    int i;
+-
+-    dc->ir = ir;
+-
+-    /* bit 2 seems to indicate insn type.  */
+-    dc->type_b = ir & (1 << 29);
+-
+-    dc->opcode = EXTRACT_FIELD(ir, 26, 31);
+-    dc->rd = EXTRACT_FIELD(ir, 21, 25);
+-    dc->ra = EXTRACT_FIELD(ir, 16, 20);
+-    dc->rb = EXTRACT_FIELD(ir, 11, 15);
+-    dc->imm = EXTRACT_FIELD(ir, 0, 15);
+-
+-    /* Large switch for all insns.  */
+-    for (i = 0; i < ARRAY_SIZE(decinfo); i++) {
+-        if ((dc->opcode & decinfo[i].mask) == decinfo[i].bits) {
+-            decinfo[i].dec(dc);
+-            break;
+-        }
 -    }
 -}
 -
- void helper_stackprot(CPUMBState *env, target_ulong addr)
+ static void mb_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
  {
-     if (addr < env->slr || addr > env->shr) {
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index d2ee163294..597b96ffb3 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -751,10 +751,22 @@ static TCGv compute_ldst_addr_ea(DisasContext *dc, int ra, int rb)
-     return ret;
- }
+     DisasContext *dc = container_of(dcb, DisasContext, base);
+@@ -1667,7 +1599,6 @@ static void mb_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
+     dc->cpu = cpu;
+     dc->tb_flags = dc->base.tb->flags;
+     dc->cpustate_changed = 0;
+-    dc->abort_at_next_insn = 0;
+     dc->ext_imm = dc->base.tb->cs_base;
+     dc->r0 = NULL;
+     dc->r0_set = false;
+@@ -1724,7 +1655,7 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
  
-+static void record_unaligned_ess(DisasContext *dc, int rd,
-+                                 MemOp size, bool store)
-+{
-+    uint32_t iflags = tcg_get_insn_start_param(dc->insn_start, 1);
-+
-+    iflags |= ESR_ESS_FLAG;
-+    iflags |= rd << 5;
-+    iflags |= store * ESR_S;
-+    iflags |= (size == MO_32) * ESR_W;
-+
-+    tcg_set_insn_start_param(dc->insn_start, 1, iflags);
-+}
-+
- static bool do_load(DisasContext *dc, int rd, TCGv addr, MemOp mop,
-                     int mem_index, bool rev)
- {
--    TCGv_i32 v;
-     MemOp size = mop & MO_SIZE;
- 
-     /*
-@@ -774,34 +786,15 @@ static bool do_load(DisasContext *dc, int rd, TCGv addr, MemOp mop,
- 
-     sync_jmpstate(dc);
- 
--    /*
--     * Microblaze gives MMU faults priority over faults due to
--     * unaligned addresses. That's why we speculatively do the load
--     * into v. If the load succeeds, we verify alignment of the
--     * address and if that succeeds we write into the destination reg.
--     */
--    v = tcg_temp_new_i32();
--    tcg_gen_qemu_ld_i32(v, addr, mem_index, mop);
--
--    /* TODO: Convert to CPUClass::do_unaligned_access.  */
--    if (dc->cpu->cfg.unaligned_exceptions && size > MO_8) {
--        TCGv_i32 t0 = tcg_const_i32(0);
--        TCGv_i32 treg = tcg_const_i32(rd);
--        TCGv_i32 tsize = tcg_const_i32((1 << size) - 1);
--
--        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
--        gen_helper_memalign(cpu_env, addr, treg, t0, tsize);
--
--        tcg_temp_free_i32(t0);
--        tcg_temp_free_i32(treg);
--        tcg_temp_free_i32(tsize);
-+    if (size > MO_8 &&
-+        (dc->tb_flags & MSR_EE) &&
-+        dc->cpu->cfg.unaligned_exceptions) {
-+        record_unaligned_ess(dc, rd, size, false);
-+        mop |= MO_ALIGN;
+     ir = cpu_ldl_code(env, dc->base.pc_next);
+     if (!decode(dc, ir)) {
+-        old_decode(dc, ir);
++        trap_illegal(dc, true);
      }
  
--    if (rd) {
--        tcg_gen_mov_i32(cpu_R[rd], v);
--    }
-+    tcg_gen_qemu_ld_i32(reg_for_write(dc, rd), addr, mem_index, mop);
+     if (dc->r0) {
+@@ -1764,8 +1695,6 @@ static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
+ {
+     DisasContext *dc = container_of(dcb, DisasContext, base);
  
--    tcg_temp_free_i32(v);
-     tcg_temp_free(addr);
-     return true;
- }
-@@ -931,28 +924,15 @@ static bool do_store(DisasContext *dc, int rd, TCGv addr, MemOp mop,
- 
-     sync_jmpstate(dc);
- 
--    tcg_gen_qemu_st_i32(reg_for_read(dc, rd), addr, mem_index, mop);
+-    assert(!dc->abort_at_next_insn);
 -
--    /* TODO: Convert to CPUClass::do_unaligned_access.  */
--    if (dc->cpu->cfg.unaligned_exceptions && size > MO_8) {
--        TCGv_i32 t1 = tcg_const_i32(1);
--        TCGv_i32 treg = tcg_const_i32(rd);
--        TCGv_i32 tsize = tcg_const_i32((1 << size) - 1);
--
--        tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
--        /* FIXME: if the alignment is wrong, we should restore the value
--         *        in memory. One possible way to achieve this is to probe
--         *        the MMU prior to the memaccess, thay way we could put
--         *        the alignment checks in between the probe and the mem
--         *        access.
--         */
--        gen_helper_memalign(cpu_env, addr, treg, t1, tsize);
--
--        tcg_temp_free_i32(t1);
--        tcg_temp_free_i32(treg);
--        tcg_temp_free_i32(tsize);
-+    if (size > MO_8 &&
-+        (dc->tb_flags & MSR_EE) &&
-+        dc->cpu->cfg.unaligned_exceptions) {
-+        record_unaligned_ess(dc, rd, size, true);
-+        mop |= MO_ALIGN;
-     }
- 
-+    tcg_gen_qemu_st_i32(reg_for_read(dc, rd), addr, mem_index, mop);
-+
-     tcg_temp_free(addr);
-     return true;
- }
+     if (dc->base.is_jmp == DISAS_NORETURN) {
+         /* We have already exited the TB. */
+         return;
 -- 
 2.25.1
 
