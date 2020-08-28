@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E3AC433E6
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:15:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEF2CC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:15:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51C4320776
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:15:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8ED3620776
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:15:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V60rgXcw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C4320776
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OOfAeiJZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ED3620776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBZY1-0005FK-Hu
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 04:15:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57876)
+	id 1kBZY2-0005IP-QI
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 04:15:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRY-0000hP-GA
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRY-0000gj-7O
  for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32356
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43307
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRS-0003SF-KE
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:04 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRS-0003S4-4C
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1598602137;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iMjAeZE8KysOCotHdYlErXQLpMhSFzcspX0W4u/w6y8=;
- b=V60rgXcwQcME0v3RSvVQUPydOVqwsOi7Qa2W+Ee2mwTLgHparLiKPVwUkmRLaVlBAa69hA
- x7TOuAWJyXLreVNic0EpDePWodrg73geITrxpLK6VE0PITP+DgsUn1TsV6BJlDQR9ZdCkn
- N/Sm1fA4B8E7J4o08bdH9omYD26YLSw=
+ bh=Nz2sZrJX4qzBF63OonFqdCb3a+jIn0R8qkWmHt5YvFQ=;
+ b=OOfAeiJZ2a3ogwU7ZeobqlSbf1PQjwLenPIr8YzqhsUXPLYQvwTVyOkV6dtEptpkCaxg+N
+ +J3w3itqiyEX7+YmNMgjQemm9wQ3Mf6Hy7MKkoWMWt1cfIsgFlwkqBt69XXkRwGX3Nf8Gu
+ mL5cdbKk0YIx5OfMx7gOWM7hixQtq+Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-A-Gb5UbWPyWmERks5jRXQA-1; Fri, 28 Aug 2020 04:08:53 -0400
-X-MC-Unique: A-Gb5UbWPyWmERks5jRXQA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-361-dvHFQ1dwPhG0NNkLe9AcPA-1; Fri, 28 Aug 2020 04:08:55 -0400
+X-MC-Unique: dvHFQ1dwPhG0NNkLe9AcPA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 997C91084C95;
- Fri, 28 Aug 2020 08:08:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73A831008301;
+ Fri, 28 Aug 2020 08:08:54 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4977A7E565;
- Fri, 28 Aug 2020 08:08:52 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 310C35D9F3;
+ Fri, 28 Aug 2020 08:08:50 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 777A031F09; Fri, 28 Aug 2020 10:08:46 +0200 (CEST)
+ id 5C59731E68; Fri, 28 Aug 2020 10:08:46 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/18] hw/usb: Add U2F device check to passthru mode
-Date: Fri, 28 Aug 2020 10:08:42 +0200
-Message-Id: <20200828080845.28287-16-kraxel@redhat.com>
+Subject: [PULL 12/18] docs/system: Add U2F key to the USB devices examples
+Date: Fri, 28 Aug 2020 10:08:39 +0200
+Message-Id: <20200828080845.28287-13-kraxel@redhat.com>
 In-Reply-To: <20200828080845.28287-1-kraxel@redhat.com>
 References: <20200828080845.28287-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -107,85 +107,27 @@ Sender: "Qemu-devel"
 
 From: César Belley <cesar.belley@lse.epita.fr>
 
-This patchs adds a check to verify that the device passed through the
-hidraw property is a U2F device.
-
-The check is done by ensuring that the first values of the report
-descriptor (USAGE PAGE and USAGE) correspond to those of a U2F device.
-
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
-Message-id: 20200826114209.28821-12-cesar.belley@lse.epita.fr
+Message-id: 20200826114209.28821-9-cesar.belley@lse.epita.fr
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/u2f-passthru.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ docs/system/usb.rst | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
-index 52b44670775d..74d4ae6e9294 100644
---- a/hw/usb/u2f-passthru.c
-+++ b/hw/usb/u2f-passthru.c
-@@ -34,6 +34,12 @@
+diff --git a/docs/system/usb.rst b/docs/system/usb.rst
+index ddfa828d74ae..9a2f1927c451 100644
+--- a/docs/system/usb.rst
++++ b/docs/system/usb.rst
+@@ -81,6 +81,9 @@ option or the ``device_add`` monitor command. Available devices are:
+ ``usb-audio``
+    USB audio device
  
- #include "u2f.h"
++``u2f-{emulated,passthru}``
++   Universal Second Factor device
++
+ .. _host_005fusb_005fdevices:
  
-+#ifdef CONFIG_LIBUDEV
-+#include <libudev.h>
-+#endif
-+#include <linux/hidraw.h>
-+#include <sys/ioctl.h>
-+
- #define NONCE_SIZE 8
- #define BROADCAST_CID 0xFFFFFFFF
- #define TRANSACTION_TIMEOUT 120000
-@@ -344,6 +350,34 @@ static void u2f_passthru_recv_from_guest(U2FKeyState *base,
-     }
- }
- 
-+static bool u2f_passthru_is_u2f_device(int fd)
-+{
-+    int ret, rdesc_size;
-+    struct hidraw_report_descriptor rdesc;
-+    const uint8_t u2f_hid_report_desc_header[] = {
-+        0x06, 0xd0, 0xf1, /* Usage Page (FIDO) */
-+        0x09, 0x01,       /* Usage (FIDO) */
-+    };
-+
-+    /* Get report descriptor size */
-+    ret = ioctl(fd, HIDIOCGRDESCSIZE, &rdesc_size);
-+    if (ret < 0 || rdesc_size < sizeof(u2f_hid_report_desc_header)) {
-+        return false;
-+    }
-+
-+    /* Get report descriptor */
-+    memset(&rdesc, 0x0, sizeof(rdesc));
-+    rdesc.size = rdesc_size;
-+    ret = ioctl(fd, HIDIOCGRDESC, &rdesc);
-+    if (ret < 0) {
-+        return false;
-+    }
-+
-+    /* Header bytes cover specific U2F rdesc values */
-+    return memcmp(u2f_hid_report_desc_header, rdesc.value,
-+                  sizeof(u2f_hid_report_desc_header)) == 0;
-+}
-+
- static void u2f_passthru_unrealize(U2FKeyState *base)
- {
-     U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-@@ -368,6 +402,13 @@ static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
-                    key->hidraw);
-         return;
-     }
-+
-+    if (!u2f_passthru_is_u2f_device(fd)) {
-+        qemu_close(fd);
-+        error_setg(errp, "%s: Passed hidraw does not represent "
-+                   "a U2F HID device", TYPE_U2F_PASSTHRU);
-+        return;
-+    }
-     key->hidraw_fd = fd;
-     u2f_passthru_reset(key);
- }
+ Using host USB devices on a Linux host
 -- 
 2.27.0
 
