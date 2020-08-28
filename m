@@ -2,93 +2,127 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75348C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 16:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C91C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 16:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AA602080C
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 16:24:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84CDC2080C
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 16:29:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pJAcD7hT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AA602080C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="AFA9xSa2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84CDC2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBhBJ-00071P-Eb
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 12:24:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55408)
+	id 1kBhFn-0000Wd-Ln
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 12:29:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kBh9o-0004l8-4p
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 12:23:16 -0400
-Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:33660)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kBh9m-0006Dg-EB
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 12:23:15 -0400
-Received: by mail-pj1-x102e.google.com with SMTP id q93so748370pjq.0
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 09:23:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=LZiMRoeF7G/b98wNi88YNT8vTFSa3RHCtmDHzAQmKfM=;
- b=pJAcD7hTKZmGQQ4R3+/Hzaz+ZDWND0yPxS8jaRVsiQUNBHh1HJ/uIDF+qe1GVVZlxT
- Uzy9qDdRWX48WN5rQPG76MvL67JKYhBDen3JUI1ZQRNESbugmxLA1OVIkpMj4/eMxPPs
- BZzmRuA7Xxc/mSMfpwahhhlwo6+Z88RHVEjaZE7JtEN6CoE2gQXZPhYcsz2FFaXOAVkV
- PziRUvKnxMfHr6fE6U/sO0Mny2nS4pmVUwSeoNawUeBFO3T73FCRdY6MqSZv/pGeF5dU
- rUairXUV4TvhRFG9krUIT3x9TuDiXGXvV/5QVCbcMT1uMEQyRUaNPgKdsBKfH2r3AsiA
- JFpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=LZiMRoeF7G/b98wNi88YNT8vTFSa3RHCtmDHzAQmKfM=;
- b=C1SGMOzSTqc0N0xphwrKFPF9ioCucRAOSNKr3q/XmZg1le6ea4/U6IgUjqT3U5ecxq
- 2ymEml7TWx/UZQv+5TZ5CBaRnvtVh5/+AvLykcpKV2kncQP0jm97XilhaOjwa9Xs0TOZ
- PmnM5F6wpNu+Y46pfziR0zZH3v4K/rImwFe1vekNNLxSAC3RUXetTZZBjXUGAXqzk/b5
- iWYPnyaTMiyH3w+pwH2RH5/gzOyzKIAEZ9pBXCBGSJiyBWAHXEpR3BQawumzuGPNCdA/
- 68dvMOOVa6b9w1N/LPvb4yDPSF0ysjAGHnPoBIQ5iOMrEn76SBky1j2EHPuVucUpCpVS
- 0p3Q==
-X-Gm-Message-State: AOAM5332emKmtQ4qzY7lksY3QvnTe4+qk3T6Y9P0H3heuXJdOvCnU+EZ
- WdayDS//GhtlY2CMpI9eTeDXEuIUHDlURHa7
-X-Google-Smtp-Source: ABdhPJy+94rw29BwrPkZm7T5zGG+jYw1TCRLzgvSQjjglErHMiWyNXXYSz/wRbE6wI4v1Rb/ETto+w==
-X-Received: by 2002:a17:90a:5282:: with SMTP id
- w2mr2048704pjh.77.1598631791757; 
- Fri, 28 Aug 2020 09:23:11 -0700 (PDT)
-Received: from localhost.localdomain ([2401:c080:1c01:4fe:5400:2ff:fef1:b056])
- by smtp.googlemail.com with ESMTPSA id
- v8sm1629324pju.1.2020.08.28.09.23.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 28 Aug 2020 09:23:11 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] meson: Convert undefsym.sh to undefsym.py
-Date: Sat, 29 Aug 2020 00:22:45 +0800
-Message-Id: <20200828162246.423-2-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.27.0.windows.1
-In-Reply-To: <20200828162246.423-1-luoyonggang@gmail.com>
-References: <20200828162246.423-1-luoyonggang@gmail.com>
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kBhFE-0008PB-1i; Fri, 28 Aug 2020 12:28:52 -0400
+Received: from mail-eopbgr130104.outbound.protection.outlook.com
+ ([40.107.13.104]:48014 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kBhF9-00074H-S4; Fri, 28 Aug 2020 12:28:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mGi89byRA6Dqkd/jQu4Ui2h1JeN0yiWbdv7BYVmMzGFrRKZ/VH+EEn/n4+fJ3HTqqL3zbIZvv6+T7V2EHw5pEDvz9C3O9Hh4OZavjEYlSWFckHLGoJpxKY1vifSdKjYCU9kJQnBBBPqI6X3CU+Cz1/+ERABEWmAnKxfacHnaaSh27/m9bmUggUQXqo0YmjYmYjYSHtRIwTWd8M9ygz+HZkxrBflm2Ot3ubjDR+jYo5isN9P26d6AfCDh30UU4wN/xgfnZLpIG3s9dEW78jAmMnz1VFIBK263eY3sUOb3GnxPpykLSp1E5FULGvYscEqXUG6uGG+Q2P43qwnUPiAg2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=24p3HBhex2pqwtFnhm+1+eMJQFFmDRZVbtSJNXXhuE4=;
+ b=ln2A+yyIhFB638y10Qt8/RuNt8Nv+UOAhT4xzvUIBFDrt1KMZ1ppnxYIgpnDWuKatp7S3/mL0Dr93Kde/tro6cRtNrwzk9gOPRN0rrROGy25zMmEahO79EwnNeWQ6osW4LjqU9B2FYxeCelLGqMEMz61Lsmg0fCVQ8odpV6lvlgsRkyroczwWOMh8r8KeAb6LywpLXHFoV8l92SGYqTm5PAqrchL8YdqGmhW/3AuJISPdJ6Ku+iR6hJpqJtuMOjyGeTBqOgmmRduDL3uWM+t1CfIxlrjofHFfRIwieyPMFNuscOoW2Zd9hWmrF+LhaRFHskDAoaPKVClGAT4jPgX9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=24p3HBhex2pqwtFnhm+1+eMJQFFmDRZVbtSJNXXhuE4=;
+ b=AFA9xSa2FezwxMG+tSRwvCDuyBDNCpOrbq+Q+j2jtuPG1ua+eF4DXnUACcFx/Tyzm5o/Bosv5hb3sWqmxaEwhGucByxLZ14kS4KMIhHFxs38hMnYW9ijmNvgYFgOLHMEfW9rtmCGWeTykLLNvNA0id+UbGQHLoObBJfDE4VtM4E=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
+ by HE1PR0801MB1673.eurprd08.prod.outlook.com (2603:10a6:3:86::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3305.25; Fri, 28 Aug
+ 2020 16:28:42 +0000
+Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
+ ([fe80::b5e5:e4d:ed88:5a3a]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
+ ([fe80::b5e5:e4d:ed88:5a3a%9]) with mapi id 15.20.3305.032; Fri, 28 Aug 2020
+ 16:28:42 +0000
+Subject: Re: [PATCH v7 4/4] block: apply COR-filter to block-stream jobs
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
+ armbru@redhat.com, jsnow@redhat.com, eblake@redhat.com, den@openvz.org
+References: <1598257914-887267-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1598257914-887267-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <2eef369e-a79d-57c9-f8c8-40be9c3aaa2c@virtuozzo.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <5a2bfe27-3589-5735-a3f8-cbcfc9cdbe75@virtuozzo.com>
+Date: Fri, 28 Aug 2020 19:28:39 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <2eef369e-a79d-57c9-f8c8-40be9c3aaa2c@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x102e.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Language: en-GB
+X-ClientProxiedBy: AM4P190CA0015.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:200:56::25) To HE1PR0801MB2124.eurprd08.prod.outlook.com
+ (2603:10a6:3:89::22)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.22) by
+ AM4P190CA0015.EURP190.PROD.OUTLOOK.COM (2603:10a6:200:56::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.19 via Frontend Transport; Fri, 28 Aug 2020 16:28:41 +0000
+X-Originating-IP: [109.252.114.22]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 04b47e30-eff0-4db5-8cea-08d84b6f6d55
+X-MS-TrafficTypeDiagnostic: HE1PR0801MB1673:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <HE1PR0801MB167313DC84ADD1E7BA896E59F4520@HE1PR0801MB1673.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5MC60gJ0wWMZFJcrWMHds5d6RCWuAVpPmnP5pKtSZWFY69c6wVR57RGOVK1AlcUCXjaWOaAd4E3kR5a4mnAv88ydULkW2955ibq50PXlYM2Ax+mHK29THoBcaegGfSIiJvmhChazE5YdFfA2sB8daURMrYYQOause/HqebNvVlicmWtHR4XgsYaE9i2JGoD0WGw4MHaWrk064MoHfTlSCe3Xfn/ON5PbuEzHuPgQjuHEx3uwnBv0Rk7F3eIp3wgHEk+7W3EVncyGde7Zti6GkdoGiUE00jMg7RcOyclJQ//F810BZnLqdprhybH0A/CSsEql30UNqs3Z4LRDQA+x10BK2f5RyCjHCQP4jKemvA2lSkVGmqBo92YKdeUV+pDD
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(136003)(376002)(366004)(346002)(39840400004)(107886003)(83380400001)(5660300002)(4326008)(6512007)(8676002)(2906002)(6486002)(36756003)(316002)(8936002)(86362001)(956004)(2616005)(31696002)(31686004)(44832011)(26005)(478600001)(16526019)(186003)(66946007)(53546011)(66556008)(66476007)(6506007)(52116002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: S9s4mX6DRQYhP5V5IlR64jGk5Cp7BhKO//hLehebJh/tijIfacHWDJLBGOzsbCx8azIUIPUFimV8v8t+hpzr8Axfy+UK5a2QeS97lTIsEMhHj06rAUycIKNRLUl51DifQkGUH0INiuoo8ghxB8VFwaFqmx8E0at9K3nSk8DuVfSeNErz4XdJf26bj3r9zDiKcdt59y9dkuQBdEmD0zXf46YZY+MirQThckqgGXBNf7HCQ+M1+IphLTzsnr0KnPC880YVmUjEMQE4VxJr01Pwt75gcSS/ILd03MewrcUcuvlZYAvjltyIy1DneWWVbd3eJuqDZNPSF+bd0EjwgbQwtlHRUP6pcWsqo0TARfS5PhllCGlVcyv7lVV/j3vv5x+ZQnalC8rbBvMT9WBhonugfgvIiDwsTXw7rLWKAOMKcPhKgfBitx5I/1UIndjEZOH2c8gzhkY1vM1kAQgrnz6KrObjLXobOuRv1K8477rMjehEdLJf5QLtRMaIymcIROyzttvnvD0Qpn8fj348+ab23w1JrNU8f3WM5edU2kTFYJcDobbY9TpCiPibrC+n3cIXE1Rqnl47TcWWlm1z0qQf5QMDjdM9FHDtrzbkpj7ziyeRnSHaTVYaYEbssIOo6FLgSb9P8RJH5g2GiWbRalLAjA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 04b47e30-eff0-4db5-8cea-08d84b6f6d55
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Aug 2020 16:28:42.5189 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SpH8uQHY39ckFMNGEyJgV98QMSUZ9AMf4Z2WG1pCmnob5XnJ0FSy3yUZJ2IjJOkBsqMj8hHQXW/KAY7q0fSKcVMednuKnbF9oxtfDBqFD8Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1673
+Received-SPF: pass client-ip=40.107.13.104;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR01-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/28 12:28:44
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -35
+X-Spam_score: -3.6
+X-Spam_bar: ---
+X-Spam_report: (-3.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.809, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,125 +136,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-undefsym.sh are not msys2 compatible, convert it to python script
+On 24.08.2020 14:30, Vladimir Sementsov-Ogievskiy wrote:
+> 24.08.2020 11:31, Andrey Shinkevich wrote:
+>> This patch completes the series with the COR-filter insertion for
+>> block-stream operations. Adding the filter makes it possible for copied
+>> regions to be discarded in backing files during the block-stream job,
+>> what will reduce the disk overuse.
+>> The COR-filter insertion incurs changes in the iotests case
+>> 245:test_block_stream_4 that reopens the backing chain during a
+>> block-stream job. There are changes in the iotests #030 as well.
+>> The iotests case 030:test_stream_parallel was deleted due to multiple
+>> conflicts between the concurrent job operations over the same backing
+>> chain. The base backing node for one job is the top node for another
+>> job. It may change due to the filter node inserted into the backing
+>> chain while both jobs are running. Another issue is that the parts of
+>> the backing chain are being frozen by the running job and may not be
+>> changed by the concurrent job when needed. The concept of the parallel
+>> jobs with common nodes is considered vital no more.
+>>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> ---
+>>   block/stream.c             | 58 
+>> +++++++++++++++++++++++++++++++++++-----------
+>>   tests/qemu-iotests/030     | 50 
+>> ++++-----------------------------------
+>>   tests/qemu-iotests/030.out |  4 ++--
+>>   tests/qemu-iotests/245     | 19 +++++++++++----
+>>   4 files changed, 65 insertions(+), 66 deletions(-)
+>>
+>> diff --git a/block/stream.c b/block/stream.c
+>> index 8bf6b6d..e927fed 100644
+>> --- a/block/stream.c
+>> +++ b/block/stream.c
+...
+>> @@ -307,5 +332,10 @@ fail:
+>>       if (bs_read_only) {
+>>           bdrv_reopen_set_read_only(bs, true, NULL);
+>>       }
+>> -    bdrv_unfreeze_backing_chain(bs, above_base);
+>> +    if () {
+>> +        bdrv_unfreeze_backing_chain(cor_filter_bs, above_base);
+>> +        bdrv_cor_filter_drop(cor_filter_bs);
+>> +    } else {
+>> +        bdrv_unfreeze_backing_chain(bs, above_base);
+>
+> as I see, in this case chain is not yet frozen
+>
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
----
- meson.build         |  2 +-
- scripts/undefsym.py | 57 +++++++++++++++++++++++++++++++++++++++++++++
- scripts/undefsym.sh | 20 ----------------
- 3 files changed, 58 insertions(+), 21 deletions(-)
- create mode 100644 scripts/undefsym.py
- delete mode 100755 scripts/undefsym.sh
+When cor_filter_bs is NULL, only bs - above_base chain is frozen at this 
+point.
 
-diff --git a/meson.build b/meson.build
-index 74f8ea0c2e..9d8419bf82 100644
---- a/meson.build
-+++ b/meson.build
-@@ -859,7 +859,7 @@ foreach d, list : modules
- endforeach
- 
- nm = find_program('nm')
--undefsym = find_program('scripts/undefsym.sh')
-+undefsym = find_program('scripts/undefsym.py')
- block_syms = custom_target('block.syms', output: 'block.syms',
-                              input: [libqemuutil, block_mods],
-                              capture: true,
-diff --git a/scripts/undefsym.py b/scripts/undefsym.py
-new file mode 100644
-index 0000000000..c690f88c7a
---- /dev/null
-+++ b/scripts/undefsym.py
-@@ -0,0 +1,57 @@
-+#!/usr/bin/env python3
-+# -*- coding: utf-8 -*-
-+
-+# Before a shared module's DSO is produced, a static library is built for it
-+# and passed to this script.  The script generates -Wl,-u options to force
-+# the inclusion of symbol from libqemuutil.a if the shared modules need them,
-+# This is necessary because the modules may use functions not needed by the
-+# executable itself, which would cause the function to not be linked in.
-+# Then the DSO loading would fail because of the missing symbol.
-+
-+
-+"""
-+Compare the static library with the shared module for compute the symbol duplication
-+"""
-+
-+import sys
-+import subprocess
-+
-+def filter_lines_set(stdout, is_static = True):
-+    linesSet = set()
-+    for line in stdout.splitlines():
-+        tokens = line.split(b' ')
-+        if len(tokens) >= 1:
-+            if len(tokens) > 1:
-+                if is_static and tokens[1] == b'U':
-+                    continue
-+                if not is_static and tokens[1] != b'U':
-+                    continue
-+            new_line = b'-Wl,-u,' + tokens[0]
-+            if not new_line in linesSet:
-+                linesSet.add(new_line)
-+    return linesSet
-+
-+def main(args):
-+    if len(args) <= 3:
-+        sys.exit(0)
-+
-+    nm = args[1]
-+    staticlib = args[2]
-+    pc = subprocess.run([nm, "-P", "-g", staticlib], stdout=subprocess.PIPE)
-+    if pc.returncode != 0:
-+        sys.exit(-1)
-+    lines_set_left = filter_lines_set(pc.stdout)
-+
-+    shared_modules = args[3:]
-+    pc = subprocess.run([nm, "-P", "-g"] + shared_modules, stdout=subprocess.PIPE)
-+    if pc.returncode != 0:
-+        sys.exit(-1)
-+    lines_set_right = filter_lines_set(pc.stdout, False)
-+    lines = []
-+    for line in sorted(list(lines_set_right)):
-+        if line in lines_set_left:
-+            lines.append(line)
-+    sys.stdout.write(b'\n'.join(lines).decode())
-+
-+if __name__ == "__main__":
-+    main(sys.argv)
-diff --git a/scripts/undefsym.sh b/scripts/undefsym.sh
-deleted file mode 100755
-index b9ec332e95..0000000000
---- a/scripts/undefsym.sh
-+++ /dev/null
-@@ -1,20 +0,0 @@
--#! /usr/bin/env bash
--
--# Before a shared module's DSO is produced, a static library is built for it
--# and passed to this script.  The script generates -Wl,-u options to force
--# the inclusion of symbol from libqemuutil.a if the shared modules need them,
--# This is necessary because the modules may use functions not needed by the
--# executable itself, which would cause the function to not be linked in.
--# Then the DSO loading would fail because of the missing symbol.
--
--if test $# -le 2; then
--  exit 0
--fi
--
--NM=$1
--staticlib=$2
--shift 2
--# Find symbols defined in static libraries and undefined in shared modules
--comm -12 \
--  <( $NM -P -g $staticlib | awk '$2!="U"{print "-Wl,-u," $1}' | sort -u) \
--  <( $NM -P -g "$@" | awk '$2=="U"{print "-Wl,-u," $1}' | sort -u)
--- 
-2.27.0.windows.1
+Andrey
 
+
+>> +    }
+>>   }
+>> diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
+>> index 1cdd7e2..fec9d89 100755
+>> --- a/tests/qemu-iotests/030
+>> +++ b/tests/qemu-iotests/030
+...
 
