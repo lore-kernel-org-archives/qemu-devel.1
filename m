@@ -2,77 +2,77 @@ Return-Path: <SRS0=7Ydp=CG=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFCA8C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:14:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E3AC433E6
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:15:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BBA520665
-	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:14:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51C4320776
+	for <qemu-devel@archiver.kernel.org>; Fri, 28 Aug 2020 08:15:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnMISFp/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BBA520665
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V60rgXcw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51C4320776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52716 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBZWQ-0002mJ-Pr
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 04:14:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57840)
+	id 1kBZY1-0005FK-Hu
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 04:15:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRW-0000cb-QG
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57279
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRY-0000hP-GA
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32356
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRS-0003RU-2k
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:02 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kBZRS-0003SF-KE
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 04:09:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598602136;
+ s=mimecast20190719; t=1598602137;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mVf/UE+JMYlpL1srU0dpkzi9EtkgTXpYauLVVSsyaJo=;
- b=WnMISFp/M5AmwqItzkRaw7f7oTWpflmFy5NH302D+x2iB8BulTZ6MQIJPQvLKcD6NHdOuK
- Popa4exBgDN3xYjveqYavK/6GIqS8b/DZj50kjPadbSF2bwoOlNNYjWCze/7kd0/huHFgH
- ZMl3mBjRh/yjQQ8RAZABefKAYgWxq0o=
+ bh=iMjAeZE8KysOCotHdYlErXQLpMhSFzcspX0W4u/w6y8=;
+ b=V60rgXcwQcME0v3RSvVQUPydOVqwsOi7Qa2W+Ee2mwTLgHparLiKPVwUkmRLaVlBAa69hA
+ x7TOuAWJyXLreVNic0EpDePWodrg73geITrxpLK6VE0PITP+DgsUn1TsV6BJlDQR9ZdCkn
+ N/Sm1fA4B8E7J4o08bdH9omYD26YLSw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-231-Z38kNKmfPkyfqDfgVX3_ng-1; Fri, 28 Aug 2020 04:08:51 -0400
-X-MC-Unique: Z38kNKmfPkyfqDfgVX3_ng-1
+ us-mta-285-A-Gb5UbWPyWmERks5jRXQA-1; Fri, 28 Aug 2020 04:08:53 -0400
+X-MC-Unique: A-Gb5UbWPyWmERks5jRXQA-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22DA110082E5;
- Fri, 28 Aug 2020 08:08:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 997C91084C95;
+ Fri, 28 Aug 2020 08:08:52 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C1CBD747BD;
- Fri, 28 Aug 2020 08:08:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4977A7E565;
+ Fri, 28 Aug 2020 08:08:52 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E26E99C90; Fri, 28 Aug 2020 10:08:45 +0200 (CEST)
+ id 777A031F09; Fri, 28 Aug 2020 10:08:46 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/18] hw: xhci: check return value of 'usb_packet_map'
-Date: Fri, 28 Aug 2020 10:08:28 +0200
-Message-Id: <20200828080845.28287-2-kraxel@redhat.com>
+Subject: [PULL 15/18] hw/usb: Add U2F device check to passthru mode
+Date: Fri, 28 Aug 2020 10:08:42 +0200
+Message-Id: <20200828080845.28287-16-kraxel@redhat.com>
 In-Reply-To: <20200828080845.28287-1-kraxel@redhat.com>
 References: <20200828080845.28287-1-kraxel@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
@@ -98,81 +98,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Li Qiang <liq3ea@163.com>,
- Alexander Bulekov <alxndr@bu.edu>, Gerd Hoffmann <kraxel@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+ =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>,
+ Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Li Qiang <liq3ea@163.com>
+From: César Belley <cesar.belley@lse.epita.fr>
 
-Currently we don't check the return value of 'usb_packet_map',
-this will cause an UAF issue. This is LP#1891341.
-Following is the reproducer provided in:
--->https://bugs.launchpad.net/qemu/+bug/1891341
+This patchs adds a check to verify that the device passed through the
+hidraw property is a U2F device.
 
-cat << EOF | ./i386-softmmu/qemu-system-i386 -device nec-usb-xhci \
--trace usb\* -device usb-audio -device usb-storage,drive=mydrive \
--drive id=mydrive,file=null-co://,size=2M,format=raw,if=none \
--nodefaults -nographic -qtest stdio
-outl 0xcf8 0x80001016
-outl 0xcfc 0x3c009f0d
-outl 0xcf8 0x80001004
-outl 0xcfc 0xc77695e
-writel 0x9f0d000000000040 0xffff3655
-writeq 0x9f0d000000002000 0xff2f9e0000000000
-write 0x1d 0x1 0x27
-write 0x2d 0x1 0x2e
-write 0x17232 0x1 0x03
-write 0x17254 0x1 0x06
-write 0x17278 0x1 0x34
-write 0x3d 0x1 0x27
-write 0x40 0x1 0x2e
-write 0x41 0x1 0x72
-write 0x42 0x1 0x01
-write 0x4d 0x1 0x2e
-write 0x4f 0x1 0x01
-writeq 0x9f0d000000002000 0x5c051a0100000000
-write 0x34001d 0x1 0x13
-write 0x340026 0x1 0x30
-write 0x340028 0x1 0x08
-write 0x34002c 0x1 0xfe
-write 0x34002d 0x1 0x08
-write 0x340037 0x1 0x5e
-write 0x34003a 0x1 0x05
-write 0x34003d 0x1 0x05
-write 0x34004d 0x1 0x13
-writeq 0x9f0d000000002000 0xff00010100400009
-EOF
+The check is done by ensuring that the first values of the report
+descriptor (USAGE PAGE and USAGE) correspond to those of a U2F device.
 
-This patch fixes this.
-
-Buglink: https://bugs.launchpad.net/qemu/+bug/1891341
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
-Signed-off-by: Li Qiang <liq3ea@163.com>
-Message-id: 20200812153139.15146-1-liq3ea@163.com
+Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
+Message-id: 20200826114209.28821-12-cesar.belley@lse.epita.fr
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/hcd-xhci.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ hw/usb/u2f-passthru.c | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
 
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index 67a18fe2b64c..46a2186d912a 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -1615,7 +1615,10 @@ static int xhci_setup_packet(XHCITransfer *xfer)
-     xhci_xfer_create_sgl(xfer, dir == USB_TOKEN_IN); /* Also sets int_req */
-     usb_packet_setup(&xfer->packet, dir, ep, xfer->streamid,
-                      xfer->trbs[0].addr, false, xfer->int_req);
--    usb_packet_map(&xfer->packet, &xfer->sgl);
-+    if (usb_packet_map(&xfer->packet, &xfer->sgl)) {
-+        qemu_sglist_destroy(&xfer->sgl);
-+        return -1;
+diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
+index 52b44670775d..74d4ae6e9294 100644
+--- a/hw/usb/u2f-passthru.c
++++ b/hw/usb/u2f-passthru.c
+@@ -34,6 +34,12 @@
+ 
+ #include "u2f.h"
+ 
++#ifdef CONFIG_LIBUDEV
++#include <libudev.h>
++#endif
++#include <linux/hidraw.h>
++#include <sys/ioctl.h>
++
+ #define NONCE_SIZE 8
+ #define BROADCAST_CID 0xFFFFFFFF
+ #define TRANSACTION_TIMEOUT 120000
+@@ -344,6 +350,34 @@ static void u2f_passthru_recv_from_guest(U2FKeyState *base,
+     }
+ }
+ 
++static bool u2f_passthru_is_u2f_device(int fd)
++{
++    int ret, rdesc_size;
++    struct hidraw_report_descriptor rdesc;
++    const uint8_t u2f_hid_report_desc_header[] = {
++        0x06, 0xd0, 0xf1, /* Usage Page (FIDO) */
++        0x09, 0x01,       /* Usage (FIDO) */
++    };
++
++    /* Get report descriptor size */
++    ret = ioctl(fd, HIDIOCGRDESCSIZE, &rdesc_size);
++    if (ret < 0 || rdesc_size < sizeof(u2f_hid_report_desc_header)) {
++        return false;
 +    }
-     DPRINTF("xhci: setup packet pid 0x%x addr %d ep %d\n",
-             xfer->packet.pid, ep->dev->addr, ep->nr);
-     return 0;
++
++    /* Get report descriptor */
++    memset(&rdesc, 0x0, sizeof(rdesc));
++    rdesc.size = rdesc_size;
++    ret = ioctl(fd, HIDIOCGRDESC, &rdesc);
++    if (ret < 0) {
++        return false;
++    }
++
++    /* Header bytes cover specific U2F rdesc values */
++    return memcmp(u2f_hid_report_desc_header, rdesc.value,
++                  sizeof(u2f_hid_report_desc_header)) == 0;
++}
++
+ static void u2f_passthru_unrealize(U2FKeyState *base)
+ {
+     U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
+@@ -368,6 +402,13 @@ static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
+                    key->hidraw);
+         return;
+     }
++
++    if (!u2f_passthru_is_u2f_device(fd)) {
++        qemu_close(fd);
++        error_setg(errp, "%s: Passed hidraw does not represent "
++                   "a U2F HID device", TYPE_U2F_PASSTHRU);
++        return;
++    }
+     key->hidraw_fd = fd;
+     u2f_passthru_reset(key);
+ }
 -- 
 2.27.0
 
