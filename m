@@ -8,76 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0998C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 15:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC08C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 15:21:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67E7020707
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 15:20:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6747820707
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 15:21:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eTkc3P/t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67E7020707
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oQ3z908A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6747820707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kC2eQ-00034y-JO
-	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 11:20:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44592)
+	id 1kC2fW-0005Ck-Ir
+	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 11:21:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kC2cw-00016e-Nb; Sat, 29 Aug 2020 11:18:46 -0400
-Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:41935)
+ id 1kC2cP-0000EI-JM; Sat, 29 Aug 2020 11:18:13 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:43856)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kC2cu-0005Dj-TZ; Sat, 29 Aug 2020 11:18:46 -0400
-Received: by mail-oi1-x243.google.com with SMTP id 2so3327120ois.8;
- Sat, 29 Aug 2020 08:18:44 -0700 (PDT)
+ id 1kC2cN-0005A0-DV; Sat, 29 Aug 2020 11:18:13 -0400
+Received: by mail-ot1-x341.google.com with SMTP id v16so1769745otp.10;
+ Sat, 29 Aug 2020 08:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ffO5CG6O0bdtGu4nC+qXhrBBPdnKSoatcxODngYecGI=;
- b=eTkc3P/tuDqmBKIj5rle32kXIbMOTS+WcVNICJ5ZMITRGoj4/852/NUkJaOakQV3SE
- TFAgigIGkjr4YcFtJ7EWjmgRd8jyc505QSiJc4mBPSdoHfzbGrf9lHdvRBtc1zY/xG8g
- LGYEE1kWPRDOx3S7ygm5pdKA18CfQVHilQJoUl0XUmubBRwk/SLZqPjvzXnYCpIDrTS5
- VcjgggVqlisSGUYyALJLQIyUDvvIi+H8QfQ+yv7QRI3E0R2Gf30I8t1jkD5l9h1IanWC
- NsxZG793dYPdPcvggOVksZYwAiIdMjWgHG0L8HcOQShjLuNTgmKKWmYGWsGRpIfLH5/d
- oa+g==
+ bh=jDcYY0K/h58b0nGwvA6H9r7tjjvba9vWIRW+Z67cCA4=;
+ b=oQ3z908AvEQRme7iG1uz1lKCs6Sy6/tj9h1zPvoFHix4qZodDGFhUIN/miFGXZbXbN
+ 5HEO0CDyhoey7YK1VdGxf6HbCFPbKfsjoBZr43udfkDnp+juGEL+sMbP2+JmagyNP3UO
+ 7U/IuBXgDNV7PjWl3XR/Jf8GjEvgGo8v7F4kV5ByU9MwH70xST4V4pUTCbxWHLFwF+DP
+ NaIwwm3AaotxVtjj+JsSJnkwxRW7UfojKU+VLi85PDNaubicz8447kV0C38CKzkOs5Hp
+ jC4w4fqAcYUIMyGSfT5hseFc1inuFHkOlAX/PU4szRACUXpuac3kQbJbjj8EP3dtgy7Q
+ BwaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=ffO5CG6O0bdtGu4nC+qXhrBBPdnKSoatcxODngYecGI=;
- b=gPxcz0L0+UZoCVJn51hOWUeRBBKs93JBv4NlvRAkHupbMXbnw6QvmqTWEF/gHUP928
- RBpNivfwqr8qvzEIqhIfq5ZyukDhGpdtTauOE1tTpEOANPnpkD1feVqmGx5Irbud3tH1
- pjOOY1ovGkf+fqIrnGu0PiA7+tNQsq+e36aSTCKT5d6kYYkJVlydrIkeAVhsWk8XGxC+
- n2OGsDZla+0AQQA6cnWaC0/7gEOH4nN0lQCPEOCRvyyKf5o79+mbCyygEe1CyAE5e+Tq
- iTIGTBQsGXUnwc7Xuam3d2lyh1JquJdSi0f5OrnjXv2NZ6nEr/S84FLbuxS+xmT2g6Yq
- ItIw==
-X-Gm-Message-State: AOAM530gIOuKckzAcPaCJN3138nSjORLsMSB4rDST486aoBfq2pNBWtB
- 7RUrZ/74F4hAbXWCVrabH3E=
-X-Google-Smtp-Source: ABdhPJwAf5Q8/n+WJy9/GfsgMskSh2Wu2G4J8XutUcmvBTjeu49udYsJcrQBO249L4FF3apXd4jPIw==
-X-Received: by 2002:aca:48cc:: with SMTP id v195mr2282643oia.57.1598714323317; 
- Sat, 29 Aug 2020 08:18:43 -0700 (PDT)
+ bh=jDcYY0K/h58b0nGwvA6H9r7tjjvba9vWIRW+Z67cCA4=;
+ b=mKT6ACESUQhzZaSPLy2W+lKlOHjRQgIwwrb4M7gRt7Y8AXWW4jhlwQRTUFt5CzI3tt
+ Hm0UhN9yxNDhA6TL7YdmK9dHYP8VEiJElTWmiF/63c/LHwhYB2PdomPMpuvw5iGYyDa3
+ 4fvRpwijpDSFzPxsKqkQXp0JF4TFuifzsph5TONxTTU7R29XCKmAc4CchHJ7Mh64lRpx
+ DH2RC9QsKF8Y5ELO3VapMziG+t0Ldgz0nVvWYcg/sDZcToYklL1aCa8i3U6stmCVyyEO
+ 0s6vqrG7vD9h6t6iz+PCcEzCxlrEtT1GBi9rF9yy6vS3+uwzvZ3e3QTdQBwPu6rWgt6H
+ HA0w==
+X-Gm-Message-State: AOAM533BW3A0ZMPGiRgKLFruUO64TjgQJyWIGh2Eoq9FZ0RYYQtnwcfq
+ Er1SY2LSrd7OBecE3P45q5U=
+X-Google-Smtp-Source: ABdhPJzrvOqhJrioJvbe3LvHWSCigMKanQL3nS3od2FJAzHn8UeZuASgqGdcYQFxDJT6o5SwN77vYg==
+X-Received: by 2002:a05:6830:4001:: with SMTP id
+ h1mr2323678ots.219.1598714290210; 
+ Sat, 29 Aug 2020 08:18:10 -0700 (PDT)
 Received: from pek-vx-bsp2.wrs.com (unknown-146-144.windriver.com.
  [147.11.146.144])
- by smtp.gmail.com with ESMTPSA id f50sm58181otf.47.2020.08.29.08.18.39
+ by smtp.gmail.com with ESMTPSA id f50sm58181otf.47.2020.08.29.08.18.06
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sat, 29 Aug 2020 08:18:42 -0700 (PDT)
+ Sat, 29 Aug 2020 08:18:09 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Palmer Dabbelt <palmerdabbelt@google.com>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Subject: [PATCH v2 10/16] hw/riscv: microchip_pfsoc: Connect a DMA controller
-Date: Sat, 29 Aug 2020 23:17:34 +0800
-Message-Id: <1598714261-8320-11-git-send-email-bmeng.cn@gmail.com>
+Subject: [PATCH v2 01/16] target/riscv: cpu: Add a new 'resetvec' property
+Date: Sat, 29 Aug 2020 23:17:25 +0800
+Message-Id: <1598714261-8320-2-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1598714261-8320-1-git-send-email-bmeng.cn@gmail.com>
 References: <1598714261-8320-1-git-send-email-bmeng.cn@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
- envelope-from=bmeng.cn@gmail.com; helo=mail-oi1-x243.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,122 +109,49 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-On the Icicle Kit board, the HSS firmware utilizes the on-chip DMA
-controller to move the 2nd stage bootloader in the system memory.
-Let's connect a DMA controller to Microchip PolarFire SoC.
+Currently the reset vector address is hard-coded in a RISC-V CPU's
+instance_init() routine. In a real world we can have 2 exact same
+CPUs except for the reset vector address, which is pretty common in
+the RISC-V core IP licensing business.
+
+Normally reset vector address is a configurable parameter. Let's
+create a 64-bit property to store the reset vector address which
+covers both 32-bit and 64-bit CPUs.
 
 Signed-off-by: Bin Meng <bin.meng@windriver.com>
-
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 ---
 
-Changes in v2:
-- connect 8 IRQs to the PLIC
+(no changes since v1)
 
- include/hw/riscv/microchip_pfsoc.h | 11 +++++++++++
- hw/riscv/microchip_pfsoc.c         | 15 +++++++++++++++
- hw/riscv/Kconfig                   |  1 +
- 3 files changed, 27 insertions(+)
+ target/riscv/cpu.h | 1 +
+ target/riscv/cpu.c | 1 +
+ 2 files changed, 2 insertions(+)
 
-diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-index d810ee8..63e7860 100644
---- a/include/hw/riscv/microchip_pfsoc.h
-+++ b/include/hw/riscv/microchip_pfsoc.h
-@@ -23,6 +23,7 @@
- #define HW_MICROCHIP_PFSOC_H
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 383808b..dc350f0 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -291,6 +291,7 @@ typedef struct RISCVCPU {
+         uint16_t elen;
+         bool mmu;
+         bool pmp;
++        uint64_t resetvec;
+     } cfg;
+ } RISCVCPU;
  
- #include "hw/char/mchp_pfsoc_mmuart.h"
-+#include "hw/dma/sifive_pdma.h"
- #include "hw/sd/cadence_sdhci.h"
- 
- typedef struct MicrochipPFSoCState {
-@@ -40,6 +41,7 @@ typedef struct MicrochipPFSoCState {
-     MchpPfSoCMMUartState *serial2;
-     MchpPfSoCMMUartState *serial3;
-     MchpPfSoCMMUartState *serial4;
-+    SiFivePDMAState dma;
-     CadenceSDHCIState sdhci;
- } MicrochipPFSoCState;
- 
-@@ -71,6 +73,7 @@ enum {
-     MICROCHIP_PFSOC_BUSERR_UNIT4,
-     MICROCHIP_PFSOC_CLINT,
-     MICROCHIP_PFSOC_L2CC,
-+    MICROCHIP_PFSOC_DMA,
-     MICROCHIP_PFSOC_L2LIM,
-     MICROCHIP_PFSOC_PLIC,
-     MICROCHIP_PFSOC_MMUART0,
-@@ -88,6 +91,14 @@ enum {
+diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
+index 228b9bd..8067a26 100644
+--- a/target/riscv/cpu.c
++++ b/target/riscv/cpu.c
+@@ -518,6 +518,7 @@ static Property riscv_cpu_properties[] = {
+     DEFINE_PROP_UINT16("elen", RISCVCPU, cfg.elen, 64),
+     DEFINE_PROP_BOOL("mmu", RISCVCPU, cfg.mmu, true),
+     DEFINE_PROP_BOOL("pmp", RISCVCPU, cfg.pmp, true),
++    DEFINE_PROP_UINT64("resetvec", RISCVCPU, cfg.resetvec, DEFAULT_RSTVEC),
+     DEFINE_PROP_END_OF_LIST(),
  };
  
- enum {
-+    MICROCHIP_PFSOC_DMA_IRQ0 = 5,
-+    MICROCHIP_PFSOC_DMA_IRQ1 = 6,
-+    MICROCHIP_PFSOC_DMA_IRQ2 = 7,
-+    MICROCHIP_PFSOC_DMA_IRQ3 = 8,
-+    MICROCHIP_PFSOC_DMA_IRQ4 = 9,
-+    MICROCHIP_PFSOC_DMA_IRQ5 = 10,
-+    MICROCHIP_PFSOC_DMA_IRQ6 = 11,
-+    MICROCHIP_PFSOC_DMA_IRQ7 = 12,
-     MICROCHIP_PFSOC_EMMC_SD_IRQ = 88,
-     MICROCHIP_PFSOC_MMUART0_IRQ = 90,
-     MICROCHIP_PFSOC_MMUART1_IRQ = 91,
-diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-index 0b2e9ca..d8ec973 100644
---- a/hw/riscv/microchip_pfsoc.c
-+++ b/hw/riscv/microchip_pfsoc.c
-@@ -13,6 +13,7 @@
-  * 2) eNVM (Embedded Non-Volatile Memory)
-  * 3) MMUARTs (Multi-Mode UART)
-  * 4) Cadence eMMC/SDHC controller and an SD card connected to it
-+ * 5) SiFive Platform DMA (Direct Memory Access Controller)
-  *
-  * This board currently generates devicetree dynamically that indicates at least
-  * two harts and up to five harts.
-@@ -71,6 +72,7 @@ static const struct MemmapEntry {
-     [MICROCHIP_PFSOC_BUSERR_UNIT4] =    {  0x1704000,     0x1000 },
-     [MICROCHIP_PFSOC_CLINT] =           {  0x2000000,    0x10000 },
-     [MICROCHIP_PFSOC_L2CC] =            {  0x2010000,     0x1000 },
-+    [MICROCHIP_PFSOC_DMA] =             {  0x3000000,   0x100000 },
-     [MICROCHIP_PFSOC_L2LIM] =           {  0x8000000,  0x2000000 },
-     [MICROCHIP_PFSOC_PLIC] =            {  0xc000000,  0x4000000 },
-     [MICROCHIP_PFSOC_MMUART0] =         { 0x20000000,     0x1000 },
-@@ -114,6 +116,9 @@ static void microchip_pfsoc_soc_instance_init(Object *obj)
-                          TYPE_RISCV_CPU_SIFIVE_U54);
-     qdev_prop_set_uint64(DEVICE(&s->u_cpus), "resetvec", RESET_VECTOR);
- 
-+    object_initialize_child(obj, "dma-controller", &s->dma,
-+                            TYPE_SIFIVE_PDMA);
-+
-     object_initialize_child(obj, "sd-controller", &s->sdhci,
-                             TYPE_CADENCE_SDHCI);
- }
-@@ -218,6 +223,16 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-         memmap[MICROCHIP_PFSOC_PLIC].size);
-     g_free(plic_hart_config);
- 
-+    /* DMA */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->dma), errp);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->dma), 0,
-+                    memmap[MICROCHIP_PFSOC_DMA].base);
-+    for (i = 0; i < SIFIVE_PDMA_IRQS; i++) {
-+        sysbus_connect_irq(SYS_BUS_DEVICE(&s->dma), i,
-+                           qdev_get_gpio_in(DEVICE(s->plic),
-+                                            MICROCHIP_PFSOC_DMA_IRQ0 + i));
-+    }
-+
-     /* SYSREG */
-     create_unimplemented_device("microchip.pfsoc.sysreg",
-         memmap[MICROCHIP_PFSOC_SYSREG].base,
-diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-index 7412db9..9032cb0 100644
---- a/hw/riscv/Kconfig
-+++ b/hw/riscv/Kconfig
-@@ -55,4 +55,5 @@ config MICROCHIP_PFSOC
-     select SIFIVE
-     select UNIMP
-     select MCHP_PFSOC_MMUART
-+    select SIFIVE_PDMA
-     select CADENCE_SDHCI
 -- 
 2.7.4
 
