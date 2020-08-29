@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF554C433E6
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:47:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48CC4C433E6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:48:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFC1520838
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:47:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFC1520838
+	by mail.kernel.org (Postfix) with ESMTPS id 17E6120838
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:48:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17E6120838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBqtR-00053d-Ug
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 22:47:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49658)
+	id 1kBquS-0005w3-Aa
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 22:48:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBqod-0003gQ-Fw
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:42:03 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4675 helo=huawei.com)
+ id 1kBqod-0003hz-Vm
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:42:04 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4673 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBqoa-000236-Fj
+ id 1kBqoY-00021y-Rj
  for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:42:03 -0400
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 90302863C3DFA0DA8609;
+ by Forcepoint Email with ESMTP id 7FB4033952FFD65774C1;
  Sat, 29 Aug 2020 10:41:48 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS413-HUB.china.huawei.com
  (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Sat, 29 Aug 2020
- 10:41:41 +0800
+ 10:41:38 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>, <dme@dme.org>
-Subject: [PATCH v6 12/12] migration/dirtyrate: Add trace_calls to make it
- easier to debug
-Date: Sat, 29 Aug 2020 10:52:57 +0800
-Message-ID: <1598669577-76914-13-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v6 07/12] migration/dirtyrate: Compare page hash results for
+ recorded sampled page
+Date: Sat, 29 Aug 2020 10:52:52 +0800
+Message-ID: <1598669577-76914-8-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
 References: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
@@ -80,93 +80,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add trace_calls to  make it easier to debug
+Compare page hash results for recorded sampled page.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
 ---
- migration/dirtyrate.c  | 9 +++++++++
- migration/trace-events | 8 ++++++++
- 2 files changed, 17 insertions(+)
+ migration/dirtyrate.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 63 insertions(+)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index fa1a12d..2a8f4ff 100644
+index f4967fd..9cc2cbb 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -22,6 +22,7 @@
- #include "qapi/qapi-commands-migration.h"
- #include "migration.h"
- #include "ram.h"
-+#include "trace.h"
- #include "dirtyrate.h"
+@@ -193,6 +193,69 @@ static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
+     return 0;
+ }
  
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-@@ -54,6 +55,7 @@ static bool get_sample_page_period(int64_t sec)
- static int dirtyrate_set_state(int *state, int old_state, int new_state)
++static void calc_page_dirty_rate(struct RamblockDirtyInfo *info)
++{
++    uint32_t crc;
++    int i;
++
++    for (i = 0; i < info->sample_pages_count; i++) {
++        crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
++        if (crc != info->hash_result[i]) {
++            info->sample_dirty_count++;
++        }
++    }
++}
++
++static struct RamblockDirtyInfo *
++find_page_matched(RAMBlock *block, int count,
++                  struct RamblockDirtyInfo *infos)
++{
++    int i;
++    struct RamblockDirtyInfo *matched;
++
++    for (i = 0; i < count; i++) {
++        if (!strcmp(infos[i].idstr, qemu_ram_get_idstr(block))) {
++            break;
++        }
++    }
++
++    if (i == count) {
++        return NULL;
++    }
++
++    if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
++        infos[i].ramblock_pages !=
++            (qemu_ram_get_used_length(block) >> TARGET_PAGE_BITS)) {
++        return NULL;
++    }
++
++    matched = &infos[i];
++
++    return matched;
++}
++
++static int compare_page_hash_info(struct RamblockDirtyInfo *info,
++                                  int block_index)
++{
++    struct RamblockDirtyInfo *block_dinfo = NULL;
++    RAMBlock *block = NULL;
++
++    RAMBLOCK_FOREACH_MIGRATABLE(block) {
++        block_dinfo = find_page_matched(block, block_index + 1, info);
++        if (block_dinfo == NULL) {
++            continue;
++        }
++        calc_page_dirty_rate(block_dinfo);
++        update_dirtyrate_stat(block_dinfo);
++    }
++
++    if (!DirtyStat.total_sample_count) {
++        return -1;
++    }
++
++    return 0;
++}
++
+ static void calculate_dirtyrate(struct DirtyRateConfig config)
  {
-     assert(new_state < DIRTY_RATE_STATUS__MAX);
-+    trace_dirtyrate_set_state(DirtyRateStatus_str(new_state));
-     if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
-         return 0;
-     } else {
-@@ -76,6 +78,8 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
-     info->start_time = DirtyStat.start_time;
-     info->calc_time = DirtyStat.calc_time;
- 
-+    trace_query_dirty_rate_info(DirtyRateStatus_str(CalculatingState));
-+
-     return info;
- }
- 
-@@ -123,6 +127,7 @@ static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
-     crc = crc32(0, (info->ramblock_addr +
-                 vfn * TARGET_PAGE_SIZE), TARGET_PAGE_SIZE);
- 
-+    trace_get_ramblock_vfn_hash(info->idstr, vfn, crc);
-     return crc;
- }
- 
-@@ -228,6 +233,8 @@ static bool skip_sample_ramblock(RAMBlock *block)
-      * want to sample.
-      */
-     if (qemu_ram_get_used_length(block) < (MIN_RAMBLOCK_SIZE << 10)) {
-+        trace_skip_sample_ramblock(block->idstr,
-+                                   qemu_ram_get_used_length(block));
-         return true;
-     }
- 
-@@ -274,6 +281,7 @@ static void calc_page_dirty_rate(struct RamblockDirtyInfo *info)
-     for (i = 0; i < info->sample_pages_count; i++) {
-         crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
-         if (crc != info->hash_result[i]) {
-+            trace_calc_page_dirty_rate(info->idstr, crc, info->hash_result[i]);
-             info->sample_dirty_count++;
-         }
-     }
-@@ -299,6 +307,7 @@ find_page_matched(RAMBlock *block, int count,
-     if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
-         infos[i].ramblock_pages !=
-             (qemu_ram_get_used_length(block) >> TARGET_PAGE_BITS)) {
-+        trace_find_page_matched(block->idstr);
-         return NULL;
-     }
- 
-diff --git a/migration/trace-events b/migration/trace-events
-index 4ab0a50..8c2b58f 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -312,3 +312,11 @@ dirty_bitmap_load_bits_zeroes(void) ""
- dirty_bitmap_load_header(uint32_t flags) "flags 0x%x"
- dirty_bitmap_load_enter(void) ""
- dirty_bitmap_load_success(void) ""
-+
-+# dirtyrate.c
-+dirtyrate_set_state(const char *new_state) "new state %s"
-+query_dirty_rate_info(const char *new_state) "current state %s"
-+get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock name: %s, vfn: %"PRIu64 ", crc: %" PRIu32
-+calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
-+skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
-+find_page_matched(const char *idstr) "ramblock %s addr or size changed"
+     /* todo */
 -- 
 1.8.3.1
 
