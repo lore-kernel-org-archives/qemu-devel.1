@@ -7,82 +7,84 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C103C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 01:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC3E1C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:03:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3222B207BB
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 01:59:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70E2D20838
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:03:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GoeDevt8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3222B207BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GI1Dao3K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70E2D20838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBq8x-0004nJ-A4
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 21:58:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43908)
+	id 1kBqDD-00063m-IP
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 22:03:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBq87-0004Ig-0S
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 21:58:07 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41243)
+ id 1kBqCh-0005eO-Uk
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:02:51 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:35514)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kBq85-0004gA-GP
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 21:58:06 -0400
-Received: by mail-pf1-x443.google.com with SMTP id t9so1535472pfq.8
- for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 18:58:04 -0700 (PDT)
+ id 1kBqCg-0005Co-6i
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:02:51 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id g6so377477pjl.0
+ for <qemu-devel@nongnu.org>; Fri, 28 Aug 2020 19:02:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Xg7a5MDuZv5G6oZmTXPqF91ZxxtVVJWURaJIL7UKDcQ=;
- b=GoeDevt8M5GRIhId1sYr5bzoYlIYOdGf5SVQIbXBTY2vepslG2qzaMWiU5vMbI6Qnk
- O4vXOV71AIQqMAMFWO3UkXrcYOrwGT1ga5iPZtp2sJmHU5I0ukLfp1BbgImQHDZ8b/cK
- x+b1tlIo5x0J09FfoW0fdEfj5feU3vgJld6pT2C6tTxIrLZkIMN0thdg4+7O2PGjq7nr
- YkYbusxN34yxgNHb6XRcH8Rmnl8b9syJgCdAu3BIbUtAM3LbXxFUfMxLKNvV35/EdjA3
- LIIp+SNq9t1nDkpkKLSotFcNL2uq3sdgG9A+orZpZVia+ZVczdeLrgAKlwCeilKZTQJe
- bFnw==
+ bh=eb/QSNln2gvty3yqgN0kmbPLfUGQJkxG4tpmjUuCHaM=;
+ b=GI1Dao3Kw9WrSRUaYiGVGKmGJ+Kml2M2QSbcg2Oa0RVYYtHMsv87kpBXCs08c2rfCW
+ ePLGYsPP+99iz9YBvwc1lB1QuVErY2U58etr8RWJE43V42nSnRhuNORPhfDpBkPGgPmX
+ hfKdLUfzglQu7c7rB84gFxDqrwplvekG1pIHlAC2xCL66ZUtzxYYXg8gfcMilXw+yAFp
+ Ex16GDFYv+0OpjYRU0MjwockGc38l+NpZt+IF+2nUSGML1lmGAQ9MhwIg48rxbxQUOQN
+ d/tZk6cXHsA0h28CXMJfGMu+NNU+MPjl1egqVNGemogjbKWoSgQH4VakRUFD015wa7kW
+ j7zQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Xg7a5MDuZv5G6oZmTXPqF91ZxxtVVJWURaJIL7UKDcQ=;
- b=pRU1l5ZLeOqq702WDlfdTWCuE+4f0URi+4r1hVMDQ7/YtgoH9U33KjuPc/BCt08ym/
- wgQb23A6nX10Fc2k6WzErM2XDKokmoBl9NxRAoq6fjG1Y4AOYU8+ScX40Nh7VXi4Pgep
- 7O2gqtmdtkQk33M469vF1RYYIdP5Blwvf+wjsSs3QR0XjCfFaXvweKtChRK0keyOHjM9
- L0JtYt+9h9u9i3+8Oq95hLOxIrxij40HsXR8nH3skMVJPA0sQI9ZDeaoNxynPIVupzHV
- 7zmsvTxgeNIfoQ0fnsEtAP5IT6pnUw5faBcHfC89qrxB1FLp6i5+lSCIePXJNTcMvyCa
- 2BCA==
-X-Gm-Message-State: AOAM532MHOqouzMd1XVcLpXIbu9lu5DU/dZTZFXZoi6z8W0xiRBjNZZw
- Ui6sTuAnDACFDZ+42imFMBLu2w==
-X-Google-Smtp-Source: ABdhPJylRswLn00xZAPdqezpTdVJOfShSAeKsX6lRevKu1Cm/++DTTEqbFmhF/aJf99exZS9RRUFkQ==
-X-Received: by 2002:a63:fc4b:: with SMTP id r11mr1084558pgk.342.1598666283859; 
- Fri, 28 Aug 2020 18:58:03 -0700 (PDT)
+ bh=eb/QSNln2gvty3yqgN0kmbPLfUGQJkxG4tpmjUuCHaM=;
+ b=JkJuCrR9TO8+zEqlhHxsKf0ArqlnFuAj7Z9ldjC9LUz3rFbc7sEuLqr26M/MSv5E7S
+ 2IIgWX3LwGJI3pD50FF3q6C+jlJ3tmC5elD5yIGCVBDrMemuEJTOUCMINqJ4FlSF0cNl
+ qF12Q89KdJI9nptnoqKCiljfB67FzHjf3OfWHczMsewo3OSp7mth3VqsSJArR4Ecyt09
+ uXLaMRZGBYlYQFGJytzKV1Uq7J0E8ZvLUG/+i4KGH8/nnVZDeM1yufQYs9wlNP0uraa5
+ oQOgfMdlXdOTdw1qaksuH5HirndcP2lh5lZMHXc/bcW1WVNHZrt8AXqcoROJGQOe4dy3
+ kJRw==
+X-Gm-Message-State: AOAM531JtJAJailZ66qTYAE4Zbbfs2nLR/wCt/I6t4YsShPtWpekKS+t
+ hcWd5Ef7lb7Vcr9yf91xGMDbOw==
+X-Google-Smtp-Source: ABdhPJwhL6XoWdOiM0XJrGl+nGLQxYMXSYZ6Uuj1NPHOwW+ry5cjfX3ROsbwO2x0Cdz02otjXTxKNg==
+X-Received: by 2002:a17:90a:bc94:: with SMTP id
+ x20mr1389324pjr.45.1598666568755; 
+ Fri, 28 Aug 2020 19:02:48 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id i1sm701590pfo.212.2020.08.28.18.58.02
+ by smtp.gmail.com with ESMTPSA id h65sm709790pfb.210.2020.08.28.19.02.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 28 Aug 2020 18:58:02 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 29/34] Hexagon (target/hexagon) TCG generation
+ Fri, 28 Aug 2020 19:02:48 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 30/34] Hexagon (target/hexagon) TCG for
+ instructions with multiple definitions
 To: Taylor Simpson <tsimpson@quicinc.com>, qemu-devel@nongnu.org
 References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
- <1597765847-16637-30-git-send-email-tsimpson@quicinc.com>
+ <1597765847-16637-31-git-send-email-tsimpson@quicinc.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8c139500-7e22-a99b-fe00-1c7eecb64246@linaro.org>
-Date: Fri, 28 Aug 2020 18:58:00 -0700
+Message-ID: <10127f7e-a2df-2f19-e897-9a874f9a5d82@linaro.org>
+Date: Fri, 28 Aug 2020 19:02:46 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <1597765847-16637-30-git-send-email-tsimpson@quicinc.com>
+In-Reply-To: <1597765847-16637-31-git-send-email-tsimpson@quicinc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -28
@@ -111,30 +113,16 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/18/20 8:50 AM, Taylor Simpson wrote:
-> +/* Fill in the table with NULLs because not all the opcodes have DEF_QEMU */
-> +semantic_insn_t opcode_genptr[] = {
-> +#define OPCODE(X)                              NULL
-> +#include "opcodes_def_generated.h"
-> +    NULL
-> +#undef OPCODE
-> +};
-> +
-> +/* This function overwrites the NULL entries where we have a DEF_QEMU */
-> +void init_genptr(void)
-> +{
-> +#define DEF_TCG_FUNC(TAG, GENFN) \
-> +    opcode_genptr[TAG] = generate_##TAG;
-> +#include "tcg_funcs_generated.h"
-> +#undef DEF_TCG_FUNC
-> +}
+> +++ b/target/hexagon/helper.h
+> @@ -15,6 +15,8 @@
+>   *  along with this program; if not, see <http://www.gnu.org/licenses/>.
+>   */
+>  
+> +#include "gen_tcg.h"
 
-Just size the array properly to start.
+Why would you need this here?  Definitely looks wrong.
 
-const semantic_insn_t opcode_genptr[XX_LAST_OPCODE] = {
 
-#define DEF_TCG_FUNC(TAG, GENFN) \
-    [TAG] = generate_##TAG,
-#include "tcg_funcs_generated.h"
+r~
 
-};
 
