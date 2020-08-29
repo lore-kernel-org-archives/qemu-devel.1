@@ -2,69 +2,93 @@ Return-Path: <SRS0=OYoK=CH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	FROM_LOCAL_NOVOWEL,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C67AEC433E6
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 10:42:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB0E2C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 10:49:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D3C02076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 10:42:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3C02076D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
+	by mail.kernel.org (Postfix) with ESMTPS id A0C6F20825
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 10:49:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nffiYWHH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0C6F20825
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kByJt-0002Zc-Ot
-	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 06:42:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55270)
+	id 1kByPr-00046N-S0
+	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 06:48:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
- id 1kByJD-0001tB-5C
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 06:42:07 -0400
-Received: from mailout08.t-online.de ([194.25.134.20]:58618)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
- id 1kByJA-0007yn-U5
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 06:42:06 -0400
-Received: from fwd04.aul.t-online.de (fwd04.aul.t-online.de [172.20.26.149])
- by mailout08.t-online.de (Postfix) with SMTP id 8104F411C908;
- Sat, 29 Aug 2020 12:42:01 +0200 (CEST)
-Received: from linpower.localnet
- (bNl1qiZ6QhY7rPjYlpJP7J565md+5zNtzzdyqaaH7C8EaEnh0TejTDht94QylqmQeG@[93.236.153.131])
- by fwd04.t-online.de
- with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
- esmtp id 1kByJ4-20FM5g0; Sat, 29 Aug 2020 12:41:58 +0200
-Received: by linpower.localnet (Postfix, from userid 1000)
- id 443BD200637; Sat, 29 Aug 2020 12:41:58 +0200 (CEST)
-From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH] meson: fix SDL2_image detection
-Date: Sat, 29 Aug 2020 12:41:58 +0200
-Message-Id: <20200829104158.7461-1-vr_qemu@t-online.de>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1kByPB-0003gA-L5
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 06:48:17 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:56166)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jcmvbkbc@gmail.com>)
+ id 1kByPA-000082-Ae
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 06:48:17 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id 2so724589pjx.5
+ for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 03:48:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=1yo7JQ5QRR44B/zQ3mXm4YUcLjnziUu9+pZ2amneVmQ=;
+ b=nffiYWHHiUiZ/Ohk8rkTYMXcXwSrhPZNx6+7Luw5LuIQNeKyVOypL/umCc2Y0Xi2os
+ WjrOjke7stJAAPYZhx/7qmKCMXX4V+6rEYsM1HjFFEFmtixGXAnLA9PX7cjHoJHo3COX
+ 0wdYKUHWCebaDZeKk/gQrxEPqbu04ipBp0kCUrVDzUviJ2InnIWJ1X7C3zm/yVerWeAQ
+ U7s7DxDAZF+dwu8RfWcuG9ZUNvk4cdFxZLHPtgCGnhQBDxLoGrIJSqpsJDxj0m4OpeJZ
+ IMKd0JCgmkVNk8jKu4l0zfvavztZPHQsaQr0vUojrUpNeGWEkPuWyxoawsS8qGRs3bsi
+ U2Kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=1yo7JQ5QRR44B/zQ3mXm4YUcLjnziUu9+pZ2amneVmQ=;
+ b=BCP5j/82H9X2VngHTfz/7fDfQd3DL0Khl84FTeexD2nFUjBVodv9Fy+9Vd5mStnGpQ
+ 9LIBrrrlUAFX+Ad+RSTP0pymASH3ZmPWOXgh9ZzlPTc4IFdr98gBqT1bsXDTLsHUoF5V
+ HrKygzjUfKfHN1NCxYRZygP+otyaKed1MU8KYHHByzo50p2HSFXZczVPHq0Yex6OuvpG
+ jR2ls+kRgvUotDvCGxdX7sbPEVJXkhYnNnyX+E5tx3xMGnd6tR05cYLTFmdyPs5Cws35
+ tBURuk7vJJSxpblkyg3y/0LDM2tFmAjk4rZvzxTpk/1bNA1Wo/LdF0KJHfzQXW/4Idxm
+ RMGQ==
+X-Gm-Message-State: AOAM531GPuTG0fHLjEdOdAUeYpVVemk3maUAaAjbLqsKhyjuK2mRc3tt
+ 9ML9TbW5sMAvm3/csbe40jh9qGEsHK4=
+X-Google-Smtp-Source: ABdhPJw4w7bHs5/29IFfu3rd74M+c3c6YhjouHL8ASvjOQl0A++PypBOAyhh4hrIrZovu6CYRtl6qQ==
+X-Received: by 2002:a17:90a:bd87:: with SMTP id
+ z7mr2589102pjr.187.1598698094215; 
+ Sat, 29 Aug 2020 03:48:14 -0700 (PDT)
+Received: from octofox.hsd1.ca.comcast.net
+ ([2601:641:401:26c0:5caa:fe49:9c90:e47c])
+ by smtp.gmail.com with ESMTPSA id ft12sm1789028pjb.6.2020.08.29.03.48.12
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 29 Aug 2020 03:48:13 -0700 (PDT)
+From: Max Filippov <jcmvbkbc@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] target/xtensa: enable all coprocessors for linux-user
+Date: Sat, 29 Aug 2020 03:47:58 -0700
+Message-Id: <20200829104758.22337-1-jcmvbkbc@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-ID: bNl1qiZ6QhY7rPjYlpJP7J565md+5zNtzzdyqaaH7C8EaEnh0TejTDht94QylqmQeG
-X-TOI-EXPURGATEID: 150726::1598697718-00004F6D-F4CB8C37/0/0 CLEAN NORMAL
-X-TOI-MSGID: 2ea7af8c-6bbd-4832-88aa-cf000e6e2361
-Received-SPF: none client-ip=194.25.134.20;
- envelope-from=volker.ruemelin@t-online.de; helo=mailout08.t-online.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/29 06:42:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=jcmvbkbc@gmail.com; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -5
 X-Spam_score: -0.6
 X-Spam_bar: /
-X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- SPOOFED_FREEMAIL=1.26 autolearn=no autolearn_force=no
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FROM_LOCAL_NOVOWEL=0.5, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,47 +101,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>
+Cc: Max Filippov <jcmvbkbc@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Configure used to probe for SDL2_image in sdl_image_probe (). Meson
-should do the same.
+Linux userspace always sees coprocessors as enabled. CPENABLE register
+and coprocessor exceptions are used internally by the kernel to manage
+lazy coprocessor context switch. None of it is needed for linux-user.
+Always enable all coprocessors for user emulation.
 
-This fixes the following error on my system:
-
-Run-time dependency sdl2 found: YES 2.0.8
-Found CMake: /usr/bin/cmake (3.17.0)
-Run-time dependency sdl-image found: NO (tried pkgconfig and cmake)
-
-../qemu-master/meson.build:256:2: ERROR: Dependency "sdl-image" not
-found, tried pkgconfig and cmake
-
-A full log can be found at /home/ruemelin/rpmbuild/BUILD
-/qemu-5.1.50-build/meson-logs/meson-log.txt
-
-ERROR: meson setup failed
-
-Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
 ---
- meson.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/xtensa/cpu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/meson.build b/meson.build
-index 74f8ea0c2e..8204878860 100644
---- a/meson.build
-+++ b/meson.build
-@@ -248,7 +248,7 @@ if sdl.found()
-   # work around 2.0.8 bug
-   sdl = declare_dependency(compile_args: '-Wno-undef',
-                            dependencies: sdl)
--  sdl_image = dependency('sdl-image', required: get_option('sdl_image'),
-+  sdl_image = dependency('SDL2_image', required: get_option('sdl_image'),
-                          static: enable_static)
- else
-   if get_option('sdl_image').enabled()
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index 6a033e778c95..88a32268a18b 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -93,6 +93,7 @@ static void xtensa_cpu_reset(DeviceState *dev)
+         !xtensa_abi_call0()) {
+         env->sregs[PS] |= PS_WOE;
+     }
++    env->sregs[CPENABLE] = 0xff;
+ #endif
+     env->sregs[VECBASE] = env->config->vecbase;
+     env->sregs[IBREAKENABLE] = 0;
 -- 
-2.26.2
+2.20.1
 
 
