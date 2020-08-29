@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F029C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842F4C433E6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:46:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEDF220CC7
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:44:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEDF220CC7
+	by mail.kernel.org (Postfix) with ESMTPS id 5126F20838
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:46:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5126F20838
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBqrI-0001CW-4D
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 22:44:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49652)
+	id 1kBqsR-0002xr-H1
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 22:45:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBqob-0003bQ-Jp
+ id 1kBqob-0003a2-1N
  for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:42:01 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4670 helo=huawei.com)
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4672 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBqoY-00021j-54
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:42:01 -0400
+ id 1kBqoY-00021z-S2
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:42:00 -0400
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 81BD3796DC94046FC45F;
- Sat, 29 Aug 2020 10:41:43 +0800 (CST)
+ by Forcepoint Email with ESMTP id 852BD700112ADC70577B;
+ Sat, 29 Aug 2020 10:41:48 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS413-HUB.china.huawei.com
  (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Sat, 29 Aug 2020
- 10:41:37 +0800
+ 10:41:40 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>, <dme@dme.org>
-Subject: [PATCH v6 05/12] migration/dirtyrate: move
- RAMBLOCK_FOREACH_MIGRATABLE into ram.h
-Date: Sat, 29 Aug 2020 10:52:50 +0800
-Message-ID: <1598669577-76914-6-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v6 10/12] migration/dirtyrate: Implement calculate_dirtyrate()
+ function
+Date: Sat, 29 Aug 2020 10:52:55 +0800
+Message-ID: <1598669577-76914-11-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
 References: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
@@ -80,77 +80,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RAMBLOCK_FOREACH_MIGRATABLE is need in dirtyrate measure,
-move the existing definition up into migration/ram.h
+Implement calculate_dirtyrate() function.
 
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
 ---
- migration/dirtyrate.c |  1 +
- migration/ram.c       | 11 +----------
- migration/ram.h       | 10 ++++++++++
- 3 files changed, 12 insertions(+), 10 deletions(-)
+ migration/dirtyrate.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 43 insertions(+), 2 deletions(-)
 
 diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index fa7a1db..35b5c69 100644
+index 850126d..95ee23e 100644
 --- a/migration/dirtyrate.c
 +++ b/migration/dirtyrate.c
-@@ -20,6 +20,7 @@
- #include "qemu/rcu_queue.h"
- #include "qapi/qapi-commands-migration.h"
- #include "migration.h"
-+#include "ram.h"
- #include "dirtyrate.h"
- 
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-diff --git a/migration/ram.c b/migration/ram.c
-index 76d4fee..37ef0da 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -158,21 +158,12 @@ out:
-     return ret;
+@@ -162,6 +162,21 @@ static void get_ramblock_dirty_info(RAMBlock *block,
+     strcpy(info->idstr, qemu_ram_get_idstr(block));
  }
  
--static bool ramblock_is_ignored(RAMBlock *block)
-+bool ramblock_is_ignored(RAMBlock *block)
++static void free_ramblock_dirty_info(struct RamblockDirtyInfo *infos, int count)
++{
++    int i;
++
++    if (!infos) {
++        return;
++    }
++
++    for (i = 0; i < count; i++) {
++        g_free(infos[i].sample_page_vfn);
++        g_free(infos[i].hash_result);
++    }
++    g_free(infos);
++}
++
+ static struct RamblockDirtyInfo *
+ alloc_ramblock_dirty_info(int *block_index,
+                           struct RamblockDirtyInfo *block_dinfo)
+@@ -301,8 +316,34 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info,
+ 
+ static void calculate_dirtyrate(struct DirtyRateConfig config)
  {
-     return !qemu_ram_is_migratable(block) ||
-            (migrate_ignore_shared() && qemu_ram_is_shared(block));
+-    /* todo */
+-    return;
++    struct RamblockDirtyInfo *block_dinfo = NULL;
++    int block_index = 0;
++    int64_t msec = 0;
++    int64_t initial_time;
++
++    rcu_register_thread();
++    reset_dirtyrate_stat();
++    rcu_read_lock();
++    initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
++    if (record_ramblock_hash_info(&block_dinfo, config, &block_index) < 0) {
++        goto out;
++    }
++    rcu_read_unlock();
++
++    msec = config.sample_period_seconds * 1000;
++    msec = set_sample_page_period(msec, initial_time);
++
++    rcu_read_lock();
++    if (compare_page_hash_info(block_dinfo, block_index) < 0) {
++        goto out;
++    }
++
++    update_dirtyrate(msec);
++
++out:
++    rcu_read_unlock();
++    free_ramblock_dirty_info(block_dinfo, block_index + 1);
++    rcu_unregister_thread();
  }
  
--/* Should be holding either ram_list.mutex, or the RCU lock. */
--#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
--    INTERNAL_RAMBLOCK_FOREACH(block)                   \
--        if (ramblock_is_ignored(block)) {} else
--
--#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
--    INTERNAL_RAMBLOCK_FOREACH(block)                   \
--        if (!qemu_ram_is_migratable(block)) {} else
--
- #undef RAMBLOCK_FOREACH
- 
- int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque)
-diff --git a/migration/ram.h b/migration/ram.h
-index 2eeaacf..011e854 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -37,6 +37,16 @@ extern MigrationStats ram_counters;
- extern XBZRLECacheStats xbzrle_counters;
- extern CompressionStats compression_counters;
- 
-+bool ramblock_is_ignored(RAMBlock *block);
-+/* Should be holding either ram_list.mutex, or the RCU lock. */
-+#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
-+    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-+        if (ramblock_is_ignored(block)) {} else
-+
-+#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-+    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-+        if (!qemu_ram_is_migratable(block)) {} else
-+
- int xbzrle_cache_resize(int64_t new_size, Error **errp);
- uint64_t ram_bytes_remaining(void);
- uint64_t ram_bytes_total(void);
+ void *get_dirtyrate_thread(void *arg)
 -- 
 1.8.3.1
 
