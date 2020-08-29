@@ -2,67 +2,95 @@ Return-Path: <SRS0=OYoK=CH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B86EDC433E6
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 15:06:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E57C433E6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 15:19:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A4FF207DA
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 15:06:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A4FF207DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 09EAF20707
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 15:19:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gKALEd8i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09EAF20707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kC2Ql-00076G-Nr
-	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 11:06:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42842)
+	id 1kC2dc-0001pS-3n
+	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 11:19:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1kC2QE-0006eg-Bn
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 11:05:38 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:54899)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1kC2Q7-0003ci-1c
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 11:05:38 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.06561751|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_enroll_verification|0.0702077-0.000130234-0.929662;
- FP=0|0|0|0|0|-1|-1|-1; HT=e02c03306; MF=zhiwei_liu@c-sky.com; NM=1; PH=DS;
- RN=2; RT=2; SR=0; TI=SMTPD_---.IPmSxL4_1598713511; 
-Received: from 192.168.3.36(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.IPmSxL4_1598713511) by smtp.aliyun-inc.com(10.147.40.7);
- Sat, 29 Aug 2020 23:05:11 +0800
-Subject: Re: [PATCH] softfloat: Define comparison operations for bfloat16
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200828175351.435119-1-richard.henderson@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <595aa258-dc1c-2c21-7081-41cfccb449a3@c-sky.com>
-Date: Sat, 29 Aug 2020 23:05:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kC2cM-0000AB-Oj; Sat, 29 Aug 2020 11:18:10 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kC2cK-00059p-JO; Sat, 29 Aug 2020 11:18:10 -0400
+Received: by mail-ot1-x341.google.com with SMTP id e23so1789727otk.7;
+ Sat, 29 Aug 2020 08:18:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=R5qVG5jOKGSbnO0xWX+6JYcxuQjGVPGCR7TKX+uYaUE=;
+ b=gKALEd8i7/vNIaZeuxrF/NqG7D4bhA2XIrDTu3EnCwUwGGy15htX8xZEFjCsTsVXEx
+ wAlLa/FYh7KF7nEp8eCLKhA7dZW2aWgAzlGct3KDoUr6Mu3xQM8zalvX5wTgQlVfkj+r
+ 8s2ugUDk/schA2SrHqdLtfOXCtACyYZ2n8slbCOeeb83BW9CevR9zwt9YNimqx0ODjD3
+ UPUsXDEJIqrAhoTxqXP9PnCipfpLdpPFZBPfVN6a80ZSb3zCBeVnwds0r3BKszv3i/SE
+ OrpSbhZoY9mMMzSnpY7NSZQ7ZBhc4Qy1UTu3yaYIgkqnyEARnx56OFCLKi06L6IhUkBx
+ noDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=R5qVG5jOKGSbnO0xWX+6JYcxuQjGVPGCR7TKX+uYaUE=;
+ b=Ln/abFRUEa5evpCz7K2d9i2l/F9lN1pFR7rdp48FxpoJwee5s7oHiN3b7s/tDkteSA
+ K5VKKysAFho5QOYKA1b0ACyBuNX8/JPfjssOowUL7y6yuXBZ+ZJB+UoE7ShtGsefagQx
+ q2RIMNT+PzA5QNc2hSB+cVwPJMCBQiul3zhAnwoecZ51KtKk/Y6ANKNjTYkidjYWZX8f
+ yoSOWNX9VbE1ieEziolh58Qloaqb+qWzZyM9YVSA9iOra+b6QD7aLq/XPhZPK86ajRf+
+ 3AzxHtnsdq69DxLThe+/811dKm0aut2niHoLZ8Rh1Tn81udVe8Yf2IBTKt+dzGTHXM7m
+ zs6w==
+X-Gm-Message-State: AOAM531GacmyetQfzeNpgDGon2M+g65T/7iQknSt+dks4QVm0t/14+jU
+ 2pXdDSYvaye+0I5AUC0MdX4=
+X-Google-Smtp-Source: ABdhPJzL9gDBspOh2MmemcOhs6/gUt7DOiVWotj+oZnKe+CflIyO5yq+CxZ/D00VXtHpKNEWtY2xmA==
+X-Received: by 2002:a05:6830:1be4:: with SMTP id
+ k4mr2350117otb.319.1598714286479; 
+ Sat, 29 Aug 2020 08:18:06 -0700 (PDT)
+Received: from pek-vx-bsp2.wrs.com (unknown-146-144.windriver.com.
+ [147.11.146.144])
+ by smtp.gmail.com with ESMTPSA id f50sm58181otf.47.2020.08.29.08.18.01
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Sat, 29 Aug 2020 08:18:05 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Palmer Dabbelt <palmerdabbelt@google.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Subject: [PATCH v2 00/16] hw/riscv: Add Microchip PolarFire SoC Icicle Kit
+ board support
+Date: Sat, 29 Aug 2020 23:17:24 +0800
+Message-Id: <1598714261-8320-1-git-send-email-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-In-Reply-To: <20200828175351.435119-1-richard.henderson@linaro.org>
-Content-Type: multipart/alternative;
- boundary="------------75460598582B99A98EF02006"
-Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/29 11:05:16
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-ot1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- NICE_REPLY_A=-0.809, SPF_HELO_NONE=0.001, T_SPF_TEMPERROR=0.01,
- UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,212 +103,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Jason Wang <jasowang@redhat.com>, Bin Meng <bin.meng@windriver.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ qemu-arm@nongnu.org, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------75460598582B99A98EF02006
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+From: Bin Meng <bin.meng@windriver.com>
 
+This adds support for Microchip PolarFire SoC Icicle Kit board.
+The Icicle Kit board integrates a PolarFire SoC, with one SiFive's
+E51 plus four U54 cores and many on-chip peripherals and an FPGA.
 
+For more details about Microchip PolarFire SoC, please see:
+https://www.microsemi.com/product-directory/soc-fpgas/5498-polarfire-soc-fpga
 
-On 2020/8/29 1:53, Richard Henderson wrote:
-> These operations were missed in Zhiwei's bfloat16 implementation.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->   include/fpu/softfloat.h | 41 +++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 41 insertions(+)
->
-> diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-> index 1233f98014..78ad5ca738 100644
-> --- a/include/fpu/softfloat.h
-> +++ b/include/fpu/softfloat.h
-> @@ -479,6 +479,47 @@ static inline bfloat16 bfloat16_set_sign(bfloat16 a, int sign)
->       return (a & 0x7fff) | (sign << 15);
->   }
->   
-> +static inline bool bfloat16_eq(bfloat16 a, bfloat16 b, float_status *s)
-> +{
-> +    return bfloat16_compare(a, b, s) == float_relation_equal;
-> +}
-> +
-> +static inline bool bfloat16_le(bfloat16 a, bfloat16 b, float_status *s)
-> +{
-> +    return bfloat16_compare(a, b, s) <= float_relation_equal;
-> +}
-> +
-> +static inline bool bfloat16_lt(bfloat16 a, bfloat16 b, float_status *s)
-> +{
-> +    return bfloat16_compare(a, b, s) < float_relation_equal;
-> +}
-> +
-> +static inline bool bfloat16_unordered(bfloat16 a, bfloat16 b, float_status *s)
-> +{
-> +    return bfloat16_compare(a, b, s) == float_relation_unordered;
-> +}
-> +
-> +static inline bool bfloat16_eq_quiet(bfloat16 a, bfloat16 b, float_status *s)
-> +{
-> +    return bfloat16_compare_quiet(a, b, s) == float_relation_equal;
-> +}
-> +
-> +static inline bool bfloat16_le_quiet(bfloat16 a, bfloat16 b, float_status *s)
-> +{
-> +    return bfloat16_compare_quiet(a, b, s) <= float_relation_equal;
-> +}
-> +
-> +static inline bool bfloat16_lt_quiet(bfloat16 a, bfloat16 b, float_status *s)
-> +{
-> +    return bfloat16_compare_quiet(a, b, s) < float_relation_equal;
-> +}
-> +
-> +static inline bool bfloat16_unordered_quiet(bfloat16 a, bfloat16 b,
-> +                                           float_status *s)
-Indentation.
-> +{
-> +    return bfloat16_compare_quiet(a, b, s) == float_relation_unordered;
-> +}
-> +
-Hi Richard,
+The Icicle Kit board information can be found here:
+https://www.microsemi.com/existing-parts/parts/152514
 
-If you have already applied the bfloat16 patch set,   I am afraid you 
-have to remove these lines.
+Unlike SiFive FU540, the RISC-V core resect vector is at 0x20220000.
+The RISC-V CPU and HART codes has been updated to set the core's
+reset vector based on a configurable property from machine codes.
 
--int bfloat16_unordered_quiet(bfloat16, bfloat16, float_status *status);
--int bfloat16_le(bfloat16, bfloat16, float_status *status);
--int bfloat16_lt(bfloat16, bfloat16, float_status *status);
--int bfloat16_eq_quiet(bfloat16, bfloat16, float_status *status);
+The following perepherals are created as an unimplemented device:
 
-The corresponding float16 interfaces have been removed in the master 
-branch when I sent the bfloat16 patch set.
-So I deleted the implementations. But I forgot to remove the declarations.
+- Bus Error Uint 0/1/2/3/4
+- L2 cache controller
+- SYSREG
+- MPUCFG
+- IOSCBCFG
+- GPIO
 
-I see you have applied float16 comparison interfaces from Kito, and the 
-corresponding bfloat16
-interfaces have all been defined here. After remove the redundant 
-declarations,
+The following perepherals are emulated:
+- SiFive CLINT
+- SiFive PLIC
+- PolarFire SoC Multi-Mode UART
+- SiFive PDMA
+- Cadence eMMC/SDHCI controller
+- Cadence Gigabit Ethernet MAC
 
-Reviewed-by: LIU Zhiwei <zhiwei_liu@c-sky.com>
+The BIOS image used by this machine is hss.bin, aka Hart Software
+Services, which can be built from:
+https://github.com/polarfire-soc/hart-software-services
 
->   #define bfloat16_zero 0
->   #define bfloat16_half 0x3f00
->   #define bfloat16_one 0x3f80
+To launch this machine:
+$ qemu-system-riscv64 -M microchip-icicle-kit -smp 5 \
+    -bios path/to/hss.bin -sd path/to/sdcard.img \
+    -nic tap,ifname=tap,script=no,model=cadence_gem \
+    -display none -serial stdio \
+    -chardev socket,id=serial1,path=serial1.sock,server,wait \
+    -serial chardev:serial1
 
+The memory is set to 1 GiB by default to match the hardware.
+A sanity check on ram size is performed in the machine init routine
+to prompt user to increase the RAM size to > 1 GiB when less than
+1 GiB ram is detected.
 
---------------75460598582B99A98EF02006
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+HSS output is on the first serial port (stdio) and U-Boot/Linux
+outputs on the 2nd serial port. OpenSBI outputs on a random serial
+port due to the lottery mechanism used during the multi-core boot.
 
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  </head>
-  <body>
-    <br>
-    <br>
-    <div class="moz-cite-prefix">On 2020/8/29 1:53, Richard Henderson
-      wrote:<br>
-    </div>
-    <blockquote type="cite"
-      cite="mid:20200828175351.435119-1-richard.henderson@linaro.org">
-      <pre class="moz-quote-pre" wrap="">These operations were missed in Zhiwei's bfloat16 implementation.
+Please check the QEMU WiKi page for the target specific information:
+https://wiki.qemu.org/Documentation/Platforms/RISCV#Microchip_PolarFire_SoC_Icicle_Kit
 
-Signed-off-by: Richard Henderson <a class="moz-txt-link-rfc2396E" href="mailto:richard.henderson@linaro.org">&lt;richard.henderson@linaro.org&gt;</a>
----
- include/fpu/softfloat.h | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+Changes in v2:
+- change to update hw/char/meson.build
+- add impl.min_access_size and impl.max_access_size as part of
+  MemoryRegionOps and remove the allignment check
+- change to update hw/sd/meson.build
+- change the name to "generic-sdhci" when calling object_initialize_child()
+- add a container MR to simplify out-of-bounds access checks
+- do not initialize TYPE_SYSBUS_SDHCI in the SoC instance_init(),
+  instead move that to the cadence_sdhci model
+- do not access generic-sdhci's state directly,
+  instead move that to the cadence_sdhci model
+- change to update hw/dma/meson.build
+- rename the file names to sifive_pdma.[c|h]
+- update irq number to 8 per the SiFive FU540 manual
+- fix the register offset for channel 1/2/3 in the read/write ops
+- connect 8 IRQs to the PLIC
+- change "phy-addr" default value to BOARD_PHY_ADDRESS
 
-diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
-index 1233f98014..78ad5ca738 100644
---- a/include/fpu/softfloat.h
-+++ b/include/fpu/softfloat.h
-@@ -479,6 +479,47 @@ static inline bfloat16 bfloat16_set_sign(bfloat16 a, int sign)
-     return (a &amp; 0x7fff) | (sign &lt;&lt; 15);
- }
- 
-+static inline bool bfloat16_eq(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool bfloat16_le(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare(a, b, s) &lt;= float_relation_equal;
-+}
-+
-+static inline bool bfloat16_lt(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare(a, b, s) &lt; float_relation_equal;
-+}
-+
-+static inline bool bfloat16_unordered(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare(a, b, s) == float_relation_unordered;
-+}
-+
-+static inline bool bfloat16_eq_quiet(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare_quiet(a, b, s) == float_relation_equal;
-+}
-+
-+static inline bool bfloat16_le_quiet(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare_quiet(a, b, s) &lt;= float_relation_equal;
-+}
-+
-+static inline bool bfloat16_lt_quiet(bfloat16 a, bfloat16 b, float_status *s)
-+{
-+    return bfloat16_compare_quiet(a, b, s) &lt; float_relation_equal;
-+}
-+
-+static inline bool bfloat16_unordered_quiet(bfloat16 a, bfloat16 b,
-+                                           float_status *s)</pre>
-    </blockquote>
-    Indentation.<br>
-    <blockquote type="cite"
-      cite="mid:20200828175351.435119-1-richard.henderson@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
-+{
-+    return bfloat16_compare_quiet(a, b, s) == float_relation_unordered;
-+}
-+</pre>
-    </blockquote>
-    Hi Richard,<br>
-    <br>
-    If you have already applied the bfloat16 patch set,   I am afraid
-    you have to remove these lines.<br>
-    <pre>-int bfloat16_unordered_quiet(bfloat16, bfloat16, float_status *status);
--int bfloat16_le(bfloat16, bfloat16, float_status *status);
--int bfloat16_lt(bfloat16, bfloat16, float_status *status);
--int bfloat16_eq_quiet(bfloat16, bfloat16, float_status *status);
+Bin Meng (16):
+  target/riscv: cpu: Add a new 'resetvec' property
+  hw/riscv: hart: Add a new 'resetvec' property
+  target/riscv: cpu: Set reset vector based on the configured property
+    value
+  hw/riscv: Initial support for Microchip PolarFire SoC Icicle Kit board
+  hw/char: Add Microchip PolarFire SoC MMUART emulation
+  hw/riscv: microchip_pfsoc: Connect 5 MMUARTs
+  hw/sd: Add Cadence SDHCI emulation
+  hw/riscv: microchip_pfsoc: Connect a Cadence SDHCI controller and an
+    SD card
+  hw/dma: Add SiFive platform DMA controller emulation
+  hw/riscv: microchip_pfsoc: Connect a DMA controller
+  hw/net: cadence_gem: Add a new 'phy-addr' property
+  hw/arm: xlnx: Set all boards' GEM 'phy-addr' property value to 23
+  hw/riscv: microchip_pfsoc: Connect 2 Cadence GEMs
+  hw/riscv: microchip_pfsoc: Hook GPIO controllers
+  hw/riscv: clint: Avoid using hard-coded timebase frequency
+  hw/riscv: sifive_u: Connect a DMA controller
 
-</pre>
-    The corresponding float16 interfaces have been removed in the master
-    branch when I sent the bfloat16 patch set.<br>
-    So I deleted the implementations. But I forgot to remove the
-    declarations.<br>
-    <br>
-    I see you have applied float16 comparison interfaces from Kito, and
-    the corresponding bfloat16<br>
-    interfaces have all been defined here. After remove the redundant
-    declarations,<br>
-    <br>
-    Reviewed-by: LIU Zhiwei <a class="moz-txt-link-rfc2396E" href="mailto:zhiwei_liu@c-sky.com">&lt;zhiwei_liu@c-sky.com&gt;</a><br>
-    <br>
-    <blockquote type="cite"
-      cite="mid:20200828175351.435119-1-richard.henderson@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
- #define bfloat16_zero 0
- #define bfloat16_half 0x3f00
- #define bfloat16_one 0x3f80
-</pre>
-    </blockquote>
-    <br>
-  </body>
-</html>
+ default-configs/riscv64-softmmu.mak |   1 +
+ include/hw/char/mchp_pfsoc_mmuart.h |  61 +++++
+ include/hw/dma/sifive_pdma.h        |  57 +++++
+ include/hw/net/cadence_gem.h        |   2 +
+ include/hw/riscv/microchip_pfsoc.h  | 133 +++++++++++
+ include/hw/riscv/riscv_hart.h       |   1 +
+ include/hw/riscv/sifive_clint.h     |   4 +-
+ include/hw/riscv/sifive_u.h         |  11 +
+ include/hw/sd/cadence_sdhci.h       |  47 ++++
+ target/riscv/cpu.h                  |   7 +-
+ hw/arm/xilinx_zynq.c                |   1 +
+ hw/arm/xlnx-versal.c                |   1 +
+ hw/arm/xlnx-zynqmp.c                |   1 +
+ hw/char/mchp_pfsoc_mmuart.c         |  86 +++++++
+ hw/dma/sifive_pdma.c                | 313 ++++++++++++++++++++++++++
+ hw/net/cadence_gem.c                |   7 +-
+ hw/riscv/microchip_pfsoc.c          | 437 ++++++++++++++++++++++++++++++++++++
+ hw/riscv/opentitan.c                |   1 +
+ hw/riscv/riscv_hart.c               |   3 +
+ hw/riscv/sifive_clint.c             |  26 ++-
+ hw/riscv/sifive_e.c                 |   4 +-
+ hw/riscv/sifive_u.c                 |  35 ++-
+ hw/riscv/spike.c                    |   3 +-
+ hw/riscv/virt.c                     |   3 +-
+ hw/sd/cadence_sdhci.c               | 193 ++++++++++++++++
+ target/riscv/cpu.c                  |   8 +-
+ target/riscv/cpu_helper.c           |   4 +-
+ target/riscv/csr.c                  |   4 +-
+ MAINTAINERS                         |   9 +
+ hw/char/Kconfig                     |   3 +
+ hw/char/meson.build                 |   1 +
+ hw/dma/Kconfig                      |   3 +
+ hw/dma/meson.build                  |   1 +
+ hw/riscv/Kconfig                    |  10 +
+ hw/riscv/meson.build                |   1 +
+ hw/sd/Kconfig                       |   4 +
+ hw/sd/meson.build                   |   1 +
+ 37 files changed, 1458 insertions(+), 29 deletions(-)
+ create mode 100644 include/hw/char/mchp_pfsoc_mmuart.h
+ create mode 100644 include/hw/dma/sifive_pdma.h
+ create mode 100644 include/hw/riscv/microchip_pfsoc.h
+ create mode 100644 include/hw/sd/cadence_sdhci.h
+ create mode 100644 hw/char/mchp_pfsoc_mmuart.c
+ create mode 100644 hw/dma/sifive_pdma.c
+ create mode 100644 hw/riscv/microchip_pfsoc.c
+ create mode 100644 hw/sd/cadence_sdhci.c
 
---------------75460598582B99A98EF02006--
+-- 
+2.7.4
+
 
