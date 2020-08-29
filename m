@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA479C433E6
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 20:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 757FAC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 20:23:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DAA62076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 20:23:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E5432076D
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 20:23:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KgZt3NJU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DAA62076D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SyA7ea8C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E5432076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kC7Ni-00006O-NA
-	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 16:23:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37526)
+	id 1kC7O6-0000XV-Dj
+	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 16:23:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kC7MK-0007EM-Py
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 16:21:56 -0400
-Received: from mail-pj1-x102b.google.com ([2607:f8b0:4864:20::102b]:51595)
+ id 1kC7N4-0007xd-89
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 16:22:42 -0400
+Received: from mail-pj1-x1029.google.com ([2607:f8b0:4864:20::1029]:36273)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kC7MJ-0007nn-Bf
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 16:21:56 -0400
-Received: by mail-pj1-x102b.google.com with SMTP id ds1so1123771pjb.1
- for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 13:21:54 -0700 (PDT)
+ id 1kC7N2-0007tb-5w
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 16:22:41 -0400
+Received: by mail-pj1-x1029.google.com with SMTP id q1so1082431pjd.1
+ for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 13:22:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:message-id:date:user-agent
+ h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=9L/aGUaP3iq4qPOXVXMB3tKy0tWK8spjI5tS1ind9xw=;
- b=KgZt3NJU8GLEYtnk4a/EHS8K77MXgKw/DoddZBq3oECH9XbqfVuTFfznOKVPEvljid
- jQPh770UP9ybJJ/wl8m+G3oR18LN4k9Uc49aTkP6sskilIcPiF5AW1o6CsILsjPV1nti
- f/VrAG9Bgd6pwQmmAvOtsyYiORpt6FCDL3I/vEBP/Au2cmIKovFi1tTwn1ccUw2GRX7e
- QYlpEIQPS60v9AkTLuYEkgu5Gv75iQRWEkI4k1mi8I9SuuiRcknvlftjRWHDnCIH/7U5
- 6RfqjB9QaKk3lhDg7MeWn6V6FUNhN/3im5HTTlHfRsDraOZIJxlE5ovOyZB5a/tL5e01
- 6GVA==
+ bh=cTCBFiJGE64/Bepjg/IelyhjWfEhq9WhnnrEDVwNVCg=;
+ b=SyA7ea8CF+vlogRbeyEh8+xu06zJpoQZTFRVGXfkFqkrhr3XDte+Kry75ySijvzeW2
+ sel9Ui5QQgeNWzQzXjSK/lEMIjbGtc6px7gEv5YrHB/hecOMNa2XHSba3v4WBfUfY6L/
+ zEiKnZpKvUlIfrowLey7AOWihGkkIy9sddRv9bZ3pg7LnS2tR8M9yTfKTnj+0EOCU0+p
+ PE76bmMTBI+TQfAN6GgjlEnf4WsfTWuLIl1bJkwnF33DzGc7LK1ZB51FxeeGVHS1qNxK
+ zXMmTCT1qdiPtZX/lCyzGAv68Kig12AAEXPd4y/NAaBt0tzNppsge6svfcN9VDzLBjh2
+ aoYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=9L/aGUaP3iq4qPOXVXMB3tKy0tWK8spjI5tS1ind9xw=;
- b=CMB+EadAf40a8xPjPudrnNEOXSBFfGmFhZVrAx390vkHcLMfzXzjT3zaUaAUhc79w2
- 1/rIJrXsrBBTSgYt1o7MowDOxiFObdB7LLj0PtgNsSoAAylXbqe1BfITgxdTtZkW3Kt1
- 6YPxREs7z1vZbTKqGy4gCku8NKZs9tXIvFROgxKeJrlfjctP6jvZq/DkLRq0UqHirAqy
- jt/8SlpzK2kFL9qJWtT8aYY7WmYAfOJ7paGyZLrWPzLzro91x9c5kN6MG7kd/At5RJoh
- zh/1Eou4m28z7mdsAa242WpeM6WS4xF4HajDaR1fm+zUTH6AYF9s/ZUPwzMmxo0nvoDD
- XBmA==
-X-Gm-Message-State: AOAM5307IY2miHo1wEErvyW7KNCVQeJQ4aNvmgzJGJzI10yg0dXhgU5i
- qqdpRFOjwS0YPK9Il1+Idr60Ulj43NZMdw==
-X-Google-Smtp-Source: ABdhPJzF4dJzSfpumAvcRExs3WAXsUXL82+pHCcf39Jyhs2cXcOmnjYPVLDVk93vRF12kRJ8ELjtFg==
-X-Received: by 2002:a17:90a:950a:: with SMTP id
- t10mr4092385pjo.107.1598732513829; 
- Sat, 29 Aug 2020 13:21:53 -0700 (PDT)
+ bh=cTCBFiJGE64/Bepjg/IelyhjWfEhq9WhnnrEDVwNVCg=;
+ b=LpxmxCdhxemlOk8+qZUJLsfUMHhBHKPjb74zEC+y1y/Vr6pdgOjuQq3FV2uxQs/+qM
+ y6t5lhxN+vUBPvB4WrtsEn/cFurY2qPID1g1EKqoaXDmKjBoSkQfXNNa4lIqJ4LoYP4z
+ ysaYLDDLZvU/7dml5zG6efm2XzQ+nmQt//xScGlIAn7tyfJ09aOEPdYowD8NaMF6k5pn
+ mY8S3x2RHgyQlNiQkfT5jXkUrdZlZUeOrjbEiIh4Q41ECPhS8i4a/jbyli4abm58/qf4
+ m+Dl9Sspbv7SOGrYuaYWKRwtLTcxFL7YNoxt2vbqCwTtzgJd1tOjL1NgvOz9a18HMVUG
+ /PTA==
+X-Gm-Message-State: AOAM532fIKnpudolkLi7E2lp8GznzMJx4vLw9nnh+xDy2loTERy+CQlM
+ 1dj9BxcW57iVG7FMvPTyq6ZE9w==
+X-Google-Smtp-Source: ABdhPJzKxU0UzmsRCcYNnmVF/25ESgMKQinGf8dpZje8zQ1/CO1yMj+/zwSZS0Zxl+tiX5Lr+sPGvw==
+X-Received: by 2002:a17:902:788e:: with SMTP id
+ q14mr3712810pll.140.1598732555528; 
+ Sat, 29 Aug 2020 13:22:35 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id i20sm3566533pfq.204.2020.08.29.13.21.52
+ by smtp.gmail.com with ESMTPSA id u22sm3067391pgi.85.2020.08.29.13.22.34
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 29 Aug 2020 13:21:53 -0700 (PDT)
-Subject: Re: [RFC v4 45/70] target/riscv: rvv-1.0: add Zvqmac extension
-From: Richard Henderson <richard.henderson@linaro.org>
+ Sat, 29 Aug 2020 13:22:34 -0700 (PDT)
+Subject: Re: [RFC v4 46/70] target/riscv: rvv-1.0: quad-widening integer
+ multiply-add instructions
 To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 References: <20200817084955.28793-1-frank.chang@sifive.com>
- <20200817084955.28793-46-frank.chang@sifive.com>
- <39cd6665-b74e-c61d-97ba-1ef1d41487f8@linaro.org>
-Message-ID: <48cad5a8-c81f-dd8e-4452-add26d351e8a@linaro.org>
-Date: Sat, 29 Aug 2020 13:21:51 -0700
+ <20200817084955.28793-47-frank.chang@sifive.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <b6c3e083-dca6-9d33-78e6-bbb2f3b107af@linaro.org>
+Date: Sat, 29 Aug 2020 13:22:32 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <39cd6665-b74e-c61d-97ba-1ef1d41487f8@linaro.org>
+In-Reply-To: <20200817084955.28793-47-frank.chang@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102b;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1029;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1029.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -28
@@ -114,27 +114,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/29/20 1:17 PM, Richard Henderson wrote:
-> On 8/17/20 1:49 AM, frank.chang@sifive.com wrote:
->> From: Frank Chang <frank.chang@sifive.com>
->>
->> Signed-off-by: Frank Chang <frank.chang@sifive.com>
->> ---
->>  target/riscv/cpu.c       | 1 +
->>  target/riscv/cpu.h       | 1 +
->>  target/riscv/translate.c | 2 ++
->>  3 files changed, 4 insertions(+)
+On 8/17/20 1:49 AM, frank.chang@sifive.com wrote:
+> From: Frank Chang <frank.chang@sifive.com>
 > 
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Add the following instructions:
+> 
+> * vqmaccu.vv
+> * vqmaccu.vx
+> * vqmacc.vv
+> * vqmacc.vx
+> * vqmaccsu.vv
+> * vqmaccsu.vx
+> * vqmaccus.vx
+> 
+> Signed-off-by: Frank Chang <frank.chang@sifive.com>
+> ---
+>  target/riscv/helper.h                   |  15 ++++
+>  target/riscv/insn32.decode              |   7 ++
+>  target/riscv/insn_trans/trans_rvv.inc.c | 109 ++++++++++++++++++++++++
+>  target/riscv/vector_helper.c            |  40 +++++++++
+>  4 files changed, 171 insertions(+)
 
-On second thought, the current manual says
-
-# This is only a proposal for a future extension after v1.0 and might change
-substantially before ratifcation.
-
-and does not even include the opcodes for these.
-
-I think we should focus on 1.0 and drop this extension for now.
+As mentioned, let's table this one for now.
 
 
 r~
