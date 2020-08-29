@@ -2,81 +2,82 @@ Return-Path: <SRS0=OYoK=CH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC47C433E6
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 16:46:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7247BC433E6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 16:51:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 482E320791
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 16:46:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 482E320791
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 47C3B20791
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 16:51:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47C3B20791
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37568 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kC3zX-0002xA-DP
-	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 12:46:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59472)
+	id 1kC44O-0004w6-Eb
+	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 12:51:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kC3yk-0002RE-KY
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 12:45:22 -0400
-Received: from mail-ej1-f66.google.com ([209.85.218.66]:47046)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kC43p-0004Sh-3T
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 12:50:37 -0400
+Received: from indium.canonical.com ([91.189.90.7]:37428)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kC3yi-0000eg-D2
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 12:45:22 -0400
-Received: by mail-ej1-f66.google.com with SMTP id d11so3088207ejt.13
- for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 09:45:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=NA9+N46o01a6W89L8qoDkMqjLqZ52nEpLkQ3zGwQigQ=;
- b=lLtLQDSqgDGW5b2OHUgd4+mqWKK+WHW4NUm0H5TNuae0NRCW3YakDLNmY6MFj7NU7D
- D2KNKQKJ7byj3OCofJ8U/z2erf3nwfSiQyXydtIwFVIAHpaMzpA8ublmkk/3CLFTi3Ps
- dvOp4tstDxZfuEV2fYjpnPV0Xua4xDoAdM9c1sQxCb5je+jvHIrZDyjFlWpcFavfKKf2
- 85hwf1yQ7MfZQE/flVjwK6jdRvmwlwkTVpLpVoHvrUkjHB0X/Kap8GEz+BrpMmwfz7b5
- YBrG7U+yrRfX+OVGJtkUTOvkDD4Tlve/zWGzM/SnVzjJ9NIa/jmwFP9NKDkud4jhdaZ1
- 2VTw==
-X-Gm-Message-State: AOAM532BytpYsl4Dc96Y3LHOOmefDtiFc4yRVyuFqKkW5KfmlllD4E50
- m6xQ0hErUVD9W8RjOSbKBDIm2pS5K4he7D98S9k=
-X-Google-Smtp-Source: ABdhPJwUYKoDqo1qLGDp2DzISXEoQkjm0ZxWFFdFugEMMe1OgiYQBmYumLtc9F3HP2YE5z8imqDJXBShNxbvzChKl1Q=
-X-Received: by 2002:a17:906:2296:: with SMTP id
- p22mr4180424eja.510.1598719517639; 
- Sat, 29 Aug 2020 09:45:17 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kC43m-0001KQ-MI
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 12:50:36 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kC43k-0002gg-KB
+ for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 16:50:32 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 946382E805D
+ for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 16:50:32 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200822142127.1316231-1-f4bug@amsat.org>
- <7300edf2-ab44-3676-6948-adf2c5af6c02@linaro.org>
- <20200829121341.59d8277b@glenfarclas>
-In-Reply-To: <20200829121341.59d8277b@glenfarclas>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Sat, 29 Aug 2020 18:45:06 +0200
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 29 Aug 2020 16:45:06 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1892540@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: sparc testcase
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: gson laurent-vivier philmd
+X-Launchpad-Bug-Reporter: Andreas Gustafsson (gson)
+X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+References: <159803735569.2614.10182276398047269277.malonedeb@chaenomeles.canonical.com>
 Message-ID: <CAAdtpL4Pi3w+5awNrohmSpySsZhmmPFQeby+a1-=TT8mJ7ZQVw@mail.gmail.com>
-Subject: Re: [RFC PATCH v2] hw/display/tcx: Allow 64-bit accesses to
- framebuffer stippler and blitter
-To: Michael <macallan1888@gmail.com>
-Content-Type: multipart/alternative; boundary="000000000000f1c80a05ae06e485"
-Received-SPF: pass client-ip=209.85.218.66;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-f66.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/29 12:45:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Subject: [Bug 1892540] Re: [RFC PATCH v2] hw/display/tcx: Allow 64-bit
+ accesses to framebuffer stippler and blitter
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
+X-Launchpad-Hash: 634eab59090ee4bb3730d257a9b6a762cd3792c4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/29 12:50:32
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,18 +86,11 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Lorenz <macallan@netbsd.org>, Andreas Gustafsson <gson@gson.org>,
- Richard Henderson <richard.henderson@linaro.org>, 1892540@bugs.launchpad.net,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>
+Reply-To: Bug 1892540 <1892540@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-
---000000000000f1c80a05ae06e485
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Message-ID: <20200829164506.5kk3QCu7-WBjYlSB6Kgyvy4xuBRpcyO0Q5OBbR7YQVc@z>
 
 Le sam. 29 ao=C3=BBt 2020 18:14, Michael <macallan1888@gmail.com> a =C3=A9c=
 rit :
@@ -139,57 +133,47 @@ I'm waiting for *Andreas Gustafsson to test it then will repost.*
 > Michael
 >
 
---000000000000f1c80a05ae06e485
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+-- =
 
-<div dir=3D"auto"><div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
-"gmail_attr">Le sam. 29 ao=C3=BBt 2020 18:14, Michael &lt;<a href=3D"mailto=
-:macallan1888@gmail.com">macallan1888@gmail.com</a>&gt; a =C3=A9crit=C2=A0:=
-<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bord=
-er-left:1px #ccc solid;padding-left:1ex">Hello,<br>
-<br>
-since I wrote the NetBSD code in question, here are my 2 cent:<br>
-<br>
-On Sat, 29 Aug 2020 08:41:43 -0700<br>
-Richard Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org" targe=
-t=3D"_blank" rel=3D"noreferrer">richard.henderson@linaro.org</a>&gt; wrote:=
-<br>
-<br>
-&gt; On 8/22/20 7:21 AM, Philippe Mathieu-Daud=C3=A9 wrote:<br>
-&gt; &gt; The S24/TCX datasheet is listed as &quot;Unable to locate&quot; o=
-n [1].<br>
-<br>
-I don&#39;t have it either, but someone did a lot of reverse engineering<br=
->
-and gave me his notes. The hardware isn&#39;t that complicated, but quite<b=
-r>
-weird.<br>
-<br>
-&gt; &gt; However the NetBSD revision 1.32 of the driver introduced<br>
-&gt; &gt; 64-bit accesses to the stippler and blitter [2]. It is safe<br>
-&gt; &gt; to assume these memory regions are 64-bit accessible.<br>
-&gt; &gt; QEMU implementation is 32-bit, so fill the &#39;impl&#39; fields.=
-<br>
-<br>
-IIRC the real hardware *requires* 64bit accesses for stipple and<br>
-blitter operations to work. For stipples you write a 64bit word into<br>
-STIP space, the address defines where in the framebuffer you want to<br>
-draw, the data contain a 32bit bitmask, foreground colour and a ROP.<br>
-BLIT space works similarly, the 64bit word contains an offset were to<br>
-read pixels from, and how many you want to copy.<br></blockquote></div></di=
-v><div dir=3D"auto"><br></div><div dir=3D"auto">Thanks Michael for this inf=
-ormation!=C2=A0</div><div dir=3D"auto">If you don&#39;t mind I&#39;ll amend=
- it to the commit description so there is a reference for posterity.=C2=A0<=
-/div><div dir=3D"auto"><br></div><div dir=3D"auto">I&#39;m waiting for=C2=
-=A0<i>Andreas Gustafsson to test it then will repost.</i></div><div dir=3D"=
-auto"><i><br></i></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockq=
-uote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc =
-solid;padding-left:1ex">
-<br>
-have fun<br>
-Michael<br>
-</blockquote></div></div></div>
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1892540
 
---000000000000f1c80a05ae06e485--
+Title:
+  qemu can no longer boot NetBSD/sparc
+
+Status in QEMU:
+  New
+
+Bug description:
+  Booting NetBSD/sparc in qemu no longer works.  It broke between qemu
+  version 5.0.0 and 5.1.0, and a bisection identified the following as
+  the offending commit:
+
+    [5d971f9e672507210e77d020d89e0e89165c8fc9] memory: Revert "memory:
+  accept mismatching sizes in memory_region_access_valid"
+
+  It's still broken as of 7fd51e68c34fcefdb4d6fd646ed3346f780f89f4.
+
+  To reproduce, run
+
+    wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-9.0/images/NetBSD-9.0-spar=
+c.iso
+    qemu-system-sparc -nographic -cdrom NetBSD-9.0-sparc.iso -boot d
+
+  The expected behavior is that the guest boots to the prompt
+
+    Installation medium to load the additional utilities from:
+
+  The observed behavior is a panic:
+
+    [   1.0000050] system[0]: trap 0x29: pc=3D0xf0046b14 sfsr=3D0xb6 sfva=
+=3D0x54000000
+    [   1.0000050] cpu0: data fault: pc=3D0xf0046b14 addr=3D0x54000000 sfsr=
+=3D0xb6<PERR=3D0x0,LVL=3D0x0,AT=3D0x5,FT=3D0x5,FAV,OW>
+    [   1.0000050] panic: kernel fault
+    [   1.0000050] halted
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1892540/+subscriptions
 
