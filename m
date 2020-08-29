@@ -2,78 +2,79 @@ Return-Path: <SRS0=OYoK=CH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39064C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 13:52:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F9BC433E6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 13:53:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0037F20C56
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 13:52:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6814920C56
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 13:53:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L24Cjb2d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0037F20C56
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v3rbjyZB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6814920C56
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kC1H7-0006QE-84
-	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 09:52:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57848)
+	id 1kC1IJ-0007Z1-HV
+	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 09:53:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58126)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kC1GQ-0005pV-W6
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 09:51:27 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35383)
+ id 1kC1He-000710-06
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 09:52:42 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:40858)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kC1GP-00037X-5b
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 09:51:26 -0400
-Received: by mail-ed1-x542.google.com with SMTP id ba12so1592902edb.2
- for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 06:51:24 -0700 (PDT)
+ id 1kC1Hc-0003Ct-L2
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 09:52:41 -0400
+Received: by mail-ed1-x544.google.com with SMTP id l21so1570364eds.7
+ for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 06:52:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9KH9nr6joWT50Gqz1LjlhoH5FgAQwIqhLeZ95q8fYRM=;
- b=L24Cjb2dhWhZen6EmLvpzVFVaEBU8UitY2T4QuVyv88+8Zp9GW4Cv4RvUYhCuW4YKb
- R9uWfR9EnFSusK7uFtJT6MEkm/ciR/11MhWky+EigzHxXd4CyZhYdSodRpfELqge8tiF
- 3fH/W8KMfqVfidkaQMRzpXfUIVkPTftfqmBpGkVDD1MlJBynafOeNKZNtuhMfXD9HayN
- F7CJFlKToUt3GXcdD4s4RFM1SydaiSfeT8DVyh4qXtDqZsAz8/k6P3bnneEJWm5+IcWJ
- ErQ0B0gwMzvS+SO/Ellcw/FATqMJgWH27cgVci1qhjXVYZRIzR9/I1EuVfm81uxoGR81
- 60QA==
+ :cc; bh=TLoBdnrYojAW/6644vytV0Fe8KUqij1xapHp9AFymdU=;
+ b=v3rbjyZBCjtVgZ/xg7DvhCKQAop21zsHEJHJfMZPmLXrIoBm+l61D9sv5lVPjmOmxo
+ r31q/Aa9le8mTTWEea/WzPIBSVzmYQ69/hB4svxGmCkdL+/wwFdt52qbbUL9cZnrocqh
+ sfeWyi1bWpVKPj9m3xPlUNDvzb6mjrmGtMtK2niVL6l8/sd/2slIZLpp5eF0Q0wVX7sl
+ r4oeBANtK6wB9E8f97eQWAAinfaAGN7/zrUQCNql40P+iqiqMAQCcAP4gyJiJLORjkDx
+ YRTjjtJb4+Jo6X6ZYT3sQj9tRSbgPPl/eepfcSvbjHUR/2ttQYWuozBNNvF9p6xecvhG
+ TXRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=9KH9nr6joWT50Gqz1LjlhoH5FgAQwIqhLeZ95q8fYRM=;
- b=EIdbCZQ+fQCQ1djMtQ6An/CQQSWwT5nwwf9C59n0mrKn3zoKrIk8kU5zZfaBL0kgjy
- TEUUG/aK4w3K1WS4XGWWebs/M9EqeL6mDsc5K7NETTpVoBGmY2EuHkHdM4zjja3GIszs
- HJwGlQiulpWswY4uC0NLrm+LcdS1CEQJ7H45bJgk92Ieoknezg2841BCrz23plMq5csU
- M2SHE6yZHd/rK06P/xPf86cs+APk7HkFMKoMtQdwON9r5DHGube2BkPy/QdUpjoRuWxg
- U0gt+hbxtGtWep9q8LyKadegYp4Tpe8+vwxSQw7ZgUeyTLhroSbmZwpHbf1pmT7T1Qe/
- CXog==
-X-Gm-Message-State: AOAM532LftO1GpiElZeKV40wedLKrZ7I8bNJ3Nb1Xu8HYJvLPigAVfSK
- YpMVVzT1vGrxWr28XbJ0vUITB1oZ6dr7EmOwLMpFVA==
-X-Google-Smtp-Source: ABdhPJzwHpZYsmvX7RjjbpX8AarmRNm7V/ZCTsgAkzca8IBzsA5zTf8cVyr7OZJUobOe2QgxodjXstgcGA75Qap/5wc=
-X-Received: by 2002:a50:f28b:: with SMTP id f11mr700070edm.44.1598709083473;
- Sat, 29 Aug 2020 06:51:23 -0700 (PDT)
+ bh=TLoBdnrYojAW/6644vytV0Fe8KUqij1xapHp9AFymdU=;
+ b=haQr2ftJ6LC0Fk6wjbBJtQQg5IabSujy5J83046EqChvnfgnE1vdzO+RPGT5OXKp75
+ fIyihR9tZlNcUDS78GFgzVom1qwwwAAwDSJDz8MIakp9W9zxda6//mR+lvJ8hveYsj2Z
+ AoOHMX2pPbGbzqCEN6m43/E099tQw+oxpyLEWJ78AO24dz+hmMItNcyd63xm3oi6AJpq
+ RYNlXAHp8sUWY/yOrrU84YkzeVLrIN98qMYUVPd15m+nTr0GM7kC7wolKsIxN+2Be/AH
+ OaxRdqWNOtKhnFMayfJFzdo0oIijLqz5OwCHeHG7FWJU2+QmKqpsvyp2+spTODtmfubl
+ Cc3w==
+X-Gm-Message-State: AOAM533y6uKjdUsPYKZxnoi/az9v0oBzHPcbQvSGfZXneGyC0wvbQSIg
+ r3LuGV4tqisqxPCVc6SUMoStDMeDOynovx9g7y4qVtg9mZZAkg==
+X-Google-Smtp-Source: ABdhPJwRpQqWt0/KYoOigzrg/eBa2c50JsgtYzVXq7grSILM1ELW4hfbW1pN4L50iy/eeIFrHGw8ODyoboIZ4V6wEMc=
+X-Received: by 2002:a50:8f45:: with SMTP id 63mr3646506edy.52.1598709159264;
+ Sat, 29 Aug 2020 06:52:39 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200828183354.27913-1-peter.maydell@linaro.org>
- <20200828183354.27913-44-peter.maydell@linaro.org>
- <a9995eb6-6cb6-f041-ea09-9104e9dc293e@linaro.org>
-In-Reply-To: <a9995eb6-6cb6-f041-ea09-9104e9dc293e@linaro.org>
+ <20200828183354.27913-45-peter.maydell@linaro.org>
+ <1306a667-216c-533c-9107-e42aa9ebfa24@linaro.org>
+In-Reply-To: <1306a667-216c-533c-9107-e42aa9ebfa24@linaro.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 29 Aug 2020 14:51:12 +0100
-Message-ID: <CAFEAcA_w4t4XsDbkws3MgDVW-9V6pzCY09pNU++9WGvtCCma2Q@mail.gmail.com>
-Subject: Re: [PATCH v2 43/45] target/arm/vec_helper: Add gvec fp indexed
- multiply-and-add operations
+Date: Sat, 29 Aug 2020 14:52:28 +0100
+Message-ID: <CAFEAcA9nVMS9YhemLcBbVKgqTwtubO0sB+jb=FTLQ8sTUANm+g@mail.gmail.com>
+Subject: Re: [PATCH v2 44/45] target/arm: Implement fp16 for Neon VMUL, VMLA,
+ VMLS
 To: Richard Henderson <richard.henderson@linaro.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -82,7 +83,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,45 +101,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 29 Aug 2020 at 00:24, Richard Henderson
+On Sat, 29 Aug 2020 at 00:38, Richard Henderson
 <richard.henderson@linaro.org> wrote:
 >
 > On 8/28/20 11:33 AM, Peter Maydell wrote:
-> > +#define float16_nop(N, M, S) (M)
-> > +#define float32_nop(N, M, S) (M)
-> > +#define float64_nop(N, M, S) (M)
+> > Convert the Neon floating-point VMUL, VMLA and VMLS to use gvec,
+> > and use this to implement fp16 support.
 > >
-> > +DO_FMUL_IDX(gvec_fmul_idx_h, nop, float16, H2)
-> > +DO_FMUL_IDX(gvec_fmul_idx_s, nop, float32, H4)
-> > +DO_FMUL_IDX(gvec_fmul_idx_d, nop, float64, )
-> > +
-> > +/*
-> > + * Non-fused multiply-accumulate operations, for Neon. NB that unlike
-> > + * the fused ops below they assume accumulate both from and into Vd.
-> > + */
-> > +DO_FMUL_IDX(gvec_fmla_nf_idx_h, add, float16, H2)
-> > +DO_FMUL_IDX(gvec_fmla_nf_idx_s, add, float32, H4)
-> > +DO_FMUL_IDX(gvec_fmls_nf_idx_h, sub, float16, H2)
-> > +DO_FMUL_IDX(gvec_fmls_nf_idx_s, sub, float32, H4)
-> > +
-> > +#undef float16_nop
-> > +#undef float32_nop
-> > +#undef float64_nop
+> > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 >
-> This floatN_nop stuff is pretty ugly.
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 >
-> Better to pass in either floatN_mul, or the floatN_muladd_nf helpers that you
-> added earlier.  Although I guess you're missing float64_muladd_nf so far.
+> > +    /* a->vm is M:Vm, which encodes both register and index */
+> > +    idx = extract32(a->vm, a->size + 2, 2);
+> > +    a->vm = extract32(a->vm, 0, a->size + 2);
+>
+> I know this is what the current code does, but I tend to think that this is
+> better done in decode.
 
-I thought about doing that, but the float*_muladd_nf functions
-don't have the same signature as float*_mul -- they take
-(dest, op1, op2, stat) and float*_mul only takes (op1, op2, stat) --
-so it doesn't work. You'd have to construct a wrapper for
-the mul function that took and ignored the dest argument,
-or split out mul entirely into its own macro rather than
-using DO_FMUL_IDX for mul and muladd. The nop macros seemed
-the simplest.
+Yeah, I thought that too as I was writing it, but I didn't
+want to mess with the decode in this patchset, especially
+given it would have meant I needed to touch all the non-fp
+scalar-indexed operations too...
 
-thanks
 -- PMM
 
