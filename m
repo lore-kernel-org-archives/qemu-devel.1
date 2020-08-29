@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9719CC433E6
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 18:51:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FC00C433E6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 19:14:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6790E2076D
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 18:51:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D062F20776
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 19:14:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a9zoILvS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6790E2076D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IMO/lljB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D062F20776
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kC5wr-0002z9-Kr
-	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 14:51:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52262)
+	id 1kC6JM-000808-34
+	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 15:14:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kC5vl-0002Ky-J6
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 14:50:26 -0400
-Received: from mail-pj1-x1031.google.com ([2607:f8b0:4864:20::1031]:54989)
+ id 1kC6I9-0007Pj-Hf
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 15:13:33 -0400
+Received: from mail-pg1-x52a.google.com ([2607:f8b0:4864:20::52a]:38719)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kC5vh-0006J0-Pq
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 14:50:25 -0400
-Received: by mail-pj1-x1031.google.com with SMTP id mt12so1053955pjb.4
- for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 11:50:21 -0700 (PDT)
+ id 1kC6I7-0000QX-LA
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 15:13:33 -0400
+Received: by mail-pg1-x52a.google.com with SMTP id l191so2081767pgd.5
+ for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 12:13:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=VCZOcskORWKnMglI/hHMrkHWQr5rJTv1J15iAIy58Z0=;
- b=a9zoILvSJ1NDqFbWM4u5YfSdfe3HiTwLPllhyziuUqDdmoO8kd3lTgna0zSKjhh9jP
- ljIQgzfVphIWNrV814tcjcTmohcrd4/uDLMgpMA/ycxSh5p7fDP9EZU00nPNcmt5FELk
- r1URXZKN46GFn4thrQ6z2ZplHsuivQHjt00rA5FNMr1EalqTTgY204oLmwE/o0X9zATw
- IQjPfMAvYF4cpRRFW6Qp/IfD2B/rSy9sfKYuxFFVWOotBM+A+fWMlvWalQdehIm86Pym
- uDOGl+vSOPXlrPg9kdWTyM6jKcXTP0rBbE0gKiUDVBjrk9indUDNs+UlJy5kgRefKnHc
- OH4Q==
+ bh=7vfRGmvkycs9b3PuqV/xniTiuFAdsTo4TrtMviFYgBk=;
+ b=IMO/lljBaMXOewAtRdX4VzIyawiG7t5MKSUYFZFKaHB63MgKSGbnHNvUvZ17YhmFkE
+ aRrumI3ymWmvfjgTrF2ueVSln6000gS9+18NcCCopS9vGLzeHL9/7Zl8sDxNP/vXGPWF
+ C0iyhKZlmhjwNPbHBswdGkZK/wmOrwy+uIAm5OLpEJZGAhZLPocUf9eH/2wiVBT/Ectp
+ V1FjlbmfBWQw/syXmGpgH6HRlKgkybhedSPNEm6L3yNqN59uQE+eNwginLW98twfxOQ4
+ yMOpbfySoT7srQi/Z84nXoExx0u9GGYhsV9EjslXdMcFVr2VM1Cw+41jq2PnFEhL+Fyl
+ fwkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=VCZOcskORWKnMglI/hHMrkHWQr5rJTv1J15iAIy58Z0=;
- b=q2NdFCTcabIf/2VB4QB+tkzjaCHWCV9PtDi3gFCO2BmQJs6146O1hZ3i/Ebh3nctF6
- hc/6FxtLWVYaPb9qvaSuYPGsF0Cu/d8cubWTFHvTkkqGnaLQ/Wu/WWbPo79AqoGi31dS
- MPLoPsQnCaAGpCZWLNKSy9BgqFO3XQ/GEQdZN9eZqyJloFp4PYXnkSO3bIhGb7gR181m
- L/rUSQdGxsyCkLGAewo4TaVj4xaFrHubwtAMz2RUkLdcmAJdE6/q7jpTGkpvPYsbVK2B
- ysT3wrUAzdYa9ajdQfKoRkDKKHtsLC85HHhHX6xmY4yfbkNCls5G4TPGpACnWRk+CqdE
- 5WmA==
-X-Gm-Message-State: AOAM532P65OnmQ3SfpzZEpTVIGtiGISd+MYuZYSLU+jXtfy5mpWxRwnv
- pV0Dyxre13fAzJk9n+zubbtGXg==
-X-Google-Smtp-Source: ABdhPJwrOgqc/Ql5VQoDDTOGUOhIKitbSIC7oe/dIV2K219/gCO0J7/wKjLYtymmVbWSEpoNdmNrRg==
-X-Received: by 2002:a17:90b:4acd:: with SMTP id
- mh13mr4056856pjb.147.1598727020062; 
- Sat, 29 Aug 2020 11:50:20 -0700 (PDT)
+ bh=7vfRGmvkycs9b3PuqV/xniTiuFAdsTo4TrtMviFYgBk=;
+ b=p5Ql3xdWyzeQpN5dnl/MMsLbrSiDr9QRNoARdYECUH3n5wMJ/PdE92guY8OngTR1HG
+ zMN7wIFP9xHm1OchTtZ1XBk2dH34z9WayNwNCt2HsVRV4pWd3rmh99AGDJdf/3Px3QyM
+ 25Zk5Dm4xthYAfzew+P5Br0BnKoJmzl+xlKZSrimxfmgDwFsGX8I6IxTENjcK9NIXTlS
+ HQl/fpEXElxbf1WpFeSptLc0wT1mWdKYcYoPoWn4Kr1thZ+tZEmkMo1JNtuOkgOXMIqX
+ B43u0Ay7LjuWUX3RWuX08uQ63h9I3z8Cx5EJsey4yxDG5HrIZyvVRDmVde1YdKG3IvcI
+ 977A==
+X-Gm-Message-State: AOAM530dbiesHqsBQmxDW2QPzBgDLNjcXQduQ2gtOyH3Q6/H2bOfEbD9
+ StSqUBshTC/9i5Chx88/FTl85g==
+X-Google-Smtp-Source: ABdhPJyg1xkldLFDozBvoG2w4pgeHaykLBNAEiv+rukkfj3tQguixGQUy5zffFIdgHm6hKikHhBaVQ==
+X-Received: by 2002:aa7:850b:: with SMTP id v11mr3891961pfn.240.1598728409888; 
+ Sat, 29 Aug 2020 12:13:29 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id l20sm3659353pfc.72.2020.08.29.11.50.19
+ by smtp.gmail.com with ESMTPSA id r186sm3616310pfr.162.2020.08.29.12.13.28
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 29 Aug 2020 11:50:19 -0700 (PDT)
-Subject: Re: [RFC v4 22/70] target/riscv: rvv-1.0: amo operations
+ Sat, 29 Aug 2020 12:13:29 -0700 (PDT)
+Subject: Re: [RFC v4 23/70] target/riscv: rvv-1.0: load/store whole register
+ instructions
 To: frank.chang@sifive.com, qemu-devel@nongnu.org, qemu-riscv@nongnu.org
 References: <20200817084955.28793-1-frank.chang@sifive.com>
- <20200817084955.28793-23-frank.chang@sifive.com>
+ <20200817084955.28793-24-frank.chang@sifive.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <30dcedd1-84e3-70c4-7b8b-d985608b81c5@linaro.org>
-Date: Sat, 29 Aug 2020 11:50:17 -0700
+Message-ID: <2c43a438-e9ae-6e8f-0d52-066278756c14@linaro.org>
+Date: Sat, 29 Aug 2020 12:13:26 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200817084955.28793-23-frank.chang@sifive.com>
+In-Reply-To: <20200817084955.28793-24-frank.chang@sifive.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1031;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1031.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52a;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -28
@@ -114,35 +114,29 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 8/17/20 1:49 AM, frank.chang@sifive.com wrote:
-> +static bool vext_check_amo(DisasContext *s, int vd, int vs2,
-> +                           int wd, int vm, uint8_t eew)
-> +{
-> +    int8_t emul = ctzl(eew) - (s->sew + 3) + s->lmul;
-> +    bool ret = has_ext(s, RVA) &&
-> +               (1 << s->sew >= 4) &&
-> +               (1 << s->sew <= sizeof(target_ulong)) &&
-> +               (eew <= (sizeof(target_ulong) << 3))  &&
-> +               require_align(vd, 1 << s->lmul) &&
-> +               require_align(vs2, 1 << emul) &&
-> +               (emul >= -3 && emul <= 3);
-> +    if (wd) {
-> +        ret &= require_vm(vm, vd);
-> +        if (eew > (1 << (s->sew + 3))) {
-> +            if (vd != vs2) {
-> +                ret &= require_noover(vd, 1 << s->lmul, vs2, 1 << emul);
-> +            }
-> +        } else if (eew < (1 << (s->sew + 3))) {
-> +            if (emul < 0) {
-> +                ret &= require_noover(vd, 1 << s->lmul, vs2, 1 << emul);
-> +            } else {
-> +                ret &= require_noover_widen(vd, 1 << s->lmul, vs2, 1 << emul);
-> +            }
-> +        }
-> +    }
-> +    return ret;
+> +/*
+> + * load and store whole register instructions ignore vtype and vl setting.
+> + * Thus, we don't need to check vill bit. (Section 7.9)
+> + */
+> +#define GEN_LDST_WHOLE_TRANS(NAME, EEW, ARGTYPE, ARG_NF, IS_STORE)     \
+> +static bool trans_##NAME(DisasContext *s, arg_##ARGTYPE * a)           \
+> +{                                                                      \
+> +    if (require_rvv(s) &&                                              \
+> +        QEMU_IS_ALIGNED(a->rd, ARG_NF)) {                              \
+> +        uint32_t data = 0;                                             \
+> +        bool ret;                                                      \
+> +        data = FIELD_DP32(data, VDATA, NF, ARG_NF);                    \
+> +        ret = ldst_whole_trans(a->rd, a->rs1, data, gen_helper_##NAME, \
+> +                               s, IS_STORE);                           \
+> +        return ret;                                                    \
+> +    }                                                                  \
+> +    return false;                                                      \
 > +}
 
-Same comments for EEW and require_noover.
+Decodetree is intentionally organized such that ARGTYPE = NAME.  There's no
+point in duplicating that.  Move everything besides the call to
+ldst_whole_trans into ldst_whole_trans.
+
 
 r~
 
