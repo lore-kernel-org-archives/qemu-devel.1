@@ -2,52 +2,48 @@ Return-Path: <SRS0=OYoK=CH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7437C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E962C433E6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:44:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94B7F20CC7
+	by mail.kernel.org (Postfix) with ESMTPS id E53E520CC7
 	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 02:44:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94B7F20CC7
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E53E520CC7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBqqd-0008Og-OL
-	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 22:44:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49612)
+	id 1kBqqe-0008OE-4P
+	for qemu-devel@archiver.kernel.org; Fri, 28 Aug 2020 22:44:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBqoZ-0003WW-LT
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:41:59 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4665 helo=huawei.com)
+ id 1kBqoY-0003U1-4B
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:41:58 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4668 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kBqoT-0001wo-VF
- for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:41:59 -0400
+ id 1kBqoV-0001wk-Sr
+ for qemu-devel@nongnu.org; Fri, 28 Aug 2020 22:41:57 -0400
 Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 6BDEFE8CA77D61F403AD;
+ by Forcepoint Email with ESMTP id 7BEC097907D4172C1D2E;
  Sat, 29 Aug 2020 10:41:43 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS413-HUB.china.huawei.com
  (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Sat, 29 Aug 2020
- 10:41:36 +0800
+ 10:41:34 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
  <berrange@redhat.com>, <dme@dme.org>
-Subject: [PATCH v6 04/12] migration/dirtyrate: Add dirtyrate statistics series
- functions
-Date: Sat, 29 Aug 2020 10:52:49 +0800
-Message-ID: <1598669577-76914-5-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v6 00/12] *** A Method for evaluating dirty page rate ***
+Date: Sat, 29 Aug 2020 10:52:45 +0800
+Message-ID: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
-References: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.101.6]
@@ -80,87 +76,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add dirtyrate statistics functions to record/update dirtyrate info.
+v5 -> v6:
+    fix coding style according to review
+    use TARGET_PAGE_SIZE and TARGET_PAGE_BITS instead of self-defined macros
+    return start-time and calc-time by qmp command
 
-Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
----
- migration/dirtyrate.c | 32 ++++++++++++++++++++++++++++++++
- migration/dirtyrate.h | 12 ++++++++++++
- 2 files changed, 44 insertions(+)
+v4 -> v5:
+    fix git apply failed due to meson-build
+    add review-by for patches in v3
 
-diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-index 035ccd1..fa7a1db 100644
---- a/migration/dirtyrate.c
-+++ b/migration/dirtyrate.c
-@@ -23,6 +23,7 @@
- #include "dirtyrate.h"
- 
- static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-+static struct DirtyRateStat DirtyStat;
- 
- static int dirtyrate_set_state(int *state, int old_state, int new_state)
- {
-@@ -34,6 +35,37 @@ static int dirtyrate_set_state(int *state, int old_state, int new_state)
-     }
- }
- 
-+static void reset_dirtyrate_stat(void)
-+{
-+    DirtyStat.total_dirty_samples = 0;
-+    DirtyStat.total_sample_count = 0;
-+    DirtyStat.total_block_mem_MB = 0;
-+    DirtyStat.dirty_rate = 0;
-+    DirtyStat.start_time = 0;
-+    DirtyStat.calc_time = 0;
-+}
-+
-+static void update_dirtyrate_stat(struct RamblockDirtyInfo *info)
-+{
-+    DirtyStat.total_dirty_samples += info->sample_dirty_count;
-+    DirtyStat.total_sample_count += info->sample_pages_count;
-+    /* size of total pages in MB */
-+    DirtyStat.total_block_mem_MB += (info->ramblock_pages *
-+                                     TARGET_PAGE_SIZE) >> 20;
-+}
-+
-+static void update_dirtyrate(uint64_t msec)
-+{
-+    uint64_t dirtyrate;
-+    uint64_t total_dirty_samples = DirtyStat.total_dirty_samples;
-+    uint64_t total_sample_count = DirtyStat.total_sample_count;
-+    uint64_t total_block_mem_MB = DirtyStat.total_block_mem_MB;
-+
-+    dirtyrate = total_dirty_samples * total_block_mem_MB *
-+                1000 / (total_sample_count * msec);
-+
-+    DirtyStat.dirty_rate = dirtyrate;
-+}
- 
- static void calculate_dirtyrate(struct DirtyRateConfig config)
- {
-diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
-index 479e222..a3ee305 100644
---- a/migration/dirtyrate.h
-+++ b/migration/dirtyrate.h
-@@ -42,6 +42,18 @@ struct RamblockDirtyInfo {
-     uint32_t *hash_result; /* array of hash result for sampled pages */
- };
- 
-+/*
-+ * Store calculation statistics for each measure.
-+ */
-+struct DirtyRateStat {
-+    uint64_t total_dirty_samples; /* total dirty sampled page */
-+    uint64_t total_sample_count; /* total sampled pages */
-+    uint64_t total_block_mem_MB; /* size of total sampled pages in MB */
-+    int64_t dirty_rate; /* dirty rate in MB/s */
-+    int64_t start_time; /* calculation start time in units of second */
-+    int64_t calc_time; /* time duration of two sampling in units of second */
-+};
-+
- void *get_dirtyrate_thread(void *arg);
- #endif
- 
+v3 -> v4:
+    use crc32 to get hash result instead of md5
+    add DirtyRateStatus to denote calculation status
+    add some trace_calls to make it easier to debug
+    fix some comments accroding to review
+
+v2 -> v3:
+    fix size_t compile warning
+    fix codestyle checked by checkpatch.pl
+
+v1 -> v2:
+    use g_rand_new() to generate rand_buf
+    move RAMBLOCK_FOREACH_MIGRATABLE into migration/ram.h
+    add skip_sample_ramblock to filter sampled ramblock
+    fix multi-numa vm coredump when query dirtyrate
+    rename qapi interface and rename some structures and functions
+    succeed to compile by appling each patch
+    add test for migrating vm
+
+Sometimes it is neccessary to evaluate dirty page rate before migration.
+Users could decide whether to proceed migration based on the evaluation
+in case of vm performance loss due to heavy workload.
+Unlikey simulating dirtylog sync which could do harm on runnning vm,
+we provide a sample-hash method to compare hash results for samping page.
+In this way, it would have hardly no impact on vm performance.
+
+Evaluate the dirtypage rate both on running and migration vm.
+The VM specifications for migration are as follows:
+- VM use 4-K page;
+- the number of VCPU is 32;
+- the total memory is 32Gigabit;
+- use 'mempress' tool to pressurize VM(mempress 4096 1024);
+- migration bandwidth is 1GB/s
+
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+|                      |  running  |                  migrating                           |
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+| no mempress          |   4MB/s   |          8MB/s      (migrated success)               |
+-------------------------------------------------------------------------------------------
+| mempress 4096 1024   |  1060MB/s |     456MB/s ~ 1142MB/s (cpu throttle triggered)      |
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+| mempress 4096 4096   |  4114MB/s |     688MB/s ~ 4132MB/s (cpu throttle triggered)      |
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Test dirtyrate by qmp command like this:
+1.  virsh qemu-monitor-command [vmname] '{"execute":"calc-dirty-rate", "arguments": {"calc-time": [sleep-time]}}'; 
+2.  sleep specific time which is a bit larger than sleep-time
+3.  virsh qemu-monitor-command [vmname] '{"execute":"query-dirty-rate"}'
+
+The qmp command returns like this:
+{"return":{"status":"measured","dirty-rate":374,"start-time":3718293,"calc-time":1},"id":"libvirt-15"}
+
+Further test dirtyrate by libvirt api like this:
+virsh getdirtyrate [vmname] [sleep-time]
+
+Chuan Zheng (12):
+  migration/dirtyrate: setup up query-dirtyrate framwork
+  migration/dirtyrate: add DirtyRateStatus to denote calculation status
+  migration/dirtyrate: Add RamblockDirtyInfo to store sampled page info
+  migration/dirtyrate: Add dirtyrate statistics series functions
+  migration/dirtyrate: move RAMBLOCK_FOREACH_MIGRATABLE into ram.h
+  migration/dirtyrate: Record hash results for each sampled page
+  migration/dirtyrate: Compare page hash results for recorded sampled
+    page
+  migration/dirtyrate: skip sampling ramblock with size below
+    MIN_RAMBLOCK_SIZE
+  migration/dirtyrate: Implement set_sample_page_period() and
+    get_sample_page_period()
+  migration/dirtyrate: Implement calculate_dirtyrate() function
+  migration/dirtyrate: Implement
+    qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
+  migration/dirtyrate: Add trace_calls to make it easier to debug
+
+ migration/dirtyrate.c  | 436 +++++++++++++++++++++++++++++++++++++++++++++++++
+ migration/dirtyrate.h  |  70 ++++++++
+ migration/meson.build  |   2 +-
+ migration/ram.c        |  11 +-
+ migration/ram.h        |  10 ++
+ migration/trace-events |   8 +
+ qapi/migration.json    |  67 ++++++++
+ 7 files changed, 593 insertions(+), 11 deletions(-)
+ create mode 100644 migration/dirtyrate.c
+ create mode 100644 migration/dirtyrate.h
+
 -- 
 1.8.3.1
 
