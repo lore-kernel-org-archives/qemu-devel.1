@@ -2,84 +2,69 @@ Return-Path: <SRS0=OYoK=CH=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,HTML_OBFUSCATE_05_10,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF421C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 08:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C67AEC433E6
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 10:42:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E84E208A9
-	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 08:56:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u9IoLZZe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E84E208A9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8D3C02076D
+	for <qemu-devel@archiver.kernel.org>; Sat, 29 Aug 2020 10:42:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D3C02076D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kBweV-00038h-Rd
-	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 04:55:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40860)
+	id 1kByJt-0002Zc-Ot
+	for qemu-devel@archiver.kernel.org; Sat, 29 Aug 2020 06:42:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kBwdz-0002iZ-Px
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 04:55:27 -0400
-Received: from mail-lj1-x232.google.com ([2a00:1450:4864:20::232]:45517)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kBwdy-00050L-Cc
- for qemu-devel@nongnu.org; Sat, 29 Aug 2020 04:55:27 -0400
-Received: by mail-lj1-x232.google.com with SMTP id w25so1386835ljo.12
- for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 01:55:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:reply-to:from:date:message-id:subject:to;
- bh=cdIDYMvu+LteGbeaRYXFj2zEQQFZ3VWpO1Ye4Kx4o9Y=;
- b=u9IoLZZeilg/VHpg9YRK/vqjgRBLZ/RCL14KRCYVsXJHmzOpYeZrEDIkfw8o7cJwe/
- drsboHGjQhg8sH6KPq3St8E9EL6Dk2evl6SNQW5FjdHc8SiDq4qNjROZA524OsUzNaFo
- oSJ8NJWOLHwMbQ/y1n8Jxyc00x1zN3GFQeduOfwkMD6kVIrFKDMlYgEUX1kxgKxVpXPb
- Uk48LoDFzlFNcAPzJGH33Tu3zkaSL65grN7LbQQcFsT5Q+KrMtsXZUeDrw5LC8o7LxTX
- wsXXjCNXa+1fF99L+m8w3SSKKZPjLsPbQOF62wEoYtAJC4Wts11pJ83M8PN1l7aegQsL
- +zKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:reply-to:from:date:message-id
- :subject:to;
- bh=cdIDYMvu+LteGbeaRYXFj2zEQQFZ3VWpO1Ye4Kx4o9Y=;
- b=nA0LxQJIz3Ir2UuL9O6lbviX7R7PlA3OtdKwxd1boAfScMFYdXcMXXpdbdOLMzBdaP
- XG124SZgc9ZkV8n7GloZIhmJ8w2Qw/Z8V1VletMyLuayIqgRqJFqaNhx9Q7u2COeMZXw
- AAT67P/a1syWoxkh6z96IXv2dwPw9F6OI/Vo/jyKnsIf7dZ5AylQIB4R1Q2S6TYd8zLN
- VMoO/9Cliiz8a2Rw/4Q3uu/uYZWtvp1eSV5cDDtOVR3Ik95p4VTDz5FpBX7+eb/uFXVd
- ZgD9qjTGTCRkkC31XPWzdZ/6R3cr4x4+5eTu7BprOWx3bj5ZWnyMXIt5G5tiihLXBGvF
- Twag==
-X-Gm-Message-State: AOAM5337ne6qG+nUmegy3oCVB4Ot0PXpVxFMJiTKnrbJ0HsAlpUNw2rp
- 7I2HKR5LIMYxX+9fwncpsitVUxbEJdqyU6kn9Hg7spr0qtkTYc/h
-X-Google-Smtp-Source: ABdhPJyurbaDjvFh1epVvM8AngUe+F1Eg9mwMpTejgJqo8QkyzgjQwyI4kYUsWsgXehGhG1UujlCQg2mcywYI9yaP3E=
-X-Received: by 2002:a2e:8084:: with SMTP id i4mr1235042ljg.447.1598691323879; 
- Sat, 29 Aug 2020 01:55:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
+ id 1kByJD-0001tB-5C
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 06:42:07 -0400
+Received: from mailout08.t-online.de ([194.25.134.20]:58618)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <volker.ruemelin@t-online.de>)
+ id 1kByJA-0007yn-U5
+ for qemu-devel@nongnu.org; Sat, 29 Aug 2020 06:42:06 -0400
+Received: from fwd04.aul.t-online.de (fwd04.aul.t-online.de [172.20.26.149])
+ by mailout08.t-online.de (Postfix) with SMTP id 8104F411C908;
+ Sat, 29 Aug 2020 12:42:01 +0200 (CEST)
+Received: from linpower.localnet
+ (bNl1qiZ6QhY7rPjYlpJP7J565md+5zNtzzdyqaaH7C8EaEnh0TejTDht94QylqmQeG@[93.236.153.131])
+ by fwd04.t-online.de
+ with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
+ esmtp id 1kByJ4-20FM5g0; Sat, 29 Aug 2020 12:41:58 +0200
+Received: by linpower.localnet (Postfix, from userid 1000)
+ id 443BD200637; Sat, 29 Aug 2020 12:41:58 +0200 (CEST)
+From: =?UTF-8?q?Volker=20R=C3=BCmelin?= <vr_qemu@t-online.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] meson: fix SDL2_image detection
+Date: Sat, 29 Aug 2020 12:41:58 +0200
+Message-Id: <20200829104158.7461-1-vr_qemu@t-online.de>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Sat, 29 Aug 2020 16:55:12 +0800
-Message-ID: <CAE2XoE9YT=qn8dd4TfRnMoGnFY6LxH3TagrBirFxf8GbSvW9DQ@mail.gmail.com>
-Subject: on msys2, the generated qemu-version.h seems not valid
-To: qemu-level <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="00000000000077240905ae00542f"
-Received-SPF: pass client-ip=2a00:1450:4864:20::232;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x232.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, HTML_OBFUSCATE_05_10=0.26, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ID: bNl1qiZ6QhY7rPjYlpJP7J565md+5zNtzzdyqaaH7C8EaEnh0TejTDht94QylqmQeG
+X-TOI-EXPURGATEID: 150726::1598697718-00004F6D-F4CB8C37/0/0 CLEAN NORMAL
+X-TOI-MSGID: 2ea7af8c-6bbd-4832-88aa-cf000e6e2361
+Received-SPF: none client-ip=194.25.134.20;
+ envelope-from=volker.ruemelin@t-online.de; helo=mailout08.t-online.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/29 06:42:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001,
+ SPOOFED_FREEMAIL=1.26 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,56 +77,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000077240905ae00542f
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Configure used to probe for SDL2_image in sdl_image_probe (). Meson
+should do the same.
 
-#define QEMU_PKGVERSION ""
-#define QEMU_FULL_VERSION "5.1.50"
+This fixes the following error on my system:
 
+Run-time dependency sdl2 found: YES 2.0.8
+Found CMake: /usr/bin/cmake (3.17.0)
+Run-time dependency sdl-image found: NO (tried pkgconfig and cmake)
 
-        pkgversion=3D$(git describe --match 'v*' --dirty | echo "")
-what's echo "" for in qemu-version.sh
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+../qemu-master/meson.build:256:2: ERROR: Dependency "sdl-image" not
+found, tried pkgconfig and cmake
 
---00000000000077240905ae00542f
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+A full log can be found at /home/ruemelin/rpmbuild/BUILD
+/qemu-5.1.50-build/meson-logs/meson-log.txt
 
-<div dir=3D"ltr"><br clear=3D"all"><div><div style=3D"color:rgb(212,212,212=
-);background-color:rgb(30,30,30);font-family:Consolas,&quot;Courier New&quo=
-t;,monospace;font-size:15px;line-height:20px;white-space:pre"><div><span st=
-yle=3D"color:rgb(197,134,192)">#define</span><span style=3D"color:rgb(86,15=
-6,214)">=C2=A0</span><span style=3D"color:rgb(86,156,214)">QEMU_PKGVERSION<=
-/span><span style=3D"color:rgb(86,156,214)">=C2=A0</span><span style=3D"col=
-or:rgb(206,145,120)">&quot;&quot;</span></div><div><span style=3D"color:rgb=
-(197,134,192)">#define</span><span style=3D"color:rgb(86,156,214)">=C2=A0</=
-span><span style=3D"color:rgb(86,156,214)">QEMU_FULL_VERSION</span><span st=
-yle=3D"color:rgb(86,156,214)">=C2=A0</span><span style=3D"color:rgb(206,145=
-,120)">&quot;5.1.50&quot;</span></div><br></div></div><div><br></div><div><=
-div style=3D"color:rgb(212,212,212);background-color:rgb(30,30,30);font-fam=
-ily:Consolas,&quot;Courier New&quot;,monospace;font-size:15px;line-height:2=
-0px;white-space:pre"><div>=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0p=
-kgversion=3D<span style=3D"color:rgb(206,145,120)">$(git=C2=A0describe=C2=
-=A0--match=C2=A0&#39;v*&#39;=C2=A0--dirty=C2=A0</span>|<span style=3D"color=
-:rgb(206,145,120)">=C2=A0</span><span style=3D"color:rgb(220,220,170)">echo=
-</span><span style=3D"color:rgb(206,145,120)">=C2=A0&quot;&quot;)</span></d=
-iv><div></div></div></div><div>what&#39;s echo &quot;&quot; for in=C2=A0qem=
-u-version.sh</div>-- <br><div dir=3D"ltr" class=3D"gmail_signature" data-sm=
-artmail=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
+ERROR: meson setup failed
 
---00000000000077240905ae00542f--
+Signed-off-by: Volker Rümelin <vr_qemu@t-online.de>
+---
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/meson.build b/meson.build
+index 74f8ea0c2e..8204878860 100644
+--- a/meson.build
++++ b/meson.build
+@@ -248,7 +248,7 @@ if sdl.found()
+   # work around 2.0.8 bug
+   sdl = declare_dependency(compile_args: '-Wno-undef',
+                            dependencies: sdl)
+-  sdl_image = dependency('sdl-image', required: get_option('sdl_image'),
++  sdl_image = dependency('SDL2_image', required: get_option('sdl_image'),
+                          static: enable_static)
+ else
+   if get_option('sdl_image').enabled()
+-- 
+2.26.2
+
 
