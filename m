@@ -2,102 +2,92 @@ Return-Path: <SRS0=e36u=CI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A3DDC433E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 06:19:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29FFFC433E6
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 06:21:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEE6720757
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 06:19:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3ED220757
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 06:21:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H+dq0xAe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEE6720757
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ty7bl0dq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3ED220757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCGh1-00072k-2A
-	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 02:19:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52550)
+	id 1kCGij-0008C3-Tm
+	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 02:21:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kCGgI-0006Sa-R2
- for qemu-devel@nongnu.org; Sun, 30 Aug 2020 02:19:10 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44166
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kCGhu-0007bW-9u
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 02:20:50 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29769
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kCGgF-0008SI-SE
- for qemu-devel@nongnu.org; Sun, 30 Aug 2020 02:19:10 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kCGhs-0000GV-6d
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 02:20:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598768346;
- h=from:from:sender:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ s=mimecast20190719; t=1598768447;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=qdueEY1/oWbqO+TNfreaWrPud9o32Z+0RhfvHMpp+90=;
- b=H+dq0xAe0eZfyZq2nBZebEXsaBVQfNhNO/TLVUtwEjagENJo/A5fqdbqFLuamOuDAG+7iq
- XcNls5EPosaqCMaUqcrIih3P+FYKDiPS8dI35jRvbMK1ngc9xi8ODoEep6Zgkz6ptCghQh
- 9+eEcg1YV0nSjyXVfGEpsvIp6RCr2ig=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-B7dsRhxHOIq7hUSUgZnB2A-1; Sun, 30 Aug 2020 02:18:46 -0400
-X-MC-Unique: B7dsRhxHOIq7hUSUgZnB2A-1
-Received: by mail-wr1-f71.google.com with SMTP id i10so1711932wrq.5
- for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 23:18:46 -0700 (PDT)
+ bh=dtDWKcW89q+Ftt9uCoYc7tBBrjmqgHOx8mIB74jVTtc=;
+ b=Ty7bl0dqikGQ/6zzDTid3E781BFDyg653+5n6P8CJ18ZTx1OoLHTzSt72HtsfOA194Q45J
+ +r286cIcyqfUcmNnAguVJNUgrQFiTCIfxxWW0eFCy88dx/xFN35jGBGtagInx8ANEo7gPj
+ K1NE21edYas3ZCheoth1OklfvoxquVY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-559-yIOOBUtaPLu467RfD6n8Lg-1; Sun, 30 Aug 2020 02:20:43 -0400
+X-MC-Unique: yIOOBUtaPLu467RfD6n8Lg-1
+Received: by mail-wr1-f69.google.com with SMTP id z1so1707678wrn.18
+ for <qemu-devel@nongnu.org>; Sat, 29 Aug 2020 23:20:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
- :references:mime-version:content-disposition
- :content-transfer-encoding:in-reply-to;
- bh=V2nCr2RPn1NrqT0tvAO1gfWK3iizlxVGfbl5BGyE7jU=;
- b=Czqft7qYHkXzbBhpPduHlP5bHdLLIs4PXa7Bi9JQSLbS0R8flGBXHmkwr88zrqGEOF
- SF3LTRoYYIWrCgkQO7bmeBqv7gQLbjz02vaxmF1Rkedu/6UfDGXlew7M14CXXyLmKlBN
- 3LpUBVatUT4oyLy2WahS66OaS0ZxlJcOPKE1YokOSc1qqMjnimTRer81NWWi6P/aZlOI
- 8W3iZtsazSQ4X/bRVAWA6wcZzUpsQgoJmHTlU76y8PKXQR0H6BHSbLtFSOTJj1hQvYpB
- lP06+FOoN+FRwHxi0shKz1yi+d0hzy+DbDgnDnTeNXXrmYQ4k+xn9O7T/+wmAy9WAVUH
- 35fQ==
-X-Gm-Message-State: AOAM532Gy22cIGxG2I0NXV65mVQQftynTGUvrn8VECBcdexhYMZehT00
- P14kA/1eCFRfYM/x+N+2TnPjChunChVRkx/h6W5Z7SHIDc+mV7HPw3dQO4UtlbVEDYAWJ6AUq+u
- WPgII3tVkBTIyNng=
-X-Received: by 2002:adf:ebcf:: with SMTP id v15mr6592364wrn.372.1598768325149; 
- Sat, 29 Aug 2020 23:18:45 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyMdNUWHYDZ+ZN1B+yAZiYvgu/Qp49U3uXeyQ4EQlJCL6Y2267ynJAyLbzzzcVVUqLu0CZzUA==
-X-Received: by 2002:adf:ebcf:: with SMTP id v15mr6592335wrn.372.1598768324811; 
- Sat, 29 Aug 2020 23:18:44 -0700 (PDT)
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=dtDWKcW89q+Ftt9uCoYc7tBBrjmqgHOx8mIB74jVTtc=;
+ b=Y0m+z1HxonEOoHpbE6RztCaU0vH0pWpktnxCsYGau1h6IL8u0LIoKn8jkceq++bwwt
+ TsRoyPXKJ6RiUDYQPDb+F/HKed6HJnhWewJ7bS5nsU1NIaT6+aLACEO7N/0oG8NcquQz
+ flqiNkKX5JF5LeTPZEP4Ekt2wC/cq2eo0gytlF1YiPoqV6bNavuJU0zgPbzx3zSDUG7Y
+ VXd7NV4EiH8ghRHQEUqWl2ynfsEv3TNRZUcu+rObDTVY4626mAncIFEzJ2pDFIjoextL
+ Q5GptucbdHKWetJVRscft21W1SYKeSiJgaTDbddzG0XCb8+agLAXvZUNfIABUlM0/BgQ
+ Lc2Q==
+X-Gm-Message-State: AOAM5304X1tA2RgQGsiby2ig+kMWuda+7uyMEVLl61S0N3StSe0ZKQy8
+ H4o3AtXO4419JaFESaFBM5a3KKJ4kDJBiK5UoQdc/REqm9TFEbIHbmGdb+3Wztw+Vqtr3nxEEjq
+ QOZFSQyWo2F6gT9I=
+X-Received: by 2002:adf:a287:: with SMTP id s7mr6672362wra.103.1598768442200; 
+ Sat, 29 Aug 2020 23:20:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw5YbtoHXF+no8PKTlSCp8iIGRC9w0k9TFJ4KzQNYA+vKlrfrOKlKILb6kClJuLPeYO3hS7Tw==
+X-Received: by 2002:adf:a287:: with SMTP id s7mr6672336wra.103.1598768441891; 
+ Sat, 29 Aug 2020 23:20:41 -0700 (PDT)
 Received: from redhat.com (bzq-109-64-136-54.red.bezeqint.net. [109.64.136.54])
- by smtp.gmail.com with ESMTPSA id n8sm6215160wra.32.2020.08.29.23.18.41
+ by smtp.gmail.com with ESMTPSA id z11sm576426wru.88.2020.08.29.23.20.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 29 Aug 2020 23:18:43 -0700 (PDT)
-From: mst@redhat.com
-X-Google-Original-From: "Michael S. Tsirkin" <mst@redhat.com>,
- Nathan Chancellor <natechancellor@gmail.com>
-Date: Sun, 30 Aug 2020 02:18:39 -0400
-To: Bug 1892540 <1892540@bugs.launchpad.net>,
- "Michael S. Tsirkin" <mst@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Subject: Re: [Bug 1892540] [RFC PATCH v2] hw/display/tcx: Allow 64-bit
- accesses to framebuffer stippler and blitter
-Message-ID: <20200830021257-mutt-send-email-mst@kernel.org>
-References: <159803735569.2614.10182276398047269277.malonedeb@chaenomeles.canonical.com>
- <20200822142127.1316231-1-f4bug@amsat.org>
+ Sat, 29 Aug 2020 23:20:41 -0700 (PDT)
+Date: Sun, 30 Aug 2020 02:20:38 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH] memory: Revert "memory: accept mismatching sizes in
+ memory_region_access_valid"
+Message-ID: <20200830021939-mutt-send-email-mst@kernel.org>
+References: <20200610134731.1514409-1-mst@redhat.com>
+ <20200827053216.GA1515751@ubuntu-n2-xlarge-x86>
 MIME-Version: 1.0
-In-Reply-To: <20200822142127.1316231-1-f4bug@amsat.org>
+In-Reply-To: <20200827053216.GA1515751@ubuntu-n2-xlarge-x86>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/30 02:19:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -106,8 +96,8 @@ X-Spam_score: -3.1
 X-Spam_bar: ---
 X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.959,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,44 +110,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org, qemu-stable@nongnu.org
+Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
+ qemu-stable@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Aug 22, 2020 at 02:21:27PM -0000, Philippe Mathieu-Daudé wrote:
-> The S24/TCX datasheet is listed as "Unable to locate" on [1].
+On Wed, Aug 26, 2020 at 10:32:16PM -0700, Nathan Chancellor wrote:
+> Hi all,
 > 
-> However the NetBSD revision 1.32 of the driver introduced
-> 64-bit accesses to the stippler and blitter [2]. It is safe
-> to assume these memory regions are 64-bit accessible.
-> QEMU implementation is 32-bit, so fill the 'impl' fields.
+> Sorry for the duplicate reply, my first one was rejected by a mailing
+> list administrator for being too long so I resent it with the error logs
+> as a link instead of inline.
 > 
-> [1] http://web.archive.org/web/20111209011516/http://wikis.sun.com/display/FOSSdocs/Home
-> [2] http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/dev/sbus/tcx.c.diff?r1=1.31&r2=1.32
+> On Wed, Jun 10, 2020 at 09:47:49AM -0400, Michael S. Tsirkin wrote:
+> > Memory API documentation documents valid .min_access_size and .max_access_size
+> > fields and explains that any access outside these boundaries is blocked.
+> > 
+> > This is what devices seem to assume.
+> > 
+> > However this is not what the implementation does: it simply
+> > ignores the boundaries unless there's an "accepts" callback.
+> > 
+> > Naturally, this breaks a bunch of devices.
+> > 
+> > Revert to the documented behaviour.
+> > 
+> > Devices that want to allow any access can just drop the valid field,
+> > or add the impl field to have accesses converted to appropriate
+> > length.
+> > 
+> > Cc: qemu-stable@nongnu.org
+> > Reviewed-by: Richard Henderson <rth@twiddle.net>
+> > Fixes: CVE-2020-13754
+> > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1842363
+> > Fixes: a014ed07bd5a ("memory: accept mismatching sizes in memory_region_access_valid")
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  memory.c | 29 +++++++++--------------------
+> >  1 file changed, 9 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/memory.c b/memory.c
+> > index 91ceaf9fcf..3e9388fb74 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -1352,35 +1352,24 @@ bool memory_region_access_valid(MemoryRegion *mr,
+> >                                  bool is_write,
+> >                                  MemTxAttrs attrs)
+> >  {
+> > -    int access_size_min, access_size_max;
+> > -    int access_size, i;
+> > +    if (mr->ops->valid.accepts
+> > +        && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs)) {
+> > +        return false;
+> > +    }
+> >  
+> >      if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
+> >          return false;
+> >      }
+> >  
+> > -    if (!mr->ops->valid.accepts) {
+> > +    /* Treat zero as compatibility all valid */
+> > +    if (!mr->ops->valid.max_access_size) {
+> >          return true;
+> >      }
+> >  
+> > -    access_size_min = mr->ops->valid.min_access_size;
+> > -    if (!mr->ops->valid.min_access_size) {
+> > -        access_size_min = 1;
+> > +    if (size > mr->ops->valid.max_access_size
+> > +        || size < mr->ops->valid.min_access_size) {
+> > +        return false;
+> >      }
+> > -
+> > -    access_size_max = mr->ops->valid.max_access_size;
+> > -    if (!mr->ops->valid.max_access_size) {
+> > -        access_size_max = 4;
+> > -    }
+> > -
+> > -    access_size = MAX(MIN(size, access_size_max), access_size_min);
+> > -    for (i = 0; i < size; i += access_size) {
+> > -        if (!mr->ops->valid.accepts(mr->opaque, addr + i, access_size,
+> > -                                    is_write, attrs)) {
+> > -            return false;
+> > -        }
+> > -    }
+> > -
+> >      return true;
+> >  }
+> >  
+> > -- 
+> > MST
+> > 
+> > 
 > 
-> Reported-by: Andreas Gustafsson <gson@gson.org>
-> Buglink: https://bugs.launchpad.net/bugs/1892540
-> Fixes: 55d7bfe2293 ("tcx: Implement hardware acceleration")
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> I just ran into a regression with booting RISC-V kernels due to this
+> commit. I can reproduce it with QEMU 5.1.0 and latest tip of tree
+> (25f6dc28a3a8dd231c2c092a0e65bd796353c769 at the time of initially
+> writing this).
+> 
+> The error message, commands, and bisect logs are available here:
+> 
+> https://gist.githubusercontent.com/nathanchance/c106dd22ec0c0e00f6a25daba106a1b9/raw/d929f2fff6da9126ded156affb0f19f359e9f693/qemu-5.1.0-issue-terminal-log.txt
+> 
+> I have attached the rootfs and kernel image used for these tests. If for
+> some reason there is a problem receiving them, the kernel is just an
+> arch/riscv/configs/defconfig kernel at Linux 5.9-rc2 and the rootfs is
+> available here:
+> 
+> https://github.com/ClangBuiltLinux/boot-utils/blob/3b21a5b71451742866349ba4f18638c5a754e660/images/riscv/rootfs.cpio.zst
+> 
+> Please let me know if I can provide any follow up information or if I am
+> doing something wrong.
+> 
+> Cheers,
+> Nathan
 
-Philippe, did you submit the patch on the mailing list
-normally too? I don't seem to see it there.
 
-the patch seems to work for me:
+The following patch was proposed to fix the issue:
 
-Tested-by: Michael S. Tsirkin <mst@redhat.com>
-
-
-CC Nathan who reported a similar failure.
-
-Nathan, does the patch below fix the issue for you?
-
-> ---
-> Since v1:
-> - added missing uncommitted staged changes... (tcx_blit_ops)
-> ---
+-----------------------------------------------------------
  hw/display/tcx.c | 18 +++++++++++++++---
  1 file changed, 15 insertions(+), 3 deletions(-)
 
@@ -216,9 +291,7 @@ index 1fb45b1aab8..96c6898b149 100644
 
 -----------------------------------------------------------
 
-I think you shouldn't specify .min_access_size in impl, since
-that also allows 1 and 2 byte accesses from guest.
-
+does this fix the issue for you?
 
 
 > -- 
@@ -263,5 +336,7 @@ that also allows 1 and 2 byte accesses from guest.
 > 
 > To manage notifications about this bug go to:
 > https://bugs.launchpad.net/qemu/+bug/1892540/+subscriptions
+
+
 
 
