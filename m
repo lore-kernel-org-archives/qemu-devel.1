@@ -2,96 +2,59 @@ Return-Path: <SRS0=e36u=CI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED9DEC433E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 15:05:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C2DC433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 15:29:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B74542071B
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 15:05:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QLr4uD0F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B74542071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 08E7F2137B
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 15:29:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08E7F2137B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCOu4-00019V-U1
-	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 11:05:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53686)
+	id 1kCPGm-0007Du-6q
+	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 11:29:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCOtW-0000c4-4M
- for qemu-devel@nongnu.org; Sun, 30 Aug 2020 11:05:22 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:35605)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCOtU-0003Cf-Dp
- for qemu-devel@nongnu.org; Sun, 30 Aug 2020 11:05:21 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id g6so1705430pjl.0
- for <qemu-devel@nongnu.org>; Sun, 30 Aug 2020 08:05:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=mjEnAUmv9YinhkxK3wNqV4vPZMq4aV7GMpW66/cKzQY=;
- b=QLr4uD0F5Gj02xN22yUxI181FQCLwkHzAzvGfz1t2zRzvIMZMRPpuYS7cOth+WlJWY
- F6dfd+JwFKXveGqCZNaEK5D8Oe9RGHmwdAz2P8Cyr8DE7G2fsfDeK8LQC8DLIAg81JKU
- ZCDFhD0kfeDGBCzmgB93cXfHUBe97FiEDpiZbNwB0NwTNnIzPNYZN4T8ofTw0kaZNJi3
- Ht4lmx0IOc4++GZAxEukqfdW5MhT61ruddojPZLM5TeAe3fl0jAI70VrXlIKjSwlEcmP
- /hy7P0quAp+IxPPAKe+rafy7UUh0u6x/RrSRJEqyPEpJ55XyXmpCcbqLlsnbJ7eLxN9g
- t4Uw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mjEnAUmv9YinhkxK3wNqV4vPZMq4aV7GMpW66/cKzQY=;
- b=abC5Q2VdbX3nwRiStj3HwZYgxFKMKq+Yv0VXpb6gns2erddLUNKqXn7HM6pXiPPMOb
- 1c8m3GIoVUMMwR8QC+bZ2ECXpIyVmro+7yYPTcnAmrKx/rMRPApWV0djIna9xAAa4sDQ
- eKBkkawt0SsQFq+83sVk5P0ynC4vbhcFkRsNUP77ui+/7wGnopRQXMLwa5PX1czpSNuN
- Abc3a2RS/HyFeHObQUMr3S/9R5HCuUqA9PlISAAfu7Y5ohUnFSgSOSXXG1YTDpEExTxi
- GlRvU6cySONnc6Vt51NkRMIg2OsK4tCDdMzLWx3we5VuZQdkwMrYLIFlRTOp+fAqfF9b
- VD2A==
-X-Gm-Message-State: AOAM533fQ/bsTRGbb5C4PWYqG0X8imVZrKvea+q+QAHeWaB7SUBU4gYk
- A3Ar9Rb3IFWfJCYfK61mO9JtmThecO7Akw==
-X-Google-Smtp-Source: ABdhPJzTyF3Il42Ajz/CWOG32ozkisj1DwTIWcKj33lJ6ifxXeHkjM8DnpuLC8jTUJ5I1o0MOw9y1w==
-X-Received: by 2002:a17:902:6a88:: with SMTP id
- n8mr5691976plk.261.1598799918494; 
- Sun, 30 Aug 2020 08:05:18 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gb17sm1332672pjb.15.2020.08.30.08.05.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 30 Aug 2020 08:05:17 -0700 (PDT)
-Subject: Re: [PATCH] target/hppa: Fix boot with old Linux installation CDs
-To: Helge Deller <deller@gmx.de>, Laurent Vivier <laurent@vivier.eu>,
- qemu-devel@nongnu.org
-References: <20200830132110.GA31329@ls3530.fritz.box>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f021841f-74d7-92b7-8e13-79421806cbfa@linaro.org>
-Date: Sun, 30 Aug 2020 08:05:15 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kCPGG-0006ng-6V
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 11:28:52 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:48975)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kCPGE-0005sV-1P
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 11:28:51 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 07UFRf55010151
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Sun, 30 Aug 2020 11:27:45 -0400
+Date: Sun, 30 Aug 2020 11:27:41 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: P J P <ppandit@redhat.com>
+Subject: Re: [PATCH] xhci: check return value from usb_packet_map
+Message-ID: <20200830152737.l3f42t2fvvrmdiwo@mozz.bu.edu>
+References: <20200827115933.1851563-1-ppandit@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200830132110.GA31329@ls3530.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
-X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.207,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200827115933.1851563-1-ppandit@redhat.com>
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/30 11:28:47
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=1, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,24 +68,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>,
+ Ruhr-University <bugs-syssec@rub.de>, Gerd Hoffmann <kraxel@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/30/20 6:21 AM, Helge Deller wrote:
-> The patch below modifies the qemu instruction decoder to ignore the
-> 64-bit flag too - which is what real 32-bit hardware seems to do as
-> well.  With this modification qemu now successfully boots those older
-> images too.
-> 
-> I suggest to apply the patch below - even if it does not reflect what
-> the SPEC says.  Instead it increases the compatibility to really
-> existing hardware and seem to not create problems if we add real PA2.0
-> support anytime later.
-> 
-> Signed-off-by: Helge Deller <deller@gmx.de>
+I think there is already a fix queued for this one:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg734424.html
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-
-r~
+On 200827 1729, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
+> 
+> While setting up a packet in xhci_setup_packet() routine,
+> usb_packet_map() may return an error. Check this return value
+> before further processing the packet, to avoid use-after-free
+> issue.
+> 
+>  -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Fxhci_uaf_2
+>   #0  __interceptor_free (/lib64/libasan.so.6+0xb0307)
+>   #1  qemu_vfree ../util/oslib-posix.c:247
+>   #2  address_space_unmap ../exec.c:3635
+>   #3  dma_memory_unmap ../include/sysemu/dma.h:145
+>   #4  usb_packet_unmap ../hw/usb/libhw.c:65
+>   #5  usb_packet_map ../hw/usb/libhw.c:54
+>   #6  xhci_setup_packet ../hw/usb/hcd-xhci.c:1618
+>   #7  xhci_fire_ctl_transfer ../hw/usb/hcd-xhci.c:1722
+>   #8  xhci_kick_epctx ../hw/usb/hcd-xhci.c:1991
+>   #9  xhci_kick_ep ../hw/usb/hcd-xhci.c:1861
+>   #10 xhci_doorbell_write ../hw/usb/hcd-xhci.c:3162
+>   ...
+> 
+> Reported-by: Ruhr-University <bugs-syssec@rub.de>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> ---
+>  hw/usb/hcd-xhci.c | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+> index 67a18fe2b6..848e7e935f 100644
+> --- a/hw/usb/hcd-xhci.c
+> +++ b/hw/usb/hcd-xhci.c
+> @@ -1615,7 +1615,14 @@ static int xhci_setup_packet(XHCITransfer *xfer)
+>      xhci_xfer_create_sgl(xfer, dir == USB_TOKEN_IN); /* Also sets int_req */
+>      usb_packet_setup(&xfer->packet, dir, ep, xfer->streamid,
+>                       xfer->trbs[0].addr, false, xfer->int_req);
+> -    usb_packet_map(&xfer->packet, &xfer->sgl);
+> +    if (usb_packet_map(&xfer->packet, &xfer->sgl) < 0) {
+> +        DPRINTF("xhci: setup packet failed: pid: 0x%x addr %d ep %d\n",
+> +                xfer->packet.pid, ep->dev->addr, ep->nr);
+> +        usb_packet_cleanup(&xfer->packet);
+> +        qemu_sglist_destroy(&xfer->sgl);
+> +        return -1;
+> +    }
+> +
+>      DPRINTF("xhci: setup packet pid 0x%x addr %d ep %d\n",
+>              xfer->packet.pid, ep->dev->addr, ep->nr);
+>      return 0;
+> -- 
+> 2.26.2
+> 
+> 
 
