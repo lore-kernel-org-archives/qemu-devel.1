@@ -2,99 +2,101 @@ Return-Path: <SRS0=e36u=CI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D89C433E6
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 20:59:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85802C433E6
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 21:03:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C95DF206FA
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 20:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4829B2083E
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 21:03:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WBM+YSmT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C95DF206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RD8q/bXK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4829B2083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53134 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56070 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCUQc-0004Ny-Ut
-	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 16:59:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49528)
+	id 1kCUTi-0005lV-Ge
+	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 17:03:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCUPs-0003xj-Tr
- for qemu-devel@nongnu.org; Sun, 30 Aug 2020 16:59:08 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:35661)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCUPr-000655-59
- for qemu-devel@nongnu.org; Sun, 30 Aug 2020 16:59:08 -0400
-Received: by mail-pg1-x542.google.com with SMTP id g29so3185624pgl.2
- for <qemu-devel@nongnu.org>; Sun, 30 Aug 2020 13:59:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=dq8e1idrZ8gz2wJQoxhOV3aszh9ziGnQm1F0H+7ftWI=;
- b=WBM+YSmTy21IsguLchOAsV+p2TdpM2v09x4Lfjk1HNQLOVKsSTUYTsXgOm7pUXuWHq
- CRn0Tpga7zuw9vxQDKMS8TtFuzGCzOpNFSo26zxENY5/XGhHveg71s9r/58nF/hx1zSf
- GtIgygRurKGKn1nBJh0UEOsv1UQFCy3ww1Qt9LmHQywSiNRUtG9wexwfq31irj+6WGnx
- i0eTsq1vMzEu1qNcN+lZZvKBQevP40Rie1mIsWYs4odPx494RNdJLNcuForMHAuBmhT1
- xy27L5gX/cQPpusVasAWWbA/1CgvtOi0Vh/ggC4z3b4Cyp8Wl4Zv6tumzBjngSnPeVbZ
- JB0A==
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kCUT6-0005Ez-5L
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 17:02:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33684
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kCUT4-0006YB-3X
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 17:02:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598821345;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=J28CCJfGG+ljSEorICWLhVTWzErz59BPNB8snhKQgjM=;
+ b=RD8q/bXKt+Rv4JYq0vaosTc2ROj/aK5VbZ4xcOkv+9fdWeqNUWgX/TFPlbk5OnZALs3UDI
+ qpQOJ0XpiZQUUFHs53MKimN/hn7zggdcr1s6jGkpDo5QRFasAHDTUPAE2ihm7q5nlSoW9x
+ SRVOH4urw4fQ+Yke3xc/tmV5Gpnkvbo=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-1Z_oce_OOgCplAuIwVAQAg-1; Sun, 30 Aug 2020 17:02:21 -0400
+X-MC-Unique: 1Z_oce_OOgCplAuIwVAQAg-1
+Received: by mail-wr1-f71.google.com with SMTP id i10so2382210wrq.5
+ for <qemu-devel@nongnu.org>; Sun, 30 Aug 2020 14:02:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=dq8e1idrZ8gz2wJQoxhOV3aszh9ziGnQm1F0H+7ftWI=;
- b=mcIFjU3gXTFcdpZxkRERXtJWHkgOMBhHpLAzJlealRYyKBTPMKdoq10eTOByT89JCJ
- zGTsiv9vmJ2cJJ5ND0lyAsOzpaKpPEJ5gMStRT45G8ft2F2L/+ZtfPxKPysURCI8iTI4
- tDPoClLqiIrKLyKw2NWB+ulxOAGVdX5SMEkpSVu33st2GfyR15OMZI3h43HsutG6HYSS
- iHLl2zqWT5XcbnQ0UaCkFqQr/lk6JSu5M8azty7vBvq6sWpPsSMVcpcrt+1/4jYH6r68
- f/+ayq4O2XZW136zZLZTxA2DQgwzifZnR8FM1Frs5g49oaekoMxFSTerj0Ss8PIzyWlD
- QfWQ==
-X-Gm-Message-State: AOAM530NIGnfvF495Uh0egzsw34viOGtKky8z6DWJGBp6FL8v4qfuQfR
- ZjPTUhFYlxUGHQ68AjFy39gIEw==
-X-Google-Smtp-Source: ABdhPJx++6/bfZZa397vIUpTu4/pth18QZyGcq50GK2QFoaezhd7NqcrgHB6tiYk7hi1KrNfImPo/g==
-X-Received: by 2002:aa7:9dd0:: with SMTP id g16mr6820146pfq.107.1598821145498; 
- Sun, 30 Aug 2020 13:59:05 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id f7sm354500pfa.151.2020.08.30.13.59.04
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 30 Aug 2020 13:59:04 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 25/34] Hexagon (target/hexagon) macros to interface
- with the generator
-To: Taylor Simpson <tsimpson@quicinc.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
- <1597765847-16637-26-git-send-email-tsimpson@quicinc.com>
- <56924ad5-7b6a-a05f-7773-e9be5cc9b9e5@linaro.org>
- <BYAPR02MB4886669B0BB9CED20CF166FCDE500@BYAPR02MB4886.namprd02.prod.outlook.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <343df449-d140-eac2-0b63-2a0a2172ecfd@linaro.org>
-Date: Sun, 30 Aug 2020 13:59:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=J28CCJfGG+ljSEorICWLhVTWzErz59BPNB8snhKQgjM=;
+ b=lp79hOk2bsKU1lD79+4e9f3/bQxuGItIuT4snSTEhREZcWGbKX+7UAAMfrvFMAP8mi
+ TU1NXJtOAPFCiItD72WFpEEngUyb6nrbLPtmGwBf8fl7ODcNiU4XwzPnBkPBENAzULj6
+ 8fvzsVdaOWPqmNx0HN44lHzQaKhQZXise0ax6yRdLmesucVPnhnEe4EYdvEvuk53VO3g
+ Rz2jmbMUqvgb3YKiO21/lEysJ3+bl3AmRNX11ZV23uojbx2RA/1trbHCSeD6AJq7gwqO
+ Te3lIfCKiZMXQHlqPo19z36OTQXzrhsWNvGGaLmUQjdN+yS8vbGyVcRyZmL7pK44OZFb
+ hP5Q==
+X-Gm-Message-State: AOAM5321x3/hLDCJInoSi/CKGtB5JDSLEGr6VQRtSyfVIoO59Et6up6/
+ 8ZxmvhCHMBzQUMaVJtKMpCrsbnoI+Bvx3QFu6WF6RuifYAOsqBamEBhb7ujV+LLsuBuMgsfZgb8
+ U/uee8K0mLUbMa+I=
+X-Received: by 2002:a5d:4a4b:: with SMTP id v11mr8352950wrs.36.1598821340618; 
+ Sun, 30 Aug 2020 14:02:20 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwDjyW/wVF0qsKoDpzjVdUqWQbDMa+tm4JECSA2VU5mepE4SDYyMbQXRv7iRMPWn/39DZhrAQ==
+X-Received: by 2002:a5d:4a4b:: with SMTP id v11mr8352927wrs.36.1598821340234; 
+ Sun, 30 Aug 2020 14:02:20 -0700 (PDT)
+Received: from redhat.com (bzq-109-64-136-54.red.bezeqint.net. [109.64.136.54])
+ by smtp.gmail.com with ESMTPSA id h184sm8023138wmh.41.2020.08.30.14.02.17
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 30 Aug 2020 14:02:18 -0700 (PDT)
+Date: Sun, 30 Aug 2020 17:02:15 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Nathan Chancellor <natechancellor@gmail.com>
+Subject: Re: [PATCH] memory: Revert "memory: accept mismatching sizes in
+ memory_region_access_valid"
+Message-ID: <20200830170132-mutt-send-email-mst@kernel.org>
+References: <20200610134731.1514409-1-mst@redhat.com>
+ <20200827053216.GA1515751@ubuntu-n2-xlarge-x86>
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB4886669B0BB9CED20CF166FCDE500@BYAPR02MB4886.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+In-Reply-To: <20200827053216.GA1515751@ubuntu-n2-xlarge-x86>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/30 17:02:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.207,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,69 +110,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "ale@rev.ng" <ale@rev.ng>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
- "philmd@redhat.com" <philmd@redhat.com>,
- "laurent@vivier.eu" <laurent@vivier.eu>,
- "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
+Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
+ qemu-stable@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/30/20 1:30 PM, Taylor Simpson wrote:
+On Wed, Aug 26, 2020 at 10:32:16PM -0700, Nathan Chancellor wrote:
+> Hi all,
 > 
+> Sorry for the duplicate reply, my first one was rejected by a mailing
+> list administrator for being too long so I resent it with the error logs
+> as a link instead of inline.
 > 
->> -----Original Message-----
->> From: Richard Henderson <richard.henderson@linaro.org>
->> Sent: Friday, August 28, 2020 6:49 PM
->> To: Taylor Simpson <tsimpson@quicinc.com>; qemu-devel@nongnu.org
->> Cc: philmd@redhat.com; laurent@vivier.eu; riku.voipio@iki.fi;
->> aleksandar.m.mail@gmail.com; ale@rev.ng
->> Subject: Re: [RFC PATCH v3 25/34] Hexagon (target/hexagon) macros to
->> interface with the generator
->>
->> On 8/18/20 8:50 AM, Taylor Simpson wrote:
->>> +#define DECL_REG(NAME, NUM, X, OFF) \
->>> +    TCGv NAME = tcg_temp_local_new(); \
->>> +    int NUM = REGNO(X) + OFF
->>> +
->>> +#define DECL_REG_WRITABLE(NAME, NUM, X, OFF) \
->>> +    TCGv NAME = tcg_temp_local_new(); \
->>> +    int NUM = REGNO(X) + OFF; \
->>> +    do { \
->>> +        int is_predicated = GET_ATTRIB(insn->opcode, A_CONDEXEC); \
->>> +        if (is_predicated && !is_preloaded(ctx, NUM)) { \
->>> +            tcg_gen_mov_tl(hex_new_value[NUM], hex_gpr[NUM]); \
->>> +        } \
->>> +    } while (0)
->>> +/*
->>> + * For read-only temps, avoid allocating and freeing
->>> + */
->>> +#define DECL_REG_READONLY(NAME, NUM, X, OFF) \
->>> +    TCGv NAME; \
->>> +    int NUM = REGNO(X) + OFF
->>> +
->>> +#define DECL_RREG_d(NAME, NUM, X, OFF) \
->>> +    DECL_REG_WRITABLE(NAME, NUM, X, OFF)
->>> +#define DECL_RREG_e(NAME, NUM, X, OFF) \
->>> +    DECL_REG(NAME, NUM, X, OFF)
->>
->> Is there a good reason for all these macros?
->> Why not just bake this knowledge into gen_tcg_funcs.py?
->> Seems like it would be just a couple of functions...
->>
->> At present, both this and the intermediary files are unreadable.  One has to
->> pass genptr.c through -E and indent to see what's going on.
+> On Wed, Jun 10, 2020 at 09:47:49AM -0400, Michael S. Tsirkin wrote:
+> > Memory API documentation documents valid .min_access_size and .max_access_size
+> > fields and explains that any access outside these boundaries is blocked.
+> > 
+> > This is what devices seem to assume.
+> > 
+> > However this is not what the implementation does: it simply
+> > ignores the boundaries unless there's an "accepts" callback.
+> > 
+> > Naturally, this breaks a bunch of devices.
+> > 
+> > Revert to the documented behaviour.
+> > 
+> > Devices that want to allow any access can just drop the valid field,
+> > or add the impl field to have accesses converted to appropriate
+> > length.
+> > 
+> > Cc: qemu-stable@nongnu.org
+> > Reviewed-by: Richard Henderson <rth@twiddle.net>
+> > Fixes: CVE-2020-13754
+> > Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1842363
+> > Fixes: a014ed07bd5a ("memory: accept mismatching sizes in memory_region_access_valid")
+> > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > ---
+> >  memory.c | 29 +++++++++--------------------
+> >  1 file changed, 9 insertions(+), 20 deletions(-)
+> > 
+> > diff --git a/memory.c b/memory.c
+> > index 91ceaf9fcf..3e9388fb74 100644
+> > --- a/memory.c
+> > +++ b/memory.c
+> > @@ -1352,35 +1352,24 @@ bool memory_region_access_valid(MemoryRegion *mr,
+> >                                  bool is_write,
+> >                                  MemTxAttrs attrs)
+> >  {
+> > -    int access_size_min, access_size_max;
+> > -    int access_size, i;
+> > +    if (mr->ops->valid.accepts
+> > +        && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs)) {
+> > +        return false;
+> > +    }
+> >  
+> >      if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
+> >          return false;
+> >      }
+> >  
+> > -    if (!mr->ops->valid.accepts) {
+> > +    /* Treat zero as compatibility all valid */
+> > +    if (!mr->ops->valid.max_access_size) {
+> >          return true;
+> >      }
+> >  
+> > -    access_size_min = mr->ops->valid.min_access_size;
+> > -    if (!mr->ops->valid.min_access_size) {
+> > -        access_size_min = 1;
+> > +    if (size > mr->ops->valid.max_access_size
+> > +        || size < mr->ops->valid.min_access_size) {
+> > +        return false;
+> >      }
+> > -
+> > -    access_size_max = mr->ops->valid.max_access_size;
+> > -    if (!mr->ops->valid.max_access_size) {
+> > -        access_size_max = 4;
+> > -    }
+> > -
+> > -    access_size = MAX(MIN(size, access_size_max), access_size_min);
+> > -    for (i = 0; i < size; i += access_size) {
+> > -        if (!mr->ops->valid.accepts(mr->opaque, addr + i, access_size,
+> > -                                    is_write, attrs)) {
+> > -            return false;
+> > -        }
+> > -    }
+> > -
+> >      return true;
+> >  }
+> >  
+> > -- 
+> > MST
+> > 
+> > 
 > 
-> I add the regid...
+> I just ran into a regression with booting RISC-V kernels due to this
+> commit. I can reproduce it with QEMU 5.1.0 and latest tip of tree
+> (25f6dc28a3a8dd231c2c092a0e65bd796353c769 at the time of initially
+> writing this).
+> 
+> The error message, commands, and bisect logs are available here:
+> 
+> https://gist.githubusercontent.com/nathanchance/c106dd22ec0c0e00f6a25daba106a1b9/raw/d929f2fff6da9126ded156affb0f19f359e9f693/qemu-5.1.0-issue-terminal-log.txt
+> 
+> I have attached the rootfs and kernel image used for these tests. If for
+> some reason there is a problem receiving them, the kernel is just an
+> arch/riscv/configs/defconfig kernel at Linux 5.9-rc2 and the rootfs is
+> available here:
+> 
+> https://github.com/ClangBuiltLinux/boot-utils/blob/3b21a5b71451742866349ba4f18638c5a754e660/images/riscv/rootfs.cpio.zst
+> 
+> Please let me know if I can provide any follow up information or if I am
+> doing something wrong.
+> 
+> Cheers,
+> Nathan
 
-No, that doesn't answer the question.
 
-Why does DECL_RREG_d et al exist as macros at all?  Why not emit the expansions
-directly by gen_tcg_funcs.py?
-
-It seems to me that all this does is obfuscate the code, adding one more layer
-that one has to unwind in order to understand.
+So pls try this patch and use gdb backtrace to see access to which MR
+triggers the assert.
 
 
-r~
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 70b93104e8..dc8b7682aa 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1368,6 +1368,7 @@ bool memory_region_access_valid(MemoryRegion *mr,
+ 
+     if (size > mr->ops->valid.max_access_size
+         || size < mr->ops->valid.min_access_size) {
++        assert(0);
+         return false;
+     }
+     return true;
+
 
