@@ -6,42 +6,44 @@ X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A103CC433E6
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 07:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F60C433E6
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 07:33:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D8A6206FA
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 07:25:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D8A6206FA
+	by mail.kernel.org (Postfix) with ESMTPS id 5BC0C2076D
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 07:33:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC0C2076D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCHiF-0001HH-LK
-	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 03:25:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59052)
+	id 1kCHpu-0002ol-EX
+	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 03:33:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kCHhh-0000ij-A0; Sun, 30 Aug 2020 03:24:41 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:43162
+ id 1kCHp9-0002PC-OB
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 03:32:23 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:43190
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kCHhf-0005sn-Bi; Sun, 30 Aug 2020 03:24:41 -0400
+ id 1kCHp7-0006kc-Pi
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 03:32:23 -0400
 Received: from host217-42-19-185.range217-42.btcentralplus.com
  ([217.42.19.185] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kCHhq-0002Cu-BL; Sun, 30 Aug 2020 08:24:55 +0100
-To: Nathan Chancellor <natechancellor@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200610134731.1514409-1-mst@redhat.com>
- <20200827053216.GA1515751@ubuntu-n2-xlarge-x86>
- <20200830021939-mutt-send-email-mst@kernel.org>
- <20200830064944.GA1073664@ubuntu-n2-xlarge-x86>
+ id 1kCHpV-0002Dx-KW; Sun, 30 Aug 2020 08:32:50 +0100
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Michael <macallan1888@gmail.com>
+References: <20200822142127.1316231-1-f4bug@amsat.org>
+ <7300edf2-ab44-3676-6948-adf2c5af6c02@linaro.org>
+ <20200829121341.59d8277b@glenfarclas>
+ <CAAdtpL4Pi3w+5awNrohmSpySsZhmmPFQeby+a1-=TT8mJ7ZQVw@mail.gmail.com>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
@@ -67,19 +69,19 @@ Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
  Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
  KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
  imgcU9TTGC5qd9g=
-Message-ID: <2fd7a1df-db2b-9edd-1d73-7efa18312ace@ilande.co.uk>
-Date: Sun, 30 Aug 2020 08:24:15 +0100
+Message-ID: <578210d0-059e-9fca-5ea9-b2cf12733f7e@ilande.co.uk>
+Date: Sun, 30 Aug 2020 08:32:12 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200830064944.GA1073664@ubuntu-n2-xlarge-x86>
+In-Reply-To: <CAAdtpL4Pi3w+5awNrohmSpySsZhmmPFQeby+a1-=TT8mJ7ZQVw@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 217.42.19.185
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH] memory: Revert "memory: accept mismatching sizes in
- memory_region_access_valid"
+Subject: Re: [RFC PATCH v2] hw/display/tcx: Allow 64-bit accesses to
+ framebuffer stippler and blitter
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -104,32 +106,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
- qemu-stable@nongnu.org, Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Michael Lorenz <macallan@netbsd.org>, 1892540@bugs.launchpad.net,
+ Andreas Gustafsson <gson@gson.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/08/2020 07:49, Nathan Chancellor wrote:
+On 29/08/2020 17:45, Philippe Mathieu-Daudé wrote:
 
-> Unfortunately, it does not. I applied it on top of latest
-> git (ac8b279f13865d1a4f1958d3bf34240c1c3af90d) and I can still
-> reproduce my failure. Is it possible that type of fix is needed
-> in a RISC-V specific driver?
+> Le sam. 29 août 2020 18:14, Michael <macallan1888@gmail.com
+> <mailto:macallan1888@gmail.com>> a écrit :
 > 
-> Would you like me to comment on the Launchpad bug as well?
+>     Hello,
+> 
+>     since I wrote the NetBSD code in question, here are my 2 cent:
+> 
+>     On Sat, 29 Aug 2020 08:41:43 -0700
+>     Richard Henderson <richard.henderson@linaro.org
+>     <mailto:richard.henderson@linaro.org>> wrote:
+> 
+>     > On 8/22/20 7:21 AM, Philippe Mathieu-Daudé wrote:
+>     > > The S24/TCX datasheet is listed as "Unable to locate" on [1].
+> 
+>     I don't have it either, but someone did a lot of reverse engineering
+>     and gave me his notes. The hardware isn't that complicated, but quite
+>     weird.
+> 
+>     > > However the NetBSD revision 1.32 of the driver introduced
+>     > > 64-bit accesses to the stippler and blitter [2]. It is safe
+>     > > to assume these memory regions are 64-bit accessible.
+>     > > QEMU implementation is 32-bit, so fill the 'impl' fields.
+> 
+>     IIRC the real hardware *requires* 64bit accesses for stipple and
+>     blitter operations to work. For stipples you write a 64bit word into
+>     STIP space, the address defines where in the framebuffer you want to
+>     draw, the data contain a 32bit bitmask, foreground colour and a ROP.
+>     BLIT space works similarly, the 64bit word contains an offset were to
+>     read pixels from, and how many you want to copy.
+> 
+> 
+> Thanks Michael for this information! 
+> If you don't mind I'll amend it to the commit description so there is a reference for
+> posterity. 
+> 
+> I'm waiting for /Andreas Gustafsson to test it then will repost.
 
-Hi Nathan,
+Hi Philippe,
 
-I came up with a quick patch to enable some logging to catch memory accesses being
-refused for a similar bug report at
-https://bugs.launchpad.net/qemu/+bug/1886318/comments/13.
-
-Can you apply the same change to your tree and report any messages on stderr as you
-do your board reboot test?
+Thanks for coming up with this patch! Looks fine to me, just wondering if it should
+have a "Fixes: 5d971f9e67 ("memory: Revert "memory: accept mismatching sizes in
+memory_region_access_valid"") tag rather than the original commit since that's how
+other bugs exposed by that commit have been tagged?
 
 
 ATB,
