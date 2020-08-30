@@ -7,87 +7,87 @@ X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE06C433E2
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 21:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1968C433E6
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 21:13:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8AEB2083E
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 21:07:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AFFC20936
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 21:13:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lrzOGJAP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8AEB2083E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qHolv7mT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AFFC20936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCUXf-00073r-4h
-	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 17:07:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50536)
+	id 1kCUeC-0008LJ-J4
+	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 17:13:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCUWu-0006eZ-Bm
- for qemu-devel@nongnu.org; Sun, 30 Aug 2020 17:06:24 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43009)
+ id 1kCUdf-0007wS-B0
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 17:13:23 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:41395)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCUWs-0006wf-AS
- for qemu-devel@nongnu.org; Sun, 30 Aug 2020 17:06:23 -0400
-Received: by mail-pl1-x641.google.com with SMTP id y6so2073125plk.10
- for <qemu-devel@nongnu.org>; Sun, 30 Aug 2020 14:06:21 -0700 (PDT)
+ id 1kCUdd-0007Yl-Mr
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 17:13:22 -0400
+Received: by mail-pl1-x642.google.com with SMTP id l9so455829plt.8
+ for <qemu-devel@nongnu.org>; Sun, 30 Aug 2020 14:13:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=l/HNSL8YRGS37j39j0uice1uD2+LcwVkHCTKl9u7Kqo=;
- b=lrzOGJAPsNGJ1CAadyUFWubbBl6+IG4stntTHExYdxpidVxYma2a8pD7nHj3x2WFSq
- nxHub3gs0mf9UuVTQaK6aUxQmN5kDseQVwi0zEL8i8O+QXdK7p8My3E1U+HJ88T7EZjm
- KFuCzk3mbFST7kIWDuLn/KoNTMhTlakwtIOf6ZAQ8xA8i0AMH9qOYMXRV+EnWW9sc1MW
- ADtb06UPq76S/n7NSLxgsTJ3ezwHSLuI3BqZL2wzWQtILjf88G0jh9vSrri6LESRtu+h
- Iotr6pUwR8LP0sm9LA4dy8kzpgsj0GMHykydpD4mjxQfjfBWw3whmrYJtOB8zAfWlMkX
- 7Duw==
+ bh=YVOviIW5wTEzNq9upYse/kB6TeNnSA7t6xmTtQ+W+Es=;
+ b=qHolv7mTkBNtyS05EXUHCo5tMDQuIDB8nB+2WxD8GU/7Ga3Q48y+4vgTYFv4ZaXnNS
+ /1gB5fk4GGLJL+OmFyNVc9u1X7N7zs3ZjLjRgER01OGJDe2tn7apqCv40PsfvjktKm3Y
+ 7x4JNo8USxIm9544qFgA+z30bszrxBj+ticcbaWjr2KyddkZ5NBDmLa613I6Ta0rytxM
+ APVNClIFcFcVzwrz6OzNFCEDrzdRCvAvhDlaYxHgHeN87Pgj5vkmE9A5CNtPl0Deyj2u
+ q22A6up0tmuerxG7Xjw7x14fmguA5a4hRBm2NHj521MSM6MqkZb5oE198z1mekqetIkx
+ dZ2g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=l/HNSL8YRGS37j39j0uice1uD2+LcwVkHCTKl9u7Kqo=;
- b=cygf36ZaMjS/kdDDLXt0xkc3z0xr0xZpz6KyWH4CaI22ipn+pjVsRFr8AmyfU8eaHo
- 5vqVxJLppPZu38ZbYBJZyjdZWCAzS2J8XQRlJO/pPvwF4Fw2XFtag8Yj3voE9bB7J6Qe
- ZWfCUyJDb9PmuurWNB617ysacsLUz7U78u5LyKZXCXUckKBkoEai3/O6rnXRJpmxQAjO
- 5ALpEQ3Is7FWrM0nvTiRjGChr5c1H/aM2vbzdobDO58RovJM+HhUSKA6y9XkftMU7juT
- e4VoupWGxX6lRDYB3jHfaksFhco4eHvIpA0e5IelIwCV3C9EGWFB51E5aY9tmXj8+xy3
- p9qA==
-X-Gm-Message-State: AOAM532eUXwOH6TEc1WHp9bJE5gekCdrcQAkYwZhrcn8fqpK0F8edcUM
- JffGc7+AAqh9sPwnHHTHubDsuw==
-X-Google-Smtp-Source: ABdhPJz+vB0BhJwlrzB3Gf9154fr3ctguYCUmhGsyUYkxSnn0BV61LOYUOXyV0TrcAzb3KO7yF8iPA==
-X-Received: by 2002:a17:90a:d808:: with SMTP id
- a8mr7933439pjv.127.1598821580686; 
- Sun, 30 Aug 2020 14:06:20 -0700 (PDT)
+ bh=YVOviIW5wTEzNq9upYse/kB6TeNnSA7t6xmTtQ+W+Es=;
+ b=H3UJ+E1358hHNucUy6BCr+vdxH2gvtpaknjW5smcxZ/pe1ULT5iFyPhiY9xBkpzxcF
+ XzgYdWyXxwGHs7w1ZCYHkm9fXk/8ixOf9Zsk1bpUZPvcIbE8l+g0943fNxyPFfXO5HMd
+ yZN/KeKuMkN9maylxVq7WpBRGtIki20/5cTU7tX4akJpm07ZzQoXyR4+O0ROjexqTHCi
+ kYQXIS2HYpUGKx6FGQpGBW5wws05AW9xrkjp3Lkoflb7p16m+2N421RYEBp4ifRUEQ2k
+ FC3XNM15Eefsi/ldzwuCeCO6h2855cMkU8m1U5PXNfimLovgIazdTSAEilQTIcMbuq5H
+ SqXA==
+X-Gm-Message-State: AOAM531TMx+arNfoRXpZ7D2Fyl0Wn8CU71LDKk2/Jy/qDzWHtmg2qETw
+ WVteb7ccjbEAig97ky9V5rR+2g==
+X-Google-Smtp-Source: ABdhPJwp7EOzRM6Os0Orv/6mP7Eq+9lmpeYsIg/bXsm0uu0/kt/SJfjnZRUB4JRNeTaQkAKAEFMZ7w==
+X-Received: by 2002:a17:90a:fc98:: with SMTP id
+ ci24mr8020875pjb.101.1598822000110; 
+ Sun, 30 Aug 2020 14:13:20 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id o30sm5443166pgc.45.2020.08.30.14.06.19
+ by smtp.gmail.com with ESMTPSA id c203sm5664631pfc.156.2020.08.30.14.13.18
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 30 Aug 2020 14:06:19 -0700 (PDT)
-Subject: Re: [RFC PATCH v3 26/34] Hexagon (target/hexagon) macros referenced
- in instruction semantics
+ Sun, 30 Aug 2020 14:13:19 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 30/34] Hexagon (target/hexagon) TCG for
+ instructions with multiple definitions
 To: Taylor Simpson <tsimpson@quicinc.com>,
  "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
- <1597765847-16637-27-git-send-email-tsimpson@quicinc.com>
- <75d5275b-76e5-38a5-f9a3-f36d1ee08c74@linaro.org>
- <BYAPR02MB4886F42C26BAEEC5CF00D0AADE500@BYAPR02MB4886.namprd02.prod.outlook.com>
+ <1597765847-16637-31-git-send-email-tsimpson@quicinc.com>
+ <10127f7e-a2df-2f19-e897-9a874f9a5d82@linaro.org>
+ <BYAPR02MB488691F539AD3A2BFA1C819DDE500@BYAPR02MB4886.namprd02.prod.outlook.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <9ff75671-1b85-8fd1-2ee2-aeebd402f7a2@linaro.org>
-Date: Sun, 30 Aug 2020 14:06:18 -0700
+Message-ID: <a0987bce-409b-cd14-7559-c63413ff2b6f@linaro.org>
+Date: Sun, 30 Aug 2020 14:13:17 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <BYAPR02MB4886F42C26BAEEC5CF00D0AADE500@BYAPR02MB4886.namprd02.prod.outlook.com>
+In-Reply-To: <BYAPR02MB488691F539AD3A2BFA1C819DDE500@BYAPR02MB4886.namprd02.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -22
@@ -117,27 +117,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/30/20 1:23 PM, Taylor Simpson wrote:
->> I think the merge stuff is a mistake.  I think you can get the semantics that
->> you want with
->>
->> probe_read(ld_addr, ld_len)
->> qemu_st(st_value, st_addr)
->> qemu_ld(ld_value, ld_addr)
->>
->> In this way, all exceptions are recognized before the store is complete, the
->> normal memory operations handle any possible overlap.
+On 8/30/20 12:48 PM, Taylor Simpson wrote:
+> I'll add the following comment to indicate what's going on
 > 
-> So, do this inside the helper?  Or is there a way to generate TCG code?
+> /*
+>   * Each of the generated helpers is wrapped with #ifndef fGEN_TCG_<tag>.
+>   * For example
+>    *     #ifndef fGEN_TCG_A2_add
+>    *     DEF_HELPER_3(A2_add, s32, env, s32, s32)
+>    *     #endif
+>   * We include gen_tcg.h here to provide definitions of fGEN_TCG for any instructions that
+>   * are overridden.
+>   *
+>   * This prevents unused helpers from taking up space in the executable.
+>   */
 
-I was thinking TCG code, where you can look at the packet before any code gen,
-and decide whether or not this situation actually applies.
+Ah, hum.  Well.
 
-The probe is a simple helper call, for which the generic machinery exists
-(probe_access, probe_write, probe_read).  All you have to do is write the wrapper.
+How about we figure out a way to communicate to the generator scripts which
+functions have been implemented "directly", and don't need to be generated at all?
 
-The loads and stores are, well, normal loads and stores.
+I don't see why we have to wait until the c preprocessor to remove this unused
+code, and the less we have of it, the better.
 
 
 r~
+
 
