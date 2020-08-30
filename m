@@ -2,60 +2,80 @@ Return-Path: <SRS0=e36u=CI=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD05AC433E6
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 09:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DA1C433E2
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 09:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC2E420714
-	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 09:23:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC2E420714
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=mikedld.com
+	by mail.kernel.org (Postfix) with ESMTPS id 51E1B20738
+	for <qemu-devel@archiver.kernel.org>; Sun, 30 Aug 2020 09:31:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51E1B20738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCJYp-0002hO-TU
-	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 05:23:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50182)
+	id 1kCJga-0005G3-FZ
+	for qemu-devel@archiver.kernel.org; Sun, 30 Aug 2020 05:31:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mikedld@mikedld.com>)
- id 1kCJYC-0002Fe-FQ; Sun, 30 Aug 2020 05:23:00 -0400
-Received: from static.44.144.216.95.clients.your-server.de
- ([95.216.144.44]:47808 helo=mikedld.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mikedld@mikedld.com>)
- id 1kCJYA-00006M-SR; Sun, 30 Aug 2020 05:23:00 -0400
-Received: from localhost (unknown [178.124.162.207])
- by mikedld.com (Postfix) with ESMTPS id 1172839C3BC;
- Sun, 30 Aug 2020 09:22:54 +0000 (UTC)
-From: Mike Gelfand <mikedld@mikedld.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] linux-user: Add strace support for printing OFD fcntl
- operations
-Date: Sun, 30 Aug 2020 12:22:42 +0300
-Message-Id: <20200830092242.31506-1-mikedld@mikedld.com>
-X-Mailer: git-send-email 2.28.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kCJfh-0004ju-Fd
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 05:30:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44886)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kCJff-0001ET-D9
+ for qemu-devel@nongnu.org; Sun, 30 Aug 2020 05:30:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kCJfd-0006GJ-H9
+ for <qemu-devel@nongnu.org>; Sun, 30 Aug 2020 09:30:41 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7EF0E2E80DB
+ for <qemu-devel@nongnu.org>; Sun, 30 Aug 2020 09:30:41 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=95.216.144.44; envelope-from=mikedld@mikedld.com;
- helo=mikedld.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/30 05:22:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, KHOP_HELO_FCRDNS=0.4,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sun, 30 Aug 2020 09:24:26 -0000
+From: Mike Gelfand <1893010@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: linux-user
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: laurent-vivier mike.dld
+X-Launchpad-Bug-Reporter: Mike Gelfand (mike.dld)
+X-Launchpad-Bug-Modifier: Mike Gelfand (mike.dld)
+References: <159843096085.1469.8304847352897420087.malonedeb@wampee.canonical.com>
+Message-Id: <159877946704.22385.13825359602214513995.malone@wampee.canonical.com>
+Subject: [Bug 1893010] Re: qemu linux-user doesn't support OFD fcntl locks
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
+X-Launchpad-Hash: db9b80e40757e4efdb0c7fc72bd83a602eb2bccb
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/30 02:25:36
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -64,41 +84,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Mike Gelfand <mikedld@mikedld.com>,
- Laurent Vivier <laurent@vivier.eu>
+Reply-To: Bug 1893010 <1893010@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Mike Gelfand <mikedld@mikedld.com>
----
- linux-user/strace.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Thanks, the changes in 5.1.0 seem to work indeed.
 
-diff --git a/linux-user/strace.c b/linux-user/strace.c
-index 4f77b0cf76..11fea14fba 100644
---- a/linux-user/strace.c
-+++ b/linux-user/strace.c
-@@ -2056,6 +2056,18 @@ print_fcntl(void *cpu_env, const struct syscallname *name,
-         print_pointer(arg2, 1);
-         break;
- #endif
-+    case TARGET_F_OFD_GETLK:
-+        qemu_log("F_OFD_GETLK,");
-+        print_pointer(arg2, 1);
-+        break;
-+    case TARGET_F_OFD_SETLK:
-+        qemu_log("F_OFD_SETLK,");
-+        print_pointer(arg2, 1);
-+        break;
-+    case TARGET_F_OFD_SETLKW:
-+        qemu_log("F_OFD_SETLKW,");
-+        print_pointer(arg2, 1);
-+        break;
-     case TARGET_F_SETLEASE:
-         qemu_log("F_SETLEASE,");
-         print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
--- 
-2.28.0
+> perhaps you can send a patch to the qemu-devel ML to add the strace
+part
 
+Done.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1893010
+
+Title:
+  qemu linux-user doesn't support OFD fcntl locks
+
+Status in QEMU:
+  New
+
+Bug description:
+  "Open file description locks (non-POSIX)", as they are described in
+  fcntl(2) man page, aren't supported by qemu-user  and attempting to
+  use those results in EINVAL. I'm on Gentoo with latest QEMU version
+  currently available (5.0.0-r2), and trying to emulate ppc64 and s390x
+  on x86_64.
+
+  Looking at linux-user/syscall.c, I'm guessing the issue is in (at
+  least) `target_to_host_fcntl_cmd` where switch reaches the default
+  clause as there're no cases for F_OFD_SETLK / F_OFD_SETLKW /
+  F_OFD_GETLK.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1893010/+subscriptions
 
