@@ -4,87 +4,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9FEBC433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:05:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 546BAC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B27E52072D
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:05:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FADE2072D
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:05:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q1PjcLHd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B27E52072D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q67TXJpV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FADE2072D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kChcp-0002tq-SV
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:05:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47044)
+	id 1kChcq-0002sz-5I
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:05:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kChbv-0001Da-OK
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:04:27 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:46981
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kChbw-0001FM-JZ
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:04:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47826
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kChbt-0008Ma-Kp
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:04:27 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kChbv-0008My-1r
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:04:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598871864;
+ s=mimecast20190719; t=1598871866;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=05wm/L/XPk6410ikRNnz1N7rEdTkTuz4gpHOoZ6FZPg=;
- b=Q1PjcLHdOKvfCB4bnKrTUOVgqqrz4FGwLyOnpQGC6zyF93VISWBEUCuyBcTibww2BU9NK1
- Mw9kOZLlSPeuoODEi8z0gzRwP6ndLiDPxeSQ5IVIhsNs4U1bHdPhwl3pLWdaZaXzjS+XT0
- VJytHa7ZnkvceFmZe5Y8v6naQBjuqJs=
+ bh=7MEBuq0zfJBQ1/zxCRza1DPT/6+tMCyqccviMn0hSOs=;
+ b=Q67TXJpVjVZbqbSTWCjWy5o8is0VTKVuc6yhntYY3lmxkR0Wf+5Mx4UKxeTPpmhQkZzg9n
+ E9GqBYWCDjtO+qpC/lTHwkCcNjl7n0gI0fjPdSQM/i+S03h09SHMaLniZnG3fZZ784rExZ
+ kGWpwcqWDsYIFX17CAdCXDR/I1AIATo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-304-dnbMtM8lMlipSVZaSnZ2wA-1; Mon, 31 Aug 2020 07:04:22 -0400
-X-MC-Unique: dnbMtM8lMlipSVZaSnZ2wA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-379-mIbTpIIRM-qIZClj-GrNIA-1; Mon, 31 Aug 2020 07:04:22 -0400
+X-MC-Unique: mIbTpIIRM-qIZClj-GrNIA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EA4518A224B;
- Mon, 31 Aug 2020 11:04:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EEEC910066FA;
+ Mon, 31 Aug 2020 11:04:20 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F36A31002D40;
- Mon, 31 Aug 2020 11:04:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E684F7E303;
+ Mon, 31 Aug 2020 11:04:16 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 3AD4431E68; Mon, 31 Aug 2020 13:04:16 +0200 (CEST)
+ id 1FF8D7828; Mon, 31 Aug 2020 13:04:16 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 5/5] ui/gtk: Update refresh interval after widget is realized
-Date: Mon, 31 Aug 2020 13:04:16 +0200
-Message-Id: <20200831110416.15176-6-kraxel@redhat.com>
+Subject: [PULL 2/5] vnc-auth-sasl: Plug memleak in vnc_socket_ip_addr_string
+Date: Mon, 31 Aug 2020 13:04:13 +0200
+Message-Id: <20200831110416.15176-3-kraxel@redhat.com>
 In-Reply-To: <20200831110416.15176-1-kraxel@redhat.com>
 References: <20200831110416.15176-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:56:57
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:54:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,131 +97,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Nikola Pavlica <pavlica.nikola@gmail.com>
+Cc: Li Qiang <liq3ea@gmail.com>, Pan Nengyuan <pannengyuan@huawei.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Pan Nengyuan <pannengyuan@huawei.com>
 
-Nikola reported on Windows when gd_vc_gfx_init() is called, the
-window is not yet realized, so we run gd_refresh_rate_millihz(NULL)
-which returns 0 milli-Hertz.
-When a Widget is realized, it fires a 'realized' event. We already
-have the gd_draw_event() handler registered for this even, so simply
-move the gd_refresh_rate_millihz() there. When the event fires, the
-window is known to exist.
-This completes commit c4c00922cc original intention.
+'addr' is forgot to free in vnc_socket_ip_addr_string error path. Fix that.
 
-Reported-by: Nikola Pavlica <pavlica.nikola@gmail.com>
-Tested-by: Nikola Pavlica <pavlica.nikola@gmail.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-id: 20200817172331.598255-1-philmd@redhat.com
-Suggested-by: Nikola Pavlica <pavlica.nikola@gmail.com>
-Tested-by: Nikola Pavlica <pavlica.nikola@gmail.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Message-Id: <20200831134315.1221-11-pannengyuan@huawei.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/gtk.c | 52 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 26 insertions(+), 26 deletions(-)
+ ui/vnc-auth-sasl.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/ui/gtk.c b/ui/gtk.c
-index b0cc08ad6da7..7a717ce8e5e4 100644
---- a/ui/gtk.c
-+++ b/ui/gtk.c
-@@ -744,6 +744,25 @@ static void gd_resize_event(GtkGLArea *area,
+diff --git a/ui/vnc-auth-sasl.c b/ui/vnc-auth-sasl.c
+index 7b2b09f24276..0517b2ead9ce 100644
+--- a/ui/vnc-auth-sasl.c
++++ b/ui/vnc-auth-sasl.c
+@@ -522,6 +522,7 @@ vnc_socket_ip_addr_string(QIOChannelSocket *ioc,
  
- #endif
- 
-+/*
-+ * If available, return the refresh rate of the display in milli-Hertz,
-+ * else return 0.
-+ */
-+static int gd_refresh_rate_millihz(GtkWidget *window)
-+{
-+#ifdef GDK_VERSION_3_22
-+    GdkWindow *win = gtk_widget_get_window(window);
-+
-+    if (win) {
-+        GdkDisplay *dpy = gtk_widget_get_display(window);
-+        GdkMonitor *monitor = gdk_display_get_monitor_at_window(dpy, win);
-+
-+        return gdk_monitor_get_refresh_rate(monitor);
-+    }
-+#endif
-+    return 0;
-+}
-+
- static gboolean gd_draw_event(GtkWidget *widget, cairo_t *cr, void *opaque)
- {
-     VirtualConsole *vc = opaque;
-@@ -751,6 +770,7 @@ static gboolean gd_draw_event(GtkWidget *widget, cairo_t *cr, void *opaque)
-     int mx, my;
-     int ww, wh;
-     int fbw, fbh;
-+    int refresh_rate_millihz;
- 
- #if defined(CONFIG_OPENGL)
-     if (vc->gfx.gls) {
-@@ -771,6 +791,12 @@ static gboolean gd_draw_event(GtkWidget *widget, cairo_t *cr, void *opaque)
-         return FALSE;
+     if (addr->type != SOCKET_ADDRESS_TYPE_INET) {
+         error_setg(errp, "Not an inet socket type");
++        qapi_free_SocketAddress(addr);
+         return NULL;
      }
- 
-+    refresh_rate_millihz = gd_refresh_rate_millihz(vc->window ?
-+                                                   vc->window : s->window);
-+    if (refresh_rate_millihz) {
-+        vc->gfx.dcl.update_interval = MILLISEC_PER_SEC / refresh_rate_millihz;
-+    }
-+
-     fbw = surface_width(vc->gfx.ds);
-     fbh = surface_height(vc->gfx.ds);
- 
-@@ -1949,31 +1975,11 @@ static GtkWidget *gd_create_menu_machine(GtkDisplayState *s)
-     return machine_menu;
- }
- 
--/*
-- * If available, return the refresh rate of the display in milli-Hertz,
-- * else return 0.
-- */
--static int gd_refresh_rate_millihz(GtkWidget *window)
--{
--#ifdef GDK_VERSION_3_22
--    GdkWindow *win = gtk_widget_get_window(window);
--
--    if (win) {
--        GdkDisplay *dpy = gtk_widget_get_display(window);
--        GdkMonitor *monitor = gdk_display_get_monitor_at_window(dpy, win);
--
--        return gdk_monitor_get_refresh_rate(monitor);
--    }
--#endif
--    return 0;
--}
--
- static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
-                               QemuConsole *con, int idx,
-                               GSList *group, GtkWidget *view_menu)
- {
-     bool zoom_to_fit = false;
--    int refresh_rate_millihz;
- 
-     vc->label = qemu_console_get_label(con);
-     vc->s = s;
-@@ -2031,12 +2037,6 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
-     vc->gfx.kbd = qkbd_state_init(con);
-     vc->gfx.dcl.con = con;
- 
--    refresh_rate_millihz = gd_refresh_rate_millihz(vc->window ?
--                                                   vc->window : s->window);
--    if (refresh_rate_millihz) {
--        vc->gfx.dcl.update_interval = MILLISEC_PER_SEC / refresh_rate_millihz;
--    }
--
-     register_displaychangelistener(&vc->gfx.dcl);
- 
-     gd_connect_vc_gfx_signals(vc);
+     ret = g_strdup_printf("%s;%s", addr->u.inet.host, addr->u.inet.port);
 -- 
 2.27.0
 
