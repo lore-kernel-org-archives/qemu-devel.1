@@ -2,90 +2,79 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD65AC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 19:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FEB9C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 20:06:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71A96206C0
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 19:36:42 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="atrG//0/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A96206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5B7CE2078B
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 20:06:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B7CE2078B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40186 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50692 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCpbd-0000iO-Ix
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 15:36:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53532)
+	id 1kCq4G-0008LW-H0
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 16:06:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kCpZh-0005kS-TU
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 15:34:41 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47309
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kCpZg-0005fa-0N
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 15:34:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598902479;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UbfoLXN+nHRwFXdTrfiaSZqZbGEzYEgETohlSjexE70=;
- b=atrG//0/wzB30OQ1j2IrbJw0Nm2zNQHWsoP34hV5IYbcxDDMOhhQflPPGxsqLt8HnCPUXy
- kVKq9G0l2aGuzz5Z9zmnS7yLrYHfN9e1cmE3YwK35uR0XP1G8aBaZLe6uXamvLOkqGBb/4
- BWE26ih1wmBbQvUrG4XqTSbcbSMlVFo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-184-RB50YXbIM1yGtBsKCVNXEg-1; Mon, 31 Aug 2020 15:34:35 -0400
-X-MC-Unique: RB50YXbIM1yGtBsKCVNXEg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF1EC8030DD;
- Mon, 31 Aug 2020 19:34:33 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-112-112.ams2.redhat.com [10.36.112.112])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7169F7EB85;
- Mon, 31 Aug 2020 19:34:31 +0000 (UTC)
-From: Eric Auger <eric.auger@redhat.com>
-To: eric.auger.pro@gmail.com, eric.auger@redhat.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, drjones@redhat.com,
- andrew.murray@arm.com, sudeep.holla@arm.com, maz@kernel.org,
- will@kernel.org, haibo.xu@linaro.org
-Subject: [kvm-unit-tests RFC 4/4] spe: Test Profiling Buffer Events
-Date: Mon, 31 Aug 2020 21:34:14 +0200
-Message-Id: <20200831193414.6951-5-eric.auger@redhat.com>
-In-Reply-To: <20200831193414.6951-1-eric.auger@redhat.com>
-References: <20200831193414.6951-1-eric.auger@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kCq3j-0007sJ-Ct
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 16:05:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57628)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kCq3h-0000f2-9M
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 16:05:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kCq3e-0004UD-Eg
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 20:05:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 686C82E8053
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 20:05:38 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:13:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 31 Aug 2020 19:58:29 -0000
+From: Piotr Jurkiewicz <1893691@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: piotrjurkiewicz
+X-Launchpad-Bug-Reporter: Piotr Jurkiewicz (piotrjurkiewicz)
+X-Launchpad-Bug-Modifier: Piotr Jurkiewicz (piotrjurkiewicz)
+Message-Id: <159890390988.14589.1084059668441088626.malonedeb@gac.canonical.com>
+Subject: [Bug 1893691] [NEW] Chardev logfile is not written (regression
+ between 5.0 and 5.1)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
+X-Launchpad-Hash: 6e85f67b957c35bbb6636187f6fad856efba4cb3
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 13:40:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,249 +83,182 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1893691 <1893691@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Setup the infrastructure to check the occurence of events.
-The test checks the Buffer Full event occurs when no space
-is available. The PPI is handled and we check the syndrome register
-against the expected event.
+Public bug reported:
 
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
----
- arm/spe.c         | 141 +++++++++++++++++++++++++++++++++++++++++++++-
- arm/unittests.cfg |   8 +++
- 2 files changed, 148 insertions(+), 1 deletion(-)
+After update from version 5.0 to 5.1, logfile stopped being populated
+with console output. The file is being created, but remains empty.
 
-diff --git a/arm/spe.c b/arm/spe.c
-index 7996f79..2f5ee35 100644
---- a/arm/spe.c
-+++ b/arm/spe.c
-@@ -19,6 +19,7 @@
- #include "alloc_page.h"
- #include <bitops.h>
- #include "alloc.h"
-+#include <asm/gic.h>
- 
- struct spe {
- 	int min_interval;
-@@ -36,13 +37,37 @@ struct spe {
- 	bool unique_record_size;
- };
- 
-+enum spe_event_exception_class {
-+	EC_STAGE1_DATA_ABORT =  0x24,
-+	EC_STAGE2_DATA_ABORT = 0x25,
-+	EC_OTHER = 0,
-+};
-+
-+struct spe_event {
-+	enum spe_event_exception_class ec;
-+	bool dl;	/* data lost */
-+	bool ea;	/* external abort */
-+	bool s;		/* service */
-+	bool coll;	/* collision */
-+	union {
-+		bool buffer_filled; /* ec = other */
-+	} mss;
-+};
-+
- static struct spe spe;
- 
-+struct spe_stats {
-+	struct spe_event observed;
-+	bool unexpected;
-+};
-+static struct spe_stats spe_stats;
-+
- #ifdef __arm__
- 
- static bool spe_probe(void) { return false; }
- static void test_spe_introspection(void) { }
- static void test_spe_buffer(void) { }
-+static void test_spe_events(void) { }
- 
- #else
- 
-@@ -95,6 +120,16 @@ static void test_spe_buffer(void) { }
- #define PMSCR_EL1_TS			0x20
- #define PMSCR_EL1_PCT			0x40
- 
-+#define PMBSR_EL1_COLL			0x10000
-+#define PMBSR_EL1_S			0x20000
-+#define PMBSR_EL1_EA			0x40000
-+#define PMBSR_EL1_DL			0x80000
-+#define PMBSR_EL1_EC_SHIFT		26
-+#define PMBSR_EL1_EC_MASK		0x3F
-+#define PMBSR_EL1_MISS_MASK		0xFFFF
-+
-+#define SPE_PPI 21
-+
- static int min_interval(uint8_t idr_bits)
- {
- 	switch (idr_bits) {
-@@ -119,6 +154,44 @@ static int min_interval(uint8_t idr_bits)
- 	}
- }
- 
-+static int decode_syndrome_register(uint64_t sr, struct spe_event *event, bool verbose)
-+{
-+	if (!sr)
-+		return 0;
-+
-+	if (sr & PMBSR_EL1_S)
-+		event->s = true;
-+	if (sr & PMBSR_EL1_COLL)
-+		event->coll = true;
-+	if (sr & PMBSR_EL1_EA)
-+		event->ea = true;
-+	if (sr & PMBSR_EL1_DL)
-+		event->dl = true;
-+	if (verbose)
-+		report_info("PMBSR_EL1: Service=%d Collision=%d External Fault=%d DataLost=%d",
-+			    event->s, event->coll, event->ea, event->dl);
-+
-+	switch ((sr >> PMBSR_EL1_EC_SHIFT) & PMBSR_EL1_EC_MASK) {
-+	case EC_OTHER:
-+		event->ec = EC_OTHER;
-+		event->mss.buffer_filled = sr & 0x1;
-+		if (verbose)
-+			report_info("PMBSR_EL1: EC = OTHER buffer filled=%d", event->mss.buffer_filled);
-+		break;
-+	case EC_STAGE1_DATA_ABORT:
-+		event->ec = EC_STAGE1_DATA_ABORT;
-+		report_info("PMBSR_EL1: EC = stage 1 data abort");
-+		break;
-+	case EC_STAGE2_DATA_ABORT:
-+		event->ec = EC_STAGE2_DATA_ABORT;
-+		report_info("PMBSR_EL1: EC = stage 2 data abort");
-+		break;
-+	default:
-+		return -1;
-+	}
-+	return 0;
-+}
-+
- static bool spe_probe(void)
- {
- 	uint64_t pmbidr_el1, pmsidr_el1;
-@@ -224,6 +297,13 @@ static void reset(void)
- 
- 	/* Make sure the syndrome register is void */
- 	write_sysreg_s(0, PMBSR_EL1);
-+
-+	memset(&spe_stats, 0, sizeof(spe_stats));
-+}
-+
-+inline bool event_match(struct spe_event *observed, struct spe_event *expected)
-+{
-+	return !memcmp(observed, expected, sizeof(struct spe_event));
- }
- 
- static inline void drain(void)
-@@ -235,6 +315,7 @@ static inline void drain(void)
- 
- static void test_spe_buffer(void)
- {
-+	struct spe_event observed = {}, expected = {};
- 	uint64_t pmbsr_el1, val1, val2;
- 	void *addr = malloc(10 * PAGE_SIZE);
- 
-@@ -290,7 +371,61 @@ static void test_spe_buffer(void)
- 		report_info("This corresponds to %ld record(s) of %d bytes",
- 			    val2 / spe.maxsize, spe.maxsize);
- 	pmbsr_el1 = read_sysreg_s(PMBSR_EL1);
--	report(!pmbsr_el1, "PMBSR_EL1: no event");
-+	report(!(decode_syndrome_register(pmbsr_el1, &observed, true)) &&
-+	       event_match(&observed, &expected), "PMBSR_EL1: no event");
-+
-+	free(addr);
-+}
-+
-+static void irq_handler(struct pt_regs *regs)
-+{
-+	uint32_t irqstat, irqnr;
-+
-+	irqstat = gic_read_iar();
-+	irqnr = gic_iar_irqnr(irqstat);
-+
-+	if (irqnr == SPE_PPI) {
-+		uint64_t pmbsr_el1 = read_sysreg_s(PMBSR_EL1);
-+
-+		if (decode_syndrome_register(pmbsr_el1, &spe_stats.observed, true))
-+			spe_stats.unexpected = true;
-+		report_info("SPE IRQ! SR=0x%lx", pmbsr_el1);
-+		write_sysreg_s(0, PMBSR_EL1);
-+	} else {
-+		spe_stats.unexpected = true;
-+	}
-+	gic_write_eoir(irqstat);
-+}
-+
-+static inline bool has_event_occurred(struct spe_event *expected)
-+{
-+	return (!spe_stats.unexpected && event_match(&spe_stats.observed, expected));
-+}
-+
-+static void test_spe_events(void)
-+{
-+	struct spe_event expected = {.ec = EC_OTHER, .mss.buffer_filled = true, .s = true};
-+	void *addr = malloc(10 * PAGE_SIZE);
-+
-+	gic_enable_defaults();
-+	install_irq_handler(EL1H_IRQ, irq_handler);
-+	local_irq_enable();
-+	gic_enable_irq(SPE_PPI);
-+
-+	reset();
-+
-+	/* Willingly set pmblimitr tp pmdptr */
-+	spe.pmblimitr_el1 = spe.pmbptr_el1;
-+
-+	mem_access_loop(addr, 100000, spe.pmblimitr_el1 | PMBLIMITR_EL1_E);
-+	drain();
-+	report(has_event_occurred(&expected), "PMBSR_EL1: buffer full event");
-+
-+	/* redo it once */
-+
-+	mem_access_loop(addr, 100000, spe.pmblimitr_el1 | PMBLIMITR_EL1_E);
-+	drain();
-+	report(has_event_occurred(&expected), "PMBSR_EL1: buffer full event");
- 
- 	free(addr);
- }
-@@ -317,6 +452,10 @@ int main(int argc, char *argv[])
- 		report_prefix_push(argv[1]);
- 		test_spe_buffer();
- 		report_prefix_pop();
-+	} else if (strcmp(argv[1], "spe-events") == 0) {
-+		report_prefix_push(argv[1]);
-+		test_spe_events();
-+		report_prefix_pop();
- 	} else {
- 		report_abort("Unknown sub-test '%s'", argv[1]);
- 	}
-diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-index bb0e84c..b2b07be 100644
---- a/arm/unittests.cfg
-+++ b/arm/unittests.cfg
-@@ -150,6 +150,14 @@ extra_params = -append 'spe-buffer'
- accel = kvm
- arch = arm64
- 
-+[spe-events]
-+file = spe.flat
-+groups = spe
-+arch = arm64
-+extra_params = -append 'spe-events'
-+accel = kvm
-+arch = arm64
-+
- # Test GIC emulation
- [gicv2-ipi]
- file = gic.flat
--- 
-2.21.3
+Relevant command line options:
 
+-mon chardev=3Dchar0
+-serial chardev:char0
+-chardev socket,host=3D127.0.0.10,port=3D2323,server,nowait,telnet,mux=3Don=
+,id=3Dchar0,logfile=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/in=
+ternal/log
+
+
+Full command line:
+
+qemu-system-x86_64
+-nodefaults
+-no-user-config
+-snapshot
+-enable-kvm
+-cpu
+host
+-nographic
+-echr
+17
+-mon
+chardev=3Dchar0
+-serial
+chardev:char0
+-rtc
+clock=3Dvm
+-object
+rng-random,filename=3D/dev/urandom,id=3Drng0
+-device
+virtio-rng-pci,rng=3Drng0,max-bytes=3D512,period=3D1000
+-name
+2020-08-31T21:46:55-0,debug-threads=3Don
+-smp
+sockets=3D1,cores=3D9,threads=3D2
+-m
+251G
+-overcommit
+cpu-pm=3Don
+-pidfile
+/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/internal/pid
+-net
+nic,model=3Dvirtio
+-net
+user,hostfwd=3Dtcp:127.0.0.10:2222-:22,hostfwd=3Dtcp:127.0.0.10:8000-:8000,=
+hostfwd=3Dtcp:127.0.0.10:9000-:9000
+-fsdev
+local,id=3Dmachiner_internal_dir,security_model=3Dnone,path=3D/home/jurkiew=
+/.machiner/runs/2020-08-31T21:46:55-0/internal
+-device
+virtio-9p-pci,fsdev=3Dmachiner_internal_dir,mount_tag=3Dmachiner_internal_d=
+ir
+-fsdev
+local,id=3Dmachiner_lower_dir,security_model=3Dnone,readonly,path=3D.
+-device
+virtio-9p-pci,fsdev=3Dmachiner_lower_dir,mount_tag=3Dmachiner_lower_dir
+-fsdev
+local,id=3Dmachiner_upper_dir,security_model=3Dmapped-xattr,fmode=3D0777,dm=
+ode=3D0777,path=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0
+-device
+virtio-9p-pci,fsdev=3Dmachiner_upper_dir,mount_tag=3Dmachiner_upper_dir
+-device
+virtio-scsi
+-drive
+if=3Dnone,file=3D/home/jurkiew/.machiner/images/famtar/image.qcow2,discard=
+=3Don,id=3Dfamtar
+-device
+scsi-hd,drive=3Dfamtar
+-chardev
+socket,host=3D127.0.0.10,port=3D2323,server,nowait,telnet,mux=3Don,id=3Dcha=
+r0,logfile=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/internal/log
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1893691
+
+Title:
+  Chardev logfile is not written (regression between 5.0 and 5.1)
+
+Status in QEMU:
+  New
+
+Bug description:
+  After update from version 5.0 to 5.1, logfile stopped being populated
+  with console output. The file is being created, but remains empty.
+
+  Relevant command line options:
+
+  -mon chardev=3Dchar0
+  -serial chardev:char0
+  -chardev socket,host=3D127.0.0.10,port=3D2323,server,nowait,telnet,mux=3D=
+on,id=3Dchar0,logfile=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/=
+internal/log
+
+  =
+
+  Full command line:
+
+  qemu-system-x86_64
+  -nodefaults
+  -no-user-config
+  -snapshot
+  -enable-kvm
+  -cpu
+  host
+  -nographic
+  -echr
+  17
+  -mon
+  chardev=3Dchar0
+  -serial
+  chardev:char0
+  -rtc
+  clock=3Dvm
+  -object
+  rng-random,filename=3D/dev/urandom,id=3Drng0
+  -device
+  virtio-rng-pci,rng=3Drng0,max-bytes=3D512,period=3D1000
+  -name
+  2020-08-31T21:46:55-0,debug-threads=3Don
+  -smp
+  sockets=3D1,cores=3D9,threads=3D2
+  -m
+  251G
+  -overcommit
+  cpu-pm=3Don
+  -pidfile
+  /home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/internal/pid
+  -net
+  nic,model=3Dvirtio
+  -net
+  user,hostfwd=3Dtcp:127.0.0.10:2222-:22,hostfwd=3Dtcp:127.0.0.10:8000-:800=
+0,hostfwd=3Dtcp:127.0.0.10:9000-:9000
+  -fsdev
+  local,id=3Dmachiner_internal_dir,security_model=3Dnone,path=3D/home/jurki=
+ew/.machiner/runs/2020-08-31T21:46:55-0/internal
+  -device
+  virtio-9p-pci,fsdev=3Dmachiner_internal_dir,mount_tag=3Dmachiner_internal=
+_dir
+  -fsdev
+  local,id=3Dmachiner_lower_dir,security_model=3Dnone,readonly,path=3D.
+  -device
+  virtio-9p-pci,fsdev=3Dmachiner_lower_dir,mount_tag=3Dmachiner_lower_dir
+  -fsdev
+  local,id=3Dmachiner_upper_dir,security_model=3Dmapped-xattr,fmode=3D0777,=
+dmode=3D0777,path=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0
+  -device
+  virtio-9p-pci,fsdev=3Dmachiner_upper_dir,mount_tag=3Dmachiner_upper_dir
+  -device
+  virtio-scsi
+  -drive
+  if=3Dnone,file=3D/home/jurkiew/.machiner/images/famtar/image.qcow2,discar=
+d=3Don,id=3Dfamtar
+  -device
+  scsi-hd,drive=3Dfamtar
+  -chardev
+  socket,host=3D127.0.0.10,port=3D2323,server,nowait,telnet,mux=3Don,id=3Dc=
+har0,logfile=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/internal/=
+log
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1893691/+subscriptions
 
