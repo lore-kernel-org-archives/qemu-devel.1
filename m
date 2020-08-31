@@ -2,77 +2,83 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4696C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 556CFC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:41:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9EDB32071B
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:40:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2104C2071B
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:41:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h/3YYDoD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EDB32071B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ctO+JnpJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2104C2071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCois-0001Ir-9J
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 14:40:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39620)
+	id 1kCok7-0003NA-AU
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 14:41:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kCoi3-0000tD-F3
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:39:15 -0400
-Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:40543)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kCojD-0001gc-KF
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:40:27 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:39607)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kCoi1-000721-75
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:39:15 -0400
-Received: by mail-ej1-x636.google.com with SMTP id o18so9838339eje.7
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:39:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kCojA-0007Am-JZ
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:40:26 -0400
+Received: by mail-pl1-x642.google.com with SMTP id x18so2289005pll.6
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:40:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=dICnIPZASVNKKrmh6ZmzExC0Ryd6kHigLRkpWqX9NQY=;
- b=h/3YYDoDynXglnHPxb5PBIQifNmbvChkyq1cniPmjkKwCgkxfM9t11MOBGP98BzLsW
- NZF/mHPAX4DzQ8Lem4RlW9D1if/o8r8MranJ+yuc2vpr7NcPi9HwAcC4lREBssa2MKAa
- 71HYt95yYnobt2z0e9yN/y22VwHsDQeLQRX6j7DIg8bjn/wdVlnsuLp2SJzzMfLIYtM6
- skGMoEPYREEjtO04lepnkqJfBK0NDp2iRJAWf+Bv9wi/k6SBcjCin/OAna8VY/9MdDnG
- EPuGFNrooCS1+dfwKVdr1sKap8QEeTz30wFfY9MKuZCR5tkbitmRoyEEDWhTLfjPNyFp
- tOZQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=eVnq7Yqrhmhc9cmYB+OfT/PWM85dgl9OXAW1Q23ktl8=;
+ b=ctO+JnpJ3GZuuCMdFUWRv0ZBetNukWWimJT+SflftRg7Vj3OguFP4Xd27M8qTuyTui
+ 1VoeT8Vkru4Pv0xPtAHDKhDQ+/JW7cKHDLhjlNQNgSPsd+aK6TB9OMy0re3y02WeQ5ZF
+ 0v7Kc4sHXv95BPbHTI+oybBXzVrUR/nEWuJIPH95gZyRHAruQwjiTK+Ooeqc2LJN3YR5
+ ETFN7DLhpDh7WN/9IjU0UWt6OXNp/DwRqSOw0MQgKExAtOyC1UfRjVYzoqa6by8yLqR/
+ 7rCQiBgNXScocOiW46aXEK5ijbc+3SXw8N6Jh30Iwilpp24jjhSZht0b+olNjkfaYL6Y
+ ga2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=dICnIPZASVNKKrmh6ZmzExC0Ryd6kHigLRkpWqX9NQY=;
- b=O/XKk/2rWFIJDUHjfSaqVv1yp3iCN6UptwP8LwE9l9jZYvIcDK2zrFsCfyab/CS6y4
- buUCaJ8o3dqqrg+tvowqeHEs96H7rhYGPMykhm6KCW1qdCTsJbnxPGUF9fscUd2B0zS5
- VV9RhJnCSemFpEGVUmYVzZ4gW1x8kRx8NGdaaqGhkzAulTD+4UwdMq6H9dM/2F4q4SOb
- G4RuWZhvjAfjIKY2S9+RZ6/oagI8Epm/GQro50syLfd4t4QzLS6YtZTRHrigI33/TXYM
- 806+oCMevh4Kv07wo9qfmOkJ16fdq+GLfi+WqJAyLQyXMXYkPnUclcAeZ+bm+uGzjaro
- QF5g==
-X-Gm-Message-State: AOAM530yqz2qc44izpD3NfoPBG46PSH59fZNwatxQkO3kNQ+hiYdBLOZ
- 2zXyinHAIHoGepZ/jRA9z+Y13e42BwB/ADHOT6od7A==
-X-Google-Smtp-Source: ABdhPJxErron6DsMNwVR5UWL0ACRTa3Av3zory3IgWrgoKn2RiQOKn0nEeJeQtEvwef0UNmz07+9vDq1lOlRJwfhdOY=
-X-Received: by 2002:a17:906:71c9:: with SMTP id
- i9mr2183605ejk.250.1598899151072; 
- Mon, 31 Aug 2020 11:39:11 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=eVnq7Yqrhmhc9cmYB+OfT/PWM85dgl9OXAW1Q23ktl8=;
+ b=r04efKA7AYzvjLVXmjhKZ/eDQQ6RPsoPWbhde0ZijcupZIdZXyh5YWr8oQGMiZJ3vv
+ pS0hyZy2l0upbfbcDELFcdL65cK/IhIkg87zY1fp+wrUtQHBL4d4Apqf0iFgg8Etw4AJ
+ XEraFv9nMMLHZJzXPRcQuhQjd8/8X6jQZn7E97cnh5hIKaIcWomJR5jb98GlvvAOGHPo
+ ClxMXVyGZVnA+SKt5hU5181xsVQ7taBFMiX8ksf6378dGgW/vHBTOp5CNschvCaUVU8k
+ LEi54cC9I9naCZp3V3+d2wOzdqL1HPb6+OyCQaHeDpidSb/TtiFguWt92y77rFJbalCL
+ /QbQ==
+X-Gm-Message-State: AOAM532vyc4Lfk3DZl4jd4q533i2h3gh5X1UQyIV4JDO86N3pPqoesTp
+ hTetebR7xZ8EYq0XvBemJM0nB6xiWbuXUA==
+X-Google-Smtp-Source: ABdhPJz/fMJfk6YDJ9vq4IavPk07czYD0A8IG+tWnJt/uXjXmaEVzggtB1c4eAOUVv+HdhQD0sO/3Q==
+X-Received: by 2002:a17:90a:fb52:: with SMTP id
+ iq18mr575588pjb.207.1598899221934; 
+ Mon, 31 Aug 2020 11:40:21 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id y195sm5757580pfc.137.2020.08.31.11.40.20
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 31 Aug 2020 11:40:21 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/6] target/microblaze: Rename DISAS_UPDATE to DISAS_EXIT
+Date: Mon, 31 Aug 2020 11:40:13 -0700
+Message-Id: <20200831184018.839906-2-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200831184018.839906-1-richard.henderson@linaro.org>
+References: <20200831184018.839906-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-References: <20200830023203.612312-1-richard.henderson@linaro.org>
-In-Reply-To: <20200830023203.612312-1-richard.henderson@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 31 Aug 2020 19:38:59 +0100
-Message-ID: <CAFEAcA9WsDs1J5tqWdh8KbkasGd4b8GA=+k11-7fy9ivhw-YwQ@mail.gmail.com>
-Subject: Re: [PULL 0/7] softfloat patch queue
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::636;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x636.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -94,37 +100,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: edgar.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 30 Aug 2020 at 03:32, Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> The following changes since commit ea1bb830cb021cca2e361091cf728aaabc8c0654:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200828' into staging (2020-08-28 15:14:40 +0100)
->
-> are available in the Git repository at:
->
->   https://github.com/rth7680/qemu.git tags/pull-sf-20200829
->
-> for you to fetch changes up to c53b1079334c41b342a8ad3b7ccfd51bf5427f5a:
->
->   softfloat: Define comparison operations for bfloat16 (2020-08-29 19:25:42 -0700)
->
-> ----------------------------------------------------------------
-> * float16 comparison wrappers
-> * float16 conversions to/from 8-bit integers
-> * bfloat16 support
->
+The name "update" suggests that something needs updating, but
+this is not the case.  Use "exit" to emphasize that nothing
+needs doing except to exit.
 
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ target/microblaze/translate.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Applied, thanks.
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index a377818b5e..03fc653ce2 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -37,7 +37,7 @@
+ 
+ /* is_jmp field values */
+ #define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
+-#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_EXIT    DISAS_TARGET_1 /* all cpu state modified dynamically */
+ 
+ static TCGv_i32 cpu_R[32];
+ static TCGv_i32 cpu_pc;
+@@ -1161,7 +1161,7 @@ static bool trans_brk(DisasContext *dc, arg_typea_br *arg)
+     tcg_gen_ori_i32(cpu_msr, cpu_msr, MSR_BIP);
+     tcg_gen_movi_tl(cpu_res_addr, -1);
+ 
+-    dc->base.is_jmp = DISAS_UPDATE;
++    dc->base.is_jmp = DISAS_EXIT;
+     return true;
+ }
+ 
+@@ -1202,7 +1202,7 @@ static bool trans_brki(DisasContext *dc, arg_typeb_br *arg)
+                          ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM));
+     }
+     tcg_gen_ori_i32(cpu_msr, cpu_msr, msr_to_set);
+-    dc->base.is_jmp = DISAS_UPDATE;
++    dc->base.is_jmp = DISAS_EXIT;
+ #endif
+ 
+     return true;
+@@ -1712,7 +1712,7 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
+ 
+     /* Force an exit if the per-tb cpu state has changed.  */
+     if (dc->base.is_jmp == DISAS_NEXT && dc->cpustate_changed) {
+-        dc->base.is_jmp = DISAS_UPDATE;
++        dc->base.is_jmp = DISAS_EXIT;
+         tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
+     }
+ }
+@@ -1733,7 +1733,7 @@ static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
+         gen_goto_tb(dc, 0, dc->base.pc_next);
+         return;
+ 
+-    case DISAS_UPDATE:
++    case DISAS_EXIT:
+         if (unlikely(cs->singlestep_enabled)) {
+             gen_raise_exception(dc, EXCP_DEBUG);
+         } else {
+-- 
+2.25.1
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
