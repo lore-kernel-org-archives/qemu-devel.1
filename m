@@ -2,92 +2,81 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0526C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8297C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:07:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5522207EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:07:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GruEH7Q2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5522207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8C5B7207EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:07:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C5B7207EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kClP1-0005TA-Ti
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 11:07:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44222)
+	id 1kClP3-0005Wv-Ob
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 11:07:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kClJf-0006I0-G5
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:01:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40532
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kClJd-0004WJ-2L
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:01:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598886107;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FZYL7a+wM3VyXEfeS23vdxhnPrcCvz6aLxgaGhEQPJ4=;
- b=GruEH7Q2Hd/+fwOw6QNc776Yv49SVmNg/6novRI3+/5hEBX/6TrHOO1nkVMyGV+vejmsPy
- UaVKeChBq163R+HJPklGm4Fc31itN7aoNZVgGV2kv0hyj8/A1sbsSIIH3RP6+9pQVXhN/p
- PmMezIcm8fJE7WqnXLWtidy/KLcuwCI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-307-HkyID_c7OKe-Hz_xEX3a0g-1; Mon, 31 Aug 2020 11:01:45 -0400
-X-MC-Unique: HkyID_c7OKe-Hz_xEX3a0g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E178210ABDA0;
- Mon, 31 Aug 2020 15:01:44 +0000 (UTC)
-Received: from localhost.localdomain (unknown [10.35.206.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 93ECF19C4F;
- Mon, 31 Aug 2020 15:01:42 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 4/9] device-core: use RCU for list of childs of a bus
-Date: Mon, 31 Aug 2020 18:01:19 +0300
-Message-Id: <20200831150124.206267-5-mlevitsk@redhat.com>
-In-Reply-To: <20200831150124.206267-1-mlevitsk@redhat.com>
-References: <20200831150124.206267-1-mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kClNR-0003Cl-Bb
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:05:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38562)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kClNO-0005Of-SJ
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:05:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kClNM-0005wo-P0
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 15:05:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id BA66D2E80DB
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 15:05:40 +0000 (UTC)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 10:30:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 31 Aug 2020 14:51:02 -0000
+From: Neal Gompa <1893667@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug: distribution=fedora; sourcepackage=qemu; component=None;
+ status=Unknown; importance=Unknown; assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: ngompa13
+X-Launchpad-Bug-Reporter: Neal Gompa (ngompa13)
+X-Launchpad-Bug-Modifier: Neal Gompa (ngompa13)
+Message-Id: <159888546236.27779.1997908478541755158.malonedeb@soybean.canonical.com>
+Subject: [Bug 1893667] [NEW] Btrfs commands don't work when using user-space
+ emulation of other architectures
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
+X-Launchpad-Hash: d8e2396ef317785bfc7770d2b613201b8d87eb8e
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 04:40:47
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,284 +85,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Bug 1893667 <1893667@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This fixes the race between device emulation code that tries to find
-a child device to dispatch the request to (e.g a scsi disk),
-and hotplug of a new device to that bus.
+Public bug reported:
 
-Note that this doesn't convert all the readers of the list
-but only these that might go over that list without BQL held.
+Description of problem:
+When doing cross-arch builds with mock, it uses qemu-user-static under the =
+hood, and qemu-user-static lacks support for Btrfs ioctls to emulate so tha=
+t btrfs(8) commands work correctly.
 
-This is a very small first step to make this code thread safe.
+This is especially important for being able to do cross-arch image
+builds.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- hw/core/bus.c          | 28 ++++++++++++++++++----------
- hw/core/qdev.c         | 37 +++++++++++++++++++++++--------------
- hw/scsi/scsi-bus.c     | 17 ++++++++++++++---
- hw/scsi/virtio-scsi.c  |  6 +++++-
- include/hw/qdev-core.h |  9 +++++++++
- 5 files changed, 69 insertions(+), 28 deletions(-)
+How reproducible:
+Always (on Fedora 33 with qemu-5.1.0-2.fc33)
 
-diff --git a/hw/core/bus.c b/hw/core/bus.c
-index 6b987b6946..385eb3ad5a 100644
---- a/hw/core/bus.c
-+++ b/hw/core/bus.c
-@@ -49,12 +49,14 @@ int qbus_walk_children(BusState *bus,
-         }
-     }
- 
--    QTAILQ_FOREACH(kid, &bus->children, sibling) {
--        err = qdev_walk_children(kid->child,
--                                 pre_devfn, pre_busfn,
--                                 post_devfn, post_busfn, opaque);
--        if (err < 0) {
--            return err;
-+    WITH_RCU_READ_LOCK_GUARD() {
-+        QTAILQ_FOREACH_RCU(kid, &bus->children, sibling) {
-+            err = qdev_walk_children(kid->child,
-+                                     pre_devfn, pre_busfn,
-+                                     post_devfn, post_busfn, opaque);
-+            if (err < 0) {
-+                return err;
-+            }
-         }
-     }
- 
-@@ -90,9 +92,13 @@ static void bus_reset_child_foreach(Object *obj, ResettableChildCallback cb,
-     BusState *bus = BUS(obj);
-     BusChild *kid;
- 
--    QTAILQ_FOREACH(kid, &bus->children, sibling) {
-+    rcu_read_lock();
-+
-+    QTAILQ_FOREACH_RCU(kid, &bus->children, sibling) {
-         cb(OBJECT(kid->child), opaque, type);
-     }
-+
-+    rcu_read_unlock();
- }
- 
- static void qbus_init(BusState *bus, DeviceState *parent, const char *name)
-@@ -194,9 +200,11 @@ static void bus_set_realized(Object *obj, bool value, Error **errp)
- 
-         /* TODO: recursive realization */
-     } else if (!value && bus->realized) {
--        QTAILQ_FOREACH(kid, &bus->children, sibling) {
--            DeviceState *dev = kid->child;
--            qdev_unrealize(dev);
-+        WITH_RCU_READ_LOCK_GUARD() {
-+            QTAILQ_FOREACH_RCU(kid, &bus->children, sibling) {
-+                DeviceState *dev = kid->child;
-+                qdev_unrealize(dev);
-+            }
-         }
-         if (bc->unrealize) {
-             bc->unrealize(bus);
-diff --git a/hw/core/qdev.c b/hw/core/qdev.c
-index 96772a15bd..28e5fff5ed 100644
---- a/hw/core/qdev.c
-+++ b/hw/core/qdev.c
-@@ -51,6 +51,12 @@ const VMStateDescription *qdev_get_vmsd(DeviceState *dev)
-     return dc->vmsd;
- }
- 
-+static void bus_free_bus_child(BusChild *kid)
-+{
-+    object_unref(OBJECT(kid->child));
-+    g_free(kid);
-+}
-+
- static void bus_remove_child(BusState *bus, DeviceState *child)
- {
-     BusChild *kid;
-@@ -60,15 +66,16 @@ static void bus_remove_child(BusState *bus, DeviceState *child)
-             char name[32];
- 
-             snprintf(name, sizeof(name), "child[%d]", kid->index);
--            QTAILQ_REMOVE(&bus->children, kid, sibling);
-+            QTAILQ_REMOVE_RCU(&bus->children, kid, sibling);
- 
-             bus->num_children--;
- 
-             /* This gives back ownership of kid->child back to us.  */
-             object_property_del(OBJECT(bus), name);
--            object_unref(OBJECT(kid->child));
--            g_free(kid);
--            return;
-+
-+            /* free the bus kid, when it is safe to do so*/
-+            call_rcu(kid, bus_free_bus_child, rcu);
-+            break;
-         }
-     }
- }
-@@ -83,7 +90,7 @@ static void bus_add_child(BusState *bus, DeviceState *child)
-     kid->child = child;
-     object_ref(OBJECT(kid->child));
- 
--    QTAILQ_INSERT_HEAD(&bus->children, kid, sibling);
-+    QTAILQ_INSERT_HEAD_RCU(&bus->children, kid, sibling);
- 
-     /* This transfers ownership of kid->child to the property.  */
-     snprintf(name, sizeof(name), "child[%d]", kid->index);
-@@ -659,17 +666,19 @@ DeviceState *qdev_find_recursive(BusState *bus, const char *id)
-     DeviceState *ret;
-     BusState *child;
- 
--    QTAILQ_FOREACH(kid, &bus->children, sibling) {
--        DeviceState *dev = kid->child;
-+    WITH_RCU_READ_LOCK_GUARD() {
-+        QTAILQ_FOREACH_RCU(kid, &bus->children, sibling) {
-+            DeviceState *dev = kid->child;
- 
--        if (dev->id && strcmp(dev->id, id) == 0) {
--            return dev;
--        }
-+            if (dev->id && strcmp(dev->id, id) == 0) {
-+                return dev;
-+            }
- 
--        QLIST_FOREACH(child, &dev->child_bus, sibling) {
--            ret = qdev_find_recursive(child, id);
--            if (ret) {
--                return ret;
-+            QLIST_FOREACH(child, &dev->child_bus, sibling) {
-+                ret = qdev_find_recursive(child, id);
-+                if (ret) {
-+                    return ret;
-+                }
-             }
-         }
-     }
-diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
-index f8adfbc2a5..92d412b65c 100644
---- a/hw/scsi/scsi-bus.c
-+++ b/hw/scsi/scsi-bus.c
-@@ -400,7 +400,10 @@ static bool scsi_target_emulate_report_luns(SCSITargetReq *r)
-     id = r->req.dev->id;
-     found_lun0 = false;
-     n = 0;
--    QTAILQ_FOREACH(kid, &r->req.bus->qbus.children, sibling) {
-+
-+    rcu_read_lock();
-+
-+    QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
-         DeviceState *qdev = kid->child;
-         SCSIDevice *dev = SCSI_DEVICE(qdev);
- 
-@@ -421,7 +424,7 @@ static bool scsi_target_emulate_report_luns(SCSITargetReq *r)
-     memset(r->buf, 0, len);
-     stl_be_p(&r->buf[0], n);
-     i = found_lun0 ? 8 : 16;
--    QTAILQ_FOREACH(kid, &r->req.bus->qbus.children, sibling) {
-+    QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
-         DeviceState *qdev = kid->child;
-         SCSIDevice *dev = SCSI_DEVICE(qdev);
- 
-@@ -430,6 +433,9 @@ static bool scsi_target_emulate_report_luns(SCSITargetReq *r)
-             i += 8;
-         }
-     }
-+
-+    rcu_read_unlock();
-+
-     assert(i == n + 8);
-     r->len = len;
-     return true;
-@@ -1572,12 +1578,15 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-     BusChild *kid;
-     SCSIDevice *target_dev = NULL;
- 
--    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
-+    rcu_read_lock();
-+
-+    QTAILQ_FOREACH_RCU(kid, &bus->qbus.children, sibling) {
-         DeviceState *qdev = kid->child;
-         SCSIDevice *dev = SCSI_DEVICE(qdev);
- 
-         if (dev->channel == channel && dev->id == id) {
-             if (dev->lun == lun) {
-+                rcu_read_unlock();
-                 return dev;
-             }
- 
-@@ -1591,6 +1600,8 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
-             }
-         }
-     }
-+
-+    rcu_read_unlock();
-     return target_dev;
- }
- 
-diff --git a/hw/scsi/virtio-scsi.c b/hw/scsi/virtio-scsi.c
-index 3a71ea7097..971afbb217 100644
---- a/hw/scsi/virtio-scsi.c
-+++ b/hw/scsi/virtio-scsi.c
-@@ -367,12 +367,16 @@ static int virtio_scsi_do_tmf(VirtIOSCSI *s, VirtIOSCSIReq *req)
-     case VIRTIO_SCSI_T_TMF_I_T_NEXUS_RESET:
-         target = req->req.tmf.lun[1];
-         s->resetting++;
--        QTAILQ_FOREACH(kid, &s->bus.qbus.children, sibling) {
-+
-+        rcu_read_lock();
-+        QTAILQ_FOREACH_RCU(kid, &s->bus.qbus.children, sibling) {
-              d = SCSI_DEVICE(kid->child);
-              if (d->channel == 0 && d->id == target) {
-                 qdev_reset_all(&d->qdev);
-              }
-         }
-+        rcu_read_unlock();
-+
-         s->resetting--;
-         break;
- 
-diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
-index ea3f73a282..7c7728ff86 100644
---- a/include/hw/qdev-core.h
-+++ b/include/hw/qdev-core.h
-@@ -3,6 +3,8 @@
- 
- #include "qemu/queue.h"
- #include "qemu/bitmap.h"
-+#include "qemu/rcu.h"
-+#include "qemu/rcu_queue.h"
- #include "qom/object.h"
- #include "hw/hotplug.h"
- #include "hw/resettable.h"
-@@ -230,6 +232,7 @@ struct BusClass {
- };
- 
- typedef struct BusChild {
-+    struct rcu_head rcu;
-     DeviceState *child;
-     int index;
-     QTAILQ_ENTRY(BusChild) sibling;
-@@ -250,6 +253,12 @@ struct BusState {
-     int max_index;
-     bool realized;
-     int num_children;
-+
-+    /*
-+     * children is a RCU QTAILQ, thus readers must use RCU to access it,
-+     * and writers must hold the big qemu lock
-+     */
-+
-     QTAILQ_HEAD(, BusChild) children;
-     QLIST_ENTRY(BusState) sibling;
-     ResettableState reset;
--- 
-2.26.2
+Steps to Reproduce:
 
+$ sudo dnf install mock qemu-user-static wget
+$ sudo usermod -a -G mock $USER
+$ newgrp mock
+$ mock --root fedora-rawhide-armhfp --install btrfs-progs util-linux
+$ mock --root fedora-rawhide-armhfp --chroot 'rm -f foo.img && dd if=3D/dev=
+/zero of=3Dfoo.img bs=3D1G count=3D1 && losetup /dev/loop9 foo.img &&  mkfs=
+.btrfs /dev/loop9 && mkdir /foo && mount /dev/loop9 /foo && btrfs subvol cr=
+eate /foo/subvol && umount /foo && losetup -d /dev/loop9'
+
+
+Actual results:
+Fails with errors like "ERROR: cannot create subvolume: Function not implem=
+ented"
+
+Expected results:
+Succeeds and creates subvolumes properly.
+
+Additional info:
+There is a patch series from a few days ago to add support for many btrfs i=
+octls which could fix this...
+
+https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg05594.html
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Affects: qemu (Fedora)
+     Importance: Unknown
+         Status: Unknown
+
+** Bug watch added: Red Hat Bugzilla #1872918
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1872918
+
+** Also affects: qemu (Fedora) via
+   https://bugzilla.redhat.com/show_bug.cgi?id=3D1872918
+   Importance: Unknown
+       Status: Unknown
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1893667
+
+Title:
+  Btrfs commands don't work when using user-space emulation of other
+  architectures
+
+Status in QEMU:
+  New
+Status in qemu package in Fedora:
+  Unknown
+
+Bug description:
+  Description of problem:
+  When doing cross-arch builds with mock, it uses qemu-user-static under th=
+e hood, and qemu-user-static lacks support for Btrfs ioctls to emulate so t=
+hat btrfs(8) commands work correctly.
+
+  This is especially important for being able to do cross-arch image
+  builds.
+
+  How reproducible:
+  Always (on Fedora 33 with qemu-5.1.0-2.fc33)
+
+  Steps to Reproduce:
+
+  $ sudo dnf install mock qemu-user-static wget
+  $ sudo usermod -a -G mock $USER
+  $ newgrp mock
+  $ mock --root fedora-rawhide-armhfp --install btrfs-progs util-linux
+  $ mock --root fedora-rawhide-armhfp --chroot 'rm -f foo.img && dd if=3D/d=
+ev/zero of=3Dfoo.img bs=3D1G count=3D1 && losetup /dev/loop9 foo.img &&  mk=
+fs.btrfs /dev/loop9 && mkdir /foo && mount /dev/loop9 /foo && btrfs subvol =
+create /foo/subvol && umount /foo && losetup -d /dev/loop9'
+
+  =
+
+  Actual results:
+  Fails with errors like "ERROR: cannot create subvolume: Function not impl=
+emented"
+
+  Expected results:
+  Succeeds and creates subvolumes properly.
+
+  Additional info:
+  There is a patch series from a few days ago to add support for many btrfs=
+ ioctls which could fix this...
+
+  https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg05594.html
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1893667/+subscriptions
 
