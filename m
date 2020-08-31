@@ -2,82 +2,80 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BB2DC433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 235E3C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:41:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BC3A2071B
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:41:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2E462071B
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:41:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q1SYjZbc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC3A2071B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wFOUoya2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2E462071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCokA-0003Ux-Di
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 14:41:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39950)
+	id 1kCokF-0003ih-2P
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 14:41:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCojG-0001iW-MN
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:40:30 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:53210)
+ id 1kCojA-0001fc-TH
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:40:24 -0400
+Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:44179)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCojE-0007DB-LL
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:40:30 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id o16so283469pjr.2
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:40:28 -0700 (PDT)
+ id 1kCoj8-0007AK-OZ
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:40:24 -0400
+Received: by mail-pf1-x430.google.com with SMTP id o20so1073890pfp.11
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:40:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=eKbkQ2gWYLZDojvyyJ6asnBPMQqGjh2G5aTiAzfJ7X0=;
- b=q1SYjZbcJU2yC1dHZiK3bZo8F8l200bPrQNtxu2EtTeSUDZ2+ilrH+o8CkxxQptXU2
- o9/rt5A+lVc99jVrb8cnQaCcrcq4oqZg0Dn3wdocIX0P0wlWIEBmX/zHKev3DoKrDflX
- u9I7i0x33WS3Rtj5bDNgMSDa8TYolWKNz6YBRARuQnQLlUqSCcI1CQovCGN4CYeLhQcO
- Rms3oWy8yuu7P8+FUzBpJHIdlzeVyf+F+cJhD0v8sRvD3HuNUMzFsp65IFI8rSX68veY
- b7M0KJyORaOKrRt7I2QB9ZWoixVuuM8IvDsBihEdFwja8bof/mEECIJ4IYUqaQR5nxX/
- 1+uA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=m6pgdynR0VeZCI36OMiuEL47OfF+3c/eQ/RKBt4vgFo=;
+ b=wFOUoya2qauJvFJw0thWVkTnOGMKDKUnb2YmDAvANYYcwYKXMSN4MjuR2E0sE2rzt8
+ 6Q8hlUPjI3WXC1lD8Nfzrl30RR4dAzWXrxdh71yaSs2VgvVaPuQhlXVkm1s8IlYIJpWV
+ tzfwoztqi7ODfCUL5dl3IoIJoqhiKL1FB0KoPinQdxptkE7R09q/JQ4r1ah3dCzDqh0O
+ 2Kc6ucYN9Btw6gKz46NfGQL1w0AOznpX75aikxVsY6Bxcr/8qUmPY8EteBVs1HW5iTt0
+ zNDPGybjrJo/QD85L134I2h7O99lOPyDUbyCUe09QTSDdBE85mnnK0OCAfH21v5WJihk
+ RPTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=eKbkQ2gWYLZDojvyyJ6asnBPMQqGjh2G5aTiAzfJ7X0=;
- b=Q8m2r8qvc7rtfCgE+/eRi9C53Y6ZpOY3vVTHvi1tAqoUtJ87+UEM5jSBIfh0gjAJbC
- kYkgajFnQnixmS4WoGc+CVN3iImDCDiP5GR7rU21mB2DELbMb5CD4UUhhtIMwUUVyBpI
- pJ39VFp0BxfAM4/NHnrWdBFCsm5kapbtTcrYx5ILDqPay7GMOLYqxnzSuyzWCTP3nySB
- 6dM80z+nuLwjcu5x+HFqSe/RtUdDbirL6xI4qWjhpL+WKDrd3Hfx/t3QTxGWXb9e/BDX
- SZM8c5UG8rw3fsoUZ9DzoJ+a216fVrx0sHhoxsBzEVUfwtZTOrPByyzB5u1o0nyfbUEP
- AKeA==
-X-Gm-Message-State: AOAM531NAnorEGMI6t+KcM/Cn5yY5Ac870r1gF6ZaXoY7fn59UKtkh8S
- GAchEjrFSFVwVZdf9xcGpcYnoONQ+p/Hkw==
-X-Google-Smtp-Source: ABdhPJxMSYbIcOVsWoZ9QdJ7HWy5wwpBtRZnkSyctyU4xGSfasSMHIRffmxRqV1oma6aDrrGyULRlQ==
-X-Received: by 2002:a17:90a:8e82:: with SMTP id f2mr605544pjo.11.1598899226638; 
- Mon, 31 Aug 2020 11:40:26 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=m6pgdynR0VeZCI36OMiuEL47OfF+3c/eQ/RKBt4vgFo=;
+ b=ZLdwNZgp/QDxogD4PqOnLEfJTxCaXMj90wrzyxPFD5Ux5W3hXVdZ+VjfzkDZz8VQ9f
+ AEVf0LUPp4vBRgVdpD6zcbO5GJaVsfYzsgF3f/wyqzKq680CklQvrlfcLuyL4ILgxg9Z
+ ny1+FILqtci3ubDJsB98F4haT6n5QIrS7C9JUu7ICkDR6XzcjuNGq+X6nriqFMOrUgpC
+ nn3W1SR81vLyM1sUPR3ac/fb7xkY1aQjQMKhwj33vn37U0/BJBf0Tu6hiP1hcRFfS2i+
+ 5qGRHZsVL8jjsWeH9TFZiI3rVqUZRwtoeN7pSRmvbfbVli6doW1q+Aw2gRpVFdL9eFfK
+ yj8Q==
+X-Gm-Message-State: AOAM533huCQnfmGL5TZhu6AbSkxQTIaG0J1MbXfMzr1H9nbl9FCEq5xR
+ DECFRL3wfIN1e62NylCcmA2D6/o/kpQFJQ==
+X-Google-Smtp-Source: ABdhPJz7QMdrHcRR7WRhd0W5pbNgApXADet4nTyq4Gk2QOhTvUilnhyfVPoT04Xtq3xNrzM0YzpE2A==
+X-Received: by 2002:a62:3641:: with SMTP id d62mr2374997pfa.82.1598899220527; 
+ Mon, 31 Aug 2020 11:40:20 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id y195sm5757580pfc.137.2020.08.31.11.40.25
+ by smtp.gmail.com with ESMTPSA id y195sm5757580pfc.137.2020.08.31.11.40.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 31 Aug 2020 11:40:26 -0700 (PDT)
+ Mon, 31 Aug 2020 11:40:19 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 5/6] target/microblaze: Force rtid, rted, rtbd to exit
-Date: Mon, 31 Aug 2020 11:40:17 -0700
-Message-Id: <20200831184018.839906-6-richard.henderson@linaro.org>
+Subject: [PATCH 0/6] target/microblaze: Use tcg_gen_lookup_and_goto_ptr
+Date: Mon, 31 Aug 2020 11:40:12 -0700
+Message-Id: <20200831184018.839906-1-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200831184018.839906-1-richard.henderson@linaro.org>
-References: <20200831184018.839906-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::430;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x430.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,83 +102,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These return-from-exception type instructions have modified
-MSR to re-enable various forms of interrupt.  Force a return
-to the main loop.
+Based-on: <20200831160601.833692-1-richard.henderson@linaro.org>
+("[PULL 00/76] target/microblaze improvements")
 
-Consolidate the cleanup of tb_flags into mb_tr_translate_insn.
+Hello again, Edgar.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/microblaze/translate.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
+I had dropped the tcg_gen_lookup_and_goto_ptr patch from the
+previous omnibus patch set, as you had reported lockups.
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index b116a0ce4f..8d02b07b73 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1518,7 +1518,6 @@ static void do_rti(DisasContext *dc)
-     tcg_gen_or_i32(cpu_msr, cpu_msr, tmp);
- 
-     tcg_temp_free_i32(tmp);
--    dc->tb_flags &= ~DRTI_FLAG;
- }
- 
- static void do_rtb(DisasContext *dc)
-@@ -1531,7 +1530,6 @@ static void do_rtb(DisasContext *dc)
-     tcg_gen_or_i32(cpu_msr, cpu_msr, tmp);
- 
-     tcg_temp_free_i32(tmp);
--    dc->tb_flags &= ~DRTB_FLAG;
- }
- 
- static void do_rte(DisasContext *dc)
-@@ -1545,7 +1543,6 @@ static void do_rte(DisasContext *dc)
-     tcg_gen_or_i32(cpu_msr, cpu_msr, tmp);
- 
-     tcg_temp_free_i32(tmp);
--    dc->tb_flags &= ~DRTE_FLAG;
- }
- 
- /* Insns connected to FSL or AXI stream attached devices.  */
-@@ -1700,12 +1697,16 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
-          * Finish finish any return-from branch.
-          * TODO: Diagnose rtXd in delay slot of rtYd earlier.
-          */
--        if (dc->tb_flags & DRTI_FLAG) {
--            do_rti(dc);
--        } else if (dc->tb_flags & DRTB_FLAG) {
--            do_rtb(dc);
--        } else if (dc->tb_flags & DRTE_FLAG) {
--            do_rte(dc);
-+        uint32_t rt_ibe = dc->tb_flags & (DRTI_FLAG | DRTB_FLAG | DRTE_FLAG);
-+        if (unlikely(rt_ibe != 0)) {
-+            dc->tb_flags &= ~(DRTI_FLAG | DRTB_FLAG | DRTE_FLAG);
-+            if (rt_ibe & DRTI_FLAG) {
-+                do_rti(dc);
-+            } else if (rt_ibe & DRTB_FLAG) {
-+                do_rtb(dc);
-+            } else {
-+                do_rte(dc);
-+            }
-         }
- 
-         /* Complete the branch, ending the TB. */
-@@ -1723,8 +1724,12 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
-              */
-             break;
-         case DISAS_NEXT:
--            /* Normal insn a delay slot.  */
--            dc->base.is_jmp = DISAS_JUMP;
-+            /*
-+             * Normal insn a delay slot.
-+             * However, the return-from-exception type insns should
-+             * return to the main loop, as they have adjusted MSR.
-+             */
-+            dc->base.is_jmp = (rt_ibe ? DISAS_EXIT_JUMP : DISAS_JUMP);
-             break;
-         case DISAS_EXIT_NEXT:
-             /*
+I have identified, by inspection, two cases in which we failed
+to return to the main loop even though we should have:
+
+(1) Return-from-exception type instructions.
+
+I had missed these before because they hadn't set cpustate_changed.
+This still worked fine because they are all indirect branches, and
+had exited immediately.
+
+Fixed by distinguishing these cases from normal indirect branches
+before we start using lookup_and_goto_ptr.
+
+(2) MTS in a branch delay slot.
+
+We did not check dc->cpustate_changed before setting
+dc->base.is_jmp to DISAS_JUMP, which lost the fact that we
+need to return to the main loop.
+
+This mostly works fine without lookup_and_goto_ptr, because
+we either (a) finished an indirect branch and returned to the
+main loop anyway or (b) we'd return to the main loop via some
+subsequent indirect branch, which would happen "soon enough".
+
+We should have been able to see soft-lockup with the existing
+code in the case of a cpustate_changed in the delay slot of
+a loop of direct branches that all use goto_tb.  E.g.
+
+	brid	0
+	 msrset MSR_IE
+
+I.e. an immediate branch back to the same branch insn,
+re-enabling interrupts in the delay slot.  Probably not
+something that shows up in the wild.
+
+----
+
+Follow-up question: The manual says that several classes of
+instructions are invalid in a branch delay slot, but does
+not say what action is taken, if any.
+
+Some of these invalid cases could leave qemu in an inconsistent
+state.  Would it be legal for us to diagnose these cases with
+trap_illegal?  If not, what *should* we be doing?  We could also
+LOG_GUEST_ERROR for these either way.
+
+I've added some TODO comments in these patches that are relevant.
+
+Thanks,
+
+
+r~
+
+
+Richard Henderson (6):
+  target/microblaze: Rename DISAS_UPDATE to DISAS_EXIT
+  target/microblaze: Introduce DISAS_EXIT_NEXT, DISAS_EXIT_JUMP
+  target/microblaze: Replace cpustate_changed with DISAS_EXIT_NEXT
+  target/microblaze: Handle DISAS_EXIT_NEXT in delay slot
+  target/microblaze: Force rtid, rted, rtbd to exit
+  target/microblaze: Use tcg_gen_lookup_and_goto_ptr
+
+ target/microblaze/translate.c | 128 ++++++++++++++++++++++------------
+ 1 file changed, 82 insertions(+), 46 deletions(-)
+
 -- 
 2.25.1
 
