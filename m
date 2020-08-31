@@ -2,75 +2,97 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A347BC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F8AC433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:42:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6E1172083E
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:42:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E1172083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id EC2322083E
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:42:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x9nepgtx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC2322083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCrZK-0005Fp-KI
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:42:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47772)
+	id 1kCrZN-0005Hy-0y
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:42:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51736)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kCrEO-0004ym-9G
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:20:48 -0400
-Received: from mail-qv1-f67.google.com ([209.85.219.67]:44403)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kCrUk-0006ey-Po
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:37:42 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45149)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kCrEJ-0001dD-Po
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:20:45 -0400
-Received: by mail-qv1-f67.google.com with SMTP id j10so3331875qvk.11
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:20:43 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kCrUh-0003h9-Sp
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:37:42 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 67so1437372pgd.12
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:37:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=aF1TYW9+DmXTOxP0rCa7SthEkQoCWC6+zXjV5LlvHMQ=;
+ b=x9nepgtxkHBfFxTs3l5K+WI7B4/dG6sa5gTKjEPEGKA1i5vT6JzRQJaSdCrvAj2qcj
+ l4AgJLy+SFSEe6+fHkBRVCvjtfGQ74mPaSBEjO6Ch6+EmgbmHf6htxPuY2j6nJalxYn5
+ HTw1NQ6UG+mo4m0s7Z3oUNl6YTjT2/nS3VdjRu1iYp0Aiqmq6J+YstIkF0HbaZTkoIst
+ WJiO3EuBHTYr4TFqufi+VQ1i6tKkPobaZKkzV+v+JsjyoV45ByZGhAKD8j0kOrW+rHZN
+ TJz99ZJ9Bb/z1O8MMzb+2SrIRiUduIdIQIvB1EcEhMN0vEFe0ZLFyxYMi+GjW10eBvjV
+ 4F9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=kHfl62pj9DSTAmXOKYpkKn+3gaeqtkwVPxj8YvsQnvo=;
- b=WVd0FlN273mGL4mii9kmdDWRJI4EgvVd06c7kvB4Rq/vAMS2p9kyB2+23kY/wOb76c
- rWAz431OkgkvbEdnYoI4achF5O6biTlDd/XZOBfrXTMxGbAuQWktLAROAnAviowI2So7
- wFkue3Iw6WBSJatiOO6zrgWy1uwv0oLUzE+YqcYxsOvtNUHgV1zKiFt4RbNznSYp1aYi
- 33CsgqhJcn0UW5tuOMkoILwcqzTF28iv6/GPpYLuY+99GGiI8UbzSk9QgNDYi9g3ghcf
- G396/SgSbPGulWFL/7HKb/z2c7cqsieihpp5cN1E6x8PUVspmYsTQQs2SBMe0SL1NxE/
- R2Cg==
-X-Gm-Message-State: AOAM532pd4uaTO+xMoJe1JkwLXagon0T4DO+8djSzKy7WiTboZpEgBoT
- ZzH3v+AzmVTVZsfWdjbqOj3knwkamD0W4q6yNgE=
-X-Google-Smtp-Source: ABdhPJyf2MwtN4Sir+x7bCmJUowhRw/X7prd9UcZbCrOUofzHSr+j+tT56u58BEVj7/bDfJ+ZTRSZUpRCjEYssOcFKE=
-X-Received: by 2002:a0c:dc90:: with SMTP id n16mr3023546qvk.168.1598908843027; 
- Mon, 31 Aug 2020 14:20:43 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aF1TYW9+DmXTOxP0rCa7SthEkQoCWC6+zXjV5LlvHMQ=;
+ b=ljjkBHZ7EwwRYSNZxSJhzCjn16spX6sNcnr/xkeAaRVAMRZYq4Dk89GqxYtrKL16Pn
+ 1b5hOcwmWUW/IEKAspu8Ay0QFQFF8CWn4lU100QsM4LKTLwMrYEHbj3jVh+i1GRqWDp0
+ nyvQGVfB4gN9gDEoEE54Jnem5Gzr6Cf8YdquWpylbmPsxaaF6UjZyb4166LdqxurkKAr
+ 4nwfzjadSDLDXkmqf78plcsnutZFOxwBnROA/fZjU9OJ9yyqSMxa8s1aHuBVrTvpUgUB
+ LCIlLA/8fTWPTpmCS1Szg9LpX+2/H4xBytFZTkutmmtX6cTseRzFqsiWLbcO7RPOxbDU
+ 6dpg==
+X-Gm-Message-State: AOAM5310g5f+0oG1oU8r/TnJAP+HVTEywaVdYOi5ADLlJM/fgzBMVFVN
+ XYAmXghPlsj2nycDUsSJk4QyZA==
+X-Google-Smtp-Source: ABdhPJzY9pX9FAI2tHfXc+NCEv0qzRv6gNhJkv6mav6Bw3GJSowl8ysxOYGftSt9JXFwE7ENfBsMbg==
+X-Received: by 2002:aa7:9556:: with SMTP id w22mr2885120pfq.245.1598909858396; 
+ Mon, 31 Aug 2020 14:37:38 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id c1sm7936988pfi.136.2020.08.31.14.37.36
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 31 Aug 2020 14:37:37 -0700 (PDT)
+Subject: Re: [PATCH v2 4/7] target: Push BQL on ->do_interrupt down into
+ per-arch implementation
+To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
+References: <20200819182856.4893-1-robert.foley@linaro.org>
+ <20200819182856.4893-5-robert.foley@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <047fe2b3-c51b-1840-8b93-f747684abea0@linaro.org>
+Date: Mon, 31 Aug 2020 14:37:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200828141929.77854-1-richard.henderson@linaro.org>
- <20200828141929.77854-33-richard.henderson@linaro.org>
-In-Reply-To: <20200828141929.77854-33-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 31 Aug 2020 23:14:01 +0200
-Message-ID: <CAAdtpL5hsUcLU5OEZH+=dMzUL3ZofiGYiQ1nLB3_i7af+qvdxQ@mail.gmail.com>
-Subject: Re: [PATCH v2 32/76] target/microblaze: Remove empty D macros
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000009df00a05ae32f953"
-Received-SPF: pass client-ip=209.85.219.67;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-qv1-f67.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 17:15:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200819182856.4893-5-robert.foley@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,246 +105,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>, Chris Wulff <crwulff@gmail.com>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ David Hildenbrand <david@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "open list:S390 general arch..." <qemu-s390x@nongnu.org>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ Michael Rolnik <mrolnik@gmail.com>, peter.puhov@linaro.org,
+ Stafford Horne <shorne@gmail.com>, alex.bennee@linaro.org,
+ Richard Henderson <rth@twiddle.net>,
+ "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
+ Michael Walle <michael@walle.cc>,
+ "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>, pbonzini@redhat.com,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000009df00a05ae32f953
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 8/19/20 11:28 AM, Robert Foley wrote:
+> avr is another exception.  avr, arm and cris all had a similar
+> case where their *_cpu_exec_interrupt was calling to
+> the CPUClass ->do_interrupt.  This causes an issue when we push
+> the lock down since ->do_interrupt will try to acquire the BQL, but
+> the calling context already has it.
 
-Le ven. 28 ao=C3=BBt 2020 16:32, Richard Henderson <richard.henderson@linar=
-o.org>
-a =C3=A9crit :
+Alpha is in this lest as well, correct?
 
-> This is never used in op_helper.c and translate.c.  There are
-> two trivial uses in helper.c which can be improved by always
-> logging MMU_EXCP to CPU_LOG_INT.
->
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
->
-
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-
----
->  target/microblaze/helper.c    | 11 ++++-------
->  target/microblaze/op_helper.c |  2 --
->  target/microblaze/translate.c |  2 --
->  3 files changed, 4 insertions(+), 11 deletions(-)
->
-> diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
-> index 9a95456401..f8e2ca12a9 100644
-> --- a/target/microblaze/helper.c
-> +++ b/target/microblaze/helper.c
-> @@ -24,8 +24,6 @@
->  #include "qemu/host-utils.h"
->  #include "exec/log.h"
->
-> -#define D(x)
-> -
->  #if defined(CONFIG_USER_ONLY)
->
->  void mb_cpu_do_interrupt(CPUState *cs)
-> @@ -155,10 +153,13 @@ void mb_cpu_do_interrupt(CPUState *cs)
->          case EXCP_MMU:
->              env->regs[17] =3D env->pc;
->
-> +            qemu_log_mask(CPU_LOG_INT,
-> +                          "MMU exception at pc=3D%x iflags=3D%x ear=3D%"=
- PRIx64
-> "\n",
-> +                          env->pc, env->iflags, env->ear);
-> +
->              env->esr &=3D ~(1 << 12);
->              /* Exception breaks branch + dslot sequence?  */
->              if (env->iflags & D_FLAG) {
-> -                D(qemu_log("D_FLAG set at exception bimm=3D%d\n",
-> env->bimm));
->                  env->esr |=3D 1 << 12 ;
->                  env->btr =3D env->btarget;
->
-> @@ -166,14 +167,10 @@ void mb_cpu_do_interrupt(CPUState *cs)
->                  env->regs[17] -=3D 4;
->                  /* was the branch immprefixed?.  */
->                  if (env->bimm) {
-> -                    qemu_log_mask(CPU_LOG_INT,
-> -                                  "bimm exception at pc=3D%x iflags=3D%x=
-\n",
-> -                                  env->pc, env->iflags);
->                      env->regs[17] -=3D 4;
->                      log_cpu_state_mask(CPU_LOG_INT, cs, 0);
->                  }
->              } else if (env->iflags & IMM_FLAG) {
-> -                D(qemu_log("IMM_FLAG set at exception\n"));
->                  env->regs[17] -=3D 4;
->              }
->
-> diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.=
-c
-> index d79202c3f8..decdca0fd8 100644
-> --- a/target/microblaze/op_helper.c
-> +++ b/target/microblaze/op_helper.c
-> @@ -26,8 +26,6 @@
->  #include "exec/cpu_ldst.h"
->  #include "fpu/softfloat.h"
->
-> -#define D(x)
-> -
->  void helper_put(uint32_t id, uint32_t ctrl, uint32_t data)
->  {
->      int test =3D ctrl & STREAM_TEST;
-> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.=
-c
-> index 6757720776..860859324a 100644
-> --- a/target/microblaze/translate.c
-> +++ b/target/microblaze/translate.c
-> @@ -41,8 +41,6 @@
->  #  define LOG_DIS(...) do { } while (0)
+> diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
+> index 4c6753df34..be29bdd530 100644
+> --- a/target/alpha/cpu.h
+> +++ b/target/alpha/cpu.h
+> @@ -276,7 +276,7 @@ struct AlphaCPU {
+>  extern const VMStateDescription vmstate_alpha_cpu;
 >  #endif
->
-> -#define D(x)
-> -
->  #define EXTRACT_FIELD(src, start, end) \
->              (((src) >> start) & ((1 << (end - start + 1)) - 1))
->
-> --
-> 2.25.1
->
->
->
+>  
+> -void alpha_cpu_do_interrupt_locked(CPUState *cpu);
+> +void alpha_cpu_do_interrupt(CPUState *cpu);
+>  bool alpha_cpu_exec_interrupt(CPUState *cpu, int int_req);
+>  void alpha_cpu_dump_state(CPUState *cs, FILE *f, int flags);
+>  hwaddr alpha_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+> diff --git a/target/alpha/helper.c b/target/alpha/helper.c
+> index ff9a2a7765..e497dd269e 100644
+> --- a/target/alpha/helper.c
+> +++ b/target/alpha/helper.c
+> @@ -295,7 +295,7 @@ bool alpha_cpu_tlb_fill(CPUState *cs, vaddr addr, int size,
+>  }
+>  #endif /* USER_ONLY */
+>  
+> -void alpha_cpu_do_interrupt_locked(CPUState *cs)
+> +static void alpha_cpu_do_interrupt_locked(CPUState *cs)
+>  {
+>      AlphaCPU *cpu = ALPHA_CPU(cs);
+>      CPUAlphaState *env = &cpu->env;
+> @@ -407,6 +407,13 @@ void alpha_cpu_do_interrupt_locked(CPUState *cs)
+>  #endif /* !USER_ONLY */
+>  }
+>  
+> +void alpha_cpu_do_interrupt(CPUState *cs)
+> +{
+> +    qemu_mutex_lock_iothread();
+> +    alpha_cpu_do_interrupt_locked(cs);
+> +    qemu_mutex_unlock_iothread();
+> +}
+> +
+>  bool alpha_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+>  {
+>      AlphaCPU *cpu = ALPHA_CPU(cs);
 
---0000000000009df00a05ae32f953
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+This rename should have been done in patch 1, as with all others.
+Moreover, this leaves a bug in alpha_cpu_exec_interrupt in that it should be
+calling alpha_cpu_do_interrupt_locked.
 
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Le ven. 28 ao=C3=BBt 2020 16:32, Richard Henderson &lt=
-;<a href=3D"mailto:richard.henderson@linaro.org">richard.henderson@linaro.o=
-rg</a>&gt; a =C3=A9crit=C2=A0:<br></div><blockquote class=3D"gmail_quote" s=
-tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">This=
- is never used in op_helper.c and translate.c.=C2=A0 There are<br>
-two trivial uses in helper.c which can be improved by always<br>
-logging MMU_EXCP to CPU_LOG_INT.<br>
-<br>
-Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
-naro.org" target=3D"_blank" rel=3D"noreferrer">richard.henderson@linaro.org=
-</a>&gt;<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
-=3D"auto"><span style=3D"font-family:sans-serif;font-size:13.696px">Reviewe=
-d-by: Philippe Mathieu-Daud=C3=A9 &lt;</span><a href=3D"mailto:f4bug@amsat.=
-org" style=3D"text-decoration:none;color:rgb(66,133,244);font-family:sans-s=
-erif;font-size:13.696px">f4bug@amsat.org</a><span style=3D"font-family:sans=
--serif;font-size:13.696px">&gt;</span><br></div><div dir=3D"auto"><br></div=
-><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_qu=
-ote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex=
-">
----<br>
-=C2=A0target/microblaze/helper.c=C2=A0 =C2=A0 | 11 ++++-------<br>
-=C2=A0target/microblaze/op_helper.c |=C2=A0 2 --<br>
-=C2=A0target/microblaze/translate.c |=C2=A0 2 --<br>
-=C2=A03 files changed, 4 insertions(+), 11 deletions(-)<br>
-<br>
-diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c<br>
-index 9a95456401..f8e2ca12a9 100644<br>
---- a/target/microblaze/helper.c<br>
-+++ b/target/microblaze/helper.c<br>
-@@ -24,8 +24,6 @@<br>
-=C2=A0#include &quot;qemu/host-utils.h&quot;<br>
-=C2=A0#include &quot;exec/log.h&quot;<br>
-<br>
--#define D(x)<br>
--<br>
-=C2=A0#if defined(CONFIG_USER_ONLY)<br>
-<br>
-=C2=A0void mb_cpu_do_interrupt(CPUState *cs)<br>
-@@ -155,10 +153,13 @@ void mb_cpu_do_interrupt(CPUState *cs)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case EXCP_MMU:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;regs[17] =3D env-&g=
-t;pc;<br>
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_log_mask(CPU_LOG_INT,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 &quot;MMU exception at pc=3D%x iflags=3D%x ear=3D%&quot; =
-PRIx64 &quot;\n&quot;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 env-&gt;pc, env-&gt;iflags, env-&gt;ear);<br>
-+<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;esr &amp;=3D ~(1 &l=
-t;&lt; 12);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Exception breaks branch =
-+ dslot sequence?=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (env-&gt;iflags &amp; D_=
-FLAG) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 D(qemu_log(&quot;D=
-_FLAG set at exception bimm=3D%d\n&quot;, env-&gt;bimm));<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;esr |=
-=3D 1 &lt;&lt; 12 ;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;btr =
-=3D env-&gt;btarget;<br>
-<br>
-@@ -166,14 +167,10 @@ void mb_cpu_do_interrupt(CPUState *cs)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;regs[=
-17] -=3D 4;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* was the br=
-anch immprefixed?.=C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (env-&gt;b=
-imm) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu=
-_log_mask(CPU_LOG_INT,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;bimm exception at pc=3D=
-%x iflags=3D%x\n&quot;,<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;pc, env-&gt;iflags);<=
-br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0env-&gt;regs[17] -=3D 4;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0log_cpu_state_mask(CPU_LOG_INT, cs, 0);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0} else if (env-&gt;iflags &=
-amp; IMM_FLAG) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 D(qemu_log(&quot;I=
-MM_FLAG set at exception\n&quot;));<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;regs[=
-17] -=3D 4;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c<=
-br>
-index d79202c3f8..decdca0fd8 100644<br>
---- a/target/microblaze/op_helper.c<br>
-+++ b/target/microblaze/op_helper.c<br>
-@@ -26,8 +26,6 @@<br>
-=C2=A0#include &quot;exec/cpu_ldst.h&quot;<br>
-=C2=A0#include &quot;fpu/softfloat.h&quot;<br>
-<br>
--#define D(x)<br>
--<br>
-=C2=A0void helper_put(uint32_t id, uint32_t ctrl, uint32_t data)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0int test =3D ctrl &amp; STREAM_TEST;<br>
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c<=
-br>
-index 6757720776..860859324a 100644<br>
---- a/target/microblaze/translate.c<br>
-+++ b/target/microblaze/translate.c<br>
-@@ -41,8 +41,6 @@<br>
-=C2=A0#=C2=A0 define LOG_DIS(...) do { } while (0)<br>
-=C2=A0#endif<br>
-<br>
--#define D(x)<br>
--<br>
-=C2=A0#define EXTRACT_FIELD(src, start, end) \<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(((src) &gt;&gt; start) &am=
-p; ((1 &lt;&lt; (end - start + 1)) - 1))<br>
-<br>
--- <br>
-2.25.1<br>
-<br>
-<br>
-</blockquote></div></div></div>
+That seems to be the only instance of this mistake.
 
---0000000000009df00a05ae32f953--
+
+r~
 
