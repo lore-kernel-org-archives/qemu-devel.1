@@ -4,80 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D6F1C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F09D5C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:09:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0322A20767
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A391520767
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:09:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C9aKhV9z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0322A20767
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bEVoBbVA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A391520767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35122 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCmMZ-0000AF-5q
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:08:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33410)
+	id 1kCmMd-0000Or-QE
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:08:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmJx-0003Q0-P5
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:13 -0400
-Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:35753)
+ id 1kCmK1-0003XL-6N
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:17 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:41665)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmJu-0005tw-C0
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:13 -0400
-Received: by mail-pg1-x52b.google.com with SMTP id g29so841030pgl.2
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:06:09 -0700 (PDT)
+ id 1kCmJy-0005uf-U5
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:16 -0400
+Received: by mail-pf1-x443.google.com with SMTP id t9so804164pfq.8
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:06:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=unhCEa+c++7uk9+yQ2XBvkX8JjrsH/tZ97/HnRS/zo4=;
- b=C9aKhV9zcNFwgMhf9cj1IdJ6dZpAscIBprz8wWvT4iq1HxyeIhWeoE2VtqQrvMtQR0
- 0WwEXOWTUMLxTzWhS/zD+9pgo1PsD8xPooFp2LRoM6TBg9sOhfJtvCBaBgOrpL1jU+Cr
- mydkkEKeZAbg0CpprObEX7u3HyADIbQZIrTUza6MyZh+vHUSJmETbF/KMEUypwqgoIHL
- iullAOCQ5GgQa66sHqU6qbQ4AwyfO2BLYdPAcwROSoleU8BptHLBcEWuKzTSPtWxlx5X
- ZH2TdRASkkZeygNNUChr2uRX3zpZPnbTCOJg7xWCvcS0rs+PYeqBssJ2UHR749aTAjZi
- A5yw==
+ bh=dhuky+ghTtqZQFSVESX75P/DE+x+rOs7dZeyQCqARaQ=;
+ b=bEVoBbVAkl+sHSH+MTrql94W2ReJRlpU6qjcDiQ/v3zu+fNwFgx5R8CyuZVzolSp5K
+ /HbG1yb2v5hlZ3ttjbzts1FhAUa1cq3QBIhVZP2YLfbRzov3IuO7G9PqFlFRWcwz8mWv
+ iQrre32tSKSQopSkvHYhwK41wlgARRf6qjD1JhqfEsRGaajxEeodYQF8U0VND00cOhvm
+ CcvJUDdVK230JR4SvNx8yUefyU2F2QBG6RB5QzfrXFxCS8dkzfxU6LMiBdPSFGfmweHX
+ t3i7oM80J9g8IlrzT4cwnkRkBWHHs0Y1OBv0YH0Ln/WIxdaNOYleBuRSCcOrosAVT13d
+ jyMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=unhCEa+c++7uk9+yQ2XBvkX8JjrsH/tZ97/HnRS/zo4=;
- b=JIb+WNNxvKgkUl42KfJOtWz/tPQBiolD/47Ex4BIbY+GxOKHnzzKCVwIc5nGV4f9ji
- 8pGsanQegVnbW8a6w0uRozhKm39xUfIuBOuGGb8Mxdq0e/XjO/py9AhXLRzgOJWTmNJs
- Fh7jF9SrQc8/CrchdqfYVJUHNF+tkFXyRM6QvganREbh531jhp4KvkYjtQz1N7ySy0vN
- 14z2wUXGnNdAn7qSatuQHp9uiubZVMcOHbpVxSIYLc5hJR92ZrfL3PN0JfMBKhyv+C5V
- 2Dyo/9o+f77gvTWUCKfQBLbqzuF6iUC0EHXNM/AlzQ5bedoNL4X6fzFggq3yrAJywx0/
- zxvQ==
-X-Gm-Message-State: AOAM532uGYIiA7eVDa7z4rO4R4EoaApZSiNFK9oihSddzRLwXaL0+3HU
- mhi9aUbeAUgJukw3s6UUmvkUGwSpfQLWTw==
-X-Google-Smtp-Source: ABdhPJyDtqdok+j03nMpUOxHCp1UMzO12T+qf4sH0KLNQDn+FaqoB1MZ7t2tCHSudCIXc1U5J5Sz5w==
-X-Received: by 2002:a63:5c1a:: with SMTP id q26mr1788510pgb.223.1598889968668; 
- Mon, 31 Aug 2020 09:06:08 -0700 (PDT)
+ bh=dhuky+ghTtqZQFSVESX75P/DE+x+rOs7dZeyQCqARaQ=;
+ b=G+fP6UbDkSP043/tXcudZo/WKTD3kpX/nKDEEmKRZFyCjGJa41E8jTvS/wTo7E4Q1+
+ BQg/guVU8DnqNtD+WvjwJt2KBnbQ9T7NZHEF7IoxvNHi/Wpwz72EvPT2KrjyQXnz9IXf
+ Sk9tqtizqucgzPfalPXaVWqovdcZQxTiDH7mkIVjJMfuI698eRlTl5982OOSRhPTmH0G
+ UYiRltoXXJHj/O+oxOwNmGRCaFzaxnfiQkE3HG2bk20z0R/OWFD8DbEeFiQG/aaIrIgE
+ N5HRnM5Tf7YuA9GPQ8Y8p/AOI0VdfEbVUK/f8hY3lYWLY81ebFgL1YAZmJVeWcQ0zbwh
+ dKnA==
+X-Gm-Message-State: AOAM531EPqLfav3mhfoWK1brY3EQBCp0h5w/U3XNVYYFE7u2UOr4B4e7
+ q5Fsxu9h9/+cFI1CxgJ4tdT+vB6RF9HK4Q==
+X-Google-Smtp-Source: ABdhPJzylxZwg2JqgaYOJW0xmkRXVVa5Tkl3ZUbKyP7hZ9fQdS4AlyWag1EH47NmACJvx60wJorIzQ==
+X-Received: by 2002:a63:ec54:: with SMTP id r20mr1724168pgj.430.1598889972785; 
+ Mon, 31 Aug 2020 09:06:12 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.06.07
+ by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.06.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 31 Aug 2020 09:06:07 -0700 (PDT)
+ Mon, 31 Aug 2020 09:06:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/76] tests/tcg: Do not require FE_* exception bits
-Date: Mon, 31 Aug 2020 09:04:48 -0700
-Message-Id: <20200831160601.833692-4-richard.henderson@linaro.org>
+Subject: [PULL 06/76] target/microblaze: Split out MSR from env->sregs
+Date: Mon, 31 Aug 2020 09:04:51 -0700
+Message-Id: <20200831160601.833692-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200831160601.833692-1-richard.henderson@linaro.org>
 References: <20200831160601.833692-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52b;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,44 +104,322 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Define anything that is missing as 0, so that flags & FE_FOO
-is false for any missing FOO.
+Continue eliminating the sregs array in favor of individual members.
+Does not correct the width of MSR, yet.
 
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tests/tcg/multiarch/float_helpers.h | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ target/microblaze/cpu.h       |  7 ++---
+ target/microblaze/cpu.c       |  4 +--
+ target/microblaze/gdbstub.c   |  4 +--
+ target/microblaze/helper.c    | 49 +++++++++++++++++------------------
+ target/microblaze/op_helper.c | 22 ++++++++--------
+ target/microblaze/translate.c | 14 +++++-----
+ 6 files changed, 51 insertions(+), 49 deletions(-)
 
-diff --git a/tests/tcg/multiarch/float_helpers.h b/tests/tcg/multiarch/float_helpers.h
-index 6337bc66c1..309f3f4bf1 100644
---- a/tests/tcg/multiarch/float_helpers.h
-+++ b/tests/tcg/multiarch/float_helpers.h
-@@ -8,6 +8,23 @@
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index d1f91bb318..36de61d9f9 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -237,6 +237,7 @@ struct CPUMBState {
+     uint32_t imm;
+     uint32_t regs[32];
+     uint64_t pc;
++    uint64_t msr;
+     uint64_t sregs[14];
+     float_status fp_status;
+     /* Stack protectors. Yes, it's a hw feature.  */
+@@ -355,7 +356,7 @@ static inline void cpu_get_tb_cpu_state(CPUMBState *env, target_ulong *pc,
+     *pc = env->pc;
+     *cs_base = 0;
+     *flags = (env->iflags & IFLAGS_TB_MASK) |
+-                 (env->sregs[SR_MSR] & (MSR_UM | MSR_VM | MSR_EE));
++             (env->msr & (MSR_UM | MSR_VM | MSR_EE));
+ }
  
- #include <inttypes.h>
+ #if !defined(CONFIG_USER_ONLY)
+@@ -370,11 +371,11 @@ static inline int cpu_mmu_index(CPUMBState *env, bool ifetch)
+     MicroBlazeCPU *cpu = env_archcpu(env);
  
-+/* Some hosts do not have support for all of these; not required by ISO C. */
-+#ifndef FE_OVERFLOW
-+#define FE_OVERFLOW 0
-+#endif
-+#ifndef FE_UNDERFLOW
-+#define FE_UNDERFLOW 0
-+#endif
-+#ifndef FE_DIVBYZERO
-+#define FE_DIVBYZERO 0
-+#endif
-+#ifndef FE_INEXACT
-+#define FE_INEXACT 0
-+#endif
-+#ifndef FE_INVALID
-+#define FE_INVALID 0
-+#endif
-+
- /* Number of constants in each table */
- int get_num_f16(void);
- int get_num_f32(void);
+     /* Are we in nommu mode?.  */
+-    if (!(env->sregs[SR_MSR] & MSR_VM) || !cpu->cfg.use_mmu) {
++    if (!(env->msr & MSR_VM) || !cpu->cfg.use_mmu) {
+         return MMU_NOMMU_IDX;
+     }
+ 
+-    if (env->sregs[SR_MSR] & MSR_UM) {
++    if (env->msr & MSR_UM) {
+         return MMU_USER_IDX;
+     }
+     return MMU_KERNEL_IDX;
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index bde9992535..0eac068570 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -121,9 +121,9 @@ static void mb_cpu_reset(DeviceState *dev)
+ 
+ #if defined(CONFIG_USER_ONLY)
+     /* start in user mode with interrupts enabled.  */
+-    env->sregs[SR_MSR] = MSR_EE | MSR_IE | MSR_VM | MSR_UM;
++    env->msr = MSR_EE | MSR_IE | MSR_VM | MSR_UM;
+ #else
+-    env->sregs[SR_MSR] = 0;
++    env->msr = 0;
+     mmu_init(&env->mmu);
+     env->mmu.c_mmu = 3;
+     env->mmu.c_mmu_tlb_access = 3;
+diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c
+index 9ea31f8d2f..e4c4936a7a 100644
+--- a/target/microblaze/gdbstub.c
++++ b/target/microblaze/gdbstub.c
+@@ -62,7 +62,7 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+         val = env->pc;
+         break;
+     case GDB_MSR:
+-        val = env->sregs[SR_MSR];
++        val = env->msr;
+         break;
+     case GDB_EAR:
+         val = env->sregs[SR_EAR];
+@@ -118,7 +118,7 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+         env->pc = tmp;
+         break;
+     case GDB_MSR:
+-        env->sregs[SR_MSR] = tmp;
++        env->msr = tmp;
+         break;
+     case GDB_EAR:
+         env->sregs[SR_EAR] = tmp;
+diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
+index 5c392deea4..a18314540f 100644
+--- a/target/microblaze/helper.c
++++ b/target/microblaze/helper.c
+@@ -117,7 +117,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
+     /* IMM flag cannot propagate across a branch and into the dslot.  */
+     assert(!((env->iflags & D_FLAG) && (env->iflags & IMM_FLAG)));
+     assert(!(env->iflags & (DRTI_FLAG | DRTE_FLAG | DRTB_FLAG)));
+-/*    assert(env->sregs[SR_MSR] & (MSR_EE)); Only for HW exceptions.  */
++/*    assert(env->msr & (MSR_EE)); Only for HW exceptions.  */
+     env->res_addr = RES_ADDR_NONE;
+     switch (cs->exception_index) {
+         case EXCP_HW_EXCP:
+@@ -136,11 +136,11 @@ void mb_cpu_do_interrupt(CPUState *cs)
+             }
+ 
+             /* Disable the MMU.  */
+-            t = (env->sregs[SR_MSR] & (MSR_VM | MSR_UM)) << 1;
+-            env->sregs[SR_MSR] &= ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM);
+-            env->sregs[SR_MSR] |= t;
++            t = (env->msr & (MSR_VM | MSR_UM)) << 1;
++            env->msr &= ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM);
++            env->msr |= t;
+             /* Exception in progress.  */
+-            env->sregs[SR_MSR] |= MSR_EIP;
++            env->msr |= MSR_EIP;
+ 
+             qemu_log_mask(CPU_LOG_INT,
+                           "hw exception at pc=%" PRIx64 " ear=%" PRIx64 " "
+@@ -179,11 +179,11 @@ void mb_cpu_do_interrupt(CPUState *cs)
+             }
+ 
+             /* Disable the MMU.  */
+-            t = (env->sregs[SR_MSR] & (MSR_VM | MSR_UM)) << 1;
+-            env->sregs[SR_MSR] &= ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM);
+-            env->sregs[SR_MSR] |= t;
++            t = (env->msr & (MSR_VM | MSR_UM)) << 1;
++            env->msr &= ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM);
++            env->msr |= t;
+             /* Exception in progress.  */
+-            env->sregs[SR_MSR] |= MSR_EIP;
++            env->msr |= MSR_EIP;
+ 
+             qemu_log_mask(CPU_LOG_INT,
+                           "exception at pc=%" PRIx64 " ear=%" PRIx64 " "
+@@ -195,11 +195,11 @@ void mb_cpu_do_interrupt(CPUState *cs)
+             break;
+ 
+         case EXCP_IRQ:
+-            assert(!(env->sregs[SR_MSR] & (MSR_EIP | MSR_BIP)));
+-            assert(env->sregs[SR_MSR] & MSR_IE);
++            assert(!(env->msr & (MSR_EIP | MSR_BIP)));
++            assert(env->msr & MSR_IE);
+             assert(!(env->iflags & D_FLAG));
+ 
+-            t = (env->sregs[SR_MSR] & (MSR_VM | MSR_UM)) << 1;
++            t = (env->msr & (MSR_VM | MSR_UM)) << 1;
+ 
+ #if 0
+ #include "disas/disas.h"
+@@ -216,7 +216,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
+ 
+                     qemu_log(
+                          "interrupt at pc=%x msr=%x %x iflags=%x sym=%s\n",
+-                         env->pc, env->sregs[SR_MSR], t, env->iflags,
++                         env->pc, env->msr, t, env->iflags,
+                          sym);
+ 
+                     log_cpu_state(cs, 0);
+@@ -226,11 +226,10 @@ void mb_cpu_do_interrupt(CPUState *cs)
+             qemu_log_mask(CPU_LOG_INT,
+                          "interrupt at pc=%" PRIx64 " msr=%" PRIx64 " %x "
+                          "iflags=%x\n",
+-                         env->pc, env->sregs[SR_MSR], t, env->iflags);
++                         env->pc, env->msr, t, env->iflags);
+ 
+-            env->sregs[SR_MSR] &= ~(MSR_VMS | MSR_UMS | MSR_VM \
+-                                    | MSR_UM | MSR_IE);
+-            env->sregs[SR_MSR] |= t;
++            env->msr &= ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM | MSR_IE);
++            env->msr |= t;
+ 
+             env->regs[14] = env->pc;
+             env->pc = cpu->cfg.base_vectors + 0x10;
+@@ -241,18 +240,18 @@ void mb_cpu_do_interrupt(CPUState *cs)
+         case EXCP_HW_BREAK:
+             assert(!(env->iflags & IMM_FLAG));
+             assert(!(env->iflags & D_FLAG));
+-            t = (env->sregs[SR_MSR] & (MSR_VM | MSR_UM)) << 1;
++            t = (env->msr & (MSR_VM | MSR_UM)) << 1;
+             qemu_log_mask(CPU_LOG_INT,
+                         "break at pc=%" PRIx64 " msr=%" PRIx64 " %x "
+                         "iflags=%x\n",
+-                        env->pc, env->sregs[SR_MSR], t, env->iflags);
++                        env->pc, env->msr, t, env->iflags);
+             log_cpu_state_mask(CPU_LOG_INT, cs, 0);
+-            env->sregs[SR_MSR] &= ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM);
+-            env->sregs[SR_MSR] |= t;
+-            env->sregs[SR_MSR] |= MSR_BIP;
++            env->msr &= ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM);
++            env->msr |= t;
++            env->msr |= MSR_BIP;
+             if (cs->exception_index == EXCP_HW_BREAK) {
+                 env->regs[16] = env->pc;
+-                env->sregs[SR_MSR] |= MSR_BIP;
++                env->msr |= MSR_BIP;
+                 env->pc = cpu->cfg.base_vectors + 0x18;
+             } else
+                 env->pc = env->btarget;
+@@ -293,8 +292,8 @@ bool mb_cpu_exec_interrupt(CPUState *cs, int interrupt_request)
+     CPUMBState *env = &cpu->env;
+ 
+     if ((interrupt_request & CPU_INTERRUPT_HARD)
+-        && (env->sregs[SR_MSR] & MSR_IE)
+-        && !(env->sregs[SR_MSR] & (MSR_EIP | MSR_BIP))
++        && (env->msr & MSR_IE)
++        && !(env->msr & (MSR_EIP | MSR_BIP))
+         && !(env->iflags & (D_FLAG | IMM_FLAG))) {
+         cs->exception_index = EXCP_IRQ;
+         mb_cpu_do_interrupt(cs);
+diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
+index 2deef32740..3668382d36 100644
+--- a/target/microblaze/op_helper.c
++++ b/target/microblaze/op_helper.c
+@@ -78,14 +78,14 @@ void helper_debug(CPUMBState *env)
+     qemu_log("PC=%" PRIx64 "\n", env->pc);
+     qemu_log("rmsr=%" PRIx64 " resr=%" PRIx64 " rear=%" PRIx64 " "
+              "debug[%x] imm=%x iflags=%x\n",
+-             env->sregs[SR_MSR], env->sregs[SR_ESR], env->sregs[SR_EAR],
++             env->msr, env->sregs[SR_ESR], env->sregs[SR_EAR],
+              env->debug, env->imm, env->iflags);
+     qemu_log("btaken=%d btarget=%" PRIx64 " mode=%s(saved=%s) eip=%d ie=%d\n",
+              env->btaken, env->btarget,
+-             (env->sregs[SR_MSR] & MSR_UM) ? "user" : "kernel",
+-             (env->sregs[SR_MSR] & MSR_UMS) ? "user" : "kernel",
+-             (bool)(env->sregs[SR_MSR] & MSR_EIP),
+-             (bool)(env->sregs[SR_MSR] & MSR_IE));
++             (env->msr & MSR_UM) ? "user" : "kernel",
++             (env->msr & MSR_UMS) ? "user" : "kernel",
++             (bool)(env->msr & MSR_EIP),
++             (bool)(env->msr & MSR_IE));
+     for (i = 0; i < 32; i++) {
+         qemu_log("r%2.2d=%8.8x ", i, env->regs[i]);
+         if ((i + 1) % 4 == 0)
+@@ -135,15 +135,15 @@ static inline int div_prepare(CPUMBState *env, uint32_t a, uint32_t b)
+     MicroBlazeCPU *cpu = env_archcpu(env);
+ 
+     if (b == 0) {
+-        env->sregs[SR_MSR] |= MSR_DZ;
++        env->msr |= MSR_DZ;
+ 
+-        if ((env->sregs[SR_MSR] & MSR_EE) && cpu->cfg.div_zero_exception) {
++        if ((env->msr & MSR_EE) && cpu->cfg.div_zero_exception) {
+             env->sregs[SR_ESR] = ESR_EC_DIVZERO;
+             helper_raise_exception(env, EXCP_HW_EXCP);
+         }
+         return 0;
+     }
+-    env->sregs[SR_MSR] &= ~MSR_DZ;
++    env->msr &= ~MSR_DZ;
+     return 1;
+ }
+ 
+@@ -192,7 +192,7 @@ static void update_fpu_flags(CPUMBState *env, int flags)
+     }
+     if (raise
+         && (env->pvr.regs[2] & PVR2_FPU_EXC_MASK)
+-        && (env->sregs[SR_MSR] & MSR_EE)) {
++        && (env->msr & MSR_EE)) {
+         raise_fpu_exception(env);
+     }
+ }
+@@ -437,7 +437,7 @@ void helper_memalign(CPUMBState *env, target_ulong addr,
+             if (mask == 3) {
+                 env->sregs[SR_ESR] |= 1 << 11;
+             }
+-            if (!(env->sregs[SR_MSR] & MSR_EE)) {
++            if (!(env->msr & MSR_EE)) {
+                 return;
+             }
+             helper_raise_exception(env, EXCP_HW_EXCP);
+@@ -484,7 +484,7 @@ void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
+     env = &cpu->env;
+ 
+     cpu_restore_state(cs, retaddr, true);
+-    if (!(env->sregs[SR_MSR] & MSR_EE)) {
++    if (!(env->msr & MSR_EE)) {
+         return;
+     }
+ 
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index 9f6815cc1f..9f2dcd82cd 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -1809,16 +1809,16 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+     qemu_fprintf(f, "rmsr=%" PRIx64 " resr=%" PRIx64 " rear=%" PRIx64 " "
+                  "debug=%x imm=%x iflags=%x fsr=%" PRIx64 " "
+                  "rbtr=%" PRIx64 "\n",
+-                 env->sregs[SR_MSR], env->sregs[SR_ESR], env->sregs[SR_EAR],
++                 env->msr, env->sregs[SR_ESR], env->sregs[SR_EAR],
+                  env->debug, env->imm, env->iflags, env->sregs[SR_FSR],
+                  env->sregs[SR_BTR]);
+     qemu_fprintf(f, "btaken=%d btarget=%" PRIx64 " mode=%s(saved=%s) "
+                  "eip=%d ie=%d\n",
+                  env->btaken, env->btarget,
+-                 (env->sregs[SR_MSR] & MSR_UM) ? "user" : "kernel",
+-                 (env->sregs[SR_MSR] & MSR_UMS) ? "user" : "kernel",
+-                 (bool)(env->sregs[SR_MSR] & MSR_EIP),
+-                 (bool)(env->sregs[SR_MSR] & MSR_IE));
++                 (env->msr & MSR_UM) ? "user" : "kernel",
++                 (env->msr & MSR_UMS) ? "user" : "kernel",
++                 (bool)(env->msr & MSR_EIP),
++                 (bool)(env->msr & MSR_IE));
+     for (i = 0; i < 12; i++) {
+         qemu_fprintf(f, "rpvr%2.2d=%8.8x ", i, env->pvr.regs[i]);
+         if ((i + 1) % 4 == 0) {
+@@ -1871,8 +1871,10 @@ void mb_tcg_init(void)
+ 
+     cpu_SR[SR_PC] =
+         tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, pc), "rpc");
++    cpu_SR[SR_MSR] =
++        tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, msr), "rmsr");
+ 
+-    for (i = 1; i < ARRAY_SIZE(cpu_SR); i++) {
++    for (i = SR_MSR + 1; i < ARRAY_SIZE(cpu_SR); i++) {
+         cpu_SR[i] = tcg_global_mem_new_i64(cpu_env,
+                           offsetof(CPUMBState, sregs[i]),
+                           special_regnames[i]);
 -- 
 2.25.1
 
