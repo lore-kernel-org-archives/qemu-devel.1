@@ -4,86 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 059ECC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2067C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 22:03:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC1D52083E
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:47:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A65E82065F
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 22:03:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iPsWc6iQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC1D52083E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q+rOkWxj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A65E82065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCre8-0000ro-Ve
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:47:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53564)
+	id 1kCrtT-0004XT-SG
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 18:03:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCrdU-00008r-09
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:46:44 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46943)
+ id 1kCrsm-0003yo-IR
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 18:02:32 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:47071)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCrdQ-0004uI-Vo
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:46:43 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 31so1448542pgy.13
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:46:40 -0700 (PDT)
+ id 1kCrsj-0006T7-Hn
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 18:02:32 -0400
+Received: by mail-pg1-x544.google.com with SMTP id 31so1472954pgy.13
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 15:02:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
+ h=subject:from:to:cc:references:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=DAMvSkP3ycghdbPfao8tjevb03zNd12UoRVFNvmY36E=;
- b=iPsWc6iQv7QsltWoK3+ijsoP1moLRxpImZEue8X7GtJcystyO4zIlXWNfSM09ZyQ1W
- KObxSCIK7DAYzLxueNwh479O9PGvts2PRq+Med7mv8vZPKxH0ZomSiDXToUuH41rwCdy
- HSgc9DmDv4pc65o9X2pjCaVgXOuZ1KymoXli/ujb7Zs/2637Sms3Omh3BEv2CTFga1/S
- kV+TW/21x1hCGafCNv2ekSBaKal/Ov6PYK52e9NjGNPjv9OfKuMsh5smsTmethxyZf8f
- 5CkZicR9T2CRI2shE+gRFuf1OKVugZezEDrlXXddGN4iPXttG0yLvfBDbXWxZ4AGJejO
- DFww==
+ bh=X0cFCtxK4xl55T5MuZgphvDqnW4fkCQ//cpbpdaWuII=;
+ b=Q+rOkWxjgJi2ChGk3eRGNT7q1L2VezWMZouczsGSnq/pGfBV7SH5gcXWq9CO8IsN4/
+ DboCRiPyTikwG1bGDNRI/XKFN+dPdTNE5TPcDEgfcAArzWtJJkhcQSFUIfzUZvFfgdWT
+ 0krwWTVKkhsF4IcNcAJI883hZUiN6asUoLxHE7SwUghI918R+8Wdrvk5sAE59Fw/2lrz
+ TW1S+OeG3fWwyMfeshrf18PanPDDw+FwU5lx3gXeTZfZazn/3+f17hqerOQdrDYuf2Eh
+ pGtc7lxDHLALV5Ai4T0vrwWU4wPo0WZ/wCCT+GZX7XZNCUBQYgOiwaw3k3tBocHGrZCT
+ 9kpw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=DAMvSkP3ycghdbPfao8tjevb03zNd12UoRVFNvmY36E=;
- b=A056my5Rxdgl914noirg5o3uaHvarYU/9d4tjRl/CCxaKHEiQRXpki7sBNPj7CUV9A
- TfMqPaLcxv0b0NXKmMloZcov5nut0v+dQFaD/dA9mWRyTZ+IhVX2gzfUinqcWb906Ci5
- EKFe1ifpr0N9ay97qc+idHHdveuupJzK+A77+UYhItgX3+KjD4pGlA3y+Ohdce10ZxJR
- he6KIMuITEpAhMG6V6WS7Zw+Cpw1F/5WLl+XOSbn1Rl32eIajJuFojAN+EWtNZpGnRii
- KPdCJdksy24O0EqklRhwolm3Ygtyekg7u7UVKmrZPJWwMrpb/Fu3U8UHJKdk8E+XCiQW
- 7uHQ==
-X-Gm-Message-State: AOAM531eSfnVAIogb0yCWY5RbtXewH7KS+LZo5S+WGwTTPi2sTUIG87o
- 76Vz9elwQIihWHiiC8GiRR/c3g==
-X-Google-Smtp-Source: ABdhPJwVMWj8oUCpSfve9TEoH3FHJ80jj1Hv+2mD0LUDgJqyvyFzzmUWM1IPifEPUU//Q9eLHkn1CA==
-X-Received: by 2002:a62:444:: with SMTP id 65mr2964961pfe.86.1598910399504;
- Mon, 31 Aug 2020 14:46:39 -0700 (PDT)
+ bh=X0cFCtxK4xl55T5MuZgphvDqnW4fkCQ//cpbpdaWuII=;
+ b=dxCA+mVnyPLIzVwZcMBLoDdos8YRe+Z1UoK4cqgSvkeDtgq576Ch2RZXUUDmfeJPP7
+ YXCl8j2ilfq4u/pH86yA1DB7zDS++Us6zGayv/jmrE98ymrk+V1hq10wqGimgJZlrtYG
+ bCKWUNevtEKmAJhUp4KdVVAdXl8eDZQ1NgHuCUFrqSFY93g4q1/QWq973GWH2LLm1dgb
+ e/CBxfKpC8J8eTuWWwDz+TJXd6B7cpeKFLR7Fkm6Vm+hGBQaH8lOm8cnKsHTsThaQxjT
+ jLYLK9MdWMzhgUjYWQclfIs5BUgPzcb8uy9OxgAiVRID/yiAAQFLhJ9fx5+oaFxb3yxY
+ 6xjw==
+X-Gm-Message-State: AOAM530VOyYbE8X2jm29hOTxNY/qGiXDExshll/szPhFDPqRqXIMHzwl
+ OaR7FB3l3QIuVNq3CBlDH3Qp9g==
+X-Google-Smtp-Source: ABdhPJzu3nRvymJP3v2mQhcPt4yPiSsA88UUSsh0vzQCCZFZfpeeIkARyNeuHPoSJi+Ery/QJ9Jeig==
+X-Received: by 2002:a62:760e:: with SMTP id r14mr2857257pfc.309.1598911347876; 
+ Mon, 31 Aug 2020 15:02:27 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gm3sm535739pjb.31.2020.08.31.14.46.37
+ by smtp.gmail.com with ESMTPSA id w66sm9581237pfb.126.2020.08.31.15.02.26
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 31 Aug 2020 14:46:38 -0700 (PDT)
-Subject: Re: [PATCH v2 6/7] target: rename all *_cpu_exec_interrupt functions
- to *_cpu_exec_interrupt_locked
+ Mon, 31 Aug 2020 15:02:27 -0700 (PDT)
+Subject: Re: [PATCH v2 2/7] target/arm: add ARMCPUClass->do_interrupt_locked
+From: Richard Henderson <richard.henderson@linaro.org>
 To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
 References: <20200819182856.4893-1-robert.foley@linaro.org>
- <20200819182856.4893-7-robert.foley@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0ef04de1-4dd0-e432-d1c1-b5672d276e1b@linaro.org>
-Date: Mon, 31 Aug 2020 14:46:36 -0700
+ <20200819182856.4893-3-robert.foley@linaro.org>
+ <439e8b14-adc1-b7ea-edaa-d11069863007@linaro.org>
+Message-ID: <e324f958-8c9e-ebe1-e624-7eec610fe5aa@linaro.org>
+Date: Mon, 31 Aug 2020 15:02:25 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200819182856.4893-7-robert.foley@linaro.org>
+In-Reply-To: <439e8b14-adc1-b7ea-edaa-d11069863007@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -41
@@ -106,65 +106,70 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>, Chris Wulff <crwulff@gmail.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- David Hildenbrand <david@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Max Filippov <jcmvbkbc@gmail.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Guan Xuetao <gxt@mprc.pku.edu.cn>, Marek Vasut <marex@denx.de>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "open list:S390 general arch..." <qemu-s390x@nongnu.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- Michael Rolnik <mrolnik@gmail.com>, peter.puhov@linaro.org,
- Stafford Horne <shorne@gmail.com>, alex.bennee@linaro.org,
- Richard Henderson <rth@twiddle.net>,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Cornelia Huck <cohuck@redhat.com>, Laurent Vivier <laurent@vivier.eu>,
- Michael Walle <michael@walle.cc>,
- "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>, pbonzini@redhat.com,
- Aurelien Jarno <aurelien@aurel32.net>
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, alex.bennee@linaro.org,
+ pbonzini@redhat.com, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/19/20 11:28 AM, Robert Foley wrote:
-> The rename of all *_cpu_exec_interrupt functions to
-> *_cpu_exec_interrupt_locked is preparation for pushing the BQL lock
-> around these functions down into the per-arch implementation of
-> *_cpu_exec_interrupt.  In a later patch, which pushes down the lock,
-> we will add a new *_cpu_exec_interrupt function, which grabs the BQL
-> and calls to *_cpu_exec_interrupt_locked.
+On 8/31/20 2:18 PM, Richard Henderson wrote:
+> On 8/19/20 11:28 AM, Robert Foley wrote:
+>> Adding ->do_interrupt_locked to ARMCPUClass is preparation for
+>> pushing the BQL down into the per-arch implementation of ->do_interrupt.
+>>
+>> This is needed since ARM's *_cpu_exec_interrupt calls to *_do_interrupt.
+>> With the push down of the BQL into *_cpu_exec_interrupt and
+>> *_do_interrupt, *_cpu_exec_interrupt will call to ->do_interrupt
+>> with lock held.  Since ->do_interrupt also has the lock, we need a way
+>> to allow cpu_exec_interrupt to call do_interrupt with lock held.
+>> This patch solves this issue of *_cpu_exec_interrupt needing
+>> to call do_interrupt with lock held.
+>>
+>> This patch is part of a series of transitions to move the
+>> BQL down into the do_interrupt per arch functions.  This set of
+>> transitions is needed to maintain bisectability.
+>>
+>> This approach was suggested by Paolo Bonzini.
+>> For reference, here are two key posts in the discussion, explaining
+>> the reasoning/benefits of this approach.
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00784.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg01517.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg08731.html
+>> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00044.html
+>>
+>> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+>> ---
+>>  target/arm/cpu-qom.h | 3 +++
+>>  target/arm/cpu.c     | 5 +++--
+>>  target/arm/cpu_tcg.c | 5 +++--
+>>  3 files changed, 9 insertions(+), 4 deletions(-)
 > 
-> This patch is part of a series of transitions to move the
-> BQL down into the cpu_exec_interrupt per arch functions.  This set of
-> transitions is needed to maintain bisectability.
-> 
-> The purpose of this set of changes is to set the groundwork
-> so that an arch could move towards removing
-> the BQL from the cpu_handle_interrupt/exception paths.
-> 
-> This approach was suggested by Paolo Bonzini.
-> For reference, here are key posts in the discussion, explaining
-> the reasoning/benefits of this approach.
-> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00784.html
-> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg01517.html
-> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg08731.html
-> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00044.html
-> 
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> ---
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I take it back.  These two cc->do_interrupt calls can be replaced with direct
+calls.
+
+> #ifndef CONFIG_USER_ONLY
+>     cc->do_interrupt = arm_v7m_cpu_do_interrupt;
+> #endif
+> 
+>     cc->cpu_exec_interrupt = arm_v7m_cpu_exec_interrupt;
+
+If we are in arm_v7m_cpu_exec_interrupt we will always call
+arm_v7m_cpu_do_interrupt.
+
+I think the mismatch of #ifdef, which implies a different destination is
+possible, is a bug -- cc->do_interrupt is not otherwise assigned and in fact
+would be NULL.
+
+I suspect that some of these slots themselves should be ifdefed, so that we
+cannot assign to them when they are unused.  That would help keep the ifdefs in
+the cpu init functions in sync.
+
+This same condition is *not* true for cris -- there is no
+crisv10_cpu_exec_interrupt -- so you do need the new do_interrupt_locked field
+there.
 
 
 r~
-
 
