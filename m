@@ -2,97 +2,75 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 787F8C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A12C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:39:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A6522083E
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:38:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YLqmHzLp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A6522083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id B4EF22083E
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:39:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4EF22083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCrVq-0007mk-B4
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:38:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47522)
+	id 1kCrWe-00012r-U6
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:39:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCrDa-0004L0-AK
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:19:58 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40905)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kCrDn-0004Yt-Ql
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:20:12 -0400
+Received: from mail-qv1-f67.google.com ([209.85.219.67]:34239)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCrDY-0001YI-FQ
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:19:57 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id kx11so547058pjb.5
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:19:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=1BwTVD6X4hEAzrEYONfujXAn5wRXQaDQdFnvOyy2+C0=;
- b=YLqmHzLpEepN+bV6V8MuiH8rKdrlDTIdXqqRpgjtj3l1UzS2JOUfWTl583gR1CvGfD
- KOX7MVqgeQLF2O13121XkvFkTRvW7oB8gCX19xnCl+MPDhHOR91OlPnIDSlF+XpSOOlM
- qIbjLOhL8Fft6yqCsCsBXC9lWcXfEPgLRbPBd2j9sv4+kGb4ywMqA9OXplwlskIErlZJ
- zw7w/Pla6JDYbxkK6FBV2dyaCGBUAEQhKoy0MaXyPnkzcVDQrRuWSrPNnvS+Fu6opJds
- KE7MlFVoUhnM4am2/OCN06OTu5r0cmAAxOogbU4bCUTpnGRtB4NcDB56B/Ns/bg/jW6e
- VohA==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kCrDl-0001ZL-QR
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:20:11 -0400
+Received: by mail-qv1-f67.google.com with SMTP id m14so1852323qvt.1
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:20:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1BwTVD6X4hEAzrEYONfujXAn5wRXQaDQdFnvOyy2+C0=;
- b=pZ5xtzTcx3Fimsmcznh3ALMWXDYzKtmWc2hr4J/7hSB8yZTssiOI3jBE2xnFsB0Iyh
- Tny50TSzbl7NjXqkrGv0btFHBMA0j4bGL7VpbZYY0fHH4cRgaSTtohXyzOzMMo1b/ar2
- r2qn/UaLGXDa899act3Odz6xX3dO8zPp0OKOy8FFeTQoGDi2QtK6mV911QBokTHTRnTW
- +Lu6fRsxqp5i2GIBF10nRQqRzWwqs8mYYDzMIgOhcqCHj9L0cHM44oISd7RZjBRg348t
- EOtHjiDbC7VBEBR4keh2XTD4I1qt6fNdmBFmzaPy12R/XCCm3qIc77VK1PtP45phWl92
- LIqg==
-X-Gm-Message-State: AOAM531g/crcp0vzGL8TUKzgNj5vxHTfGkg2/SVoBVdJtytNPdCGB0aY
- lLVS3gKx9vJlkj51O5fxTtaZxw==
-X-Google-Smtp-Source: ABdhPJwaZLXkvH7WkUffFCfBkAaaPb3u5ouadWEORzAajOlTxkbfGjedq5he9OlY3NyzILM/Osf4Mg==
-X-Received: by 2002:a17:902:c24b:: with SMTP id
- 11mr2489937plg.64.1598908794963; 
- Mon, 31 Aug 2020 14:19:54 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j19sm4475978pfi.51.2020.08.31.14.19.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 31 Aug 2020 14:19:54 -0700 (PDT)
-Subject: Re: [PATCH v2 3/7] target/cris: add CRISCPUClass->do_interrupt_locked
-To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
-References: <20200819182856.4893-1-robert.foley@linaro.org>
- <20200819182856.4893-4-robert.foley@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <4259ab85-888d-83b4-ea48-d1a93a3f8951@linaro.org>
-Date: Mon, 31 Aug 2020 14:19:52 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=SjgWIsZuXFPtl3+R2qxjhWR5+JINNygoUiofAL6ajIc=;
+ b=ZOsh/vZxd8acJPvYPrgYUvjAkXkbpMybkbvJxcc/lBTMY4PdCv0QMq5TSTxDGRUxMr
+ OdS9eg/Z+uPGzn/ArWmbuXwdibFPutfI4ttTccdYZwEks3jjkzVYMHy4VWyHU4ja2OiW
+ AuIvYluHr5FxssE0ewsYA/2peEB8VShSG+heSiQ/SQHSGdnWkpbvNkB3RTUaSyNcNxkd
+ 0Lm31P8t+JlHtOdY4za3ygKfnhFlETvUHhSi+TT5o45o5ivTN5BNrWLC4UUg0lxoR7eY
+ TUwsi1HGqxSeSjtsRgzhOjgkI6q32JSw9CHDG4YcmM+OGI6BXGK2pFrgpF+dgx1364Ml
+ q41Q==
+X-Gm-Message-State: AOAM531LMVgiOKC4EDX9rfL+Vt8rN9U1pANciDEt5+tVitckj3Hsck+u
+ Cvcrs0e51aq7XEmNVdwL3bEGFLJ8zgQFq8e1XxI=
+X-Google-Smtp-Source: ABdhPJzbXTwMlKCHEK9iUVx0HIKGKaf7MKsvxxkEwEHnCKErFwPwMBCpDNQqTCRvluxbUlFBHfThGY3vxLQnHPj+TJA=
+X-Received: by 2002:ad4:59d0:: with SMTP id el16mr3028940qvb.116.1598908808980; 
+ Mon, 31 Aug 2020 14:20:08 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200819182856.4893-4-robert.foley@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200828141929.77854-1-richard.henderson@linaro.org>
+ <20200828141929.77854-10-richard.henderson@linaro.org>
+In-Reply-To: <20200828141929.77854-10-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 31 Aug 2020 22:51:42 +0200
+Message-ID: <CAAdtpL53UOxEDFeEc7K+W-BjAUsqK7f2AkxLgc9qAkc88Ee1fQ@mail.gmail.com>
+Subject: Re: [PATCH v2 09/76] target/microblaze: Split out FSR from env->sregs
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000966d6e05ae32f728"
+Received-SPF: pass client-ip=209.85.219.67;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-qv1-f67.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 17:15:50
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,45 +83,331 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, peter.puhov@linaro.org,
- alex.bennee@linaro.org, pbonzini@redhat.com
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/19/20 11:28 AM, Robert Foley wrote:
-> Adding ->do_interrupt_locked to CRISCPUClass is preparation for
-> pushing the BQL down into the per-arch implementation of ->do_interrupt.
-> 
-> This is needed since Cris's *_cpu_exec_interrupt calls to *_do_interrupt.
-> With the push down of the BQL into *_cpu_exec_interrupt and
-> *_do_interrupt, *_cpu_exec_interrupt will call to ->do_interrupt
-> with lock held.  Since ->do_interrupt also has the lock, we need a way
-> to allow cpu_exec_interrupt to call do_interrupt with lock held.
-> This patch solves the issue of *_cpu_exec_interrupt needing
-> to call do_interrupt with lock held.
-> 
-> This patch is part of a series of transitions to move the
-> BQL down into the do_interrupt per arch functions.  This set of
-> transitions is needed to maintain bisectability.
-> 
-> This approach was suggested by Paolo Bonzini.
-> For reference, here are two key posts in the discussion, explaining
-> the reasoning/benefits of this approach.
-> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00784.html
-> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg01517.html
-> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg08731.html
-> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00044.html
-> 
-> Signed-off-by: Robert Foley <robert.foley@linaro.org>
-> ---
->  target/cris/cpu-qom.h | 3 +++
->  target/cris/cpu.c     | 6 ++++++
->  target/cris/helper.c  | 6 +++---
->  3 files changed, 12 insertions(+), 3 deletions(-)
+--000000000000966d6e05ae32f728
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Le ven. 28 ao=C3=BBt 2020 16:25, Richard Henderson <richard.henderson@linar=
+o.org>
+a =C3=A9crit :
 
+> Continue eliminating the sregs array in favor of individual members.
+> Does not correct the width of FSR, yet.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
 
-r~
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
+---
+>  target/microblaze/cpu.h          | 1 +
+>  linux-user/microblaze/cpu_loop.c | 4 ++--
+>  target/microblaze/gdbstub.c      | 4 ++--
+>  target/microblaze/op_helper.c    | 8 ++++----
+>  target/microblaze/translate.c    | 6 ++++--
+>  5 files changed, 13 insertions(+), 10 deletions(-)
+>
+> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> index 7d94af43ed..bcafef99b0 100644
+> --- a/target/microblaze/cpu.h
+> +++ b/target/microblaze/cpu.h
+> @@ -240,6 +240,7 @@ struct CPUMBState {
+>      uint64_t msr;
+>      uint64_t ear;
+>      uint64_t esr;
+> +    uint64_t fsr;
+>      uint64_t sregs[14];
+>      float_status fp_status;
+>      /* Stack protectors. Yes, it's a hw feature.  */
+> diff --git a/linux-user/microblaze/cpu_loop.c
+> b/linux-user/microblaze/cpu_loop.c
+> index c10e3e0261..da5e98b784 100644
+> --- a/linux-user/microblaze/cpu_loop.c
+> +++ b/linux-user/microblaze/cpu_loop.c
+> @@ -96,10 +96,10 @@ void cpu_loop(CPUMBState *env)
+>                  case ESR_EC_FPU:
+>                      info.si_signo =3D TARGET_SIGFPE;
+>                      info.si_errno =3D 0;
+> -                    if (env->sregs[SR_FSR] & FSR_IO) {
+> +                    if (env->fsr & FSR_IO) {
+>                          info.si_code =3D TARGET_FPE_FLTINV;
+>                      }
+> -                    if (env->sregs[SR_FSR] & FSR_DZ) {
+> +                    if (env->fsr & FSR_DZ) {
+>                          info.si_code =3D TARGET_FPE_FLTDIV;
+>                      }
+>                      info._sifields._sigfault._addr =3D 0;
+> diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c
+> index 05e22f233d..2634ce49fc 100644
+> --- a/target/microblaze/gdbstub.c
+> +++ b/target/microblaze/gdbstub.c
+> @@ -71,7 +71,7 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray
+> *mem_buf, int n)
+>          val =3D env->esr;
+>          break;
+>      case GDB_FSR:
+> -        val =3D env->sregs[SR_FSR];
+> +        val =3D env->fsr;
+>          break;
+>      case GDB_BTR:
+>          val =3D env->sregs[SR_BTR];
+> @@ -127,7 +127,7 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t
+> *mem_buf, int n)
+>          env->esr =3D tmp;
+>          break;
+>      case GDB_FSR:
+> -        env->sregs[SR_FSR] =3D tmp;
+> +        env->fsr =3D tmp;
+>          break;
+>      case GDB_BTR:
+>          env->sregs[SR_BTR] =3D tmp;
+> diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.=
+c
+> index f01cf9be64..ae57d45536 100644
+> --- a/target/microblaze/op_helper.c
+> +++ b/target/microblaze/op_helper.c
+> @@ -175,19 +175,19 @@ static void update_fpu_flags(CPUMBState *env, int
+> flags)
+>      int raise =3D 0;
+>
+>      if (flags & float_flag_invalid) {
+> -        env->sregs[SR_FSR] |=3D FSR_IO;
+> +        env->fsr |=3D FSR_IO;
+>          raise =3D 1;
+>      }
+>      if (flags & float_flag_divbyzero) {
+> -        env->sregs[SR_FSR] |=3D FSR_DZ;
+> +        env->fsr |=3D FSR_DZ;
+>          raise =3D 1;
+>      }
+>      if (flags & float_flag_overflow) {
+> -        env->sregs[SR_FSR] |=3D FSR_OF;
+> +        env->fsr |=3D FSR_OF;
+>          raise =3D 1;
+>      }
+>      if (flags & float_flag_underflow) {
+> -        env->sregs[SR_FSR] |=3D FSR_UF;
+> +        env->fsr |=3D FSR_UF;
+>          raise =3D 1;
+>      }
+>      if (raise
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.=
+c
+> index 411c7b6e49..c58c49ea8f 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -1810,7 +1810,7 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int
+> flags)
+>                   "debug=3D%x imm=3D%x iflags=3D%x fsr=3D%" PRIx64 " "
+>                   "rbtr=3D%" PRIx64 "\n",
+>                   env->msr, env->esr, env->ear,
+> -                 env->debug, env->imm, env->iflags, env->sregs[SR_FSR],
+> +                 env->debug, env->imm, env->iflags, env->fsr,
+>                   env->sregs[SR_BTR]);
+>      qemu_fprintf(f, "btaken=3D%d btarget=3D%" PRIx64 " mode=3D%s(saved=
+=3D%s) "
+>                   "eip=3D%d ie=3D%d\n",
+> @@ -1877,8 +1877,10 @@ void mb_tcg_init(void)
+>          tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, ear),
+> "rear");
+>      cpu_SR[SR_ESR] =3D
+>          tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, esr),
+> "resr");
+> +    cpu_SR[SR_FSR] =3D
+> +        tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, fsr),
+> "rfsr");
+>
+> -    for (i =3D SR_ESR + 1; i < ARRAY_SIZE(cpu_SR); i++) {
+> +    for (i =3D SR_FSR + 1; i < ARRAY_SIZE(cpu_SR); i++) {
+>          cpu_SR[i] =3D tcg_global_mem_new_i64(cpu_env,
+>                            offsetof(CPUMBState, sregs[i]),
+>                            special_regnames[i]);
+> --
+> 2.25.1
+>
+>
+>
+
+--000000000000966d6e05ae32f728
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Le ven. 28 ao=C3=BBt 2020 16:25, Richard Henderson &lt=
+;<a href=3D"mailto:richard.henderson@linaro.org">richard.henderson@linaro.o=
+rg</a>&gt; a =C3=A9crit=C2=A0:<br></div><blockquote class=3D"gmail_quote" s=
+tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Cont=
+inue eliminating the sregs array in favor of individual members.<br>
+Does not correct the width of FSR, yet.<br>
+<br>
+Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
+naro.org" target=3D"_blank" rel=3D"noreferrer">richard.henderson@linaro.org=
+</a>&gt;<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
+=3D"auto"><span style=3D"font-family:sans-serif;font-size:13.696px">Reviewe=
+d-by: Philippe Mathieu-Daud=C3=A9 &lt;</span><a href=3D"mailto:f4bug@amsat.=
+org" style=3D"text-decoration:none;color:rgb(66,133,244);font-family:sans-s=
+erif;font-size:13.696px">f4bug@amsat.org</a><span style=3D"font-family:sans=
+-serif;font-size:13.696px">&gt;</span><br></div><div dir=3D"auto"><br></div=
+><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_qu=
+ote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex=
+">
+---<br>
+=C2=A0target/microblaze/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 1 +<br>
+=C2=A0linux-user/microblaze/cpu_loop.c | 4 ++--<br>
+=C2=A0target/microblaze/gdbstub.c=C2=A0 =C2=A0 =C2=A0 | 4 ++--<br>
+=C2=A0target/microblaze/op_helper.c=C2=A0 =C2=A0 | 8 ++++----<br>
+=C2=A0target/microblaze/translate.c=C2=A0 =C2=A0 | 6 ++++--<br>
+=C2=A05 files changed, 13 insertions(+), 10 deletions(-)<br>
+<br>
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h<br>
+index 7d94af43ed..bcafef99b0 100644<br>
+--- a/target/microblaze/cpu.h<br>
++++ b/target/microblaze/cpu.h<br>
+@@ -240,6 +240,7 @@ struct CPUMBState {<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t msr;<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t ear;<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t esr;<br>
++=C2=A0 =C2=A0 uint64_t fsr;<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t sregs[14];<br>
+=C2=A0 =C2=A0 =C2=A0float_status fp_status;<br>
+=C2=A0 =C2=A0 =C2=A0/* Stack protectors. Yes, it&#39;s a hw feature.=C2=A0 =
+*/<br>
+diff --git a/linux-user/microblaze/cpu_loop.c b/linux-user/microblaze/cpu_l=
+oop.c<br>
+index c10e3e0261..da5e98b784 100644<br>
+--- a/linux-user/microblaze/cpu_loop.c<br>
++++ b/linux-user/microblaze/cpu_loop.c<br>
+@@ -96,10 +96,10 @@ void cpu_loop(CPUMBState *env)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0case ESR_EC_F=
+PU:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0info.si_signo =3D TARGET_SIGFPE;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0info.si_errno =3D 0;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (=
+env-&gt;sregs[SR_FSR] &amp; FSR_IO) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (=
+env-&gt;fsr &amp; FSR_IO) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0info.si_code =3D TARGET_FPE_FLTINV;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0}<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (=
+env-&gt;sregs[SR_FSR] &amp; FSR_DZ) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (=
+env-&gt;fsr &amp; FSR_DZ) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0info.si_code =3D TARGET_FPE_FLTDIV;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0}<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0info._sifields._sigfault._addr =3D 0;<br>
+diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c<br>
+index 05e22f233d..2634ce49fc 100644<br>
+--- a/target/microblaze/gdbstub.c<br>
++++ b/target/microblaze/gdbstub.c<br>
+@@ -71,7 +71,7 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *me=
+m_buf, int n)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0val =3D env-&gt;esr;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0case GDB_FSR:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D env-&gt;sregs[SR_FSR];<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D env-&gt;fsr;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0case GDB_BTR:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0val =3D env-&gt;sregs[SR_BTR];<br>
+@@ -127,7 +127,7 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *me=
+m_buf, int n)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;esr =3D tmp;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0case GDB_FSR:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sregs[SR_FSR] =3D tmp;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;fsr =3D tmp;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0case GDB_BTR:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;sregs[SR_BTR] =3D tmp;<br>
+diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c<=
+br>
+index f01cf9be64..ae57d45536 100644<br>
+--- a/target/microblaze/op_helper.c<br>
++++ b/target/microblaze/op_helper.c<br>
+@@ -175,19 +175,19 @@ static void update_fpu_flags(CPUMBState *env, int fla=
+gs)<br>
+=C2=A0 =C2=A0 =C2=A0int raise =3D 0;<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (flags &amp; float_flag_invalid) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sregs[SR_FSR] |=3D FSR_IO;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;fsr |=3D FSR_IO;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0raise =3D 1;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0if (flags &amp; float_flag_divbyzero) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sregs[SR_FSR] |=3D FSR_DZ;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;fsr |=3D FSR_DZ;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0raise =3D 1;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0if (flags &amp; float_flag_overflow) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sregs[SR_FSR] |=3D FSR_OF;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;fsr |=3D FSR_OF;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0raise =3D 1;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0if (flags &amp; float_flag_underflow) {<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sregs[SR_FSR] |=3D FSR_UF;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;fsr |=3D FSR_UF;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0raise =3D 1;<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0if (raise<br>
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c<=
+br>
+index 411c7b6e49..c58c49ea8f 100644<br>
+--- a/target/microblaze/translate.c<br>
++++ b/target/microblaze/translate.c<br>
+@@ -1810,7 +1810,7 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int fla=
+gs)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;debug=
+=3D%x imm=3D%x iflags=3D%x fsr=3D%&quot; PRIx64 &quot; &quot;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;rbtr=
+=3D%&quot; PRIx64 &quot;\n&quot;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;msr,=
+ env-&gt;esr, env-&gt;ear,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;debu=
+g, env-&gt;imm, env-&gt;iflags, env-&gt;sregs[SR_FSR],<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;debu=
+g, env-&gt;imm, env-&gt;iflags, env-&gt;fsr,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sreg=
+s[SR_BTR]);<br>
+=C2=A0 =C2=A0 =C2=A0qemu_fprintf(f, &quot;btaken=3D%d btarget=3D%&quot; PRI=
+x64 &quot; mode=3D%s(saved=3D%s) &quot;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;eip=3D=
+%d ie=3D%d\n&quot;,<br>
+@@ -1877,8 +1877,10 @@ void mb_tcg_init(void)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_global_mem_new_i64(cpu_env, offsetof(=
+CPUMBState, ear), &quot;rear&quot;);<br>
+=C2=A0 =C2=A0 =C2=A0cpu_SR[SR_ESR] =3D<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_global_mem_new_i64(cpu_env, offsetof(=
+CPUMBState, esr), &quot;resr&quot;);<br>
++=C2=A0 =C2=A0 cpu_SR[SR_FSR] =3D<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_global_mem_new_i64(cpu_env, offsetof(CPUMB=
+State, fsr), &quot;rfsr&quot;);<br>
+<br>
+-=C2=A0 =C2=A0 for (i =3D SR_ESR + 1; i &lt; ARRAY_SIZE(cpu_SR); i++) {<br>
++=C2=A0 =C2=A0 for (i =3D SR_FSR + 1; i &lt; ARRAY_SIZE(cpu_SR); i++) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cpu_SR[i] =3D tcg_global_mem_new_i64(cpu_=
+env,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0offsetof(CPUMBState, sregs[i]),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0special_regnames[i]);<br>
+-- <br>
+2.25.1<br>
+<br>
+<br>
+</blockquote></div></div></div>
+
+--000000000000966d6e05ae32f728--
 
