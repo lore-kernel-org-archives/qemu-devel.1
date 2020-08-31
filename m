@@ -7,43 +7,42 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16504C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 07:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 274E4C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 07:18:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0F6D206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 07:18:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0F6D206F0
+	by mail.kernel.org (Postfix) with ESMTPS id E8FBD206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 07:18:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8FBD206F0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCe59-0004D3-Ty
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 03:18:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54146)
+	id 1kCe5B-0004H8-Uz
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 03:18:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1kCe47-0002bo-J3
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 03:17:19 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:56132 helo=huawei.com)
+ id 1kCe48-0002bw-Fb
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 03:17:20 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:40248 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pannengyuan@huawei.com>)
- id 1kCe45-0005sa-Hf
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 03:17:19 -0400
+ id 1kCe45-0005tD-Gu
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 03:17:20 -0400
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 8163A57252889B684A46;
- Mon, 31 Aug 2020 15:17:05 +0800 (CST)
+ by Forcepoint Email with ESMTP id C7662753174EF9D15823;
+ Mon, 31 Aug 2020 15:17:10 +0800 (CST)
 Received: from opensource.huawei.com (10.175.100.152) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 31 Aug 2020 15:16:56 +0800
+ 14.3.487.0; Mon, 31 Aug 2020 15:17:00 +0800
 From: Pan Nengyuan <pannengyuan@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 01/10] qga/channel-posix: Plug memory leak in
- ga_channel_write_all()
-Date: Mon, 31 Aug 2020 09:43:06 -0400
-Message-ID: <20200831134315.1221-2-pannengyuan@huawei.com>
+Subject: [PATCH v2 04/10] target/i386/sev: Plug memleak in sev_read_file_base64
+Date: Mon, 31 Aug 2020 09:43:09 -0400
+Message-ID: <20200831134315.1221-5-pannengyuan@huawei.com>
 X-Mailer: git-send-email 2.18.2
 In-Reply-To: <20200831134315.1221-1-pannengyuan@huawei.com>
 References: <20200831134315.1221-1-pannengyuan@huawei.com>
@@ -51,9 +50,9 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.100.152]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
+Received-SPF: pass client-ip=45.249.212.32;
  envelope-from=pannengyuan@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:17:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:17:11
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -22
 X-Spam_score: -2.3
@@ -73,49 +72,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>, kuhn.chenqun@huawei.com,
- Pan Nengyuan <pannengyuan@huawei.com>, zhang.zhanghailiang@huawei.com,
- euler.robot@huawei.com
+Cc: zhang.zhanghailiang@huawei.com, euler.robot@huawei.com,
+ Pan Nengyuan <pannengyuan@huawei.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kuhn.chenqun@huawei.com,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Missing g_error_free on error path in ga_channel_write_all(). Fix that.
+Missing g_error_free() in sev_read_file_base64() error path.
+Fix that.
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 ---
-Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
 ---
-- V2: no changes in v2
+- v2: no changes in v2
 ---
- qga/channel-posix.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ target/i386/sev.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/qga/channel-posix.c b/qga/channel-posix.c
-index 8fc205ad21..0b151cb87b 100644
---- a/qga/channel-posix.c
-+++ b/qga/channel-posix.c
-@@ -249,7 +249,7 @@ GIOStatus ga_channel_write_all(GAChannel *c, const gchar *buf, gsize size)
-             buf += written;
-         } else if (status != G_IO_STATUS_AGAIN) {
-             g_warning("error writing to channel: %s", err->message);
--            return status;
-+            goto out;
-         }
-     }
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index c3ecf86704..de4818da6d 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -500,6 +500,7 @@ sev_read_file_base64(const char *filename, guchar **data, gsize *len)
  
-@@ -261,6 +261,10 @@ GIOStatus ga_channel_write_all(GAChannel *c, const gchar *buf, gsize size)
-         g_warning("error flushing channel: %s", err->message);
+     if (!g_file_get_contents(filename, &base64, &sz, &error)) {
+         error_report("failed to read '%s' (%s)", filename, error->message);
++        g_error_free(error);
+         return -1;
      }
- 
-+out:
-+    if (err) {
-+        g_error_free(err);
-+    }
-     return status;
- }
  
 -- 
 2.18.2
