@@ -2,80 +2,91 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E73BC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E110C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:24:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D4F9207DA
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:21:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D4F9207DA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6537F2073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:24:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DwV0PAkK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6537F2073A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kChsD-0005an-KQ
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:21:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51340)
+	id 1kChus-0006pc-Kd
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:24:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51996)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kChrh-0005Af-Qs
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:20:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51302)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kChrf-0002OO-Mu
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:20:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kChrd-0007kT-Qw
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:20:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C63792E80DB
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:20:41 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kChuN-0006Om-Jp
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:23:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56850)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kChuM-0002jl-5y
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:23:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598873009;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=QUnV2kEC8ebPCiwGi0p9JRUuse8JSUOMISydRCsIIM4=;
+ b=DwV0PAkKhib3KRYxJQEZhCPMCDuXhMSFXCrWe6X0QVRmIzluhSeMnttuGMYXBcVm7JYoOn
+ jRQo+S72vDlo6VmDM4hZHWMohaZoPn7tku3X7GR+qVutVxd9Fkht6hjvo6/0/aIG53wS2z
+ 2hGWhSLzB/Qwbj+4CO+3DMUH3nnKc3w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-506-NexDDuO4P4yoQoZzT1p2qw-1; Mon, 31 Aug 2020 07:23:25 -0400
+X-MC-Unique: NexDDuO4P4yoQoZzT1p2qw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1FD710ABDA0;
+ Mon, 31 Aug 2020 11:23:23 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A4AF47EB7B;
+ Mon, 31 Aug 2020 11:23:23 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id D7D7FED9; Mon, 31 Aug 2020 13:23:22 +0200 (CEST)
+Date: Mon, 31 Aug 2020 13:23:22 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Li Qiang <liq3ea@gmail.com>
+Subject: Re: [PATCH] cirrus: handle wraparound in cirrus_invalidate_region
+Message-ID: <20200831112322.rkzv6acsw7iza6w7@sirius.home.kraxel.org>
+References: <20200821082622.7169-1-kraxel@redhat.com>
+ <CAKXe6SKZuuCnzAF2uwHO=sh=o2XdAU1+dG6OO-eLYnubX9KikA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 31 Aug 2020 11:08:29 -0000
-From: Tom Yan <1893634@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: tom-ty89
-X-Launchpad-Bug-Reporter: Tom Yan (tom-ty89)
-X-Launchpad-Bug-Modifier: Tom Yan (tom-ty89)
-References: <159886949002.28151.4021199873744523881.malonedeb@soybean.canonical.com>
-Message-Id: <159887210987.22277.15768282066317792490.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1893634] Re: blk_get_max_transfer() works only with sg
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
-X-Launchpad-Hash: 3a1eb49a7842c3a69474b8315f6b2071240651c5
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 04:40:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAKXe6SKZuuCnzAF2uwHO=sh=o2XdAU1+dG6OO-eLYnubX9KikA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:02:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,62 +95,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1893634 <1893634@bugs.launchpad.net>
+Cc: Alexander Bulekov <alxndr@bu.edu>, Li Qiang <liq3ea@163.com>,
+ Qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Description changed:
+> >      for (y = 0; y < lines; y++) {
+> > -        off_cur = off_begin;
+> > +        off_cur = off_begin & s->cirrus_addr_mask;
+> >          off_cur_end = ((off_cur + bytesperline - 1) & s->cirrus_addr_mask) + 1;
+> > -        assert(off_cur_end >= off_cur);
+> > -        memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+> > +        if (off_cur_end >= off_cur) {
+> > +            memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
+> > +        } else {
+> > +            /* wraparound */
+> > +            memory_region_set_dirty(&s->vga.vram, off_cur, s->cirrus_addr_mask - off_cur);
+> 
+> Should here be 's->cirrus_addr_mask + 1 - off_cur'
 
-  blk_get_max_transfer() is supposed to be able to get the max_sectors
-  queue limit of the scsi device on the host side and is used in both
-  scsi-generic.c (for scsi-generic and scsi-block) and scsi-disk.c (for
-  scsi-hd) to set/change the max_xfer_len (and opt_xfer_len in the case of
-- scsi-generic).
-+ scsi-generic.c).
-  =
+Yes (mask != size).
 
-  However, it only works with the sg driver in doing so. It cannot get the
-  queue limit with the sd driver and simply returns MAX_INT.
-  =
+> > +            memory_region_set_dirty(&s->vga.vram, 0, off_cur_end);
+> 
+> And here be 'off_cur_end -1'
 
-  qemu version 5.1.0
-  kernel version 5.8.5
-  =
+--verbose please.  I think this one is correct.
 
-  Btw, is there a particular reason that it doesn't MIN_NON_ZERO against
-  the original max_xfer_len:
-  https://github.com/qemu/qemu/blob/v5.1.0/hw/scsi/scsi-generic.c#L172?
+take care,
+  Gerd
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1893634
-
-Title:
-  blk_get_max_transfer() works only with sg
-
-Status in QEMU:
-  New
-
-Bug description:
-  blk_get_max_transfer() is supposed to be able to get the max_sectors
-  queue limit of the scsi device on the host side and is used in both
-  scsi-generic.c (for scsi-generic and scsi-block) and scsi-disk.c (for
-  scsi-hd) to set/change the max_xfer_len (and opt_xfer_len in the case
-  of scsi-generic.c).
-
-  However, it only works with the sg driver in doing so. It cannot get
-  the queue limit with the sd driver and simply returns MAX_INT.
-
-  qemu version 5.1.0
-  kernel version 5.8.5
-
-  Btw, is there a particular reason that it doesn't MIN_NON_ZERO against
-  the original max_xfer_len:
-  https://github.com/qemu/qemu/blob/v5.1.0/hw/scsi/scsi-generic.c#L172?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1893634/+subscriptions
 
