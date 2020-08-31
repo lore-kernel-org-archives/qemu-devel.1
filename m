@@ -2,73 +2,85 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CFE8C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4696C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:40:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 239112068E
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:32:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 239112068E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9EDB32071B
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 18:40:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h/3YYDoD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EDB32071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCobW-0007wZ-9W
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 14:32:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38322)
+	id 1kCois-0001Ir-9J
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 14:40:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kCoao-0007W3-5O
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:31:46 -0400
-Resent-Date: Mon, 31 Aug 2020 14:31:46 -0400
-Resent-Message-Id: <E1kCoao-0007W3-5O@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21739)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kCoal-0006Lv-PA
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:31:45 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1598898690; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=CcTRegQVLqT/SWm3cPqwsHIdYTR+t2CvHdK78m8pZh9l32w/r+Ycb24WDdtxUeKPAo0l5hh1DGprHL0V9CwrNd3oc+/cpe9djXUOH9O2RXFTqn9iGFux05UlvJM6eof6sp6fOzkgHtjZ8K5Z7t1camKhgWrF78CtIfulpBFb2p4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1598898690;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=jxANCojl1yQbggAzrNdw2ok9AZ56R94FtJxYoL0ijs4=; 
- b=GZEdx2p2fPE/5ZSttYz3tqc5y9igKz72PmygZNIHo95UC6PxZY57aYgUroC9NoK14+8P/N/puHwaeay8ekmO+zCgZKWvqdfyoQlXfCbe5o+4YAU0JGg44GW0hkS2wn+m8TxTx9fC+RfWiegKGIlpaEIC/QHNUOXjnU+ycg3E96w=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1598898689576872.631693368587;
- Mon, 31 Aug 2020 11:31:29 -0700 (PDT)
-Subject: Re: [PATCH v3 0/5] pc-bios: s390x: Cleanup part 2
-Message-ID: <159889868824.5668.13582270939572327054@66eaa9a8a123>
-In-Reply-To: <20200831150910.317171-1-frankja@linux.ibm.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kCoi3-0000tD-F3
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:39:15 -0400
+Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:40543)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kCoi1-000721-75
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 14:39:15 -0400
+Received: by mail-ej1-x636.google.com with SMTP id o18so9838339eje.7
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:39:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=dICnIPZASVNKKrmh6ZmzExC0Ryd6kHigLRkpWqX9NQY=;
+ b=h/3YYDoDynXglnHPxb5PBIQifNmbvChkyq1cniPmjkKwCgkxfM9t11MOBGP98BzLsW
+ NZF/mHPAX4DzQ8Lem4RlW9D1if/o8r8MranJ+yuc2vpr7NcPi9HwAcC4lREBssa2MKAa
+ 71HYt95yYnobt2z0e9yN/y22VwHsDQeLQRX6j7DIg8bjn/wdVlnsuLp2SJzzMfLIYtM6
+ skGMoEPYREEjtO04lepnkqJfBK0NDp2iRJAWf+Bv9wi/k6SBcjCin/OAna8VY/9MdDnG
+ EPuGFNrooCS1+dfwKVdr1sKap8QEeTz30wFfY9MKuZCR5tkbitmRoyEEDWhTLfjPNyFp
+ tOZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=dICnIPZASVNKKrmh6ZmzExC0Ryd6kHigLRkpWqX9NQY=;
+ b=O/XKk/2rWFIJDUHjfSaqVv1yp3iCN6UptwP8LwE9l9jZYvIcDK2zrFsCfyab/CS6y4
+ buUCaJ8o3dqqrg+tvowqeHEs96H7rhYGPMykhm6KCW1qdCTsJbnxPGUF9fscUd2B0zS5
+ VV9RhJnCSemFpEGVUmYVzZ4gW1x8kRx8NGdaaqGhkzAulTD+4UwdMq6H9dM/2F4q4SOb
+ G4RuWZhvjAfjIKY2S9+RZ6/oagI8Epm/GQro50syLfd4t4QzLS6YtZTRHrigI33/TXYM
+ 806+oCMevh4Kv07wo9qfmOkJ16fdq+GLfi+WqJAyLQyXMXYkPnUclcAeZ+bm+uGzjaro
+ QF5g==
+X-Gm-Message-State: AOAM530yqz2qc44izpD3NfoPBG46PSH59fZNwatxQkO3kNQ+hiYdBLOZ
+ 2zXyinHAIHoGepZ/jRA9z+Y13e42BwB/ADHOT6od7A==
+X-Google-Smtp-Source: ABdhPJxErron6DsMNwVR5UWL0ACRTa3Av3zory3IgWrgoKn2RiQOKn0nEeJeQtEvwef0UNmz07+9vDq1lOlRJwfhdOY=
+X-Received: by 2002:a17:906:71c9:: with SMTP id
+ i9mr2183605ejk.250.1598899151072; 
+ Mon, 31 Aug 2020 11:39:11 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: frankja@linux.ibm.com
-Date: Mon, 31 Aug 2020 11:31:29 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 14:31:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+References: <20200830023203.612312-1-richard.henderson@linaro.org>
+In-Reply-To: <20200830023203.612312-1-richard.henderson@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 31 Aug 2020 19:38:59 +0100
+Message-ID: <CAFEAcA9WsDs1J5tqWdh8KbkasGd4b8GA=+k11-7fy9ivhw-YwQ@mail.gmail.com>
+Subject: Re: [PULL 0/7] softfloat patch queue
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::636;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x636.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,51 +94,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: borntraeger@de.ibm.com, thuth@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, david@redhat.com
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDgzMTE1MDkxMC4zMTcx
-NzEtMS1mcmFua2phQGxpbnV4LmlibS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMgdG8g
-aGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IKbW9y
-ZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMDgzMTE1MDkxMC4z
-MTcxNzEtMS1mcmFua2phQGxpbnV4LmlibS5jb20KU3ViamVjdDogW1BBVENIIHYzIDAvNV0gcGMt
-YmlvczogczM5MHg6IENsZWFudXAgcGFydCAyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMh
-L2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNv
-bmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
-ZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQou
-L3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQg
-RU5EID09PQoKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICog
-W25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMDgzMTE1MDkxMC4zMTcxNzEtMS1mcmFua2ph
-QGxpbnV4LmlibS5jb20gLT4gcGF0Y2hldy8yMDIwMDgzMTE1MDkxMC4zMTcxNzEtMS1mcmFua2ph
-QGxpbnV4LmlibS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0Jwo2MmM2YzE4IHBj
-LWJpb3M6IHMzOTB4OiBHbyBpbnRvIGRpc2FibGVkIHdhaXQgd2hlbiBlbmNvdW50ZXJpbmcgYSBQ
-R00gZXhjZXB0aW9uCjI4YTY4ZTQgcGMtYmlvczogczM5MHg6IFNhdmUgaW8gYW5kIGV4dGVybmFs
-IG5ldyBQU1dzIGJlZm9yZSBvdmVyd3JpdGluZyB0aGVtCjU4YWVjOWUgcGMtYmlvczogczM5MHg6
-IFVzZSByZXNldCBQU1cgaWYgYXZhbGlhYmxlCmI0Y2YwNDAgcGMtYmlvczogczM5MHg6IFNhdmUg
-UFNXIHJld29yawozMGJhYjFhIHBjLWJpb3M6IHMzOTB4OiBGaXggYm9vdG1hcC5jIHppcGwgY29t
-cG9uZW50IGVudHJ5IGRhdGEgaGFuZGxpbmcKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvNSBDaGVj
-a2luZyBjb21taXQgMzBiYWIxYWU3NTM2IChwYy1iaW9zOiBzMzkweDogRml4IGJvb3RtYXAuYyB6
-aXBsIGNvbXBvbmVudCBlbnRyeSBkYXRhIGhhbmRsaW5nKQoyLzUgQ2hlY2tpbmcgY29tbWl0IGI0
-Y2YwNDBhMWU1MyAocGMtYmlvczogczM5MHg6IFNhdmUgUFNXIHJld29yaykKMy81IENoZWNraW5n
-IGNvbW1pdCA1OGFlYzllZmQxNTcgKHBjLWJpb3M6IHMzOTB4OiBVc2UgcmVzZXQgUFNXIGlmIGF2
-YWxpYWJsZSkKNC81IENoZWNraW5nIGNvbW1pdCAyOGE2OGU0NTAzYjEgKHBjLWJpb3M6IHMzOTB4
-OiBTYXZlIGlvIGFuZCBleHRlcm5hbCBuZXcgUFNXcyBiZWZvcmUgb3ZlcndyaXRpbmcgdGhlbSkK
-RVJST1I6IGV4dGVybnMgc2hvdWxkIGJlIGF2b2lkZWQgaW4gLmMgZmlsZXMKIzIyOiBGSUxFOiBw
-Yy1iaW9zL3MzOTAtY2N3L2p1bXAyaXBsLmM6MTc6CitleHRlcm4gdWludDY0X3QgcHN3X3NhdmVf
-aW9bXSwgcHN3X3NhdmVfZXh0W107Cgp0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDExOCBs
-aW5lcyBjaGVja2VkCgpQYXRjaCA0LzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3
-LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCjUvNSBD
-aGVja2luZyBjb21taXQgNjJjNmMxODdjOTBmIChwYy1iaW9zOiBzMzkweDogR28gaW50byBkaXNh
-YmxlZCB3YWl0IHdoZW4gZW5jb3VudGVyaW5nIGEgUEdNIGV4Y2VwdGlvbikKPT09IE9VVFBVVCBF
-TkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBp
-cyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA4MzExNTA5MTAuMzE3
-MTcxLTEtZnJhbmtqYUBsaW51eC5pYm0uY29tL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1tZXNz
-YWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6
-Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2
-ZWxAcmVkaGF0LmNvbQ==
+On Sun, 30 Aug 2020 at 03:32, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> The following changes since commit ea1bb830cb021cca2e361091cf728aaabc8c0654:
+>
+>   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-20200828' into staging (2020-08-28 15:14:40 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/rth7680/qemu.git tags/pull-sf-20200829
+>
+> for you to fetch changes up to c53b1079334c41b342a8ad3b7ccfd51bf5427f5a:
+>
+>   softfloat: Define comparison operations for bfloat16 (2020-08-29 19:25:42 -0700)
+>
+> ----------------------------------------------------------------
+> * float16 comparison wrappers
+> * float16 conversions to/from 8-bit integers
+> * bfloat16 support
+>
+
+
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
