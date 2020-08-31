@@ -7,77 +7,77 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD7ADC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:10:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE30C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:10:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A463206CD
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:10:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54FAF206CD
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:10:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n1vuf/U5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A463206CD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yaEv84Dw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54FAF206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCmO4-0003Lq-L8
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:10:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33466)
+	id 1kCmOD-0003W8-E8
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:10:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmK1-0003ZK-Ue
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:17 -0400
-Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:36769)
+ id 1kCmJy-0003SX-Pp
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:14 -0400
+Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:40379)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmK0-0005v8-4w
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:17 -0400
-Received: by mail-pg1-x52b.google.com with SMTP id p37so838928pgl.3
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:06:15 -0700 (PDT)
+ id 1kCmJv-0005u4-Qe
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:14 -0400
+Received: by mail-pf1-x430.google.com with SMTP id c142so804699pfb.7
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:06:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Y/1nd0STg2fwgw26kyAhRI4aPsi6vfmi/pGgkxdn03M=;
- b=n1vuf/U5ni04Q+LoL1Hy2Wn5aaLaSkl0Xhvn/5vGuCQydpiG9ZYV3ddHpEG/b6g5Pg
- pKcmX7X3Lp9KTrT3Sva5GDXPxIQGgwebYwe+qMqORprUa1iNdZ/PdZjmtREFx6PJaIo0
- hfrP52U8N6+M5VVgu2bLFF/Xu/6bFV60raMk3Xq+LkCGpGD2IDFJrrik6T7brsWIPk4u
- r6S+ETykmKC3fWfWsjbSj9dRQiR3iOcRxqTJGs7Jd/foy8OpJtUPOiEImPleLJXEttxO
- 9T/XX+bDOBG+f5yiltbxtHFWABHeGJfa8smZ+BQM6pimRdMc08Z3bA2zIiybx6jaYnGl
- MT3g==
+ bh=EAqHVd7k8qnFGYSw1XH+Q9LqQUEdcVQsZIdVmMRUJCo=;
+ b=yaEv84DwJSc1LaJNI+Yu4tyRP9PN6oLWy6S+wvSiSuMRkFUi5Qvs8ajcINvPTck8Qs
+ Kcx9UUjk0fC2BOh67v2j4VRB+82fNqU3wgv6nYEA5j/ynLyjbAOKe3rI0h/aLUXntwjW
+ T5liPMFFEUagpYpYBaMjJ111D6GonBo8TUaArh8AEbz9RFVF5h7BjLfZrRSXx0PU/DMi
+ qQZoqRZyS+7tvcWMdsXmaNmz8fxCrFlgqhLJAkucrB0il68gM9WYb7q7dCKv0rI6ZEKN
+ clpEzrQp814qqpE1It1VhQlIv5cZ3LAGQUkn0lhlo7tlyJAm4LgWub/EnypNJ+Qnakgj
+ IyRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Y/1nd0STg2fwgw26kyAhRI4aPsi6vfmi/pGgkxdn03M=;
- b=Nm3MjMqgOlF67NG27Lb0Fv0mHFhMzndptwuNUS9eCWxMb3D0tZ12hn9MTLc97Ibog2
- MP0iq1u18A6fOv3qk0P6G5dCH5hiYLhkYTa/3/ySS3qdIbK6vlXgPH8nOEqg6pqkK2mU
- WfqR+QcysGpz0SwZvp2GFVDvgXOXLZjhJRYVC0KznbunphJ8tJi5K9DCKrMcTzSR9GT5
- HklYJZe9ICZljq3QzvC0UXF8RYNyskCPh8fT7J0TTZmwkiHWdgFMkM5tj/5hBhrJeT5e
- prDQloGra9zlPlsZWSf4oahWBwUuKEr7D0OlvJQFN7p+W5CYM1227xpeya2i/0hwI/B+
- uMdQ==
-X-Gm-Message-State: AOAM530avmMLeXjXqYgwEtjA5sZHU5GpPVoLXcbwoHIUXHJvyfJrSA+Y
- Tj3BbWhNSOR4m0ak+XzDexQ/E/CLsz6WKA==
-X-Google-Smtp-Source: ABdhPJzWJlfmnepN315d70ORP76t5oWrrWc2Ti57U1jhkaRuZBOr9PkuCUMseXTXkNrWfv3OiHU6CQ==
-X-Received: by 2002:a62:8309:: with SMTP id h9mr1695633pfe.104.1598889974376; 
- Mon, 31 Aug 2020 09:06:14 -0700 (PDT)
+ bh=EAqHVd7k8qnFGYSw1XH+Q9LqQUEdcVQsZIdVmMRUJCo=;
+ b=A/42wvBBVzyt434rzFYtQRSqcYt/NlG6ZjiREUGADoRh6bUzH4EStFRNdYJFftErXL
+ SZ7mPlCoO3Ytxgs4CkoQzeEtgXFSz3VdSJ9wnGzeTqbgvB/EpzA9yo/04REzl110CHGl
+ NYl35cr940YqbxlJebNWAsKzJ31M6I8QW2mKc2ymjgXLCHFS+nU+MBFjJbccnzdmIkaL
+ 57+x+eT2/HbvuwJusUhehW5khLCGUkrTyW3aun35oVtcYu/K1Ckcb4z2W19GaoNnJvuB
+ BhjDazT3DdCVPJwd5AH2WblxuiqW9qQESVLVqk4keNsikYaWswTfxgE8wElf+sQIHA/J
+ 7boQ==
+X-Gm-Message-State: AOAM533Wb8ilfXsKN092F3rfac2smz3Ms9xJ6xqG2X8xyno8tO2cw3FC
+ 8rFRDyBCJvuckHiWkjccXMx0M6haRl0r3A==
+X-Google-Smtp-Source: ABdhPJy99AJH1SHXr+9rcWqCo+2PcVIrbMvrPAmovZVCKec/SC6JjfqAwyi/SIlUvkY4b1XXdfIplA==
+X-Received: by 2002:a62:8c91:: with SMTP id m139mr1822568pfd.267.1598889969889; 
+ Mon, 31 Aug 2020 09:06:09 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.06.13
+ by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.06.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 31 Aug 2020 09:06:13 -0700 (PDT)
+ Mon, 31 Aug 2020 09:06:09 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/76] target/microblaze: Split out EAR from env->sregs
-Date: Mon, 31 Aug 2020 09:04:52 -0700
-Message-Id: <20200831160601.833692-8-richard.henderson@linaro.org>
+Subject: [PULL 04/76] target/microblaze: Tidy gdbstub
+Date: Mon, 31 Aug 2020 09:04:49 -0700
+Message-Id: <20200831160601.833692-5-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200831160601.833692-1-richard.henderson@linaro.org>
 References: <20200831160601.833692-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52b;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::430;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x430.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,149 +104,243 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Continue eliminating the sregs array in favor of individual members.
+Use an enumeration for the gdb register mapping.  Use one
+switch statement for the entire dispatch.  Drop sreg_map
+and simply enumerate those cases explicitly.  Force r0 to
+have value 0 and ignore writes.
 
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/cpu.h       | 1 +
- target/microblaze/gdbstub.c   | 4 ++--
- target/microblaze/helper.c    | 6 +++---
- target/microblaze/op_helper.c | 8 ++++----
- target/microblaze/translate.c | 6 ++++--
- 5 files changed, 14 insertions(+), 11 deletions(-)
+ target/microblaze/gdbstub.c | 193 +++++++++++++++++++-----------------
+ 1 file changed, 101 insertions(+), 92 deletions(-)
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 36de61d9f9..c9035b410e 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -238,6 +238,7 @@ struct CPUMBState {
-     uint32_t regs[32];
-     uint64_t pc;
-     uint64_t msr;
-+    uint64_t ear;
-     uint64_t sregs[14];
-     float_status fp_status;
-     /* Stack protectors. Yes, it's a hw feature.  */
 diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c
-index e4c4936a7a..e33a613efe 100644
+index 73e8973597..e65ec051a5 100644
 --- a/target/microblaze/gdbstub.c
 +++ b/target/microblaze/gdbstub.c
-@@ -65,7 +65,7 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
-         val = env->msr;
-         break;
-     case GDB_EAR:
--        val = env->sregs[SR_EAR];
-+        val = env->ear;
-         break;
-     case GDB_ESR:
-         val = env->sregs[SR_ESR];
-@@ -121,7 +121,7 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
-         env->msr = tmp;
-         break;
-     case GDB_EAR:
--        env->sregs[SR_EAR] = tmp;
-+        env->ear = tmp;
-         break;
-     case GDB_ESR:
-         env->sregs[SR_ESR] = tmp;
-diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
-index a18314540f..afe9634781 100644
---- a/target/microblaze/helper.c
-+++ b/target/microblaze/helper.c
-@@ -85,7 +85,7 @@ bool mb_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     qemu_log_mask(CPU_LOG_MMU, "mmu=%d miss v=%" VADDR_PRIx "\n",
-                   mmu_idx, address);
+@@ -21,58 +21,80 @@
+ #include "cpu.h"
+ #include "exec/gdbstub.h"
  
--    env->sregs[SR_EAR] = address;
-+    env->ear = address;
-     switch (lu.err) {
-     case ERR_PROT:
-         env->sregs[SR_ESR] = access_type == MMU_INST_FETCH ? 17 : 16;
-@@ -145,7 +145,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
-             qemu_log_mask(CPU_LOG_INT,
-                           "hw exception at pc=%" PRIx64 " ear=%" PRIx64 " "
-                           "esr=%" PRIx64 " iflags=%x\n",
--                          env->pc, env->sregs[SR_EAR],
-+                          env->pc, env->ear,
-                           env->sregs[SR_ESR], env->iflags);
-             log_cpu_state_mask(CPU_LOG_INT, cs, 0);
-             env->iflags &= ~(IMM_FLAG | D_FLAG);
-@@ -188,7 +188,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
-             qemu_log_mask(CPU_LOG_INT,
-                           "exception at pc=%" PRIx64 " ear=%" PRIx64 " "
-                           "iflags=%x\n",
--                          env->pc, env->sregs[SR_EAR], env->iflags);
-+                          env->pc, env->ear, env->iflags);
-             log_cpu_state_mask(CPU_LOG_INT, cs, 0);
-             env->iflags &= ~(IMM_FLAG | D_FLAG);
-             env->pc = cpu->cfg.base_vectors + 0x20;
-diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-index 3668382d36..5bacd29663 100644
---- a/target/microblaze/op_helper.c
-+++ b/target/microblaze/op_helper.c
-@@ -78,7 +78,7 @@ void helper_debug(CPUMBState *env)
-     qemu_log("PC=%" PRIx64 "\n", env->pc);
-     qemu_log("rmsr=%" PRIx64 " resr=%" PRIx64 " rear=%" PRIx64 " "
-              "debug[%x] imm=%x iflags=%x\n",
--             env->msr, env->sregs[SR_ESR], env->sregs[SR_EAR],
-+             env->msr, env->sregs[SR_ESR], env->ear,
-              env->debug, env->imm, env->iflags);
-     qemu_log("btaken=%d btarget=%" PRIx64 " mode=%s(saved=%s) eip=%d ie=%d\n",
-              env->btaken, env->btarget,
-@@ -431,7 +431,7 @@ void helper_memalign(CPUMBState *env, target_ulong addr,
-                           "unaligned access addr=" TARGET_FMT_lx
-                           " mask=%x, wr=%d dr=r%d\n",
-                           addr, mask, wr, dr);
--            env->sregs[SR_EAR] = addr;
-+            env->ear = addr;
-             env->sregs[SR_ESR] = ESR_EC_UNALIGNED_DATA | (wr << 10) \
-                                  | (dr & 31) << 5;
-             if (mask == 3) {
-@@ -450,7 +450,7 @@ void helper_stackprot(CPUMBState *env, target_ulong addr)
-         qemu_log_mask(CPU_LOG_INT, "Stack protector violation at "
-                       TARGET_FMT_lx " %x %x\n",
-                       addr, env->slr, env->shr);
--        env->sregs[SR_EAR] = addr;
-+        env->ear = addr;
-         env->sregs[SR_ESR] = ESR_EC_STACKPROT;
-         helper_raise_exception(env, EXCP_HW_EXCP);
++/*
++ * GDB expects SREGs in the following order:
++ * PC, MSR, EAR, ESR, FSR, BTR, EDR, PID, ZPR, TLBX, TLBSX, TLBLO, TLBHI.
++ *
++ * PID, ZPR, TLBx, TLBsx, TLBLO, and TLBHI aren't modeled, so we don't
++ * map them to anything and return a value of 0 instead.
++ */
++
++enum {
++    GDB_PC    = 32 + 0,
++    GDB_MSR   = 32 + 1,
++    GDB_EAR   = 32 + 2,
++    GDB_ESR   = 32 + 3,
++    GDB_FSR   = 32 + 4,
++    GDB_BTR   = 32 + 5,
++    GDB_PVR0  = 32 + 6,
++    GDB_PVR11 = 32 + 17,
++    GDB_EDR   = 32 + 18,
++    GDB_SLR   = 32 + 25,
++    GDB_SHR   = 32 + 26,
++};
++
+ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *mem_buf, int n)
+ {
+     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
++    CPUClass *cc = CPU_GET_CLASS(cs);
+     CPUMBState *env = &cpu->env;
+-    /*
+-     * GDB expects SREGs in the following order:
+-     * PC, MSR, EAR, ESR, FSR, BTR, EDR, PID, ZPR, TLBX, TLBSX, TLBLO, TLBHI.
+-     * They aren't stored in this order, so make a map.
+-     * PID, ZPR, TLBx, TLBsx, TLBLO, and TLBHI aren't modeled, so we don't
+-     * map them to anything and return a value of 0 instead.
+-     */
+-    static const uint8_t sreg_map[6] = {
+-        SR_PC,
+-        SR_MSR,
+-        SR_EAR,
+-        SR_ESR,
+-        SR_FSR,
+-        SR_BTR
+-    };
++    uint32_t val;
+ 
+-    /*
+-     * GDB expects registers to be reported in this order:
+-     * R0-R31
+-     * PC-BTR
+-     * PVR0-PVR11
+-     * EDR-TLBHI
+-     * SLR-SHR
+-     */
+-    if (n < 32) {
+-        return gdb_get_reg32(mem_buf, env->regs[n]);
+-    } else {
+-        n -= 32;
+-        switch (n) {
+-        case 0 ... 5:
+-            return gdb_get_reg32(mem_buf, env->sregs[sreg_map[n]]);
+-        /* PVR12 is intentionally skipped */
+-        case 6 ... 17:
+-            n -= 6;
+-            return gdb_get_reg32(mem_buf, env->pvr.regs[n]);
+-        case 18:
+-            return gdb_get_reg32(mem_buf, env->sregs[SR_EDR]);
+-        /* Other SRegs aren't modeled, so report a value of 0 */
+-        case 19 ... 24:
+-            return gdb_get_reg32(mem_buf, 0);
+-        case 25:
+-            return gdb_get_reg32(mem_buf, env->slr);
+-        case 26:
+-            return gdb_get_reg32(mem_buf, env->shr);
+-        default:
+-            return 0;
+-        }
++    if (n > cc->gdb_num_core_regs) {
++        return 0;
      }
-@@ -488,7 +488,7 @@ void mb_cpu_transaction_failed(CPUState *cs, hwaddr physaddr, vaddr addr,
-         return;
++
++    switch (n) {
++    case 1 ... 31:
++        val = env->regs[n];
++        break;
++    case GDB_PC:
++        val = env->sregs[SR_PC];
++        break;
++    case GDB_MSR:
++        val = env->sregs[SR_MSR];
++        break;
++    case GDB_EAR:
++        val = env->sregs[SR_EAR];
++        break;
++    case GDB_ESR:
++        val = env->sregs[SR_ESR];
++        break;
++    case GDB_FSR:
++        val = env->sregs[SR_FSR];
++        break;
++    case GDB_BTR:
++        val = env->sregs[SR_BTR];
++        break;
++    case GDB_PVR0 ... GDB_PVR11:
++        /* PVR12 is intentionally skipped */
++        val = env->pvr.regs[n - GDB_PVR0];
++        break;
++    case GDB_EDR:
++        val = env->sregs[SR_EDR];
++        break;
++    case GDB_SLR:
++        val = env->slr;
++        break;
++    case GDB_SHR:
++        val = env->shr;
++        break;
++    default:
++        /* Other SRegs aren't modeled, so report a value of 0 */
++        val = 0;
++        break;
++    }
++    return gdb_get_reg32(mem_buf, val);
+ }
+ 
+ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+@@ -82,60 +104,47 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *mem_buf, int n)
+     CPUMBState *env = &cpu->env;
+     uint32_t tmp;
+ 
+-    /*
+-     * GDB expects SREGs in the following order:
+-     * PC, MSR, EAR, ESR, FSR, BTR, EDR, PID, ZPR, TLBX, TLBSX, TLBLO, TLBHI.
+-     * They aren't stored in this order, so make a map.
+-     * PID, ZPR, TLBx, TLBsx, TLBLO, and TLBHI aren't modeled, so we don't
+-     * map them to anything.
+-     */
+-    static const uint8_t sreg_map[6] = {
+-        SR_PC,
+-        SR_MSR,
+-        SR_EAR,
+-        SR_ESR,
+-        SR_FSR,
+-        SR_BTR
+-    };
+-
+     if (n > cc->gdb_num_core_regs) {
+         return 0;
      }
  
--    env->sregs[SR_EAR] = addr;
-+    env->ear = addr;
-     if (access_type == MMU_INST_FETCH) {
-         if ((env->pvr.regs[2] & PVR2_IOPB_BUS_EXC_MASK)) {
-             env->sregs[SR_ESR] = ESR_EC_INSN_BUS;
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 9f2dcd82cd..62747b02f3 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -1809,7 +1809,7 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-     qemu_fprintf(f, "rmsr=%" PRIx64 " resr=%" PRIx64 " rear=%" PRIx64 " "
-                  "debug=%x imm=%x iflags=%x fsr=%" PRIx64 " "
-                  "rbtr=%" PRIx64 "\n",
--                 env->msr, env->sregs[SR_ESR], env->sregs[SR_EAR],
-+                 env->msr, env->sregs[SR_ESR], env->ear,
-                  env->debug, env->imm, env->iflags, env->sregs[SR_FSR],
-                  env->sregs[SR_BTR]);
-     qemu_fprintf(f, "btaken=%d btarget=%" PRIx64 " mode=%s(saved=%s) "
-@@ -1873,8 +1873,10 @@ void mb_tcg_init(void)
-         tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, pc), "rpc");
-     cpu_SR[SR_MSR] =
-         tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, msr), "rmsr");
-+    cpu_SR[SR_EAR] =
-+        tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, ear), "rear");
+     tmp = ldl_p(mem_buf);
  
--    for (i = SR_MSR + 1; i < ARRAY_SIZE(cpu_SR); i++) {
-+    for (i = SR_EAR + 1; i < ARRAY_SIZE(cpu_SR); i++) {
-         cpu_SR[i] = tcg_global_mem_new_i64(cpu_env,
-                           offsetof(CPUMBState, sregs[i]),
-                           special_regnames[i]);
+-    /*
+-     * GDB expects registers to be reported in this order:
+-     * R0-R31
+-     * PC-BTR
+-     * PVR0-PVR11
+-     * EDR-TLBHI
+-     * SLR-SHR
+-     */
+-    if (n < 32) {
++    switch (n) {
++    case 1 ... 31:
+         env->regs[n] = tmp;
+-    } else {
+-        n -= 32;
+-        switch (n) {
+-        case 0 ... 5:
+-            env->sregs[sreg_map[n]] = tmp;
+-            break;
++        break;
++    case GDB_PC:
++        env->sregs[SR_PC] = tmp;
++        break;
++    case GDB_MSR:
++        env->sregs[SR_MSR] = tmp;
++        break;
++    case GDB_EAR:
++        env->sregs[SR_EAR] = tmp;
++        break;
++    case GDB_ESR:
++        env->sregs[SR_ESR] = tmp;
++        break;
++    case GDB_FSR:
++        env->sregs[SR_FSR] = tmp;
++        break;
++    case GDB_BTR:
++        env->sregs[SR_BTR] = tmp;
++        break;
++    case GDB_PVR0 ... GDB_PVR11:
+         /* PVR12 is intentionally skipped */
+-        case 6 ... 17:
+-            n -= 6;
+-            env->pvr.regs[n] = tmp;
+-            break;
+-        /* Only EDR is modeled in these indeces, so ignore the rest */
+-        case 18:
+-            env->sregs[SR_EDR] = tmp;
+-            break;
+-        case 25:
+-            env->slr = tmp;
+-            break;
+-        case 26:
+-            env->shr = tmp;
+-            break;
+-        }
++        env->pvr.regs[n - GDB_PVR0] = tmp;
++        break;
++    case GDB_EDR:
++        env->sregs[SR_EDR] = tmp;
++        break;
++    case GDB_SLR:
++        env->slr = tmp;
++        break;
++    case GDB_SHR:
++        env->shr = tmp;
++        break;
+     }
+     return 4;
+ }
 -- 
 2.25.1
 
