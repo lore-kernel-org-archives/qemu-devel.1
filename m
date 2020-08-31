@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E2D0C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08EC2C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13FCE2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C844C2083E
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h3dEG6FP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13FCE2073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSg0yUqv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C844C2083E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCfPa-0003cl-A5
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:43:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43032)
+	id 1kCfQ0-0004N4-VT
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:44:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFi-0008Tr-9A
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24280
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFf-0008N3-Ne
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:19 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43960
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFb-0006bd-1u
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:21 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFa-0006bP-Lx
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598862794;
+ s=mimecast20190719; t=1598862793;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=xfX8++UP0VaXTlvY6Xl3dnABweKyPnmkj4qOIGoSEoA=;
- b=h3dEG6FP00l4PNUUIr+AICqIL+Uo17DLfqFT94g+wcdhKr7GRCvowOuGH/uvZJOacq8JcP
- Gq6JwYFMw+zKZK2Wn9hatCaeW9fAq5o7VfyL/soqD9I+bFO1w4ZqsuPPT8CmIdPyVzKD7I
- si+nAu24xtnqYgiP5Uz/rBzDzuNGgKw=
+ bh=wq5Pda4Lt5SRqI7o7hjLCdVq24fwCUMV/EoS3UXA+x0=;
+ b=HSg0yUqvL8D12IENb4tTuqxL3Wef3gjCjKLB3miL5cCL1+Kjk0IMdFQTe9iWsuH5UegE8B
+ p9L+GmQ3N06UGantAUs/7ar8NbckIYTXxA+cCQVwEwdPTvgl+Ge3MlT5Yu4Mkgp5Hudinn
+ x5WfYNwGxgQ+xJV8jVsV2I7em+Ro1So=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-X8wqLdjoOUq4rjQ8JdzFuw-1; Mon, 31 Aug 2020 04:33:11 -0400
-X-MC-Unique: X8wqLdjoOUq4rjQ8JdzFuw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-54-X9GvElQKNqeC8Ba6-s7K6Q-1; Mon, 31 Aug 2020 04:33:10 -0400
+X-MC-Unique: X9GvElQKNqeC8Ba6-s7K6Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 975DD801AC4;
- Mon, 31 Aug 2020 08:33:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FB6F18A224A;
+ Mon, 31 Aug 2020 08:33:09 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E82E75C221;
- Mon, 31 Aug 2020 08:33:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7BE32616B;
+ Mon, 31 Aug 2020 08:33:08 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 3E06631E68; Mon, 31 Aug 2020 10:33:02 +0200 (CEST)
+ id 72EF331FC3; Mon, 31 Aug 2020 10:33:02 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/18] hw/usb: Add U2F key passthru mode
-Date: Mon, 31 Aug 2020 10:32:52 +0200
-Message-Id: <20200831083301.6357-10-kraxel@redhat.com>
+Subject: [PULL 14/18] scripts: Add u2f-setup-gen script
+Date: Mon, 31 Aug 2020 10:32:57 +0200
+Message-Id: <20200831083301.6357-15-kraxel@redhat.com>
 In-Reply-To: <20200831083301.6357-1-kraxel@redhat.com>
 References: <20200831083301.6357-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:13:08
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:56:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,464 +107,196 @@ Sender: "Qemu-devel"
 
 From: César Belley <cesar.belley@lse.epita.fr>
 
-This patch adds the U2F key pass-through mode.
+This patch adds the script used to generate setup directories, needed
+for the device u2f-emulated configuration in directory mode:
 
-The pass-through mode consists of passing all requests made from the
-guest to the physical security key connected to the host machine and
-vice versa.
-
-In addition, the dedicated pass-through allows to have a U2F security key
-shared on several guests which is not possible with a simple host device
-assignment pass-through.
-
-The pass-through mode is associated with a device inheriting from
-u2f-key base.
-
-To work, it needs the path to a U2F hidraw, obtained from the Qemu
-command line, and passed by the user:
-
-    qemu -usb -device u2f-passthru,hidraw=/dev/hidrawX
-
-Autoscan and U2F compatibility checking features are given at the end
-of the patch series.
+    python u2f-setup-gen.py $DIR
+    qemu -usb -device u2f-emulated,dir=$DIR
 
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
-Message-id: 20200826114209.28821-6-cesar.belley@lse.epita.fr
+Message-id: 20200826114209.28821-11-cesar.belley@lse.epita.fr
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/u2f-passthru.c | 423 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 423 insertions(+)
- create mode 100644 hw/usb/u2f-passthru.c
+ scripts/u2f-setup-gen.py | 170 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 170 insertions(+)
+ create mode 100755 scripts/u2f-setup-gen.py
 
-diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
-new file mode 100644
-index 000000000000..52b44670775d
+diff --git a/scripts/u2f-setup-gen.py b/scripts/u2f-setup-gen.py
+new file mode 100755
+index 000000000000..2122598fed8e
 --- /dev/null
-+++ b/hw/usb/u2f-passthru.c
-@@ -0,0 +1,423 @@
-+/*
-+ * U2F USB Passthru device.
-+ *
-+ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
-+ * Written by César Belley <cesar.belley@lse.epita.fr>
-+ *
-+ * Permission is hereby granted, free of charge, to any person obtaining a copy
-+ * of this software and associated documentation files (the "Software"), to deal
-+ * in the Software without restriction, including without limitation the rights
-+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-+ * copies of the Software, and to permit persons to whom the Software is
-+ * furnished to do so, subject to the following conditions:
-+ *
-+ * The above copyright notice and this permission notice shall be included in
-+ * all copies or substantial portions of the Software.
-+ *
-+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-+ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-+ * THE SOFTWARE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/module.h"
-+#include "qemu/main-loop.h"
-+#include "qemu/error-report.h"
-+#include "qapi/error.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/usb.h"
-+#include "migration/vmstate.h"
-+
-+#include "u2f.h"
-+
-+#define NONCE_SIZE 8
-+#define BROADCAST_CID 0xFFFFFFFF
-+#define TRANSACTION_TIMEOUT 120000
-+
-+struct transaction {
-+    uint32_t cid;
-+    uint16_t resp_bcnt;
-+    uint16_t resp_size;
-+
-+    /* Nonce for broadcast isolation */
-+    uint8_t nonce[NONCE_SIZE];
-+};
-+
-+typedef struct U2FPassthruState U2FPassthruState;
-+
-+#define CURRENT_TRANSACTIONS_NUM 4
-+
-+struct U2FPassthruState {
-+    U2FKeyState base;
-+
-+    /* Host device */
-+    char *hidraw;
-+    int hidraw_fd;
-+
-+    /* Current Transactions */
-+    struct transaction current_transactions[CURRENT_TRANSACTIONS_NUM];
-+    uint8_t current_transactions_start;
-+    uint8_t current_transactions_end;
-+    uint8_t current_transactions_num;
-+
-+    /* Transaction time checking */
-+    int64_t last_transaction_time;
-+    QEMUTimer timer;
-+};
-+
-+#define TYPE_U2F_PASSTHRU "u2f-passthru"
-+#define PASSTHRU_U2F_KEY(obj) \
-+    OBJECT_CHECK(U2FPassthruState, (obj), TYPE_U2F_PASSTHRU)
-+
-+/* Init packet sizes */
-+#define PACKET_INIT_HEADER_SIZE 7
-+#define PACKET_INIT_DATA_SIZE (U2FHID_PACKET_SIZE - PACKET_INIT_HEADER_SIZE)
-+
-+/* Cont packet sizes */
-+#define PACKET_CONT_HEADER_SIZE 5
-+#define PACKET_CONT_DATA_SIZE (U2FHID_PACKET_SIZE - PACKET_CONT_HEADER_SIZE)
-+
-+struct packet_init {
-+    uint32_t cid;
-+    uint8_t cmd;
-+    uint8_t bcnth;
-+    uint8_t bcntl;
-+    uint8_t data[PACKET_INIT_DATA_SIZE];
-+} QEMU_PACKED;
-+
-+static inline uint32_t packet_get_cid(const void *packet)
-+{
-+    return *((uint32_t *)packet);
-+}
-+
-+static inline bool packet_is_init(const void *packet)
-+{
-+    return ((uint8_t *)packet)[4] & (1 << 7);
-+}
-+
-+static inline uint16_t packet_init_get_bcnt(
-+        const struct packet_init *packet_init)
-+{
-+    uint16_t bcnt = 0;
-+    bcnt |= packet_init->bcnth << 8;
-+    bcnt |= packet_init->bcntl;
-+
-+    return bcnt;
-+}
-+
-+static void u2f_passthru_reset(U2FPassthruState *key)
-+{
-+    timer_del(&key->timer);
-+    qemu_set_fd_handler(key->hidraw_fd, NULL, NULL, key);
-+    key->last_transaction_time = 0;
-+    key->current_transactions_start = 0;
-+    key->current_transactions_end = 0;
-+    key->current_transactions_num = 0;
-+}
-+
-+static void u2f_timeout_check(void *opaque)
-+{
-+    U2FPassthruState *key = opaque;
-+    int64_t time = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+
-+    if (time > key->last_transaction_time + TRANSACTION_TIMEOUT) {
-+        u2f_passthru_reset(key);
-+    } else {
-+        timer_mod(&key->timer, time + TRANSACTION_TIMEOUT / 4);
-+    }
-+}
-+
-+static int u2f_transaction_get_index(U2FPassthruState *key, uint32_t cid)
-+{
-+    for (int i = 0; i < key->current_transactions_num; ++i) {
-+        int index = (key->current_transactions_start + i)
-+            % CURRENT_TRANSACTIONS_NUM;
-+        if (cid == key->current_transactions[index].cid) {
-+            return index;
-+        }
-+    }
-+    return -1;
-+}
-+
-+static struct transaction *u2f_transaction_get(U2FPassthruState *key,
-+                                               uint32_t cid)
-+{
-+    int index = u2f_transaction_get_index(key, cid);
-+    if (index < 0) {
-+        return NULL;
-+    }
-+    return &key->current_transactions[index];
-+}
-+
-+static struct transaction *u2f_transaction_get_from_nonce(U2FPassthruState *key,
-+                                const uint8_t nonce[NONCE_SIZE])
-+{
-+    for (int i = 0; i < key->current_transactions_num; ++i) {
-+        int index = (key->current_transactions_start + i)
-+            % CURRENT_TRANSACTIONS_NUM;
-+        if (key->current_transactions[index].cid == BROADCAST_CID
-+            && memcmp(nonce, key->current_transactions[index].nonce,
-+                      NONCE_SIZE) == 0) {
-+            return &key->current_transactions[index];
-+        }
-+    }
-+    return NULL;
-+}
-+
-+static void u2f_transaction_close(U2FPassthruState *key, uint32_t cid)
-+{
-+    int index, next_index;
-+    index = u2f_transaction_get_index(key, cid);
-+    if (index < 0) {
-+        return;
-+    }
-+    next_index = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+
-+    /* Rearrange to ensure the oldest is at the start position */
-+    while (next_index != key->current_transactions_end) {
-+        memcpy(&key->current_transactions[index],
-+               &key->current_transactions[next_index],
-+               sizeof(struct transaction));
-+
-+        index = next_index;
-+        next_index = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+    }
-+
-+    key->current_transactions_end = index;
-+    --key->current_transactions_num;
-+
-+    if (key->current_transactions_num == 0) {
-+        u2f_passthru_reset(key);
-+    }
-+}
-+
-+static void u2f_transaction_add(U2FPassthruState *key, uint32_t cid,
-+                                const uint8_t nonce[NONCE_SIZE])
-+{
-+    uint8_t index;
-+    struct transaction *transaction;
-+
-+    if (key->current_transactions_num >= CURRENT_TRANSACTIONS_NUM) {
-+        /* Close the oldest transaction */
-+        index = key->current_transactions_start;
-+        transaction = &key->current_transactions[index];
-+        u2f_transaction_close(key, transaction->cid);
-+    }
-+
-+    /* Index */
-+    index = key->current_transactions_end;
-+    key->current_transactions_end = (index + 1) % CURRENT_TRANSACTIONS_NUM;
-+    ++key->current_transactions_num;
-+
-+    /* Transaction */
-+    transaction = &key->current_transactions[index];
-+    transaction->cid = cid;
-+    transaction->resp_bcnt = 0;
-+    transaction->resp_size = 0;
-+
-+    /* Nonce */
-+    if (nonce != NULL) {
-+        memcpy(transaction->nonce, nonce, NONCE_SIZE);
-+    }
-+}
-+
-+static void u2f_passthru_read(void *opaque);
-+
-+static void u2f_transaction_start(U2FPassthruState *key,
-+                                  const struct packet_init *packet_init)
-+{
-+    int64_t time;
-+
-+    /* Transaction */
-+    if (packet_init->cid == BROADCAST_CID) {
-+        u2f_transaction_add(key, packet_init->cid, packet_init->data);
-+    } else {
-+        u2f_transaction_add(key, packet_init->cid, NULL);
-+    }
-+
-+    /* Time */
-+    time = qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL);
-+    if (key->last_transaction_time == 0) {
-+        qemu_set_fd_handler(key->hidraw_fd, u2f_passthru_read, NULL, key);
-+        timer_init_ms(&key->timer, QEMU_CLOCK_VIRTUAL, u2f_timeout_check, key);
-+        timer_mod(&key->timer, time + TRANSACTION_TIMEOUT / 4);
-+    }
-+    key->last_transaction_time = time;
-+}
-+
-+static void u2f_passthru_recv_from_host(U2FPassthruState *key,
-+                                    const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    struct transaction *transaction;
-+    uint32_t cid;
-+
-+    /* Retrieve transaction */
-+    cid = packet_get_cid(packet);
-+    if (cid == BROADCAST_CID) {
-+        struct packet_init *packet_init;
-+        if (!packet_is_init(packet)) {
-+            return;
-+        }
-+        packet_init = (struct packet_init *)packet;
-+        transaction = u2f_transaction_get_from_nonce(key, packet_init->data);
-+    } else {
-+        transaction = u2f_transaction_get(key, cid);
-+    }
-+
-+    /* Ignore no started transaction */
-+    if (transaction == NULL) {
-+        return;
-+    }
-+
-+    if (packet_is_init(packet)) {
-+        struct packet_init *packet_init = (struct packet_init *)packet;
-+        transaction->resp_bcnt = packet_init_get_bcnt(packet_init);
-+        transaction->resp_size = PACKET_INIT_DATA_SIZE;
-+
-+        if (packet_init->cid == BROADCAST_CID) {
-+            /* Nonce checking for legitimate response */
-+            if (memcmp(transaction->nonce, packet_init->data, NONCE_SIZE)
-+                != 0) {
-+                return;
-+            }
-+        }
-+    } else {
-+        transaction->resp_size += PACKET_CONT_DATA_SIZE;
-+    }
-+
-+    /* Transaction end check */
-+    if (transaction->resp_size >= transaction->resp_bcnt) {
-+        u2f_transaction_close(key, cid);
-+    }
-+    u2f_send_to_guest(&key->base, packet);
-+}
-+
-+static void u2f_passthru_read(void *opaque)
-+{
-+    U2FPassthruState *key = opaque;
-+    U2FKeyState *base = &key->base;
-+    uint8_t packet[2 * U2FHID_PACKET_SIZE];
-+    int ret;
-+
-+    /* Full size base queue check */
-+    if (base->pending_in_num >= U2FHID_PENDING_IN_NUM) {
-+        return;
-+    }
-+
-+    ret = read(key->hidraw_fd, packet, sizeof(packet));
-+    if (ret < 0) {
-+        /* Detach */
-+        if (base->dev.attached) {
-+            usb_device_detach(&base->dev);
-+            u2f_passthru_reset(key);
-+        }
-+        return;
-+    }
-+    if (ret != U2FHID_PACKET_SIZE) {
-+        return;
-+    }
-+    u2f_passthru_recv_from_host(key, packet);
-+}
-+
-+static void u2f_passthru_recv_from_guest(U2FKeyState *base,
-+                                    const uint8_t packet[U2FHID_PACKET_SIZE])
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+    uint8_t host_packet[U2FHID_PACKET_SIZE + 1];
-+    ssize_t written;
-+
-+    if (packet_is_init(packet)) {
-+        u2f_transaction_start(key, (struct packet_init *)packet);
-+    }
-+
-+    host_packet[0] = 0;
-+    memcpy(host_packet + 1, packet, U2FHID_PACKET_SIZE);
-+
-+    written = write(key->hidraw_fd, host_packet, sizeof(host_packet));
-+    if (written != sizeof(host_packet)) {
-+        error_report("%s: Bad written size (req 0x%zu, val 0x%zd)",
-+                     TYPE_U2F_PASSTHRU, sizeof(host_packet), written);
-+    }
-+}
-+
-+static void u2f_passthru_unrealize(U2FKeyState *base)
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+
-+    u2f_passthru_reset(key);
-+    qemu_close(key->hidraw_fd);
-+}
-+
-+static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
-+{
-+    U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-+    int fd;
-+
-+    if (key->hidraw == NULL) {
-+        error_setg(errp, "%s: Missing hidraw", TYPE_U2F_PASSTHRU);
-+        return;
-+    }
-+
-+    fd = qemu_open(key->hidraw, O_RDWR);
-+    if (fd < 0) {
-+        error_setg(errp, "%s: Failed to open %s", TYPE_U2F_PASSTHRU,
-+                   key->hidraw);
-+        return;
-+    }
-+    key->hidraw_fd = fd;
-+    u2f_passthru_reset(key);
-+}
-+
-+static int u2f_passthru_post_load(void *opaque, int version_id)
-+{
-+    U2FPassthruState *key = opaque;
-+    u2f_passthru_reset(key);
-+    return 0;
-+}
-+
-+static const VMStateDescription u2f_passthru_vmstate = {
-+    .name = "u2f-key-passthru",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .post_load = u2f_passthru_post_load,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_U2F_KEY(base, U2FPassthruState),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
-+static Property u2f_passthru_properties[] = {
-+    DEFINE_PROP_STRING("hidraw", U2FPassthruState, hidraw),
-+    DEFINE_PROP_END_OF_LIST(),
-+};
-+
-+static void u2f_passthru_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+    U2FKeyClass *kc = U2F_KEY_CLASS(klass);
-+
-+    kc->realize = u2f_passthru_realize;
-+    kc->unrealize = u2f_passthru_unrealize;
-+    kc->recv_from_guest = u2f_passthru_recv_from_guest;
-+    dc->desc = "QEMU U2F passthrough key";
-+    dc->vmsd = &u2f_passthru_vmstate;
-+    device_class_set_props(dc, u2f_passthru_properties);
-+}
-+
-+static const TypeInfo u2f_key_passthru_info = {
-+    .name = TYPE_U2F_PASSTHRU,
-+    .parent = TYPE_U2F_KEY,
-+    .instance_size = sizeof(U2FPassthruState),
-+    .class_init = u2f_passthru_class_init
-+};
-+
-+static void u2f_key_passthru_register_types(void)
-+{
-+    type_register_static(&u2f_key_passthru_info);
-+}
-+
-+type_init(u2f_key_passthru_register_types)
++++ b/scripts/u2f-setup-gen.py
+@@ -0,0 +1,170 @@
++#!/usr/bin/env python3
++#
++# Libu2f-emu setup directory generator for USB U2F key emulation.
++#
++# Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
++# Written by César Belley <cesar.belley@lse.epita.fr>
++#
++# This work is licensed under the terms of the GNU GPL, version 2
++# or, at your option, any later version.  See the COPYING file in
++# the top-level directory.
++
++import sys
++import os
++from random import randint
++from typing import Tuple
++
++from cryptography.hazmat.backends import default_backend
++from cryptography.hazmat.primitives.asymmetric import ec
++from cryptography.hazmat.primitives.serialization import Encoding, \
++    NoEncryption, PrivateFormat, PublicFormat
++from OpenSSL import crypto
++
++
++def write_setup_dir(dirpath: str, privkey_pem: bytes, cert_pem: bytes,
++                    entropy: bytes, counter: int) -> None:
++    """
++    Write the setup directory.
++
++    Args:
++        dirpath: The directory path.
++        key_pem: The private key PEM.
++        cert_pem: The certificate PEM.
++        entropy: The 48 bytes of entropy.
++        counter: The counter value.
++    """
++    # Directory
++    os.mkdir(dirpath)
++
++    # Private key
++    with open(f'{dirpath}/private-key.pem', 'bw') as f:
++        f.write(privkey_pem)
++
++    # Certificate
++    with open(f'{dirpath}/certificate.pem', 'bw') as f:
++        f.write(cert_pem)
++
++    # Entropy
++    with open(f'{dirpath}/entropy', 'wb') as f:
++        f.write(entropy)
++
++    # Counter
++    with open(f'{dirpath}/counter', 'w') as f:
++        f.write(f'{str(counter)}\n')
++
++
++def generate_ec_key_pair() -> Tuple[str, str]:
++    """
++    Generate an ec key pair.
++
++    Returns:
++        The private and public key PEM.
++    """
++    # Key generation
++    privkey = ec.generate_private_key(ec.SECP256R1, default_backend())
++    pubkey = privkey.public_key()
++
++    # PEM serialization
++    privkey_pem = privkey.private_bytes(encoding=Encoding.PEM,
++                                        format=PrivateFormat.TraditionalOpenSSL,
++                                        encryption_algorithm=NoEncryption())
++    pubkey_pem = pubkey.public_bytes(encoding=Encoding.PEM,
++                                     format=PublicFormat.SubjectPublicKeyInfo)
++    return privkey_pem, pubkey_pem
++
++
++def generate_certificate(privkey_pem: str, pubkey_pem: str) -> str:
++    """
++    Generate a x509 certificate from a key pair.
++
++    Args:
++        privkey_pem: The private key PEM.
++        pubkey_pem: The public key PEM.
++
++    Returns:
++        The certificate PEM.
++    """
++    # Convert key pair
++    privkey = crypto.load_privatekey(crypto.FILETYPE_PEM, privkey_pem)
++    pubkey = crypto.load_publickey(crypto.FILETYPE_PEM, pubkey_pem)
++
++    # New x509v3 certificate
++    cert = crypto.X509()
++    cert.set_version(0x2)
++
++    # Serial number
++    cert.set_serial_number(randint(1, 2 ** 64))
++
++    # Before / After
++    cert.gmtime_adj_notBefore(0)
++    cert.gmtime_adj_notAfter(4 * (365 * 24 * 60 * 60))
++
++    # Public key
++    cert.set_pubkey(pubkey)
++
++    # Subject name and issueer
++    cert.get_subject().CN = "U2F emulated"
++    cert.set_issuer(cert.get_subject())
++
++    # Extensions
++    cert.add_extensions([
++        crypto.X509Extension(b"subjectKeyIdentifier",
++                             False, b"hash", subject=cert),
++    ])
++    cert.add_extensions([
++        crypto.X509Extension(b"authorityKeyIdentifier",
++                             False, b"keyid:always", issuer=cert),
++    ])
++    cert.add_extensions([
++        crypto.X509Extension(b"basicConstraints", True, b"CA:TRUE")
++    ])
++
++    # Signature
++    cert.sign(privkey, 'sha256')
++
++    return crypto.dump_certificate(crypto.FILETYPE_PEM, cert)
++
++
++def generate_setup_dir(dirpath: str) -> None:
++    """
++    Generates the setup directory.
++
++    Args:
++        dirpath: The directory path.
++    """
++    # Key pair
++    privkey_pem, pubkey_pem = generate_ec_key_pair()
++
++    # Certificate
++    certificate_pem = generate_certificate(privkey_pem, pubkey_pem)
++
++    # Entropy
++    entropy = os.urandom(48)
++
++    # Counter
++    counter = 0
++
++    # Write
++    write_setup_dir(dirpath, privkey_pem, certificate_pem, entropy, counter)
++
++
++def main() -> None:
++    """
++    Main function
++    """
++    # Dir path
++    if len(sys.argv) != 2:
++        sys.stderr.write(f'Usage: {sys.argv[0]} <setup_dir>\n')
++        exit(2)
++    dirpath = sys.argv[1]
++
++    # Dir non existence
++    if os.path.exists(dirpath):
++        sys.stderr.write(f'Directory: {dirpath} already exists.\n')
++        exit(1)
++
++    generate_setup_dir(dirpath)
++
++
++if __name__ == '__main__':
++    main()
 -- 
 2.27.0
 
