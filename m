@@ -4,77 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD479C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:36:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D225C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:37:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86142206EB
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:36:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 22E1A2073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:37:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JgM8zzqV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86142206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N/lu8ZLJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22E1A2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCfJ8-0006iB-JY
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:36:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42042)
+	id 1kCfJG-00070d-8u
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:37:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kCfCi-0004wF-0y
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:30:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24104)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFZ-00089W-Ql
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23642)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kCfCf-00069z-IJ
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:30:15 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFX-0006Zz-AY
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598862612;
+ s=mimecast20190719; t=1598862790;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=v2uE0+ed78+UFuOqAdJL2VFp4mJybTxMVKwhf5ZD7i8=;
- b=JgM8zzqV/6ls1/D4zWswt1Mn4WtgtgHH9JbSKfvzNxRAPgWyGSLsRYnJHruXlvZgQCDvq0
- hGHLOj31EARHwKRZnTASGwPJ/7kGtvYqgbM7VpwEKCpq7AHaV36w4SmUqug5KfG3eo6eQf
- vnCUTHrrsFZLFNGaiyCW/DnsXYWzkSM=
+ bh=6J2zt+T0zv9qukEkUS4yvFYuQ+2v0y+WJwvBDg4/bkw=;
+ b=N/lu8ZLJz32hWCiwp/ef1lACNKrTf/OUq/Pjw4LeCUxDzdnVaOGI30p3kWF+boTIzUYhvb
+ Hxdhf8kcs35hizE0MrS8chpDCssehXHbv2ROhFd0sQxeAmgNwh01B2pHboh8Kxm5mIXEeK
+ BD0rmj3bued6QB7SFzj7yLct4gJeYoQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-398-YnZJy_q6On-jVkfNBGzcew-1; Mon, 31 Aug 2020 04:30:10 -0400
-X-MC-Unique: YnZJy_q6On-jVkfNBGzcew-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-244-RB-VYZXqPpmpMqFwe3_-ug-1; Mon, 31 Aug 2020 04:33:08 -0400
+X-MC-Unique: RB-VYZXqPpmpMqFwe3_-ug-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CE23802B77
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 08:30:09 +0000 (UTC)
-Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
- (ovpn-12-88.pek2.redhat.com [10.72.12.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 023D95D9E2;
- Mon, 31 Aug 2020 08:30:02 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: jasowang@redhat.com,
-	qemu-devel@nongnu.org
-Subject: [PATCH 9/9] vhost-vdpa: allow pre-opend file descriptor
-Date: Mon, 31 Aug 2020 16:27:37 +0800
-Message-Id: <20200831082737.10983-10-jasowang@redhat.com>
-In-Reply-To: <20200831082737.10983-1-jasowang@redhat.com>
-References: <20200831082737.10983-1-jasowang@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8331110ABDA0;
+ Mon, 31 Aug 2020 08:33:07 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DAE66925BB;
+ Mon, 31 Aug 2020 08:33:06 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 2A4F6204AE; Mon, 31 Aug 2020 10:33:02 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 07/18] hw/usb: Add U2F key base class
+Date: Mon, 31 Aug 2020 10:32:50 +0200
+Message-Id: <20200831083301.6357-8-kraxel@redhat.com>
+In-Reply-To: <20200831083301.6357-1-kraxel@redhat.com>
+References: <20200831083301.6357-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:02:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,89 +96,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Markus Armbruster <armbru@redhat.com>, lulu@redhat.com, mst@redhat.com
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?C=C3=A9sar=20Belley?= <cesar.belley@lse.epita.fr>,
+ Gerd Hoffmann <kraxel@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch allows to initialize vhost-vdpa network backend with pre
-opened vhost-vdpa file descriptor. This is useful for running
-unprivileged qemu through libvirt.
+From: César Belley <cesar.belley@lse.epita.fr>
 
-Cc: Eric Blake <eblake@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
+This patch adds the specification for the U2F key base class.
+Used to group the common characteristics, this device class will be
+inherited by its two variants, corresponding to the two modes:
+passthrough and emulated
+
+This prepares the U2F devices hierarchy which is as follow:
+USB device -> u2f-key -> {u2f-passthru, u2f-emulated}.
+
+Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
+Message-id: 20200826114209.28821-4-cesar.belley@lse.epita.fr
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- net/vhost-vdpa.c | 24 +++++++++++++++++++-----
- qapi/net.json    |  5 ++++-
- 2 files changed, 23 insertions(+), 6 deletions(-)
+ hw/usb/u2f.h | 92 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
+ create mode 100644 hw/usb/u2f.h
 
-diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-index 9a6f0b63d3..f6385cd264 100644
---- a/net/vhost-vdpa.c
-+++ b/net/vhost-vdpa.c
-@@ -206,20 +206,34 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
-                           (char *)name, errp)) {
-         return -1;
-     }
--    if (!opts->has_vhostdev) {
--        error_setg(errp, "vhost-vdpa requires vhostdev to be set");
-+    if (!(opts->has_vhostdev ^ opts->has_fd)) {
-+        error_setg(errp, "Vhost-vdpa requires either vhostdev or fd to be set");
-         return -1;
-     }
- 
-     assert(name);
- 
-     nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, TYPE_VHOST_VDPA, name);
--    snprintf(nc->info_str, sizeof(nc->info_str), "vhostdev=%s", opts->vhostdev);
-+    if (opts->has_vhostdev) {
-+        snprintf(nc->info_str, sizeof(nc->info_str),
-+                 "vhostdev=%s", opts->vhostdev);
-+        vdpa_device_fd = qemu_open(opts->vhostdev, O_RDWR);
-+        if (vdpa_device_fd == -1) {
-+            error_setg(errp, "Fail to open vhost-vdpa device %s",
-+                       opts->vhostdev);
-+            return -errno;
-+        }
-+    } else {
-+        snprintf(nc->info_str, sizeof(nc->info_str), "fd=%s", opts->fd);
-+        vdpa_device_fd = monitor_fd_param(cur_mon, opts->fd, errp);
-+        if (vdpa_device_fd == -1) {
-+            return -1;
-+        }
-+    }
- 
-     s = DO_UPCAST(VhostVDPAState, nc, nc);
--    vdpa_device_fd = qemu_open(opts->vhostdev, O_RDWR);
-     if (vdpa_device_fd == -1) {
--        error_setg(errp, "Fail to open vhost-vdpa device %s", opts->vhostdev);
+diff --git a/hw/usb/u2f.h b/hw/usb/u2f.h
+new file mode 100644
+index 000000000000..db30f3586bf7
+--- /dev/null
++++ b/hw/usb/u2f.h
+@@ -0,0 +1,92 @@
++/*
++ * U2F USB device.
++ *
++ * Copyright (c) 2020 César Belley <cesar.belley@lse.epita.fr>
++ * Written by César Belley <cesar.belley@lse.epita.fr>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
 +
-         return -errno;
-     }
-     s->vhost_vdpa.device_fd = vdpa_device_fd;
-diff --git a/qapi/net.json b/qapi/net.json
-index a2a94fad3e..5ad60c3045 100644
---- a/qapi/net.json
-+++ b/qapi/net.json
-@@ -442,12 +442,15 @@
- # @queues: number of queues to be created for multiqueue vhost-vdpa
- #          (default: 1)
- #
-+# @fd: file descriptor of an already opened vhost-vdpa (since 5.2)
-+#
- # Since: 5.1
- ##
- { 'struct': 'NetdevVhostVDPAOptions',
-   'data': {
-     '*vhostdev':     'str',
--    '*queues':       'int' } }
-+    '*queues':       'int',
-+    '*fd':           'str' } }
- 
- ##
- # @NetClientDriver:
++#ifndef U2F_H
++#define U2F_H
++
++#include "hw/qdev-core.h"
++
++#define U2FHID_PACKET_SIZE 64
++#define U2FHID_PENDING_IN_NUM 32
++
++typedef struct U2FKeyState U2FKeyState;
++typedef struct U2FKeyInfo U2FKeyInfo;
++
++#define TYPE_U2F_KEY "u2f-key"
++#define U2F_KEY(obj) \
++    OBJECT_CHECK(U2FKeyState, (obj), TYPE_U2F_KEY)
++#define U2F_KEY_CLASS(klass) \
++    OBJECT_CLASS_CHECK(U2FKeyClass, (klass), TYPE_U2F_KEY)
++#define U2F_KEY_GET_CLASS(obj) \
++    OBJECT_GET_CLASS(U2FKeyClass, (obj), TYPE_U2F_KEY)
++
++/*
++ * Callbacks to be used by the U2F key base device (i.e. hw/u2f.c)
++ * to interact with its variants (i.e. hw/u2f-*.c)
++ */
++typedef struct U2FKeyClass {
++    /*< private >*/
++    USBDeviceClass parent_class;
++
++    /*< public >*/
++    void (*recv_from_guest)(U2FKeyState *key,
++                            const uint8_t packet[U2FHID_PACKET_SIZE]);
++    void (*realize)(U2FKeyState *key, Error **errp);
++    void (*unrealize)(U2FKeyState *key);
++} U2FKeyClass;
++
++/*
++ * State of the U2F key base device (i.e. hw/u2f.c)
++ */
++typedef struct U2FKeyState {
++    USBDevice dev;
++    USBEndpoint *ep;
++    uint8_t idle;
++
++    /* Pending packets to be send to the guest */
++    uint8_t pending_in[U2FHID_PENDING_IN_NUM][U2FHID_PACKET_SIZE];
++    uint8_t pending_in_start;
++    uint8_t pending_in_end;
++    uint8_t pending_in_num;
++} U2FKeyState;
++
++/*
++ * API to be used by the U2F key device variants (i.e. hw/u2f-*.c)
++ * to interact with the the U2F key base device (i.e. hw/u2f.c)
++ */
++void u2f_send_to_guest(U2FKeyState *key,
++                       const uint8_t packet[U2FHID_PACKET_SIZE]);
++
++extern const VMStateDescription vmstate_u2f_key;
++
++#define VMSTATE_U2F_KEY(_field, _state) {                            \
++    .name       = (stringify(_field)),                               \
++    .size       = sizeof(U2FKeyState),                               \
++    .vmsd       = &vmstate_u2f_key,                                  \
++    .flags      = VMS_STRUCT,                                        \
++    .offset     = vmstate_offset_value(_state, _field, U2FKeyState), \
++}
++
++#endif /* U2F_H */
 -- 
-2.20.1
+2.27.0
 
 
