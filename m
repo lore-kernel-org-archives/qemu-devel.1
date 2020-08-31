@@ -2,134 +2,99 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6E1C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 14:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D57C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 14:56:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D705620693
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 14:15:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C2A720719
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 14:56:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="C3gbVszj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D705620693
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NHF2U+dq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C2A720719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCkbA-0007Au-OC
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 10:15:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33494)
+	id 1kClEj-0003ZT-Gd
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 10:56:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kCka8-0006L4-2A
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 10:14:48 -0400
-Received: from mail-bn7nam10on2051.outbound.protection.outlook.com
- ([40.107.92.51]:38624 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kCka5-0006r4-Dy
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 10:14:47 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZQaWt7bQs0XoytT/CeV5WhCp781hxhRKbdpB5iPdgmQlghAmJKgCcIyG3dqLJRUqD/A2rKwYaI+9TvJ7UDyBpqHcdc8F0RwyxnFJ7KI+ybOLMGdwuXiBzjgeFIfKSEO2BvwCvePI+LCAGGQ3/3n2b1aIg7EpAf7iPFR2Zs+ej8HsaoKJJTkYiHcDWSYPYFJAvQJdpcnyXoDIFLUcn4e7Q+nXtT1YO7SbVvhKtUj8nb/AdFhTtZzyRexP5z75ResOwnmuFF9qho2yq9rP3ovQKXUoJ7f14cVahzSuLZyh2ozrm/yWVXtuyDWtUtopBSp0xWaW1GqnhQDqkpDUSNojqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ApwzKLTj/1Th0BHzLoI+bV5AExfvX+qtR7+/D9XxYrc=;
- b=BhrU5T1Qt3FUSQqTv9UFXjBc5mcAUDybu9kA+yBwRsudZ/kpE/mUyrAa1Btw2QtiXUDtcu/yn2eaX2QFTnGMFs0z9SW2RAgUVT9yUipngw/q86fmPDACBT6+GEs6zdxvC5H51DVfddy2bqesz7SB8mRtiYF2+Y0o+MMN0Sv8lJEf5l5lu04zfS5wodejnNU7WDVcDyHBknTTvzK+GYCKjj/souJgR0Z3rw35+PGP//tlc+pUOaP7kY+zZww2rdsBZtTTeayhFKCsXg/7hr0c8SzpyGbNonHExMRQgG7WwKCSShn2PHSlQEtdiGYktehinlg13R76Oc+uIvvk9Ugebw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
- is 149.199.60.83) smtp.rcpttodomain=linaro.org
- smtp.mailfrom=xilinx.com; 
- dmarc=none action=none header.from=xilinx.com; dkim=none (message not
- signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ApwzKLTj/1Th0BHzLoI+bV5AExfvX+qtR7+/D9XxYrc=;
- b=C3gbVszjSDDF1BQWmuYCP3Sijj+YPfjnnK58kwpfSUin7BYGllcSLnF0RQLTv/zkxyz19kJAc3Xy/uop5A5PyspTmd0bUSMXeW0QyWrDXnKxuOjuE8PuIn9Avf0LEPxgUNm9bON7m76OOvtkbdObvECu5ynF7dlIlHerGf7sNSU=
-Received: from MN2PR10CA0028.namprd10.prod.outlook.com (2603:10b6:208:120::41)
- by DM6PR02MB6041.namprd02.prod.outlook.com (2603:10b6:5:1d2::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.21; Mon, 31 Aug
- 2020 14:14:42 +0000
-Received: from BL2NAM02FT013.eop-nam02.prod.protection.outlook.com
- (2603:10b6:208:120:cafe::19) by MN2PR10CA0028.outlook.office365.com
- (2603:10b6:208:120::41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
- Transport; Mon, 31 Aug 2020 14:14:42 +0000
-X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
- 149.199.60.83) smtp.mailfrom=xilinx.com; linaro.org; dkim=none (message not
- signed) header.d=none;linaro.org; dmarc=none action=none
- header.from=xilinx.com;
-Received-SPF: TempError (protection.outlook.com: error in processing during
- lookup of xilinx.com: DNS Timeout)
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT013.mail.protection.outlook.com (10.152.77.19) with Microsoft SMTP
- Server id 15.20.3326.19 via Frontend Transport; Mon, 31 Aug 2020 14:14:40
- +0000
-Received: from [149.199.38.66] (port=47588 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <edgar@xilinx.com>)
- id 1kCkZy-0003uf-Ib; Mon, 31 Aug 2020 07:14:38 -0700
-Received: from [127.0.0.1] (helo=xsj-pvapsmtp01)
- by smtp.xilinx.com with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kCka0-0001kY-DZ; Mon, 31 Aug 2020 07:14:40 -0700
-Received: from [10.71.116.235] (helo=localhost)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kCkZz-0001kQ-Ny; Mon, 31 Aug 2020 07:14:40 -0700
-Date: Mon, 31 Aug 2020 16:14:35 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 00/76] target/microblaze improvements
-Message-ID: <20200831141435.GD14249@toto>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kClDv-0002XI-9N
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 10:55:55 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:55070)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kClDt-0003cw-N8
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 10:55:54 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id mm21so761094pjb.4
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 07:55:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Q3qqEumtpcKe+NzD5BpfBt8Unr/mc/TMx0+JL6z8Q5U=;
+ b=NHF2U+dqDcwAjZAIonPeTm7Y6SgtW7B94ZxePJejYq6/trTGgLQpIkZQW7tg/lO9+D
+ 6x/ffDonTcSCEX1FGORlyedWshuhrh3N0n6Z5R4Sp1b5c6Vzp9cEF0MTECfjlxTvTM3S
+ yzHoNU8gDGFpdL0gOKT0rLun4PBec4ChFgRCrkzbPncMhbt4uHe42ItbaYbTdbhJp36N
+ xIn06dTc+E8PRFAxUBu8PIXa1yNTDPBmL9T4SZYZTWpT9DPfZ7wOybBvH9FbKRUq/GLS
+ ldcmMMti5z9QZxNc0R2Q3QyVRpNIk177oKmrRqqIKkFn4q4N/AuDYyT4gEu6TQcyUGxa
+ 7AlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Q3qqEumtpcKe+NzD5BpfBt8Unr/mc/TMx0+JL6z8Q5U=;
+ b=bRcL83nst5Nm9UwR8aYYvyC6kS93LqYbjlnOOy88bwcJuQgLy+GaX0X5vp/gfZU0cg
+ JoqijrRVy6FxpHkM3MN9IoTPP+4Pbe/Pgg92Jb0q0ZV0vZUhCG2vND420fh401ZvoOLg
+ +is7Vv5w62acuw3AA+M1vUF0s5e21OLM8b+DwlZ3dyW8ec9kNe2airjUwPqGSETbU3AU
+ cDIc5YjPpVlnN24FA1JavwR8voGWZTUPgbJLlAEe+s56maQB8gkLr0BZKH2Uu1UBOd0h
+ Y8L2IseLiN+yS0Binc0pNb2Q919ejtSaxOKzBpeow54CbH7vNnI4l5byRuTq0JUthLco
+ iZLQ==
+X-Gm-Message-State: AOAM530q6NtPWjVc67+WbudyUtZwXYdDk9FizeQmSm2UilUbyOb8KIWc
+ iMx2cFI3+niFojqaW73Yh5eEue/ht6lg1w==
+X-Google-Smtp-Source: ABdhPJxZiHCOi/eCKCAjFby0jr9Ie0ud6ANlaCfCUU7oMJF+RqeKPhcVVex0NjLoYbcxGsL1d6i3Jg==
+X-Received: by 2002:a17:90b:3750:: with SMTP id
+ ne16mr1708245pjb.6.1598885751108; 
+ Mon, 31 Aug 2020 07:55:51 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id p17sm8072562pfn.147.2020.08.31.07.55.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 31 Aug 2020 07:55:50 -0700 (PDT)
+Subject: Re: [PATCH v2 27/76] target/microblaze: Check singlestep_enabled in
+ gen_goto_tb
+To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 References: <20200828141929.77854-1-richard.henderson@linaro.org>
+ <20200828141929.77854-28-richard.henderson@linaro.org>
+ <20200831135416.GC14249@toto>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bd6b8e33-c718-c5a8-c196-41f1c4191354@linaro.org>
+Date: Mon, 31 Aug 2020 07:55:47 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 821b80fd-cf40-474b-0532-08d84db8338f
-X-MS-TrafficTypeDiagnostic: DM6PR02MB6041:
-X-Microsoft-Antispam-PRVS: <DM6PR02MB6041452B559F60ADDDF98245C2510@DM6PR02MB6041.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: fshan7Y860A0gq0hPWHaShrZHWwMAQHkzKZrxH6LbEMYLuzrS44nk3ePqGsp3/oqKDkINw+LUyKSl9BuhebhqZza/FjwYNjQrUou9tdacN/719Wpg/qi9eGtbc3MJSWuwi9D4DJdASPyt+SgZhIpH4QvQGI7ENaoTkORJ2QDzfEmekIjaXskuIz/VAviVHshm7kJW7pQMGlDgZvhIufF3L4EmXpEvTxGEA1wfjkPb6koUjVQ95xUSLFtN86FEYLdhNQI5eatqf4pUHfKPpYI8jbcFrFcrJAwPFCk+6oliS5J/2oxAmmH5Y55Qfv48+ovHbLp2jwn4/oV95RTr8ftejn9NLy1O6U9kIRb0+KjN0SFK7GcMspqgh7s0MwgRWrRQ81USKTVO7o8M3r3BkOgOQ==
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(7916004)(346002)(39860400002)(396003)(376002)(136003)(46966005)(6916009)(336012)(186003)(6666004)(8936002)(2906002)(63350400001)(4326008)(9786002)(26005)(5660300002)(426003)(82740400003)(478600001)(9686003)(70586007)(70206006)(1076003)(83380400001)(33716001)(82310400002)(316002)(8676002)(47076004)(356005)(81166007)(33656002);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2020 14:14:40.7217 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 821b80fd-cf40-474b-0532-08d84db8338f
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT013.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB6041
-Received-SPF: pass client-ip=40.107.92.51; envelope-from=edgar@xilinx.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 10:14:43
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200831135416.GC14249@toto>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -147,141 +112,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 28, 2020 at 07:18:13AM -0700, Richard Henderson wrote:
-> Thanks for all the testing and review, Edgar.
+On 8/31/20 6:54 AM, Edgar E. Iglesias wrote:
+>> +        TCGv_i32 tmp = tcg_const_i32(EXCP_DEBUG);
+>> +        tcg_gen_movi_i64(cpu_SR[SR_PC], dest);
 > 
-> Changes in v2:
->   * Restored opcode_0_illegal handling.
->   * Dropped problematic imm/delay slot tb extension.
->   * Dropped tcg_gen_lookup_and_goto_ptr for now.
->   * Added fix for mb_cpu_transaction_failed.
->   * Removed microblaze-decode.h with old decoder.
->   * Removed abort_at_next_insn with old decoder.
->   * Fixed mbar.
->   * Fixed put.
+> This needs to be i32 cpu_pc to avoid breaking bisection. Looks like this
+> part slipped over to the next patch.
 > 
-> 
-> r~
+> With that fixed:
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-I had one more comment on patch #27 but the rest of the series looks good to
-me and it also passes my tests.
-
-So once you fix #27 feel free to add my RB & TB tags on the entire series.
-It's probably easiest if you send a pull-req via one of your trees.
-
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-
-Thanks again for working on this!
-Cheers,
-Edgar
+Whoops, yes.  Thanks.
 
 
-> 
-> 
-> Richard Henderson (76):
->   tests/tcg: Add microblaze to arches filter
->   tests/tcg: Do not require FE_TOWARDZERO
->   tests/tcg: Do not require FE_* exception bits
->   target/microblaze: Tidy gdbstub
->   target/microblaze: Split out PC from env->sregs
->   target/microblaze: Split out MSR from env->sregs
->   target/microblaze: Split out EAR from env->sregs
->   target/microblaze: Split out ESR from env->sregs
->   target/microblaze: Split out FSR from env->sregs
->   target/microblaze: Split out BTR from env->sregs
->   target/microblaze: Split out EDR from env->sregs
->   target/microblaze: Split the cpu_SR array
->   target/microblaze: Fix width of PC and BTARGET
->   target/microblaze: Fix width of MSR
->   target/microblaze: Fix width of ESR
->   target/microblaze: Fix width of FSR
->   target/microblaze: Fix width of BTR
->   target/microblaze: Fix width of EDR
->   target/microblaze: Remove cpu_ear
->   target/microblaze: Tidy raising of exceptions
->   target/microblaze: Mark raise_exception as noreturn
->   target/microblaze: Remove helper_debug and env->debug
->   target/microblaze: Rename env_* tcg variables to cpu_*
->   target/microblaze: Tidy mb_tcg_init
->   target/microblaze: Split out MSR[C] to its own variable
->   target/microblaze: Use DISAS_NORETURN
->   target/microblaze: Check singlestep_enabled in gen_goto_tb
->   target/microblaze: Convert to DisasContextBase
->   target/microblaze: Convert to translator_loop
->   target/microblaze: Remove SIM_COMPAT
->   target/microblaze: Remove DISAS_GNU
->   target/microblaze: Remove empty D macros
->   target/microblaze: Remove LOG_DIS
->   target/microblaze: Ensure imm constant is always available
->   target/microblaze: Add decodetree infrastructure
->   target/microblaze: Convert dec_add to decodetree
->   target/microblaze: Convert dec_sub to decodetree
->   target/microblaze: Implement cmp and cmpu inline
->   target/microblaze: Convert dec_pattern to decodetree
->   target/microblaze: Convert dec_and, dec_or, dec_xor to decodetree
->   target/microblaze: Convert dec_mul to decodetree
->   target/microblaze: Convert dec_div to decodetree
->   target/microblaze: Unwind properly when raising divide-by-zero
->   target/microblaze: Convert dec_bit to decodetree
->   target/microblaze: Convert dec_barrel to decodetree
->   target/microblaze: Convert dec_imm to decodetree
->   target/microblaze: Convert dec_fpu to decodetree
->   target/microblaze: Fix cpu unwind for fpu exceptions
->   target/microblaze: Mark fpu helpers TCG_CALL_NO_WG
->   target/microblaze: Replace MSR_EE_FLAG with MSR_EE
->   target/microblaze: Cache mem_index in DisasContext
->   target/microblaze: Fix cpu unwind for stackprot
->   target/microblaze: Convert dec_load and dec_store to decodetree
->   target/microblaze: Assert no overlap in flags making up tb_flags
->   target/microblaze: Move bimm to BIMM_FLAG
->   target/microblaze: Fix no-op mb_cpu_transaction_failed
->   target/microblaze: Store "current" iflags in insn_start
->   tcg: Add tcg_get_insn_start_param
->   target/microblaze: Use cc->do_unaligned_access
->   target/microblaze: Replace clear_imm with tb_flags_to_set
->   target/microblaze: Replace delayed_branch with tb_flags_to_set
->   target/microblaze: Tidy mb_cpu_dump_state
->   target/microblaze: Convert brk and brki to decodetree
->   target/microblaze: Convert mbar to decodetree
->   target/microblaze: Reorganize branching
->   target/microblaze: Convert dec_br to decodetree
->   target/microblaze: Convert dec_bcc to decodetree
->   target/microblaze: Convert dec_rts to decodetree
->   target/microblaze: Tidy do_rti, do_rtb, do_rte
->   target/microblaze: Convert msrclr, msrset to decodetree
->   target/microblaze: Convert dec_msr to decodetree
->   target/microblaze: Convert dec_stream to decodetree
->   target/microblaze: Remove last of old decoder
->   target/microblaze: Remove cpu_R[0]
->   target/microblaze: Add flags markup to some helpers
->   target/microblaze: Reduce linux-user address space to 32-bit
-> 
->  include/tcg/tcg.h                     |   15 +
->  target/microblaze/cpu-param.h         |   15 +
->  target/microblaze/cpu.h               |   67 +-
->  target/microblaze/helper.h            |   49 +-
->  target/microblaze/microblaze-decode.h |   59 -
->  tests/tcg/multiarch/float_helpers.h   |   17 +
->  target/microblaze/insns.decode        |  256 ++
->  linux-user/elfload.c                  |    9 +-
->  linux-user/microblaze/cpu_loop.c      |   26 +-
->  linux-user/microblaze/signal.c        |    8 +-
->  target/microblaze/cpu.c               |    9 +-
->  target/microblaze/gdbstub.c           |  193 +-
->  target/microblaze/helper.c            |  164 +-
->  target/microblaze/mmu.c               |    4 +-
->  target/microblaze/op_helper.c         |  194 +-
->  target/microblaze/translate.c         | 3223 +++++++++++++------------
->  tests/tcg/multiarch/float_convs.c     |    2 +
->  tests/tcg/multiarch/float_madds.c     |    2 +
->  target/microblaze/meson.build         |    3 +
->  tests/tcg/configure.sh                |    2 +-
->  20 files changed, 2292 insertions(+), 2025 deletions(-)
->  delete mode 100644 target/microblaze/microblaze-decode.h
->  create mode 100644 target/microblaze/insns.decode
-> 
-> -- 
-> 2.25.1
-> 
+r~
 
