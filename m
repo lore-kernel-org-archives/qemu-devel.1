@@ -7,76 +7,76 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CDFCC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:08:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01F1FC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:08:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55C1A2067C
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:08:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF10B2067C
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:08:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxHD4T2G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C1A2067C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RLRS7i6q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF10B2067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCr2q-0004rk-DF
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:08:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44698)
+	id 1kCr2r-0004uZ-OE
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:08:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kCr1t-0003Ld-UI
+ id 1kCr1t-0003Lc-Tq
  for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:07:53 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22492
- helo=us-smtp-1.mimecast.com)
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51750
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kCr1r-00006F-Ct
+ id 1kCr1p-00005q-8c
  for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:07:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598908069;
+ s=mimecast20190719; t=1598908067;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=PRxAgUBhqVc1+dN8jUvCKhHXmUwHjS3oX0Fs90WM7tU=;
- b=JxHD4T2GQ1PN7DnySa6iKHEQEMyBggaMYXk9GMCRXniM5VRJjmXV7RaATmp5PXh9EieTXQ
- vOdmaDTFNNJoHdY3pMIcY+WRGR3gZP6EjFySMg4XmSktk2hKNXk0XHSTNfeIP9qSrD/r0P
- PV0cndEhhrACMdE33GrPDd7AnYP+3/M=
+ bh=IO3SPGT2jewK+oxpuh0WYQhxAAejCxJnN7mn9MehJ2I=;
+ b=RLRS7i6qDPogSQ9AjkwcdFNtZgbJRxWdMEtj/b6dMOUJPwoA3P+J949oz8Ckev5bdi5W0c
+ WHdAEB7fc62EzVV9zWttnTF8md1wtEwy1lL5LHg8fQCRnK6MAbjRMgB307I9qYZqgZPS17
+ 2gkZvbcjxS57AvYZ0fQbikMtAFyBh6U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-WtSyIXpeNp-BrVDWR3mwyA-1; Mon, 31 Aug 2020 17:07:47 -0400
-X-MC-Unique: WtSyIXpeNp-BrVDWR3mwyA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-217-yot1mvoHOsuqqwAFebZguA-1; Mon, 31 Aug 2020 17:07:45 -0400
+X-MC-Unique: yot1mvoHOsuqqwAFebZguA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42E961005E6D
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 21:07:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B9A11DDEE
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 21:07:44 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 10C631002D48;
- Mon, 31 Aug 2020 21:07:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 96C1A78B20;
+ Mon, 31 Aug 2020 21:07:42 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 03/18] qom: Allow class type name to be specified in
- OBJECT_DECLARE*
-Date: Mon, 31 Aug 2020 17:07:25 -0400
-Message-Id: <20200831210740.126168-4-ehabkost@redhat.com>
+Subject: [PATCH v4 01/18] qom: make object_ref/unref use a void * instead of
+ Object *.
+Date: Mon, 31 Aug 2020 17:07:23 -0400
+Message-Id: <20200831210740.126168-2-ehabkost@redhat.com>
 In-Reply-To: <20200831210740.126168-1-ehabkost@redhat.com>
 References: <20200831210740.126168-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:13:08
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:06:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -103,12 +103,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Many QOM types don't follow the Type/TypeClass pattern
-on the instance/struct names.  Let the class struct name
-be specified in the OBJECT_DECLARE* macros.
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+The object_ref/unref methods are intended for use with any subclass of
+the base Object. Using "Object *" in the signature is not adding any
+meaningful level of type safety, since callers simply use "OBJECT(ptr)"
+and this expands to an unchecked cast "(Object *)".
+
+By using "void *" we enable the object_unref() method to be used to
+provide support for g_autoptr() with any subclass.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200723181410.3145233-2-berrange@redhat.com>
 ---
 Changes v3 -> v4: none
 
@@ -116,84 +122,58 @@ Changes v2 -> v3: none
 
 Changes v1 -> v2: none
 ---
- include/qom/object.h | 35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+ include/qom/object.h | 4 ++--
+ qom/object.c         | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
 diff --git a/include/qom/object.h b/include/qom/object.h
-index f515230f61..500e7dfa99 100644
+index 0f3a60617c..1f8aa2d48e 100644
 --- a/include/qom/object.h
 +++ b/include/qom/object.h
-@@ -555,7 +555,8 @@ struct Object
- 
- /**
-  * OBJECT_DECLARE_TYPE:
-- * @ModuleObjName: the object name with initial capitalization
-+ * @InstanceType: instance struct name
-+ * @ClassType: class struct name
-  * @module_obj_name: the object name in lowercase with underscore separators
-  * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-  *
-@@ -567,33 +568,33 @@ struct Object
-  *
-  * The object struct and class struct need to be declared manually.
+@@ -1035,7 +1035,7 @@ GSList *object_class_get_list_sorted(const char *implements_type,
+  * as its reference count is greater than zero.
+  * Returns: @obj
   */
--#define OBJECT_DECLARE_TYPE(ModuleObjName, module_obj_name, MODULE_OBJ_NAME) \
--    typedef struct ModuleObjName ModuleObjName; \
--    typedef struct ModuleObjName##Class ModuleObjName##Class; \
-+#define OBJECT_DECLARE_TYPE(InstanceType, ClassType, module_obj_name, MODULE_OBJ_NAME) \
-+    typedef struct InstanceType InstanceType; \
-+    typedef struct ClassType ClassType; \
-     \
--    G_DEFINE_AUTOPTR_CLEANUP_FUNC(ModuleObjName, object_unref) \
-+    G_DEFINE_AUTOPTR_CLEANUP_FUNC(InstanceType, object_unref) \
-     \
--    static inline G_GNUC_UNUSED ModuleObjName##Class * \
-+    static inline G_GNUC_UNUSED ClassType * \
-     MODULE_OBJ_NAME##_GET_CLASS(void *obj) \
--    { return OBJECT_GET_CLASS(ModuleObjName##Class, obj, \
-+    { return OBJECT_GET_CLASS(ClassType, obj, \
-                               TYPE_##MODULE_OBJ_NAME); } \
-     \
--    static inline G_GNUC_UNUSED ModuleObjName##Class * \
-+    static inline G_GNUC_UNUSED ClassType * \
-     MODULE_OBJ_NAME##_CLASS(void *klass) \
--    { return OBJECT_CLASS_CHECK(ModuleObjName##Class, klass, \
-+    { return OBJECT_CLASS_CHECK(ClassType, klass, \
-                                 TYPE_##MODULE_OBJ_NAME); } \
-     \
--    static inline G_GNUC_UNUSED ModuleObjName * \
-+    static inline G_GNUC_UNUSED InstanceType * \
-     MODULE_OBJ_NAME(void *obj) \
--    { return OBJECT_CHECK(ModuleObjName, obj, \
-+    { return OBJECT_CHECK(InstanceType, obj, \
-                           TYPE_##MODULE_OBJ_NAME); }
+-Object *object_ref(Object *obj);
++Object *object_ref(void *obj);
  
  /**
-  * OBJECT_DECLARE_SIMPLE_TYPE:
-- * @ModuleObjName: the object name with initial caps
-+ * @InstanceType: instance struct name
-  * @module_obj_name: the object name in lowercase with underscore separators
-  * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-- * @ParentModuleObjName: the parent object name with initial caps
-+ * @ParentClassType: class struct name of parent type
-  *
-  * This does the same as OBJECT_DECLARE_TYPE(), but also declares
-  * the class struct, thus only the object struct needs to be declare
-@@ -602,10 +603,10 @@ struct Object
-  * This macro should be used unless the class struct needs to have
-  * virtual methods declared.
+  * object_unref:
+@@ -1044,7 +1044,7 @@ Object *object_ref(Object *obj);
+  * Decrease the reference count of a object.  A object cannot be freed as long
+  * as its reference count is greater than zero.
   */
--#define OBJECT_DECLARE_SIMPLE_TYPE(ModuleObjName, module_obj_name, \
--                                   MODULE_OBJ_NAME, ParentModuleObjName) \
--    OBJECT_DECLARE_TYPE(ModuleObjName, module_obj_name, MODULE_OBJ_NAME) \
--    struct ModuleObjName##Class { ParentModuleObjName##Class parent_class; };
-+#define OBJECT_DECLARE_SIMPLE_TYPE(InstanceType, module_obj_name, \
-+                                   MODULE_OBJ_NAME, ParentClassType) \
-+    OBJECT_DECLARE_TYPE(InstanceType, InstanceType##Class, module_obj_name, MODULE_OBJ_NAME) \
-+    struct InstanceType##Class { ParentClassType parent_class; };
- 
+-void object_unref(Object *obj);
++void object_unref(void *obj);
  
  /**
+  * object_property_try_add:
+diff --git a/qom/object.c b/qom/object.c
+index 00fdf89b3b..b1822a2ef4 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1124,8 +1124,9 @@ GSList *object_class_get_list_sorted(const char *implements_type,
+                         object_class_cmp);
+ }
+ 
+-Object *object_ref(Object *obj)
++Object *object_ref(void *objptr)
+ {
++    Object *obj = OBJECT(objptr);
+     if (!obj) {
+         return NULL;
+     }
+@@ -1133,8 +1134,9 @@ Object *object_ref(Object *obj)
+     return obj;
+ }
+ 
+-void object_unref(Object *obj)
++void object_unref(void *objptr)
+ {
++    Object *obj = OBJECT(objptr);
+     if (!obj) {
+         return;
+     }
 -- 
 2.26.2
 
