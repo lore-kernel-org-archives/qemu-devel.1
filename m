@@ -2,89 +2,77 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97432C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:16:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA3EC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:18:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 547BE20866
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:16:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IKjbChgW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 547BE20866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7335920678
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:18:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7335920678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCrAH-0007wN-7r
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:16:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44908)
+	id 1kCrCJ-00027u-87
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:18:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kCr2j-000553-Jl
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:08:45 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28638
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kCr2h-0000Aq-4J
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:08:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598908121;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Drboy62O1LBCh7uah3AZ0Zl6FneOi0JiDtImU/qB8Yk=;
- b=IKjbChgW5lMmLbFiFyNQjE+UwMcMw6YJe4N8IIQyyamDgSxzOc9AC91bC0wtrj/hLhmoA5
- KP9aPzh1gnTxOPvhIONs98PcJzyDDVdlnK1ZeAP9VJjel8lCZWrf4GPJuSZKmKZNL6zfX8
- Ce+Abkq576NGFCytE2TOvEgieSSRiM8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-451-MH3ZqCvYNoSPf-v-uik8Iw-1; Mon, 31 Aug 2020 17:08:39 -0400
-X-MC-Unique: MH3ZqCvYNoSPf-v-uik8Iw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C73971074644;
- Mon, 31 Aug 2020 21:08:37 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9CE055D9D3;
- Mon, 31 Aug 2020 21:08:34 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 10/18] [automated] Move QOM typedefs and add missing
- includes (pass 3)
-Date: Mon, 31 Aug 2020 17:07:32 -0400
-Message-Id: <20200831210740.126168-11-ehabkost@redhat.com>
-In-Reply-To: <20200831210740.126168-1-ehabkost@redhat.com>
-References: <20200831210740.126168-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kCr9X-0007D1-TB
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:15:47 -0400
+Received: from mail-ej1-f65.google.com ([209.85.218.65]:34353)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kCr9W-00017k-7z
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:15:47 -0400
+Received: by mail-ej1-f65.google.com with SMTP id d26so10445812ejr.1
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:15:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pH4AN0J1S8rxUY7tvtPyaKEI4oM9DyYokKXvKdxRSLo=;
+ b=P1Cj6CHINBenQCuAO+yFpeQKilv5ZvMAuqeCb+9vaWH0L7rYdkdbHZyr6oo82FFJVn
+ nND7uIPQbWpYTdx657IugsxibOFygJSzueQVR1pSztLOLwc7MrIv7C8ZrdbWwxsoFzKE
+ VbCA/qoqM2XQ67bufgmxjstDc+gnv+VPZcHRSLu8+Y+WgSPmELgX+lq7cm/08RpBXeBZ
+ s3zzrCN7Qck65m33Oetb3SHihsRdsJ9e78guLgUqIIGl6GQUp/wvGqgd9L8GILEi0Eya
+ DmXgRkFS9m434g5xd3k/1TB/0L3w73fdfenEHXCJPZWwFe01sV/R9al1qdu4u3ijxddq
+ NSWg==
+X-Gm-Message-State: AOAM533/TJ7Mc+7gKxnX9AnKku5th20RQULiZ2f63VLhQ1c7INV/d6Is
+ 9LNSO0E/jWn91A2O6wjjvBtMz9eTDLnE8qi033M=
+X-Google-Smtp-Source: ABdhPJxd94qNtlZM2xg6CGYJw+JaWr6DhybmdhMnI86xN1t+RoedsppLA6GHb5MRaxYictD1VRsZlTl2Evrcit6ZNlg=
+X-Received: by 2002:a17:906:24d2:: with SMTP id
+ f18mr191055ejb.510.1598908544361; 
+ Mon, 31 Aug 2020 14:15:44 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 15:02:38
+References: <20200828180243.443016-1-richard.henderson@linaro.org>
+ <20200828180243.443016-3-richard.henderson@linaro.org>
+In-Reply-To: <20200828180243.443016-3-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 31 Aug 2020 19:18:26 +0200
+Message-ID: <CAAdtpL4dG6PeuOconfpnzSjq3u+s2H8ODTEny5viB4RULxi=4g@mail.gmail.com>
+Subject: Re: [PATCH 2/3] tcg: Eliminate one store for in-place 128-bit dup_mem
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000d0a72b05ae32e77e"
+Received-SPF: pass client-ip=209.85.218.65;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-f65.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 17:15:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: -0.1
+X-Spam_bar: /
+X-Spam_report: (-0.1 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_03_06=1.592,
+ FREEMAIL_FORGED_FROMDOMAIN=0.25, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,209 +85,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, qemu-riscv@nongnu.org,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Helge Deller <deller@gmx.de>, Raphael Norwitz <raphael.norwitz@nutanix.com>,
- qemu-arm@nongnu.org, Palmer Dabbelt <palmer@dabbelt.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Some typedefs and macros are defined after the type check macros.
-This makes it difficult to automatically replace their
-definitions with OBJECT_DECLARE_TYPE.
+--000000000000d0a72b05ae32e77e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Patch generated using:
+Le ven. 28 ao=C3=BBt 2020 20:04, Richard Henderson <richard.henderson@linar=
+o.org>
+a =C3=A9crit :
 
- $ ./scripts/codeconverter/converter.py -i \
-   --pattern=QOMStructTypedefSplit $(git grep -l '' -- '*.[ch]')
+> Do not store back to the exact memory from which we just loaded.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
 
-which will split "typdef struct { ... } TypedefName"
-declarations.
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-Followed by:
-
- $ ./scripts/codeconverter/converter.py -i --pattern=MoveSymbols \
-    $(git grep -l '' -- '*.[ch]')
-
-which will:
-- move the typedefs and #defines above the type check macros
-- add missing #include "qom/object.h" lines if necessary
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Changes series v3 -> v4: this is a new patch added in series v4
+>  tcg/tcg-op-gvec.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+> index 793d4ba64c..fcc25b04e6 100644
+> --- a/tcg/tcg-op-gvec.c
+> +++ b/tcg/tcg-op-gvec.c
+> @@ -1581,7 +1581,7 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t
+> dofs, uint32_t aofs,
+>              TCGv_vec in =3D tcg_temp_new_vec(TCG_TYPE_V128);
+>
+>              tcg_gen_ld_vec(in, cpu_env, aofs);
+> -            for (i =3D 0; i < oprsz; i +=3D 16) {
+> +            for (i =3D (aofs =3D=3D dofs) * 16; i < oprsz; i +=3D 16) {
+>                  tcg_gen_st_vec(in, cpu_env, dofs + i);
+>              }
+>              tcg_temp_free_vec(in);
+> @@ -1591,7 +1591,7 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t
+> dofs, uint32_t aofs,
+>
+>              tcg_gen_ld_i64(in0, cpu_env, aofs);
+>              tcg_gen_ld_i64(in1, cpu_env, aofs + 8);
+> -            for (i =3D 0; i < oprsz; i +=3D 16) {
+> +            for (i =3D (aofs =3D=3D dofs) * 16; i < oprsz; i +=3D 16) {
+>                  tcg_gen_st_i64(in0, cpu_env, dofs + i);
+>                  tcg_gen_st_i64(in1, cpu_env, dofs + i + 8);
+>              }
+> --
+> 2.25.1
+>
+>
+>
 
-The script was re-run after series rebase.
+--000000000000d0a72b05ae32e77e
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This is being submitted as a separate patch to make review
-easier, but it can be squashed into the previous patch once it
-gets reviewed.
----
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: Helge Deller <deller@gmx.de>
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>
-Cc: Sagar Karandikar <sagark@eecs.berkeley.edu>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-Cc: Raphael Norwitz <raphael.norwitz@nutanix.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qemu-devel@nongnu.org
-Cc: qemu-arm@nongnu.org
-Cc: qemu-riscv@nongnu.org
----
- include/hw/arm/armsse.h            | 11 +++++++----
- include/hw/riscv/spike.h           |  6 ++++--
- include/hw/virtio/vhost-user-blk.h |  6 ++++--
- hw/hppa/lasi.c                     |  6 ++++--
- 4 files changed, 19 insertions(+), 10 deletions(-)
+<div dir=3D"auto"><div><br><div class=3D"gmail_quote"><div dir=3D"ltr" clas=
+s=3D"gmail_attr">Le ven. 28 ao=C3=BBt 2020 20:04, Richard Henderson &lt;<a =
+href=3D"mailto:richard.henderson@linaro.org">richard.henderson@linaro.org</=
+a>&gt; a =C3=A9crit=C2=A0:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Do not s=
+tore back to the exact memory from which we just loaded.<br>
+<br>
+Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
+naro.org" target=3D"_blank" rel=3D"noreferrer">richard.henderson@linaro.org=
+</a>&gt;<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
+=3D"auto"><span style=3D"font-family:sans-serif;font-size:13.696px">Reviewe=
+d-by: Philippe Mathieu-Daud=C3=A9 &lt;</span><a href=3D"mailto:f4bug@amsat.=
+org" style=3D"text-decoration:none;color:rgb(66,133,244);font-family:sans-s=
+erif;font-size:13.696px">f4bug@amsat.org</a><span style=3D"font-family:sans=
+-serif;font-size:13.696px">&gt;</span><br></div><div dir=3D"auto"><br></div=
+><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_qu=
+ote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex=
+">
+---<br>
+=C2=A0tcg/tcg-op-gvec.c | 4 ++--<br>
+=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c<br>
+index 793d4ba64c..fcc25b04e6 100644<br>
+--- a/tcg/tcg-op-gvec.c<br>
++++ b/tcg/tcg-op-gvec.c<br>
+@@ -1581,7 +1581,7 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t dof=
+s, uint32_t aofs,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0TCGv_vec in =3D tcg_temp_ne=
+w_vec(TCG_TYPE_V128);<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_gen_ld_vec(in, cpu_env,=
+ aofs);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i &lt; oprsz; i +=
+=3D 16) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D (aofs =3D=3D dofs) * =
+16; i &lt; oprsz; i +=3D 16) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_gen_st_ve=
+c(in, cpu_env, dofs + i);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_temp_free_vec(in);<br>
+@@ -1591,7 +1591,7 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t dof=
+s, uint32_t aofs,<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_gen_ld_i64(in0, cpu_env=
+, aofs);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_gen_ld_i64(in1, cpu_env=
+, aofs + 8);<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D 0; i &lt; oprsz; i +=
+=3D 16) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 for (i =3D (aofs =3D=3D dofs) * =
+16; i &lt; oprsz; i +=3D 16) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_gen_st_i6=
+4(in0, cpu_env, dofs + i);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_gen_st_i6=
+4(in1, cpu_env, dofs + i + 8);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+-- <br>
+2.25.1<br>
+<br>
+<br>
+</blockquote></div></div></div>
 
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index 347b977ae5..e5788e9d3c 100644
---- a/include/hw/arm/armsse.h
-+++ b/include/hw/arm/armsse.h
-@@ -105,8 +105,11 @@
- #include "hw/or-irq.h"
- #include "hw/core/split-irq.h"
- #include "hw/cpu/cluster.h"
-+#include "qom/object.h"
- 
- #define TYPE_ARM_SSE "arm-sse"
-+typedef struct ARMSSE ARMSSE;
-+typedef struct ARMSSEClass ARMSSEClass;
- #define ARM_SSE(obj) OBJECT_CHECK(ARMSSE, (obj), TYPE_ARM_SSE)
- 
- /*
-@@ -140,7 +143,7 @@
- #define RAM3_PPU 6
- #define NUM_PPUS 7
- 
--typedef struct ARMSSE {
-+struct ARMSSE {
-     /*< private >*/
-     SysBusDevice parent_obj;
- 
-@@ -215,14 +218,14 @@ typedef struct ARMSSE {
-     uint32_t init_svtor;
-     bool cpu_fpu[SSE_MAX_CPUS];
-     bool cpu_dsp[SSE_MAX_CPUS];
--} ARMSSE;
-+};
- 
- typedef struct ARMSSEInfo ARMSSEInfo;
- 
--typedef struct ARMSSEClass {
-+struct ARMSSEClass {
-     SysBusDeviceClass parent_class;
-     const ARMSSEInfo *info;
--} ARMSSEClass;
-+};
- 
- #define ARM_SSE_CLASS(klass) \
-     OBJECT_CLASS_CHECK(ARMSSEClass, (klass), TYPE_ARM_SSE)
-diff --git a/include/hw/riscv/spike.h b/include/hw/riscv/spike.h
-index b0a18a9c94..121396d07a 100644
---- a/include/hw/riscv/spike.h
-+++ b/include/hw/riscv/spike.h
-@@ -21,15 +21,17 @@
- 
- #include "hw/riscv/riscv_hart.h"
- #include "hw/sysbus.h"
-+#include "qom/object.h"
- 
- #define SPIKE_CPUS_MAX 8
- #define SPIKE_SOCKETS_MAX 8
- 
- #define TYPE_SPIKE_MACHINE MACHINE_TYPE_NAME("spike")
-+typedef struct SpikeState SpikeState;
- #define SPIKE_MACHINE(obj) \
-     OBJECT_CHECK(SpikeState, (obj), TYPE_SPIKE_MACHINE)
- 
--typedef struct {
-+struct SpikeState {
-     /*< private >*/
-     MachineState parent;
- 
-@@ -37,7 +39,7 @@ typedef struct {
-     RISCVHartArrayState soc[SPIKE_SOCKETS_MAX];
-     void *fdt;
-     int fdt_size;
--} SpikeState;
-+};
- 
- enum {
-     SPIKE_MROM,
-diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
-index 292d17147c..9d38877907 100644
---- a/include/hw/virtio/vhost-user-blk.h
-+++ b/include/hw/virtio/vhost-user-blk.h
-@@ -20,14 +20,16 @@
- #include "chardev/char-fe.h"
- #include "hw/virtio/vhost.h"
- #include "hw/virtio/vhost-user.h"
-+#include "qom/object.h"
- 
- #define TYPE_VHOST_USER_BLK "vhost-user-blk"
-+typedef struct VHostUserBlk VHostUserBlk;
- #define VHOST_USER_BLK(obj) \
-         OBJECT_CHECK(VHostUserBlk, (obj), TYPE_VHOST_USER_BLK)
- 
- #define VHOST_USER_BLK_AUTO_NUM_QUEUES UINT16_MAX
- 
--typedef struct VHostUserBlk {
-+struct VHostUserBlk {
-     VirtIODevice parent_obj;
-     CharBackend chardev;
-     int32_t bootindex;
-@@ -41,6 +43,6 @@ typedef struct VHostUserBlk {
-     struct vhost_virtqueue *vhost_vqs;
-     VirtQueue **virtqs;
-     bool connected;
--} VHostUserBlk;
-+};
- 
- #endif
-diff --git a/hw/hppa/lasi.c b/hw/hppa/lasi.c
-index 194aa3e619..1acb9ce631 100644
---- a/hw/hppa/lasi.c
-+++ b/hw/hppa/lasi.c
-@@ -26,6 +26,7 @@
- #include "hw/input/lasips2.h"
- #include "exec/address-spaces.h"
- #include "migration/vmstate.h"
-+#include "qom/object.h"
- 
- #define TYPE_LASI_CHIP "lasi-chip"
- 
-@@ -52,10 +53,11 @@
- #define ICR_BUS_ERROR_BIT  LASI_BIT(8)  /* bit 8 in ICR */
- #define ICR_TOC_BIT        LASI_BIT(1)  /* bit 1 in ICR */
- 
-+typedef struct LasiState LasiState;
- #define LASI_CHIP(obj) \
-     OBJECT_CHECK(LasiState, (obj), TYPE_LASI_CHIP)
- 
--typedef struct LasiState {
-+struct LasiState {
-     PCIHostState parent_obj;
- 
-     uint32_t irr;
-@@ -70,7 +72,7 @@ typedef struct LasiState {
-     time_t rtc_ref;
- 
-     MemoryRegion this_mem;
--} LasiState;
-+};
- 
- static bool lasi_chip_mem_valid(void *opaque, hwaddr addr,
-                                 unsigned size, bool is_write,
--- 
-2.26.2
-
+--000000000000d0a72b05ae32e77e--
 
