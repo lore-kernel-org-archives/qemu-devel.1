@@ -7,76 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B927EC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:31:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E70BC433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:32:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80B2C206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:31:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06663206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:32:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="A+RUBWRm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80B2C206F0
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="SjXXhxVc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06663206F0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCgA3-0006er-NS
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 05:31:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55714)
+	id 1kCgAc-0007QU-65
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 05:32:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kCg6i-0001p5-3g; Mon, 31 Aug 2020 05:28:08 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:40616)
+ id 1kCg6c-0001aE-IX; Mon, 31 Aug 2020 05:28:02 -0400
+Received: from forwardcorp1p.mail.yandex.net ([77.88.29.217]:58258)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kCg6g-00050w-4C; Mon, 31 Aug 2020 05:28:07 -0400
+ id 1kCg6a-00050E-Py; Mon, 31 Aug 2020 05:28:02 -0400
 Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net
  (sas1-ec30c78b6c5b.qloud-c.yandex.net
  [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 4631A2E1752;
- Mon, 31 Aug 2020 12:28:04 +0300 (MSK)
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id E92F42E1592;
+ Mon, 31 Aug 2020 12:27:58 +0300 (MSK)
 Received: from sas1-58a37b48fb94.qloud-c.yandex.net
  (sas1-58a37b48fb94.qloud-c.yandex.net [2a02:6b8:c08:1d1b:0:640:58a3:7b48])
  by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- t8pPA2lpZk-S3vGTJ9j; Mon, 31 Aug 2020 12:28:04 +0300
+ EC2gTuV1PB-RwveTQa1; Mon, 31 Aug 2020 12:27:58 +0300
 Precedence: bulk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
  s=default; 
- t=1598866084; bh=q/BEie8WWdulCQ+K3Z9sfH9Ao00pTgDfrRPfxe/FziU=;
+ t=1598866078; bh=UciJc8X9njWrEUHJFothSUSQxAE9xsIR5v3e7XbMiqU=;
  h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
  Subject:To:From:Cc;
- b=A+RUBWRmPpoOPbcH489bv4wTKKdCdf5YLSxuNPIHEfaHFUAQ9MtqyuN+y5T0zY2vv
- 8AEL940BrcwYxypx6Sepu8X4f9dzpz9wakvljv9ilWRM7K+nFVHxOxhXDKRnxxja/I
- 2K/ub1tgVvMVPk1y+WyRWVEkIH66AO1VbDA+lg+4=
+ b=SjXXhxVcZ5yfjC9ANLoye+PAjU4F4d4Zp34VnndKZJhK1auWBLX8jgJUdf+s293l4
+ eU1loKmPvMKieHQrqezSW+Rt2WF7d3+QDdZYoiYoCineYRcVyle6P4lgAhpiEjPmOW
+ q4Be38qNYWCMULqKSFuHiX2wHn9NYl1InGxOGE7s=
 Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net;
  dkim=pass header.i=@yandex-team.ru
 Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
  [2a02:6b8:b081:216::1:a])
  by sas1-58a37b48fb94.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- yaozkQMlmT-S3m8NKJw; Mon, 31 Aug 2020 12:28:03 +0300
+ yaozkQMlmT-Rwm8kf8T; Mon, 31 Aug 2020 12:27:58 +0300
  (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
  (Client certificate not present)
 From: Dima Stepanov <dimastep@yandex-team.ru>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 7/7] tests/qtest/vhost-user-test: enable the reconnect tests
-Date: Mon, 31 Aug 2020 12:27:23 +0300
-Message-Id: <ecd8b3820dd95175bd2a4a34484713eeba1aa930.1598865610.git.dimastep@yandex-team.ru>
+Subject: [PATCH v3 4/7] tests/qtest/libqos/virtio-blk: add support for
+ vhost-user-blk
+Date: Mon, 31 Aug 2020 12:27:20 +0300
+Message-Id: <50d827a7b383de531ac1452e1e0ce3ad961d00af.1598865610.git.dimastep@yandex-team.ru>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <cover.1598865610.git.dimastep@yandex-team.ru>
 References: <cover.1598865610.git.dimastep@yandex-team.ru>
 In-Reply-To: <cover.1598865610.git.dimastep@yandex-team.ru>
 References: <cover.1598865610.git.dimastep@yandex-team.ru>
-Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Received-SPF: pass client-ip=77.88.29.217;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 04:37:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,53 +99,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-For now a QTEST_VHOST_USER_FIXME environment variable is used to
-separate reconnect tests for the vhost-user-net device. Looks like the
-reconnect functionality is pretty stable, so this separation is
-deprecated.
-Remove it and enable these tests for the default run.
+Add support for the vhost-user-blk-pci device. This node can be used by
+the vhost-user-blk tests. Tests for the vhost-user-blk device are added
+in the following patches.
 
 Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
 ---
- tests/qtest/vhost-user-test.c | 25 +++++++++++--------------
- 1 file changed, 11 insertions(+), 14 deletions(-)
+ tests/qtest/libqos/virtio-blk.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.c
-index 4b715d3..4b96312 100644
---- a/tests/qtest/vhost-user-test.c
-+++ b/tests/qtest/vhost-user-test.c
-@@ -1140,20 +1140,17 @@ static void register_vhost_user_test(void)
-                  "virtio-net",
-                  test_migrate, &opts);
+diff --git a/tests/qtest/libqos/virtio-blk.c b/tests/qtest/libqos/virtio-blk.c
+index 5da0259..959c5dc 100644
+--- a/tests/qtest/libqos/virtio-blk.c
++++ b/tests/qtest/libqos/virtio-blk.c
+@@ -36,6 +36,9 @@ static void *qvirtio_blk_get_driver(QVirtioBlk *v_blk,
+     if (!g_strcmp0(interface, "virtio")) {
+         return v_blk->vdev;
+     }
++    if (!g_strcmp0(interface, "vhost-user-blk")) {
++        return v_blk;
++    }
  
--    /* keeps failing on build-system since Aug 15 2017 */
--    if (getenv("QTEST_VHOST_USER_FIXME")) {
--        opts.before = vhost_user_test_setup_reconnect;
--        qos_add_test("vhost-user/reconnect", "virtio-net",
--                     test_reconnect, &opts);
--
--        opts.before = vhost_user_test_setup_connect_fail;
--        qos_add_test("vhost-user/connect-fail", "virtio-net",
--                     test_vhost_user_started, &opts);
--
--        opts.before = vhost_user_test_setup_flags_mismatch;
--        qos_add_test("vhost-user/flags-mismatch", "virtio-net",
--                     test_vhost_user_started, &opts);
--    }
-+    opts.before = vhost_user_test_setup_reconnect;
-+    qos_add_test("vhost-user/reconnect", "virtio-net",
-+                 test_reconnect, &opts);
-+
-+    opts.before = vhost_user_test_setup_connect_fail;
-+    qos_add_test("vhost-user/connect-fail", "virtio-net",
-+                 test_vhost_user_started, &opts);
-+
-+    opts.before = vhost_user_test_setup_flags_mismatch;
-+    qos_add_test("vhost-user/flags-mismatch", "virtio-net",
-+                 test_vhost_user_started, &opts);
+     fprintf(stderr, "%s not present in virtio-blk-device\n", interface);
+     g_assert_not_reached();
+@@ -120,6 +123,17 @@ static void virtio_blk_register_nodes(void)
+     qos_node_produces("virtio-blk-pci", "virtio-blk");
  
-     opts.before = vhost_user_test_setup_multiqueue;
-     opts.edge.extra_device_opts = "mq=on";
+     g_free(arg);
++
++    /* vhost-user-blk-pci */
++    arg = g_strdup_printf("id=drv0,chardev=chdev0,addr=%x.%x",
++                                PCI_SLOT, PCI_FN);
++    opts.extra_device_opts = arg;
++    add_qpci_address(&opts, &addr);
++    qos_node_create_driver("vhost-user-blk-pci", virtio_blk_pci_create);
++    qos_node_consumes("vhost-user-blk-pci", "pci-bus", &opts);
++    qos_node_produces("vhost-user-blk-pci", "vhost-user-blk");
++
++    g_free(arg);
+ }
+ 
+ libqos_init(virtio_blk_register_nodes);
 -- 
 2.7.4
 
