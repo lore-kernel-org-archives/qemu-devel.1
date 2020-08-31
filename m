@@ -7,77 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA574C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC146C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:29:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A7DC2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:29:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B133A2073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:29:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RxGguRan"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A7DC2073A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FpY8A4WE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B133A2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCmgD-0001co-Dq
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:29:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34356)
+	id 1kCmgG-0001jz-Pt
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:29:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmKu-0005cv-HE
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:07:12 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44787)
+ id 1kCmL1-0005wH-St
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:07:19 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:46515)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmKs-00065E-Jr
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:07:12 -0400
-Received: by mail-pf1-x444.google.com with SMTP id o20so799450pfp.11
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:07:10 -0700 (PDT)
+ id 1kCmL0-00067e-7X
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:07:19 -0400
+Received: by mail-pg1-x543.google.com with SMTP id 31so821210pgy.13
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:07:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=5MvRykgMTcIF07iOKyUuKHIQ1MzsLcRrDLZyuwy1N1o=;
- b=RxGguRanxxr7PBvN+flPPZ6N76nr8f1ySYtzxzmOkIJJKYBVY5WqBePv5abjHjRArZ
- 2U7hZTY2VyaMqAE0pQtKMC8IYhMfKK4rb4n7NjTzjNq8SQS3on5F3vYH3uhQii5x/PfJ
- izFgZyc0blhaQniolgXg3U1bxbhbpUfbU0+YZRUG1ZEEciJoXn5Uw4WUDjq9qMhu0ymx
- axDbHeI2CGNK0OWeQdoXW/bzrbb/M1ZAqwDD4+qzKU1MySMHwz2+5lyxe1MJ9AZjYz4a
- zy4xtI2FMUNIx4EXTXgVqpR41Ni/SQSNiubFdLGiBjoVnfQPt59ECVhKbT2wYlAtvNQE
- /H+A==
+ bh=+YTQPSRa7wIGfMOHKJcDIJtbiajs8gBf9sLY+UjyvJI=;
+ b=FpY8A4WEPbglTlZeEI7EV5gOhMujrXdRoz8G+oo80aWvAyeqpg5MCiWqgF+J9vpiN+
+ LY9c9J+B0bZnCGkX+SE+U/vttDGxajOd2+Emlh8umLnKsHxlOPYnRAWZpTIda0CyynB6
+ 9+7/SNJm+rrqnt/2ZURP6bha4YiEvRPmpbMFKwl4Gi8t9JY4SOVKAoQmOtvOMTEhGLrd
+ /EkBrVgVKR0i2Mt4QwRs9AHGziA6XDRMnpvy1xpxAqY2n8MflZ6LSE+e8TZCsIVZhMKN
+ zahGDdVyMn0zuOV+q0kB4GQYQBY6Xm2d9qmDVYmjSig9SIRZ7gz0isStbt+0H8QGcVQ/
+ 5OiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=5MvRykgMTcIF07iOKyUuKHIQ1MzsLcRrDLZyuwy1N1o=;
- b=a3WxBo+2/44HOQIojpHsR+xIeXWm62QvzFoBtSiEdZ3/UD48Vm0SKORcfgbe8+eUW+
- GhTEKNGrMpg1+J8JiHLRZ3YAYsNWsbstMeA6GdHxBEEaEtUs2SLeON2amofW4rgzdzcJ
- ZF6yyxXAeu9N76zKQV893b9zYO9E2D9wBJQ21EfvbrGOVHMj+9cLvl+HPfEFeJTIiNSd
- GTLXddgGZTFB+Dvm8FqQX+/gpmGbjkS1U0MuiUUCJloCa6MrSE+vz0Meuj0bzzXlyCC6
- MCTvD/rDaj9ZVWCWw3MenMKfgM+mXDjEd86Qi3kVRRPAm839K8Zs21pwlGMmlO2Or2wI
- enOw==
-X-Gm-Message-State: AOAM530xrR90tNBh4IFIjQz1KnYDCwv87jjXCHZzBCn/ZIrgIX+DqxUh
- QaH9ZFk7HWyzfLg1X7FjGPGMNR7/Cv4cfA==
-X-Google-Smtp-Source: ABdhPJzg9tDuWdHtBjmSpKL5i6ew3SYrDxM8rzzcJec1O2C/Dcqcq/HGkprWu4uE+Y74VvfT9sX8og==
-X-Received: by 2002:a63:50c:: with SMTP id 12mr1768523pgf.173.1598890028847;
- Mon, 31 Aug 2020 09:07:08 -0700 (PDT)
+ bh=+YTQPSRa7wIGfMOHKJcDIJtbiajs8gBf9sLY+UjyvJI=;
+ b=p64gD2pZ1983popEEitFK3vu/oNsDdqYHrP/jAXR7EohAtxY4Ya3BMYrtPliJHzirM
+ tkzW9eQR668WRZdqcQU0wCA3TQmc6hFid0ms7/torpMaN/8fTS2fl7ZvotH906y3hk3w
+ D0F/7eNlGoCbWj/waRzN2YlQisAeqWcrGG12xxVS0ErLKXl3P3Z0bmQfT+THW0qI3Tmc
+ ha8rwBfEVRJkCjEaMBk76wvtMfd6X4dfpP4t/saJtN/M+HeZWMxDvV4EYRgXZ8AgLoVp
+ 85jfnxvE+NRmaKH7KBAsb5CoM+JN/pGoLs1Gcsb/wTV4iEJRHqQCu0LM4af0JfWXvzdr
+ 1zbA==
+X-Gm-Message-State: AOAM5330cY5GIG85wHLgHGEzn5GNWzSO0TZeUmo+bb27mE+XrQzgwHFE
+ oDBspeNZUg8oF8HD6jqeHOWvEkYuhVom6g==
+X-Google-Smtp-Source: ABdhPJwSVlogUkYoObcMNbMKGsKurYVfMZ8nFpiiUaRh01JEQb87mKH1SkXTagh8gcRKwOuuqJjFqQ==
+X-Received: by 2002:a65:568b:: with SMTP id v11mr1749842pgs.396.1598890036570; 
+ Mon, 31 Aug 2020 09:07:16 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.07.07
+ by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.07.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 31 Aug 2020 09:07:08 -0700 (PDT)
+ Mon, 31 Aug 2020 09:07:15 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 48/76] target/microblaze: Fix cpu unwind for fpu exceptions
-Date: Mon, 31 Aug 2020 09:05:33 -0700
-Message-Id: <20200831160601.833692-49-richard.henderson@linaro.org>
+Subject: [PULL 54/76] target/microblaze: Assert no overlap in flags making up
+ tb_flags
+Date: Mon, 31 Aug 2020 09:05:39 -0700
+Message-Id: <20200831160601.833692-55-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200831160601.833692-1-richard.henderson@linaro.org>
 References: <20200831160601.833692-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,165 +105,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Restore the correct PC when an exception must be raised.
+Create MSR_TB_MASK.  Use it in cpu_get_tb_cpu_state, and check
+that IFLAGS_TB_MASK does not overlap.
 
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/op_helper.c | 37 +++++++++++++++++++----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+ target/microblaze/cpu.h | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/target/microblaze/op_helper.c b/target/microblaze/op_helper.c
-index d99d98051a..2c59d4492d 100644
---- a/target/microblaze/op_helper.c
-+++ b/target/microblaze/op_helper.c
-@@ -104,13 +104,16 @@ uint32_t helper_divu(CPUMBState *env, uint32_t a, uint32_t b)
- }
- 
- /* raise FPU exception.  */
--static void raise_fpu_exception(CPUMBState *env)
-+static void raise_fpu_exception(CPUMBState *env, uintptr_t ra)
- {
-+    CPUState *cs = env_cpu(env);
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 594501e4e7..2fc7cf26f1 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -261,8 +261,11 @@ struct CPUMBState {
+ #define DRTE_FLAG	(1 << 17)
+ #define DRTB_FLAG	(1 << 18)
+ #define D_FLAG		(1 << 19)  /* Bit in ESR.  */
 +
-     env->esr = ESR_EC_FPU;
--    helper_raise_exception(env, EXCP_HW_EXCP);
-+    cs->exception_index = EXCP_HW_EXCP;
-+    cpu_loop_exit_restore(cs, ra);
- }
+ /* TB dependent CPUMBState.  */
+ #define IFLAGS_TB_MASK  (D_FLAG | IMM_FLAG | DRTI_FLAG | DRTE_FLAG | DRTB_FLAG)
++#define MSR_TB_MASK     (MSR_UM | MSR_VM | MSR_EE)
++
+     uint32_t iflags;
  
--static void update_fpu_flags(CPUMBState *env, int flags)
-+static void update_fpu_flags(CPUMBState *env, int flags, uintptr_t ra)
+ #if !defined(CONFIG_USER_ONLY)
+@@ -372,12 +375,14 @@ typedef MicroBlazeCPU ArchCPU;
+ 
+ #include "exec/cpu-all.h"
+ 
++/* Ensure there is no overlap between the two masks. */
++QEMU_BUILD_BUG_ON(MSR_TB_MASK & IFLAGS_TB_MASK);
++
+ static inline void cpu_get_tb_cpu_state(CPUMBState *env, target_ulong *pc,
+                                         target_ulong *cs_base, uint32_t *flags)
  {
-     int raise = 0;
- 
-@@ -133,7 +136,7 @@ static void update_fpu_flags(CPUMBState *env, int flags)
-     if (raise
-         && (env->pvr.regs[2] & PVR2_FPU_EXC_MASK)
-         && (env->msr & MSR_EE)) {
--        raise_fpu_exception(env);
-+        raise_fpu_exception(env, ra);
-     }
+     *pc = env->pc;
+-    *flags = (env->iflags & IFLAGS_TB_MASK) |
+-             (env->msr & (MSR_UM | MSR_VM | MSR_EE));
++    *flags = (env->iflags & IFLAGS_TB_MASK) | (env->msr & MSR_TB_MASK);
+     *cs_base = (*flags & IMM_FLAG ? env->imm : 0);
  }
  
-@@ -148,7 +151,7 @@ uint32_t helper_fadd(CPUMBState *env, uint32_t a, uint32_t b)
-     fd.f = float32_add(fa.f, fb.f, &env->fp_status);
- 
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags);
-+    update_fpu_flags(env, flags, GETPC());
-     return fd.l;
- }
- 
-@@ -162,7 +165,7 @@ uint32_t helper_frsub(CPUMBState *env, uint32_t a, uint32_t b)
-     fb.l = b;
-     fd.f = float32_sub(fb.f, fa.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags);
-+    update_fpu_flags(env, flags, GETPC());
-     return fd.l;
- }
- 
-@@ -176,7 +179,7 @@ uint32_t helper_fmul(CPUMBState *env, uint32_t a, uint32_t b)
-     fb.l = b;
-     fd.f = float32_mul(fa.f, fb.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags);
-+    update_fpu_flags(env, flags, GETPC());
- 
-     return fd.l;
- }
-@@ -191,7 +194,7 @@ uint32_t helper_fdiv(CPUMBState *env, uint32_t a, uint32_t b)
-     fb.l = b;
-     fd.f = float32_div(fb.f, fa.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags);
-+    update_fpu_flags(env, flags, GETPC());
- 
-     return fd.l;
- }
-@@ -206,7 +209,7 @@ uint32_t helper_fcmp_un(CPUMBState *env, uint32_t a, uint32_t b)
- 
-     if (float32_is_signaling_nan(fa.f, &env->fp_status) ||
-         float32_is_signaling_nan(fb.f, &env->fp_status)) {
--        update_fpu_flags(env, float_flag_invalid);
-+        update_fpu_flags(env, float_flag_invalid, GETPC());
-         r = 1;
-     }
- 
-@@ -229,7 +232,7 @@ uint32_t helper_fcmp_lt(CPUMBState *env, uint32_t a, uint32_t b)
-     fb.l = b;
-     r = float32_lt(fb.f, fa.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags & float_flag_invalid);
-+    update_fpu_flags(env, flags & float_flag_invalid, GETPC());
- 
-     return r;
- }
-@@ -245,7 +248,7 @@ uint32_t helper_fcmp_eq(CPUMBState *env, uint32_t a, uint32_t b)
-     fb.l = b;
-     r = float32_eq_quiet(fa.f, fb.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags & float_flag_invalid);
-+    update_fpu_flags(env, flags & float_flag_invalid, GETPC());
- 
-     return r;
- }
-@@ -261,7 +264,7 @@ uint32_t helper_fcmp_le(CPUMBState *env, uint32_t a, uint32_t b)
-     set_float_exception_flags(0, &env->fp_status);
-     r = float32_le(fa.f, fb.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags & float_flag_invalid);
-+    update_fpu_flags(env, flags & float_flag_invalid, GETPC());
- 
- 
-     return r;
-@@ -277,7 +280,7 @@ uint32_t helper_fcmp_gt(CPUMBState *env, uint32_t a, uint32_t b)
-     set_float_exception_flags(0, &env->fp_status);
-     r = float32_lt(fa.f, fb.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags & float_flag_invalid);
-+    update_fpu_flags(env, flags & float_flag_invalid, GETPC());
-     return r;
- }
- 
-@@ -291,7 +294,7 @@ uint32_t helper_fcmp_ne(CPUMBState *env, uint32_t a, uint32_t b)
-     set_float_exception_flags(0, &env->fp_status);
-     r = !float32_eq_quiet(fa.f, fb.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags & float_flag_invalid);
-+    update_fpu_flags(env, flags & float_flag_invalid, GETPC());
- 
-     return r;
- }
-@@ -306,7 +309,7 @@ uint32_t helper_fcmp_ge(CPUMBState *env, uint32_t a, uint32_t b)
-     set_float_exception_flags(0, &env->fp_status);
-     r = !float32_lt(fa.f, fb.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags & float_flag_invalid);
-+    update_fpu_flags(env, flags & float_flag_invalid, GETPC());
- 
-     return r;
- }
-@@ -330,7 +333,7 @@ uint32_t helper_fint(CPUMBState *env, uint32_t a)
-     fa.l = a;
-     r = float32_to_int32(fa.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags);
-+    update_fpu_flags(env, flags, GETPC());
- 
-     return r;
- }
-@@ -344,7 +347,7 @@ uint32_t helper_fsqrt(CPUMBState *env, uint32_t a)
-     fa.l = a;
-     fd.l = float32_sqrt(fa.f, &env->fp_status);
-     flags = get_float_exception_flags(&env->fp_status);
--    update_fpu_flags(env, flags);
-+    update_fpu_flags(env, flags, GETPC());
- 
-     return fd.l;
- }
 -- 
 2.25.1
 
