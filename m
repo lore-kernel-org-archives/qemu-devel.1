@@ -2,78 +2,91 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63EA1C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 10:31:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E18BEC433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 10:38:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C9212083E
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 10:31:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C9212083E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id A8EC12083E
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 10:38:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tp5O6A81"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8EC12083E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36882 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCh61-0007NQ-DD
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 06:31:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39924)
+	id 1kChCQ-0001dg-NQ
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 06:38:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kCh5P-0006u8-8o
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 06:30:51 -0400
-Received: from indium.canonical.com ([91.189.90.7]:46662)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kChBt-0001DL-TL
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 06:37:33 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:46874)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kCh5N-0004Hf-5r
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 06:30:51 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kCh5H-0003eW-Jn
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 10:30:43 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 9091E2E8025
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 10:30:43 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kChBs-000542-AX
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 06:37:33 -0400
+Received: by mail-ej1-x641.google.com with SMTP id d11so7738645ejt.13
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 03:37:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=+1JBvc9O72wvn+zT2o7QhV2iaeu3pOujw+5wQB67d4c=;
+ b=tp5O6A815chXK9TizIr0PrehSY27cOFpd5Yq5IWf6eahpuv6gjIacjfcZB+jAZjgYI
+ de55eqXAy4dPwa3/aUEp2juhYa0YgSE9C2X1LfDR4mkT58wmJJ8RwwmgNNejW3wzUSQE
+ 6fZpzrfIwXqbP7hmH4Xvbv27myk8hMGCx3sIRBLB+tRZq3LZqyub4gkds8aT8Hgab1qT
+ mT5w1k/kFa2dVIpg98S/WHaeMJciqL9qIA266sb7fEVDeIBGfhBtRQwtQ8VToVK4ip6a
+ 48vmdm1RCR0nsRu4xGAl3yUWprddMSh2xaFI6v3/TN038g9q2virysKKLnP+nlKJ52BF
+ sTkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=+1JBvc9O72wvn+zT2o7QhV2iaeu3pOujw+5wQB67d4c=;
+ b=BT8Vg8G5WquWwDB7ckLQU2wCdfBFYwYAVjZwsymNQupEVWN0AtJQwnOotppwM4/fER
+ 2T3DEaVH60lWvMFpKafNPqPty9tV5KK8C3U2/xg5blDkPbgdDCjseFTdB9WbqddswFMO
+ QPB72bDaVNV0N5/VlPXUEk6untwCFEq7ogaflZ4Nk8rvz82rsZ+myOD+0RTr0IyCHyF8
+ GovCUPNQRaLJobqYY+ugGYW6NUe3bmjgInbFslxovVhLCxMoEjXBCOu3G82pMlD4fDhl
+ VKDe80XZehosAEuUl0eAXvMsC82PBQZuTJ5tuv5v+yM7ceIHPaidhE/JPKqL/iPCAhDv
+ ZSjg==
+X-Gm-Message-State: AOAM530TUriHIxrnAnwTeKLMybhH35d7aMg4FuT9/9k07dcTv1wNItq1
+ A++RpxqRmekNVJQDwZrVTk7P8Sy4t3qGOkwi70o=
+X-Google-Smtp-Source: ABdhPJzON3Mf/LsSL4qzRBzmTcIUBFJBJMuLYV+ET99i07Wh7Z/V0neZfX+YmYxnB4NtvLfLEb+lCecLoFsU+uD8g/M=
+X-Received: by 2002:a17:906:52c2:: with SMTP id
+ w2mr501769ejn.389.1598870250457; 
+ Mon, 31 Aug 2020 03:37:30 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 31 Aug 2020 10:24:49 -0000
-From: Tom Yan <1893634@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: tom-ty89
-X-Launchpad-Bug-Reporter: Tom Yan (tom-ty89)
-X-Launchpad-Bug-Modifier: Tom Yan (tom-ty89)
-Message-Id: <159886949002.28151.4021199873744523881.malonedeb@soybean.canonical.com>
-Subject: [Bug 1893634] [NEW] blk_get_max_transfer() works only with sg
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
-X-Launchpad-Hash: 879f296fbfa2f1063942581bcb2f63b31a39b0bb
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 04:40:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20200831084937.8298-1-pbonzini@redhat.com>
+In-Reply-To: <20200831084937.8298-1-pbonzini@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Mon, 31 Aug 2020 14:37:18 +0400
+Message-ID: <CAJ+F1C+PEbQ7+9NcO4f_Dab50bOQGWHcpsRD+vGF15dM8GNsZw@mail.gmail.com>
+Subject: Re: [PATCH] configure: do not include ${prefix} in firmwarepath
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000520cf905ae29fd17"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,62 +95,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1893634 <1893634@bugs.launchpad.net>
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+--000000000000520cf905ae29fd17
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-blk_get_max_transfer() is supposed to be able to get the max_sectors
-queue limit of the scsi device on the host side and is used in both
-scsi-generic.c (for scsi-generic and scsi-block) and scsi-disk.c (for
-scsi-hd) to set/change the max_xfer_len (and opt_xfer_len in the case of
-scsi-generic).
+On Mon, Aug 31, 2020 at 12:50 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-However, it only works with the sg driver in doing so. It cannot get the
-queue limit with the sd driver and simply returns MAX_INT.
+> Left out in commit 22a87800e6 ("configure: expand path variables for
+> meson configure", 2020-08-21), do it now.
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>
 
-qemu version 5.1.0
-kernel version 5.8.5
+lgtm
 
-Btw, is there a particular reason that it doesn't MIN_NON_ZERO against
-the original max_xfer_len:
-https://github.com/qemu/qemu/blob/v5.1.0/hw/scsi/scsi-generic.c#L172?
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
 
--- =
+---
+>  configure | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/configure b/configure
+> index 56ceca2f68..d15ecbee46 100755
+> --- a/configure
+> +++ b/configure
+> @@ -473,7 +473,6 @@ LDFLAGS_SHARED=3D"-shared"
+>  modules=3D"no"
+>  module_upgrades=3D"no"
+>  prefix=3D"/usr/local"
+> -firmwarepath=3D"\${prefix}/share/qemu-firmware"
+>  qemu_suffix=3D"qemu"
+>  slirp=3D""
+>  oss_lib=3D""
+> @@ -1672,6 +1671,7 @@ for opt do
+>    esac
+>  done
+>
+> +firmwarepath=3D"${firmwarepath:-$prefix/share/qemu-firmware}"
+>  libdir=3D"${libdir:-$prefix/lib}"
+>  libexecdir=3D"${libexecdir:-$prefix/libexec}"
+>  includedir=3D"${includedir:-$prefix/include}"
+> --
+> 2.26.2
+>
+>
+>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1893634
+--=20
+Marc-Andr=C3=A9 Lureau
 
-Title:
-  blk_get_max_transfer() works only with sg
+--000000000000520cf905ae29fd17
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Status in QEMU:
-  New
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Aug 31, 2020 at 12:50 PM Paol=
+o Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a=
+>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
+ 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Lef=
+t out in commit 22a87800e6 (&quot;configure: expand path variables for<br>
+meson configure&quot;, 2020-08-21), do it now.<br>
+<br>
+Signed-off-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" tar=
+get=3D"_blank">pbonzini@redhat.com</a>&gt;<br></blockquote><div><br></div><=
+div>lgtm</div><div><br></div><div>Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<=
+a href=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</=
+a>&gt;</div><div><br></div><div> <br></div><blockquote class=3D"gmail_quote=
+" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
+padding-left:1ex">
+---<br>
+=C2=A0configure | 2 +-<br>
+=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
+<br>
+diff --git a/configure b/configure<br>
+index 56ceca2f68..d15ecbee46 100755<br>
+--- a/configure<br>
++++ b/configure<br>
+@@ -473,7 +473,6 @@ LDFLAGS_SHARED=3D&quot;-shared&quot;<br>
+=C2=A0modules=3D&quot;no&quot;<br>
+=C2=A0module_upgrades=3D&quot;no&quot;<br>
+=C2=A0prefix=3D&quot;/usr/local&quot;<br>
+-firmwarepath=3D&quot;\${prefix}/share/qemu-firmware&quot;<br>
+=C2=A0qemu_suffix=3D&quot;qemu&quot;<br>
+=C2=A0slirp=3D&quot;&quot;<br>
+=C2=A0oss_lib=3D&quot;&quot;<br>
+@@ -1672,6 +1671,7 @@ for opt do<br>
+=C2=A0 =C2=A0esac<br>
+=C2=A0done<br>
+<br>
++firmwarepath=3D&quot;${firmwarepath:-$prefix/share/qemu-firmware}&quot;<br=
+>
+=C2=A0libdir=3D&quot;${libdir:-$prefix/lib}&quot;<br>
+=C2=A0libexecdir=3D&quot;${libexecdir:-$prefix/libexec}&quot;<br>
+=C2=A0includedir=3D&quot;${includedir:-$prefix/include}&quot;<br>
+-- <br>
+2.26.2<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
 
-Bug description:
-  blk_get_max_transfer() is supposed to be able to get the max_sectors
-  queue limit of the scsi device on the host side and is used in both
-  scsi-generic.c (for scsi-generic and scsi-block) and scsi-disk.c (for
-  scsi-hd) to set/change the max_xfer_len (and opt_xfer_len in the case
-  of scsi-generic).
-
-  However, it only works with the sg driver in doing so. It cannot get
-  the queue limit with the sd driver and simply returns MAX_INT.
-
-  qemu version 5.1.0
-  kernel version 5.8.5
-
-  Btw, is there a particular reason that it doesn't MIN_NON_ZERO against
-  the original max_xfer_len:
-  https://github.com/qemu/qemu/blob/v5.1.0/hw/scsi/scsi-generic.c#L172?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1893634/+subscriptions
+--000000000000520cf905ae29fd17--
 
