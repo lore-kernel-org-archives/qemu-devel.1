@@ -2,76 +2,87 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6202BC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:08:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0FDEC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:08:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ED3D2054F
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:08:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ED3D2054F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id B74F2206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:08:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+j1Ezq8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B74F2206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kChfc-0000Eg-AE
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:08:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48174)
+	id 1kChg2-0001Dy-Tk
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:08:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kCher-00070O-Bn
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:07:29 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:50495)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kChep-0000Qs-3O
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:07:28 -0400
-Received: from localhost.localdomain ([82.252.135.186]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Mna0x-1ktm6G3P5Z-00jczK; Mon, 31 Aug 2020 13:07:22 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/8] linux-user: Add support for a group of btrfs ioctls used
- for subvolumes
-Date: Mon, 31 Aug 2020 13:07:09 +0200
-Message-Id: <20200831110716.536808-2-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200831110716.536808-1-laurent@vivier.eu>
-References: <20200831110716.536808-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCheQ-00068f-LJ
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:07:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59422)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCheO-0000Nu-UZ
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:07:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598872020;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=6wOofA9NB1IMuwXXUSEQIzql8pEf/WvvBNBuZh0rxEo=;
+ b=N+j1Ezq8I5v6ReIwZvqPRsc5hQYVlnyvfd93l6zqMtDq9IGCCrYpv+BVTlHkjaFcy5PdbB
+ bGl9+kBIi1lvfDckk2rYKOTPE0lbEFDRXK9ykAHnscw9Ku+FSpwPuxPXJJoYBppq6NfPGQ
+ sT9TnZLUR8sSmaoTykitmc1fJyRPIpU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-106-UpZ6pSDfMNKO_5H6VvBAAg-1; Mon, 31 Aug 2020 07:06:57 -0400
+X-MC-Unique: UpZ6pSDfMNKO_5H6VvBAAg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2273D185BDE1
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:06:57 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD2E65C221;
+ Mon, 31 Aug 2020 11:06:56 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 80A87ED9; Mon, 31 Aug 2020 13:06:55 +0200 (CEST)
+Date: Mon, 31 Aug 2020 13:06:55 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] meson: use pkg-config method to find dependencies
+Message-ID: <20200831110655.uj6f2hq3yyygqqox@sirius.home.kraxel.org>
+References: <20200831102819.24334-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:mDIX00i5rwNVd18k6fob77XJ0HwvkSafRmtQb1M9HWRLZ3xRHM2
- eEYWG+r8bL+dPWHwTXX1d+tA9n2JKZtfP0xGNNpjphyBBgpPjKUV0/k1hESxpLgt1wNwmpo
- Ectb3F0azKxVhiwZpouYDgoJ1vz7qujeMBMNikItzkcta9gbL1pLu7ydaAEPAZgUHq+TUop
- cG2i+ossi2tDdEq7A4IVw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:NC5yaROxCxo=:irvFPG5r6XdTH+xxCp234a
- B6aiQmiVAbY3xeEnPn5Ve4YZmRrynslBY7J6MQSjrnuLH1VXLMHBQqHvOGz0ZVXicjnwzGQxa
- nelJd7oxo8K0wGPzmdaBwu+B1FAwQaygwNQe/zS4LePER4CSi0GM+bHMm0kSvwfSRxzsO2aYg
- 4F4go/jIhU3rw+JjwB87DwJbeVJDMif52k6ksnE4AEHCZKZbgVMybbZ/Jrdj9sTBXE7UVRcGR
- VF8559M4k0AB7UNqjaK1yfmc30/mq1PrECA6Ijt5pfz4VixP/lj3GDdziuAF932uiAJUlRSAq
- 1qEVyoQkC8b9SQMVouy2fQQ81IjkoOgmTfydUEmzLU/qhs+32X+sqsRl8XZJrbuyO6gvdqZD+
- C1Kis+N/Raz/6N5aPgGzDrC5K8yGa9Ke8FLyLn9iK36u0C/RhG7q7TcvQMVQjP9uXJgA891H5
- Wd+rEL43Jf2SO+imcdZ2JnVOpkIpgnp4mpMMC80vSGHA6maMzZodMLUEFrw72qtYWQVt21pZp
- fBaXHFOFuZOoQSbPltu1IvmxITJvBvJT4byd52aX7EPiF5TlG7HI+tR3WrwimL8VgYg/I1u4+
- CqKDbS/nd1xqFV5TIiqu3xhKUeL8qwfRabGvhsrI1eLq2b4Iy3UIoRRjrMFuxUzeHI7o4dabD
- +cAtILoFfIKMY+pZitNZLEv1Qn0DjwdUY/Sp5vQWlJ52lHmDBHRnGxUr0I86Gb/HPhNvYXog0
- dmDOqHfQAlPu33MHoYvfxynfiJz8Z4SxQ9PdFstCg2GwnSZ9CJg7uSeGjYE6zz1hOYZZIjH7h
- lDiDcLikgFGiAV/qKfxySUoKiHYGJ4/BiDtfUKGa9JAERyE/FZAe1Ad/Yf1GXylanoD1lcG
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 07:07:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200831102819.24334-1-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:02:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,267 +95,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+  Hi,
 
-This patch implements functionality of following ioctls:
+> Keep "auto" for SDL so that it tries using
+> sdl-config too.
 
-BTRFS_IOC_SUBVOL_CREATE - Creating a btrfs subvolume
+> -  sdl = dependency('sdl2',
+> -                   required: get_option('sdl'),
+> +  sdl = dependency('sdl2', required: get_option('sdl'),
+> +                   method: 'pkg-config',
 
-    Create a btrfs subvolume. The subvolume is created using the ioctl's
-    third argument which represents a pointer to a following structure
-    type:
+code and commit message mismatch here.
 
-    struct btrfs_ioctl_vol_args {
-	__s64 fd;
-	char name[BTRFS_PATH_NAME_MAX + 1];
-    };
-
-    Before calling this ioctl, the fields of this structure should be filled
-    with aproppriate values. The fd field represents the file descriptor
-    value of the subvolume and the name field represents the subvolume
-    path.
-
-BTRFS_IOC_SUBVOL_GETFLAGS - Getting subvolume flags
-
-    Read the flags of the btrfs subvolume. The flags are read using
-    the ioctl's third argument that is a pointer of __u64 (unsigned long).
-    The third argument represents a bit mask that can be composed of following
-    values:
-    BTRFS_SUBVOL_RDONLY           (1ULL << 1)
-    BTRFS_SUBVOL_QGROUP_INHERIT   (1ULL << 2)
-    BTRFS_DEVICE_SPEC_BY_ID       (1ULL << 3)
-    BTRFS_SUBVOL_SPEC_BY_ID       (1ULL << 4)
-
-BTRFS_IOC_SUBVOL_SETFLAGS - Setting subvolume flags
-
-    Set the flags of the btrfs subvolume. The flags are set using the
-    ioctl's third argument that is a pointer of __u64 (unsigned long).
-    The third argument represents a bit mask that can be composed of same
-    values as in the case of previous ioctl (BTRFS_IOC_SUBVOL_GETFLAGS).
-
-BTRFS_IOC_SUBVOL_GETINFO - Getting subvolume information
-
-    Read information about the subvolume. The subvolume information is
-    returned in the ioctl's third argument which represents a pointer to
-    a following structure type:
-
-    struct btrfs_ioctl_get_subvol_info_args {
-	/* Id of this subvolume */
-	__u64 treeid;
-
-	/* Name of this subvolume, used to get the real name at mount point */
-	char name[BTRFS_VOL_NAME_MAX + 1];
-
-	/*
-	 * Id of the subvolume which contains this subvolume.
-	 * Zero for top-level subvolume or a deleted subvolume.
-	 */
-	__u64 parent_id;
-
-	/*
-	 * Inode number of the directory which contains this subvolume.
-	 * Zero for top-level subvolume or a deleted subvolume
-	 */
-	__u64 dirid;
-
-	/* Latest transaction id of this subvolume */
-	__u64 generation;
-
-	/* Flags of this subvolume */
-	__u64 flags;
-
-	/* UUID of this subvolume */
-	__u8 uuid[BTRFS_UUID_SIZE];
-
-	/*
-	 * UUID of the subvolume of which this subvolume is a snapshot.
-	 * All zero for a non-snapshot subvolume.
-	 */
-	__u8 parent_uuid[BTRFS_UUID_SIZE];
-
-	/*
-	 * UUID of the subvolume from which this subvolume was received.
-	 * All zero for non-received subvolume.
-	 */
-	__u8 received_uuid[BTRFS_UUID_SIZE];
-
-	/* Transaction id indicating when change/create/send/receive happened */
-	__u64 ctransid;
-	__u64 otransid;
-	__u64 stransid;
-	__u64 rtransid;
-	/* Time corresponding to c/o/s/rtransid */
-	struct btrfs_ioctl_timespec ctime;
-	struct btrfs_ioctl_timespec otime;
-	struct btrfs_ioctl_timespec stime;
-	struct btrfs_ioctl_timespec rtime;
-
-	/* Must be zero */
-	__u64 reserved[8];
-     };
-
-     All of the fields of this structure are filled after the ioctl call.
-
-Implementation notes:
-
-    Ioctls BTRFS_IOC_SUBVOL_CREATE and BTRFS_IOC_SUBVOL_GETINFO have structure
-    types as third arguments. That is the reason why a corresponding definition
-    are added in file 'linux-user/syscall_types.h'.
-
-    The line '#include <linux/btrfs.h>' is added in file 'linux-user/syscall.c' to
-    recognise preprocessor definitions for these ioctls. Since the file "linux/btrfs.h"
-    was added in the kernel version 3.9, it is enwrapped in an #ifdef statement
-    with parameter CONFIG_BTRFS which is defined in 'configure' if the
-    header file is present.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Tested-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200823195014.116226-2-Filip.Bozuta@syrmia.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- configure                  |  9 +++++++++
- linux-user/ioctls.h        | 15 +++++++++++++++
- linux-user/syscall.c       |  3 +++
- linux-user/syscall_defs.h  |  8 ++++++++
- linux-user/syscall_types.h | 32 ++++++++++++++++++++++++++++++++
- 5 files changed, 67 insertions(+)
-
-diff --git a/configure b/configure
-index 6ecaff429b1b..24a6146b14c7 100755
---- a/configure
-+++ b/configure
-@@ -4939,6 +4939,12 @@ if check_include sys/kcov.h ; then
-     kcov=yes
- fi
- 
-+# check for btrfs filesystem support (kernel must be 3.9+)
-+btrfs=no
-+if check_include linux/btrfs.h ; then
-+    btrfs=yes
-+fi
-+
- # If we're making warnings fatal, apply this to Sphinx runs as well
- sphinx_werror=""
- if test "$werror" = "yes"; then
-@@ -6918,6 +6924,9 @@ fi
- if test "$kcov" = "yes" ; then
-   echo "CONFIG_KCOV=y" >> $config_host_mak
- fi
-+if test "$btrfs" = "yes" ; then
-+  echo "CONFIG_BTRFS=y" >> $config_host_mak
-+fi
- if test "$inotify" = "yes" ; then
-   echo "CONFIG_INOTIFY=y" >> $config_host_mak
- fi
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index e2fc09b5a5ee..bf89b96d27b0 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -174,6 +174,21 @@
-      IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
-      IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
- 
-+#ifdef BTRFS_IOC_SUBVOL_CREATE
-+     IOCTL(BTRFS_IOC_SUBVOL_CREATE, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
-+#endif
-+#ifdef BTRFS_IOC_SUBVOL_GETFLAGS
-+     IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
-+#endif
-+#ifdef BTRFS_IOC_SUBVOL_SETFLAGS
-+     IOCTL(BTRFS_IOC_SUBVOL_SETFLAGS, IOC_W, MK_PTR(TYPE_ULONGLONG))
-+#endif
-+#ifdef BTRFS_IOC_GET_SUBVOL_INFO
-+     IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
-+#endif
-+
- #ifdef CONFIG_USBFS
-   /* USB ioctls */
-   IOCTL(USBDEVFS_CONTROL, IOC_RW,
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index d14d849a720c..93da3b972852 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -112,6 +112,9 @@
- #include <linux/if_alg.h>
- #include <linux/rtc.h>
- #include <sound/asound.h>
-+#ifdef CONFIG_BTRFS
-+#include <linux/btrfs.h>
-+#endif
- #ifdef HAVE_DRM_H
- #include <libdrm/drm.h>
- #include <libdrm/i915_drm.h>
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 9d07991176b8..cae79f8492e1 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1005,6 +1005,14 @@ struct target_rtc_pll_info {
- #define TARGET_FS_IOC32_GETVERSION TARGET_IOR('v', 1, int)
- #define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
- 
-+/* btrfs ioctls */
-+#define TARGET_BTRFS_IOC_SUBVOL_CREATE          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 14)
-+#define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, 25,\
-+                                                           abi_ullong)
-+#define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, 26,\
-+                                                           abi_ullong)
-+#define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IORU(BTRFS_IOCTL_MAGIC, 60)
-+
- /* usb ioctls */
- #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
- #define TARGET_USBDEVFS_BULK TARGET_IOWRU('U', 2)
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 12bf3484e2bd..0ce58d77727c 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -358,6 +358,38 @@ STRUCT(blkpg_partition,
-        MK_ARRAY(TYPE_CHAR, BLKPG_DEVNAMELTH), /* devname */
-        MK_ARRAY(TYPE_CHAR, BLKPG_VOLNAMELTH)) /* volname */
- 
-+#ifdef BTRFS_IOC_SUBVOL_CREATE
-+STRUCT(btrfs_ioctl_vol_args,
-+       TYPE_LONGLONG, /* fd */
-+       MK_ARRAY(TYPE_CHAR, BTRFS_PATH_NAME_MAX + 1)) /* name */
-+#endif
-+
-+#ifdef BTRFS_IOC_GET_SUBVOL_INFO
-+STRUCT(btrfs_ioctl_timespec,
-+       TYPE_ULONGLONG, /* sec */
-+       TYPE_INT) /* nsec */
-+
-+STRUCT(btrfs_ioctl_get_subvol_info_args,
-+       TYPE_ULONGLONG, /* treeid */
-+       MK_ARRAY(TYPE_CHAR, BTRFS_VOL_NAME_MAX + 1),
-+       TYPE_ULONGLONG, /* parentid */
-+       TYPE_ULONGLONG, /* dirid */
-+       TYPE_ULONGLONG, /* generation */
-+       TYPE_ULONGLONG, /* flags */
-+       MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* uuid */
-+       MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* parent_uuid */
-+       MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* received_uuid */
-+       TYPE_ULONGLONG, /* ctransid */
-+       TYPE_ULONGLONG, /* otransid */
-+       TYPE_ULONGLONG, /* stransid */
-+       TYPE_ULONGLONG, /* rtransid */
-+       MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* ctime */
-+       MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* otime */
-+       MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* stime */
-+       MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* rtime */
-+       MK_ARRAY(TYPE_ULONGLONG, 8)) /* reserved */
-+#endif
-+
- STRUCT(rtc_time,
-        TYPE_INT, /* tm_sec */
-        TYPE_INT, /* tm_min */
--- 
-2.26.2
+take care,
+  Gerd
 
 
