@@ -7,59 +7,62 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751FFC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E89C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:36:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4222B2083E
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:35:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4222B2083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6A6602083E
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:36:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A6602083E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47970 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCrSi-0002PK-DQ
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:35:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47570)
+	id 1kCrTQ-00047R-BE
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:36:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kCrDg-0004Sl-HX; Mon, 31 Aug 2020 17:20:04 -0400
-Received: from mail-qv1-f65.google.com ([209.85.219.65]:40178)
+ id 1kCrDp-0004a9-DZ
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:20:13 -0400
+Received: from mail-qv1-f66.google.com ([209.85.219.66]:42217)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kCrDe-0001Yr-1U; Mon, 31 Aug 2020 17:20:04 -0400
-Received: by mail-qv1-f65.google.com with SMTP id s15so3336906qvv.7;
- Mon, 31 Aug 2020 14:20:01 -0700 (PDT)
+ id 1kCrDm-0001ZQ-F7
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:20:13 -0400
+Received: by mail-qv1-f66.google.com with SMTP id h1so1796429qvo.9
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:20:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=F2QmUjKxgknkTpjif27qNU+W0a1swYhjYlyfFRQE5ps=;
- b=UDMuFGn5LZI/xK+itCBMwDrJV45cBvPnS5pWtkfXA4/TSHfEH7w6AJegj+NFo9qG8H
- l/oEFH8a5ngg/5Q47x7lZ6VUlRipwfKGOKBkXv+fbnf352XsFdhsVXMTZGLxyEAg9zgp
- uCy3yCGpFnfNgun7CHLexhjUXoIFFUCtgfhHdJ/TyEVXzayJzb2N0DB57puUkoOWCs9z
- qyaVw2OOachbpmesxHAVJNpQQuKWko61iPG7VdhB6VhKYVfDD3Hagdlc03qDaVGxtlHx
- 3YjLM6HIgHUaxi93W40SkRW9vDyzUs9qVF8N+BMJH4bdW/Cwa4eRlp3Ss3Vi6k9/T5M4
- SB3w==
-X-Gm-Message-State: AOAM531SVd31oKgeIMiREI8FVIx7X5f8ilg+evOTtr4sQxPO6ODLERRo
- tHZ2YCCfLSN3ppZ+H0PDJwtphagdBCipI9d2MaA=
-X-Google-Smtp-Source: ABdhPJxlfYefVSpGHj3LcvER2ERQs9doqFE2fB12FC0NJob71KVT19K96pAdemnYxauGquUWL/PArQr4Yn5e4Tr9Bxw=
-X-Received: by 2002:a0c:f493:: with SMTP id i19mr3017469qvm.84.1598908800880; 
- Mon, 31 Aug 2020 14:20:00 -0700 (PDT)
+ bh=MzfXW+TMY6CFyIVBla0E0+8dA5AuvzaqhAaHY6HHukE=;
+ b=CKnBbizgUxqg43epZ/J2PpwWu6TZXsn6204Phe6jr34muPEaCNujZ0dGlOmfA5Z5eg
+ EOym+4Gz0aCV5ivuYbUaoL8vDazdffB8EHHyoZHHvOEJGundp6fFmxrnftbmlbyRj0Dx
+ vXhOEwAy1vtChr2hoV/+WsspvJ1DkSlXmHERGj3bmnXNkKYCALsuf8pQObIBDkE7WN8R
+ +Lyvfle27SJRcPtOk2EKYSlkCZETfm3yeVKJJ+z20sVzcp/GWVXHP9zQPS+NFk8roYaT
+ HCBHyVVienECwTAwbkEYkSrFZSBp2gxzvjoZM3fSOvJHyLMOTJoqsmjTurtfYZzO49nx
+ eqMw==
+X-Gm-Message-State: AOAM532WigqB7JXHdsT9hf9Mpo+xh/eHzXhg+NOVJKEGXSQvC6wUzEBk
+ MogYEXaaZajXTxrlTl4Xxo02OkV6o7N7I0TzjNY=
+X-Google-Smtp-Source: ABdhPJwajZYKO8UNA/Jgc7aLJDD+DsHjVMf3ZwM1pZGwjKvrJ9bQiw6aaReecbHJVVGoYrU2v9FHXsv/17Py9/kY8Wg=
+X-Received: by 2002:a0c:f9cd:: with SMTP id j13mr2960363qvo.227.1598908809546; 
+ Mon, 31 Aug 2020 14:20:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200827124335.30586-1-leif@nuviainc.com>
-In-Reply-To: <20200827124335.30586-1-leif@nuviainc.com>
+References: <20200828141929.77854-1-richard.henderson@linaro.org>
+ <20200828141929.77854-11-richard.henderson@linaro.org>
+In-Reply-To: <20200828141929.77854-11-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 31 Aug 2020 22:41:41 +0200
-Message-ID: <CAAdtpL6LAa9h2sBNN9v=3kvwqOabd4KwE4CksPAwK6ERYw0C5g@mail.gmail.com>
-Subject: Re: [PATCH v2] hw/arm/sbsa-ref: add "reg" property to DT cpu nodes
-To: Leif Lindholm <leif@nuviainc.com>
-Content-Type: multipart/alternative; boundary="0000000000001ad54305ae32f72e"
-Received-SPF: pass client-ip=209.85.219.65;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-qv1-f65.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 17:15:47
+Date: Mon, 31 Aug 2020 22:53:59 +0200
+Message-ID: <CAAdtpL5kz4fBLDYp1mDg9YRRJX3FU8U+jzWdBdAnNysUxZrvMw@mail.gmail.com>
+Subject: Re: [PATCH v2 10/76] target/microblaze: Split out BTR from env->sregs
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="0000000000009f0fe805ae32f775"
+Received-SPF: pass client-ip=209.85.219.66;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-qv1-f66.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 17:20:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -15
 X-Spam_score: -1.6
@@ -80,253 +83,279 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Graeme Gregory <graeme@nuviainc.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Tanmay Jagdale <tanmay.jagdale@linaro.org>,
- Radoslaw Biernacki <rad@semihalf.com>, qemu-devel@nongnu.org,
- qemu-arm <qemu-arm@nongnu.org>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000001ad54305ae32f72e
+--0000000000009f0fe805ae32f775
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Le jeu. 27 ao=C3=BBt 2020 14:45, Leif Lindholm <leif@nuviainc.com> a =C3=A9=
-crit :
+Le ven. 28 ao=C3=BBt 2020 16:26, Richard Henderson <richard.henderson@linar=
+o.org>
+a =C3=A9crit :
 
-> The sbsa-ref platform uses a minimal device tree to pass amount of memory
-> as well as number of cpus to the firmware. However, when dumping that
-> minimal dtb (with -M sbsa-virt,dumpdtb=3D<file>), the resulting blob
-> generates a warning when decompiled by dtc due to lack of reg property.
+> Continue eliminating the sregs array in favor of individual members.
+> Does not correct the width of BTR, yet.
 >
-> Add a simple reg property per cpu, representing a 64-bit MPIDR_EL1.
->
-> This also ends up being cleaner than having the firmware calculating its
-> own IDs for generating APCI.
->
-> Signed-off-by: Leif Lindholm <leif@nuviainc.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 >
 
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 ---
+>  target/microblaze/cpu.h       | 1 +
+>  target/microblaze/gdbstub.c   | 4 ++--
+>  target/microblaze/helper.c    | 4 ++--
+>  target/microblaze/translate.c | 6 ++++--
+>  4 files changed, 9 insertions(+), 6 deletions(-)
 >
-> As per Graeme's feedback, properly represent the MPIDR topology info
-> in the reg property rather than just counting cores (and update the
-> commit message on why this is useful).
-> I'm using the local helper function sbsa_ref_cpu_mp_affinity() for this,
-> and moving it up somewhat rather than adding a forward declaration.
+> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> index bcafef99b0..deddb47abb 100644
+> --- a/target/microblaze/cpu.h
+> +++ b/target/microblaze/cpu.h
+> @@ -241,6 +241,7 @@ struct CPUMBState {
+>      uint64_t ear;
+>      uint64_t esr;
+>      uint64_t fsr;
+> +    uint64_t btr;
+>      uint64_t sregs[14];
+>      float_status fp_status;
+>      /* Stack protectors. Yes, it's a hw feature.  */
+> diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c
+> index 2634ce49fc..cde8c169bf 100644
+> --- a/target/microblaze/gdbstub.c
+> +++ b/target/microblaze/gdbstub.c
+> @@ -74,7 +74,7 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray
+> *mem_buf, int n)
+>          val =3D env->fsr;
+>          break;
+>      case GDB_BTR:
+> -        val =3D env->sregs[SR_BTR];
+> +        val =3D env->btr;
+>          break;
+>      case GDB_PVR0 ... GDB_PVR11:
+>          /* PVR12 is intentionally skipped */
+> @@ -130,7 +130,7 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t
+> *mem_buf, int n)
+>          env->fsr =3D tmp;
+>          break;
+>      case GDB_BTR:
+> -        env->sregs[SR_BTR] =3D tmp;
+> +        env->btr =3D tmp;
+>          break;
+>      case GDB_PVR0 ... GDB_PVR11:
+>          /* PVR12 is intentionally skipped */
+> diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
+> index ea290be780..b240dc76f6 100644
+> --- a/target/microblaze/helper.c
+> +++ b/target/microblaze/helper.c
+> @@ -132,7 +132,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
+>              /* Exception breaks branch + dslot sequence?  */
+>              if (env->iflags & D_FLAG) {
+>                  env->esr |=3D 1 << 12 ;
+> -                env->sregs[SR_BTR] =3D env->btarget;
+> +                env->btr =3D env->btarget;
+>              }
 >
->  hw/arm/sbsa-ref.c | 29 +++++++++++++++++++++++------
->  1 file changed, 23 insertions(+), 6 deletions(-)
+>              /* Disable the MMU.  */
+> @@ -160,7 +160,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
+>              if (env->iflags & D_FLAG) {
+>                  D(qemu_log("D_FLAG set at exception bimm=3D%d\n",
+> env->bimm));
+>                  env->esr |=3D 1 << 12 ;
+> -                env->sregs[SR_BTR] =3D env->btarget;
+> +                env->btr =3D env->btarget;
 >
-> diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
-> index f030a416fd..3e65ded9a0 100644
-> --- a/hw/arm/sbsa-ref.c
-> +++ b/hw/arm/sbsa-ref.c
-> @@ -138,6 +138,12 @@ static const int sbsa_ref_irqmap[] =3D {
->      [SBSA_EHCI] =3D 11,
->  };
+>                  /* Reexecute the branch.  */
+>                  env->regs[17] -=3D 4;
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.=
+c
+> index c58c49ea8f..469e1f103a 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -1811,7 +1811,7 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int
+> flags)
+>                   "rbtr=3D%" PRIx64 "\n",
+>                   env->msr, env->esr, env->ear,
+>                   env->debug, env->imm, env->iflags, env->fsr,
+> -                 env->sregs[SR_BTR]);
+> +                 env->btr);
+>      qemu_fprintf(f, "btaken=3D%d btarget=3D%" PRIx64 " mode=3D%s(saved=
+=3D%s) "
+>                   "eip=3D%d ie=3D%d\n",
+>                   env->btaken, env->btarget,
+> @@ -1879,8 +1879,10 @@ void mb_tcg_init(void)
+>          tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, esr),
+> "resr");
+>      cpu_SR[SR_FSR] =3D
+>          tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, fsr),
+> "rfsr");
+> +    cpu_SR[SR_BTR] =3D
+> +        tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, btr),
+> "rbtr");
 >
-> +static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
-> +{
-> +    uint8_t clustersz =3D ARM_DEFAULT_CPUS_PER_CLUSTER;
-> +    return arm_cpu_mp_affinity(idx, clustersz);
-> +}
-> +
->  /*
->   * Firmware on this machine only uses ACPI table to load OS, these limit=
-ed
->   * device tree nodes are just to let firmware know the info which varies
-> from
-> @@ -183,14 +189,31 @@ static void create_fdt(SBSAMachineState *sms)
->          g_free(matrix);
->      }
->
-> +    /*
-> +     * From Documentation/devicetree/bindings/arm/cpus.yaml
-> +     *  On ARM v8 64-bit systems this property is required
-> +     *    and matches the MPIDR_EL1 register affinity bits.
-> +     *
-> +     *    * If cpus node's #address-cells property is set to 2
-> +     *
-> +     *      The first reg cell bits [7:0] must be set to
-> +     *      bits [39:32] of MPIDR_EL1.
-> +     *
-> +     *      The second reg cell bits [23:0] must be set to
-> +     *      bits [23:0] of MPIDR_EL1.
-> +     */
->      qemu_fdt_add_subnode(sms->fdt, "/cpus");
-> +    qemu_fdt_setprop_cell(sms->fdt, "/cpus", "#address-cells", 2);
-> +    qemu_fdt_setprop_cell(sms->fdt, "/cpus", "#size-cells", 0x0);
->
->      for (cpu =3D sms->smp_cpus - 1; cpu >=3D 0; cpu--) {
->          char *nodename =3D g_strdup_printf("/cpus/cpu@%d", cpu);
->          ARMCPU *armcpu =3D ARM_CPU(qemu_get_cpu(cpu));
->          CPUState *cs =3D CPU(armcpu);
-> +        uint64_t mpidr =3D sbsa_ref_cpu_mp_affinity(sms, cpu);
->
->          qemu_fdt_add_subnode(sms->fdt, nodename);
-> +        qemu_fdt_setprop_u64(sms->fdt, nodename, "reg", mpidr);
->
->          if (ms->possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
->              qemu_fdt_setprop_cell(sms->fdt, nodename, "numa-node-id",
-> @@ -717,12 +740,6 @@ static void sbsa_ref_init(MachineState *machine)
->      arm_load_kernel(ARM_CPU(first_cpu), machine, &sms->bootinfo);
->  }
->
-> -static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
-> -{
-> -    uint8_t clustersz =3D ARM_DEFAULT_CPUS_PER_CLUSTER;
-> -    return arm_cpu_mp_affinity(idx, clustersz);
-> -}
-> -
->  static const CPUArchIdList *sbsa_ref_possible_cpu_arch_ids(MachineState
-> *ms)
->  {
->      unsigned int max_cpus =3D ms->smp.max_cpus;
+> -    for (i =3D SR_FSR + 1; i < ARRAY_SIZE(cpu_SR); i++) {
+> +    for (i =3D SR_BTR + 1; i < ARRAY_SIZE(cpu_SR); i++) {
+>          cpu_SR[i] =3D tcg_global_mem_new_i64(cpu_env,
+>                            offsetof(CPUMBState, sregs[i]),
+>                            special_regnames[i]);
 > --
-> 2.20.1
+> 2.25.1
 >
 >
 >
 
---0000000000001ad54305ae32f72e
+--0000000000009f0fe805ae32f775
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"auto"><div><br><div class=3D"gmail_quote"><div dir=3D"ltr" clas=
-s=3D"gmail_attr">Le jeu. 27 ao=C3=BBt 2020 14:45, Leif Lindholm &lt;<a href=
-=3D"mailto:leif@nuviainc.com">leif@nuviainc.com</a>&gt; a =C3=A9crit=C2=A0:=
-<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bord=
-er-left:1px #ccc solid;padding-left:1ex">The sbsa-ref platform uses a minim=
-al device tree to pass amount of memory<br>
-as well as number of cpus to the firmware. However, when dumping that<br>
-minimal dtb (with -M sbsa-virt,dumpdtb=3D&lt;file&gt;), the resulting blob<=
-br>
-generates a warning when decompiled by dtc due to lack of reg property.<br>
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Le ven. 28 ao=C3=BBt 2020 16:26, Richard Henderson &lt=
+;<a href=3D"mailto:richard.henderson@linaro.org">richard.henderson@linaro.o=
+rg</a>&gt; a =C3=A9crit=C2=A0:<br></div><blockquote class=3D"gmail_quote" s=
+tyle=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Cont=
+inue eliminating the sregs array in favor of individual members.<br>
+Does not correct the width of BTR, yet.<br>
 <br>
-Add a simple reg property per cpu, representing a 64-bit MPIDR_EL1.<br>
-<br>
-This also ends up being cleaner than having the firmware calculating its<br=
->
-own IDs for generating APCI.<br>
-<br>
-Signed-off-by: Leif Lindholm &lt;<a href=3D"mailto:leif@nuviainc.com" targe=
-t=3D"_blank" rel=3D"noreferrer">leif@nuviainc.com</a>&gt;<br></blockquote><=
-/div></div><div dir=3D"auto"><br></div><div dir=3D"auto"><span style=3D"fon=
-t-family:sans-serif;font-size:13.696px">Reviewed-by: Philippe Mathieu-Daud=
-=C3=A9 &lt;</span><a href=3D"mailto:f4bug@amsat.org" style=3D"text-decorati=
-on:none;color:rgb(66,133,244);font-family:sans-serif;font-size:13.696px">f4=
-bug@amsat.org</a><span style=3D"font-family:sans-serif;font-size:13.696px">=
-&gt;</span><br></div><div dir=3D"auto"><br></div><div dir=3D"auto"><div cla=
-ss=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 =
-.8ex;border-left:1px #ccc solid;padding-left:1ex">
+Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
+naro.org" target=3D"_blank" rel=3D"noreferrer">richard.henderson@linaro.org=
+</a>&gt;<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
+=3D"auto"><span style=3D"font-family:sans-serif;font-size:13.696px">Reviewe=
+d-by: Philippe Mathieu-Daud=C3=A9 &lt;</span><a href=3D"mailto:f4bug@amsat.=
+org" style=3D"text-decoration:none;color:rgb(66,133,244);font-family:sans-s=
+erif;font-size:13.696px">f4bug@amsat.org</a><span style=3D"font-family:sans=
+-serif;font-size:13.696px">&gt;</span><br></div><div dir=3D"auto"><br></div=
+><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_qu=
+ote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex=
+">
 ---<br>
+=C2=A0target/microblaze/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0| 1 +<br>
+=C2=A0target/microblaze/gdbstub.c=C2=A0 =C2=A0| 4 ++--<br>
+=C2=A0target/microblaze/helper.c=C2=A0 =C2=A0 | 4 ++--<br>
+=C2=A0target/microblaze/translate.c | 6 ++++--<br>
+=C2=A04 files changed, 9 insertions(+), 6 deletions(-)<br>
 <br>
-As per Graeme&#39;s feedback, properly represent the MPIDR topology info<br=
->
-in the reg property rather than just counting cores (and update the<br>
-commit message on why this is useful).<br>
-I&#39;m using the local helper function sbsa_ref_cpu_mp_affinity() for this=
-,<br>
-and moving it up somewhat rather than adding a forward declaration.<br>
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h<br>
+index bcafef99b0..deddb47abb 100644<br>
+--- a/target/microblaze/cpu.h<br>
++++ b/target/microblaze/cpu.h<br>
+@@ -241,6 +241,7 @@ struct CPUMBState {<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t ear;<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t esr;<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t fsr;<br>
++=C2=A0 =C2=A0 uint64_t btr;<br>
+=C2=A0 =C2=A0 =C2=A0uint64_t sregs[14];<br>
+=C2=A0 =C2=A0 =C2=A0float_status fp_status;<br>
+=C2=A0 =C2=A0 =C2=A0/* Stack protectors. Yes, it&#39;s a hw feature.=C2=A0 =
+*/<br>
+diff --git a/target/microblaze/gdbstub.c b/target/microblaze/gdbstub.c<br>
+index 2634ce49fc..cde8c169bf 100644<br>
+--- a/target/microblaze/gdbstub.c<br>
++++ b/target/microblaze/gdbstub.c<br>
+@@ -74,7 +74,7 @@ int mb_cpu_gdb_read_register(CPUState *cs, GByteArray *me=
+m_buf, int n)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0val =3D env-&gt;fsr;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0case GDB_BTR:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D env-&gt;sregs[SR_BTR];<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 val =3D env-&gt;btr;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0case GDB_PVR0 ... GDB_PVR11:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* PVR12 is intentionally skipped */<br>
+@@ -130,7 +130,7 @@ int mb_cpu_gdb_write_register(CPUState *cs, uint8_t *me=
+m_buf, int n)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;fsr =3D tmp;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0case GDB_BTR:<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sregs[SR_BTR] =3D tmp;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;btr =3D tmp;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
+=C2=A0 =C2=A0 =C2=A0case GDB_PVR0 ... GDB_PVR11:<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* PVR12 is intentionally skipped */<br>
+diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c<br>
+index ea290be780..b240dc76f6 100644<br>
+--- a/target/microblaze/helper.c<br>
++++ b/target/microblaze/helper.c<br>
+@@ -132,7 +132,7 @@ void mb_cpu_do_interrupt(CPUState *cs)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Exception breaks branch =
++ dslot sequence?=C2=A0 */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (env-&gt;iflags &amp; D_=
+FLAG) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;esr |=
+=3D 1 &lt;&lt; 12 ;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sregs[SR_B=
+TR] =3D env-&gt;btarget;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;btr =3D en=
+v-&gt;btarget;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
 <br>
-=C2=A0hw/arm/sbsa-ref.c | 29 +++++++++++++++++++++++------<br>
-=C2=A01 file changed, 23 insertions(+), 6 deletions(-)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Disable the MMU.=C2=A0 *=
+/<br>
+@@ -160,7 +160,7 @@ void mb_cpu_do_interrupt(CPUState *cs)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (env-&gt;iflags &amp; D_=
+FLAG) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0D(qemu_log(&q=
+uot;D_FLAG set at exception bimm=3D%d\n&quot;, env-&gt;bimm));<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;esr |=
+=3D 1 &lt;&lt; 12 ;<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;sregs[SR_B=
+TR] =3D env-&gt;btarget;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;btr =3D en=
+v-&gt;btarget;<br>
 <br>
-diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c<br>
-index f030a416fd..3e65ded9a0 100644<br>
---- a/hw/arm/sbsa-ref.c<br>
-+++ b/hw/arm/sbsa-ref.c<br>
-@@ -138,6 +138,12 @@ static const int sbsa_ref_irqmap[] =3D {<br>
-=C2=A0 =C2=A0 =C2=A0[SBSA_EHCI] =3D 11,<br>
-=C2=A0};<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* Reexecute =
+the branch.=C2=A0 */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;regs[=
+17] -=3D 4;<br>
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c<=
+br>
+index c58c49ea8f..469e1f103a 100644<br>
+--- a/target/microblaze/translate.c<br>
++++ b/target/microblaze/translate.c<br>
+@@ -1811,7 +1811,7 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int fla=
+gs)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;rbtr=
+=3D%&quot; PRIx64 &quot;\n&quot;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;msr,=
+ env-&gt;esr, env-&gt;ear,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;debu=
+g, env-&gt;imm, env-&gt;iflags, env-&gt;fsr,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;sreg=
+s[SR_BTR]);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env-&gt;btr)=
+;<br>
+=C2=A0 =C2=A0 =C2=A0qemu_fprintf(f, &quot;btaken=3D%d btarget=3D%&quot; PRI=
+x64 &quot; mode=3D%s(saved=3D%s) &quot;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &quot;eip=3D=
+%d ie=3D%d\n&quot;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env-&gt;btak=
+en, env-&gt;btarget,<br>
+@@ -1879,8 +1879,10 @@ void mb_tcg_init(void)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_global_mem_new_i64(cpu_env, offsetof(=
+CPUMBState, esr), &quot;resr&quot;);<br>
+=C2=A0 =C2=A0 =C2=A0cpu_SR[SR_FSR] =3D<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_global_mem_new_i64(cpu_env, offsetof(=
+CPUMBState, fsr), &quot;rfsr&quot;);<br>
++=C2=A0 =C2=A0 cpu_SR[SR_BTR] =3D<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_global_mem_new_i64(cpu_env, offsetof(CPUMB=
+State, btr), &quot;rbtr&quot;);<br>
 <br>
-+static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)<b=
-r>
-+{<br>
-+=C2=A0 =C2=A0 uint8_t clustersz =3D ARM_DEFAULT_CPUS_PER_CLUSTER;<br>
-+=C2=A0 =C2=A0 return arm_cpu_mp_affinity(idx, clustersz);<br>
-+}<br>
-+<br>
-=C2=A0/*<br>
-=C2=A0 * Firmware on this machine only uses ACPI table to load OS, these li=
-mited<br>
-=C2=A0 * device tree nodes are just to let firmware know the info which var=
-ies from<br>
-@@ -183,14 +189,31 @@ static void create_fdt(SBSAMachineState *sms)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_free(matrix);<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-<br>
-+=C2=A0 =C2=A0 /*<br>
-+=C2=A0 =C2=A0 =C2=A0* From Documentation/devicetree/bindings/arm/cpus.yaml=
-<br>
-+=C2=A0 =C2=A0 =C2=A0*=C2=A0 On ARM v8 64-bit systems this property is requ=
-ired<br>
-+=C2=A0 =C2=A0 =C2=A0*=C2=A0 =C2=A0 and matches the MPIDR_EL1 register affi=
-nity bits.<br>
-+=C2=A0 =C2=A0 =C2=A0*<br>
-+=C2=A0 =C2=A0 =C2=A0*=C2=A0 =C2=A0 * If cpus node&#39;s #address-cells pro=
-perty is set to 2<br>
-+=C2=A0 =C2=A0 =C2=A0*<br>
-+=C2=A0 =C2=A0 =C2=A0*=C2=A0 =C2=A0 =C2=A0 The first reg cell bits [7:0] mu=
-st be set to<br>
-+=C2=A0 =C2=A0 =C2=A0*=C2=A0 =C2=A0 =C2=A0 bits [39:32] of MPIDR_EL1.<br>
-+=C2=A0 =C2=A0 =C2=A0*<br>
-+=C2=A0 =C2=A0 =C2=A0*=C2=A0 =C2=A0 =C2=A0 The second reg cell bits [23:0] =
-must be set to<br>
-+=C2=A0 =C2=A0 =C2=A0*=C2=A0 =C2=A0 =C2=A0 bits [23:0] of MPIDR_EL1.<br>
-+=C2=A0 =C2=A0 =C2=A0*/<br>
-=C2=A0 =C2=A0 =C2=A0qemu_fdt_add_subnode(sms-&gt;fdt, &quot;/cpus&quot;);<b=
-r>
-+=C2=A0 =C2=A0 qemu_fdt_setprop_cell(sms-&gt;fdt, &quot;/cpus&quot;, &quot;=
-#address-cells&quot;, 2);<br>
-+=C2=A0 =C2=A0 qemu_fdt_setprop_cell(sms-&gt;fdt, &quot;/cpus&quot;, &quot;=
-#size-cells&quot;, 0x0);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0for (cpu =3D sms-&gt;smp_cpus - 1; cpu &gt;=3D 0; cpu--=
-) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0char *nodename =3D g_strdup_printf(&quot;=
-/cpus/cpu@%d&quot;, cpu);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ARMCPU *armcpu =3D ARM_CPU(qemu_get_cpu(c=
-pu));<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0CPUState *cs =3D CPU(armcpu);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 uint64_t mpidr =3D sbsa_ref_cpu_mp_affinity(sm=
-s, cpu);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qemu_fdt_add_subnode(sms-&gt;fdt, nodenam=
-e);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qemu_fdt_setprop_u64(sms-&gt;fdt, nodename, &q=
-uot;reg&quot;, mpidr);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (ms-&gt;possible_cpus-&gt;cpus[cs-&gt;=
-cpu_index].props.has_node_id) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qemu_fdt_setprop_cell(sms-&=
-gt;fdt, nodename, &quot;numa-node-id&quot;,<br>
-@@ -717,12 +740,6 @@ static void sbsa_ref_init(MachineState *machine)<br>
-=C2=A0 =C2=A0 =C2=A0arm_load_kernel(ARM_CPU(first_cpu), machine, &amp;sms-&=
-gt;bootinfo);<br>
-=C2=A0}<br>
-<br>
--static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)<b=
-r>
--{<br>
--=C2=A0 =C2=A0 uint8_t clustersz =3D ARM_DEFAULT_CPUS_PER_CLUSTER;<br>
--=C2=A0 =C2=A0 return arm_cpu_mp_affinity(idx, clustersz);<br>
--}<br>
--<br>
-=C2=A0static const CPUArchIdList *sbsa_ref_possible_cpu_arch_ids(MachineSta=
-te *ms)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0unsigned int max_cpus =3D ms-&gt;smp.max_cpus;<br>
+-=C2=A0 =C2=A0 for (i =3D SR_FSR + 1; i &lt; ARRAY_SIZE(cpu_SR); i++) {<br>
++=C2=A0 =C2=A0 for (i =3D SR_BTR + 1; i &lt; ARRAY_SIZE(cpu_SR); i++) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0cpu_SR[i] =3D tcg_global_mem_new_i64(cpu_=
+env,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0offsetof(CPUMBState, sregs[i]),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0special_regnames[i]);<br>
 -- <br>
-2.20.1<br>
+2.25.1<br>
 <br>
 <br>
 </blockquote></div></div></div>
 
---0000000000001ad54305ae32f72e--
+--0000000000009f0fe805ae32f775--
 
