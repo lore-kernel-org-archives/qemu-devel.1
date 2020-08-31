@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DBFC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FBFC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:06:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D06F207EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:04:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64BF5207EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:06:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c5UdXglh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D06F207EA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/jWW8W/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64BF5207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kClMQ-00021e-C0
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 11:04:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44208)
+	id 1kClNv-0003l2-H4
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 11:06:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kClJc-0006D8-RB
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:01:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27502)
+ id 1kClJX-0006BD-NY
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:01:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46879)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kClJb-0004VV-0Z
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:01:48 -0400
+ id 1kClJW-0004VD-2N
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:01:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598886106;
+ s=mimecast20190719; t=1598886101;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=T9AFma23LBkYxDC875+y6zL/RyokUGeWCTcMzCRTxYM=;
- b=c5UdXglhy4cTwqbbHBFpNYgz64j2w9GZLOW1fz4Kbb3a0JG1Y0Noz6CO5PpVSSb8XojI5o
- NeQctQ2bJzUV5j5PjQWDpdZdymHlgFp6mMoLDPcgs9dtUrLToMczXFkLr46TkCnl+S5oVX
- 5CCzEe7sDQgE7gmWqi9NOUDJaD+VCW0=
+ bh=Z2PpamRG0wqHHnFH6TPqPqum/uJ9JpSRTxMEU5HEr7w=;
+ b=O/jWW8W/0+lsWBp3f423ajdZeh4hMpzvZDcf3OZzplJuZAzoG2KAIcUMUl0kq6P2U9yN41
+ MOavhpt+4sSTBSnLd37suORtHWfJdu9ER7B6dIK07ESy7K/qM3HXxXe+eV+myt9k4Howek
+ 2aKvHXXDvcaz6vj7CKxXw1SwIIVFe6M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-Us6tPSUeMwOqoIvWM3hLuA-1; Mon, 31 Aug 2020 11:01:44 -0400
-X-MC-Unique: Us6tPSUeMwOqoIvWM3hLuA-1
+ us-mta-310-5We50y58NeWRRyTG-dG5xg-1; Mon, 31 Aug 2020 11:01:37 -0400
+X-MC-Unique: 5We50y58NeWRRyTG-dG5xg-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A06618A224C;
- Mon, 31 Aug 2020 15:01:42 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 35D28801ADD;
+ Mon, 31 Aug 2020 15:01:36 +0000 (UTC)
 Received: from localhost.localdomain (unknown [10.35.206.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9A52219C4F;
- Mon, 31 Aug 2020 15:01:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E906D19C4F;
+ Mon, 31 Aug 2020 15:01:30 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 3/9] device_core: use drain_call_rcu in in
- hmp_device_del/qmp_device_add
-Date: Mon, 31 Aug 2020 18:01:18 +0300
-Message-Id: <20200831150124.206267-4-mlevitsk@redhat.com>
+Subject: [PATCH v4 1/9] scsi/scsi_bus: switch search direction in
+ scsi_device_find
+Date: Mon, 31 Aug 2020 18:01:16 +0300
+Message-Id: <20200831150124.206267-2-mlevitsk@redhat.com>
 In-Reply-To: <20200831150124.206267-1-mlevitsk@redhat.com>
 References: <20200831150124.206267-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
-X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mlevitsk@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlevitsk@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:43:46
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:02:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -99,63 +99,51 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Fam Zheng <fam@euphon.net>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>, Maxim Levitsky <mlevitsk@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+ Maxim Levitsky <mlevitsk@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Soon, a device removal might only happen on RCU callback execution,
-but to avoid chanding HMP semantics, just drain all pending RCU
-callbacks
+This change will allow us to convert the bus children list to RCU,
+while not changing the logic of this function
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-Suggested-by: Stefan Hajnoczi <stefanha@gmail.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- qdev-monitor.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ hw/scsi/scsi-bus.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index e9b7228480..c66ba13780 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -803,6 +803,18 @@ void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
-         return;
-     }
-     dev = qdev_device_add(opts, errp);
+diff --git a/hw/scsi/scsi-bus.c b/hw/scsi/scsi-bus.c
+index df65cc2223..f8adfbc2a5 100644
+--- a/hw/scsi/scsi-bus.c
++++ b/hw/scsi/scsi-bus.c
+@@ -1572,7 +1572,7 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
+     BusChild *kid;
+     SCSIDevice *target_dev = NULL;
+ 
+-    QTAILQ_FOREACH_REVERSE(kid, &bus->qbus.children, sibling) {
++    QTAILQ_FOREACH(kid, &bus->qbus.children, sibling) {
+         DeviceState *qdev = kid->child;
+         SCSIDevice *dev = SCSI_DEVICE(qdev);
+ 
+@@ -1580,7 +1580,15 @@ SCSIDevice *scsi_device_find(SCSIBus *bus, int channel, int id, int lun)
+             if (dev->lun == lun) {
+                 return dev;
+             }
+-            target_dev = dev;
 +
-+    /*
-+     * Drain all pending RCU callbacks. This is done because
-+     * some bus related operations can delay a device removal
-+     * (in this case this can happen if device is added and then
-+     * removed due to a configuration error)
-+     * to a RCU callback, but user might expect that this interface
-+     * will finish its job completely once qmp command returns result
-+     * to the user
-+     */
-+    drain_call_rcu();
++            /*
++             * If we don't find exact match (channel/bus/lun),
++             * we will return the first device which matches channel/bus
++             */
 +
-     if (!dev) {
-         qemu_opts_del(opts);
-         return;
-@@ -894,6 +906,16 @@ void qmp_device_del(const char *id, Error **errp)
++            if (!target_dev) {
++                target_dev = dev;
++            }
          }
- 
-         qdev_unplug(dev, errp);
-+
-+        /*
-+         * Drain all pending RCU callbacks. This is done because
-+         * some bus related operations can delay a device removal
-+         * to a RCU callback, but user might expect that this interface
-+         * will finish its job completely once qmp command returns result
-+         * to the user
-+         */
-+
-+        drain_call_rcu();
      }
- }
- 
+     return target_dev;
 -- 
 2.26.2
 
