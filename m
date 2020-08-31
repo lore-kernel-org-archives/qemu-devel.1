@@ -2,170 +2,90 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA58C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:24:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D536FC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:25:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFC2D20767
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:24:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A19D120767
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:25:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="O9IsPYhV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC2D20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="iMYecPpz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A19D120767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCf7D-0007MC-Rj
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:24:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40348)
+	id 1kCf7o-0000Fz-SK
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:25:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kCf6X-0006Wc-4W
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:23:53 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:49070)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kCf72-0007JP-29; Mon, 31 Aug 2020 04:24:24 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:59766)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kCf6U-000596-SY
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:23:52 -0400
-Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 07V7Wgk9145537
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 04:23:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=Xq97u4Yb44WgGWCb21At1iBEU0wB0XyWIkOQSeoUEPU=;
- b=O9IsPYhV16CV9hMM82DXO3a3RCs2pZUw6jajI+YFkA6/wNPfhRTaeZKUB7UyHNMPwnx3
- qphiivnetcn/0/YDJwIYSQGxU7eOaoD2BalUckeM51UgtiC+0gSDFu9rWT2r2oFI6Md9
- KBJB3D3C3RwaS7X4X3ifjo/I44L6CNc6VinjUsANQlZ09CsTc0xxJh5c8e2R76HXl/fB
- aYEo7ARhHBoX3Ow2FENmNKKwq7ZCReK+QPY6//3yji7+TfWK8Kk9FH+T3ZryS22attoc
- VdOAt689tdNT2UqWhvxyUVdIUwnomqg/zxra8BBw/6SKAk+3GSmsiBltOMz1viwK6JQZ KQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 338t10p036-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 04:23:47 -0400
-Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 07V7XofB002601
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 04:23:46 -0400
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com
- [159.122.73.71])
- by mx0a-001b2d01.pphosted.com with ESMTP id 338t10p026-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 31 Aug 2020 04:23:46 -0400
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
- by ppma02fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 07V8CTTa024375;
- Mon, 31 Aug 2020 08:23:44 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma02fra.de.ibm.com with ESMTP id 337en7h64c-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 31 Aug 2020 08:23:44 +0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com
- [9.149.105.62])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 07V8MAvt53543198
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 31 Aug 2020 08:22:10 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E7017AE056;
- Mon, 31 Aug 2020 08:23:41 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8F9CEAE04D;
- Mon, 31 Aug 2020 08:23:41 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.20.219])
- by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon, 31 Aug 2020 08:23:41 +0000 (GMT)
-Subject: Re: [PATCH v2 4/4] pc-bios: s390x: Go into disabled wait when
- encountering a PGM exception
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20200827093152.3026-1-frankja@linux.ibm.com>
- <20200827093152.3026-5-frankja@linux.ibm.com>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <25f47a0e-4aa6-cd74-dad6-24a0d803775f@de.ibm.com>
-Date: Mon, 31 Aug 2020 10:23:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kCf6x-0005CM-GN; Mon, 31 Aug 2020 04:24:22 -0400
+Received: from vla1-fdfb804fb3f3.qloud-c.yandex.net
+ (vla1-fdfb804fb3f3.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c0d:3199:0:640:fdfb:804f])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 0A1BD2E15F8;
+ Mon, 31 Aug 2020 11:24:12 +0300 (MSK)
+Received: from vla5-58875c36c028.qloud-c.yandex.net
+ (vla5-58875c36c028.qloud-c.yandex.net [2a02:6b8:c18:340b:0:640:5887:5c36])
+ by vla1-fdfb804fb3f3.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ sb06DzYyyQ-OBwiQWkt; Mon, 31 Aug 2020 11:24:11 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1598862251; bh=l3Xae3HgBQ87O8DrK0v6qYneV907Nu3YzzovUHqeOAE=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=iMYecPpz1yRFHyX1vcvsrnl2tbm/kZMc1lapWgCc7pgEppW9n5Ro1e+Q/1B/cPwWF
+ ihzvnE+Q1l9sv5Ojb6x3UYYQN4aE7E14ofxrS6ezDRBIgdl+/kWksTAjdsb4ZK791N
+ AImer6BzbHQEfcozf/uc+o7sz0uBXweNwZp8rlW4=
+Authentication-Results: vla1-fdfb804fb3f3.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:216::1:a])
+ by vla5-58875c36c028.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ UDIrRDQMut-OBlCGaK4; Mon, 31 Aug 2020 11:24:11 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client certificate not present)
+Date: Mon, 31 Aug 2020 11:24:09 +0300
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+Subject: Re: [PATCH v2 1/7] vhost: recheck dev state in the
+ vhost_migration_log routine
+Message-ID: <20200831082400.GA5967@dimastep-nix>
+References: <cover.1598257838.git.dimastep@yandex-team.ru>
+ <e63c6abf81084026da70990569e570b6b4720977.1598257838.git.dimastep@yandex-team.ru>
+ <CAFubqFuE06frhZ3F_pVtWVFY6cQW9rxNGREy9WsEq59JG6Z_FA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200827093152.3026-5-frankja@linux.ibm.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-08-31_01:2020-08-28,
- 2020-08-31 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 mlxlogscore=999
- clxscore=1015 phishscore=0 lowpriorityscore=0 impostorscore=0 bulkscore=0
- suspectscore=0 mlxscore=0 priorityscore=1501 spamscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008310047
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 04:23:47
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAFubqFuE06frhZ3F_pVtWVFY6cQW9rxNGREy9WsEq59JG6Z_FA@mail.gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 04:24:12
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.207,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -174,41 +94,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, cohuck@redhat.com, david@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
+ QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>, fengli@smartx.com,
+ yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 27.08.20 11:31, Janosch Frank wrote:
-> Let's setup a PGM PSW, so we won't load 0s when a program exception
-> happens. Instead we'll load a disabled wait PSW.
-
-Makes sense
-
-Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
-
+On Thu, Aug 27, 2020 at 09:44:22PM -0400, Raphael Norwitz wrote:
+> Generally I’m happy with this. Some comments:
+> 
+> On Mon, Aug 24, 2020 at 4:40 AM Dima Stepanov <dimastep@yandex-team.ru> wrote:
+> >
+> > vhost-user devices can get a disconnect in the middle of the VHOST-USER
+> > handshake on the migration start. If disconnect event happened right
+> > before sending next VHOST-USER command, then the vhost_dev_set_log()
+> > call in the vhost_migration_log() function will return error. This error
+> > will lead to the assert() and close the QEMU migration source process.
+> > For the vhost-user devices the disconnect event should not break the
+> > migration process, because:
+> >   - the device will be in the stopped state, so it will not be changed
+> >     during migration
+> >   - if reconnect will be made the migration log will be reinitialized as
+> >     part of reconnect/init process:
+> >     #0  vhost_log_global_start (listener=0x563989cf7be0)
+> >     at hw/virtio/vhost.c:920
+> >     #1  0x000056398603d8bc in listener_add_address_space (listener=0x563989cf7be0,
+> >         as=0x563986ea4340 <address_space_memory>)
+> >     at softmmu/memory.c:2664
+> >     #2  0x000056398603dd30 in memory_listener_register (listener=0x563989cf7be0,
+> >         as=0x563986ea4340 <address_space_memory>)
+> >     at softmmu/memory.c:2740
+> >     #3  0x0000563985fd6956 in vhost_dev_init (hdev=0x563989cf7bd8,
+> >         opaque=0x563989cf7e30, backend_type=VHOST_BACKEND_TYPE_USER,
+> >         busyloop_timeout=0)
+> >     at hw/virtio/vhost.c:1385
+> >     #4  0x0000563985f7d0b8 in vhost_user_blk_connect (dev=0x563989cf7990)
+> >     at hw/block/vhost-user-blk.c:315
+> >     #5  0x0000563985f7d3f6 in vhost_user_blk_event (opaque=0x563989cf7990,
+> >         event=CHR_EVENT_OPENED)
+> >     at hw/block/vhost-user-blk.c:379
+> > Update the vhost-user-blk device with the internal started field which
+> > will be used for initialization and clean up. The disconnect event will
+> > set the overall VHOST device to the stopped state, so it can be used by
+> > the vhost_migration_log routine.
+> > Such approach could be propogated to the other vhost-user devices, but
+> > better idea is just to make the same connect/disconnect code for all the
+> > vhost-user devices.
+> >
+> > This migration issue was slightly discussed earlier:
+> >   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg01509.html
+> >   - https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg05241.html
+> >
+> 
+> What you’re doing here on a structural level is adding an additional
+> flag “started” to VhostUserBlk to track whether the device really
+> needs to be stopped and cleaned up on a vhost level on a disconnect.
+> Can you make that more clear in the commit message as you have in the
+> comments?
+Sounds reasonable, will update the commit message.
 
 > 
-> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
-> ---
->  pc-bios/s390-ccw/start.S | 3 +++
->  1 file changed, 3 insertions(+)
 > 
-> diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
-> index 939aac3a7c..775b45baeb 100644
-> --- a/pc-bios/s390-ccw/start.S
-> +++ b/pc-bios/s390-ccw/start.S
-> @@ -44,6 +44,9 @@ done:
->          larl  %r2, external_new_psw
->          stg   %r1, 8(%r2)
->          mvc   0x1b0(16),0(%r2)
-> +        /* set up a pgm exception disabled wait psw */
-> +        larl  %r2, disabled_wait_psw
-> +        mvc   0x01d0(16), 0(%r2)
->          j      main		/* And call C */
->  
->  memsetxc:
+> > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> > ---
+> >  hw/block/vhost-user-blk.c          | 19 ++++++++++++++++---
+> >  hw/virtio/vhost.c                  | 27 ++++++++++++++++++++++++---
+> >  include/hw/virtio/vhost-user-blk.h | 10 ++++++++++
+> >  3 files changed, 50 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/hw/block/vhost-user-blk.c b/hw/block/vhost-user-blk.c
+> > index a00b854..5573e89 100644
+> > --- a/hw/block/vhost-user-blk.c
+> > +++ b/hw/block/vhost-user-blk.c
+> > @@ -150,6 +150,7 @@ static int vhost_user_blk_start(VirtIODevice *vdev)
+> >          error_report("Error starting vhost: %d", -ret);
+> >          goto err_guest_notifiers;
+> >      }
+> > +    s->started = true;
+> >
+> >      /* guest_notifier_mask/pending not used yet, so just unmask
+> >       * everything here. virtio-pci will do the right thing by
+> > @@ -175,6 +176,11 @@ static void vhost_user_blk_stop(VirtIODevice *vdev)
+> >      VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
+> >      int ret;
+> >
+> > +    if (!s->started) {
+> > +        return;
+> > +    }
+> > +    s->started = false;
+> > +
+> >      if (!k->set_guest_notifiers) {
+> >          return;
+> >      }
+> > @@ -341,9 +347,7 @@ static void vhost_user_blk_disconnect(DeviceState *dev)
+> >      }
+> >      s->connected = false;
+> >
+> > -    if (s->dev.started) {
+> > -        vhost_user_blk_stop(vdev);
+> > -    }
+> > +    vhost_user_blk_stop(vdev);
+> >
+> >      vhost_dev_cleanup(&s->dev);
+> >  }
+> > @@ -399,6 +403,15 @@ static void vhost_user_blk_event(void *opaque, QEMUChrEvent event)
+> >                      NULL, NULL, false);
+> >              aio_bh_schedule_oneshot(ctx, vhost_user_blk_chr_closed_bh, opaque);
+> >          }
+> > +
+> > +        /*
+> > +         * Move vhost device to the stopped state. The vhost-user device
+> > +         * will be clean up and disconnected in BH. This can be useful in
+> > +         * the vhost migration code. If disconnect was caught there is an
+> > +         * option for the general vhost code to get the dev state without
+> > +         * knowing its type (in this case vhost-user).
+> > +         */
+> > +        s->dev.started = false;
+> >          break;
+> >      case CHR_EVENT_BREAK:
+> >      case CHR_EVENT_MUX_IN:
+> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > index 1a1384e..ffef7ab 100644
+> > --- a/hw/virtio/vhost.c
+> > +++ b/hw/virtio/vhost.c
+> > @@ -861,21 +861,42 @@ static int vhost_migration_log(MemoryListener *listener, bool enable)
+> >          dev->log_enabled = enable;
+> >          return 0;
+> >      }
+> > +
+> > +    r = 0;
+> >      if (!enable) {
+> >          r = vhost_dev_set_log(dev, false);
+> >          if (r < 0) {
+> > -            return r;
+> > +            goto check_dev_state;
+> >          }
+> >          vhost_log_put(dev, false);
+> >      } else {
+> >          vhost_dev_log_resize(dev, vhost_get_log_size(dev));
+> >          r = vhost_dev_set_log(dev, true);
+> >          if (r < 0) {
+> > -            return r;
+> > +            goto check_dev_state;
+> >          }
+> >      }
+> > +
+> > +check_dev_state:
+> >      dev->log_enabled = enable;
+> > -    return 0;
+> > +    /*
+> > +     * vhost-user-* devices could change their state during log
+> > +     * initialization due to disconnect. So check dev state after
+> > +     * vhost communication.
+> > +     */
+> > +    if (!dev->started) {
+> > +        /*
+> > +         * Since device is in the stopped state, it is okay for
+> > +         * migration. Return success.
+> > +         */
+> > +        r = 0;
+> > +    }
+> > +    if (r) {
+> > +        /* An error is occured. */
+> > +        dev->log_enabled = false;
+> > +    }
+> > +
+> > +    return r;
+> >  }
+> >
+> >  static void vhost_log_global_start(MemoryListener *listener)
+> > diff --git a/include/hw/virtio/vhost-user-blk.h b/include/hw/virtio/vhost-user-blk.h
+> > index 34ad6f0..f4c0754 100644
+> > --- a/include/hw/virtio/vhost-user-blk.h
+> > +++ b/include/hw/virtio/vhost-user-blk.h
+> > @@ -38,7 +38,17 @@ typedef struct VHostUserBlk {
+> >      VhostUserState vhost_user;
+> >      struct vhost_virtqueue *vhost_vqs;
+> >      VirtQueue **virtqs;
+> > +
+> > +    /*
+> > +     * There are at least two steps of initialization of the
+> > +     * vhost-user device. The first is a "connect" step and
+> > +     * second is a "start" step. Make a separation between
+> > +     * those initialization phases by using two fields.
+> > +     */
+> > +    /* vhost_user_blk_connect/vhost_user_blk_disconnect */
+> >      bool connected;
+> > +    /* vhost_user_blk_start/vhost_user_blk_stop */
 > 
+> I don’t like the name “started” for the vhost-user-blk flag because
+> it’s easy to get confused with the vhost_dev "started" field, and they
+> are used for very different things. Maybe call it “needs_cleanup” or
+> “started_internal”, or something to that effect?
+Good point. In this case i like the "started_internal" or "started_vu"
+just to show that it is only vhost-user start/stop routine flag.
+
+No other comments mixed in below.
+
+> 
+> 
+> > +    bool started;
+> >  } VHostUserBlk;
+> >
+> >  #endif
+> > --
+> > 2.7.4
+> >
+> >
 
