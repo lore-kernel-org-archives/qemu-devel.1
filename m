@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BD2C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:29:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF8BC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:30:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E08A620767
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:29:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 263B920E65
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:30:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RVTWLCZv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E08A620767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LdUdtoQA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 263B920E65
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCfCD-0003GL-1i
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:29:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41652)
+	id 1kCfCl-0004Ya-8Z
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:30:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kCfBJ-0001v1-Dv
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:28:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51906
+ id 1kCfBo-0002sS-6v
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:29:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26796
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kCfBH-0005wm-Tq
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:28:49 -0400
+ id 1kCfBm-00064W-Ck
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:29:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598862527;
+ s=mimecast20190719; t=1598862557;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=K5tETAoLbfuWF+hCqz5qMjRY7nddCTTiomGWd9L5PXY=;
- b=RVTWLCZv+bSV2l0+fL+EKz04xS4VkUvRo7Ez70uLvDer+izxwmi8cBfaC6MFgLXU35hdyU
- L5lRSiPqnMDeHoPVJdUr5Ys7aAcp/S9jtV12nGrGNPtIPPd7fZVO+5AG+KUDAjBnwnl8dI
- l89qnmMswqieq/3R1A9xrksvQhgo/f8=
+ bh=4hh/qZDjFKTi3QwYN/AbYw7PuAXqiDG6gOeX+DBWFSg=;
+ b=LdUdtoQA88SOb6tiJfGJt8CDDrWBpXxaSeQ1H9JHngwVIJkwigWUV1izNIc6LMk2w/DMmD
+ ANv7cRG0umx5OcN3LgCEPP3EpDA+zZkkoThXDjR9VHcKo0WW1N6BdBpMETeo9iDekg7yeb
+ LiPT4nxyhOR9Ude/Gdc8i1xp2wtZi4A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-6d2eNRiaPzuH4zTJ5qlulQ-1; Mon, 31 Aug 2020 04:28:45 -0400
-X-MC-Unique: 6d2eNRiaPzuH4zTJ5qlulQ-1
+ us-mta-416-3Zad95GxNDC76flnCVfGLQ-1; Mon, 31 Aug 2020 04:29:15 -0400
+X-MC-Unique: 3Zad95GxNDC76flnCVfGLQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2D51910ABDA3
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 08:28:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8DF2801AC4
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 08:29:14 +0000 (UTC)
 Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
  (ovpn-12-88.pek2.redhat.com [10.72.12.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A24FE5D9D3;
- Mon, 31 Aug 2020 08:28:29 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D02155D9D3;
+ Mon, 31 Aug 2020 08:29:00 +0000 (UTC)
 From: Jason Wang <jasowang@redhat.com>
 To: jasowang@redhat.com,
 	qemu-devel@nongnu.org
-Subject: [PATCH 3/9] vhost-vdpa: remove the unnecessary assert(s->vhost_net)
-Date: Mon, 31 Aug 2020 16:27:31 +0800
-Message-Id: <20200831082737.10983-4-jasowang@redhat.com>
+Subject: [PATCH 5/9] vhost-vdpa: remove the unnecessary initialization
+Date: Mon, 31 Aug 2020 16:27:33 +0800
+Message-Id: <20200831082737.10983-6-jasowang@redhat.com>
 In-Reply-To: <20200831082737.10983-1-jasowang@redhat.com>
 References: <20200831082737.10983-1-jasowang@redhat.com>
 MIME-Version: 1.0
@@ -103,28 +103,29 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-vhost_vdpa_add() can fail before s->vhost_net is set and
-net_vhost_vdpa_init() can report error. So there's no need for this
-assert. Let's remove it.
-
 Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- net/vhost-vdpa.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/vhost-vdpa.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-index b7221beaa1..c4568b885e 100644
+index 397d4d3082..bcbf49d55b 100644
 --- a/net/vhost-vdpa.c
 +++ b/net/vhost-vdpa.c
-@@ -190,7 +190,7 @@ static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
-     }
-     s->vhost_vdpa.device_fd = vdpa_device_fd;
-     ret = vhost_vdpa_add(nc, (void *)&s->vhost_vdpa);
--    assert(s->vhost_net);
-+
-     return ret;
- }
- 
+@@ -175,10 +175,10 @@ static NetClientInfo net_vhost_vdpa_info = {
+ static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
+                                const char *name, const char *vhostdev)
+ {
+-    NetClientState *nc = NULL;
++    NetClientState *nc;
+     VhostVDPAState *s;
+-    int vdpa_device_fd = -1;
+-    int ret = 0;
++    int vdpa_device_fd;
++    int ret;
+     assert(name);
+     nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, device, name);
+     snprintf(nc->info_str, sizeof(nc->info_str), "vhostdev=%s", vhostdev);
 -- 
 2.20.1
 
