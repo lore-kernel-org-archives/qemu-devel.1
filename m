@@ -2,114 +2,87 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 577D0C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F20CC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E2052073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:16:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D961A208DB
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:28:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Bs6MW6Pt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E2052073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="1aHShIP1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D961A208DB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCfvR-0008Ba-Bq
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 05:16:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52752)
+	id 1kCg7J-0002rN-0L
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 05:28:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
- id 1kCfu5-00071B-Av
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:15:05 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:51550)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kCg6a-0001Vx-50; Mon, 31 Aug 2020 05:28:00 -0400
+Received: from forwardcorp1p.mail.yandex.net
+ ([2a02:6b8:0:1472:2741:0:8b6:217]:59834)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
- id 1kCfu3-0003Ru-Ax
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:15:05 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07V8U4uN036292;
- Mon, 31 Aug 2020 09:14:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=to : cc : subject :
- in-reply-to : references : sender : from : date : message-id :
- mime-version : content-type; s=corp-2020-01-29;
- bh=5LdCJ7z/KA5qMDQ7LkrOYk9v4BYD0pigp9HUo0c3LhY=;
- b=Bs6MW6PtAB2eulViWCRJqajr5JrwhF3JrlE+xjsz2gxj9Rlpro/VjBcBLLN38jm8CuGl
- L/MxCfIXGpV0dADcjlISu8U4FfMOoxxH0uygmwa+FB2fiT6iQy82yVCFBJ/FUBBscJJ2
- yUPXTXxrAL49jsOYSDV4hGQXV+ipPPY2BFx8ROeDbI695IncsCrL/m0O1i5F1M63WpDZ
- 696bP0OoCV/hOaoDj3RcVMK4jv32BbSdWsgHNgrAWGVjQhApkmTrg4rjPtvIaxgu91Lb
- QpQW+7i2pXaZEOj6XHzpVdaGuAAUEHSVYhzBnM7LGtWvjPKfleDA0h9rbNfwDV+tBBkM ZA== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 337eykw75m-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Mon, 31 Aug 2020 09:14:56 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07V8UXli122253;
- Mon, 31 Aug 2020 09:14:56 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 3380wyqmru-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 31 Aug 2020 09:14:56 +0000
-Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07V9EtOT012876;
- Mon, 31 Aug 2020 09:14:55 GMT
-Received: from disaster-area.hh.sledj.net (/81.187.26.238)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 31 Aug 2020 02:14:55 -0700
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 37ca79f8;
- Mon, 31 Aug 2020 09:14:52 +0000 (UTC)
-To: Chuan Zheng <zhengchuan@huawei.com>, quintela@redhat.com,
- eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
-Subject: Re: [PATCH v6 12/12] migration/dirtyrate: Add trace_calls to make
- it easier to debug
-In-Reply-To: <1598669577-76914-13-git-send-email-zhengchuan@huawei.com>
-References: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
- <1598669577-76914-13-git-send-email-zhengchuan@huawei.com>
-X-HGTTG: heart-of-gold
-From: David Edmondson <david.edmondson@oracle.com>
-Date: Mon, 31 Aug 2020 10:14:52 +0100
-Message-ID: <m2r1rnb2ib.fsf@oracle.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9729
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- spamscore=0 phishscore=0
- mlxlogscore=999 adultscore=0 suspectscore=1 bulkscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2008310051
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9729
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- adultscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008310051
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=david.edmondson@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 05:07:47
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kCg6Y-0004zc-Dy; Mon, 31 Aug 2020 05:27:59 -0400
+Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net
+ (sas1-ec30c78b6c5b.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
+ by forwardcorp1p.mail.yandex.net (Yandex) with ESMTP id 9C0512E15E7;
+ Mon, 31 Aug 2020 12:27:53 +0300 (MSK)
+Received: from sas1-58a37b48fb94.qloud-c.yandex.net
+ (sas1-58a37b48fb94.qloud-c.yandex.net [2a02:6b8:c08:1d1b:0:640:58a3:7b48])
+ by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ XkxenMCgdz-Rqv8PXdx; Mon, 31 Aug 2020 12:27:53 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1598866073; bh=w4HAjC+uPauCS+4y5UQZrU0FI/SIeVh9OnDJmAmUQsg=;
+ h=In-Reply-To:In-Reply-To:Message-Id:References:References:Date:
+ Subject:To:From:Cc;
+ b=1aHShIP1bnot4avwtSApn/lP4DBkJ5xoIPEb5IClup1+dxfXNxiH8B2eCI0cio/pq
+ 6dROcY/pOGAun4Z3Q+ctWS2bEVkpacsBrTTwtQVWxKeQcwrFdJlgVIxT0pGgx+ByPV
+ TP4zVLZMD+tuRSSokSKHIxKI7tIGXZB5XZKdPhW4=
+Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b081:216::1:a])
+ by sas1-58a37b48fb94.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ yaozkQMlmT-Rqm81KUg; Mon, 31 Aug 2020 12:27:52 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+ (Client certificate not present)
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 2/7] vhost: check queue state in the vhost_dev_set_log
+ routine
+Date: Mon, 31 Aug 2020 12:27:18 +0300
+Message-Id: <2da64fc45789094b6bd6f1c283cac9e47eeeb786.1598865610.git.dimastep@yandex-team.ru>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <cover.1598865610.git.dimastep@yandex-team.ru>
+References: <cover.1598865610.git.dimastep@yandex-team.ru>
+In-Reply-To: <cover.1598865610.git.dimastep@yandex-team.ru>
+References: <cover.1598865610.git.dimastep@yandex-team.ru>
+Received-SPF: pass client-ip=2a02:6b8:0:1472:2741:0:8b6:217;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1p.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 04:24:12
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -118,108 +91,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
- zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, lvivier@redhat.com, thuth@redhat.com,
+ qemu-block@nongnu.org, mst@redhat.com, jasowang@redhat.com,
+ dgilbert@redhat.com, mreitz@redhat.com, fengli@smartx.com,
+ yc-core@yandex-team.ru, pbonzini@redhat.com, raphael.norwitz@nutanix.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Saturday, 2020-08-29 at 10:52:57 +08, Chuan Zheng wrote:
+If the vhost-user-blk daemon provides only one virtqueue, but device was
+added with several queues, then QEMU will send more VHOST-USER command
+than expected by daemon side. The vhost_virtqueue_start() routine
+handles such case by checking the return value from the
+virtio_queue_get_desc_addr() function call. Add the same check to the
+vhost_dev_set_log() routine.
 
-> Add trace_calls to  make it easier to debug
->
-> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+---
+ hw/virtio/vhost.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
-
-> ---
->  migration/dirtyrate.c  | 9 +++++++++
->  migration/trace-events | 8 ++++++++
->  2 files changed, 17 insertions(+)
->
-> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> index fa1a12d..2a8f4ff 100644
-> --- a/migration/dirtyrate.c
-> +++ b/migration/dirtyrate.c
-> @@ -22,6 +22,7 @@
->  #include "qapi/qapi-commands-migration.h"
->  #include "migration.h"
->  #include "ram.h"
-> +#include "trace.h"
->  #include "dirtyrate.h"
->  
->  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-> @@ -54,6 +55,7 @@ static bool get_sample_page_period(int64_t sec)
->  static int dirtyrate_set_state(int *state, int old_state, int new_state)
->  {
->      assert(new_state < DIRTY_RATE_STATUS__MAX);
-> +    trace_dirtyrate_set_state(DirtyRateStatus_str(new_state));
->      if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
->          return 0;
->      } else {
-> @@ -76,6 +78,8 @@ static struct DirtyRateInfo *query_dirty_rate_info(void)
->      info->start_time = DirtyStat.start_time;
->      info->calc_time = DirtyStat.calc_time;
->  
-> +    trace_query_dirty_rate_info(DirtyRateStatus_str(CalculatingState));
-> +
->      return info;
->  }
->  
-> @@ -123,6 +127,7 @@ static uint32_t get_ramblock_vfn_hash(struct RamblockDirtyInfo *info,
->      crc = crc32(0, (info->ramblock_addr +
->                  vfn * TARGET_PAGE_SIZE), TARGET_PAGE_SIZE);
->  
-> +    trace_get_ramblock_vfn_hash(info->idstr, vfn, crc);
->      return crc;
->  }
->  
-> @@ -228,6 +233,8 @@ static bool skip_sample_ramblock(RAMBlock *block)
->       * want to sample.
->       */
->      if (qemu_ram_get_used_length(block) < (MIN_RAMBLOCK_SIZE << 10)) {
-> +        trace_skip_sample_ramblock(block->idstr,
-> +                                   qemu_ram_get_used_length(block));
->          return true;
->      }
->  
-> @@ -274,6 +281,7 @@ static void calc_page_dirty_rate(struct RamblockDirtyInfo *info)
->      for (i = 0; i < info->sample_pages_count; i++) {
->          crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
->          if (crc != info->hash_result[i]) {
-> +            trace_calc_page_dirty_rate(info->idstr, crc, info->hash_result[i]);
->              info->sample_dirty_count++;
->          }
->      }
-> @@ -299,6 +307,7 @@ find_page_matched(RAMBlock *block, int count,
->      if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
->          infos[i].ramblock_pages !=
->              (qemu_ram_get_used_length(block) >> TARGET_PAGE_BITS)) {
-> +        trace_find_page_matched(block->idstr);
->          return NULL;
->      }
->  
-> diff --git a/migration/trace-events b/migration/trace-events
-> index 4ab0a50..8c2b58f 100644
-> --- a/migration/trace-events
-> +++ b/migration/trace-events
-> @@ -312,3 +312,11 @@ dirty_bitmap_load_bits_zeroes(void) ""
->  dirty_bitmap_load_header(uint32_t flags) "flags 0x%x"
->  dirty_bitmap_load_enter(void) ""
->  dirty_bitmap_load_success(void) ""
-> +
-> +# dirtyrate.c
-> +dirtyrate_set_state(const char *new_state) "new state %s"
-> +query_dirty_rate_info(const char *new_state) "current state %s"
-> +get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock name: %s, vfn: %"PRIu64 ", crc: %" PRIu32
-> +calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
-> +skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
-> +find_page_matched(const char *idstr) "ramblock %s addr or size changed"
-> -- 
-> 1.8.3.1
-
-dme.
+diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+index ffef7ab..a33ffd4 100644
+--- a/hw/virtio/vhost.c
++++ b/hw/virtio/vhost.c
+@@ -825,12 +825,24 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
+ static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
+ {
+     int r, i, idx;
++    hwaddr addr;
++
+     r = vhost_dev_set_features(dev, enable_log);
+     if (r < 0) {
+         goto err_features;
+     }
+     for (i = 0; i < dev->nvqs; ++i) {
+         idx = dev->vhost_ops->vhost_get_vq_index(dev, dev->vq_index + i);
++        addr = virtio_queue_get_desc_addr(dev->vdev, idx);
++        if (!addr) {
++            /*
++             * The queue might not be ready for start. If this
++             * is the case there is no reason to continue the process.
++             * The similar logic is used by the vhost_virtqueue_start()
++             * routine.
++             */
++            break;
++        }
+         r = vhost_virtqueue_set_addr(dev, dev->vqs + i, idx,
+                                      enable_log);
+         if (r < 0) {
 -- 
-All of us, we're going out tonight. We're gonna walk all over your cars.
+2.7.4
+
 
