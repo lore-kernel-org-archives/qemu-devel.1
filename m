@@ -2,89 +2,77 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1FF1C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:19:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69288C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83B1F20678
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:19:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fUfRys60"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B1F20678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 38D2D206FA
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:21:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38D2D206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCrCm-0002j2-G7
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:19:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45436)
+	id 1kCrEZ-0004wD-Ay
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:20:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kCr3r-0007Gp-8l
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:09:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25332
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kCr3o-0000Kc-R0
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:09:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598908192;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3N8MU34wJDgAzlASWM30qHcPmvC5h8VLdJM9gx0xXyg=;
- b=fUfRys60eGRNKGhlskCami4oeh2ZYzkc/4iUQ3+X/HTrWa5cP4mvlmXPGITpN8yo8aIgET
- HUyW+Pd7YEBBb/GMsMBzzaMhiSGOkDpkQ8G3vm+wmo0OV42nOOL+zFgShVM35GOJVqRry/
- 2335W+fXU08022Z6Nsy0iwchscKteCI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-_Rob8seWOB2bCFWl2s0NgA-1; Mon, 31 Aug 2020 17:09:50 -0400
-X-MC-Unique: _Rob8seWOB2bCFWl2s0NgA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3C528801AAD
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 21:09:49 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 038167EB69;
- Mon, 31 Aug 2020 21:09:39 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 18/18] [automated] Use OBJECT_DECLARE_SIMPLE_TYPE when
- possible
-Date: Mon, 31 Aug 2020 17:07:40 -0400
-Message-Id: <20200831210740.126168-19-ehabkost@redhat.com>
-In-Reply-To: <20200831210740.126168-1-ehabkost@redhat.com>
-References: <20200831210740.126168-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kCr9X-0007D0-TM
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:15:47 -0400
+Received: from mail-ej1-f67.google.com ([209.85.218.67]:42173)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kCr9W-00017a-0V
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:15:47 -0400
+Received: by mail-ej1-f67.google.com with SMTP id q13so6921266ejo.9
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:15:44 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=9W8NNLK/TmUATKVgycZSdsnaRkDE8aQGo8xB4Pn3WQI=;
+ b=E4T0k3nknNMqMcqEcxEL+dmqqSpNYNdPgGy1JNSq8o+fpH7UK9ujUskmCS14MCq5Mg
+ 8++p1nPmGszJ279s5VBDC+bsGa5i5fZyB8234uHqkw2C5KqSVEXx5PSV7zbexyNVxXEz
+ XMRpHsRvMMODsXeI6dCzQ2gVOu9CFpzzgV9LjxD3xSoYDZ0lifL35zVNLmU3Y1NlGyYa
+ ZTmkURCBZFwbsahwmk6JJp2aZCS+2gxvcFj/jkVHQ4RHdrvDVZYSzS/+e45mtceUipIu
+ 8RE9zxxVdVve7v501CAmpNWQTRtiGP99QcKuFm96mNd/RYCiwENl/Yy9szxUvZDuggG6
+ dCgw==
+X-Gm-Message-State: AOAM532wBzhkg1dxjNZSR76a2aB4LIPK+FcpCdQORNQwseZhpyAWJg18
+ /u98EdjypWSemjSVurhKrQuS4nh7Vtn5Sp0yPX0=
+X-Google-Smtp-Source: ABdhPJxj/Mlz5MCddPjxP+idWFKoMC0qb9xn85E2hCad9zflUpEwPi7baXwjZvEzIZeaMfbAzkZEc/vanjp9+o0BtzE=
+X-Received: by 2002:a17:906:454a:: with SMTP id
+ s10mr2682321ejq.138.1598908543551; 
+ Mon, 31 Aug 2020 14:15:43 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:13:08
+References: <20200828180243.443016-1-richard.henderson@linaro.org>
+ <20200828180243.443016-2-richard.henderson@linaro.org>
+In-Reply-To: <20200828180243.443016-2-richard.henderson@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Mon, 31 Aug 2020 19:17:13 +0200
+Message-ID: <CAAdtpL6q35O3Z4cDfuStAfiXN4m42MoE9B2UK6MPyaM0iesB4w@mail.gmail.com>
+Subject: Re: [PATCH 1/3] softmmu/cpus: Only set parallel_cpus for SMP
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000c44b0105ae32e75d"
+Received-SPF: pass client-ip=209.85.218.67;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-f67.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 17:15:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: 0
+X-Spam_score: -0.1
+X-Spam_bar: /
+X-Spam_report: (-0.1 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_03_06=1.592,
+ FREEMAIL_FORGED_FROMDOMAIN=0.25, FREEMAIL_FROM=0.001,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,311 +85,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- "Daniel P. Berrange" <berrange@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Generated using:
+--000000000000c44b0105ae32e75d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
- $ ./scripts/codeconverter/converter.py -i \
-   --pattern=ObjectDeclareType $(git grep -l '' -- '*.[ch]')
+Le ven. 28 ao=C3=BBt 2020 20:04, Richard Henderson <richard.henderson@linar=
+o.org>
+a =C3=A9crit :
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> Do not set parallel_cpus if there is only one cpu instantiated.
+> This will allow tcg to use serial code to implement atomics.
+>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>
+
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+
 ---
-Changes v3 -> v4: none
+>  softmmu/cpus.c | 11 ++++++++++-
+>  1 file changed, 10 insertions(+), 1 deletion(-)
+>
+> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+> index a802e899ab..e3b98065c9 100644
+> --- a/softmmu/cpus.c
+> +++ b/softmmu/cpus.c
+> @@ -1895,6 +1895,16 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>      if (!tcg_region_inited) {
+>          tcg_region_inited =3D 1;
+>          tcg_region_init();
+> +        /*
+> +         * If MTTCG, and we will create multiple cpus,
+> +         * then we will have cpus running in parallel.
+> +         */
+> +        if (qemu_tcg_mttcg_enabled()) {
+> +            MachineState *ms =3D MACHINE(qdev_get_machine());
+> +            if (ms->smp.max_cpus > 1) {
+> +                parallel_cpus =3D true;
+> +            }
+> +        }
+>      }
+>
+>      if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
+> @@ -1904,7 +1914,6 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>
+>          if (qemu_tcg_mttcg_enabled()) {
+>              /* create a thread per vCPU with TCG (MTTCG) */
+> -            parallel_cpus =3D true;
+>              snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+>                   cpu->cpu_index);
+>
+> --
+> 2.25.1
+>
+>
+>
 
-Changes v2 -> v3: none
+--000000000000c44b0105ae32e75d
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Changes v1 -> v2: none
+<div dir=3D"auto"><div><br><div class=3D"gmail_quote"><div dir=3D"ltr" clas=
+s=3D"gmail_attr">Le ven. 28 ao=C3=BBt 2020 20:04, Richard Henderson &lt;<a =
+href=3D"mailto:richard.henderson@linaro.org">richard.henderson@linaro.org</=
+a>&gt; a =C3=A9crit=C2=A0:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Do not s=
+et parallel_cpus if there is only one cpu instantiated.<br>
+This will allow tcg to use serial code to implement atomics.<br>
+<br>
+Signed-off-by: Richard Henderson &lt;<a href=3D"mailto:richard.henderson@li=
+naro.org" target=3D"_blank" rel=3D"noreferrer">richard.henderson@linaro.org=
+</a>&gt;<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
+=3D"auto"><span style=3D"font-family:sans-serif;font-size:13.696px">Reviewe=
+d-by: Philippe Mathieu-Daud=C3=A9 &lt;</span><a href=3D"mailto:f4bug@amsat.=
+org" style=3D"text-decoration:none;color:rgb(66,133,244);font-family:sans-s=
+erif;font-size:13.696px">f4bug@amsat.org</a><span style=3D"font-family:sans=
+-serif;font-size:13.696px">&gt;</span><br></div><div dir=3D"auto"><span sty=
+le=3D"font-family:sans-serif;font-size:13.696px"><br></span></div><div dir=
+=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" styl=
+e=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+---<br>
+=C2=A0softmmu/cpus.c | 11 ++++++++++-<br>
+=C2=A01 file changed, 10 insertions(+), 1 deletion(-)<br>
+<br>
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c<br>
+index a802e899ab..e3b98065c9 100644<br>
+--- a/softmmu/cpus.c<br>
++++ b/softmmu/cpus.c<br>
+@@ -1895,6 +1895,16 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)<br>
+=C2=A0 =C2=A0 =C2=A0if (!tcg_region_inited) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_region_inited =3D 1;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tcg_region_init();<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 /*<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* If MTTCG, and we will create multiple =
+cpus,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0* then we will have cpus running in para=
+llel.<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0*/<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if (qemu_tcg_mttcg_enabled()) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 MachineState *ms =3D MACHINE(qde=
+v_get_machine());<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 if (ms-&gt;smp.max_cpus &gt; 1) =
+{<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 parallel_cpus =3D =
+true;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 }<br>
+=C2=A0 =C2=A0 =C2=A0}<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread)=
+ {<br>
+@@ -1904,7 +1914,6 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (qemu_tcg_mttcg_enabled()) {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0/* create a thread per vCPU=
+ with TCG (MTTCG) */<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 parallel_cpus =3D true;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0snprintf(thread_name, VCPU_=
+THREAD_NAME_SIZE, &quot;CPU %d/TCG&quot;,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 cpu-&gt;cpu_=
+index);<br>
+<br>
+-- <br>
+2.25.1<br>
+<br>
+<br>
+</blockquote></div></div></div>
 
----
-Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
-Cc: "Daniel P. Berrangé" <berrange@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
----
- include/authz/list.h                | 7 ++-----
- include/authz/listfile.h            | 7 ++-----
- include/authz/pamacct.h             | 7 ++-----
- include/authz/simple.h              | 7 ++-----
- include/crypto/secret_keyring.h     | 7 ++-----
- include/io/dns-resolver.h           | 7 ++-----
- include/io/net-listener.h           | 7 ++-----
- include/sysemu/vhost-user-backend.h | 7 ++-----
- backends/dbus-vmstate.c             | 7 ++-----
- ui/input-barrier.c                  | 7 ++-----
- ui/input-linux.c                    | 7 ++-----
- 11 files changed, 22 insertions(+), 55 deletions(-)
-
-diff --git a/include/authz/list.h b/include/authz/list.h
-index e4e1040472..5676bb375c 100644
---- a/include/authz/list.h
-+++ b/include/authz/list.h
-@@ -27,8 +27,8 @@
- 
- #define TYPE_QAUTHZ_LIST "authz-list"
- 
--OBJECT_DECLARE_TYPE(QAuthZList, QAuthZListClass,
--                    qauthz_list, QAUTHZ_LIST)
-+OBJECT_DECLARE_SIMPLE_TYPE(QAuthZList, qauthz_list,
-+                           QAUTHZ_LIST, QAuthZClass)
- 
- 
- 
-@@ -68,9 +68,6 @@ struct QAuthZList {
- };
- 
- 
--struct QAuthZListClass {
--    QAuthZClass parent_class;
--};
- 
- 
- QAuthZList *qauthz_list_new(const char *id,
-diff --git a/include/authz/listfile.h b/include/authz/listfile.h
-index 89c5eafbfa..b491227bbe 100644
---- a/include/authz/listfile.h
-+++ b/include/authz/listfile.h
-@@ -27,8 +27,8 @@
- 
- #define TYPE_QAUTHZ_LIST_FILE "authz-list-file"
- 
--OBJECT_DECLARE_TYPE(QAuthZListFile, QAuthZListFileClass,
--                    qauthz_list_file, QAUTHZ_LIST_FILE)
-+OBJECT_DECLARE_SIMPLE_TYPE(QAuthZListFile, qauthz_list_file,
-+                           QAUTHZ_LIST_FILE, QAuthZClass)
- 
- 
- 
-@@ -87,9 +87,6 @@ struct QAuthZListFile {
- };
- 
- 
--struct QAuthZListFileClass {
--    QAuthZClass parent_class;
--};
- 
- 
- QAuthZListFile *qauthz_list_file_new(const char *id,
-diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
-index 44bb5ff28d..7804853ddf 100644
---- a/include/authz/pamacct.h
-+++ b/include/authz/pamacct.h
-@@ -27,8 +27,8 @@
- 
- #define TYPE_QAUTHZ_PAM "authz-pam"
- 
--OBJECT_DECLARE_TYPE(QAuthZPAM, QAuthZPAMClass,
--                    qauthz_pam, QAUTHZ_PAM)
-+OBJECT_DECLARE_SIMPLE_TYPE(QAuthZPAM, qauthz_pam,
-+                           QAUTHZ_PAM, QAuthZClass)
- 
- 
- 
-@@ -79,9 +79,6 @@ struct QAuthZPAM {
- };
- 
- 
--struct QAuthZPAMClass {
--    QAuthZClass parent_class;
--};
- 
- 
- QAuthZPAM *qauthz_pam_new(const char *id,
-diff --git a/include/authz/simple.h b/include/authz/simple.h
-index ba4a5ec5ea..346fcb0c6c 100644
---- a/include/authz/simple.h
-+++ b/include/authz/simple.h
-@@ -26,8 +26,8 @@
- 
- #define TYPE_QAUTHZ_SIMPLE "authz-simple"
- 
--OBJECT_DECLARE_TYPE(QAuthZSimple, QAuthZSimpleClass,
--                    qauthz_simple, QAUTHZ_SIMPLE)
-+OBJECT_DECLARE_SIMPLE_TYPE(QAuthZSimple, qauthz_simple,
-+                           QAUTHZ_SIMPLE, QAuthZClass)
- 
- 
- 
-@@ -62,9 +62,6 @@ struct QAuthZSimple {
- };
- 
- 
--struct QAuthZSimpleClass {
--    QAuthZClass parent_class;
--};
- 
- 
- QAuthZSimple *qauthz_simple_new(const char *id,
-diff --git a/include/crypto/secret_keyring.h b/include/crypto/secret_keyring.h
-index cc2c7397db..73d2a8f501 100644
---- a/include/crypto/secret_keyring.h
-+++ b/include/crypto/secret_keyring.h
-@@ -26,8 +26,8 @@
- #include "crypto/secret_common.h"
- 
- #define TYPE_QCRYPTO_SECRET_KEYRING "secret_keyring"
--OBJECT_DECLARE_TYPE(QCryptoSecretKeyring, QCryptoSecretKeyringClass,
--                    qcrypto_secret_keyring, QCRYPTO_SECRET_KEYRING)
-+OBJECT_DECLARE_SIMPLE_TYPE(QCryptoSecretKeyring, qcrypto_secret_keyring,
-+                           QCRYPTO_SECRET_KEYRING, QCryptoSecretCommonClass)
- 
- 
- struct QCryptoSecretKeyring {
-@@ -36,8 +36,5 @@ struct QCryptoSecretKeyring {
- };
- 
- 
--struct QCryptoSecretKeyringClass {
--    QCryptoSecretCommonClass parent;
--};
- 
- #endif /* QCRYPTO_SECRET_KEYRING_H */
-diff --git a/include/io/dns-resolver.h b/include/io/dns-resolver.h
-index 8ae4857e05..e248fba5bd 100644
---- a/include/io/dns-resolver.h
-+++ b/include/io/dns-resolver.h
-@@ -26,8 +26,8 @@
- #include "io/task.h"
- 
- #define TYPE_QIO_DNS_RESOLVER "qio-dns-resolver"
--OBJECT_DECLARE_TYPE(QIODNSResolver, QIODNSResolverClass,
--                    qio_dns_resolver, QIO_DNS_RESOLVER)
-+OBJECT_DECLARE_SIMPLE_TYPE(QIODNSResolver, qio_dns_resolver,
-+                           QIO_DNS_RESOLVER, ObjectClass)
- 
- 
- /**
-@@ -133,9 +133,6 @@ struct QIODNSResolver {
-     Object parent;
- };
- 
--struct QIODNSResolverClass {
--    ObjectClass parent;
--};
- 
- 
- /**
-diff --git a/include/io/net-listener.h b/include/io/net-listener.h
-index 4f0847ff19..60fad29ff4 100644
---- a/include/io/net-listener.h
-+++ b/include/io/net-listener.h
-@@ -25,8 +25,8 @@
- #include "qom/object.h"
- 
- #define TYPE_QIO_NET_LISTENER "qio-net-listener"
--OBJECT_DECLARE_TYPE(QIONetListener, QIONetListenerClass,
--                    qio_net_listener, QIO_NET_LISTENER)
-+OBJECT_DECLARE_SIMPLE_TYPE(QIONetListener, qio_net_listener,
-+                           QIO_NET_LISTENER, ObjectClass)
- 
- 
- typedef void (*QIONetListenerClientFunc)(QIONetListener *listener,
-@@ -58,9 +58,6 @@ struct QIONetListener {
-     GDestroyNotify io_notify;
- };
- 
--struct QIONetListenerClass {
--    ObjectClass parent;
--};
- 
- 
- /**
-diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-user-backend.h
-index 76ca06cf40..23205edeb8 100644
---- a/include/sysemu/vhost-user-backend.h
-+++ b/include/sysemu/vhost-user-backend.h
-@@ -22,13 +22,10 @@
- #include "io/channel.h"
- 
- #define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
--OBJECT_DECLARE_TYPE(VhostUserBackend, VhostUserBackendClass,
--                    vhost_user_backend, VHOST_USER_BACKEND)
-+OBJECT_DECLARE_SIMPLE_TYPE(VhostUserBackend, vhost_user_backend,
-+                           VHOST_USER_BACKEND, ObjectClass)
- 
- 
--struct VhostUserBackendClass {
--    ObjectClass parent_class;
--};
- 
- struct VhostUserBackend {
-     /* private */
-diff --git a/backends/dbus-vmstate.c b/backends/dbus-vmstate.c
-index 0ca9d52ae5..a13461edea 100644
---- a/backends/dbus-vmstate.c
-+++ b/backends/dbus-vmstate.c
-@@ -23,12 +23,9 @@
- 
- 
- #define TYPE_DBUS_VMSTATE "dbus-vmstate"
--OBJECT_DECLARE_TYPE(DBusVMState, DBusVMStateClass,
--                    dbus_vmstate, DBUS_VMSTATE)
-+OBJECT_DECLARE_SIMPLE_TYPE(DBusVMState, dbus_vmstate,
-+                           DBUS_VMSTATE, ObjectClass)
- 
--struct DBusVMStateClass {
--    ObjectClass parent_class;
--};
- 
- struct DBusVMState {
-     Object parent;
-diff --git a/ui/input-barrier.c b/ui/input-barrier.c
-index c7a8dc19a7..87543a3399 100644
---- a/ui/input-barrier.c
-+++ b/ui/input-barrier.c
-@@ -20,8 +20,8 @@
- #include "input-barrier.h"
- 
- #define TYPE_INPUT_BARRIER "input-barrier"
--OBJECT_DECLARE_TYPE(InputBarrier, InputBarrierClass,
--                    input_barrier, INPUT_BARRIER)
-+OBJECT_DECLARE_SIMPLE_TYPE(InputBarrier, input_barrier,
-+                           INPUT_BARRIER, ObjectClass)
- 
- 
- #define MAX_HELLO_LENGTH 1024
-@@ -44,9 +44,6 @@ struct InputBarrier {
-     char buffer[MAX_HELLO_LENGTH];
- };
- 
--struct InputBarrierClass {
--    ObjectClass parent_class;
--};
- 
- static const char *cmd_names[] = {
-     [barrierCmdCNoop]          = "CNOP",
-diff --git a/ui/input-linux.c b/ui/input-linux.c
-index a95269cc25..5d501c8360 100644
---- a/ui/input-linux.c
-+++ b/ui/input-linux.c
-@@ -31,8 +31,8 @@ static bool linux_is_button(unsigned int lnx)
- }
- 
- #define TYPE_INPUT_LINUX "input-linux"
--OBJECT_DECLARE_TYPE(InputLinux, InputLinuxClass,
--                    input_linux, INPUT_LINUX)
-+OBJECT_DECLARE_SIMPLE_TYPE(InputLinux, input_linux,
-+                           INPUT_LINUX, ObjectClass)
- 
- 
- struct InputLinux {
-@@ -65,9 +65,6 @@ struct InputLinux {
-     QTAILQ_ENTRY(InputLinux) next;
- };
- 
--struct InputLinuxClass {
--    ObjectClass parent_class;
--};
- 
- static QTAILQ_HEAD(, InputLinux) inputs = QTAILQ_HEAD_INITIALIZER(inputs);
- 
--- 
-2.26.2
-
+--000000000000c44b0105ae32e75d--
 
