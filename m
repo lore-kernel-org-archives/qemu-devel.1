@@ -2,140 +2,86 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NORMAL_HTTP_TO_IP,NUMERIC_HTTP_ADDR,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C60C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:42:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53D9FC433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:57:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 777BF20782
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:42:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1D9742068E
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:57:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="q7i5578I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 777BF20782
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VOqwVBpZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D9742068E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44700 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCj8u-0006V7-Kt
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 08:42:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40488)
+	id 1kCjNO-0001NZ-9M
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 08:57:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
- id 1kCj8A-0005kw-7o; Mon, 31 Aug 2020 08:41:50 -0400
-Received: from mail-eopbgr760048.outbound.protection.outlook.com
- ([40.107.76.48]:20357 helo=NAM02-CY1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
- id 1kCj86-00043t-FG; Mon, 31 Aug 2020 08:41:49 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jrP3C2Xfy0s4OVo9L5/88PBHx1J3J5VLBtB87nb+FN8amr5tZyqWSegfIs1KA7eSaikiG+CZRoGfuKhd/pdwktj0JFXEWH3p/VE72QPbFUKlvB7Gms0s1usMxFpueVDkRZo2SBSTiAhpLohwCuM0FA+pYf0O4Scc7FATA6ZZMUGNyF9ilrXqO1h+N0OmnXxVyHYSPbLlde2mwqCxq7+Yuv/cT8MkH4e58nPA46DrJyaz6O1JzVgEzjzhPy/UXSd90ZBJaCiv/aAiBnJXTK8ORGXq+wJfAR/wZ0JIefzM8PzAyRD6cXu3TCXsEoF5a4Lk9z0mgV/R2SGpYiu592/eJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EclMdyf35hmWjRvXk1G/IkZSsdsd/lNkS4tCE9bucMo=;
- b=SDaXCTzVNJnjeF+a0zshovNImyAo5bp17xyTGzf8CyE6u6dvAB/BTAbaniEObskMilyufcV4WFgSTVfkE1Ony3/f2Qo42Z3AZTP31OlIYnzB3p/lTSVMPS4ng+O5wl6mcv1Rk9BUcqv54MopOBiKnj+Xq+XSONaEqYPVHPDK7LMCR+9T42PZZuWgtN87F9ePmpjKXrrIzW02sCobSXPzGHzZIuNC5CGHC9HexI1KxUXDBIfwX2uUGaSAqM/PVk1O3u5LbN/gApXsrl/jHmFhQ9ZQPdH6ZlTG6wBIDlcXtzcFNTfrm1ggrgcobNR39QK72mTQp/vD4j6xhOeWwXKVrw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=kernel.org smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=EclMdyf35hmWjRvXk1G/IkZSsdsd/lNkS4tCE9bucMo=;
- b=q7i5578I/3R0J3Qt5yKnZob7JcUR77qjasp7Kwg6Q3EyZ9DFbD5C/6kT9/rZARN2w7thnIAtHi9xM6hVI9kZKpOr3q7M/uO+YKUCLETHsauLqmkUcVdeIu69AhLZ25iMpuiuMGzyjzKSWrnechFxWh66oD6C2plqZGiub1qi6UE=
-Received: from CY4PR14CA0025.namprd14.prod.outlook.com (2603:10b6:903:101::11)
- by BL0PR02MB4738.namprd02.prod.outlook.com (2603:10b6:208:5b::16)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.23; Mon, 31 Aug
- 2020 12:41:41 +0000
-Received: from CY1NAM02FT034.eop-nam02.prod.protection.outlook.com
- (2603:10b6:903:101:cafe::ad) by CY4PR14CA0025.outlook.office365.com
- (2603:10b6:903:101::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.21 via Frontend
- Transport; Mon, 31 Aug 2020 12:41:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; kernel.org; dkim=none (message not signed)
- header.d=none;kernel.org; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT034.mail.protection.outlook.com (10.152.75.190) with Microsoft SMTP
- Server id 15.20.3326.19 via Frontend Transport; Mon, 31 Aug 2020 12:41:41
- +0000
-Received: from [149.199.38.66] (port=50851 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <edgar@xilinx.com>)
- id 1kCj7z-0006Gw-BS; Mon, 31 Aug 2020 05:41:39 -0700
-Received: from [127.0.0.1] (helo=localhost)
- by smtp.xilinx.com with smtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kCj81-0004Z9-4C; Mon, 31 Aug 2020 05:41:41 -0700
-Received: from xsj-pvapsmtp01 (mailhub.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 07VCfWeC017370; 
- Mon, 31 Aug 2020 05:41:32 -0700
-Received: from [10.71.116.235] (helo=localhost)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kCj7s-0004YR-I4; Mon, 31 Aug 2020 05:41:32 -0700
-Date: Mon, 31 Aug 2020 14:41:28 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v1 2/2] target/microblaze: Improve transaction failure
- handling
-Message-ID: <20200831124128.GB14249@toto>
-References: <20200828113931.3252489-1-edgar.iglesias@gmail.com>
- <20200828113931.3252489-3-edgar.iglesias@gmail.com>
- <3556c713-8635-2868-cd4c-387fcef6c50c@linaro.org>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kCjMr-0000wm-QW
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 08:57:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55709)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kCjMo-0005ov-QC
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 08:57:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598878617;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=/GcRD78QoWlMZKiwLtD5Ismx807IB0TKmTFc2pQgRoo=;
+ b=VOqwVBpZ22Ly1iuhp9XUlWtAMRr5CkFZmUFCdn2huKcxO8xgxSCqr+28XynbrR4+elt/nW
+ Ww/1iKSa3RFo6E8iS5x2d7UGcbRFwKz2S9qrT5MYlEZ0uwJUpymzaLtHdZ4lYe0q4IcwSy
+ JClZzbEl7nlDCI+q33yMcTOMjbQCLt8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-479-_B_bGIcVNsaU2jcd664MjQ-1; Mon, 31 Aug 2020 08:56:47 -0400
+X-MC-Unique: _B_bGIcVNsaU2jcd664MjQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92591425CD
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 12:56:46 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40F831002D47;
+ Mon, 31 Aug 2020 12:56:46 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] build: fix recurse-all target
+Date: Mon, 31 Aug 2020 08:56:45 -0400
+Message-Id: <20200831125645.29331-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3556c713-8635-2868-cd4c-387fcef6c50c@linaro.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: cee689d6-94f4-40d9-3792-08d84dab3606
-X-MS-TrafficTypeDiagnostic: BL0PR02MB4738:
-X-Microsoft-Antispam-PRVS: <BL0PR02MB4738AC5155B800F086C9769FC2510@BL0PR02MB4738.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: i7HPvJiZUyr7/zHR7lUoO7K9FymIAchhe/l3qHWqEenNhVpuuKuQmBbi+ov5tj1naE/2UT39NUoIjtXIa3RB8A08LfjnYWxxgimuQg0yEwHIzvI2jOrdJV9bH27FZtMDPZeivJlpt+x9xvJBfSIyjnBmdYVmksyLyLO1RKqofzRMK6/DUUiACH3p+phQ0etXtyxNLVeHnIaERJCL5WOUKeLTnLgxbnDUBkDHKw+N46hcxvM+Q66ii8o+NF31uBqYDhCXWsBp3K0M3OExxYzMw0xzSuN0ml2WX+xycd1/PHjCCOBUPlbLiz/S0DcpG2tHgG7IyQSCXvVXRjIzgpE7L49gcx7S4t0X6vEZJ6j24YFRStQ+WldVzkPvha1LQ8NxFeCIaaLV7t1jfQXi1G3xRdhYpCGgJ2vepbGuTSz7eAknwIh+F/SwhW7A4JRGgWOFf2PoOmn4hJvUWJODTZHBBjW8+LbPF9l9HaZusqbJVX8=
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(7916004)(136003)(396003)(376002)(346002)(39860400002)(46966005)(4744005)(82740400003)(5660300002)(9686003)(7416002)(8676002)(8936002)(336012)(1076003)(33716001)(966005)(9786002)(26005)(478600001)(70586007)(47076004)(316002)(4326008)(186003)(107886003)(426003)(53546011)(81166007)(83380400001)(82310400002)(6916009)(2906002)(6666004)(70206006)(356005)(33656002);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2020 12:41:41.3908 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cee689d6-94f4-40d9-3792-08d84dab3606
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT034.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR02MB4738
-Received-SPF: pass client-ip=40.107.76.48; envelope-from=edgar@xilinx.com;
- helo=NAM02-CY1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 08:41:43
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:43:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -148,33 +94,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- sai.pavan.boddu@xilinx.com, frasse.iglesias@gmail.com, alistair@alistair23.me,
- qemu-devel@nongnu.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, philmd@redhat.com,
- luc.michel@greensocs.com
+Cc: thuth@redhat.com, Miroslav Rezanina <mrezanin@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Aug 28, 2020 at 01:34:08PM -0700, Richard Henderson wrote:
-> On 8/28/20 4:39 AM, Edgar E. Iglesias wrote:
-> > +    if ((access_type == MMU_INST_FETCH && cpu->cfg.iopb_bus_exception) ||
-> > +        (access_type != MMU_INST_FETCH && cpu->cfg.dopb_bus_exception)) {
-> > +        cpu_restore_state(cs, retaddr, true);
-> > +        env->sregs[SR_ESR] = access_type == MMU_INST_FETCH ?
-> > +                             ESR_EC_INSN_BUS : ESR_EC_DATA_BUS;
-> > +        env->sregs[SR_EAR] = addr;
-> > +        helper_raise_exception(env, EXCP_HW_EXCP);
-> 
-> I think it's better to use cpu_loop_exit_restore, adding the one line for
-> cs->exception_index from helper_raise_exception.
-> 
+The missing "/all" suffix prevents the pc-bios/ parts of the build
+from running.
 
-OK, let's use the patch you posted:
+In the meanwhile, -Wall has moved from QEMU_CFLAGS to CFLAGS.  Simplify
+everything by not passing down CFLAGS, and add -Wall in the recursive
+Makefiles.
 
-https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg07630.html
+Reported-by: Miroslav Rezanina <mrezanin@redhat.com>
+Fixes: 5e6d1573b4 ("remove Makefile.target", 2020-08-21)
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Makefile                   | 4 ++--
+ pc-bios/optionrom/Makefile | 8 ++------
+ pc-bios/s390-ccw/Makefile  | 3 ++-
+ 3 files changed, 6 insertions(+), 9 deletions(-)
 
-Thanks,
-Edgar
+diff --git a/Makefile b/Makefile
+index 27bf8156ec..7230f0f1f3 100644
+--- a/Makefile
++++ b/Makefile
+@@ -186,10 +186,10 @@ ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
+ # Only keep -O and -g cflags
+ .PHONY: $(ROM_DIRS_RULES)
+ $(ROM_DIRS_RULES):
+-	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" CFLAGS="$(filter -O% -g%,$(CFLAGS))" $(notdir $@),)
++	$(call quiet-command,$(MAKE) $(SUBDIR_MAKEFLAGS) -C $(dir $@) V="$(V)" TARGET_DIR="$(dir $@)" $(notdir $@),)
+ 
+ .PHONY: recurse-all recurse-clean
+-recurse-all: $(ROM_DIRS)
++recurse-all: $(addsuffix /all, $(ROM_DIRS))
+ recurse-clean: $(addsuffix /clean, $(ROM_DIRS))
+ 
+ ######################################################################
+diff --git a/pc-bios/optionrom/Makefile b/pc-bios/optionrom/Makefile
+index 51cb6ca9d8..6495802d9f 100644
+--- a/pc-bios/optionrom/Makefile
++++ b/pc-bios/optionrom/Makefile
+@@ -8,15 +8,12 @@ all: multiboot.bin linuxboot.bin linuxboot_dma.bin kvmvapic.bin pvh.bin
+ 	@true
+ 
+ include ../../config-host.mak
++CFLAGS = -O2 -g
+ 
+ quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
+ cc-option = $(if $(shell $(CC) $1 -S -o /dev/null -xc /dev/null >/dev/null 2>&1 && echo OK), $1, $2)
+ 
+-# Compiling with no optimization creates ROMs that are too large
+-ifeq ($(lastword $(filter -O%, -O0 $(CFLAGS))),-O0)
+-override CFLAGS += -O2
+-endif
+-override CFLAGS += -march=i486
++override CFLAGS += -march=i486 -Wall
+ 
+ # Flags for dependency generation
+ override CPPFLAGS += -MMD -MP -MT $@ -MF $(@D)/$(*F).d
+@@ -42,7 +39,6 @@ Wa = -Wa,
+ override ASFLAGS += -32
+ override CFLAGS += $(call cc-option, $(Wa)-32)
+ 
+-
+ LD_I386_EMULATION ?= elf_i386
+ override LDFLAGS = -m $(LD_I386_EMULATION) -T $(SRC_DIR)/flat.lds
+ override LDFLAGS += $(LDFLAGS_NOPIE)
+diff --git a/pc-bios/s390-ccw/Makefile b/pc-bios/s390-ccw/Makefile
+index cc0f77baa6..3eb785048a 100644
+--- a/pc-bios/s390-ccw/Makefile
++++ b/pc-bios/s390-ccw/Makefile
+@@ -3,6 +3,7 @@ all: build-all
+ 	@true
+ 
+ include ../../config-host.mak
++CFLAGS = -O2 -g
+ 
+ quiet-command = $(if $(V),$1,$(if $(2),@printf "  %-7s %s\n" $2 $3 && $1, @$1))
+ cc-option = $(if $(shell $(CC) $1 -S -o /dev/null -xc /dev/null > /dev/null \
+@@ -28,7 +29,7 @@ QEMU_DGFLAGS = -MMD -MP -MT $@ -MF $(@D)/$(*F).d
+ OBJECTS = start.o main.o bootmap.o jump2ipl.o sclp.o menu.o \
+ 	  virtio.o virtio-scsi.o virtio-blkdev.o libc.o cio.o dasd-ipl.o
+ 
+-QEMU_CFLAGS := $(filter -W%, $(QEMU_CFLAGS))
++QEMU_CFLAGS := -Wall $(filter -W%, $(QEMU_CFLAGS))
+ QEMU_CFLAGS += -ffreestanding -fno-delete-null-pointer-checks -msoft-float
+ QEMU_CFLAGS += -march=z900 -fPIE -fno-strict-aliasing
+ QEMU_CFLAGS += -fno-asynchronous-unwind-tables
+-- 
+2.26.2
+
 
