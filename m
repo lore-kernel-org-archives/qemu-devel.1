@@ -2,88 +2,96 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08F50C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5626C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:27:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE6E0206FA
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 675CB20719
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:27:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LX6Jxs+e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE6E0206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UP+mQycb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 675CB20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39008 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCrJy-0003rN-RC
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:26:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45358)
+	id 1kCrKX-00051a-9o
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:27:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kCr3i-0006tI-Ev
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:09:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48355)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kCr3f-0000JH-H4
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:09:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598908182;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Wbzi430Kpadf0ivRBdvVfzRyP76PlwJUtCXjcSq46Ns=;
- b=LX6Jxs+e/Hq/iAQhpsnZHI5TZ4JRQG7ueBdmbevCNHtaFk5LFFikPfxE3A6ZJFsUizvj06
- 2EQfI/iBIxQENj4hWvhEANYEef0TJfsRqo1R6ECc+cCQNAaVcPQ2/DS6qfKtnhKlVaTc/q
- qUX4mCoo8vnnd11wP3XiXSCe8rnoot8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-161-OhSkuY7nNgKFd-eGMJyAFg-1; Mon, 31 Aug 2020 17:09:40 -0400
-X-MC-Unique: OhSkuY7nNgKFd-eGMJyAFg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F881801AB2;
- Mon, 31 Aug 2020 21:09:39 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0D8BF16E27;
- Mon, 31 Aug 2020 21:09:38 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 17/18] [automated] Use OBJECT_DECLARE_TYPE where possible
- (pass 3)
-Date: Mon, 31 Aug 2020 17:07:39 -0400
-Message-Id: <20200831210740.126168-18-ehabkost@redhat.com>
-In-Reply-To: <20200831210740.126168-1-ehabkost@redhat.com>
-References: <20200831210740.126168-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kCrCK-0002an-Qd
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:18:40 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38548)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kCrCJ-0001TG-40
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:18:40 -0400
+Received: by mail-pf1-x444.google.com with SMTP id d22so1395395pfn.5
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:18:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=lEAC0sSRDk8AHWvjEH7biZuBF1C2T1sYg1EOKUCzcd8=;
+ b=UP+mQycbq8qhOGg+R+Nbn2/6U2WQeAY/M+4L5sTvCUWEGJs5avlsdIL0ZL3d4iaX2B
+ oGF4ARyvz7NWjpMgm54mhPHBC+3F2pg23Lxdc0BPyWx3/1og8RNy9dtQgRqkgi9sgBvx
+ 3jwc8MtsKPLmq0T8ODfiPDxIqxcSMpgmflmEuJJluB8pq6RiC8c5fDBR2AOynNmiwB+x
+ EEQ3CavDNtNztvgUZM6c3IIn45Ssl/CVwBnwAECTSkyBK+0a4qRdqS9/W+WkCNxO4OgH
+ 9xf+Fty8ho4tZ7hPUeha12/bEybk3O7JBMx4SHrIQbYdw8bHLIhOUeV4ZRwtVsXVMrm0
+ aogg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lEAC0sSRDk8AHWvjEH7biZuBF1C2T1sYg1EOKUCzcd8=;
+ b=Fdmyo/Tok/GCsvjW0Vs/nFSG3JidyQvRHG70l8BSDZNj8fkF1r1a55arMZLaI7gDw5
+ Mrbi2ITzF9EHg+r0n8q3cvToG96m11UwsU9w/MOTuRMszlfpDW8XmDiYJbukNlIRmain
+ gqcnuJzYpksOiGF7E5LhOzDSptny0KgGXq7VXu3R47yP51wiurWbXTyhg55joPrRggvw
+ AeznMtZc1JoNXAS6T6/scwjIfcgKM5tKn1u10Vut6GlYsfnRvTWj5K+qNJFwE5oKayhy
+ VZG7MIVO/466MBHE+qzvbcVD5glRz8C56RuXxVr08pO5dETJXFdn5kr5aK9W0l5YRR4S
+ 5Y4g==
+X-Gm-Message-State: AOAM532An8oiiMezfGgdAxa82SROs4CHkZ2tnSERPxwu5VdV9Df7gYUt
+ 1ApkmuTqwm1IhZeOiBTPMRAwk6eMxzkrJg==
+X-Google-Smtp-Source: ABdhPJwob5F+J4hvu2kqcbA4eoWCZuUSVY7YjdaQZoFfEXrmRvMHTNh5NloGp+HtCeXEVBBVibWA/g==
+X-Received: by 2002:aa7:8c42:: with SMTP id e2mr2776241pfd.181.1598908717468; 
+ Mon, 31 Aug 2020 14:18:37 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id 193sm8818709pfu.169.2020.08.31.14.18.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 31 Aug 2020 14:18:36 -0700 (PDT)
+Subject: Re: [PATCH v2 2/7] target/arm: add ARMCPUClass->do_interrupt_locked
+To: Robert Foley <robert.foley@linaro.org>, qemu-devel@nongnu.org
+References: <20200819182856.4893-1-robert.foley@linaro.org>
+ <20200819182856.4893-3-robert.foley@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <439e8b14-adc1-b7ea-edaa-d11069863007@linaro.org>
+Date: Mon, 31 Aug 2020 14:18:34 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 15:34:32
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200819182856.4893-3-robert.foley@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,56 +104,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, alex.bennee@linaro.org,
+ pbonzini@redhat.com, peter.puhov@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace DECLARE_OBJ_CHECKERS with OBJECT_DECLARE_TYPE where the
-typedefs can be safely removed.
+On 8/19/20 11:28 AM, Robert Foley wrote:
+> Adding ->do_interrupt_locked to ARMCPUClass is preparation for
+> pushing the BQL down into the per-arch implementation of ->do_interrupt.
+> 
+> This is needed since ARM's *_cpu_exec_interrupt calls to *_do_interrupt.
+> With the push down of the BQL into *_cpu_exec_interrupt and
+> *_do_interrupt, *_cpu_exec_interrupt will call to ->do_interrupt
+> with lock held.  Since ->do_interrupt also has the lock, we need a way
+> to allow cpu_exec_interrupt to call do_interrupt with lock held.
+> This patch solves this issue of *_cpu_exec_interrupt needing
+> to call do_interrupt with lock held.
+> 
+> This patch is part of a series of transitions to move the
+> BQL down into the do_interrupt per arch functions.  This set of
+> transitions is needed to maintain bisectability.
+> 
+> This approach was suggested by Paolo Bonzini.
+> For reference, here are two key posts in the discussion, explaining
+> the reasoning/benefits of this approach.
+> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00784.html
+> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg01517.html
+> https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg08731.html
+> https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00044.html
+> 
+> Signed-off-by: Robert Foley <robert.foley@linaro.org>
+> ---
+>  target/arm/cpu-qom.h | 3 +++
+>  target/arm/cpu.c     | 5 +++--
+>  target/arm/cpu_tcg.c | 5 +++--
+>  3 files changed, 9 insertions(+), 4 deletions(-)
 
-Generated running:
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-$ ./scripts/codeconverter/converter.py -i \
-  --pattern=DeclareObjCheckers $(git grep -l '' -- '*.[ch]')
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes series v3 -> v4: this is a new patch added in series v4
-
-The script was re-run after series rebase.
-
-This is being submitted as a separate patch to make review
-easier, but it can be squashed into the previous patch once it
-gets reviewed.
----
-Cc: Peter Maydell <peter.maydell@linaro.org>
-Cc: qemu-arm@nongnu.org
-Cc: qemu-devel@nongnu.org
----
- include/hw/arm/armsse.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/include/hw/arm/armsse.h b/include/hw/arm/armsse.h
-index 452cbb5793..b844ef6bc0 100644
---- a/include/hw/arm/armsse.h
-+++ b/include/hw/arm/armsse.h
-@@ -108,10 +108,8 @@
- #include "qom/object.h"
- 
- #define TYPE_ARM_SSE "arm-sse"
--typedef struct ARMSSE ARMSSE;
--typedef struct ARMSSEClass ARMSSEClass;
--DECLARE_OBJ_CHECKERS(ARMSSE, ARMSSEClass,
--                     ARM_SSE, TYPE_ARM_SSE)
-+OBJECT_DECLARE_TYPE(ARMSSE, ARMSSEClass,
-+                    arm_sse, ARM_SSE)
- 
- /*
-  * These type names are for specific IoTKit subsystems; other than
--- 
-2.26.2
-
+r~
 
