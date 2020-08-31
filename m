@@ -2,76 +2,89 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D857C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A29C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:15:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EB3B21473
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:13:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EB3B21473
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 15B3A20684
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:15:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="il6oAYap"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15B3A20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kChka-0001dX-DO
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:13:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48234)
+	id 1kChmz-0002ck-A7
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:15:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kChet-00075p-JP
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:07:31 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:59389)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kCher-0000RW-DS
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:07:31 -0400
-Received: from localhost.localdomain ([82.252.135.186]) by
- mrelayeu.kundenserver.de (mreue106 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MysBI-1kZ1u229ys-00vuQP; Mon, 31 Aug 2020 13:07:24 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 6/8] linux-user: Add support for two btrfs ioctls used for
- subvolume
-Date: Mon, 31 Aug 2020 13:07:14 +0200
-Message-Id: <20200831110716.536808-7-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200831110716.536808-1-laurent@vivier.eu>
-References: <20200831110716.536808-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kChmO-0002Cj-2V
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:15:16 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26300
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kChmM-0001VY-AV
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:15:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598872513;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ta6Pf8pjwmhnQp2iuv4zHskaw60g68HnPvxcL92VHY8=;
+ b=il6oAYapn6mRbAQjnvsfGMABOhDMWfg1XlN1gQZnS3pJxGvoPCQeUPWmJ/8aKVSbbeR5CP
+ PtuFQYyTZ9ky2tJoUcbmuVwE8eMNQoKtM01WKvNG2AVi1a7lxt7QyCGfM4QhZblhwpuM4m
+ eA+ZK66UPtxxsZLQ4vc2yg4/anXXAAY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-190-I863Xhp3O9eNc4NdNnvsfA-1; Mon, 31 Aug 2020 07:15:11 -0400
+X-MC-Unique: I863Xhp3O9eNc4NdNnvsfA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91B6B10199AD
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 11:15:10 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-174.ams2.redhat.com [10.36.112.174])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DC4065D9DC;
+ Mon, 31 Aug 2020 11:15:04 +0000 (UTC)
+Subject: Re: [PATCH] meson: fix keymaps witout qemu-keymap
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20200827102617.14448-1-kraxel@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <772abf5c-30e2-149f-2507-2c47c016dd7b@redhat.com>
+Date: Mon, 31 Aug 2020 13:15:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:gP++zb2zEvzLKP/z7C17sFUsRuzroIK7o/zvgwLUkJ3LcrP16Q8
- PC6zF6Q1U68aD0u0DGYTOVYpQ81i8q0vbo/amUCFjdEMFtZUppGk8H/Sc18zlujxs1UBxDP
- 5NEtXz+kW5dQY0hacVOYB074jUbMH/nbEUV6OYKC5C5W1C6MXaRhD0Xq9XTOfAaHC9oyxUi
- jRUw9jIsfljQQKoJf0EVw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IjocbBXNDL4=:5ukBYv1rloQ4USn/BB4HH8
- L5lhkaM0AsDLJUJkdOClDoKaPviMYWeLv6DQEzyaLJQbAJoam2732OfxydXNS9I5Vo+JWpDpB
- 5iSUeu0UHYIfBxhI2bbipcCANg90B2z4N27d3wmfmRz5OhsZNKtkh0lw1PTvYWA6X4ZXr+doQ
- QA0AYEyLlGFs0Ptr5k8FtmNPns4y1IeiS5yxKPrU0kx4/9G0VNWD1aROPDr8xXJ1WZCAdQfcl
- ttlkAlnApjnQm0iQAVt5sQfjFWdZCRckgJk2HdZSvduFyldl3J3TkdC8HdF00Zt8hXVwXBmOg
- lYSxae+Stgjws0OJNTo1XX35RJJOY/jU5Es1o9MUTOSghmdvJGB4FuglXc7pFoarecbg9FJwI
- PSQF1P5l6MXb4c/Fws5IEbWdaTzWcCuDXhSZh1BnrlrH9ocJEbGVzgmt00WLPbBSDyb4Zikb3
- SZha7pSLwH9peU3WeFdSMXuf2aX9HEXYmeSwFF2fTjHBD3skI9QRbIUuYAHj81kPgdz4Ssw49
- YTyuu7YDBdwH2PadVN9iwvnOfeGIbq+/aMCe0lSV55XTF56Aa9EeyFlKhqAa8O9ftkgatkjsU
- QoELMKMcQcrGqauQM8ViI30X39BkluYEPUBGDNyPzkqAlFV7INodjU6weUhKFHlvoFLdKLtXt
- k2rULhWT9m4d8D89Oar5xHLtX6nlevRpICwKZXIvGHq2OjItr+OXaldYG6M4kfWWYG9cyyKTf
- QFLSZN9gLzdON7Q5xLkaXOOQZQ5bO3ezTQP1HIiKZpQY0L9W6TbLUKa+9AIXdpv+qFFkY3PeJ
- 6vTrXmzWJoYgeMRsr7O88vHhxncEDoqhjttnCYzhvp/zqacaShRC7lXkGnFhieHrVfeVrV2
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 07:07:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200827102617.14448-1-kraxel@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:13:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,135 +97,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+On 27/08/2020 12.26, Gerd Hoffmann wrote:
+> In case the qemu-keymap tool generating them is neither installed on the
+> system nor built from sources (due to xkbcommon not being available)
+> qemu will not find the keymaps when started directly from the build
+> tree,
+> 
+> This happens because commit ddcf607fa3d6 ("meson: drop keymaps symlink")
+> removed the symlink to the source tree, and the special handling for
+> install doesn't help in case we do not install qemu.
+> 
+> Lets fix that by simply copying over the file from the source tree as
+> fallback.
+> 
+> Reported-by: Thomas Huth <thuth@redhat.com>
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  pc-bios/keymaps/meson.build | 28 +++++++++++++++++++---------
+>  1 file changed, 19 insertions(+), 9 deletions(-)
 
-This patch implements functionality for following ioctl:
+Thanks, this fixes the acceptance tests on gitlab-CI for me!
 
-BTRFS_IOC_DEFAULT_SUBVOL - Setting a default subvolume
-
-    Set a default subvolume for a btrfs filesystem. The third
-    ioctl's argument is a '__u64' (unsigned long long) which
-    represents the id of a subvolume that is to be set as
-    the default.
-
-BTRFS_IOC_GET_SUBVOL_ROOTREF - Getting tree and directory id of subvolumes
-
-    Read tree and directory id of subvolumes from a btrfs
-    filesystem. The tree and directory id's are returned in the
-    ioctl's third argument which represents a pointer to a
-    following type:
-
-    struct btrfs_ioctl_get_subvol_rootref_args {
-		/* in/out, minimum id of rootref's treeid to be searched */
-		__u64 min_treeid;
-
-		/* out */
-		struct {
-			__u64 treeid;
-			__u64 dirid;
-		} rootref[BTRFS_MAX_ROOTREF_BUFFER_NUM];
-
-		/* out, number of found items */
-		__u8 num_items;
-		__u8 align[7];
-     };
-
-     Before calling this ioctl, 'min_treeid' field should be filled
-     with value that represent the minimum value for the tree id.
-
-Implementation notes:
-
-    Ioctl BTRFS_IOC_GET_SUBVOL_ROOTREF uses the above mentioned structure
-    type as third argument. That is the reason why a aproppriate thunk
-    structure definition is added in file 'syscall_types.h'.
-
-Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
-Tested-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200823195014.116226-7-Filip.Bozuta@syrmia.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
----
- linux-user/ioctls.h        |  7 +++++++
- linux-user/syscall_defs.h  |  3 +++
- linux-user/syscall_types.h | 13 +++++++++++++
- 3 files changed, 23 insertions(+)
-
-diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index 23807513eed1..dc2f3d2413ed 100644
---- a/linux-user/ioctls.h
-+++ b/linux-user/ioctls.h
-@@ -206,6 +206,9 @@
-      IOCTL(BTRFS_IOC_INO_LOOKUP, IOC_RW,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_args)))
- #endif
-+#ifdef BTRFS_IOC_DEFAULT_SUBVOL
-+     IOCTL(BTRFS_IOC_DEFAULT_SUBVOL, IOC_W, MK_PTR(TYPE_ULONGLONG))
-+#endif
- #ifdef BTRFS_IOC_SUBVOL_GETFLAGS
-      IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
- #endif
-@@ -248,6 +251,10 @@
-      IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
- #endif
-+#ifdef BTRFS_IOC_GET_SUBVOL_ROOTREF
-+     IOCTL(BTRFS_IOC_GET_SUBVOL_ROOTREF, IOC_RW,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_rootref_args)))
-+#endif
- #ifdef BTRFS_IOC_INO_LOOKUP_USER
-      IOCTL(BTRFS_IOC_INO_LOOKUP_USER, IOC_RW,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_ino_lookup_user_args)))
-diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 4929121956c6..bb60c728d81a 100644
---- a/linux-user/syscall_defs.h
-+++ b/linux-user/syscall_defs.h
-@@ -1014,6 +1014,8 @@ struct target_rtc_pll_info {
- #define TARGET_BTRFS_IOC_SUBVOL_CREATE          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 14)
- #define TARGET_BTRFS_IOC_SNAP_DESTROY           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 15)
- #define TARGET_BTRFS_IOC_INO_LOOKUP             TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 18)
-+#define TARGET_BTRFS_IOC_DEFAULT_SUBVOL         TARGET_IOW(BTRFS_IOCTL_MAGIC, 19,\
-+                                                           abi_ullong)
- #define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, 25,\
-                                                            abi_ullong)
- #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, 26,\
-@@ -1027,6 +1029,7 @@ struct target_rtc_pll_info {
- #define TARGET_BTRFS_IOC_GET_SUPPORTED_FEATURES TARGET_IORU(BTRFS_IOCTL_MAGIC, 57)
- #define TARGET_BTRFS_IOC_LOGICAL_INO_V2         TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 59)
- #define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IORU(BTRFS_IOCTL_MAGIC, 60)
-+#define TARGET_BTRFS_IOC_GET_SUBVOL_ROOTREF     TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 61)
- #define TARGET_BTRFS_IOC_INO_LOOKUP_USER        TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 62)
- 
- /* usb ioctls */
-diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index dab2c16bcac7..73e36620cedc 100644
---- a/linux-user/syscall_types.h
-+++ b/linux-user/syscall_types.h
-@@ -435,6 +435,19 @@ STRUCT(btrfs_ioctl_dev_info_args,
-        MK_ARRAY(TYPE_CHAR, BTRFS_DEVICE_PATH_NAME_MAX)) /* path */
- #endif
- 
-+#ifdef BTRFS_IOC_GET_SUBVOL_ROOTREF
-+STRUCT(rootref,
-+       TYPE_ULONGLONG, /* treeid */
-+       TYPE_ULONGLONG) /* dirid */
-+
-+STRUCT(btrfs_ioctl_get_subvol_rootref_args,
-+       TYPE_ULONGLONG, /* min_treeid */
-+       MK_ARRAY(MK_STRUCT(STRUCT_rootref),
-+                BTRFS_MAX_ROOTREF_BUFFER_NUM), /* rootref */
-+       TYPE_CHAR, /* num_items */
-+       MK_ARRAY(TYPE_CHAR, 7)) /* align */
-+#endif
-+
- #ifdef BTRFS_IOC_GET_DEV_STATS
- STRUCT(btrfs_ioctl_get_dev_stats,
-        TYPE_ULONGLONG, /* devid */
--- 
-2.26.2
+Tested-by: Thomas Huth <thuth@redhat.com>
 
 
