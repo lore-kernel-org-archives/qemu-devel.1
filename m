@@ -2,65 +2,68 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D5BC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:33:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21990C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:38:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 308AF2068E
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:33:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99F352073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:38:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BqQVB1fw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308AF2068E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FLPz1PCK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F352073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36278 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCj0G-0002vs-CR
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 08:33:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38908)
+	id 1kCj54-0004kt-Hl
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 08:38:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kCizj-0002VR-RJ
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 08:33:07 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58683
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kCj4B-0003uG-SI
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 08:37:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43151
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kCizh-00035K-CN
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 08:33:07 -0400
+ id 1kCj48-0003Z6-Tl
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 08:37:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598877184;
+ s=mimecast20190719; t=1598877459;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=f7UZHyrLj+aA32ueieIBWbLo/AJeJvWAb6bpX9Y3UPk=;
- b=BqQVB1fwxrqVGM5iAYmOWcpoRuUQVY3edgC/Qhf3rX2duwrTqLC2cmvCdgZuhrX26B875I
- bMGcx/psbxhKVm1ZT+mEzsfFylL6B6rYx27dzR+yyek8WNoJMLjtWs4kD065RJGOaoIU5t
- phPVUBXjFdYvQB340r2bNQlZF6F3RWs=
+ bh=4ywBxzubw03QbPXuE6QhtIOCyLsUlt1tcti+tYeiBak=;
+ b=FLPz1PCKp4JKyUd4eqELSjBiQTGXZ9rkFz25NzMA+ZRxSnG/WyxI6+SqZ9NR0YNXDRIHL9
+ 5krMveohH2sDNctLBQfNv8F5spBU57icc8e2xu6acCChr4n8u6jbva2V8eLjsixj/fF4le
+ qhDRSu3ajf9HxTq6QJ0b3mJVmFabwqI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-497-AM9ZEzMONveJLwtnf2AP4A-1; Mon, 31 Aug 2020 08:31:55 -0400
-X-MC-Unique: AM9ZEzMONveJLwtnf2AP4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-80-3Gt23T5OPtqmFaRzGnwD0A-1; Mon, 31 Aug 2020 08:37:33 -0400
+X-MC-Unique: 3Gt23T5OPtqmFaRzGnwD0A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94F04801F98
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 12:31:54 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE73D18A2242;
+ Mon, 31 Aug 2020 12:37:31 +0000 (UTC)
 Received: from [10.36.113.34] (ovpn-113-34.ams2.redhat.com [10.36.113.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C0C4819C4F;
- Mon, 31 Aug 2020 12:31:53 +0000 (UTC)
-Subject: Re: [PATCH] meson: bump submodule to 0.55.1
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20200830161729.255253-1-pbonzini@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1A39A5C1BB;
+ Mon, 31 Aug 2020 12:37:26 +0000 (UTC)
+Subject: Re: [PATCH v3] virtio-rng: return available data with O_NONBLOCK
+To: Martin Wilck <mwilck@suse.com>, "Michael S. Tsirkin" <mst@redhat.com>
+References: <20200811142821.12323-1-mwilck@suse.com>
+ <4ae4f348-c186-f7e4-f7e3-b1f1e4a4b408@redhat.com>
+ <20200826082613-mutt-send-email-mst@kernel.org>
+ <519e0296a7d61d5e9e8d258a855eb42a57c641c5.camel@suse.com>
 From: Laurent Vivier <lvivier@redhat.com>
 Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -116,13 +119,13 @@ Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
  pt0DCMMTbiYIUcrhX8eveCJtY7NGWNyxFCRkhxRuGcpwPmRVDwOl39MB3iTsRighiMnijkbL
  XiKoJ5CDVvX5yicNqYJPKh5MFXN1bvsBkmYiStMRbrD0HoY1kx5/VozBtc70OU0EB8Wrv9hZ
  D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <9017db82-5f38-9820-a907-fe955502f798@redhat.com>
-Date: Mon, 31 Aug 2020 14:31:52 +0200
+Message-ID: <a5d4bcd3-e468-e818-3bd2-3a1b0fa172d8@redhat.com>
+Date: Mon, 31 Aug 2020 14:37:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200830161729.255253-1-pbonzini@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <519e0296a7d61d5e9e8d258a855eb42a57c641c5.camel@suse.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -130,17 +133,17 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=lvivier@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:06:35
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:13:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
 X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -153,45 +156,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30/08/2020 18:17, Paolo Bonzini wrote:
-> This version includes an important bugfix to avoid including unnecessary
-> -Wl,-rpath flags.  It also avoids the warnings on custom_targets with
-> more than one output.
+On 28/08/2020 23:34, Martin Wilck wrote:
+> On Wed, 2020-08-26 at 08:26 -0400, Michael S. Tsirkin wrote:
+>> On Tue, Aug 11, 2020 at 04:42:32PM +0200, Laurent Vivier wrote:
+>>> On 11/08/2020 16:28, mwilck@suse.com wrote:
+>>>> From: Martin Wilck <mwilck@suse.com>
+>>>>
+>>>> If a program opens /dev/hwrng with O_NONBLOCK and uses poll() and
+>>>> non-blocking read() to retrieve random data, it ends up in a
+>>>> tight
+>>>> loop with poll() always returning POLLIN and read() returning
+>>>> EAGAIN.
+>>>> This repeats forever until some process makes a blocking read()
+>>>> call.
+>>>> The reason is that virtio_read() always returns 0 in non-blocking 
+>>>> mode,
+>>>> even if data is available. Worse, it fetches random data from the
+>>>> hypervisor after every non-blocking call, without ever using this
+>>>> data.
+>>>>
+>>>> The following test program illustrates the behavior and can be
+>>>> used
+>>>> for testing and experiments. The problem will only be seen if all
+>>>> tasks use non-blocking access; otherwise the blocking reads will
+>>>> "recharge" the random pool and cause other, non-blocking reads to
+>>>> succeed at least sometimes.
+>>>>
+>>>> /* Whether to use non-blocking mode in a task, problem occurs if
+>>>> CONDITION is 1 */
+>>>> //#define CONDITION (getpid() % 2 != 0)
+>>>>
+>>>> static volatile sig_atomic_t stop;
+>>>> static void handler(int sig __attribute__((unused))) { stop = 1;
+>>>> }
+>>>>
+>>>> static void loop(int fd, int sec)
+>>>> {
+>>>> 	struct pollfd pfd = { .fd = fd, .events  = POLLIN, };
+>>>> 	unsigned long errors = 0, eagains = 0, bytes = 0, succ = 0;
+>>>> 	int size, rc, rd;
+>>>>
+>>>> 	srandom(getpid());
+>>>> 	if (CONDITION && fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) |
+>>>> O_NONBLOCK) == -1)
+>>>> 		perror("fcntl");
+>>>> 	size = MINBUFSIZ + random() % (MAXBUFSIZ - MINBUFSIZ + 1);
+>>>>
+>>>> 	for(;;) {
+>>>> 		char buf[size];
+>>>>
+>>>> 		if (stop)
+>>>> 			break;
+>>>> 		rc = poll(&pfd, 1, sec);
+>>>> 		if (rc > 0) {
+>>>> 			rd = read(fd, buf, sizeof(buf));
+>>>> 			if (rd == -1 && errno == EAGAIN)
+>>>> 				eagains++;
+>>>> 			else if (rd == -1)
+>>>> 				errors++;
+>>>> 			else {
+>>>> 				succ++;
+>>>> 				bytes += rd;
+>>>> 				write(1, buf, sizeof(buf));
+>>>> 			}
+>>>> 		} else if (rc == -1) {
+>>>> 			if (errno != EINTR)
+>>>> 				perror("poll");
+>>>> 			break;
+>>>> 		} else
+>>>> 			fprintf(stderr, "poll: timeout\n");
+>>>> 	}
+>>>> 	fprintf(stderr,
+>>>> 		"pid %d %sblocking, bufsize %d, %d seconds, %lu bytes
+>>>> read, %lu success, %lu eagain, %lu errors\n",
+>>>> 		getpid(), CONDITION ? "non-" : "", size, sec, bytes,
+>>>> succ, eagains, errors);
+>>>> }
+>>>>
+>>>> int main(void)
+>>>> {
+>>>> 	int fd;
+>>>>
+>>>> 	fork(); fork();
+>>>> 	fd = open("/dev/hwrng", O_RDONLY);
+>>>> 	if (fd == -1) {
+>>>> 		perror("open");
+>>>> 		return 1;
+>>>> 	};
+>>>> 	signal(SIGALRM, handler);
+>>>> 	alarm(SECONDS);
+>>>> 	loop(fd, SECONDS);
+>>>> 	close(fd);
+>>>> 	wait(NULL);
+>>>> 	return 0;
+>>>> }
+>>>>
+>>>> void loop(int fd)
+>>>> {
+>>>>         struct pollfd pfd0 = { .fd = fd, .events  = POLLIN, };
+>>>>         int rc;
+>>>>         unsigned int n;
+>>>>
+>>>>         for (n = LOOPS; n > 0; n--) {
+>>>>                 struct pollfd pfd = pfd0;
+>>>>                 char buf[SIZE];
+>>>>
+>>>>                 rc = poll(&pfd, 1, 1);
+>>>>                 if (rc > 0) {
+>>>>                         int rd = read(fd, buf, sizeof(buf));
+>>>>
+>>>>                         if (rd == -1)
+>>>>                                 perror("read");
+>>>>                         else
+>>>>                                 printf("read %d bytes\n", rd);
+>>>>                 } else if (rc == -1)
+>>>>                         perror("poll");
+>>>>                 else
+>>>>                         fprintf(stderr, "timeout\n");
+>>>>
+>>>>         }
+>>>> }
+>>>>
+>>>> int main(void)
+>>>> {
+>>>>         int fd;
+>>>>
+>>>>         fd = open("/dev/hwrng", O_RDONLY|O_NONBLOCK);
+>>>>         if (fd == -1) {
+>>>>                 perror("open");
+>>>>                 return 1;
+>>>>         };
+>>>>         loop(fd);
+>>>>         close(fd);
+>>>>         return 0;
+>>>> }
+>>>>
+>>>> This can be observed in the real word e.g. with nested qemu/KVM
+>>>> virtual
+>>>> machines, if both the "outer" and "inner" VMs have a virtio-rng
+>>>> device.
+>>>> If the "inner" VM requests random data, qemu running in the
+>>>> "outer" VM
+>>>> uses this device in a non-blocking manner like the test program
+>>>> above.
+>>>>
+>>>> Fix it by returning available data if a previous hypervisor call
+>>>> has
+>>>> completed. I tested this patch with the program above, and with
+>>>> rng-tools.
+>>>>
+>>>> v2 -> v3: Simplified the implementation as suggested by Laurent
+>>>> Vivier
+>>>>
+>>>> Signed-off-by: Martin Wilck <mwilck@suse.com>
+>>>> ---
+>>>>  drivers/char/hw_random/virtio-rng.c | 4 ++--
+>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/drivers/char/hw_random/virtio-rng.c
+>>>> b/drivers/char/hw_random/virtio-rng.c
+>>>> index a90001e02bf7..8eaeceecb41e 100644
+>>>> --- a/drivers/char/hw_random/virtio-rng.c
+>>>> +++ b/drivers/char/hw_random/virtio-rng.c
+>>>> @@ -65,7 +65,7 @@ static int virtio_read(struct hwrng *rng, void
+>>>> *buf, size_t size, bool wait)
+>>>>  		register_buffer(vi, buf, size);
+>>>>  	}
+>>>>  
+>>>> -	if (!wait)
+>>>> +	if (!wait && !completion_done(&vi->have_data))
+>>>>  		return 0;
+>>>>  
+>>>>  	ret = wait_for_completion_killable(&vi->have_data);
+>>>> @@ -74,7 +74,7 @@ static int virtio_read(struct hwrng *rng, void
+>>>> *buf, size_t size, bool wait)
+>>>>  
+>>>>  	vi->busy = false;
+>>>>  
+>>>> -	return vi->data_avail;
+>>>> +	return min_t(size_t, size, vi->data_avail);
+>>>>  }
+>>>>  
+>>>>  static void virtio_cleanup(struct hwrng *rng)
+>>>>
+>>>
+>>> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
+>>
+>> Laurent didn't we agree the real fix is private buffers in the
+>> driver,
+>> and copying out from there?
+>>
 > 
-> Reported-by: Laurent Vivier <lvivier@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  configure | 2 +-
->  meson     | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/configure b/configure
-> index 6ecaff429b..783fe03119 100755
-> --- a/configure
-> +++ b/configure
-> @@ -2017,7 +2017,7 @@ python_version=$($python -c 'import sys; print("%d.%d.%d" % (sys.version_info[0]
->  python="$python -B"
->  
->  if test -z "$meson"; then
-> -    if test "$explicit_python" = no && has meson && version_ge "$(meson --version)" 0.55.0; then
-> +    if test "$explicit_python" = no && has meson && version_ge "$(meson --version)" 0.55.1; then
->          meson=meson
->      elif test -e "${source_path}/.git" && test $git_update = 'yes' ; then
->          meson=git
-> diff --git a/meson b/meson
-> index d0c68dc115..68ed748f84 160000
-> --- a/meson
-> +++ b/meson
-> @@ -1 +1 @@
-> -Subproject commit d0c68dc11507a47b9b85de508e023d9590d60565
-> +Subproject commit 68ed748f84f14c2d4e62dcbd123816e5898eb04c
+> Can we perhaps proceed with this for now? AFAICS the private buffer
+> implementation would be a larger effort, while we have the issues with
+> nested VMs getting no entropy today.
 > 
 
-Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-Tested-by: Laurent Vivier <lvivier@redhat.com>
+I agree. I think it's important to have a simple and quick fix for the
+problem reported by Martin.
+
+We need the private buffers but not sure how long it will take to have
+them included in the kernel and how many new bugs will be introduced
+doing that as the code is hard to understand and the core is shared with
+several other hardware backends that can be impacted by the changes needed.
+
+Thanks,
+Laurent
 
 
