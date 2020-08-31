@@ -7,84 +7,82 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF81C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:33:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D271C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:34:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14D552073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:33:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 005FD2073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:34:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bQpBtZCL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14D552073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a8chflFx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 005FD2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCfFt-0008Nc-2O
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:33:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41934)
+	id 1kCfGg-0001LD-6x
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:34:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kCfCC-0003iP-16
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:29:44 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:24442
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFX-00085D-Hi
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38171)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kCfCA-000668-3Z
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:29:43 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFV-0006ZQ-L1
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598862580;
+ s=mimecast20190719; t=1598862788;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ex8PBSv6bXHMCw9LpxfF6xvEd3IoS3Vnyb9p5IrtWKA=;
- b=bQpBtZCL2jrfXV97mwyBRAKy2Be+909+ZW1JCLLWhXansw8s8x+0Zti9wAz4+Qvs+DlhVp
- UthHKTW4EFdTqNmbR7F6AWLgtQ779qPyHFp/jdXVeYPQ1ht9Voa648m+ThzhSHwK2+IL4G
- E4ntH9H57wBRr7DRlYwMqqda/IlQ0Go=
+ bh=7/J0K4csVztYP7o+7FyVdDGJsxMvUqrrvTDjsw7WPVs=;
+ b=a8chflFx0/vbZ3Aycj8xX7B52ya36db+QCsOusjXD7KfpP4mQzreE4md6BVYxIDQ1n9fVo
+ gf20ygDkJKq8rD58JeBuhE3X53oSfslNVjZNQuC700FCi3fVtW/WlOqNioTNu6F8kIOUWK
+ tdqSTjZXVvV8IvNqxaP5rjmiDGB5KcM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-sgPAQTYVPFCo-dwOgqxYKw-1; Mon, 31 Aug 2020 04:29:38 -0400
-X-MC-Unique: sgPAQTYVPFCo-dwOgqxYKw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-286-CsdYJ_B6MGyikCWTAhkR0g-1; Mon, 31 Aug 2020 04:33:06 -0400
+X-MC-Unique: CsdYJ_B6MGyikCWTAhkR0g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC53F1019626
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 08:29:37 +0000 (UTC)
-Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
- (ovpn-12-88.pek2.redhat.com [10.72.12.88])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D31A5D9D3;
- Mon, 31 Aug 2020 08:29:18 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: jasowang@redhat.com,
-	qemu-devel@nongnu.org
-Subject: [PATCH 6/9] vhost-vdpa: remove the unnecessary queue index assignment
-Date: Mon, 31 Aug 2020 16:27:34 +0800
-Message-Id: <20200831082737.10983-7-jasowang@redhat.com>
-In-Reply-To: <20200831082737.10983-1-jasowang@redhat.com>
-References: <20200831082737.10983-1-jasowang@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D73BC10ABDAD
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 08:33:05 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C9DE92616B;
+ Mon, 31 Aug 2020 08:33:02 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0C23645B2; Mon, 31 Aug 2020 10:33:02 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 04/18] ehci: drop pointless warn_report for guest bugs.
+Date: Mon, 31 Aug 2020 10:32:47 +0200
+Message-Id: <20200831083301.6357-5-kraxel@redhat.com>
+In-Reply-To: <20200831083301.6357-1-kraxel@redhat.com>
+References: <20200831083301.6357-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:56:57
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:02:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,32 +96,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lulu@redhat.com, mst@redhat.com
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The nc is allocated through g_malloc0(), so no need to assign its
-queue_index to zero.
+We have a tracepoint at the same place which can be enabled if needed.
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
+Buglink: https://bugzilla.redhat.com//show_bug.cgi?id=1859236
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200722072613.10390-1-kraxel@redhat.com>
 ---
- net/vhost-vdpa.c | 1 -
+ hw/usb/hcd-ehci.c | 1 -
  1 file changed, 1 deletion(-)
 
-diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
-index bcbf49d55b..1d3ac89135 100644
---- a/net/vhost-vdpa.c
-+++ b/net/vhost-vdpa.c
-@@ -182,7 +182,6 @@ static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
-     assert(name);
-     nc = qemu_new_net_client(&net_vhost_vdpa_info, peer, device, name);
-     snprintf(nc->info_str, sizeof(nc->info_str), "vhostdev=%s", vhostdev);
--    nc->queue_index = 0;
-     s = DO_UPCAST(VhostVDPAState, nc, nc);
-     vdpa_device_fd = qemu_open(vhostdev, O_RDWR);
-     if (vdpa_device_fd == -1) {
+diff --git a/hw/usb/hcd-ehci.c b/hw/usb/hcd-ehci.c
+index 4da446d2de6b..2b995443fbfd 100644
+--- a/hw/usb/hcd-ehci.c
++++ b/hw/usb/hcd-ehci.c
+@@ -352,7 +352,6 @@ static void ehci_trace_sitd(EHCIState *s, hwaddr addr,
+ static void ehci_trace_guest_bug(EHCIState *s, const char *message)
+ {
+     trace_usb_ehci_guest_bug(message);
+-    warn_report("%s", message);
+ }
+ 
+ static inline bool ehci_enabled(EHCIState *s)
 -- 
-2.20.1
+2.27.0
 
 
