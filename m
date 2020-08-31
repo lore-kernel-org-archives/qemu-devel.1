@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4511CC433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:34:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 188FFC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:35:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D35E206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:34:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D35E206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id C28BA206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 21:35:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C28BA206F0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCrS1-0000vM-Sf
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:34:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47320)
+	id 1kCrSM-0001Qq-TF
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 17:35:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47372)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kCrCp-0003B5-5K
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:19:11 -0400
-Received: from mail-qt1-f195.google.com ([209.85.160.195]:36130)
+ id 1kCrCw-0003KM-HL
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:19:18 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:37523)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kCrCn-0001UB-Dd
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:19:10 -0400
-Received: by mail-qt1-f195.google.com with SMTP id n10so3275243qtv.3
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:19:08 -0700 (PDT)
+ id 1kCrCu-0001Vt-VM
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 17:19:18 -0400
+Received: by mail-qt1-f195.google.com with SMTP id d27so5894873qtg.4
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 14:19:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=fcsRPnob1oX3NIGeA3G2AlKCyFbc0Ai8j8HxH8Fku6o=;
- b=X5AGyWRwLlWOhwB15S2zGMz89ptup9CmHuDDwftiEPyzyRfb5rAY8YtzuKvT7wTc1u
- lK2sPykrAGpHGyoLhaWSIN1uyZTIWoTkck/s6YlIBBt8VDlHXs0phtSdHEXXM8GTVI6C
- WIM+GuWvRQC71oWwdwpUMJR3vRQOZFFQS1e4qgUFdad3Dt15tJf7sTPieBFFLvfBUtkz
- zHCOTUt8bShSN4keOQ/BxVHiyoguJEyfMF+v5y/6cVVViJzLWzZUo6bVZw/cIFvhkoYP
- T+tV3DDUd9vWlSbuu7fJh1uP3VGIw7CAf873kDiPhYkjUpzSquOlxWHwrRSbrZpJby9w
- Yd2w==
-X-Gm-Message-State: AOAM532gjCKH8Cvjbt7g2H/F1p06xdM7+XXd37kLGPbYP+f9GSth+PjO
- jQ7hc57zGowIy8izpiG8kA3SAbd2N7yxLgaErks=
-X-Google-Smtp-Source: ABdhPJwl/ARMNqgD7oPtWmmFuydphtOUurND18blNkZitbhH5FgH6uAYy5oCQQM4Br4G0Z2QxRoGF9YAlXPaq3LV3s4=
-X-Received: by 2002:ac8:f86:: with SMTP id b6mr3330613qtk.252.1598908748524;
- Mon, 31 Aug 2020 14:19:08 -0700 (PDT)
+ bh=PXHuyGMFN8Fp0t7Q1JaJVdLkVmSaGYKuDGs7sODlsMo=;
+ b=nQObQmpOzbACA3QpaDzJeqak79fj2KeULY7XvuG3Vrxne+S9K2XfhqPWX0rg25CeDS
+ pAhN5NJNZtBLW2BBgvNrIxALWOXaHAcY6XqIWYsp3NsiyFQLCt1cUkz1+hVMyKY1Avtx
+ S0kS5ytcPB0pynt1hCru8srtTYr3J/ZOZ0pTh5uiv+Zh534hWVsghRoDpyOKItKGtJyf
+ N9usvJ6qM3XIw9LdgyDv59tNOV8ur9DsKkN9pubGVQGwJvwjV/nNm6R9eDXAOu2xn4nq
+ 7qiLzPUkDwlwDiskTTrIsAT4zl1o6/9/iLALoURdaMmNgjMGtaQPbM8ECgaZ/H2mrVAI
+ SuQA==
+X-Gm-Message-State: AOAM533010Ti95rlCn4THh2ZNFxbDpunIfIvOFo2nNhor/fg1XQtnrQ6
+ MjK7EbMHclgd2ptQ8cYxxm6Eo8Yszbt0ddS9uw6VEtUs
+X-Google-Smtp-Source: ABdhPJwQqJHSrMYUlqw//cPzyf4WFiBR1s7TCmDK3v202z9wo//GDvqDGeBJaLNvnjQNJC9pnn7bucJvG0cLzuHmfrs=
+X-Received: by 2002:aed:21a6:: with SMTP id l35mr3334674qtc.178.1598908756251; 
+ Mon, 31 Aug 2020 14:19:16 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200827210920.111611-1-sw@weilnetz.de>
-In-Reply-To: <20200827210920.111611-1-sw@weilnetz.de>
+References: <20200827173051.31050-1-sw@weilnetz.de>
+In-Reply-To: <20200827173051.31050-1-sw@weilnetz.de>
 From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Mon, 31 Aug 2020 21:52:19 +0200
-Message-ID: <CAAdtpL5wdBnXO8NqArE0Fgad8EU7bXTKc83daQo4kfHW=8XvHQ@mail.gmail.com>
-Subject: Re: [PATCH] libvhost-user: Add GCC_FMT_ATTR and fix format string
+Date: Mon, 31 Aug 2020 22:01:07 +0200
+Message-ID: <CAAdtpL508gaCmuencEu31H0bcQorUhywUXGkD-3ZukafjsdLzw@mail.gmail.com>
+Subject: Re: [PATCH] docs/system: Fix grammar in documentation
 To: Stefan Weil <sw@weilnetz.de>
-Content-Type: multipart/alternative; boundary="000000000000fbef3905ae32f3d7"
+Content-Type: multipart/alternative; boundary="00000000000071d72b05ae32f44d"
 Received-SPF: pass client-ip=209.85.160.195;
  envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-qt1-f195.google.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 17:15:50
@@ -82,122 +82,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000fbef3905ae32f3d7
+--00000000000071d72b05ae32f44d
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Le jeu. 27 ao=C3=BBt 2020 23:09, Stefan Weil <sw@weilnetz.de> a =C3=A9crit =
+Le jeu. 27 ao=C3=BBt 2020 19:31, Stefan Weil <sw@weilnetz.de> a =C3=A9crit =
 :
 
 > Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
->  contrib/libvhost-user/libvhost-user.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/contrib/libvhost-user/libvhost-user.c
-> b/contrib/libvhost-user/libvhost-user.c
-> index 53f16bdf08..ff7ac876f4 100644
-> --- a/contrib/libvhost-user/libvhost-user.c
-> +++ b/contrib/libvhost-user/libvhost-user.c
-> @@ -151,7 +151,7 @@ vu_request_to_string(unsigned int req)
->      }
->  }
->
-> -static void
-> +static void GCC_FMT_ATTR(2, 3)
->  vu_panic(VuDev *dev, const char *msg, ...)
->  {
->      char *buf =3D NULL;
-> @@ -643,7 +643,7 @@ generate_faults(VuDev *dev) {
->
->          if (ioctl(dev->postcopy_ufd, UFFDIO_REGISTER, &reg_struct)) {
->              vu_panic(dev, "%s: Failed to userfault region %d "
-> -                          "@%p + size:%zx offset: %zx: (ufd=3D%d)%s\n",
-> +                          "@%016"PRIx64" + size:%zx offset: %zx:
-> (ufd=3D%d)%s\n",
 >
 
-I thought I had fixed this last month, but I don't have my email backlog,
-so:
 Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-                      __func__, i,
->                       dev_region->mmap_addr,
->                       dev_region->size, dev_region->mmap_offset,
+---
+>  docs/system/build-platforms.rst | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+>
+> diff --git a/docs/system/build-platforms.rst
+> b/docs/system/build-platforms.rst
+> index c2b92a9698..9734eba2f1 100644
+> --- a/docs/system/build-platforms.rst
+> +++ b/docs/system/build-platforms.rst
+> @@ -57,12 +57,12 @@ macOS
+>  -----
+>
+>  The project supports building with the two most recent versions of
+> -macOS, with the current homebrew package set available.
+> +macOS, with the current Homebrew package set available.
+>
+>  FreeBSD
+>  -------
+>
+> -The project aims to support the all the versions which are not end of
+> +The project aims to support all versions which are not end of
+>  life.
+>
+>  NetBSD
+> @@ -75,5 +75,5 @@ new major version is released.
+>  OpenBSD
+>  -------
+>
+> -The project aims to support the all the versions which are not end of
+> +The project aims to support all versions which are not end of
+>  life.
 > --
 > 2.28.0
 >
 >
 >
 
---000000000000fbef3905ae32f3d7
+--00000000000071d72b05ae32f44d
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"auto"><div><br><div class=3D"gmail_quote"><div dir=3D"ltr" clas=
-s=3D"gmail_attr">Le jeu. 27 ao=C3=BBt 2020 23:09, Stefan Weil &lt;<a href=
-=3D"mailto:sw@weilnetz.de">sw@weilnetz.de</a>&gt; a =C3=A9crit=C2=A0:<br></=
-div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-lef=
-t:1px #ccc solid;padding-left:1ex">Signed-off-by: Stefan Weil &lt;<a href=
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Le jeu. 27 ao=C3=BBt 2020 19:31, Stefan Weil &lt;<a hr=
+ef=3D"mailto:sw@weilnetz.de">sw@weilnetz.de</a>&gt; a =C3=A9crit=C2=A0:<br>=
+</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
+eft:1px #ccc solid;padding-left:1ex">Signed-off-by: Stefan Weil &lt;<a href=
 =3D"mailto:sw@weilnetz.de" target=3D"_blank" rel=3D"noreferrer">sw@weilnetz=
-.de</a>&gt;<br>
+.de</a>&gt;<br></blockquote></div></div><div dir=3D"auto"><br></div><div di=
+r=3D"auto"><span style=3D"font-family:sans-serif;font-size:13.696px">Review=
+ed-by: Philippe Mathieu-Daud=C3=A9 &lt;</span><a href=3D"mailto:f4bug@amsat=
+.org" style=3D"text-decoration:none;color:rgb(66,133,244);font-family:sans-=
+serif;font-size:13.696px">f4bug@amsat.org</a><span style=3D"font-family:san=
+s-serif;font-size:13.696px">&gt;</span><br></div><div dir=3D"auto"><br></di=
+v><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_q=
+uote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1e=
+x">
 ---<br>
-=C2=A0contrib/libvhost-user/libvhost-user.c | 4 ++--<br>
-=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
+=C2=A0docs/system/build-platforms.rst | 6 +++---<br>
+=C2=A01 file changed, 3 insertions(+), 3 deletions(-)<br>
 <br>
-diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/=
-libvhost-user.c<br>
-index 53f16bdf08..ff7ac876f4 100644<br>
---- a/contrib/libvhost-user/libvhost-user.c<br>
-+++ b/contrib/libvhost-user/libvhost-user.c<br>
-@@ -151,7 +151,7 @@ vu_request_to_string(unsigned int req)<br>
-=C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0}<br>
+diff --git a/docs/system/build-platforms.rst b/docs/system/build-platforms.=
+rst<br>
+index c2b92a9698..9734eba2f1 100644<br>
+--- a/docs/system/build-platforms.rst<br>
++++ b/docs/system/build-platforms.rst<br>
+@@ -57,12 +57,12 @@ macOS<br>
+=C2=A0-----<br>
 <br>
--static void<br>
-+static void GCC_FMT_ATTR(2, 3)<br>
-=C2=A0vu_panic(VuDev *dev, const char *msg, ...)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0char *buf =3D NULL;<br>
-@@ -643,7 +643,7 @@ generate_faults(VuDev *dev) {<br>
+=C2=A0The project supports building with the two most recent versions of<br=
+>
+-macOS, with the current homebrew package set available.<br>
++macOS, with the current Homebrew package set available.<br>
 <br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0if (ioctl(dev-&gt;postcopy_ufd, UFFDIO_RE=
-GISTER, &amp;reg_struct)) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vu_panic(dev, &quot;%s: Fai=
-led to userfault region %d &quot;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 &quot;@%p + size:%zx offset: %zx: (ufd=3D%d)%s\n&quot;,<b=
-r>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 &quot;@%016&quot;PRIx64&quot; + size:%zx offset: %zx: (uf=
-d=3D%d)%s\n&quot;,<br></blockquote></div></div><div dir=3D"auto"><br></div>=
-<div dir=3D"auto">I thought I had fixed this last month, but I don&#39;t ha=
-ve my email backlog, so:</div><div dir=3D"auto"><span style=3D"font-family:=
-sans-serif;font-size:13.696px">Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt=
-;</span><a href=3D"mailto:f4bug@amsat.org" style=3D"text-decoration:none;co=
-lor:rgb(66,133,244);font-family:sans-serif;font-size:13.696px">f4bug@amsat.=
-org</a><span style=3D"font-family:sans-serif;font-size:13.696px">&gt;</span=
-><br></div><div dir=3D"auto"><span style=3D"font-family:sans-serif;font-siz=
-e:13.696px"><br></span></div><div dir=3D"auto"><div class=3D"gmail_quote"><=
-blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px=
- #ccc solid;padding-left:1ex">
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 __func__, i,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 dev_region-&gt;mmap_addr,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 dev_region-&gt;size, dev_region-&gt;mmap_offset,<br>
+=C2=A0FreeBSD<br>
+=C2=A0-------<br>
+<br>
+-The project aims to support the all the versions which are not end of<br>
++The project aims to support all versions which are not end of<br>
+=C2=A0life.<br>
+<br>
+=C2=A0NetBSD<br>
+@@ -75,5 +75,5 @@ new major version is released.<br>
+=C2=A0OpenBSD<br>
+=C2=A0-------<br>
+<br>
+-The project aims to support the all the versions which are not end of<br>
++The project aims to support all versions which are not end of<br>
+=C2=A0life.<br>
 -- <br>
 2.28.0<br>
 <br>
 <br>
 </blockquote></div></div></div>
 
---000000000000fbef3905ae32f3d7--
+--00000000000071d72b05ae32f44d--
 
