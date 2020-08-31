@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9272DC433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A801AC433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:39:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 574882073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:39:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2500E2073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:39:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QflCidQX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 574882073A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iHqbwqUi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2500E2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCfLg-00031m-5P
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:39:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42908)
+	id 1kCfLm-0003Jk-3g
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:39:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFd-0008H7-5O
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:17 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:35914
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFg-0008Og-DX
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48611)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFY-0006aS-PV
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:16 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCfFa-0006bU-Mt
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:33:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598862792;
+ s=mimecast20190719; t=1598862793;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iMjAeZE8KysOCotHdYlErXQLpMhSFzcspX0W4u/w6y8=;
- b=QflCidQXSqnCw1AY0+vBflRXJ2XH2Lu7QZIDyVJAytv76bSrjl4C4/M975mUeX7CeVffk2
- tZjqXGuTDDaZA5/R3OqxbB9A/HvXYo5LZxtqX+aeyz5o5EsmSdpRVKJHlUPDJ11Bi749wH
- 8KuNeHhJlhQypdA+GUHyW9xNX5vDnsU=
+ bh=Pj6QbpvhXb4xod3nciQRVD0Eay61+3ZfpSS93t0PtVU=;
+ b=iHqbwqUiAHhCIM7r81yZR38mNjaqt1/MJZVFp9WAfhaFIgTplJXSoq6qrnAmd1fy/V5m8W
+ PHqaLwWqOIMVlJyX2ssSFWi2zPr1NdClRUjEavAKQDDVepbAEZO3A8bAedamOQI9it+NVX
+ Crc06LAq6TrATBzqt7E4VcEw+4SGLuE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-9E0N5tIaMmGDELe9sUCw7w-1; Mon, 31 Aug 2020 04:33:09 -0400
-X-MC-Unique: 9E0N5tIaMmGDELe9sUCw7w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-91-6XZfvslvPPq3eBdjEmMCXA-1; Mon, 31 Aug 2020 04:33:09 -0400
+X-MC-Unique: 6XZfvslvPPq3eBdjEmMCXA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E14418A225C;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BCA8802B7B;
  Mon, 31 Aug 2020 08:33:08 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
  [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 35D073A40;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 392B987A70;
  Mon, 31 Aug 2020 08:33:08 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 7BFA831FC5; Mon, 31 Aug 2020 10:33:02 +0200 (CEST)
+ id 6987931FBC; Mon, 31 Aug 2020 10:33:02 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/18] hw/usb: Add U2F device check to passthru mode
-Date: Mon, 31 Aug 2020 10:32:58 +0200
-Message-Id: <20200831083301.6357-16-kraxel@redhat.com>
+Subject: [PULL 13/18] docs/qdev-device-use.txt: Add USB U2F key to the QDEV
+ devices examples
+Date: Mon, 31 Aug 2020 10:32:56 +0200
+Message-Id: <20200831083301.6357-14-kraxel@redhat.com>
 In-Reply-To: <20200831083301.6357-1-kraxel@redhat.com>
 References: <20200831083301.6357-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:56:57
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:43:46
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,85 +107,25 @@ Sender: "Qemu-devel"
 
 From: César Belley <cesar.belley@lse.epita.fr>
 
-This patchs adds a check to verify that the device passed through the
-hidraw property is a U2F device.
-
-The check is done by ensuring that the first values of the report
-descriptor (USAGE PAGE and USAGE) correspond to those of a U2F device.
-
 Signed-off-by: César Belley <cesar.belley@lse.epita.fr>
-Message-id: 20200826114209.28821-12-cesar.belley@lse.epita.fr
+Message-id: 20200826114209.28821-10-cesar.belley@lse.epita.fr
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/usb/u2f-passthru.c | 41 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+ docs/qdev-device-use.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/usb/u2f-passthru.c b/hw/usb/u2f-passthru.c
-index 52b44670775d..74d4ae6e9294 100644
---- a/hw/usb/u2f-passthru.c
-+++ b/hw/usb/u2f-passthru.c
-@@ -34,6 +34,12 @@
+diff --git a/docs/qdev-device-use.txt b/docs/qdev-device-use.txt
+index f8d0d2fe297a..9889521e3c07 100644
+--- a/docs/qdev-device-use.txt
++++ b/docs/qdev-device-use.txt
+@@ -325,6 +325,7 @@ The new way is -device DEVNAME,DEV-OPTS...  Details depend on DRIVER:
+ * mouse           -device usb-mouse
+ * tablet          -device usb-tablet
+ * wacom-tablet    -device usb-wacom-tablet
++* u2f             -device u2f-{emulated,passthru}
+ * braille         See "Character Devices"
  
- #include "u2f.h"
- 
-+#ifdef CONFIG_LIBUDEV
-+#include <libudev.h>
-+#endif
-+#include <linux/hidraw.h>
-+#include <sys/ioctl.h>
-+
- #define NONCE_SIZE 8
- #define BROADCAST_CID 0xFFFFFFFF
- #define TRANSACTION_TIMEOUT 120000
-@@ -344,6 +350,34 @@ static void u2f_passthru_recv_from_guest(U2FKeyState *base,
-     }
- }
- 
-+static bool u2f_passthru_is_u2f_device(int fd)
-+{
-+    int ret, rdesc_size;
-+    struct hidraw_report_descriptor rdesc;
-+    const uint8_t u2f_hid_report_desc_header[] = {
-+        0x06, 0xd0, 0xf1, /* Usage Page (FIDO) */
-+        0x09, 0x01,       /* Usage (FIDO) */
-+    };
-+
-+    /* Get report descriptor size */
-+    ret = ioctl(fd, HIDIOCGRDESCSIZE, &rdesc_size);
-+    if (ret < 0 || rdesc_size < sizeof(u2f_hid_report_desc_header)) {
-+        return false;
-+    }
-+
-+    /* Get report descriptor */
-+    memset(&rdesc, 0x0, sizeof(rdesc));
-+    rdesc.size = rdesc_size;
-+    ret = ioctl(fd, HIDIOCGRDESC, &rdesc);
-+    if (ret < 0) {
-+        return false;
-+    }
-+
-+    /* Header bytes cover specific U2F rdesc values */
-+    return memcmp(u2f_hid_report_desc_header, rdesc.value,
-+                  sizeof(u2f_hid_report_desc_header)) == 0;
-+}
-+
- static void u2f_passthru_unrealize(U2FKeyState *base)
- {
-     U2FPassthruState *key = PASSTHRU_U2F_KEY(base);
-@@ -368,6 +402,13 @@ static void u2f_passthru_realize(U2FKeyState *base, Error **errp)
-                    key->hidraw);
-         return;
-     }
-+
-+    if (!u2f_passthru_is_u2f_device(fd)) {
-+        qemu_close(fd);
-+        error_setg(errp, "%s: Passed hidraw does not represent "
-+                   "a U2F HID device", TYPE_U2F_PASSTHRU);
-+        return;
-+    }
-     key->hidraw_fd = fd;
-     u2f_passthru_reset(key);
- }
+ === Watchdog Devices ===
 -- 
 2.27.0
 
