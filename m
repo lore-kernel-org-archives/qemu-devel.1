@@ -2,148 +2,140 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21990C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C60C433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:42:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99F352073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:38:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 777BF20782
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 12:42:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FLPz1PCK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99F352073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="q7i5578I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 777BF20782
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36278 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCj54-0004kt-Hl
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 08:38:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39654)
+	id 1kCj8u-0006V7-Kt
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 08:42:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kCj4B-0003uG-SI
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 08:37:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43151
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
- id 1kCj48-0003Z6-Tl
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 08:37:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598877459;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=4ywBxzubw03QbPXuE6QhtIOCyLsUlt1tcti+tYeiBak=;
- b=FLPz1PCKp4JKyUd4eqELSjBiQTGXZ9rkFz25NzMA+ZRxSnG/WyxI6+SqZ9NR0YNXDRIHL9
- 5krMveohH2sDNctLBQfNv8F5spBU57icc8e2xu6acCChr4n8u6jbva2V8eLjsixj/fF4le
- qhDRSu3ajf9HxTq6QJ0b3mJVmFabwqI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-80-3Gt23T5OPtqmFaRzGnwD0A-1; Mon, 31 Aug 2020 08:37:33 -0400
-X-MC-Unique: 3Gt23T5OPtqmFaRzGnwD0A-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE73D18A2242;
- Mon, 31 Aug 2020 12:37:31 +0000 (UTC)
-Received: from [10.36.113.34] (ovpn-113-34.ams2.redhat.com [10.36.113.34])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A39A5C1BB;
- Mon, 31 Aug 2020 12:37:26 +0000 (UTC)
-Subject: Re: [PATCH v3] virtio-rng: return available data with O_NONBLOCK
-To: Martin Wilck <mwilck@suse.com>, "Michael S. Tsirkin" <mst@redhat.com>
-References: <20200811142821.12323-1-mwilck@suse.com>
- <4ae4f348-c186-f7e4-f7e3-b1f1e4a4b408@redhat.com>
- <20200826082613-mutt-send-email-mst@kernel.org>
- <519e0296a7d61d5e9e8d258a855eb42a57c641c5.camel@suse.com>
-From: Laurent Vivier <lvivier@redhat.com>
-Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
- 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
- D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
-Message-ID: <a5d4bcd3-e468-e818-3bd2-3a1b0fa172d8@redhat.com>
-Date: Mon, 31 Aug 2020 14:37:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
+ id 1kCj8A-0005kw-7o; Mon, 31 Aug 2020 08:41:50 -0400
+Received: from mail-eopbgr760048.outbound.protection.outlook.com
+ ([40.107.76.48]:20357 helo=NAM02-CY1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
+ id 1kCj86-00043t-FG; Mon, 31 Aug 2020 08:41:49 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jrP3C2Xfy0s4OVo9L5/88PBHx1J3J5VLBtB87nb+FN8amr5tZyqWSegfIs1KA7eSaikiG+CZRoGfuKhd/pdwktj0JFXEWH3p/VE72QPbFUKlvB7Gms0s1usMxFpueVDkRZo2SBSTiAhpLohwCuM0FA+pYf0O4Scc7FATA6ZZMUGNyF9ilrXqO1h+N0OmnXxVyHYSPbLlde2mwqCxq7+Yuv/cT8MkH4e58nPA46DrJyaz6O1JzVgEzjzhPy/UXSd90ZBJaCiv/aAiBnJXTK8ORGXq+wJfAR/wZ0JIefzM8PzAyRD6cXu3TCXsEoF5a4Lk9z0mgV/R2SGpYiu592/eJg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EclMdyf35hmWjRvXk1G/IkZSsdsd/lNkS4tCE9bucMo=;
+ b=SDaXCTzVNJnjeF+a0zshovNImyAo5bp17xyTGzf8CyE6u6dvAB/BTAbaniEObskMilyufcV4WFgSTVfkE1Ony3/f2Qo42Z3AZTP31OlIYnzB3p/lTSVMPS4ng+O5wl6mcv1Rk9BUcqv54MopOBiKnj+Xq+XSONaEqYPVHPDK7LMCR+9T42PZZuWgtN87F9ePmpjKXrrIzW02sCobSXPzGHzZIuNC5CGHC9HexI1KxUXDBIfwX2uUGaSAqM/PVk1O3u5LbN/gApXsrl/jHmFhQ9ZQPdH6ZlTG6wBIDlcXtzcFNTfrm1ggrgcobNR39QK72mTQp/vD4j6xhOeWwXKVrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=kernel.org smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EclMdyf35hmWjRvXk1G/IkZSsdsd/lNkS4tCE9bucMo=;
+ b=q7i5578I/3R0J3Qt5yKnZob7JcUR77qjasp7Kwg6Q3EyZ9DFbD5C/6kT9/rZARN2w7thnIAtHi9xM6hVI9kZKpOr3q7M/uO+YKUCLETHsauLqmkUcVdeIu69AhLZ25iMpuiuMGzyjzKSWrnechFxWh66oD6C2plqZGiub1qi6UE=
+Received: from CY4PR14CA0025.namprd14.prod.outlook.com (2603:10b6:903:101::11)
+ by BL0PR02MB4738.namprd02.prod.outlook.com (2603:10b6:208:5b::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.23; Mon, 31 Aug
+ 2020 12:41:41 +0000
+Received: from CY1NAM02FT034.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:903:101:cafe::ad) by CY4PR14CA0025.outlook.office365.com
+ (2603:10b6:903:101::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.21 via Frontend
+ Transport; Mon, 31 Aug 2020 12:41:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; kernel.org; dkim=none (message not signed)
+ header.d=none;kernel.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ CY1NAM02FT034.mail.protection.outlook.com (10.152.75.190) with Microsoft SMTP
+ Server id 15.20.3326.19 via Frontend Transport; Mon, 31 Aug 2020 12:41:41
+ +0000
+Received: from [149.199.38.66] (port=50851 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kCj7z-0006Gw-BS; Mon, 31 Aug 2020 05:41:39 -0700
+Received: from [127.0.0.1] (helo=localhost)
+ by smtp.xilinx.com with smtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kCj81-0004Z9-4C; Mon, 31 Aug 2020 05:41:41 -0700
+Received: from xsj-pvapsmtp01 (mailhub.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 07VCfWeC017370; 
+ Mon, 31 Aug 2020 05:41:32 -0700
+Received: from [10.71.116.235] (helo=localhost)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kCj7s-0004YR-I4; Mon, 31 Aug 2020 05:41:32 -0700
+Date: Mon, 31 Aug 2020 14:41:28 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v1 2/2] target/microblaze: Improve transaction failure
+ handling
+Message-ID: <20200831124128.GB14249@toto>
+References: <20200828113931.3252489-1-edgar.iglesias@gmail.com>
+ <20200828113931.3252489-3-edgar.iglesias@gmail.com>
+ <3556c713-8635-2868-cd4c-387fcef6c50c@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <519e0296a7d61d5e9e8d258a855eb42a57c641c5.camel@suse.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lvivier@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:13:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3556c713-8635-2868-cd4c-387fcef6c50c@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cee689d6-94f4-40d9-3792-08d84dab3606
+X-MS-TrafficTypeDiagnostic: BL0PR02MB4738:
+X-Microsoft-Antispam-PRVS: <BL0PR02MB4738AC5155B800F086C9769FC2510@BL0PR02MB4738.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: i7HPvJiZUyr7/zHR7lUoO7K9FymIAchhe/l3qHWqEenNhVpuuKuQmBbi+ov5tj1naE/2UT39NUoIjtXIa3RB8A08LfjnYWxxgimuQg0yEwHIzvI2jOrdJV9bH27FZtMDPZeivJlpt+x9xvJBfSIyjnBmdYVmksyLyLO1RKqofzRMK6/DUUiACH3p+phQ0etXtyxNLVeHnIaERJCL5WOUKeLTnLgxbnDUBkDHKw+N46hcxvM+Q66ii8o+NF31uBqYDhCXWsBp3K0M3OExxYzMw0xzSuN0ml2WX+xycd1/PHjCCOBUPlbLiz/S0DcpG2tHgG7IyQSCXvVXRjIzgpE7L49gcx7S4t0X6vEZJ6j24YFRStQ+WldVzkPvha1LQ8NxFeCIaaLV7t1jfQXi1G3xRdhYpCGgJ2vepbGuTSz7eAknwIh+F/SwhW7A4JRGgWOFf2PoOmn4hJvUWJODTZHBBjW8+LbPF9l9HaZusqbJVX8=
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(7916004)(136003)(396003)(376002)(346002)(39860400002)(46966005)(4744005)(82740400003)(5660300002)(9686003)(7416002)(8676002)(8936002)(336012)(1076003)(33716001)(966005)(9786002)(26005)(478600001)(70586007)(47076004)(316002)(4326008)(186003)(107886003)(426003)(53546011)(81166007)(83380400001)(82310400002)(6916009)(2906002)(6666004)(70206006)(356005)(33656002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2020 12:41:41.3908 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cee689d6-94f4-40d9-3792-08d84dab3606
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT034.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR02MB4738
+Received-SPF: pass client-ip=40.107.76.48; envelope-from=edgar@xilinx.com;
+ helo=NAM02-CY1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 08:41:43
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -156,218 +148,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, Amit Shah <amit@kernel.org>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ sai.pavan.boddu@xilinx.com, frasse.iglesias@gmail.com, alistair@alistair23.me,
+ qemu-devel@nongnu.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, philmd@redhat.com,
+ luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/08/2020 23:34, Martin Wilck wrote:
-> On Wed, 2020-08-26 at 08:26 -0400, Michael S. Tsirkin wrote:
->> On Tue, Aug 11, 2020 at 04:42:32PM +0200, Laurent Vivier wrote:
->>> On 11/08/2020 16:28, mwilck@suse.com wrote:
->>>> From: Martin Wilck <mwilck@suse.com>
->>>>
->>>> If a program opens /dev/hwrng with O_NONBLOCK and uses poll() and
->>>> non-blocking read() to retrieve random data, it ends up in a
->>>> tight
->>>> loop with poll() always returning POLLIN and read() returning
->>>> EAGAIN.
->>>> This repeats forever until some process makes a blocking read()
->>>> call.
->>>> The reason is that virtio_read() always returns 0 in non-blocking 
->>>> mode,
->>>> even if data is available. Worse, it fetches random data from the
->>>> hypervisor after every non-blocking call, without ever using this
->>>> data.
->>>>
->>>> The following test program illustrates the behavior and can be
->>>> used
->>>> for testing and experiments. The problem will only be seen if all
->>>> tasks use non-blocking access; otherwise the blocking reads will
->>>> "recharge" the random pool and cause other, non-blocking reads to
->>>> succeed at least sometimes.
->>>>
->>>> /* Whether to use non-blocking mode in a task, problem occurs if
->>>> CONDITION is 1 */
->>>> //#define CONDITION (getpid() % 2 != 0)
->>>>
->>>> static volatile sig_atomic_t stop;
->>>> static void handler(int sig __attribute__((unused))) { stop = 1;
->>>> }
->>>>
->>>> static void loop(int fd, int sec)
->>>> {
->>>> 	struct pollfd pfd = { .fd = fd, .events  = POLLIN, };
->>>> 	unsigned long errors = 0, eagains = 0, bytes = 0, succ = 0;
->>>> 	int size, rc, rd;
->>>>
->>>> 	srandom(getpid());
->>>> 	if (CONDITION && fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) |
->>>> O_NONBLOCK) == -1)
->>>> 		perror("fcntl");
->>>> 	size = MINBUFSIZ + random() % (MAXBUFSIZ - MINBUFSIZ + 1);
->>>>
->>>> 	for(;;) {
->>>> 		char buf[size];
->>>>
->>>> 		if (stop)
->>>> 			break;
->>>> 		rc = poll(&pfd, 1, sec);
->>>> 		if (rc > 0) {
->>>> 			rd = read(fd, buf, sizeof(buf));
->>>> 			if (rd == -1 && errno == EAGAIN)
->>>> 				eagains++;
->>>> 			else if (rd == -1)
->>>> 				errors++;
->>>> 			else {
->>>> 				succ++;
->>>> 				bytes += rd;
->>>> 				write(1, buf, sizeof(buf));
->>>> 			}
->>>> 		} else if (rc == -1) {
->>>> 			if (errno != EINTR)
->>>> 				perror("poll");
->>>> 			break;
->>>> 		} else
->>>> 			fprintf(stderr, "poll: timeout\n");
->>>> 	}
->>>> 	fprintf(stderr,
->>>> 		"pid %d %sblocking, bufsize %d, %d seconds, %lu bytes
->>>> read, %lu success, %lu eagain, %lu errors\n",
->>>> 		getpid(), CONDITION ? "non-" : "", size, sec, bytes,
->>>> succ, eagains, errors);
->>>> }
->>>>
->>>> int main(void)
->>>> {
->>>> 	int fd;
->>>>
->>>> 	fork(); fork();
->>>> 	fd = open("/dev/hwrng", O_RDONLY);
->>>> 	if (fd == -1) {
->>>> 		perror("open");
->>>> 		return 1;
->>>> 	};
->>>> 	signal(SIGALRM, handler);
->>>> 	alarm(SECONDS);
->>>> 	loop(fd, SECONDS);
->>>> 	close(fd);
->>>> 	wait(NULL);
->>>> 	return 0;
->>>> }
->>>>
->>>> void loop(int fd)
->>>> {
->>>>         struct pollfd pfd0 = { .fd = fd, .events  = POLLIN, };
->>>>         int rc;
->>>>         unsigned int n;
->>>>
->>>>         for (n = LOOPS; n > 0; n--) {
->>>>                 struct pollfd pfd = pfd0;
->>>>                 char buf[SIZE];
->>>>
->>>>                 rc = poll(&pfd, 1, 1);
->>>>                 if (rc > 0) {
->>>>                         int rd = read(fd, buf, sizeof(buf));
->>>>
->>>>                         if (rd == -1)
->>>>                                 perror("read");
->>>>                         else
->>>>                                 printf("read %d bytes\n", rd);
->>>>                 } else if (rc == -1)
->>>>                         perror("poll");
->>>>                 else
->>>>                         fprintf(stderr, "timeout\n");
->>>>
->>>>         }
->>>> }
->>>>
->>>> int main(void)
->>>> {
->>>>         int fd;
->>>>
->>>>         fd = open("/dev/hwrng", O_RDONLY|O_NONBLOCK);
->>>>         if (fd == -1) {
->>>>                 perror("open");
->>>>                 return 1;
->>>>         };
->>>>         loop(fd);
->>>>         close(fd);
->>>>         return 0;
->>>> }
->>>>
->>>> This can be observed in the real word e.g. with nested qemu/KVM
->>>> virtual
->>>> machines, if both the "outer" and "inner" VMs have a virtio-rng
->>>> device.
->>>> If the "inner" VM requests random data, qemu running in the
->>>> "outer" VM
->>>> uses this device in a non-blocking manner like the test program
->>>> above.
->>>>
->>>> Fix it by returning available data if a previous hypervisor call
->>>> has
->>>> completed. I tested this patch with the program above, and with
->>>> rng-tools.
->>>>
->>>> v2 -> v3: Simplified the implementation as suggested by Laurent
->>>> Vivier
->>>>
->>>> Signed-off-by: Martin Wilck <mwilck@suse.com>
->>>> ---
->>>>  drivers/char/hw_random/virtio-rng.c | 4 ++--
->>>>  1 file changed, 2 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/drivers/char/hw_random/virtio-rng.c
->>>> b/drivers/char/hw_random/virtio-rng.c
->>>> index a90001e02bf7..8eaeceecb41e 100644
->>>> --- a/drivers/char/hw_random/virtio-rng.c
->>>> +++ b/drivers/char/hw_random/virtio-rng.c
->>>> @@ -65,7 +65,7 @@ static int virtio_read(struct hwrng *rng, void
->>>> *buf, size_t size, bool wait)
->>>>  		register_buffer(vi, buf, size);
->>>>  	}
->>>>  
->>>> -	if (!wait)
->>>> +	if (!wait && !completion_done(&vi->have_data))
->>>>  		return 0;
->>>>  
->>>>  	ret = wait_for_completion_killable(&vi->have_data);
->>>> @@ -74,7 +74,7 @@ static int virtio_read(struct hwrng *rng, void
->>>> *buf, size_t size, bool wait)
->>>>  
->>>>  	vi->busy = false;
->>>>  
->>>> -	return vi->data_avail;
->>>> +	return min_t(size_t, size, vi->data_avail);
->>>>  }
->>>>  
->>>>  static void virtio_cleanup(struct hwrng *rng)
->>>>
->>>
->>> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
->>
->> Laurent didn't we agree the real fix is private buffers in the
->> driver,
->> and copying out from there?
->>
+On Fri, Aug 28, 2020 at 01:34:08PM -0700, Richard Henderson wrote:
+> On 8/28/20 4:39 AM, Edgar E. Iglesias wrote:
+> > +    if ((access_type == MMU_INST_FETCH && cpu->cfg.iopb_bus_exception) ||
+> > +        (access_type != MMU_INST_FETCH && cpu->cfg.dopb_bus_exception)) {
+> > +        cpu_restore_state(cs, retaddr, true);
+> > +        env->sregs[SR_ESR] = access_type == MMU_INST_FETCH ?
+> > +                             ESR_EC_INSN_BUS : ESR_EC_DATA_BUS;
+> > +        env->sregs[SR_EAR] = addr;
+> > +        helper_raise_exception(env, EXCP_HW_EXCP);
 > 
-> Can we perhaps proceed with this for now? AFAICS the private buffer
-> implementation would be a larger effort, while we have the issues with
-> nested VMs getting no entropy today.
+> I think it's better to use cpu_loop_exit_restore, adding the one line for
+> cs->exception_index from helper_raise_exception.
 > 
 
-I agree. I think it's important to have a simple and quick fix for the
-problem reported by Martin.
+OK, let's use the patch you posted:
 
-We need the private buffers but not sure how long it will take to have
-them included in the kernel and how many new bugs will be introduced
-doing that as the code is hard to understand and the core is shared with
-several other hardware backends that can be impacted by the changes needed.
+https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg07630.html
 
 Thanks,
-Laurent
-
+Edgar
 
