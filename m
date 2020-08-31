@@ -2,81 +2,124 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFACAC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:34:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18AADC433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:39:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C4CA207EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:34:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A82D207EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 15:39:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Csb+0nID"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C4CA207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="eBTRGY6a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A82D207EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kClow-0006eI-Py
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 11:34:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51956)
+	id 1kClth-0000Qs-CB
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 11:39:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kClnb-00068B-NH
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:32:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31580)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kClnZ-00014D-TL
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:32:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598887964;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=CP9nLgVzX7lUSsK2cnuaA5FK74qnWk0GMDVTspkdqMg=;
- b=Csb+0nIDFd+nzyvBH77F66GUbj/z42awrFzGPJoBnkL+Vp7PPggtgiaKDQuymbX20iX0zm
- /C8tPbOe9urpIv47vNjvKgDBoQnfGJSJRh9AjZg275+m/vfsiBPmIEssqqikhVkkqFVRBS
- ws90KKo+9KRxaEwbTd8dsw+9HmqRpNg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-23-brhE4XCHNZOx9UJVtg6HJw-1; Mon, 31 Aug 2020 11:32:43 -0400
-X-MC-Unique: brhE4XCHNZOx9UJVtg6HJw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB51C100CF6F;
- Mon, 31 Aug 2020 15:32:41 +0000 (UTC)
-Received: from thuth.com (ovpn-112-174.ams2.redhat.com [10.36.112.174])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8DFB760C04;
- Mon, 31 Aug 2020 15:32:30 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
+ id 1kClss-0007NN-Pn
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:38:14 -0400
+Received: from mail-dm6nam08on2070.outbound.protection.outlook.com
+ ([40.107.102.70]:41056 helo=NAM04-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Thomas.Lendacky@amd.com>)
+ id 1kClsq-0001yB-NP
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 11:38:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CA9ituaPySmYdpBCZWQHc719C9VrmO2NG9+6+e6vyFU90F01BXhTuYobsU3RN+6ut7xONhe+jOppQgRYoVtKfsye17t6cX+SJxu4H+3sCD/HrmJNzTPzziHBSxhLVnv///OrPy/O/Edsi92+EqS8HGVb3I+vxUM3BF+0AFm/lyo3KZE+YPje7XHDOujBbsD9fW/KVvfPHtt7W6iWRCJ3K5uFz1KXgSiEyinYkejbqDK0aRdBiMK2vTVWKLmbTIkAF0ANgHWk/ehquC1JAMQL/SFWzTh8aMxZj5IC/ukBbu8NhJ560M/PGuah9Kr6Gu5qfdCLjZF/M7DwUhQPRoB4VA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MJ+BpJng5csN/LA+I/qcPQkYM/tISIORmRx+LOYMnks=;
+ b=hORM3Vy8hyK6xLsYFFSIq/y5Tp6Pg2z/sJ60tyYU1JZyT2yeXLN0JIwCuzigEd90XFO6iCzy/7VCTbvNkYmv3I2yEx66mY7GYHl7KcTWxLvGruA7o89b+SmXOhIQACCdqeJUGDt4zl5J8g5c0NMcTUmJBuYpl0a5bI7ctwF7zxOPH+OVpwJHCH692Ie+5sYpc1qp6RShWQUqGr7CE08rIpEr9KHl+GGSWV1Y1Vc/AL+HCTi/6019BUZCInTm+2kMFx2NHqY37W6J4aVlZAccV2ScuvS9KmtFSyOYRf0c9e9mCvZx5A9ODE4XCPvZjAYFtpeAS4YDOtHNlZhZVqPCPw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MJ+BpJng5csN/LA+I/qcPQkYM/tISIORmRx+LOYMnks=;
+ b=eBTRGY6a+GyfUq51LlvjAUZ2fHcsw2xp2QzSuQ9LF+DjVDHDA6KTX5D79vYYHN03TrwuzczBCPhSxTy6dX2I07/wkMbvuWSBMD5hgTnXyJSuGyEMLCZlXFdIi1L7b7uqN47qHv6xhfdvAT3tAL58zzTvUyvQk5k5HLgEHHwNfOg=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM6PR12MB4484.namprd12.prod.outlook.com (2603:10b6:5:28f::24) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.19; Mon, 31 Aug 2020 15:37:36 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::299a:8ed2:23fc:6346%3]) with mapi id 15.20.3326.025; Mon, 31 Aug 2020
+ 15:37:36 +0000
+From: Tom Lendacky <thomas.lendacky@amd.com>
 To: qemu-devel@nongnu.org,
-	Alexander Bulekov <alxndr@bu.edu>
-Subject: [PATCH] gitlab-ci.yml: Run check-qtest and check-unit at the end of
- the fuzzer job
-Date: Mon, 31 Aug 2020 17:32:28 +0200
-Message-Id: <20200831153228.229185-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:43:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+	kvm@vger.kernel.org
+Subject: [PATCH v2 1/4] sev/i386: Add initial support for SEV-ES
+Date: Mon, 31 Aug 2020 10:37:10 -0500
+Message-Id: <6222b0024f7af99fe7de5eede633d00e42162e2f.1598888232.git.thomas.lendacky@amd.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1598888232.git.thomas.lendacky@amd.com>
+References: <cover.1598888232.git.thomas.lendacky@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0061.namprd12.prod.outlook.com
+ (2603:10b6:802:20::32) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from 255.255.255.255 (255.255.255.255) by
+ SN1PR12CA0061.namprd12.prod.outlook.com (2603:10b6:802:20::32) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.19 via Frontend Transport; Mon, 31 Aug 2020 15:37:35 +0000
+X-Mailer: git-send-email 2.28.0
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 9569550a-4ca3-4eab-65e0-08d84dc3c93d
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4484:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <DM6PR12MB448403024AD44777CD0BE3B4EC510@DM6PR12MB4484.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2043;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: sEp+kjbfBef11bfZgkVrkg5IV8ofbX8OSiVzyVbxJsRsel2y/a7COTjh4OjyPDfh8ro02/ASUQiMVfsdmaGngLCbrs3N9jzKB2k5CD6DAH0rrf+g0fVIFgSjcptViR7RCmrHb3PGgjqDJ8/OvrddosHJNa+Bj39dBHPsdfNYgOQNpHnNnLxq9/DRxLwMynjPyeUKjSVe8sLM3hXK7KwgvCXaNpEtlr4MeEtuzd4SxdkDwD9ffcHWbiSooVjtTAdVPGLsWyJQaVR+bRSupXcAOuToqhI5Yptf5cl0qNbuL8lBkpEY3Av4FQqXVc9Mrm7ZNMh4l3ANg3JS4EgKoPpjUX7OMwltedn74PYKTSgWsOwIXxup9ZzxZxvjyQWuv3yx
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:DM5PR12MB1355.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(39860400002)(366004)(346002)(376002)(136003)(54906003)(956004)(16576012)(7416002)(2906002)(6666004)(4326008)(2616005)(6486002)(316002)(66556008)(8676002)(66946007)(478600001)(186003)(5660300002)(8936002)(86362001)(83380400001)(66476007)(36756003)(52116002)(26005)(309714004);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: BC9uk/Y5kE+Kl2S0IU3FJD8eG/XG8+D3Hl7bC1jXS8CpO66hDLSNRueM1NW1hFMk0Q2YE4CHLfjoMIel0mpPTNuBcYTuZwP7nZ5tw0NJFChW1dREVmhrCbEaTNSp6o/x3JE8LROIvncmO7nO1ebOpXoRz46v0IJy+nnGZqx1r9qnBQ5yGr3QQbSn03z33i4TTc6QkkZ2ZL8QEKg3o0APvje7HW5uMBBKKld8bk6qXA+Z9mIr/t/V4PDsYIEke/vEMBCRgUBt0GO8a0+jMi0uMh9/lhwM5pwkdW8oZBDvs7lSg0lbijDdYAaHDV5v45E80HJxN0bp2u6MxQJSfz1bGgiBPw2A1GbDfcOLGbSBDMZQsEn7cinXrOubP20lkTVfgJRlBORvmwz7prs+Ohwp9ERFv71V7RHe7g1pWRr4MuXFZ7xLbp2qivmkxFatPYz1qXbyB5A2Vrk7i0ppgRyTr06Qjduka2RPk4HX6SvCgLkPJqPzLJHzG6yqgKRg12M5psouQNcCBZBaoPrXTCEHQ+jzu+ORK4ZRXMcfpEsX3I5wSY6aOSTsjyWRf9BwaxL527pKJW19QFGOtgpMChZwf/OwvuTkyXeTTMtwb6yBd85AeVMT6dckM0lifOAPIZi2mRhvKLl0gAA4Xv+tFM5QRA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9569550a-4ca3-4eab-65e0-08d84dc3c93d
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR12MB1355.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2020 15:37:36.6519 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xHBZq1bZzH2IaITt/kKzRcSjaqYZRPvFht2nuA55LtkDYM9viUkbWMz171Ow4jQanmY4UKW7hbe7tXfhSoORGQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4484
+Received-SPF: none client-ip=40.107.102.70;
+ envelope-from=Thomas.Lendacky@amd.com;
+ helo=NAM04-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 11:38:11
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -5
+X-Spam_score: -0.6
+X-Spam_bar: /
+X-Spam_report: (-0.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001, RCVD_ILLEGAL_IP=1.3,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -89,44 +132,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, Bandan Das <bsd@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Brijesh Singh <brijesh.singh@amd.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Connor Kuehl <ckuehl@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Jiri Slaby <jslaby@suse.cz>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fuzzer job finishes quite early, so we can run the unit tests and
-qtests with -fsanitize=address here without extending the total test time.
+From: Tom Lendacky <thomas.lendacky@amd.com>
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+Provide initial support for SEV-ES. This includes creating a function to
+indicate the guest is an SEV-ES guest (which will return false until all
+support is in place), performing the proper SEV initialization and
+ensuring that the guest CPU state is measured as part of the launch.
+
+Co-developed-by: Jiri Slaby <jslaby@suse.cz>
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+Signed-off-by: Tom Lendacky <thomas.lendacky@amd.com>
 ---
- .gitlab-ci.yml | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ target/i386/cpu.c      |  1 +
+ target/i386/sev-stub.c |  5 +++++
+ target/i386/sev.c      | 46 ++++++++++++++++++++++++++++++++++++++++--
+ target/i386/sev_i386.h |  1 +
+ 4 files changed, 51 insertions(+), 2 deletions(-)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 17f1f8fad9..417fda6909 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -256,13 +256,14 @@ build-oss-fuzz:
-     - mkdir build-oss-fuzz
-     - CC="clang" CXX="clang++" CFLAGS="-fsanitize=address"
-       ./scripts/oss-fuzz/build.sh
-+    - export ASAN_OPTIONS="fast_unwind_on_malloc=0"
-     - for fuzzer in $(find ./build-oss-fuzz/DEST_DIR/ -executable -type f
-                       | grep -v slirp); do
-         grep "LLVMFuzzerTestOneInput" ${fuzzer} > /dev/null 2>&1 || continue ;
-         echo Testing ${fuzzer} ... ;
--        ASAN_OPTIONS="fast_unwind_on_malloc=0"
--         "${fuzzer}" -runs=1000 -seed=1 || exit 1 ;
-+        "${fuzzer}" -runs=1000 -seed=1 || exit 1 ;
-       done
-+    - cd build-oss-fuzz && make check-qtest-i386 check-unit
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 588f32e136..bbbe581d35 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -5969,6 +5969,7 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+         break;
+     case 0x8000001F:
+         *eax = sev_enabled() ? 0x2 : 0;
++        *eax |= sev_es_enabled() ? 0x8 : 0;
+         *ebx = sev_get_cbit_position();
+         *ebx |= sev_get_reduced_phys_bits() << 6;
+         *ecx = 0;
+diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+index 88e3f39a1e..040ac90563 100644
+--- a/target/i386/sev-stub.c
++++ b/target/i386/sev-stub.c
+@@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
+     error_setg(errp, "SEV is not available in this QEMU");
+     return NULL;
+ }
++
++bool sev_es_enabled(void)
++{
++    return false;
++}
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index c3ecf86704..6c9cd0854b 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -359,6 +359,12 @@ sev_enabled(void)
+     return !!sev_guest;
+ }
  
- build-tci:
-   <<: *native_build_job_definition
++bool
++sev_es_enabled(void)
++{
++    return false;
++}
++
+ uint64_t
+ sev_get_me_mask(void)
+ {
+@@ -578,6 +584,22 @@ sev_launch_update_data(SevGuestState *sev, uint8_t *addr, uint64_t len)
+     return ret;
+ }
+ 
++static int
++sev_launch_update_vmsa(SevGuestState *sev)
++{
++    int ret, fw_error;
++
++    ret = sev_ioctl(sev->sev_fd, KVM_SEV_LAUNCH_UPDATE_VMSA, NULL, &fw_error);
++    if (ret) {
++        error_report("%s: LAUNCH_UPDATE_VMSA ret=%d fw_error=%d '%s'",
++                __func__, ret, fw_error, fw_error_to_str(fw_error));
++        goto err;
++    }
++
++err:
++    return ret;
++}
++
+ static void
+ sev_launch_get_measure(Notifier *notifier, void *unused)
+ {
+@@ -590,6 +612,14 @@ sev_launch_get_measure(Notifier *notifier, void *unused)
+         return;
+     }
+ 
++    if (sev_es_enabled()) {
++        /* measure all the VM save areas before getting launch_measure */
++        ret = sev_launch_update_vmsa(sev);
++        if (ret) {
++            exit(1);
++        }
++    }
++
+     measurement = g_new0(struct kvm_sev_launch_measure, 1);
+ 
+     /* query the measurement blob length */
+@@ -684,7 +714,7 @@ sev_guest_init(const char *id)
+ {
+     SevGuestState *sev;
+     char *devname;
+-    int ret, fw_error;
++    int ret, fw_error, cmd;
+     uint32_t ebx;
+     uint32_t host_cbitpos;
+     struct sev_user_data_status status = {};
+@@ -745,8 +775,20 @@ sev_guest_init(const char *id)
+     sev->api_major = status.api_major;
+     sev->api_minor = status.api_minor;
+ 
++    if (sev_es_enabled()) {
++        if (!(status.flags & SEV_STATUS_FLAGS_CONFIG_ES)) {
++            error_report("%s: guest policy requires SEV-ES, but "
++                         "host SEV-ES support unavailable",
++                         __func__);
++            goto err;
++        }
++        cmd = KVM_SEV_ES_INIT;
++    } else {
++        cmd = KVM_SEV_INIT;
++    }
++
+     trace_kvm_sev_init();
+-    ret = sev_ioctl(sev->sev_fd, KVM_SEV_INIT, NULL, &fw_error);
++    ret = sev_ioctl(sev->sev_fd, cmd, NULL, &fw_error);
+     if (ret) {
+         error_report("%s: failed to initialize ret=%d fw_error=%d '%s'",
+                      __func__, ret, fw_error, fw_error_to_str(fw_error));
+diff --git a/target/i386/sev_i386.h b/target/i386/sev_i386.h
+index 4db6960f60..4f9a5e9b21 100644
+--- a/target/i386/sev_i386.h
++++ b/target/i386/sev_i386.h
+@@ -29,6 +29,7 @@
+ #define SEV_POLICY_SEV          0x20
+ 
+ extern bool sev_enabled(void);
++extern bool sev_es_enabled(void);
+ extern uint64_t sev_get_me_mask(void);
+ extern SevInfo *sev_get_info(void);
+ extern uint32_t sev_get_cbit_position(void);
 -- 
-2.18.2
+2.28.0
 
 
