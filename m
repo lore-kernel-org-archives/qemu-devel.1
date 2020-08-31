@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15ACFC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AA7DC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:37:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D36CD20719
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:36:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0629D20719
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:37:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g+/KovhH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D36CD20719
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e69b8CsJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0629D20719
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCmnj-00009K-2T
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:36:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34854)
+	id 1kCmnl-0000CT-8C
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:37:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmLS-0006rR-9r
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:07:46 -0400
-Received: from mail-pj1-x1030.google.com ([2607:f8b0:4864:20::1030]:38604)
+ id 1kCmLW-00072n-Mx
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:07:50 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:34142)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmLP-0006BV-Ua
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:07:45 -0400
-Received: by mail-pj1-x1030.google.com with SMTP id ls14so26229pjb.3
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:07:43 -0700 (PDT)
+ id 1kCmLU-0006CK-OU
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:07:50 -0400
+Received: by mail-pg1-x544.google.com with SMTP id i10so846115pgk.1
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:07:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=VlVvLuwvJhqN5DUGPUSEKxjopLK3XRPeauR+IVz+80Y=;
- b=g+/KovhH2JGR8JZYQi0xdB3dwyIIHBg6n48noeQelptkxQDESh6LCw/uV8qg4CXO9u
- VWKxOVd4BiMqupb1Ckw0nFQn7ZZjr4ZoevmbqpSIHWvMYceZujtNBN5VPhmm7Pv/VwGT
- 6NGMwo4yNKaVFZoauFPBd2q6oRaOOFEfd09rkgv8mppBa8WPqVwi+Hd9u+2xIXD/3ePX
- Kgil0Yb+mDfwReJ7yc9CvW5P7DSnc2WVUyV3+7f2QnNdAzpJ9kl8n7Y3HtG91JBwvQLy
- 2xZGxdA7kQaYML/aK8OYh6kzzK8+42CRLb7CeKEeDuQDb2/aqwjtnerw67nG4OvnI8+b
- QLgw==
+ bh=1WdUOJWGCdcV9QIGGOS0y70LT85NGsncqmvGoqTi8AE=;
+ b=e69b8CsJeYkWnBKvekJVHEOqMk9y1E4fM/sL+A12hFC5kyXMEE4NYTB9HkSwooL6Z1
+ tuIJCTBcW9Fn6CF1UGzNux4+Q/kpIcCjBW0025jOvaepFCcRdpnuDsh8/asu0GrEj+Zx
+ CjW6ji916SXGhWbeHNjoQLdICCwiNcSRVrI7WJmtJeOb8/yeKu0V8EeRTlX2fRv/aU3P
+ GjC4kfEMqWK/f/reTysvW86vO1n7PJ0sLRUGOdzCppqiLBWZRbYR2lSB7GYvxurAqKQ4
+ IYWCWsI2YI+QesbKQkCRdiV4g3u3vPdWJqignyDN9nCS0jYrNiBYoWpzl4882ji7bDkS
+ G+XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=VlVvLuwvJhqN5DUGPUSEKxjopLK3XRPeauR+IVz+80Y=;
- b=aYA6fG2uNtt3dxbw7kwgkVxdFmSZUUhme54lsNx5oQoG+Nsmycypk3VLSSoReZIJtG
- c2++pw5eXdWJdXV5h2EB9uWBSuqcqddBRDK8qOFOG+P5ovo2gW6AHCAn6CTHgn7Iozfz
- gQ0mhk5fCNXpGJyEIQ29AQIm7dS7JqIDuh6zjGO19tV+JnWB4W+9BwSJFOtJvhq9f8P0
- 4tXIbIHuIEuyyDHLr9VyCJO/iMJY70Lq5xEgUe2jGfeQes8wNQPDQRpvLBRO0Apezgr9
- pCQTAatEjZREWx7GO2jrPBI1ExtSzb7rJ6u5hu9bCW+aDNxW/0YgBqrJy4z+b6FogN9M
- F97A==
-X-Gm-Message-State: AOAM531uJ6yYMwPQRZzJyKLLB4+/3E5cxxrjTiuKuxMkyqGX78hNswas
- RixzQOhqD4CvZYhGvO8o0CIR2buFZJ0RMg==
-X-Google-Smtp-Source: ABdhPJzGmatiyHRoZVMd0Ke3HTlzCh4S+4tnuXItWoJDvs/INKEVHeUn7Lna0CQudfDzEjctAD6hIw==
-X-Received: by 2002:a17:90a:fb52:: with SMTP id
- iq18mr96348pjb.162.1598890062128; 
- Mon, 31 Aug 2020 09:07:42 -0700 (PDT)
+ bh=1WdUOJWGCdcV9QIGGOS0y70LT85NGsncqmvGoqTi8AE=;
+ b=OoDKvVwxZt5PukGYZMMWA7E0RI16UHW4swXM+VovC2pHcOQNxGIYoIIAXOPjsDPwfq
+ fMGerLys+PvZ7Bv3Ao3qcraMvHkV66HzDDQcyW5btw6IYzfRNBIJ8uG57vKh5oHVGG8r
+ gxFXAj4rixH/zJ/5ZDduCpnAqDfJ4WeLcSCM/mLaAzc6XMKpZ0NdQdMrE2uIv0Q7NuHN
+ sThQ8CG5K8pFj9y+yLvumFr/CvILSDsFyhFht4chUH4jvIEOqnBMsOoxPaNeCsAvMv/n
+ t6ssf/DMF/uLTCSUcpYCC8tGLnV/LGYR8AX9iMdKP3kaovJoko77Dy3XX8Gwy1tQtT90
+ eMjA==
+X-Gm-Message-State: AOAM532lPc5eQgWuXdmCx8reWTLbRaTH54jBY3pK4K43uh/FV3wJL3O4
+ pRYYNqHW+lb+//xKc+x7XtWtYzcHWGXGxA==
+X-Google-Smtp-Source: ABdhPJzFbcohSmZKJviXBgQG6bENMT3+OcH0MDMKGiZL7tgmnD5bsreHKmqLzefXolvheZu9Ev9WYA==
+X-Received: by 2002:a65:6882:: with SMTP id e2mr1803507pgt.290.1598890065867; 
+ Mon, 31 Aug 2020 09:07:45 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.07.40
+ by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.07.44
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 31 Aug 2020 09:07:41 -0700 (PDT)
+ Mon, 31 Aug 2020 09:07:45 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 73/76] target/microblaze: Remove last of old decoder
-Date: Mon, 31 Aug 2020 09:05:58 -0700
-Message-Id: <20200831160601.833692-74-richard.henderson@linaro.org>
+Subject: [PULL 76/76] target/microblaze: Reduce linux-user address space to
+ 32-bit
+Date: Mon, 31 Aug 2020 09:06:01 -0700
+Message-Id: <20200831160601.833692-77-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200831160601.833692-1-richard.henderson@linaro.org>
 References: <20200831160601.833692-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1030;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1030.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,225 +105,184 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All instructions have been convered.  Issue sigill if decodetree
-does not match.  Remove argument decode from DisasContext.
-Remove microblaze-decode.h.
+User-space programs cannot use the 64-bit lwea/swea instructions.
+We can improve code generation and runtime by restricting the
+user-only address space to 32-bit.
 
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/microblaze-decode.h | 59 ----------------------
- target/microblaze/translate.c         | 73 +--------------------------
- 2 files changed, 1 insertion(+), 131 deletions(-)
- delete mode 100644 target/microblaze/microblaze-decode.h
+ target/microblaze/cpu-param.h | 15 +++++++++++++++
+ target/microblaze/cpu.h       |  2 +-
+ target/microblaze/helper.c    |  4 ++--
+ target/microblaze/translate.c | 28 +++++++++++++++++++++++++++-
+ 4 files changed, 45 insertions(+), 4 deletions(-)
 
-diff --git a/target/microblaze/microblaze-decode.h b/target/microblaze/microblaze-decode.h
-deleted file mode 100644
-index 17b2f29fff..0000000000
---- a/target/microblaze/microblaze-decode.h
-+++ /dev/null
-@@ -1,59 +0,0 @@
--/*
-- *  MicroBlaze insn decoding macros.
-- *
-- *  Copyright (c) 2009 Edgar E. Iglesias <edgar.iglesias@gmail.com>
-- *
-- * This library is free software; you can redistribute it and/or
-- * modify it under the terms of the GNU Lesser General Public
-- * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-- *
-- * This library is distributed in the hope that it will be useful,
-- * but WITHOUT ANY WARRANTY; without even the implied warranty of
-- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-- * Lesser General Public License for more details.
-- *
-- * You should have received a copy of the GNU Lesser General Public
-- * License along with this library; if not, see <http://www.gnu.org/licenses/>.
-- */
--
--#ifndef TARGET_MICROBLAZE_MICROBLAZE_DECODE_H
--#define TARGET_MICROBLAZE_MICROBLAZE_DECODE_H
--
--/* Convenient binary macros.  */
--#define HEX__(n) 0x##n##LU
--#define B8__(x) ((x&0x0000000FLU)?1:0) \
--                 + ((x&0x000000F0LU)?2:0) \
--                 + ((x&0x00000F00LU)?4:0) \
--                 + ((x&0x0000F000LU)?8:0) \
--                 + ((x&0x000F0000LU)?16:0) \
--                 + ((x&0x00F00000LU)?32:0) \
--                 + ((x&0x0F000000LU)?64:0) \
--                 + ((x&0xF0000000LU)?128:0)
--#define B8(d) ((unsigned char)B8__(HEX__(d)))
--
--/* Decode logic, value and mask.  */
--#define DEC_ADD     {B8(00000000), B8(00110001)}
--#define DEC_SUB     {B8(00000001), B8(00110001)}
--#define DEC_AND     {B8(00100001), B8(00110101)}
--#define DEC_XOR     {B8(00100010), B8(00110111)}
--#define DEC_OR      {B8(00100000), B8(00110111)}
--#define DEC_BIT     {B8(00100100), B8(00111111)}
--#define DEC_MSR     {B8(00100101), B8(00111111)}
--
--#define DEC_BARREL  {B8(00010001), B8(00110111)}
--#define DEC_MUL     {B8(00010000), B8(00110111)}
--#define DEC_DIV     {B8(00010010), B8(00110111)}
--#define DEC_FPU     {B8(00010110), B8(00111111)}
--
--#define DEC_LD      {B8(00110000), B8(00110100)}
--#define DEC_ST      {B8(00110100), B8(00110100)}
--#define DEC_IMM     {B8(00101100), B8(00111111)}
--
--#define DEC_BR      {B8(00100110), B8(00110111)}
--#define DEC_BCC     {B8(00100111), B8(00110111)}
--#define DEC_RTS     {B8(00101101), B8(00111111)}
--
--#define DEC_STREAM  {B8(00010011), B8(00110111)}
--
--#endif
+diff --git a/target/microblaze/cpu-param.h b/target/microblaze/cpu-param.h
+index 4abbc62d50..4d8297fa94 100644
+--- a/target/microblaze/cpu-param.h
++++ b/target/microblaze/cpu-param.h
+@@ -8,9 +8,24 @@
+ #ifndef MICROBLAZE_CPU_PARAM_H
+ #define MICROBLAZE_CPU_PARAM_H 1
+ 
++/*
++ * While system mode can address up to 64 bits of address space,
++ * this is done via the lea/sea instructions, which are system-only
++ * (as they also bypass the mmu).
++ *
++ * We can improve the user-only experience by only exposing 32 bits
++ * of address space.
++ */
++#ifdef CONFIG_USER_ONLY
++#define TARGET_LONG_BITS 32
++#define TARGET_PHYS_ADDR_SPACE_BITS 32
++#define TARGET_VIRT_ADDR_SPACE_BITS 32
++#else
+ #define TARGET_LONG_BITS 64
+ #define TARGET_PHYS_ADDR_SPACE_BITS 64
+ #define TARGET_VIRT_ADDR_SPACE_BITS 64
++#endif
++
+ /* FIXME: MB uses variable pages down to 1K but linux only uses 4k.  */
+ #define TARGET_PAGE_BITS 12
+ #define NB_MMU_MODES 3
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 4298f242a6..d11b6fa995 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -242,7 +242,7 @@ struct CPUMBState {
+     uint32_t pc;
+     uint32_t msr;    /* All bits of MSR except MSR[C] and MSR[CC] */
+     uint32_t msr_c;  /* MSR[C], in low bit; other bits must be 0 */
+-    uint64_t ear;
++    target_ulong ear;
+     uint32_t esr;
+     uint32_t fsr;
+     uint32_t btr;
+diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
+index 1667822fb7..48547385b0 100644
+--- a/target/microblaze/helper.c
++++ b/target/microblaze/helper.c
+@@ -303,8 +303,8 @@ void mb_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+     iflags = cpu->env.iflags;
+ 
+     qemu_log_mask(CPU_LOG_INT,
+-                  "Unaligned access addr=" TARGET_FMT_lx
+-                  " pc=%x iflags=%x\n", addr, cpu->env.pc, iflags);
++                  "Unaligned access addr=" TARGET_FMT_lx " pc=%x iflags=%x\n",
++                  (target_ulong)addr, cpu->env.pc, iflags);
+ 
+     esr = ESR_EC_UNALIGNED_DATA;
+     if (likely(iflags & ESR_ESS_FLAG)) {
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 2c87d671ae..8f69ca50b2 100644
+index 8c287457a9..a377818b5e 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -24,7 +24,6 @@
- #include "exec/exec-all.h"
- #include "tcg/tcg-op.h"
- #include "exec/helper-proto.h"
--#include "microblaze-decode.h"
- #include "exec/cpu_ldst.h"
- #include "exec/helper-gen.h"
- #include "exec/translator.h"
-@@ -65,13 +64,7 @@ typedef struct DisasContext {
-     bool r0_set;
- 
-     /* Decoder.  */
--    int type_b;
--    uint32_t ir;
-     uint32_t ext_imm;
--    uint8_t opcode;
--    uint8_t rd, ra, rb;
--    uint16_t imm;
--
-     unsigned int cpustate_changed;
-     unsigned int tb_flags;
-     unsigned int tb_flags_to_set;
-@@ -82,8 +75,6 @@ typedef struct DisasContext {
- 
-     /* Immediate branch-taken destination, or -1 for indirect. */
-     uint32_t jmp_dest;
--
--    int abort_at_next_insn;
- } DisasContext;
- 
- static int typeb_imm(DisasContext *dc, int x)
-@@ -184,21 +175,6 @@ static bool trap_userspace(DisasContext *dc, bool cond)
-     return cond_user;
+@@ -687,6 +687,7 @@ static TCGv compute_ldst_addr_typeb(DisasContext *dc, int ra, int imm)
+     return ret;
  }
  
--static int32_t dec_alu_typeb_imm(DisasContext *dc)
--{
--    tcg_debug_assert(dc->type_b);
--    return typeb_imm(dc, (int16_t)dc->imm);
--}
--
--static inline TCGv_i32 *dec_alu_op_b(DisasContext *dc)
--{
--    if (dc->type_b) {
--        tcg_gen_movi_i32(cpu_imm, dec_alu_typeb_imm(dc));
--        return &cpu_imm;
--    }
--    return &cpu_R[dc->rb];
--}
--
- static TCGv_i32 reg_for_read(DisasContext *dc, int reg)
++#ifndef CONFIG_USER_ONLY
+ static TCGv compute_ldst_addr_ea(DisasContext *dc, int ra, int rb)
  {
-     if (likely(reg != 0)) {
-@@ -1549,16 +1525,6 @@ static void do_rte(DisasContext *dc)
-     dc->tb_flags &= ~DRTE_FLAG;
+     int addr_size = dc->cpu->cfg.addr_size;
+@@ -712,6 +713,7 @@ static TCGv compute_ldst_addr_ea(DisasContext *dc, int ra, int rb)
+     }
+     return ret;
+ }
++#endif
+ 
+ static void record_unaligned_ess(DisasContext *dc, int rd,
+                                  MemOp size, bool store)
+@@ -776,8 +778,12 @@ static bool trans_lbuea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_load(dc, arg->rd, addr, MO_UB, MMU_NOMMU_IDX, false);
++#endif
  }
  
--static void dec_null(DisasContext *dc)
--{
--    if (trap_illegal(dc, true)) {
--        return;
--    }
--    qemu_log_mask(LOG_GUEST_ERROR, "unknown insn pc=%x opc=%x\n",
--                  (uint32_t)dc->base.pc_next, dc->opcode);
--    dc->abort_at_next_insn = 1;
--}
--
- /* Insns connected to FSL or AXI stream attached devices.  */
- static bool do_get(DisasContext *dc, int rd, int rb, int imm, int ctrl)
- {
-@@ -1624,40 +1590,6 @@ static bool trans_putd(DisasContext *dc, arg_putd *arg)
-     return do_put(dc, arg->ra, arg->rb, 0, arg->ctrl);
+ static bool trans_lbui(DisasContext *dc, arg_typeb *arg)
+@@ -803,8 +809,12 @@ static bool trans_lhuea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_load(dc, arg->rd, addr, MO_TEUW, MMU_NOMMU_IDX, false);
++#endif
  }
  
--static struct decoder_info {
--    struct {
--        uint32_t bits;
--        uint32_t mask;
--    };
--    void (*dec)(DisasContext *dc);
--} decinfo[] = {
--    {{0, 0}, dec_null}
--};
--
--static void old_decode(DisasContext *dc, uint32_t ir)
--{
--    int i;
--
--    dc->ir = ir;
--
--    /* bit 2 seems to indicate insn type.  */
--    dc->type_b = ir & (1 << 29);
--
--    dc->opcode = EXTRACT_FIELD(ir, 26, 31);
--    dc->rd = EXTRACT_FIELD(ir, 21, 25);
--    dc->ra = EXTRACT_FIELD(ir, 16, 20);
--    dc->rb = EXTRACT_FIELD(ir, 11, 15);
--    dc->imm = EXTRACT_FIELD(ir, 0, 15);
--
--    /* Large switch for all insns.  */
--    for (i = 0; i < ARRAY_SIZE(decinfo); i++) {
--        if ((dc->opcode & decinfo[i].mask) == decinfo[i].bits) {
--            decinfo[i].dec(dc);
--            break;
--        }
--    }
--}
--
- static void mb_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcb, DisasContext, base);
-@@ -1667,7 +1599,6 @@ static void mb_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
-     dc->cpu = cpu;
-     dc->tb_flags = dc->base.tb->flags;
-     dc->cpustate_changed = 0;
--    dc->abort_at_next_insn = 0;
-     dc->ext_imm = dc->base.tb->cs_base;
-     dc->r0 = NULL;
-     dc->r0_set = false;
-@@ -1724,7 +1655,7 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
+ static bool trans_lhui(DisasContext *dc, arg_typeb *arg)
+@@ -830,8 +840,12 @@ static bool trans_lwea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_load(dc, arg->rd, addr, MO_TEUL, MMU_NOMMU_IDX, false);
++#endif
+ }
  
-     ir = cpu_ldl_code(env, dc->base.pc_next);
-     if (!decode(dc, ir)) {
--        old_decode(dc, ir);
-+        trap_illegal(dc, true);
+ static bool trans_lwi(DisasContext *dc, arg_typeb *arg)
+@@ -910,8 +924,12 @@ static bool trans_sbea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_store(dc, arg->rd, addr, MO_UB, MMU_NOMMU_IDX, false);
++#endif
+ }
+ 
+ static bool trans_sbi(DisasContext *dc, arg_typeb *arg)
+@@ -937,8 +955,12 @@ static bool trans_shea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_store(dc, arg->rd, addr, MO_TEUW, MMU_NOMMU_IDX, false);
++#endif
+ }
+ 
+ static bool trans_shi(DisasContext *dc, arg_typeb *arg)
+@@ -964,8 +986,12 @@ static bool trans_swea(DisasContext *dc, arg_typea *arg)
+     if (trap_userspace(dc, true)) {
+         return true;
+     }
++#ifdef CONFIG_USER_ONLY
++    return true;
++#else
+     TCGv addr = compute_ldst_addr_ea(dc, arg->ra, arg->rb);
+     return do_store(dc, arg->rd, addr, MO_TEUL, MMU_NOMMU_IDX, false);
++#endif
+ }
+ 
+ static bool trans_swi(DisasContext *dc, arg_typeb *arg)
+@@ -1818,7 +1844,7 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
      }
  
-     if (dc->r0) {
-@@ -1764,8 +1695,6 @@ static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
- {
-     DisasContext *dc = container_of(dcb, DisasContext, base);
+     qemu_fprintf(f, "\nesr=0x%04x fsr=0x%02x btr=0x%08x edr=0x%x\n"
+-                 "ear=0x%016" PRIx64 " slr=0x%x shr=0x%x\n",
++                 "ear=0x" TARGET_FMT_lx " slr=0x%x shr=0x%x\n",
+                  env->esr, env->fsr, env->btr, env->edr,
+                  env->ear, env->slr, env->shr);
  
--    assert(!dc->abort_at_next_insn);
--
-     if (dc->base.is_jmp == DISAS_NORETURN) {
-         /* We have already exited the TB. */
-         return;
 -- 
 2.25.1
 
