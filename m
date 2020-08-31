@@ -2,93 +2,134 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 536DEC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 14:04:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E6E1C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 14:15:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BDC82083E
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 14:04:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D705620693
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 14:15:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c7rPsJjW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BDC82083E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="C3gbVszj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D705620693
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCkPx-0003yz-9Z
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 10:04:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58646)
+	id 1kCkbA-0007Au-OC
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 10:15:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
- id 1kCkNR-0001Z0-2U; Mon, 31 Aug 2020 10:01:41 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35789)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <nirsof@gmail.com>)
- id 1kCkNO-0005Rq-LS; Mon, 31 Aug 2020 10:01:40 -0400
-Received: by mail-wm1-x344.google.com with SMTP id o21so5427720wmc.0;
- Mon, 31 Aug 2020 07:01:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=CxVi3AwzX6wIEGts+Qx2coeo7yCmSP7/IF+d/L8k3BM=;
- b=c7rPsJjWpEeXVO4uVAIk79AqHacG3klAN6NI5+BuOI/rxSL4zkvTh3a51wgdLzeAZR
- OGLEv7Vb3tawX9GfwkXS502hXz6rAS35VQXDFyBTWr75gElHlLKTX58F3+cxXRgZg0h0
- +zIkirU/TqyZmfVtREHc7DWwatAnF4j/MW/uDFlVL+DYum1BPomL5cg13MtbM9BhFfz0
- qA6qCs6h8lwtyagxZbwAwA3yl8OTLT4EaP7/J9924eCnbSoDJMpmnPMG5Q+LW2uyRrn7
- D07gRQ0AMqW2yhAmnwYQKU4K9Bib3wPt0W8QPoINSKQd5RG2HxFZ1SzTGfxVjGUyUJpc
- BavA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=CxVi3AwzX6wIEGts+Qx2coeo7yCmSP7/IF+d/L8k3BM=;
- b=Pr5nVDFgjZ+SwGQtpVrl6plcDRFv7kZ4bZLdwFBHPnKxrKgfnmt/BBxozAIVnC7fQF
- CKYqa80sv0C6rU6VwIS9VxlxLewiYIFM2M5VqNhTcvS266ATq84jrMJRU2yi0816qhNE
- XUYesQAZ1j4u9rrPM8yGKk7Kx2XK35i4oYcNm2u+p625+fY8CqCgDIh+5dPfRndV7Bg3
- T3V6uNrPHFzLWqQ/A/qw2/yGKckA6aF9St1pWNb2Sqp7g/MBenDwnhMs5Q5AJ5MoEroH
- XHGPRxeiKZ6JNceDm6TugLvgnRsyfLS16L/Bnu4GwRFvdELSoFPTGwTw3iqRuR09k/5S
- 62Tw==
-X-Gm-Message-State: AOAM533Kia34u8mIa9cD4Wg7i238pctJSBHYyMy5pvSUA6O0/iLcoWbn
- KFRneTYvsbQdSEIGpthdzEsbrv288qG866mO
-X-Google-Smtp-Source: ABdhPJxkaHCLMG1nHD1HOldcLB3hqbSOgp1OTw5zi8G4B6rAV/Bhxd2IPjhUcQXLxgg/ptlYCE+kXA==
-X-Received: by 2002:a7b:c055:: with SMTP id u21mr1423972wmc.64.1598882495596; 
- Mon, 31 Aug 2020 07:01:35 -0700 (PDT)
-Received: from localhost.localdomain (109-186-204-55.bb.netvision.net.il.
- [109.186.204.55])
- by smtp.gmail.com with ESMTPSA id q192sm12413320wme.13.2020.08.31.07.01.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 31 Aug 2020 07:01:35 -0700 (PDT)
-From: Nir Soffer <nirsof@gmail.com>
-X-Google-Original-From: Nir Soffer <nsoffer@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] block: file-posix: Replace posix_fallocate with fallocate
-Date: Mon, 31 Aug 2020 17:01:27 +0300
-Message-Id: <20200831140127.657134-3-nsoffer@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200831140127.657134-1-nsoffer@redhat.com>
-References: <20200831140127.657134-1-nsoffer@redhat.com>
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kCka8-0006L4-2A
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 10:14:48 -0400
+Received: from mail-bn7nam10on2051.outbound.protection.outlook.com
+ ([40.107.92.51]:38624 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kCka5-0006r4-Dy
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 10:14:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZQaWt7bQs0XoytT/CeV5WhCp781hxhRKbdpB5iPdgmQlghAmJKgCcIyG3dqLJRUqD/A2rKwYaI+9TvJ7UDyBpqHcdc8F0RwyxnFJ7KI+ybOLMGdwuXiBzjgeFIfKSEO2BvwCvePI+LCAGGQ3/3n2b1aIg7EpAf7iPFR2Zs+ej8HsaoKJJTkYiHcDWSYPYFJAvQJdpcnyXoDIFLUcn4e7Q+nXtT1YO7SbVvhKtUj8nb/AdFhTtZzyRexP5z75ResOwnmuFF9qho2yq9rP3ovQKXUoJ7f14cVahzSuLZyh2ozrm/yWVXtuyDWtUtopBSp0xWaW1GqnhQDqkpDUSNojqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ApwzKLTj/1Th0BHzLoI+bV5AExfvX+qtR7+/D9XxYrc=;
+ b=BhrU5T1Qt3FUSQqTv9UFXjBc5mcAUDybu9kA+yBwRsudZ/kpE/mUyrAa1Btw2QtiXUDtcu/yn2eaX2QFTnGMFs0z9SW2RAgUVT9yUipngw/q86fmPDACBT6+GEs6zdxvC5H51DVfddy2bqesz7SB8mRtiYF2+Y0o+MMN0Sv8lJEf5l5lu04zfS5wodejnNU7WDVcDyHBknTTvzK+GYCKjj/souJgR0Z3rw35+PGP//tlc+pUOaP7kY+zZww2rdsBZtTTeayhFKCsXg/7hr0c8SzpyGbNonHExMRQgG7WwKCSShn2PHSlQEtdiGYktehinlg13R76Oc+uIvvk9Ugebw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 149.199.60.83) smtp.rcpttodomain=linaro.org
+ smtp.mailfrom=xilinx.com; 
+ dmarc=none action=none header.from=xilinx.com; dkim=none (message not
+ signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ApwzKLTj/1Th0BHzLoI+bV5AExfvX+qtR7+/D9XxYrc=;
+ b=C3gbVszjSDDF1BQWmuYCP3Sijj+YPfjnnK58kwpfSUin7BYGllcSLnF0RQLTv/zkxyz19kJAc3Xy/uop5A5PyspTmd0bUSMXeW0QyWrDXnKxuOjuE8PuIn9Avf0LEPxgUNm9bON7m76OOvtkbdObvECu5ynF7dlIlHerGf7sNSU=
+Received: from MN2PR10CA0028.namprd10.prod.outlook.com (2603:10b6:208:120::41)
+ by DM6PR02MB6041.namprd02.prod.outlook.com (2603:10b6:5:1d2::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.21; Mon, 31 Aug
+ 2020 14:14:42 +0000
+Received: from BL2NAM02FT013.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:208:120:cafe::19) by MN2PR10CA0028.outlook.office365.com
+ (2603:10b6:208:120::41) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
+ Transport; Mon, 31 Aug 2020 14:14:42 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 149.199.60.83) smtp.mailfrom=xilinx.com; linaro.org; dkim=none (message not
+ signed) header.d=none;linaro.org; dmarc=none action=none
+ header.from=xilinx.com;
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of xilinx.com: DNS Timeout)
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ BL2NAM02FT013.mail.protection.outlook.com (10.152.77.19) with Microsoft SMTP
+ Server id 15.20.3326.19 via Frontend Transport; Mon, 31 Aug 2020 14:14:40
+ +0000
+Received: from [149.199.38.66] (port=47588 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kCkZy-0003uf-Ib; Mon, 31 Aug 2020 07:14:38 -0700
+Received: from [127.0.0.1] (helo=xsj-pvapsmtp01)
+ by smtp.xilinx.com with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kCka0-0001kY-DZ; Mon, 31 Aug 2020 07:14:40 -0700
+Received: from [10.71.116.235] (helo=localhost)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kCkZz-0001kQ-Ny; Mon, 31 Aug 2020 07:14:40 -0700
+Date: Mon, 31 Aug 2020 16:14:35 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v2 00/76] target/microblaze improvements
+Message-ID: <20200831141435.GD14249@toto>
+References: <20200828141929.77854-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=nirsof@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200828141929.77854-1-richard.henderson@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 821b80fd-cf40-474b-0532-08d84db8338f
+X-MS-TrafficTypeDiagnostic: DM6PR02MB6041:
+X-Microsoft-Antispam-PRVS: <DM6PR02MB6041452B559F60ADDDF98245C2510@DM6PR02MB6041.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fshan7Y860A0gq0hPWHaShrZHWwMAQHkzKZrxH6LbEMYLuzrS44nk3ePqGsp3/oqKDkINw+LUyKSl9BuhebhqZza/FjwYNjQrUou9tdacN/719Wpg/qi9eGtbc3MJSWuwi9D4DJdASPyt+SgZhIpH4QvQGI7ENaoTkORJ2QDzfEmekIjaXskuIz/VAviVHshm7kJW7pQMGlDgZvhIufF3L4EmXpEvTxGEA1wfjkPb6koUjVQ95xUSLFtN86FEYLdhNQI5eatqf4pUHfKPpYI8jbcFrFcrJAwPFCk+6oliS5J/2oxAmmH5Y55Qfv48+ovHbLp2jwn4/oV95RTr8ftejn9NLy1O6U9kIRb0+KjN0SFK7GcMspqgh7s0MwgRWrRQ81USKTVO7o8M3r3BkOgOQ==
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(7916004)(346002)(39860400002)(396003)(376002)(136003)(46966005)(6916009)(336012)(186003)(6666004)(8936002)(2906002)(63350400001)(4326008)(9786002)(26005)(5660300002)(426003)(82740400003)(478600001)(9686003)(70586007)(70206006)(1076003)(83380400001)(33716001)(82310400002)(316002)(8676002)(47076004)(356005)(81166007)(33656002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2020 14:14:40.7217 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 821b80fd-cf40-474b-0532-08d84db8338f
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT013.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB6041
+Received-SPF: pass client-ip=40.107.92.51; envelope-from=edgar@xilinx.com;
+ helo=NAM10-BN7-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 10:14:43
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,196 +142,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Nir Soffer <nsoffer@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If fallocate() is not supported, posix_fallocate() falls back to
-inefficient allocation, writing one byte for every 4k bytes[1]. This is
-very slow compared with writing zeros. In oVirt we measured ~400%
-improvement in allocation time when replacing posix_fallocate() with
-manually writing zeroes[2].
+On Fri, Aug 28, 2020 at 07:18:13AM -0700, Richard Henderson wrote:
+> Thanks for all the testing and review, Edgar.
+> 
+> Changes in v2:
+>   * Restored opcode_0_illegal handling.
+>   * Dropped problematic imm/delay slot tb extension.
+>   * Dropped tcg_gen_lookup_and_goto_ptr for now.
+>   * Added fix for mb_cpu_transaction_failed.
+>   * Removed microblaze-decode.h with old decoder.
+>   * Removed abort_at_next_insn with old decoder.
+>   * Fixed mbar.
+>   * Fixed put.
+> 
+> 
+> r~
 
-We also know that posix_fallocated() does not work well when using OFD
-locks[3]. We don't know the reason yet for this issue yet.
+I had one more comment on patch #27 but the rest of the series looks good to
+me and it also passes my tests.
 
-Change preallocate_falloc() to use fallocate() instead of
-posix_falloate(), and fall back to full preallocation if not supported.
+So once you fix #27 feel free to add my RB & TB tags on the entire series.
+It's probably easiest if you send a pull-req via one of your trees.
 
-Here are quick test results with this change.
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-Before (qemu-img-5.1.0-2.fc32.x86_64):
+Thanks again for working on this!
+Cheers,
+Edgar
 
-$ time qemu-img create -f raw -o preallocation=falloc /tmp/nfs3/test.raw 6g
-Formatting '/tmp/nfs3/test.raw', fmt=raw size=6442450944 preallocation=falloc
 
-real 0m42.100s
-user 0m0.602s
-sys 0m4.137s
-
-NFS stats:
-calls      retrans    authrefrsh    write
-1571583    0          1572205       1571321
-
-After:
-
-$ time ./qemu-img create -f raw -o preallocation=falloc /tmp/nfs3/test.raw 6g
-Formatting '/tmp/nfs3/test.raw', fmt=raw size=6442450944 preallocation=falloc
-
-real 0m15.551s
-user 0m0.070s
-sys 0m2.623s
-
-NFS stats:
-calls      retrans    authrefrsh    write
-24620      0          24624         24567  
-
-[1] https://code.woboq.org/userspace/glibc/sysdeps/posix/posix_fallocate.c.html#96
-[2] https://bugzilla.redhat.com/1850267#c25
-[3] https://bugzilla.redhat.com/1851097
-
-Signed-off-by: Nir Soffer <nsoffer@redhat.com>
----
- block/file-posix.c                     | 32 +++++++++-----------------
- docs/system/qemu-block-drivers.rst.inc | 11 +++++----
- docs/tools/qemu-img.rst                | 11 +++++----
- qapi/block-core.json                   |  4 ++--
- 4 files changed, 25 insertions(+), 33 deletions(-)
-
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 341ffb1cb4..eac3c0b412 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1835,36 +1835,24 @@ static int allocate_first_block(int fd, size_t max_size)
- static int preallocate_falloc(int fd, int64_t current_length, int64_t offset,
-                               Error **errp)
- {
--#ifdef CONFIG_POSIX_FALLOCATE
-+#ifdef CONFIG_FALLOCATE
-     int result;
- 
-     if (offset == current_length)
-         return 0;
- 
--    /*
--     * Truncating before posix_fallocate() makes it about twice slower on
--     * file systems that do not support fallocate(), trying to check if a
--     * block is allocated before allocating it, so don't do that here.
--     */
--
--    result = -posix_fallocate(fd, current_length,
--                              offset - current_length);
-+    result = do_fallocate(fd, 0, current_length, offset - current_length);
-     if (result != 0) {
--        /* posix_fallocate() doesn't set errno. */
--        error_setg_errno(errp, -result,
--                         "Could not preallocate new data");
-+        error_setg_errno(errp, -result, "Could not preallocate new data");
-         return result;
-     }
- 
-     if (current_length == 0) {
-         /*
--         * posix_fallocate() uses fallocate() if the filesystem supports
--         * it, or fallback to manually writing zeroes. If fallocate()
--         * was used, unaligned reads from the fallocated area in
--         * raw_probe_alignment() will succeed, hence we need to allocate
--         * the first block.
-+         * Unaligned reads from the fallocated area in raw_probe_alignment()
-+         * will succeed, hence we need to allocate the first block.
-          *
--         * Optimize future alignment probing; ignore failures.
-+         * Optimizes future alignment probing; ignore failures.
-          */
-         allocate_first_block(fd, offset);
-     }
-@@ -1973,10 +1961,12 @@ static int handle_aiocb_truncate(void *opaque)
-     }
- 
-     switch (prealloc) {
--#ifdef CONFIG_POSIX_FALLOCATE
-+#ifdef CONFIG_FALLOCATE
-     case PREALLOC_MODE_FALLOC:
-         result = preallocate_falloc(fd, current_length, offset, errp);
--        goto out;
-+        if (result != -ENOTSUP)
-+            goto out;
-+        /* If fallocate() is not supported, fallback to full preallocation. */
- #endif
-     case PREALLOC_MODE_FULL:
-         result = preallocate_full(fd, current_length, offset, errp);
-@@ -3080,7 +3070,7 @@ static QemuOptsList raw_create_opts = {
-             .name = BLOCK_OPT_PREALLOC,
-             .type = QEMU_OPT_STRING,
-             .help = "Preallocation mode (allowed values: off"
--#ifdef CONFIG_POSIX_FALLOCATE
-+#ifdef CONFIG_FALLOCATE
-                     ", falloc"
- #endif
-                     ", full)"
-diff --git a/docs/system/qemu-block-drivers.rst.inc b/docs/system/qemu-block-drivers.rst.inc
-index b052a6d14e..8e4acf397e 100644
---- a/docs/system/qemu-block-drivers.rst.inc
-+++ b/docs/system/qemu-block-drivers.rst.inc
-@@ -25,11 +25,12 @@ This section describes each format and the options that are supported for it.
-   .. program:: raw
-   .. option:: preallocation
- 
--    Preallocation mode (allowed values: ``off``, ``falloc``,
--    ``full``). ``falloc`` mode preallocates space for image by
--    calling ``posix_fallocate()``. ``full`` mode preallocates space
--    for image by writing data to underlying storage. This data may or
--    may not be zero, depending on the storage location.
-+    Preallocation mode (allowed values: ``off``, ``falloc``, ``full``).
-+    ``falloc`` mode preallocates space for image by calling
-+    ``fallocate()``, and falling back to ``full` mode if not supported.
-+    ``full`` mode preallocates space for image by writing data to
-+    underlying storage. This data may or may not be zero, depending on
-+    the storage location.
- 
- .. program:: image-formats
- .. option:: qcow2
-diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
-index c35bd64822..a2089bd1b7 100644
---- a/docs/tools/qemu-img.rst
-+++ b/docs/tools/qemu-img.rst
-@@ -750,11 +750,12 @@ Supported image file formats:
-   Supported options:
- 
-   ``preallocation``
--    Preallocation mode (allowed values: ``off``, ``falloc``,
--    ``full``).  ``falloc`` mode preallocates space for image by
--    calling ``posix_fallocate()``.  ``full`` mode preallocates space
--    for image by writing data to underlying storage.  This data may or
--    may not be zero, depending on the storage location.
-+    Preallocation mode (allowed values: ``off``, ``falloc``, ``full``).
-+    ``falloc`` mode preallocates space for image by calling
-+    ``fallocate()``, and falling back to ``full` mode if not supported.
-+    ``full`` mode preallocates space for image by writing data to
-+    underlying storage. This data may or may not be zero, depending on
-+    the storage location.
- 
- ``qcow2``
- 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index db08c58d78..681d79ec63 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -5021,8 +5021,8 @@
- #
- # @off: no preallocation
- # @metadata: preallocate only for metadata
--# @falloc: like @full preallocation but allocate disk space by
--#          posix_fallocate() rather than writing data.
-+# @falloc: try to allocate disk space by fallocate(), and fallback to
-+#          @full preallocation if not supported.
- # @full: preallocate all data by writing it to the device to ensure
- #        disk space is really available. This data may or may not be
- #        zero, depending on the image format and storage.
--- 
-2.26.2
-
+> 
+> 
+> Richard Henderson (76):
+>   tests/tcg: Add microblaze to arches filter
+>   tests/tcg: Do not require FE_TOWARDZERO
+>   tests/tcg: Do not require FE_* exception bits
+>   target/microblaze: Tidy gdbstub
+>   target/microblaze: Split out PC from env->sregs
+>   target/microblaze: Split out MSR from env->sregs
+>   target/microblaze: Split out EAR from env->sregs
+>   target/microblaze: Split out ESR from env->sregs
+>   target/microblaze: Split out FSR from env->sregs
+>   target/microblaze: Split out BTR from env->sregs
+>   target/microblaze: Split out EDR from env->sregs
+>   target/microblaze: Split the cpu_SR array
+>   target/microblaze: Fix width of PC and BTARGET
+>   target/microblaze: Fix width of MSR
+>   target/microblaze: Fix width of ESR
+>   target/microblaze: Fix width of FSR
+>   target/microblaze: Fix width of BTR
+>   target/microblaze: Fix width of EDR
+>   target/microblaze: Remove cpu_ear
+>   target/microblaze: Tidy raising of exceptions
+>   target/microblaze: Mark raise_exception as noreturn
+>   target/microblaze: Remove helper_debug and env->debug
+>   target/microblaze: Rename env_* tcg variables to cpu_*
+>   target/microblaze: Tidy mb_tcg_init
+>   target/microblaze: Split out MSR[C] to its own variable
+>   target/microblaze: Use DISAS_NORETURN
+>   target/microblaze: Check singlestep_enabled in gen_goto_tb
+>   target/microblaze: Convert to DisasContextBase
+>   target/microblaze: Convert to translator_loop
+>   target/microblaze: Remove SIM_COMPAT
+>   target/microblaze: Remove DISAS_GNU
+>   target/microblaze: Remove empty D macros
+>   target/microblaze: Remove LOG_DIS
+>   target/microblaze: Ensure imm constant is always available
+>   target/microblaze: Add decodetree infrastructure
+>   target/microblaze: Convert dec_add to decodetree
+>   target/microblaze: Convert dec_sub to decodetree
+>   target/microblaze: Implement cmp and cmpu inline
+>   target/microblaze: Convert dec_pattern to decodetree
+>   target/microblaze: Convert dec_and, dec_or, dec_xor to decodetree
+>   target/microblaze: Convert dec_mul to decodetree
+>   target/microblaze: Convert dec_div to decodetree
+>   target/microblaze: Unwind properly when raising divide-by-zero
+>   target/microblaze: Convert dec_bit to decodetree
+>   target/microblaze: Convert dec_barrel to decodetree
+>   target/microblaze: Convert dec_imm to decodetree
+>   target/microblaze: Convert dec_fpu to decodetree
+>   target/microblaze: Fix cpu unwind for fpu exceptions
+>   target/microblaze: Mark fpu helpers TCG_CALL_NO_WG
+>   target/microblaze: Replace MSR_EE_FLAG with MSR_EE
+>   target/microblaze: Cache mem_index in DisasContext
+>   target/microblaze: Fix cpu unwind for stackprot
+>   target/microblaze: Convert dec_load and dec_store to decodetree
+>   target/microblaze: Assert no overlap in flags making up tb_flags
+>   target/microblaze: Move bimm to BIMM_FLAG
+>   target/microblaze: Fix no-op mb_cpu_transaction_failed
+>   target/microblaze: Store "current" iflags in insn_start
+>   tcg: Add tcg_get_insn_start_param
+>   target/microblaze: Use cc->do_unaligned_access
+>   target/microblaze: Replace clear_imm with tb_flags_to_set
+>   target/microblaze: Replace delayed_branch with tb_flags_to_set
+>   target/microblaze: Tidy mb_cpu_dump_state
+>   target/microblaze: Convert brk and brki to decodetree
+>   target/microblaze: Convert mbar to decodetree
+>   target/microblaze: Reorganize branching
+>   target/microblaze: Convert dec_br to decodetree
+>   target/microblaze: Convert dec_bcc to decodetree
+>   target/microblaze: Convert dec_rts to decodetree
+>   target/microblaze: Tidy do_rti, do_rtb, do_rte
+>   target/microblaze: Convert msrclr, msrset to decodetree
+>   target/microblaze: Convert dec_msr to decodetree
+>   target/microblaze: Convert dec_stream to decodetree
+>   target/microblaze: Remove last of old decoder
+>   target/microblaze: Remove cpu_R[0]
+>   target/microblaze: Add flags markup to some helpers
+>   target/microblaze: Reduce linux-user address space to 32-bit
+> 
+>  include/tcg/tcg.h                     |   15 +
+>  target/microblaze/cpu-param.h         |   15 +
+>  target/microblaze/cpu.h               |   67 +-
+>  target/microblaze/helper.h            |   49 +-
+>  target/microblaze/microblaze-decode.h |   59 -
+>  tests/tcg/multiarch/float_helpers.h   |   17 +
+>  target/microblaze/insns.decode        |  256 ++
+>  linux-user/elfload.c                  |    9 +-
+>  linux-user/microblaze/cpu_loop.c      |   26 +-
+>  linux-user/microblaze/signal.c        |    8 +-
+>  target/microblaze/cpu.c               |    9 +-
+>  target/microblaze/gdbstub.c           |  193 +-
+>  target/microblaze/helper.c            |  164 +-
+>  target/microblaze/mmu.c               |    4 +-
+>  target/microblaze/op_helper.c         |  194 +-
+>  target/microblaze/translate.c         | 3223 +++++++++++++------------
+>  tests/tcg/multiarch/float_convs.c     |    2 +
+>  tests/tcg/multiarch/float_madds.c     |    2 +
+>  target/microblaze/meson.build         |    3 +
+>  tests/tcg/configure.sh                |    2 +-
+>  20 files changed, 2292 insertions(+), 2025 deletions(-)
+>  delete mode 100644 target/microblaze/microblaze-decode.h
+>  create mode 100644 target/microblaze/insns.decode
+> 
+> -- 
+> 2.25.1
+> 
 
