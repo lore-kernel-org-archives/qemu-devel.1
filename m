@@ -2,87 +2,71 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E110C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:24:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4A2CC433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:25:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6537F2073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:24:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DwV0PAkK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6537F2073A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 826322073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 11:25:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 826322073A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kChus-0006pc-Kd
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:24:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51996)
+	id 1kChvs-0007kB-Ok
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 07:25:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kChuN-0006Om-Jp
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:23:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56850)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kChuM-0002jl-5y
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:23:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598873009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=QUnV2kEC8ebPCiwGi0p9JRUuse8JSUOMISydRCsIIM4=;
- b=DwV0PAkKhib3KRYxJQEZhCPMCDuXhMSFXCrWe6X0QVRmIzluhSeMnttuGMYXBcVm7JYoOn
- jRQo+S72vDlo6VmDM4hZHWMohaZoPn7tku3X7GR+qVutVxd9Fkht6hjvo6/0/aIG53wS2z
- 2hGWhSLzB/Qwbj+4CO+3DMUH3nnKc3w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-NexDDuO4P4yoQoZzT1p2qw-1; Mon, 31 Aug 2020 07:23:25 -0400
-X-MC-Unique: NexDDuO4P4yoQoZzT1p2qw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F1FD710ABDA0;
- Mon, 31 Aug 2020 11:23:23 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
- [10.36.112.54])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A4AF47EB7B;
- Mon, 31 Aug 2020 11:23:23 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id D7D7FED9; Mon, 31 Aug 2020 13:23:22 +0200 (CEST)
-Date: Mon, 31 Aug 2020 13:23:22 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Li Qiang <liq3ea@gmail.com>
-Subject: Re: [PATCH] cirrus: handle wraparound in cirrus_invalidate_region
-Message-ID: <20200831112322.rkzv6acsw7iza6w7@sirius.home.kraxel.org>
-References: <20200821082622.7169-1-kraxel@redhat.com>
- <CAKXe6SKZuuCnzAF2uwHO=sh=o2XdAU1+dG6OO-eLYnubX9KikA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kChvD-0007Hl-Mu
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:24:23 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:51584 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kChvB-0002uq-Kk
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 07:24:23 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 4A4C483DA508D7D521A0;
+ Mon, 31 Aug 2020 19:24:14 +0800 (CST)
+Received: from [127.0.0.1] (10.174.186.4) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.487.0; Mon, 31 Aug 2020
+ 19:24:04 +0800
+Subject: Re: [PATCH v6 10/12] migration/dirtyrate: Implement
+ calculate_dirtyrate() function
+To: David Edmondson <dme@dme.org>, <quintela@redhat.com>, <eblake@redhat.com>, 
+ <dgilbert@redhat.com>, <berrange@redhat.com>
+References: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
+ <1598669577-76914-11-git-send-email-zhengchuan@huawei.com>
+ <m2tuwjb2jt.fsf@dme.org>
+From: Zheng Chuan <zhengchuan@huawei.com>
+Message-ID: <7cf49925-1ff6-d57e-3cac-fb573be182f9@huawei.com>
+Date: Mon, 31 Aug 2020 19:24:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <CAKXe6SKZuuCnzAF2uwHO=sh=o2XdAU1+dG6OO-eLYnubX9KikA@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:02:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <m2tuwjb2jt.fsf@dme.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.186.4]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 07:08:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -62
+X-Spam_score: -6.3
+X-Spam_bar: ------
+X-Spam_report: (-6.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,35 +79,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, Li Qiang <liq3ea@163.com>,
- Qemu Developers <qemu-devel@nongnu.org>
+Cc: alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> >      for (y = 0; y < lines; y++) {
-> > -        off_cur = off_begin;
-> > +        off_cur = off_begin & s->cirrus_addr_mask;
-> >          off_cur_end = ((off_cur + bytesperline - 1) & s->cirrus_addr_mask) + 1;
-> > -        assert(off_cur_end >= off_cur);
-> > -        memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
-> > +        if (off_cur_end >= off_cur) {
-> > +            memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
-> > +        } else {
-> > +            /* wraparound */
-> > +            memory_region_set_dirty(&s->vga.vram, off_cur, s->cirrus_addr_mask - off_cur);
+
+
+On 2020/8/31 17:13, David Edmondson wrote:
+> On Saturday, 2020-08-29 at 10:52:55 +08, Chuan Zheng wrote:
 > 
-> Should here be 's->cirrus_addr_mask + 1 - off_cur'
-
-Yes (mask != size).
-
-> > +            memory_region_set_dirty(&s->vga.vram, 0, off_cur_end);
+>> Implement calculate_dirtyrate() function.
+>>
+>> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+>> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+>> ---
+>>  migration/dirtyrate.c | 45 +++++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 43 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+>> index 850126d..95ee23e 100644
+>> --- a/migration/dirtyrate.c
+>> +++ b/migration/dirtyrate.c
+>> @@ -162,6 +162,21 @@ static void get_ramblock_dirty_info(RAMBlock *block,
+>>      strcpy(info->idstr, qemu_ram_get_idstr(block));
+>>  }
+>>  
+>> +static void free_ramblock_dirty_info(struct RamblockDirtyInfo *infos, int count)
+>> +{
+>> +    int i;
+>> +
+>> +    if (!infos) {
+>> +        return;
+>> +    }
+>> +
+>> +    for (i = 0; i < count; i++) {
+>> +        g_free(infos[i].sample_page_vfn);
+>> +        g_free(infos[i].hash_result);
+>> +    }
+>> +    g_free(infos);
+>> +}
+>> +
+>>  static struct RamblockDirtyInfo *
+>>  alloc_ramblock_dirty_info(int *block_index,
+>>                            struct RamblockDirtyInfo *block_dinfo)
+>> @@ -301,8 +316,34 @@ static int compare_page_hash_info(struct RamblockDirtyInfo *info,
+>>  
+>>  static void calculate_dirtyrate(struct DirtyRateConfig config)
+>>  {
+>> -    /* todo */
+>> -    return;
+>> +    struct RamblockDirtyInfo *block_dinfo = NULL;
+>> +    int block_index = 0;
+>> +    int64_t msec = 0;
+>> +    int64_t initial_time;
+>> +
+>> +    rcu_register_thread();
+>> +    reset_dirtyrate_stat();
+>> +    rcu_read_lock();
+>> +    initial_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+>> +    if (record_ramblock_hash_info(&block_dinfo, config, &block_index) < 0) {
+>> +        goto out;
+>> +    }
+>> +    rcu_read_unlock();
+>> +
+>> +    msec = config.sample_period_seconds * 1000;
+>> +    msec = set_sample_page_period(msec, initial_time);
+>> +
+>> +    rcu_read_lock();
+>> +    if (compare_page_hash_info(block_dinfo, block_index) < 0) {
+>> +        goto out;
+>> +    }
+>> +
+>> +    update_dirtyrate(msec);
+>> +
+>> +out:
+>> +    rcu_read_unlock();
 > 
-> And here be 'off_cur_end -1'
+> This still holds the RCU lock across update_dirtyrate(), which I
+> understood to be unnecessary.
+>It does need to update_dirtyrate if we goto out when erro happens.
+In order to remove update_dirtyrate out of RCU, it need to add flag
+like is_need_update, like:
+if (record_ramblock_hash_info(&block_dinfo, config, &block_index) < 0) {
+         is_need_update = false;
+         goto out;
+}
 
---verbose please.  I think this one is correct.
+if (is_need_update)
+    update_dirtyrate(msec);
 
-take care,
-  Gerd
+I doubt it is worth doing that or it will does any hurt if i holds
+the RCU lock across update_dirtyrate()?
+
+
+>> +    free_ramblock_dirty_info(block_dinfo, block_index + 1);
+>> +    rcu_unregister_thread();
+>>  }
+>>  
+>>  void *get_dirtyrate_thread(void *arg)
+>> -- 
+>> 1.8.3.1
+> 
+> dme.
+> 
 
 
