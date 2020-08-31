@@ -2,91 +2,88 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46097C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 06:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BE65C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 06:28:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DC3F20707
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 06:13:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5B0B20738
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 06:28:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dSCvVtUZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DC3F20707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qzdgAFPx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5B0B20738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCd4d-0004Q2-8C
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 02:13:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42466)
+	id 1kCdIx-0007OK-0l
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 02:28:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kCd44-0003z4-Ko
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 02:13:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21854
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kCd41-0006ni-N8
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 02:13:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598854388;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=32cTT9dMT3hwKBe8WDBqbSP2A29FwKJT91n29y/Goms=;
- b=dSCvVtUZ6a5kS5njV42WHMQUydp548D10UnncHWOQnogxyTx8Gxu4sST+ncggqo/sd1ygX
- wqdpkdVW3p/CHJWycoBq6Q3Q7/wOBB04CDmsJIHVoy10upSvaNewIi/ppp26WqGGBrkbeL
- tnzoV94Gw2O4ghzt4prR/d6R8ITVilY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-570-Q_vfrY3CPZKHpbBvw2HqqA-1; Mon, 31 Aug 2020 02:13:04 -0400
-X-MC-Unique: Q_vfrY3CPZKHpbBvw2HqqA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79ADF801AC5;
- Mon, 31 Aug 2020 06:13:03 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-174.ams2.redhat.com [10.36.112.174])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E4CD51002D59;
- Mon, 31 Aug 2020 06:13:01 +0000 (UTC)
-Subject: Re: [PATCH] cirrus.yml: Exclude some targets in the FreeBSD job to
- speed up the build
-From: Thomas Huth <thuth@redhat.com>
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20200824094410.6201-1-thuth@redhat.com>
- <20200828085954.GE224144@redhat.com>
- <79c7c98a-bb34-df86-a24f-b7df2ac89242@redhat.com>
-Message-ID: <b13e0371-05f6-6de6-73a3-a4380e1245a9@redhat.com>
-Date: Mon, 31 Aug 2020 08:13:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
+ id 1kCdIE-0006k3-Ic
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 02:27:50 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:42993)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
+ id 1kCdIC-0008OA-GS
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 02:27:50 -0400
+Received: by mail-io1-xd43.google.com with SMTP id g13so4731354ioo.9
+ for <qemu-devel@nongnu.org>; Sun, 30 Aug 2020 23:27:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IFbepArYBYiEtT18n8i3X49y/Ch7pBYSVm7oj4RrqyY=;
+ b=qzdgAFPxGsNa2O+LVKL4mUf7OhicqG0Dbvf24bPn6o1xTvQedXEcippVK4OnIb1X1a
+ IgbLc++5+UqcW10jGhfhCqnYtyCxFJAH7eB1QuCQThx1Uu0MHS6Udlf98i4F5Gpw2E0B
+ 6EqEaWrS4k9OvPiYOTEs5nJqdtKZxlhlH2qoFmK/8Aw1wH/e/KQtnJmQwbwn6LD3/jZ8
+ N7M7oQsSn+WMyvalI7pCKSCpfLpBgdCeTsrf+X0yGLsnNdWoE+QKQ5lzREbu+8CiY9CU
+ YoEnZraO4ekQ7Wcg3vR1JlxW734hpStWA4sJy6/Htl+Bo+PB0PC53mCmkLQCy70c6DqZ
+ tUpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IFbepArYBYiEtT18n8i3X49y/Ch7pBYSVm7oj4RrqyY=;
+ b=TVnstGVNkbPJcpYr1mSKYG4EH1SX3vO5M1fIOqyq5ku8/hYa6zXGnj3RrCwmEMOylr
+ a0Tp4CiZHNMe8q2ZQf1HeOBvlxcKa9aCCTOIWz4UdinGbQF9k5Vr2TUwtz60a8ZULEtz
+ Tw5FTb1/QX9HN4Z3lP41AOi7rubBxH12fdUYm9vTr9vku9XuprJ/ZBAO3qZvktWkIFtK
+ eeaeIVpT0Kt9b/vINjqLdEAVxMPR8Zb38t9GeIrp3jRW9u5r/CzMI9lpdFXcv0yG5u5P
+ 6EpDVfvsJEnNtr7dF7ldHQcUZum4LLQp+bw72u8bmxrEOqmiFYQpvUguTyodFdK7hqdo
+ AYkA==
+X-Gm-Message-State: AOAM5338oG5kMp9fDOJ1oNotgEf5bKjrK6y3jW0dqlLjvIIrthLqiJ7c
+ k+OsaeUh1lzYC8x9hLXBnyUQ5glxfZ8Cc9jDSBvO
+X-Google-Smtp-Source: ABdhPJwebQXfb0YaDH0kbWaXZSi0giLu8PLolYeV2VndKysnJ58iLPxYZzYrjgAqRRGphsDY0yeudfGDxW/gLAWHdmg=
+X-Received: by 2002:a05:6602:2fcf:: with SMTP id
+ v15mr176646iow.78.1598855266658; 
+ Sun, 30 Aug 2020 23:27:46 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <79c7c98a-bb34-df86-a24f-b7df2ac89242@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 02:13:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -22
-X-Spam_score: -2.3
+References: <cover.1596768588.git.haibo.xu@linaro.org>
+ <1663d06172cffa723e00893837ba04634f061fc8.1596768588.git.haibo.xu@linaro.org>
+ <4e6b3ee2-7f81-7c72-c4a9-0e8d330215ab@redhat.com>
+In-Reply-To: <4e6b3ee2-7f81-7c72-c4a9-0e8d330215ab@redhat.com>
+From: Haibo Xu <haibo.xu@linaro.org>
+Date: Mon, 31 Aug 2020 14:27:35 +0800
+Message-ID: <CAJc+Z1G3BpX-5HDqFkFhXJOK9_bq_zw5hp6LqGR=oeSvGJcfDw@mail.gmail.com>
+Subject: Re: [PATCH 6/7] hw/arm/virt: spe: Add SPE fdt binding for virt machine
+To: Auger Eric <eric.auger@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=haibo.xu@linaro.org; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.207, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,50 +97,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Ed Maste <emaste@freebsd.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
+ qemu-arm@nongnu.org, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 28/08/2020 11.54, Thomas Huth wrote:
-> On 28/08/2020 10.59, Daniel P. Berrangé wrote:
->> On Mon, Aug 24, 2020 at 11:44:10AM +0200, Thomas Huth wrote:
->>> The FreeBSD jobs currently hit the 1h time limit in the Cirrus-CI.
->>> We've got to exclude some build targets here to make sure that the job
->>> finishes in time again. The targets that are excluded should not hurt
->>> much, since e.g. all the code from i386-softmmu is covered again by
->>> x86_64-softmmu.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  Not sure why the FreeBSD builds suddenly got slower and hit the 1h
->>>  time limit now. Looking at https://cirrus-ci.com/github/qemu/qemu
->>>  it seems like the FreeBSD jobs were already taking ca. 48 minutes
->>>  since quite a while, but since the Meson build system has been merged,
->>>  they now always hit the 1h limit. Could it be that Meson is slow on
->>>  FreeBSD?
->>>  
->>>  I hope disabling some of the "redundant" targets is ok for everybody
->>>  to get this working again. Alternatively, we could also introduce a
->>>  second FreeBSD job and run half of the targets in one job, and half
->>>  of the targets in the other job if that's preferred?
->>
->> I'd probably suggest we go for two jobs, as there doesn't look like
->> any constraint on running multiple jobs that we'll hit any time
->> soon.
-> 
-> I gave it a try, but either I'm doing something wrong, or it is not
-> possible to run multiple FreeBSD tasks on cirrus-ci for one commit 
+On Sat, 29 Aug 2020 at 23:22, Auger Eric <eric.auger@redhat.com> wrote:
+>
+> Hi Haibo,
+>
+> On 8/7/20 10:10 AM, Haibo Xu wrote:
+> > Add a virtual SPE device for virt machine while using PPI
+> > 5 for SPE overflow interrupt number.
+> >
+> > Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
+> > ---
+> >  hw/arm/virt-acpi-build.c    |  3 +++
+> >  hw/arm/virt.c               | 42 +++++++++++++++++++++++++++++++++++++
+> >  include/hw/acpi/acpi-defs.h |  1 +
+> >  include/hw/arm/virt.h       |  1 +
+> >  target/arm/cpu.c            |  2 ++
+> >  target/arm/cpu.h            |  2 ++
+> >  target/arm/kvm.c            |  6 ++++++
+> >  7 files changed, 57 insertions(+)
+> >
+> > diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> > index 91f0df7b13..5073ba22a5 100644
+> > --- a/hw/arm/virt-acpi-build.c
+> > +++ b/hw/arm/virt-acpi-build.c
+> > @@ -666,6 +666,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+> >          if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
+> >              gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
+> >          }
+> > +        if (arm_feature(&armcpu->env, ARM_FEATURE_SPE)) {
+> > +            gicc->spe_interrupt = cpu_to_le32(PPI(VIRTUAL_SPE_IRQ));
+> > +        }
+> >          if (vms->virt) {
+> >              gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GIC_MAINT_IRQ));
+> >          }
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index ecfee362a1..c40819705d 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -555,6 +555,42 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+> >      }
+> >  }
+> >
+> > +static void fdt_add_spe_nodes(const VirtMachineState *vms)
+> > +{
+> > +    CPUState *cpu;
+> > +    ARMCPU *armcpu;
+> > +    uint32_t irqflags = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
+> > +
+> > +    CPU_FOREACH(cpu) {
+> > +        armcpu = ARM_CPU(cpu);
+> > +        if (!arm_feature(&armcpu->env, ARM_FEATURE_SPE)) {
+> > +            return;
+> > +        }
+> > +        if (kvm_enabled()) {
+> > +            if (kvm_irqchip_in_kernel()) {
+> > +                kvm_arm_spe_set_irq(cpu, PPI(VIRTUAL_SPE_IRQ));
+> > +            }
+> > +            kvm_arm_spe_init(cpu);
+> > +        }
+> > +    }
+> > +
+> > +    if (vms->gic_version == VIRT_GIC_VERSION_2) {
+> > +        irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+> > +                             GIC_FDT_IRQ_PPI_CPU_WIDTH,
+> > +                             (1 << vms->smp_cpus) - 1);
+> > +    }
+> > +
+> > +    armcpu = ARM_CPU(qemu_get_cpu(0));
+> > +    qemu_fdt_add_subnode(vms->fdt, "/spe");
+> > +    if (arm_feature(&armcpu->env, ARM_FEATURE_V8)) {
+> > +        const char compat[] = "arm,statistical-profiling-extension-v1";
+> > +        qemu_fdt_setprop(vms->fdt, "/spe", "compatible",
+> > +                         compat, sizeof(compat));
+> > +        qemu_fdt_setprop_cells(vms->fdt, "/spe", "interrupts",
+> > +                               GIC_FDT_IRQ_TYPE_PPI, VIRTUAL_SPE_IRQ, irqflags);
+> > +    }
+> > +}
+> > +
+> >  static inline DeviceState *create_acpi_ged(VirtMachineState *vms)
+> >  {
+> >      DeviceState *dev;
+> > @@ -727,6 +763,10 @@ static void create_gic(VirtMachineState *vms)
+> >                                      qdev_get_gpio_in(vms->gic, ppibase
+> >                                                       + VIRTUAL_PMU_IRQ));
+> >
+> > +        qdev_connect_gpio_out_named(cpudev, "spe-interrupt", 0,
+> > +                                    qdev_get_gpio_in(vms->gic, ppibase
+> > +                                                     + VIRTUAL_SPE_IRQ));
+> > +
+> >          sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
+> >          sysbus_connect_irq(gicbusdev, i + smp_cpus,
+> >                             qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
+> > @@ -1915,6 +1955,8 @@ static void machvirt_init(MachineState *machine)
+> >
+> >      fdt_add_pmu_nodes(vms);
+> >
+> > +    fdt_add_spe_nodes(vms);
+> > +
+> >      create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
+> >
+> >      if (vms->secure) {
+> > diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> > index 38a42f409a..56a7f38ae4 100644
+> > --- a/include/hw/acpi/acpi-defs.h
+> > +++ b/include/hw/acpi/acpi-defs.h
+> > @@ -302,6 +302,7 @@ struct AcpiMadtGenericCpuInterface {
+> >      uint32_t vgic_interrupt;
+> >      uint64_t gicr_base_address;
+> >      uint64_t arm_mpidr;
+> > +    uint16_t spe_interrupt; /* ACPI 6.3 */
+> This does not work for me.
+> You miss 2 uint8_t fields inbetween arm_mpdir and spe_interrupt:
+> Processor Power Efficiency Class and Reserved.
+>
+> At the moment arm_spe_acpi_register_device() silently fails on guest
+> side since
+> gicc->header.length < ACPI_MADT_GICC_SPE
+>
+> Thanks
+>
+> Eric
+>
 
-I apparently needed a weekend in between to get a clean head again. I
-was doing indeed something wrong... apparently you have to name your
-tasks on cirrus-ci with "_task" at the end. If you use "_task1" and
-"_task2", it does now work anymore. Sigh.
+Thanks for pointing out this. I will fix it in the next version.
 
-So I'll try to cook a proper patch to split the job instead.
-
- Thomas
-
+> >  } QEMU_PACKED;
+> >
+> >  typedef struct AcpiMadtGenericCpuInterface AcpiMadtGenericCpuInterface;
+> > diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> > index dff67e1bef..56c83224d2 100644
+> > --- a/include/hw/arm/virt.h
+> > +++ b/include/hw/arm/virt.h
+> > @@ -49,6 +49,7 @@
+> >  #define ARCH_TIMER_NS_EL1_IRQ 14
+> >  #define ARCH_TIMER_NS_EL2_IRQ 10
+> >
+> > +#define VIRTUAL_SPE_IRQ 5
+> >  #define VIRTUAL_PMU_IRQ 7
+> >
+> >  #define PPI(irq) ((irq) + 16)
+> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> > index 40768b4d19..67ab0089fd 100644
+> > --- a/target/arm/cpu.c
+> > +++ b/target/arm/cpu.c
+> > @@ -1038,6 +1038,8 @@ static void arm_cpu_initfn(Object *obj)
+> >                               "gicv3-maintenance-interrupt", 1);
+> >      qdev_init_gpio_out_named(DEVICE(cpu), &cpu->pmu_interrupt,
+> >                               "pmu-interrupt", 1);
+> > +    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->spe_interrupt,
+> > +                             "spe-interrupt", 1);
+> >  #endif
+> >
+> >      /* DTB consumers generally don't in fact care what the 'compatible'
+> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> > index fe0ac14386..4bf8591df8 100644
+> > --- a/target/arm/cpu.h
+> > +++ b/target/arm/cpu.h
+> > @@ -790,6 +790,8 @@ struct ARMCPU {
+> >      qemu_irq gicv3_maintenance_interrupt;
+> >      /* GPIO output for the PMU interrupt */
+> >      qemu_irq pmu_interrupt;
+> > +    /* GPIO output for the SPE interrupt */
+> > +    qemu_irq spe_interrupt;
+> >
+> >      /* MemoryRegion to use for secure physical accesses */
+> >      MemoryRegion *secure_memory;
+> > diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> > index 58f991e890..ecafdda364 100644
+> > --- a/target/arm/kvm.c
+> > +++ b/target/arm/kvm.c
+> > @@ -820,6 +820,12 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+> >              switched_level &= ~KVM_ARM_DEV_PMU;
+> >          }
+> >
+> > +        if (switched_level & KVM_ARM_DEV_SPE) {
+> > +            qemu_set_irq(cpu->spe_interrupt,
+> > +                         !!(run->s.regs.device_irq_level & KVM_ARM_DEV_SPE));
+> > +            switched_level &= ~KVM_ARM_DEV_SPE;
+> > +        }
+> > +
+> >          if (switched_level) {
+> >              qemu_log_mask(LOG_UNIMP, "%s: unhandled in-kernel device IRQ %x\n",
+> >                            __func__, switched_level);
+> >
+>
 
