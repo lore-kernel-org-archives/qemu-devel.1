@@ -4,94 +4,108 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A027EC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:10:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 133B8C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:13:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5958B208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:10:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCF42208CA
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:13:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=dme-org.20150623.gappssmtp.com header.i=@dme-org.20150623.gappssmtp.com header.b="F4BOfpzD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5958B208CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=dme.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vcGqfc+l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCF42208CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCfq2-0004CD-HF
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 05:10:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51268)
+	id 1kCfsa-0005Jf-UD
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 05:13:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kCfpU-0003h6-CN
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:10:20 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50425)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dme@dme.org>) id 1kCfpS-0002mz-Tp
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:10:20 -0400
-Received: by mail-wm1-x343.google.com with SMTP id e17so4517649wme.0
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 02:10:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=dme-org.20150623.gappssmtp.com; s=20150623;
- h=to:cc:subject:in-reply-to:references:from:date:message-id
- :mime-version; bh=5OzFI4RLkpdXjDByxRcdVYfducqwJu3a7ZWXjm5337c=;
- b=F4BOfpzDkpmPCJVFUiMc/p1wVCVwQwgJUWVF0TUsdQRv7czO1LXDdeWBCxuLMuQfCa
- KXk2s6CHsIDS5gbBvSaBOEtcwYFGxzgTpUmNSi6bDr3qOJNJa13jezBIcjHZXB5chZvd
- R7TjutJJztN8C6s5qKtm7zWzp9C2CvzUwM9sqDUycIbsqYU7uNylOJyFYe7VJboZ9WAe
- cVI1e26GRUSeN/DZ2B5crIgL8lYyzUUNO5cmruNLuscbp5deIvsTlLxKI9GmKDg7KExq
- jm3tRY7YVdAxkRIfSVIYCTG/1yJVcpGaU8cwTdEDjdAnPFoDRDE/s5jITDtVYmrUv11r
- ovIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:subject:in-reply-to:references:from:date
- :message-id:mime-version;
- bh=5OzFI4RLkpdXjDByxRcdVYfducqwJu3a7ZWXjm5337c=;
- b=icadWvdwUcI7QUE2XrQHyMmP7+j/X/neIgMcyLPp+D5HlW3/qRK52KDnT+5Ap8O+e7
- 7HL9/SkM3lmQOrShR7ECVLe/zumWH5Wm0eOBo082d7y7X5MzXBSYyQ1Mnq3ATs3thz7V
- ABx59a9/x2r2SCQ8IGycj6e6LoOAFEcAhCuWviaaTBZFiMAwKgiokrJYyA4J/0BN7EBb
- Xk+kQZs7/GzFtLJqvDd8+o+QUmBjUW7sF9YBCcDQpRaE06JZY4eeJSeB2YrwBd7bFlzz
- Kn6dcjc9BZI6hbEn9Ut7bUBqcNsqJLFnPgg06Kw3eQK+M3OxW+7T78kPS3+XHqArLKIh
- l7Fw==
-X-Gm-Message-State: AOAM532PS6ZNDqk2v+zE9glJHQT/QChymtEz6tZmqFpwStMN6sxrgYUT
- r4COEmW9SsHGU0YI8Mhq8lcC9Q==
-X-Google-Smtp-Source: ABdhPJzn0YvPf0NBwPK2G8zYqi9XkA2s+0ju4WQwnJNpvWJM9N1bluE1qz5m/4cuyRNydKXVxuL7Gw==
-X-Received: by 2002:a1c:f311:: with SMTP id q17mr501705wmq.92.1598865017159;
- Mon, 31 Aug 2020 02:10:17 -0700 (PDT)
-Received: from disaster-area.hh.sledj.net
- (8.a.e.d.0.0.0.0.0.0.0.0.4.6.0.0.0.4.1.7.1.7.b.b.0.b.8.0.1.0.0.2.ip6.arpa.
- [2001:8b0:bb71:7140:64::dea8])
- by smtp.gmail.com with ESMTPSA id t4sm11276634wre.30.2020.08.31.02.10.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 31 Aug 2020 02:10:16 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
+ id 1kCfs0-0004rv-Fu
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:12:56 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:49976)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
+ id 1kCfry-0003Fi-Iq
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:12:56 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07V8UAGU036435;
+ Mon, 31 Aug 2020 09:12:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=to : cc : subject :
+ in-reply-to : references : sender : from : date : message-id :
+ mime-version : content-type; s=corp-2020-01-29;
+ bh=dcnkMy+m1ZqaSDGgxfkNERdf9EQ4/ec3L7LCZRO4WxM=;
+ b=vcGqfc+l/GnzpXgb34D4BWiDBy7lnwN+wT41FYqUBdhdzysNJXeV6HikxPTbRJ3AQqgC
+ pVoRbyFVLbyUkPhIiULMC+AYdlFWvO95L7KJDiS1NaO1QGiPVleiJWxiD2L4owVv5VUb
+ WeZgQNbUybOCzrgTWps3yyNfSuoYuWfNZvwoIKR6PxV1blfaaObX61z/ZXl9y0qlzrFB
+ BIq6Ue0+IRHr1VV3JOKoew01MCfVxTJjSS4rF3CtXF61Rgfhn6zn1mOAciHkUvAXXKF3
+ mKKytr0gT3S6lLNplD1EgWiRjmhE/mUJkv+Elum5qA5F+k0b3uuNof3DKnYidTCJZjHs GQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 337eykw6sd-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Mon, 31 Aug 2020 09:12:47 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07V8V7bj053081;
+ Mon, 31 Aug 2020 09:12:46 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+ by aserp3030.oracle.com with ESMTP id 3380kkcf1y-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 31 Aug 2020 09:12:46 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 07V9Ckc6009902;
+ Mon, 31 Aug 2020 09:12:46 GMT
+Received: from disaster-area.hh.sledj.net (/81.187.26.238)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Mon, 31 Aug 2020 02:12:46 -0700
 Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 9e24171c;
- Mon, 31 Aug 2020 09:10:15 +0000 (UTC)
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id ed5d9b7a;
+ Mon, 31 Aug 2020 09:12:43 +0000 (UTC)
 To: Chuan Zheng <zhengchuan@huawei.com>, quintela@redhat.com,
  eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
-Subject: Re: [PATCH v6 07/12] migration/dirtyrate: Compare page hash results
- for recorded sampled page
-In-Reply-To: <1598669577-76914-8-git-send-email-zhengchuan@huawei.com>
+Subject: Re: [PATCH v6 09/12] migration/dirtyrate: Implement
+ set_sample_page_period() and get_sample_page_period()
+In-Reply-To: <1598669577-76914-10-git-send-email-zhengchuan@huawei.com>
 References: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
- <1598669577-76914-8-git-send-email-zhengchuan@huawei.com>
+ <1598669577-76914-10-git-send-email-zhengchuan@huawei.com>
 X-HGTTG: heart-of-gold
-From: David Edmondson <dme@dme.org>
-Date: Mon, 31 Aug 2020 10:10:15 +0100
-Message-ID: <m23643chag.fsf@dme.org>
+From: David Edmondson <david.edmondson@oracle.com>
+Date: Mon, 31 Aug 2020 10:12:43 +0100
+Message-ID: <m2wo1fb2lw.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-Received-SPF: neutral client-ip=2a00:1450:4864:20::343;
- envelope-from=dme@dme.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NEUTRAL=0.779, UNPARSEABLE_RELAY=0.001 autolearn=no autolearn_force=no
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9729
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ spamscore=0 adultscore=0
+ mlxscore=0 suspectscore=1 malwarescore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008310051
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9729
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
+ adultscore=0
+ priorityscore=1501 phishscore=0 mlxlogscore=999 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2008310051
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=david.edmondson@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 05:07:47
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,98 +124,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Saturday, 2020-08-29 at 10:52:52 +08, Chuan Zheng wrote:
+On Saturday, 2020-08-29 at 10:52:54 +08, Chuan Zheng wrote:
 
-> Compare page hash results for recorded sampled page.
+> Implement set_sample_page_period()/get_sample_page_period() to sleep
+> specific time between sample actions.
 >
 > Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
-> Signed-off-by: YanYing Zhuang <ann.zhuangyanying@huawei.com>
+> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
+Reviewed-by: David Edmondson <david.edmondson@oracle.com>
+
 > ---
->  migration/dirtyrate.c | 63 +++++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 63 insertions(+)
+>  migration/dirtyrate.c | 24 ++++++++++++++++++++++++
+>  migration/dirtyrate.h |  6 ++++++
+>  2 files changed, 30 insertions(+)
 >
 > diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> index f4967fd..9cc2cbb 100644
+> index 420fc59..850126d 100644
 > --- a/migration/dirtyrate.c
 > +++ b/migration/dirtyrate.c
-> @@ -193,6 +193,69 @@ static int record_ramblock_hash_info(struct RamblockDirtyInfo **block_dinfo,
->      return 0;
->  }
+> @@ -27,6 +27,30 @@
+>  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
+>  static struct DirtyRateStat DirtyStat;
 >  
-> +static void calc_page_dirty_rate(struct RamblockDirtyInfo *info)
+> +static int64_t set_sample_page_period(int64_t msec, int64_t initial_time)
 > +{
-> +    uint32_t crc;
-> +    int i;
+> +    int64_t current_time;
 > +
-> +    for (i = 0; i < info->sample_pages_count; i++) {
-> +        crc = get_ramblock_vfn_hash(info, info->sample_page_vfn[i]);
-> +        if (crc != info->hash_result[i]) {
-> +            info->sample_dirty_count++;
-> +        }
+> +    current_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME);
+> +    if ((current_time - initial_time) >= msec) {
+> +        msec = current_time - initial_time;
+> +    } else {
+> +        g_usleep((msec + initial_time - current_time) * 1000);
 > +    }
+> +
+> +    return msec;
 > +}
 > +
-> +static struct RamblockDirtyInfo *
-> +find_page_matched(RAMBlock *block, int count,
-> +                  struct RamblockDirtyInfo *infos)
+> +static bool get_sample_page_period(int64_t sec)
 > +{
-> +    int i;
-> +    struct RamblockDirtyInfo *matched;
-> +
-> +    for (i = 0; i < count; i++) {
-> +        if (!strcmp(infos[i].idstr, qemu_ram_get_idstr(block))) {
-> +            break;
-> +        }
+> +    if (sec < MIN_FETCH_DIRTYRATE_TIME_SEC ||
+> +        sec > MAX_FETCH_DIRTYRATE_TIME_SEC) {
+> +        return false;
 > +    }
 > +
-> +    if (i == count) {
-> +        return NULL;
-> +    }
-> +
-> +    if (infos[i].ramblock_addr != qemu_ram_get_host_addr(block) ||
-> +        infos[i].ramblock_pages !=
-> +            (qemu_ram_get_used_length(block) >> TARGET_PAGE_BITS)) {
-> +        return NULL;
-> +    }
-> +
-> +    matched = &infos[i];
-> +
-> +    return matched;
+> +    return true;
 > +}
 > +
-> +static int compare_page_hash_info(struct RamblockDirtyInfo *info,
-> +                                  int block_index)
-> +{
-> +    struct RamblockDirtyInfo *block_dinfo = NULL;
-> +    RAMBlock *block = NULL;
-> +
-> +    RAMBLOCK_FOREACH_MIGRATABLE(block) {
-> +        block_dinfo = find_page_matched(block, block_index + 1, info);
-> +        if (block_dinfo == NULL) {
-> +            continue;
-> +        }
-> +        calc_page_dirty_rate(block_dinfo);
-> +        update_dirtyrate_stat(block_dinfo);
-> +    }
-> +
-> +    if (!DirtyStat.total_sample_count) {
-
-total_sample_count isn't a boolean or pointer - comparing against 0
-would be clearer.
-
-> +        return -1;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
->  static void calculate_dirtyrate(struct DirtyRateConfig config)
+>  static int dirtyrate_set_state(int *state, int old_state, int new_state)
 >  {
->      /* todo */
+>      assert(new_state < DIRTY_RATE_STATUS__MAX);
+> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+> index faaf9da..8f9bc80 100644
+> --- a/migration/dirtyrate.h
+> +++ b/migration/dirtyrate.h
+> @@ -29,6 +29,12 @@
+>   */
+>  #define MIN_RAMBLOCK_SIZE                         128
+>  
+> +/*
+> + * Take 1s as minimum time for calculation duration
+> + */
+> +#define MIN_FETCH_DIRTYRATE_TIME_SEC              1
+> +#define MAX_FETCH_DIRTYRATE_TIME_SEC              60
+> +
+>  struct DirtyRateConfig {
+>      uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
+>      int64_t sample_period_seconds; /* time duration between two sampling */
 > -- 
 > 1.8.3.1
 
 dme.
 -- 
-You can't hide from the flipside.
+Tonight I think I'll walk alone, I'll find my soul as I go home.
 
