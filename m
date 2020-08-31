@@ -2,90 +2,128 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43E39C433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 13:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA8BC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 13:13:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14698206E3
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 13:12:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14698206E3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 31648206E3
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 13:13:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="s/fp9IlQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 31648206E3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCjc4-00048t-80
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 09:12:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47280)
+	id 1kCjcb-0004zC-Ar
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 09:13:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kCjb4-0003hb-Rf
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 09:11:42 -0400
-Received: from indium.canonical.com ([91.189.90.7]:40988)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kCjb0-0007hP-Sq
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 09:11:42 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kCjax-0002xf-HF
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 13:11:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 818342E802E
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 13:11:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1kCjbp-00047C-2Q; Mon, 31 Aug 2020 09:12:29 -0400
+Received: from mail-mw2nam10on2054.outbound.protection.outlook.com
+ ([40.107.94.54]:63291 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1kCjbl-0007kw-Np; Mon, 31 Aug 2020 09:12:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZEVpzc8jUMGmTPM/+aQY7cl0mAh5j6pMJxlao5HgU4S+kgtkeU3Q5LJUmPyLnn5U5KCo1yghylimDefVwSO3pgax99R5ILtDZV8aoVRbIZ0LzBh5gKvP3E4gpISRxkFg+LgnqHu8iPsRxzHm1AiBXdl6dunXcP1hRlCRn8u++YuzOJqTw6Yd9qy0mq72d43727ZHHrpX5bb+Y5lM/vsgks2t1rHPLfhEf0B2XK7oy5PDU1JHjUmQ+qX7gXp7XZb7mjV4Qycc1Wa4FraVs4+Ih5wcSZK16IOr5eKXTuwdLN+uxPHeuO0KJGxa5OcPZp8RnHsQlG3uopeXnK/jofMo2g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pJwV3wqZyRJlE/LL5ZpEQdAYoJ5tDmWqzLJ8Z1Edktk=;
+ b=RmhFqhLQe3Q53KPCIO9q3/llSZZbvy+dhuqRBG/reSI12ai5T4PFAj16Mf4n9EI8c/uYS1+LFoeWoCs3+WjoLh7RppYc3JQmGoD4wJgSI29auvMMSwuc8rGbC0v6J3sOsQiwVITYl6ubrx+D4tORzqT/o7+2VCdUflha1ebZ5nc/DB9jLAkRv/bpAQG+IPAd05bXSDZTe9uZ2R5d2xVw63YSd62LHLQ18BZPYDq3VPEuuRq3K4+SD7GqGiMDlyPy6O7i8/G66qnOzDHvXCk6cOouckIUQDd18sCktJexB82a8Mgtg4pUIHj8V6wLVJdWoEvFSNyjmIiOgSLBbGYOkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pJwV3wqZyRJlE/LL5ZpEQdAYoJ5tDmWqzLJ8Z1Edktk=;
+ b=s/fp9IlQdgPxz65pKitsOAwHo2FMFAPosGY7DvUnvIh7IiXsC4HIM8D9JDU6GbviEDHXi5zK+lyVKO0IIiWaovrJmdNEv3ZGbSTDPx4CL2QK0/G5/tnterLglp1Q9fd+6cS+leI8GA1whIhg1exr8iIwspV51AiftUfFQ1sJ6QE=
+Authentication-Results: twiddle.net; dkim=none (message not signed)
+ header.d=none;twiddle.net; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN1PR12MB2383.namprd12.prod.outlook.com (2603:10b6:802:26::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.23; Mon, 31 Aug
+ 2020 13:12:17 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3326.025; Mon, 31 Aug 2020
+ 13:12:17 +0000
+Subject: RE: [PATCH v6 15/20] x86: move cpu hotplug from pc to x86
+To: Igor Mammedov <imammedo@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>
+References: <20200826105254.28496-1-kraxel@redhat.com>
+ <20200826105254.28496-16-kraxel@redhat.com>
+ <20200831095032.55e7863b@redhat.com>
+From: Babu Moger <babu.moger@amd.com>
+Message-ID: <1fb9ff57-9f7b-11d1-a3c7-e18550829ec4@amd.com>
+Date: Mon, 31 Aug 2020 08:12:13 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
+In-Reply-To: <20200831095032.55e7863b@redhat.com>
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DM6PR07CA0040.namprd07.prod.outlook.com
+ (2603:10b6:5:74::17) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 31 Aug 2020 12:51:56 -0000
-From: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF?= <1589923@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=berrange@redhat.com; 
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=Fix Released; importance=High; assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=xenial; sourcepackage=qemu; 
- component=main; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=ubuntu; distroseries=yakkety; sourcepackage=qemu;
- component=None; status=Won't Fix; importance=Undecided; assignee=None; 
-X-Launchpad-Bug: distribution=archlinux; sourcepackage=None; component=None;
- status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange paelzer th-huth z-ben-5
-X-Launchpad-Bug-Reporter: Ben Aitchison (z-ben-5)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Christian_Ehrhardt_=EE=83=BF_=28paelzer?=
- =?utf-8?q?=29?=
-References: <20160607104531.2663.45779.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159887831721.13607.17466411866770091419.launchpad@gac.canonical.com>
-Subject: [Bug 1589923] Re: https websockets not working in 2.5 or 2.6
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
-X-Launchpad-Hash: 0d8006b61ebb200a20c8192790898b6f6b155f50
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 04:40:47
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from 255.255.255.255 (255.255.255.255) by
+ DM6PR07CA0040.namprd07.prod.outlook.com (2603:10b6:5:74::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.19 via Frontend Transport; Mon, 31 Aug 2020 13:12:15 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 4f6962c9-29b8-472b-cf13-08d84daf7ba7
+X-MS-TrafficTypeDiagnostic: SN1PR12MB2383:
+X-Microsoft-Antispam-PRVS: <SN1PR12MB238394342ADE4F929567668D95510@SN1PR12MB2383.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:883;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DUZ7rwzI+dXsi6Ohl4pgGI1MpzZbnfsHloFN0cc5n4L5H3/UCHZj6RZlrv2iM6hvet33dMbebhVH8ad9M0wyFUo7Uz2mCpDIEXDCJj79Rv37mi4yzYBwujHHHX9/N8NSyYUtW8lnugz2oRYwp+0r1rmIGaZ46uCsiHflZQRSqjXHctJD1K7lc53lxtrkE/ybSMRwBI0gAsYg6917M6e8gfP0TuJfVtNnKgFVyD50LbxZV5ffI7Gs/nohaIMHP6GCj0ZkoZu7dw9ZBy3vKX8y1Rxu15jfM/Fta9ptWOqBNXEvqInwVMBSI1gavQxCXyZd/mmyTOcRWBIAF5IeM6Reou7/9ERc3P8DJPJ3m/kPLINzHtNCNZjSp1M/Nv6DOsBD
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(39860400002)(366004)(346002)(376002)(136003)(2906002)(8936002)(31696002)(26005)(186003)(6486002)(44832011)(52116002)(31686004)(53546011)(2616005)(956004)(66946007)(83380400001)(54906003)(110136005)(4326008)(86362001)(478600001)(8676002)(316002)(66556008)(66476007)(30864003)(36756003)(5660300002)(16576012)(7416002)(43740500002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: 2x1WxrBm9q48JopYB49roOqF7tSE+wqxkeS/QIU5eNsKPm8C++GJgpYlH+BqI4yeAYawbfGNBpwv2GV8ugv1Ssahn8PvVxvvteb5vuP2KYDUtCEjrZ+qzOO1fOpgU6mpeTFY40KHPyLDqgkM8pq+3ndBgksVRqbk5nsjMUVJYZxn/cDwaXd7tNRthaaMDPNA2CkJRWcQHGHtV14vLxr59NbA/Ab1EtW0HY5c5eYj5XRLG3wiSVid1rqjj7tH2RedhhACGnEYXYliuiZSaEtYSOkLF9dL2qbJl55etlyMTScnLJwVxa47Yprh/lV1hy4RyCeF6PuEldqEEyUsFtRMfQW84G9YaWC1u3+tnWAHJsVxkHLHCyivk88E/TmZtD1bjlxLKciO6FS4sogHGqIbkphK5rPLaM1bDOE2e0WMrYQN9fWMLoK5U5D1J2GJeNWl40D17xw14FZRQsYWOJJweLD7MmULjOfkaqaEEeGDf0PVv9+By86TyJ/UrY4QhkmUS8L326Wen982ePrqZfZLB/RXhIXzZxIk4D82ccwME3FKLFBv2lZG9OFnVmbSosmEqw3aez6Lk2M5ZV0C6JVcddYPNq12bOzycH0LbwyFOiIv/ZzudJf6ltWbd4WMsc0Hbl/z8k0d2tqr1NjuONBUnw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f6962c9-29b8-472b-cf13-08d84daf7ba7
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Aug 2020 13:12:16.8951 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Xs4IHvcli2R2Zg4oCg4PslDUpCTc1yoBYDGeGsTB+pOmA83OywAjxUwan/NjWBVE
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2383
+Received-SPF: none client-ip=40.107.94.54; envelope-from=Babu.Moger@amd.com;
+ helo=NAM10-MW2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 09:12:22
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
+ NICE_REPLY_A=-2.13, RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,147 +132,720 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1589923 <1589923@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Tags removed: server-next
 
--- =
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1589923
+> -----Original Message-----
+> From: Igor Mammedov <imammedo@redhat.com>
+> Sent: Monday, August 31, 2020 2:51 AM
+> To: Gerd Hoffmann <kraxel@redhat.com>
+> Cc: qemu-devel@nongnu.org; Laurent Vivier <lvivier@redhat.com>; Peter
+> Maydell <peter.maydell@linaro.org>; Thomas Huth <thuth@redhat.com>;
+> Eduardo Habkost <ehabkost@redhat.com>; Sergio Lopez
+> <slp@redhat.com>; Michael S. Tsirkin <mst@redhat.com>; Shannon Zhao
+> <shannon.zhaosl@gmail.com>; qemu-arm@nongnu.org; Paolo Bonzini
+> <pbonzini@redhat.com>; Richard Henderson <rth@twiddle.net>; Moger,
+> Babu <Babu.Moger@amd.com>
+> Subject: Re: [PATCH v6 15/20] x86: move cpu hotplug from pc to x86
+> 
+> On Wed, 26 Aug 2020 12:52:49 +0200
+> Gerd Hoffmann <kraxel@redhat.com> wrote:
+> 
+> > The cpu hotplug code handles the iniu hotplug is not supported.
+> >
+> > Move the code from pc to x86, so microvm can use it.
+> >
+> > Move both plug and unplug to keep everything in one place, even though
+> > microvm needs plug only.
+> 
+> this will conflict with planned revert of EPYC changes
+>  2e26f4ab3bf8 hw/i386: Move arch_id decode inside x86_cpus_init so it will
+> mess up otherwise clean revert, I'd prefer revert being merged first and than
+> this reased on top of it.
 
-Title:
-  https websockets not working in 2.5 or 2.6
+Sure. I will send the revert patches later today. Thanks
 
-Status in QEMU:
-  Fix Released
-Status in qemu package in Ubuntu:
-  Fix Released
-Status in qemu source package in Xenial:
-  Incomplete
-Status in qemu source package in Yakkety:
-  Won't Fix
-Status in Arch Linux:
-  New
+> 
+> 
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >  include/hw/i386/x86.h |  10 ++
+> >  hw/i386/pc.c          | 283 +-----------------------------------------
+> >  hw/i386/x86.c         | 268
+> +++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 283 insertions(+), 278 deletions(-)
+> >
+> > diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h index
+> > de74c831c3ab..5c3803e74e31 100644
+> > --- a/include/hw/i386/x86.h
+> > +++ b/include/hw/i386/x86.h
+> > @@ -102,6 +102,16 @@ CpuInstanceProperties
+> x86_cpu_index_to_props(MachineState *ms,
+> >                                               unsigned cpu_index);
+> > int64_t x86_get_default_cpu_node_id(const MachineState *ms, int idx);
+> > const CPUArchIdList *x86_possible_cpu_arch_ids(MachineState *ms);
+> > +CPUArchId *x86_find_cpu_slot(MachineState *ms, uint32_t id, int
+> > +*idx); void x86_rtc_set_cpus_count(ISADevice *rtc, uint16_t
+> > +cpus_count); void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
+> > +                      DeviceState *dev, Error **errp); void
+> > +x86_cpu_plug(HotplugHandler *hotplug_dev,
+> > +                  DeviceState *dev, Error **errp); void
+> > +x86_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+> > +                               DeviceState *dev, Error **errp); void
+> > +x86_cpu_unplug_cb(HotplugHandler *hotplug_dev,
+> > +                       DeviceState *dev, Error **errp);
+> >
+> >  void x86_bios_rom_init(MemoryRegion *rom_memory, bool
+> isapc_ram_fw);
+> >
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c index
+> > 0bd6dbbd7bf6..b55369357e5d 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -803,19 +803,6 @@ void pc_hot_add_cpu(MachineState *ms, const
+> int64_t id, Error **errp)
+> >      }
+> >  }
+> >
+> > -static void rtc_set_cpus_count(ISADevice *rtc, uint16_t cpus_count)
+> > -{
+> > -    if (cpus_count > 0xff) {
+> > -        /* If the number of CPUs can't be represented in 8 bits, the
+> > -         * BIOS must use "FW_CFG_NB_CPUS". Set RTC field to 0 just
+> > -         * to make old BIOSes fail more predictably.
+> > -         */
+> > -        rtc_set_memory(rtc, 0x5f, 0);
+> > -    } else {
+> > -        rtc_set_memory(rtc, 0x5f, cpus_count - 1);
+> > -    }
+> > -}
+> > -
+> >  static
+> >  void pc_machine_done(Notifier *notifier, void *data)  { @@ -825,7
+> > +812,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+> >      PCIBus *bus = pcms->bus;
+> >
+> >      /* set the number of CPUs */
+> > -    rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
+> > +    x86_rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
+> >
+> >      if (bus) {
+> >          int extra_hosts = 0;
+> > @@ -1373,266 +1360,6 @@ static void pc_memory_unplug(HotplugHandler
+> *hotplug_dev,
+> >      error_propagate(errp, local_err);  }
+> >
+> > -static int pc_apic_cmp(const void *a, const void *b) -{
+> > -   CPUArchId *apic_a = (CPUArchId *)a;
+> > -   CPUArchId *apic_b = (CPUArchId *)b;
+> > -
+> > -   return apic_a->arch_id - apic_b->arch_id;
+> > -}
+> > -
+> > -/* returns pointer to CPUArchId descriptor that matches CPU's apic_id
+> > - * in ms->possible_cpus->cpus, if ms->possible_cpus->cpus has no
+> > - * entry corresponding to CPU's apic_id returns NULL.
+> > - */
+> > -static CPUArchId *pc_find_cpu_slot(MachineState *ms, uint32_t id, int
+> > *idx) -{
+> > -    CPUArchId apic_id, *found_cpu;
+> > -
+> > -    apic_id.arch_id = id;
+> > -    found_cpu = bsearch(&apic_id, ms->possible_cpus->cpus,
+> > -        ms->possible_cpus->len, sizeof(*ms->possible_cpus->cpus),
+> > -        pc_apic_cmp);
+> > -    if (found_cpu && idx) {
+> > -        *idx = found_cpu - ms->possible_cpus->cpus;
+> > -    }
+> > -    return found_cpu;
+> > -}
+> > -
+> > -static void pc_cpu_plug(HotplugHandler *hotplug_dev,
+> > -                        DeviceState *dev, Error **errp)
+> > -{
+> > -    CPUArchId *found_cpu;
+> > -    Error *local_err = NULL;
+> > -    X86CPU *cpu = X86_CPU(dev);
+> > -    PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> > -    X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> > -
+> > -    if (x86ms->acpi_dev) {
+> > -        hotplug_handler_plug(x86ms->acpi_dev, dev, &local_err);
+> > -        if (local_err) {
+> > -            goto out;
+> > -        }
+> > -    }
+> > -
+> > -    /* increment the number of CPUs */
+> > -    x86ms->boot_cpus++;
+> > -    if (x86ms->rtc) {
+> > -        rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
+> > -    }
+> > -    if (x86ms->fw_cfg) {
+> > -        fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms-
+> >boot_cpus);
+> > -    }
+> > -
+> > -    found_cpu = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, NULL);
+> > -    found_cpu->cpu = OBJECT(dev);
+> > -out:
+> > -    error_propagate(errp, local_err);
+> > -}
+> > -static void pc_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+> > -                                     DeviceState *dev, Error **errp)
+> > -{
+> > -    int idx = -1;
+> > -    X86CPU *cpu = X86_CPU(dev);
+> > -    PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> > -    X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> > -
+> > -    if (!x86ms->acpi_dev) {
+> > -        error_setg(errp, "CPU hot unplug not supported without ACPI");
+> > -        return;
+> > -    }
+> > -
+> > -    pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+> > -    assert(idx != -1);
+> > -    if (idx == 0) {
+> > -        error_setg(errp, "Boot CPU is unpluggable");
+> > -        return;
+> > -    }
+> > -
+> > -    hotplug_handler_unplug_request(x86ms->acpi_dev, dev,
+> > -                                   errp);
+> > -}
+> > -
+> > -static void pc_cpu_unplug_cb(HotplugHandler *hotplug_dev,
+> > -                             DeviceState *dev, Error **errp)
+> > -{
+> > -    CPUArchId *found_cpu;
+> > -    Error *local_err = NULL;
+> > -    X86CPU *cpu = X86_CPU(dev);
+> > -    PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> > -    X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> > -
+> > -    hotplug_handler_unplug(x86ms->acpi_dev, dev, &local_err);
+> > -    if (local_err) {
+> > -        goto out;
+> > -    }
+> > -
+> > -    found_cpu = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, NULL);
+> > -    found_cpu->cpu = NULL;
+> > -    qdev_unrealize(dev);
+> > -
+> > -    /* decrement the number of CPUs */
+> > -    x86ms->boot_cpus--;
+> > -    /* Update the number of CPUs in CMOS */
+> > -    rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
+> > -    fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms-
+> >boot_cpus);
+> > - out:
+> > -    error_propagate(errp, local_err);
+> > -}
+> > -
+> > -static void pc_cpu_pre_plug(HotplugHandler *hotplug_dev,
+> > -                            DeviceState *dev, Error **errp)
+> > -{
+> > -    int idx;
+> > -    CPUState *cs;
+> > -    CPUArchId *cpu_slot;
+> > -    X86CPUTopoIDs topo_ids;
+> > -    X86CPU *cpu = X86_CPU(dev);
+> > -    CPUX86State *env = &cpu->env;
+> > -    MachineState *ms = MACHINE(hotplug_dev);
+> > -    PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> > -    X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> > -    unsigned int smp_cores = ms->smp.cores;
+> > -    unsigned int smp_threads = ms->smp.threads;
+> > -    X86CPUTopoInfo topo_info;
+> > -
+> > -    if(!object_dynamic_cast(OBJECT(cpu), ms->cpu_type)) {
+> > -        error_setg(errp, "Invalid CPU type, expected cpu type: '%s'",
+> > -                   ms->cpu_type);
+> > -        return;
+> > -    }
+> > -
+> > -    init_topo_info(&topo_info, x86ms);
+> > -
+> > -    env->nr_dies = x86ms->smp_dies;
+> > -    env->nr_nodes = topo_info.nodes_per_pkg;
+> > -    env->pkg_offset = x86ms->apicid_pkg_offset(&topo_info);
+> > -
+> > -    /*
+> > -     * If APIC ID is not set,
+> > -     * set it based on socket/die/core/thread properties.
+> > -     */
+> > -    if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+> > -        int max_socket = (ms->smp.max_cpus - 1) /
+> > -                                smp_threads / smp_cores / x86ms->smp_dies;
+> > -
+> > -        /*
+> > -         * die-id was optional in QEMU 4.0 and older, so keep it optional
+> > -         * if there's only one die per socket.
+> > -         */
+> > -        if (cpu->die_id < 0 && x86ms->smp_dies == 1) {
+> > -            cpu->die_id = 0;
+> > -        }
+> > -
+> > -        if (cpu->socket_id < 0) {
+> > -            error_setg(errp, "CPU socket-id is not set");
+> > -            return;
+> > -        } else if (cpu->socket_id > max_socket) {
+> > -            error_setg(errp, "Invalid CPU socket-id: %u must be in range 0:%u",
+> > -                       cpu->socket_id, max_socket);
+> > -            return;
+> > -        }
+> > -        if (cpu->die_id < 0) {
+> > -            error_setg(errp, "CPU die-id is not set");
+> > -            return;
+> > -        } else if (cpu->die_id > x86ms->smp_dies - 1) {
+> > -            error_setg(errp, "Invalid CPU die-id: %u must be in range 0:%u",
+> > -                       cpu->die_id, x86ms->smp_dies - 1);
+> > -            return;
+> > -        }
+> > -        if (cpu->core_id < 0) {
+> > -            error_setg(errp, "CPU core-id is not set");
+> > -            return;
+> > -        } else if (cpu->core_id > (smp_cores - 1)) {
+> > -            error_setg(errp, "Invalid CPU core-id: %u must be in range 0:%u",
+> > -                       cpu->core_id, smp_cores - 1);
+> > -            return;
+> > -        }
+> > -        if (cpu->thread_id < 0) {
+> > -            error_setg(errp, "CPU thread-id is not set");
+> > -            return;
+> > -        } else if (cpu->thread_id > (smp_threads - 1)) {
+> > -            error_setg(errp, "Invalid CPU thread-id: %u must be in range 0:%u",
+> > -                       cpu->thread_id, smp_threads - 1);
+> > -            return;
+> > -        }
+> > -
+> > -        topo_ids.pkg_id = cpu->socket_id;
+> > -        topo_ids.die_id = cpu->die_id;
+> > -        topo_ids.core_id = cpu->core_id;
+> > -        topo_ids.smt_id = cpu->thread_id;
+> > -        cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info,
+> &topo_ids);
+> > -    }
+> > -
+> > -    cpu_slot = pc_find_cpu_slot(MACHINE(pcms), cpu->apic_id, &idx);
+> > -    if (!cpu_slot) {
+> > -        MachineState *ms = MACHINE(pcms);
+> > -
+> > -        x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> > -        error_setg(errp,
+> > -            "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
+> > -            " APIC ID %" PRIu32 ", valid index range 0:%d",
+> > -            topo_ids.pkg_id, topo_ids.die_id, topo_ids.core_id,
+> topo_ids.smt_id,
+> > -            cpu->apic_id, ms->possible_cpus->len - 1);
+> > -        return;
+> > -    }
+> > -
+> > -    if (cpu_slot->cpu) {
+> > -        error_setg(errp, "CPU[%d] with APIC ID %" PRIu32 " exists",
+> > -                   idx, cpu->apic_id);
+> > -        return;
+> > -    }
+> > -
+> > -    /* if 'address' properties socket-id/core-id/thread-id are not set, set
+> them
+> > -     * so that machine_query_hotpluggable_cpus would show correct
+> values
+> > -     */
+> > -    /* TODO: move socket_id/core_id/thread_id checks into
+> x86_cpu_realizefn()
+> > -     * once -smp refactoring is complete and there will be CPU private
+> > -     * CPUState::nr_cores and CPUState::nr_threads fields instead of globals
+> */
+> > -    x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> > -    if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
+> > -        error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
+> > -            " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id,
+> > -            topo_ids.pkg_id);
+> > -        return;
+> > -    }
+> > -    cpu->socket_id = topo_ids.pkg_id;
+> > -
+> > -    if (cpu->die_id != -1 && cpu->die_id != topo_ids.die_id) {
+> > -        error_setg(errp, "property die-id: %u doesn't match set apic-id:"
+> > -            " 0x%x (die-id: %u)", cpu->die_id, cpu->apic_id, topo_ids.die_id);
+> > -        return;
+> > -    }
+> > -    cpu->die_id = topo_ids.die_id;
+> > -
+> > -    if (cpu->core_id != -1 && cpu->core_id != topo_ids.core_id) {
+> > -        error_setg(errp, "property core-id: %u doesn't match set apic-id:"
+> > -            " 0x%x (core-id: %u)", cpu->core_id, cpu->apic_id,
+> > -            topo_ids.core_id);
+> > -        return;
+> > -    }
+> > -    cpu->core_id = topo_ids.core_id;
+> > -
+> > -    if (cpu->thread_id != -1 && cpu->thread_id != topo_ids.smt_id) {
+> > -        error_setg(errp, "property thread-id: %u doesn't match set apic-id:"
+> > -            " 0x%x (thread-id: %u)", cpu->thread_id, cpu->apic_id,
+> > -            topo_ids.smt_id);
+> > -        return;
+> > -    }
+> > -    cpu->thread_id = topo_ids.smt_id;
+> > -
+> > -    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX) &&
+> > -        !kvm_hv_vpindex_settable()) {
+> > -        error_setg(errp, "kernel doesn't allow setting HyperV VP_INDEX");
+> > -        return;
+> > -    }
+> > -
+> > -    cs = CPU(cpu);
+> > -    cs->cpu_index = idx;
+> > -
+> > -    numa_cpu_pre_plug(cpu_slot, dev, errp);
+> > -}
+> > -
+> >  static void pc_virtio_md_pci_pre_plug(HotplugHandler *hotplug_dev,
+> >                                        DeviceState *dev, Error **errp)
+> > { @@ -1701,7 +1428,7 @@ static void
+> > pc_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> >      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >          pc_memory_pre_plug(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> > -        pc_cpu_pre_plug(hotplug_dev, dev, errp);
+> > +        x86_cpu_pre_plug(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)
+> ||
+> >                 object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+> >          pc_virtio_md_pci_pre_plug(hotplug_dev, dev, errp); @@ -1714,7
+> > +1441,7 @@ static void pc_machine_device_plug_cb(HotplugHandler
+> *hotplug_dev,
+> >      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >          pc_memory_plug(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> > -        pc_cpu_plug(hotplug_dev, dev, errp);
+> > +        x86_cpu_plug(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)
+> ||
+> >                 object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+> >          pc_virtio_md_pci_plug(hotplug_dev, dev, errp); @@ -1727,7
+> > +1454,7 @@ static void
+> pc_machine_device_unplug_request_cb(HotplugHandler *hotplug_dev,
+> >      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >          pc_memory_unplug_request(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> > -        pc_cpu_unplug_request_cb(hotplug_dev, dev, errp);
+> > +        x86_cpu_unplug_request_cb(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)
+> ||
+> >                 object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+> >          pc_virtio_md_pci_unplug_request(hotplug_dev, dev, errp); @@
+> > -1743,7 +1470,7 @@ static void
+> pc_machine_device_unplug_cb(HotplugHandler *hotplug_dev,
+> >      if (object_dynamic_cast(OBJECT(dev), TYPE_PC_DIMM)) {
+> >          pc_memory_unplug(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_CPU)) {
+> > -        pc_cpu_unplug_cb(hotplug_dev, dev, errp);
+> > +        x86_cpu_unplug_cb(hotplug_dev, dev, errp);
+> >      } else if (object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_PMEM_PCI)
+> ||
+> >                 object_dynamic_cast(OBJECT(dev), TYPE_VIRTIO_MEM_PCI)) {
+> >          pc_virtio_md_pci_unplug(hotplug_dev, dev, errp); diff --git
+> > a/hw/i386/x86.c b/hw/i386/x86.c index 31a82885d735..f1eeca01cd79
+> > 100644
+> > --- a/hw/i386/x86.c
+> > +++ b/hw/i386/x86.c
+> > @@ -41,6 +41,7 @@
+> >  #include "hw/i386/topology.h"
+> >  #include "hw/i386/fw_cfg.h"
+> >  #include "hw/intc/i8259.h"
+> > +#include "hw/rtc/mc146818rtc.h"
+> >
+> >  #include "hw/acpi/cpu_hotplug.h"
+> >  #include "hw/irq.h"
+> > @@ -165,6 +166,273 @@ void x86_cpus_init(X86MachineState *x86ms, int
+> default_cpu_version)
+> >      }
+> >  }
+> >
+> > +void x86_cpu_pre_plug(HotplugHandler *hotplug_dev,
+> > +                      DeviceState *dev, Error **errp) {
+> > +    int idx;
+> > +    CPUState *cs;
+> > +    CPUArchId *cpu_slot;
+> > +    X86CPUTopoIDs topo_ids;
+> > +    X86CPU *cpu = X86_CPU(dev);
+> > +    CPUX86State *env = &cpu->env;
+> > +    MachineState *ms = MACHINE(hotplug_dev);
+> > +    X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> > +    unsigned int smp_cores = ms->smp.cores;
+> > +    unsigned int smp_threads = ms->smp.threads;
+> > +    X86CPUTopoInfo topo_info;
+> > +
+> > +    if(!object_dynamic_cast(OBJECT(cpu), ms->cpu_type)) {
+> > +        error_setg(errp, "Invalid CPU type, expected cpu type: '%s'",
+> > +                   ms->cpu_type);
+> > +        return;
+> > +    }
+> > +
+> > +    init_topo_info(&topo_info, x86ms);
+> > +
+> > +    env->nr_dies = x86ms->smp_dies;
+> > +    env->nr_nodes = topo_info.nodes_per_pkg;
+> > +    env->pkg_offset = x86ms->apicid_pkg_offset(&topo_info);
+> > +
+> > +    /*
+> > +     * If APIC ID is not set,
+> > +     * set it based on socket/die/core/thread properties.
+> > +     */
+> > +    if (cpu->apic_id == UNASSIGNED_APIC_ID) {
+> > +        int max_socket = (ms->smp.max_cpus - 1) /
+> > +                                smp_threads / smp_cores /
+> > + x86ms->smp_dies;
+> > +
+> > +        /*
+> > +         * die-id was optional in QEMU 4.0 and older, so keep it optional
+> > +         * if there's only one die per socket.
+> > +         */
+> > +        if (cpu->die_id < 0 && x86ms->smp_dies == 1) {
+> > +            cpu->die_id = 0;
+> > +        }
+> > +
+> > +        if (cpu->socket_id < 0) {
+> > +            error_setg(errp, "CPU socket-id is not set");
+> > +            return;
+> > +        } else if (cpu->socket_id > max_socket) {
+> > +            error_setg(errp, "Invalid CPU socket-id: %u must be in range 0:%u",
+> > +                       cpu->socket_id, max_socket);
+> > +            return;
+> > +        }
+> > +        if (cpu->die_id < 0) {
+> > +            error_setg(errp, "CPU die-id is not set");
+> > +            return;
+> > +        } else if (cpu->die_id > x86ms->smp_dies - 1) {
+> > +            error_setg(errp, "Invalid CPU die-id: %u must be in range 0:%u",
+> > +                       cpu->die_id, x86ms->smp_dies - 1);
+> > +            return;
+> > +        }
+> > +        if (cpu->core_id < 0) {
+> > +            error_setg(errp, "CPU core-id is not set");
+> > +            return;
+> > +        } else if (cpu->core_id > (smp_cores - 1)) {
+> > +            error_setg(errp, "Invalid CPU core-id: %u must be in range 0:%u",
+> > +                       cpu->core_id, smp_cores - 1);
+> > +            return;
+> > +        }
+> > +        if (cpu->thread_id < 0) {
+> > +            error_setg(errp, "CPU thread-id is not set");
+> > +            return;
+> > +        } else if (cpu->thread_id > (smp_threads - 1)) {
+> > +            error_setg(errp, "Invalid CPU thread-id: %u must be in range 0:%u",
+> > +                       cpu->thread_id, smp_threads - 1);
+> > +            return;
+> > +        }
+> > +
+> > +        topo_ids.pkg_id = cpu->socket_id;
+> > +        topo_ids.die_id = cpu->die_id;
+> > +        topo_ids.core_id = cpu->core_id;
+> > +        topo_ids.smt_id = cpu->thread_id;
+> > +        cpu->apic_id = x86ms->apicid_from_topo_ids(&topo_info,
+> &topo_ids);
+> > +    }
+> > +
+> > +    cpu_slot = x86_find_cpu_slot(MACHINE(x86ms), cpu->apic_id, &idx);
+> > +    if (!cpu_slot) {
+> > +        MachineState *ms = MACHINE(x86ms);
+> > +
+> > +        x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info,
+> &topo_ids);
+> > +        error_setg(errp,
+> > +            "Invalid CPU [socket: %u, die: %u, core: %u, thread: %u] with"
+> > +            " APIC ID %" PRIu32 ", valid index range 0:%d",
+> > +            topo_ids.pkg_id, topo_ids.die_id, topo_ids.core_id,
+> topo_ids.smt_id,
+> > +            cpu->apic_id, ms->possible_cpus->len - 1);
+> > +        return;
+> > +    }
+> > +
+> > +    if (cpu_slot->cpu) {
+> > +        error_setg(errp, "CPU[%d] with APIC ID %" PRIu32 " exists",
+> > +                   idx, cpu->apic_id);
+> > +        return;
+> > +    }
+> > +
+> > +    /* if 'address' properties socket-id/core-id/thread-id are not set, set
+> them
+> > +     * so that machine_query_hotpluggable_cpus would show correct
+> values
+> > +     */
+> > +    /* TODO: move socket_id/core_id/thread_id checks into
+> x86_cpu_realizefn()
+> > +     * once -smp refactoring is complete and there will be CPU private
+> > +     * CPUState::nr_cores and CPUState::nr_threads fields instead of
+> globals */
+> > +    x86ms->topo_ids_from_apicid(cpu->apic_id, &topo_info, &topo_ids);
+> > +    if (cpu->socket_id != -1 && cpu->socket_id != topo_ids.pkg_id) {
+> > +        error_setg(errp, "property socket-id: %u doesn't match set apic-id:"
+> > +            " 0x%x (socket-id: %u)", cpu->socket_id, cpu->apic_id,
+> > +            topo_ids.pkg_id);
+> > +        return;
+> > +    }
+> > +    cpu->socket_id = topo_ids.pkg_id;
+> > +
+> > +    if (cpu->die_id != -1 && cpu->die_id != topo_ids.die_id) {
+> > +        error_setg(errp, "property die-id: %u doesn't match set apic-id:"
+> > +            " 0x%x (die-id: %u)", cpu->die_id, cpu->apic_id, topo_ids.die_id);
+> > +        return;
+> > +    }
+> > +    cpu->die_id = topo_ids.die_id;
+> > +
+> > +    if (cpu->core_id != -1 && cpu->core_id != topo_ids.core_id) {
+> > +        error_setg(errp, "property core-id: %u doesn't match set apic-id:"
+> > +            " 0x%x (core-id: %u)", cpu->core_id, cpu->apic_id,
+> > +            topo_ids.core_id);
+> > +        return;
+> > +    }
+> > +    cpu->core_id = topo_ids.core_id;
+> > +
+> > +    if (cpu->thread_id != -1 && cpu->thread_id != topo_ids.smt_id) {
+> > +        error_setg(errp, "property thread-id: %u doesn't match set apic-id:"
+> > +            " 0x%x (thread-id: %u)", cpu->thread_id, cpu->apic_id,
+> > +            topo_ids.smt_id);
+> > +        return;
+> > +    }
+> > +    cpu->thread_id = topo_ids.smt_id;
+> > +
+> > +    if (hyperv_feat_enabled(cpu, HYPERV_FEAT_VPINDEX) &&
+> > +        !kvm_hv_vpindex_settable()) {
+> > +        error_setg(errp, "kernel doesn't allow setting HyperV VP_INDEX");
+> > +        return;
+> > +    }
+> > +
+> > +    cs = CPU(cpu);
+> > +    cs->cpu_index = idx;
+> > +
+> > +    numa_cpu_pre_plug(cpu_slot, dev, errp); }
+> > +
+> > +void x86_rtc_set_cpus_count(ISADevice *rtc, uint16_t cpus_count) {
+> > +    if (cpus_count > 0xff) {
+> > +        /* If the number of CPUs can't be represented in 8 bits, the
+> > +         * BIOS must use "FW_CFG_NB_CPUS". Set RTC field to 0 just
+> > +         * to make old BIOSes fail more predictably.
+> > +         */
+> > +        rtc_set_memory(rtc, 0x5f, 0);
+> > +    } else {
+> > +        rtc_set_memory(rtc, 0x5f, cpus_count - 1);
+> > +    }
+> > +}
+> > +
+> > +static int x86_apic_cmp(const void *a, const void *b) {
+> > +   CPUArchId *apic_a = (CPUArchId *)a;
+> > +   CPUArchId *apic_b = (CPUArchId *)b;
+> > +
+> > +   return apic_a->arch_id - apic_b->arch_id; }
+> > +
+> > +/* returns pointer to CPUArchId descriptor that matches CPU's apic_id
+> > + * in ms->possible_cpus->cpus, if ms->possible_cpus->cpus has no
+> > + * entry corresponding to CPU's apic_id returns NULL.
+> > + */
+> > +CPUArchId *x86_find_cpu_slot(MachineState *ms, uint32_t id, int *idx)
+> > +{
+> > +    CPUArchId apic_id, *found_cpu;
+> > +
+> > +    apic_id.arch_id = id;
+> > +    found_cpu = bsearch(&apic_id, ms->possible_cpus->cpus,
+> > +        ms->possible_cpus->len, sizeof(*ms->possible_cpus->cpus),
+> > +        x86_apic_cmp);
+> > +    if (found_cpu && idx) {
+> > +        *idx = found_cpu - ms->possible_cpus->cpus;
+> > +    }
+> > +    return found_cpu;
+> > +}
+> > +
+> > +void x86_cpu_plug(HotplugHandler *hotplug_dev,
+> > +                  DeviceState *dev, Error **errp) {
+> > +    CPUArchId *found_cpu;
+> > +    X86CPU *cpu = X86_CPU(dev);
+> > +    X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> > +
+> > +    if (x86ms->acpi_dev) {
+> > +        hotplug_handler_plug(x86ms->acpi_dev, dev, errp);
+> > +        if (*errp) {
+> > +            return;
+> > +        }
+> > +    }
+> > +
+> > +    /* increment the number of CPUs */
+> > +    x86ms->boot_cpus++;
+> > +    if (x86ms->rtc) {
+> > +        x86_rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
+> > +    }
+> > +    if (x86ms->fw_cfg) {
+> > +        fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms-
+> >boot_cpus);
+> > +    }
+> > +
+> > +    found_cpu = x86_find_cpu_slot(MACHINE(x86ms), cpu->apic_id,
+> NULL);
+> > +    found_cpu->cpu = OBJECT(dev);
+> > +}
+> > +
+> > +void x86_cpu_unplug_request_cb(HotplugHandler *hotplug_dev,
+> > +                               DeviceState *dev, Error **errp) {
+> > +    int idx = -1;
+> > +    X86CPU *cpu = X86_CPU(dev);
+> > +    X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> > +
+> > +    if (!x86ms->acpi_dev) {
+> > +        error_setg(errp, "CPU hot unplug not supported without ACPI");
+> > +        return;
+> > +    }
+> > +
+> > +    x86_find_cpu_slot(MACHINE(x86ms), cpu->apic_id, &idx);
+> > +    assert(idx != -1);
+> > +    if (idx == 0) {
+> > +        error_setg(errp, "Boot CPU is unpluggable");
+> > +        return;
+> > +    }
+> > +
+> > +    hotplug_handler_unplug_request(x86ms->acpi_dev, dev,
+> > +                                   errp); }
+> > +
+> > +void x86_cpu_unplug_cb(HotplugHandler *hotplug_dev,
+> > +                       DeviceState *dev, Error **errp) {
+> > +    CPUArchId *found_cpu;
+> > +    Error *local_err = NULL;
+> > +    X86CPU *cpu = X86_CPU(dev);
+> > +    X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> > +
+> > +    hotplug_handler_unplug(x86ms->acpi_dev, dev, &local_err);
+> > +    if (local_err) {
+> > +        goto out;
+> > +    }
+> > +
+> > +    found_cpu = x86_find_cpu_slot(MACHINE(x86ms), cpu->apic_id,
+> NULL);
+> > +    found_cpu->cpu = NULL;
+> > +    qdev_unrealize(dev);
+> > +
+> > +    /* decrement the number of CPUs */
+> > +    x86ms->boot_cpus--;
+> > +    /* Update the number of CPUs in CMOS */
+> > +    x86_rtc_set_cpus_count(x86ms->rtc, x86ms->boot_cpus);
+> > +    fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS,
+> > +x86ms->boot_cpus);
+> > + out:
+> > +    error_propagate(errp, local_err); }
+> > +
+> >  CpuInstanceProperties
+> >  x86_cpu_index_to_props(MachineState *ms, unsigned cpu_index)  {
 
-Bug description:
-  % gdb --args ./x86_64-softmmu/qemu-system-x86_64 -vnc 0.0.0.0:1,tls,x509=
-=3D/etc/pki/libvirt-le,websocket=3D5701 =
-
-                          =
-
-  GNU gdb (GDB) 7.11
-  Copyright (C) 2016 Free Software Foundation, Inc.
-  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>
-  This is free software: you are free to change and redistribute it.
-  There is NO WARRANTY, to the extent permitted by law.  Type "show copying"
-  and "show warranty" for details.
-  This GDB was configured as "x86_64-pc-linux-gnu".
-  Type "show configuration" for configuration details.
-  For bug reporting instructions, please see:
-  <http://www.gnu.org/software/gdb/bugs/>.
-  Find the GDB manual and other documentation resources online at:
-  <http://www.gnu.org/software/gdb/documentation/>.
-  For help, type "help".
-  Type "apropos word" to search for commands related to "word"...
-  Reading symbols from ./x86_64-softmmu/qemu-system-x86_64...done.
-  (gdb) run
-  Starting program: /home/ben/qemu/qemu-2.6.0/x86_64-softmmu/qemu-system-x8=
-6_64 -vnc 0.0.0.0:1,tls,x509=3D/etc/pki/libvirt-le,websocket=3D5701
-  [Thread debugging using libthread_db enabled]
-  Using host libthread_db library "/usr/lib/libthread_db.so.1".
-  [New Thread 0x7fffe16f6700 (LWP 12767)]
-  [New Thread 0x7fffde2d4700 (LWP 12768)]
-  [New Thread 0x7fffd3fff700 (LWP 12769)]
-  Initializing VNC server with x509 no auth
-  Client sioc=3D0x55555874d6b0 ws=3D1 auth=3D1 subauth=3D0
-  New client on socket 0x55555874d6b0
-  vnc_set_share_mode/0x55555874d6b0: undefined -> connecting
-  TLS Websocket connection required
-  Start TLS WS handshake process
-  Handshake failed TLS handshake failed: The TLS connection was non-properl=
-y terminated.
-  Closing down client sock: protocol error
-  vnc_set_share_mode/0x55555779f510: connecting -> disconnected
-  Client sioc=3D0x55555873c6a0 ws=3D1 auth=3D1 subauth=3D0
-  New client on socket 0x55555873c6a0
-  vnc_set_share_mode/0x55555873c6a0: undefined -> connecting
-  TLS Websocket connection required
-  Start TLS WS handshake process
-  TLS handshake complete, starting websocket handshake
-  Websocket negotiate starting
-  Websock handshake complete, starting VNC protocol
-  Write Plain: Pending output 0x555557b91c60 size 4096 offset 12. Wait SSF 0
-  Wrote wire 0x555557b91c60 12 -> 12
-
-  Thread 1 "qemu-system-x86" received signal SIGSEGV, Segmentation fault.
-  0x0000000000000001 in ?? ()
-  (gdb) thread apply all bt
-
-  Thread 4 (Thread 0x7fffd3fff700 (LWP 12769)):
-  #0  0x00007fffef35a09f in pthread_cond_wait@@GLIBC_2.3.2 () from /usr/lib=
-/libpthread.so.0
-  #1  0x0000555555a20bd9 in qemu_cond_wait (cond=3Dcond@entry=3D0x555558726=
-7e0, =
-
-      mutex=3Dmutex@entry=3D0x555558726810) at util/qemu-thread-posix.c:123
-  #2  0x00005555559770ab in vnc_worker_thread_loop (queue=3Dqueue@entry=3D0=
-x5555587267e0)
-      at ui/vnc-jobs.c:228
-  #3  0x00005555559775e8 in vnc_worker_thread (arg=3D0x5555587267e0) at ui/=
-vnc-jobs.c:335
-  #4  0x00007fffef354474 in start_thread () from /usr/lib/libpthread.so.0
-  #5  0x00007fffea43c69d in clone () from /usr/lib/libc.so.6
-
-  Thread 3 (Thread 0x7fffde2d4700 (LWP 12768)):
-  #0  0x00007fffef35a09f in pthread_cond_wait@@GLIBC_2.3.2 () from /usr/lib=
-/libpthread.so.0
-  #1  0x0000555555a20bd9 in qemu_cond_wait (cond=3D<optimized out>, =
-
-  ---Type <return> to continue, or q <return> to quit---
-      emu_global_mutex>) at util/qemu-thread-posix.c:123
-  #2  0x0000555555715edf in qemu_tcg_wait_io_event (cpu=3D0x5555564ee840) a=
-t /home/ben/qemu/qemu-2.6.0/cpus.c:1015
-  #3  qemu_tcg_cpu_thread_fn (arg=3D<optimized out>) at /home/ben/qemu/qemu=
--2.6.0/cpus.c:1161
-  #4  0x00007fffef354474 in start_thread () from /usr/lib/libpthread.so.0
-  #5  0x00007fffea43c69d in clone () from /usr/lib/libc.so.6
-
-  Thread 2 (Thread 0x7fffe16f6700 (LWP 12767)):
-  #0  0x00007fffea438229 in syscall () from /usr/lib/libc.so.6
-  #1  0x0000555555a20ee8 in futex_wait (val=3D<optimized out>, ev=3D<optimi=
-zed out>) at util/qemu-thread-posix.c:292
-  #2  qemu_event_wait (ev=3Dev@entry=3D0x55555641ece4 <rcu_call_ready_event=
->) at util/qemu-thread-posix.c:399
-  #3  0x0000555555a2f2ae in call_rcu_thread (opaque=3D<optimized out>) at u=
-til/rcu.c:250
-  #4  0x00007fffef354474 in start_thread () from /usr/lib/libpthread.so.0
-  #5  0x00007fffea43c69d in clone () from /usr/lib/libc.so.6
-
-  Thread 1 (Thread 0x7ffff7f5bb00 (LWP 12763)):
-  #0  0x0000000000000001 in ?? ()
-  #1  0x00005555559efb53 in qio_task_free (task=3D0x555558212140) at io/tas=
-k.c:58
-  #2  0x00005555559efd89 in qio_task_complete (task=3Dtask@entry=3D0x555558=
-212140) at io/task.c:145
-  #3  0x00005555559ef5aa in qio_channel_websock_handshake_send (ioc=3D0x555=
-55873c6a0, condition=3D<optimized out>, =
-
-      user_data=3D0x555558212140) at io/channel-websock.c:289
-  #4  0x00007fffecf59c8a in g_main_context_dispatch () from /usr/lib/libgli=
-b-2.0.so.0
-  #5  0x000055555598a6b3 in glib_pollfds_poll () at main-loop.c:213
-  #6  os_host_main_loop_wait (timeout=3D<optimized out>) at main-loop.c:258
-  #7  main_loop_wait (nonblocking=3D<optimized out>) at main-loop.c:506
-  #8  0x00005555556e1fbd in main_loop () at vl.c:1934
-  #9  main (argc=3D<optimized out>, argv=3D<optimized out>, envp=3D<optimiz=
-ed out>) at vl.c:4656
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1589923/+subscriptions
 
