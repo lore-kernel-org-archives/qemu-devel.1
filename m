@@ -7,97 +7,97 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31668C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AC7FC433E6
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:09:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E271E208CA
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:08:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 04481208CA
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 09:09:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="yaslxsC8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E271E208CA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="JcYCfxGI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04481208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCfnr-0001KE-19
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 05:08:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50422)
+	id 1kCfoc-0002Oi-4R
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 05:09:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
- id 1kCfn4-0000Rq-23
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:07:50 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:45922)
+ id 1kCfnh-0001JL-Ky
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:08:29 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:46436)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
- id 1kCfn2-0002SL-Ef
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:07:49 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07V8UAG2036435;
- Mon, 31 Aug 2020 09:07:41 GMT
+ id 1kCfnf-0002Zl-UD
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 05:08:29 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07V8Snk9165210;
+ Mon, 31 Aug 2020 09:08:06 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=to : cc : subject :
  in-reply-to : references : sender : from : date : message-id :
  mime-version : content-type; s=corp-2020-01-29;
- bh=9OucBOKZIrghkbGS8d7UaZOfp4BmVpdvfrUfbmC8i0k=;
- b=yaslxsC8mjSPBmCXO+ndvlKdfVXvcTlO8vHsdSY3fp3h7pJJiKNXvC1QB7HuCAapxbwz
- wOvz7zqlBQnstf0tqE+Vr21WywtxWsNSHwUQqCkyF7puLktsQb7bRxkgK1BhmVyixjJ8
- JtRmr8s8vlPMO37ev7oNVLf2ByE2PqF/4peibqPTZUmCSuulrr4f5eD0ZzyzqFDuwfTQ
- pZ8C8jO7589YUtPDFv6asorxudqGlDrccUMk3VwHurZP0UJT2GTRqW44pkX04KtfURhT
- Xw5cRHZDbgkQ3EoL/ZVjxBxyPsfpjSnYGEiR1R/C70aqdqpG10JmFRPajooAOLcBHIjV RA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 337eykw5vf-1
+ bh=Was0WEuOTYaxOW+EBlfLK5RfEo3fUlZIZe2MVoKJq4c=;
+ b=JcYCfxGIYweaCPLr6WUOwuZDqiGZtocQBX84A9v6VHkavf1JrtbCveSPA+uVekPmHf9Q
+ g/P2aKnHrs8NEkkfb4h5R5n5lxlNAbRopjRG5UEDeU/pyCm82hx+mPrl5Ouen8PTeB1O
+ mmJFHmIhSBgyZlzNtzZpRkBKXL17qC20gmPu73qVxckIdpr5izU/OiWbufVh69jE2h0f
+ 8r/PfYil2JeR6Qi/f6PiGzCtkJ5v994DtEisxoJMV7PBbUyk1BqcQWlobT0nNDjxjsVr
+ JV9m/+OJ60QY7zE3If/bHg8Fkqo2LefkkxwDpGP2ue5s4g+NvpckF6zGfyMldLHoG6aC EQ== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by userp2130.oracle.com with ESMTP id 337eeqn7bh-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Mon, 31 Aug 2020 09:07:41 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07V8UtWB126610;
- Mon, 31 Aug 2020 09:07:40 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3020.oracle.com with ESMTP id 3380spqjpc-1
+ Mon, 31 Aug 2020 09:08:06 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 07V8V8VZ053310;
+ Mon, 31 Aug 2020 09:06:05 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by aserp3030.oracle.com with ESMTP id 3380kkc8f9-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 31 Aug 2020 09:07:40 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07V97dt3021885;
- Mon, 31 Aug 2020 09:07:39 GMT
+ Mon, 31 Aug 2020 09:06:05 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 07V964ki009072;
+ Mon, 31 Aug 2020 09:06:04 GMT
 Received: from disaster-area.hh.sledj.net (/81.187.26.238)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 31 Aug 2020 02:07:39 -0700
+ with ESMTP ; Mon, 31 Aug 2020 02:06:04 -0700
 Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 2827759b;
- Mon, 31 Aug 2020 09:07:36 +0000 (UTC)
+ by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id 5e251fda;
+ Mon, 31 Aug 2020 09:06:02 +0000 (UTC)
 To: Chuan Zheng <zhengchuan@huawei.com>, quintela@redhat.com,
  eblake@redhat.com, dgilbert@redhat.com, berrange@redhat.com
-Subject: Re: [PATCH v6 05/12] migration/dirtyrate: move
- RAMBLOCK_FOREACH_MIGRATABLE into ram.h
-In-Reply-To: <1598669577-76914-6-git-send-email-zhengchuan@huawei.com>
+Subject: Re: [PATCH v6 03/12] migration/dirtyrate: Add RamblockDirtyInfo to
+ store sampled page info
+In-Reply-To: <1598669577-76914-4-git-send-email-zhengchuan@huawei.com>
 References: <1598669577-76914-1-git-send-email-zhengchuan@huawei.com>
- <1598669577-76914-6-git-send-email-zhengchuan@huawei.com>
+ <1598669577-76914-4-git-send-email-zhengchuan@huawei.com>
 X-HGTTG: heart-of-gold
 From: David Edmondson <david.edmondson@oracle.com>
-Date: Mon, 31 Aug 2020 10:07:36 +0100
-Message-ID: <m28sdvchev.fsf@oracle.com>
+Date: Mon, 31 Aug 2020 10:06:01 +0100
+Message-ID: <m2eennchhi.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9729
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- adultscore=0
- phishscore=0 malwarescore=0 mlxscore=0 spamscore=0 bulkscore=0
- suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008310051
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ spamscore=0 adultscore=0
+ mlxscore=0 suspectscore=1 malwarescore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008310051
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9729
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- adultscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2008310051
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=david.edmondson@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 05:07:47
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
+ priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 adultscore=0 spamscore=0 mlxscore=0
+ phishscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2008310051
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=david.edmondson@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 05:07:21
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -124,10 +124,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Saturday, 2020-08-29 at 10:52:50 +08, Chuan Zheng wrote:
+On Saturday, 2020-08-29 at 10:52:48 +08, Chuan Zheng wrote:
 
-> RAMBLOCK_FOREACH_MIGRATABLE is need in dirtyrate measure,
-> move the existing definition up into migration/ram.h
+> Add RamblockDirtyInfo to store sampled page info of each ramblock.
 >
 > Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 > Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
@@ -135,75 +134,47 @@ On Saturday, 2020-08-29 at 10:52:50 +08, Chuan Zheng wrote:
 Reviewed-by: David Edmondson <david.edmondson@oracle.com>
 
 > ---
->  migration/dirtyrate.c |  1 +
->  migration/ram.c       | 11 +----------
->  migration/ram.h       | 10 ++++++++++
->  3 files changed, 12 insertions(+), 10 deletions(-)
+>  migration/dirtyrate.h | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
 >
-> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
-> index fa7a1db..35b5c69 100644
-> --- a/migration/dirtyrate.c
-> +++ b/migration/dirtyrate.c
-> @@ -20,6 +20,7 @@
->  #include "qemu/rcu_queue.h"
->  #include "qapi/qapi-commands-migration.h"
->  #include "migration.h"
-> +#include "ram.h"
->  #include "dirtyrate.h"
+> diff --git a/migration/dirtyrate.h b/migration/dirtyrate.h
+> index 5be9714..479e222 100644
+> --- a/migration/dirtyrate.h
+> +++ b/migration/dirtyrate.h
+> @@ -19,11 +19,29 @@
+>   */
+>  #define DIRTYRATE_DEFAULT_SAMPLE_PAGES            512
 >  
->  static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
-> diff --git a/migration/ram.c b/migration/ram.c
-> index 76d4fee..37ef0da 100644
-> --- a/migration/ram.c
-> +++ b/migration/ram.c
-> @@ -158,21 +158,12 @@ out:
->      return ret;
->  }
->  
-> -static bool ramblock_is_ignored(RAMBlock *block)
-> +bool ramblock_is_ignored(RAMBlock *block)
->  {
->      return !qemu_ram_is_migratable(block) ||
->             (migrate_ignore_shared() && qemu_ram_is_shared(block));
->  }
->  
-> -/* Should be holding either ram_list.mutex, or the RCU lock. */
-> -#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
-> -    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-> -        if (ramblock_is_ignored(block)) {} else
-> -
-> -#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-> -    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-> -        if (!qemu_ram_is_migratable(block)) {} else
-> -
->  #undef RAMBLOCK_FOREACH
->  
->  int foreach_not_ignored_block(RAMBlockIterFunc func, void *opaque)
-> diff --git a/migration/ram.h b/migration/ram.h
-> index 2eeaacf..011e854 100644
-> --- a/migration/ram.h
-> +++ b/migration/ram.h
-> @@ -37,6 +37,16 @@ extern MigrationStats ram_counters;
->  extern XBZRLECacheStats xbzrle_counters;
->  extern CompressionStats compression_counters;
->  
-> +bool ramblock_is_ignored(RAMBlock *block);
-> +/* Should be holding either ram_list.mutex, or the RCU lock. */
-> +#define RAMBLOCK_FOREACH_NOT_IGNORED(block)            \
-> +    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-> +        if (ramblock_is_ignored(block)) {} else
+> +/*
+> + * Record ramblock idstr
+> + */
+> +#define RAMBLOCK_INFO_MAX_LEN                     256
 > +
-> +#define RAMBLOCK_FOREACH_MIGRATABLE(block)             \
-> +    INTERNAL_RAMBLOCK_FOREACH(block)                   \
-> +        if (!qemu_ram_is_migratable(block)) {} else
+>  struct DirtyRateConfig {
+>      uint64_t sample_pages_per_gigabytes; /* sample pages per GB */
+>      int64_t sample_period_seconds; /* time duration between two sampling */
+>  };
+>  
+> +/*
+> + * Store dirtypage info for each ramblock.
+> + */
+> +struct RamblockDirtyInfo {
+> +    char idstr[RAMBLOCK_INFO_MAX_LEN]; /* idstr for each ramblock */
+> +    uint8_t *ramblock_addr; /* base address of ramblock we measure */
+> +    uint64_t ramblock_pages; /* ramblock size in TARGET_PAGE_SIZE */
+> +    uint64_t *sample_page_vfn; /* relative offset address for sampled page */
+> +    uint64_t sample_pages_count; /* count of sampled pages */
+> +    uint64_t sample_dirty_count; /* count of dirty pages we measure */
+> +    uint32_t *hash_result; /* array of hash result for sampled pages */
+> +};
 > +
->  int xbzrle_cache_resize(int64_t new_size, Error **errp);
->  uint64_t ram_bytes_remaining(void);
->  uint64_t ram_bytes_total(void);
+>  void *get_dirtyrate_thread(void *arg);
+>  #endif
+>  
 > -- 
 > 1.8.3.1
 
 dme.
 -- 
-When you were the brightest star, who were the shadows?
+This is the time. This is the record of the time.
 
