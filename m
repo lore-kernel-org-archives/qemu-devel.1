@@ -4,80 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8905AC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:15:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F2C8C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:16:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 520562073A
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:15:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8E3F2073A
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 16:16:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UzXAKX5F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 520562073A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q+k2ihij"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8E3F2073A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCmTE-00071G-EH
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:15:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33932)
+	id 1kCmUH-0008PU-Up
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 12:16:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmKS-0004Yf-89
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:44 -0400
-Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:40382)
+ id 1kCmKD-00042l-Tc
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:29 -0400
+Received: from mail-pj1-x1030.google.com ([2607:f8b0:4864:20::1030]:35329)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kCmKO-00060N-Hm
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:43 -0400
-Received: by mail-pf1-x432.google.com with SMTP id c142so805536pfb.7
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:06:40 -0700 (PDT)
+ id 1kCmKC-0005xr-3V
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 12:06:29 -0400
+Received: by mail-pj1-x1030.google.com with SMTP id g6so31883pjl.0
+ for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 09:06:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=uIKhTONsxJcHP4WPV5M1NnbEZDfvPYoEbwvp1GTDwH0=;
- b=UzXAKX5F9YVWp7VQ/tMXsH6+P2hNGccXa568aEytk+jOKR98GKzxAUU3xSv64u/hBo
- TYXuJcbVO6AmWwPEd8F9sa3QN2bOECLRh7MgemWiZrhbWjzL9TO97BVojY0eex3iW6Ve
- g4NL/BQ+aOce36GJipiw1QAsS1Ye5PvkMvXLbIEbegC7L/gVLzKHjLO1Yw5kAH+MSpGQ
- /GNOEDCuhrVezcjbR30lSYgfM3FOpQ06UJOgpGeqh6Zx0i1LKRMQYMACEkRJqY6COIjs
- hdsj6saRKHMY3ghlvfmYbyL1vnYSya8kBP+FUd67x1YQdYbFglsTuIcbmlPXfZA5qAro
- nc0Q==
+ bh=haB+kLrfuYUnX1QRhCRrExdmXpWhe0msojEhc/6IfBE=;
+ b=Q+k2ihijyVPVWPtuvJ/wbicUttguv37ghqruVnOwXXEtxnNXmRf5wXaDKsvQHxvGBe
+ ggBi+2QAJo05a+m08rnNA+52jv0W9eFZHop8Z16zVPyM0v+SEcMmbtEMqALrnIFkF4X6
+ G22xvi7F7ZxL7+3EeHaKS3VDF1klgkSZraNYkoLS5217Vped4dtCT8u8aHXa03aDaXTg
+ EJ8nMng8b2KapHZEejCo3oOpDI1e7ePje6fY2nU6r5j7bg9q/vF9NQse3Uniw8EkYVZP
+ itl9Nh5/tJtX4vY9FccPck8TeRhv8YklCCESEmGNfqhfeaQ0vqo3XpspcSr15H7HOmk0
+ 1eBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=uIKhTONsxJcHP4WPV5M1NnbEZDfvPYoEbwvp1GTDwH0=;
- b=hU3k3l0eo/XsBPlDA7lSb193381HCJYJGDpGu62qZl8+ltyWLDgVQoDQhB5crK0Igt
- ABhXrcFS7pjGzvQHnm6/4rsgbz8CUkcqQacstoW2p7Kv+N5+otQUAPn/mLI1ORiEFP6B
- Fgm7V8/bEdjKFkyfTs/lKIxXOQNNI5uxv/P4/ys7macGAYbQtzMlmsU4I1Wg0k98LeC0
- q0MuQ2SbI6d3KkKVmwvGqRFwiJbsTPD1/V6G72PTKg5MYnHKR4xkYHuMgCr0L8HDyjQD
- noiSoaJhpBCKfBlAvmoSPGkyOBrqCI6n8RVE7d6cDRhImgKngyNvrKC2ZJhyHq5r8c9K
- 6xsA==
-X-Gm-Message-State: AOAM532NmKTyILsBASpj0DaBQ4kxBigGrlN2soJgXXqOKAcALf0oGnl5
- ikQDNTXLm/vsS3Nu8FCqqEtjiJ9zCrCPmA==
-X-Google-Smtp-Source: ABdhPJz3IoY5XMoh3olPx05xYnTHj2YaPGREHs+S1z6p6hHnckcuddD+g2CryCMyNdUuTZyKRyFvww==
-X-Received: by 2002:a63:1b65:: with SMTP id b37mr1815154pgm.453.1598889998794; 
- Mon, 31 Aug 2020 09:06:38 -0700 (PDT)
+ bh=haB+kLrfuYUnX1QRhCRrExdmXpWhe0msojEhc/6IfBE=;
+ b=AMZ8XWnSFxx9peKn4OzBpbpOowoi3MRnq54+HAXZrU22es73nK60JjuZGyOwsNfiGw
+ GQsjoR4M68d9erc9+1MzEK58KZUoxbsHVgg3FSa686bgqPol3RgkQ5krbAxjwYQkHCl8
+ G5gcWfCjPw12K0uSYp0JB9zJtd4Ft3F22rGuAR+MJqRqDrPYn2YhVrEed12hijpQO4Ov
+ jpkyPH23s80LVGpfyDaz023JQ+n2rv+cko3ZzFfx7kd6qRlt+RknkkeNH1VCCi3VJAJZ
+ ehOFTYY1cjT34ODEalfOt5mvBZtlOwil7VaI112r58eW1nrIT9wnE/qY2pEiPNC9xv+i
+ CXcQ==
+X-Gm-Message-State: AOAM530R8jCdFCLz1/KL7LLJt3uFOd5iYpaWkvo4OwK1cR0hJbuHnEiU
+ A7XXmH7rwL6e48jAEE2s5TCiHzt8Fxu3bg==
+X-Google-Smtp-Source: ABdhPJwhlinzqDCn05V6qfoBPN4IjdnoDHzGGPipwmfLWfR70chETlQOHTweapVJDpW3R0tX6V6gkg==
+X-Received: by 2002:a17:90a:7e15:: with SMTP id
+ i21mr57021pjl.175.1598889986167; 
+ Mon, 31 Aug 2020 09:06:26 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.06.37
+ by smtp.gmail.com with ESMTPSA id gt13sm17218pjb.43.2020.08.31.09.06.24
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 31 Aug 2020 09:06:38 -0700 (PDT)
+ Mon, 31 Aug 2020 09:06:25 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/76] target/microblaze: Use DISAS_NORETURN
-Date: Mon, 31 Aug 2020 09:05:11 -0700
-Message-Id: <20200831160601.833692-27-richard.henderson@linaro.org>
+Subject: [PULL 16/76] target/microblaze: Fix width of FSR
+Date: Mon, 31 Aug 2020 09:05:01 -0700
+Message-Id: <20200831160601.833692-17-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200831160601.833692-1-richard.henderson@linaro.org>
 References: <20200831160601.833692-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::432;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x432.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1030;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1030.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,93 +105,82 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Both exceptions and gen_goto_tb do not return.  Use the
-official DISAS_NORETURN enumerator for this case.
-This eliminates all use of DISAS_TB_JUMP.
+The exception status register is only 32-bits wide.  Do not use a
+64-bit type to represent it.  Since cpu_fsr is only used during
+MSR and MTR instructions, we can just as easily use an explicit
+load and store, so eliminate the variable.
 
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/translate.c | 17 +++++++----------
- 1 file changed, 7 insertions(+), 10 deletions(-)
+ target/microblaze/cpu.h       |  2 +-
+ target/microblaze/translate.c | 11 +++++------
+ 2 files changed, 6 insertions(+), 7 deletions(-)
 
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index aaac0c9a6c..34177f9b28 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -240,7 +240,7 @@ struct CPUMBState {
+     uint32_t msr;
+     uint64_t ear;
+     uint32_t esr;
+-    uint64_t fsr;
++    uint32_t fsr;
+     uint64_t btr;
+     uint64_t edr;
+     float_status fp_status;
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index 0c9b4ffa5a..53ca0bfb38 100644
+index f63aae6de9..3fc2feda3d 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -51,7 +51,6 @@
- /* is_jmp field values */
- #define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
- #define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
--#define DISAS_TB_JUMP DISAS_TARGET_2 /* only pc was modified statically */
- 
- static TCGv_i32 cpu_R[32];
- static TCGv_i32 cpu_pc;
-@@ -111,7 +110,7 @@ static void gen_raise_exception(DisasContext *dc, uint32_t index)
- 
-     gen_helper_raise_exception(cpu_env, tmp);
-     tcg_temp_free_i32(tmp);
--    dc->is_jmp = DISAS_UPDATE;
-+    dc->is_jmp = DISAS_NORETURN;
- }
- 
- static void gen_raise_exception_sync(DisasContext *dc, uint32_t index)
-@@ -149,6 +148,7 @@ static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
-         tcg_gen_movi_i32(cpu_pc, dest);
-         tcg_gen_exit_tb(NULL, 0);
-     }
-+    dc->is_jmp = DISAS_NORETURN;
- }
- 
- /*
-@@ -1675,7 +1675,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-                 } else if (dc->jmp == JMP_DIRECT) {
-                     t_sync_flags(dc);
-                     gen_goto_tb(dc, 0, dc->jmp_pc);
--                    dc->is_jmp = DISAS_TB_JUMP;
-                 } else if (dc->jmp == JMP_DIRECT_CC) {
-                     TCGLabel *l1 = gen_new_label();
-                     t_sync_flags(dc);
-@@ -1684,8 +1683,6 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-                     gen_goto_tb(dc, 1, dc->pc);
-                     gen_set_label(l1);
-                     gen_goto_tb(dc, 0, dc->jmp_pc);
--
--                    dc->is_jmp = DISAS_TB_JUMP;
-                 }
+@@ -59,7 +59,6 @@ static TCGv_i32 cpu_pc;
+ static TCGv_i32 cpu_msr;
+ static TCGv_i64 cpu_ear;
+ static TCGv_i32 cpu_esr;
+-static TCGv_i64 cpu_fsr;
+ static TCGv_i64 cpu_btr;
+ static TCGv_i64 cpu_edr;
+ static TCGv_i32 env_imm;
+@@ -542,7 +541,8 @@ static void dec_msr(DisasContext *dc)
+                 tcg_gen_mov_i32(cpu_esr, cpu_R[dc->ra]);
                  break;
-             }
-@@ -1717,7 +1714,9 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-     }
-     t_sync_flags(dc);
- 
--    if (unlikely(cs->singlestep_enabled)) {
-+    if (dc->is_jmp == DISAS_NORETURN) {
-+        /* nothing more to generate */
-+    } else if (unlikely(cs->singlestep_enabled)) {
-         TCGv_i32 tmp = tcg_const_i32(EXCP_DEBUG);
- 
-         if (dc->is_jmp != DISAS_JUMP) {
-@@ -1730,16 +1729,14 @@ void gen_intermediate_code(CPUState *cs, TranslationBlock *tb, int max_insns)
-             case DISAS_NEXT:
-                 gen_goto_tb(dc, 1, npc);
+             case SR_FSR:
+-                tcg_gen_extu_i32_i64(cpu_fsr, cpu_R[dc->ra]);
++                tcg_gen_st_i32(cpu_R[dc->ra],
++                               cpu_env, offsetof(CPUMBState, fsr));
                  break;
--            default:
-             case DISAS_JUMP:
-             case DISAS_UPDATE:
-                 /* indicate that the hash table must be used
-                    to find the next TB */
-                 tcg_gen_exit_tb(NULL, 0);
+             case SR_BTR:
+                 tcg_gen_extu_i32_i64(cpu_btr, cpu_R[dc->ra]);
+@@ -583,7 +583,8 @@ static void dec_msr(DisasContext *dc)
+                 tcg_gen_mov_i32(cpu_R[dc->rd], cpu_esr);
                  break;
--            case DISAS_TB_JUMP:
--                /* nothing more to generate */
--                break;
-+            default:
-+                g_assert_not_reached();
-         }
-     }
-     gen_tb_end(tb, num_insns);
+             case SR_FSR:
+-                tcg_gen_extrl_i64_i32(cpu_R[dc->rd], cpu_fsr);
++                tcg_gen_ld_i32(cpu_R[dc->rd],
++                               cpu_env, offsetof(CPUMBState, fsr));
+                 break;
+             case SR_BTR:
+                 tcg_gen_extrl_i64_i32(cpu_R[dc->rd], cpu_btr);
+@@ -1798,7 +1799,7 @@ void mb_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+     qemu_fprintf(f, "IN: PC=%x %s\n",
+                  env->pc, lookup_symbol(env->pc));
+     qemu_fprintf(f, "rmsr=%x resr=%x rear=%" PRIx64 " "
+-                 "debug=%x imm=%x iflags=%x fsr=%" PRIx64 " "
++                 "debug=%x imm=%x iflags=%x fsr=%x "
+                  "rbtr=%" PRIx64 "\n",
+                  env->msr, env->esr, env->ear,
+                  env->debug, env->imm, env->iflags, env->fsr,
+@@ -1867,8 +1868,6 @@ void mb_tcg_init(void)
+         tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, ear), "rear");
+     cpu_esr =
+         tcg_global_mem_new_i32(cpu_env, offsetof(CPUMBState, esr), "resr");
+-    cpu_fsr =
+-        tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, fsr), "rfsr");
+     cpu_btr =
+         tcg_global_mem_new_i64(cpu_env, offsetof(CPUMBState, btr), "rbtr");
+     cpu_edr =
 -- 
 2.25.1
 
