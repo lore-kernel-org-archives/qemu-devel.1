@@ -2,94 +2,90 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA6DDC433E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AE4DC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:15:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2194206F0
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:13:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00640206F0
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 08:15:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hK3/iUlr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2194206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yu8gYUN4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00640206F0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCewh-00042W-V6
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:13:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38342)
+	id 1kCey2-0004wV-4w
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 04:15:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblot.ml@gmail.com>)
- id 1kCew0-0003QD-V4
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:13:00 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45926)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <eblot.ml@gmail.com>)
- id 1kCevz-00040O-AT
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:13:00 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h15so4933752wrt.12
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 01:12:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ekJfKK+wFfDYlSJyBPkFQnu9AkCGZ4kEzzzczfNIQLI=;
- b=hK3/iUlrl1ytLBRQiOIQb2kW4QfkwtMDJ0vZu/Q/UTCgkyT0jdH30MZ60lUYN85FvH
- U3xTQtZG2Ygt8sxauhl9X9xPDWkb8e8srQG4pXmsn/+/auDileZ/K/3wTp/gBNlZ+C/O
- vIdbI6rjywWm5TYObb74BRX6uWgmLJk50veJom8YmjSnj/QeN6UxsTDhHoefbkq4TjHo
- XINHB0N0ncjsroUSHQn/feOR4NZ68muHf/K6NYCD4HRuksSxNf77plg27CPXyU4NYNuT
- /43B7RyA3scLBgBeSHTpA00KIsz+TW8NorGIi5zrJexcZfguv8B5EOmgHK2ivTJusbMw
- ZHmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=ekJfKK+wFfDYlSJyBPkFQnu9AkCGZ4kEzzzczfNIQLI=;
- b=GAVCObEw+/RwhKNqaUlyOchQRJcIXABI9OljAMN3Cpl2725FInlBtgSKP2qTbmjcej
- 5IZbT9U4quJADvYKLSVhvl+VOXWhYUiXMYoYflL9tq2mKBQHFWk7e4VO3kD80m78/gra
- HmcgINYzTZWl30RRFpPDbqrgGbtJwfWU6OKDbmxbsMfD1yt6iHH960jJzCaWpUukHAZs
- Iwo8Lzn1Dr1hWsdTTvIfDTic4woevqgJhJJ0lG+6HV6nxwO2/ETihDr0ndJuSDQa4LEb
- yJlTFGGMYu2L2UO3MV/jnPReb534C5iUTc2P5QbTRUL/yavHOQusl9qG04y5509jVM/J
- gC9Q==
-X-Gm-Message-State: AOAM533lMBQLh3NahZ87Eyxk/2ugGgzU8hlyfcgdMVCo6kd5sEBo+0wC
- R/iGRLba+AEHG1c9C9wbis0=
-X-Google-Smtp-Source: ABdhPJwM8sQ+dCJMB+khkHxWT/UGXvnGvJQVwpM/Zwk17nZdHM0LCdTDpMUD9aCHF2gpFZKegvSvqA==
-X-Received: by 2002:a5d:6caf:: with SMTP id a15mr499126wra.344.1598861576974; 
- Mon, 31 Aug 2020 01:12:56 -0700 (PDT)
-Received: from [192.168.15.15] ([195.200.173.126])
- by smtp.gmail.com with ESMTPSA id z13sm7789229wro.97.2020.08.31.01.12.56
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 31 Aug 2020 01:12:56 -0700 (PDT)
-From: "Emmanuel Blot" <eblot.ml@gmail.com>
-To: "Paolo Bonzini" <pbonzini@redhat.com>
-Subject: Re: Meson build on macOS: undefined symbol treatment
-Date: Mon, 31 Aug 2020 10:12:55 +0200
-X-Mailer: MailMate (1.13.2r5672)
-Message-ID: <764F294F-6A6F-4E1E-B8C1-5FB6D9BC9F33@gmail.com>
-In-Reply-To: <9b3f88da-ec74-96d0-41a4-8fd89b845a6f@redhat.com>
-References: <E79B1486-1C3C-4271-9B76-62B2C4B8BCA7@gmail.com>
- <24ac4d35-ff2b-4381-ab1b-1a8f31ba36fb@redhat.com>
- <9b3f88da-ec74-96d0-41a4-8fd89b845a6f@redhat.com>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kCexU-0004XC-SS
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:14:32 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40951)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kCexT-00047c-1K
+ for qemu-devel@nongnu.org; Mon, 31 Aug 2020 04:14:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598861668;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=wh/Opgl/qf+UYU2hz7A+5GnTMTC0yXbXz1du2Ay8Dc0=;
+ b=Yu8gYUN4mCkTDn8mli2uhBJmer/dWB9UwjtHzk2WVHgc9Zk8f5CtbHGFaIQ7T388k21Jm3
+ cAkmrRcNmO6RNajBc31quNDC2CIb4dWGarnt548LRUnOyzVzzxglTSs4iXqsVsvW0MX7Kl
+ IJbP+Rh9Fy//ckPXJSLHJqk2SnxYq64=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-21-opMCMtEnMP-bnen0ucfnrg-1; Mon, 31 Aug 2020 04:14:23 -0400
+X-MC-Unique: opMCMtEnMP-bnen0ucfnrg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB629640C5;
+ Mon, 31 Aug 2020 08:14:22 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-174.ams2.redhat.com [10.36.112.174])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 073D97EB68;
+ Mon, 31 Aug 2020 08:14:17 +0000 (UTC)
+Subject: Re: [PATCH 2/2] gitlab: expand test coverage for crypto builds
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200828132716.279782-1-berrange@redhat.com>
+ <20200828132716.279782-3-berrange@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <5f70db9f-e482-d144-9f24-8f90ec4d1b86@redhat.com>
+Date: Mon, 31 Aug 2020 10:14:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed; markup=markdown
+In-Reply-To: <20200828132716.279782-3-berrange@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=eblot.ml@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 03:06:35
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -22
+X-Spam_score: -2.3
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.207, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,27 +98,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?utf-8?q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Fam Zheng <fam@euphon.net>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 30 Aug 2020, at 11:35, Paolo Bonzini wrote:
+On 28/08/2020 15.27, Daniel P. Berrangé wrote:
+> Most jobs test the latest nettle library. This adds explicit coverage
+> for latest gcrypt using Fedora, and old gcrypt and nettle using
+> CentOS-7. The latter does a minimal tools-only build, as we only need to
+> validate that the crypto code builds and unit tests pass. Finally a job
+> disabling both nettle and gcrypt is provided to validate that gnutls
+> still works.
+> 
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
+>  .gitlab-ci.yml                          | 66 +++++++++++++++++++++++++
+>  tests/docker/dockerfiles/centos7.docker |  2 +
+>  tests/docker/dockerfiles/centos8.docker |  1 +
+>  3 files changed, 69 insertions(+)
 
-> This is done by "b_lundef=false".  I think it was added for modules, 
-> but
-> maybe it's not necessary.  Emmanuel, can you try removing it (line 3 
-> of
-> meson.build) and seeing if --enable-modules still works for you?
+Acked-by: Thomas Huth <thuth@redhat.com>
 
-Removing this option does restore the regular behavior on macOS (link 
-stage fails whenever some symbols are missing), and QEMU still builds ok 
-with —enable-modules option, but I have not actually tested this 
-feature - I did not know it even existed. Do you want me to test some 
-specific use cases?
-
-Thanks,
-Emmanuel.
 
