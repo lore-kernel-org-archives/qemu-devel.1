@@ -2,84 +2,124 @@ Return-Path: <SRS0=j6Zk=CJ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC512C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 17:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 730DFC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 17:43:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D42520678
-	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 17:41:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D42520678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 439F72071B
+	for <qemu-devel@archiver.kernel.org>; Mon, 31 Aug 2020 17:43:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439F72071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCnoJ-0002So-ID
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 13:41:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56364)
+	id 1kCnqO-000478-G7
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 13:43:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kCnnW-0001zh-Ry
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 13:40:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42390)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kCnnU-0000bG-Mt
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 13:40:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kCnnS-0001Dl-Eb
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 17:40:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 5E8BD2E80EA
- for <qemu-devel@nongnu.org>; Mon, 31 Aug 2020 17:40:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kCnpe-0003HE-0Z; Mon, 31 Aug 2020 13:43:02 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:33631)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kCnpc-0000np-8G; Mon, 31 Aug 2020 13:43:01 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MjSDU-1ktG7y2Mgs-00kxJ2; Mon, 31 Aug 2020 19:42:52 +0200
+Subject: Re: [PATCH] hw/register: Document register_init_block @memory_size
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200707062308.4531-1-f4bug@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <b9f49023-a053-cbee-62be-f57ad28fa142@vivier.eu>
+Date: Mon, 31 Aug 2020 19:42:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 31 Aug 2020 17:30:14 -0000
-From: Laurent Vivier <1893667@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug: distribution=fedora; sourcepackage=qemu; component=None;
- status=Unknown; importance=Unknown; assignee=None; 
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: ngompa13
-X-Launchpad-Bug-Reporter: Neal Gompa (ngompa13)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <159888546236.27779.1997908478541755158.malonedeb@soybean.canonical.com>
-Message-Id: <159889501524.20713.11983792409938870447.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1893667] Re: Btrfs commands don't work when using user-space
- emulation of other architectures
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
-X-Launchpad-Hash: d96960996e6eab668e3a8b61efcd6086b405891c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 13:40:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200707062308.4531-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:HDrh5F6+mhvVWi8tyH0DhT5qwO0JIz4m7PMqErvQ41nYt8q2hlB
+ RvbX3O//tMVN/Rthr9DcXqiX9zHGJ4JJ9VWf06uEDCqjgLTNA57G2Kew1iQjVjFKyZNZulO
+ klHUo1qO+QO3aB99qlPaFRWdAkkgDZGxopybjcMakm15tdO4ehxYdzSkx2VwrR5vvuV6JQ7
+ 59En9HMccXCoCzGqCZbWQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Bx6sb7OJHFI=:uze4XOkk0JcE+GSCkjDBcX
+ BYBRpOyxe9pmZubgMgiaU6vWp/Qt/H2saXxD3azax1GsARHjfSfoH2Ob4nPwdoUzoCjh3wRZM
+ KwyYh7U4hprVfQY0yox7f8BNiHPwPd6VRCTl41BBq11DDkFPfgT8UGL5YpW5GcKPr/Styra6M
+ 0OCGE9E4/gDZRT3mCXj0T6Wfuzdfo4di/bJPJK0Mw2AVWs5ZCRlNIwdK4x0cHNyvbJ9Ld+0b/
+ VkFiUXESo0pxwfesRNFRLpPNocefijvKKFYACkPVqQQK4dw6ju7HUKWKJqUwCQbo3yzB8gLH1
+ etnV+pavCcmLDCixYcsDJS+Nj8KlsLfnurBrAUo9r9XfuDN/Mg1+ENesPStsnHQdBEFfcAb8H
+ hLh2V7Z0y+9wbEIqPIS5xs4mdmimAV3H/Xj3LaVRjCvbqZwXcjIn9XR/xU8ZYVgOC1FEeFT8L
+ 9U2riUWGUGLpid08BPC70WVJ7z1PLDbyOLA9y8TM2G70VbG4bCqn/VsoENfGQzbpudAoCjB3+
+ Eh8/H3FQise1KYbA2gsIOVvT4NVAG8guqdr2olnyY2PJvV04PsruMcxCPF3sq7DwvTmPjO4DP
+ j+fMFOorAG6RF4BLCWcOepHMrk7kitunHma4svgoYTsRdRoVvHUZ5ONFi6BBqRjF2tnbHUhba
+ UPQW7AqAq1msTxoFMsGcSYJA5IijCISfBdsc+95UdJAINceMGuBwoG5cFrUcEAfweDmlxUVNG
+ L0wIBD8y23QjPdVH2HsBfLVYVk/Xjg2nIIPViwPXaceOFLEAOHi16kKpvfBndpWJXggPfT2/+
+ L+Mut1S6EtZRSo6kPUBpkRJ6EGuhPCeKx2W1Ih+ia7jY+KyDtirOihkGp2+BfYeUlx67Ngi
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 13:42:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -88,69 +128,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1893667 <1893667@bugs.launchpad.net>
+Cc: qemu-trivial@nongnu.org, Alistair Francis <alistair@alistair23.me>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> In Progress
+Le 07/07/2020 à 08:23, Philippe Mathieu-Daudé a écrit :
+> Document the 'memory_size' argument of register_init_block().
+> 
+> Fixes: a74229597e ("register: Add block initialise helper")
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  include/hw/register.h | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/include/hw/register.h b/include/hw/register.h
+> index 5d2c565ae0..fdac5e69b5 100644
+> --- a/include/hw/register.h
+> +++ b/include/hw/register.h
+> @@ -181,6 +181,7 @@ uint64_t register_read_memory(void *opaque, hwaddr addr, unsigned size);
+>   * @data: Array to use for register data, must already be allocated
+>   * @ops: Memory region ops to access registers.
+>   * @debug enabled: turn on/off verbose debug information
+> + * @memory_size: Size of the memory region
+>   * returns: A structure containing all of the registers and an initialized
+>   *          memory region (r_array->mem) the caller should add to a container.
+>   */
+> 
 
-** Tags added: linux-user
+Applied to my trivial-patches branch.
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1893667
-
-Title:
-  Btrfs commands don't work when using user-space emulation of other
-  architectures
-
-Status in QEMU:
-  In Progress
-Status in qemu package in Fedora:
-  Unknown
-
-Bug description:
-  Description of problem:
-  When doing cross-arch builds with mock, it uses qemu-user-static under th=
-e hood, and qemu-user-static lacks support for Btrfs ioctls to emulate so t=
-hat btrfs(8) commands work correctly.
-
-  This is especially important for being able to do cross-arch image
-  builds.
-
-  How reproducible:
-  Always (on Fedora 33 with qemu-5.1.0-2.fc33)
-
-  Steps to Reproduce:
-
-  $ sudo dnf install mock qemu-user-static wget
-  $ sudo usermod -a -G mock $USER
-  $ newgrp mock
-  $ mock --root fedora-rawhide-armhfp --install btrfs-progs util-linux
-  $ mock --root fedora-rawhide-armhfp --chroot 'rm -f foo.img && dd if=3D/d=
-ev/zero of=3Dfoo.img bs=3D1G count=3D1 && losetup /dev/loop9 foo.img &&  mk=
-fs.btrfs /dev/loop9 && mkdir /foo && mount /dev/loop9 /foo && btrfs subvol =
-create /foo/subvol && umount /foo && losetup -d /dev/loop9'
-
-  =
-
-  Actual results:
-  Fails with errors like "ERROR: cannot create subvolume: Function not impl=
-emented"
-
-  Expected results:
-  Succeeds and creates subvolumes properly.
-
-  Additional info:
-  There is a patch series from a few days ago to add support for many btrfs=
- ioctls which could fix this...
-
-  https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg05594.html
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1893667/+subscriptions
+Thanks,
+Laurent
 
