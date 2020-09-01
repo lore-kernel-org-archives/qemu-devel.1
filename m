@@ -2,122 +2,77 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CF75C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68A37C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:16:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD7BB206EB
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:14:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD7BB206EB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 2E00A206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:16:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E00A206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3JP-0007L3-SB
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:14:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47574)
+	id 1kD3Ky-0000RS-A4
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:16:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD3Bq-00038K-CH; Tue, 01 Sep 2020 06:06:58 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:34161)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD3Bo-0005Vv-Fh; Tue, 01 Sep 2020 06:06:58 -0400
-Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1McGxG-1kj4cT4BES-00cjlf; Tue, 01 Sep 2020 12:06:46 +0200
-Subject: Re: [PATCH v3 10/10] hw/display/vga:Remove redundant statement in
- vga_draw_graphic()
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20200827110311.164316-1-kuhn.chenqun@huawei.com>
- <20200827110311.164316-11-kuhn.chenqun@huawei.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <61577913-6317-bbb4-f405-1857ef477c9e@vivier.eu>
-Date: Tue, 1 Sep 2020 12:06:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kD3Jn-0007vj-2r
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:15:11 -0400
+Received: from mail-ed1-f65.google.com ([209.85.208.65]:46746)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kD3Jl-0006W0-Bw
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:15:10 -0400
+Received: by mail-ed1-f65.google.com with SMTP id a12so863946eds.13
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 03:15:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fsHn0y7UM6Va67V0qG3UBaiJqnO2aKr95wGq6fE4alk=;
+ b=UYhdc1WEDznilZ29Bq4/e/H53GQ9n5TTooU3AnX7eNQB9YYqg0UlmX6cv9Zk+tTMtt
+ L1U2OqoKqH33Zk8MUmXblQ2vJMgXz5E05c4sleEIziAun5BpOmgL1e5w70fOyC60lbMA
+ 3DXlTXIKTFcmG/r6mAdc6yprwJ/gEl1iCG7e0GkyLZg+UcVTC9DpnOwTDZPEANRTM/f4
+ tSRuhCcK4ho8lWvjmkMzsc6foAfQhkuv7PA/zXyaMJ3GDyV2jIrANf1MQbpm+UUsup9W
+ nav+SjjqwrvBAAueo8h0mr97FlJj7OE+Ih9BAE7tNXkhKPe0jcxkz92l4G/Cmgk+TZme
+ XnwQ==
+X-Gm-Message-State: AOAM533dX0Q1g+S9prnKN1ZJlAI7JCEcxjrsiUiCqKA5wwVcmUbqq1mf
+ +f8EgUV10zC5T+wPJb0QYkDYjCRZV+FzLcO2quw=
+X-Google-Smtp-Source: ABdhPJx/CPcrK7kVEmoRVCB2B5ETs9OeZrl8Nc7VlAnjgy0oLjg53D1Ciqz7YuDOMf5X8AjSNsddeg+31u5QNr4rcrA=
+X-Received: by 2002:a05:6402:1641:: with SMTP id
+ s1mr1159227edx.66.1598955307860; 
+ Tue, 01 Sep 2020 03:15:07 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200827110311.164316-11-kuhn.chenqun@huawei.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:KKifPMZ4DxHU8rdd9Gh2jsYTsrgDZ0KglrfVYl8Ly1OUeVjkE2r
- 7vVDPpzz88NnG49FJuDC5pe387m0FnypxwE5k2teaDo2aRCTEIxHC1MV9AEqIPMywPdMaQf
- lVK695qF4Wj3hZLu1qqG9pl/26sphHwv2TB2GpLVtXMTMIFZBYnvM/WiYXjF7clWvYVTpaT
- bQlGE/agHELiVAIUkYqdQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:F9EtzihvaWk=:x6+9wPMOIhIBQAutaPQpBh
- T+D8N5RQSQBilR1t932SVTAlu6bXPQiMXwfZbhXflmVff5j4dkAzOcC2upG/LiB8RHvWMv+RV
- 5Ay2BmYwf++zivII4eiNeSi6OS2vqEz+0fGOubbiMmXEKD4v5wwpd4G+PrueXFf/e+UiGSu0M
- 9Fo9mdYKD8bNsS7T4H+n/TTMMo+Y8coSYQ6w5aF/gOU9xpJTKuDIggs4u8fm4G4yyNNkumq/z
- JaDmqhE/FXeeujrk5EYER1oMU/vn4QqpqQlgLT+JVeu07K+GMum9lmuZIHmnVY7BUrrlz1aRS
- AK3MuNxT7tSmwyVHl0MkHwhUWp4r1i+gkdheWpDEkwSboBhCy3ZFgRTpg+8oBO20h8DWAm+t5
- myFbpix5ppIEmEk+2h9yOXDthHdKOB0Jm3ar+BoTNjVkhcQ9izgUUskqGGqeIrOWVEbQ1JDRd
- EiEHGp5PV0jzGKysIdAAvUahggxIaGb+jq9p4LgzSb4ESWglp4zOy4VnSbCs79iZ/SdsQdpig
- oXqE9gaO+4poOzl/u+SXnLLJdJmdGiTOHdLQkh0axiXsg9etebxvzc7STCzW3zdGnIFZWoL8p
- MmOGOoRL3GnRAub4TyLGFY4QLUMqEsyalbdxhSn9z216b0wU8KpYTzpwapOkXXtjJs1Cx9HjP
- BAk7MefQvizzRrdw80KWjlUJRxfRX5FVqLhC0Iv1c/TdzIN4xzeg7vDDBjKIJksuqtYT5lYuu
- slUX3xVjJhGsGIqmQdAElUG5NU5Vyz7gPR13k6JIGO4gJz9kikFc2ZCDDA/7epRYEubk1kJhR
- I7QQ+U1yEWD5qdOX0AZwPTDGpaOqxpnVLTZs4KNmYI/whzP1pnWclZNBGhPTCaqzukLIcLV
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:06:41
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+References: <20200827210920.111611-1-sw@weilnetz.de>
+ <CAAdtpL5wdBnXO8NqArE0Fgad8EU7bXTKc83daQo4kfHW=8XvHQ@mail.gmail.com>
+In-Reply-To: <CAAdtpL5wdBnXO8NqArE0Fgad8EU7bXTKc83daQo4kfHW=8XvHQ@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Date: Tue, 1 Sep 2020 12:14:56 +0200
+Message-ID: <CAAdtpL6itteQJqgVL0irWki=EYHUT_tGwaNtES3Bk4WbJ=43xg@mail.gmail.com>
+Subject: Re: [PATCH] libvhost-user: Add GCC_FMT_ATTR and fix format string
+To: Stefan Weil <sw@weilnetz.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=209.85.208.65;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-f65.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 06:15:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,46 +85,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Qiang <liq3ea@gmail.com>, Euler Robot <euler.robot@huawei.com>,
- pannengyuan@huawei.com, zhang.zhanghailiang@huawei.com,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 27/08/2020 à 13:03, Chen Qun a écrit :
-> Clang static code analyzer show warning:
-> hw/display/vga.c:1677:9: warning: Value stored to 'update' is never read
->         update = full_update;
->         ^        ~~~~~~~~~~~
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reviewed-by: Li Qiang <liq3ea@gmail.com>
-> ---
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> ---
->  hw/display/vga.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/hw/display/vga.c b/hw/display/vga.c
-> index 061fd9ab8f..836ad50c7b 100644
-> --- a/hw/display/vga.c
-> +++ b/hw/display/vga.c
-> @@ -1674,7 +1674,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
->          if (!(s->cr[VGA_CRTC_MODE] & 2)) {
->              addr = (addr & ~0x8000) | ((y1 & 2) << 14);
->          }
-> -        update = full_update;
->          page0 = addr & s->vbe_size_mask;
->          page1 = (addr + bwidth - 1) & s->vbe_size_mask;
->          if (full_update) {
-> 
+On Mon, Aug 31, 2020 at 9:52 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+>
+> Le jeu. 27 ao=C3=BBt 2020 23:09, Stefan Weil <sw@weilnetz.de> a =C3=A9cri=
+t :
+>>
+>> Signed-off-by: Stefan Weil <sw@weilnetz.de>
+>> ---
+>>  contrib/libvhost-user/libvhost-user.c | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-us=
+er/libvhost-user.c
+>> index 53f16bdf08..ff7ac876f4 100644
+>> --- a/contrib/libvhost-user/libvhost-user.c
+>> +++ b/contrib/libvhost-user/libvhost-user.c
+>> @@ -151,7 +151,7 @@ vu_request_to_string(unsigned int req)
+>>      }
+>>  }
+>>
+>> -static void
+>> +static void GCC_FMT_ATTR(2, 3)
+>>  vu_panic(VuDev *dev, const char *msg, ...)
+>>  {
+>>      char *buf =3D NULL;
+>> @@ -643,7 +643,7 @@ generate_faults(VuDev *dev) {
+>>
+>>          if (ioctl(dev->postcopy_ufd, UFFDIO_REGISTER, &reg_struct)) {
+>>              vu_panic(dev, "%s: Failed to userfault region %d "
+>> -                          "@%p + size:%zx offset: %zx: (ufd=3D%d)%s\n",
+>> +                          "@%016"PRIx64" + size:%zx offset: %zx: (ufd=
+=3D%d)%s\n",
+>
+>
+> I thought I had fixed this last month, but I don't have my email backlog,
 
-Applied to my trivial-patches branch.
+Ah not it was you =3D) I remember having looked at it.
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg724900.html
 
-Thanks,
-Laurent
-
+> so:
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+>
+>>                       __func__, i,
+>>                       dev_region->mmap_addr,
+>>                       dev_region->size, dev_region->mmap_offset,
+>> --
+>> 2.28.0
+>>
+>>
 
