@@ -2,96 +2,97 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C958C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:37:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B6FAC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:39:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9F57206FA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:37:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A4F7206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:39:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MgMj3uoh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9F57206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aHhNUSQw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A4F7206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3ey-0002lw-1N
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:37:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55826)
+	id 1kD3hK-0003sQ-2d
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:39:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kD3dd-0001aQ-AY
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:35:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59533)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kD3da-00019L-G3
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:35:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598956537;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NAY2/a4Y2AatabFuDDgQnzty8VmSqaLTTQonY/KTgS0=;
- b=MgMj3uohXEI1jNim4JsPzMPmSlXh4sfGhPtq6fzXzTVA3XF10ICRQ6/MdHGa/MdCNkortd
- lhRzzEFJ3E1erL8V6+BPajDc817sEzIHEQkaW3mNfdHIE7rvWDOCeW5J5/2mBOM1LU48XD
- R6RdNWuFz6VnOG2EQkxjjLa7CUPEWRA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-NLPAEgT5PKKjwhfiij6cDw-1; Tue, 01 Sep 2020 06:35:33 -0400
-X-MC-Unique: NLPAEgT5PKKjwhfiij6cDw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BAAC6425CF;
- Tue,  1 Sep 2020 10:35:32 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
- [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A04BC5C1A3;
- Tue,  1 Sep 2020 10:35:29 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 07A8E113C418; Tue,  1 Sep 2020 12:35:28 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH 0/5] Introduce 'yank' oob qmp command to recover from
- hanging qemu
-References: <cover.1589193717.git.lukasstraub2@web.de>
- <20200511114947.GJ1135885@redhat.com> <20200511120718.GD2811@work-vm>
- <20200511121714.GL1135885@redhat.com> <20200511154645.GI2811@work-vm>
- <20200512113206.62836e44@luklap> <20200512094337.GK1191162@redhat.com>
- <20200513103245.GD6202@linux.fritz.box>
- <20200513105359.GF3225@work-vm>
- <20200513111320.GE6202@linux.fritz.box>
-Date: Tue, 01 Sep 2020 12:35:28 +0200
-In-Reply-To: <20200513111320.GE6202@linux.fritz.box> (Kevin Wolf's message of
- "Wed, 13 May 2020 13:13:20 +0200")
-Message-ID: <87blip3hu7.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kD3gY-0003QE-VH
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:38:43 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44987)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kD3gW-0001S7-B3
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:38:42 -0400
+Received: by mail-wr1-x444.google.com with SMTP id c15so927362wrs.11
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 03:38:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=VKLlypz5dyUSFmj71mZfu5hbHwWvT6qYT7KdZQ6x5Lk=;
+ b=aHhNUSQwOfv+M2z2EbZMaa2VPWaTVE25rZU2r0vpTO4laTMeq1mMJza9YeqFFpzhIq
+ qypvZLNxR9UsyDeQmbOV9+3XT7csp33tl6coIdCtSUioUX2wk4dd4Wp5XniPbfeaLlJc
+ 2mLslOt9pSBPECCwETccOqJX3Ed6cC0xCf3cN0xWmWIb6dJrq9OB0Iuezu0+K8TCGvP/
+ 2vGwnw7022+We/Z/tGGsa3Ztx9SQ/uGL/tJsHLqVnRMV+4DfgHQWv7v33SobPwPeTWEy
+ QWd0ad/Q6GtaWt0Ezzo4nzYdZdPlS0J6YnJJ7AHDb+7SWule6SUvkCoFN55htV5AlB7K
+ EHhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=VKLlypz5dyUSFmj71mZfu5hbHwWvT6qYT7KdZQ6x5Lk=;
+ b=E1ZiQHIHKCJCKypt+4rFPm6dqn5I94x1ulNFaKtWhEXh5OX7iF3xNg8tuZpzH09QA7
+ uxZqz6MLrOUksrACqW3dsiWPxYpNswDNhuEomqLgVR1fFs/H3x3RZpqrXCqZQZTtYxJC
+ RVoCXsQ+iZf8fs0+HwhKKPth8BVfn/qUnnxQxzOjn8UrzSPGEoV5Yrw1ajAJhW/0yIv3
+ MKFT0Co2G7gTgZKZlqaHiAXgKFL1xrCLc6GUliSlAachDFUNYCkoplrLL/2pVPLhOZS0
+ K3w6R7mSlmyDGMiujJTVGHgBoVcl0jTZVsftfT7jiTv77LdgFXSHVcl9HYODBL4R6xn9
+ JNEA==
+X-Gm-Message-State: AOAM531wzCz5twPsBeVG3dD6lBvp4z4dxbHz3GU4vbXM4APXcHl/oXUx
+ 5LtRv+CBexq2QMMuJknGximy8A==
+X-Google-Smtp-Source: ABdhPJz1ls2UxmQUF0v5T/524B4RIoPivkRPPnhb/xrRXMGDmcM8c22eSL62nF1XNFvXYY43CuAFCQ==
+X-Received: by 2002:adf:9e8b:: with SMTP id a11mr1131835wrf.309.1598956718500; 
+ Tue, 01 Sep 2020 03:38:38 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id a83sm1259313wmh.48.2020.09.01.03.38.37
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 03:38:37 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id AD0881FF7E;
+ Tue,  1 Sep 2020 11:38:36 +0100 (BST)
+References: <20200901072201.7133-1-cfontana@suse.de>
+ <20200901072201.7133-4-cfontana@suse.de>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [PATCH v6 03/16] cpus: prepare new CpusAccel cpu accelerator
+ interface
+In-reply-to: <20200901072201.7133-4-cfontana@suse.de>
+Date: Tue, 01 Sep 2020 11:38:36 +0100
+Message-ID: <87k0xd6atv.fsf@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,184 +105,302 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Lukas Straub <lukasstraub2@web.de>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, haxm-team@intel.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
+ Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
 
-> Am 13.05.2020 um 12:53 hat Dr. David Alan Gilbert geschrieben:
->> * Kevin Wolf (kwolf@redhat.com) wrote:
->> > Am 12.05.2020 um 11:43 hat Daniel P. Berrang=C3=83=C6=92=C3=82=C2=A9 g=
-eschrieben:
->> > > On Tue, May 12, 2020 at 11:32:06AM +0200, Lukas Straub wrote:
->> > > > On Mon, 11 May 2020 16:46:45 +0100
->> > > > "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
->> > > >=20
->> > > > > * Daniel P. Berrang=C3=83=C6=92=C3=86=E2=80=99=C3=83=E2=80=9A=C3=
-=82=C2=A9 (berrange@redhat.com) wrote:=20
->> > > > > > ...
->> > > > > > That way if QEMU does get stuck, you can start by tearing down=
- the
->> > > > > > least distruptive channel. eg try tearing down the migration c=
-onnection
->> > > > > > first (which shouldn't negatively impact the guest), and only =
-if that
->> > > > > > doesn't work then, move on to tear down the NBD connection (wh=
-ich risks
->> > > > > > data loss) =20
->> > > > >=20
->> > > > > I wonder if a different way would be to make all network connect=
-ions
->> > > > > register with yank, but then make yank take a list of connection=
-s to
->> > > > > shutdown(2).
->> > > >=20
->> > > > Good Idea. We could name the connections (/yank callbacks) in the
->> > > > form "nbd:<node-name>", "chardev:<chardev-name>" and "migration"
->> > > > (and add "netdev:...", etc. in the future). Then make yank take a
->> > > > list of connection names as you suggest and silently ignore connec=
-tions
->> > > > that don't exist. And maybe even add a 'query-yank' oob command re=
-turning
->> > > > a list of registered connections so the management application can=
- do
->> > > > pattern matching if it wants.
-[...]
->> > > Yes, that would make the yank command much more flexible in how it c=
-an
->> > > be used.
->> > >=20
->> > > As an alternative to using formatted strings like this, it could be
->> > > modelled more explicitly in QAPI
->> > >=20
->> > >   { 'struct':  'YankChannels',
->> > >     'data': { 'chardev': [ 'string' ],
->> > >               'nbd': ['string'],
->> > > =09      'migration': bool } }
->> > >=20
->> > > In this example, 'chardev' would accept a list of chardev IDs which
->> > > have it enabled, 'nbd' would accept a list of block node IDs which
->> > > have it enabled, and migration is a singleton on/off.
->> >=20
->> > Of course, it also means that the yank code needs to know about every
->> > single object that supports the operation, whereas if you only have
->> > strings, the objects could keep registering their connection with a
->> > generic function like yank_register_function() in this version.
->> >=20
->> > I'm not sure if the additional complexity is worth the benefits.
->>=20
->> I tend to agree; although we do have to ensure we either use an existing
->> naming scheme (e.g. QOM object names?) or make sure we've got a well
->> defined list of prefixes.
+Claudio Fontana <cfontana@suse.de> writes:
+
+> The new interface starts unused, will start being used by the
+> next patches.
 >
-> Not everything that has a network connection is a QOM object (in fact,
-> neither migration nor chardev nor nbd are QOM objects).
+> It provides methods for each accelerator to start a vcpu, kick a vcpu,
+> synchronize state, get cpu virtual clock and elapsed ticks.
 >
-> I guess it would be nice to have a single namespace for everything in
-> QEMU, but the reality is that we have a few separate ones. As long as we
-> consistently add a prefix that identifies the namespace in question, I
-> think that would work.
+> In qemu_wait_io_event, make it clear that APC is used only for HAX
+> on Windows.
 >
-> This means that if we're using node-name to identify the NBD connection,
-> the namespace should be 'block' rather than 'nbd'.
->
-> One more thing to consider is, what if a single object has multiple
-> connections? In the case of node-names, we have a limited set of allowed
-> characters, so we can use one of the remaining characters as a separator
-> and then suffix a counter. In other places, the identifier isn't
-> restricted, so suffixing doesn't work. Maybe prefixing does, but it
-> would have to be there from the beginning then.
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+<snip>
+>=20=20
+>      /* signal CPU creation */
+> -    cpu->created =3D true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>=20=20
+>      do {
+> @@ -482,8 +582,7 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>=20=20
+>      qemu_kvm_destroy_vcpu(cpu);
+> -    cpu->created =3D false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_destroyed(cpu);
+>      qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
+> @@ -511,8 +610,7 @@ static void *qemu_dummy_cpu_thread_fn(void *arg)
+>      sigaddset(&waitset, SIG_IPI);
+>=20=20
+>      /* signal CPU creation */
+> -    cpu->created =3D true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>=20=20
+>      do {
+> @@ -660,8 +758,7 @@ static void deal_with_unplugged_cpus(void)
+>      CPU_FOREACH(cpu) {
+>          if (cpu->unplug && !cpu_can_run(cpu)) {
+>              qemu_tcg_destroy_vcpu(cpu);
+> -            cpu->created =3D false;
+> -            qemu_cond_signal(&qemu_cpu_cond);
+> +            cpu_thread_signal_destroyed(cpu);
+>              break;
+>          }
+>      }
+> @@ -688,9 +785,8 @@ static void *qemu_tcg_rr_cpu_thread_fn(void *arg)
+>      qemu_thread_get_self(cpu->thread);
+>=20=20
+>      cpu->thread_id =3D qemu_get_thread_id();
+> -    cpu->created =3D true;
+>      cpu->can_do_io =3D 1;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>=20=20
+>      /* wait for initial kick-off after machine start */
+> @@ -800,11 +896,9 @@ static void *qemu_hax_cpu_thread_fn(void *arg)
+>      qemu_thread_get_self(cpu->thread);
+>=20=20
+>      cpu->thread_id =3D qemu_get_thread_id();
+> -    cpu->created =3D true;
+>      current_cpu =3D cpu;
+> -
+>      hax_init_vcpu(cpu);
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>=20=20
+>      do {
+> @@ -843,8 +937,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>      hvf_init_vcpu(cpu);
+>=20=20
+>      /* signal CPU creation */
+> -    cpu->created =3D true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>=20=20
+>      do {
+> @@ -858,8 +951,7 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>=20=20
+>      hvf_vcpu_destroy(cpu);
+> -    cpu->created =3D false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_destroyed(cpu);
+>      qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
+> @@ -884,8 +976,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+>      }
+>=20=20
+>      /* signal CPU creation */
+> -    cpu->created =3D true;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>=20=20
+>      do {
+> @@ -902,8 +993,7 @@ static void *qemu_whpx_cpu_thread_fn(void *arg)
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>=20=20
+>      whpx_destroy_vcpu(cpu);
+> -    cpu->created =3D false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_destroyed(cpu);
+>      qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
+> @@ -936,10 +1026,9 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>      qemu_thread_get_self(cpu->thread);
+>=20=20
+>      cpu->thread_id =3D qemu_get_thread_id();
+> -    cpu->created =3D true;
+>      cpu->can_do_io =3D 1;
+>      current_cpu =3D cpu;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
+>=20=20
+>      /* process any pending work */
+> @@ -980,14 +1069,13 @@ static void *qemu_tcg_cpu_thread_fn(void *arg)
+>      } while (!cpu->unplug || cpu_can_run(cpu));
+>=20=20
+>      qemu_tcg_destroy_vcpu(cpu);
+> -    cpu->created =3D false;
+> -    qemu_cond_signal(&qemu_cpu_cond);
+> +    cpu_thread_signal_destroyed(cpu);
+>      qemu_mutex_unlock_iothread();
+>      rcu_unregister_thread();
+>      return NULL;
 
-If I understand it correctly, the argument for encoding the structured
-"what to yank" information into a string is ease of implementation.  The
-yank core sees only strings, and doesn't care about their contents.
-Code registering "yankables" can build strings however it likes, as long
-as they're all distinct.  QMP clients need to understand how the strings
-are built to be able to yank specific "yankables" (as opposed to blindly
-yanking stuff until QEMU gets unstuck").
+I suspect this clean-up could be a separate patch.
 
-I disagree with this argument for a number of reasons.
+<snip>
+>=20=20
+> +/* signal CPU creation */
+> +void cpu_thread_signal_created(CPUState *cpu)
+> +{
+> +    cpu->created =3D true;
+> +    qemu_cond_signal(&qemu_cpu_cond);
+> +}
+> +
+> +/* signal CPU destruction */
+> +void cpu_thread_signal_destroyed(CPUState *cpu)
+> +{
+> +    cpu->created =3D false;
+> +    qemu_cond_signal(&qemu_cpu_cond);
+> +}
+> +
+> +
+>  static bool all_vcpus_paused(void)
+>  {
+>      CPUState *cpu;
+> @@ -1163,9 +1269,6 @@ void cpu_remove_sync(CPUState *cpu)
+>      qemu_mutex_lock_iothread();
+>  }
+>=20=20
+> -/* For temporary buffers for forming a name */
+> -#define VCPU_THREAD_NAME_SIZE 16
+> -
 
-1. Use of strings doesn't reduce complexity, it moves it.
+Lets kill this rather than move it around. The thread functions could
+more cleanly do:
 
-   String:
+    g_autoptr(GString) thread_name =3D g_string_new(NULL);
+    ...
+    g_string_printf(thread_name, "CPU %d/DUMMY", cpu->cpu_index);
+    qemu_thread_create(..., thread_name->str, ...);
 
-   * QMP clients may need to parse the strings they get back from
-     command query-yank intro structured data.
 
-   * QMP clients may need to format structured data into a string for
-     command yank.
+>  static void qemu_tcg_init_vcpu(CPUState *cpu)
+>  {
+>      char thread_name[VCPU_THREAD_NAME_SIZE];
+> @@ -1286,6 +1389,13 @@ static void qemu_whpx_start_vcpu(CPUState *cpu)
+>  #endif
+>  }
+>=20=20
+> +void cpus_register_accel(const CpusAccel *ca)
+> +{
+> +    assert(ca !=3D NULL);
+> +    assert(ca->create_vcpu_thread !=3D NULL); /* mandatory */
+> +    cpus_accel =3D ca;
+> +}
+> +
+>  static void qemu_dummy_start_vcpu(CPUState *cpu)
+>  {
+>      char thread_name[VCPU_THREAD_NAME_SIZE];
+> @@ -1316,7 +1426,10 @@ void qemu_init_vcpu(CPUState *cpu)
+>          cpu_address_space_init(cpu, 0, "cpu-memory", cpu->memory);
+>      }
+>=20=20
+> -    if (kvm_enabled()) {
+> +    if (cpus_accel) {
+> +        /* accelerator already implements the CpusAccel interface */
+> +        cpus_accel->create_vcpu_thread(cpu);
+> +    } else if (kvm_enabled()) {
+>          qemu_kvm_start_vcpu(cpu);
+>      } else if (hax_enabled()) {
+>          qemu_hax_start_vcpu(cpu);
+> diff --git a/stubs/cpu-synchronize-state.c b/stubs/cpu-synchronize-state.c
+> new file mode 100644
+> index 0000000000..d9211da66c
+> --- /dev/null
+> +++ b/stubs/cpu-synchronize-state.c
+> @@ -0,0 +1,9 @@
+> +#include "qemu/osdep.h"
+> +#include "sysemu/hw_accel.h"
+> +
+> +void cpu_synchronize_state(CPUState *cpu)
+> +{
+> +}
+> +void cpu_synchronize_post_init(CPUState *cpu)
+> +{
+> +}
+> diff --git a/stubs/cpus-get-virtual-clock.c b/stubs/cpus-get-virtual-cloc=
+k.c
+> new file mode 100644
+> index 0000000000..fd447d53f3
+> --- /dev/null
+> +++ b/stubs/cpus-get-virtual-clock.c
+> @@ -0,0 +1,8 @@
+> +#include "qemu/osdep.h"
+> +#include "sysemu/cpu-timers.h"
+> +#include "qemu/main-loop.h"
+> +
+> +int64_t cpus_get_virtual_clock(void)
+> +{
+> +    return cpu_get_clock();
+> +}
+> diff --git a/stubs/meson.build b/stubs/meson.build
+> index 57fec4f8c8..54d4a3f6d4 100644
+> --- a/stubs/meson.build
+> +++ b/stubs/meson.build
+> @@ -5,6 +5,7 @@ stub_ss.add(files('blockdev-close-all-bdrv-states.c'))
+>  stub_ss.add(files('change-state-handler.c'))
+>  stub_ss.add(files('cmos.c'))
+>  stub_ss.add(files('cpu-get-clock.c'))
+> +stub_ss.add(files('cpus-get-virtual-clock.c'))
+>  stub_ss.add(files('qemu-timer-notify-cb.c'))
+>  stub_ss.add(files('icount.c'))
+>  stub_ss.add(files('dump.c'))
+> @@ -45,6 +46,7 @@ stub_ss.add(files('vmgenid.c'))
+>  stub_ss.add(files('vmstate.c'))
+>  stub_ss.add(files('vm-stop.c'))
+>  stub_ss.add(files('win32-kbd-hook.c'))
+> +stub_ss.add(files('cpu-synchronize-state.c'))
+>  if have_system
+>    stub_ss.add(files('semihost.c'))
+>  endif
+> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+> index db51e68f25..50b325c65b 100644
+> --- a/util/qemu-timer.c
+> +++ b/util/qemu-timer.c
+> @@ -635,13 +635,7 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
+>          return get_clock();
+>      default:
+>      case QEMU_CLOCK_VIRTUAL:
+> -        if (icount_enabled()) {
+> -            return icount_get();
+> -        } else if (qtest_enabled()) { /* for qtest_clock_warp */
+> -            return qtest_get_virtual_clock();
+> -        } else {
+> -            return cpu_get_clock();
+> -        }
+> +        return cpus_get_virtual_clock();
+>      case QEMU_CLOCK_HOST:
+>          return REPLAY_CLOCK(REPLAY_CLOCK_HOST, get_clock_realtime());
+>      case QEMU_CLOCK_VIRTUAL_RT:
 
-   * How structured data is be parsed from / formatted to a string is
-     part of the external interface, and needs to be documented, in
-     addition to the data structure.
+Otherwise:
 
-   * The strings need to be kept backward compatible.  We could
-     inadvertently create problems like the one you described above,
-     where a format like UNIQUE-PREFIX:ID with an unrestricted ID is not
-     extensible.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-   * Code providing "yankables" needs to somehow ensure their strings
-     are distinct.
-
-   Complex type:
-
-   * The result of query-yank is already structured data, no need for
-     QMP clients to parse.
-
-   * The argument of yank is structured data, no need to for QMP clients
-     to format it into a string first.
-
-   * Documenting just the data structure suffices.
-
-   * Backward compatibility of complex QMP types is a well-understood
-     problem.
-
-   * Defining the structure in the QAPI schema as union trivially
-     ensures the union branches are distinct.
-
-2. Even with structured yank arguments, the yank core doesn't *need* to
-   understand the structure.
-
-   The yank core manages a set of instances.  Each instance associates a
-   key with a list of YankFuncAndParam.  This is a basically dictionary.
-   All the yank core needs to do with the dictionary keys is looking
-   them up.
-
-   The proposed implementation uses a list of instances (which is just
-   fine).  All the lookup needs from the keys is an "is equal" relation.
-
-   Checking two QAPI objects for structural equality is admittedly not
-   as simple as comparing strings.  It does not, however, require
-   understanding their structure.  Two stupid solutions come to mind:
-
-   * Hand-written compare that keeps specifics out of the yank core
-
-     Whatever uses a variant of YankInstance gets to provide a
-     comparison function of the variant members.
-
-     Compare the common members (initially just @type, which is the
-     discriminator).  Return false if any of them differs.
-
-     Else both instances use the same variant.  Return the value of the
-     variant comparison function.
-
-   * Visitors exist
-
-     Convert both YankInstances to QObject, compare with
-     qobject_is_equal(), done.
-
-3. In QMP, encoding structured data in strings is anathema :)
-
-[...]
-
+--=20
+Alex Benn=C3=A9e
 
