@@ -2,95 +2,80 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F169AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:05:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBC19C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:11:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B82D8206EF
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:05:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="RjGOrLug"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B82D8206EF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	by mail.kernel.org (Postfix) with ESMTPS id 75F0E206EF
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:11:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75F0E206EF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD52X-0000kq-T8
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:05:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51672)
+	id 1kD58M-0002ke-ML
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:11:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53858)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kD51y-0000Ea-He
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:04:54 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:43070)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kD57p-0002K9-N8
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:10:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:38062)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kD51v-0004XV-Ql
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:04:54 -0400
-Received: by mail-wr1-x441.google.com with SMTP id k15so1220528wrn.10
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 05:04:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=L/LjdGhIGGcl8WBr9RWbbswS3n+uVGKwk6PLw/Q/wVA=;
- b=RjGOrLugKjvElCYVoRucYDwnSrBSfydomkLggSRf4sGFHDznU+touQoVQp6Jb81pk1
- GUSx5m7jvIHZJcJVCT7YFwDWOb/yPinN9G/th27aBucVUltBe9ym6NEdquNGtcDwfIvm
- M/HuHTiAohmbGT9ZthMhd7s7iWKEuifBJjXA3o96/wq2P+Ct4tKExuIt4KM1kElS7+ox
- tX43l/iMXJw4JaEdBAYaYWQsP3S4VNJ8yLXJ7noQkfKfqxChc1HhUwkLIeshJLtOo4k0
- 1w9qVyNu8vgi2AqS6y12PjPcn3udrVjwDgrAhTBv9CkMQnLrbFMl8zKgyIJZGP0XVoMQ
- 9gHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=L/LjdGhIGGcl8WBr9RWbbswS3n+uVGKwk6PLw/Q/wVA=;
- b=PcBBbJBxoaOkhPgQ6Kg9livS/8CZbc9/XHDwApJv5iNt/y8ZzYpNLUVt7ahXrmCW3z
- uCqOqSE24m7R+KBwe9rvKX+n2z6NyRvUReANT99X5RpaGiuBvX8vnpUcMnb0q7mGd04o
- ZXiZmReeC7eqnAEB9ljO/5JgyMx7ycSOwl1neN0Ux2VnzWdtEirBZ0WgNxTkRYemEs8T
- gegMEmzGY+h1UpQSAAapdcAW4U2lIz0N881tJ5OermTh9J8/ajT7k7DRHi7A8z5gkIq9
- z/BHZNIImhaSRicCa82PC3j8TAKrEKl6b5/EuvDvvGyeba7PZVoobxL7JGPn3Opb1I4l
- Ap8Q==
-X-Gm-Message-State: AOAM53187023O02lHuYqeLqcaXZ/2lomLgk0UTyn8IfiZYy1+xqdWQ42
- kDPKZQKL1//8ZRDaV1lbJ4vfHO/SRe/j83ExrSRdxA==
-X-Google-Smtp-Source: ABdhPJxSI7nFYcZPEKwfs52qTf9CdsnN8Hs5xVzPlyM/iCD/dxuCN6S+PFLzq/SXvWXIbJV0MHQHm6Wjh/M52g9vxDU=
-X-Received: by 2002:adf:bb44:: with SMTP id x4mr1537333wrg.76.1598961889951;
- Tue, 01 Sep 2020 05:04:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kD57m-0005dN-3A
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:10:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kD57k-0000c4-9n
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 12:10:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4749E2E8052
+ for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 12:10:52 +0000 (UTC)
 MIME-Version: 1.0
-References: <20200827133954.2118749-1-mst@redhat.com>
- <20200827133954.2118749-7-mst@redhat.com>
- <20200827194115.673f94de@imammedo-mac>
- <CAARzgwzLcu5iHrXNZrVbg2Yx27AvyYWrKqBZ0wK7CveQ_eKgsQ@mail.gmail.com>
- <20200828114907.42961cd3@redhat.com>
- <d67e8431-b23a-46ee-94f3-544c4476848e@Spark>
- <CAMDeoFXa2NPwCE3u-OVsBGQQWOY9yk_048iL8gieboGU5Hj7+w@mail.gmail.com>
- <CAARzgwx+61UKm7-Qhgwm-Da60BuYmMKUMC7vcscOQf3SihYvmg@mail.gmail.com>
-In-Reply-To: <CAARzgwx+61UKm7-Qhgwm-Da60BuYmMKUMC7vcscOQf3SihYvmg@mail.gmail.com>
-From: Ani Sinha <ani@anisinha.ca>
-Date: Tue, 1 Sep 2020 17:34:37 +0530
-Message-ID: <CAARzgwxY2-6XzAqHSdGVPCfdZgnjyqOt29cJg+EwdyU+uiJbMg@mail.gmail.com>
-Subject: Re: [PULL 06/13] Introduce a new flag for i440fx to disable PCI
- hotplug on the root bus
-To: Julia Suvorova <jusual@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: none client-ip=2a00:1450:4864:20::441;
- envelope-from=ani@anisinha.ca; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 01 Sep 2020 12:01:24 -0000
+From: P J P <1892960@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: a1xndr pjps
+X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
+X-Launchpad-Bug-Modifier: P J P (pjps)
+References: <159840512781.15369.16521722289936881073.malonedeb@soybean.canonical.com>
+Message-Id: <159896168432.21231.7284859121491524476.malone@chaenomeles.canonical.com>
+Subject: [Bug 1892960] Re: Heap-overflow in flatview_read through
+ sdhci_data_transfer
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
+X-Launchpad-Hash: 460b4d42937023b7c061c5efd56b9caf183166a8
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 03:58:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -99,363 +84,314 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Igor Mammedov <imammedo@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1892960 <1892960@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 1, 2020 at 11:57 AM Ani Sinha <ani@anisinha.ca> wrote:
->
-> On Fri, Aug 28, 2020 at 6:40 PM Julia Suvorova <jusual@redhat.com> wrote:
-> >
-> > On Fri, Aug 28, 2020 at 11:53 AM Ani Sinha <ani@anisinha.ca> wrote:
-> > >
-> > >
-> > > Ani
-> > > On Aug 28, 2020, 15:19 +0530, Igor Mammedov <imammedo@redhat.com>, wrote:
-> > >
-> > > On Thu, 27 Aug 2020 23:29:34 +0530
-> > >
-> > > Ani Sinha <ani@anisinha.ca> wrote:
-> > >
-> > >
-> > > On Thu, Aug 27, 2020 at 11:11 PM Igor Mammedov <imammedo@redhat.com> wrote:
-> > >
-> > >
-> > > On Thu, 27 Aug 2020 09:40:34 -0400
-> > >
-> > > "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > >
-> > >
-> > > From: Ani Sinha <ani@anisinha.ca>
-> > >
-> > >
-> > > We introduce a new global flag 'acpi-root-pci-hotplug' for i440fx with which
-> > >
-> > > we can turn on or off PCI device hotplug on the root bus. This flag can be
-> > >
-> > > used to prevent all PCI devices from getting hotplugged or unplugged from the
-> > >
-> > > root PCI bus.
-> > >
-> > > This feature is targetted mostly towards Windows VMs. It is useful in cases
-> > >
-> > > where some hypervisor admins want to deploy guest VMs in a way so that the
-> > >
-> > > users of the guest OSes are not able to hot-eject certain PCI devices from
-> > >
-> > > the Windows system tray. Laine has explained the use case here in detail:
-> > >
-> > > https://www.redhat.com/archives/libvir-list/2020-February/msg00110.html
-> > >
-> > >
-> > > Julia has resolved this issue for PCIE buses with the following commit:
-> > >
-> > > 530a0963184e57e71a5b538 ("pcie_root_port: Add hotplug disabling option")
-> > >
-> > >
-> > > This commit attempts to introduce similar behavior for PCI root buses used in
-> > >
-> > > i440fx machine types (although in this case, we do not have a per-slot
-> > >
-> > > capability to turn hotplug on or off).
-> > >
-> > >
-> > > Usage:
-> > >
-> > > -global PIIX4_PM.acpi-root-pci-hotplug=off
-> > >
-> > >
-> > > By default, this option is enabled which means that hotplug is turned on for
-> > >
-> > > the PCI root bus.
-> > >
-> > >
-> > > The previously existing flag 'acpi-pci-hotplug-with-bridge-support' for PCI-PCI
-> > >
-> > > bridges remain as is and can be used along with this new flag to control PCI
-> > >
-> > > hotplug on PCI bridges.
-> > >
-> > >
-> > > This change has been tested using a Windows 2012R2 server guest image and also
-> > >
-> > > with a Windows 2019 server guest image on a Ubuntu 18.04 host using the latest
-> > >
-> > > master qemu from upstream.
-> > >
-> > >
-> > > Signed-off-by: Ani Sinha <ani@anisinha.ca>
-> > >
-> > > Message-Id: <20200821165403.26589-1-ani@anisinha.ca>
-> > >
-> > > Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > >
-> > >
-> > >
-> > > Tested-by: Igor Mammedov <imammedo@redhat.com>
-> > >
-> > > Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> > >
-> > > A glitch in scripts?
-> > >
-> > > I didn't review nor tested this (v8) version
-> > >
-> > >
-> > > oops! I am so eager to get this done and dusted :)
-> > >
-> > > it's merged now,
-> > >
-> > >
-> > > Wait it merged without your review?
-> >
-> > Yeah, not only added into the pull request, but actually merged.
-> >
-> > >
-> > > can you add a test case for it please?
-> > >
-> > >
-> > > You can use test_acpi_piix4_tcg_bridge() as model.
-> > >
-> > > See header comment at the top of bios-tables-test.c
-> > >
-> > > for how to prepare and submit testcase.
-> > >
-> > >
-> > > Will get on it.
-> >
-> > Also, while the whole approach seems good to me, it leaves the hotplug
-> > registers initialized (see build_piix4_pci_hotplug()), even if both
-> > root and bridges hotplug are disabled. Which you can exploit by
-> > writing something like this to the io registers:
-> >
-> > outl 0xae10 0
-> > outl 0xae08 your_slot
-> >
-> > And because of these quite interesting lines the device will be
-> > successfully unplugged:
-> >
-> > static PCIBus *acpi_pcihp_find_hotplug_bus(AcpiPciHpState *s, int bsel)
-> > {
-> > ...
-> >     /* Make bsel 0 eject root bus if bsel property is not set,
-> >      * for compatibility with non acpi setups.
-> >      * TODO: really needed?
-> >      */
-> >     if (!bsel && !find.bus) {
-> >         find.bus = s->root;
-> >     }
-> >     return find.bus;
-> > }
-> >
->
-> I have sent a patch to address this. Please review.
->
-> > Could you please cover both issues in the follow-up patches?
->
-> Also julia, looking at the code, should we also set pm->pcihp_io_len
-> to 0 as well in case where bridge and pci bus 0 hotplugs are both
-> disabled?
+Proposed patch
+  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-08/msg07968.html
 
-I have sent a RFC patch where I check if at least one of the two
-options is ON in the conditional below. Seems the right thing to do
-instead of setting the io_len to 0.
+-- =
 
-This is because I see:
->
->    /* reserve PCIHP resources */
->     if (pm->pcihp_io_len) {
->
-> which we do not want to do if PCI hotplug is disabled altogether?
->
-> >
-> > Best regards, Julia Suvorova.
-> >
-> > >
-> > >
-> > >
-> > > ---
-> > >
-> > > include/hw/acpi/pcihp.h | 2 +-
-> > >
-> > > hw/acpi/pcihp.c | 23 ++++++++++++++++++++++-
-> > >
-> > > hw/acpi/piix4.c | 5 ++++-
-> > >
-> > > 3 files changed, 27 insertions(+), 3 deletions(-)
-> > >
-> > >
-> > > diff --git a/include/hw/acpi/pcihp.h b/include/hw/acpi/pcihp.h
-> > >
-> > > index 8bc4a4c01d..02f4665767 100644
-> > >
-> > > --- a/include/hw/acpi/pcihp.h
-> > >
-> > > +++ b/include/hw/acpi/pcihp.h
-> > >
-> > > @@ -67,7 +67,7 @@ void acpi_pcihp_device_unplug_request_cb(HotplugHandler *hotplug_dev,
-> > >
-> > > Error **errp);
-> > >
-> > >
-> > > /* Called on reset */
-> > >
-> > > -void acpi_pcihp_reset(AcpiPciHpState *s);
-> > >
-> > > +void acpi_pcihp_reset(AcpiPciHpState *s, bool acpihp_root_off);
-> > >
-> > >
-> > > extern const VMStateDescription vmstate_acpi_pcihp_pci_status;
-> > >
-> > >
-> > > diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-> > >
-> > > index 9e31ab2da4..39b1f74442 100644
-> > >
-> > > --- a/hw/acpi/pcihp.c
-> > >
-> > > +++ b/hw/acpi/pcihp.c
-> > >
-> > > @@ -104,6 +104,24 @@ static void acpi_set_pci_info(void)
-> > >
-> > > }
-> > >
-> > > }
-> > >
-> > >
-> > > +static void acpi_pcihp_disable_root_bus(void)
-> > >
-> > > +{
-> > >
-> > > + static bool root_hp_disabled;
-> > >
-> > > + PCIBus *bus;
-> > >
-> > > +
-> > >
-> > > + if (root_hp_disabled) {
-> > >
-> > > + return;
-> > >
-> > > + }
-> > >
-> > > +
-> > >
-> > > + bus = find_i440fx();
-> > >
-> > > + if (bus) {
-> > >
-> > > + /* setting the hotplug handler to NULL makes the bus non-hotpluggable */
-> > >
-> > > + qbus_set_hotplug_handler(BUS(bus), NULL);
-> > >
-> > > + }
-> > >
-> > > + root_hp_disabled = true;
-> > >
-> > > + return;
-> > >
-> > > +}
-> > >
-> > > +
-> > >
-> > > static void acpi_pcihp_test_hotplug_bus(PCIBus *bus, void *opaque)
-> > >
-> > > {
-> > >
-> > > AcpiPciHpFind *find = opaque;
-> > >
-> > > @@ -209,8 +227,11 @@ static void acpi_pcihp_update(AcpiPciHpState *s)
-> > >
-> > > }
-> > >
-> > > }
-> > >
-> > >
-> > > -void acpi_pcihp_reset(AcpiPciHpState *s)
-> > >
-> > > +void acpi_pcihp_reset(AcpiPciHpState *s, bool acpihp_root_off)
-> > >
-> > > {
-> > >
-> > > + if (acpihp_root_off) {
-> > >
-> > > + acpi_pcihp_disable_root_bus();
-> > >
-> > > + }
-> > >
-> > > acpi_set_pci_info();
-> > >
-> > > acpi_pcihp_update(s);
-> > >
-> > > }
-> > >
-> > > diff --git a/hw/acpi/piix4.c b/hw/acpi/piix4.c
-> > >
-> > > index 26bac4f16c..e6163bb6ce 100644
-> > >
-> > > --- a/hw/acpi/piix4.c
-> > >
-> > > +++ b/hw/acpi/piix4.c
-> > >
-> > > @@ -78,6 +78,7 @@ typedef struct PIIX4PMState {
-> > >
-> > >
-> > > AcpiPciHpState acpi_pci_hotplug;
-> > >
-> > > bool use_acpi_hotplug_bridge;
-> > >
-> > > + bool use_acpi_root_pci_hotplug;
-> > >
-> > >
-> > > uint8_t disable_s3;
-> > >
-> > > uint8_t disable_s4;
-> > >
-> > > @@ -324,7 +325,7 @@ static void piix4_pm_reset(DeviceState *dev)
-> > >
-> > > pci_conf[0x5B] = 0x02;
-> > >
-> > > }
-> > >
-> > > pm_io_space_update(s);
-> > >
-> > > - acpi_pcihp_reset(&s->acpi_pci_hotplug);
-> > >
-> > > + acpi_pcihp_reset(&s->acpi_pci_hotplug, !s->use_acpi_root_pci_hotplug);
-> > >
-> > > }
-> > >
-> > >
-> > > static void piix4_pm_powerdown_req(Notifier *n, void *opaque)
-> > >
-> > > @@ -635,6 +636,8 @@ static Property piix4_pm_properties[] = {
-> > >
-> > > DEFINE_PROP_UINT8(ACPI_PM_PROP_S4_VAL, PIIX4PMState, s4_val, 2),
-> > >
-> > > DEFINE_PROP_BOOL("acpi-pci-hotplug-with-bridge-support", PIIX4PMState,
-> > >
-> > > use_acpi_hotplug_bridge, true),
-> > >
-> > > + DEFINE_PROP_BOOL("acpi-root-pci-hotplug", PIIX4PMState,
-> > >
-> > > + use_acpi_root_pci_hotplug, true),
-> > >
-> > > DEFINE_PROP_BOOL("memory-hotplug-support", PIIX4PMState,
-> > >
-> > > acpi_memory_hotplug.is_enabled, true),
-> > >
-> > > DEFINE_PROP_END_OF_LIST(),
-> > >
-> > >
-> > >
-> > >
-> >
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1892960
+
+Title:
+  Heap-overflow in flatview_read through sdhci_data_transfer
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+  Reproducer:
+  cat << EOF | ./qemu-system-i386 -nodefaults \
+  -device sdhci-pci,sd-spec-version=3D3 \
+  -device sd-card,drive=3Dmydrive \
+  -drive if=3Dsd,index=3D0,file=3Dnull-co://,format=3Draw,id=3Dmydrive \
+  -nographic -qtest stdio -accel qtest =
+
+  outl 0xcf8 0x80001010
+  outl 0xcfc 0xd7055dba
+  outl 0xcf8 0x80001003
+  outl 0xcfc 0x86b1d733
+  writeq 0xd7055d2b 0x84126e0ed7d7355e
+  writeq 0xd7055d23 0x13bd7d7346e0129
+  writeq 0xd7055d05 0x615bfb845e05c42c
+  write 0x0 0x1 0x39
+  write 0x5 0x1 0x06
+  write 0x6 0x1 0x35
+  write 0x7 0x1 0x01
+  write 0x1350600 0x1 0x39
+  writew 0xd7055d0e 0x846e
+  write 0x1350600 0x1 0x29
+  write 0x1350602 0x1 0x1a
+  write 0x1350608 0x1 0x39
+  clock_step
+  writeq 0xd7055d03 0x6d00000026000000
+  clock_step
+  EOF
+
+  The trace:
+
+  [R +0.077745] outl 0xcf8 0x80001010
+  OK
+  [S +0.077773] OK
+  [R +0.077792] outl 0xcfc 0xd7055dba
+  OK
+  [S +0.077813] OK
+  [R +0.077826] outl 0xcf8 0x80001003
+  OK
+  [S +0.077835] OK
+  [R +0.077846] outl 0xcfc 0x86b1d733
+  OK
+  [S +0.080186] OK
+  [R +0.080204] writeq 0xd7055d2b 0x84126e0ed7d7355e
+  752161@1598405049.572123:sdhci_access wr8: addr[0x002b] <- 0x0000005e (94)
+  752161@1598405049.572133:sdhci_access wr32: addr[0x002c] <- 0x0ed7d735 (2=
+49026357)
+  752161@1598405049.572142:sdhci_access wr16: addr[0x0030] <- 0x0000126e (4=
+718)
+  752161@1598405049.572150:sdhci_access wr8: addr[0x0032] <- 0x00000084 (13=
+2)
+  OK
+  [S +0.080255] OK
+  [R +0.080267] writeq 0xd7055d23 0x13bd7d7346e0129
+  752161@1598405049.572176:sdhci_error Non-sequential access to Buffer Data=
+ Port registeris prohibited
+
+  752161@1598405049.572181:sdhci_access wr8: addr[0x0023] <- 0x00000029 (41)
+  752161@1598405049.572187:sdhci_access wr32: addr[0x0024] <- 0xd7346e01 (3=
+610537473)
+  752161@1598405049.572193:sdhci_access wr16: addr[0x0028] <- 0x00003bd7 (1=
+5319)
+  752161@1598405049.572200:sdhci_access wr8: addr[0x002a] <- 0x00000001 (1)
+  OK
+  [S +0.080303] OK
+  [R +0.080316] writeq 0xd7055d05 0x615bfb845e05c42c
+  752161@1598405049.572226:sdhci_access wr8: addr[0x0005] <- 0x0000002c (44)
+  752161@1598405049.572233:sdhci_access wr16: addr[0x0006] <- 0x000005c4 (1=
+476)
+  752161@1598405049.572240:sdhci_access wr32: addr[0x0008] <- 0x5bfb845e (1=
+543210078)
+  752161@1598405049.572247:sdhci_access wr8: addr[0x000c] <- 0x00000061 (97)
+  OK
+  [S +0.080350] OK
+  [R +0.080362] write 0x0 0x1 0x39
+  OK
+  [S +0.080606] OK
+  [R +0.080617] write 0x5 0x1 0x06
+  OK
+  [S +0.080629] OK
+  [R +0.080639] write 0x6 0x1 0x35
+  OK
+  [S +0.080648] OK
+  [R +0.080657] write 0x7 0x1 0x01
+  OK
+  [S +0.080665] OK
+  [R +0.080675] write 0x1350600 0x1 0x39
+  OK
+  [S +0.080863] OK
+  [R +0.080875] writew 0xd7055d0e 0x846e
+  752161@1598405049.572786:sdhci_send_command CMD132 ARG[0x5bfb845e]
+  752161@1598405049.572810:sdhci_error timeout waiting for command response
+  752161@1598405049.572822:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572827:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.572833:sdhci_adma_loop addr=3D0x00000000, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572837:sdhci_adma link: admasysaddr=3D0x0
+  752161@1598405049.572842:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572845:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.572851:sdhci_adma_loop addr=3D0x00000000, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572854:sdhci_adma link: admasysaddr=3D0x0
+  752161@1598405049.572859:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572862:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.572875:sdhci_access wr16: addr[0x000e] <- 0x0000846e (3=
+3902)
+  OK
+  [S +0.080979] OK
+  [R +0.080991] write 0x1350600 0x1 0x29
+  OK
+  [S +0.081001] OK
+  [R +0.081011] write 0x1350602 0x1 0x1a
+  OK
+  [S +0.081019] OK
+  [R +0.081029] write 0x1350608 0x1 0x39
+  OK
+  [S +0.081037] OK
+  [R +0.081045] clock_step
+  752161@1598405049.572962:sdhci_adma_loop addr=3D0x00000000, len=3D26, att=
+r=3D0x29
+  752161@1598405049.572972:sdhci_adma_loop addr=3D0x00000000, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572977:sdhci_adma link: admasysaddr=3D0x0
+  752161@1598405049.572981:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572985:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.572989:sdhci_adma_loop addr=3D0x00000000, len=3D26, att=
+r=3D0x29
+  752161@1598405049.572997:sdhci_adma_loop addr=3D0x00000000, len=3D0, attr=
+=3D0x39
+  752161@1598405049.573001:sdhci_adma link: admasysaddr=3D0x0
+  OK 100
+  [S +0.081112] OK 100
+  [R +0.081126] writeq 0xd7055d03 0x6d00000026000000
+  752161@1598405049.573038:sdhci_access wr8: addr[0x0003] <- 0x00000000 (0)
+  752161@1598405049.573045:sdhci_access wr32: addr[0x0004] <- 0x00260000 (2=
+490368)
+  752161@1598405049.573051:sdhci_access wr16: addr[0x0008] <- 0x00000000 (0)
+  752161@1598405049.573057:sdhci_access wr8: addr[0x000a] <- 0x0000006d (10=
+9)
+  OK
+  [S +0.081162] OK
+  [R +0.081171] clock_step
+  752161@1598405049.573085:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.573090:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.573096:sdhci_adma_loop addr=3D0x00000000, len=3D26, att=
+r=3D0x29
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  =3D=3D752161=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on addres=
+s 0x61500001e500 at pc 0x5651bce1a940 bp 0x7fff16a81f50 sp 0x7fff16a81718
+  WRITE of size 786432 at 0x61500001e500 thread T0
+      #0 0x5651bce1a93f in __asan_memcpy (/home/alxndr/Development/qemu/gen=
+eral-fuzz/build/qemu-system-i386+0x2d2893f)
+      #1 0x5651bf4197ce in flatview_read_continue /home/alxndr/Development/=
+qemu/general-fuzz/build/../exec.c:3246:13
+      #2 0x5651bf41bff3 in flatview_read /home/alxndr/Development/qemu/gene=
+ral-fuzz/build/../exec.c:3279:12
+      #3 0x5651bf41bb48 in address_space_read_full /home/alxndr/Development=
+/qemu/general-fuzz/build/../exec.c:3292:18
+      #4 0x5651bf41cce8 in address_space_rw /home/alxndr/Development/qemu/g=
+eneral-fuzz/build/../exec.c:3320:16
+      #5 0x5651bd623b67 in dma_memory_rw_relaxed /home/alxndr/Development/q=
+emu/general-fuzz/include/sysemu/dma.h:87:18
+      #6 0x5651bd623585 in dma_memory_rw /home/alxndr/Development/qemu/gene=
+ral-fuzz/include/sysemu/dma.h:110:12
+      #7 0x5651bd6227b7 in dma_memory_read /home/alxndr/Development/qemu/ge=
+neral-fuzz/include/sysemu/dma.h:116:12
+      #8 0x5651bd61b052 in sdhci_do_adma /home/alxndr/Development/qemu/gene=
+ral-fuzz/build/../hw/sd/sdhci.c:792:21
+      #9 0x5651bd60d3c4 in sdhci_data_transfer /home/alxndr/Development/qem=
+u/general-fuzz/build/../hw/sd/sdhci.c:887:13
+      #10 0x5651c0c4d917 in timerlist_run_timers /home/alxndr/Development/q=
+emu/general-fuzz/build/../util/qemu-timer.c:572:9
+      #11 0x5651c0c4de51 in qemu_clock_run_timers /home/alxndr/Development/=
+qemu/general-fuzz/build/../util/qemu-timer.c:586:12
+      #12 0x5651bf562a13 in qtest_clock_warp /home/alxndr/Development/qemu/=
+general-fuzz/build/../softmmu/cpus.c:507:9
+      #13 0x5651bf74f5d8 in qtest_process_command /home/alxndr/Development/=
+qemu/general-fuzz/build/../softmmu/qtest.c:665:9
+      #14 0x5651bf73d63e in qtest_process_inbuf /home/alxndr/Development/qe=
+mu/general-fuzz/build/../softmmu/qtest.c:710:9
+      #15 0x5651bf73c3e3 in qtest_read /home/alxndr/Development/qemu/genera=
+l-fuzz/build/../softmmu/qtest.c:722:5
+      #16 0x5651c0842762 in qemu_chr_be_write_impl /home/alxndr/Development=
+/qemu/general-fuzz/build/../chardev/char.c:188:9
+      #17 0x5651c08428aa in qemu_chr_be_write /home/alxndr/Development/qemu=
+/general-fuzz/build/../chardev/char.c:200:9
+      #18 0x5651c0868514 in fd_chr_read /home/alxndr/Development/qemu/gener=
+al-fuzz/build/../chardev/char-fd.c:68:9
+      #19 0x5651c0754736 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
+elopment/qemu/general-fuzz/build/../io/channel-watch.c:84:12
+      #20 0x7fac88fad4cd in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x504cd)
+      #21 0x5651c0cdfc67 in glib_pollfds_poll /home/alxndr/Development/qemu=
+/general-fuzz/build/../util/main-loop.c:217:9
+      #22 0x5651c0cdd567 in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/general-fuzz/build/../util/main-loop.c:240:5
+      #23 0x5651c0cdcf47 in main_loop_wait /home/alxndr/Development/qemu/ge=
+neral-fuzz/build/../util/main-loop.c:516:11
+      #24 0x5651bf4bb08d in qemu_main_loop /home/alxndr/Development/qemu/ge=
+neral-fuzz/build/../softmmu/vl.c:1676:9
+      #25 0x5651bce4d51c in main /home/alxndr/Development/qemu/general-fuzz=
+/build/../softmmu/main.c:50:5
+      #26 0x7fac887b6cc9 in __libc_start_main csu/../csu/libc-start.c:308:16
+      #27 0x5651bcda2cf9 in _start (/home/alxndr/Development/qemu/general-f=
+uzz/build/qemu-system-i386+0x2cb0cf9)
+
+  0x61500001e500 is located 0 bytes to the right of 512-byte region [0x6150=
+0001e300,0x61500001e500)
+  allocated by thread T0 here:
+      #0 0x5651bce1b5b2 in calloc (/home/alxndr/Development/qemu/general-fu=
+zz/build/qemu-system-i386+0x2d295b2)
+      #1 0x7fac88fb3210 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0=
+.so.0+0x56210)
+      #2 0x5651bd8cd222 in sdhci_pci_realize /home/alxndr/Development/qemu/=
+general-fuzz/build/../hw/sd/sdhci-pci.c:36:5
+      #3 0x5651bd88c228 in pci_qdev_realize /home/alxndr/Development/qemu/g=
+eneral-fuzz/build/../hw/pci/pci.c:2114:9
+      #4 0x5651c07a4ec9 in device_set_realized /home/alxndr/Development/qem=
+u/general-fuzz/build/../hw/core/qdev.c:864:13
+      #5 0x5651bfe384b8 in property_set_bool /home/alxndr/Development/qemu/=
+general-fuzz/build/../qom/object.c:2202:5
+      #6 0x5651bfe2c1cf in object_property_set /home/alxndr/Development/qem=
+u/general-fuzz/build/../qom/object.c:1349:5
+      #7 0x5651bfe49471 in object_property_set_qobject /home/alxndr/Develop=
+ment/qemu/general-fuzz/build/../qom/qom-qobject.c:28:10
+      #8 0x5651bfe2d890 in object_property_set_bool /home/alxndr/Developmen=
+t/qemu/general-fuzz/build/../qom/object.c:1416:15
+      #9 0x5651c078cc64 in qdev_realize /home/alxndr/Development/qemu/gener=
+al-fuzz/build/../hw/core/qdev.c:379:12
+      #10 0x5651bd8bd8cc in qdev_device_add /home/alxndr/Development/qemu/g=
+eneral-fuzz/build/../qdev-monitor.c:676:10
+      #11 0x5651bf4e3e43 in device_init_func /home/alxndr/Development/qemu/=
+general-fuzz/build/../softmmu/vl.c:2101:11
+      #12 0x5651c0af71e4 in qemu_opts_foreach /home/alxndr/Development/qemu=
+/general-fuzz/build/../util/qemu-option.c:1172:14
+      #13 0x5651bf4cd04b in qemu_init /home/alxndr/Development/qemu/general=
+-fuzz/build/../softmmu/vl.c:4384:5
+      #14 0x5651bce4d517 in main /home/alxndr/Development/qemu/general-fuzz=
+/build/../softmmu/main.c:49:5
+      #15 0x7fac887b6cc9 in __libc_start_main csu/../csu/libc-start.c:308:16
+
+  SUMMARY: AddressSanitizer: heap-buffer-overflow (/home/alxndr/Development=
+/qemu/general-fuzz/build/qemu-system-i386+0x2d2893f) in __asan_memcpy
+  Shadow bytes around the buggy address:
+    0x0c2a7fffbc50: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+    0x0c2a7fffbc60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    0x0c2a7fffbc70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    0x0c2a7fffbc80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    0x0c2a7fffbc90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  =3D>0x0c2a7fffbca0:[fa]fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+    0x0c2a7fffbcb0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+    0x0c2a7fffbcc0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+    0x0c2a7fffbcd0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+    0x0c2a7fffbce0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+    0x0c2a7fffbcf0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  Shadow byte legend (one shadow byte represents 8 application bytes):
+    Addressable:           00
+    Partially addressable: 01 02 03 04 05 06 07 =
+
+    Heap left redzone:       fa
+    Freed heap region:       fd
+    Stack left redzone:      f1
+    Stack mid redzone:       f2
+    Stack right redzone:     f3
+    Stack after return:      f5
+    Stack use after scope:   f8
+    Global redzone:          f9
+    Global init order:       f6
+    Poisoned by user:        f7
+    Container overflow:      fc
+    Array cookie:            ac
+    Intra object redzone:    bb
+    ASan internal:           fe
+    Left alloca redzone:     ca
+    Right alloca redzone:    cb
+    Shadow gap:              cc
+  =3D=3D752161=3D=3DABORTING
+
+  -Alex
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1892960/+subscriptions
 
