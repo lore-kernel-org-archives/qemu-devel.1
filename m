@@ -4,79 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 084DDC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1833C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:55:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BA593206EF
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:52:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 85CB0206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:55:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DA9e9EY7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA593206EF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ejTvCjNi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85CB0206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35390 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD6i5-0006oi-Tz
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:52:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49600)
+	id 1kD6km-0000OI-GQ
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:55:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kD6hZ-0006OF-NX
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:51:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29294)
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1kD6jw-0007gS-9d
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:54:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29694)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kD6hX-0001FX-3t
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:51:57 -0400
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1kD6ju-0001SC-Fv
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:54:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598968313;
+ s=mimecast20190719; t=1598968461;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZTwz4mtJxCUSFWTe1NDgtTvK2A1FCjwk1T50rkOWCb0=;
- b=DA9e9EY7hjhszlSxmfdXhbNiy9ncx0P2BhVVrFKYf9oye+x/zqI/x30Rc0bL0cbFdSctvs
- hWKmCdOK/XzvhRL+1NJ9dcTsYxtWaDj6VJHSVapey2A3L83Ixll3MLxi/og2ER7Mo0tfOc
- /MTMsSlnqQz2JzSrt3mDF6bvTeMw1rw=
+ bh=YqwEOZh9pg3KL4mXVkYiZj4zgaY7qsVslSgXGMejPIA=;
+ b=ejTvCjNis3JoPf2J/5M++voVBVnaY5dVs7Z/CLnbv42wu+rQFAdOBQ8C+k1mHtERreKJUb
+ pdRD+fwYW1gEtH8jnJdhY6mezWq1TZI+DWRVO4ZOY6aAHgpQs3SMUo/BKyBVru9Z0JXcTU
+ eOoMNsuhNYxpAr5q+lCoV2e67t17hJU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-504-31WjOYnKMHeXAXiRVGUTUA-1; Tue, 01 Sep 2020 09:51:52 -0400
-X-MC-Unique: 31WjOYnKMHeXAXiRVGUTUA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-61-OfgxaG3nMqeKNF6Ro7WcGw-1; Tue, 01 Sep 2020 09:54:19 -0400
+X-MC-Unique: OfgxaG3nMqeKNF6Ro7WcGw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CD101005E5B;
- Tue,  1 Sep 2020 13:51:51 +0000 (UTC)
-Received: from imammedo-mac (unknown [10.40.193.201])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DB7E78B29;
- Tue,  1 Sep 2020 13:51:43 +0000 (UTC)
-Date: Tue, 1 Sep 2020 15:51:41 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Ani Sinha <ani@anisinha.ca>
-Subject: Re: [PATCH 2/3] tests/acpi: add a new unit test to test hotplug
- off/on feature on the root pci bus
-Message-ID: <20200901155141.0a6d93f6@imammedo-mac>
-In-Reply-To: <20200830095915.14402-3-ani@anisinha.ca>
-References: <20200830095915.14402-1-ani@anisinha.ca>
- <20200830095915.14402-3-ani@anisinha.ca>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6AF981F00A;
+ Tue,  1 Sep 2020 13:54:17 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-114-76.ams2.redhat.com [10.36.114.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A54B67C5A0;
+ Tue,  1 Sep 2020 13:54:07 +0000 (UTC)
+From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To: qemu-devel@nongnu.org,
+	Peter Xu <peterx@redhat.com>
+Subject: [RFC v7 1/5] memory: Rename memory_region_notify_one to
+ memory_region_notify_iommu_one
+Date: Tue,  1 Sep 2020 15:53:39 +0200
+Message-Id: <20200901135343.22136-2-eperezma@redhat.com>
+In-Reply-To: <20200901135343.22136-1-eperezma@redhat.com>
+References: <20200901135343.22136-1-eperezma@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0.003
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eperezma@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 01:27:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -97,63 +97,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 30 Aug 2020 15:29:13 +0530
-Ani Sinha <ani@anisinha.ca> wrote:
+Previous name didn't reflect the iommu operation.
 
-> Ability to turn hotplug off on the pci root bus for i440fx was added in commit:
-> 3d7e78aa7777f0 ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus")
-> 
-> This change adds a unit test in order to test this feature.
-> 
-> This change has been tested against upstream qemu master branch on top of tag v5.1.0.
-> 
-> Signed-off-by: Ani Sinha <ani@anisinha.ca>
-> ---
->  tests/qtest/bios-tables-test.c | 14 ++++++++++++++
->  1 file changed, 14 insertions(+)
-> 
-> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-> index d49b3988ec..8f7d87c0f6 100644
-> --- a/tests/qtest/bios-tables-test.c
-> +++ b/tests/qtest/bios-tables-test.c
-> @@ -709,6 +709,19 @@ static void test_acpi_piix4_tcg_bridge(void)
->      free_test_data(&data);
->  }
->  
-> +static void test_acpi_piix4_root_hotplug(void)
-> +{
-> +    test_data data;
-> +
-> +    memset(&data, 0, sizeof(data));
-> +    data.machine = MACHINE_PC;
-> +    data.variant = ".roothp";
-> +    data.required_struct_types = base_required_struct_types;
-> +    data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
-> +    test_acpi_one("-global PIIX4_PM.acpi-root-pci-hotplug=off", &data);
+Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+---
+ hw/arm/smmu-common.c  | 2 +-
+ hw/arm/smmuv3.c       | 2 +-
+ hw/i386/intel_iommu.c | 4 ++--
+ include/exec/memory.h | 6 +++---
+ softmmu/memory.c      | 6 +++---
+ 5 files changed, 10 insertions(+), 10 deletions(-)
 
-I'd include here bridge config as well (test_acpi_piix4_tcg_bridge)
-so that ASL diff could show whether bridge was or wasn't affected.
-
-> +    free_test_data(&data);
-> +}
-> +
->  static void test_acpi_q35_tcg(void)
->  {
->      test_data data;
-> @@ -1102,6 +1115,7 @@ int main(int argc, char *argv[])
->          qtest_add_func("acpi/q35/tpm-tis", test_acpi_q35_tcg_tpm_tis);
->          qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
->          qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
-> +        qtest_add_func("acpi/piix4/hotplug", test_acpi_piix4_root_hotplug);
->          qtest_add_func("acpi/q35", test_acpi_q35_tcg);
->          qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
->          qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index 3838db1395..88d2c454f0 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -472,7 +472,7 @@ static void smmu_unmap_notifier_range(IOMMUNotifier *n)
+     entry.perm = IOMMU_NONE;
+     entry.addr_mask = n->end - n->start;
+ 
+-    memory_region_notify_one(n, &entry);
++    memory_region_notify_iommu_one(n, &entry);
+ }
+ 
+ /* Unmap all notifiers attached to @mr */
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 0122700e72..0a893ae918 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -827,7 +827,7 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
+     entry.addr_mask = num_pages * (1 << granule) - 1;
+     entry.perm = IOMMU_NONE;
+ 
+-    memory_region_notify_one(n, &entry);
++    memory_region_notify_iommu_one(n, &entry);
+ }
+ 
+ /* invalidate an asid/iova range tuple in all mr's */
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 5284bb68b6..2ad6b9d796 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3498,7 +3498,7 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+         /* This field is meaningless for unmap */
+         entry.translated_addr = 0;
+ 
+-        memory_region_notify_one(n, &entry);
++        memory_region_notify_iommu_one(n, &entry);
+ 
+         start += mask;
+         remain -= mask;
+@@ -3536,7 +3536,7 @@ static void vtd_address_space_refresh_all(IntelIOMMUState *s)
+ 
+ static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
+ {
+-    memory_region_notify_one((IOMMUNotifier *)private, entry);
++    memory_region_notify_iommu_one((IOMMUNotifier *)private, entry);
+     return 0;
+ }
+ 
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 0cfe987ab4..22c5f564d1 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -226,7 +226,7 @@ enum IOMMUMemoryRegionAttr {
+  * The IOMMU implementation must use the IOMMU notifier infrastructure
+  * to report whenever mappings are changed, by calling
+  * memory_region_notify_iommu() (or, if necessary, by calling
+- * memory_region_notify_one() for each registered notifier).
++ * memory_region_notify_iommu_one() for each registered notifier).
+  *
+  * Conceptually an IOMMU provides a mapping from input address
+  * to an output TLB entry. If the IOMMU is aware of memory transaction
+@@ -1274,7 +1274,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+                                 IOMMUTLBEntry entry);
+ 
+ /**
+- * memory_region_notify_one: notify a change in an IOMMU translation
++ * memory_region_notify_iommu_one: notify a change in an IOMMU translation
+  *                           entry to a single notifier
+  *
+  * This works just like memory_region_notify_iommu(), but it only
+@@ -1285,7 +1285,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+  *         replaces all old entries for the same virtual I/O address range.
+  *         Deleted entries have .@perm == 0.
+  */
+-void memory_region_notify_one(IOMMUNotifier *notifier,
++void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
+                               IOMMUTLBEntry *entry);
+ 
+ /**
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 70b93104e8..961c25b42f 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1890,8 +1890,8 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+     memory_region_update_iommu_notify_flags(iommu_mr, NULL);
+ }
+ 
+-void memory_region_notify_one(IOMMUNotifier *notifier,
+-                              IOMMUTLBEntry *entry)
++void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
++                                    IOMMUTLBEntry *entry)
+ {
+     IOMMUNotifierFlag request_flags;
+     hwaddr entry_end = entry->iova + entry->addr_mask;
+@@ -1927,7 +1927,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+ 
+     IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
+         if (iommu_notifier->iommu_idx == iommu_idx) {
+-            memory_region_notify_one(iommu_notifier, &entry);
++            memory_region_notify_iommu_one(iommu_notifier, &entry);
+         }
+     }
+ }
+-- 
+2.18.1
 
 
