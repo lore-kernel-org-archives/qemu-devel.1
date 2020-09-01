@@ -2,87 +2,96 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B3DC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DBF5C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:23:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 134AF20767
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:20:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 40F7820767
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:23:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gWDkBEAY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134AF20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BmpKht9w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 40F7820767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD6DJ-0003XY-88
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:20:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42164)
+	id 1kD6Fp-0004bP-Ei
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:23:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42686)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kD6Cd-00031X-ET
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:19:59 -0400
-Received: from mail-lj1-x233.google.com ([2a00:1450:4864:20::233]:38608)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kD6Cb-0005UC-Bw
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:19:59 -0400
-Received: by mail-lj1-x233.google.com with SMTP id w3so1482294ljo.5
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 06:19:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=s18B5dwypIm5SaW4dyeU9nUQPwau4889kVjag61Telk=;
- b=gWDkBEAYEUUGqsGzRaWrCEV4I7h6JQhcURE85QTiD2g2PHPTcvklPT87kZWiY9ia6D
- DeAMguz7dDxd/8lwEFIZFFjhQyQqnSCfG2c2dEERJ36xam0iH/Oy90w1TkLnYsLUX9Kn
- Y4mvV9shDVbJaoXxc5wYYc90Gm4K4Q7AK/PL//fvBReGKwp172Q4As3boOTPTIz64Jx1
- YUqPjI9QQS5fa10nZxwfFglQm6NnXf6VM2FomEqwFCRMboIanblfZESs1z4y21lbvkTU
- 1fB5BYwy/mDAU/Dh85P2sUoM64wl0w3oob2pcyW6mh6cfw+iy+SKtZvKfqR/cmz9AivJ
- in8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=s18B5dwypIm5SaW4dyeU9nUQPwau4889kVjag61Telk=;
- b=uLn5ortLc3gJ+d+Jjcd54XcML4S06GxYzF7f/n4koOGPN/bI+P5jQsw+CqsbXQvGCH
- RtD9gCC4+CFYHYs6J0JCtKRqmCFTt/xtN1F6v2rem2LFCEAh9iETPbjFhJ+fls0zS4SF
- 4VfGLa7BJqjkVcwfEiY4BsF2eUfFwQborOt9P2Gqc/A1bQajQu42f9r9U3JsXtm9mfG+
- 7mos6JbwD8yZ84XldO5KS48F3nAecJx4nUHkABzSiV38/a0jo1ewO7uwhf4gnLJd1iOv
- rOEqafy9eCTEdKPF///AIil53j6sUq9WbM1XjkqESAn2A6KSx3NE2hN0n1TXHtaGGnyD
- hQxQ==
-X-Gm-Message-State: AOAM533sWkidyg9Yq+6WUv3p3Az1lcJn7feDOEIHEhGDcj4afoD1fHrA
- DqMC5YFIB7oj/a6bw9HKIhAGoqxr3Q4SHBuXKNLt5+XIZY4J5g==
-X-Google-Smtp-Source: ABdhPJwRovQn5LfeKj4oiPcB8IjgYmhocxvbVYC58sL2G/kHpdnyGLNfUBN4UpyGqJjjNxs2+7Hq3lsW0TfDd9NkoM0=
-X-Received: by 2002:a2e:2a83:: with SMTP id q125mr624168ljq.242.1598966394922; 
- Tue, 01 Sep 2020 06:19:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kD6FJ-0004BY-JS
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:22:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36908)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kD6FH-0005xZ-Qm
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:22:45 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598966563;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9QkIg2Gteny+RzE/aI1+ikNttRDP4KXD0Nz2Kcnqe9o=;
+ b=BmpKht9wY4Jt97+PtF9B4Ha00akm3cpE3zBrNXRNS79hTk92riCOEFM/iLHoGdNVhh47f6
+ hhR5Rt2kY1d2H7Lw/M0i5x2tfUQ7CkWYZrYcKpT7hiMCfZ8v8Sm1fHkhIcYTxEC7lJ6vOs
+ wK45TQlgvug1LoMqgx52bqlVi+yhUjI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-9QbtB8ncO4uNy_AeyskWTw-1; Tue, 01 Sep 2020 09:22:28 -0400
+X-MC-Unique: 9QbtB8ncO4uNy_AeyskWTw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C1CA910ABDA8;
+ Tue,  1 Sep 2020 13:22:26 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 31F8A78374;
+ Tue,  1 Sep 2020 13:22:26 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 992F3113C418; Tue,  1 Sep 2020 15:22:24 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Subject: Re: [PATCH v2 (BROKEN) 0/6] migration: bring improved
+ savevm/loadvm/delvm to QMP
+References: <20200727150843.3419256-1-berrange@redhat.com>
+ <877dtls8ux.fsf@dusky.pond.sub.org>
+ <20200826182824.GA190807@redhat.com>
+ <874koonyd0.fsf@dusky.pond.sub.org>
+ <20200827113411.GP192458@redhat.com>
+Date: Tue, 01 Sep 2020 15:22:24 +0200
+In-Reply-To: <20200827113411.GP192458@redhat.com> ("Daniel P. =?utf-8?Q?Be?=
+ =?utf-8?Q?rrang=C3=A9=22's?=
+ message of "Thu, 27 Aug 2020 12:34:11 +0100")
+Message-ID: <87d035ws1b.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20200901091132.29601-1-pbonzini@redhat.com>
-In-Reply-To: <20200901091132.29601-1-pbonzini@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Tue, 1 Sep 2020 21:19:42 +0800
-Message-ID: <CAE2XoE_cO83H7ki8NXY=X+U0aWGbmPRBhyakzMk8dqmTOAmcFQ@mail.gmail.com>
-Subject: Re: [PULL 00/24] Meson changes for 2020-09-01
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000fa2be905ae405fe7"
-Received-SPF: pass client-ip=2a00:1450:4864:20::233;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x233.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,253 +104,141 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: qemu-level <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org, "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000fa2be905ae405fe7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Seems forgot queue my undefsym.py patch
+> On Thu, Aug 27, 2020 at 01:04:43PM +0200, Markus Armbruster wrote:
+>> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+>>=20
+>> > On Wed, Aug 26, 2020 at 05:52:06PM +0200, Markus Armbruster wrote:
+>> > From the POV of practicality, making a design that unifies internal
+>> > and external snapshots is something I'm considering out of scope.
+>> > It increases the design time burden, as well as implementation burden.
+>> > On my side, improving internal snapshots is a "spare time" project,
+>> > not something I can justify spending weeks or months on.
+>>=20
+>> I'm not demanding a solution that unifies internal and external
+>> snapshots.  I'm asking for a bit of serious thought on an interface that
+>> could compatibly evolve there.  Hours, not weeks or months.
+>>=20
+>> > My goal is to implement something that is achievable in a short
+>> > amount of time that gets us out of the hole we've been in for 10
+>> > years. Minimal refactoring of the internal snapshot code aside
+>> > from fixing the critical limitations we have today around choice
+>> > of disks to snapshot.
+>> >
+>> > If someone later wants to come up with a grand unified design
+>> > for everything that's fine, we can deprecate the new QMP commands
+>> > I'm proposing now.
+>>=20
+>> Failing at coming up with an interface that has a reasonable chance to
+>> be future-proof is okay.
+>>=20
+>> Not even trying is not okay.
+>
+> This was raised in my v1 posting:
+>
+>   https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg01346.html
+>
+> but the conclusion was that it was a non-trivial amount of extra
+> implementation work
 
-On Tue, Sep 1, 2020 at 5:12 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+Thanks for the pointer.  I've now read that review thread.
 
-> The following changes since commit
-> 2f4c51c0f384d7888a04b4815861e6d5fd244d75:
+>> Specifically, I'd like you to think about monolothic snapshot command
+>> (internal snapshots only by design) vs. transaction of individual
+>> snapshot commands (design is not restricted to internal snapshots, but
+>> we may want to accept implementation restrictions).
+>>=20
+>> We already have transactionable individual storage snapshot commands.
+>> What's missing is a transactionable machine state snapshot command.
 >
->   Merge remote-tracking branch
-> 'remotes/kraxel/tags/usb-20200831-pull-request' into staging (2020-08-31
-> 19:39:13 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 703230593ffda7699ae81811967b4d2c76a425c1:
->
->   meson: add description to options (2020-09-01 03:10:36 -0400)
->
-> ----------------------------------------------------------------
-> meson fixes:
-> * bump submodule to 0.55.1
-> * SDL, pixman and zlib fixes
-> * firmwarepath fix
-> * fix firmware builds
->
-> meson related:
-> * move install to Meson
-> * move NSIS to Meson
-> * do not make meson use cmake
-> * add description to options
->
-> ----------------------------------------------------------------
-> Marc-Andr=C3=A9 Lureau (14):
->       meson: install pc-bios blobs
->       meson: install scripts/qemu-trace-stap
->       meson: install icons
->       meson: install desktop file
->       meson: install $localstatedir/run for qga
->       build-sys: remove install target from Makefile
->       configure: rename confsuffix option
->       configure: always /-seperate directory from qemu_suffix
->       configure: build docdir like other suffixed directories
->       meson: pass qemu_suffix option
->       meson: use meson datadir instead of qemu_datadir
->       meson: pass docdir option
->       meson: use meson mandir instead of qemu_mandir
->       meson: add NSIS building
->
-> Paolo Bonzini (8):
->       meson: bump submodule to 0.55.1
->       block: always link with zlib
->       meson: move zlib detection to meson
->       meson: add pixman dependency to UI modules
->       configure: do not include ${prefix} in firmwarepath
->       meson: use pkg-config method to find dependencies
->       build: fix recurse-all target
->       meson: add description to options
->
-> Stefan Weil (1):
->       meson: add pixman dependency to chardev/baum module
->
-> Volker R=C3=BCmelin (1):
->       meson: fix SDL2_image detection
->
->  Makefile                           | 122
-> +------------------------------------
->  block/meson.build                  |   4 +-
->  chardev/meson.build                |   2 +-
->  configure                          |  65 ++++++--------------
->  contrib/vhost-user-gpu/meson.build |   2 +-
->  docs/devel/build-system.rst        |  27 ++++----
->  docs/meson.build                   |   4 +-
->  meson                              |   2 +-
->  meson.build                        |  53 +++++++++++-----
->  meson_options.txt                  |  33 +++++++---
->  pc-bios/descriptors/meson.build    |   2 +-
->  pc-bios/keymaps/meson.build        |   6 +-
->  pc-bios/meson.build                |  65 +++++++++++++++++++-
->  pc-bios/optionrom/Makefile         |  10 +--
->  pc-bios/s390-ccw/Makefile          |   3 +-
->  qga/meson.build                    |   2 +
->  scripts/meson.build                |   3 +
->  scripts/nsis.py                    |  78 ++++++++++++++++++++++++
->  tools/virtiofsd/meson.build        |   2 +-
->  trace/meson.build                  |   2 +-
->  ui/icons/meson.build               |  13 ++++
->  ui/meson.build                     |   9 ++-
->  22 files changed, 281 insertions(+), 228 deletions(-)
->  create mode 100644 scripts/meson.build
->  create mode 100644 scripts/nsis.py
->  create mode 100644 ui/icons/meson.build
-> --
-> 2.26.2
+> At a high level I consider what I've proposed as being higher level
+> syntax sugar vs a more generic future impl based on multiple commands
+> for snapshotting disk & state. I don't think I'd claim that it will
+> evolve to become the design you're suggesting here, as they are designs
+> from different levels in the stack. IOW, I think the would ultimately
+> just exist in parallel. I don't think that's a real problem from a
+> maint POV, as the large burden from the monolithic snapshot code is
+> not the HMP/QMP interface, but rather the guts of the internal
+> impl in the migration/savevm.c and block/snapshot.c files. That code
+> will exist for as long as the HMP commands exist, and adding a QMP
+> interface doesn't make that situation worse unless we were intending
+> to drop the existing HMP commands. If we did change our minds though,
+> we can just deprecate the QMP command at any time we like.
 >
 >
+>> One restriction I'd readily accept at this time is "the machine state
+>> snapshot must write to a QCOW2 that is also internally snapshot in the
+>> same transaction".
+>>=20
+>> Now explain to me why this is impractical.
 >
+> The issues were described by Kevin here:
+>
+>   https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg02057.html
+>
+> Assuming the migration impl is actually possible to solve, there is
+> still the question of actually writing it. That's a non-trivial
+> amount of work someone has to find time for.
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+Kevin explained how the transactionable machine state snapshot command
+should be made non-blocking: post-copy.
 
---000000000000fa2be905ae405fe7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+I don't dispute that creating such a post-copy snapshot is a non-trivial
+task.  It is out of reach for you and me.  I didn't actually ask for it,
+though.
 
-<div dir=3D"ltr">Seems forgot queue my=C2=A0undefsym.py patch</div><br><div=
- class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Sep 1,=
- 2020 at 5:12 PM Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">p=
-bonzini@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote=
-" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
-padding-left:1ex">The following changes since commit 2f4c51c0f384d7888a04b4=
-815861e6d5fd244d75:<br>
-<br>
-=C2=A0 Merge remote-tracking branch &#39;remotes/kraxel/tags/usb-20200831-p=
-ull-request&#39; into staging (2020-08-31 19:39:13 +0100)<br>
-<br>
-are available in the Git repository at:<br>
-<br>
-=C2=A0 <a href=3D"https://gitlab.com/bonzini/qemu.git" rel=3D"noreferrer" t=
-arget=3D"_blank">https://gitlab.com/bonzini/qemu.git</a> tags/for-upstream<=
-br>
-<br>
-for you to fetch changes up to 703230593ffda7699ae81811967b4d2c76a425c1:<br=
->
-<br>
-=C2=A0 meson: add description to options (2020-09-01 03:10:36 -0400)<br>
-<br>
-----------------------------------------------------------------<br>
-meson fixes:<br>
-* bump submodule to 0.55.1<br>
-* SDL, pixman and zlib fixes<br>
-* firmwarepath fix<br>
-* fix firmware builds<br>
-<br>
-meson related:<br>
-* move install to Meson<br>
-* move NSIS to Meson<br>
-* do not make meson use cmake<br>
-* add description to options<br>
-<br>
-----------------------------------------------------------------<br>
-Marc-Andr=C3=A9 Lureau (14):<br>
-=C2=A0 =C2=A0 =C2=A0 meson: install pc-bios blobs<br>
-=C2=A0 =C2=A0 =C2=A0 meson: install scripts/qemu-trace-stap<br>
-=C2=A0 =C2=A0 =C2=A0 meson: install icons<br>
-=C2=A0 =C2=A0 =C2=A0 meson: install desktop file<br>
-=C2=A0 =C2=A0 =C2=A0 meson: install $localstatedir/run for qga<br>
-=C2=A0 =C2=A0 =C2=A0 build-sys: remove install target from Makefile<br>
-=C2=A0 =C2=A0 =C2=A0 configure: rename confsuffix option<br>
-=C2=A0 =C2=A0 =C2=A0 configure: always /-seperate directory from qemu_suffi=
-x<br>
-=C2=A0 =C2=A0 =C2=A0 configure: build docdir like other suffixed directorie=
-s<br>
-=C2=A0 =C2=A0 =C2=A0 meson: pass qemu_suffix option<br>
-=C2=A0 =C2=A0 =C2=A0 meson: use meson datadir instead of qemu_datadir<br>
-=C2=A0 =C2=A0 =C2=A0 meson: pass docdir option<br>
-=C2=A0 =C2=A0 =C2=A0 meson: use meson mandir instead of qemu_mandir<br>
-=C2=A0 =C2=A0 =C2=A0 meson: add NSIS building<br>
-<br>
-Paolo Bonzini (8):<br>
-=C2=A0 =C2=A0 =C2=A0 meson: bump submodule to 0.55.1<br>
-=C2=A0 =C2=A0 =C2=A0 block: always link with zlib<br>
-=C2=A0 =C2=A0 =C2=A0 meson: move zlib detection to meson<br>
-=C2=A0 =C2=A0 =C2=A0 meson: add pixman dependency to UI modules<br>
-=C2=A0 =C2=A0 =C2=A0 configure: do not include ${prefix} in firmwarepath<br=
->
-=C2=A0 =C2=A0 =C2=A0 meson: use pkg-config method to find dependencies<br>
-=C2=A0 =C2=A0 =C2=A0 build: fix recurse-all target<br>
-=C2=A0 =C2=A0 =C2=A0 meson: add description to options<br>
-<br>
-Stefan Weil (1):<br>
-=C2=A0 =C2=A0 =C2=A0 meson: add pixman dependency to chardev/baum module<br=
->
-<br>
-Volker R=C3=BCmelin (1):<br>
-=C2=A0 =C2=A0 =C2=A0 meson: fix SDL2_image detection<br>
-<br>
-=C2=A0Makefile=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 122 +------------------------------=
-------<br>
-=C2=A0block/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 =C2=A04 +-<br>
-=C2=A0chardev/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 =C2=A02 +-<br>
-=C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 65 ++++++--------------<br>
-=C2=A0contrib/vhost-user-gpu/meson.build |=C2=A0 =C2=A02 +-<br>
-=C2=A0docs/devel/build-system.rst=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 27 +++=
-+----<br>
-=C2=A0docs/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A04 +-<br>
-=C2=A0meson=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A02 +-<br>
-=C2=A0meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 53 +++++++++++-----<br>
-=C2=A0meson_options.txt=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 33 +++++++---<br>
-=C2=A0pc-bios/descriptors/meson.build=C2=A0 =C2=A0 |=C2=A0 =C2=A02 +-<br>
-=C2=A0pc-bios/keymaps/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0=
-6 +-<br>
-=C2=A0pc-bios/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 65 +++++++++++++++++++-<br>
-=C2=A0pc-bios/optionrom/Makefile=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 1=
-0 +--<br>
-=C2=A0pc-bios/s390-ccw/Makefile=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =
-=C2=A03 +-<br>
-=C2=A0qga/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A02 +<br>
-=C2=A0scripts/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 |=C2=A0 =C2=A03 +<br>
-=C2=A0scripts/nsis.py=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 |=C2=A0 78 ++++++++++++++++++++++++<br>
-=C2=A0tools/virtiofsd/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0=
-2 +-<br>
-=C2=A0trace/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 =C2=A02 +-<br>
-=C2=A0ui/icons/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0|=C2=A0 13 ++++<br>
-=C2=A0ui/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A09 ++-<br>
-=C2=A022 files changed, 281 insertions(+), 228 deletions(-)<br>
-=C2=A0create mode 100644 scripts/meson.build<br>
-=C2=A0create mode 100644 scripts/nsis.py<br>
-=C2=A0create mode 100644 ui/icons/meson.build<br>
--- <br>
-2.26.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div>
+You argue that providing a blocking snapshot in QMP is better than
+nothing, and good enough for quite a few applications.  I agree!  I
+blocked prior attempts at porting HMP's savevm/loadvm to QMP not because
+they were blocking, but because they stuck to the HMP interface, and the
+HMP interface is bonkers.  I would accept the restriction "snapshotting
+machine state is blocking, i.e. it stops the machine."  As I wrote in
+2016, "Limitations: No live internal machine snapshot, yet."
 
---000000000000fa2be905ae405fe7--
+Aside: unless I'm mistaken, taking an internal block device snapshot is
+also blocking, but unlike taking a machine state snapshot, it's fast
+enough for the blocking not to matter.  That's the "sync" in
+blockdev-snapshot-internal-sync.
+
+I asked you to consider the interface design I proposed back in 2016.
+You point out above that your interface is more high-level, and could be
+turned into sugar for a low level interface.
+
+If true, this means your proposal doesn't box us into a corner, which is
+good.
+
+Let me elaborate a bit on the desugaring, just to make sure we're on the
+same page.  Please correct me where I'm talking nonsense.
+
+snapshot-save creates job that snapshots a set of block devices and the
+machine state.  The snapshots are consistent, i.e. they are all taken at
+the same point in time.  The block device snapshots are all internal.
+The machine state snapshot is saved together with one of the (internal)
+block device snapshots.
+
+This is basically a transaction of blockdev-snapshot-internal-sync
+(which exists) plus machine-snapshot-internal-sync (which doesn't exist)
+wrapped in a job.
+
+Likweise for snapshot-load, except there not even the command for block
+snapshots exists.
+
+I doubt creating the (transactionable, but blocking) low-level commands
+is actually out of reach.  It's a matter of adding interfaces to parts
+of the code you already got working.
+
+I'm not demanding you do that, though.  As I said, my chief concerns are
+keeping "bonkers" out of QMP, and not boxing us in needlessly.
+
 
