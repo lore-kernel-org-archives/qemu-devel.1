@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DA3C433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E64F2C433E2
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:48:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8BEB206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:48:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8BEB206CD
+	by mail.kernel.org (Postfix) with ESMTPS id B7593206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:48:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7593206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD5iD-0001I9-Vo
+	id 1kD5iE-0001JS-QL
 	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:48:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33604)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fP-0004bo-5i
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:39 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:56631)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fR-0004ed-8L
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:41 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:46147)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fL-0001Qz-Sl
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:38 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.4.108])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 8813C563B954;
- Tue,  1 Sep 2020 14:45:32 +0200 (CEST)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fM-0001Pf-C8
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:40 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.188])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id E95295CC535B;
+ Tue,  1 Sep 2020 14:45:31 +0200 (CEST)
 Received: from kaod.org (37.59.142.99) by DAG4EX1.mxp5.local (172.16.2.31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 1 Sep 2020
  14:45:31 +0200
 Authentication-Results: garm.ovh; auth=pass
- (GARM-99G00384827f71-701d-4661-840d-b1912642d67b,
+ (GARM-99G003761c2c86-22b6-42bc-808a-1d1cdfac51cb,
  38EE1E9FF4E34D4C85F4190D418CEE501B878519) smtp.auth=clg@kaod.org
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: <qemu-devel@nongnu.org>
-Subject: [PULL 05/20] aspeed/smc: Fix MemoryRegionOps definition
-Date: Tue, 1 Sep 2020 14:45:10 +0200
-Message-ID: <20200901124525.220252-6-clg@kaod.org>
+Subject: [PULL 03/20] aspeed/scu: Fix valid access size on AST2400
+Date: Tue, 1 Sep 2020 14:45:08 +0200
+Message-ID: <20200901124525.220252-4-clg@kaod.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200901124525.220252-1-clg@kaod.org>
 References: <20200901124525.220252-1-clg@kaod.org>
@@ -54,14 +54,14 @@ Content-Transfer-Encoding: 8bit
 X-Originating-IP: [37.59.142.99]
 X-ClientProxiedBy: DAG7EX1.mxp5.local (172.16.2.61) To DAG4EX1.mxp5.local
  (172.16.2.31)
-X-Ovh-Tracer-GUID: 1e64f420-cd02-406a-868c-f6335defd7c7
-X-Ovh-Tracer-Id: 4786200504106716067
+X-Ovh-Tracer-GUID: 2063d41f-e671-4fc5-bf20-ad7ab33a329b
+X-Ovh-Tracer-Id: 4785919032676158371
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefjedgheejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheehfeegjeeitdfffeetjeduveejueefuefgtdefueelueetveeliefhhffgtdelnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 08:45:33
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 08:45:31
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -81,39 +81,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Erik Smit <erik.lucas.smit@gmail.com>,
  =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- "Michael S . Tsirkin" <mst@redhat.com>
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Unaligned access support is a leftover from the initial commit. There
-is no such need on this device register mapping. Remove it.
+The read access size of the SCU registers can be 1/2/4 bytes and write
+is 4 bytes and all Aspeed models would need a .valid.accepts() handler.
 
-Cc: Michael S. Tsirkin <mst@redhat.com>
+For the moment, set the min access size to 1 byte to cover both read
+and write operations on the AST2400 but keep the min access size of
+the other SoCs to 4 bytes as this is an unusual access size.
+
+This fixes support for some old firmware doing 2 bytes reads on the
+AST2400 SoC.
+
+Reported-by: Erik Smit <erik.lucas.smit@gmail.com>
 Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-Id: <20200819100956.2216690-7-clg@kaod.org>
+Message-Id: <20200819100956.2216690-5-clg@kaod.org>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- hw/ssi/aspeed_smc.c | 2 --
- 1 file changed, 2 deletions(-)
+ hw/misc/aspeed_scu.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
-index 4fab1f5f855e..0646e0dca72e 100644
---- a/hw/ssi/aspeed_smc.c
-+++ b/hw/ssi/aspeed_smc.c
-@@ -1299,10 +1299,8 @@ static const MemoryRegionOps aspeed_smc_ops = {
-     .read = aspeed_smc_read,
-     .write = aspeed_smc_write,
+diff --git a/hw/misc/aspeed_scu.c b/hw/misc/aspeed_scu.c
+index ec4fef900e27..764222404bef 100644
+--- a/hw/misc/aspeed_scu.c
++++ b/hw/misc/aspeed_scu.c
+@@ -328,9 +328,10 @@ static const MemoryRegionOps aspeed_ast2400_scu_ops = {
+     .read = aspeed_scu_read,
+     .write = aspeed_ast2400_scu_write,
      .endianness = DEVICE_LITTLE_ENDIAN,
--    .valid.unaligned = true,
+-    .valid.min_access_size = 4,
+-    .valid.max_access_size = 4,
+-    .valid.unaligned = false,
++    .valid = {
++        .min_access_size = 1,
++        .max_access_size = 4,
++    },
  };
  
--
- /*
-  * Initialize the custom address spaces for DMAs
-  */
+ static const MemoryRegionOps aspeed_ast2500_scu_ops = {
 -- 
 2.25.4
 
