@@ -2,126 +2,88 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD91FC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:21:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C121C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:21:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CFB921548
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:21:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C54B3206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:21:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="qwC0cT5c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CFB921548
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="eJRjdjLZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C54B3206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD86H-0005Tf-JZ
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:21:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47576)
+	id 1kD86e-0006WB-Tz
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:21:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1kD83O-0007PM-JG
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:18:34 -0400
-Received: from mail-bn8nam12on2064.outbound.protection.outlook.com
- ([40.107.237.64]:18144 helo=NAM12-BN8-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
- id 1kD83M-00069y-3l
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:18:34 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IV11ASA8JwlTtWS2vYGXlAQf6s3O59kgbbyJvJK4jGbCiTHyfCUgzz6CJf+M2BPRvbwK4iXh4c+bZUETOZbk0M8gJ5pBcf0cebsOo2FS4ckMRAHc4yi2HF44o2np9gSVYL3Ige7Nes2lPabSxMlMsj6YcCVhfJT/1MQz+IBtBWWyvl5X12fz7kRwsLYOgwAVREk32tlpnJwWKiZjox9piuzCtOXxPBIk/TyRCp2RwVPPeUqtBntj10gHUjA3s/fnZFzGwSaNUgVDeJjG+rHSNqvhch2i7+C+oEj/AvGqqIXgSUMNGQWhNg3aJK8flRcmPjsCWxWuKUFHyRR4FocZ2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5dAPpwyxoA/Z4UzVBdNJG7O/wVqR0LfU7bMVc+rIh7c=;
- b=HVLo3s/qshAowN+ojxfbF6Bw+gOCJ6WIctopgg1FD6fTExO/YOAUfyNbbFgvsWMrYfm+PwcJzmWmoTY2SfJXXmidM1/eBpl/vRoUYKHnjuLUocbeCguAKs5XfNdGNUMJ8eadkj0yBccXfZshazQJgd5bWtVSZ/Ktqp+Cyb4jXUivqhOGm03fwJwtRRVkZv8obEtsIM/y4sdt0gIj4ahL0QdEE/+RN9YUSaoaJaKVQaGSie7FJy+kY0Xn+p8TcxSWUSnVo7Pv4JWdgJ7ob8pThjHwWtcpwAaklb1LNt2dJRPe0/xBAUEeyYbuY/LoQrCdMRlzadLvaME7lCrfsWiqcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kD7v0-0004Zx-7E
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:09:55 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:35912)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kD7ux-0004bi-Mf
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:09:53 -0400
+Received: by mail-pl1-x643.google.com with SMTP id y6so678911plt.3
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:09:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5dAPpwyxoA/Z4UzVBdNJG7O/wVqR0LfU7bMVc+rIh7c=;
- b=qwC0cT5crEa59pzLe14su7Ga1RvvbPArQxcNl98bMqHsWrY+X6KI0eRXdGHqYje5KACy0yo8CPwuLC7vrRat54EMcDgNt3DlV8SLK1r4oX3725mQHqDfqXSUdI9gl0GZhxXfkW8PjcYdvAORJR2XPk3UuYdaq3HVj9DqLH/Zn0k=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
- by SN1PR12MB2431.namprd12.prod.outlook.com (2603:10b6:802:27::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Tue, 1 Sep
- 2020 14:45:32 +0000
-Received: from SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
- ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3326.025; Tue, 1 Sep 2020
- 14:45:31 +0000
-Subject: Re: [PATCH v6 09/10] i386: Simplify CPUID_8000_001E for AMD
-To: Igor Mammedov <imammedo@redhat.com>
-References: <159889924378.21294.16494070903874534542.stgit@naples-babu.amd.com>
- <159889938099.21294.9493474163204060713.stgit@naples-babu.amd.com>
- <20200901135249.22db38e1@imammedo-mac>
-From: Babu Moger <babu.moger@amd.com>
-Message-ID: <3d8e5b6f-3a0f-5679-d3a6-c758a445e804@amd.com>
-Date: Tue, 1 Sep 2020 09:45:29 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-In-Reply-To: <20200901135249.22db38e1@imammedo-mac>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SA0PR11CA0045.namprd11.prod.outlook.com
- (2603:10b6:806:d0::20) To SN1PR12MB2560.namprd12.prod.outlook.com
- (2603:10b6:802:26::19)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- SA0PR11CA0045.namprd11.prod.outlook.com (2603:10b6:806:d0::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.19 via Frontend Transport; Tue, 1 Sep 2020 14:45:30 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 8077faf1-fc11-4dcf-b102-08d84e85acb1
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2431:
-X-Microsoft-Antispam-PRVS: <SN1PR12MB2431415C637F356B1E49EDFB952E0@SN1PR12MB2431.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:274;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ckV3wTCMPz6CEYkwIwqvF31Sn0NdVxbGwSHJa0rwAfWVI0yk1mmvZTAEJyVgEF5CsQmZT0y2ll4LZ1xLqRLzGR6HbsB6tdFRLtGsn++092jMoVZyKsjmazHBYZ3foq8GBaHVEP9xcoJ823PwsRTa+1j42gjGlXZNfqe+MaX61y4ORY1A5eMlQoopRbyYwiwtt5HMel4OkSOssb5kdgvdUosKcy+/uc87szIN/2/PTFh82MQvz5Zo/V5dHzDKSpTj3IhIUpa2MTVvhwFeBH3+AXrBeqc6yTxRIeCLUa+eRjmwgndNiMaMqNQs0DzcZ0LF4zhGyzRdqOMQC4YFo/23fNlpPzF1//aDvOmefqi0EFI4xUp3JesAtccixdWDx39/
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(346002)(39860400002)(366004)(396003)(136003)(376002)(26005)(186003)(6486002)(53546011)(316002)(8676002)(16576012)(6916009)(8936002)(31686004)(83380400001)(4326008)(66946007)(2906002)(31696002)(86362001)(52116002)(66476007)(66556008)(36756003)(956004)(478600001)(5660300002)(44832011)(2616005)(43740500002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: oPshJyluT+oc9IR7sKAADyl3W6pzNc8rthR3FLAmJuRMZ7BeGvmp6Y7yadpVeQjJNX5/ftTEK/tjU1pkSRZzM5hCv2wd8o/lzwfWUjY8Vx0k0o7I+ULKgd10wyqy/KIt7wlbuET7D6NbYfUrcTYYFswabnlp+z8l/L6VJhZVha2f0p2EyBLzyWD95cnSAL/pceTE5oTOPda0cRSh4IYVtjxA0p4vJXUcm1l47vP6Zw53KeNC/xJ+6+GC/UiWKKGJWsGctu28CfdpcGm8hnijdVOtS4nD5UOmH9qeJF47Imp0kC85fox1uTG69ONotcg2Mvlr4Az8YIqpOPs661lAXOLzo3jy1T87zTEJ+j31pJPYM021BE9tbsiFIY/D6fNk9NbYwQEVNdlV7YGZ1DU4gkVbBlvCRCmFgYfIxzM5Z1uEA8a1t9b8neLjZDX3xM9hOhwo3KV304jNoQjkj7bD+abifV1aBIZUFCK2qrnZ6FSxTcjiq4LE3rp70Owq/FPOKuRkz2IFlW1l4wtNuVHTivaUM1m6heC1FVUF4FtB+xFfF6wryr0sJJw5BtIRMrwDRy8VbXuPDsE8IfeMrMGK30FWT/rkK9qfAepp19c4qgS7AAolomToZ7woAnFoeMxHO+2R+tH0JvdTE7zR2kQs0w==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8077faf1-fc11-4dcf-b102-08d84e85acb1
-X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2020 14:45:31.2265 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wFLkQWpZ6/aSDnCyiCRomdXFgszp1pzWsn37U37gwaCx4RXSri+HPcrH9xnxMW0z
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2431
-Received-SPF: none client-ip=40.107.237.64; envelope-from=Babu.Moger@amd.com;
- helo=NAM12-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 11:18:30
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -16
-X-Spam_score: -1.7
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Cr4XHulQO9fR/HQsLEEkrXwNCbZttZVEViWwSbm5i7E=;
+ b=eJRjdjLZTQeMTnZ1G6iDq27E4TtBpk5XHnlvRIU6WHA8NysXJsgrL3u6j+Hel/DO2C
+ RBiI8fpB2Z2/pOsckxEDh8231DJA9CjGL3RWN5eKE0vPXzrh4RGScgd8JOq3kQSOHlyV
+ DkEZb1HPXFl3kBnXqIT8PWnb47q5OvAsDlvTlwbxuMdvngeoV8czn27Q5yBMrMME2lR1
+ fCLy2ZjSmuj9Www3b8cmz5a4P1YK6tCwYeOq51dMxQ4WPlQso7EIMaD10Dy8sIz2fqL8
+ eJ6k+z2aigUOt1YYbG4KL2AJuKclKZ4+JPChR8qYfGft7houY2VUEOUBIDmTZ1b2ffyc
+ wGdg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=Cr4XHulQO9fR/HQsLEEkrXwNCbZttZVEViWwSbm5i7E=;
+ b=OJHhFLrK05h/PjRpE9bITGsInoT9D0nWehASKrqxf7ZDRQIz1b3pnyPHOQdwFiLuqN
+ vRsZ8jI1GFGBcYhBTzdcxExX2neMxCwT8OrfSiJpBS/VNCqKtl6mVoTWKhbbj3tuF4GI
+ CQ3bbOfer+qVrFKLHX1AY/8JnDgmlBqNzW6Eb+flM3dOmn80+jrcUJvARsWDM1Sux+9D
+ wAs/X6gDoSH78Fzz5RBGCkdiNDGKOYWtC29SPRdDwvWXst3QiT9d6o1dzqaKJuDBeZxt
+ T4H3+GYD7rioqRJg7WVg8yRUc4R56t8xTrOHvodEmhuF69o7nZolYadyVREP5Cv47e9K
+ xB6Q==
+X-Gm-Message-State: AOAM531o69yPcbkcxSB2h6W3ZZ6mauofwt72ff+EkRXB3ff+ok+GILFv
+ EnfMpKbNqC6JMzzh/e2cROCpOex6OToV89pz
+X-Google-Smtp-Source: ABdhPJyOWrHHEdP19UtNk/U1L2KPRFyMoK2uTzS7FF8QfOViQNCN6ij2Ac5eks8wZ595M4JpVeA60Q==
+X-Received: by 2002:a17:902:b18b:: with SMTP id
+ s11mr1771378plr.211.1598972989341; 
+ Tue, 01 Sep 2020 08:09:49 -0700 (PDT)
+Received: from localhost.localdomain ([203.163.237.89])
+ by smtp.googlemail.com with ESMTPSA id gk19sm3315777pjb.2.2020.09.01.08.09.45
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 08:09:48 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 3/3] tests/acpi: add a new ACPI table in order to test root
+ pci hotplug on/off
+Date: Tue,  1 Sep 2020 20:39:28 +0530
+Message-Id: <20200901150928.12428-3-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200901150928.12428-1-ani@anisinha.ca>
+References: <20200901150928.12428-1-ani@anisinha.ca>
+Received-SPF: none client-ip=2607:f8b0:4864:20::643;
+ envelope-from=ani@anisinha.ca; helo=mail-pl1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001,
- NICE_REPLY_A=-2.13, RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001, T_FILL_THIS_FORM_SHORT=0.01 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -134,109 +96,639 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
+ Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+A new binary ACPI table tests/data/acpi/pc/DSDT.roothp is added in order
+to unit test hotplug on/off capability on the root pci bus for i440fx.
+The diff between the table DSDT.bridge and DSDT.roothp is listed below:
 
+@@ -1,30 +1,30 @@
+ /*
+  * Intel ACPI Component Architecture
+  * AML/ASL+ Disassembler version 20180105 (64-bit version)
+  * Copyright (c) 2000 - 2018 Intel Corporation
+  *
+  * Disassembling to symbolic ASL+ operators
+  *
+- * Disassembly of tests/data/acpi/pc/DSDT.bridge, Tue Sep  1 20:02:44 2020
++ * Disassembly of /tmp/aml-4FIZP0, Tue Sep  1 20:02:44 2020
+  *
+  * Original Table Header:
+  *     Signature        "DSDT"
+- *     Length           0x00001A89 (6793)
++ *     Length           0x0000140A (5130)
+  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+- *     Checksum         0x08
++ *     Checksum         0xE5
+  *     OEM ID           "BOCHS "
+  *     OEM Table ID     "BXPCDSDT"
+  *     OEM Revision     0x00000001 (1)
+  *     Compiler ID      "BXPC"
+  *     Compiler Version 0x00000001 (1)
+  */
+ DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT", 0x00000001)
+ {
+     Scope (\)
+     {
+         OperationRegion (DBG, SystemIO, 0x0402, One)
+         Field (DBG, ByteAcc, NoLock, Preserve)
+         {
+             DBGB,   8
+         }
 
-On 9/1/20 6:52 AM, Igor Mammedov wrote:
-> On Mon, 31 Aug 2020 13:43:01 -0500
-> Babu Moger <babu.moger@amd.com> wrote:
-> 
->> Remove all the hardcoded values and replace with generalized
->> fields.
->>
->> Signed-off-by: Babu Moger <babu.moger@amd.com>
->> ---
->>  target/i386/cpu.c |   31 +++++++++++++++++--------------
->>  1 file changed, 17 insertions(+), 14 deletions(-)
->>
->> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
->> index ba4667b33c..d434c8545a 100644
->> --- a/target/i386/cpu.c
->> +++ b/target/i386/cpu.c
->> @@ -395,9 +395,10 @@ static int cores_in_core_complex(int nr_cores)
->>  }
->>  
->>  /* Encode cache info for CPUID[8000001D] */
->> -static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
->> -                                uint32_t *eax, uint32_t *ebx,
->> -                                uint32_t *ecx, uint32_t *edx)
->> +static void encode_cache_cpuid8000001d(CPUCacheInfo *cache,
->> +                                       X86CPUTopoInfo *topo_info,
->> +                                       uint32_t *eax, uint32_t *ebx,
->> +                                       uint32_t *ecx, uint32_t *edx)
->>  {
->>      uint32_t l3_cores;
->>      assert(cache->size == cache->line_size * cache->associativity *
->> @@ -408,10 +409,12 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
->>  
->>      /* L3 is shared among multiple cores */
->>      if (cache->level == 3) {
->> -        l3_cores = cores_in_core_complex(cs->nr_cores);
->> -        *eax |= ((l3_cores * cs->nr_threads) - 1) << 14;
->> +        l3_cores = DIV_ROUND_UP((topo_info->cores_per_die *
->> +                                 topo_info->threads_per_core),
->> +                                 topo_info->dies_per_pkg);
-> 
-> from spec:
-> "
-> NumSharingCache: number of '''logical processors''' sharing cache.
-> "
-> 
-> s/l3_cores/l3_vcpus|l3_threads/
-> 
+@@ -831,61 +831,60 @@
+             Name (_CRS, ResourceTemplate ()  // _CRS: Current Resource Settings
+             {
+                 IO (Decode16,
+                     0x0510,             // Range Minimum
+                     0x0510,             // Range Maximum
+                     0x01,               // Alignment
+                     0x0C,               // Length
+                     )
+             })
+         }
+     }
 
-Sure.
+     Scope (\_SB)
+     {
+         Scope (PCI0)
+         {
+-            Name (BSEL, Zero)
+             Device (S00)
+             {
+                 Name (_ADR, Zero)  // _ADR: Address
+             }
 
-> Also why not use just:
-> 
->   val = topo_info->cores_per_die * topo_info->threads_per_core
+             Device (S10)
+             {
+                 Name (_ADR, 0x00020000)  // _ADR: Address
+                 Method (_S1D, 0, NotSerialized)  // _S1D: S1 Device State
+                 {
+                     Return (Zero)
+                 }
 
-Yes. You are right. Will correct it. thanks
+                 Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
+                 {
+                     Return (Zero)
+                 }
 
-> 
-> 
-> 
->> +        *eax |= (l3_cores - 1) << 14;
->>      } else {
->> -        *eax |= ((cs->nr_threads - 1) << 14);
->> +        *eax |= ((topo_info->threads_per_core - 1) << 14);
->>      }
->>  
->>      assert(cache->line_size > 0);
->> @@ -5994,20 +5997,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->>          }
->>          switch (count) {
->>          case 0: /* L1 dcache info */
->> -            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, cs,
->> -                                       eax, ebx, ecx, edx);
->> +            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache,
->> +                                       &topo_info, eax, ebx, ecx, edx);
->>              break;
->>          case 1: /* L1 icache info */
->> -            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache, cs,
->> -                                       eax, ebx, ecx, edx);
->> +            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache,
->> +                                       &topo_info, eax, ebx, ecx, edx);
->>              break;
->>          case 2: /* L2 cache info */
->> -            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache, cs,
->> -                                       eax, ebx, ecx, edx);
->> +            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache,
->> +                                       &topo_info, eax, ebx, ecx, edx);
->>              break;
->>          case 3: /* L3 cache info */
->> -            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache, cs,
->> -                                       eax, ebx, ecx, edx);
->> +            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache,
->> +                                       &topo_info, eax, ebx, ecx, edx);
->>              break;
->>          default: /* end of info */
->>              *eax = *ebx = *ecx = *edx = 0;
->>
-> 
+                 Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
+                 {
+                     Return (Zero)
+                 }
+             }
+
+             Device (S18)
+             {
+                 Name (_ADR, 0x00030000)  // _ADR: Address
+-                Name (BSEL, One)
++                Name (BSEL, Zero)
+                 Device (S00)
+                 {
+                     Name (_SUN, Zero)  // _SUN: Slot User Number
+                     Name (_ADR, Zero)  // _ADR: Address
+                     Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+                     {
+                         PCEJ (BSEL, _SUN)
+                     }
+                 }
+
+                 Device (S08)
+                 {
+                     Name (_SUN, One)  // _SUN: Slot User Number
+                     Name (_ADR, 0x00010000)  // _ADR: Address
+                     Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+                     {
+@@ -1345,456 +1344,30 @@
+                         Notify (SE8, Arg1)
+                     }
+
+                     If ((Arg0 & 0x40000000))
+                     {
+                         Notify (SF0, Arg1)
+                     }
+
+                     If ((Arg0 & 0x80000000))
+                     {
+                         Notify (SF8, Arg1)
+                     }
+                 }
+
+                 Method (PCNT, 0, NotSerialized)
+                 {
+-                    BNUM = One
++                    BNUM = Zero
+                     DVNT (PCIU, One)
+                     DVNT (PCID, 0x03)
+                 }
+             }
+
+-            Device (S20)
+-            {
+-                Name (_SUN, 0x04)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00040000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S28)
+-            {
+-                Name (_SUN, 0x05)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00050000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S30)
+-            {
+-                Name (_SUN, 0x06)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00060000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S38)
+-            {
+-                Name (_SUN, 0x07)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00070000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S40)
+-            {
+-                Name (_SUN, 0x08)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00080000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S48)
+-            {
+-                Name (_SUN, 0x09)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00090000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S50)
+-            {
+-                Name (_SUN, 0x0A)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000A0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S58)
+-            {
+-                Name (_SUN, 0x0B)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000B0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S60)
+-            {
+-                Name (_SUN, 0x0C)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000C0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S68)
+-            {
+-                Name (_SUN, 0x0D)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000D0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S70)
+-            {
+-                Name (_SUN, 0x0E)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000E0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S78)
+-            {
+-                Name (_SUN, 0x0F)  // _SUN: Slot User Number
+-                Name (_ADR, 0x000F0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S80)
+-            {
+-                Name (_SUN, 0x10)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00100000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S88)
+-            {
+-                Name (_SUN, 0x11)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00110000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S90)
+-            {
+-                Name (_SUN, 0x12)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00120000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (S98)
+-            {
+-                Name (_SUN, 0x13)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00130000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SA0)
+-            {
+-                Name (_SUN, 0x14)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00140000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SA8)
+-            {
+-                Name (_SUN, 0x15)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00150000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SB0)
+-            {
+-                Name (_SUN, 0x16)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00160000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SB8)
+-            {
+-                Name (_SUN, 0x17)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00170000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SC0)
+-            {
+-                Name (_SUN, 0x18)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00180000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SC8)
+-            {
+-                Name (_SUN, 0x19)  // _SUN: Slot User Number
+-                Name (_ADR, 0x00190000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SD0)
+-            {
+-                Name (_SUN, 0x1A)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001A0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SD8)
+-            {
+-                Name (_SUN, 0x1B)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001B0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SE0)
+-            {
+-                Name (_SUN, 0x1C)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001C0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SE8)
+-            {
+-                Name (_SUN, 0x1D)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001D0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SF0)
+-            {
+-                Name (_SUN, 0x1E)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001E0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Device (SF8)
+-            {
+-                Name (_SUN, 0x1F)  // _SUN: Slot User Number
+-                Name (_ADR, 0x001F0000)  // _ADR: Address
+-                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                {
+-                    PCEJ (BSEL, _SUN)
+-                }
+-            }
+-
+-            Method (DVNT, 2, NotSerialized)
+-            {
+-                If ((Arg0 & 0x10))
+-                {
+-                    Notify (S20, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x20))
+-                {
+-                    Notify (S28, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x40))
+-                {
+-                    Notify (S30, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x80))
+-                {
+-                    Notify (S38, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0100))
+-                {
+-                    Notify (S40, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0200))
+-                {
+-                    Notify (S48, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0400))
+-                {
+-                    Notify (S50, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x0800))
+-                {
+-                    Notify (S58, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x1000))
+-                {
+-                    Notify (S60, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x2000))
+-                {
+-                    Notify (S68, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x4000))
+-                {
+-                    Notify (S70, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x8000))
+-                {
+-                    Notify (S78, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00010000))
+-                {
+-                    Notify (S80, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00020000))
+-                {
+-                    Notify (S88, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00040000))
+-                {
+-                    Notify (S90, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00080000))
+-                {
+-                    Notify (S98, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00100000))
+-                {
+-                    Notify (SA0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00200000))
+-                {
+-                    Notify (SA8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00400000))
+-                {
+-                    Notify (SB0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x00800000))
+-                {
+-                    Notify (SB8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x01000000))
+-                {
+-                    Notify (SC0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x02000000))
+-                {
+-                    Notify (SC8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x04000000))
+-                {
+-                    Notify (SD0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x08000000))
+-                {
+-                    Notify (SD8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x10000000))
+-                {
+-                    Notify (SE0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x20000000))
+-                {
+-                    Notify (SE8, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x40000000))
+-                {
+-                    Notify (SF0, Arg1)
+-                }
+-
+-                If ((Arg0 & 0x80000000))
+-                {
+-                    Notify (SF8, Arg1)
+-                }
+-            }
+-
+             Method (PCNT, 0, NotSerialized)
+             {
+-                BNUM = Zero
+-                DVNT (PCIU, One)
+-                DVNT (PCID, 0x03)
+                 ^S18.PCNT ()
+             }
+         }
+     }
+ }
+
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+---
+ tests/data/acpi/pc/DSDT.roothp              | Bin 0 -> 5130 bytes
+ tests/qtest/bios-tables-test-allowed-diff.h |   1 -
+ 2 files changed, 1 deletion(-)
+ create mode 100644 tests/data/acpi/pc/DSDT.roothp
+
+diff --git a/tests/data/acpi/pc/DSDT.roothp b/tests/data/acpi/pc/DSDT.roothp
+new file mode 100644
+index 0000000000000000000000000000000000000000..be3e3bfaff7e4e2cfc51e11ca88e4e113aa5e6c8
+GIT binary patch
+literal 5130
+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
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index ac864fc982..dfb8523c8b 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,2 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/pc/DSDT.roothp",
+-- 
+2.17.1
+
 
