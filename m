@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A5AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F04AC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:42:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9FD072098B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:40:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FD072098B
+	by mail.kernel.org (Postfix) with ESMTPS id 09F532098B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:42:35 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09F532098B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCzxc-0002UN-QM
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:40:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47698)
+	id 1kD003-0003be-7c
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:42:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzwo-0001Hi-9P; Tue, 01 Sep 2020 02:39:14 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:47697)
+ id 1kCzzU-00038U-MM; Tue, 01 Sep 2020 02:42:00 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:33321)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzwm-0002wE-Em; Tue, 01 Sep 2020 02:39:14 -0400
+ id 1kCzzS-0003J4-HW; Tue, 01 Sep 2020 02:42:00 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mv2gw-1kUOIl3XxA-00qwmN; Tue, 01 Sep 2020 08:38:52 +0200
-Subject: Re: [PATCH 11/12] target/sh4: Remove superfluous breaks
+ 1MCs9W-1kLlPa0x0q-008uf5; Tue, 01 Sep 2020 08:41:42 +0200
+Subject: Re: [PATCH 12/12] target/cris: Remove superfluous breaks
 To: Thomas Huth <thuth@redhat.com>, Yi Wang <wang.yi59@zte.com.cn>,
  qemu-devel@nongnu.org
-References: <1594631142-36745-1-git-send-email-wang.yi59@zte.com.cn>
- <038e7f75-8c34-0a26-1451-75120d703c3d@redhat.com>
+References: <1594631150-36801-1-git-send-email-wang.yi59@zte.com.cn>
+ <454721ce-1508-dcc0-bf08-2c27fd37854f@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <be244055-0fc4-bc7a-776e-32cdede9636c@vivier.eu>
-Date: Tue, 1 Sep 2020 08:38:50 +0200
+Message-ID: <23b37ce6-a7da-9366-928f-5ce6df41f79a@vivier.eu>
+Date: Tue, 1 Sep 2020 08:41:41 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <038e7f75-8c34-0a26-1451-75120d703c3d@redhat.com>
+In-Reply-To: <454721ce-1508-dcc0-bf08-2c27fd37854f@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BlxzRNxxMsvhHyv5MfGELEvgY/rPpnnBYVA1fTPRGv/TuZ+kkVp
- brGOBzd/izODXElWsF0F2icsBVOvyCy9MSlrhLG4uNLonCors4c4FEdD+PkPg+3xSy7VBjF
- 4VcrAShT3JtfQDXn4Ns1cg3hNgDe3bRdtTZSd8kkrtd7C+xGYn625OPGXhrukGFSw8bS1CF
- iIMBnIYxX7t5sS2B5t99w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:lKUQvxnqQyk=:QPS17tl8z7d1BLklwnuyZw
- kGdU1Cxnu0zBXEdQ/7HDwd57AcPQehkzMgHAwlXHURodXma8x59XDyxMCoF2dujQOfn9eD5IF
- HQtAuxq88fk2WSotwgnFqHizscdnpblt4AV9Zcs1DXRNaiCbFItEmZTCVBXe4gqa2sdTL7112
- CwPBV5WYv7Cv9T5mX/zVJBiOGlwpwameYEJeRXJFxupDW104X4aCzuINzYK7TESGkZgWG4wPg
- +V9qQqwmODVU88ZHZavatgf7zylqxD+kWXfXpcttj9xO6Nn5sLcA/LUipSerhJDIQCw3OCaaQ
- kjI7A0q2qy7AfHPNul3IFQvCliuPb7rpFYn8esGI+8Tpkgo+MS96GFyAd/g3TTtdg5fm79s1Z
- opUyS50rIbtoFU+QeqKAMCSFuXBtytFieuuBkEJYdHpnOj62/YW+c3qj2uycP3b7AXt8VrtyC
- JJkbmQiIXdUwUj5+BCOoyyEPj9oWnM0vDlMQe17vgub4NghHLptqJiSEKAPYwcLjfwZ1VDNCD
- V15dCvhA6CnKjGosvfglH7XASBHWvkuzlK6QR5quqJ2Fvl8dUqkg9jIe68EtHfuxJsqCc7Fj0
- iw49J/4/VrdphgUaWyo3qVjsQb1oCLNmUSA8URQ1hUryfX26eX7m6P6Qs7lUgfdcKCI6YF6zB
- CzSKMVI6Qi2yOuYXxiOeHOzwWLSatQ0dAbCIeLyKSBh5STl4mbXWXZlCy8ufgP0PEYtHIHCY2
- 3/2Xn/osP/KB+jv2DlB+gfDjqRIDUPHb65i57E6+RuwnbfS0oNNTFdS1otfk8OnL35eoYDceB
- rXsY8BiGlF0+msT+87eOJ7nvW8Dr8naDfJT9feFC0MXhvSD6ruSjVR9MjyOSpuSF3unYPEk
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:V0y26JkjvLFFCZMfBSShf63k4rSUtXGbkaLvnauKJ4w5ddVjs5c
+ cAQM9rwBP4zmpPasTsImQPAsW+Uzsc1nQWrqbNqNDvAx+juw2eCRqilju2aaKMz+lrcT7ot
+ SXCQwz8q30STcWAW7ywOc+Wkk+WBVXqSZRgX3ysYX5WVBdYP5K1WXp3aTV5t/AHuLvPIoNp
+ 1S9YIJwQi/T+6GE1JRoSg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Vl06Cf6tiuE=:ynZvFyLJv8q1RwMXUi8pOI
+ o1beXpiC8+KdKlD4FzKOchZs6zlGT42BmHmIbrsnr8d6T2YJgcF59ggI/jwtcN2wjkKQ+TGhQ
+ oaXk+aHIaQnJvQVzqs+07vvV4z8KVQbe5+o5lKqCz52foEUKcSYHivFBUl6cXHFOEquZMIU7I
+ OXWehAQQwAagOWx0Cd1jumUH4RsI/b8cptkuKpTg3XuynT/eGrLO43TKiHMB+GaJ7ZEt31P+L
+ s0thVHu2zdaNRzXvHzenS4SfL+1vpEtTjHs2CkKh9SeMhmTU2uDSEuT+7iUQhQpApiaR4moNn
+ EWoa/D6y+qM1S1wwClVZr7WfskH/G4uRqx/fSaFF6kCnC6vgULCI9is1r9Hm1cdVThhNLw0h+
+ 9G+/YvG/R5wyB2WV3d8jms5j0fVJUYGOoRcThe4Qwpkfiv+QDpSR2bv5WOZPV15xpQSFhVv4S
+ O1ZsZlD0GyixW0rFjaNavDqZ2lqWx+NL4EsHQypsqzIKAfwcHBB5zUZ/F5lctjmkjaTj5og4T
+ LbAZB71Sq92tAsQg2PQcjPv3XTePvZfp8fuMCeYUwRQ7e68iVNr6biGH6uQu6TlMYo1g1hxDR
+ 21FhwVF9brPofy59f0pI0W3EU3htLnOjlON21OTLP+Wgs91zjLv2VkE2GQKrBIkbnSMKSY7tq
+ jzG4E5w7xQgXEptbCFdQ2JlEunxvxriK/04jvrXpVodFqp/wknI8adI2GAbtVRejpLnh/w3q5
+ Cto16hRAe1BCfS+LzNfjlXOpmPgV2QNJCL5dWDe6HegSK6C7txwPLtl/7JUH31GtQ1b9aQrNW
+ /t0GUof6D2eEouzaFeDX3sqIXYyRcuYarnLvZNPS49zDKOC4w87e/Osdg5RxxRI5wp8zvSp
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:33:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:35:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -130,13 +130,14 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
  Liao Pingfang <liao.pingfang@zte.com.cn>, wang.liang82@zte.com.cn,
- xue.zhihong@zte.com.cn, Yoshinori Sato <ysato@users.sourceforge.jp>
+ xue.zhihong@zte.com.cn
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/07/2020 à 11:38, Thomas Huth a écrit :
+Le 13/07/2020 à 11:39, Thomas Huth a écrit :
 > On 13/07/2020 11.05, Yi Wang wrote:
 >> From: Liao Pingfang <liao.pingfang@zte.com.cn>
 >>
@@ -146,37 +147,45 @@ Le 13/07/2020 à 11:38, Thomas Huth a écrit :
 >> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 >> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >> ---
->>  target/sh4/translate.c | 3 ---
->>  1 file changed, 3 deletions(-)
+>>  target/cris/translate.c         | 7 +++----
+>>  target/cris/translate_v10.inc.c | 2 --
+>>  2 files changed, 3 insertions(+), 6 deletions(-)
 >>
->> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
->> index 6192d83..60c863d 100644
->> --- a/target/sh4/translate.c
->> +++ b/target/sh4/translate.c
->> @@ -1542,7 +1542,6 @@ static void _decode_opc(DisasContext * ctx)
->>          tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
->>                              MO_TEUL | MO_UNALN);
->>          return;
+>> diff --git a/target/cris/translate.c b/target/cris/translate.c
+>> index aaa46b5..64a478b 100644
+>> --- a/target/cris/translate.c
+>> +++ b/target/cris/translate.c
+>> @@ -1178,12 +1178,11 @@ static inline void t_gen_zext(TCGv d, TCGv s, int size)
+>>  static char memsize_char(int size)
+>>  {
+>>      switch (size) {
+>> -    case 1: return 'b';  break;
+>> -    case 2: return 'w';  break;
+>> -    case 4: return 'd';  break;
+>> +    case 1: return 'b';
+>> +    case 2: return 'w';
+>> +    case 4: return 'd';
+>>      default:
+>>          return 'x';
 >> -        break;
->>      case 0x40e9:                /* movua.l @Rm+,R0 */
->>          CHECK_SH4A
->>          /* Load non-boundary-aligned data */
->> @@ -1550,7 +1549,6 @@ static void _decode_opc(DisasContext * ctx)
->>                              MO_TEUL | MO_UNALN);
->>          tcg_gen_addi_i32(REG(B11_8), REG(B11_8), 4);
->>          return;
->> -        break;
->>      case 0x0029:		/* movt Rn */
->>          tcg_gen_mov_i32(REG(B11_8), cpu_sr_t);
->>  	return;
->> @@ -1638,7 +1636,6 @@ static void _decode_opc(DisasContext * ctx)
->>          CHECK_SH4A
->>          tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
->>          return;
->> -        break;
->>      case 0x4024:		/* rotcl Rn */
->>  	{
->>  	    TCGv tmp = tcg_temp_new();
+>>      }
+>>  }
+>>  #endif
+>> diff --git a/target/cris/translate_v10.inc.c b/target/cris/translate_v10.inc.c
+>> index ae34a0d..7f38fd2 100644
+>> --- a/target/cris/translate_v10.inc.c
+>> +++ b/target/cris/translate_v10.inc.c
+>> @@ -1026,10 +1026,8 @@ static unsigned int dec10_ind(CPUCRISState *env, DisasContext *dc)
+>>          switch (dc->opcode) {
+>>              case CRISV10_IND_MOVE_M_R:
+>>                  return dec10_ind_move_m_r(env, dc, size);
+>> -                break;
+>>              case CRISV10_IND_MOVE_R_M:
+>>                  return dec10_ind_move_r_m(dc, size);
+>> -                break;
+>>              case CRISV10_IND_CMP:
+>>                  LOG_DIS("cmp size=%d op=%d %d\n",  size, dc->src, dc->dst);
+>>                  cris_cc_mask(dc, CC_MASK_NZVC);
 >>
 > 
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
