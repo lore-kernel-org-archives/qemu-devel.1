@@ -2,77 +2,80 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 875F8C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 04:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60C97C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 05:01:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F732208CA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 04:58:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A2112087D
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 05:01:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DZnOQ3SE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F732208CA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RUHtiG6D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A2112087D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCyNP-0003m5-F4
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 00:58:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59126)
+	id 1kCyQ1-0004p7-5e
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 01:01:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kCyMt-0003Lf-6V
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 00:58:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38716
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCyPS-0004O3-LE
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 01:00:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46511
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kCyMq-0000Uh-VR
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 00:58:02 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kCyPR-0000pR-4O
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 01:00:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598936279;
+ s=mimecast20190719; t=1598936440;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=ZIK8z7H0yjZPm75IRm985CwA2QYdlQqCEWM3WlyKf4Q=;
- b=DZnOQ3SEPVzvxfwD7huLrwGgYQLXsce99rwzbQlunB142Z83XiQ+ul0M8mLcDc+HLp3due
- pVBq0QcjLwYn8gtv5dlG7jCA7l2DBwWgcaA1zGkH3+Qn0oAsxJG3J/m1XkIue4RDmoEoqT
- EEZevpiQun2x1ZmwSgye1iFzplqFGqg=
+ bh=BFWDzasM1imPzj146/YYgkl92/6mYTw3tqWnZ9y9SY8=;
+ b=RUHtiG6DOHMqP+JpfWnCkFRpsGoXbH3Cmd1n9rFlGuurrAPvZJowAG3IuJPe0aYIdgcPEK
+ Mfz2GjPmJXycdw/rJrQ8jsXSVv4Hu+c3HCND6l/Bdqfqc7p3n5h+nzWN1mKlG/oBTB782c
+ n1OFYKQYMNrVK/gD1g7VEg1ruxZa9Fo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-43-k4wmzA9kMtetTU1OHel1Vw-1; Tue, 01 Sep 2020 00:57:55 -0400
-X-MC-Unique: k4wmzA9kMtetTU1OHel1Vw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-311-eD7xPCvGMs2M6pw50Mikkw-1; Tue, 01 Sep 2020 01:00:39 -0400
+X-MC-Unique: eD7xPCvGMs2M6pw50Mikkw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77B451009440;
- Tue,  1 Sep 2020 04:57:54 +0000 (UTC)
-Received: from kaapi (unknown [10.74.8.94])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7D001614F5;
- Tue,  1 Sep 2020 04:57:49 +0000 (UTC)
-Date: Tue, 1 Sep 2020 10:27:46 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: Li Qiang <liq3ea@gmail.com>
-Subject: Re: [PATCH] usb: fix setup_len init (CVE-2020-14364)
-In-Reply-To: <CAKXe6SKrTLAgRE4Wnk4sJkxzvXHD_FoaXBBrM_utLRtbJrCvRw@mail.gmail.com>
-Message-ID: <nycvar.YSQ.7.78.906.2009011021440.306228@xnncv>
-References: <20200825053636.29648-1-kraxel@redhat.com>
- <CAKXe6SKrTLAgRE4Wnk4sJkxzvXHD_FoaXBBrM_utLRtbJrCvRw@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 283DC10ABDAB
+ for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 05:00:38 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DC4497DA45;
+ Tue,  1 Sep 2020 05:00:37 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 04B6F991; Tue,  1 Sep 2020 07:00:37 +0200 (CEST)
+Date: Tue, 1 Sep 2020 07:00:36 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] meson: use pkg-config method to find dependencies
+Message-ID: <20200901050036.wozkbgggv6pufji5@sirius.home.kraxel.org>
+References: <20200831102819.24334-1-pbonzini@redhat.com>
+ <20200831110655.uj6f2hq3yyygqqox@sirius.home.kraxel.org>
+ <0e111925-dded-3866-cfd7-6de152f7e95c@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <0e111925-dded-3866-cfd7-6de152f7e95c@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ppandit@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
  helo=us-smtp-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:57:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,32 +98,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gonglei <arei.gonglei@huawei.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hello Li,
+On Mon, Aug 31, 2020 at 02:15:23PM +0200, Paolo Bonzini wrote:
+> On 31/08/20 13:06, Gerd Hoffmann wrote:
+> > 
+> >> Keep "auto" for SDL so that it tries using
+> >> sdl-config too.
+> >> -  sdl = dependency('sdl2',
+> >> -                   required: get_option('sdl'),
+> >> +  sdl = dependency('sdl2', required: get_option('sdl'),
+> >> +                   method: 'pkg-config',
+> > code and commit message mismatch here.
+> 
+> That's docs/devel/build-system.rst,
 
-+-- On Tue, 25 Aug 2020, Li Qiang wrote --+
-| Just see the page.
-| -->https://access.redhat.com/security/cve/CVE-2020-14364
-| 
-| The 'Attack Vector' of the CVSS score here is 'local'.
-| 
-| I think this should be 'network' as the guest user can touch this in cloud 
-| environment? What's the consideration here?
+Oops, missed that, sorry.
 
-  -> https://www.first.org/cvss/v3.1/user-guide#3-5-Scope-Vulnerable-Component-and-Impacted-Component
+> I wanted to keep the "method" so
+> that people can cut-and-paste correctly.
+> 
+> Would you prefer if I switched from sdl2 to something else (for example
+> pixman which has a "version" keyword argument as well)?
 
-AV:Network or Adjacent is generally used when issue involves network stack. In 
-this case it's a usb device r/w operation.
+Sounds like a good idea to me.
 
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+take care,
+  Gerd
 
 
