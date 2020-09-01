@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ECB9C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:44:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADB94C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:44:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66084206FA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:44:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 69CCD206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:44:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rSkZ7X8k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66084206FA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q7YmGjHf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69CCD206FA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3lu-0002DG-HD
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:44:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57142)
+	id 1kD3mY-00035v-FK
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:44:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD3ik-0004ra-P6; Tue, 01 Sep 2020 06:40:58 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35777)
+ id 1kD3kR-0008MQ-QJ; Tue, 01 Sep 2020 06:42:43 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:33973)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD3ij-0001t5-9t; Tue, 01 Sep 2020 06:40:58 -0400
-Received: by mail-wr1-x444.google.com with SMTP id e16so965817wrm.2;
- Tue, 01 Sep 2020 03:40:55 -0700 (PDT)
+ id 1kD3kP-00024W-M0; Tue, 01 Sep 2020 06:42:43 -0400
+Received: by mail-wm1-x341.google.com with SMTP id c19so679320wmd.1;
+ Tue, 01 Sep 2020 03:42:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/6T9K6cB8UVV4OMBVpNqFssF0Hs6NHMYQ4tqHB6tDmc=;
- b=rSkZ7X8kUrd1wGRYX5B7WFEO/QF4TYJ+3JQmfHKvkF6SXIFOP0HKs/VwAZhLJkq+nq
- EaqwAdc4qz9b8RLL9cP/PLn6uV4CDyumJ37k1+JTisKFb8jANR3kMGFkRQD+c71TVwUc
- mreOAALZDYEgOX440Hvhp7XgAR82yq+VAmpjh3WHQ3EhUcVZFZJzslPIb34dN1UbAbDS
- iG+HFx60g3ryQrHHAYkv2d9rqfDkGO4lm0XWctqK7bhu6gL8tZymJIUSbwueyKzB8Wc/
- kvEJcJYi7PYw1Oi3umjGdc9VFxnyhIBWmwe1LCnJHuajdGQ7Hh19SkzLkSbFETc45WM9
- 8Sbg==
+ bh=fqHTEPlAjV9bvBkHlzkr+R6J+o6iCqiuHYjcb5bwgeI=;
+ b=q7YmGjHfJ1jHHFk7ho5O78GGMi5CDWGeRX6lG0mOAkHD7+r2TAU5O4bFLJ9lPrxJob
+ 8GcLl5JHVEWbr0qDkxtTjtGim1VffAmgiS4k4P7tMUJ/Di6qtiKvj8KdSmzkwykHXe9k
+ W9hORW0EUHyd4EMHc4g0I+WznXuOC4WSmfGxhfaVBZPEsAoKDeT6i9//p87A2bhMCQUM
+ 6MpUFcaBzT4WVD1Lv5OXUBqMvSfjRmzuG6t19ngd1AR5krTotVRQNOA2SxoMmpQEXDj6
+ 0loiU0pXbaTPXrD3uKl0HqDzVg5f9H2W4CDbHv7V+4lpvNETZbrLmz9Ez9sUkDIfTavv
+ rOhg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=/6T9K6cB8UVV4OMBVpNqFssF0Hs6NHMYQ4tqHB6tDmc=;
- b=HcHzcnHSapCYCL/N2W2gXLi++i2hkNRfnLPbvie6ybSgqFfGGP5+eymhNW76gajzGe
- Y1Y6NRN/Vcl6Ww4Encn3PvA4wZfwyh6tvsVdn+CVG9inzYVxBKmYbRVAKjBJAK8aOVFF
- ft6wsFKSaQ7rzJ1R85vhPVGnnsyOFPiM6Shc10dbj4G2S8/vkLhYBStVhGgVUJ5tCSVP
- Ldoh0xR4I0JZAFtYbQkT+Q/W2EZ1GtN/1oaK2n6efwZa67XsjVXCrPj/uX4qUkGEZknh
- zkk4PMthsKZGXElDa5Y9rM7S7No+bJFjWiY9mSvN4URo7aFeI0Hk61Gp5nSoB9Rs5hLG
- /G7g==
-X-Gm-Message-State: AOAM530bB6VbQ6wpCt0CTH0BLnlEgQQSdOhHRh7BkguWYY/oezN9m26h
- 50X0qt8ajl1MrdGCkdYFe7lC13wtGdQ=
-X-Google-Smtp-Source: ABdhPJxyQyV0nXdaMnInamHSELiEe2+BOhW6gq7YYS31iXqk+TVi8a8hYpg2D/Ob+QWRsh/byW51cA==
-X-Received: by 2002:adf:eece:: with SMTP id a14mr1157824wrp.330.1598956854735; 
- Tue, 01 Sep 2020 03:40:54 -0700 (PDT)
+ bh=fqHTEPlAjV9bvBkHlzkr+R6J+o6iCqiuHYjcb5bwgeI=;
+ b=lvr8mwCpS4KY2v7v64X1+0BkM6AoSkly3q97OoG3t8OEe0v6GM+4a+KWtZwIfEWyVP
+ QnD93sv7EzOjD11xFDDw1JGryjnhKCLNgfhsE2BQmHq3PgdRgQEjPeiuueKlT+Givmsy
+ BGoPfTjeA8LjGbq4snl/PvvqQpRCO9lWbUZ3xLaLMMSDxmOvbaSODfvVYyehmZ7Y+kwH
+ xjifDjP1xO9zS0PnGpszogCuvexu0xX4ms5Y+u8vuWRV0TKG84MEiBwq6A9tadr9tiVP
+ SCFGckZj1PS3SM8GNpbIJz+l5lltqzoy4tFivDZzUgglh+BO4DbP8qOqAX9rAnJuJcoQ
+ Zzlw==
+X-Gm-Message-State: AOAM532OphNEugdiRUqkCJt12PmyZOPM5HDinLUPy2moH+rnTaVze1PG
+ STQcn4UwH0hdUISPxe4ChzJbrdYq6q8=
+X-Google-Smtp-Source: ABdhPJy+IJY8M8CU8l8ULDDy1r5oSLd42U7S0454oTBxLt8sggJQZChyv6i9K8neGTvtBU+4cEpMVg==
+X-Received: by 2002:a1c:6083:: with SMTP id u125mr1122066wmb.161.1598956959216; 
+ Tue, 01 Sep 2020 03:42:39 -0700 (PDT)
 Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id o9sm1541461wrw.58.2020.09.01.03.40.53
+ by smtp.gmail.com with ESMTPSA id l8sm1693217wrx.22.2020.09.01.03.42.38
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Sep 2020 03:40:54 -0700 (PDT)
+ Tue, 01 Sep 2020 03:42:38 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 5/5] hw/isa/isa-bus: Replace hw_error() by assert()
-Date: Tue,  1 Sep 2020 12:40:43 +0200
-Message-Id: <20200901104043.91383-6-f4bug@amsat.org>
+Subject: [PATCH 2/2] hw/gpio/max7310: Replace disabled printf() by
+ qemu_log_mask(UNIMP)
+Date: Tue,  1 Sep 2020 12:42:34 +0200
+Message-Id: <20200901104234.92159-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200901104043.91383-1-f4bug@amsat.org>
-References: <20200901104043.91383-1-f4bug@amsat.org>
+In-Reply-To: <20200901104234.92159-1-f4bug@amsat.org>
+References: <20200901104234.92159-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -101,61 +102,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Huacai Chen <chenhc@lemote.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we can never have more than ISA_NUM_IRQS (16) ISA IRQs,
-replace the not very interesting hw_error() call by an
-assert() which is more useful to debug condition that can
-not happen.
+Replace disabled printf() by qemu_log_mask(UNIMP).
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/isa/isa-bus.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ hw/gpio/max7310.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-index 58fde178f92..10bb7ffa43a 100644
---- a/hw/isa/isa-bus.c
-+++ b/hw/isa/isa-bus.c
-@@ -21,7 +21,6 @@
- #include "qemu/error-report.h"
+diff --git a/hw/gpio/max7310.c b/hw/gpio/max7310.c
+index 7f5de189acf..c58a1996418 100644
+--- a/hw/gpio/max7310.c
++++ b/hw/gpio/max7310.c
+@@ -11,6 +11,7 @@
+ #include "hw/i2c/i2c.h"
+ #include "hw/irq.h"
+ #include "migration/vmstate.h"
++#include "qemu/log.h"
  #include "qemu/module.h"
- #include "qapi/error.h"
--#include "hw/hw.h"
- #include "monitor/monitor.h"
- #include "hw/sysbus.h"
- #include "sysemu/sysemu.h"
-@@ -85,18 +84,14 @@ void isa_bus_irqs(ISABus *bus, qemu_irq *irqs)
- qemu_irq isa_get_irq(ISADevice *dev, unsigned isairq)
- {
-     assert(!dev || ISA_BUS(qdev_get_parent_bus(DEVICE(dev))) == isabus);
--    if (isairq >= ISA_NUM_IRQS) {
--        hw_error("isa irq %d invalid", isairq);
--    }
-+    assert(isairq < ISA_NUM_IRQS);
-     return isabus->irqs[isairq];
- }
  
- void isa_init_irq(ISADevice *dev, qemu_irq *p, unsigned isairq)
- {
-     assert(dev->nirqs < ARRAY_SIZE(dev->isairq));
--    if (isairq >= ISA_NUM_IRQS) {
--        hw_error("isa irq %d invalid", isairq);
--    }
-+    assert(isairq < ISA_NUM_IRQS);
-     dev->isairq[dev->nirqs] = isairq;
-     *p = isa_get_irq(dev, isairq);
-     dev->nirqs++;
+ #define TYPE_MAX7310 "max7310"
+@@ -69,9 +70,8 @@ static uint8_t max7310_rx(I2CSlave *i2c)
+         return 0xff;
+ 
+     default:
+-#ifdef VERBOSE
+-        printf("%s: unknown register %02x\n", __func__, s->command);
+-#endif
++        qemu_log_mask(LOG_UNIMP, "%s: Unsupported register 0x02%" PRIx8 "\n",
++                      __func__, s->command);
+         break;
+     }
+     return 0xff;
+@@ -123,9 +123,8 @@ static int max7310_tx(I2CSlave *i2c, uint8_t data)
+     case 0x00:	/* Input port - ignore writes */
+         break;
+     default:
+-#ifdef VERBOSE
+-        printf("%s: unknown register %02x\n", __func__, s->command);
+-#endif
++        qemu_log_mask(LOG_UNIMP, "%s: Unsupported register 0x02%" PRIx8 "\n",
++                      __func__, s->command);
+         return 1;
+     }
+ 
 -- 
 2.26.2
 
