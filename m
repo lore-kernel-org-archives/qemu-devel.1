@@ -2,80 +2,100 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CB0AC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 701AAC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:22:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F257C206FA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:21:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F257C206FA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 146F4206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:22:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VdGyw1rI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 146F4206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3Q8-0002pu-29
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:21:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51354)
+	id 1kD3Qc-0003MH-5i
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:22:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kD3PM-0001yo-Fd
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:20:56 -0400
-Received: from indium.canonical.com ([91.189.90.7]:33066)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kD3PX-0002Cs-0D
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:21:08 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51437)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kD3PH-0007RD-F8
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:20:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kD3PF-0007eO-QR
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 10:20:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id C4BAD2E8023
- for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 10:20:49 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kD3PU-0007SA-BB
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 06:21:06 -0400
+Received: by mail-wm1-x342.google.com with SMTP id w2so598506wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 03:21:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=eYJ0RXkZvzuWGnDMGsRwvxIJEBCxdxtR+jMX6kcyO7Y=;
+ b=VdGyw1rIJ6tWZl7SC4sx4mGwJz0sPlS4W3AkplHW0gPucboLXB6Lo32NmWGwyQw3Et
+ z6HBhvQMhWl51TMoiBABENnBpF8d8+posbYF6mP1xz5PMVc/BqcedHg9tS0j4VtNmpyJ
+ 7IKoH8oDA/ufJbexyjpLMo320X83RvAtRZqhMrShyCIDqGoxnqQkqpu9KdX9p3E+5RbN
+ KW9odR22cMBnvNz128/qQqkH/EaNcybgkv+//qTYxFux6av0f26J151BxB8O6mC1HG88
+ KnO0VGDOhUICHSem90LusYYRntPWTdC8ShIsu+1Hjv7ZFM2iBhRzZEAIBQkLT8t8RXGq
+ ju8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=eYJ0RXkZvzuWGnDMGsRwvxIJEBCxdxtR+jMX6kcyO7Y=;
+ b=FMlewxkBFCtXe3PqAfN8gsffg1276BiCGAjbtMne9m+Wg1ozB1AyJzTkUBWAqDDNiz
+ kFdqOaDpi74SaQT+J2WlO910iPffnFEdg4VFAVYkErJmNHYQroPuvB1f71eb3SA00GKe
+ HNdaLuG/xdH8BsXCP80Mhfpw2nmBWVFOZ4LawLD5dJK27XrEKP1rWmcIDatgIeQ+Yuh6
+ zapyggoJrG+fPuEp1efZUNanQnUd7Jkc5OO+IHYMLeDecN8clj5Kz4EW/bnPXKC42xxS
+ ReNO8q6+V/h45QYNLSIcLAYvUYk7kf4fbl99MLodbvrc+G87P5e+GJ79R8Kt1TPKJCO8
+ SacA==
+X-Gm-Message-State: AOAM5339NLCskSKSgl9Vl4COLHB/FHYrV6nrraEApxOXgllBY32KxgPU
+ 42S8XAqlMnViZpSNkhWw2Y4BEA==
+X-Google-Smtp-Source: ABdhPJyGUS5GbEBKXFSrKdzcdcB9IAyTBD5QmxcYe7hiqe30qutYyT91jWCAOCRwJu6E2ZXk8pkutA==
+X-Received: by 2002:a1c:a185:: with SMTP id k127mr1129233wme.142.1598955662007; 
+ Tue, 01 Sep 2020 03:21:02 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id p16sm1512613wro.71.2020.09.01.03.21.00
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 03:21:00 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id ECEF11FF7E;
+ Tue,  1 Sep 2020 11:20:59 +0100 (BST)
+References: <20200901072201.7133-1-cfontana@suse.de>
+ <20200901072201.7133-2-cfontana@suse.de>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [PATCH v6 01/16] cpu-timers, icount: new modules
+In-reply-to: <20200901072201.7133-2-cfontana@suse.de>
+Date: Tue, 01 Sep 2020 11:20:59 +0100
+Message-ID: <87r1rl6bn8.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Tue, 01 Sep 2020 10:10:34 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1893758@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-Message-Id: <159895503437.23051.7002685011475326158.malonedeb@wampee.canonical.com>
-Subject: [Bug 1893758] [NEW] meson: scary KeyboardInterrupt backtrace displayed
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
-X-Launchpad-Hash: 96edac295a2417e2e918e0f65733adbdd271d893
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 03:58:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,211 +104,426 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1893758 <1893758@bugs.launchpad.net>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, haxm-team@intel.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Roman Bolshakov <r.bolshakov@yadro.com>,
+ Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
 
-Pressing ^C while building (calling 'make') sometime displays
-KeyboardInterrupt exception backtrace (host Fedora 32):
+Claudio Fontana <cfontana@suse.de> writes:
 
-$ make qemu-system-arm
-Generating qemu-version.h with a meson_exe.py custom command
-^CTraceback (most recent call last):
-  File "/usr/bin/meson", line 6, in <module>
-    from pkg_resources import load_entry_point
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 3=
-252, in <module>
-    def _initialize_master_working_set():
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 3=
-235, in _call_aside
-    f(*args, **kwargs)
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 3=
-277, in _initialize_master_working_set
-    tuple(
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 3=
-278, in <genexpr>
-    dist.activate(replace=3DFalse)
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 2=
-782, in activate
-    fixup_namespace_packages(self.location)
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 2=
-295, in fixup_namespace_packages
-    subpath =3D _handle_ns(package, path_item)
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 2=
-194, in _handle_ns
-    importer =3D get_importer(path_item)
-  File "/usr/lib64/python3.8/pkgutil.py", line 415, in get_importer
-    importer =3D sys.path_importer_cache[path_item]
-KeyboardInterrupt
+> refactoring of cpus.c continues with cpu timer state extraction.
+>
+> cpu-timers: responsible for the softmmu cpu timers state,
+>             including cpu clocks and ticks.
+>
+> icount: counts the TCG instructions executed. As such it is specific to
+> the TCG accelerator. Therefore, it is built only under CONFIG_TCG.
+>
+> One complication is due to qtest, which uses an icount field to warp time
+> as part of qtest (qtest_clock_warp).
+>
+> In order to solve this problem, provide a separate counter for qtest.
+>
+> This requires fixing assumptions scattered in the code that
+> qtest_enabled() implies icount_enabled(), checking each specific case.
+>
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+<snip>
+> +
+> +void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
+> +{
+> +    if (!icount_enabled() || type !=3D QEMU_CLOCK_VIRTUAL) {
+> +        qemu_notify_event();
+> +        return;
+> +    }
+> +
+> +    if (qemu_in_vcpu_thread()) {
+> +        /*
+> +         * A CPU is currently running; kick it back out to the
+> +         * tcg_cpu_exec() loop so it will recalculate its
+> +         * icount deadline immediately.
+> +         */
+> +        qemu_cpu_kick(current_cpu);
+> +    } else if (first_cpu) {
+> +        /*
+> +         * qemu_cpu_kick is not enough to kick a halted CPU out of
+> +         * qemu_tcg_wait_io_event.  async_run_on_cpu, instead,
+> +         * causes cpu_thread_is_idle to return false.  This way,
+> +         * handle_icount_deadline can run.
+> +         * If we have no CPUs at all for some reason, we don't
+> +         * need to do anything.
+> +         */
+> +        async_run_on_cpu(first_cpu, do_nothing, RUN_ON_CPU_NULL);
+> +    }
+> +}
+> +
 
+See bellow for comments on stub.
 
-$ make
-[...]
-Compiling C object libcommon.fa.p/disas_alpha.c.o
-Compiling C object libcommon.fa.p/hw_isa_smc37c669-superio.c.o
-Compiling C object libcommon.fa.p/hw_isa_isa-superio.c.o
-Compiling C object libcommon.fa.p/hw_char_serial-isa.c.o
-Compiling C object libcommon.fa.p/hw_acpi_aml-build-stub.c.o
-^CTraceback (most recent call last):
-  File "/usr/bin/meson", line 6, in <module>
-    from pkg_resources import load_entry_point
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 3=
-252, in <module>
-make: *** [Makefile.ninja:994: libcommon.fa.p/disas_alpha.c.o] Interrupt
-make: *** [Makefile.ninja:998: libcommon.fa.p/hw_isa_smc37c669-superio.c.o]=
- Interrupt
-make: *** [Makefile.ninja:1025: libcommon.fa.p/hw_isa_isa-superio.c.o] Inte=
-rrupt
-make: *** [Makefile.ninja:1069: libcommon.fa.p/hw_char_serial-isa.c.o] Inte=
-rrupt
-make: *** [Makefile.ninja:1102: libcommon.fa.p/hw_acpi_aml-build-stub.c.o] =
-Interrupt
-make: *** [Makefile.ninja:2138: qemu-system-alpha.p/softmmu_main.c.o] Inter=
-rupt
-make: *** [Makefile.ninja:949: libblock.fa.p/block_qcow2.c.o] Interrupt
-    def _initialize_master_working_set():
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 3=
-235, in _call_aside
-    f(*args, **kwargs)
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 3=
-287, in _initialize_master_working_set
-    list(map(working_set.add_entry, sys.path))
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 6=
-23, in add_entry
-    for dist in find_distributions(entry, True):
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 2=
-065, in find_on_path
-    for dist in factory(fullpath):
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 2=
-134, in distributions_from_metadata
-    yield Distribution.from_location(
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 2=
-590, in from_location
-    return cls(
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 2=
-571, in __init__
-    self._version =3D safe_version(version)
-  File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line 1=
-331, in safe_version
-    return str(packaging.version.Version(version))
-  File "/usr/lib/python3.8/site-packages/pkg_resources/_vendor/packaging/ve=
-rsion.py", line 205, in __init__
-    self._version =3D _Version(
-  File "<string>", line 1, in __new__
-KeyboardInterrupt
-make: *** [Makefile.ninja:875: qemu.syms.stamp] Interrupt
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index 0cc86b0766..ff94cf4983 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -74,6 +74,7 @@
+>  #include "hw/audio/soundhw.h"
+>  #include "audio/audio.h"
+>  #include "sysemu/cpus.h"
+> +#include "sysemu/cpu-timers.h"
+>  #include "migration/colo.h"
+>  #include "migration/postcopy-ram.h"
+>  #include "sysemu/kvm.h"
+> @@ -2802,7 +2803,7 @@ static void configure_accelerators(const char *prog=
+name)
+>          error_report("falling back to %s", ac->name);
+>      }
+>=20=20
+> -    if (use_icount && !(tcg_enabled() || qtest_enabled())) {
+> +    if (icount_enabled() && !tcg_enabled()) {
+>          error_report("-icount is not allowed with hardware virtualizatio=
+n");
+>          exit(1);
+>      }
+> @@ -4237,7 +4238,11 @@ void qemu_init(int argc, char **argv, char **envp)
+>          semihosting_arg_fallback(kernel_filename, kernel_cmdline);
+>      }
+>=20=20
+> -    cpu_ticks_init();
+> +    /* initialize cpu timers and VCPU throttle modules */
+> +    cpu_timers_init();
+> +
+> +    /* spice needs the timers to be initialized by this point */
+> +    qemu_spice_init();
 
-** Affects: qemu
-     Importance: Undecided
-         Status: New
+This seems to be an additional fix?
 
--- =
+<snip>
+> diff --git a/stubs/cpu-get-icount.c b/stubs/cpu-get-icount.c
+> deleted file mode 100644
+> index b35f844638..0000000000
+> --- a/stubs/cpu-get-icount.c
+> +++ /dev/null
+> @@ -1,21 +0,0 @@
+> -#include "qemu/osdep.h"
+> -#include "qemu/timer.h"
+> -#include "sysemu/cpus.h"
+> -#include "qemu/main-loop.h"
+> -
+> -int use_icount;
+> -
+> -int64_t cpu_get_icount(void)
+> -{
+> -    abort();
+> -}
+> -
+> -int64_t cpu_get_icount_raw(void)
+> -{
+> -    abort();
+> -}
+> -
+> -void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
+> -{
+> -    qemu_notify_event();
+> -}
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1893758
+Hmm so this was existing behaviour for stubs - I find it slightly weird
+that a stub function actually does something - although of course that
+might be stubbed as well :-/
 
-Title:
-  meson: scary KeyboardInterrupt backtrace displayed
+> diff --git a/stubs/icount.c b/stubs/icount.c
+> new file mode 100644
+> index 0000000000..61e28cbaf9
+> --- /dev/null
+> +++ b/stubs/icount.c
+> @@ -0,0 +1,45 @@
+> +#include "qemu/osdep.h"
+> +#include "qapi/error.h"
+> +#include "sysemu/cpu-timers.h"
+> +
+> +/* icount - Instruction Counter API */
+> +
+> +int use_icount;
+> +
+> +void cpu_update_icount(CPUState *cpu)
+> +{
+> +    abort();
+> +}
+> +void configure_icount(QemuOpts *opts, Error **errp)
+> +{
+> +    /* signal error */
+> +    error_setg(errp, "cannot configure icount, TCG support not available=
+");
+> +}
+> +int64_t cpu_get_icount_raw(void)
+> +{
+> +    abort();
+> +    return 0;
+> +}
+> +int64_t cpu_get_icount(void)
+> +{
+> +    abort();
+> +    return 0;
+> +}
+> +int64_t cpu_icount_to_ns(int64_t icount)
+> +{
+> +    abort();
+> +    return 0;
+> +}
+> +int64_t qemu_icount_round(int64_t count)
+> +{
+> +    abort();
+> +    return 0;
+> +}
+> +void qemu_start_warp_timer(void)
+> +{
+> +    abort();
+> +}
+> +void qemu_account_warp_timer(void)
+> +{
+> +    abort();
+> +}
+> diff --git a/stubs/meson.build b/stubs/meson.build
+> index 019bd79c7a..57fec4f8c8 100644
+> --- a/stubs/meson.build
+> +++ b/stubs/meson.build
+> @@ -3,10 +3,10 @@ stub_ss.add(files('bdrv-next-monitor-owned.c'))
+>  stub_ss.add(files('blk-commit-all.c'))
+>  stub_ss.add(files('blockdev-close-all-bdrv-states.c'))
+>  stub_ss.add(files('change-state-handler.c'))
+> -stub_ss.add(files('clock-warp.c'))
+>  stub_ss.add(files('cmos.c'))
+>  stub_ss.add(files('cpu-get-clock.c'))
+> -stub_ss.add(files('cpu-get-icount.c'))
+> +stub_ss.add(files('qemu-timer-notify-cb.c'))
+> +stub_ss.add(files('icount.c'))
+>  stub_ss.add(files('dump.c'))
+>  stub_ss.add(files('error-printf.c'))
+>  stub_ss.add(files('fd-register.c'))
+> diff --git a/stubs/qemu-timer-notify-cb.c b/stubs/qemu-timer-notify-cb.c
+> new file mode 100644
+> index 0000000000..845e46f8e0
+> --- /dev/null
+> +++ b/stubs/qemu-timer-notify-cb.c
+> @@ -0,0 +1,8 @@
+> +#include "qemu/osdep.h"
+> +#include "sysemu/cpu-timers.h"
+> +#include "qemu/main-loop.h"
+> +
+> +void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
+> +{
+> +    qemu_notify_event();
+> +}
+> diff --git a/stubs/qtest.c b/stubs/qtest.c
+> index 891eb954fb..4666a49d7d 100644
+> --- a/stubs/qtest.c
+> +++ b/stubs/qtest.c
+> @@ -18,3 +18,8 @@ bool qtest_driver(void)
+>  {
+>      return false;
+>  }
+> +
+> +int64_t qtest_get_virtual_clock(void)
+> +{
+> +    return 0;
+> +}
+> diff --git a/target/alpha/translate.c b/target/alpha/translate.c
+> index 8870284f57..36be602179 100644
+> --- a/target/alpha/translate.c
+> +++ b/target/alpha/translate.c
+> @@ -20,6 +20,7 @@
+>  #include "qemu/osdep.h"
+>  #include "cpu.h"
+>  #include "sysemu/cpus.h"
+> +#include "sysemu/cpu-timers.h"
+>  #include "disas/disas.h"
+>  #include "qemu/host-utils.h"
+>  #include "exec/exec-all.h"
+> @@ -1329,7 +1330,7 @@ static DisasJumpType gen_mfpr(DisasContext *ctx, TC=
+Gv va, int regno)
+>      case 249: /* VMTIME */
+>          helper =3D gen_helper_get_vmtime;
+>      do_helper:
+> -        if (use_icount) {
+> +        if (icount_enabled()) {
+>              gen_io_start();
+>              helper(va);
+>              return DISAS_PC_STALE;
+> diff --git a/target/arm/helper.c b/target/arm/helper.c
+> index 44d666627a..dc2b91084c 100644
+> --- a/target/arm/helper.c
+> +++ b/target/arm/helper.c
+> @@ -24,6 +24,7 @@
+>  #include "hw/irq.h"
+>  #include "hw/semihosting/semihost.h"
+>  #include "sysemu/cpus.h"
+> +#include "sysemu/cpu-timers.h"
+>  #include "sysemu/kvm.h"
+>  #include "sysemu/tcg.h"
+>  #include "qemu/range.h"
+> @@ -1206,7 +1207,7 @@ static int64_t cycles_ns_per(uint64_t cycles)
+>=20=20
+>  static bool instructions_supported(CPUARMState *env)
+>  {
+> -    return use_icount =3D=3D 1 /* Precise instruction counting */;
+> +    return icount_enabled() =3D=3D 1; /* Precise instruction counting */
+>  }
+>=20=20
+>  static uint64_t instructions_get_count(CPUARMState *env)
+> diff --git a/target/riscv/csr.c b/target/riscv/csr.c
+> index 200001de74..5231404a70 100644
+> --- a/target/riscv/csr.c
+> +++ b/target/riscv/csr.c
+> @@ -299,7 +299,7 @@ static int write_vstart(CPURISCVState *env, int csrno=
+, target_ulong val)
+>  static int read_instret(CPURISCVState *env, int csrno, target_ulong *val)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (use_icount) {
+> +    if (icount_enabled()) {
+>          *val =3D cpu_get_icount();
+>      } else {
+>          *val =3D cpu_get_host_ticks();
+> @@ -314,7 +314,7 @@ static int read_instret(CPURISCVState *env, int csrno=
+, target_ulong *val)
+>  static int read_instreth(CPURISCVState *env, int csrno, target_ulong *va=
+l)
+>  {
+>  #if !defined(CONFIG_USER_ONLY)
+> -    if (use_icount) {
+> +    if (icount_enabled()) {
+>          *val =3D cpu_get_icount() >> 32;
+>      } else {
+>          *val =3D cpu_get_host_ticks() >> 32;
+> diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
+> index ed393d9082..e935a1395e 100644
+> --- a/tests/ptimer-test-stubs.c
+> +++ b/tests/ptimer-test-stubs.c
+> @@ -12,6 +12,7 @@
+>  #include "qemu/main-loop.h"
+>  #include "sysemu/replay.h"
+>  #include "migration/vmstate.h"
+> +#include "sysemu/cpu-timers.h"
+>=20=20
+>  #include "ptimer-test.h"
+>=20=20
+> @@ -30,8 +31,8 @@ QEMUTimerListGroup main_loop_tlg;
+>=20=20
+>  int64_t ptimer_test_time_ns;
+>=20=20
+> -/* Do not artificially limit period - see hw/core/ptimer.c.  */
+> -int use_icount =3D 1;
+> +/* under qtest_enabled(), will not artificially limit period - see hw/co=
+re/ptimer.c. */
+> +int use_icount;
+>  bool qtest_allowed;
+>=20=20
+>  void timer_init_full(QEMUTimer *ts,
+> diff --git a/tests/test-timed-average.c b/tests/test-timed-average.c
+> index e2bcf5fe13..82c92500df 100644
+> --- a/tests/test-timed-average.c
+> +++ b/tests/test-timed-average.c
+> @@ -11,7 +11,7 @@
+>   */
+>=20=20
+>  #include "qemu/osdep.h"
+> -
+> +#include "sysemu/cpu-timers.h"
+>  #include "qemu/timed-average.h"
+>=20=20
+>  /* This is the clock for QEMU_CLOCK_VIRTUAL */
+> diff --git a/util/main-loop.c b/util/main-loop.c
+> index f69f055013..4015d58967 100644
+> --- a/util/main-loop.c
+> +++ b/util/main-loop.c
+> @@ -27,7 +27,7 @@
+>  #include "qemu/cutils.h"
+>  #include "qemu/timer.h"
+>  #include "sysemu/qtest.h"
+> -#include "sysemu/cpus.h"
+> +#include "sysemu/cpu-timers.h"
+>  #include "sysemu/replay.h"
+>  #include "qemu/main-loop.h"
+>  #include "block/aio.h"
+> @@ -517,9 +517,13 @@ void main_loop_wait(int nonblocking)
+>      mlpoll.state =3D ret < 0 ? MAIN_LOOP_POLL_ERR : MAIN_LOOP_POLL_OK;
+>      notifier_list_notify(&main_loop_poll_notifiers, &mlpoll);
+>=20=20
+> -    /* CPU thread can infinitely wait for event after
+> -       missing the warp */
+> -    qemu_start_warp_timer();
+> +    if (icount_enabled()) {
+> +        /*
+> +         * CPU thread can infinitely wait for event after
+> +         * missing the warp
+> +         */
+> +        qemu_start_warp_timer();
+> +    }
+>      qemu_clock_run_all_timers();
+>  }
+>=20=20
+> diff --git a/util/qemu-timer.c b/util/qemu-timer.c
+> index f62b4feecd..100a4eba22 100644
+> --- a/util/qemu-timer.c
+> +++ b/util/qemu-timer.c
+> @@ -26,8 +26,10 @@
+>  #include "qemu/main-loop.h"
+>  #include "qemu/timer.h"
+>  #include "qemu/lockable.h"
+> +#include "sysemu/cpu-timers.h"
+>  #include "sysemu/replay.h"
+>  #include "sysemu/cpus.h"
+> +#include "sysemu/qtest.h"
+>=20=20
+>  #ifdef CONFIG_POSIX
+>  #include <pthread.h>
+> @@ -134,7 +136,7 @@ static void qemu_clock_init(QEMUClockType type, QEMUT=
+imerListNotifyCB *notify_cb
+>=20=20
+>  bool qemu_clock_use_for_deadline(QEMUClockType type)
+>  {
+> -    return !(use_icount && (type =3D=3D QEMU_CLOCK_VIRTUAL));
+> +    return !(icount_enabled() && (type =3D=3D QEMU_CLOCK_VIRTUAL));
+>  }
+>=20=20
+>  void qemu_clock_notify(QEMUClockType type)
+> @@ -416,7 +418,7 @@ static bool timer_mod_ns_locked(QEMUTimerList *timer_=
+list,
+>  static void timerlist_rearm(QEMUTimerList *timer_list)
+>  {
+>      /* Interrupt execution to force deadline recalculation.  */
+> -    if (timer_list->clock->type =3D=3D QEMU_CLOCK_VIRTUAL) {
+> +    if (icount_enabled() && timer_list->clock->type =3D=3D QEMU_CLOCK_VI=
+RTUAL) {
+>          qemu_start_warp_timer();
+>      }
+>      timerlist_notify(timer_list);
+> @@ -633,8 +635,10 @@ int64_t qemu_clock_get_ns(QEMUClockType type)
+>          return get_clock();
+>      default:
+>      case QEMU_CLOCK_VIRTUAL:
+> -        if (use_icount) {
+> +        if (icount_enabled()) {
+>              return cpu_get_icount();
+> +        } else if (qtest_enabled()) { /* for qtest_clock_warp */
+> +            return qtest_get_virtual_clock();
+>          } else {
+>              return cpu_get_clock();
+>          }
 
-Status in QEMU:
-  New
+Otherwise:
 
-Bug description:
-  Pressing ^C while building (calling 'make') sometime displays
-  KeyboardInterrupt exception backtrace (host Fedora 32):
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-  $ make qemu-system-arm
-  Generating qemu-version.h with a meson_exe.py custom command
-  ^CTraceback (most recent call last):
-    File "/usr/bin/meson", line 6, in <module>
-      from pkg_resources import load_entry_point
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 3252, in <module>
-      def _initialize_master_working_set():
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 3235, in _call_aside
-      f(*args, **kwargs)
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 3277, in _initialize_master_working_set
-      tuple(
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 3278, in <genexpr>
-      dist.activate(replace=3DFalse)
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 2782, in activate
-      fixup_namespace_packages(self.location)
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 2295, in fixup_namespace_packages
-      subpath =3D _handle_ns(package, path_item)
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 2194, in _handle_ns
-      importer =3D get_importer(path_item)
-    File "/usr/lib64/python3.8/pkgutil.py", line 415, in get_importer
-      importer =3D sys.path_importer_cache[path_item]
-  KeyboardInterrupt
-
-  =
-
-  $ make
-  [...]
-  Compiling C object libcommon.fa.p/disas_alpha.c.o
-  Compiling C object libcommon.fa.p/hw_isa_smc37c669-superio.c.o
-  Compiling C object libcommon.fa.p/hw_isa_isa-superio.c.o
-  Compiling C object libcommon.fa.p/hw_char_serial-isa.c.o
-  Compiling C object libcommon.fa.p/hw_acpi_aml-build-stub.c.o
-  ^CTraceback (most recent call last):
-    File "/usr/bin/meson", line 6, in <module>
-      from pkg_resources import load_entry_point
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 3252, in <module>
-  make: *** [Makefile.ninja:994: libcommon.fa.p/disas_alpha.c.o] Interrupt
-  make: *** [Makefile.ninja:998: libcommon.fa.p/hw_isa_smc37c669-superio.c.=
-o] Interrupt
-  make: *** [Makefile.ninja:1025: libcommon.fa.p/hw_isa_isa-superio.c.o] In=
-terrupt
-  make: *** [Makefile.ninja:1069: libcommon.fa.p/hw_char_serial-isa.c.o] In=
-terrupt
-  make: *** [Makefile.ninja:1102: libcommon.fa.p/hw_acpi_aml-build-stub.c.o=
-] Interrupt
-  make: *** [Makefile.ninja:2138: qemu-system-alpha.p/softmmu_main.c.o] Int=
-errupt
-  make: *** [Makefile.ninja:949: libblock.fa.p/block_qcow2.c.o] Interrupt
-      def _initialize_master_working_set():
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 3235, in _call_aside
-      f(*args, **kwargs)
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 3287, in _initialize_master_working_set
-      list(map(working_set.add_entry, sys.path))
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 623, in add_entry
-      for dist in find_distributions(entry, True):
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 2065, in find_on_path
-      for dist in factory(fullpath):
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 2134, in distributions_from_metadata
-      yield Distribution.from_location(
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 2590, in from_location
-      return cls(
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 2571, in __init__
-      self._version =3D safe_version(version)
-    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
- 1331, in safe_version
-      return str(packaging.version.Version(version))
-    File "/usr/lib/python3.8/site-packages/pkg_resources/_vendor/packaging/=
-version.py", line 205, in __init__
-      self._version =3D _Version(
-    File "<string>", line 1, in __new__
-  KeyboardInterrupt
-  make: *** [Makefile.ninja:875: qemu.syms.stamp] Interrupt
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1893758/+subscriptions
+--=20
+Alex Benn=C3=A9e
 
