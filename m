@@ -2,79 +2,83 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33796C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:41:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 738CFC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:41:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D411A206FA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E6C7206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:41:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pWbeLGIU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D411A206FA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q7oDLRCB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E6C7206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3jX-0006HO-Us
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:41:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57058)
+	id 1kD3jZ-0006LM-9J
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:41:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD3ic-0004VC-NG; Tue, 01 Sep 2020 06:40:50 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40848)
+ id 1kD3ie-0004WO-7S; Tue, 01 Sep 2020 06:40:52 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:33963)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD3ib-0001rU-8i; Tue, 01 Sep 2020 06:40:50 -0400
-Received: by mail-wm1-x343.google.com with SMTP id v4so659720wmj.5;
- Tue, 01 Sep 2020 03:40:47 -0700 (PDT)
+ id 1kD3ic-0001rs-QE; Tue, 01 Sep 2020 06:40:51 -0400
+Received: by mail-wm1-x344.google.com with SMTP id c19so676043wmd.1;
+ Tue, 01 Sep 2020 03:40:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=AS9iE5jICxt728QvQddccBLJxmpLmZSe3J8QH1ar4ec=;
- b=pWbeLGIUG6DEWzohVYh0R3MPCT/wYTFQff8wIJt3ANIJTFzgkRIqJC76+yYfXX0DRK
- ap7/sLZ/97/yXBAfeUbeNHqICanWYLTYZFr17HHBGcspdXfa0XD6mR6sDw+mgE9811Xc
- Ol29xXEj1U1lAGw+xO59p/bQYP5N7tPaKgDz6ZiZ/OV6oBVC9e3cStMJKRrZaDhicctI
- k9/Ll0ktPxTtAIVp2pXE8sD2OoV1KWAAn7dP72jlpSpgLkKUDafpph0nnjIR517RSsdY
- 6RkCeaE2eYMBYDr3QT7lU9DHBf7W9hMfF0LkV0ui3R3rBF8q1/GwmeTkvXa7tQGBztip
- VhFg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=os2g75NZJynKLqxUCLFQR7EXSgQAqSybj5K1q1ubV4c=;
+ b=q7oDLRCBSQlEals5F8HOqPCDlbI33XdKStZTwZUOsfdz9JxRIj0zVYF5hbA4OsrKT9
+ bUOVVyDVwkp0kji5QextZq+x5++t3LfpgoHzw+Kx/oZlQOYBDZQ7TbnR2Jg332Ly25Ws
+ 4vG75strPSdKZjSBvxseUYdO56XKA51JEI8A1UqDqEzmZCzdcFNJataFqIeOk3g8TSkY
+ QVOdss3R6D5Xke0+qVKRKtJLC1fcMf73d9xRhb1I1lPFykTIqsl58rRafyLVtB2Ba7JG
+ lzx5YYaCalh003u9BQKzFo9TifRZwnT2xNAf8GHnaCjC1whFyjFq2EFK1TWPwT39ChOf
+ XKcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=AS9iE5jICxt728QvQddccBLJxmpLmZSe3J8QH1ar4ec=;
- b=ImbQdPNQtQ5pApZMlW2Gym4w/JNp5NNYJXoSheaVQf/rDF9le72Dzhgzb+W9iTHvG9
- WKs5Tck2xD5p+NtpOdbUHbFMKJKFs5BfTV5wwrSMYuNK4QNikAxkU156fAtpdqgkaURV
- VwDvqq/oqF+Y6HN80rxTLptFzZqBYaK5FwycBbXUKAwRkCTK2hIYGEpQ075cC0vHaqxd
- NBMzzZ/15eKGN9eVW7cbZREr03v05HTyXg+Xay10e3Yv5kf7joPNwIZLuWEzbhuGZALe
- CNiiN0wfH51pCh2djtMOvY1VB0n6Uwo+qLbGZKtfA3M3uSkGpGxdVvqJibexAnaRa+x2
- kkIw==
-X-Gm-Message-State: AOAM531sn+BqZj2X8M4b+L5+qno1f05d9Pje2r+AYfMnVq1SW6XSOuTd
- tq8u+KHZrtCzLgDrl8l2cOmce11vJMo=
-X-Google-Smtp-Source: ABdhPJy+00Mwj/k3JHchfxDpB++xNiiepqxnw7B4l6xczQWOmbmg4x59eB4/MknpCMdSKMesvbnygA==
-X-Received: by 2002:a1c:4187:: with SMTP id o129mr1107714wma.113.1598956846547; 
- Tue, 01 Sep 2020 03:40:46 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=os2g75NZJynKLqxUCLFQR7EXSgQAqSybj5K1q1ubV4c=;
+ b=GqicHqD4U5oxeBCSDNlYikXCKuwbtm2tXcN2ITlZc862+rAgb2LvgnvVViR/UPJN35
+ 675lBhc8PfUwUu/eM6xKbg9fsN4Z2MXVyr1QhsbxhooLtvTvLh40fhndrbD2muT3eyrs
+ Az03Ppdqo7Ezf+O9boR//CUSJbhAk3V2D182j3rBQbDVysAiMnqjFcmU3oNFSiUACUTs
+ 64XgbGu53gKMgH2gmnwb0LYlgMJMdztZf8kaSuY3IlzkG2HDUbU+eZjNGeDVM3azZLzm
+ g7Qzz3w/YZ5lhCC0QS+CLU8EAKK9LkcUYPdwALSfzfxWbc/bfSfuE58xRbimrkiLl+BN
+ EKHA==
+X-Gm-Message-State: AOAM532Bp4d5MbGwMkqnYQp+e1jD+6Pkxp+23BpnYrYmx0mef93avHL9
+ 8cGTNljFi1j+yk9NYY5vl3XZZUeUV5A=
+X-Google-Smtp-Source: ABdhPJwZ9J6pck+SzQ737LShkB24MvQsS94u14Hs3PFPrhRzxwy6Fzs8u86oa8BO6VKkDqtDuTOoyQ==
+X-Received: by 2002:a1c:c256:: with SMTP id s83mr1152559wmf.93.1598956848137; 
+ Tue, 01 Sep 2020 03:40:48 -0700 (PDT)
 Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id o9sm1541461wrw.58.2020.09.01.03.40.45
+ by smtp.gmail.com with ESMTPSA id o9sm1541461wrw.58.2020.09.01.03.40.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Sep 2020 03:40:45 -0700 (PDT)
+ Tue, 01 Sep 2020 03:40:47 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/5] hw: Replace some impossible checks by assertions
-Date: Tue,  1 Sep 2020 12:40:38 +0200
-Message-Id: <20200901104043.91383-1-f4bug@amsat.org>
+Subject: [PATCH 1/5] hw/gpio/max7310: Remove impossible check
+Date: Tue,  1 Sep 2020 12:40:39 +0200
+Message-Id: <20200901104043.91383-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200901104043.91383-1-f4bug@amsat.org>
+References: <20200901104043.91383-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -109,21 +113,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Trivial patches removing unreachable code.
+The max7310_gpio_set() handler is static and only used by
+qdev_init_gpio_in, initialized with 8 IRQs. The 'line'
+argument can not be out of the [0-8[ range.
+Remove the dead code.
 
-Philippe Mathieu-Daudé (5):
-  hw/gpio/max7310: Remove impossible check
-  hw/mips/fuloong2e: Convert pointless error message to an assert()
-  hw/ppc/ppc4xx_pci: Use ARRAY_SIZE() instead of magic value
-  hw/ppc/ppc4xx_pci: Replace pointless warning by assert()
-  hw/isa/isa-bus: Replace hw_error() by assert()
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/gpio/max7310.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
- hw/gpio/max7310.c   | 4 ----
- hw/isa/isa-bus.c    | 9 ++-------
- hw/mips/fuloong2e.c | 5 +----
- hw/ppc/ppc4xx_pci.c | 8 +++-----
- 4 files changed, 6 insertions(+), 20 deletions(-)
-
+diff --git a/hw/gpio/max7310.c b/hw/gpio/max7310.c
+index bebb4030d27..7f5de189acf 100644
+--- a/hw/gpio/max7310.c
++++ b/hw/gpio/max7310.c
+@@ -8,9 +8,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "hw/hw.h"
+ #include "hw/i2c/i2c.h"
+-#include "hw/hw.h"
+ #include "hw/irq.h"
+ #include "migration/vmstate.h"
+ #include "qemu/module.h"
+@@ -176,8 +174,6 @@ static const VMStateDescription vmstate_max7310 = {
+ static void max7310_gpio_set(void *opaque, int line, int level)
+ {
+     MAX7310State *s = (MAX7310State *) opaque;
+-    if (line >= ARRAY_SIZE(s->handler) || line  < 0)
+-        hw_error("bad GPIO line");
+ 
+     if (level)
+         s->level |= s->direction & (1 << line);
 -- 
 2.26.2
 
