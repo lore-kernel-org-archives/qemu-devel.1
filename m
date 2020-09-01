@@ -2,84 +2,73 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF757C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7555EC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:51:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8671E206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:51:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=zohomail.com header.i=dacohen@zohomail.com header.b="Vh1FS+Qd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8671E206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=zohomail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 45B26206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:51:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45B26206CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD5lQ-00084u-IC
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:51:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33850)
+	id 1kD5lR-00089w-Cs
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:51:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dacohen@zohomail.com>)
- id 1kD5fp-0005JD-UD
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:46:05 -0400
-Received: from sender4-pp-o95.zoho.com ([136.143.188.95]:25523)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dacohen@zohomail.com>)
- id 1kD5fl-0001WY-Io
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:46:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1598964358; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=NWZSamrfca0Ug0Oo4am6hLnIpVnTbVZfLsXxXw3MwCOmHqHYLEbOO5FY5eTpG66zfIS1u7mhqPFgNhy6WDWkIZR/xjwFso9pu9u5ZC4Z7JEui+sMDNQt50CAJCb5ykloTo/JQGQ/IMwPDCozYRevh8j1NIgbDo4xq2KuL147u9k=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1598964358;
- h=Content-Type:Content-Transfer-Encoding:Date:From:MIME-Version:Message-ID:Subject:To;
- bh=5TW+zewYKljC/CEpnCMVFx1AV6rAgZQDJjJfMry849o=; 
- b=klpKJuP++CEWCKnsFF0AhMKOaqfkNUgK1gAXhRqWUQ3uKteID15szizrDMFmpxXKK9/HVfSfQ+1dy+QQp7gA0kcGFC7uUJZ1nDiGA8Legg7Mp+9TyZnV3JWgYLjh6mK36vFXCADJmBU8+DVN5/tU7ve+phgW1556ExecgbVGJtQ=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- dkim=pass  header.i=zohomail.com;
- spf=pass  smtp.mailfrom=dacohen@zohomail.com;
- dmarc=pass header.from=<dacohen@zohomail.com>
- header.from=<dacohen@zohomail.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1598964358; 
- s=zm2020; d=zohomail.com; i=dacohen@zohomail.com;
- h=To:From:Subject:Message-ID:Date:MIME-Version:Content-Type:Content-Transfer-Encoding;
- bh=5TW+zewYKljC/CEpnCMVFx1AV6rAgZQDJjJfMry849o=;
- b=Vh1FS+QdfjoU6ULErYbn6Hak+l3pZmETD/krtDIWhoJ48tyNRlqR0XZTYdxjFwfh
- q8S3a2l7kYp286yYuWf1h1cORyq9ApL07/MoYJal6Lhuddrheg+84AmsnOaVMUdp9sL
- gYWZRgexPV79OQdwjHTA67Xrmub7ncjYkYyxNBis=
-Received: from Davids-iMac.local (cpe-24-27-46-206.austin.res.rr.com
- [24.27.46.206]) by mx.zohomail.com
- with SMTPS id 1598964356865630.2277097234039;
- Tue, 1 Sep 2020 05:45:56 -0700 (PDT)
-To: qemu-devel@nongnu.org
-From: David Cohen <dacohen@zohomail.com>
-Subject: qemu panic on OSX 10.15.6
-Message-ID: <a1f5ea65-073c-6130-1151-722d66d1564e@zohomail.com>
-Date: Tue, 1 Sep 2020 07:45:55 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.2.0
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fT-0004je-1t
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:43 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:51309)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fP-0001UA-IK
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:42 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.103])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id EF5695CC5369;
+ Tue,  1 Sep 2020 14:45:33 +0200 (CEST)
+Received: from kaod.org (37.59.142.99) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 1 Sep 2020
+ 14:45:33 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-99G00332cc62d9-c584-466e-96c6-1195bd14ad9f,
+ 38EE1E9FF4E34D4C85F4190D418CEE501B878519) smtp.auth=clg@kaod.org
+From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+To: <qemu-devel@nongnu.org>
+Subject: [PULL 09/20] ftgmac100: Fix interrupt status "Packet transmitted on
+ ethernet"
+Date: Tue, 1 Sep 2020 14:45:14 +0200
+Message-ID: <20200901124525.220252-10-clg@kaod.org>
+X-Mailer: git-send-email 2.25.4
+In-Reply-To: <20200901124525.220252-1-clg@kaod.org>
+References: <20200901124525.220252-1-clg@kaod.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.95; envelope-from=dacohen@zohomail.com;
- helo=sender4-pp-o95.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 08:45:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.99]
+X-ClientProxiedBy: DAG7EX1.mxp5.local (172.16.2.61) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 9e9a9f52-2e93-442a-ab7c-0a79ec653a1f
+X-Ovh-Tracer-Id: 4786481983226022819
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefjedgheejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheehfeegjeeitdfffeetjeduveejueefuefgtdefueelueetveeliefhhffgtdelnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 08:45:31
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,38 +82,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Frederic Konrad <konrad.frederic@yahoo.fr>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+The second field of the TX descriptor has a set of flags to choose
+when the transmit interrupt is raised : after the packet has been sent
+on the ethernet or after it has been moved into the TX FIFO. But we
+don't model that today.
 
-I'm trying to use qemu on OSX Catalina using HVF hypervisor, but it's 
-currently panic'ing upon booting Linux guest.
+Simply raise the "Packet transmitted on ethernet" interrupt status bit
+as soon as the packet is sent by QEMU.
 
-These are the args I'm using:
-build % ./qemu-system-x86_64 -cdrom 
-~/Downloads/archlinux-2020.08.01-x86_64.iso -smp 4 -m 4G -vga virtio 
--accel hvf -cpu host
+Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
+Reviewed-by: Joel Stanley <joel@jms.id.au>
+Message-Id: <20200819100956.2216690-11-clg@kaod.org>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+---
+ hw/net/ftgmac100.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-I could trace the failure to test_pt_entry(), in this exact position:
+diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
+index 0348fcf45676..aa3c05ef9882 100644
+--- a/hw/net/ftgmac100.c
++++ b/hw/net/ftgmac100.c
+@@ -547,9 +547,7 @@ static void ftgmac100_do_tx(FTGMAC100State *s, uint32_t tx_ring,
+             qemu_send_packet(qemu_get_queue(s->nic), s->frame, frame_size);
+             ptr = s->frame;
+             frame_size = 0;
+-            if (flags & FTGMAC100_TXDES1_TXIC) {
+-                s->isr |= FTGMAC100_INT_XPKT_ETH;
+-            }
++            s->isr |= FTGMAC100_INT_XPKT_ETH;
+         }
+ 
+         if (flags & FTGMAC100_TXDES1_TX2FIC) {
+-- 
+2.25.4
 
-build % git diff
-diff --git a/target/i386/hvf/x86_mmu.c b/target/i386/hvf/x86_mmu.c
-index 65d4603dbf..8f04a94cc6 100644
---- a/target/i386/hvf/x86_mmu.c
-+++ b/target/i386/hvf/x86_mmu.c
-@@ -113,6 +113,7 @@ static bool test_pt_entry(struct CPUState *cpu, 
-struct gpt_translation *pt,
-      }
-
-      if (!pte_present(pte)) {
-+        printf("Code is failing here");
-          return false;
-      }
-
-
-Is anyone aware of this issue?
-
-Br, David Cohen
 
