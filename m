@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9EABC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EECBC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:29:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D8F6206EF
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:28:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D8F6206EF
+	by mail.kernel.org (Postfix) with ESMTPS id 23FCE206EF
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:29:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23FCE206EF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44482 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7HO-0003fp-JE
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:28:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55496)
+	id 1kD7I6-00056M-60
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:29:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zT-0005rV-K3; Tue, 01 Sep 2020 10:10:27 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:49385)
+ id 1kD6zX-000645-Vs; Tue, 01 Sep 2020 10:10:32 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:53745)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zR-0003yK-Pm; Tue, 01 Sep 2020 10:10:27 -0400
+ id 1kD6zV-0003zS-QH; Tue, 01 Sep 2020 10:10:31 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mv2tE-1kUmOf3Bi4-00r3s5; Tue, 01 Sep 2020 16:10:17 +0200
+ id 1MDQqk-1kKI030IWU-00AT1v; Tue, 01 Sep 2020 16:10:21 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 30/44] hw/net/xilinx_axienet: Remove unused code
-Date: Tue,  1 Sep 2020 16:09:40 +0200
-Message-Id: <20200901140954.889743-31-laurent@vivier.eu>
+Subject: [PULL 35/44] target/arm/translate-a64:Remove dead assignment in
+ handle_scalar_simd_shli()
+Date: Tue,  1 Sep 2020 16:09:45 +0200
+Message-Id: <20200901140954.889743-36-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
 References: <20200901140954.889743-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:n+vFiyHYyYBQqQfH6cYkSjR6+cxuqFt5Hp+vTdtSzSMNljrGceV
- 3i8MU/Kt/Ke/8vIGr3QSRDFuJ8dBVdaLuAJFGrsFSoQJE2b4YeGdWlchQQRnvcfIUbqgqh1
- uzmYh1/F1FqSIvlHOjnRSmzx5vVEoleHAOo+RN8fD5LemhsGY/VgOKD9KKXbdPWIIV2/E4O
- xfBgMQqvvE4c5fs8578qw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ieP0z49afpw=:+o2uGUoye/c2L4x+d/FpJt
- UekgvLNw73+PzFQtQp6K5yBgxLlmqTJvF6bwv7bCbywF6R/3AlMyrva+nnpr8pw4NqJ7dvdmO
- mgpbVnubL8l0hx94FSwsTOwu/+6FmUutSBQGRfRCZEGhSsUuu4hac3cmOz3j5jtrzBMNrt/HT
- RRFrsnY8wrfxC0R+mzpD160h2OR49bEK5LMh+jyuLtkgazPgMHiYxWtuNKdzPjqv7PGKOqKSI
- uJTokeLr6u7UOWJzICQvGWOLwDHZcZ5/ZIh2DOkpdqnO7K9dhcST99Dv4Q7H00dDxtalAtNlr
- qqmmLI/R4yUY2wRMldxiX7iVhBpDKFiTdQdl0yMAq2N+1gW3d3f85xBMo8tk39nD9pMKWyuMi
- 8oojV3MrDw7B//ZsXHFCUMl6ZL0KlrqXO09P3BMhPIhY9gtiZLF8vIZcyom6TjOqf9/X+Oq1A
- NPrUu2bDUZFFl2HbUurIl41CMWzQsK9PD6xcmktldgqygQsbv9qskL9qnK62Tv6xVmhhThVGz
- TJV8UHulJbwjlhwg955IuU3QgJ2hPkTZ2yGNmvDFv0c5B7GR7uSM4GehDpbaSPduN9gCbz6+o
- PeAHrAhsv4kElOOYp952hnVWZT9TOyGxPTR1FOMsnY+QgjqdprAcpJp0Q3ukYhftQMT3Yr/B+
- 5D14l+Jz8C+6Hu5KnTcavxml2Mr1ko4gCoQZh6y++pmPJzMLmNsh2IhRJ8A88LF/3tAbXqiWp
- DH1FOpwxkRew0r7l2z72Basbowa69rb4dZLo2lwwfGh2rtMuKNBIuBDvC2Q5XSAYaI5tyyHBB
- bw4DUdfupS+zf0UT4B0MQ6YEdpoXJMl3vyW2jmunnuUIrDzwgRNP1sowIN69K880DPoMEIb
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:7MytmcQlZbd0x7aW2n0tHP/lWDilC+4WyjdtE03XZV3dMl9gCsZ
+ tid0ho/0Rf9qrqda7CX6DNS501cq7GAz5hr1Zgx2+2CXIj9XvqJoSNA+3ypl/lKgG7rTwG1
+ g7Id7vtrHF/6fSodLQ1CsEsZ+8N2+FlZ4AvmEGOTib5ml55ebxl6wUr12gyirZjEeaKmjPH
+ 76j2kBTAynlNNOs0IgX/Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:D4SzP2V09+Y=:fnfFRWUCmK17meChl6FvaY
+ T1KcPuDeEGrPeQEFpIBHHQo07agKz84T87KDYRFTbFap4N8dtl90B3+KjiXqFSelhvSE2qhXs
+ lIyipI2swjin96Wq/Xdow+mgic95mPzarA6QX1FYES0aAfN+C6pTWrR+6W0pdUyRcE+etJ87K
+ +hgT0qH6Wbsec/gdI0ul8ydJLqG4FpJRFTP/zqExuO9nsd0c8QuEO/puvOm3jMMiNSGavXqIG
+ 8/Z+1pMKD+Azv9iOp/0GV8rDzd2TcauUSN+hCQ8n4TZ/zhdD1rDiaHXvhdYc9ImZNADN8iIi/
+ pOXMY61j4rJNgLzLr1YnjWeb1Smc5bhoB/axBbg+/hiq5eem1hRrU4vEfTPdgHc+chx0AjXfM
+ 9EAR5ODihDQUwNINZYdDJcPj04l/RRMnrq07MRGeh4pgQyp9hHK0M12St72+usb/5+ousNY9b
+ /AeL5rBGtpyeXO0wVLBOu9VxnhekIRXQ53Thj8WUSwedo6CqODZ48p6YrfJT7RO5xjRAymbot
+ X6hTaCayI7OrdUCHk83hp72vGLaAdLXAWpJSe4Rhx6jo+8xxecLOgg6yjaHMEsALIhwMMKz9u
+ lzGUs93nxEYQao+gWH+ObIlD2I5u1r7ZLQ15m+QMdZJ4x2qANVJb2KtKssrFe1YLZ+rAtmAvm
+ pCNYsv+q+HhPMUgbz/e1D+ZJG6exB7fEALaazSls8mU0rHsnno8qhgCXivtKkAdM1iXmV7mRZ
+ 4iIELbGKNsQz/aNeNz1UP7OfvawPvN669Br7Icy9Lf+UDVRF4VuuYPif5xiJ4SLYVhYlCbbVc
+ AUvguDxHYgiTNdzg9hM7FQyokLDrinq6AatWKG+43y3a0m0FGumNFdXId+pDszfml1n+GfP
+Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:07
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:09:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -83,69 +83,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-trivial@nongnu.org, Chen Qun <kuhn.chenqun@huawei.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Laurent Vivier <laurent@vivier.eu>,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Chen Qun <kuhn.chenqun@huawei.com>
 
-Most of the MDIOBus fields are unused.  The ADVERTISE_10HALF
-definition is unused.  Remove unused code.
+Clang static code analyzer show warning:
+target/arm/translate-a64.c:8635:14: warning: Value stored to 'tcg_rn' during its
+ initialization is never read
+    TCGv_i64 tcg_rn = new_tmp_a64(s);
+             ^~~~~~   ~~~~~~~~~~~~~~
+target/arm/translate-a64.c:8636:14: warning: Value stored to 'tcg_rd' during its
+ initialization is never read
+    TCGv_i64 tcg_rd = new_tmp_a64(s);
+             ^~~~~~   ~~~~~~~~~~~~~~
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Message-Id: <20200814133007.16850-1-f4bug@amsat.org>
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200827110311.164316-4-kuhn.chenqun@huawei.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/net/xilinx_axienet.c | 23 -----------------------
- 1 file changed, 23 deletions(-)
+ target/arm/translate-a64.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/net/xilinx_axienet.c b/hw/net/xilinx_axienet.c
-index 1e48eb70c9cc..2e89f236b4ab 100644
---- a/hw/net/xilinx_axienet.c
-+++ b/hw/net/xilinx_axienet.c
-@@ -54,7 +54,6 @@
-      TYPE_XILINX_AXI_ENET_CONTROL_STREAM)
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 4ba6918b6063..1fc3b2273207 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -8631,8 +8631,8 @@ static void handle_scalar_simd_shli(DisasContext *s, bool insert,
+     int size = 32 - clz32(immh) - 1;
+     int immhb = immh << 3 | immb;
+     int shift = immhb - (8 << size);
+-    TCGv_i64 tcg_rn = new_tmp_a64(s);
+-    TCGv_i64 tcg_rd = new_tmp_a64(s);
++    TCGv_i64 tcg_rn;
++    TCGv_i64 tcg_rd;
  
- /* Advertisement control register. */
--#define ADVERTISE_10HALF        0x0020  /* Try for 10mbps half-duplex  */
- #define ADVERTISE_10FULL        0x0040  /* Try for 10mbps full-duplex  */
- #define ADVERTISE_100HALF       0x0080  /* Try for 100mbps half-duplex */
- #define ADVERTISE_100FULL       0x0100  /* Try for 100mbps full-duplex */
-@@ -169,28 +168,6 @@ tdk_init(struct PHY *phy)
- }
- 
- struct MDIOBus {
--    /* bus.  */
--    int mdc;
--    int mdio;
--
--    /* decoder.  */
--    enum {
--        PREAMBLE,
--        SOF,
--        OPC,
--        ADDR,
--        REQ,
--        TURNAROUND,
--        DATA
--    } state;
--    unsigned int drive;
--
--    unsigned int cnt;
--    unsigned int addr;
--    unsigned int opc;
--    unsigned int req;
--    unsigned int data;
--
-     struct PHY *devs[32];
- };
- 
+     if (!extract32(immh, 3, 1)) {
+         unallocated_encoding(s);
 -- 
 2.26.2
 
