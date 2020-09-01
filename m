@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2234C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:49:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E491AC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:49:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 858562220B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:49:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACAD22220B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:49:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fn9jPuBW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 858562220B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQixez/U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACAD22220B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7b6-0001i5-Ny
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:49:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33934)
+	id 1kD7bB-0001uk-R5
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:49:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7NB-0007sb-P0
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:34:57 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48525
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7N0-0007LA-9d
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:34:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42249
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7NA-00077E-2D
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:34:57 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7My-00074S-15
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:34:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598970895;
+ s=mimecast20190719; t=1598970883;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Pjj0uA512fbFHl0Wo1WPSqzpfgcIAEyienzfhOB+I1E=;
- b=fn9jPuBWECrbtPVKrt4K18qKbQc5tiQv0EUk9GOvihbsyW3AcguHlh5uegxAG2/tXTDcXx
- u3Gi4akKkBnMGMz3eOEbEQno3abKxXnntsxVMSuW5/ZiIymjCLoNeidDB4xxLikeO6oZny
- /nIAupJ4o/SyqS4G/WDXqG5nE+xn97A=
+ bh=cCMiT+2Ux5fgoVwg5u/c7tY2FBk4k80X/o2PcDcV6Ew=;
+ b=PQixez/UcNjbfPWIPAbPFqiktZVJTV+fJJ94aueNh70BeY3xNRECqLSiPVph18Wd6znJ8u
+ KMeutE0ZIdzwJrGNYahoqh8A8PNeTZbCg2iWHCn03tlY0TaVP1tCAbjoLjFBksqMxOCKxG
+ N6FIKtjC4VyCiwaSHWqN9PHHr6uIu6k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-V3QOS1c5Oq2PBYexAqbbig-1; Tue, 01 Sep 2020 10:34:50 -0400
-X-MC-Unique: V3QOS1c5Oq2PBYexAqbbig-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-457-kpHX1y3wNEy1WaTAx2bpsQ-1; Tue, 01 Sep 2020 10:34:39 -0400
+X-MC-Unique: kpHX1y3wNEy1WaTAx2bpsQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6D01801F9A;
- Tue,  1 Sep 2020 14:34:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A4A9873081;
+ Tue,  1 Sep 2020 14:34:38 +0000 (UTC)
 Received: from localhost (ovpn-113-83.ams2.redhat.com [10.36.113.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 445FE7EB7D;
- Tue,  1 Sep 2020 14:34:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B344E61177;
+ Tue,  1 Sep 2020 14:34:37 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v8 10/43] block: Use bdrv_filter_(bs|child) where obvious
-Date: Tue,  1 Sep 2020 16:33:51 +0200
-Message-Id: <20200901143424.884735-11-mreitz@redhat.com>
+Subject: [PATCH v8 05/43] block: Include filters when freezing backing chain
+Date: Tue,  1 Sep 2020 16:33:46 +0200
+Message-Id: <20200901143424.884735-6-mreitz@redhat.com>
 In-Reply-To: <20200901143424.884735-1-mreitz@redhat.com>
 References: <20200901143424.884735-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:11:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:57:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -102,171 +102,185 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Places that use patterns like
+In order to make filters work in backing chains, the associated
+functions must be able to deal with them and freeze both COW and filter
+child links.
 
-    if (bs->drv->is_filter && bs->file) {
-        ... something about bs->file->bs ...
-    }
-
-should be
-
-    BlockDriverState *filtered = bdrv_filter_bs(bs);
-    if (filtered) {
-        ... something about @filtered ...
-    }
-
-instead.
+While at it, add some comments that note which functions require their
+caller to ensure that a given child link is not frozen, and how the
+callers do so.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block.c                        | 31 ++++++++++++++++++++-----------
- block/io.c                     |  7 +++++--
- migration/block-dirty-bitmap.c |  8 +-------
- 3 files changed, 26 insertions(+), 20 deletions(-)
+ block.c | 60 +++++++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 39 insertions(+), 21 deletions(-)
 
 diff --git a/block.c b/block.c
-index c09a766f54..887c125400 100644
+index e8d09d46ec..edef6273b8 100644
 --- a/block.c
 +++ b/block.c
-@@ -712,11 +712,12 @@ int coroutine_fn bdrv_co_delete_file(BlockDriverState *bs, Error **errp)
- int bdrv_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
+@@ -2612,12 +2612,15 @@ static void bdrv_replace_child_noperm(BdrvChild *child,
+  * If @new_bs is not NULL, bdrv_check_perm() must be called beforehand, as this
+  * function uses bdrv_set_perm() to update the permissions according to the new
+  * reference that @new_bs gets.
++ *
++ * Callers must ensure that child->frozen is false.
+  */
+ static void bdrv_replace_child(BdrvChild *child, BlockDriverState *new_bs)
  {
-     BlockDriver *drv = bs->drv;
-+    BlockDriverState *filtered = bdrv_filter_bs(bs);
+     BlockDriverState *old_bs = child->bs;
+     uint64_t perm, shared_perm;
  
-     if (drv && drv->bdrv_probe_blocksizes) {
-         return drv->bdrv_probe_blocksizes(bs, bsz);
--    } else if (drv && drv->is_filter && bs->file) {
--        return bdrv_probe_blocksizes(bs->file->bs, bsz);
-+    } else if (filtered) {
-+        return bdrv_probe_blocksizes(filtered, bsz);
-     }
++    /* Asserts that child->frozen == false */
+     bdrv_replace_child_noperm(child, new_bs);
  
-     return -ENOTSUP;
-@@ -731,11 +732,12 @@ int bdrv_probe_blocksizes(BlockDriverState *bs, BlockSizes *bsz)
- int bdrv_probe_geometry(BlockDriverState *bs, HDGeometry *geo)
+     /*
+@@ -2778,6 +2781,7 @@ static void bdrv_detach_child(BdrvChild *child)
+     g_free(child);
+ }
+ 
++/* Callers must ensure that child->frozen is false. */
+ void bdrv_root_unref_child(BdrvChild *child)
  {
-     BlockDriver *drv = bs->drv;
-+    BlockDriverState *filtered = bdrv_filter_bs(bs);
- 
-     if (drv && drv->bdrv_probe_geometry) {
-         return drv->bdrv_probe_geometry(bs, geo);
--    } else if (drv && drv->is_filter && bs->file) {
--        return bdrv_probe_geometry(bs->file->bs, geo);
-+    } else if (filtered) {
-+        return bdrv_probe_geometry(filtered, geo);
+     BlockDriverState *child_bs;
+@@ -2815,6 +2819,7 @@ static void bdrv_unset_inherits_from(BlockDriverState *root, BdrvChild *child)
      }
+ }
  
-     return -ENOTSUP;
-@@ -5442,6 +5444,8 @@ int bdrv_has_zero_init_1(BlockDriverState *bs)
- 
- int bdrv_has_zero_init(BlockDriverState *bs)
++/* Callers must ensure that child->frozen is false. */
+ void bdrv_unref_child(BlockDriverState *parent, BdrvChild *child)
  {
-+    BlockDriverState *filtered;
-+
-     if (!bs->drv) {
-         return 0;
-     }
-@@ -5454,8 +5458,10 @@ int bdrv_has_zero_init(BlockDriverState *bs)
-     if (bs->drv->bdrv_has_zero_init) {
-         return bs->drv->bdrv_has_zero_init(bs);
-     }
--    if (bs->file && bs->drv->is_filter) {
--        return bdrv_has_zero_init(bs->file->bs);
-+
-+    filtered = bdrv_filter_bs(bs);
-+    if (filtered) {
-+        return bdrv_has_zero_init(filtered);
+     if (child == NULL) {
+@@ -2881,6 +2886,7 @@ void bdrv_set_backing_hd(BlockDriverState *bs, BlockDriverState *backing_hd,
      }
  
-     /* safe default */
-@@ -5485,8 +5491,9 @@ int bdrv_get_info(BlockDriverState *bs, BlockDriverInfo *bdi)
-         return -ENOMEDIUM;
+     if (bs->backing) {
++        /* Cannot be frozen, we checked that above */
+         bdrv_unref_child(bs, bs->backing);
+         bs->backing = NULL;
      }
-     if (!drv->bdrv_get_info) {
--        if (bs->file && drv->is_filter) {
--            return bdrv_get_info(bs->file->bs, bdi);
-+        BlockDriverState *filtered = bdrv_filter_bs(bs);
-+        if (filtered) {
-+            return bdrv_get_info(filtered, bdi);
+@@ -4387,6 +4393,7 @@ static void bdrv_close(BlockDriverState *bs)
+ 
+     if (bs->drv) {
+         if (bs->drv->bdrv_close) {
++            /* Must unfreeze all children, so bdrv_unref_child() works */
+             bs->drv->bdrv_close(bs);
          }
-         return -ENOTSUP;
-     }
-@@ -6571,6 +6578,8 @@ int bdrv_amend_options(BlockDriverState *bs, QemuOpts *opts,
- bool bdrv_recurse_can_replace(BlockDriverState *bs,
-                               BlockDriverState *to_replace)
- {
-+    BlockDriverState *filtered;
-+
-     if (!bs || !bs->drv) {
-         return false;
-     }
-@@ -6585,9 +6594,9 @@ bool bdrv_recurse_can_replace(BlockDriverState *bs,
-     }
+         bs->drv = NULL;
+@@ -4762,20 +4769,22 @@ BlockDriverState *bdrv_find_base(BlockDriverState *bs)
+ }
  
-     /* For filters without an own implementation, we can recurse on our own */
--    if (bs->drv->is_filter) {
--        BdrvChild *child = bs->file ?: bs->backing;
--        return bdrv_recurse_can_replace(child->bs, to_replace);
-+    filtered = bdrv_filter_bs(bs);
-+    if (filtered) {
-+        return bdrv_recurse_can_replace(filtered, to_replace);
-     }
- 
-     /* Safe default */
-diff --git a/block/io.c b/block/io.c
-index ad3a51ed53..01e3477a77 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -3309,6 +3309,7 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
+ /*
+- * Return true if at least one of the backing links between @bs and
+- * @base is frozen. @errp is set if that's the case.
++ * Return true if at least one of the COW (backing) and filter links
++ * between @bs and @base is frozen. @errp is set if that's the case.
+  * @base must be reachable from @bs, or NULL.
+  */
+ bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
                                    Error **errp)
  {
-     BlockDriverState *bs = child->bs;
-+    BdrvChild *filtered;
-     BlockDriver *drv = bs->drv;
-     BdrvTrackedRequest req;
-     int64_t old_size, new_bytes;
-@@ -3360,6 +3361,8 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
-         goto out;
+     BlockDriverState *i;
++    BdrvChild *child;
+ 
+-    for (i = bs; i != base; i = backing_bs(i)) {
+-        if (i->backing && i->backing->frozen) {
++    for (i = bs; i != base; i = child_bs(child)) {
++        child = bdrv_filter_or_cow_child(i);
++
++        if (child && child->frozen) {
+             error_setg(errp, "Cannot change '%s' link from '%s' to '%s'",
+-                       i->backing->name, i->node_name,
+-                       backing_bs(i)->node_name);
++                       child->name, i->node_name, child->bs->node_name);
+             return true;
+         }
+     }
+@@ -4784,7 +4793,7 @@ bool bdrv_is_backing_chain_frozen(BlockDriverState *bs, BlockDriverState *base,
+ }
+ 
+ /*
+- * Freeze all backing links between @bs and @base.
++ * Freeze all COW (backing) and filter links between @bs and @base.
+  * If any of the links is already frozen the operation is aborted and
+  * none of the links are modified.
+  * @base must be reachable from @bs, or NULL.
+@@ -4794,22 +4803,25 @@ int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
+                               Error **errp)
+ {
+     BlockDriverState *i;
++    BdrvChild *child;
+ 
+     if (bdrv_is_backing_chain_frozen(bs, base, errp)) {
+         return -EPERM;
      }
  
-+    filtered = bdrv_filter_child(bs);
-+
-     /*
-      * If the image has a backing file that is large enough that it would
-      * provide data for the new area, we cannot leave it unallocated because
-@@ -3392,8 +3395,8 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
-             goto out;
+-    for (i = bs; i != base; i = backing_bs(i)) {
+-        if (i->backing && backing_bs(i)->never_freeze) {
++    for (i = bs; i != base; i = child_bs(child)) {
++        child = bdrv_filter_or_cow_child(i);
++        if (child && child->bs->never_freeze) {
+             error_setg(errp, "Cannot freeze '%s' link to '%s'",
+-                       i->backing->name, backing_bs(i)->node_name);
++                       child->name, child->bs->node_name);
+             return -EPERM;
          }
-         ret = drv->bdrv_co_truncate(bs, offset, exact, prealloc, flags, errp);
--    } else if (bs->file && drv->is_filter) {
--        ret = bdrv_co_truncate(bs->file, offset, exact, prealloc, flags, errp);
-+    } else if (filtered) {
-+        ret = bdrv_co_truncate(filtered, offset, exact, prealloc, flags, errp);
-     } else {
-         error_setg(errp, "Image format driver does not support resize");
-         ret = -ENOTSUP;
-diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 549e14daba..5bef793ac0 100644
---- a/migration/block-dirty-bitmap.c
-+++ b/migration/block-dirty-bitmap.c
-@@ -615,13 +615,7 @@ static int init_dirty_bitmap_migration(DBMSaveState *s)
-             while (bs && bs->drv && bs->drv->is_filter &&
-                    !bdrv_has_named_bitmaps(bs))
-             {
--                if (bs->backing) {
--                    bs = bs->backing->bs;
--                } else if (bs->file) {
--                    bs = bs->file->bs;
--                } else {
--                    bs = NULL;
--                }
-+                bs = bdrv_filter_bs(bs);
-             }
+     }
  
-             if (bs && bs->drv && !bs->drv->is_filter) {
+-    for (i = bs; i != base; i = backing_bs(i)) {
+-        if (i->backing) {
+-            i->backing->frozen = true;
++    for (i = bs; i != base; i = child_bs(child)) {
++        child = bdrv_filter_or_cow_child(i);
++        if (child) {
++            child->frozen = true;
+         }
+     }
+ 
+@@ -4817,18 +4829,21 @@ int bdrv_freeze_backing_chain(BlockDriverState *bs, BlockDriverState *base,
+ }
+ 
+ /*
+- * Unfreeze all backing links between @bs and @base. The caller must
+- * ensure that all links are frozen before using this function.
++ * Unfreeze all COW (backing) and filter links between @bs and @base.
++ * The caller must ensure that all links are frozen before using this
++ * function.
+  * @base must be reachable from @bs, or NULL.
+  */
+ void bdrv_unfreeze_backing_chain(BlockDriverState *bs, BlockDriverState *base)
+ {
+     BlockDriverState *i;
++    BdrvChild *child;
+ 
+-    for (i = bs; i != base; i = backing_bs(i)) {
+-        if (i->backing) {
+-            assert(i->backing->frozen);
+-            i->backing->frozen = false;
++    for (i = bs; i != base; i = child_bs(child)) {
++        child = bdrv_filter_or_cow_child(i);
++        if (child) {
++            assert(child->frozen);
++            child->frozen = false;
+         }
+     }
+ }
+@@ -4931,8 +4946,11 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
+             }
+         }
+ 
+-        /* Do the actual switch in the in-memory graph.
+-         * Completes bdrv_check_update_perm() transaction internally. */
++        /*
++         * Do the actual switch in the in-memory graph.
++         * Completes bdrv_check_update_perm() transaction internally.
++         * c->frozen is false, we have checked that above.
++         */
+         bdrv_ref(base);
+         bdrv_replace_child(c, base);
+         bdrv_unref(top);
 -- 
 2.26.2
 
