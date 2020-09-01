@@ -2,89 +2,90 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDE4AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E748EC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96F3E2064B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:49:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3093206EB
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:49:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FP1BY+2c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96F3E2064B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="FxjfpQyH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3093206EB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD8Wx-0004dN-JB
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:49:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49564)
+	id 1kD8Xh-000670-Kp
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:49:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kD87z-0000z0-Mk
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:23:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32987)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kD87x-0006rd-3k
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:23:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598973796;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=R4ilDNmcENKf88JVo+QQQWiziBYkVYzcxWLhbUqyl+k=;
- b=FP1BY+2cZnjYey7S5N0S8mECRuqxgc+9/DUPEFm8yRpyUkp2zUmckZYdritUciETNrf8FC
- zw83eJRL3MhT+BpBsP/48BHmu+6RnIa2I/mFJUKMOuyEP+i1SojJ+i1N2dKkYC9Knwp5W9
- 11Ye5PwK7jVTOEsPYX+5VYiCGEsQIEE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-462-DbOJnrmGNpuWH8YA3HUfzQ-1; Tue, 01 Sep 2020 11:23:07 -0400
-X-MC-Unique: DbOJnrmGNpuWH8YA3HUfzQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A880E1007471;
- Tue,  1 Sep 2020 15:23:06 +0000 (UTC)
-Received: from redhat.com (ovpn-114-215.ams2.redhat.com [10.36.114.215])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DD77219C66;
- Tue,  1 Sep 2020 15:23:01 +0000 (UTC)
-Date: Tue, 1 Sep 2020 16:22:59 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v8 1/8] Introduce yank feature
-Message-ID: <20200901152259.GO345480@redhat.com>
-References: <cover.1598951375.git.lukasstraub2@web.de>
- <ab5c04766f270d53e90f17f76c0af7e5b66f8623.1598951375.git.lukasstraub2@web.de>
- <874kohsgsp.fsf@dusky.pond.sub.org>
-MIME-Version: 1.0
-In-Reply-To: <874kohsgsp.fsf@dusky.pond.sub.org>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+ (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
+ id 1kD8Vd-0002GJ-8Q
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:47:45 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:43595)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
+ id 1kD8Vb-00026i-EB
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:47:44 -0400
+Received: by mail-pl1-x643.google.com with SMTP id y6so721964plk.10
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:47:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Dka4kGmZfMcbFE4G/5IsI7nQ8gtf9IAo5wRmBXJcgzA=;
+ b=FxjfpQyHEdjUQ2UKZUinwwi/zNqDX7YQ4XSlDjIplvJteba8JM40xdPF8EHFQknvUV
+ yEGL6M2T9ATkyos33QH2Fun4kdJYaBEIsH27EsJP/XGQcDiE4fj6QEE3pk7d1/LcMc4e
+ 29X5K/UB8VfVBgUgz2fEiOZu3fG/aOz62ugnozjCB1heA7SWA7hjYr7s7Ru3QeZgQv3s
+ qRVjGID6sx3Acd/QuBVQ45fYf7/m6asuDaFS2//3QemMLLIczckME8AOEqiYNWJsKTNV
+ c1SQe0KFNlFxUXZeeHDWQUn50Ds8uwIfwDts4bSbRS1CA4b9FlnrBaNymgA05aYFWWgt
+ IMTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=Dka4kGmZfMcbFE4G/5IsI7nQ8gtf9IAo5wRmBXJcgzA=;
+ b=QFDaVd7JiYHg1o1NF52lKQEAhRnwbqVls4o6cKSgHfegvboLePu/6ygLhCcWkb2VLW
+ lvhwPuIoVgCBoxQ+9c5y/b/6sdt/PrQkwcsN0oyc3W7fhgsQB12LVW6qA2OKJryOHMld
+ lbdZDCif5G3iD9SY0kUyzHJhYhrCHlsfUMSfsnKLcPmktcJF0U/kXgw6BOXJxc3kERMZ
+ rq/P+DOwdFdSZ1yTA+QwCv9dbqBGD2ekLWJAEEJT9lAR8qf6drFJ84RwVSZsNs/jpeZr
+ hae5HZqVp0DwFLxSqZvvfOvRAROboETiCSndlg5ykfO6BUqDxDZ+1Li0GwgoEuyuuWvX
+ q7vg==
+X-Gm-Message-State: AOAM531ao+Gp4DQK2RO+olwRptUpY0oEPWLVm8/8jPGvJbs5HqbmhO41
+ 8zuxN1RMQvkH7j7Okooy2ZQvLRxyFmMEFTZH
+X-Google-Smtp-Source: ABdhPJwuZaYYkJSIQ7Qox7m2qFd3c6hdvqfw489NgESG+2Qau1UJoTI8STjSfRfy4hIQmsmXakp2ow==
+X-Received: by 2002:a17:90b:282:: with SMTP id
+ az2mr2224329pjb.66.1598975261902; 
+ Tue, 01 Sep 2020 08:47:41 -0700 (PDT)
+Received: from localhost.localdomain (111-241-104-82.dynamic-ip.hinet.net.
+ [111.241.104.82])
+ by smtp.gmail.com with ESMTPSA id e17sm2485344pfm.60.2020.09.01.08.47.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 08:47:41 -0700 (PDT)
+From: Green Wan <green.wan@sifive.com>
+To: 
+Subject: [RFC PATCH v5 2/2] hw/riscv: sifive_u: Add backend drive support
+Date: Tue,  1 Sep 2020 23:47:11 +0800
+Message-Id: <20200901154711.18457-3-green.wan@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200901154711.18457-1-green.wan@sifive.com>
+References: <20200901154711.18457-1-green.wan@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=green.wan@sifive.com; helo=mail-pl1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,82 +98,136 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Lukas Straub <lukasstraub2@web.de>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
+ Green Wan <green.wan@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, bmeng.cn@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 01, 2020 at 04:38:46PM +0200, Markus Armbruster wrote:
-> One more question...
-> 
-> Lukas Straub <lukasstraub2@web.de> writes:
-> 
-> > The yank feature allows to recover from hanging qemu by "yanking"
-> > at various parts. Other qemu systems can register themselves and
-> > multiple yank functions. Then all yank functions for selected
-> > instances can be called by the 'yank' out-of-band qmp command.
-> > Available instances can be queried by a 'query-yank' oob command.
-> >
-> > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-> > Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-> [...]
-> > diff --git a/qapi/misc.json b/qapi/misc.json
-> > index 9d32820dc1..7de330416a 100644
-> > --- a/qapi/misc.json
-> > +++ b/qapi/misc.json
-> > @@ -1615,3 +1615,65 @@
-> >  ##
-> >  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
-> >
-> > +##
-> > +# @YankInstances:
-> > +#
-> > +# @instances: List of yank instances.
-> > +#
-> > +# A yank instance can be yanked with the "yank" qmp command to recover from a
-> > +# hanging qemu.
-> > +#
-> > +# Yank instances are named after the following schema:
-> > +# "blockdev:<node-name>" refers to a block device. Currently only nbd block
-> > +# devices are implemented.
-> > +# "chardev:<chardev-name>" refers to a chardev. Currently only socket chardevs
-> > +# are implemented.
-> > +# "migration" refers to the migration currently in progress.
-> > +#
-> > +# Currently implemented yank instances:
-> > +#  -nbd block device:
-> > +#   Yanking it will shutdown the connection to the nbd server without
-> > +#   attempting to reconnect.
-> > +#  -socket chardev:
-> > +#   Yanking it will shutdown the connected socket.
-> > +#  -migration:
-> > +#   Yanking it will shutdown all migration connections.
-> 
-> How is yanking migration related to command migrate_cancel?
+Add '-drive' support to OTP device. Allow users to assign a raw file
+as OTP image.
 
-migrate_cancel will do a shutdown() on the primary migration socket only.
-In addition it will toggle the migration state.
+Signed-off-by: Green Wan <green.wan@sifive.com>
+---
+ hw/riscv/sifive_u_otp.c         | 50 +++++++++++++++++++++++++++++++++
+ include/hw/riscv/sifive_u_otp.h |  2 ++
+ 2 files changed, 52 insertions(+)
 
-Yanking will do a shutdown on all migration sockets (important for
-multifd), but won't touch migration state or any other aspect of QEMU
-code.
-
-Overall yanking has less potential for things to go wrong than the
-migrate_cancel method, as it doesn't try to do any kind of cleanup
-or migration.
-
-
-Regards,
-Daniel
+diff --git a/hw/riscv/sifive_u_otp.c b/hw/riscv/sifive_u_otp.c
+index b8369e9035..477c54c7b8 100644
+--- a/hw/riscv/sifive_u_otp.c
++++ b/hw/riscv/sifive_u_otp.c
+@@ -24,6 +24,8 @@
+ #include "qemu/log.h"
+ #include "qemu/module.h"
+ #include "hw/riscv/sifive_u_otp.h"
++#include "sysemu/blockdev.h"
++#include "sysemu/block-backend.h"
+ 
+ #define WRITTEN_BIT_ON 0x1
+ 
+@@ -54,6 +56,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
+         if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
+             (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
+             (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
++
++            /* read from backend */
++            if (s->blk) {
++                int32_t buf;
++
++                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
++                          SIFIVE_U_OTP_FUSE_WORD);
++                return buf;
++            }
++
+             return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
+         } else {
+             return 0xff;
+@@ -145,6 +157,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
+             /* write bit data */
+             SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
+ 
++            /* write to backend */
++            if (s->blk) {
++                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &val32,
++                           SIFIVE_U_OTP_FUSE_WORD, 0);
++            }
++
+             /* update written bit */
+             SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
+         }
+@@ -168,16 +186,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
+ 
+ static Property sifive_u_otp_properties[] = {
+     DEFINE_PROP_UINT32("serial", SiFiveUOTPState, serial, 0),
++    DEFINE_PROP_DRIVE("drive", SiFiveUOTPState, blk),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+ static void sifive_u_otp_realize(DeviceState *dev, Error **errp)
+ {
+     SiFiveUOTPState *s = SIFIVE_U_OTP(dev);
++    DriveInfo *dinfo;
+ 
+     memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_u_otp_ops, s,
+                           TYPE_SIFIVE_U_OTP, SIFIVE_U_OTP_REG_SIZE);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
++
++    dinfo = drive_get_next(IF_NONE);
++    if (dinfo) {
++        int ret;
++        uint64_t perm;
++        int filesize;
++        BlockBackend *blk;
++
++        blk = blk_by_legacy_dinfo(dinfo);
++        filesize = SIFIVE_U_OTP_NUM_FUSES * SIFIVE_U_OTP_FUSE_WORD;
++        if (blk_getlength(blk) < filesize) {
++            qemu_log_mask(LOG_GUEST_ERROR, "OTP drive size < 16K\n");
++            return;
++        }
++
++        qdev_prop_set_drive(dev, "drive", blk);
++
++        perm = BLK_PERM_CONSISTENT_READ |
++                        (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE);
++        ret = blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
++        if (ret < 0) {
++            qemu_log_mask(LOG_GUEST_ERROR, "set perm error.");
++        }
++
++        if (blk_pread(s->blk, 0, s->fuse, filesize) != filesize) {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "failed to read the initial flash content");
++            return;
++        }
++    }
+ }
+ 
+ static void sifive_u_otp_reset(DeviceState *dev)
+diff --git a/include/hw/riscv/sifive_u_otp.h b/include/hw/riscv/sifive_u_otp.h
+index 4a5a0acf48..9bc781fd4f 100644
+--- a/include/hw/riscv/sifive_u_otp.h
++++ b/include/hw/riscv/sifive_u_otp.h
+@@ -45,6 +45,7 @@
+ 
+ #define SIFIVE_U_OTP_PA_MASK        0xfff
+ #define SIFIVE_U_OTP_NUM_FUSES      0x1000
++#define SIFIVE_U_OTP_FUSE_WORD      4
+ #define SIFIVE_U_OTP_SERIAL_ADDR    0xfc
+ 
+ #define SIFIVE_U_OTP_REG_SIZE       0x1000
+@@ -78,6 +79,7 @@ typedef struct SiFiveUOTPState {
+     uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
+     /* config */
+     uint32_t serial;
++    BlockBackend *blk;
+ } SiFiveUOTPState;
+ 
+ #endif /* HW_SIFIVE_U_OTP_H */
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.17.1
 
 
