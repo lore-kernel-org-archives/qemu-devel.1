@@ -2,98 +2,67 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D31BFC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A832C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:54:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 97EC72083B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:53:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e1fa4nrb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97EC72083B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id B660B2083B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:54:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B660B2083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD2yU-0001pF-Li
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:53:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40292)
+	id 1kD2zJ-0001lQ-ER
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:54:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD2jM-00064v-7m; Tue, 01 Sep 2020 05:37:32 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:39174)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD2jK-0001Ze-Go; Tue, 01 Sep 2020 05:37:31 -0400
-Received: by mail-wm1-x342.google.com with SMTP id b79so479271wmb.4;
- Tue, 01 Sep 2020 02:37:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=xQJ/1aeREE6BtqE2y9OvWz7GTKgA3waNf32gvJPB1gA=;
- b=e1fa4nrb+T7nyVo1a1L5HjBZ24S7uBozAfV+T29mPvBHw0pjPvuuuAysNxj1HN4z+b
- dntlahUwNNYPQOR/9lBJWMuBM4IaoeQUxvdqKPd+diBLUSrz2ZGkmEADf0yv5xD1CLxB
- lex/O3nQdcHIpPhGr8Xn2iom/ZqRACBvOwR1dCUglfrx4kj1sG5Ujm6xmPkHZb8lxLHF
- 2sY4kYT2J0Qwz3ZSjMe9Q1RVVqfIgiV6jwMGHBgqjh86qgiQmp65sLkP7HAG4umnvjq8
- UPsWw3g5jahYG7eQjtQhlndGzcKReiXJnQvHkX3liyzBONsrzhWJVJsd3qqN6CC64Geo
- xwSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=xQJ/1aeREE6BtqE2y9OvWz7GTKgA3waNf32gvJPB1gA=;
- b=bOynwQp3B3SK6VLo2l3azXcqe2EobGHcRQysACmW9ipFgZ4WxOi4y6SpOziB4io4rN
- 0mPScEpiO4I3WssLZPvok0wJH5NPc259nT+lKpyXAfNM649JQcwqZoL9jlKz+iFRNPFS
- gJSxi9UhE9BomraDoH/FjQ+ROpkVB05NF9mBDXsCxBu9/Hf7+R/qWzGiClPMurv/h1T5
- U+wxsvVK3zAdQjxsDrihXJAsk9slSQ0Nr0lbtn5AN+z5G4KiEHHzin7WBKoo/H/Gqm8A
- wRqPuNzNMD6gGUxxOdZyNct6QJhE5k9vIdXjCnDroQa4IJ8s+YWpfw626SXjkL+x1KKn
- fW3g==
-X-Gm-Message-State: AOAM530RvvI93peBzjnGvvD2DK9DUqWweMlvOKswTSGBlEiHDzOt/pgE
- WVK7ZUBWPN1/ZvKhaWasLxE=
-X-Google-Smtp-Source: ABdhPJwQw+ITF9/jCVKl4WXnR44vXMw1T9lZreN8JLVPQpAgbyQs4ta1LEfSfyUpR13YjYujy18DsQ==
-X-Received: by 2002:a7b:cc0b:: with SMTP id f11mr955113wmh.31.1598953048636;
- Tue, 01 Sep 2020 02:37:28 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id h184sm1083354wmh.41.2020.09.01.02.37.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Sep 2020 02:37:28 -0700 (PDT)
-Subject: Re: [PATCH v3 03/16] target/riscv: cpu: Set reset vector based on the
- configured property value
-To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis
- <Alistair.Francis@wdc.com>, Palmer Dabbelt <palmerdabbelt@google.com>,
- qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <1598924352-89526-1-git-send-email-bmeng.cn@gmail.com>
- <1598924352-89526-4-git-send-email-bmeng.cn@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <897097ce-54cc-e7de-e4a8-83f9ab83269e@amsat.org>
-Date: Tue, 1 Sep 2020 11:37:27 +0200
+ (Exim 4.90_1) (envelope-from <alexandru.elisei@arm.com>)
+ id 1kD2WM-0000db-Dn
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:24:06 -0400
+Received: from foss.arm.com ([217.140.110.172]:59946)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <alexandru.elisei@arm.com>) id 1kD2WJ-0008Bd-FR
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:24:05 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id BC94D30E;
+ Tue,  1 Sep 2020 02:24:00 -0700 (PDT)
+Received: from [192.168.0.110] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5E6123F71F;
+ Tue,  1 Sep 2020 02:23:59 -0700 (PDT)
+Subject: Re: [kvm-unit-tests RFC 0/4] KVM: arm64: Statistical Profiling
+ Extension Tests
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ kvm@vger.kernel.org, kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org,
+ drjones@redhat.com, andrew.murray@arm.com, sudeep.holla@arm.com,
+ maz@kernel.org, will@kernel.org, haibo.xu@linaro.org
+References: <20200831193414.6951-1-eric.auger@redhat.com>
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+Message-ID: <b5eb2cd0-9798-6e40-7690-78992eca30fd@arm.com>
+Date: Tue, 1 Sep 2020 10:24:57 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <1598924352-89526-4-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <20200831193414.6951-1-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=217.140.110.172;
+ envelope-from=alexandru.elisei@arm.com; helo=foss.arm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:24:00
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -62
+X-Spam_score: -6.3
+X-Spam_bar: ------
+X-Spam_report: (-6.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,32 +76,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Bin Meng <bin.meng@windriver.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/1/20 3:38 AM, Bin Meng wrote:
-> From: Bin Meng <bin.meng@windriver.com>
-> 
-> Now that we have the newly introduced 'resetvec' property in the
-> RISC-V CPU and HART, instead of hard-coding the reset vector addr
-> in the CPU's instance_init(), move that to riscv_cpu_realize()
-> based on the configured property value from the RISC-V machines.
-> 
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
-> 
-> (no changes since v1)
-> 
->  hw/riscv/opentitan.c | 1 +
->  hw/riscv/sifive_e.c  | 1 +
->  hw/riscv/sifive_u.c  | 2 ++
->  target/riscv/cpu.c   | 7 ++-----
->  4 files changed, 6 insertions(+), 5 deletions(-)
+Hi Eric,
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+These patches are extremely welcome! I took over the KVM SPE patches from Andrew
+Murray, and I was working on something similar to help with development.
+
+The KVM series on the public mailing list work only by chance because it is
+impossible to reliably map the SPE buffer at EL2 when profiling triggers a stage 2
+data abort. That's because the DABT is reported asynchronously via the buffer
+management interrupt and the faulting IPA is not reported anywhere. I'm trying to
+fix this issue in the next iteration of the series, and then I'll come back to
+your patches for review and testing.
+
+Thanks,
+
+Alex
+
+On 8/31/20 8:34 PM, Eric Auger wrote:
+> This series implements tests exercising the Statistical Profiling
+> Extensions.
+>
+> This was tested with associated unmerged kernel [1] and QEMU [2]
+> series.
+>
+> Depending on the comments, I can easily add other tests checking
+> more configs, additional events and testing migration too. I hope
+> this can be useful when respinning both series.
+>
+> All SPE tests can be launched with:
+> ./run_tests.sh -g spe
+> Tests also can be launched individually. For example:
+> ./arm-run arm/spe.flat -append 'spe-buffer'
+>
+> The series can be found at:
+> https://github.com/eauger/kut/tree/spe_rfc
+>
+> References:
+> [1] [PATCH v2 00/18] arm64: KVM: add SPE profiling support
+> [2] [PATCH 0/7] target/arm: Add vSPE support to KVM guest
+>
+> Eric Auger (4):
+>   arm64: Move get_id_aa64dfr0() in processor.h
+>   spe: Probing and Introspection Test
+>   spe: Add profiling buffer test
+>   spe: Test Profiling Buffer Events
+>
+>  arm/Makefile.common       |   1 +
+>  arm/pmu.c                 |   1 -
+>  arm/spe.c                 | 463 ++++++++++++++++++++++++++++++++++++++
+>  arm/unittests.cfg         |  24 ++
+>  lib/arm64/asm/barrier.h   |   1 +
+>  lib/arm64/asm/processor.h |   5 +
+>  6 files changed, 494 insertions(+), 1 deletion(-)
+>  create mode 100644 arm/spe.c
+>
 
