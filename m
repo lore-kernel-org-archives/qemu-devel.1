@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F04AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:42:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2ABC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:44:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09F532098B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:42:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09F532098B
+	by mail.kernel.org (Postfix) with ESMTPS id AA5312098B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:44:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA5312098B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD003-0003be-7c
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:42:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48066)
+	id 1kD01W-000503-S0
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:44:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzzU-00038U-MM; Tue, 01 Sep 2020 02:42:00 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:33321)
+ id 1kD00Z-0004BJ-Ov; Tue, 01 Sep 2020 02:43:07 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:57273)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzzS-0003J4-HW; Tue, 01 Sep 2020 02:42:00 -0400
+ id 1kD00Y-0003Rn-17; Tue, 01 Sep 2020 02:43:07 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MCs9W-1kLlPa0x0q-008uf5; Tue, 01 Sep 2020 08:41:42 +0200
-Subject: Re: [PATCH 12/12] target/cris: Remove superfluous breaks
-To: Thomas Huth <thuth@redhat.com>, Yi Wang <wang.yi59@zte.com.cn>,
- qemu-devel@nongnu.org
-References: <1594631150-36801-1-git-send-email-wang.yi59@zte.com.cn>
- <454721ce-1508-dcc0-bf08-2c27fd37854f@redhat.com>
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MQuLB-1jyv5x2plv-00Nz2W; Tue, 01 Sep 2020 08:42:58 +0200
+Subject: Re: [PATCH] hw/net/can: Add missing fallthrough statements
+To: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+References: <20200630075520.29825-1-thuth@redhat.com>
+ <c31c772f-9d30-ac47-9e91-02126dc79736@vivier.eu>
+ <202007140009.55103.pisa@cmp.felk.cvut.cz>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,32 +81,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <23b37ce6-a7da-9366-928f-5ce6df41f79a@vivier.eu>
-Date: Tue, 1 Sep 2020 08:41:41 +0200
+Message-ID: <278ac22c-e3f9-cc93-c711-ad420102141f@vivier.eu>
+Date: Tue, 1 Sep 2020 08:42:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <454721ce-1508-dcc0-bf08-2c27fd37854f@redhat.com>
+In-Reply-To: <202007140009.55103.pisa@cmp.felk.cvut.cz>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:V0y26JkjvLFFCZMfBSShf63k4rSUtXGbkaLvnauKJ4w5ddVjs5c
- cAQM9rwBP4zmpPasTsImQPAsW+Uzsc1nQWrqbNqNDvAx+juw2eCRqilju2aaKMz+lrcT7ot
- SXCQwz8q30STcWAW7ywOc+Wkk+WBVXqSZRgX3ysYX5WVBdYP5K1WXp3aTV5t/AHuLvPIoNp
- 1S9YIJwQi/T+6GE1JRoSg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Vl06Cf6tiuE=:ynZvFyLJv8q1RwMXUi8pOI
- o1beXpiC8+KdKlD4FzKOchZs6zlGT42BmHmIbrsnr8d6T2YJgcF59ggI/jwtcN2wjkKQ+TGhQ
- oaXk+aHIaQnJvQVzqs+07vvV4z8KVQbe5+o5lKqCz52foEUKcSYHivFBUl6cXHFOEquZMIU7I
- OXWehAQQwAagOWx0Cd1jumUH4RsI/b8cptkuKpTg3XuynT/eGrLO43TKiHMB+GaJ7ZEt31P+L
- s0thVHu2zdaNRzXvHzenS4SfL+1vpEtTjHs2CkKh9SeMhmTU2uDSEuT+7iUQhQpApiaR4moNn
- EWoa/D6y+qM1S1wwClVZr7WfskH/G4uRqx/fSaFF6kCnC6vgULCI9is1r9Hm1cdVThhNLw0h+
- 9G+/YvG/R5wyB2WV3d8jms5j0fVJUYGOoRcThe4Qwpkfiv+QDpSR2bv5WOZPV15xpQSFhVv4S
- O1ZsZlD0GyixW0rFjaNavDqZ2lqWx+NL4EsHQypsqzIKAfwcHBB5zUZ/F5lctjmkjaTj5og4T
- LbAZB71Sq92tAsQg2PQcjPv3XTePvZfp8fuMCeYUwRQ7e68iVNr6biGH6uQu6TlMYo1g1hxDR
- 21FhwVF9brPofy59f0pI0W3EU3htLnOjlON21OTLP+Wgs91zjLv2VkE2GQKrBIkbnSMKSY7tq
- jzG4E5w7xQgXEptbCFdQ2JlEunxvxriK/04jvrXpVodFqp/wknI8adI2GAbtVRejpLnh/w3q5
- Cto16hRAe1BCfS+LzNfjlXOpmPgV2QNJCL5dWDe6HegSK6C7txwPLtl/7JUH31GtQ1b9aQrNW
- /t0GUof6D2eEouzaFeDX3sqIXYyRcuYarnLvZNPS49zDKOC4w87e/Osdg5RxxRI5wp8zvSp
+X-Provags-ID: V03:K1:lQXv3JTZV+xhFPnPtXnzJIpCk7lV7he7h+WpXxNcuoeDbWHIgYB
+ +viX0AAXUkLCeQxdpkqlEVrAYvLwdGzG3swNXu31j7kDYHXFmIKx/mG9i8DssUmoPVDEtKS
+ H+hSyIKqNjwxfk+8sqiKvXPm7o7OAeBww351y1veO+R46inZRzvfLxJuxv4jtrUMSz/rGnx
+ AdoWRzZxu5u73Cs1EruAA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:jUmjIUnGbGM=:13KNceBjcVpV27tbIHRivB
+ 6GAaQUeBKHQJZVCXYOb/Ne27IWZtco83OFuQwmgfCgR9bm7R3ZNXUh8pMVvTxHDNOSKq99yWS
+ oGa+phUOkaOFEqr3CaEPbURNoxMvii2cSEF+agr+w1grknt/D7TqtgFPReXWE8ODpaWy6090b
+ np3/PXOrQCXtaWp+UAt5Gesxbmjvb+6fkC+Y9pmXpah4hVPkjKm5kxZBzOgMpaoowU571nykL
+ UcYQOeuhbgulk65aEeBsFbIl9eZK8FzRKH3Fx/8ngdXLe3ZCnWAYv2aHvkIDdm2z34dQeLWSD
+ +mQFKNHSx4Cjc9iNoaQAb2QaqRTm739EUa8iRD+AmHMe69vv92kb1al1JyiMknRyJNgWjnbbZ
+ Kt567rYyZw9KoaJjSugjuwU8JDia2slqvr/p9tw6udZuy3z6So01M+YvFlqvEXrnAQrOn9ip4
+ doEkdThJeArxjYnwVbepxKIDgHP/eAGUgmqJe2eNb66ORF9GqRP3HPaERQ5sTI8/HrBAuQbc5
+ cLZy5gCYooS8zqgHzIQ5fgd6fG/8CvTc/U+/YNlmm2GEr7pUIv9aaD7Y+1dOrQ+0/yb23galP
+ /MZwvSYDqxTe4a+AzbpMz9wtplojiPZhGbx/ttMBla2HojCgke4wyZtOY8NITjWyJGJh60tti
+ KVpMBN+2uNqfu3okYV2s2h6jDYmChCJt8PzRZuo4vKPBFRJItmT6iGhA4aup4Z9TQf4CZjOh6
+ V3VhhxTkgkibw/Q71l4cKtG3peU0UxaW+vegm+dVwaVkfS6NoARI7FE5Tn2w22GOm82KoU4fq
+ HCobwNjxcPHWzp7YBKxddSGjHrOwod3R4mfILzggjcjZG8FUZzrEYQaH+aOyLu3/NtstbJb
 Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:35:25
@@ -129,67 +129,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Liao Pingfang <liao.pingfang@zte.com.cn>, wang.liang82@zte.com.cn,
- xue.zhihong@zte.com.cn
+Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org,
+ Oliver Hartkopp <socketcan@hartkopp.net>, Jason Wang <jasowang@redhat.com>,
+ qemu-devel@nongnu.org, Ondrej Ille <ondrej.ille@gmail.com>,
+ =?UTF-8?Q?Jan_Charv=c3=a1t?= <charvj10@fel.cvut.cz>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/07/2020 à 11:39, Thomas Huth a écrit :
-> On 13/07/2020 11.05, Yi Wang wrote:
->> From: Liao Pingfang <liao.pingfang@zte.com.cn>
->>
->> Remove superfluous breaks, as there is a "return" before them.
->>
->> Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
->> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
->> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  target/cris/translate.c         | 7 +++----
->>  target/cris/translate_v10.inc.c | 2 --
->>  2 files changed, 3 insertions(+), 6 deletions(-)
->>
->> diff --git a/target/cris/translate.c b/target/cris/translate.c
->> index aaa46b5..64a478b 100644
->> --- a/target/cris/translate.c
->> +++ b/target/cris/translate.c
->> @@ -1178,12 +1178,11 @@ static inline void t_gen_zext(TCGv d, TCGv s, int size)
->>  static char memsize_char(int size)
->>  {
->>      switch (size) {
->> -    case 1: return 'b';  break;
->> -    case 2: return 'w';  break;
->> -    case 4: return 'd';  break;
->> +    case 1: return 'b';
->> +    case 2: return 'w';
->> +    case 4: return 'd';
->>      default:
->>          return 'x';
->> -        break;
->>      }
->>  }
->>  #endif
->> diff --git a/target/cris/translate_v10.inc.c b/target/cris/translate_v10.inc.c
->> index ae34a0d..7f38fd2 100644
->> --- a/target/cris/translate_v10.inc.c
->> +++ b/target/cris/translate_v10.inc.c
->> @@ -1026,10 +1026,8 @@ static unsigned int dec10_ind(CPUCRISState *env, DisasContext *dc)
->>          switch (dc->opcode) {
->>              case CRISV10_IND_MOVE_M_R:
->>                  return dec10_ind_move_m_r(env, dc, size);
->> -                break;
->>              case CRISV10_IND_MOVE_R_M:
->>                  return dec10_ind_move_r_m(dc, size);
->> -                break;
->>              case CRISV10_IND_CMP:
->>                  LOG_DIS("cmp size=%d op=%d %d\n",  size, dc->src, dc->dst);
->>                  cris_cc_mask(dc, CC_MASK_NZVC);
->>
+Le 14/07/2020 à 00:09, Pavel Pisa a écrit :
+> Hello Laurent and others,
 > 
-> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> On Monday 06 of July 2020 18:35:50 Laurent Vivier wrote:
+>> Le 30/06/2020 à 09:55, Thomas Huth a écrit :
+>>> Add fallthrough annotations to be able to compile the code without
+>>> warnings when using -Wimplicit-fallthrough in our CFLAGS. Looking
+>>> at the code, it seems like the fallthrough is indeed intended here,
+>>> so the comments should be appropriate.
+>>>
+>>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+>>> ---
+>>>  hw/net/can/can_sja1000.c | 2 ++
+>>>  1 file changed, 2 insertions(+)
+>>>
+>>> diff --git a/hw/net/can/can_sja1000.c b/hw/net/can/can_sja1000.c
+>>> index ea915a023a..299932998a 100644
+>>> --- a/hw/net/can/can_sja1000.c
+>>> +++ b/hw/net/can/can_sja1000.c
+>>> @@ -523,6 +523,7 @@ void can_sja_mem_write(CanSJA1000State *s, hwaddr
+>>> addr, uint64_t val, break;
+>>>          case 16: /* RX frame information addr16-28. */
+>>>              s->status_pel |= (1 << 5); /* Set transmit status. */
+>>> +            /* fallthrough */
+>>>          case 17 ... 28:
+>>>              if (s->mode & 0x01) { /* Reset mode */
+>>>                  if (addr < 24) {
+>>> @@ -620,6 +621,7 @@ void can_sja_mem_write(CanSJA1000State *s, hwaddr
+>>> addr, uint64_t val, break;
+>>>          case 10:
+>>>              s->status_bas |= (1 << 5); /* Set transmit status. */
+>>> +            /* fallthrough */
+>>>          case 11 ... 19:
+>>>              if ((s->control & 0x01) == 0) { /* Operation mode */
+>>>                  s->tx_buff[addr - 10] = val; /* Store to TX buffer
+>>> directly. */
+>>
+>> cc: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+>>
+>> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 > 
+> The fallthrough is intentional for sure but I have gone
+> through datasheet and checked why the status bit is set
+> there and my conclusion is that to mimic real HW the status
+> bit should not be set there. In the fact, it should be set
+> and immediately (in a future delayed) reset after SJA_CMR
+> transmit request write. This would mimic real hardware
+> more closely. May it be I send patch in future when more
+> of our developed CAN support is added to QEMU. The status
+> bit behavior has no influence on actual Linux SJA1000 driver
+> anyway.
+> 
+> So for now, I confirm that adding  /* fallthrough */ is correct
+> step forward.
+> 
+> Reviewed-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 > 
 
 Applied to my trivial-patches branch.
