@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE9D0C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE261C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:19:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9241D206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:18:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9241D206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 94214206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:19:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94214206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD77Z-0006a4-O4
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:18:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55314)
+	id 1kD78E-0007lM-Mk
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:19:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zN-0005Xv-6u; Tue, 01 Sep 2020 10:10:21 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:48255)
+ id 1kD6zL-0005S8-81; Tue, 01 Sep 2020 10:10:19 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:35911)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zH-0003ov-Vw; Tue, 01 Sep 2020 10:10:20 -0400
+ id 1kD6zH-0003nk-2p; Tue, 01 Sep 2020 10:10:18 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MJm8H-1jtWrf3TKL-00KD1Y; Tue, 01 Sep 2020 16:10:07 +0200
+ id 1MlwBf-1kv0OQ3GUt-00iypq; Tue, 01 Sep 2020 16:10:09 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/44] qemu-options.hx: Fix typo for netdev documentation
-Date: Tue,  1 Sep 2020 16:09:24 +0200
-Message-Id: <20200901140954.889743-15-laurent@vivier.eu>
+Subject: [PULL 19/44] .mailmap: Update Paul Burton email address
+Date: Tue,  1 Sep 2020 16:09:29 +0200
+Message-Id: <20200901140954.889743-20-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
 References: <20200901140954.889743-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:LZ4UW4gukykKXwMApcvpEihZ/4Hd1xk4TMb5v2qEjF9n2FKeik3
- psiWqZ3UvV1dO5spmBGc8mai8x7oEmHNHsvlhpGLa6YHegtE2p87FCZYQf578FxjlReHjEO
- sVwjuZyTIjBbI8rpqkeZjqIizpq4/iha8vzQvBKcHeqB+oecQL9z+r/fKt2NJREfOmqn4+6
- 0jGh/BRU0rW6uymL7TnXQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ESYrRRrAvTk=:kiZilTFRpgu8PApf+h+9vh
- 1hHQoesjxIxD6whd8hIGBO06jk13bfMbSofcaXbyOULbXaWPkFGb/y/6aQhQ3XQxR/Nw8yMyy
- JCKkqiRs7OmELy7KgPrlljH9+xB++G1Cb22zdnyPm0mifYPPIgCw8ZsWY7Xfz8vKgIHxly1Th
- i3/hOsYDJBJbWzjDUI1PgyvTHp9GGR8HJn9TZmBbkyGRvyCALVZ+RF2RK/1c+G2b+Wq+ffgfh
- cdqX3ykPVjcHbhwvgV8f94X4XPsCMh32GWHMdx3Nd1HA5djHYvZ3oEGqRQ2oh8ybG7LHlwTWm
- Dj9aTpponveMvoUJ6JD+vCwPnDmuRGbPviOwPH+Wx49GfmKkM5kiQfW7F620vOBmTrf0ZK9O4
- Z+tDMKrgyvh2izn2BzQdntcCotrjzZ+Wdp7JWG5w4qEcYyYDrWMip1mPEcbXEsN9HoumUcYw/
- BpomhLo+fT9Zrxny/g3wpFD1hu9eq4LIUH0E3GKBlqq1UCw0zYxES/4EmSNSYNeV7fwAxUq5w
- 8T8i7mZeoXLgle+l2PhQsggrmT+3WPedoiPzIzLHOA3baTkuq3Kw0CYGN5rPM4egcxLZdNdZV
- x3Ez+4NnVhPv8urOLDc8sdaoeqhiy+sM1ku9bHD75WrxQvViuYJGtTdW850kcHe0XLfypczwZ
- cO0DdT7h33JYNUSLT0eSU2YSnRGpja35jw0r4Vh03sDdkgIeQxSwMrkO99ZSp9jp+lfrl8AHi
- Vo9Ki4ReImQlXEkeRSgkBQYFaOMTrXiyLP1dkhFmMIuj4duNs8PG+A3JC1WG8o/u6rVl+0kOY
- 7T224tzp/1bH0T++RFv6tK1NXWbLC5X2cn366pLoQZ3QyMBotdN3WsmcRqf1Eb4HSXbwNlQ
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:g8Ho16oUxUbOqmfmigPDkiytVMUWXcCfrpPunxSV76MaDLvpp+S
+ sRFosgigpHiyzxSd93VOHWobCOuk+WEI+hzz0HAzrEDVVUfi7js1r3OTXynH9/pt5c5fnV6
+ a14TDsFfisVo6VhXBZoTxnBMtUjvceH+etwGQh6rXEuJzxSq+ojyX5NauXXFXrfBcNtbFLr
+ 4MnGH7J4Y7IrLm14zWuQQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:QNr4C/M9WYU=:ouBpm/ttmPOKg0yBmeS+Tg
+ zmCzi5FZBWCoe5+sDhGurxz10RxViJHHJY0XI8Sg4kz2Je3xHZosuUwIVcQuJv7lnPizwXX+4
+ C+QgreV8Izj6V9yLVkcfW+iDiVhOPMsUsKgLarHNq8vHP178EAfAjA8D2HrjBn+i4zH9E19IM
+ wpLBf649Lxk1MWU+kEDnyO49gDUarrkOxSH3QUkRBvpqIypaC86MMKE+rErspg3lItefUdxDo
+ jSwHabuB3u48zdo/kjAX+v/eGkJGiICqnFXjrgV0f+nmMUEf4utWOognOo5Gb5/5dw8WmjaB7
+ lsdKIWS5cEuPQA7f+XRV01tIEEb+1tfj1Hdx5/JkwPhqWRgDTDXbyE13kFeYWvag2ZubN3r7o
+ /kNU2LjmHblfTUCzHzRxjAN3bE/mYLp07oJQi5/QbqZR5o8a+nsSuRd93THyLobOuy8zIIX6p
+ Ncp6zN9YBui9zE9sgW6Xv271kpevtev6IgkO03yO9liUbcsj0T56/NRhOFRrpZXKcB6+G7prP
+ EsdNkwcLsCcoS2pNjeVFLiEXfRqs/hDGwQRn9ELjX7AzwOs2hfMPElXODmOJfnvB9kvV9kIgZ
+ FBd+o/prOqsfDGsN6G0Rtf21yuZeJoaBHmSZZ1yfA9/fStJZxWJFhHZknbegUbAf8Lzfdtxi9
+ RoUVnWDDsU8zAyRRi/u2Tkb8WCCIOa6dlr0TQru/8KZKmj0yXLQPnBYEyrQcXD7+wABDzdzs5
+ CkC9ALrzkyr8LWv1cIcD2paReV+xgjaA87cjIv1pS7SOsElvBcBynxLAc44gxoQzJxgGtRtkT
+ TO1holQX2nwSWVyEWmHyudjm7/xjM3uLiLh34cTxV35mSBpGr5S7xsJJxBzJ09c6FjAq8ji
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -82,41 +83,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
- "Michael S . Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
- Li Qiang <liq3ea@gmail.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Paul Burton <paulburton@kernel.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-This patch fixes the netdev document description typo in qemu-option.hx.
+Following the Linux kernel equivalent patch posted on
+linux-mips@vger.kernel.org [*], update Paul Burton email
+address to avoid emails bouncing.
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20200727045925.29375-1-tianjia.zhang@linux.alibaba.com>
+[*] 'MAINTAINERS: Use @kernel.org address for Paul Burton'
+https://lore.kernel.org/patchwork/patch/1140341/
+
+Cc: Paul Burton <paulburton@kernel.org>
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Acked-by: Paul Burton <paulburton@kernel.org>
+Message-Id: <20200707022544.24925-1-f4bug@amsat.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- qemu-options.hx | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .mailmap | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 30019c4eca2f..b0f020594eab 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -2684,7 +2684,7 @@ SRST
-     disable script execution.
+diff --git a/.mailmap b/.mailmap
+index 2d97a14af3c6..4f40d1cc6e1b 100644
+--- a/.mailmap
++++ b/.mailmap
+@@ -51,9 +51,10 @@ Frederic Konrad <konrad@adacore.com> <fred.konrad@greensocs.com>
+ James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
+ Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
+ Radoslaw Biernacki <rad@semihalf.com> <radoslaw.biernacki@linaro.org>
+-Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
+-Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
+-Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
++Paul Burton <paulburton@kernel.org> <paul.burton@mips.com>
++Paul Burton <paulburton@kernel.org> <paul.burton@imgtec.com>
++Paul Burton <paulburton@kernel.org> <paul@archlinuxmips.org>
++Paul Burton <paulburton@kernel.org> <pburton@wavecomp.com>
+ Stefan Brankovic <stefan.brankovic@syrmia.com> <stefan.brankovic@rt-rk.com.com>
+ Yongbok Kim <yongbok.kim@mips.com> <yongbok.kim@imgtec.com>
  
-     If running QEMU as an unprivileged user, use the network helper
--    helper to configure the TAP interface and attach it to the bridge.
-+    to configure the TAP interface and attach it to the bridge.
-     The default network helper executable is
-     ``/path/to/qemu-bridge-helper`` and the default bridge device is
-     ``br0``.
 -- 
 2.26.2
 
