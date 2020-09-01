@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58A13C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C011C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:22:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21C84206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:22:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C84206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 63379206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:22:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 63379206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36206 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7BG-0006cS-2Y
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:22:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55466)
+	id 1kD7BL-0006tB-HH
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:22:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zS-0005lO-17; Tue, 01 Sep 2020 10:10:26 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:34003)
+ id 1kD6zP-0005dD-4m; Tue, 01 Sep 2020 10:10:23 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:38033)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zO-0003vM-9z; Tue, 01 Sep 2020 10:10:25 -0400
+ id 1kD6zK-0003qW-43; Tue, 01 Sep 2020 10:10:22 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MF39M-1kO8YZ1I88-00FPlt; Tue, 01 Sep 2020 16:10:15 +0200
+ id 1MVeDs-1k3Apo3JLQ-00RaTR; Tue, 01 Sep 2020 16:10:00 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 27/44] hw/ide/atapi: Replace magic '512' value by
- BDRV_SECTOR_SIZE
-Date: Tue,  1 Sep 2020 16:09:37 +0200
-Message-Id: <20200901140954.889743-28-laurent@vivier.eu>
+Subject: [PULL 05/44] vnc: Remove the superfluous break
+Date: Tue,  1 Sep 2020 16:09:15 +0200
+Message-Id: <20200901140954.889743-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
 References: <20200901140954.889743-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:XxvDiAfEEf/04NBgoBcF9pZo4GWfl/h/H5eA0RtNc1GoJBaRxzA
- 7a9L0pf3xltRzut/4I+nLUEaJWFqpMvKfrOeDM9I3xERbD43UbkrUA+9p8hBPwXlyArULK1
- CXzApjMmspuv/hmZwE9HWixkBa0meLnVX/A4V/jz2fb6SceC86ExY8ufbQPWnC76aCxbkAh
- WUsHLH/egpmzl9uyynddg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:0j5L6IFBVXQ=:YWRmFRVEYEl7NwFBvgwZ1N
- zvL1EzYmCwBE3cQcgxjRRWGUkAn/zT9b480225Dn7QoLaWOZzaiuNjr7r20X0Jvll/vMAPLNF
- OsMIlYBe6H5cR87DnZ/UP9OkF+HYLozgPSE3TWiChI2hsjWZehXbrFFiAB10wjmN0ldbXAtsx
- po0/k4V3Ix58G9Qtlj9HRgbEnhaK+DxOxSD2Sl029CW+04PyLMtv19P5dKwBVPAHVncn55cm2
- a2Rq3zClLO5LDeDtgkboMfJTTZkXr1GhpwzbYfirbEeOov3gwJ2R30BbSGIJsf7fZRwiCMp/R
- sEMHu4YgujNHRRWEaZoaS3fVAb4OdZUoCEbmZ6QGHanAY7SrJXDHZ7gt2feuXWUv3x0B+D2QU
- 0Ui1GHmCXFeIRcNH2bOF+Oly2niUMmEQNss2KVsuuJ/GcQ1kgiVFJ6G4TQuGqqVjOXtiQH7JF
- m+fIfvvXYV9tyq/4yygp0tMledU2QKZDHIHj6t0X8FYmGuFjN1tpAUlLCxvOsoMx+9h0v663v
- em5i36dE/z+3bhich2E9j0QA9NurAsGznT5kTJGkBVGA1xEX9fNuIC10WLUKseNs0evqf1Zfe
- W2Dt6Llncn1OSQ0S2Wn5m3crZbgUg4uDwF8jvUsdUJcEYxHYFPKSGzUaqglEEwpyrlwQ0lHFc
- F5xQ54UzUq0VQ0jmmt/LT4s3QIdmtJey1FEcB5gBquhz+CAwYxkLynTQ2VG91Tto68/77QXQZ
- RYwwsAfZlD3HzaDrIKdrcm2M+nebtiGKKrbiUqahq5TYEzLVhqMMg6wdMQAe6gecSR2VQDeYi
- KYWuECHweCBd7bOzY3tSfV0SJ0cod7/ZE5/btHURtriSyFysd4VTIQmmKUXFtxlpHo16cN+
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:Pdv3G5Oqe3F2hu2/7gXBOoL5WAz0XamQawEsYgcNF5YJP/+Ca2e
+ uOh/8pgWD95l4+aXRbKkcS2L8wlzNnsLkCqOQeXPQPezwSpu4Fbx1AgRX+3PDidXqnLTjz1
+ /o8JqoRu+huLR2afrbh8O9XGvEjdXRTWwQGM2oSLGfKdTN40dy1hRjGpsuIJka2ncQaQcFF
+ yTeU3ySy+s0gU/0nxSI1A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NBEvsUduZJk=:wiYh741gjlNi3HyZ5q/vZX
+ tKaY8C/UQgnh7K67xFxkgIYsuxcOFkLirpNbGpKiJZierlUpL2V7QGuUsuS0IjcgsnCSoHzDK
+ 6kd0XGKB7VVNDXsjlOMjTnJd4Phdaw/V/CwBd9CtCa09gojNJP6CJ85fU5lpoG8LWfJm1qSyG
+ xedyQA2PGl16zp1QtQ+Dc+vdbi5hUanQwpESSWcE2BRLTNyL41PnLjKaO8eEVk0fmRUq5qdtj
+ K6TDAfW+pJ72N5zDdqcuE4WnJl579jBWTyHwCoUleZ4Xo2QaJE9DbODCdFGWI3enB9FuRwQYF
+ Y8TBLKqDgceLBgdH+e03TiZLvdTYZTECrJBcgomVUYX3soCTnauwmVSkf7w8ZSs6j0OqLWT1K
+ Ym0vpEZfkFa8avOFq/cEcu6QmBpLpzHSfivy74zWeYZxrNNoF1oWByF7sUu4NzUz+U9TYrtSg
+ +JMu4Qy8rF9uwFhst9e2JH4Pa7ET37oGMxRFu/+Cy55qRi/DqrqCkBbjhju0C1GOrXkZbjKyV
+ iPA1eMMHOFBA7DJ+x+Vk6lkVcAgbkG0YIfTznUGw852ROmLehJMcZIAPWoPZor+rWlh8N2Ra+
+ cw44jaFID4795kyL/rgkiJ1Vt7fmovn1wme34yTKYzBOk4KLPAKRtf1SMXkDwuvaryqKizC/d
+ qcXFtja/xcYUOxYHUrmXf/6uVPUaBz3K6LQ033doMwm4ZAQSJD9KXZGtJPT4ml/fZHs59d9oc
+ J72D41vKp3k3NzStFsB7eXP+iVBcpj2E0ImfgfeIxYrTj92x5iqWWkr8B9pBmKYHQudovRnX0
+ RqXZQsTTRjmMA/RZLrbUR4hhzFmob3Czp2yxvYPK2so7fkLA/wjiWEk512hmeJzIzrl9Mlw
+Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:09:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -84,56 +83,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Li Qiang <liq3ea@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: Yi Wang <wang.yi59@zte.com.cn>, Thomas Huth <thuth@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-trivial@nongnu.org,
  Laurent Vivier <laurent@vivier.eu>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Stefano Garzarella <sgarzare@redhat.com>
+ Liao Pingfang <liao.pingfang@zte.com.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Liao Pingfang <liao.pingfang@zte.com.cn>
 
-Use self-explicit definitions instead of magic '512' value.
+Remove the superfluous break, as there is a "return" before.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20200814082841.27000-6-f4bug@amsat.org>
+Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>a
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <1594631086-36509-1-git-send-email-wang.yi59@zte.com.cn>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/ide/atapi.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ ui/vnc-enc-tight.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/hw/ide/atapi.c b/hw/ide/atapi.c
-index 17a9d635d842..14a2b0bb2f8a 100644
---- a/hw/ide/atapi.c
-+++ b/hw/ide/atapi.c
-@@ -824,9 +824,9 @@ static void cmd_get_configuration(IDEState *s, uint8_t *buf)
-      *
-      *      Only a problem if the feature/profiles grow.
-      */
--    if (max_len > 512) {
-+    if (max_len > BDRV_SECTOR_SIZE) {
-         /* XXX: assume 1 sector */
--        max_len = 512;
-+        max_len = BDRV_SECTOR_SIZE;
+diff --git a/ui/vnc-enc-tight.c b/ui/vnc-enc-tight.c
+index 1e0851826a84..cebd35841a92 100644
+--- a/ui/vnc-enc-tight.c
++++ b/ui/vnc-enc-tight.c
+@@ -1125,7 +1125,6 @@ static int send_palette_rect(VncState *vs, int x, int y,
      }
- 
-     memset(buf, 0, max_len);
-@@ -1186,8 +1186,8 @@ static void cmd_read_dvd_structure(IDEState *s, uint8_t* buf)
-         }
+     default:
+         return -1; /* No palette for 8bits colors */
+-        break;
      }
- 
--    memset(buf, 0, max_len > IDE_DMA_BUF_SECTORS * 512 + 4 ?
--           IDE_DMA_BUF_SECTORS * 512 + 4 : max_len);
-+    memset(buf, 0, max_len > IDE_DMA_BUF_SECTORS * BDRV_SECTOR_SIZE + 4 ?
-+           IDE_DMA_BUF_SECTORS * BDRV_SECTOR_SIZE + 4 : max_len);
- 
-     switch (format) {
-         case 0x00 ... 0x7f:
+     bytes = w * h;
+     vs->tight->tight.offset = bytes;
 -- 
 2.26.2
 
