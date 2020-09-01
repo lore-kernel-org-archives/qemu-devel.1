@@ -2,88 +2,124 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,RCVD_ILLEGAL_IP,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E30C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F804C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:34:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E31A2071B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:27:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1BA72078B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:34:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="E4F8jTDP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E31A2071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="Gur/KMph"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1BA72078B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59902 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDB08-0006u2-AN
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 14:27:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45146)
+	id 1kDB6r-0000yZ-6T
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 14:34:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kDAwk-0002VW-Cc
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 14:23:54 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:36670)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDB5x-0000WB-Sy
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 14:33:26 -0400
+Received: from mail-mw2nam10on2126.outbound.protection.outlook.com
+ ([40.107.94.126]:46072 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kDAwf-0006iZ-Q7
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 14:23:54 -0400
-Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net
- (sas1-ec30c78b6c5b.qloud-c.yandex.net
- [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id CBD852E155D;
- Tue,  1 Sep 2020 21:23:47 +0300 (MSK)
-Received: from sas1-58a37b48fb94.qloud-c.yandex.net
- (sas1-58a37b48fb94.qloud-c.yandex.net [2a02:6b8:c08:1d1b:0:640:58a3:7b48])
- by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- ht2oBPWaGn-NjQOtXXv; Tue, 01 Sep 2020 21:23:47 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1598984627; bh=dsNySRRI8O3TYJ/VgJLD9f0RYcQlOma9W5BAbqgGe+g=;
- h=In-Reply-To:Message-Id:References:Date:Subject:To:From:Cc;
- b=E4F8jTDPxzPvQMd72CU0thfrTaIQ+9ZmczGzeyng3njZ8aomNev/ibXq1pYVs8ueK
- 42a3Gnz50eDArUrx01ODH/x00LGnPugAPoyVt0lpuao5GBNip9lHZpGy6HlQNjadq3
- vHcdrK4uTJH8KaJfKYTzK1X/+bC4aJW/AQvdVF2w=
-Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b080:8026::1:2])
- by sas1-58a37b48fb94.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- kKjd0SHRPh-NiluJeZQ; Tue, 01 Sep 2020 21:23:45 +0300
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
- (Client certificate not present)
-From: Alexey Kirillov <lekiravi@yandex-team.ru>
-To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
-Subject: [PATCH v3 3/4] hmp: Use QMP query-netdevs in hmp_info_network
-Date: Tue,  1 Sep 2020 21:23:25 +0300
-Message-Id: <20200901182326.59633-4-lekiravi@yandex-team.ru>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200901182326.59633-1-lekiravi@yandex-team.ru>
-References: <20200901182326.59633-1-lekiravi@yandex-team.ru>
-MIME-Version: 1.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDB5v-0007zX-TN
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 14:33:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gYiyYo5MWy096PXGratcxe0Pu+fecLQ8U60wP9Iz26W9Z33DOyVz2ExB+bm/dIOMmH+mvF6JZ5lnsitIkgaZDFeA6ldiKu2tNTCXAUAlHCpLBmixMko3w32wMBqA7EjlUOUmIhwUOAoQU0DctggGp8xrhu/mZaz5BPMPcEgI1mNVdZvRBkg18kSr2agApv0SlTcxUMFDb1KtarVTsMw/zqs8g7klWHAufRlKjB+gKbAmz79QUP9pxArsIox4HL/3zoi9g86IylKT4LiXMtT99dn4NtfUCa1bthKFp+g/YlWiCJWRhuy2oZwOI4lhd3WZQA6BfxNIOuoceBWFlKc3Zw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HKYCJPDuuNmjcoHzOd9k1+4sks/ENLm2Q7530ECIkEQ=;
+ b=Lky9NTpS+0l7phBV+uR1w0HL8VFM5nbBshB9NPksdNlmzVhKqxeJ/RTHe9xReGYNDvce3kExZp5kYO4aE3k4vVxsQnlTYn2AZXSGAlmYakT9in9xXWfaz+B8K0WFhaWXBPkkvTJnFqsGW75n0I9Fm6Qh2tyhIZtB2hksChhaHFhZzGS2Fjg1OX5btRlkavnIwfw1HgpwvMsEphp7wYOMuSD6ZbDo5pI70rsG+n0qHbH3h6bIwQkghWzYACuTOr+F5ZVNJYoWedFW5yz9tiTogi+KBKaSbBMKoesFRIZ9NVQyBA9tOVt8wgTmeTXO+WUdmCyvK4uSVpJ6stuAhkstrw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
+ header.d=bu.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HKYCJPDuuNmjcoHzOd9k1+4sks/ENLm2Q7530ECIkEQ=;
+ b=Gur/KMphJzm2mA9ESkwFPe/TqkWU26Iw/EgbkMTfWzi81KB4d/gNL0SmEZiTYp9tjN/8dlEp9KeXtqFqBTP67nkgauZyTLHLJlAiPK1TStJUOImGbyGIijCMvtsZ+hopTggYweCNo6IZUqia1Juqaw8azayvwmbS+Okr3VEKSRw=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
+ by SN6PR03MB3983.namprd03.prod.outlook.com (2603:10b6:805:6a::29)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.23; Tue, 1 Sep
+ 2020 18:18:17 +0000
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::61ae:93a8:b26c:77b8]) by SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::61ae:93a8:b26c:77b8%4]) with mapi id 15.20.3326.025; Tue, 1 Sep 2020
+ 18:18:17 +0000
+From: Alexander Bulekov <alxndr@bu.edu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] fuzz: Add support for custom fuzzing library
+Date: Tue,  1 Sep 2020 14:18:00 -0400
+Message-Id: <20200901181800.326382-1-alxndr@bu.edu>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <9dfe703d-5c78-36d0-bc15-17ff6f9179d7@redhat.com>
+References: <9dfe703d-5c78-36d0-bc15-17ff6f9179d7@redhat.com>
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=5.45.199.163;
- envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 14:23:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR10CA0016.namprd10.prod.outlook.com
+ (2603:10b6:208:120::29) To SN6PR03MB3871.namprd03.prod.outlook.com
+ (2603:10b6:805:6d::32)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from 255.255.255.255 (255.255.255.255) by
+ MN2PR10CA0016.namprd10.prod.outlook.com (2603:10b6:208:120::29) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
+ Transport; Tue, 1 Sep 2020 18:18:16 +0000
+X-Mailer: git-send-email 2.28.0
+X-Originating-IP: [72.93.72.163]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: f46034aa-2779-4d9a-0922-08d84ea365e9
+X-MS-TrafficTypeDiagnostic: SN6PR03MB3983:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR03MB3983AF254A75166997ADAF26BA2E0@SN6PR03MB3983.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fJ+/v6PAjEP5vUfYQZNezmelSiHIU68pvMZRTqFSSmBrRjfpSizVDimavTyBthz8K7ehNOSEovMv0EEIjFEcOUmFJYKP4t0DsYdi7JzKIWvyMWsC9LXlA0QRmNspUiySm/unAJKq5psYNIaiyh9mgofILy2yxkF2rQC/2o8JJdd+fAvYAlOKwShUZKmE8yzhJ+PNsZV4/yWV3mMcX0yzzYsVe3HPiS6bVZSiTUH9i7zqNuOD9KY0zOcJ5wjV8waX0goPRP2NGR/GpEmIrBAmhMtYwVYg4XFKZaELNp/wl/ASGHfxacfelZG64xtTlxf72D0V9RMCkRF/F3bEmXiZvbBb4jDSHaeC8kdv2ZcJZeCkhBFxH++l8m2aLfGC+04O
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(136003)(396003)(39860400002)(376002)(346002)(316002)(6916009)(16576012)(36756003)(1076003)(8936002)(478600001)(75432002)(8676002)(54906003)(5660300002)(83380400001)(86362001)(26005)(66476007)(66556008)(786003)(66946007)(6486002)(956004)(2616005)(6666004)(4326008)(52116002)(186003)(2906002)(21314003);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: tX1DwKkLc/bgd8lEgoTCUCAT1Tz8n/c8I26NbVFujW6ZvPai+bKwbW1LAvp+Ij4DWNNMLggfv0TwvQi/R9Z9GkE1KL+AUQP5tjEVnJ/GMcAoKEMPpZGHVaeUp9zuAs4ywMUtFdw/vvsoWsKrYsRfFKHhJqIB2+i3IHx1rAyZT0MHlD2SW2TE0BUBNTudKsirW2HDOjal2U8XDuwXWt7hJLLiw/+woetwPCpbHrb7aXqtU7sKucpISWotm+UQN3MNmVq35Ix/K1Q7PkwK4HvKgFOl77fchmb27+ih0r/axNrja6MVEWAVMxka8kswxMDCJmKR4drBAtC+s5NEjoLAKyp3iu7VAcK5V6ZpsulZzC50V0U5JjueDsa9pIRK7KbSSfHJQURV+AVBM7nIl+1+2zXWGcJmrz/PrNYcsXPMqIIH9Q9kVrrNwp1cLJVyxWu+WCdNROiG+l+T7pahFAk7QBMrfu5UKQdPgmKiaexiwdoVLWcxtN6ktK4AqEhSM2qThH1RIv675BUyUy262yCU/gmVQ3bZw8In8N/6iFaV6JgElFr9n+0CdC5sp3m0vcxXoZeaA+60vpaiYcnRgrdnG1agoJxnw0UG3v4Lvxb+ajmQLn1oVGf+OordhgHb1k1cdQf3tjYqMlJGAvEaUyNZ4A==
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: f46034aa-2779-4d9a-0922-08d84ea365e9
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2020 18:18:17.3839 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: k+62OU5BK6T2SaMJuVa5bxsxFh14GXLqqki60mwHoBWgmo9EvWqBV8CdFMcKlWf/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB3983
+Received-SPF: pass client-ip=40.107.94.126; envelope-from=alxndr@bu.edu;
+ helo=NAM10-MW2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 14:33:21
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: 4
+X-Spam_score: 0.4
+X-Spam_bar: /
+X-Spam_report: (0.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.999, MSGID_FROM_MTA_HEADER=0.001,
+ RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -92,328 +128,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
- Vincenzo Maffione <v.maffione@gmail.com>, yc-core@yandex-team.ru,
- Paolo Bonzini <pbonzini@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, Bandan Das <bsd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace usage of legacy field info_str of NetClientState for
-backend network devices with result of QMP command query-netdevs.
-NIC and hubports still use legacy info_str field.
-
-Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
 ---
- include/net/net.h |   3 +-
- net/clients.h     |   1 +
- net/hub.c         |   4 +-
- net/hub.h         |   2 +-
- net/net.c         | 181 ++++++++++++++++++++++++++++++++++++++++++++--
- net/vde.c         |  10 +++
- 6 files changed, 192 insertions(+), 9 deletions(-)
+ configure                    | 12 ++++++++++--
+ meson.build                  |  6 +++++-
+ tests/qtest/fuzz/meson.build |  5 ++---
+ 3 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/net.h b/include/net/net.h
-index 04d51ac215..d6d3168a0d 100644
---- a/include/net/net.h
-+++ b/include/net/net.h
-@@ -172,7 +172,8 @@ void qemu_check_nic_model(NICInfo *nd, const char *model);
- int qemu_find_nic_model(NICInfo *nd, const char * const *models,
-                         const char *default_model);
+
+Hi Paolo,
+Here I'm trying to specify the linker-script with
+add_project_link_arguments. How I'm testing this:
+
+$ CC=clang-10 CXX=clang++-10 ../configure --enable-fuzzing
+$ make V=1 "-j$(nproc)" qemu-fuzz-i386
+
+clang++-10  -o qemu-fuzz-i386 qemu-fuzz-i386.p/tests_qtest_fuzz_qtest_wrappers.c.o \
+... libblock.fa chardev/libchardev.fa \
+-Wl,--start-group tests/qtest/libqos/libqos.a -Wl,--no-whole-archive \
+-Wl,-T,/home/alxndr/Development/qemu/tests/qtest/fuzz/fork_fuzz.ld \
+... \
+-Wl,-rpath-link,/home/alxndr/Development/qemu/build/ -lstdc++ -Wl,--end-group
+
+Maybe if I can get the oss-fuzz LIB_FUZZING_ENGINE
+(/usr/lib/libFuzzingEngine.a) into the --start-group, that could also
+solve the issue... I'll take another look at exactly what the oss-fuzz
+build container does.
+
+-Alex
+
+diff --git a/configure b/configure
+index 6ecaff429b..d31b91850c 100755
+--- a/configure
++++ b/configure
+@@ -6165,7 +6165,7 @@ fi
  
--void print_net_client(Monitor *mon, NetClientState *nc);
-+void print_net_client(Monitor *mon, NetClientState *nc,
-+                      NetdevInfoList *ni_list);
- void hmp_info_network(Monitor *mon, const QDict *qdict);
- void net_socket_rs_init(SocketReadState *rs,
-                         SocketReadStateFinalize *finalize,
-diff --git a/net/clients.h b/net/clients.h
-index 92f9b59aed..fdf257f641 100644
---- a/net/clients.h
-+++ b/net/clients.h
-@@ -51,6 +51,7 @@ int net_init_l2tpv3(const Netdev *netdev, const char *name,
- #ifdef CONFIG_VDE
- int net_init_vde(const Netdev *netdev, const char *name,
-                  NetClientState *peer, Error **errp);
-+int net_vde_get_fd(const NetClientState *nc);
- #endif
+ ##########################################
+ # checks for fuzzer
+-if test "$fuzzing" = "yes" ; then
++if test "$fuzzing" = "yes" && test -z "${LIB_FUZZING_ENGINE+xxx}"; then
+   write_c_fuzzer_skeleton
+   if compile_prog "$CPU_CFLAGS -Werror -fsanitize=fuzzer" ""; then
+     have_fuzzer=yes
+@@ -7505,7 +7505,14 @@ if test "$have_mlockall" = "yes" ; then
+   echo "HAVE_MLOCKALL=y" >> $config_host_mak
+ fi
+ if test "$fuzzing" = "yes" ; then
+-  QEMU_CFLAGS="$QEMU_CFLAGS -fsanitize=fuzzer-no-link"
++  # If LIB_FUZZING_ENGINE is set, assume we are running on OSS-Fuzz, and the
++  # needed CFLAGS have already been provided
++  if test -z "${LIB_FUZZING_ENGINE+xxx}" ; then
++    QEMU_CFLAGS="$QEMU_CFLAGS -fsanitize=fuzzer-no-link"
++    FUZZ_LINK_COMMAND="-fsanitize=fuzzer"
++  else
++    FUZZ_LINK_COMMAND="$LIB_FUZZING_ENGINE"
++  fi
+ fi
  
- #ifdef CONFIG_NETMAP
-diff --git a/net/hub.c b/net/hub.c
-index 1375738bf1..7815248650 100644
---- a/net/hub.c
-+++ b/net/hub.c
-@@ -221,7 +221,7 @@ NetClientState *net_hub_port_find(int hub_id)
- /**
-  * Print hub configuration
-  */
--void net_hub_info(Monitor *mon)
-+void net_hub_info(Monitor *mon, NetdevInfoList *ni_list)
- {
-     NetHub *hub;
-     NetHubPort *port;
-@@ -232,7 +232,7 @@ void net_hub_info(Monitor *mon)
-             monitor_printf(mon, " \\ %s", port->nc.name);
-             if (port->nc.peer) {
-                 monitor_printf(mon, ": ");
--                print_net_client(mon, port->nc.peer);
-+                print_net_client(mon, port->nc.peer, ni_list);
-             } else {
-                 monitor_printf(mon, "\n");
-             }
-diff --git a/net/hub.h b/net/hub.h
-index ce45f7b399..2c9a384077 100644
---- a/net/hub.h
-+++ b/net/hub.h
-@@ -17,7 +17,7 @@
+ if test "$plugins" = "yes" ; then
+@@ -7619,6 +7626,7 @@ if test "$libudev" != "no"; then
+ fi
+ if test "$fuzzing" != "no"; then
+     echo "CONFIG_FUZZ=y" >> $config_host_mak
++    echo "FUZZ_LINK_COMMAND=$FUZZ_LINK_COMMAND" >> $config_host_mak
+ fi
  
- NetClientState *net_hub_add_port(int hub_id, const char *name,
-                                  NetClientState *hubpeer);
--void net_hub_info(Monitor *mon);
-+void net_hub_info(Monitor *mon, NetdevInfoList *ninfo);
- void net_hub_check_clients(void);
- bool net_hub_flush(NetClientState *nc);
+ if test "$edk2_blobs" = "yes" ; then
+diff --git a/meson.build b/meson.build
+index 74f8ea0c2e..3a5205040f 100644
+--- a/meson.build
++++ b/meson.build
+@@ -35,11 +35,16 @@ add_project_arguments(config_host['QEMU_CFLAGS'].split(),
+                       native: false, language: ['c', 'objc'])
+ add_project_arguments(config_host['QEMU_CXXFLAGS'].split(),
+                       native: false, language: 'cpp')
++if 'CONFIG_FUZZ' in config_host
++   add_project_link_arguments(['-Wl,-T,' + (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
++   native: false, language: ['c', 'cpp', 'objc'])
++endif
+ add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
+                            native: false, language: ['c', 'cpp', 'objc'])
+ add_project_arguments(config_host['QEMU_INCLUDES'].split(),
+                       language: ['c', 'cpp', 'objc'])
  
-diff --git a/net/net.c b/net/net.c
-index 923e3d0bc6..384b57da3b 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -1175,14 +1175,182 @@ static void netfilter_print_info(Monitor *mon, NetFilterState *nf)
-     monitor_printf(mon, "\n");
- }
++
+ python = import('python').find_installation()
  
--void print_net_client(Monitor *mon, NetClientState *nc)
-+static NetdevInfo *get_netdev_info(NetdevInfoList *ni_list, char *name)
-+{
-+    NetdevInfo *ni;
-+
-+    while (ni_list) {
-+        ni = ni_list->value;
-+        if (g_str_equal(ni->id, name)) {
-+            return ni;
-+        }
-+        ni_list = ni_list->next;
-+    }
-+
-+    return NULL;
-+}
-+
-+static char *generate_info_str(NetdevInfo *ni, NetClientState *nc)
-+{
-+    char *info_str;
-+
-+    /* Use legacy field info_str for NIC and hubports */
-+    if ((nc->info->type == NET_CLIENT_DRIVER_NIC) ||
-+        (nc->info->type == NET_CLIENT_DRIVER_HUBPORT)) {
-+        return g_strdup(nc->info_str);
-+    }
-+
-+    if (!ni) {
-+        return g_malloc0(1);
-+    }
-+
-+    switch (ni->type) {
-+#ifdef CONFIG_SLIRP
-+        case NET_CLIENT_DRIVER_USER: {
-+            size_t len = strchr(ni->u.user.net, '/') - ni->u.user.net;
-+            char *net = g_strndup(ni->u.user.net, len);
-+
-+            info_str = g_strdup_printf("net=%s,restrict=%s",
-+                                       net,
-+                                       ni->u.user.q_restrict ? "on" : "off");
-+            g_free(net);
-+            break;
-+        }
-+#endif /* CONFIG_SLIRP */
-+        case NET_CLIENT_DRIVER_TAP: {
-+#ifndef _WIN32
-+            if (ni->u.tap.has_fds) {
-+                char **fds = g_strsplit(ni->u.tap.fds, ":", -1);
-+
-+                info_str = g_strdup_printf("fd=%s", fds[nc->queue_index]);
-+                g_strfreev(fds);
-+            } else if (ni->u.tap.has_helper) {
-+                info_str = g_strdup_printf("helper=%s", ni->u.tap.helper);
-+            } else {
-+                info_str = g_strdup_printf("ifname=%s,script=%s,downscript=%s",
-+                    ni->u.tap.ifname,
-+                    nc->queue_index == 0 ? ni->u.tap.script : "no",
-+                    nc->queue_index == 0 ? ni->u.tap.downscript : "no");
-+            }
-+#else
-+            info_str = g_strdup_printf("tap: ifname=%s", ni->u.tap.ifname);
-+#endif /* _WIN32 */
-+            break;
-+        }
-+#ifdef CONFIG_L2TPV3
-+        case NET_CLIENT_DRIVER_L2TPV3: {
-+            info_str = g_strdup_printf("l2tpv3: connected");
-+            break;
-+        }
-+#endif /* CONFIG_L2TPV3 */
-+        case NET_CLIENT_DRIVER_SOCKET: {
-+            if (ni->u.socket.has_listen) {
-+                if (ni->u.socket.has_fd) {
-+                    info_str = g_strdup_printf("socket: connection from %s",
-+                                               ni->u.socket.listen);
-+                } else {
-+                    info_str = g_strdup_printf("socket: wait from %s",
-+                                               ni->u.socket.listen);
-+                }
-+            } else if (ni->u.socket.has_connect && ni->u.socket.has_fd) {
-+                info_str = g_strdup_printf("socket: connect to %s",
-+                                           ni->u.socket.connect);
-+            } else if (ni->u.socket.has_mcast && ni->u.socket.has_fd) {
-+                info_str = g_strdup_printf("socket: mcast=%s",
-+                                           ni->u.socket.mcast);
-+            } else if (ni->u.socket.has_udp && ni->u.socket.has_fd) {
-+                info_str = g_strdup_printf("socket: udp=%s", ni->u.socket.udp);
-+            } else {
-+                g_assert(ni->u.socket.has_fd);
-+                int so_type = -1;
-+                int optlen = sizeof(so_type);
-+                int fd = atoi(ni->u.socket.fd);
-+
-+                getsockopt(fd, SOL_SOCKET, SO_TYPE, (char *)&so_type,
-+                           (socklen_t *)&optlen);
-+                if (so_type == SOCK_STREAM) {
-+                    info_str = g_strdup_printf("socket: fd=%s",
-+                                               ni->u.socket.fd);
-+                } else {
-+                    if (ni->u.socket.has_mcast) {
-+                        /*
-+                         * This branch is unreachable, according to how it is in
-+                         * net/socket.c at this moment
-+                         */
-+                        info_str = g_strdup_printf("socket: fd=%s "
-+                                                   "(cloned mcast=%s)",
-+                                                   ni->u.socket.fd,
-+                                                   ni->u.socket.mcast);
-+                    } else {
-+                        SocketAddress *sa = socket_local_address(fd, NULL);
-+
-+                        info_str = g_strdup_printf("socket: fd=%s %s",
-+                            ni->u.socket.fd,
-+                            SocketAddressType_str(sa->type));
-+                        qapi_free_SocketAddress(sa);
-+                    }
-+                }
-+            }
-+            break;
-+        }
-+#ifdef CONFIG_VDE
-+        case NET_CLIENT_DRIVER_VDE: {
-+            info_str = g_strdup_printf("sock=%s,fd=%d",
-+                                       ni->u.vde.sock,
-+                                       net_vde_get_fd(nc));
-+            break;
-+        }
-+#endif /* CONFIG_VDE */
-+#ifdef CONFIG_NET_BRIDGE
-+        case NET_CLIENT_DRIVER_BRIDGE: {
-+            info_str = g_strdup_printf("helper=%s,br=%s",
-+                                       ni->u.bridge.helper,
-+                                       ni->u.bridge.br);
-+            break;
-+        }
-+#endif /* CONFIG_NET_BRIDGE */
-+#ifdef CONFIG_NETMAP
-+        case NET_CLIENT_DRIVER_NETMAP: {
-+            info_str = g_strdup_printf("netmap: ifname=%s",
-+                                       ni->u.netmap.ifname);
-+            break;
-+        }
-+#endif /* CONFIG_NETMAP */
-+#ifdef CONFIG_VHOST_NET_USER
-+        case NET_CLIENT_DRIVER_VHOST_USER: {
-+            info_str = g_strdup_printf("vhost-user%d to %s",
-+                                       nc->queue_index,
-+                                       ni->u.vhost_user.chardev);
-+            break;
-+        }
-+#endif /* CONFIG_VHOST_NET_USER */
-+#ifdef CONFIG_VHOST_NET_VDPA
-+        case NET_CLIENT_DRIVER_VHOST_VDPA: {
-+            info_str = g_strdup("vhost-vdpa");
-+            break;
-+        }
-+#endif /* CONFIG_VHOST_NET_VDPA */
-+        default: {
-+            info_str = g_malloc0(1);
-+            break;
-+        }
-+    }
-+
-+    return info_str;
-+}
-+
-+void print_net_client(Monitor *mon, NetClientState *nc, NetdevInfoList *ni_list)
- {
-     NetFilterState *nf;
-+    NetdevInfo *ni = get_netdev_info(ni_list, nc->name);
-+    char *info_str = generate_info_str(ni, nc);
- 
-     monitor_printf(mon, "%s: index=%d,type=%s,%s\n", nc->name,
-                    nc->queue_index,
-                    NetClientDriver_str(nc->info->type),
--                   nc->info_str);
-+                   info_str);
-+    g_free(info_str);
-+
-     if (!QTAILQ_EMPTY(&nc->filters)) {
-         monitor_printf(mon, "filters:\n");
-     }
-@@ -1286,8 +1454,9 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
- {
-     NetClientState *nc, *peer;
-     NetClientDriver type;
-+    NetdevInfoList *ni_list = qmp_query_netdevs(NULL);
- 
--    net_hub_info(mon);
-+    net_hub_info(mon, ni_list);
- 
-     QTAILQ_FOREACH(nc, &net_clients, next) {
-         peer = nc->peer;
-@@ -1299,13 +1468,15 @@ void hmp_info_network(Monitor *mon, const QDict *qdict)
-         }
- 
-         if (!peer || type == NET_CLIENT_DRIVER_NIC) {
--            print_net_client(mon, nc);
-+            print_net_client(mon, nc, ni_list);
-         } /* else it's a netdev connected to a NIC, printed with the NIC */
-         if (peer && type == NET_CLIENT_DRIVER_NIC) {
-             monitor_printf(mon, " \\ ");
--            print_net_client(mon, peer);
-+            print_net_client(mon, peer, ni_list);
-         }
-     }
-+
-+    qapi_free_NetdevInfoList(ni_list);
- }
- 
- void colo_notify_filters_event(int event, Error **errp)
-diff --git a/net/vde.c b/net/vde.c
-index c0ab2bb65c..c4edf5cba1 100644
---- a/net/vde.c
-+++ b/net/vde.c
-@@ -153,3 +153,13 @@ int net_init_vde(const Netdev *netdev, const char *name,
- 
-     return 0;
- }
-+
-+int net_vde_get_fd(const NetClientState *nc)
-+{
-+    VDEState *s;
-+    assert(nc->info->type == NET_CLIENT_DRIVER_VDE);
-+
-+    s = DO_UPCAST(VDEState, nc, nc);
-+
-+    return vde_datafd(s->vde);
-+}
+ link_language = meson.get_external_property('link_language', 'cpp')
+@@ -1019,7 +1024,6 @@ foreach target : target_dirs
+         'gui': false,
+         'sources': specific_fuzz.sources(),
+         'dependencies': specific_fuzz.dependencies(),
+-        'link_depends': [files('tests/qtest/fuzz/fork_fuzz.ld')],
+       }]
+     endif
+   else
+diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
+index bb0a3f271d..c0accc8af9 100644
+--- a/tests/qtest/fuzz/meson.build
++++ b/tests/qtest/fuzz/meson.build
+@@ -9,9 +9,8 @@ specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuz
+ # unfortunately declare_dependency does not support link_depends, so
+ # this will be duplicated in meson.build
+ fork_fuzz = declare_dependency(
+-  link_args: ['-fsanitize=fuzzer',
+-              '-Wl,-T,' + (meson.current_source_dir() / 'fork_fuzz.ld'),
+-              '-Wl,-wrap,qtest_inb',
++  link_args: config_host['FUZZ_LINK_COMMAND'].split() +
++              ['-Wl,-wrap,qtest_inb',
+               '-Wl,-wrap,qtest_inw',
+               '-Wl,-wrap,qtest_inl',
+               '-Wl,-wrap,qtest_outb',
 -- 
-2.25.1
+2.28.0
 
 
