@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E1C7C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0803C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:39:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6BB082098B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:39:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BB082098B
+	by mail.kernel.org (Postfix) with ESMTPS id 80ECF2098B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:39:37 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80ECF2098B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCzwm-0000xZ-5R
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:39:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47590)
+	id 1kCzxA-0001KL-Jb
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:39:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzw1-0008MF-Kk; Tue, 01 Sep 2020 02:38:25 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:57763)
+ id 1kCzvP-00085U-Af; Tue, 01 Sep 2020 02:37:47 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:51215)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzvz-0002sl-F1; Tue, 01 Sep 2020 02:38:25 -0400
+ id 1kCzvN-0002pK-Md; Tue, 01 Sep 2020 02:37:47 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MG9wg-1kMrpl0Q7Y-00Gc9a; Tue, 01 Sep 2020 08:38:09 +0200
-Subject: Re: [PATCH 09/12] hw: Remove superfluous breaks
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M42fG-1kCzvG1Rq4-0005Km; Tue, 01 Sep 2020 08:37:38 +0200
+Subject: Re: [PATCH 08/12] block/vmdk: Remove superfluous breaks
 To: Thomas Huth <thuth@redhat.com>, Yi Wang <wang.yi59@zte.com.cn>,
  qemu-devel@nongnu.org
-References: <1594631126-36631-1-git-send-email-wang.yi59@zte.com.cn>
- <728da22b-18db-cec9-1cb8-b17202a62846@redhat.com>
+References: <1594631107-36574-1-git-send-email-wang.yi59@zte.com.cn>
+ <ea32b527-7d78-1c7a-a2a2-30ffa2a9e528@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <da57820c-f059-16fb-d4de-dbf18c494ef3@vivier.eu>
-Date: Tue, 1 Sep 2020 08:38:08 +0200
+Message-ID: <ad7366a2-64e9-c088-d988-abdecba8067d@vivier.eu>
+Date: Tue, 1 Sep 2020 08:37:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <728da22b-18db-cec9-1cb8-b17202a62846@redhat.com>
+In-Reply-To: <ea32b527-7d78-1c7a-a2a2-30ffa2a9e528@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:3LuAQFXj/bK6tmmIFEk75EUNdjoB1eeyJmSSWjMHtjUSOwecdw9
- ZXAQ0e4ofq1/eRHxteGYJl3H1MALRMig8MCTjkWibjbHhw8F7rTznIgptl27xDK4vietBvw
- /kHhZ372QqHEZo9zXM7OVWA3gk97dePQpLmUaBPugf1LYUjbRB6AgKJ+mnQ9fUlBZViPfgx
- ASNETZNyC8voX6GRd32Yg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:l3Ken/RFWoE=:1mPX2LPjf7GQM0f2ZEuvPc
- ULqlWB2EfWDQXcZWUba2WF3qjZs18s8YJsOXntRjxVc05h+smBcmJbkdrD12DIUbv2dTUeTwj
- KwX0wg9y/7Wg/sWCuUkp+vtgaw/CpO1aYwt17rIao2Zc4T3s1CbUHulWUUbtWb1YxFR99GRhi
- Rog/6PV1l9mav5+IoG/uccBTCiHga/6eVA4jkTVbsMxwc9sWg564tP960hEHUGCHDjVI+Y/Gj
- zGUUOW1C1lufWaNYF6Jyn/pWv7wQr0zKYJU7oDOBfU8NV8l5kmRKFC8icGgl1gfFMk2OKfjea
- 2jD3vNCCy7PX7UcX6/8iQnEC7wnykX+3AnpP8qXMKHoBb0T736GD+ug77lclu71W+EXK6VHQo
- 5CQ30g74kakx7b2jwt1TryV49xB2BFMkiiPSDUhr+XCxdSN+o02Wk77AQYPTyJwPv8eW7uafZ
- 9phuQi6Mc9esUi5N7nYkaE4Wk/RDOxB/hCqaVR88xGDlN2BE6GOq3VQ01AT/h4qBKkaI+yXOg
- SdIxBczlpB+cFA/jfJtV1uB0M4tve5ne2DJ3OW4ilfaSqjxJtAzeSyt853+Si+3GgjtC0nlyi
- 7vlq3EcPW6CvGXb5cV1YPPjs4J74Z63gLsqHH/QDRQhA33hqJSy0Z2uXDn3wr3hpRmZjv8vqr
- fBgh88YF6UxyN4LxsI2dOc69M4MH6EklDSL+xt7JtPZnBoz9i7WKPlEjzbPgjMtKpWz6zoOHG
- lP7iNWDlvqeHEVmcQtZrsdIbe5FNSXF3TBfJDKfK1piotYekNzUfOjMaAqd3wt9uprQ3uyHjM
- YhydqATgKKpB4vfjQ9mnIZfuNSA5ABSr3WM2Xmr7/eOdkzasEyFnK33TPjiyb7za6vaCjun
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:GtLufzURPVJUpet6Yc4lYhCeFrvXHm6g73WgU8h7lGykVBbR+33
+ IQxZnQe3Dco9+OwzXQcoF3DP3kOVgGckRWxsdv8Xv+B9JVAwavlfsoMHmOXdfqW+R/GSTyG
+ xPd/qRuoalFurEzrwRFzgZmKb5aY1jttjt+Zh6Q4L/soqmjQUhwy/ntsw+7kUSSRsGuhWfN
+ yLvjGK3eLIsl8YK7CVShw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zRGVja6Lrvw=:28VSRAQ0amDoB87pnYu8JX
+ qge05JmnCWQ7L9PomyMRxpNnFFqB4Jo0/gxVl88KVY+z1mtQHJlUWXAyb0kKLBMenEgO6DFvm
+ aubIbVMHSF+Ukf52M/ZfVd22mc2J1Lf6+kdd6Bw0x0vYVjvfipw1nYInvG3yl5eEq85sellCb
+ 5KhbwW95A9T519W4BjzxidGsxX6Fr66x2VIld/hw+Rv8LJoy/bFrSoJzedLA+4wLJ9LVR+usi
+ Vzn8PTnzSRMKQn7PJBtoD9w5jvj7KXTJ8UHenY8ZUTgGc8VRl49qAIG0UOUPAsblNnKQXbv01
+ 4O/my3V2lVPE4n8k43NkChdf+5XtcxyKuCN+8yh7P67kn9gYXteoXuTRmfeVLFyusan2QzBeN
+ yxcAm0t+k++b+mhUL9jKpourqHTVvKHMgYQjOMVR1Q2U4NMlm9gKXTeI/FK79685gykVorkGf
+ LrW/mShOfofL56Fu1J/iUFQyQF72HcMTfOM8Kwn0liGweJUOTIDQ1qzLoQdHX6SUXNwZPpk8h
+ u/igDjX/Nrb8J5cgQUgHMSTDaGBZO7xxGFkRNTXPoGnmvkFsgzgQm3ik3zMr9B6vuT7HXdTxc
+ ydyPFa041JU77MCR1rHjgUXcuYArujvAGxq438iOJSNdh8bpmN+BFqw1SA8NKj9APU/v4h8FO
+ NE6ARnL6LPKioGu7SEQu6kymaXwl9AStJHpH/3hA6VCZnO7PBF0KWidyfI24A753QVC8pm2lj
+ ZcIucj5E5kJqs3ibMMVjoqrsEcvoMneaB7Rw+IwUQXjRLxxKCrjQXVhy+R0C/CLFU+q/Td80K
+ iTXVRL/TDo8wXPRPdymVIXWYsTJHpn8C6yyz4Tf3E/+kYInBP4N0AikxLlM6s/2P7T/CnWu
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:34:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:33:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -129,14 +129,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Liao Pingfang <liao.pingfang@zte.com.cn>, wang.liang82@zte.com.cn,
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, wang.liang82@zte.com.cn,
+ Liao Pingfang <liao.pingfang@zte.com.cn>, Qemu-block <qemu-block@nongnu.org>,
  xue.zhihong@zte.com.cn
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/07/2020 à 11:37, Thomas Huth a écrit :
+Le 13/07/2020 à 11:36, Thomas Huth a écrit :
 > On 13/07/2020 11.05, Yi Wang wrote:
 >> From: Liao Pingfang <liao.pingfang@zte.com.cn>
 >>
@@ -146,183 +146,28 @@ Le 13/07/2020 à 11:37, Thomas Huth a écrit :
 >> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 >> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >> ---
->>  hw/block/pflash_cfi01.c     |  1 -
->>  hw/display/cirrus_vga.c     |  1 -
->>  hw/display/qxl-logger.c     |  2 --
->>  hw/gpio/max7310.c           |  3 ---
->>  hw/i386/intel_iommu.c       |  1 -
->>  hw/input/pxa2xx_keypad.c    | 10 ----------
->>  hw/intc/armv7m_nvic.c       |  1 -
->>  hw/net/lan9118.c            |  2 --
->>  hw/usb/ccid-card-emulated.c |  1 -
->>  9 files changed, 22 deletions(-)
+>>  block/vmdk.c | 3 ---
+>>  1 file changed, 3 deletions(-)
 >>
->> diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
->> index 8ab1d66..f0fcd63 100644
->> --- a/hw/block/pflash_cfi01.c
->> +++ b/hw/block/pflash_cfi01.c
->> @@ -213,7 +213,6 @@ static uint32_t pflash_devid_query(PFlashCFI01 *pfl, hwaddr offset)
->>      default:
->>          trace_pflash_device_info(offset);
->>          return 0;
->> -        break;
->>      }
->>      /* Replicate responses for each device in bank. */
->>      if (pfl->device_width < pfl->bank_width) {
->> diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
->> index 212d6f5..02d9ed0 100644
->> --- a/hw/display/cirrus_vga.c
->> +++ b/hw/display/cirrus_vga.c
->> @@ -1637,7 +1637,6 @@ static int cirrus_vga_read_cr(CirrusVGAState * s, unsigned reg_index)
->>  	return s->vga.cr[s->vga.cr_index];
->>      case 0x26:			// Attribute Controller Index Readback (R)
->>  	return s->vga.ar_index & 0x3f;
->> -	break;
->>      default:
->>          qemu_log_mask(LOG_GUEST_ERROR,
->>                        "cirrus: inport cr_index 0x%02x\n", reg_index);
->> diff --git a/hw/display/qxl-logger.c b/hw/display/qxl-logger.c
->> index 2ec6d8f..c15175b 100644
->> --- a/hw/display/qxl-logger.c
->> +++ b/hw/display/qxl-logger.c
->> @@ -161,7 +161,6 @@ static int qxl_log_cmd_draw(PCIQXLDevice *qxl, QXLDrawable *draw, int group_id)
->>      switch (draw->type) {
->>      case QXL_DRAW_COPY:
->>          return qxl_log_cmd_draw_copy(qxl, &draw->u.copy, group_id);
->> -        break;
->>      }
->>      return 0;
->>  }
->> @@ -180,7 +179,6 @@ static int qxl_log_cmd_draw_compat(PCIQXLDevice *qxl, QXLCompatDrawable *draw,
->>      switch (draw->type) {
->>      case QXL_DRAW_COPY:
->>          return qxl_log_cmd_draw_copy(qxl, &draw->u.copy, group_id);
->> -        break;
->>      }
->>      return 0;
->>  }
->> diff --git a/hw/gpio/max7310.c b/hw/gpio/max7310.c
->> index bebb403..4f78774 100644
->> --- a/hw/gpio/max7310.c
->> +++ b/hw/gpio/max7310.c
->> @@ -51,11 +51,9 @@ static uint8_t max7310_rx(I2CSlave *i2c)
->>      switch (s->command) {
->>      case 0x00:	/* Input port */
->>          return s->level ^ s->polarity;
->> -        break;
->>  
->>      case 0x01:	/* Output port */
->>          return s->level & ~s->direction;
->> -        break;
->>  
->>      case 0x02:	/* Polarity inversion */
->>          return s->polarity;
->> @@ -65,7 +63,6 @@ static uint8_t max7310_rx(I2CSlave *i2c)
->>  
->>      case 0x04:	/* Timeout */
->>          return s->status;
->> -        break;
->>  
->>      case 0xff:	/* Reserved */
->>          return 0xff;
->> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
->> index c56398e..7b390ca 100644
->> --- a/hw/i386/intel_iommu.c
->> +++ b/hw/i386/intel_iommu.c
->> @@ -3163,7 +3163,6 @@ static int vtd_irte_get(IntelIOMMUState *iommu, uint16_t index,
->>                                index, entry->irte.sid_vtype);
->>              /* Take this as verification failure. */
->>              return -VTD_FR_IR_SID_ERR;
+>> diff --git a/block/vmdk.c b/block/vmdk.c
+>> index 28cec50..8f222e3 100644
+>> --- a/block/vmdk.c
+>> +++ b/block/vmdk.c
+>> @@ -1053,14 +1053,11 @@ static int vmdk_open_sparse(BlockDriverState *bs, BdrvChild *file, int flags,
+>>      switch (magic) {
+>>          case VMDK3_MAGIC:
+>>              return vmdk_open_vmfs_sparse(bs, file, flags, errp);
 >> -            break;
->>          }
->>      }
->>  
->> diff --git a/hw/input/pxa2xx_keypad.c b/hw/input/pxa2xx_keypad.c
->> index 62aa6f6..7f2f739 100644
->> --- a/hw/input/pxa2xx_keypad.c
->> +++ b/hw/input/pxa2xx_keypad.c
->> @@ -192,10 +192,8 @@ static uint64_t pxa2xx_keypad_read(void *opaque, hwaddr offset,
->>              s->kpc &= ~(KPC_DI);
->>          qemu_irq_lower(s->irq);
->>          return tmp;
->> -        break;
->>      case KPDK:
->>          return s->kpdk;
->> -        break;
->>      case KPREC:
->>          tmp = s->kprec;
->>          if(tmp & KPREC_OF1)
->> @@ -207,31 +205,23 @@ static uint64_t pxa2xx_keypad_read(void *opaque, hwaddr offset,
->>          if(tmp & KPREC_UF0)
->>              s->kprec &= ~(KPREC_UF0);
->>          return tmp;
->> -        break;
->>      case KPMK:
->>          tmp = s->kpmk;
->>          if(tmp & KPMK_MKP)
->>              s->kpmk &= ~(KPMK_MKP);
->>          return tmp;
->> -        break;
->>      case KPAS:
->>          return s->kpas;
->> -        break;
->>      case KPASMKP0:
->>          return s->kpasmkp[0];
->> -        break;
->>      case KPASMKP1:
->>          return s->kpasmkp[1];
->> -        break;
->>      case KPASMKP2:
->>          return s->kpasmkp[2];
->> -        break;
->>      case KPASMKP3:
->>          return s->kpasmkp[3];
->> -        break;
->>      case KPKDI:
->>          return s->kpkdi;
->> -        break;
->>      default:
->>          qemu_log_mask(LOG_GUEST_ERROR,
->>                        "%s: Bad read offset 0x%"HWADDR_PRIx"\n",
->> diff --git a/hw/intc/armv7m_nvic.c b/hw/intc/armv7m_nvic.c
->> index 3c4b6e6..720ac97 100644
->> --- a/hw/intc/armv7m_nvic.c
->> +++ b/hw/intc/armv7m_nvic.c
->> @@ -1275,7 +1275,6 @@ static uint32_t nvic_readl(NVICState *s, uint32_t offset, MemTxAttrs attrs)
->>      case 0xd90: /* MPU_TYPE */
->>          /* Unified MPU; if the MPU is not present this value is zero */
->>          return cpu->pmsav7_dregion << 8;
->> -        break;
->>      case 0xd94: /* MPU_CTRL */
->>          return cpu->env.v7m.mpu_ctrl[attrs.secure];
->>      case 0xd98: /* MPU_RNR */
->> diff --git a/hw/net/lan9118.c b/hw/net/lan9118.c
->> index 8e2a432..e35f00f 100644
->> --- a/hw/net/lan9118.c
->> +++ b/hw/net/lan9118.c
->> @@ -931,10 +931,8 @@ static uint32_t do_mac_read(lan9118_state *s, int reg)
->>                 | (s->conf.macaddr.a[2] << 16) | (s->conf.macaddr.a[3] << 24);
->>      case MAC_HASHH:
->>          return s->mac_hashh;
->> -        break;
->>      case MAC_HASHL:
->>          return s->mac_hashl;
->> -        break;
->>      case MAC_MII_ACC:
->>          return s->mac_mii_acc;
->>      case MAC_MII_DATA:
->> diff --git a/hw/usb/ccid-card-emulated.c b/hw/usb/ccid-card-emulated.c
->> index 7d6105e..0f1afd6 100644
->> --- a/hw/usb/ccid-card-emulated.c
->> +++ b/hw/usb/ccid-card-emulated.c
->> @@ -350,7 +350,6 @@ static void *event_thread(void *arg)
->>          case VEVENT_LAST: /* quit */
->>              vevent_delete(event);
->>              return NULL;
+>>          case VMDK4_MAGIC:
+>>              return vmdk_open_vmdk4(bs, file, flags, options, errp);
 >> -            break;
 >>          default:
->>              break;
->>          }
+>>              error_setg(errp, "Image not in VMDK format");
+>>              return -EINVAL;
+>> -            break;
+>>      }
+>>  }
+>>  
 >>
 > 
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
