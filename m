@@ -2,109 +2,117 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 669C3C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C5EC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:58:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 384032065F
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:56:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BF7E2071B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:58:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UXJ5rUBX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 384032065F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="roatwilL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF7E2071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDBS1-0002Qv-8d
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 14:56:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49036)
+	id 1kDBUX-0004mg-HM
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 14:58:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDBCH-0004qQ-HM
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 14:39:57 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:32928
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDBCE-0000M3-TR
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 14:39:56 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598985592;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DkSDBu6l+Ztxj669gfGIYzTYqrHGhUz76mCIJLj7uKk=;
- b=UXJ5rUBXjmmH206exwEeqQrs8NGXqDppCpRBQUn/x8l2is/dO5UROP+L/y8+DhRzeMxXq5
- mnyHOSSWPKAzB2Got60FLXpGuTtM9zj+BwAqKLvDLqajiKyncduGPlQFjvaBPNdTvsEiMM
- eS2COLGpNZEi7PYhXADgO45mqdu+/K0=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-82-5GIBFAV-Moazb9rhoH3kVQ-1; Tue, 01 Sep 2020 14:39:51 -0400
-X-MC-Unique: 5GIBFAV-Moazb9rhoH3kVQ-1
-Received: by mail-wr1-f70.google.com with SMTP id j2so912986wrr.14
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 11:39:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=DkSDBu6l+Ztxj669gfGIYzTYqrHGhUz76mCIJLj7uKk=;
- b=jFfN1r8tdA/orCVswYxyWs/wCdNPr+DoSdhCgQ3PYyflfsjPnpbZWKR0CP7KhIaOR9
- rNCdgV3ou0vuYB5R+Ad5wkVhsIXx26lA/3vctRAQml6Ti00RWzxe5Bf23oAg/jMHbkvf
- 19TNR5RPlOvAEhbdH2/MT9XGOBdHjbaAbGjo9K6DhQTJ+kV40lKBIWYe0bdgA5iw1MTI
- xCuN5eLQA9ULpo+BV3706dVVaOzUEhj3uOPBTy7CXfd2h+vvGpMXdyERKPHhbPUq0sHr
- 1kDzhyGa68VvwCbwWeiJUe/bLMUO2vCLO+tqFcEcYd8dlPm3jeKuNwnwWqiSG1f5h/tx
- x1Bw==
-X-Gm-Message-State: AOAM532bo/Duv8RUGXQr5nbcQoe31+diTy9QncwxUA0vfBoq0b9TGZJE
- 09DHLPe9EpOAFrx9iKM5JNBtUZpggP0TTTp49TR1ZLfB34iZQ+TersiLjHd8gPeWfun3ivLBFd7
- OWbmcpqX5dl8q8zw=
-X-Received: by 2002:a5d:610d:: with SMTP id v13mr3095430wrt.23.1598985589950; 
- Tue, 01 Sep 2020 11:39:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwyR0BUQ3ZRoKpybDP4ABk4f4ym2P1JiMa4bO5mmw2swLf9I2nBD0wDoZV5Hw2/8SQpMs4kWg==
-X-Received: by 2002:a5d:610d:: with SMTP id v13mr3095416wrt.23.1598985589770; 
- Tue, 01 Sep 2020 11:39:49 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:7fbd:8007:1fa7:ed17?
- ([2001:b07:6468:f312:7fbd:8007:1fa7:ed17])
- by smtp.gmail.com with ESMTPSA id u66sm3048352wmg.44.2020.09.01.11.39.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Sep 2020 11:39:49 -0700 (PDT)
-Subject: Re: [PATCH] fuzz: Add support for custom fuzzing library
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-References: <9dfe703d-5c78-36d0-bc15-17ff6f9179d7@redhat.com>
- <20200901181800.326382-1-alxndr@bu.edu>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <dde8a8f1-a4b0-11ec-6247-c35004863598@redhat.com>
-Date: Tue, 1 Sep 2020 20:39:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
+ id 1kDBCg-00058U-Fq; Tue, 01 Sep 2020 14:40:24 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64608
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
+ id 1kDBCd-0000My-8v; Tue, 01 Sep 2020 14:40:22 -0400
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 081IWmm1181308; Tue, 1 Sep 2020 14:39:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=references : from : to :
+ cc : subject : in-reply-to : date : message-id : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=9h14+PISC/Rm6tO8J7o4jKPpgd7cER5eghf/Qz7HSyg=;
+ b=roatwilL1S/ngtcG6EYlaBy9BVeW8KI1ivG1t+bIJtRVZqG1K2s9aksPKlciUJpY3YLH
+ c4kTOA1zQKyI/fkiZjSP8udtA+BYX8zLmCZQspF64kSWf/Os42H7fu46aUykSF1rISgx
+ HZ2lo+FarefJOLnnD3Q5bjFBFD3whwh5c1TJDUEhGmmoZizmsVY0aaTU475QU/Qv4bDu
+ jqHgsKNBK33yIloQNzoFBARMcVE/r5EmCycm8ayOxRlaTlH4wMaoGlTuneb2bk2s9y9f
+ THZuGYzSVtbbI687gER0ON50pZPJLsUPnXOz8UscArBNCPf/PHJzH3RviovQ/yqkTcER Lw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 339smm4776-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Sep 2020 14:39:54 -0400
+Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 081IWwVo181986;
+ Tue, 1 Sep 2020 14:39:53 -0400
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
+ [169.63.214.131])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 339smm476u-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Sep 2020 14:39:53 -0400
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 081IXOXi007904;
+ Tue, 1 Sep 2020 18:39:52 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma01dal.us.ibm.com with ESMTP id 337en9gpng-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Sep 2020 18:39:52 +0000
+Received: from b03ledav005.gho.boulder.ibm.com
+ (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 081IdpG064291230
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 1 Sep 2020 18:39:51 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 72A0ABE051;
+ Tue,  1 Sep 2020 18:39:51 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E2CA4BE04F;
+ Tue,  1 Sep 2020 18:39:45 +0000 (GMT)
+Received: from morokweng.localdomain (unknown [9.211.88.129])
+ by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Tue,  1 Sep 2020 18:39:45 +0000 (GMT)
+References: <20200826055535.951207-1-bauerman@linux.ibm.com>
+ <20200826055535.951207-5-bauerman@linux.ibm.com>
+ <eed4a3dd-2431-8f58-f716-067e86ddcdef@redhat.com>
+User-agent: mu4e 1.4.10; emacs 27.1
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v7 4/8] ppc/e500: Use start-powered-off CPUState property
+In-reply-to: <eed4a3dd-2431-8f58-f716-067e86ddcdef@redhat.com>
+Date: Tue, 01 Sep 2020 15:39:43 -0300
+Message-ID: <873641mjdc.fsf@morokweng.localdomain>
 MIME-Version: 1.0
-In-Reply-To: <20200901181800.326382-1-alxndr@bu.edu>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:16:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: quoted-printable
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-01_10:2020-09-01,
+ 2020-09-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxlogscore=999
+ impostorscore=0 mlxscore=0 adultscore=0 bulkscore=0 phishscore=0
+ suspectscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009010157
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 14:40:17
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,20 +126,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Bandan Das <bsd@redhat.com>,
- Thomas Huth <thuth@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ David Hildenbrand <david@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
+ Artyom Tarasenko <atar4qemu@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
+ qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
+ =?utf-8?Q?C?= =?utf-8?Q?=C3=A9dric?= Le Goater <clg@kaod.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>,
+ qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/09/20 20:18, Alexander Bulekov wrote:
-> Maybe if I can get the oss-fuzz LIB_FUZZING_ENGINE
-> (/usr/lib/libFuzzingEngine.a) into the --start-group, that could also
-> solve the issue... I'll take another look at exactly what the oss-fuzz
-> build container does.
 
-Yeah, that might do it.  You can try adding it to the fork_fuzz dependency.
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-Paolo
+> On 8/26/20 7:55 AM, Thiago Jung Bauermann wrote:
+>> Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), use
+>> the start-powered-off property which makes cpu_common_reset() initialize=
+ it
+>> to 1 in common code.
+>>=20
+>> Also change creation of CPU object from cpu_create() to object_new() and
+>> qdev_realize_and_unref() because cpu_create() realizes the CPU and it's =
+not
+>> possible to set a property after the object is realized.
+>>=20
+>> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+>> ---
+>>  hw/ppc/e500.c | 13 +++++++++----
+>>  1 file changed, 9 insertions(+), 4 deletions(-)
+>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
+Thanks!
+
+--=20
+Thiago Jung Bauermann
+IBM Linux Technology Center
 
