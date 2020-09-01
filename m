@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C654C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6250EC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:16:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D3D44206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:16:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3D44206CD
+	by mail.kernel.org (Postfix) with ESMTPS id 2A8A0206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:16:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A8A0206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58876 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD74r-0000sp-TI
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:16:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55166)
+	id 1kD75C-0001R5-5q
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:16:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zI-0005LE-Ih; Tue, 01 Sep 2020 10:10:16 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:45563)
+ id 1kD6zM-0005W2-FI; Tue, 01 Sep 2020 10:10:20 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:58905)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zD-0003l8-Nd; Tue, 01 Sep 2020 10:10:16 -0400
+ id 1kD6zH-0003ob-PW; Tue, 01 Sep 2020 10:10:20 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1Mbj3e-1kibFR45Es-00dFHH; Tue, 01 Sep 2020 16:10:08 +0200
+ id 1N6bsM-1ke9Gu2gpC-0183pD; Tue, 01 Sep 2020 16:10:10 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/44] hw/core/sysbus: Assert memory region index is in range
-Date: Tue,  1 Sep 2020 16:09:26 +0200
-Message-Id: <20200901140954.889743-17-laurent@vivier.eu>
+Subject: [PULL 20/44] hw/i2c: Fix typo in description
+Date: Tue,  1 Sep 2020 16:09:30 +0200
+Message-Id: <20200901140954.889743-21-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
 References: <20200901140954.889743-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:149LN1V/RMSGZ8p3pJ/g9b9ZhYU537JP7fHyZGEDMZOFqj9ZGZ/
- NctFfN+D2CtKOCvqfsb6x+/jGSsSsf15zaFQMH8Z0NY+clSRG0h2Q6+c/3hwpeTBMf6LjB3
- +6VWnccFR5Han2e3XSF7Id6ODDD51ax+YPSa/pdHysfXLKqq+dKOX7D9LVv9RPMPuf3p9vz
- afSR0JEFsYxlENbZwx9UA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:duVrdT9jwb4=:rbpIf78QnKAO72HMFuhKyw
- ELHTYNbCZRDaj+GOgZXTvf2WM68/E8Ji6ZfOb9CkeiTIXTacOROXFnCbS1lM8J7W20m+T2X9e
- FLIrBqy5o7Sb7duxutPZ5eeL6NCQQG4HII+zifxLwK6iJSHyneMF+1CfKtcBTMyNNik9rDnGo
- sabj52V0Eg4QXf7c5RFVw1u8g5q77bThUWn93lRtX8wxDq6o+iAutV1lw/9l9o6F5foVD0ZDn
- 45N30B3mV3p8f219MbHXww4o+T9n7xtiDq0s/qi55ssMweCJSe2ebgVN6bAEb7SxKLEssZF0J
- 6f5PG6x9oTJZcPxmGuE4Lz6eS8VcSsMqFFfgGKdScV42RkqLA7tUqPeCoYbfYyfYUQtRWEA68
- hfNmaLOse7bpmWE9jXt/puQZXf1PPxJIS4PdLb52lFS5uuTLFV9L8Nw7KEyxDAGArPPPxqbEQ
- ak4bPLlLITQoWpHTZykM5yQN6zrTyiLHpDwCGEOqNLH2AQjw8bQWSp1fc29xWPUcIyZeqoygv
- gHWNsgBaeXh/Wr3QQp0diR8Snc56fhLv9iS6u95XgjXTTH9z7QgusyA2FB3NUQmoofPJxrdXJ
- j2EKPcrJT5u1l+p5G8ZUsdo39IGvXgXtwQblonuXpvuIZUaDFBB3Ia/IvKlYLbcOLrId0nc9V
- kgU8gCoKP3YHifc0yMuDrtJMdMvcl5u47R3UdlyTlr44SphMA9jEiCx8w/X3vO8dXJMnEYkxE
- xZeoKPKCi3KNw1xGxxujUwW5eb2lATxHLH87dRxye3YuzEGH/KdY49qMQ9aO4J5Q6EOxGC4dW
- jktD3AfNHtRx9CTX2Pj2vclUYDHElx/i3Z91rhVt4uAeqBdWs9YncUoNjUygXOJSfPtEPHO
+X-Provags-ID: V03:K1:hYVfATmajBOJ5pMHRvVK/fipsf1zG1zZ/XtU8JI2X9WJq7CHULQ
+ mYpzqLoNZg1PKspU1/YvMNHLNUepZjpGzSJiD0hrP146o8ZxLfgpehL7byyIXDpMty138zb
+ 4T8zQCmMiuVkwUL52kM4W/Orl02L8SgxEB3cRCXYjIR13Mf3lPdfJ00oPD6XrwbS/RtkhfJ
+ CMnUXt6aYIMx9wCNhy12A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:kN98XEpLlwo=:O68hlzn1Ic//0t/WUETcAS
+ MahSO1PzRNOppKyucS8r4QyONTGGbFqxwk6VVUIU/NreYfaTa/P2H0eH96Chsb/NMwAxQn18Y
+ fD1PevIfY8Kd43/ZNWjhl6QjbQwJijM5YBZTzFdypNpiatGoa3rVcOzFMugb7us+QoFp6ymLz
+ tnl7miZFmTs+JdJtdNtn8P4tZuFO2rlrt2xSdmbG6AqOPIiIj/zFmG/K412ZhLGWQ/Vsz+SYn
+ CR6SiH3q/y40YLJ4jvp8OceyQ3lCLFlzTe0+j1TvjTl/3b+MKUYXWOlT2lqrjmUI4kmvGIoZZ
+ 5TWeccS7G3ixE/VE/X/vZsY7eiq10zDO61JM0aPoKyE0nG+ifPgTFZjBIUwWIStAVvySOEudr
+ Ypja26DcqQs8zbMurFI8U0KOXz0SAA6yLUTpHiea5N58gIYuSsRFvoQkhjHZhcjTtWT3u+QyV
+ HbNzmRAth8G8pJstV0ZaY8BUzHVcowP2FWNRO4EpUIfv9Vwn4+r7MBMB9lachyHQ5HKutiRZC
+ ShxNeRccIGKbuLNKB6dW5uFjl4/Bqc6h4NtBD9gnkqpD5P0aseMvWaw0c4DOPXBxYG4DQowjF
+ in1HyyjEUMYKWmDpt0ECfliPHdfzll8Azmy8syP7pfv9J1lWNsK60UWuze1GZ6F5+g211zcc7
+ bZUt+nukyzm6U75b/YvBYfhiKJ8iMyPGxWOZtJyAE+I+MqTCj1krZJchpWmidU9LOvEqpocy0
+ Pb/B8TvH+pWmh112rYZuzEteD5HzgUFYb96QWe97lH8gl6r85bfcvITN0+Gfv3u7XBUxjCBAd
+ JHoyxQN0+l/7zgJCwQRiAxwgkZ27zzFKOivHVMspJlXX9nYeU6/AclT1v8vBxDpY9EJvO7E
 Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:08
@@ -83,39 +83,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Corey Minyard <cminyard@mvista.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-trivial@nongnu.org,
+ Li Qiang <liq3ea@gmail.com>, Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Devices incorrectly modelled might use invalid index while
-calling sysbus_mmio_get_region(), leading to OOB access.
-Help developers by asserting the index is in range.
+Remove the second 'and' introduced in commit 73d5f22ecb
+("hw/i2c: Document the I2C qdev helpers").
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200806130945.21629-3-f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Corey Minyard <cminyard@mvista.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200811151643.21293-2-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/core/sysbus.c | 1 +
- 1 file changed, 1 insertion(+)
+ include/hw/i2c/i2c.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 77ab351ce1a8..294f90b7deef 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -199,6 +199,7 @@ void sysbus_init_mmio(SysBusDevice *dev, MemoryRegion *memory)
+diff --git a/include/hw/i2c/i2c.h b/include/hw/i2c/i2c.h
+index a9c030a51233..f57808851e22 100644
+--- a/include/hw/i2c/i2c.h
++++ b/include/hw/i2c/i2c.h
+@@ -102,7 +102,7 @@ I2CSlave *i2c_slave_new(const char *name, uint8_t addr);
+ I2CSlave *i2c_slave_create_simple(I2CBus *bus, const char *name, uint8_t addr);
  
- MemoryRegion *sysbus_mmio_get_region(SysBusDevice *dev, int n)
- {
-+    assert(n >= 0 && n < QDEV_MAX_MMIO);
-     return dev->mmio[n].memory;
- }
- 
+ /**
+- * Realize and and drop a reference an I2C slave device
++ * Realize and drop a reference an I2C slave device
+  * @dev: I2C slave device to realize
+  * @bus: I2C bus to put it on
+  * @addr: I2C address of the slave on the bus
 -- 
 2.26.2
 
