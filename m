@@ -2,119 +2,136 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CECC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A456C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:03:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D360A2071B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:01:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D360A2071B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 0ECF82071B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:03:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="Mv3E2qkp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0ECF82071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD0I3-0001FT-UM
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:01:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52162)
+	id 1kD0Jy-0002aX-6M
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:03:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD0HQ-0000dK-Vi; Tue, 01 Sep 2020 03:00:33 -0400
-Received: from mout.kundenserver.de ([217.72.192.75]:46367)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kD0JP-0002A4-RD
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:02:35 -0400
+Received: from mail-eopbgr680047.outbound.protection.outlook.com
+ ([40.107.68.47]:38912 helo=NAM04-BN3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD0HP-0005Zj-9w; Tue, 01 Sep 2020 03:00:32 -0400
-Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MpDa5-1kwCTD1YkR-00qkXW; Tue, 01 Sep 2020 09:00:28 +0200
-Subject: Re: [PATCH] hw/i386/kvm/ioapic.c: fix typo in error message
-To: Kenta Ishiguro <kentaishiguro@slowstart.org>, qemu-devel@nongnu.org
-References: <20200717123514.15406-1-kentaishiguro@slowstart.org>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <7716b971-669b-f055-480a-9243a2c4f6c4@vivier.eu>
-Date: Tue, 1 Sep 2020 09:00:27 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kD0JL-0005s9-Sp
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:02:35 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KyJ8oADSsBj5RC1MnNDEflsJNbJmy4L3uXSWRjsixPEXjjUjxMNHuihU2a4bz4J4fT5pHIZV5QX/vbdDsNxnzupW3qZd49w7CPr8s0ObOzQC31gCHbKGqFWCbNbn93EuyEiydxoYNeHzjTCZINiex0tk8ms7ujJUOmRc1nJxS6nBaeHXUos4lS8nDvGeXUMYeAw2d68dlfW4z93J7tNVfx0KvLnDJxswBD5oWhbNpl8NaNjtm79VXPZaJXth1NMcGQLGNwF5tc+8li7fUgjADLOQ4aAj56+NSC+8jzh3q40doa3ZjFMxCEMntYIlnQtBu0LMjCNkGmfEy4ljwMJQmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Dfq5X1oNteo2ZAphtdCEMQtiJko00qzRuNQizyo9oLo=;
+ b=fyHJ53TWE+ZNvHrVbXZOIyiObCe90t+lyCNhuI3hRVKGKokgtVXqDeHwrqaWn5+dsfmnT42C2CoKAZK3lVPtpZ7jD/o0FWK9k3Z73N+bsfxcoetE8JHxxyV/V+X2zmtx7PTsnyEvPdpvAmyoWQyqfzTiBO3YkswRb35nV/xf4b7Qdl4hfEOEwyqdMWE+g9iD9rkbD1gHZi9+r+gY675CXj6OZe4eNQiQpGMHOwYBeSzCTuVaZ9wluw7oNg6VzoFZS+Rd89nk/v2qxJukG2D0ZcjWlR+4QxtPCTrI+zVTq7qGwQIp3tW1DPMf+tyo9WR54zNlbwPTgoxjTL7oIz2nkQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=temperror (sender ip
+ is 149.199.60.83) smtp.rcpttodomain=linaro.org
+ smtp.mailfrom=xilinx.com; 
+ dmarc=none action=none header.from=xilinx.com; dkim=none (message not
+ signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Dfq5X1oNteo2ZAphtdCEMQtiJko00qzRuNQizyo9oLo=;
+ b=Mv3E2qkpOXMhBfWapyZsvWPC8ZTovaRmQJn2GPkujTLL5o8RgkLSTQyEALGGSq3humSH8VluYI3N3ofVMIsdfvFLg3P3i2v3BWMyTfsGBlz659vbg3JiQYGVl4u6Vhjuu2cuIBDt/zlbZNfD+sM1NNpTycxKpKvqSfrmLNNkxrY=
+Received: from DM5PR1401CA0001.namprd14.prod.outlook.com (2603:10b6:4:4a::11)
+ by CY4PR02MB2520.namprd02.prod.outlook.com (2603:10b6:903:6e::16)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19; Tue, 1 Sep
+ 2020 07:02:29 +0000
+Received: from CY1NAM02FT011.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:4:4a:cafe::4f) by DM5PR1401CA0001.outlook.office365.com
+ (2603:10b6:4:4a::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
+ Transport; Tue, 1 Sep 2020 07:02:29 +0000
+X-MS-Exchange-Authentication-Results: spf=temperror (sender IP is
+ 149.199.60.83) smtp.mailfrom=xilinx.com; linaro.org; dkim=none (message not
+ signed) header.d=none;linaro.org; dmarc=none action=none
+ header.from=xilinx.com;
+Received-SPF: TempError (protection.outlook.com: error in processing during
+ lookup of xilinx.com: DNS Timeout)
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ CY1NAM02FT011.mail.protection.outlook.com (10.152.75.156) with Microsoft SMTP
+ Server id 15.20.3326.19 via Frontend Transport; Tue, 1 Sep 2020 07:02:28
+ +0000
+Received: from [149.199.38.66] (port=33659 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kD0JF-0004he-FF; Tue, 01 Sep 2020 00:02:25 -0700
+Received: from [127.0.0.1] (helo=xsj-pvapsmtp01)
+ by smtp.xilinx.com with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kD0JI-0006bt-8z; Tue, 01 Sep 2020 00:02:28 -0700
+Received: from [10.71.116.235] (helo=localhost)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kD0JH-0006bN-PI; Tue, 01 Sep 2020 00:02:27 -0700
+Date: Tue, 1 Sep 2020 09:02:23 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 4/6] target/microblaze: Handle DISAS_EXIT_NEXT in delay
+ slot
+Message-ID: <20200901070223.GJ14249@toto>
+References: <20200831184018.839906-1-richard.henderson@linaro.org>
+ <20200831184018.839906-5-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200717123514.15406-1-kentaishiguro@slowstart.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:unr5s9rEz27JJ6IFffiKbU4VXrCY8M6Tz7Sxc3XXIbTKBxS6MmM
- UByeHJVNS1s1mOtde9NIg3OpbYTJluZ3sODS0c4BYeMep1uq9U7eN3ObbwTwtZxzZRzQcUV
- 29dz3dpf5R9ZQWw7hYR5ooUTubemedIwoKxQju6r3+XJ/1KQGOEt/meZYzbEyPQS+b3uRBF
- t1xTKDOs9DbnNr6F2nGfA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8EJU/jFSqGA=:7f85uotPniuwrO0TfYFSu3
- IWU4fWxTU14fKfhq5eMJeLromtDa1NccEWNdFRUOdbU8u0VhcZd2y00eCRCpYNAxyI4iLG+aM
- DnEPKTpPtf/qtofrdKbIPkbgcD8uUY2uw3RwERAHxRZLhxIcRaeDO31HS28bbUNFhXUJ9qJ5v
- E8nW9IPIqzDbMKLNjYBnJzvWrU59vLk+5kpnuQul7DLgYcXM7zFyKxxBDuucGjzoiZVCe0A5Z
- xqhhG2xG8PL4/b6v/VYhwm8Cb1sAuZo64At+sVAVpFtoQYeQe6/9k17An4BLO7zfKQC62En2z
- e7njw6p+S0fd19/a7eSCLbHUvB4d0UhDjet2Ftgt3O+Seh3N9eWsf0QsDUegLVIrmSZ9bupww
- JnVMYADx3BdWNAYT1iyWF4v2TPsDJ9vze0fIbE9tg8c1k7QUck+p8GuEXkJ8Sct55UptMEQb2
- SsJWoLYdrjiV7azkiDAKiXNHIQ6G9tyx0w4jV8JEouJRIirdWR32IdHQmEsqZ4zalPB23GLW8
- Jq5kYUHZAp/lCQfeAd7AEm4RwPzREaAW1wzw8IYx0JATDodHLNm3KIJ/f0TteoIugQfubG+5H
- nSQdRi+xuMOOjN620S2pLwqUqa1MnTttkYHBKtEfX/FoujiBxdqD1GPU4neU0qBJP0mUnqpw+
- NOyaVjWQzgFwZqzNBkDOpeDEi6QQwoZjZoltt1mPMl0QV4UdOeCAW2isnnHvugCp5q48r/UZc
- PNFp1gNJw/rrc49KcMgVTp4a65cpsfrtCJwWX/ejwdTe0bbMkSBRqzi4c+o4WEvSODYAwRQcZ
- ektyckurL35R2ZCjKw5kfq8VRirgDJVTpDeyJwbW87waQV5o8wghm08LhmR/KuNknvNOOZ6
-Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 03:00:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200831184018.839906-5-richard.henderson@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0db6fe2c-b1cc-4142-ef90-08d84e44fd27
+X-MS-TrafficTypeDiagnostic: CY4PR02MB2520:
+X-Microsoft-Antispam-PRVS: <CY4PR02MB25201702DA49D14B15D41783C22E0@CY4PR02MB2520.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:3826;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: eIymP+C7RtXmmC82Zn4gsNbd4/bLq4tTfG5q8zX7exu9yyVoBDpLNGCMWCy3YOfdE4RKJxQhQTHmNoeEe04cwfI40+CcvJMHBlV+FwNH+k5jnCFQIb9vfG8d2W/iSOuZfZdO89pTtlhDbTgPntuzTh3ZrXya5I77yKtqEehID6ukm1HMbKC7WM2X+0PQWjLGJwAvy+ymxP0hR4mutgkX/l2Tdk69FnocUbV7nOJ1yl+WjGMczPGFfyqRXUYtyeFB8b0WrgbZQM0+K8zIDA8ptbZGTsESnGtEWPuUp9AagfqdDimPDEE+7cZOh5BtiPvKbvdCMKQXIOYcY1xJn6AuFHP6f7SVcl/G2ykZQKEq9tShf1LDCOmeV+T6y8YVM2X1q5WDjhOflLiTeVEvb7DMMw==
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(7916004)(136003)(39860400002)(396003)(376002)(346002)(46966005)(82740400003)(33656002)(47076004)(356005)(33716001)(81166007)(1076003)(336012)(5660300002)(9786002)(8676002)(6916009)(186003)(63350400001)(426003)(478600001)(8936002)(316002)(2906002)(4744005)(70586007)(6666004)(83380400001)(26005)(4326008)(82310400003)(9686003)(70206006);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2020 07:02:28.4890 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0db6fe2c-b1cc-4142-ef90-08d84e44fd27
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT011.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR02MB2520
+Received-SPF: pass client-ip=40.107.68.47; envelope-from=edgar@xilinx.com;
+ helo=NAM04-BN3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 03:02:30
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,38 +144,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 17/07/2020 à 14:35, Kenta Ishiguro a écrit :
-> Fix a typo in an error message for KVM_SET_IRQCHIP ioctl:
-> "KVM_GET_IRQCHIP" should be "KVM_SET_IRQCHIP".
+On Mon, Aug 31, 2020 at 11:40:16AM -0700, Richard Henderson wrote:
+> It is legal to put an mts instruction into a delay slot.
+> We should continue to return to the main loop in that
+> case so that we recognize any pending interrupts.
 > 
-> Signed-off-by: Kenta Ishiguro <kentaishiguro@slowstart.org>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  hw/i386/kvm/ioapic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  target/microblaze/translate.c | 34 +++++++++++++++++++++++++++++++++-
+>  1 file changed, 33 insertions(+), 1 deletion(-)
 > 
-> diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
-> index 4ba8e47251..c5528df942 100644
-> --- a/hw/i386/kvm/ioapic.c
-> +++ b/hw/i386/kvm/ioapic.c
-> @@ -97,7 +97,7 @@ static void kvm_ioapic_put(IOAPICCommonState *s)
+> diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+> index 9c52448c06..b116a0ce4f 100644
+> --- a/target/microblaze/translate.c
+> +++ b/target/microblaze/translate.c
+> @@ -1696,6 +1696,10 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
+>      dc->base.pc_next += 4;
 >  
->      ret = kvm_vm_ioctl(kvm_state, KVM_SET_IRQCHIP, &chip);
->      if (ret < 0) {
-> -        fprintf(stderr, "KVM_GET_IRQCHIP failed: %s\n", strerror(ret));
-> +        fprintf(stderr, "KVM_SET_IRQCHIP failed: %s\n", strerror(ret));
->          abort();
->      }
->  }
-> 
+>      if (dc->jmp_cond != TCG_COND_NEVER && !(dc->tb_flags & D_FLAG)) {
+> +        /*
+> +         * Finish finish any return-from branch.
 
-Applied to my trivial-patches branch.
+Typo, 2x finish.
 
-Thanks,
-Laurent
+With that fixed:
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
 
