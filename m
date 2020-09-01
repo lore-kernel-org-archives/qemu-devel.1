@@ -2,74 +2,86 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B615DC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB646C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:36:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6ABB120C56
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:28:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6ABB120C56
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6A13C2071B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:36:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JzbwqDGo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A13C2071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3Wq-0008Lp-JH
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:28:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53530)
+	id 1kD3e0-0001uk-H9
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:36:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kD3W4-0007Tz-3n; Tue, 01 Sep 2020 06:27:52 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:52359)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kD3W1-00008O-RC; Tue, 01 Sep 2020 06:27:51 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.4.108])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id D250B5CB8213;
- Tue,  1 Sep 2020 12:27:38 +0200 (CEST)
-Received: from kaod.org (37.59.142.97) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 1 Sep 2020
- 12:27:37 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-97G0025ab2b1c4-e3ec-43a6-a465-234858c1f105,
- DF2AD85881EC9B15757C33AEE529973A5D0472CE) smtp.auth=groug@kaod.org
-Date: Tue, 1 Sep 2020 12:27:36 +0200
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH v2 3/3] spapr: Remove unnecessary DRC type-checker macros
-Message-ID: <20200901122736.6740a243@bahia.lan>
-In-Reply-To: <20200831235146.36045-4-david@gibson.dropbear.id.au>
-References: <20200831235146.36045-1-david@gibson.dropbear.id.au>
- <20200831235146.36045-4-david@gibson.dropbear.id.au>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kD3dS-0001MC-Fa; Tue, 01 Sep 2020 06:35:30 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:42373)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kD3dQ-00018U-QX; Tue, 01 Sep 2020 06:35:30 -0400
+Received: by mail-oi1-x242.google.com with SMTP id x14so698296oic.9;
+ Tue, 01 Sep 2020 03:35:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fLeiC+kPycHsrk+GI43WqCwlCZLc+UNBu9ek2UxoDKE=;
+ b=JzbwqDGoFiT+YRhLCYUbhsDwblWfzpxES2R8s+WC6wLtT62xYLWyx+gcSJnjV+qKi9
+ iEhvQATE5GUNL/dHiSy+ZDTGlJdPBNYaODt2VdL4ytpufVyp5nEgDtKHQWtbvLtum6IB
+ 6AeXR4PmXVXGGoSFFWAEbX34+ZU5ulePyca8b0jwPT7zwpKtr9BcAth7Y0Mw7KxfnbYw
+ oQs0TWyNevMhWW+glsID6E0eHqArfvihp4rvUIN0NJp0saw58JtE4UOB7qUVnn+S9s4j
+ qJBrr3idEGaGMR/RAxYvaAUlrO5J0aq7sQBdfFpgND7H0WBPXzS4cyHCB5TSmafzn/bs
+ wbmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fLeiC+kPycHsrk+GI43WqCwlCZLc+UNBu9ek2UxoDKE=;
+ b=B/j5EO2+HwMLW1MTVkxNYowXChMtWRMHaEJE0R5WSNCPT/8LkhiupYw9PSEunTaIce
+ mYbNT9UiMSZTWCM6wSbCwoS7cCZFXSc60d8TdV5CBOznD/RVf4f5NPG/Y2FhX8DOtBtF
+ 2FLVmEQ2MqtVgvNRW+P/NJB7DdNe+tZpzHTffHgUZwypbRzfK+fCMcc/LWptdI/uZLOU
+ iQRNUyWPG9cUXTsgmyg3HTqxx9YwN8HKENIrvLXLLC3lEA7nJPfemJpLJI4niMkGLBhg
+ ilvS5EQ1H5JdADCgx2EjWAZygMsU9EDbCLZv26DfTZ67t8fIpogP0olAtLt0VpGo5zTr
+ iAdw==
+X-Gm-Message-State: AOAM5331AfwywNQg90x+1dV4XVUY4WjOgaho5m2fLsfniVbp9pSMEX2w
+ 5+wzAl0pRtDx16UZn/6OOsQLQLSm+6ZKDUKxHq0=
+X-Google-Smtp-Source: ABdhPJxBjJr8/g0N4yyymldxlgOSLy6CBzq48+J4MGsSLS4jQ6qJmiBvj6n+gEMyMiFZG1pVvvF7NrJRutH+IQMU+wY=
+X-Received: by 2002:aca:c0c1:: with SMTP id q184mr729468oif.56.1598956527270; 
+ Tue, 01 Sep 2020 03:35:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.97]
-X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: e0f7cbe5-6bd6-437e-9b6c-9b96d62e53e4
-X-Ovh-Tracer-Id: 2457276547992689059
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefjedgvdelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegtlhhgsehkrghougdrohhrgh
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 06:27:39
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
- UPPERCASE_50_75=0.008 autolearn=no autolearn_force=no
+References: <20200815072052.73228-1-liq3ea@163.com>
+In-Reply-To: <20200815072052.73228-1-liq3ea@163.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Tue, 1 Sep 2020 18:34:51 +0800
+Message-ID: <CAKXe6SJkqaeDBpDC__N6-RYgOMdTRO8NcJ0jkaFvAheEkfqbbw@mail.gmail.com>
+Subject: Re: [PATCH] hw: ide: check the pointer before do dma memory unmap
+To: Li Qiang <liq3ea@163.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,96 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?Q8OpZHJpYw==?= Le Goater <clg@kaod.org>, qemu-ppc@nongnu.org,
- ehabkost@redhat.com, qemu-devel@nongnu.org
+Cc: Alexander Bulekov <alxndr@bu.edu>, John Snow <jsnow@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  1 Sep 2020 09:51:46 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+Ping.
 
-> spapr_drc.h includes typechecker macro boilerplate for the many different
-> DRC subclasses.  However, most of these types don't actually have different
-> data in their class and/or instance, making these unneeded, unused, and in
-> fact a bad idea.  Remove them.
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Li Qiang <liq3ea@163.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8815=E6=97=A5=E5=91=
+=A8=E5=85=AD =E4=B8=8B=E5=8D=883:21=E5=86=99=E9=81=93=EF=BC=9A
+>
+> In 'map_page' we need to check the return value of
+> 'dma_memory_map' to ensure the we actully maped something.
+> Otherwise, we will hit an assert in 'address_space_unmap'.
+> This is because we can't find the MR with the NULL buffer.
+> This is the LP#1884693:
+>
+> -->https://bugs.launchpad.net/qemu/+bug/1884693
+>
+> Reported-by: Alexander Bulekov <alxndr@bu.edu>
+> Signed-off-by: Li Qiang <liq3ea@163.com>
 > ---
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-
->  include/hw/ppc/spapr_drc.h | 43 +-------------------------------------
->  1 file changed, 1 insertion(+), 42 deletions(-)
-> 
-> diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
-> index 21af8deac1..f270860769 100644
-> --- a/include/hw/ppc/spapr_drc.h
-> +++ b/include/hw/ppc/spapr_drc.h
-> @@ -29,62 +29,21 @@
->                                               TYPE_SPAPR_DR_CONNECTOR)
->  
->  #define TYPE_SPAPR_DRC_PHYSICAL "spapr-drc-physical"
-> -#define SPAPR_DRC_PHYSICAL_GET_CLASS(obj) \
-> -        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PHYSICAL)
-> -#define SPAPR_DRC_PHYSICAL_CLASS(klass) \
-> -        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, \
-> -                           TYPE_SPAPR_DRC_PHYSICAL)
->  #define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(SpaprDrcPhysical, (obj), \
->                                               TYPE_SPAPR_DRC_PHYSICAL)
->  
->  #define TYPE_SPAPR_DRC_LOGICAL "spapr-drc-logical"
-> -#define SPAPR_DRC_LOGICAL_GET_CLASS(obj) \
-> -        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_LOGICAL)
-> -#define SPAPR_DRC_LOGICAL_CLASS(klass) \
-> -        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, \
-> -                           TYPE_SPAPR_DRC_LOGICAL)
-> -#define SPAPR_DRC_LOGICAL(obj) OBJECT_CHECK(SpaprDrc, (obj), \
-> -                                             TYPE_SPAPR_DRC_LOGICAL)
->  
->  #define TYPE_SPAPR_DRC_CPU "spapr-drc-cpu"
-> -#define SPAPR_DRC_CPU_GET_CLASS(obj) \
-> -        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_CPU)
-> -#define SPAPR_DRC_CPU_CLASS(klass) \
-> -        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_CPU)
-> -#define SPAPR_DRC_CPU(obj) OBJECT_CHECK(SpaprDrc, (obj), \
-> -                                        TYPE_SPAPR_DRC_CPU)
->  
->  #define TYPE_SPAPR_DRC_PCI "spapr-drc-pci"
-> -#define SPAPR_DRC_PCI_GET_CLASS(obj) \
-> -        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PCI)
-> -#define SPAPR_DRC_PCI_CLASS(klass) \
-> -        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_PCI)
-> -#define SPAPR_DRC_PCI(obj) OBJECT_CHECK(SpaprDrc, (obj), \
-> -                                        TYPE_SPAPR_DRC_PCI)
->  
->  #define TYPE_SPAPR_DRC_LMB "spapr-drc-lmb"
-> -#define SPAPR_DRC_LMB_GET_CLASS(obj) \
-> -        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_LMB)
-> -#define SPAPR_DRC_LMB_CLASS(klass) \
-> -        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_LMB)
-> -#define SPAPR_DRC_LMB(obj) OBJECT_CHECK(SpaprDrc, (obj), \
-> -                                        TYPE_SPAPR_DRC_LMB)
->  
->  #define TYPE_SPAPR_DRC_PHB "spapr-drc-phb"
-> -#define SPAPR_DRC_PHB_GET_CLASS(obj) \
-> -        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PHB)
-> -#define SPAPR_DRC_PHB_CLASS(klass) \
-> -        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_PHB)
-> -#define SPAPR_DRC_PHB(obj) OBJECT_CHECK(SpaprDrc, (obj), \
-> -                                        TYPE_SPAPR_DRC_PHB)
->  
->  #define TYPE_SPAPR_DRC_PMEM "spapr-drc-pmem"
-> -#define SPAPR_DRC_PMEM_GET_CLASS(obj) \
-> -        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PMEM)
-> -#define SPAPR_DRC_PMEM_CLASS(klass) \
-> -        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_PMEM)
-> -#define SPAPR_DRC_PMEM(obj) OBJECT_CHECK(SpaprDrc, (obj), \
-> -                                         TYPE_SPAPR_DRC_PMEM)
+>  hw/ide/ahci.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
+> index 009120f88b..63e9fccdbe 100644
+> --- a/hw/ide/ahci.c
+> +++ b/hw/ide/ahci.c
+> @@ -250,6 +250,11 @@ static void map_page(AddressSpace *as, uint8_t **ptr=
+, uint64_t addr,
+>      }
+>
+>      *ptr =3D dma_memory_map(as, addr, &len, DMA_DIRECTION_FROM_DEVICE);
 > +
->  /*
->   * Various hotplug types managed by SpaprDrc
->   *
-
+> +    if (!*ptr) {
+> +        return;
+> +    }
+> +
+>      if (len < wanted) {
+>          dma_memory_unmap(as, *ptr, len, DMA_DIRECTION_FROM_DEVICE, len);
+>          *ptr =3D NULL;
+> --
+> 2.17.1
+>
 
