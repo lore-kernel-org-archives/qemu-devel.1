@@ -2,104 +2,94 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AB6C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 21:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2563C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 21:16:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37671206FA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 21:14:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DTk/XWws"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37671206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8548C20767
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 21:16:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8548C20767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDDcD-0002DA-B8
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 17:14:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53470)
+	id 1kDDeE-0003h5-O3
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 17:16:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kDDbV-0001lD-T8
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 17:14:09 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:28407
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kDDbQ-0001bL-NB
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 17:14:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598994843;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oMzSUbuaS0SLP3V0nKz6raRAbmrCMnOI9nSqqBp6t90=;
- b=DTk/XWwsqiDJLwZWlzBs3kNKtsFnBPq5j0Sq9i34WT7aPHCac0OxdaL18Q6AGzixmOQOj2
- gNSKeorEOAd6kwxsScW9cxsgA9GEBEFlC1EJo9CC8i2kIiq+qpsT622r/ZnKFadLleQEIv
- Uvb2FTM1t3eMklkVanmrPcE33QMmePg=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-wy8CUikGOwu1IVF1Z0klkw-1; Tue, 01 Sep 2020 17:14:01 -0400
-X-MC-Unique: wy8CUikGOwu1IVF1Z0klkw-1
-Received: by mail-qk1-f200.google.com with SMTP id g6so1864657qko.21
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 14:14:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=oMzSUbuaS0SLP3V0nKz6raRAbmrCMnOI9nSqqBp6t90=;
- b=oSBHLxia0wM2L2PGzNs1BNkvrHoyVmsxDuSkXqpnbz4C4jTMpvUBZiZ3f1PIvMRhbf
- /k3j9ueYtiySfZmpGTcojhtgdrufOAwIX0XDZhsQcj63X05fXjQkad4MLuODmCfmSjjJ
- HwiIh3urBidvwMdzDno/MeXzva4IvKwnAaHaXCgiieu37tWCLYW4og5TkCKjrmLr5r59
- xSOWEV0WBt0QEtxxoAziYXImvPAbtmKf36PkZnZLiFRG9v8cWu43EQicSmBN4/jT+tWg
- F8DMSWaW+yaul9TGSMR+ywttxtdqeJn1ckjwjN89E4OOJpBQCPF25RaPpma/s6QJZ+UV
- EIdw==
-X-Gm-Message-State: AOAM531L5GBhiAzF4tQOK+QJkEglgSiocaTreukF6iJngM/DKeBgIxGc
- UFHuWIt6FhV6azW855PqjIgC2YeS+S0ZgdCH9VxdkLjRIlffJ3awvk9yWthv0t33MGrzocriKkD
- +gz3f5rfsplo+AhU=
-X-Received: by 2002:ac8:f57:: with SMTP id l23mr3890625qtk.166.1598994840997; 
- Tue, 01 Sep 2020 14:14:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz2jSXrxJMOiA7e8jitZ9yOubd+YmH7YcxHvkHPsdGZijX9z41IAdO0D3TcJKdirU1S1m4mRw==
-X-Received: by 2002:ac8:f57:: with SMTP id l23mr3890592qtk.166.1598994840761; 
- Tue, 01 Sep 2020 14:14:00 -0700 (PDT)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca.
- [70.53.122.15])
- by smtp.gmail.com with ESMTPSA id b199sm3148134qkg.116.2020.09.01.14.13.58
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Sep 2020 14:13:59 -0700 (PDT)
-Date: Tue, 1 Sep 2020 17:13:57 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>
-Subject: Re: [RFC v8 0/5] memory: Delete assertion in
- memory_region_unregister_iommu_notifier
-Message-ID: <20200901211357.GH3053@xz-x1>
-References: <20200901142608.24481-1-eperezma@redhat.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDDcq-0002qr-Ig
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 17:15:32 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:48288
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDDcn-0001ng-QS
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 17:15:32 -0400
+Received: from host86-179-247-31.range86-179.btcentralplus.com
+ ([86.179.247.31] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDDdB-0003U2-B9; Tue, 01 Sep 2020 22:15:58 +0100
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200901062020.26660-1-pbonzini@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <156da43a-4744-ac6c-fc4b-54788a40b3e9@ilande.co.uk>
+Date: Tue, 1 Sep 2020 22:14:14 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200901142608.24481-1-eperezma@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200901062020.26660-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:08:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-SA-Exim-Connect-IP: 86.179.247.31
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 00/13] Make QEMU installation relocatable
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,33 +102,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org,
- Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: luoyonggang@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 01, 2020 at 04:26:03PM +0200, Eugenio Pérez wrote:
-> I am able to hit this assertion when a Red Hat 7 guest virtio_net device
-> raises an "Invalidation" of all the TLB entries. This happens in the
-> guest's startup if 'intel_iommu=on' argument is passed to the guest
-> kernel and right IOMMU/ATS devices are declared in qemu's command line.
+On 01/09/2020 07:20, Paolo Bonzini wrote:
 
-Thanks for working on this, Eugenio!  Sorry to let the original one-liner patch
-grow into a patchset... :)
+> Right now, the installation of QEMU is not relocatable; there is
+> a local hack in os_find_datadir() so that Windows binaries look
+> for ROMs in the executable directory, but that has several limitations:
+> 
+> - it does not extend to configuration files, icons, etc.
+> 
+> - it does not allow changing the data directory in any way
+> 
+> - it does not apply to POSIX platforms
+> 
+> This series fixes that by making all paths within the installation
+> prefix relative to the executable.  This in practice means all paths
+> will be relocatable, except for /etc and /var if they're moved
+> outside the prefix.
+> 
+> Here is an example of relocatability; before:
+> 
+>   $ make DESTDIR=$PWD/test install
+>   $ cd test/usr/local/bin
+>   $ ./qemu-system-ppc -L help
+>   /usr/local/share/qemu-firmware
+>   /usr/local/share/qemu
+> 
+> After:
+> 
+>   $ make DESTDIR=$PWD/test install
+>   $ cd test/usr/local/bin
+>   $ ./qemu-system-ppc -L help
+>   /home/pbonzini/work/upstream/qemu/+build/test/usr/local/bin/../share/qemu-firmware
+>   /home/pbonzini/work/upstream/qemu/+build/test/usr/local/bin/../share/qemu
+> 
+> The main benefit of this is on Windows, as mentioned above; but it also
+> makes behavior more consistent across platforms and allows the removal
+> of the hack that hides the "c:/Program Files/QEMU" prefix from Meson
+> during cross compilation.
+> 
+> Paolo
 
-I think it at least looks very good to me in general, besides another trivial
-comment on patch 4.
+Hi Paolo,
 
--- 
-Peter Xu
+I've managed to give this a quick go this evening and I see the same link error
+reported by Yonggang Luo at
+https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg00586.html, i.e.:
 
+"cc"  -o storage-daemon/qemu-storage-daemon.exe version.rc_version.o
+storage-daemon/qemu-storage-daemon.exe.p/meson-generated_.._qapi_qapi-introspect.c.obj storage-daemon/qemu-storage-daemon.exe.p/meson-generated_.._qapi_qapi-commands.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/meson-generated_.._qapi_qapi-emit-events.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/meson-generated_.._qapi_qapi-events.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/meson-generated_.._qapi_qapi-visit.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/meson-generated_.._qapi_qapi-init-commands.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/meson-generated_.._qapi_qapi-types.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/qemu-storage-daemon.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/.._iothread.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/.._blockdev-nbd.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/.._blockdev.c.obj
+storage-daemon/qemu-storage-daemon.exe.p/.._job-qmp.c.obj
+"-L/home/Mark/qemu/build/dtc/libfdt" "-Wl,--allow-shlib-undefined"
+"-Wl,--whole-archive" "libqmp.fa" "libblock.fa" "crypto/libcrypto.fa"
+"authz/libauthz.fa" "qom/libqom.fa" "io/libio.fa" "chardev/libchardev.fa"
+"-Wl,--no-whole-archive" "-Wl,--nxcompat" "-Wl,--no-seh" "-Wl,--dynamicbase"
+"-Wl,--warn-common" "-m64" "-fstack-protector-strong" "-Wl,--start-group"
+"libqemuutil.a" "libqmp.fa" "libblock.fa" "crypto/libcrypto.fa" "authz/libauthz.fa"
+"qom/libqom.fa" "io/libio.fa" "chardev/libchardev.fa" "@block.syms" "-lwinmm"
+"-LC:/msys64/mingw64/lib" "-lgio-2.0" "-lgobject-2.0" "-lglib-2.0" "-lintl"
+"-pthread" "-lm" "-LC:/msys64/mingw64/lib" "-lgthread-2.0" "-lglib-2.0" "-lintl"
+"-lws2_32" "-LC:/msys64/mingw64/lib" "-lzstd" "-LC:/msys64/mingw64/lib" "-lxml2"
+"-LC:/msys64/mingw64/lib" "-lz" "-lbz2" "-LC:/msys64/mingw64/lib" "-lgthread-2.0"
+"-lglib-2.0" "-lintl" "-mconsole" "-lkernel32" "-luser32" "-lgdi32" "-lwinspool"
+"-lshell32" "-lole32" "-loleaut32" "-luuid" "-lcomdlg32" "-ladvapi32" "-Wl,--end-group"
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:
+cannot find -lfdt
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:
+cannot find -lcapstone
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:
+cannot find -lfdt
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:
+cannot find -lcapstone
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:
+cannot find -lslirp
+C:/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:
+cannot find -lslirp
+collect2.exe: error: ld returned 1 exit status
+make[1]: *** [Makefile.ninja:1405: qemu-system-ppc.exe] Error 1
+make[1]: *** Waiting for unfinished jobs....
+collect2.exe: error: ld returned 1 exit status
+make[1]: *** [Makefile.ninja:1407: qemu-system-ppcw.exe] Error 1
+make[1]: Leaving directory '/home/Mark/qemu/build'
+make: *** [GNUmakefile:11: install] Error 2
+
+I think this means that it's missing something from Yonggang Luo's patch here:
+https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg07668.html. I haven't looked
+at patch 1 in that series for converting undefsym.sh to undefsym.py yet, although
+last time I was able to get a working build without it.
+
+Also patch 13 wouldn't apply for me to git master: I ended up having to make the
+changes by hand, so looks like something requiring a rebase has recently snuck in.
+
+
+ATB,
+
+Mark.
 
