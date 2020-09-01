@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87955C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19FF6C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:20:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53CED206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:19:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53CED206CD
+	by mail.kernel.org (Postfix) with ESMTPS id D2EF9206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:20:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2EF9206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51828 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD78f-0000Jp-AB
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:19:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55280)
+	id 1kD790-0001Bm-Tw
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:20:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zM-0005V6-5C; Tue, 01 Sep 2020 10:10:20 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:41591)
+ id 1kD6zP-0005fA-TX; Tue, 01 Sep 2020 10:10:23 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:44969)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zH-0003np-4x; Tue, 01 Sep 2020 10:10:19 -0400
+ id 1kD6zN-0003uP-Op; Tue, 01 Sep 2020 10:10:23 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MplPh-1kwe1l2Won-00q7Qu; Tue, 01 Sep 2020 16:10:08 +0200
+ id 1MEVBa-1kNaK03rti-00Fxjj; Tue, 01 Sep 2020 16:10:19 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/44] Revert "mailmap: Update philmd email address"
-Date: Tue,  1 Sep 2020 16:09:27 +0200
-Message-Id: <20200901140954.889743-18-laurent@vivier.eu>
+Subject: [PULL 32/44] linux-user: Add strace support for printing OFD fcntl
+ operations
+Date: Tue,  1 Sep 2020 16:09:42 +0200
+Message-Id: <20200901140954.889743-33-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
 References: <20200901140954.889743-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ChtALlJkZgJpiF96Cn17CCN5tia8WPa0gmyMFO9vzh2KNErH/3p
- 1MWld+uKMHrIzYVOqrquGvgScUiCphJcVEUEN1ed8XjHDNoYpteyKh3UTDeQFQhdX7HD8kJ
- O2u4eBI+JASfBmNnL+mWqflMsnSIuf7EB1pMDXo5WwKwORZpXFiGEeB067wnSmlFSUMwa0y
- IE3UEB9IBiMqrJsaGIjew==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hyd1NQj9Bdk=:evSdRF+5+e+oaDyNbJ4FPJ
- z8dEhxaPiSPs8Bwb8llDbJzL7F5FseE9L2OMUKBvo8J/4rFA2d7uS73x3tO1MWgYaMr2Fxf/w
- aZAMUjbnj9I1P1hcnExjhfn3TZjkra0oHN7HHcV+REC7iOximSq52s9D52jnxTum62tZTp0U0
- /lnk/iJAT2E81i8guN8Wwirko+UIkMQkt2N4vAQEIpLqVb2THINDsR3K57/clT3wg3zBICR6c
- okk327mZD69DOUfsXGFMwuQbPmc5NMssVvkWStr5/Wyw5gomJxsAxR/gYVYWffoayELB7Wl+j
- BpynW1LRe2F1bDnF9XFcwOd+GlgJL+tPybwUO6GuujmYg18xysSQBPeh2TKzOaZR+J0DXmsNr
- golo44nfkUWZH9IvKwiaVwHk8UBgpBzIOkjEDraycfozj/J6PEuqw/ZQ4QtjO/HszIURq4Ahg
- inDIk4NVLcAkbFrLuPHNVtZ3qDxaZlcoWg4E4p0OfAxy0QMDbmPViA41W3Hvdr/vOIEc/V8Vz
- qoiObjCJf1CO+NkNylVUeviKcZr2XRw2DVK7eJoE5fTS5TOC3LQCli0Z+odzcJlFQi3YYXoXP
- bcK65h6dAVEl92kVmP07RYMX62uEJcYL0BFsqQD+UylhR4Cs6WAGqkh4IAX1C06UCOTgHrmqi
- FXQI4QIX/3s0psujJoX9lF0DWoxKMYaoJVWa2Xcn2wt/IVj9jtiQ6O13ROm+06MyRmbqIPCUO
- MofVTzX5Uhf+oTNErwuhBNyAZZku270+kelRhMD+Pw6ddEnqM3laKN0JH82WLbcCxlBX6VrnS
- Vh1u/ZbtyfAyLNzCiCf32Y83ymi5JXHcT2TBVm4Mb4kTEHCuW1ytMN3KNRW4Otie7HzAB0S
+X-Provags-ID: V03:K1:o3ur6JqCZo4qSN9nasD1Ujj6N0dcSAJWVFOYwBK7k0Z2J5rk7FK
+ l/XuWxcgHOQT2gicVeubPtUNGwnDjVdUur2Ru2Tc05FnW2djSsz/9I+YUMR8X6Sy/UV5P6P
+ qp6eHNNgEO3c4dFsuvSqrjseJrcYJZQt4EX3V6CsCmzqlnrhc8WOj8glrL3kK08Ao4SsWDX
+ gax1A0f3X9dkFHK5D0jyg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Qu1gcnBW3yM=:c2k70dmoJ8wgiwGMUehr7I
+ BnlfXaPy+eB0InYKHm1GOOk7420F5TwO+v5dw7rupS6rsxCqUwmPp029OL0T/aJd14AlQr+/g
+ oqa/QowMsUJgpUkcUWfN1L4PoJAiU7LFC4LBDeqexCCM128k+n6LV2v+r4GcZFbBH0+362oGV
+ zS1wtfiRs4Q7fqhaS3r8ZhI/KHSSTPw6faWpswr3hp56TmyiQgt7+h/OwMVTFb+r1eAlbt1uL
+ XccFO8EKtJzT1U8KzkocG8IRki3U09lsRpfXoQv08UMD8IiOHdH5W0ZBNfbr6lB0k2+XGlE3N
+ 6NULtDovtOmsKXWQZbc/ciVbpNiyrWi6LpkodN0pH093AvAhdX0cnLrs+1579xJG0DffINm2Z
+ Bh6poE1cFd/R8XYDp7hXIHm/rDbKjl47WkIZs3++RkGxksL8JXxCvab8nGd/aG+BKgRcX2LiS
+ U10OmD9kgJuXM55NxitUiUnTcqrmbpnGnsoMkYUm06DHvhgTBG01AZ4axYtcj8pM+J0E4PdMf
+ 8MMs++aH7ZN6jTck53e+K1vHE7E1XksBX67MH+yiyX3Ba8tcZ3qOiTNEu+LtPGXEpIeYXeQ1F
+ aLIx7TYxYgoHAYbjXazL42UcvrDer/OqGygzn+yRcs1lNChBPbIK1YKPPm8Ervz5a3keFlsBy
+ 3kn5nroVloIS9F0W/MYnjxSHvCTsmyvWBVDWVrBQZ7BmngJKG5flu/3kOPXXcvMDjPng3P58+
+ ARLDpTrBczOEYwuCjf2Vyf6uUkiCd6/Gp4zPy/sviBfqRTchV6lT9gPVUvllSNhPfy6CqR7Cy
+ L5rykaFLhu9RCnjW/8KZ+DIhdU/V00vH15Qi5xWt643rVK6sursTq/p2vO9TP6E/cKbR/6M
 Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:10
@@ -83,42 +83,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-trivial@nongnu.org, Mike Gelfand <mikedld@mikedld.com>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Mike Gelfand <mikedld@mikedld.com>
 
-This mailmap entry does not work as I expected. I am receiving
-emails related to my hobbyist contributions in my work mailbox
-and I get distracted :) Remove the entry to keep things separated.
-
-This reverts commit 289371239153b24cb7bd96b6948c6b40b4627a9b.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200806135832.2319-1-philmd@redhat.com>
+Signed-off-by: Mike Gelfand <mikedld@mikedld.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200830092242.31506-1-mikedld@mikedld.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- .mailmap | 1 -
- 1 file changed, 1 deletion(-)
+ linux-user/strace.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/.mailmap b/.mailmap
-index 81c2ce09370c..2d97a14af3c6 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -54,7 +54,6 @@ Radoslaw Biernacki <rad@semihalf.com> <radoslaw.biernacki@linaro.org>
- Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
- Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
- Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
--Philippe Mathieu-Daudé <philmd@redhat.com> <f4bug@amsat.org>
- Stefan Brankovic <stefan.brankovic@syrmia.com> <stefan.brankovic@rt-rk.com.com>
- Yongbok Kim <yongbok.kim@mips.com> <yongbok.kim@imgtec.com>
- 
+diff --git a/linux-user/strace.c b/linux-user/strace.c
+index 4f77b0cf76eb..11fea14fba2e 100644
+--- a/linux-user/strace.c
++++ b/linux-user/strace.c
+@@ -2056,6 +2056,18 @@ print_fcntl(void *cpu_env, const struct syscallname *name,
+         print_pointer(arg2, 1);
+         break;
+ #endif
++    case TARGET_F_OFD_GETLK:
++        qemu_log("F_OFD_GETLK,");
++        print_pointer(arg2, 1);
++        break;
++    case TARGET_F_OFD_SETLK:
++        qemu_log("F_OFD_SETLK,");
++        print_pointer(arg2, 1);
++        break;
++    case TARGET_F_OFD_SETLKW:
++        qemu_log("F_OFD_SETLKW,");
++        print_pointer(arg2, 1);
++        break;
+     case TARGET_F_SETLEASE:
+         qemu_log("F_SETLEASE,");
+         print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
 -- 
 2.26.2
 
