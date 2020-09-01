@@ -2,102 +2,122 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA1CC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CF75C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:14:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 519B5206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:13:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vl+F7pjr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 519B5206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id DD7BB206EB
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:14:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD7BB206EB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3IR-0006BQ-Gg
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:13:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46838)
+	id 1kD3JP-0007L3-SB
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:14:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD39A-0005ZW-NK; Tue, 01 Sep 2020 06:04:12 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42523)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD397-000542-CA; Tue, 01 Sep 2020 06:04:12 -0400
-Received: by mail-wr1-x441.google.com with SMTP id c18so811364wrm.9;
- Tue, 01 Sep 2020 03:04:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=1M9Jaqvo6r7BX6FEljqlQp1pDlkpsFMcYy47H0RrXEM=;
- b=Vl+F7pjrsg3TaRXO5j3nx5Y5+/CoZomCkr7K6bzmphswSnGd5W6xIXpyYbHuY+4T1O
- YLrx9WRUs/a0QGuK2svjaRjtw2kcvGNL0/X44ewzeI5y1cC4hUmCCpCztjMq4e6uWFd2
- hCZded5izm/NNVxMqEuf3i1xTnKNhmUdR8Q6cxyVV10sKtKdvLhWcpCDW+q8u8WW4LBX
- AIkGQlzXni5fGfiPibGtDLxhs7t/yPbGYbZAQlWg+K8YZZWmxkLZNiGXc/l8v3QI5z81
- goOc1DXzBKBAJPl/Uk1JMxMtAYkSx4OKs+t8VTteQwB/TQZGGUN2EnSezsu0tuSxAgTp
- wgvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1M9Jaqvo6r7BX6FEljqlQp1pDlkpsFMcYy47H0RrXEM=;
- b=JdZl8ZpZ0sH1FYHUupmroDQSVX1NtF3xhTDPtIal9l1YUKZdfKgEAEcSep59zF8qWv
- XKsu7peFzcLiAFWtHi0qEQRPoYZSQTlUukiW/aZ09V2wA4n2ZeaxWWOq5RL11FHrUKJX
- eYIcUiWPCLUtjXkJL47Kofp3PaVISLLC656mewPMeph1KrWeZjWGro+5LT047k48H+3C
- 2rvARnTH9FKQQYUQUidpIsTAh6SNrjhcAwfw/hicOjgX4b/0EePNq7KQ0k3KZrqqi1F7
- G4RG+8Mjqzo9NtvkFA8YK04YNryXJJsyOxrCJQYtik6Cz9PRcqrqGcoEOLXrMrKTdbak
- GC7g==
-X-Gm-Message-State: AOAM533vIUnWdK3YUvuzb9XZT/g1UUk1OiJudXdV2mvDlq0uEiW40c5d
- AIOoF8DN3iGSPLGHwbspWegmeXdYgCI=
-X-Google-Smtp-Source: ABdhPJwmF9/zukIvZ6IwRhTzT+yvqvcd2qd4ScSvxryDt2uLiDIvYmrCi/Hm/Ct/3O+iduylQGe5yQ==
-X-Received: by 2002:adf:ef0a:: with SMTP id e10mr1022685wro.362.1598954646947; 
- Tue, 01 Sep 2020 03:04:06 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id k13sm1179219wmj.14.2020.09.01.03.04.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Sep 2020 03:04:06 -0700 (PDT)
-Subject: Re: [Bug 1892540] [RFC PATCH v2] hw/display/tcx: Allow 64-bit
- accesses to framebuffer stippler and blitter
-To: mst@redhat.com, Bug 1892540 <1892540@bugs.launchpad.net>,
- Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-References: <159803735569.2614.10182276398047269277.malonedeb@chaenomeles.canonical.com>
- <20200822142127.1316231-1-f4bug@amsat.org>
- <20200830021257-mutt-send-email-mst@kernel.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <2656bffb-9717-2d41-29d2-98334c0a8180@amsat.org>
-Date: Tue, 1 Sep 2020 12:04:05 +0200
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kD3Bq-00038K-CH; Tue, 01 Sep 2020 06:06:58 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:34161)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kD3Bo-0005Vv-Fh; Tue, 01 Sep 2020 06:06:58 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1McGxG-1kj4cT4BES-00cjlf; Tue, 01 Sep 2020 12:06:46 +0200
+Subject: Re: [PATCH v3 10/10] hw/display/vga:Remove redundant statement in
+ vga_draw_graphic()
+To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20200827110311.164316-1-kuhn.chenqun@huawei.com>
+ <20200827110311.164316-11-kuhn.chenqun@huawei.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <61577913-6317-bbb4-f405-1857ef477c9e@vivier.eu>
+Date: Tue, 1 Sep 2020 12:06:44 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200830021257-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20200827110311.164316-11-kuhn.chenqun@huawei.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Provags-ID: V03:K1:KKifPMZ4DxHU8rdd9Gh2jsYTsrgDZ0KglrfVYl8Ly1OUeVjkE2r
+ 7vVDPpzz88NnG49FJuDC5pe387m0FnypxwE5k2teaDo2aRCTEIxHC1MV9AEqIPMywPdMaQf
+ lVK695qF4Wj3hZLu1qqG9pl/26sphHwv2TB2GpLVtXMTMIFZBYnvM/WiYXjF7clWvYVTpaT
+ bQlGE/agHELiVAIUkYqdQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:F9EtzihvaWk=:x6+9wPMOIhIBQAutaPQpBh
+ T+D8N5RQSQBilR1t932SVTAlu6bXPQiMXwfZbhXflmVff5j4dkAzOcC2upG/LiB8RHvWMv+RV
+ 5Ay2BmYwf++zivII4eiNeSi6OS2vqEz+0fGOubbiMmXEKD4v5wwpd4G+PrueXFf/e+UiGSu0M
+ 9Fo9mdYKD8bNsS7T4H+n/TTMMo+Y8coSYQ6w5aF/gOU9xpJTKuDIggs4u8fm4G4yyNNkumq/z
+ JaDmqhE/FXeeujrk5EYER1oMU/vn4QqpqQlgLT+JVeu07K+GMum9lmuZIHmnVY7BUrrlz1aRS
+ AK3MuNxT7tSmwyVHl0MkHwhUWp4r1i+gkdheWpDEkwSboBhCy3ZFgRTpg+8oBO20h8DWAm+t5
+ myFbpix5ppIEmEk+2h9yOXDthHdKOB0Jm3ar+BoTNjVkhcQ9izgUUskqGGqeIrOWVEbQ1JDRd
+ EiEHGp5PV0jzGKysIdAAvUahggxIaGb+jq9p4LgzSb4ESWglp4zOy4VnSbCs79iZ/SdsQdpig
+ oXqE9gaO+4poOzl/u+SXnLLJdJmdGiTOHdLQkh0axiXsg9etebxvzc7STCzW3zdGnIFZWoL8p
+ MmOGOoRL3GnRAub4TyLGFY4QLUMqEsyalbdxhSn9z216b0wU8KpYTzpwapOkXXtjJs1Cx9HjP
+ BAk7MefQvizzRrdw80KWjlUJRxfRX5FVqLhC0Iv1c/TdzIN4xzeg7vDDBjKIJksuqtYT5lYuu
+ slUX3xVjJhGsGIqmQdAElUG5NU5Vyz7gPR13k6JIGO4gJz9kikFc2ZCDDA/7epRYEubk1kJhR
+ I7QQ+U1yEWD5qdOX0AZwPTDGpaOqxpnVLTZs4KNmYI/whzP1pnWclZNBGhPTCaqzukLIcLV
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:06:41
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,160 +130,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org,
- qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- Richard Henderson <rth@twiddle.net>
+Cc: Li Qiang <liq3ea@gmail.com>, Euler Robot <euler.robot@huawei.com>,
+ pannengyuan@huawei.com, zhang.zhanghailiang@huawei.com,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20200901100405.mDTUPfTLt2T8ynJ4_MgSxPNz0WoWZMnG9I-X_xc6TCM@z>
 
-On 8/30/20 8:18 AM, mst@redhat.com wrote:
-> On Sat, Aug 22, 2020 at 02:21:27PM -0000, Philippe Mathieu-DaudÃƒÆ’Ã‚Â© wrote:
->> The S24/TCX datasheet is listed as "Unable to locate" on [1].
->>
->> However the NetBSD revision 1.32 of the driver introduced
->> 64-bit accesses to the stippler and blitter [2]. It is safe
->> to assume these memory regions are 64-bit accessible.
->> QEMU implementation is 32-bit, so fill the 'impl' fields.
->>
->> [1] http://web.archive.org/web/20111209011516/http://wikis.sun.com/display/FOSSdocs/Home
->> [2] http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/dev/sbus/tcx.c.diff?r1=1.31&r2=1.32
->>
->> Reported-by: Andreas Gustafsson <gson@gson.org>
->> Buglink: https://bugs.launchpad.net/bugs/1892540
->> Fixes: 55d7bfe2293 ("tcx: Implement hardware acceleration")
->> Signed-off-by: Philippe Mathieu-DaudÃƒÆ’Ã‚Â© <f4bug@amsat.org>
+Le 27/08/2020 à 13:03, Chen Qun a écrit :
+> Clang static code analyzer show warning:
+> hw/display/vga.c:1677:9: warning: Value stored to 'update' is never read
+>         update = full_update;
+>         ^        ~~~~~~~~~~~
 > 
-> Philippe, did you submit the patch on the mailing list
-> normally too? I don't seem to see it there.
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> ---
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
+> ---
+>  hw/display/vga.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/hw/display/vga.c b/hw/display/vga.c
+> index 061fd9ab8f..836ad50c7b 100644
+> --- a/hw/display/vga.c
+> +++ b/hw/display/vga.c
+> @@ -1674,7 +1674,6 @@ static void vga_draw_graphic(VGACommonState *s, int full_update)
+>          if (!(s->cr[VGA_CRTC_MODE] & 2)) {
+>              addr = (addr & ~0x8000) | ((y1 & 2) << 14);
+>          }
+> -        update = full_update;
+>          page0 = addr & s->vbe_size_mask;
+>          page1 = (addr + bwidth - 1) & s->vbe_size_mask;
+>          if (full_update) {
+> 
 
-Yes, Message-id: <20200822142127.1316231-1-f4bug@amsat.org>
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg732515.html
+Applied to my trivial-patches branch.
 
-> 
-> the patch seems to work for me:
-> 
-> Tested-by: Michael S. Tsirkin <mst@redhat.com>
-
-Thanks!
-
-> 
-> 
-> CC Nathan who reported a similar failure.
-> 
-> Nathan, does the patch below fix the issue for you?
-> 
->> ---
->> Since v1:
->> - added missing uncommitted staged changes... (tcx_blit_ops)
->> ---
->  hw/display/tcx.c | 18 +++++++++++++++---
->  1 file changed, 15 insertions(+), 3 deletions(-)
-> 
-> diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-> index 1fb45b1aab8..96c6898b149 100644
-> --- a/hw/display/tcx.c
-> +++ b/hw/display/tcx.c
-> @@ -548,20 +548,28 @@ static const MemoryRegionOps tcx_stip_ops = {
->      .read = tcx_stip_readl,
->      .write = tcx_stip_writel,
->      .endianness = DEVICE_NATIVE_ENDIAN,
-> -    .valid = {
-> +    .impl = {
->          .min_access_size = 4,
->          .max_access_size = 4,
->      },
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 8,
-> +    },
->  };
->  
->  static const MemoryRegionOps tcx_rstip_ops = {
->      .read = tcx_stip_readl,
->      .write = tcx_rstip_writel,
->      .endianness = DEVICE_NATIVE_ENDIAN,
-> -    .valid = {
-> +    .impl = {
->          .min_access_size = 4,
->          .max_access_size = 4,
->      },
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 8,
-> +    },
->  };
->  
->  static uint64_t tcx_blit_readl(void *opaque, hwaddr addr,
-> @@ -650,10 +658,14 @@ static const MemoryRegionOps tcx_rblit_ops = {
->      .read = tcx_blit_readl,
->      .write = tcx_rblit_writel,
->      .endianness = DEVICE_NATIVE_ENDIAN,
-> -    .valid = {
-> +    .impl = {
->          .min_access_size = 4,
->          .max_access_size = 4,
->      },
-> +    .valid = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 8,
-> +    },
->  };
->  
->  static void tcx_invalidate_cursor_position(TCXState *s)
-> 
-> 
-> -----------------------------------------------------------
-> 
-> I think you shouldn't specify .min_access_size in impl, since
-> that also allows 1 and 2 byte accesses from guest.
-> 
-> 
-> 
->> -- 
->> 2.26.2
->>
->> -- 
->> You received this bug notification because you are subscribed to the bug
->> report.
->> https://bugs.launchpad.net/bugs/1892540
->>
->> Title:
->>   qemu can no longer boot NetBSD/sparc
->>
->> Status in QEMU:
->>   New
->>
->> Bug description:
->>   Booting NetBSD/sparc in qemu no longer works.  It broke between qemu
->>   version 5.0.0 and 5.1.0, and a bisection identified the following as
->>   the offending commit:
->>
->>     [5d971f9e672507210e77d020d89e0e89165c8fc9] memory: Revert "memory:
->>   accept mismatching sizes in memory_region_access_valid"
->>
->>   It's still broken as of 7fd51e68c34fcefdb4d6fd646ed3346f780f89f4.
->>
->>   To reproduce, run
->>
->>     wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-9.0/images/NetBSD-9.0-sparc.iso
->>     qemu-system-sparc -nographic -cdrom NetBSD-9.0-sparc.iso -boot d
->>
->>   The expected behavior is that the guest boots to the prompt
->>
->>     Installation medium to load the additional utilities from:
->>
->>   The observed behavior is a panic:
->>
->>     [   1.0000050] system[0]: trap 0x29: pc=0xf0046b14 sfsr=0xb6 sfva=0x54000000
->>     [   1.0000050] cpu0: data fault: pc=0xf0046b14 addr=0x54000000 sfsr=0xb6<PERR=0x0,LVL=0x0,AT=0x5,FT=0x5,FAV,OW>
->>     [   1.0000050] panic: kernel fault
->>     [   1.0000050] halted
->>
->> To manage notifications about this bug go to:
->> https://bugs.launchpad.net/qemu/+bug/1892540/+subscriptions
-> 
-> 
+Thanks,
+Laurent
 
 
