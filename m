@@ -2,113 +2,73 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A645BC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:18:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C59DC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:19:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C9A920BED
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:18:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="BHY9MFva"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C9A920BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id BAC4B214F1
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:19:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAC4B214F1
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39984 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD83F-0006s1-K3
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:18:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41530)
+	id 1kD849-0000S8-TV
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:19:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
- id 1kD7m2-00036V-6K
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:00:38 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:1206)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kD839-00076J-Vm
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:18:20 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:59545)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
- id 1kD7lw-0002OG-15
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:00:37 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 081EWfZV068395
- for <qemu-devel@nongnu.org>; Tue, 1 Sep 2020 11:00:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=JMdlm/IFFF44VzhHViyoUd8R/KXtjNIXetPvglq5B8k=;
- b=BHY9MFvamAhPSxPCdWmJw/4Dwey+IvdEJtyA2zXsNxAHEFV/LZxe1boyZcaA9+C4HJQI
- quoy/LfQOQRJVOKqLwMTge8qBPfJ/uiOX+PyzU5wIO0GKghLFeAeouoA7vjDXRNus1Ol
- F+7EvcK1MAN0T+DAfl1kfQZ9AXHC3hhLl9vj+9V4HQUpX1hBUC8F/WKE+f8jdi6jWD/M
- v05wmQvgPMQ+HqIEmAtrQL8itLJJmbGHvJLyjbYcDeZEe9NsabVgLssrzheEXKHgjVTc
- lteoqWcSncrqLKXO3HgTieSF502rZN2CQzZn9Bq8CQ1Ta836IIIqhGDP9VS8EpN67yqk vw== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 339nc5qdxc-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 11:00:28 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 081EWlRn068823
- for <qemu-devel@nongnu.org>; Tue, 1 Sep 2020 11:00:28 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.102])
- by mx0a-001b2d01.pphosted.com with ESMTP id 339nc5qdvx-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Sep 2020 11:00:28 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
- by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 081ExEAP029194;
- Tue, 1 Sep 2020 15:00:26 GMT
-Received: from b06avi18626390.portsmouth.uk.ibm.com
- (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
- by ppma06ams.nl.ibm.com with ESMTP id 337e9gujfh-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Sep 2020 15:00:25 +0000
-Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
- [9.149.105.58])
- by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
- id 081EwqCm52429216
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Sep 2020 14:58:52 GMT
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 428584C070;
- Tue,  1 Sep 2020 15:00:22 +0000 (GMT)
-Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id DE6CF4C098;
- Tue,  1 Sep 2020 15:00:21 +0000 (GMT)
-Received: from marcibm.ibmuc.com (unknown [9.145.15.189])
- by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue,  1 Sep 2020 15:00:21 +0000 (GMT)
-From: Marc Hartmayer <mhartmay@linux.ibm.com>
-To: <qemu-devel@nongnu.org>
-Subject: [PATCH v2 0/2] Enable virtio-fs on s390x
-Date: Tue,  1 Sep 2020 17:00:17 +0200
-Message-Id: <20200901150019.29229-1-mhartmay@linux.ibm.com>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kD836-000681-Ow
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:18:19 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.141])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id BAB76564BCFF;
+ Tue,  1 Sep 2020 17:18:12 +0200 (CEST)
+Received: from kaod.org (37.59.142.104) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 1 Sep 2020
+ 17:18:12 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-104R00546fa60f4-8e55-43ad-81e8-3e7074f0d660,
+ DF2AD85881EC9B15757C33AEE529973A5D0472CE) smtp.auth=groug@kaod.org
+Date: Tue, 1 Sep 2020 17:18:11 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Connor Kuehl <ckuehl@redhat.com>
+Subject: Re: [PATCH 1/2] Makefile: Add back TAGS/ctags/cscope rules
+Message-ID: <20200901171811.24debd1d@bahia.lan>
+In-Reply-To: <f31b9650-9db4-e038-9e4d-bd5faf1f5b96@redhat.com>
+References: <159896923655.442705.11922948674073863022.stgit@bahia.lan>
+ <159897001005.442705.16516671603870288336.stgit@bahia.lan>
+ <f31b9650-9db4-e038-9e4d-bd5faf1f5b96@redhat.com>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-01_08:2020-09-01,
- 2020-09-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- lowpriorityscore=0
- spamscore=0 bulkscore=0 mlxscore=0 impostorscore=0 suspectscore=0
- mlxlogscore=999 phishscore=0 priorityscore=1501 clxscore=1015 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009010122
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=mhartmay@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 09:02:31
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.104]
+X-ClientProxiedBy: DAG2EX2.mxp5.local (172.16.2.12) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 8a8e3064-4186-405e-9b4d-ca12c443fb37
+X-Ovh-Tracer-Id: 7364511290961598941
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefjedgkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeehgeegvddvtefhtddtvdfhiedutedvgfejtddutefgveehieejieelveffgeekheenucffohhmrghinhepqhgvmhhurdhorhhgnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehpsghonhiiihhnihesrhgvughhrghtrdgtohhm
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 08:45:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
  RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -123,88 +83,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch series is about enabling virtio-fs on s390x. For that we need
- + some shim code (first patch), and we need
- + libvhost-user to deal with virtio endiannes for non-legacy virtio
-   devices as mandated by the spec.
+On Tue, 1 Sep 2020 09:59:23 -0500
+Connor Kuehl <ckuehl@redhat.com> wrote:
 
-How to use?
+> On 9/1/20 9:20 AM, Greg Kurz wrote:
+> > It is a bit of a pain to be forced to run configure before being able
+> > to use cscope and friends. Add back the rules to build them in-tree
+> > as before commit a56650518f5b.
+> > 
+> > Fixes: a56650518f5b ("configure: integrate Meson in the build system")
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> 
+> This might be a user error on my part, but the way I read this it sounds 
+> like I could do this:
+> 
+> 	$ rm -rf build
+> 	$ make cscope
+> 
+> and have it emit a cscope file,  but when I do so it complains about the 
+> build dir not existing. As I understand it, running ./configure (or 
+> meson build) is what generates that build dir. Here's the error for 
+> posterity:
+> 
+> changing dir to build for make "cscope"...
+> make[1]: *** build: No such file or directory.  Stop.
+> make: *** [GNUmakefile:11: cscope] Error 2
+> 
 
-For general instructions how to use virtio-fs (on x86) please have a
-look at https://virtio-fs.gitlab.io/howto-qemu.html. Most of the
-instructions can also be applied on s390x.
+My use case is :
 
-In short:
+$ git clone git://git.qemu.org/qemu.git && cd qemu && make cscope
+Cloning into 'qemu'...
+remote: Counting objects: 510519, done.
+remote: Compressing objects: 100% (91407/91407), done.
+remote: Total 510519 (delta 420069), reused 507399 (delta 417643)
+Receiving objects: 100% (510519/510519), 180.42 MiB | 29.30 MiB/s, done.
+Resolving deltas: 100% (420069/420069), done.
+make: Nothing to be done for 'cscope'.
 
-1. Install self-compiled QEMU with this patch series applied
-2. Prepare host and guest kernel so they support virtio-fs
+> One comment inline
+> 
+> > ---
+> >   Makefile |   17 ++++++++++++++++-
+> >   1 file changed, 16 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/Makefile b/Makefile
+> > index 81794d5c34a2..8ffe2872915d 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -62,7 +62,7 @@ ninja-distclean::
+> >   build.ninja: config-host.mak
+> >   
+> >   Makefile.ninja: build.ninja ninjatool
+> > -	./ninjatool -t ninja2make --omit clean dist uninstall < $< > $@
+> > +	./ninjatool -t ninja2make --omit clean dist uninstall cscope TAGS ctags < $< > $@
+> >   -include Makefile.ninja
+> >   
+> >   ${ninja-targets-c_COMPILER} ${ninja-targets-cpp_COMPILER}: .var.command += -MP
+> > @@ -229,6 +229,21 @@ distclean: clean ninja-distclean
+> >   	rm -f linux-headers/asm
+> >   	rm -Rf .sdk
+> >   
+> > +.PHONY: ctags
+> > +ctags:
+> > +	rm -f tags
+> > +	find "$(SRC_PATH)" -name '*.[hc]' -exec ctags --append {} +
+> > +
+> > +.PHONY: TAGS
+> > +TAGS:
+> > +	rm -f TAGS
+> > +	find "$(SRC_PATH)" -name '*.[hc]' -exec etags --append {} +
+> > +
+> > +cscope:
+> 
+> Since this recipe doesn't output an artifact called "cscope" I wonder if 
+> this should be:
+> 
+> .PHONY: cscope
 
-Start virtiofsd on the host
+We already have it somewhere else in the makefile:
 
- $ virtiofsd -f --socket-path=/tmp/vhostqemu -o source=/tmp/shared
+.PHONY: all clean cscope distclean install \
 
-Now you can start QEMU in a separate shell on the host:
+Since this patch is a partial revert of a56650518f5b, I didn't consider
+moving it here.
 
- $ qemu-system-s390x -machine type=s390-ccw-virtio,accel=kvm,memory-backend=mem \
-   -object memory-backend-file,id=mem,size=2G,mem-path=/dev/shm/virtiofs,share=on,prealloc=on,prealloc-threads=1 \
-   -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-ccw,queue-size=1024,chardev=char0,tag=myfs \
-   -drive if=virtio,file=disk.qcow2 \
-   -m 2G -smp 2 -nographic
 
-Log into the guest and mount it
+Cheers,
 
- $ mount -t virtiofs myfs /mnt
+--
+Greg
 
-Changelog:
- v1 -> v2:
- - rebased
- - patch 1:
-   + changed to Meson build. I kept the r-b from Conny since this
-     change seems to be straightforward to me.
- - patch 2:
-   + added r-b from Michael
-   + added comment from Conny
- RFC v2 -> v1:
- - patch 1:
-  + Added `force_revision_1 = true` (Conny)
-  + I didn't add the r-b from Stefan Hajnoczi as I've added the
-    changes suggested by Conny
- - squashed patches 2 and 3:
-  + removed assertion in performance critical code path (Stefan)
-  + dropped all dead code (Stefan)
-  + removed libvhost-access.h
-
- RFC v1 -> RFC v2:
-  + rebased
-  + drop patch "libvhost-user: print invalid address on vu_panic" as it's not related to this series
-  + drop patch "[RFC 4/4] HACK: Hard-code the libvhost-user.o-cflags for s390x"
-  + patch "virtio: add vhost-user-fs-ccw device": replace qdev_set_parent_bus and object_property_set_bool by qdev_realize
-  + patch "libvhost-user: handle endianness as mandated by the spec":
-    Drop support for legacy virtio devices
-  + add patch to fence legacy virtio devices
-
-Halil Pasic (1):
-  virtio: add vhost-user-fs-ccw device
-
-Marc Hartmayer (1):
-  libvhost-user: handle endianness as mandated by the spec
-
- contrib/libvhost-user/libvhost-user.c | 77 +++++++++++++++------------
- hw/s390x/meson.build                  |  1 +
- hw/s390x/vhost-user-fs-ccw.c          | 75 ++++++++++++++++++++++++++
- 3 files changed, 119 insertions(+), 34 deletions(-)
- create mode 100644 hw/s390x/vhost-user-fs-ccw.c
-
--- 
-2.25.4
-
+> cscope:
+> 	...
+> 
+> or alternatively:
+> 
+> cscope.out:
+> 	...
+> 
+> 
+> > +	rm -f "$(SRC_PATH)"/cscope.*
+> > +	find "$(SRC_PATH)/" -name "*.[chsS]" -print | sed -e 's,^\./,,' > "$(SRC_PATH)/cscope.files"
+> > +	cscope -b -i"$(SRC_PATH)/cscope.files"
+> > +
+> >   ifdef INSTALL_BLOBS
+> >   BLOBS=bios.bin bios-256k.bin bios-microvm.bin sgabios.bin vgabios.bin vgabios-cirrus.bin \
+> >   vgabios-stdvga.bin vgabios-vmware.bin vgabios-qxl.bin vgabios-virtio.bin \
+> > 
+> > 
+> > 
+> 
+> Connor
+> 
 
