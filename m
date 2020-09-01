@@ -2,87 +2,92 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E29C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4A4C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:42:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 801FC206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:39:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FAA22083B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:42:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="GjGcRnMa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 801FC206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="MxgByNQU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FAA22083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53964 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD2l6-0007Bl-O7
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:39:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40544)
+	id 1kD2o0-0000Iy-Bq
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:42:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1kD2kM-0006ak-3a
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:38:34 -0400
-Received: from mta-02.yadro.com ([89.207.88.252]:47324 helo=mta-01.yadro.com)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1kD2OD-0002tu-Ld; Tue, 01 Sep 2020 05:15:42 -0400
+Received: from mout.web.de ([217.72.192.78]:42531)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
- id 1kD2kJ-0001eK-Mh
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:38:33 -0400
-Received: from localhost (unknown [127.0.0.1])
- by mta-01.yadro.com (Postfix) with ESMTP id 5250752215;
- Tue,  1 Sep 2020 09:38:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
- in-reply-to:content-disposition:content-type:content-type
- :mime-version:references:message-id:subject:subject:from:from
- :date:date:received:received:received; s=mta-01; t=1598953107;
- x=1600767508; bh=X3Gk2XeTBjoOCM/H6LmDrAf1ntAV3mfPsyyK5v7TkCA=; b=
- GjGcRnMa13zfw3wxHwOgtasw/Jyzns9Q5+NZ2iGjX+OhJuyyTO5veQY4TvNNgNf9
- aBkua/S2BrCK9Rl1Y5ua6rVbYKLZgoK1LLM6jg3hA5LUUxxFptS3qDSUjANFXPJt
- ygQxHUNk2Yw6deCvv5Djp+QzzWlTtznmcq14i1tChoA=
-X-Virus-Scanned: amavisd-new at yadro.com
-Received: from mta-01.yadro.com ([127.0.0.1])
- by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
- with ESMTP id Ju_sQ5fLboxz; Tue,  1 Sep 2020 12:38:27 +0300 (MSK)
-Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
- [172.17.10.102])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
- (No client certificate requested)
- by mta-01.yadro.com (Postfix) with ESMTPS id 2B76A50202;
- Tue,  1 Sep 2020 12:38:27 +0300 (MSK)
-Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
- (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 1 Sep
- 2020 12:38:27 +0300
-Date: Tue, 1 Sep 2020 12:38:26 +0300
-From: Roman Bolshakov <r.bolshakov@yadro.com>
-To: Claudio Fontana <cfontana@suse.de>
-Subject: Re: [PATCH v6 12/16] cpus: add handle_interrupt to the CpusAccel
- interface
-Message-ID: <20200901093826.GD22344@SPB-NB-133.local>
-References: <20200901072201.7133-1-cfontana@suse.de>
- <20200901072201.7133-13-cfontana@suse.de>
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1kD2OB-0007OA-Gw; Tue, 01 Sep 2020 05:15:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1598951734;
+ bh=5Ru4+rBV+K+onBUzRUv2vnLe/gWCnDAJyTD5IvZPjAI=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=MxgByNQUcLF/Wr4p0DDeQ9tm47isswj+WbNY4oBoSSCwA+k8wMfpn50zSdFkF+oRI
+ CH7lLGHuGuoP2Empeu30ZG5xH8Ph49A4MPs/Oro87kJazqZ2PuQ3ibyQhX/OkLgigp
+ IUdZjcwE9zrV8tNDmlQv99YeVukxhMA2203kXoAk=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([88.130.61.220]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LiCx5-1kzJcj2urD-00nNDr; Tue, 01
+ Sep 2020 11:15:34 +0200
+Date: Tue, 1 Sep 2020 11:15:33 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v8 8/8] tests/test-char.c: Wait for the chardev to connect
+ in char_socket_client_dupid_test
+Message-ID: <613e42af4f7219cba082acb2533fcdf95fc098cb.1598951375.git.lukasstraub2@web.de>
+In-Reply-To: <cover.1598951375.git.lukasstraub2@web.de>
+References: <cover.1598951375.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20200901072201.7133-13-cfontana@suse.de>
-X-Originating-IP: [172.17.204.212]
-X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
- T-EXCH-02.corp.yadro.com (172.17.10.102)
-Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
- helo=mta-01.yadro.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:30:08
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; boundary="Sig_/SyW1wVCwxX5bhE85ag8/sy9";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:r9EJSI9MAlnesvO4kWkt1JtcVh32jssS9wMze4dW2So/znYxAqm
+ Fg1WX8Qx2929IjCvQkXx9NKrig6hapiizA0aeIVXrlamiCmAw2W0ZAcLkCpm8edb5CVUOqL
+ /5qaJcH1sCnAwv+4Qz0RSXZFiBh4TwWY10VBUesKLbd5V/EI4/k/QZpU1+gw/MD5gJ3/kG3
+ mtAClBzTQRZ5uTSZykjwQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:e3PCHK0CH4c=:VubaWAuSmReSSNCqBnmXlw
+ FJl0j2MgvuzViKohQk15M9kxF3BwJ81U5Jeo/yt4yON7le6Q7UnlRI9v+GNIDrdLsw0JxvNDz
+ 14neHPu3Xg6lE80IuGED2xxdLudJg3bJbFktfJCcOn+9Cvonk8jAIuZ1e5M/j075aO4otIutG
+ VkP33xZLKpoXR8c7zdlftyL9HRu7MhxAOjYfGjtLbMln+udyy28Zo3iUc5YQaS6h+vkJ/g/z2
+ FE7snDPtB9eG0OjWt1oGpeo7qrWQIDAJucs7odj2VobMBkB3hpJuxqMy9uwpt95YGk8/7KG0L
+ 2coJwRWUsM+qCizlIIcY6XRPja0Yvl9t4D1kk/QkDZBbHLUoJdze1ioU3HevefolE3LG5h+GO
+ kKjKuvfNXnZCCZxkhiHiW5mowXKEJB5/3mGxGHzvFOp2zdu3FIrg9YQshE+v0Nms9K0D5N9sJ
+ hkSdcWbtWAzFReKGIAw6umXM73pGO/hZ98F1NEtsOy/U+ssnE/cfZSqFGNu4Scc8eE74DRSao
+ FI5GyWNPvg+GcjrTdUxuXXxTkt3LOYhSV5r9RIZqAoweZw2GzBqvCZEME6RZRrxe8HB1ouL2V
+ z3Qe0gbgG//NENqRCDdoHajjlqBAPECke5am96f5Go0zlnkJWHhy2usFiQoFeesU/zlgp9ANx
+ 06MK+p/b2c1jYXJUCzhTjkv4MZu1Vlu996EgRxqsjOfd5J9lenN/ZpJTuNjLSI4NIpiI6noDt
+ r+3DKn4MKODFS5zB1UlozFrHyi92Y1WktKPcwpPs3V492x3Jl3++i6OixYhYHHaVvRzEYI+2P
+ 5VKm1gX6N5otZufmwkP1ruRZ04ThaWAAxKOWh8ijdgfVO2H2BQQR9obhXrfT7a4xc8dlliO0C
+ WXV0sD5UczBDz4Z6PSdAh7/2+LNq61ahuVdPjCh+AqZhoet2uTmRlDqcQ2BOcx4cT8Ecb4uoJ
+ 74B2l2lofNE/dpJqGNykYMNiwbrmaeKqIt0OusPZ/PjKixDwMO43I/XUV2jtNzhtvrzWHWW3f
+ 5+5uL38rpbSyr9MQsjU7wl8Q6Pv+DPKYw31qv1j3+aBoTd9s4rAN0XnDZprKNkxejrEfCcMt3
+ RdjCBbprwk/BmBABM5vbqAOL31U5n0+O3dVLIv4y3NaTsT+KDG2+HMGJ0GzNwQZ1xjtoSZlRa
+ uLddVewP90tJ6tLUi9s2KK15um20lm9CNlcz7F9k28CuoajzCo57Ayk36kTOyJGHOrbIxd6uz
+ VZVcTWcCL+xVw0k50FFLhJteYG237X9pLMTootA==
+Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:15:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,328 +101,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 01, 2020 at 09:21:57AM +0200, Claudio Fontana wrote:
-> kvm: uses the generic handler
-> qtest: uses the generic handler
-> whpx: changed to use the generic handler (identical implementation)
-> hax: changed to use the generic handler (identical implementation)
-> hvf: changed to use the generic handler (identical implementation)
-> tcg: adapt tcg-cpus to point to the tcg-specific handler
-> 
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
-> ---
->  accel/tcg/tcg-all.c    | 26 --------------------------
->  accel/tcg/tcg-cpus.c   | 28 ++++++++++++++++++++++++++++
->  hw/core/cpu.c          | 13 -------------
->  include/hw/core/cpu.h  | 14 --------------
->  include/sysemu/cpus.h  |  2 ++
->  softmmu/cpus.c         | 18 ++++++++++++++++++
->  target/i386/hax-all.c  | 10 ----------
->  target/i386/hvf/hvf.c  |  9 ---------
->  target/i386/whpx-all.c | 10 ----------
->  9 files changed, 48 insertions(+), 82 deletions(-)
-> 
-> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-> index 01957b130d..af9bf5c5bb 100644
-> --- a/accel/tcg/tcg-all.c
-> +++ b/accel/tcg/tcg-all.c
-> @@ -47,31 +47,6 @@ typedef struct TCGState {
->  #define TCG_STATE(obj) \
->          OBJECT_CHECK(TCGState, (obj), TYPE_TCG_ACCEL)
->  
-> -/* mask must never be zero, except for A20 change call */
-> -static void tcg_handle_interrupt(CPUState *cpu, int mask)
-> -{
-> -    int old_mask;
-> -    g_assert(qemu_mutex_iothread_locked());
-> -
-> -    old_mask = cpu->interrupt_request;
-> -    cpu->interrupt_request |= mask;
-> -
-> -    /*
-> -     * If called from iothread context, wake the target cpu in
-> -     * case its halted.
-> -     */
-> -    if (!qemu_cpu_is_self(cpu)) {
-> -        qemu_cpu_kick(cpu);
-> -    } else {
-> -        atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
-> -        if (icount_enabled() &&
-> -            !cpu->can_do_io
-> -            && (mask & ~old_mask) != 0) {
-> -            cpu_abort(cpu, "Raised interrupt while not in I/O function");
-> -        }
-> -    }
-> -}
-> -
->  /*
->   * We default to false if we know other options have been enabled
->   * which are currently incompatible with MTTCG. Otherwise when each
-> @@ -128,7 +103,6 @@ static int tcg_init(MachineState *ms)
->      TCGState *s = TCG_STATE(current_accel());
->  
->      tcg_exec_init(s->tb_size * 1024 * 1024);
-> -    cpu_interrupt_handler = tcg_handle_interrupt;
->      mttcg_enabled = s->mttcg_enabled;
->      cpus_register_accel(&tcg_cpus);
->  
-> diff --git a/accel/tcg/tcg-cpus.c b/accel/tcg/tcg-cpus.c
-> index 72696f6d86..2bb209e2c6 100644
-> --- a/accel/tcg/tcg-cpus.c
-> +++ b/accel/tcg/tcg-cpus.c
-> @@ -533,9 +533,37 @@ static int64_t tcg_get_elapsed_ticks(void)
->      return cpu_get_ticks();
->  }
->  
-> +/* mask must never be zero, except for A20 change call */
-> +static void tcg_handle_interrupt(CPUState *cpu, int mask)
-> +{
-> +    int old_mask;
-> +    g_assert(qemu_mutex_iothread_locked());
-> +
-> +    old_mask = cpu->interrupt_request;
-> +    cpu->interrupt_request |= mask;
-> +
-> +    /*
-> +     * If called from iothread context, wake the target cpu in
-> +     * case its halted.
-> +     */
-> +    if (!qemu_cpu_is_self(cpu)) {
-> +        qemu_cpu_kick(cpu);
-> +    } else {
-> +        atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
-> +        if (icount_enabled() &&
-> +            !cpu->can_do_io
-> +            && (mask & ~old_mask) != 0) {
-> +            cpu_abort(cpu, "Raised interrupt while not in I/O function");
-> +        }
-> +    }
-> +}
-> +
->  const CpusAccel tcg_cpus = {
->      .create_vcpu_thread = tcg_start_vcpu_thread,
->      .kick_vcpu_thread = tcg_kick_vcpu_thread,
-> +
-> +    .handle_interrupt = tcg_handle_interrupt,
-> +
->      .get_virtual_clock = tcg_get_virtual_clock,
->      .get_elapsed_ticks = tcg_get_elapsed_ticks,
->  };
-> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
-> index fa8602493b..451b3d5ee7 100644
-> --- a/hw/core/cpu.c
-> +++ b/hw/core/cpu.c
-> @@ -35,8 +35,6 @@
->  #include "qemu/plugin.h"
->  #include "sysemu/hw_accel.h"
->  
-> -CPUInterruptHandler cpu_interrupt_handler;
-> -
->  CPUState *cpu_by_arch_id(int64_t id)
->  {
->      CPUState *cpu;
-> @@ -394,17 +392,6 @@ static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
->      return addr;
->  }
->  
-> -static void generic_handle_interrupt(CPUState *cpu, int mask)
-> -{
-> -    cpu->interrupt_request |= mask;
-> -
-> -    if (!qemu_cpu_is_self(cpu)) {
-> -        qemu_cpu_kick(cpu);
-> -    }
-> -}
-> -
-> -CPUInterruptHandler cpu_interrupt_handler = generic_handle_interrupt;
-> -
->  static void cpu_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
-> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-> index 8f145733ce..efd33d87fd 100644
-> --- a/include/hw/core/cpu.h
-> +++ b/include/hw/core/cpu.h
-> @@ -838,12 +838,6 @@ bool cpu_exists(int64_t id);
->   */
->  CPUState *cpu_by_arch_id(int64_t id);
->  
-> -#ifndef CONFIG_USER_ONLY
-> -
-> -typedef void (*CPUInterruptHandler)(CPUState *, int);
-> -
-> -extern CPUInterruptHandler cpu_interrupt_handler;
-> -
->  /**
->   * cpu_interrupt:
->   * @cpu: The CPU to set an interrupt on.
-> @@ -851,17 +845,9 @@ extern CPUInterruptHandler cpu_interrupt_handler;
->   *
->   * Invokes the interrupt handler.
->   */
-> -static inline void cpu_interrupt(CPUState *cpu, int mask)
-> -{
-> -    cpu_interrupt_handler(cpu, mask);
-> -}
-> -
-> -#else /* USER_ONLY */
->  
->  void cpu_interrupt(CPUState *cpu, int mask);
->  
-> -#endif /* USER_ONLY */
-> -
->  #ifdef NEED_CPU_H
->  
->  #ifdef CONFIG_SOFTMMU
-> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
-> index 26171697f5..231685955d 100644
-> --- a/include/sysemu/cpus.h
-> +++ b/include/sysemu/cpus.h
-> @@ -16,6 +16,8 @@ typedef struct CpusAccel {
->      void (*synchronize_state)(CPUState *cpu);
->      void (*synchronize_pre_loadvm)(CPUState *cpu);
->  
-> +    void (*handle_interrupt)(CPUState *cpu, int mask);
-> +
->      int64_t (*get_virtual_clock)(void);
->      int64_t (*get_elapsed_ticks)(void);
->  } CpusAccel;
-> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-> index f32ecb4bb9..7068666579 100644
-> --- a/softmmu/cpus.c
-> +++ b/softmmu/cpus.c
-> @@ -225,6 +225,24 @@ int64_t cpus_get_elapsed_ticks(void)
->      return cpu_get_ticks();
->  }
->  
-> +static void generic_handle_interrupt(CPUState *cpu, int mask)
-> +{
-> +    cpu->interrupt_request |= mask;
-> +
-> +    if (!qemu_cpu_is_self(cpu)) {
-> +        qemu_cpu_kick(cpu);
-> +    }
-> +}
-> +
-> +void cpu_interrupt(CPUState *cpu, int mask)
-> +{
-> +    if (cpus_accel->handle_interrupt) {
-> +        cpus_accel->handle_interrupt(cpu, mask);
-> +    } else {
-> +        generic_handle_interrupt(cpu, mask);
-> +    }
-> +}
-> +
+--Sig_/SyW1wVCwxX5bhE85ag8/sy9
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-The handlers is not something that dynamically changes, the functions
-can be assigned once during accel registration. Accel registraton is
-also the place where the checks can take place.
+A connecting chardev object has an additional reference by the connecting
+thread, so if the chardev is still connecting by the end of the test,
+then the chardev object won't be freed. This in turn means that the yank
+instance won't be unregistered and when running the next test-case
+yank_register_instance will abort, because the yank instance is
+already/still registered.
 
-Regards,
-Roman
+Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+---
+ tests/test-char.c | 1 +
+ 1 file changed, 1 insertion(+)
 
->  static int do_vm_stop(RunState state, bool send_stop)
->  {
->      int ret = 0;
-> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-> index b66ddeb8bf..fd1ab673d7 100644
-> --- a/target/i386/hax-all.c
-> +++ b/target/i386/hax-all.c
-> @@ -297,15 +297,6 @@ int hax_vm_destroy(struct hax_vm *vm)
->      return 0;
->  }
->  
-> -static void hax_handle_interrupt(CPUState *cpu, int mask)
-> -{
-> -    cpu->interrupt_request |= mask;
-> -
-> -    if (!qemu_cpu_is_self(cpu)) {
-> -        qemu_cpu_kick(cpu);
-> -    }
-> -}
-> -
->  static int hax_init(ram_addr_t ram_size, int max_cpus)
->  {
->      struct hax_state *hax = NULL;
-> @@ -350,7 +341,6 @@ static int hax_init(ram_addr_t ram_size, int max_cpus)
->      qversion.cur_version = hax_cur_version;
->      qversion.min_version = hax_min_version;
->      hax_notify_qemu_version(hax->vm->fd, &qversion);
-> -    cpu_interrupt_handler = hax_handle_interrupt;
->  
->      return ret;
->    error:
-> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-> index 7ac6987c1b..ed9356565c 100644
-> --- a/target/i386/hvf/hvf.c
-> +++ b/target/i386/hvf/hvf.c
-> @@ -262,14 +262,6 @@ static void update_apic_tpr(CPUState *cpu)
->  
->  #define VECTORING_INFO_VECTOR_MASK     0xff
->  
-> -static void hvf_handle_interrupt(CPUState * cpu, int mask)
-> -{
-> -    cpu->interrupt_request |= mask;
-> -    if (!qemu_cpu_is_self(cpu)) {
-> -        qemu_cpu_kick(cpu);
-> -    }
-> -}
-> -
->  void hvf_handle_io(CPUArchState *env, uint16_t port, void *buffer,
->                    int direction, int size, int count)
->  {
-> @@ -894,7 +886,6 @@ static int hvf_accel_init(MachineState *ms)
->      }
->    
->      hvf_state = s;
-> -    cpu_interrupt_handler = hvf_handle_interrupt;
->      memory_listener_register(&hvf_memory_listener, &address_space_memory);
->      cpus_register_accel(&hvf_cpus);
->      return 0;
-> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
-> index 8b6986c864..b3d17fbe04 100644
-> --- a/target/i386/whpx-all.c
-> +++ b/target/i386/whpx-all.c
-> @@ -1413,15 +1413,6 @@ static void whpx_memory_init(void)
->      memory_listener_register(&whpx_memory_listener, &address_space_memory);
->  }
->  
-> -static void whpx_handle_interrupt(CPUState *cpu, int mask)
-> -{
-> -    cpu->interrupt_request |= mask;
-> -
-> -    if (!qemu_cpu_is_self(cpu)) {
-> -        qemu_cpu_kick(cpu);
-> -    }
-> -}
-> -
->  /*
->   * Load the functions from the given library, using the given handle. If a
->   * handle is provided, it is used, otherwise the library is opened. The
-> @@ -1576,7 +1567,6 @@ static int whpx_accel_init(MachineState *ms)
->  
->      whpx_memory_init();
->  
-> -    cpu_interrupt_handler = whpx_handle_interrupt;
->      cpus_register_accel(&whpx_cpus);
->  
->      printf("Windows Hypervisor Platform accelerator is operational\n");
-> -- 
-> 2.26.2
-> 
+diff --git a/tests/test-char.c b/tests/test-char.c
+index d35cc839bc..2ced07de69 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -937,6 +937,7 @@ static void char_socket_client_dupid_test(gconstpointer=
+ opaque)
+     g_assert_nonnull(opts);
+     chr1 =3D qemu_chr_new_from_opts(opts, NULL, &error_abort);
+     g_assert_nonnull(chr1);
++    qemu_chr_wait_connected(chr1, &error_abort);
+
+     chr2 =3D qemu_chr_new_from_opts(opts, NULL, &local_err);
+     g_assert_null(chr2);
+--
+2.20.1
+
+--Sig_/SyW1wVCwxX5bhE85ag8/sy9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl9OETUACgkQNasLKJxd
+slgYoBAAgrlkduKYqkrzRw/lwpuqroimrFPAjEAl0aLrA6QBHePtYtS4r67iULwv
+oR+pVUOaBn+LpEyOb3hNuBlNzqxHXtMbMMNk0tVlXotS6KAKfZN1Q9PPn4RFn1hQ
+cqertEZnZFqRKyApzMckyJ47V7pi47a7/ikan7mf6v9/XJKpgLK2p3TxvTZ2JhHu
+ITnhPmWEC1488abRm8Bee66a4Yidiia2CbtWbPBY6JGzrUhZI125qTkA11N6m8sn
+1/HrsmMBH9NHqpoozCvePg1OKCKHs3FGsS5aJFIpm8ZJa0ouoTHdh8VpOfZ8fAFi
+C1uCf7mBbwjXuM5oftRkE/2Tr1tXPc6dnydCRi39Wdaogemex1cAE6v/eFYxn/te
+Pwai21HADMyTbk4fRx6Hn5+qN+sgSInqoddJo2Z0OSatXvo83GXc8X1/tngXkm9p
+1x/2w70ntd+moMXIqp9Q39LLbY2ZavQ762V2YsC5Y8OP3F1pNgAOnQvR07yPUtON
+CLBnruodpE0aSIBs/ep10q8MMZM1Ec3vU5/sdzOM0+7cH3ydve6Hwpzg5W2HbGCG
+/rfpRGutRDFCQfktOBmXEXNm5kxSsYZQgMQeov5yiy+eciqyjzQy+6PkVWDGzQ6/
+VwcjlKrctUHZLYvH+QRytcHCjYMdhuBq8o3g0gcrujiO8NZoIPg=
+=FpIY
+-----END PGP SIGNATURE-----
+
+--Sig_/SyW1wVCwxX5bhE85ag8/sy9--
 
