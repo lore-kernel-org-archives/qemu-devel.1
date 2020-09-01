@@ -2,92 +2,120 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,RCVD_ILLEGAL_IP,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B1FC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41733C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57D24206EB
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:57:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 043F620767
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:58:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hF4sftd4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57D24206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="JznI+4Tj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043F620767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD8fT-0001eI-J3
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:57:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48436)
+	id 1kD8fm-0002Sv-4K
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:58:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kD84D-0001Aq-8t
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:25 -0400
-Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:37384)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kD84B-0006Lh-C1
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:24 -0400
-Received: by mail-wm1-x335.google.com with SMTP id a9so1558643wmm.2
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:19:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=t+lM5dln5QeSS2yYj3HP1RzZbw3t/4bGgxiwxrpJaOg=;
- b=hF4sftd4+vRrnQrpswPoBibFsxFtlHRiju5p/WIDNIDHzZ69ynRo6PUgksA5bWvfDd
- 5RoMwpcWDMkHR7NMVWE/6xH2/42eagW5Jt6G8bCRjmBSq2HjsPPmkN9WD6Rb9iksaWLA
- p4lokyIBeDA2HxM2mHVFtckHk3O2K8rsEYL4s6gpQjHn6f1cTNN2JN6awNT7Ouz4FCed
- o+uRwRAzEDB7wIQsthpDsql/4ZLLur4/hL0S+MT68RX/X9Fw1hTU0fznHfP/tW/0xrMM
- ZOdF9CmJQqLNnHtR/AYkax1r+3MpZydoyek/JLK5oEYYPeqlvirga52aL/2hKfeI2LCS
- LWWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=t+lM5dln5QeSS2yYj3HP1RzZbw3t/4bGgxiwxrpJaOg=;
- b=M6mbMtLcn7qhIl2uIYbOK52P3SPtnztZR4mst9gfxjSQ4HUO9LhOuN+nxFjlhaAWel
- qvEJWe/xDm6SV3VeBSS5SHUqw+SR+wVmU31hQgJzC5Ufn3MXMtokqy0grxbI5/EJqi05
- 9hAUFlwMO1D+IWd99NAntHXQOfURZfQ9xfmy0OJJiinPboUztd5Lz5fVOgc4bEXDM+3R
- ejLYyRy0gH82FzNxdz7QXN5Te8DzuvQjSYG5xNTjI3MAVS7qt2SZ7mC5eXePLY7Nbz5x
- VwMqXA/5N3GV14kIJ329SKQY4UdI1AkYaiHtm3RDv3zNiWjlrRWvp9hKYaWZFRo21+a/
- Knqg==
-X-Gm-Message-State: AOAM533ddgmULKG3gYLWVy44YDMfJPyuU5WdB5EzF7lCWdT7kB7eWT/O
- oN2cdXFhEMa93o0/aqgnY2oPAYwJs+BZYe/T
-X-Google-Smtp-Source: ABdhPJz06gWBpVKtt/9i0Q4Eu1ptwGL6go5wyavv234OWqdB0zbYZ8l5ZcVBHXHGnexr1k0LvaVjSg==
-X-Received: by 2002:a7b:c2aa:: with SMTP id c10mr2276787wmk.86.1598973561682; 
- Tue, 01 Sep 2020 08:19:21 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id z9sm2242317wma.4.2020.09.01.08.19.20
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Sep 2020 08:19:20 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 46/47] hw/misc/sbsa_ec : Add an embedded controller for sbsa-ref
-Date: Tue,  1 Sep 2020 16:18:22 +0100
-Message-Id: <20200901151823.29785-47-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200901151823.29785-1-peter.maydell@linaro.org>
-References: <20200901151823.29785-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1kD8f1-00012N-84
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:57:27 -0400
+Received: from mail-co1nam11on2086.outbound.protection.outlook.com
+ ([40.107.220.86]:25473 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <Babu.Moger@amd.com>)
+ id 1kD8ez-0003YS-7U
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:57:26 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OF/3LlauoBtHS4b2lMCXojHX6m+SLY9AloID2lh+u6lqidoRBMyAlHGFPYiX65+AInPVAaLRD0B/H4GUG1KdOP+Lg8bHJR5ZY+yMcG35CThNtIbq86F2W8oz2GdgGbBezlqO8eAvG18PeNaAqHiUBBc1aoaBgmgl00/hm1zzk8MSDW6fjVrINEIJpd+DkPrd8AgSvR1RKnxh8WXrbjabMIubqmjrFcmAGOVPYtderdY8x7XHs2+JqCN0DIp8o5xVO91CS1HHxtyBvIKuwehx9blZ2rmkZ58TupCnDGMkJHtGE0iBLONPoqkVlRHx+LpvjuR2noSR5CbfRnemmWJMjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HLT9esZvqBAA3HjD3cQwWN+2eqYMxDqB9ch9bzMj4tQ=;
+ b=EfMaEtk+gmI3A8gX0E4deiacycZJu3eah52oHyTKm9hsaYJ9RR/WpugeBCuu4N5L/OcdbBxD7klErw0QMjNWjhoxC+YVUvMiJ93my/RiPKDrJGiBCQWrM7/GG09DwaET+UFOxgo5T+dB5LShEZFiLgG6Q3m4qtVWbCFkaY7K3/bGBi//zCDsuiUDYlxeIrWIJrHS8TXbJNOl5RC+WVXlNvPcfaNqb0aUeOs6nL9tvokPA7Nmy8OAvouIEoi2st/hqu4MQ1AhS5RyimPMG+eI7e/RjIPJrqIvHbkjIRx4wqWfYLyUaH+JmOKOfTG9zf4obR6p3+UOjIlMs6a7oxWPUg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=HLT9esZvqBAA3HjD3cQwWN+2eqYMxDqB9ch9bzMj4tQ=;
+ b=JznI+4TjpivPVMxqs03edKr0X/TJVXc6LmJZEglmG+EXU3N0yzjZKIQe5qY9ZCBNoN8e/ckYMz2eS0jOhrzm4Uw+xRQqGqzBNiu/GlvXjhTvjwmOrXjZbvbtUJz7TrnFAMnd6r+oyaz24aSdaV8++RjouUvEevIRnSwaTx2Ms00=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=amd.com;
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com (2603:10b6:802:26::19)
+ by SN6PR12MB2606.namprd12.prod.outlook.com (2603:10b6:805:6e::31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.25; Tue, 1 Sep
+ 2020 15:57:21 +0000
+Received: from SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d]) by SN1PR12MB2560.namprd12.prod.outlook.com
+ ([fe80::ccd9:728:9577:200d%4]) with mapi id 15.20.3326.025; Tue, 1 Sep 2020
+ 15:57:21 +0000
+Subject: [PATCH v7 0/2] Remove EPYC mode apicid decode and use generic decode
+From: Babu Moger <babu.moger@amd.com>
+To: pbonzini@redhat.com, rth@twiddle.net, ehabkost@redhat.com,
+ imammedo@redhat.com
+Date: Tue, 01 Sep 2020 10:57:20 -0500
+Message-ID: <159897580089.30750.12581669374705391794.stgit@naples-babu.amd.com>
+User-Agent: StGit/unknown-version
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0092.namprd12.prod.outlook.com
+ (2603:10b6:802:21::27) To SN1PR12MB2560.namprd12.prod.outlook.com
+ (2603:10b6:802:26::19)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::335;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x335.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from 255.255.255.255 (255.255.255.255) by
+ SN1PR12CA0092.namprd12.prod.outlook.com (2603:10b6:802:21::27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3326.19 via Frontend Transport; Tue, 1 Sep 2020 15:57:21 +0000
+X-Originating-IP: [165.204.78.2]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 17fcd5f2-8094-4383-f9d1-08d84e8fb5f2
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2606:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR12MB26066A69A8F784EFF1765AFB952E0@SN6PR12MB2606.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EhvrqgrPm1MDN1ZCfDfD97NyKLHG+BTWrBij8FWHybLrIDwiOpZVl1q6Kfd4ap9Ijss9PfWR1vpkU0b3S4Igd3jzvj4AAML+IurtuecGrmGLC60adjikvTSUz+UEkNQvd8ppl7RU7kZnsqk6b7KyyD3Z/SnM7eiYGtyAdAFcBaF7irSLItr/l5hq/G2xJiPZWkELVtME7x6nCPDDxnYYuCptjUZQxjwmjFvRa6q6SyiDwBjimVg9RpGNRRdXZcq0QdG8zqNr78tfRMxHcyX9Uy8thxmBDhbBFEKv2dRAkkc7xZ6cEPsM9Cs1eMM4QICweTYapGF6vv4Y/JF6I6i2E9iymJd+ZkBjk80jY+Az4R9kPfb1EbSO/CLYHa3sSOroyA1Mbx6nrFE3w8/Yt3iIO8TTs4AeFDRLmka3kDQUCz3vkQv6N9l0PLUTvxpkoSsmG4xvCRzRMQSwhByWQnEg3Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN1PR12MB2560.namprd12.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(366004)(136003)(39860400002)(376002)(346002)(16576012)(5660300002)(186003)(52116002)(966005)(8676002)(26005)(6486002)(316002)(478600001)(4326008)(956004)(103116003)(66476007)(66556008)(2906002)(86362001)(83380400001)(66946007)(44832011)(8936002)(41533002);
+ DIR:OUT; SFP:1101; 
+X-MS-Exchange-AntiSpam-MessageData: iVJyPKwK3irkJsFp01xfGAw/wHAqDe6JN5VJAsFRaGPlmLdeJqzPARZngWh+ZNSxJHwnshOVcQOwTzzZUQKkpYZXMMKzdC8vn8yk+pbzLFooBG5eRSK3BO2DFNJ12IJOk0tzC7vZ58WUAiYYQpLE7anSZaU/Hi5OBQ5P6WIo39SkMY8BFmWvCQ9h+AO4BsxlC0RooNrSy2i38wnRPSRnO4vJPwh9JMDjiLCD92f250ScvHsBMhrRyFdhknXwTgF9oA5NLRPqjI3ygsFbn8Ohj91wFrwvp7nt0kT1LBeWAOw16m5K5Iv7siTia5gqRU/pYY+So9JU29ggiPzgO97vDzWyFCbhe4WbSyFqxC7JbcbLjTlBygLfJwawGO5SPakEEoOyfR9BY10Qq7PMrztniGZ30o/GU+hZzS3cuHSdJ2rpH5zoAB1G61Rp0PhZIwxUH9JaByFcucDezAktAOmhxTTThOJOemDwe0FSlGD53H0wEKMq59kqQ7ExDeE0kF458VgpUys7TkAwg+Kh+sCH6HRle1yHY+UmxP2IEz+NFjW/oJKpEzKmKZ5OtDH0jd0WoSTtrBGh7/PcslKbHYJgHzJYSJyRwOMd1JKbw2qZMM4nEK8dJAQ/7dZYwxawOM1d2oUbxn/jCTUbuOtciFdWsw==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17fcd5f2-8094-4383-f9d1-08d84e8fb5f2
+X-MS-Exchange-CrossTenant-AuthSource: SN1PR12MB2560.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2020 15:57:21.3714 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bNH/Dv6+/B6OKcTcWI+xPjSOhs+1tcGxdRD7ts3Jp53M0K+JHX8RDzbSGMaN6Mve
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR12MB2606
+Received-SPF: none client-ip=40.107.220.86; envelope-from=Babu.Moger@amd.com;
+ helo=NAM11-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 11:57:22
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: 4
+X-Spam_score: 0.4
+X-Spam_bar: /
+X-Spam_report: (0.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1, DKIM_VALID=-0.1,
+ FORGED_SPF_HELO=1, MSGID_FROM_MTA_HEADER=0.001, RCVD_ILLEGAL_IP=1.3,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,147 +128,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: babu.moger@amd.com, qemu-devel@nongnu.org, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Graeme Gregory <graeme@nuviainc.com>
+To support some of the complex topology, we introduced EPYC mode apicid decode.
+But, EPYC mode decode is running into problems. Also it can become quite a
+maintenance problem in the future. So, it was decided to remove that code and
+use the generic decode which works for majority of the topology. Most of the
+SPECed configuration would work just fine. With some non-SPECed user inputs,
+it will create some sub-optimal configuration.
 
-A difference between sbsa platform and the virt platform is PSCI is
-handled by ARM-TF in the sbsa platform. This means that the PSCI code
-there needs to communicate some of the platform power changes down
-to the qemu code for things like shutdown/reset control.
+Here is the discussion thread.
+https://lore.kernel.org/qemu-devel/c0bcc1a6-1d84-a6e7-e468-d5b437c1b254@amd.com/
+https://lore.kernel.org/qemu-devel/20200826143849.59f6970b@redhat.com/
 
-Space has been left to extend the EC if we find other use cases in
-future where ARM-TF and qemu need to communicate.
-
-Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
-Reviewed-by: Leif Lindholm <leif@nuviainc.com>
-Tested-by: Leif Lindholm <leif@nuviainc.com>
-Message-id: 20200826141952.136164-2-graeme@nuviainc.com
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+This series removes all the EPYC mode specific apicid changes and use the generic
+apicid decode.
 ---
- hw/misc/sbsa_ec.c   | 98 +++++++++++++++++++++++++++++++++++++++++++++
- hw/misc/meson.build |  2 +
- 2 files changed, 100 insertions(+)
- create mode 100644 hw/misc/sbsa_ec.c
-
-diff --git a/hw/misc/sbsa_ec.c b/hw/misc/sbsa_ec.c
-new file mode 100644
-index 00000000000..9a7d7f914a9
---- /dev/null
-+++ b/hw/misc/sbsa_ec.c
-@@ -0,0 +1,98 @@
-+/*
-+ * ARM SBSA Reference Platform Embedded Controller
-+ *
-+ * A device to allow PSCI running in the secure side of sbsa-ref machine
-+ * to communicate platform power states to qemu.
-+ *
-+ * Copyright (c) 2020 Nuvia Inc
-+ * Written by Graeme Gregory <graeme@nuviainc.com>
-+ *
-+ * SPDX-License-Identifer: GPL-2.0-or-later
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "qemu/log.h"
-+#include "hw/sysbus.h"
-+#include "sysemu/runstate.h"
-+
-+typedef struct {
-+    SysBusDevice parent_obj;
-+    MemoryRegion iomem;
-+} SECUREECState;
-+
-+#define TYPE_SBSA_EC      "sbsa-ec"
-+#define SECURE_EC(obj) OBJECT_CHECK(SECUREECState, (obj), TYPE_SBSA_EC)
-+
-+enum sbsa_ec_powerstates {
-+    SBSA_EC_CMD_POWEROFF = 0x01,
-+    SBSA_EC_CMD_REBOOT = 0x02,
-+};
-+
-+static uint64_t sbsa_ec_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    /* No use for this currently */
-+    qemu_log_mask(LOG_GUEST_ERROR, "sbsa-ec: no readable registers");
-+    return 0;
-+}
-+
-+static void sbsa_ec_write(void *opaque, hwaddr offset,
-+                     uint64_t value, unsigned size)
-+{
-+    if (offset == 0) { /* PSCI machine power command register */
-+        switch (value) {
-+        case SBSA_EC_CMD_POWEROFF:
-+            qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
-+            break;
-+        case SBSA_EC_CMD_REBOOT:
-+            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
-+            break;
-+        default:
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "sbsa-ec: unknown power command");
-+        }
-+    } else {
-+        qemu_log_mask(LOG_GUEST_ERROR, "sbsa-ec: unknown EC register");
-+    }
-+}
-+
-+static const MemoryRegionOps sbsa_ec_ops = {
-+    .read = sbsa_ec_read,
-+    .write = sbsa_ec_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .valid.min_access_size = 4,
-+    .valid.max_access_size = 4,
-+};
-+
-+static void sbsa_ec_init(Object *obj)
-+{
-+    SECUREECState *s = SECURE_EC(obj);
-+    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
-+
-+    memory_region_init_io(&s->iomem, obj, &sbsa_ec_ops, s, "sbsa-ec",
-+                          0x1000);
-+    sysbus_init_mmio(dev, &s->iomem);
-+}
-+
-+static void sbsa_ec_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    /* No vmstate or reset required: device has no internal state */
-+    dc->user_creatable = false;
-+}
-+
-+static const TypeInfo sbsa_ec_info = {
-+    .name          = TYPE_SBSA_EC,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(SECUREECState),
-+    .instance_init = sbsa_ec_init,
-+    .class_init    = sbsa_ec_class_init,
-+};
-+
-+static void sbsa_ec_register_type(void)
-+{
-+    type_register_static(&sbsa_ec_info);
-+}
-+
-+type_init(sbsa_ec_register_type);
-diff --git a/hw/misc/meson.build b/hw/misc/meson.build
-index 84fed0494d2..e1576b81cf9 100644
---- a/hw/misc/meson.build
-+++ b/hw/misc/meson.build
-@@ -97,3 +97,5 @@ specific_ss.add(when: 'CONFIG_MAC_VIA', if_true: files('mac_via.c'))
+v7:
+ Eduardo has already queued 1-8 from the v6. Sending rest of the patches.
+ Fixed CPUID 800000ld based on Igor's comment and few text changes.
  
- specific_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_cmgcr.c', 'mips_cpc.c'))
- specific_ss.add(when: 'CONFIG_MIPS_ITU', if_true: files('mips_itu.c'))
-+
-+specific_ss.add(when: 'CONFIG_SBSA_REF', if_true: files('sbsa_ec.c'))
--- 
-2.20.1
+v6:
+ https://lore.kernel.org/qemu-devel/159889924378.21294.16494070903874534542.stgit@naples-babu.amd.com/
+ Found out that numa configuration is not mandatory for all the EPYC model topology.
+ We can use the generic decode which works pretty well. Also noticed that
+ cpuid does not changes when the numa nodes change(NPS- Nodes per socket).
+ Took care of couple comments from Igor and Eduardo.
+ Thank you Igor, Daniel, David, Eduardo for your feedback.  
 
+v5:
+ https://lore.kernel.org/qemu-devel/159804762216.39954.15502128500494116468.stgit@naples-babu.amd.com/
+ Revert EPYC specific decode.
+ Simplify CPUID_8000_001E
+
+v4:
+  https://lore.kernel.org/qemu-devel/159744083536.39197.13827776633866601278.stgit@naples-babu.amd.com/
+  Not much of a change. Just added few text changes.
+  Error out configuration instead of warning if dies are not configured in EPYC.
+  Few other text changes to clarify the removal of node_id, nr_nodes and nodes_per_pkg.
+
+v3:
+  https://lore.kernel.org/qemu-devel/159681772267.9679.1334429994189974662.stgit@naples-babu.amd.com/#r
+  Added a new check to pass the dies for EPYC numa configuration.
+  Added Simplify CPUID_8000_001E patch with some changes suggested by Igor.
+  Dropped the patch to build the topology from CpuInstanceProperties.
+  TODO: Not sure if we still need the Autonuma changes Igor mentioned.
+  Needs more clarity on that.
+
+v2:
+  https://lore.kernel.org/qemu-devel/159362436285.36204.986406297373871949.stgit@naples-babu.amd.com/
+  Used the numa information from CpuInstanceProperties for building
+  the apic_id suggested by Igor.
+  Also did some minor code re-aarangement to take care of changes.
+  Dropped the patch "Simplify CPUID_8000_001E" from v1. Will send
+  it later.
+
+v1:
+ https://lore.kernel.org/qemu-devel/159164739269.20543.3074052993891532749.stgit@naples-babu.amd.com
+
+Babu Moger (2):
+      i386: Simplify CPUID_8000_001d for AMD
+      i386: Simplify CPUID_8000_001E for AMD
+
+
+ target/i386/cpu.c |  226 ++++++++++++++---------------------------------------
+ 1 file changed, 61 insertions(+), 165 deletions(-)
+
+--
 
