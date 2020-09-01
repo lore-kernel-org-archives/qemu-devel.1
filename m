@@ -2,75 +2,86 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6514C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:12:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1507DC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:13:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74153207D3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:12:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74153207D3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id C1A14207D3
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:13:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgCKSGEL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1A14207D3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43370 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD71q-0002qy-J1
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:12:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55172)
+	id 1kD727-0002z3-TC
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:13:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55066)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zI-0005Lm-QO; Tue, 01 Sep 2020 10:10:16 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:53173)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zD-0003lF-Tx; Tue, 01 Sep 2020 10:10:16 -0400
-Received: from localhost.localdomain ([82.252.135.186]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M9Wqa-1kGOEd1kgu-005XLt; Tue, 01 Sep 2020 16:10:07 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kD6zF-0005C1-Cs
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:10:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28257
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kD6zC-0003kK-7q
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:10:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598969408;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=cNgVF9HWZy4RUr6DCucDvzASAeqTHl0TqesZxD7F8xs=;
+ b=CgCKSGELaQASl2+mkUN3aHNiCDCq8j7bBiCEZibykwbNS8WEWnLP3nl+WJWU1ZoHtTcCTs
+ 6nVrz1vUxs0Ms4oblHVKgo97LPjlwpOIy90hFxeJjbTOyCLhlKn+HB4L2Psw0vBYg8Hpe8
+ sxPKqbpf4+g3k0DtAGgAab8ACai9SGs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-7XrF3pF1M8K0diA-ZOYiuA-1; Tue, 01 Sep 2020 10:09:53 -0400
+X-MC-Unique: 7XrF3pF1M8K0diA-ZOYiuA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3201818CBC41;
+ Tue,  1 Sep 2020 14:09:52 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-54.ams2.redhat.com
+ [10.36.112.54])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 04E2A7C584;
+ Tue,  1 Sep 2020 14:09:46 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id C0D7D17447; Tue,  1 Sep 2020 16:09:44 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/44] hw/core/sysbus: Fix a typo
-Date: Tue,  1 Sep 2020 16:09:25 +0200
-Message-Id: <20200901140954.889743-16-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
-References: <20200901140954.889743-1-laurent@vivier.eu>
+Subject: [PATCH v2] cirrus: handle wraparound in cirrus_invalidate_region
+Date: Tue,  1 Sep 2020 16:09:44 +0200
+Message-Id: <20200901140944.24101-1-kraxel@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:uhyHOkyzsjzby5kCiitKF4XT9zu/Cc96r8PYtPu9NQ2Vh4xWozs
- s9lRP4Pc7s3Z97xI47D/Np/4qFafcZesz+Bu6W8+VPWUuQ8ocQjN8DtdvW6NjMFSm30pyHl
- Lg/luf94xS3Bltht6sd4Qp+0B4w/D/eblVmyGmSNoYALXvSHN4mA6DCPK5wC8nvOZYP+0OI
- sItrwJputbOMNTej5yiPA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:mPBbFZdFeMg=:dB8Rw/qhuw9Gqo+IfKeGHj
- dWr/lccKEjHfeJd3aiyJT0hSBNBcNh2Y2G9SAsN5yeSWYewfuf1EzEKqe3+ELl9hDnS8NxWq5
- DY7evRozaVwIc+ZlWVf29IWJfdLYKf4s8LmaZKd+LBvkvvswidXEsQC4nc0wCurYF0N+lUpmz
- QqtLhB7WQIu20GtoE9nbLnKPnJHqXEkB/vM9qUmwHv/MRsi7p0bhCfwMnba07OYa5EFJehUr1
- MPTuYCNbDWemRmklnV/QNXekdur/d0kq1hQuS94B46OeZXxC/9ezwqzltSQRywugw/3d/w73L
- Dt6K21bHeaX/lQ4VGdrpmQfHyR5pnXEie2SVIzvFsn3eCbTPNumDwzv9OX4UWMyYf4gRR7c8T
- VxqDQDuNa80em39gWKkjBCTDGCCxEipBo1duL5hWnqQJDb3y6Fumun9nCZFyozZw6fhA8pe8o
- XFmG9f39sF1CCic0hosSiTIQQlIv883VlaM+CN/nrv+PxnTYmZ3ZVcQ3lHAqDlDDwWSHI0v6q
- R9DHEwMudIzUmscEZPkdI+IgKxg+56I55Opnofe7j1onGwohIzxRn2TNw0n30Ef6QLJkV/CWp
- jleKgMIyDoBV3sch7Y6KRw7QFoFpK1eFYHSof46n7AZPMmbLrkX0+XRMO4V/8EE9YcMmzDjAT
- PHFuDzeoQ8lQneHHr7lS9uJElY8N7RdY5WP4+ictWkTLx2lvIesEmiLM/BdW7HiMTlTtavTpD
- M0Je4sd7BVpmkH52OwJbpOGVnZPu8OztwSI1+DoWAq6Wo7aYPTE5cfGg3TiQr4SC2sjvI3HcU
- DvILhXnR5ZPNv03FsN/KGR0tossJUKynVFsw8cNcvHbNsL2QQi8UEhmQm77kyDu5veE+942
-Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:09:57
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:11:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,37 +94,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Li Qiang <liq3ea@163.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Code simply asserts that there is no wraparound instead of handling
+it properly.  The assert() can be triggered by the guest (must be
+privilidged inside the guest though).  Fix it.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20200806130945.21629-2-f4bug@amsat.org>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Buglink: https://bugs.launchpad.net/qemu/+bug/1880189
+Cc: Li Qiang <liq3ea@163.com>
+Reported-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/core/sysbus.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/display/cirrus_vga.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/hw/core/sysbus.c b/hw/core/sysbus.c
-index 70239b7e7d09..77ab351ce1a8 100644
---- a/hw/core/sysbus.c
-+++ b/hw/core/sysbus.c
-@@ -64,7 +64,7 @@ void foreach_dynamic_sysbus_device(FindSysbusDeviceFunc *func, void *opaque)
-         .opaque = opaque,
-     };
+diff --git a/hw/display/cirrus_vga.c b/hw/display/cirrus_vga.c
+index 212d6f5e6145..5d1f62e50e67 100644
+--- a/hw/display/cirrus_vga.c
++++ b/hw/display/cirrus_vga.c
+@@ -640,10 +640,16 @@ static void cirrus_invalidate_region(CirrusVGAState * s, int off_begin,
+     }
  
--    /* Loop through all sysbus devices that were spawened outside the machine */
-+    /* Loop through all sysbus devices that were spawned outside the machine */
-     container = container_get(qdev_get_machine(), "/peripheral");
-     find_sysbus_device(container, &find);
-     container = container_get(qdev_get_machine(), "/peripheral-anon");
+     for (y = 0; y < lines; y++) {
+-        off_cur = off_begin;
++        off_cur = off_begin & s->cirrus_addr_mask;
+         off_cur_end = ((off_cur + bytesperline - 1) & s->cirrus_addr_mask) + 1;
+-        assert(off_cur_end >= off_cur);
+-        memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
++        if (off_cur_end >= off_cur) {
++            memory_region_set_dirty(&s->vga.vram, off_cur, off_cur_end - off_cur);
++        } else {
++            /* wraparound */
++            memory_region_set_dirty(&s->vga.vram, off_cur,
++                                    s->cirrus_addr_mask + 1 - off_cur);
++            memory_region_set_dirty(&s->vga.vram, 0, off_cur_end);
++        }
+         off_begin += off_pitch;
+     }
+ }
 -- 
-2.26.2
+2.27.0
 
 
