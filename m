@@ -7,43 +7,42 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 547A1C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D9BAC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:28:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25DC5206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:28:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25DC5206CD
+	by mail.kernel.org (Postfix) with ESMTPS id D2760206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:28:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2760206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD0iS-0008NJ-7Z
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:28:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58126)
+	id 1kD0iY-0000Bh-0k
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:28:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0dI-0005EH-LS
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:23:08 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50344)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0d6-0004gr-H5
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:22:56 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50230)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0dG-0008Pl-7w
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:23:08 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0d2-0008Ok-Cu
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:22:56 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 33A4EB1A9;
- Tue,  1 Sep 2020 07:22:55 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id 88945AF8F;
+ Tue,  1 Sep 2020 07:22:50 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [PATCH v6 14/16] whpx: remove whpx specific functions from global
- includes
-Date: Tue,  1 Sep 2020 09:21:59 +0200
-Message-Id: <20200901072201.7133-15-cfontana@suse.de>
+Subject: [PATCH v6 08/16] cpus: extract out whpx-specific code to target/i386/
+Date: Tue,  1 Sep 2020 09:21:53 +0200
+Message-Id: <20200901072201.7133-9-cfontana@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901072201.7133-1-cfontana@suse.de>
 References: <20200901072201.7133-1-cfontana@suse.de>
@@ -82,139 +81,341 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+register a "CpusAccel" interface for WHPX as well.
+
 Signed-off-by: Claudio Fontana <cfontana@suse.de>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/stubs/meson.build |  1 -
- accel/stubs/whpx-stub.c | 47 -----------------------------------------
- include/sysemu/whpx.h   | 19 -----------------
- target/i386/whpx-cpus.h | 17 +++++++++++++++
- 4 files changed, 17 insertions(+), 67 deletions(-)
- delete mode 100644 accel/stubs/whpx-stub.c
+ MAINTAINERS             |  1 +
+ softmmu/cpus.c          | 79 ---------------------------------
+ target/i386/meson.build |  5 ++-
+ target/i386/whpx-all.c  |  3 ++
+ target/i386/whpx-cpus.c | 96 +++++++++++++++++++++++++++++++++++++++++
+ target/i386/whpx-cpus.h | 17 ++++++++
+ 6 files changed, 121 insertions(+), 80 deletions(-)
+ create mode 100644 target/i386/whpx-cpus.c
+ create mode 100644 target/i386/whpx-cpus.h
 
-diff --git a/accel/stubs/meson.build b/accel/stubs/meson.build
-index 3fbe34e5bb..12dd1539af 100644
---- a/accel/stubs/meson.build
-+++ b/accel/stubs/meson.build
-@@ -2,4 +2,3 @@ specific_ss.add(when: 'CONFIG_HAX', if_false: files('hax-stub.c'))
- specific_ss.add(when: 'CONFIG_XEN', if_false: files('xen-stub.c'))
- specific_ss.add(when: 'CONFIG_KVM', if_false: files('kvm-stub.c'))
- specific_ss.add(when: 'CONFIG_TCG', if_false: files('tcg-stub.c'))
--specific_ss.add(when: 'CONFIG_WHPX', if_false: files('whpx-stub.c'))
-diff --git a/accel/stubs/whpx-stub.c b/accel/stubs/whpx-stub.c
-deleted file mode 100644
-index 1efb89f25e..0000000000
---- a/accel/stubs/whpx-stub.c
-+++ /dev/null
-@@ -1,47 +0,0 @@
--/*
-- * QEMU Windows Hypervisor Platform accelerator (WHPX) stub
-- *
-- * Copyright Microsoft Corp. 2017
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or later.
-- * See the COPYING file in the top-level directory.
-- *
-- */
--
--#include "qemu/osdep.h"
--#include "cpu.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 314ce0ded5..8d2b2679a9 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -450,6 +450,7 @@ WHPX CPUs
+ M: Sunil Muthuswamy <sunilmut@microsoft.com>
+ S: Supported
+ F: target/i386/whpx-all.c
++F: target/i386/whpx-cpus.c
+ F: target/i386/whp-dispatch.h
+ F: accel/stubs/whpx-stub.c
+ F: include/sysemu/whpx.h
+diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+index cadaec5b95..a99eacd6a6 100644
+--- a/softmmu/cpus.c
++++ b/softmmu/cpus.c
+@@ -34,7 +34,6 @@
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/kvm.h"
+ #include "sysemu/hvf.h"
 -#include "sysemu/whpx.h"
--
--int whpx_init_vcpu(CPUState *cpu)
--{
--    return -1;
--}
--
--int whpx_vcpu_exec(CPUState *cpu)
--{
--    return -1;
--}
--
--void whpx_destroy_vcpu(CPUState *cpu)
--{
--}
--
--void whpx_vcpu_kick(CPUState *cpu)
--{
--}
--
--void whpx_cpu_synchronize_state(CPUState *cpu)
--{
--}
--
--void whpx_cpu_synchronize_post_reset(CPUState *cpu)
--{
--}
--
--void whpx_cpu_synchronize_post_init(CPUState *cpu)
--{
--}
--
--void whpx_cpu_synchronize_pre_loadvm(CPUState *cpu)
--{
--}
-diff --git a/include/sysemu/whpx.h b/include/sysemu/whpx.h
-index a84b49e749..59edf13742 100644
---- a/include/sysemu/whpx.h
-+++ b/include/sysemu/whpx.h
-@@ -13,18 +13,6 @@
- #ifndef QEMU_WHPX_H
- #define QEMU_WHPX_H
+ #include "exec/exec-all.h"
+ #include "qemu/thread.h"
+ #include "qemu/plugin.h"
+@@ -178,9 +177,6 @@ void cpu_synchronize_state(CPUState *cpu)
+     if (cpus_accel && cpus_accel->synchronize_state) {
+         cpus_accel->synchronize_state(cpu);
+     }
+-    if (whpx_enabled()) {
+-        whpx_cpu_synchronize_state(cpu);
+-    }
+ }
  
--
--int whpx_init_vcpu(CPUState *cpu);
--int whpx_vcpu_exec(CPUState *cpu);
--void whpx_destroy_vcpu(CPUState *cpu);
--void whpx_vcpu_kick(CPUState *cpu);
--
--
--void whpx_cpu_synchronize_state(CPUState *cpu);
--void whpx_cpu_synchronize_post_reset(CPUState *cpu);
--void whpx_cpu_synchronize_post_init(CPUState *cpu);
--void whpx_cpu_synchronize_pre_loadvm(CPUState *cpu);
--
- #ifdef CONFIG_WHPX
+ void cpu_synchronize_post_reset(CPUState *cpu)
+@@ -188,9 +184,6 @@ void cpu_synchronize_post_reset(CPUState *cpu)
+     if (cpus_accel && cpus_accel->synchronize_post_reset) {
+         cpus_accel->synchronize_post_reset(cpu);
+     }
+-    if (whpx_enabled()) {
+-        whpx_cpu_synchronize_post_reset(cpu);
+-    }
+ }
  
- int whpx_enabled(void);
-@@ -35,11 +23,4 @@ int whpx_enabled(void);
+ void cpu_synchronize_post_init(CPUState *cpu)
+@@ -198,9 +191,6 @@ void cpu_synchronize_post_init(CPUState *cpu)
+     if (cpus_accel && cpus_accel->synchronize_post_init) {
+         cpus_accel->synchronize_post_init(cpu);
+     }
+-    if (whpx_enabled()) {
+-        whpx_cpu_synchronize_post_init(cpu);
+-    }
+ }
  
- #endif /* CONFIG_WHPX */
+ void cpu_synchronize_pre_loadvm(CPUState *cpu)
+@@ -211,9 +201,6 @@ void cpu_synchronize_pre_loadvm(CPUState *cpu)
+     if (hvf_enabled()) {
+         hvf_cpu_synchronize_pre_loadvm(cpu);
+     }
+-    if (whpx_enabled()) {
+-        whpx_cpu_synchronize_pre_loadvm(cpu);
+-    }
+ }
  
--/* state subset only touched by the VCPU itself during runtime */
--#define WHPX_SET_RUNTIME_STATE   1
--/* state subset modified during VCPU reset */
--#define WHPX_SET_RESET_STATE     2
--/* full state set, modified during initialization or on vmload */
--#define WHPX_SET_FULL_STATE      3
+ int64_t cpus_get_virtual_clock(void)
+@@ -445,48 +432,6 @@ static void *qemu_hvf_cpu_thread_fn(void *arg)
+     return NULL;
+ }
+ 
+-static void *qemu_whpx_cpu_thread_fn(void *arg)
+-{
+-    CPUState *cpu = arg;
+-    int r;
 -
- #endif /* QEMU_WHPX_H */
+-    rcu_register_thread();
+-
+-    qemu_mutex_lock_iothread();
+-    qemu_thread_get_self(cpu->thread);
+-    cpu->thread_id = qemu_get_thread_id();
+-    current_cpu = cpu;
+-
+-    r = whpx_init_vcpu(cpu);
+-    if (r < 0) {
+-        fprintf(stderr, "whpx_init_vcpu failed: %s\n", strerror(-r));
+-        exit(1);
+-    }
+-
+-    /* signal CPU creation */
+-    cpu_thread_signal_created(cpu);
+-    qemu_guest_random_seed_thread_part2(cpu->random_seed);
+-
+-    do {
+-        if (cpu_can_run(cpu)) {
+-            r = whpx_vcpu_exec(cpu);
+-            if (r == EXCP_DEBUG) {
+-                cpu_handle_guest_debug(cpu);
+-            }
+-        }
+-        while (cpu_thread_is_idle(cpu)) {
+-            qemu_cond_wait(cpu->halt_cond, &qemu_global_mutex);
+-        }
+-        qemu_wait_io_event_common(cpu);
+-    } while (!cpu->unplug || cpu_can_run(cpu));
+-
+-    whpx_destroy_vcpu(cpu);
+-    cpu_thread_signal_destroyed(cpu);
+-    qemu_mutex_unlock_iothread();
+-    rcu_unregister_thread();
+-    return NULL;
+-}
+-
+ void cpus_kick_thread(CPUState *cpu)
+ {
+ #ifndef _WIN32
+@@ -501,12 +446,6 @@ void cpus_kick_thread(CPUState *cpu)
+         fprintf(stderr, "qemu:%s: %s", __func__, strerror(err));
+         exit(1);
+     }
+-#else /* _WIN32 */
+-    if (!qemu_cpu_is_self(cpu)) {
+-        if (whpx_enabled()) {
+-            whpx_vcpu_kick(cpu);
+-        }
+-    }
+ #endif
+ }
+ 
+@@ -681,22 +620,6 @@ static void qemu_hvf_start_vcpu(CPUState *cpu)
+                        cpu, QEMU_THREAD_JOINABLE);
+ }
+ 
+-static void qemu_whpx_start_vcpu(CPUState *cpu)
+-{
+-    char thread_name[VCPU_THREAD_NAME_SIZE];
+-
+-    cpu->thread = g_malloc0(sizeof(QemuThread));
+-    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
+-    qemu_cond_init(cpu->halt_cond);
+-    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/WHPX",
+-             cpu->cpu_index);
+-    qemu_thread_create(cpu->thread, thread_name, qemu_whpx_cpu_thread_fn,
+-                       cpu, QEMU_THREAD_JOINABLE);
+-#ifdef _WIN32
+-    cpu->hThread = qemu_thread_get_handle(cpu->thread);
+-#endif
+-}
+-
+ void cpus_register_accel(const CpusAccel *ca)
+ {
+     assert(ca != NULL);
+@@ -726,8 +649,6 @@ void qemu_init_vcpu(CPUState *cpu)
+         cpus_accel->create_vcpu_thread(cpu);
+     } else if (hvf_enabled()) {
+         qemu_hvf_start_vcpu(cpu);
+-    } else if (whpx_enabled()) {
+-        qemu_whpx_start_vcpu(cpu);
+     } else {
+         g_assert_not_reached();
+     }
+diff --git a/target/i386/meson.build b/target/i386/meson.build
+index 1db619841c..a1a02f3e99 100644
+--- a/target/i386/meson.build
++++ b/target/i386/meson.build
+@@ -30,7 +30,10 @@ i386_softmmu_ss.add(files(
+ ))
+ i386_softmmu_ss.add(when: 'CONFIG_HYPERV', if_true: files('hyperv.c'), if_false: files('hyperv-stub.c'))
+ i386_softmmu_ss.add(when: 'CONFIG_KVM', if_true: files('kvm.c'))
+-i386_softmmu_ss.add(when: 'CONFIG_WHPX', if_true: files('whpx-all.c'))
++i386_softmmu_ss.add(when: 'CONFIG_WHPX', if_true: files(
++  'whpx-all.c',
++  'whpx-cpus.c',
++))
+ i386_softmmu_ss.add(when: 'CONFIG_HAX', if_true: files(
+   'hax-all.c',
+   'hax-mem.c',
+diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+index c78baac6df..8b6986c864 100644
+--- a/target/i386/whpx-all.c
++++ b/target/i386/whpx-all.c
+@@ -24,6 +24,8 @@
+ #include "migration/blocker.h"
+ #include "whp-dispatch.h"
+ 
++#include "whpx-cpus.h"
++
+ #include <WinHvPlatform.h>
+ #include <WinHvEmulation.h>
+ 
+@@ -1575,6 +1577,7 @@ static int whpx_accel_init(MachineState *ms)
+     whpx_memory_init();
+ 
+     cpu_interrupt_handler = whpx_handle_interrupt;
++    cpus_register_accel(&whpx_cpus);
+ 
+     printf("Windows Hypervisor Platform accelerator is operational\n");
+     return 0;
+diff --git a/target/i386/whpx-cpus.c b/target/i386/whpx-cpus.c
+new file mode 100644
+index 0000000000..d9bd5a2d36
+--- /dev/null
++++ b/target/i386/whpx-cpus.c
+@@ -0,0 +1,96 @@
++/*
++ * QEMU Windows Hypervisor Platform accelerator (WHPX)
++ *
++ * Copyright Microsoft Corp. 2017
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "sysemu/kvm_int.h"
++#include "qemu/main-loop.h"
++#include "sysemu/cpus.h"
++#include "qemu/guest-random.h"
++
++#include "sysemu/whpx.h"
++#include "whpx-cpus.h"
++
++#include <WinHvPlatform.h>
++#include <WinHvEmulation.h>
++
++static void *whpx_cpu_thread_fn(void *arg)
++{
++    CPUState *cpu = arg;
++    int r;
++
++    rcu_register_thread();
++
++    qemu_mutex_lock_iothread();
++    qemu_thread_get_self(cpu->thread);
++    cpu->thread_id = qemu_get_thread_id();
++    current_cpu = cpu;
++
++    r = whpx_init_vcpu(cpu);
++    if (r < 0) {
++        fprintf(stderr, "whpx_init_vcpu failed: %s\n", strerror(-r));
++        exit(1);
++    }
++
++    /* signal CPU creation */
++    cpu_thread_signal_created(cpu);
++    qemu_guest_random_seed_thread_part2(cpu->random_seed);
++
++    do {
++        if (cpu_can_run(cpu)) {
++            r = whpx_vcpu_exec(cpu);
++            if (r == EXCP_DEBUG) {
++                cpu_handle_guest_debug(cpu);
++            }
++        }
++        while (cpu_thread_is_idle(cpu)) {
++            qemu_cond_wait_iothread(cpu->halt_cond);
++        }
++        qemu_wait_io_event_common(cpu);
++    } while (!cpu->unplug || cpu_can_run(cpu));
++
++    whpx_destroy_vcpu(cpu);
++    cpu_thread_signal_destroyed(cpu);
++    qemu_mutex_unlock_iothread();
++    rcu_unregister_thread();
++    return NULL;
++}
++
++static void whpx_start_vcpu_thread(CPUState *cpu)
++{
++    char thread_name[VCPU_THREAD_NAME_SIZE];
++
++    cpu->thread = g_malloc0(sizeof(QemuThread));
++    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
++    qemu_cond_init(cpu->halt_cond);
++    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/WHPX",
++             cpu->cpu_index);
++    qemu_thread_create(cpu->thread, thread_name, whpx_cpu_thread_fn,
++                       cpu, QEMU_THREAD_JOINABLE);
++#ifdef _WIN32
++    cpu->hThread = qemu_thread_get_handle(cpu->thread);
++#endif
++}
++
++static void whpx_kick_vcpu_thread(CPUState *cpu)
++{
++    if (!qemu_cpu_is_self(cpu)) {
++        whpx_vcpu_kick(cpu);
++    }
++}
++
++const CpusAccel whpx_cpus = {
++    .create_vcpu_thread = whpx_start_vcpu_thread,
++    .kick_vcpu_thread = whpx_kick_vcpu_thread,
++
++    .synchronize_post_reset = whpx_cpu_synchronize_post_reset,
++    .synchronize_post_init = whpx_cpu_synchronize_post_init,
++    .synchronize_state = whpx_cpu_synchronize_state,
++    .synchronize_pre_loadvm = whpx_cpu_synchronize_pre_loadvm,
++};
 diff --git a/target/i386/whpx-cpus.h b/target/i386/whpx-cpus.h
-index 2393944954..bdb367d1d0 100644
---- a/target/i386/whpx-cpus.h
+new file mode 100644
+index 0000000000..2393944954
+--- /dev/null
 +++ b/target/i386/whpx-cpus.h
-@@ -14,4 +14,21 @@
- 
- extern const CpusAccel whpx_cpus;
- 
-+int whpx_init_vcpu(CPUState *cpu);
-+int whpx_vcpu_exec(CPUState *cpu);
-+void whpx_destroy_vcpu(CPUState *cpu);
-+void whpx_vcpu_kick(CPUState *cpu);
+@@ -0,0 +1,17 @@
++/*
++ * Accelerator CPUS Interface
++ *
++ * Copyright 2020 SUSE LLC
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+void whpx_cpu_synchronize_state(CPUState *cpu);
-+void whpx_cpu_synchronize_post_reset(CPUState *cpu);
-+void whpx_cpu_synchronize_post_init(CPUState *cpu);
-+void whpx_cpu_synchronize_pre_loadvm(CPUState *cpu);
++#ifndef WHPX_CPUS_H
++#define WHPX_CPUS_H
 +
-+/* state subset only touched by the VCPU itself during runtime */
-+#define WHPX_SET_RUNTIME_STATE   1
-+/* state subset modified during VCPU reset */
-+#define WHPX_SET_RESET_STATE     2
-+/* full state set, modified during initialization or on vmload */
-+#define WHPX_SET_FULL_STATE      3
++#include "sysemu/cpus.h"
 +
- #endif /* WHPX_CPUS_H */
++extern const CpusAccel whpx_cpus;
++
++#endif /* WHPX_CPUS_H */
 -- 
 2.26.2
 
