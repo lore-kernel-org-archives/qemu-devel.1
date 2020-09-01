@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 837DEC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:48:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DA3C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:48:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57091206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:48:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57091206CD
+	by mail.kernel.org (Postfix) with ESMTPS id D8BEB206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:48:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8BEB206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD5iC-0001CD-8i
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:48:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33628)
+	id 1kD5iD-0001I9-Vo
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:48:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fP-0004cC-UX
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fP-0004bo-5i
  for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:39 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:37563)
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:56631)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fM-0001RI-C7
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:39 -0400
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>) id 1kD5fL-0001Qz-Sl
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:45:38 -0400
 Received: from mxplan5.mail.ovh.net (unknown [10.108.4.108])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 892E1563B95D;
- Tue,  1 Sep 2020 14:45:33 +0200 (CEST)
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 8813C563B954;
+ Tue,  1 Sep 2020 14:45:32 +0200 (CEST)
 Received: from kaod.org (37.59.142.99) by DAG4EX1.mxp5.local (172.16.2.31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 1 Sep 2020
- 14:45:33 +0200
+ 14:45:31 +0200
 Authentication-Results: garm.ovh; auth=pass
- (GARM-99G003d0e3953c-bcca-4e9f-adf3-e0c47fa0b0fe,
+ (GARM-99G00384827f71-701d-4661-840d-b1912642d67b,
  38EE1E9FF4E34D4C85F4190D418CEE501B878519) smtp.auth=clg@kaod.org
 From: =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
 To: <qemu-devel@nongnu.org>
-Subject: [PULL 08/20] ftgmac100: Fix registers that can be read
-Date: Tue, 1 Sep 2020 14:45:13 +0200
-Message-ID: <20200901124525.220252-9-clg@kaod.org>
+Subject: [PULL 05/20] aspeed/smc: Fix MemoryRegionOps definition
+Date: Tue, 1 Sep 2020 14:45:10 +0200
+Message-ID: <20200901124525.220252-6-clg@kaod.org>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20200901124525.220252-1-clg@kaod.org>
 References: <20200901124525.220252-1-clg@kaod.org>
@@ -54,8 +54,8 @@ Content-Transfer-Encoding: 8bit
 X-Originating-IP: [37.59.142.99]
 X-ClientProxiedBy: DAG7EX1.mxp5.local (172.16.2.61) To DAG4EX1.mxp5.local
  (172.16.2.31)
-X-Ovh-Tracer-GUID: 7a8a2380-a0b2-4d45-87a3-5a52e0a54a7f
-X-Ovh-Tracer-Id: 4786481982425238310
+X-Ovh-Tracer-GUID: 1e64f420-cd02-406a-868c-f6335defd7c7
+X-Ovh-Tracer-Id: 4786200504106716067
 X-VR-SPAMSTATE: OK
 X-VR-SPAMSCORE: -100
 X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefjedgheejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkffojghfgggtgfhisehtkeertdertdejnecuhfhrohhmpeevrogurhhitgcunfgvucfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheehfeegjeeitdfffeetjeduveejueefuefgtdefueelueetveeliefhhffgtdelnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtoheptghlgheskhgrohgurdhorhhg
@@ -81,43 +81,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Joel Stanley <joel@jms.id.au>,
+Cc: Peter Maydell <peter.maydell@linaro.org>, Joel Stanley <joel@jms.id.au>,
  =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Frederic Konrad <konrad.frederic@yahoo.fr>
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Receive Ring Base Address Register (RXR_BADR) and the Normal Priority
-Transmit Receive Ring Base Address Register (NPTXR_BADR) can also be
-read.
+Unaligned access support is a leftover from the initial commit. There
+is no such need on this device register mapping. Remove it.
 
-Cc: Frederic Konrad <konrad.frederic@yahoo.fr>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Cc: Michael S. Tsirkin <mst@redhat.com>
 Reviewed-by: Joel Stanley <joel@jms.id.au>
-Message-Id: <20200819100956.2216690-10-clg@kaod.org>
+Message-Id: <20200819100956.2216690-7-clg@kaod.org>
 Signed-off-by: Cédric Le Goater <clg@kaod.org>
 ---
- hw/net/ftgmac100.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ hw/ssi/aspeed_smc.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/net/ftgmac100.c b/hw/net/ftgmac100.c
-index 5f4b26fc5f3c..0348fcf45676 100644
---- a/hw/net/ftgmac100.c
-+++ b/hw/net/ftgmac100.c
-@@ -669,6 +669,10 @@ static uint64_t ftgmac100_read(void *opaque, hwaddr addr, unsigned size)
-         return s->math[0];
-     case FTGMAC100_MATH1:
-         return s->math[1];
-+    case FTGMAC100_RXR_BADR:
-+        return s->rx_ring;
-+    case FTGMAC100_NPTXR_BADR:
-+        return s->tx_ring;
-     case FTGMAC100_ITC:
-         return s->itc;
-     case FTGMAC100_DBLAC:
+diff --git a/hw/ssi/aspeed_smc.c b/hw/ssi/aspeed_smc.c
+index 4fab1f5f855e..0646e0dca72e 100644
+--- a/hw/ssi/aspeed_smc.c
++++ b/hw/ssi/aspeed_smc.c
+@@ -1299,10 +1299,8 @@ static const MemoryRegionOps aspeed_smc_ops = {
+     .read = aspeed_smc_read,
+     .write = aspeed_smc_write,
+     .endianness = DEVICE_LITTLE_ENDIAN,
+-    .valid.unaligned = true,
+ };
+ 
+-
+ /*
+  * Initialize the custom address spaces for DMAs
+  */
 -- 
 2.25.4
 
