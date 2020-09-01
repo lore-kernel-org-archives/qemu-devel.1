@@ -2,95 +2,91 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0056AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16552C28E83
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:51:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5F262064B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:50:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E3852064B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:51:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="co89W7Ol"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F262064B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ohypDc/Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E3852064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD8YE-0007Lf-Uu
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:50:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49808)
+	id 1kD8Yt-000091-O8
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:51:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD89H-0003i0-Tw; Tue, 01 Sep 2020 11:24:39 -0400
-Received: from mail-wm1-x32c.google.com ([2a00:1450:4864:20::32c]:53027)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kD83n-0008Qk-Ch
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:18:59 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:33035)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD89G-000734-8G; Tue, 01 Sep 2020 11:24:39 -0400
-Received: by mail-wm1-x32c.google.com with SMTP id q9so1571635wmj.2;
- Tue, 01 Sep 2020 08:24:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6CDUTU1D+7Ao3iWeCaQFsPzGscbCBBSxZK330pNOH+c=;
- b=co89W7Olc02pGyV1Epaiscfzch8qtL9BJ1+0kFvG9MUOTAuVdcA0JbBWWFUKph8km8
- ZIjz8qxRx99FKwca1yytAwwWdCWGXsiDhclaTMZgsPc86r46YWpg8ihUHITkVFYHvWsa
- NZawQUDMJaasbZ8xzutGFiTps7s/SGv520Y8h0CMzTqPM2UzR/pGGthSJvIObpZxbkX2
- nzGf2HGoHmIQJMx/R7FLvrZ5RuKu8x3z37gC1HUo6lw7lF16uQh+rD0BdTQh3bICdbzk
- zL9DOHbt19twpZFK1fQT/kv+39W5NjtE2vYK3BIHTkr6ni+VxhWN7qolF26zQcDv/hYf
- 1pBg==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kD83l-0006Ep-Bq
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:18:59 -0400
+Received: by mail-wr1-x442.google.com with SMTP id m6so2003503wrn.0
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:18:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=PmeOYcAvC6VtCxfms298ylKFKv4w1tXwUMe/SRV1NTk=;
+ b=ohypDc/ZIs1qyF4qyFFoU13k8/n0xwoQGvfN108c9Xh63XpyautojlHXIxyixdKz+0
+ zReoTc/lbTmldpvNIyoNVzHsqCDmZ1gfY3qjxhFEh9vLi/Zi1A+crv4LMUBESuhZoJxf
+ mJ1+uVXV4fOp9ymYskOxxXjCrmxgUsnNUe4pSVuQMNbBBdeud7Xa+Jdm9jyHc9ZSuMn9
+ v39+SWf1wZEg5C5ss6VjNXAN9RsPsPsH8pC6FNJdixCFirxutSnRBdMQeVT3AgQ4cQZN
+ 1EAnxFXM7Llixdo4zo6aNZw3ZczWioqQ20Cq1sN4DdNyefNb7WVihMIzfThDAbxjz8g4
+ acuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6CDUTU1D+7Ao3iWeCaQFsPzGscbCBBSxZK330pNOH+c=;
- b=ptMcmfjFyI0z8teYCjCQ2XjyzNjCQWt24xhRpjazpc4CYqb1tuuIH7Xbg4jewXXVE0
- LlQvrKcYjLpxokoRzqwDldco71p4ZtDkDoiE7fWuUX3ClELAvs9bT47LPLVNIFapHPAH
- Crn3kXe2EsYcaUFjqhjA0cldEckDxVGr6izqIniveGFALX/27KfT/mtymhig7B06Te2y
- OuAQLUeFQDFvxkdT2e9cUeBRKxOlCBTuTrrkZZTxMjv+wqnyd0TCqvTid4Yi+lOctuGB
- w8q+5l8YNB+wquTdrjAEYDCVNIXSncmD8ZTEUHnrfiT1UutSmdV/DcxDb4OhfOpvWdW0
- 45JA==
-X-Gm-Message-State: AOAM533cUmUPNp8e0wu50rVGTIu+GBERPPzb7X5J4Akqy05XE/0hS0Sj
- KhRd7XZ3123UdCx6XlYdvm4r4yAa2Ow=
-X-Google-Smtp-Source: ABdhPJzl4q4KcAgNKCq/vOoP96C1+mz2VkxQyIzR+lT/5vOdrI2TPlcVib4k92kEPJINWUNf1bzn9Q==
-X-Received: by 2002:a1c:4303:: with SMTP id q3mr2250298wma.158.1598973876003; 
- Tue, 01 Sep 2020 08:24:36 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id v12sm2905740wri.47.2020.09.01.08.24.35
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Sep 2020 08:24:35 -0700 (PDT)
-Subject: Re: [PATCH-for-5.1] hw/misc/milkymist-pfpu: Fix pFPU region size
-To: Laurent Vivier <laurent@vivier.eu>
-References: <20200718093705.7271-1-f4bug@amsat.org>
- <b0eb3028f61e6eaaf9c1f4aedefeaa20@walle.cc>
- <1819668f-4747-0cb7-69c0-e167af71e8ba@vivier.eu>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <86a4c1c1-04b2-6a36-47ec-0cd0fba699df@amsat.org>
-Date: Tue, 1 Sep 2020 17:24:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=PmeOYcAvC6VtCxfms298ylKFKv4w1tXwUMe/SRV1NTk=;
+ b=I0wXYzhgZwcbDnVm9sg3WbTHH2Us9QrO03h48C7lDuv7V52K778c5Z1S54B21MepGw
+ r4TIiyid+UGdQRS25H8bKGaPbrYU1utlbh+mPh2WpT/HA4WSV9GidEO8r5NjvGSnQHpN
+ y5CDK7rufCq+u+l4W+9+jVBEqXonD6DriNxQk1RjVsdEaVqI6zByuja0qSLwKZ2+rUuQ
+ CDabcpLk0hOp7UlPAsAYfvz1Ck+3+Mj/D4ta2WzAQRuoO7taLfu8x8XI+WhnSDDhUnNR
+ LmcZAi02HKu/2DbkFyAhpzPwVDjkJVvsVM4aji4Co9WPy4kP4zsXgn3+P6mX1zdTI2q4
+ rr4A==
+X-Gm-Message-State: AOAM53187soOJr4iM0n5fWeo3kFzyz7U3DpsDjAMVu0gIiYQYJS4Pq2m
+ 5zzVzfbDztxhYBWXxbwhttMRwTAZDAopDdRU
+X-Google-Smtp-Source: ABdhPJwpJWzrOdG5JXqTb6sz3t3C5MTRFagdrc9z5ZTsleyEhYgbyHjmD4ELrd30eGyzNMTWU7cmwQ==
+X-Received: by 2002:a5d:4109:: with SMTP id l9mr2509135wrp.398.1598973535723; 
+ Tue, 01 Sep 2020 08:18:55 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id z9sm2242317wma.4.2020.09.01.08.18.54
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 08:18:54 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 23/47] target/arm: Implement fp16 for Neon VRECPE,
+ VRSQRTE using gvec
+Date: Tue,  1 Sep 2020 16:17:59 +0100
+Message-Id: <20200901151823.29785-24-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200901151823.29785-1-peter.maydell@linaro.org>
+References: <20200901151823.29785-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <1819668f-4747-0cb7-69c0-e167af71e8ba@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32c;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.13,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -105,56 +101,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Walle <michael@walle.cc>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/1/20 8:57 AM, Laurent Vivier wrote:
-> Le 19/07/2020 à 19:23, Michael Walle a écrit :
->> Hi Philippe,
->>
->> Am 2020-07-18 11:37, schrieb Philippe Mathieu-Daudé:
->>> The last microcode word (address 0x6000.6ffc) is not reachable.
->>> Correct the programmable FPU I/O size (which is 4 KiB) to be
->>> able to use all the microcode area.
->>>
->>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->>> ---
->>>  hw/misc/milkymist-pfpu.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/hw/misc/milkymist-pfpu.c b/hw/misc/milkymist-pfpu.c
->>> index 516825e83d..4fbe3e8971 100644
->>> --- a/hw/misc/milkymist-pfpu.c
->>> +++ b/hw/misc/milkymist-pfpu.c
->>> @@ -507,7 +507,7 @@ static void milkymist_pfpu_realize(DeviceState
->>> *dev, Error **errp)
->>>      sysbus_init_irq(sbd, &s->irq);
->>>
->>>      memory_region_init_io(&s->regs_region, OBJECT(dev),
->>> &pfpu_mmio_ops, s,
->>> -            "milkymist-pfpu", MICROCODE_END * 4);
->>> +                          "milkymist-pfpu", 0x1000);
->>
->> Could you use one of the MICROCODE_ macros instead? maybe
->> (MICROCODE_WORDS * 2)?
->>
->> With that fixed:
->> Reviewed-by: Michael Walle <michael@walle.cc>
->>
-> 
-> Philippe,
-> 
-> do you plan to repost with the change suggested by Michael?
+We already have gvec helpers for floating point VRECPE and
+VRQSRTE, so convert the Neon decoder to use them and
+add the fp16 support.
 
-Unfortunately I won't :( I spent 3h trying to do that, then found
-myself rewriting half of the pfpu because this is not that easy, and
-this code is now scheduled for deprecation. Not worth my time :(
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200828183354.27913-25-peter.maydell@linaro.org
+---
+ target/arm/translate-neon.c.inc | 31 +++++++++++++++++++++++++++++--
+ 1 file changed, 29 insertions(+), 2 deletions(-)
 
-> 
-> Thanks,
-> Laurent
-> 
+diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
+index 9d0959517fa..0a96245e962 100644
+--- a/target/arm/translate-neon.c.inc
++++ b/target/arm/translate-neon.c.inc
+@@ -3857,13 +3857,40 @@ static bool do_2misc_fp(DisasContext *s, arg_2misc *a,
+         return do_2misc_fp(s, a, FUNC);                         \
+     }
+ 
+-DO_2MISC_FP(VRECPE_F, gen_helper_recpe_f32)
+-DO_2MISC_FP(VRSQRTE_F, gen_helper_rsqrte_f32)
+ DO_2MISC_FP(VCVT_FS, gen_helper_vfp_sitos)
+ DO_2MISC_FP(VCVT_FU, gen_helper_vfp_uitos)
+ DO_2MISC_FP(VCVT_SF, gen_helper_vfp_tosizs)
+ DO_2MISC_FP(VCVT_UF, gen_helper_vfp_touizs)
+ 
++#define DO_2MISC_FP_VEC(INSN, HFUNC, SFUNC)                             \
++    static void gen_##INSN(unsigned vece, uint32_t rd_ofs,              \
++                           uint32_t rm_ofs,                             \
++                           uint32_t oprsz, uint32_t maxsz)              \
++    {                                                                   \
++        static gen_helper_gvec_2_ptr * const fns[4] = {                 \
++            NULL, HFUNC, SFUNC, NULL,                                   \
++        };                                                              \
++        TCGv_ptr fpst;                                                  \
++        fpst = fpstatus_ptr(vece == MO_16 ? FPST_STD_F16 : FPST_STD);   \
++        tcg_gen_gvec_2_ptr(rd_ofs, rm_ofs, fpst, oprsz, maxsz, 0,       \
++                           fns[vece]);                                  \
++        tcg_temp_free_ptr(fpst);                                        \
++    }                                                                   \
++    static bool trans_##INSN(DisasContext *s, arg_2misc *a)             \
++    {                                                                   \
++        if (a->size == MO_16) {                                         \
++            if (!dc_isar_feature(aa32_fp16_arith, s)) {                 \
++                return false;                                           \
++            }                                                           \
++        } else if (a->size != MO_32) {                                  \
++            return false;                                               \
++        }                                                               \
++        return do_2misc_vec(s, a, gen_##INSN);                          \
++    }
++
++DO_2MISC_FP_VEC(VRECPE_F, gen_helper_gvec_frecpe_h, gen_helper_gvec_frecpe_s)
++DO_2MISC_FP_VEC(VRSQRTE_F, gen_helper_gvec_frsqrte_h, gen_helper_gvec_frsqrte_s)
++
+ static bool trans_VRINTX(DisasContext *s, arg_2misc *a)
+ {
+     if (!arm_dc_feature(s, ARM_FEATURE_V8)) {
+-- 
+2.20.1
+
 
