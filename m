@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99223C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:34:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 887BFC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:35:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6556E2087D
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:34:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6556E2087D
+	by mail.kernel.org (Postfix) with ESMTPS id 56DA72068E
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:35:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56DA72068E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCzsN-0004vK-Jv
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:34:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46796)
+	id 1kCztL-0005zr-Gm
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:35:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46932)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzro-0004Dp-Gf; Tue, 01 Sep 2020 02:34:04 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:47245)
+ id 1kCzsO-00054k-Kg; Tue, 01 Sep 2020 02:34:40 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:56435)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzrm-0002OF-OC; Tue, 01 Sep 2020 02:34:04 -0400
+ id 1kCzsM-0002RI-UG; Tue, 01 Sep 2020 02:34:40 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mf0uq-1kooWc2EpO-00gZr3; Tue, 01 Sep 2020 08:33:40 +0200
-Subject: Re: [PATCH 01/12] target/arm/kvm: Remove superfluous break
+ 1N3K9E-1kdhcc41nW-010Ke3; Tue, 01 Sep 2020 08:34:21 +0200
+Subject: Re: [PATCH 02/12] target/ppc: Remove superfluous breaks
 To: Thomas Huth <thuth@redhat.com>, Yi Wang <wang.yi59@zte.com.cn>,
  qemu-devel@nongnu.org
-References: <1594630986-36148-1-git-send-email-wang.yi59@zte.com.cn>
- <62491c40-2812-f7b3-7cb6-498bd587ff13@redhat.com>
+References: <1594631025-36219-1-git-send-email-wang.yi59@zte.com.cn>
+ <9429f7c1-0bcf-5092-9f39-302f6b1cf598@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <97cadf49-b774-bded-37a5-4c77621fb65d@vivier.eu>
-Date: Tue, 1 Sep 2020 08:33:38 +0200
+Message-ID: <6d8affc9-60d2-4ad4-8954-bccffb239b1d@vivier.eu>
+Date: Tue, 1 Sep 2020 08:34:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <62491c40-2812-f7b3-7cb6-498bd587ff13@redhat.com>
+In-Reply-To: <9429f7c1-0bcf-5092-9f39-302f6b1cf598@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:tJbNcb5r7Y9U3CHndvkaEXpaFXFHkiZVUvhFFTn6rFmGfCEA8bG
- 5T848w++Ar2QbvQ6zV52bbktsHV8EhFIybat00lvac4gmDKoxJjxzcL2C8tzJ1D4LRR2AUY
- BTGmfMR6USE3ljofiGPopUhX+xPaY1XMcaM53uBsB2uKQld97G8bbsWCsvivcKE5ZQCBq8J
- PAbzWKk/tm1N3JMqxW0Cg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:77Mrlo8CXDs=:fwwxgjDQCjxF8N5k5Avqk/
- B5/HhD6xm2u/S0dWFLALTy1cEm9r1opxQe4W6soSl6jBv2fJv8A9aRIJYc54BKdq5oB8SI06u
- Ib33rijJak21jrRoeHNiRUhEOd0HbIXc53FQEM0DUQDz9UBdZ+3aF9oVvVVneD0+whmms7jF6
- 3nAmYgl07R0lJQhMxd7qgqP0vkZt0gECJ3bDJIEPq9wUxYpi58ng4Z6Sfaelyj2MYZDJOiLmC
- Mr3OWiG82mnOAWRISUgYw2zR7G5pBL/OJP4/G+b3oqxqpe+9cPvLMBPn3HiEBk8RkRPeEFo5Y
- POiTAcBf/2TKNN1WDtgy3q++UkhTaTscXqYBQp6DW+X3xsz1N7bJ7Q/Kw1lS9ELTGUpcMkp2i
- YiOBFKevZIvrAq2kg6a6Ql29qEhrogUX76S/Wqwzw0mqDyYVTXLJAzrokCRzvJcHQozmzLp4l
- yaZ2g8p4VqK275MO/dSSqZXbgHmdtzsvFMIeZqTcSxgb8SfQoEsDykeEHqBGaA9gP5zhxGtOw
- AqM9WbIatGJoLOquAeUldeKWrbhY5jkfXUbdkv87mgAkRGAorjdsYFzixjOOqYCSzPf0USzjF
- ToDDXDIM42pFxMV9LFZ6cocuXfHEq0DWixvCExx21qutiXn4GhzEmiBdJnqRnVaSB2+ysLJXm
- wcUbtwftX2QbeTbY14j9d/+XFPWH/QYUj3zRxJjFhLw84xGlTSoNiKO3M4vbpbeqKJgZcAvpy
- qbuOcglcsnjbg2iCJavACTLQydcLL04zos8JmU7vAmbv5pp9DFy+1l+RxOlVOVmOjP6Q6QxSc
- K1ZIntHxVVFfaKA7PlNlqX5GTH589w4HkfceLEe+GI5sqFxdBD3fi5/gr0iYe5lZqVsYQLz
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:4bW2GV2yLkhcDEyWlCPMhKZ65geIVyYFrVKJUUgqE75RJ4VZhe3
+ /47hvWwnaVvX48yKjLlQgNpgmukxtIPxic/qUkzexRVQOALexGYfYVLol2sq/IWElDath5/
+ 99r5Z7NH11cXBehm9Rk48kS4W25YaRD/9w6zDFDCkN4DfIRRFHRiKCBgaRsF/tlUpX7Bp/s
+ LfEikGp80UrVrywLBgzAg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:be5YsKfY67Y=:0QCuznt5Zo8hzKNbPdkIlm
+ r3MyffXbUHs2tPwGG5r/DKk75pTkp0jE2R76SgbGJsZXc9suk2c7MAN6XHMr0ZcrqeAaWy9bw
+ gEMI88+JUG1XLnr6aT5YRXOzzDQ2JfaZdD6settwYRjze2hieOQHQkOhtPwMzacJFqgm4IdEH
+ g8o2m7KY5e00DKAHWtAuvWuCAlVzFaSntvi60DlNYzkx+wHy/D029YELNp18bdyWA2hGcPQe3
+ 5Z4evHDp3nucpls49eOpq2gx4D+Qm/gRlCDUnpSHXNBXC0BoD2wwuHSoHh31A2aJPx8SzCLfg
+ /wXI7/YluoqeeGbPWF1I+OsitbajJZyRuhM81BjQ1gtA3dF7TQCOgwouZVFMNsraR15115sRW
+ fFDwmKnExaIh4ydxZazm+qQ1KTVqVqpfxwT9nqzNa574vAB9RouFmTy5w4K91XyHRUjih+RdJ
+ YDLsTJMT6mj77/JNvRPIDgTDD+nt5M42A8SmfI2CSGHuBI47doudbiIZQiELxBYlZXNEMjh5U
+ C4Snwy1rujiwVRICmgA21R4amkzE73JO09Kg2ETng+WwAJiTxQTUIm6aBC9c1HIOYy8BI/V8Q
+ qr5lGyLaNuOr2g77oNHoUAdjhgcwq1wSWYDI3/df2G/9P+JDKvJrFoRFq7M1+N45oFOcmrXxQ
+ MKhMnUdM4k+EJCoN3CRKCj9PPPuxk2zLVvW/SXcwXmAt+OuzI9q6K9YOjCce3zl7IugXC7z+m
+ 8pU59LdrRm6koccc79GxdIkxXpdyUVBLxXjvgbwLXoZitGMcpomV0Gep7fOrZFpAjJgP4WmGs
+ LOj4jErn8yNP4sLnH2ZrN0gC0E6AA1P5pLoeetXQ/VfA4Y+Yz2TA6Wz1M9ubANmKRU4hUlr
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:33:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:34:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -129,9 +129,10 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Liao Pingfang <liao.pingfang@zte.com.cn>, qemu-arm@nongnu.org,
- wang.liang82@zte.com.cn, xue.zhihong@zte.com.cn
+Cc: wang.liang82@zte.com.cn, QEMU Trivial <qemu-trivial@nongnu.org>,
+ qemu-ppc@nongnu.org, xue.zhihong@zte.com.cn,
+ Liao Pingfang <liao.pingfang@zte.com.cn>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -140,27 +141,45 @@ Le 13/07/2020 à 11:30, Thomas Huth a écrit :
 > On 13/07/2020 11.03, Yi Wang wrote:
 >> From: Liao Pingfang <liao.pingfang@zte.com.cn>
 >>
->> Remove superfluous break.
+>> Remove superfluous breaks, as there is a "return" before them.
 >>
 >> Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
 >> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 >> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org> 
 >> ---
->>  target/arm/kvm64.c | 1 -
->>  1 file changed, 1 deletion(-)
+>>  target/ppc/misc_helper.c | 5 -----
+>>  1 file changed, 5 deletions(-)
 >>
->> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
->> index 1169237..ef1e960 100644
->> --- a/target/arm/kvm64.c
->> +++ b/target/arm/kvm64.c
->> @@ -330,7 +330,6 @@ int kvm_arch_remove_hw_breakpoint(target_ulong addr,
->>      switch (type) {
->>      case GDB_BREAKPOINT_HW:
->>          return delete_hw_breakpoint(addr);
+>> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
+>> index 55b68d1..e43a3b4 100644
+>> --- a/target/ppc/misc_helper.c
+>> +++ b/target/ppc/misc_helper.c
+>> @@ -234,25 +234,20 @@ target_ulong helper_clcs(CPUPPCState *env, uint32_t arg)
+>>      case 0x0CUL:
+>>          /* Instruction cache line size */
+>>          return env->icache_line_size;
 >> -        break;
->>      case GDB_WATCHPOINT_READ:
->>      case GDB_WATCHPOINT_WRITE:
->>      case GDB_WATCHPOINT_ACCESS:
+>>      case 0x0DUL:
+>>          /* Data cache line size */
+>>          return env->dcache_line_size;
+>> -        break;
+>>      case 0x0EUL:
+>>          /* Minimum cache line size */
+>>          return (env->icache_line_size < env->dcache_line_size) ?
+>>              env->icache_line_size : env->dcache_line_size;
+>> -        break;
+>>      case 0x0FUL:
+>>          /* Maximum cache line size */
+>>          return (env->icache_line_size > env->dcache_line_size) ?
+>>              env->icache_line_size : env->dcache_line_size;
+>> -        break;
+>>      default:
+>>          /* Undefined */
+>>          return 0;
+>> -        break;
+>>      }
+>>  }
+>>  
 >>
 > 
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
