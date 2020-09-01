@@ -2,120 +2,92 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B25F8C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A88C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:34:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6380A206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:33:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6380A206CD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 5C04A206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:34:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OMKR/+B+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C04A206CD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD0nO-0000P3-Gi
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:33:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59836)
+	id 1kD0oa-0001TG-Id
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:34:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD0kg-0004i3-Ar; Tue, 01 Sep 2020 03:30:46 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:32789)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD0ke-0001B9-8H; Tue, 01 Sep 2020 03:30:46 -0400
-Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MkIEJ-1ksLyT0HUX-00kiTW; Tue, 01 Sep 2020 09:30:40 +0200
-Subject: Re: [PATCH-for-5.2] Revert "mailmap: Update philmd email address"
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200806135832.2319-1-philmd@redhat.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <697a8fe1-bdb6-740e-e070-2046c5ccf61e@vivier.eu>
-Date: Tue, 1 Sep 2020 09:30:39 +0200
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kD0o2-00010p-Jg
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:34:14 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55113
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kD0o0-0001ZW-EI
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:34:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598945651;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=q4lBrRuw0edec2OKkhlM07ktHbg/viv9JALf/WX+Q08=;
+ b=OMKR/+B+KOmDA9gQVcteXDCrMkyB6uB011ByiYDG/5njOfHu6H9f+FlT0N6Az2QLonfarl
+ LbKryQykm1jZ5ZyxXvgXngQEn+XIYl36EjAeV1lfRzs7c9KqvgsP5AZnvzj/G7F+ZZ1Ohz
+ YVS0hjQQ9590M+Lt4PtG2KC+/qVo3ZI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-0xtgUkFfNZGANFVQccsl-A-1; Tue, 01 Sep 2020 03:34:09 -0400
+X-MC-Unique: 0xtgUkFfNZGANFVQccsl-A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5113418BE165;
+ Tue,  1 Sep 2020 07:34:08 +0000 (UTC)
+Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B0DD078B40;
+ Tue,  1 Sep 2020 07:34:05 +0000 (UTC)
+Subject: Re: [kvm-unit-tests RFC 4/4] spe: Test Profiling Buffer Events
+To: eric.auger.pro@gmail.com, kvm@vger.kernel.org,
+ kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, drjones@redhat.com,
+ andrew.murray@arm.com, sudeep.holla@arm.com, maz@kernel.org,
+ will@kernel.org, haibo.xu@linaro.org
+References: <20200831193414.6951-1-eric.auger@redhat.com>
+ <20200831193414.6951-5-eric.auger@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <6007e55f-1b56-a420-31b2-71f87c51fb65@redhat.com>
+Date: Tue, 1 Sep 2020 09:34:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20200806135832.2319-1-philmd@redhat.com>
+In-Reply-To: <20200831193414.6951-5-eric.auger@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:L/RPMdz+S0P7sk7TyaQTSTDQGHZ1J5MoFq/wY60DbaaAoH4/LdT
- a6z3ZLTpodhF/mpCt29SXy2+gXCM/YL/NaKSVNaCE6pYYzsPX51sjTptvKAUtkyDGZgXhS8
- H18BvygqJS0rgT6+JEucu7AjOdH2qbTFLbTGrHubYJZV/ju0ck+Qi8EVKQQztK3qaNWQcuu
- 6AamTQmqvFQvpQNPnyzAQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:A35gAoQxUr4=:qvtCR+g5XjVRxV9+DIZckC
- ppZWlx3bx8km8yZB22nAwF0+cXK1mYdS57DbJuLk8OJy+rrSmdJQ4pBoi6VE529UPME+VeBg/
- TC4VKJuft3t1SY6HhuRzaQyimZ1NBnjcoWzFizM96Z0OLuqLSN0R23bBSN/cKKgeFqMqKR6Pj
- jt1FaHnkamt+aBBxrymxjm7p9zYWQFHYbYJnIF9H8Ot8tnwLoueO0LXQArW6KKwTw0exPejt4
- +och3xaQbn3lw08oCGOdS6wJrIDda5if5jtJj4S1qANhgR5hmDQx2560pcFXBN98rN21jj+BP
- hzJmL0Uz7+wRb2JthGdIm+A5L31FmULgEAJdOqv9JYa5czrXh3LhnIGM5f22A1Vy2xeL9zaeH
- M2DrgdpFHpPNTfegS0ePihD5lz+FkzAi7xv/eURTG5aQZHImgPnqL7nn5rxC1dZpAqTBU6rpH
- qyo3VCS7twOmFykm7ApjzMGA9Oe2wF+ysknahzE45hLXkKVfYevZ5BWeSHJN5tlcW1ZAilXiA
- y3lZKm98mTtOxHsy2uclBB86e1rvMJsD3BGu5MNwMBbU980LU4Iicj3CB2gFcJ6ryfcKsvSHu
- 6xN5moBNPD9Tc17MARBJjV0CA+y698SUp42ZKgMiMRBXSOdam6cMrG5QP9n/bTZeZ4ksSPyo6
- wDp7TpU6F9/vlGXXRiCl3QZDlLVjReo9xSCYYRfJ1RFMP+R4mDW6Fm1uXw9JXMzgNt2idVXzs
- kFuJp8+59giFArt3oZ/NRk+1MzsiFsqW+MSj+AUZl/T0T2l53OhkKMEIQ2RKNiWXaBr+NJiYG
- 9WoKGtkwCzYMKlF3JcroCzKpDD8UxO0Ykvd4fNLXe16/+kDHiUO8qxJyYNBSpY0vY2k4qP4
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:34:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -39
-X-Spam_score: -4.0
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:08:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,40 +100,256 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 06/08/2020 à 15:58, Philippe Mathieu-Daudé a écrit :
-> This mailmap entry does not work as I expected. I am receiving
-> emails related to my hobbyist contributions in my work mailbox
-> and I get distracted :) Remove the entry to keep things separated.
+Hi,
+
+On 8/31/20 9:34 PM, Eric Auger wrote:
+> Setup the infrastructure to check the occurence of events.
+> The test checks the Buffer Full event occurs when no space
+> is available. The PPI is handled and we check the syndrome register
+> against the expected event.
 > 
-> This reverts commit 289371239153b24cb7bd96b6948c6b40b4627a9b.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 > ---
->  .mailmap | 1 -
->  1 file changed, 1 deletion(-)
+>  arm/spe.c         | 141 +++++++++++++++++++++++++++++++++++++++++++++-
+>  arm/unittests.cfg |   8 +++
+>  2 files changed, 148 insertions(+), 1 deletion(-)
 > 
-> diff --git a/.mailmap b/.mailmap
-> index 81c2ce0937..2d97a14af3 100644
-> --- a/.mailmap
-> +++ b/.mailmap
-> @@ -54,7 +54,6 @@ Radoslaw Biernacki <rad@semihalf.com> <radoslaw.biernacki@linaro.org>
->  Paul Burton <pburton@wavecomp.com> <paul.burton@mips.com>
->  Paul Burton <pburton@wavecomp.com> <paul.burton@imgtec.com>
->  Paul Burton <pburton@wavecomp.com> <paul@archlinuxmips.org>
-> -Philippe Mathieu-Daudé <philmd@redhat.com> <f4bug@amsat.org>
->  Stefan Brankovic <stefan.brankovic@syrmia.com> <stefan.brankovic@rt-rk.com.com>
->  Yongbok Kim <yongbok.kim@mips.com> <yongbok.kim@imgtec.com>
+> diff --git a/arm/spe.c b/arm/spe.c
+> index 7996f79..2f5ee35 100644
+> --- a/arm/spe.c
+> +++ b/arm/spe.c
+> @@ -19,6 +19,7 @@
+>  #include "alloc_page.h"
+>  #include <bitops.h>
+>  #include "alloc.h"
+> +#include <asm/gic.h>
 >  
+>  struct spe {
+>  	int min_interval;
+> @@ -36,13 +37,37 @@ struct spe {
+>  	bool unique_record_size;
+>  };
+>  
+> +enum spe_event_exception_class {
+> +	EC_STAGE1_DATA_ABORT =  0x24,
+> +	EC_STAGE2_DATA_ABORT = 0x25,
+> +	EC_OTHER = 0,
+> +};
+> +
+> +struct spe_event {
+> +	enum spe_event_exception_class ec;
+> +	bool dl;	/* data lost */
+> +	bool ea;	/* external abort */
+> +	bool s;		/* service */
+> +	bool coll;	/* collision */
+> +	union {
+> +		bool buffer_filled; /* ec = other */
+> +	} mss;
+> +};
+> +
+>  static struct spe spe;
+>  
+> +struct spe_stats {
+> +	struct spe_event observed;
+> +	bool unexpected;
+> +};
+> +static struct spe_stats spe_stats;
+> +
+>  #ifdef __arm__
+>  
+>  static bool spe_probe(void) { return false; }
+>  static void test_spe_introspection(void) { }
+>  static void test_spe_buffer(void) { }
+> +static void test_spe_events(void) { }
+>  
+>  #else
+>  
+> @@ -95,6 +120,16 @@ static void test_spe_buffer(void) { }
+>  #define PMSCR_EL1_TS			0x20
+>  #define PMSCR_EL1_PCT			0x40
+>  
+> +#define PMBSR_EL1_COLL			0x10000
+> +#define PMBSR_EL1_S			0x20000
+> +#define PMBSR_EL1_EA			0x40000
+> +#define PMBSR_EL1_DL			0x80000
+> +#define PMBSR_EL1_EC_SHIFT		26
+> +#define PMBSR_EL1_EC_MASK		0x3F
+> +#define PMBSR_EL1_MISS_MASK		0xFFFF
+> +
+> +#define SPE_PPI 21
+> +
+>  static int min_interval(uint8_t idr_bits)
+>  {
+>  	switch (idr_bits) {
+> @@ -119,6 +154,44 @@ static int min_interval(uint8_t idr_bits)
+>  	}
+>  }
+>  
+> +static int decode_syndrome_register(uint64_t sr, struct spe_event *event, bool verbose)
+> +{
+> +	if (!sr)
+> +		return 0;
+> +
+> +	if (sr & PMBSR_EL1_S)
+> +		event->s = true;
+> +	if (sr & PMBSR_EL1_COLL)
+> +		event->coll = true;
+> +	if (sr & PMBSR_EL1_EA)
+> +		event->ea = true;
+> +	if (sr & PMBSR_EL1_DL)
+> +		event->dl = true;
+> +	if (verbose)
+> +		report_info("PMBSR_EL1: Service=%d Collision=%d External Fault=%d DataLost=%d",
+> +			    event->s, event->coll, event->ea, event->dl);
+> +
+> +	switch ((sr >> PMBSR_EL1_EC_SHIFT) & PMBSR_EL1_EC_MASK) {
+> +	case EC_OTHER:
+> +		event->ec = EC_OTHER;
+> +		event->mss.buffer_filled = sr & 0x1;
+> +		if (verbose)
+> +			report_info("PMBSR_EL1: EC = OTHER buffer filled=%d", event->mss.buffer_filled);
+> +		break;
+> +	case EC_STAGE1_DATA_ABORT:
+> +		event->ec = EC_STAGE1_DATA_ABORT;
+> +		report_info("PMBSR_EL1: EC = stage 1 data abort");
+> +		break;
+> +	case EC_STAGE2_DATA_ABORT:
+> +		event->ec = EC_STAGE2_DATA_ABORT;
+> +		report_info("PMBSR_EL1: EC = stage 2 data abort");
+> +		break;
+> +	default:
+> +		return -1;
+> +	}
+> +	return 0;
+> +}
+> +
+>  static bool spe_probe(void)
+>  {
+>  	uint64_t pmbidr_el1, pmsidr_el1;
+> @@ -224,6 +297,13 @@ static void reset(void)
+>  
+>  	/* Make sure the syndrome register is void */
+>  	write_sysreg_s(0, PMBSR_EL1);
+> +
+> +	memset(&spe_stats, 0, sizeof(spe_stats));
+> +}
+> +
+> +inline bool event_match(struct spe_event *observed, struct spe_event *expected)
+> +{
+> +	return !memcmp(observed, expected, sizeof(struct spe_event));
+>  }
+>  
+>  static inline void drain(void)
+> @@ -235,6 +315,7 @@ static inline void drain(void)
+>  
+>  static void test_spe_buffer(void)
+>  {
+> +	struct spe_event observed = {}, expected = {};
+>  	uint64_t pmbsr_el1, val1, val2;
+>  	void *addr = malloc(10 * PAGE_SIZE);
+>  
+> @@ -290,7 +371,61 @@ static void test_spe_buffer(void)
+>  		report_info("This corresponds to %ld record(s) of %d bytes",
+>  			    val2 / spe.maxsize, spe.maxsize);
+>  	pmbsr_el1 = read_sysreg_s(PMBSR_EL1);
+> -	report(!pmbsr_el1, "PMBSR_EL1: no event");
+> +	report(!(decode_syndrome_register(pmbsr_el1, &observed, true)) &&
+> +	       event_match(&observed, &expected), "PMBSR_EL1: no event");
+> +
+> +	free(addr);
+> +}
+> +
+> +static void irq_handler(struct pt_regs *regs)
+> +{
+> +	uint32_t irqstat, irqnr;
+> +
+> +	irqstat = gic_read_iar();
+> +	irqnr = gic_iar_irqnr(irqstat);
+> +
+> +	if (irqnr == SPE_PPI) {
+> +		uint64_t pmbsr_el1 = read_sysreg_s(PMBSR_EL1);
+> +
+> +		if (decode_syndrome_register(pmbsr_el1, &spe_stats.observed, true))
+> +			spe_stats.unexpected = true;
+> +		report_info("SPE IRQ! SR=0x%lx", pmbsr_el1);
+> +		write_sysreg_s(0, PMBSR_EL1);
+> +	} else {
+> +		spe_stats.unexpected = true;
+> +	}
+> +	gic_write_eoir(irqstat);
+> +}
+> +
+> +static inline bool has_event_occurred(struct spe_event *expected)
+> +{
+> +	return (!spe_stats.unexpected && event_match(&spe_stats.observed, expected));
+> +}
+> +
+> +static void test_spe_events(void)
+> +{
+> +	struct spe_event expected = {.ec = EC_OTHER, .mss.buffer_filled = true, .s = true};
+> +	void *addr = malloc(10 * PAGE_SIZE);
+> +
+> +	gic_enable_defaults();
+> +	install_irq_handler(EL1H_IRQ, irq_handler);
+> +	local_irq_enable();
+> +	gic_enable_irq(SPE_PPI);
+> +
+> +	reset();
+> +
+> +	/* Willingly set pmblimitr tp pmdptr */
+> +	spe.pmblimitr_el1 = spe.pmbptr_el1;
+> +
+> +	mem_access_loop(addr, 100000, spe.pmblimitr_el1 | PMBLIMITR_EL1_E);
+> +	drain();
+> +	report(has_event_occurred(&expected), "PMBSR_EL1: buffer full event");
+> +
+> +	/* redo it once */
+I noticed I must reset the stats here. I will fix that in next version.
+
+Thanks
+
+Eric
+> +
+> +	mem_access_loop(addr, 100000, spe.pmblimitr_el1 | PMBLIMITR_EL1_E);
+> +	drain();
+> +	report(has_event_occurred(&expected), "PMBSR_EL1: buffer full event");
+>  
+>  	free(addr);
+>  }
+> @@ -317,6 +452,10 @@ int main(int argc, char *argv[])
+>  		report_prefix_push(argv[1]);
+>  		test_spe_buffer();
+>  		report_prefix_pop();
+> +	} else if (strcmp(argv[1], "spe-events") == 0) {
+> +		report_prefix_push(argv[1]);
+> +		test_spe_events();
+> +		report_prefix_pop();
+>  	} else {
+>  		report_abort("Unknown sub-test '%s'", argv[1]);
+>  	}
+> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
+> index bb0e84c..b2b07be 100644
+> --- a/arm/unittests.cfg
+> +++ b/arm/unittests.cfg
+> @@ -150,6 +150,14 @@ extra_params = -append 'spe-buffer'
+>  accel = kvm
+>  arch = arm64
+>  
+> +[spe-events]
+> +file = spe.flat
+> +groups = spe
+> +arch = arm64
+> +extra_params = -append 'spe-events'
+> +accel = kvm
+> +arch = arm64
+> +
+>  # Test GIC emulation
+>  [gicv2-ipi]
+>  file = gic.flat
 > 
-
-Applied to my trivial-patches branch.
-
-Thanks,
-Laurent
 
 
