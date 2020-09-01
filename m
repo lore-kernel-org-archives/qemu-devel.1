@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 267E4C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A60C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:23:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E23072071B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B29CF2071B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:23:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MvMm+F0g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E23072071B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cojidpyD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B29CF2071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCzh2-0002Vc-2B
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:22:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44368)
+	id 1kCzh5-0002fm-TB
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:22:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kCzef-00062H-Oc
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 02:20:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27665)
+ id 1kCzeh-00065f-Ja
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 02:20:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44534)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kCzed-0000me-PV
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 02:20:29 -0400
+ id 1kCzef-0000o0-R5
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 02:20:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598941226;
+ s=mimecast20190719; t=1598941229;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VFTSKgbtfOAZ0MhoeAhMnWBNPjjt3/Q0xsLFhvDTcA8=;
- b=MvMm+F0g+V96wFaazpJgyNSRryIhzy0D0nqHbjyOtFGzP4bCK5l+t99SoIVBfqRb45UMPt
- asxecdxloS9+e5aFFnLSNEI06ly5bmEuHs3Nfgfxy/QDKEieJcENpSflzAYGab2TruGC+6
- Hkz+8kQ5Je/o4sa4RjXnTB8pC7AM6gw=
+ bh=pI5Jy3OYPqm2Gv6FAxa1jk28yZeAxya6itFzgt9QAso=;
+ b=cojidpyDBx+TD1iudd6Oc7PSEeSy9EgUcwsfwQmczPFPLrroaFFGSHkHbpZ7wunrUVKjXF
+ 0WxWhLV7703k38l+lsJ5HZFbUColJo/FwzJktpFovEn32+wJpALGMhZ0zHOY6t5csTeoSD
+ QjpOcy8JgQjV/VGKqsLt9RxjoMwndng=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-ftj5EehnPvqSuh8ElIiUSA-1; Tue, 01 Sep 2020 02:20:23 -0400
-X-MC-Unique: ftj5EehnPvqSuh8ElIiUSA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-140-HHOh4Mu1PU6GAwaVRrF4sg-1; Tue, 01 Sep 2020 02:20:27 -0400
+X-MC-Unique: HHOh4Mu1PU6GAwaVRrF4sg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B9FD801AC5;
- Tue,  1 Sep 2020 06:20:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1BC071888A1F;
+ Tue,  1 Sep 2020 06:20:26 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 184401002D4E;
- Tue,  1 Sep 2020 06:20:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CD29B78B46;
+ Tue,  1 Sep 2020 06:20:25 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/13] oslib-posix: default exec_dir to bindir
-Date: Tue,  1 Sep 2020 02:20:10 -0400
-Message-Id: <20200901062020.26660-4-pbonzini@redhat.com>
+Subject: [PATCH 12/13] ui: relocate paths to icons and translations
+Date: Tue,  1 Sep 2020 02:20:19 -0400
+Message-Id: <20200901062020.26660-13-pbonzini@redhat.com>
 In-Reply-To: <20200901062020.26660-1-pbonzini@redhat.com>
 References: <20200901062020.26660-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 01:27:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -101,93 +101,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the exec_dir cannot be retrieved, just assume it's the installation
-directory that was specified at configure time.  This makes it simpler
-to reason about what the callers will do if they get back an empty
-path.
-
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build        |  2 +-
- util/oslib-posix.c | 23 ++++++++---------------
- util/oslib-win32.c |  2 ++
- 3 files changed, 11 insertions(+), 16 deletions(-)
+ ui/gtk.c  | 10 ++++++++--
+ ui/sdl2.c |  9 +++++++--
+ 2 files changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/meson.build b/meson.build
-index 93182d36e3..10ab189bc5 100644
---- a/meson.build
-+++ b/meson.build
-@@ -415,7 +415,7 @@ config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1]
- config_host_data.set('QEMU_VERSION_MICRO', meson.project_version().split('.')[2])
+diff --git a/ui/gtk.c b/ui/gtk.c
+index b0cc08ad6d..597f829ad9 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -51,6 +51,7 @@
+ #include <math.h>
  
- arrays = ['CONFIG_AUDIO_DRIVERS', 'CONFIG_BDRV_RW_WHITELIST', 'CONFIG_BDRV_RO_WHITELIST']
--strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'qemu_confdir', 'qemu_datadir',
-+strings = ['HOST_DSOSUF', 'CONFIG_IASL', 'bindir', 'qemu_confdir', 'qemu_datadir',
-            'qemu_moddir', 'qemu_localstatedir', 'qemu_helperdir', 'qemu_localedir',
-            'qemu_icondir', 'qemu_desktopdir', 'qemu_firmwarepath']
- foreach k, v: config_host
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 0dd8d24076..a68fccb52d 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -358,15 +358,14 @@ void qemu_set_tty_echo(int fd, bool echo)
-     tcsetattr(fd, TCSANOW, &tty);
- }
+ #include "trace.h"
++#include "qemu/cutils.h"
+ #include "ui/input.h"
+ #include "sysemu/runstate.h"
+ #include "sysemu/sysemu.h"
+@@ -2200,6 +2201,7 @@ static void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
+     GtkDisplayState *s = g_malloc0(sizeof(*s));
+     GdkDisplay *window_display;
+     GtkIconTheme *theme;
++    char *dir;
  
--static char exec_dir[PATH_MAX];
-+static char *exec_dir;
+     if (!gtkinit) {
+         fprintf(stderr, "gtk initialization failed\n");
+@@ -2209,7 +2211,9 @@ static void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
+     s->opts = opts;
  
- void qemu_init_exec_dir(const char *argv0)
- {
--    char *dir;
-     char *p = NULL;
-     char buf[PATH_MAX];
+     theme = gtk_icon_theme_get_default();
+-    gtk_icon_theme_prepend_search_path(theme, CONFIG_QEMU_ICONDIR);
++    dir = get_relocated_path(CONFIG_QEMU_ICONDIR);
++    gtk_icon_theme_prepend_search_path(theme, dir);
++    g_free(dir);
+     g_set_prgname("qemu");
  
--    if (exec_dir[0]) {
-+    if (exec_dir) {
-         return;
+     s->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+@@ -2225,7 +2229,9 @@ static void gtk_display_init(DisplayState *ds, DisplayOptions *opts)
+      * sure that we don't accidentally break implicit assumptions.  */
+     setlocale(LC_MESSAGES, "");
+     setlocale(LC_CTYPE, "C.UTF-8");
+-    bindtextdomain("qemu", CONFIG_QEMU_LOCALEDIR);
++    dir = get_relocated_path(CONFIG_QEMU_LOCALEDIR);
++    bindtextdomain("qemu", dir);
++    g_free(dir);
+     bind_textdomain_codeset("qemu", "UTF-8");
+     textdomain("qemu");
+ 
+diff --git a/ui/sdl2.c b/ui/sdl2.c
+index b23a8f0a8e..abad7f981e 100644
+--- a/ui/sdl2.c
++++ b/ui/sdl2.c
+@@ -25,6 +25,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "qemu/module.h"
++#include "qemu/cutils.h"
+ #include "ui/console.h"
+ #include "ui/input.h"
+ #include "ui/sdl2.h"
+@@ -795,6 +796,7 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
+     int i;
+     SDL_SysWMinfo info;
+     SDL_Surface *icon = NULL;
++    char *dir;
+ 
+     assert(o->type == DISPLAY_TYPE_SDL);
+ 
+@@ -868,15 +870,18 @@ static void sdl2_display_init(DisplayState *ds, DisplayOptions *o)
      }
  
-@@ -425,20 +424,14 @@ void qemu_init_exec_dir(const char *argv0)
+ #ifdef CONFIG_SDL_IMAGE
+-    icon = IMG_Load(CONFIG_QEMU_ICONDIR "/hicolor/128x128/apps/qemu.png");
++    dir = get_relocated_path(CONFIG_QEMU_ICONDIR "/hicolor/128x128/apps/qemu.png");
++    icon = IMG_Load(dir);
+ #else
+     /* Load a 32x32x4 image. White pixels are transparent. */
+-    icon = SDL_LoadBMP(CONFIG_QEMU_ICONDIR "/hicolor/32x32/apps/qemu.bmp");
++    dir = get_relocated_path(CONFIG_QEMU_ICONDIR "/hicolor/32x32/apps/qemu.bmp");
++    icon = SDL_LoadBMP(dir);
+     if (icon) {
+         uint32_t colorkey = SDL_MapRGB(icon->format, 255, 255, 255);
+         SDL_SetColorKey(icon, SDL_TRUE, colorkey);
+     }
  #endif
-     /* If we don't have any way of figuring out the actual executable
-        location then try argv[0].  */
--    if (!p) {
--        if (!argv0) {
--            return;
--        }
-+    if (!p && argv0) {
-         p = realpath(argv0, buf);
--        if (!p) {
--            return;
--        }
++    g_free(dir);
+     if (icon) {
+         SDL_SetWindowIcon(sdl2_console[0].real_window, icon);
      }
--    dir = g_path_get_dirname(p);
--
--    pstrcpy(exec_dir, sizeof(exec_dir), dir);
--
--    g_free(dir);
-+    if (p) {
-+        exec_dir = g_path_get_dirname(p);
-+    } else {
-+        exec_dir = g_strdup(CONFIG_BINDIR);
-+    }
- }
- 
- const char *qemu_get_exec_dir(void)
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index 1a33912944..8d3f940a54 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -341,6 +341,8 @@ void qemu_init_exec_dir(const char *argv0)
-     *p = 0;
-     if (access(buf, R_OK) == 0) {
-         exec_dir = g_strdup(buf);
-+    } else {
-+        exec_dir = g_strdup(CONFIG_BINDIR);
-     }
- }
- 
 -- 
 2.26.2
 
