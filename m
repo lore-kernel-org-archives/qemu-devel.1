@@ -2,88 +2,89 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F44C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 21:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7426DC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 21:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2ED5F2078B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 21:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 17A392078B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 21:42:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P2HKW8PR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2ED5F2078B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kEQIEcWz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17A392078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDE13-0002B1-72
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 17:40:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58706)
+	id 1kDE3N-0003L1-3B
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 17:42:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59156)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDE05-0001k8-9R
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 17:39:33 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:43492)
+ id 1kDE2b-0002se-KA
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 17:42:09 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:44470)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDE03-0004WE-RO
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 17:39:33 -0400
-Received: by mail-io1-xd41.google.com with SMTP id z25so3440589iol.10
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 14:39:31 -0700 (PDT)
+ id 1kDE2Z-0004pY-Ry
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 17:42:09 -0400
+Received: by mail-pl1-x642.google.com with SMTP id q3so1210337pls.11
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 14:42:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=thchTl/dd/9GY5+hh4UQGpflHmmZzbqg0JnbKF+1rts=;
- b=P2HKW8PRHUJ6TyG3qlfv4WYoY7MCKxd+9u1rtHuV9f5nZXvvzPz1bgRWhjtFFLgmGW
- 8ACm0Jn00uTKnN/1Lq22Ch6+EIXMzOLsE9B+pVBoDAYAsAeYkrE0hEIqpv6pF9oeNO37
- 6IWvIMMHodRl88FesRWKSb5lSEmnhR2P+pAR3sm7IIkJ1djSBV4vNUFw+1ViAITWKAEp
- mM+RIhFoKNuEJb0Gn5S/9H8qAXAnH7Wj4qv8k6zTnKYyxrKsujx05s/KNjTeXPkMl2VN
- gp6RYIxubFZ9gUIPUGkmakgLhjHSyXRKIXznkva3O8rb2a9qH3K+bV9W67afNBrCKNRt
- 4xRQ==
+ bh=Kdnyboq6+SFRa3OdB4biI2dSTCS2b7JwjUN9K9hwkdQ=;
+ b=kEQIEcWzbyya45VEFxaoOQjBMPBjQPacVwx8kt6JVQd2TeJe31KwTZjCPDNaLY9uzb
+ TMPMmuIfsqtoCRAEqujv1nrqXxLc2TrrkkT6W5bpkJn55cJiEhcErsmPZXGazrqPBfzv
+ GX2KMSapP/RtU2hXCVVGbVNu7RTg7/cIDefgDNC6PqaoS2GdjWujVPc7G2Yx+/xzUZ3l
+ GuvhgNHIlWwJC9xR7ErtmrTgYfkzMLDTtjcY5dXg6L9tGYMb/nd4ashNKR6+J+DrtQkA
+ h0VsdDrzgG1uVqAGPaqpjbfLpE/SlQHyor9pIEmoi8V1LB1tbQOdb93EZ7mZ0qGrVK3u
+ Kv3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=thchTl/dd/9GY5+hh4UQGpflHmmZzbqg0JnbKF+1rts=;
- b=QN6iUyji5dr2POb0JtQm2ik7bgmDw6Cyu9ABlwhhntOhNLak8sUkAVUNUNLUGtqATQ
- SEYx1eOTVoW/OGnpSHdIO7TkXMvy7HW+Ml6RrmMzJN2Zji4vXvS9xgbfvegzq9wqVSDE
- /dBXUk3/7IqCswM60Lzlj1aUaX3yOXeOrt6SMD10P5d6+o7l6Ipy4KwBxSqq3DVj7SCe
- KW6CfZjh+kVr08cw8aox9kKhbPL3aax2yPwpboGIDPWJaps7ALFA9L21NqJlZkt2b4HM
- dPKmmmyxwXY+m8Sn4n8KV9vCPxlA7rrpkFt/RawdDtjxylWBxcxktlVjVlnokgUAOoCo
- 7qPA==
-X-Gm-Message-State: AOAM5328MsznLEYa05jiGG4/KXmHa7A9EQJa0UlVeu6niQVQty8/sYo6
- FUZ5nKFG/g21z6qgsiHryOqYQA==
-X-Google-Smtp-Source: ABdhPJxp9PbKudIjamnXL1oqIvlqWdohDhpKvJlT9bTBx+bFdl8mi2zfKvkOYTyBspF9SlVjBLfxhw==
-X-Received: by 2002:a5e:9247:: with SMTP id z7mr902767iop.71.1598996370532;
- Tue, 01 Sep 2020 14:39:30 -0700 (PDT)
+ bh=Kdnyboq6+SFRa3OdB4biI2dSTCS2b7JwjUN9K9hwkdQ=;
+ b=qhvmJBoV84MuwA+BL0BjI9NiIMcIF321hafuiJ3UBicrKrkQhb6Ks+rC56ug/PG1P4
+ flXZzesbcSObUnPgNQTxVksXpfH5u1VEFh92TTYZVzdKJsUp0xM1f7FEPVN8QDjfH4Qb
+ FbZcTgReceoTsnZSGWeFGvEjqb3VA2n9Om9W6s4p3gO6CjBo08nvQ99D+D3U8iOcFMxF
+ 1TnMJHYJx4qwrVETNZYofMaR7j+hiFEnszDvfTRregLc2lhaBZFSC8pkpk+G0A6cyyho
+ sG1t/VV0Ddj+KdEbcmGoffwtNrguhhHBgxk3fw32Q27VHJrCw0CLW5wduwicgF4Vsp5M
+ PB+g==
+X-Gm-Message-State: AOAM532twrC2t+a6jzYJibFN2ghH1kjR1Jc6f3X0iqMvxDmkbReB48Fq
+ EkdN9sblRl8+pwX5qyPezRhF1Q==
+X-Google-Smtp-Source: ABdhPJyY4RRZ0EKy0bAMnwAjNfFuliPjsxhwV2PdQmyrKKA/iAEOhdYtRVE7Zat9nLxNNe9GGkJApQ==
+X-Received: by 2002:a17:90b:4b89:: with SMTP id
+ lr9mr3641530pjb.190.1598996525975; 
+ Tue, 01 Sep 2020 14:42:05 -0700 (PDT)
 Received: from ?IPv6:2607:fb90:27d2:4b79:8545:2b44:3b48:7db9?
  ([2607:fb90:27d2:4b79:8545:2b44:3b48:7db9])
- by smtp.gmail.com with ESMTPSA id o8sm1248191ilb.64.2020.09.01.14.39.29
+ by smtp.gmail.com with ESMTPSA id u14sm2988819pfm.103.2020.09.01.14.42.04
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Sep 2020 14:39:29 -0700 (PDT)
-Subject: Re: [PATCH 4/7] hw/hppa: Inform SeaBIOS about fw_cfg port address
+ Tue, 01 Sep 2020 14:42:05 -0700 (PDT)
+Subject: Re: [PATCH 5/7] hw/hppa: Add power button emulation
 To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
 References: <20200901183452.24967-1-deller@gmx.de>
- <20200901183452.24967-5-deller@gmx.de>
+ <20200901183452.24967-6-deller@gmx.de>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <6385bd44-9cf8-95c3-1e59-0e1fb209863f@linaro.org>
-Date: Tue, 1 Sep 2020 14:39:26 -0700
+Message-ID: <96245595-b16c-5ed3-8f46-4883b60c0120@linaro.org>
+Date: Tue, 1 Sep 2020 14:42:01 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200901183452.24967-5-deller@gmx.de>
+In-Reply-To: <20200901183452.24967-6-deller@gmx.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=richard.henderson@linaro.org; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -41
@@ -111,11 +112,15 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/1/20 11:34 AM, Helge Deller wrote:
-> -/* QEMU fw_cfg interface port */
-> -#define QEMU_FW_CFG_IO_BASE     (MEMORY_HPA + 0x80)
-> +#define FW_CFG_IO_BASE  0xfffa0000
+> Emulate a power button switch, tell SeaBIOS the address via fw_cfg and
+> bind the power button to the qemu UI.
+> 
+> Signed-off-by: Helge Deller <deller@gmx.de>
+> ---
+>  hw/hppa/machine.c | 32 ++++++++++++++++++++++++++++++++
+>  1 file changed, 32 insertions(+)
 
-Why is this value changing?
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
 
 r~
