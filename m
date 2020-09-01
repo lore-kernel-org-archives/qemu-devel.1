@@ -2,92 +2,119 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ED9BC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8836C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:28:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58964206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:26:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="cFky8VPm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58964206A5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	by mail.kernel.org (Postfix) with ESMTPS id 96D0B20866
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:28:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D0B20866
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD2Z0-0002s8-D7
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:26:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34684)
+	id 1kD2ac-0004XY-Qo
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:28:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1kD2Nv-0002KD-VG; Tue, 01 Sep 2020 05:15:23 -0400
-Received: from mout.web.de ([212.227.17.11]:34845)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kD2a1-0003u4-49; Tue, 01 Sep 2020 05:27:53 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:56433)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1kD2Nt-0007GL-QA; Tue, 01 Sep 2020 05:15:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1598951716;
- bh=75ECl9bX1EGfY3DMAQC4Qu0/MXJlbsQoukpW/VUFgz0=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=cFky8VPmbrQ8rP24faNszi5Cl8Cm+wVI4qeFo2+oGYAl44kPRV4s1dFz/6h7DP1E0
- 7V6yFABMXzs/guyScrmccArwAqWnTKDJR3EAv6/zPauSqenSI7RzsYQklMeNJ7ZNEy
- of30ThqB5lg6BcS0tMZimXuc/QanyVXPbSF5d6pc=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.220]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0LdEsP-1kvTs50xiD-00iVuK; Tue, 01
- Sep 2020 11:15:16 +0200
-Date: Tue, 1 Sep 2020 11:15:14 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v8 3/8] chardev/char-socket.c: Add yank feature
-Message-ID: <cb2de974afd99baa8646261c87f66bc663e8c36d.1598951375.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1598951375.git.lukasstraub2@web.de>
-References: <cover.1598951375.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kD2Zz-0000Ot-Ay; Tue, 01 Sep 2020 05:27:52 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N6bsG-1keDgR14jG-0182Jm; Tue, 01 Sep 2020 11:27:33 +0200
+Subject: Re: [PATCH 0/7] block: Use definitions instead of magic values
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200814082841.27000-1-f4bug@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <e232bf0a-1362-a90d-31ff-95d90ad7ebc8@vivier.eu>
+Date: Tue, 1 Sep 2020 11:27:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/mF_.EjoPRGRfufbh6DGgakM";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:SWIqchQkfqMgjfjcTWWMUeWHuAzyddrcMgMwuAikZRMKfM8goQl
- TiZEgK+99+WZPdd3SyxB2oOnPx8SWmTnHYlCcOBJVqshjeYe1ixUKvAOQc+xT/a1/TFZd1P
- n9ZoCO3YZLYBELXoycswjVNdX3ofMd1dHAYrN7NWspY8fGnrjCI9IEMqFkMK7vizhx7GdAQ
- zM8UY5XjREK7qDqf/wCAQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QqNDNFckpWY=:2LApKKugsQJyw5mCnBAjuz
- 0yVlQS5KiJmdNtRShoWBgy4vyxGwX2vVrLT4IWrINVonl1uHpvWfN6NxQEffxaB0hOkEaDgrd
- yNGRvKsaZrnwmAH2zMwOq4vCnVl/eP7W8gUDQFR2I5OTuT6HNErAh8szrwWyaVy/eGBHjNt/x
- yi3BCmy2MfUO05yOon9xMtTqpEepsc/iodJRkaHKx1dD3fGc0pnp1P5ehSS0RgMpOdCn1Rdle
- DFl0KNq15fPd/gTz1qIQgfDqvLJpvLVPoYjrp4YAMLBUC59xjEd5A++i4Mm21q5m4KxCobjQl
- qTYaU8TAHMwbkIOglRNk+Xahos8FCHwZ2eCFmaFifPyqj/ey2+QtKdqWDYNGmP3DqoNSWFIh0
- 9A6B9a9G0/sEYrArGE8gw/qnkUCjFlV0x7/U1hxNJYrp+C7Qm/BsIO1t1rCs2n1f0N8W5i+8Y
- ZpBOIN+K7hBU+V9utdn7NFiLcoZKXXh6fdsro0m6KqeyQK+0vUv1w1pulLnOxum7jQiD1NRJc
- AIE5c1PGklAFUA0bw87zLP0AVpjndgb4AxTyD59c7BBxccTUyu05vDD1V5xFSo0UweaFulGUk
- zDDll/gzerTHhokuqRvqstrxA/WFKm0rRL/T/jpWlo0vvCKsX831MQ5F6I9tNKgsA0Myri1c0
- tBS2SHtACIqrugf9UmxH0e1c1RvYu4aNsWHr1fynDGZVtLWKtaM0t6MWmbLVo8fpocye9o+sm
- 2qO2mr94uOV/osVNd/YgGWZTjmFW7lUIyeIsq2kmh4q6J3psL1GEM7GzOYqwY2KVPyTJBzNWC
- IA88/rUBLr4sjboK4sHcFrPdVuBP+ZJDk9rNNoD9I4nQs1sgu9dwKf8yPmv3zeh/wuGI72K5q
- 7KCPY0MieiDDWjB9FR7nnKmvxEPNwrUpgMJgZbMGpHEakmtArxuWlNoK/6f4dAWfYVldJqDfR
- jLeK8WIIVee1wMCIZ9J0n6613eDtDCkfykSj0NltwLZ0jKoUzXloqVB823UJ9KHjP+/sBP4SI
- wZUbG3TSl8SbM+LKj0fzQ2vEAlvbLmIbalwd/5E8Rt3CNRpKil0NQNBLCiLtc4Ait+fqt503S
- PxK/0NbMPvGEl04VWve1VuA0KEJruIebvLk39ZwFsNDFPb9KoqZfs9UifpP/ooaDDLbsiLbsr
- sA9GayjMVaV5r+QMbGWbXYXl3ACuuY8YnbhwyzHrlnGrpY+iPeEgSL/S4H5YdMhQywJAxGdz/
- osxJJIeXciYIgBqVXvllrX1/HR85GWC5rB/SGiA==
-Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:15:16
+In-Reply-To: <20200814082841.27000-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:uBjerWWhZWgGSVDS4OhqFnDa+CGQa4pZJbTOVEXjGapqa03volP
+ veRTr3xOr+b2qTLJepGU1NLsBIqwQGa6GmTgGABJGM5a2O8WlxDEcxP1a0A2kCro4dueScz
+ Cr5bioNZQg9c9iqzZRueD10D84A1NQ1MFJVgrUtdoG2Em42E1l+LeD80+uxeKOOAJJRQsdv
+ PW0I0TGYY9O8PCFreLjrw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:MsSHszpiIHc=:45yR1aVIv+HZw7jes9WAjm
+ n69LVdaSDoPwd3n9TevVTlKfakmswRtn6OTiy9jtl51CajEX+lPJpp7FQDlMUGiJs3WASV9i5
+ gIwmJk5l8hURZuNsRtTiclsLi9b+q4ZCx4YQBB/FpBeWQbRdXGWuI7xN67kgu1BepagMKeYVH
+ 8IU2TZ69iPH9HZ2MDLmxQmJLrGnVJ7tzRHy5eE5Nhqv8Z+Qn3/nH4vWI72uqXa+ch3RG4R+De
+ f4T4LaXem1kg+u7EaA1hwUvOrp/eTDmZchAqVI88LLv+Mi7mRezQNdswe6C2yxEKGvx3R5xjY
+ AeZNyJq2d8qk9NXv7bswmF7U84uwKYtowqTWF4UlvaDW3UUI/QqF41OliDaCX8yY3u/Azlx8r
+ JKBNezS2RwaaYqTq8D/KENaz5m37aTdbdyQMjMVYeW7YyKLN6zIAimx7f4CX73iMFIaPGlpoj
+ ksjHQ3uh5epOJZM3kVYO8Sox5wB/zydDdOf5hJYTh9Y9QM9xKMCYAR1918QwPoyUil/Am2+u/
+ MZCrnXLYP0Bf1zGiGTAPUuT/Nm2CTqsWmuciIAKve2OncvOjl7WyakcQCtSmAPqy8CbG/52U7
+ 5BriGerzYKOujBFXgSq+ohewp8Wo1O2AUJaLk8Df6y+bk9K/g2RcAhvr3cG9FQrm+nJHTDXIw
+ 4njtU1KWwzLsUrLBhEWZriVhOJ0Sa+NdssF8IGp/sywIsgZV5DiH6otOfMJ3py94XKaXTMFbs
+ xaDW58ISmA5Kvd+sOIV/WUHuqigiHPbMGJMBtIIUHFDfiP9h+2WA+BemMzuvZ4qsxuUxbkoir
+ 26TAVSKs/7ln7Hmmc/BM2XBaRVcd59zzG0ZL2LpfmqiSuCyjcrnEKRwwJlMVJaZfmF/AAwG
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:13:18
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
-X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,168 +127,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/mF_.EjoPRGRfufbh6DGgakM
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Le 14/08/2020 à 10:28, Philippe Mathieu-Daudé a écrit :
+> Trivial block patches:
+> - Fix a typo
+> - Replace '1 << 30' by '1 * GiB' in null-co
+> - Replace 512 by BDRV_SECTOR_SIZE when appropriate.
+> 
+> Philippe Mathieu-Daudé (7):
+>   block/null: Make more explicit the driver default size is 1GiB
+>   hw/ide/core: Trivial typo fix
+>   hw/ide/core: Replace magic '512' value by BDRV_SECTOR_SIZE
+>   hw/ide/ahci: Replace magic '512' value by BDRV_SECTOR_SIZE
+>   hw/ide/atapi: Replace magic '512' value by BDRV_SECTOR_SIZE
+>   hw/ide/pci: Replace magic '512' value by BDRV_SECTOR_SIZE
+>   hw/scsi/scsi-disk: Replace magic '512' value by BDRV_SECTOR_SIZE
+> 
+>  block/null.c        |  4 +++-
+>  hw/ide/ahci.c       |  5 +++--
+>  hw/ide/atapi.c      |  8 ++++----
+>  hw/ide/core.c       | 25 +++++++++++++------------
+>  hw/ide/pci.c        |  2 +-
+>  hw/scsi/scsi-disk.c | 44 +++++++++++++++++++++++---------------------
+>  6 files changed, 47 insertions(+), 41 deletions(-)
+> 
 
-Register a yank function to shutdown the socket on yank.
+Applied to my trivial-patches branch.
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
----
- chardev/char-socket.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+Except the following ones that have comment from Kevin:
 
-diff --git a/chardev/char-socket.c b/chardev/char-socket.c
-index ef62dbf3d7..8e2865ca83 100644
---- a/chardev/char-socket.c
-+++ b/chardev/char-socket.c
-@@ -34,6 +34,7 @@
- #include "qapi/error.h"
- #include "qapi/clone-visitor.h"
- #include "qapi/qapi-visit-sockets.h"
-+#include "qemu/yank.h"
+[PATCH 1/7] block/null: Make more explicit the driver default size is 1GiB
+[PATCH 3/7] hw/ide/core: Replace magic '512' value by BDRV_SECTOR_SIZE
 
- #include "chardev/char-io.h"
-
-@@ -69,6 +70,7 @@ typedef struct {
-     size_t read_msgfds_num;
-     int *write_msgfds;
-     size_t write_msgfds_num;
-+    char *yank_name;
-
-     SocketAddress *addr;
-     bool is_listen;
-@@ -413,6 +415,11 @@ static void tcp_chr_free_connection(Chardev *chr)
-
-     tcp_set_msgfds(chr, NULL, 0);
-     remove_fd_in_watch(chr);
-+    if (s->state =3D=3D TCP_CHARDEV_STATE_CONNECTING
-+        || s->state =3D=3D TCP_CHARDEV_STATE_CONNECTED) {
-+        yank_unregister_function(s->yank_name, yank_generic_iochannel,
-+                                 QIO_CHANNEL(s->sioc));
-+    }
-     object_unref(OBJECT(s->sioc));
-     s->sioc =3D NULL;
-     object_unref(OBJECT(s->ioc));
-@@ -916,6 +923,8 @@ static int tcp_chr_add_client(Chardev *chr, int fd)
-     }
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     ret =3D tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
-     return ret;
-@@ -930,6 +939,8 @@ static void tcp_chr_accept(QIONetListener *listener,
-
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     tcp_chr_set_client_ioc_name(chr, cioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(cioc));
-     tcp_chr_new_client(chr, cioc);
- }
-
-@@ -945,6 +956,8 @@ static int tcp_chr_connect_client_sync(Chardev *chr, Er=
-ror **errp)
-         object_unref(OBJECT(sioc));
-         return -1;
-     }
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
-     return 0;
-@@ -960,6 +973,8 @@ static void tcp_chr_accept_server_sync(Chardev *chr)
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     sioc =3D qio_net_listener_wait_client(s->listener);
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     tcp_chr_new_client(chr, sioc);
-     object_unref(OBJECT(sioc));
- }
-@@ -1070,6 +1085,10 @@ static void char_socket_finalize(Object *obj)
-         object_unref(OBJECT(s->tls_creds));
-     }
-     g_free(s->tls_authz);
-+    if (s->yank_name) {
-+        yank_unregister_instance(s->yank_name);
-+        g_free(s->yank_name);
-+    }
-
-     qemu_chr_be_event(chr, CHR_EVENT_CLOSED);
- }
-@@ -1085,6 +1104,8 @@ static void qemu_chr_socket_connected(QIOTask *task, =
-void *opaque)
-
-     if (qio_task_propagate_error(task, &err)) {
-         tcp_chr_change_state(s, TCP_CHARDEV_STATE_DISCONNECTED);
-+        yank_unregister_function(s->yank_name, yank_generic_iochannel,
-+                                 QIO_CHANNEL(sioc));
-         check_report_connect_error(chr, err);
-         goto cleanup;
-     }
-@@ -1118,6 +1139,8 @@ static void tcp_chr_connect_client_async(Chardev *chr)
-     tcp_chr_change_state(s, TCP_CHARDEV_STATE_CONNECTING);
-     sioc =3D qio_channel_socket_new();
-     tcp_chr_set_client_ioc_name(chr, sioc);
-+    yank_register_function(s->yank_name, yank_generic_iochannel,
-+                           QIO_CHANNEL(sioc));
-     /*
-      * Normally code would use the qio_channel_socket_connect_async
-      * method which uses a QIOTask + qio_task_set_error internally
-@@ -1360,6 +1383,14 @@ static void qmp_chardev_open_socket(Chardev *chr,
-         qemu_chr_set_feature(chr, QEMU_CHAR_FEATURE_FD_PASS);
-     }
-
-+    s->yank_name =3D g_strconcat("chardev:", chr->label, NULL);
-+    yank_register_instance(s->yank_name, errp);
-+    if (*errp) {
-+        g_free(s->yank_name);
-+        s->yank_name =3D NULL;
-+        return;
-+    }
-+
-     /* be isn't opened until we get a connection */
-     *be_opened =3D false;
-
---
-2.20.1
-
-
---Sig_/mF_.EjoPRGRfufbh6DGgakM
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl9OESIACgkQNasLKJxd
-slhMvg/8Chh74xXK/C30xYZdPVNZzskJ4CrBW2z9f6CxQbK/NINt1HBZMUP7NY9+
-gSvJ/mo3M5Uheri3UIExt99bqMcRy424udOU7aaAm1viKZIZHyn3P3A9jF7iDgDv
-Egf0MqLokUY/Tij4MIDTwBOWg3VxYs26GmfBXYxHKsoXoktPpZLCS45duny6qmPm
-Tgtv2QrQ1IPMZDveW1nkIDxrLFjEcWLptQnmxaD0f0OMQGWUhnCG2wmgJMg4tjMl
-3wtblxyeRWuoQKvfaLYcNrvkhDH4E67NRcMdmrnzTODOlOhHeO/mXFVD8UbVeIyV
-MAmQ4f0/6HXLPwM+Lx5eJHhDUYlYCHvw/pwNfdl8eIJFGpEc48wepMU84lMjF6WW
-Xqlc6tbplMvyhFMUHLWZfdGCcXKBsPawJVgy5OP3GfPxJdlJz3B/6ot77n6cWBlW
-t/a4qs7FAnpuE3sKWhZ53vQXRLfLxnmOj0lAoRDi7Gx+Nmb/c8kbfoyiyD23nhbV
-NIFzn5ELCKLEmdDod35czz1jNVEbOcI9XwU7RCH+uUwL3ZpMJ3HAwS990zYz7bWN
-bH2tnBAEPT0MOQJjRx1yT+xINYheB7Oc7AXTFjAr+wbtgrytkp3q8ZONWpMXAAh/
-3eiVQWeYcM61kH+sb0eExwJOEJu+6+tZRiHRxvYY0OOR5oR8ghM=
-=Jf6V
------END PGP SIGNATURE-----
-
---Sig_/mF_.EjoPRGRfufbh6DGgakM--
+Thanks,
+Laurent
 
