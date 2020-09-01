@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 002D7C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE9D0C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:18:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2B76206EB
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:18:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2B76206EB
+	by mail.kernel.org (Postfix) with ESMTPS id 9241D206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:18:50 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9241D206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD76t-0004o2-Mu
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:18:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55296)
+	id 1kD77Z-0006a4-O4
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:18:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zM-0005Wo-Od; Tue, 01 Sep 2020 10:10:20 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:57591)
+ id 1kD6zN-0005Xv-6u; Tue, 01 Sep 2020 10:10:21 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:48255)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zH-0003oG-DA; Tue, 01 Sep 2020 10:10:20 -0400
+ id 1kD6zH-0003ov-Vw; Tue, 01 Sep 2020 10:10:20 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MCKO2-1kLORI2ayQ-009N6N; Tue, 01 Sep 2020 16:09:58 +0200
+ id 1MJm8H-1jtWrf3TKL-00KD1Y; Tue, 01 Sep 2020 16:10:07 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/44] target/arm/kvm: Remove superfluous break
-Date: Tue,  1 Sep 2020 16:09:12 +0200
-Message-Id: <20200901140954.889743-3-laurent@vivier.eu>
+Subject: [PULL 14/44] qemu-options.hx: Fix typo for netdev documentation
+Date: Tue,  1 Sep 2020 16:09:24 +0200
+Message-Id: <20200901140954.889743-15-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
 References: <20200901140954.889743-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:F0TpCvtnRA9SHKBw7Olb3gWaYAHJBjSIK780eap44uZXKk+wDi3
- TdPVdfQdMD6Sh2IUdNtTAV6990MRO8msMTwK/MZOew6q+PX/L80+lHK4RYzC+AvMQavhD3O
- 99wJsMEnA+aoouiW+0ruI01HzUV47leT1QVDxPLdFKsb813MJjPae5lrhpYF1pJLqETamUL
- p2rDrqu2z5wdnp67ShhnQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WSNz6tpE9yg=:wFk62DoJrKqasw67S4CXm3
- wZDfYZA4UlBtYP2aLE+gy14F4Yp5CpsgCzkWmR3jFSwsZnjFp5YTvNE5lgHIGNnnLCoaUxOtj
- M9CGa93cvs2SF/biIerdrweIkQa/WNwNM5fVWjfO62gweH7fbAc5vXnHE5+Zl4Bfy13Pk8ZrB
- lhFJrYMLJ6UjmL38RYq8zczDIKYpXNaivsGwFgBTYAF+zBrjiEHE7ZiS8jIB8BPz13kiIXhKg
- 1dNrTbmKojeXL4Q92ygPxHw1s0D4P1x2MlOnATWvW73Mv2dSTjc0GWPHTAz/phK23T82SR+En
- v6xbqLirch/RIrIkIoiKZspoI2bWSghrAcZizrhKH4BHr7PxfAsr6Ezui3HbZYGUl1I7myP84
- E5DL+45hTgMf+pLLAg3OzgTcrEyy3P29OmG25b5isn1a/3duyyALb5/vxOqZO97XhWRyR9CVX
- /yZknDlsIvNjUPNXIzVDAWLgyg2/2vNJnX21d8CQW+C4lYIt4HL9TuJCZcCp5ujW4BvE1vJg+
- rwavfATUpyor5ihQ0iLNQ/1dms6Aiqpy7k8ckt2nhfEWysbdBy2RbhmcbL26EVvNZAcddmUXt
- XNGIyrTvLkzutWD0XMjIr56vU/IHYzC/8WE4F/gUij2GoqXuvHDmNZJv8F4m8n8bAJ7qfVX6b
- tPurIw1g2GVSJi/xzy5agJum6oQrV5MIbg0dGrD9++lSDMZ4cLDyK2PlaNMgj30JAciWfwNTP
- 6J+Ig0DMt9yiDEwzILrU4uxcnC7OSFrV6vayxhEMs69eU1fHPDLTVXCDnMOpth5SF579tsXPU
- t/rWrDr2A9PH39+uuN2BnYzdc9KErRhC3IbGMBaUc5yMIKYMUe09EhWr4kuc68MSnI2Torp
-Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:LZ4UW4gukykKXwMApcvpEihZ/4Hd1xk4TMb5v2qEjF9n2FKeik3
+ psiWqZ3UvV1dO5spmBGc8mai8x7oEmHNHsvlhpGLa6YHegtE2p87FCZYQf578FxjlReHjEO
+ sVwjuZyTIjBbI8rpqkeZjqIizpq4/iha8vzQvBKcHeqB+oecQL9z+r/fKt2NJREfOmqn4+6
+ 0jGh/BRU0rW6uymL7TnXQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ESYrRRrAvTk=:kiZilTFRpgu8PApf+h+9vh
+ 1hHQoesjxIxD6whd8hIGBO06jk13bfMbSofcaXbyOULbXaWPkFGb/y/6aQhQ3XQxR/Nw8yMyy
+ JCKkqiRs7OmELy7KgPrlljH9+xB++G1Cb22zdnyPm0mifYPPIgCw8ZsWY7Xfz8vKgIHxly1Th
+ i3/hOsYDJBJbWzjDUI1PgyvTHp9GGR8HJn9TZmBbkyGRvyCALVZ+RF2RK/1c+G2b+Wq+ffgfh
+ cdqX3ykPVjcHbhwvgV8f94X4XPsCMh32GWHMdx3Nd1HA5djHYvZ3oEGqRQ2oh8ybG7LHlwTWm
+ Dj9aTpponveMvoUJ6JD+vCwPnDmuRGbPviOwPH+Wx49GfmKkM5kiQfW7F620vOBmTrf0ZK9O4
+ Z+tDMKrgyvh2izn2BzQdntcCotrjzZ+Wdp7JWG5w4qEcYyYDrWMip1mPEcbXEsN9HoumUcYw/
+ BpomhLo+fT9Zrxny/g3wpFD1hu9eq4LIUH0E3GKBlqq1UCw0zYxES/4EmSNSYNeV7fwAxUq5w
+ 8T8i7mZeoXLgle+l2PhQsggrmT+3WPedoiPzIzLHOA3baTkuq3Kw0CYGN5rPM4egcxLZdNdZV
+ x3Ez+4NnVhPv8urOLDc8sdaoeqhiy+sM1ku9bHD75WrxQvViuYJGtTdW850kcHe0XLfypczwZ
+ cO0DdT7h33JYNUSLT0eSU2YSnRGpja35jw0r4Vh03sDdkgIeQxSwMrkO99ZSp9jp+lfrl8AHi
+ Vo9Ki4ReImQlXEkeRSgkBQYFaOMTrXiyLP1dkhFmMIuj4duNs8PG+A3JC1WG8o/u6rVl+0kOY
+ 7T224tzp/1bH0T++RFv6tK1NXWbLC5X2cn366pLoQZ3QyMBotdN3WsmcRqf1Eb4HSXbwNlQ
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:08
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
@@ -83,40 +82,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yi Wang <wang.yi59@zte.com.cn>, Thomas Huth <thuth@redhat.com>,
- qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Liao Pingfang <liao.pingfang@zte.com.cn>
+Cc: Thomas Huth <thuth@redhat.com>,
+ Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
+ Li Qiang <liq3ea@gmail.com>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Liao Pingfang <liao.pingfang@zte.com.cn>
+From: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 
-Remove superfluous break.
+This patch fixes the netdev document description typo in qemu-option.hx.
 
-Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
-Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <1594630986-36148-1-git-send-email-wang.yi59@zte.com.cn>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20200727045925.29375-1-tianjia.zhang@linux.alibaba.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/arm/kvm64.c | 1 -
- 1 file changed, 1 deletion(-)
+ qemu-options.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 116923790550..ef1e96028500 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -330,7 +330,6 @@ int kvm_arch_remove_hw_breakpoint(target_ulong addr,
-     switch (type) {
-     case GDB_BREAKPOINT_HW:
-         return delete_hw_breakpoint(addr);
--        break;
-     case GDB_WATCHPOINT_READ:
-     case GDB_WATCHPOINT_WRITE:
-     case GDB_WATCHPOINT_ACCESS:
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 30019c4eca2f..b0f020594eab 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -2684,7 +2684,7 @@ SRST
+     disable script execution.
+ 
+     If running QEMU as an unprivileged user, use the network helper
+-    helper to configure the TAP interface and attach it to the bridge.
++    to configure the TAP interface and attach it to the bridge.
+     The default network helper executable is
+     ``/path/to/qemu-bridge-helper`` and the default bridge device is
+     ``br0``.
 -- 
 2.26.2
 
