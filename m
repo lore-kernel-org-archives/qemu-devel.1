@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7152C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A881C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:57:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EAAF206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:56:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F453206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 12:57:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OSzAZLpz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EAAF206CD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iJPso4Qu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F453206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD5qJ-0000mZ-Lv
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:56:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34972)
+	id 1kD5qV-00014V-Dp
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 08:57:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kD5kQ-0006JR-Q1
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:50:50 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:40597)
+ id 1kD5pW-0007wZ-0K
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:56:06 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:38416)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kD5kP-00023E-8l
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:50:50 -0400
-Received: by mail-ej1-x642.google.com with SMTP id z22so1451056ejl.7
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 05:50:48 -0700 (PDT)
+ id 1kD5pU-0002hh-E5
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 08:56:05 -0400
+Received: by mail-ej1-x644.google.com with SMTP id i22so1481417eja.5
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 05:56:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xiH9w16QnZ8MhSAJhQUehcZF69w548sdcPSigukhTRk=;
- b=OSzAZLpzB+o2WtFYm6JSvBQkIVDO/pmL80gXMQvgOWf4flbYUC/0RmTsPhRscb9AHP
- XOX0iUrTmj4SCcRnei6Mv0Itv8tCyDXI1DF5n3IFMaCmBenkJLaXGOf71I8vdoAvEksK
- z6CiF0KbxSihEml1wFIoZfzgiC0j1eLVAMN4RsezgMQ/VNCeosXl4vSDuujKE1DjjT0H
- MlxlKW0ELJzsiBKS9BM4pLWJ5K9T3MEnw1fdfmtx2FuCA8VZg2TyADC3Zu14l893TtZJ
- WHiYYvvgCi6g9Dw/V9/4sZS2lS0ow2DmVNesd2zbK83aWzAKUEy5OtuN0oKZH5YS5qEn
- NgtA==
+ :cc; bh=1J2vSdyTtg9FrxAIybA+DnjZDIQEV7Yg4BzOl495Qfs=;
+ b=iJPso4QuzDt33drrZ5NiIOdAG4v9B7bIullyKKK1p4jH4sw2AsdQWIObYBCsG/upxO
+ xFjMKsb9gc5Z4GCCaudoaEKpMWorsCDFgbugXb/sIqab/acqXMSgyIbbVMFOau0jCd1O
+ 1W+IW4WQ75WJ/g8ByjDKGSElgYDjlwFTmVFcqzs0b9ZhWhK3H2Lhtjy4Y9VcaXMfvGNz
+ GVvsV0hM+djRly6GA5iuXaA524eUYHzVPUg7n0N2/ZuIkRgovbM4T94QD1JNem9C/LWa
+ sOpkTfxRy0VfNKzv4SYfQeyChvDawj397f2HmhTSfa8MMh2/5WU485QCV5b9N8AILacL
+ 1e7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=xiH9w16QnZ8MhSAJhQUehcZF69w548sdcPSigukhTRk=;
- b=V2DZ/mEa+c6MZzwGB5eNY32jmpoaUIG0x41MCNer0Nla6/FV9g5NldPf+xIpTSxUKk
- HEg6nEpIQGgXOtU/tB2WvGq1B5FkBhNG7qAKWqDQMWsVyDHp8yh+3cg6kdjtG0JuDsIe
- KYt+rwAsYHbd95itFVggJqxTI/48S5bBWRbQDp4fUPYMYGujB9nluzxqZ2mBRH9A0ika
- 9yyseZiIrv99PPReEMZGhl1mkLqK4cIRgsbcoi3ZjN74zhEIBMGva8N2SvpXcMQj05qN
- wsVbzQOcuQx8L6zv1HCV3MADqoJiKGLz70v4+9Xfm8/+TmO52espD1pDrWCpc8z+SQV2
- LiZg==
-X-Gm-Message-State: AOAM532eK1r22BIkjUO6PIa2uvlhwTu0pnjhmaAFjIcIZLS6cw0WLAEO
- fyPrUQHwQIJXs2wn+sHrCvWHZj6iNnuYvmBR21SXVDwkGe6BNQ==
-X-Google-Smtp-Source: ABdhPJwP+mIZxCJv7UBB1alCmz0chSPyICVz88lEFJyXAI9T7k0qFh6ktP7eFojmqN+ZeB2EFfrpWErH3dpc9rmjfA4=
-X-Received: by 2002:a17:906:24d6:: with SMTP id
- f22mr1260143ejb.85.1598964647980; 
- Tue, 01 Sep 2020 05:50:47 -0700 (PDT)
+ bh=1J2vSdyTtg9FrxAIybA+DnjZDIQEV7Yg4BzOl495Qfs=;
+ b=Mgj3qJvJTxBE1Of8zEu7hPxPq+8PQsfuJXK+bTrxiZzujT3npO5EKRTmKfSX1oUfUf
+ AAKBH1NKWNoVy6R9Rdz0533p0hKT1pbCE8asGuC14TwM/orydlJKWxWhz+gBiYeWynWM
+ 9uU4GWTYlz9ZhMSsBQ74RR6l3rwQ5ftbd88wencbZJZGXtM5dI6yW2T9Zmg4jBr7T7k/
+ o9JXJ9DdA3pApEHxFyxUEABJ99/qyN1L0V3zlRrc2tPqK8UR6UqweMCCxUsm0qc/3iKC
+ PhoBHk7SNl+dFt2OmjwL0dWzjiVk65UhUkX5aOMzedOYMd9zzlC/MOEsLzJ00opYjlXk
+ lokQ==
+X-Gm-Message-State: AOAM533r3KYw3zC61DHe5AyZAlyflyF/eNOoLsNLaSNPZOQnlzLNs1v3
+ 0snsKB/zo9um/c36wYiNb6R7F6LM4GYeCs9XrqxQ8Q==
+X-Google-Smtp-Source: ABdhPJyXlw5PFJ8VAbXDek7Q7nQhf4tDnD3O8BqDiwh6/duKXPqq4bw7l5iCqyoWnrAN9ocVCpVrgPs4cIeJjelMGXc=
+X-Received: by 2002:a17:906:f28b:: with SMTP id
+ gu11mr1275999ejb.407.1598964962965; 
+ Tue, 01 Sep 2020 05:56:02 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200827142915.108730-1-stefanha@redhat.com>
- <20200827142915.108730-4-stefanha@redhat.com>
-In-Reply-To: <20200827142915.108730-4-stefanha@redhat.com>
+ <20200827142915.108730-2-stefanha@redhat.com>
+In-Reply-To: <20200827142915.108730-2-stefanha@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 1 Sep 2020 13:50:36 +0100
-Message-ID: <CAFEAcA_VYRKQq-3TU0xjoowbnaHsuHxxhnG8VSmsWrM=bKemFg@mail.gmail.com>
-Subject: Re: [PATCH 3/4] tracetool: add input filename and line number to Event
+Date: Tue, 1 Sep 2020 13:55:51 +0100
+Message-ID: <CAFEAcA_Qg5pBMkw2HjNwhBBhKwW9=h-rXUOtxHjTzFmu2bHA5Q@mail.gmail.com>
+Subject: Re: [PATCH 1/4] tracetool: add output filename command-line argument
 To: Stefan Hajnoczi <stefanha@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,11 +103,15 @@ Sender: "Qemu-devel"
 
 On Thu, 27 Aug 2020 at 15:29, Stefan Hajnoczi <stefanha@redhat.com> wrote:
 >
-> Store the input filename and line number in Event.
+> The tracetool.py script writes to stdout. This means the output filename
+> is not available to the script. Add the output filename to the
+> command-line so that the script has access to the filename.
 >
-> A later patch will use this to improve error messages.
+> This also simplifies the tracetool.py invocation. It's no longer
+> necessary to use meson's custom_build(capture : true) to save output.
 >
 > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
 
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
