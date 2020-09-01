@@ -2,86 +2,138 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B6FC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:06:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E15C6C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:10:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD470204EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:06:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7996204EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:10:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E8h14iAb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD470204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="opWHoeuN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7996204EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD0Ml-0004of-W7
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:06:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53084)
+	id 1kD0QZ-0006AN-Sk
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:09:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kD0Lx-0004Hy-0c
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:05:13 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57944
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kD0Lt-000620-QS
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:05:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598943908;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=b9AKTtufJsM2KUAdKcbxs9ux5QGHnOstuHgTA3nWgas=;
- b=E8h14iAb0OKVLtvtX5uE8S9jnc/zloWfCq7wQ1No3BGX2yPv+X6FN0xi3onWZ2VbgqiK+n
- 2UlauCRuPEgj2MWRc5/UYZALKVg6Pb3Fk8II51ZtK1FPoYgcM9qnL7Wz9viw+d/i40yIih
- S31zLtUFpW0e5JG5bL2e2eeCZfkSJpg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-531-UWtKocEwOU-mJ4YTmhGSIg-1; Tue, 01 Sep 2020 03:05:04 -0400
-X-MC-Unique: UWtKocEwOU-mJ4YTmhGSIg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39792802B75
- for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 07:05:03 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 19F91747B0;
- Tue,  1 Sep 2020 07:05:00 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] meson: use pkg-config method to find dependencies
-Date: Tue,  1 Sep 2020 03:04:59 -0400
-Message-Id: <20200901070459.27489-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kD0Pl-0005TV-Bv
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:09:09 -0400
+Received: from mail-dm6nam12on2061.outbound.protection.outlook.com
+ ([40.107.243.61]:21057 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kD0Pj-0006UX-Jg
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:09:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NR3P0/wYbrL7wq1CbG57PXfi6w1ATEG6jVtWVBSqw+7ZR6FG1DXpVuwAPQYuEsGmJ13ehYp6i2kOCYgAonKRcTINfQgeYBEmDFS5rN2vZGDpQhW2gt4933KIgyU31te1mLSNXD4/t6yNFOS2nxZeYur1isAKxKYZzJ4AtdP4ey3YwtW3lMDkl9ZToTT1SqpsQM6sJ167GR3FKeRP23F1tNpYTN0dY61mmzp2Hwk5f7NBzJ+1YFST1zxbVCAqqdg13cj4CV8jt066G3WP2WDfHaRWz0iSRekpHOZvLUJk9bL8h5cS4Kd79HAaMFPq5phxj/XAf9GcNgGX5D+AFY8kPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pVdbuMzFF7zycJNYp4bqGcTbeiBL6gzVKaMoWOemZeM=;
+ b=dGCeezCGOlPxyDxplRED3yBGYqfXb0KRa2sUKvshIVezVI/pI/UpcykUssyeRadR1xBFUYHPoIPlF4lZTJB/LLB2OCONHhsEZmrcYj4EvNrgBuxIhAZkd6pD2jV3JSB+KpuKEj+Hx/U0OXNYh77QRibsBPz4QEHBRcjnuP8OCDwZqmBZHufPgVr19Y36rN+oyLbqzFAnM8J7bzITwN+ota5vKexActooDMVkGlpLxeLN3fEXlHs89XOSyZ9s0aZBhz3mJ+7N2UlYWAQMHEkOG8pUxJ02/7LUNZA3SLkgKu26kAIsiu2eNiOG0iNQpe0xXN8tHJJen5H6r2nRRVD5cg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pVdbuMzFF7zycJNYp4bqGcTbeiBL6gzVKaMoWOemZeM=;
+ b=opWHoeuNTeW+nY8BzFnCBY7Hu3z28WDYZ0qk1FJXIMTYfvdJdOpBs6H4Pzd8J3qM9SF3/FM1h1TBo3BZkWbi2q1RAXOvQ52QoB6lDXsQ/nGwpzw66HVlIme82h5KdAu2kwfYiTAjzauQjAXVnba3roIGtQlAVJD1ywRo5Jz36cs=
+Received: from MN2PR18CA0007.namprd18.prod.outlook.com (2603:10b6:208:23c::12)
+ by CY4PR02MB2790.namprd02.prod.outlook.com (2603:10b6:903:11c::8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19; Tue, 1 Sep
+ 2020 07:09:04 +0000
+Received: from BL2NAM02FT038.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:208:23c:cafe::ed) by MN2PR18CA0007.outlook.office365.com
+ (2603:10b6:208:23c::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
+ Transport; Tue, 1 Sep 2020 07:09:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ BL2NAM02FT038.mail.protection.outlook.com (10.152.77.25) with Microsoft SMTP
+ Server id 15.20.3326.19 via Frontend Transport; Tue, 1 Sep 2020 07:09:03
+ +0000
+Received: from [149.199.38.66] (port=51197 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kD0Pb-0004oF-VA; Tue, 01 Sep 2020 00:08:59 -0700
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
+ by smtp.xilinx.com with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kD0Pe-00029G-P6; Tue, 01 Sep 2020 00:09:02 -0700
+Received: from xsj-pvapsmtp01 (smtp3.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 081792s4015825; 
+ Tue, 1 Sep 2020 00:09:02 -0700
+Received: from [10.71.116.235] (helo=localhost)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kD0Pd-00028M-Sq; Tue, 01 Sep 2020 00:09:02 -0700
+Date: Tue, 1 Sep 2020 09:08:57 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 0/6] target/microblaze: Use tcg_gen_lookup_and_goto_ptr
+Message-ID: <20200901070857.GK14249@toto>
+References: <20200831184018.839906-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:57:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200831184018.839906-1-richard.henderson@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6070de0e-58ba-441e-142e-08d84e45e85c
+X-MS-TrafficTypeDiagnostic: CY4PR02MB2790:
+X-Microsoft-Antispam-PRVS: <CY4PR02MB2790B335F25EF6CC62864072C22E0@CY4PR02MB2790.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: djL9Oo8IxGuObVT9kmRzp4lRckpdEcVfdLDeCMye0bTaL8OO8zcpBmzhCnDJNwNzrpwdTF52CL2s+liRaYA3RRDY8wZxUHbtojw4t1GJZYAaSW+fPD2mAWYlxo2YukcogipB1Z2lf1GEEuXKzt+iq9Iy203lZ3SKA1AMb8oNDI2b9/tZExyZMCjSesPRDaZrODGIUPN3JBqDvCWOuT+1eq37XZZ7YZpQJJJwlh1pc04VxZL3jSgZc+Dvn9kodEIitXaeZ5+HFwJvZSelHk8QrPe695qXk2tyD9Mzddw0qum4N/4HzyRHk6OShM0HUjShZ64+kdz4fBI2CUoZUdMhoxhrLxSVlof2GCedQ2vvNP3tyrnSn1cnbpL9K4+QiCaUirLBL+WcqcRLXRBFBvqW1w==
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(7916004)(136003)(346002)(39860400002)(376002)(396003)(46966005)(9786002)(9686003)(4326008)(186003)(426003)(82740400003)(26005)(82310400003)(6666004)(1076003)(47076004)(336012)(356005)(478600001)(83380400001)(81166007)(33716001)(316002)(6916009)(2906002)(8936002)(5660300002)(33656002)(70206006)(70586007)(8676002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Sep 2020 07:09:03.0953 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6070de0e-58ba-441e-142e-08d84e45e85c
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT038.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR02MB2790
+Received-SPF: pass client-ip=40.107.243.61; envelope-from=edgar@xilinx.com;
+ helo=NAM12-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 03:09:05
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,130 +146,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kraxel@redhat.com
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We do not need to ask cmake for the dependencies, so just use the
-pkg-config mechanism.  Keep "auto" for SDL so that it tries using
-sdl-config too.
+On Mon, Aug 31, 2020 at 11:40:12AM -0700, Richard Henderson wrote:
+> Based-on: <20200831160601.833692-1-richard.henderson@linaro.org>
+> ("[PULL 00/76] target/microblaze improvements")
+> 
+> Hello again, Edgar.
+> 
+> I had dropped the tcg_gen_lookup_and_goto_ptr patch from the
+> previous omnibus patch set, as you had reported lockups.
+> 
+> I have identified, by inspection, two cases in which we failed
+> to return to the main loop even though we should have:
+> 
+> (1) Return-from-exception type instructions.
+> 
+> I had missed these before because they hadn't set cpustate_changed.
+> This still worked fine because they are all indirect branches, and
+> had exited immediately.
+> 
+> Fixed by distinguishing these cases from normal indirect branches
+> before we start using lookup_and_goto_ptr.
+> 
+> (2) MTS in a branch delay slot.
+> 
+> We did not check dc->cpustate_changed before setting
+> dc->base.is_jmp to DISAS_JUMP, which lost the fact that we
+> need to return to the main loop.
+> 
+> This mostly works fine without lookup_and_goto_ptr, because
+> we either (a) finished an indirect branch and returned to the
+> main loop anyway or (b) we'd return to the main loop via some
+> subsequent indirect branch, which would happen "soon enough".
+> 
+> We should have been able to see soft-lockup with the existing
+> code in the case of a cpustate_changed in the delay slot of
+> a loop of direct branches that all use goto_tb.  E.g.
+> 
+> 	brid	0
+> 	 msrset MSR_IE
+> 
+> I.e. an immediate branch back to the same branch insn,
+> re-enabling interrupts in the delay slot.  Probably not
+> something that shows up in the wild.
 
-The documentation is adjusted to use SDL2_image as the example,
-rather than SDL which does not use the "pkg-config" method.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- docs/devel/build-system.rst | 27 ++++++++++++++-------------
- meson.build                 |  8 ++++----
- 2 files changed, 18 insertions(+), 17 deletions(-)
+Nice! Yes, this seems to fix the problem we ran into before.
+Series looks good both in review and testing except for minor typo in a comment.
 
-diff --git a/docs/devel/build-system.rst b/docs/devel/build-system.rst
-index 58bf392430..0c09fb9a54 100644
---- a/docs/devel/build-system.rst
-+++ b/docs/devel/build-system.rst
-@@ -66,46 +66,47 @@ following tasks:
-    upon completion.
- 
- 
--Taking the probe for SDL as an example, we have the following pieces
-+Taking the probe for SDL2_Image as an example, we have the following pieces
- in configure::
- 
-   # Initial variable state
--  sdl=auto
-+  sdl_image=auto
- 
-   ..snip..
- 
-   # Configure flag processing
--  --disable-gnutls) sdl=disabled
-+  --disable-sdl-image) sdl_image=disabled
-   ;;
--  --enable-gnutls) sdl=enabled
-+  --enable-sdl-image) sdl_image=enabled
-   ;;
- 
-   ..snip..
- 
-   # Help output feature message
--  sdl             SDL UI
-+  sdl-image         SDL Image support for icons
- 
-   ..snip..
- 
-   # Meson invocation
--  -Dsdl=$sdl
-+  -Dsdl_image=$sdl_image
- 
- In meson_options.txt::
- 
--  option('sdl', type : 'feature', value : 'auto')
-+  option('sdl', type : 'feature', value : 'auto',
-+         description: 'SDL Image support for icons')
- 
- In meson.build::
- 
-   # Detect dependency
--  sdl = dependency('sdl2',
--                   required: get_option('sdl'),
--                   static: enable_static)
-+  sdl_image = dependency('SDL2_image', required: get_option('sdl_image'),
-+                         method: 'pkg-config',
-+                         static: enable_static)
- 
--  # Create config-host.h
--  config_host_data.set('CONFIG_SDL', sdl.found())
-+  # Create config-host.h (if applicable)
-+  config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
- 
-   # Summary
--  summary_info += {'SDL support':       sdl.found()}
-+  summary_info += {'SDL image support': sdl_image.found()}
- 
- 
- 
-diff --git a/meson.build b/meson.build
-index 78ac86f3a1..0e2d884f5c 100644
---- a/meson.build
-+++ b/meson.build
-@@ -129,7 +129,7 @@ endif
- pixman = not_found
- if have_system or have_tools
-   pixman = dependency('pixman-1', required: have_system, version:'>=0.21.8',
--                      static: enable_static)
-+                      method: 'pkg-config', static: enable_static)
- endif
- pam = not_found
- if 'CONFIG_AUTH_PAM' in config_host
-@@ -168,7 +168,7 @@ if get_option('xkbcommon').auto() and not have_system and not have_tools
-   xkbcommon = not_found
- else
-   xkbcommon = dependency('xkbcommon', required: get_option('xkbcommon'),
--                         static: enable_static)
-+                         method: 'pkg-config', static: enable_static)
- endif
- slirp = not_found
- if config_host.has_key('CONFIG_SLIRP')
-@@ -247,7 +247,7 @@ if sdl.found()
-   sdl = declare_dependency(compile_args: '-Wno-undef',
-                            dependencies: sdl)
-   sdl_image = dependency('SDL2_image', required: get_option('sdl_image'),
--                         static: enable_static)
-+                         method: 'pkg-config', static: enable_static)
- else
-   if get_option('sdl_image').enabled()
-     error('sdl-image required, but SDL was @0@',
-@@ -332,7 +332,7 @@ sasl = not_found
- if get_option('vnc').enabled()
-   vnc = declare_dependency() # dummy dependency
-   png = dependency('libpng', required: get_option('vnc_png'),
--                   static: enable_static)
-+                   method: 'pkg-config', static: enable_static)
-   jpeg = cc.find_library('jpeg', has_headers: ['jpeglib.h'],
-                          required: get_option('vnc_jpeg'),
-                          static: enable_static)
--- 
-2.26.2
+With the typo in patch #4 fixed:
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
+
+
+> 
+> ----
+> 
+> Follow-up question: The manual says that several classes of
+> instructions are invalid in a branch delay slot, but does
+> not say what action is taken, if any.
+> 
+> Some of these invalid cases could leave qemu in an inconsistent
+> state.  Would it be legal for us to diagnose these cases with
+> trap_illegal?  If not, what *should* we be doing?  We could also
+> LOG_GUEST_ERROR for these either way.
+> 
+> I've added some TODO comments in these patches that are relevant.
+
+Thanks, I'll try to dig out some details. A guest-error will likely
+be needed anyway since some cores don't have exceptions enabled.
+But we may want both.
+
+Cheers,
+Edgar
 
