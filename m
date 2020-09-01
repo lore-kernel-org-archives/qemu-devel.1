@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C19C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7082C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:23:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95416206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:23:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95416206CD
+	by mail.kernel.org (Postfix) with ESMTPS id A57F0206EB
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:23:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A57F0206EB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7Bh-0007sQ-LX
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:23:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55452)
+	id 1kD7CE-0000lY-OC
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:23:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zR-0005jW-9W; Tue, 01 Sep 2020 10:10:25 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:57419)
+ id 1kD6zS-0005ns-Nv; Tue, 01 Sep 2020 10:10:26 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:44715)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zO-0003ut-3A; Tue, 01 Sep 2020 10:10:24 -0400
+ id 1kD6zJ-0003qF-Sf; Tue, 01 Sep 2020 10:10:26 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MuluN-1kUVHQ4BVr-00rsoo; Tue, 01 Sep 2020 16:10:16 +0200
+ id 1M5wTr-1kF1jc3fVD-007TIE; Tue, 01 Sep 2020 16:10:12 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 28/44] hw/ide/pci: Replace magic '512' value by BDRV_SECTOR_SIZE
-Date: Tue,  1 Sep 2020 16:09:38 +0200
-Message-Id: <20200901140954.889743-29-laurent@vivier.eu>
+Subject: [PULL 22/44] util/vfio-helpers: Fix typo in description
+Date: Tue,  1 Sep 2020 16:09:32 +0200
+Message-Id: <20200901140954.889743-23-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
 References: <20200901140954.889743-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:bTgl6P/Ee+6znIidnx6ahoDV8qX8jOCR51ZVN3cq8jLGLm1bL/4
- 2Q6GsgZd1K+bSzlc1wt0bdU0Ek8ieKjHBRyxkwu9YvLE2HyyzOvyo12c0hRQnFdr0GBEqLL
- IDxikjRmln9enzwX2Yi7yhuDvEmZefmv7nsRBkiR2grkNFkMUHekX7sXZRgSKL87y19j3E/
- VOPkDffIJIlHnp72Iln+A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:tg9Os5e/Y28=:hkidTrcs+hBv1EBwiT3E8G
- 0Ncaz796ymjoBOrgk5r/H2B77OBq40wdquxm0a7QGA15t+ZJyR2qVpHR9PAzq8EJ4ZtOJYiuq
- +Nyb/7uHyj9htE7o7t3/eU8r74/C9dNTw11hVohkSNUndih00cvbJ64Go+XoQBr30/vdaFm48
- xjsR94QgVTEtBwHrqy/E+4uRWfr3qQ7MvEq1rMlpDFG0P8oPBjlZVd92sUX/JgClfzihUu2zP
- I06fEHO3KJixOI9KDoDZcIQlZCwOrOFsIjXAkbsMUL0RtKb4f9oIVRtlvCApVGhoSSQwjH+33
- wQbCriH9bKA2v9WBMeP8WEjpU03yeT0ORTEL6vJXsflLGh2DFKMXXrOozg1OaZZDCCyD83oEB
- 8Qjtp+cvfTxz5VsicEOxFn1v/z3bKAW+0fRmZpNaSMBo4PUdfiAsHf2xJBR/YiW3EjOusrpO7
- Leb5PxUwQTCRo+KAfwtlLlVfFftsdpuLyu/5sVuDh3hRlEXcWgE4Yb2Id/D9o1ndhYtjP+BlE
- zOpMwQeFeg7RbsuTZonDLPsJdtuReVxq4N2h9b8hm4PZLX89dhlU/oMJJycvCIE74AHESXEtq
- JsEPQqZQoh4mgUNgsByNW7rBfWsKOz5cjr1tYoOt+D0m185Vcs8qD+g5FLEnuOdf08yOYZo8o
- WfBmRaEZy0+iZV+SaHup4344TR2F4/vzZ7OBcyH+Ox3wp/rhNWWOP6ZeOhPb/qcsVGesaZxjA
- K6zgD/GfR26ounsHeHx9uDJyGioDnGgRmCdAlFEFXV6qKOs1VvSofN0rwO+eXaxuSVoTzZb9Q
- niizjZdMwWgIl/WCnJa+IU1OufAf2vnXA1BkIbdLZPlDhh2oeYMQLCOLBB38tbqa8TNCJDt
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:fvs2r8nQPYulppaFIXhHwCIGgOisL/qy2m9RS/M+1rJ4NyO43gZ
+ nh0UWjyY88OttrEvUyHl2EQ80u6NM/TQiS3NrUwLIqOwEKEQbQhPGNKt4wKkBAiOA0tHSej
+ 8c2okxweiXjg9n4vITh65IwjVjxE92CHS2BA+qRWFcs3G4JBWIQdjSwtA/2nCSNGBPlxuTe
+ GTF6SurCL6mZc+Ia+Jfvg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:1Lg0SCjDYZQ=:MDPmLqx/8Ug5OmS7PPs/Lh
+ kmAjbJUcuQPGnv84pxg3lw5Br7pyaokw0lRUH+kG5SLLSnldAC3JwjQv4dfeb0/yTqJNh0nBG
+ t7zhotU0KXtxR5cXrmJTP4fhWjPwLaYnes41NeOuex8qUlukWqwIXlv9NDdJdektd55B59ECh
+ Y6Mc6TDc7y7b9nszXFQNNOjXQQ72+DsjoJwB4ane6jxG1/cEVDUCTyYXoPiiPZbnUwEZR1nXI
+ KbbHLWFSeiJC7fXdGHQVU0m4sOTXwKBhoPxYxECKXq1sUhOcbSpG2qtggUrrekUXTn+CbrL0C
+ fGvOUI7ksDRE4YMuEsVz8wKRLTuGzkQV1hsAsuiY0BS03QfpbqFefytWfQKtPtB8bu0SCLkkk
+ jwIkd33uKpuLgaH7lmKLx5otBznPJdlpm6Pt/tND6P3S/v5RbbNHZdacL/JQ6wE3kzLdlJAZ8
+ yz4sFyCMUBTpgCawas5Zs3dn1MhaIV6+LA/iZ8sEhBsc05vC+qc5OgMLOpyH90WIKE1ko3xO8
+ E/K58+4/jCoQoiPYYRU6vX+2+WKvmIPtA2dReREgtEL58WT3fSIn5Mqql5PvGSVLG8OZi1r3A
+ RP3WvGUaP9jXC4QL8Zw15fl0Y0a01G+sFqbrI88UnzXM7XJNwqCM2SRr/mq+q8m3leMve87NF
+ SPnmLJgs62b7O3qOUtcuolag41rTwCJzxGPEWeosNqq2onGi77/OYFn16wmxq711BLnnPNWCP
+ gQxvobjS1alYY91kZlsK5po4Ihwt8UacTfj8/EJBv/ayLswxCyNPPABONQNd/YYl/Hf3Tjw05
+ 1NkcdV6dzSED/Wd68BAjq54iHfLezmVj8hvfiyfsVAcXp32BL08Eupw3WZySG9GzpnyuRc5
+Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:03
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:09:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -84,41 +84,48 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-trivial@nongnu.org, Li Qiang <liq3ea@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Stefano Garzarella <sgarzare@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Use self-explicit definitions instead of magic '512' value.
+Remove the second 'and' introduced in commit 418026ca43
+("util: Introduce vfio helpers").
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Message-Id: <20200814082841.27000-7-f4bug@amsat.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Message-Id: <20200811151643.21293-4-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/ide/pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ util/vfio-helpers.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/ide/pci.c b/hw/ide/pci.c
-index 5e85c4ad17e0..b50091b615cb 100644
---- a/hw/ide/pci.c
-+++ b/hw/ide/pci.c
-@@ -138,7 +138,7 @@ static int32_t bmdma_prepare_buf(const IDEDMA *dma, int32_t limit)
-     int l, len;
+diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+index e399e330e26a..583bdfb36fc2 100644
+--- a/util/vfio-helpers.c
++++ b/util/vfio-helpers.c
+@@ -173,7 +173,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
+ }
  
-     pci_dma_sglist_init(&s->sg, pci_dev,
--                        s->nsector / (BMDMA_PAGE_SIZE / 512) + 1);
-+                        s->nsector / (BMDMA_PAGE_SIZE / BDRV_SECTOR_SIZE) + 1);
-     s->io_buffer_size = 0;
-     for(;;) {
-         if (bm->cur_prd_len == 0) {
+ /**
+- * Initialize device IRQ with @irq_type and and register an event notifier.
++ * Initialize device IRQ with @irq_type and register an event notifier.
+  */
+ int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
+                            int irq_type, Error **errp)
+@@ -505,7 +505,7 @@ static IOVAMapping *qemu_vfio_find_mapping(QEMUVFIOState *s, void *host,
+ }
+ 
+ /**
+- * Allocate IOVA and and create a new mapping record and insert it in @s.
++ * Allocate IOVA and create a new mapping record and insert it in @s.
+  */
+ static IOVAMapping *qemu_vfio_add_mapping(QEMUVFIOState *s,
+                                           void *host, size_t size,
 -- 
 2.26.2
 
