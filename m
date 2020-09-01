@@ -2,63 +2,92 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B415C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:45:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD329C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:46:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BEEC20665
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:45:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BEEC20665
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 862002083B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:46:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f5mYhnfi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 862002083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD2r3-0003dA-CP
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:45:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41394)
+	id 1kD2sG-0005b2-OM
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:46:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD2qE-0002hW-VM
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:44:38 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48172)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD2qC-0002GL-VV
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:44:38 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 7A095AC97;
- Tue,  1 Sep 2020 09:44:35 +0000 (UTC)
-Subject: Re: [PATCH v6 11/16] cpus: remove checks for non-NULL cpus_accel
-To: Roman Bolshakov <r.bolshakov@yadro.com>
-References: <20200901072201.7133-1-cfontana@suse.de>
- <20200901072201.7133-12-cfontana@suse.de>
- <20200901093418.GC22344@SPB-NB-133.local>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <ec4310eb-c5fc-2bca-37d5-ffe800c8c7c8@suse.de>
-Date: Tue, 1 Sep 2020 11:44:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kD2rN-0004Qs-LG
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:45:49 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40324
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kD2rI-0002U1-LY
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:45:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598953543;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=gpdRGh/2jOUZ/bS6vxqFBPwMsv141XnddVqAw6G4+OM=;
+ b=f5mYhnfibbBsagnD1Iqqe20p7Gbdn9Oh6cbJAHg0oAMjFW4h+lCYBQYakkMhFHhlJWDRdD
+ BlR0dBoXpn0RdYfFjSdQuGIBzz76jo9FWCu6C++9G3/JmYm51Z7f28ziuAQxLA/Oq1wnoc
+ a5WyBzaUVfqrB7nr+qGx1awBxuo133M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-YUcImfhuPG6MMdgNtdnrGQ-1; Tue, 01 Sep 2020 05:45:41 -0400
+X-MC-Unique: YUcImfhuPG6MMdgNtdnrGQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F5AA18B9ED7;
+ Tue,  1 Sep 2020 09:45:40 +0000 (UTC)
+Received: from redhat.com (ovpn-114-215.ams2.redhat.com [10.36.114.215])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6AA745D9CD;
+ Tue,  1 Sep 2020 09:45:34 +0000 (UTC)
+Date: Tue, 1 Sep 2020 10:45:31 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Lukas Straub <lukasstraub2@web.de>
+Subject: Re: [PATCH v8 1/8] Introduce yank feature
+Message-ID: <20200901094531.GG345480@redhat.com>
+References: <cover.1598951375.git.lukasstraub2@web.de>
+ <ab5c04766f270d53e90f17f76c0af7e5b66f8623.1598951375.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <20200901093418.GC22344@SPB-NB-133.local>
+In-Reply-To: <ab5c04766f270d53e90f17f76c0af7e5b66f8623.1598951375.git.lukasstraub2@web.de>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:13:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -62
-X-Spam_score: -6.3
-X-Spam_bar: ------
-X-Spam_report: (-6.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:57:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,149 +100,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block <qemu-block@nongnu.org>,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/1/20 11:34 AM, Roman Bolshakov wrote:
-> On Tue, Sep 01, 2020 at 09:21:56AM +0200, Claudio Fontana wrote:
->> now that all accelerators support the CpusAccel interface,
->> we can remove most checks for non-NULL cpus_accel,
->> we just add a sanity check/assert at vcpu creation.
->>
->> Signed-off-by: Claudio Fontana <cfontana@suse.de>
->> ---
->>  softmmu/cpus.c | 33 +++++++++++++++++++++------------
->>  1 file changed, 21 insertions(+), 12 deletions(-)
->>
->> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
->> index 3d8350fba9..f32ecb4bb9 100644
->> --- a/softmmu/cpus.c
->> +++ b/softmmu/cpus.c
->> @@ -166,34 +166,46 @@ void cpu_synchronize_all_pre_loadvm(void)
->>  
->>  void cpu_synchronize_state(CPUState *cpu)
->>  {
->> -    if (cpus_accel && cpus_accel->synchronize_state) {
->> +    if (cpus_accel->synchronize_state) {
->>          cpus_accel->synchronize_state(cpu);
->>      }
->>  }
->>  
->>  void cpu_synchronize_post_reset(CPUState *cpu)
->>  {
->> -    if (cpus_accel && cpus_accel->synchronize_post_reset) {
->> +    if (cpus_accel->synchronize_post_reset) {
->>          cpus_accel->synchronize_post_reset(cpu);
->>      }
->>  }
->>  
->>  void cpu_synchronize_post_init(CPUState *cpu)
->>  {
->> -    if (cpus_accel && cpus_accel->synchronize_post_init) {
->> +    if (cpus_accel->synchronize_post_init) {
->>          cpus_accel->synchronize_post_init(cpu);
->>      }
->>  }
->>  
->>  void cpu_synchronize_pre_loadvm(CPUState *cpu)
->>  {
->> -    if (cpus_accel && cpus_accel->synchronize_pre_loadvm) {
->> +    if (cpus_accel->synchronize_pre_loadvm) {
->>          cpus_accel->synchronize_pre_loadvm(cpu);
->>      }
->>  }
->>  
->>  int64_t cpus_get_virtual_clock(void)
->>  {
->> +    /*
->> +     * XXX
->> +     *
->> +     * need to check that cpus_accel is not NULL, because qcow2 calls
->> +     * qemu_get_clock_ns(CLOCK_VIRTUAL) without any accel initialized and
->> +     * with ticks disabled in some io-tests:
->> +     * 030 040 041 060 099 120 127 140 156 161 172 181 191 192 195 203 229 249 256 267
->> +     *
->> +     * is this expected?
->> +     *
->> +     * XXX
->> +     */
->>      if (cpus_accel && cpus_accel->get_virtual_clock) {
->>          return cpus_accel->get_virtual_clock();
->>      }
->> @@ -207,7 +219,7 @@ int64_t cpus_get_virtual_clock(void)
->>   */
->>  int64_t cpus_get_elapsed_ticks(void)
->>  {
->> -    if (cpus_accel && cpus_accel->get_elapsed_ticks) {
->> +    if (cpus_accel->get_elapsed_ticks) {
->>          return cpus_accel->get_elapsed_ticks();
->>      }
->>      return cpu_get_ticks();
->> @@ -399,7 +411,7 @@ void cpus_kick_thread(CPUState *cpu)
->>  void qemu_cpu_kick(CPUState *cpu)
->>  {
->>      qemu_cond_broadcast(cpu->halt_cond);
->> -    if (cpus_accel && cpus_accel->kick_vcpu_thread) {
->> +    if (cpus_accel->kick_vcpu_thread) {
->>          cpus_accel->kick_vcpu_thread(cpu);
->>      } else { /* default */
->>          cpus_kick_thread(cpu);
->> @@ -573,12 +585,9 @@ void qemu_init_vcpu(CPUState *cpu)
->>          cpu_address_space_init(cpu, 0, "cpu-memory", cpu->memory);
->>      }
->>  
->> -    if (cpus_accel) {
->> -        /* accelerator already implements the CpusAccel interface */
->> -        cpus_accel->create_vcpu_thread(cpu);
->> -    } else {
->> -        g_assert_not_reached();
->> -    }
->> +    /* accelerators all implement the CpusAccel interface */
->> +    g_assert(cpus_accel != NULL && cpus_accel->create_vcpu_thread != NULL);
->> +    cpus_accel->create_vcpu_thread(cpu);
->>  
->>      while (!cpu->created) {
->>          qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
->> -- 
->> 2.26.2
->>
+On Tue, Sep 01, 2020 at 11:15:07AM +0200, Lukas Straub wrote:
+> The yank feature allows to recover from hanging qemu by "yanking"
+> at various parts. Other qemu systems can register themselves and
+> multiple yank functions. Then all yank functions for selected
+> instances can be called by the 'yank' out-of-band qmp command.
+> Available instances can be queried by a 'query-yank' oob command.
 > 
-> Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
-> 
-> but I still find the condition (if cpus_accel->func) redundant, is it
-> feasible to drop it?
-> 
-> Regards,
-> Roman
-> 
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  include/qemu/yank.h |  81 +++++++++++++++++++
+>  qapi/misc.json      |  62 +++++++++++++++
+>  util/meson.build    |   1 +
+>  util/yank.c         | 187 ++++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 331 insertions(+)
+>  create mode 100644 include/qemu/yank.h
+>  create mode 100644 util/yank.c
 
-Hi Roman,
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-indeed currently not, because currently we use a NULL function pointer to mean "use generic/default behaviour".
-This is one of the open questions in the cover letter.
 
-It has the advantage that only "interesting" information is present in each data structure,
-with only non-default behaviour being explicit, this has been changed to satisfy Paolo's requirement.
-
-It has the disadvantage of an additional check.
-
-I am ok with both outcomes, but I'd like Paolo's take on this if we are to change this again?
-
-Thanks,
-
-Claudio
-
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
