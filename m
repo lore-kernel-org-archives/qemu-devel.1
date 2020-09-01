@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3053C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE100C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:27:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F5D3206F0
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:27:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F5D3206F0
+	by mail.kernel.org (Postfix) with ESMTPS id C3149206F0
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:27:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3149206F0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD0hK-0005vv-Ls
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:27:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57960)
+	id 1kD0hv-0007OC-Vz
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:27:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57922)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0d6-0004g5-9G
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:22:56 -0400
-Received: from mx2.suse.de ([195.135.220.15]:50200)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0d3-0004Zg-CJ
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:22:53 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50198)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0d0-0008OW-Uz
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:22:55 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0d0-0008OV-WD
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:22:53 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id F205DAF3F;
+ by mx2.suse.de (Postfix) with ESMTP id 33AE8AF39;
  Tue,  1 Sep 2020 07:22:48 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
@@ -40,14 +40,13 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [PATCH v6 06/16] cpus: extract out kvm-specific code to accel/kvm
-Date: Tue,  1 Sep 2020 09:21:51 +0200
-Message-Id: <20200901072201.7133-7-cfontana@suse.de>
+Subject: [PATCH v6 05/16] cpus: extract out qtest-specific code to accel/qtest
+Date: Tue,  1 Sep 2020 09:21:50 +0200
+Message-Id: <20200901072201.7133-6-cfontana@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901072201.7133-1-cfontana@suse.de>
 References: <20200901072201.7133-1-cfontana@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
  helo=mx2.suse.de
@@ -74,95 +73,82 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
  Pavel Dovgalyuk <dovgaluk@ispras.ru>, Marcelo Tosatti <mtosatti@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
- Wenchao Wang <wenchao.wang@intel.com>, haxm-team@intel.com,
- Sunil Muthuswamy <sunilmut@microsoft.com>, Claudio Fontana <cfontana@suse.de>
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Colin Xu <colin.xu@intel.com>, Wenchao Wang <wenchao.wang@intel.com>,
+ haxm-team@intel.com, Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-register a "CpusAccel" interface for KVM as well.
+register a "CpusAccel" interface for qtest as well.
 
 Signed-off-by: Claudio Fontana <cfontana@suse.de>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-[added const]
-Signed-off-by: Claudio Fontana <cfontana@suse.de>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/kvm/kvm-all.c    | 14 ++++++-
- accel/kvm/kvm-cpus.c   | 88 ++++++++++++++++++++++++++++++++++++++++++
- accel/kvm/kvm-cpus.h   | 17 ++++++++
- accel/kvm/meson.build  |  5 ++-
- accel/stubs/kvm-stub.c |  3 +-
- include/sysemu/kvm.h   |  2 +-
- softmmu/cpus.c         | 77 ------------------------------------
- 7 files changed, 124 insertions(+), 82 deletions(-)
- create mode 100644 accel/kvm/kvm-cpus.c
- create mode 100644 accel/kvm/kvm-cpus.h
+ MAINTAINERS               |  2 +-
+ accel/meson.build         |  2 +-
+ accel/qtest/meson.build   |  7 +++
+ accel/qtest/qtest-cpus.c  | 91 +++++++++++++++++++++++++++++++++++++++
+ accel/qtest/qtest-cpus.h  | 17 ++++++++
+ accel/{ => qtest}/qtest.c |  7 +++
+ softmmu/cpus.c            | 64 +--------------------------
+ 7 files changed, 125 insertions(+), 65 deletions(-)
+ create mode 100644 accel/qtest/meson.build
+ create mode 100644 accel/qtest/qtest-cpus.c
+ create mode 100644 accel/qtest/qtest-cpus.h
+ rename accel/{ => qtest}/qtest.c (86%)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 63ef6af9a1..fbd82cb444 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -44,6 +44,9 @@
- #include "qapi/qapi-types-common.h"
- #include "qapi/qapi-visit-common.h"
- #include "sysemu/reset.h"
-+#include "qemu/guest-random.h"
-+#include "sysemu/hw_accel.h"
-+#include "kvm-cpus.h"
+diff --git a/MAINTAINERS b/MAINTAINERS
+index f5361360a2..314ce0ded5 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2443,7 +2443,7 @@ M: Laurent Vivier <lvivier@redhat.com>
+ R: Paolo Bonzini <pbonzini@redhat.com>
+ S: Maintained
+ F: softmmu/qtest.c
+-F: accel/qtest.c
++F: accel/qtest/
+ F: tests/qtest/
+ X: tests/qtest/bios-tables-test-allowed-diff.h
  
- #include "hw/boards.h"
+diff --git a/accel/meson.build b/accel/meson.build
+index 26c503e480..bb00d0fd13 100644
+--- a/accel/meson.build
++++ b/accel/meson.build
+@@ -1,6 +1,6 @@
+ softmmu_ss.add(files('accel.c'))
+-specific_ss.add(when: ['CONFIG_SOFTMMU', 'CONFIG_POSIX'], if_true: files('qtest.c'))
  
-@@ -378,7 +381,7 @@ err:
-     return ret;
- }
- 
--int kvm_destroy_vcpu(CPUState *cpu)
-+static int do_kvm_destroy_vcpu(CPUState *cpu)
- {
-     KVMState *s = kvm_state;
-     long mmap_size;
-@@ -412,6 +415,14 @@ err:
-     return ret;
- }
- 
-+void kvm_destroy_vcpu(CPUState *cpu)
-+{
-+    if (do_kvm_destroy_vcpu(cpu) < 0) {
-+        error_report("kvm_destroy_vcpu failed");
-+        exit(EXIT_FAILURE);
-+    }
-+}
-+
- static int kvm_get_vcpu(KVMState *s, unsigned long vcpu_id)
- {
-     struct KVMParkedVcpu *cpu;
-@@ -2232,6 +2243,7 @@ static int kvm_init(MachineState *ms)
-         assert(!ret);
-     }
- 
-+    cpus_register_accel(&kvm_cpus);
-     return 0;
- 
- err:
-diff --git a/accel/kvm/kvm-cpus.c b/accel/kvm/kvm-cpus.c
++subdir('qtest')
+ subdir('kvm')
+ subdir('tcg')
+ subdir('xen')
+diff --git a/accel/qtest/meson.build b/accel/qtest/meson.build
 new file mode 100644
-index 0000000000..a120601564
+index 0000000000..e477cb2ae2
 --- /dev/null
-+++ b/accel/kvm/kvm-cpus.c
-@@ -0,0 +1,88 @@
++++ b/accel/qtest/meson.build
+@@ -0,0 +1,7 @@
++qtest_ss = ss.source_set()
++qtest_ss.add(files(
++  'qtest.c',
++  'qtest-cpus.c',
++))
++
++specific_ss.add_all(when: ['CONFIG_SOFTMMU', 'CONFIG_POSIX'], if_true: qtest_ss)
+diff --git a/accel/qtest/qtest-cpus.c b/accel/qtest/qtest-cpus.c
+new file mode 100644
+index 0000000000..7c5399ed9d
+--- /dev/null
++++ b/accel/qtest/qtest-cpus.c
+@@ -0,0 +1,91 @@
 +/*
-+ * QEMU KVM support
++ * QTest accelerator code
 + *
-+ * Copyright IBM, Corp. 2008
-+ *           Red Hat, Inc. 2008
++ * Copyright IBM, Corp. 2011
 + *
 + * Authors:
 + *  Anthony Liguori   <aliguori@us.ibm.com>
-+ *  Glauber Costa     <gcosta@redhat.com>
 + *
 + * This work is licensed under the terms of the GNU GPL, version 2 or later.
 + * See the COPYING file in the top-level directory.
@@ -170,18 +156,29 @@ index 0000000000..a120601564
 + */
 +
 +#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qemu/main-loop.h"
-+#include "sysemu/kvm_int.h"
-+#include "sysemu/runstate.h"
++#include "qemu/rcu.h"
++#include "qapi/error.h"
++#include "qemu/module.h"
++#include "qemu/option.h"
++#include "qemu/config-file.h"
++#include "sysemu/accel.h"
++#include "sysemu/qtest.h"
 +#include "sysemu/cpus.h"
++#include "sysemu/cpu-timers.h"
 +#include "qemu/guest-random.h"
++#include "qemu/main-loop.h"
++#include "hw/core/cpu.h"
 +
-+#include "kvm-cpus.h"
++#include "qtest-cpus.h"
 +
-+static void *kvm_vcpu_thread_fn(void *arg)
++static void *qtest_cpu_thread_fn(void *arg)
 +{
++#ifdef _WIN32
++    error_report("qtest is not supported under Windows");
++    exit(1);
++#else
 +    CPUState *cpu = arg;
++    sigset_t waitset;
 +    int r;
 +
 +    rcu_register_thread();
@@ -192,61 +189,55 @@ index 0000000000..a120601564
 +    cpu->can_do_io = 1;
 +    current_cpu = cpu;
 +
-+    r = kvm_init_vcpu(cpu);
-+    if (r < 0) {
-+        error_report("kvm_init_vcpu failed: %s", strerror(-r));
-+        exit(1);
-+    }
-+
-+    kvm_init_cpu_signals(cpu);
++    sigemptyset(&waitset);
++    sigaddset(&waitset, SIG_IPI);
 +
 +    /* signal CPU creation */
 +    cpu_thread_signal_created(cpu);
 +    qemu_guest_random_seed_thread_part2(cpu->random_seed);
 +
 +    do {
-+        if (cpu_can_run(cpu)) {
-+            r = kvm_cpu_exec(cpu);
-+            if (r == EXCP_DEBUG) {
-+                cpu_handle_guest_debug(cpu);
-+            }
++        qemu_mutex_unlock_iothread();
++        do {
++            int sig;
++            r = sigwait(&waitset, &sig);
++        } while (r == -1 && (errno == EAGAIN || errno == EINTR));
++        if (r == -1) {
++            perror("sigwait");
++            exit(1);
 +        }
++        qemu_mutex_lock_iothread();
 +        qemu_wait_io_event(cpu);
-+    } while (!cpu->unplug || cpu_can_run(cpu));
++    } while (!cpu->unplug);
 +
-+    kvm_destroy_vcpu(cpu);
-+    cpu_thread_signal_destroyed(cpu);
 +    qemu_mutex_unlock_iothread();
 +    rcu_unregister_thread();
 +    return NULL;
++#endif
 +}
 +
-+static void kvm_start_vcpu_thread(CPUState *cpu)
++static void qtest_start_vcpu_thread(CPUState *cpu)
 +{
 +    char thread_name[VCPU_THREAD_NAME_SIZE];
 +
 +    cpu->thread = g_malloc0(sizeof(QemuThread));
 +    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
 +    qemu_cond_init(cpu->halt_cond);
-+    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/KVM",
++    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/DUMMY",
 +             cpu->cpu_index);
-+    qemu_thread_create(cpu->thread, thread_name, kvm_vcpu_thread_fn,
-+                       cpu, QEMU_THREAD_JOINABLE);
++    qemu_thread_create(cpu->thread, thread_name, qtest_cpu_thread_fn, cpu,
++                       QEMU_THREAD_JOINABLE);
 +}
 +
-+const CpusAccel kvm_cpus = {
-+    .create_vcpu_thread = kvm_start_vcpu_thread,
-+
-+    .synchronize_post_reset = kvm_cpu_synchronize_post_reset,
-+    .synchronize_post_init = kvm_cpu_synchronize_post_init,
-+    .synchronize_state = kvm_cpu_synchronize_state,
-+    .synchronize_pre_loadvm = kvm_cpu_synchronize_pre_loadvm,
++const CpusAccel qtest_cpus = {
++    .create_vcpu_thread = qtest_start_vcpu_thread,
++    .get_virtual_clock = qtest_get_virtual_clock,
 +};
-diff --git a/accel/kvm/kvm-cpus.h b/accel/kvm/kvm-cpus.h
+diff --git a/accel/qtest/qtest-cpus.h b/accel/qtest/qtest-cpus.h
 new file mode 100644
-index 0000000000..547fbee111
+index 0000000000..739519a472
 --- /dev/null
-+++ b/accel/kvm/kvm-cpus.h
++++ b/accel/qtest/qtest-cpus.h
 @@ -0,0 +1,17 @@
 +/*
 + * Accelerator CPUS Interface
@@ -257,122 +248,79 @@ index 0000000000..547fbee111
 + * See the COPYING file in the top-level directory.
 + */
 +
-+#ifndef KVM_CPUS_H
-+#define KVM_CPUS_H
++#ifndef QTEST_CPUS_H
++#define QTEST_CPUS_H
 +
 +#include "sysemu/cpus.h"
 +
-+extern const CpusAccel kvm_cpus;
++extern const CpusAccel qtest_cpus;
 +
-+#endif /* KVM_CPUS_H */
-diff --git a/accel/kvm/meson.build b/accel/kvm/meson.build
-index 4db2388e2f..7e9dafe24c 100644
---- a/accel/kvm/meson.build
-+++ b/accel/kvm/meson.build
-@@ -1,5 +1,8 @@
- kvm_ss = ss.source_set()
--kvm_ss.add(files('kvm-all.c'))
-+kvm_ss.add(files(
-+  'kvm-all.c',
-+  'kvm-cpus.c',
-+))
- kvm_ss.add(when: 'CONFIG_SEV', if_false: files('sev-stub.c'))
++#endif /* QTEST_CPUS_H */
+diff --git a/accel/qtest.c b/accel/qtest/qtest.c
+similarity index 86%
+rename from accel/qtest.c
+rename to accel/qtest/qtest.c
+index 119d0f16a4..537e8b449c 100644
+--- a/accel/qtest.c
++++ b/accel/qtest/qtest.c
+@@ -12,6 +12,7 @@
+  */
  
- specific_ss.add_all(when: 'CONFIG_KVM', if_true: kvm_ss)
-diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
-index 82f118d2df..69f8a842da 100644
---- a/accel/stubs/kvm-stub.c
-+++ b/accel/stubs/kvm-stub.c
-@@ -32,9 +32,8 @@ bool kvm_readonly_mem_allowed;
- bool kvm_ioeventfd_any_length_allowed;
- bool kvm_msi_use_devid;
+ #include "qemu/osdep.h"
++#include "qemu/rcu.h"
+ #include "qapi/error.h"
+ #include "qemu/module.h"
+ #include "qemu/option.h"
+@@ -20,9 +21,15 @@
+ #include "sysemu/qtest.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/cpu-timers.h"
++#include "qemu/guest-random.h"
++#include "qemu/main-loop.h"
++#include "hw/core/cpu.h"
++
++#include "qtest-cpus.h"
  
--int kvm_destroy_vcpu(CPUState *cpu)
-+void kvm_destroy_vcpu(CPUState *cpu)
+ static int qtest_init_accel(MachineState *ms)
  {
--    return -ENOSYS;
++    cpus_register_accel(&qtest_cpus);
+     return 0;
  }
  
- int kvm_init_vcpu(CPUState *cpu)
-diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
-index 8445a88db1..f166aa5260 100644
---- a/include/sysemu/kvm.h
-+++ b/include/sysemu/kvm.h
-@@ -224,7 +224,7 @@ int kvm_has_intx_set_mask(void);
- 
- int kvm_init_vcpu(CPUState *cpu);
- int kvm_cpu_exec(CPUState *cpu);
--int kvm_destroy_vcpu(CPUState *cpu);
-+void kvm_destroy_vcpu(CPUState *cpu);
- 
- /**
-  * kvm_arm_supports_user_irq
 diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index d1eddc65d0..fd5bd6d809 100644
+index 7fd6e7c3b7..d1eddc65d0 100644
 --- a/softmmu/cpus.c
 +++ b/softmmu/cpus.c
-@@ -179,9 +179,6 @@ void cpu_synchronize_state(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_state) {
-         cpus_accel->synchronize_state(cpu);
+@@ -40,7 +40,6 @@
+ #include "qemu/thread.h"
+ #include "qemu/plugin.h"
+ #include "sysemu/cpus.h"
+-#include "sysemu/qtest.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/option.h"
+ #include "qemu/bitmap.h"
+@@ -247,9 +246,6 @@ int64_t cpus_get_virtual_clock(void)
+     if (cpus_accel && cpus_accel->get_virtual_clock) {
+         return cpus_accel->get_virtual_clock();
      }
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_state(cpu);
+-    if (qtest_enabled()) { /* for qtest_clock_warp */
+-        return qtest_get_virtual_clock();
 -    }
-     if (hax_enabled()) {
-         hax_cpu_synchronize_state(cpu);
-     }
-@@ -195,9 +192,6 @@ void cpu_synchronize_post_reset(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_post_reset) {
-         cpus_accel->synchronize_post_reset(cpu);
-     }
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_post_reset(cpu);
--    }
-     if (hax_enabled()) {
-         hax_cpu_synchronize_post_reset(cpu);
-     }
-@@ -211,9 +205,6 @@ void cpu_synchronize_post_init(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_post_init) {
-         cpus_accel->synchronize_post_init(cpu);
-     }
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_post_init(cpu);
--    }
-     if (hax_enabled()) {
-         hax_cpu_synchronize_post_init(cpu);
-     }
-@@ -227,9 +218,6 @@ void cpu_synchronize_pre_loadvm(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_pre_loadvm) {
-         cpus_accel->synchronize_pre_loadvm(cpu);
-     }
--    if (kvm_enabled()) {
--        kvm_cpu_synchronize_pre_loadvm(cpu);
--    }
-     if (hax_enabled()) {
-         hax_cpu_synchronize_pre_loadvm(cpu);
-     }
-@@ -384,14 +372,6 @@ void run_on_cpu(CPUState *cpu, run_on_cpu_func func, run_on_cpu_data data)
-     do_run_on_cpu(cpu, func, data, &qemu_global_mutex);
+     return cpu_get_clock();
  }
  
--static void qemu_kvm_destroy_vcpu(CPUState *cpu)
--{
--    if (kvm_destroy_vcpu(cpu) < 0) {
--        error_report("kvm_destroy_vcpu failed");
--        exit(EXIT_FAILURE);
--    }
--}
--
- static void qemu_cpu_stop(CPUState *cpu, bool exit)
- {
-     g_assert(qemu_cpu_is_self(cpu));
-@@ -436,48 +416,6 @@ void qemu_wait_io_event(CPUState *cpu)
-     qemu_wait_io_event_common(cpu);
+@@ -482,51 +478,6 @@ static void *qemu_kvm_cpu_thread_fn(void *arg)
+     return NULL;
  }
  
--static void *qemu_kvm_cpu_thread_fn(void *arg)
+-static void *qemu_dummy_cpu_thread_fn(void *arg)
 -{
+-#ifdef _WIN32
+-    error_report("qtest is not supported under Windows");
+-    exit(1);
+-#else
 -    CPUState *cpu = arg;
+-    sigset_t waitset;
 -    int r;
 -
 -    rcu_register_thread();
@@ -383,67 +331,65 @@ index d1eddc65d0..fd5bd6d809 100644
 -    cpu->can_do_io = 1;
 -    current_cpu = cpu;
 -
--    r = kvm_init_vcpu(cpu);
--    if (r < 0) {
--        error_report("kvm_init_vcpu failed: %s", strerror(-r));
--        exit(1);
--    }
--
--    kvm_init_cpu_signals(cpu);
+-    sigemptyset(&waitset);
+-    sigaddset(&waitset, SIG_IPI);
 -
 -    /* signal CPU creation */
 -    cpu_thread_signal_created(cpu);
 -    qemu_guest_random_seed_thread_part2(cpu->random_seed);
 -
 -    do {
--        if (cpu_can_run(cpu)) {
--            r = kvm_cpu_exec(cpu);
--            if (r == EXCP_DEBUG) {
--                cpu_handle_guest_debug(cpu);
--            }
+-        qemu_mutex_unlock_iothread();
+-        do {
+-            int sig;
+-            r = sigwait(&waitset, &sig);
+-        } while (r == -1 && (errno == EAGAIN || errno == EINTR));
+-        if (r == -1) {
+-            perror("sigwait");
+-            exit(1);
 -        }
+-        qemu_mutex_lock_iothread();
 -        qemu_wait_io_event(cpu);
--    } while (!cpu->unplug || cpu_can_run(cpu));
+-    } while (!cpu->unplug);
 -
--    qemu_kvm_destroy_vcpu(cpu);
--    cpu_thread_signal_destroyed(cpu);
 -    qemu_mutex_unlock_iothread();
 -    rcu_unregister_thread();
 -    return NULL;
+-#endif
 -}
 -
  static void *qemu_hax_cpu_thread_fn(void *arg)
  {
      CPUState *cpu = arg;
-@@ -801,19 +739,6 @@ static void qemu_hax_start_vcpu(CPUState *cpu)
- #endif
+@@ -904,19 +855,6 @@ void cpus_register_accel(const CpusAccel *ca)
+     cpus_accel = ca;
  }
  
--static void qemu_kvm_start_vcpu(CPUState *cpu)
+-static void qemu_dummy_start_vcpu(CPUState *cpu)
 -{
 -    char thread_name[VCPU_THREAD_NAME_SIZE];
 -
 -    cpu->thread = g_malloc0(sizeof(QemuThread));
 -    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
 -    qemu_cond_init(cpu->halt_cond);
--    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/KVM",
+-    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/DUMMY",
 -             cpu->cpu_index);
--    qemu_thread_create(cpu->thread, thread_name, qemu_kvm_cpu_thread_fn,
--                       cpu, QEMU_THREAD_JOINABLE);
+-    qemu_thread_create(cpu->thread, thread_name, qemu_dummy_cpu_thread_fn, cpu,
+-                       QEMU_THREAD_JOINABLE);
 -}
 -
- static void qemu_hvf_start_vcpu(CPUState *cpu)
+ void qemu_init_vcpu(CPUState *cpu)
  {
-     char thread_name[VCPU_THREAD_NAME_SIZE];
-@@ -875,8 +800,6 @@ void qemu_init_vcpu(CPUState *cpu)
-     if (cpus_accel) {
-         /* accelerator already implements the CpusAccel interface */
-         cpus_accel->create_vcpu_thread(cpu);
--    } else if (kvm_enabled()) {
--        qemu_kvm_start_vcpu(cpu);
-     } else if (hax_enabled()) {
-         qemu_hax_start_vcpu(cpu);
-     } else if (hvf_enabled()) {
+     MachineState *ms = MACHINE(qdev_get_machine());
+@@ -946,7 +884,7 @@ void qemu_init_vcpu(CPUState *cpu)
+     } else if (whpx_enabled()) {
+         qemu_whpx_start_vcpu(cpu);
+     } else {
+-        qemu_dummy_start_vcpu(cpu);
++        g_assert_not_reached();
+     }
+ 
+     while (!cpu->created) {
 -- 
 2.26.2
 
