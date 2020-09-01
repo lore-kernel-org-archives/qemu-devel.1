@@ -2,85 +2,118 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05230C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5C84C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:11:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0D412078B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 98D42206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:11:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SLhHFsF4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0D412078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pUpi/kuE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98D42206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44262 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7vq-00056H-A8
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:10:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34808)
+	id 1kD7wn-0006Vh-Ns
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:11:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7OF-0001ey-1V
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:36:03 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:34718
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7OB-0007TN-CX
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:36:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598970958;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3Ft/bBX1jhGSScJ9HqCMiz4dZw4ikJ6RZqIYMvNTJUs=;
- b=SLhHFsF4p3zvbHM3scFMX067ZpD1YenWgDMWFzasZvdTA7gSKmUkL55KT240Nwzpwu0wCJ
- hV5vBhXRK/uUYp5QIijS7uOeckr3dEakxXDKcVlyvOWpR0AJfyYc1YokWG0DNrhzoVyoxq
- 1dw+o4FmXsTi/jI/vSHBad4dkeuK6Oc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-QKHO0zdNP4mcXTVhvGQEjQ-1; Tue, 01 Sep 2020 10:35:56 -0400
-X-MC-Unique: QKHO0zdNP4mcXTVhvGQEjQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25781100747D;
- Tue,  1 Sep 2020 14:35:55 +0000 (UTC)
-Received: from localhost (ovpn-113-83.ams2.redhat.com [10.36.113.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8B9E97EEA4;
- Tue,  1 Sep 2020 14:35:54 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v8 36/43] block: Inline bdrv_co_block_status_from_*()
-Date: Tue,  1 Sep 2020 16:34:17 +0200
-Message-Id: <20200901143424.884735-37-mreitz@redhat.com>
-In-Reply-To: <20200901143424.884735-1-mreitz@redhat.com>
-References: <20200901143424.884735-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
+ id 1kD7ly-0002wL-5A
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:00:34 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:25366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
+ id 1kD7lv-0002OE-4M
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:00:33 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 081EVnag113892
+ for <qemu-devel@nongnu.org>; Tue, 1 Sep 2020 11:00:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=AFrP5xpKGk9YZFebhPC5b5mu0I0WwNASnFEw69AXuDE=;
+ b=pUpi/kuEf1fR7c7xRiRYUMC2XUq6o5Q8GReSxBos9w5AR9Jntp3s5RR2Uz2Tz0rXHJRz
+ YLh7Pox9H2tWDPDpv/JYuuqnW+aqHj8wv6/F6Fk13S709GCkRBGFqMJoIaaPll6IRr5W
+ JsuMeW6q3LKw9L0zpmmhsnyNkXLQaiPoEHEJmbvua2XKezH5WGXPRM4aUwNpHzXn2Xj2
+ /mOqivctkMMRMgQOmVexYN3FRA9jVCVMTa64ZTCiqyPgzAUnWeM/nehjYZzu7ZslqrO7
+ 5E92PbdQwOZtSYdD98xaGk2iEX1dgAdgCEnjZollMxOFbfDazl8QvaMyCGJooyq0pI7l qQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 339qdu2xsu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 11:00:28 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 081EWFBY115713
+ for <qemu-devel@nongnu.org>; Tue, 1 Sep 2020 11:00:28 -0400
+Received: from ppma04fra.de.ibm.com (6a.4a.5195.ip4.static.sl-reverse.com
+ [149.81.74.106])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 339qdu2xrk-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Sep 2020 11:00:27 -0400
+Received: from pps.filterd (ppma04fra.de.ibm.com [127.0.0.1])
+ by ppma04fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 081Ei0TH015471;
+ Tue, 1 Sep 2020 15:00:26 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma04fra.de.ibm.com with ESMTP id 339ap7rg3e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Sep 2020 15:00:25 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 081F0N6017367494
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 1 Sep 2020 15:00:23 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 33A904C089;
+ Tue,  1 Sep 2020 15:00:23 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id CE6714C090;
+ Tue,  1 Sep 2020 15:00:22 +0000 (GMT)
+Received: from marcibm.ibmuc.com (unknown [9.145.15.189])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue,  1 Sep 2020 15:00:22 +0000 (GMT)
+From: Marc Hartmayer <mhartmay@linux.ibm.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH v2 2/2] libvhost-user: handle endianness as mandated by the
+ spec
+Date: Tue,  1 Sep 2020 17:00:19 +0200
+Message-Id: <20200901150019.29229-3-mhartmay@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200901150019.29229-1-mhartmay@linux.ibm.com>
+References: <20200901150019.29229-1-mhartmay@linux.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:11:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-01_08:2020-09-01,
+ 2020-09-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ adultscore=0 phishscore=0
+ clxscore=1015 lowpriorityscore=0 spamscore=0 priorityscore=1501
+ suspectscore=0 mlxlogscore=999 malwarescore=0 impostorscore=0 mlxscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009010118
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mhartmay@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 11:00:28
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,260 +127,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With bdrv_filter_bs(), we can easily handle this default filter behavior
-in bdrv_co_block_status().
+Since virtio existed even before it got standardized, the virtio
+standard defines the following types of virtio devices:
 
-blkdebug wants to have an additional assertion, so it keeps its own
-implementation, except bdrv_co_block_status_from_file() needs to be
-inlined there.
+ + legacy device (pre-virtio 1.0)
+ + non-legacy or VIRTIO 1.0 device
+ + transitional device (which can act both as legacy and non-legacy)
 
-Suggested-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Virtio 1.0 defines the fields of the virtqueues as little endian,
+while legacy uses guest's native endian [1]. Currently libvhost-user
+does not handle virtio endianness at all, i.e. it works only if the
+native endianness matches with whatever is actually needed. That means
+things break spectacularly on big-endian targets. Let us handle virtio
+endianness for non-legacy as required by the virtio specification [1]
+and fence legacy virtio, as there is no safe way to figure out the
+needed endianness conversions for all cases. The fencing of legacy
+virtio devices is done in `vu_set_features_exec`.
+
+[1] https://docs.oasis-open.org/virtio/virtio/v1.1/cs01/virtio-v1.1-cs01.html#x1-210003
+
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
 ---
- include/block/block_int.h | 22 -----------------
- block/backup-top.c        |  2 --
- block/blkdebug.c          |  7 ++++--
- block/blklogwrites.c      |  1 -
- block/commit.c            |  1 -
- block/copy-on-read.c      |  2 --
- block/filter-compress.c   |  2 --
- block/io.c                | 51 +++++++++++++--------------------------
- block/mirror.c            |  1 -
- block/throttle.c          |  1 -
- 10 files changed, 22 insertions(+), 68 deletions(-)
+ contrib/libvhost-user/libvhost-user.c | 77 +++++++++++++++------------
+ 1 file changed, 43 insertions(+), 34 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index bb3d1c8a8c..8b9d769e14 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1303,28 +1303,6 @@ void bdrv_default_perms(BlockDriverState *bs, BdrvChild *c,
-                         uint64_t perm, uint64_t shared,
-                         uint64_t *nperm, uint64_t *nshared);
+diff --git a/contrib/libvhost-user/libvhost-user.c b/contrib/libvhost-user/libvhost-user.c
+index 53f16bdf082c..e2238a0400c9 100644
+--- a/contrib/libvhost-user/libvhost-user.c
++++ b/contrib/libvhost-user/libvhost-user.c
+@@ -42,6 +42,7 @@
  
--/*
-- * Default implementation for drivers to pass bdrv_co_block_status() to
-- * their file.
-- */
--int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
--                                                bool want_zero,
--                                                int64_t offset,
--                                                int64_t bytes,
--                                                int64_t *pnum,
--                                                int64_t *map,
--                                                BlockDriverState **file);
--/*
-- * Default implementation for drivers to pass bdrv_co_block_status() to
-- * their backing file.
-- */
--int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
--                                                   bool want_zero,
--                                                   int64_t offset,
--                                                   int64_t bytes,
--                                                   int64_t *pnum,
--                                                   int64_t *map,
--                                                   BlockDriverState **file);
- const char *bdrv_get_parent_name(const BlockDriverState *bs);
- void blk_dev_change_media_cb(BlockBackend *blk, bool load, Error **errp);
- bool blk_dev_has_removable_media(BlockBackend *blk);
-diff --git a/block/backup-top.c b/block/backup-top.c
-index 430d1be068..fe6883cc97 100644
---- a/block/backup-top.c
-+++ b/block/backup-top.c
-@@ -175,8 +175,6 @@ BlockDriver bdrv_backup_top_filter = {
-     .bdrv_co_pdiscard           = backup_top_co_pdiscard,
-     .bdrv_co_flush              = backup_top_co_flush,
+ #include "qemu/atomic.h"
+ #include "qemu/osdep.h"
++#include "qemu/bswap.h"
+ #include "qemu/memfd.h"
  
--    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
--
-     .bdrv_refresh_filename      = backup_top_refresh_filename,
+ #include "libvhost-user.h"
+@@ -539,6 +540,14 @@ vu_set_features_exec(VuDev *dev, VhostUserMsg *vmsg)
+     DPRINT("u64: 0x%016"PRIx64"\n", vmsg->payload.u64);
  
-     .bdrv_child_perm            = backup_top_child_perm,
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 9c08d8a005..eecbf3e5c4 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -752,8 +752,11 @@ static int coroutine_fn blkdebug_co_block_status(BlockDriverState *bs,
-         return err;
+     dev->features = vmsg->payload.u64;
++    if (!vu_has_feature(dev, VIRTIO_F_VERSION_1)) {
++        /*
++         * We only support devices conforming to VIRTIO 1.0 or
++         * later
++         */
++        vu_panic(dev, "virtio legacy devices aren't supported by libvhost-user");
++        return false;
++    }
+ 
+     if (!(dev->features & VHOST_USER_F_PROTOCOL_FEATURES)) {
+         vu_set_enable_all_rings(dev, true);
+@@ -1074,7 +1083,7 @@ vu_set_vring_addr_exec(VuDev *dev, VhostUserMsg *vmsg)
+         return false;
      }
  
--    return bdrv_co_block_status_from_file(bs, want_zero, offset, bytes,
--                                          pnum, map, file);
-+    assert(bs->file && bs->file->bs);
-+    *pnum = bytes;
-+    *map = offset;
-+    *file = bs->file->bs;
-+    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
+-    vq->used_idx = vq->vring.used->idx;
++    vq->used_idx = lduw_le_p(&vq->vring.used->idx);
+ 
+     if (vq->last_avail_idx != vq->used_idx) {
+         bool resume = dev->iface->queue_is_processed_in_order &&
+@@ -1191,7 +1200,7 @@ vu_check_queue_inflights(VuDev *dev, VuVirtq *vq)
+         return 0;
+     }
+ 
+-    vq->used_idx = vq->vring.used->idx;
++    vq->used_idx = lduw_le_p(&vq->vring.used->idx);
+     vq->resubmit_num = 0;
+     vq->resubmit_list = NULL;
+     vq->counter = 0;
+@@ -2021,13 +2030,13 @@ vu_queue_started(const VuDev *dev, const VuVirtq *vq)
+ static inline uint16_t
+ vring_avail_flags(VuVirtq *vq)
+ {
+-    return vq->vring.avail->flags;
++    return lduw_le_p(&vq->vring.avail->flags);
  }
  
- static void blkdebug_close(BlockDriverState *bs)
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 57315f56b4..13ae63983b 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -515,7 +515,6 @@ static BlockDriver bdrv_blk_log_writes = {
-     .bdrv_co_pwrite_zeroes  = blk_log_writes_co_pwrite_zeroes,
-     .bdrv_co_flush_to_disk  = blk_log_writes_co_flush_to_disk,
-     .bdrv_co_pdiscard       = blk_log_writes_co_pdiscard,
--    .bdrv_co_block_status   = bdrv_co_block_status_from_file,
+ static inline uint16_t
+ vring_avail_idx(VuVirtq *vq)
+ {
+-    vq->shadow_avail_idx = vq->vring.avail->idx;
++    vq->shadow_avail_idx = lduw_le_p(&vq->vring.avail->idx);
  
-     .is_filter              = true,
-     .strong_runtime_opts    = blk_log_writes_strong_runtime_opts,
-diff --git a/block/commit.c b/block/commit.c
-index 2b9929aed9..1e85c306cc 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -238,7 +238,6 @@ static void bdrv_commit_top_child_perm(BlockDriverState *bs, BdrvChild *c,
- static BlockDriver bdrv_commit_top = {
-     .format_name                = "commit_top",
-     .bdrv_co_preadv             = bdrv_commit_top_preadv,
--    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
-     .bdrv_refresh_filename      = bdrv_commit_top_refresh_filename,
-     .bdrv_child_perm            = bdrv_commit_top_child_perm,
+     return vq->shadow_avail_idx;
+ }
+@@ -2035,7 +2044,7 @@ vring_avail_idx(VuVirtq *vq)
+ static inline uint16_t
+ vring_avail_ring(VuVirtq *vq, int i)
+ {
+-    return vq->vring.avail->ring[i];
++    return lduw_le_p(&vq->vring.avail->ring[i]);
+ }
  
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index a6a864f147..2816e61afe 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -146,8 +146,6 @@ static BlockDriver bdrv_copy_on_read = {
-     .bdrv_eject                         = cor_eject,
-     .bdrv_lock_medium                   = cor_lock_medium,
+ static inline uint16_t
+@@ -2123,12 +2132,12 @@ virtqueue_read_next_desc(VuDev *dev, struct vring_desc *desc,
+                          int i, unsigned int max, unsigned int *next)
+ {
+     /* If this descriptor says it doesn't chain, we're done. */
+-    if (!(desc[i].flags & VRING_DESC_F_NEXT)) {
++    if (!(lduw_le_p(&desc[i].flags) & VRING_DESC_F_NEXT)) {
+         return VIRTQUEUE_READ_DESC_DONE;
+     }
  
--    .bdrv_co_block_status               = bdrv_co_block_status_from_file,
--
-     .has_variable_length                = true,
-     .is_filter                          = true,
- };
-diff --git a/block/filter-compress.c b/block/filter-compress.c
-index 8ec1991c1f..5136371bf8 100644
---- a/block/filter-compress.c
-+++ b/block/filter-compress.c
-@@ -146,8 +146,6 @@ static BlockDriver bdrv_compress = {
-     .bdrv_eject                         = compress_eject,
-     .bdrv_lock_medium                   = compress_lock_medium,
+     /* Check they're not leading us off end of descriptors. */
+-    *next = desc[i].next;
++    *next = lduw_le_p(&desc[i].next);
+     /* Make sure compiler knows to grab that: we don't want it changing! */
+     smp_wmb();
  
--    .bdrv_co_block_status               = bdrv_co_block_status_from_file,
--
-     .has_variable_length                = true,
-     .is_filter                          = true,
- };
-diff --git a/block/io.c b/block/io.c
-index 916464f089..a2389bb38c 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2255,36 +2255,6 @@ typedef struct BdrvCoBlockStatusData {
-     BlockDriverState **file;
- } BdrvCoBlockStatusData;
+@@ -2171,8 +2180,8 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, unsigned int *in_bytes,
+         }
+         desc = vq->vring.desc;
  
--int coroutine_fn bdrv_co_block_status_from_file(BlockDriverState *bs,
--                                                bool want_zero,
--                                                int64_t offset,
--                                                int64_t bytes,
--                                                int64_t *pnum,
--                                                int64_t *map,
--                                                BlockDriverState **file)
--{
--    assert(bs->file && bs->file->bs);
--    *pnum = bytes;
--    *map = offset;
--    *file = bs->file->bs;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
--}
--
--int coroutine_fn bdrv_co_block_status_from_backing(BlockDriverState *bs,
--                                                   bool want_zero,
--                                                   int64_t offset,
--                                                   int64_t bytes,
--                                                   int64_t *pnum,
--                                                   int64_t *map,
--                                                   BlockDriverState **file)
--{
--    assert(bs->backing && bs->backing->bs);
--    *pnum = bytes;
--    *map = offset;
--    *file = bs->backing->bs;
--    return BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
--}
--
- /*
-  * Returns the allocation status of the specified sectors.
-  * Drivers not implementing the functionality are assumed to not support
-@@ -2325,6 +2295,7 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-     BlockDriverState *local_file = NULL;
-     int64_t aligned_offset, aligned_bytes;
-     uint32_t align;
-+    bool has_filtered_child;
+-        if (desc[i].flags & VRING_DESC_F_INDIRECT) {
+-            if (desc[i].len % sizeof(struct vring_desc)) {
++        if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_INDIRECT) {
++            if (ldl_le_p(&desc[i].len) % sizeof(struct vring_desc)) {
+                 vu_panic(dev, "Invalid size for indirect buffer table");
+                 goto err;
+             }
+@@ -2185,8 +2194,8 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, unsigned int *in_bytes,
  
-     assert(pnum);
-     *pnum = 0;
-@@ -2350,7 +2321,8 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+             /* loop over the indirect descriptor table */
+             indirect = 1;
+-            desc_addr = desc[i].addr;
+-            desc_len = desc[i].len;
++            desc_addr = ldq_le_p(&desc[i].addr);
++            desc_len = ldl_le_p(&desc[i].len);
+             max = desc_len / sizeof(struct vring_desc);
+             read_len = desc_len;
+             desc = vu_gpa_to_va(dev, &read_len, desc_addr);
+@@ -2213,10 +2222,10 @@ vu_queue_get_avail_bytes(VuDev *dev, VuVirtq *vq, unsigned int *in_bytes,
+                 goto err;
+             }
  
-     /* Must be non-NULL or bdrv_getlength() would have failed */
-     assert(bs->drv);
--    if (!bs->drv->bdrv_co_block_status) {
-+    has_filtered_child = bdrv_filter_child(bs);
-+    if (!bs->drv->bdrv_co_block_status && !has_filtered_child) {
-         *pnum = bytes;
-         ret = BDRV_BLOCK_DATA | BDRV_BLOCK_ALLOCATED;
-         if (offset + bytes == total_size) {
-@@ -2371,9 +2343,20 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-     aligned_offset = QEMU_ALIGN_DOWN(offset, align);
-     aligned_bytes = ROUND_UP(offset + bytes, align) - aligned_offset;
+-            if (desc[i].flags & VRING_DESC_F_WRITE) {
+-                in_total += desc[i].len;
++            if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_WRITE) {
++                in_total += ldl_le_p(&desc[i].len);
+             } else {
+-                out_total += desc[i].len;
++                out_total += ldl_le_p(&desc[i].len);
+             }
+             if (in_total >= max_in_bytes && out_total >= max_out_bytes) {
+                 goto done;
+@@ -2367,7 +2376,7 @@ vring_used_flags_set_bit(VuVirtq *vq, int mask)
  
--    ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
--                                        aligned_bytes, pnum, &local_map,
--                                        &local_file);
-+    if (bs->drv->bdrv_co_block_status) {
-+        ret = bs->drv->bdrv_co_block_status(bs, want_zero, aligned_offset,
-+                                            aligned_bytes, pnum, &local_map,
-+                                            &local_file);
-+    } else {
-+        /* Default code for filters */
-+
-+        local_file = bdrv_filter_bs(bs);
-+        assert(local_file);
-+
-+        *pnum = aligned_bytes;
-+        local_map = aligned_offset;
-+        ret = BDRV_BLOCK_RAW | BDRV_BLOCK_OFFSET_VALID;
-+    }
-     if (ret < 0) {
-         *pnum = 0;
-         goto out;
-diff --git a/block/mirror.c b/block/mirror.c
-index f16b0d62bc..26acf4af6f 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -1531,7 +1531,6 @@ static BlockDriver bdrv_mirror_top = {
-     .bdrv_co_pwrite_zeroes      = bdrv_mirror_top_pwrite_zeroes,
-     .bdrv_co_pdiscard           = bdrv_mirror_top_pdiscard,
-     .bdrv_co_flush              = bdrv_mirror_top_flush,
--    .bdrv_co_block_status       = bdrv_co_block_status_from_backing,
-     .bdrv_refresh_filename      = bdrv_mirror_top_refresh_filename,
-     .bdrv_child_perm            = bdrv_mirror_top_child_perm,
+     flags = (uint16_t *)((char*)vq->vring.used +
+                          offsetof(struct vring_used, flags));
+-    *flags |= mask;
++    stw_le_p(flags, lduw_le_p(flags) | mask);
+ }
  
-diff --git a/block/throttle.c b/block/throttle.c
-index b21ee42d98..9a0f38149a 100644
---- a/block/throttle.c
-+++ b/block/throttle.c
-@@ -260,7 +260,6 @@ static BlockDriver bdrv_throttle = {
-     .bdrv_reopen_prepare                =   throttle_reopen_prepare,
-     .bdrv_reopen_commit                 =   throttle_reopen_commit,
-     .bdrv_reopen_abort                  =   throttle_reopen_abort,
--    .bdrv_co_block_status               =   bdrv_co_block_status_from_file,
+ static inline void
+@@ -2377,7 +2386,7 @@ vring_used_flags_unset_bit(VuVirtq *vq, int mask)
  
-     .bdrv_co_drain_begin                =   throttle_co_drain_begin,
-     .bdrv_co_drain_end                  =   throttle_co_drain_end,
+     flags = (uint16_t *)((char*)vq->vring.used +
+                          offsetof(struct vring_used, flags));
+-    *flags &= ~mask;
++    stw_le_p(flags, lduw_le_p(flags) & ~mask);
+ }
+ 
+ static inline void
+@@ -2387,7 +2396,7 @@ vring_set_avail_event(VuVirtq *vq, uint16_t val)
+         return;
+     }
+ 
+-    *((uint16_t *) &vq->vring.used->ring[vq->vring.num]) = val;
++    stw_le_p(&vq->vring.used->ring[vq->vring.num], val);
+ }
+ 
+ void
+@@ -2476,14 +2485,14 @@ vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
+     struct vring_desc desc_buf[VIRTQUEUE_MAX_SIZE];
+     int rc;
+ 
+-    if (desc[i].flags & VRING_DESC_F_INDIRECT) {
+-        if (desc[i].len % sizeof(struct vring_desc)) {
++    if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_INDIRECT) {
++        if (ldl_le_p(&desc[i].len) % sizeof(struct vring_desc)) {
+             vu_panic(dev, "Invalid size for indirect buffer table");
+         }
+ 
+         /* loop over the indirect descriptor table */
+-        desc_addr = desc[i].addr;
+-        desc_len = desc[i].len;
++        desc_addr = ldq_le_p(&desc[i].addr);
++        desc_len = ldl_le_p(&desc[i].len);
+         max = desc_len / sizeof(struct vring_desc);
+         read_len = desc_len;
+         desc = vu_gpa_to_va(dev, &read_len, desc_addr);
+@@ -2505,10 +2514,10 @@ vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
+ 
+     /* Collect all the descriptors */
+     do {
+-        if (desc[i].flags & VRING_DESC_F_WRITE) {
++        if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_WRITE) {
+             virtqueue_map_desc(dev, &in_num, iov + out_num,
+                                VIRTQUEUE_MAX_SIZE - out_num, true,
+-                               desc[i].addr, desc[i].len);
++                               ldq_le_p(&desc[i].addr), ldl_le_p(&desc[i].len));
+         } else {
+             if (in_num) {
+                 vu_panic(dev, "Incorrect order for descriptors");
+@@ -2516,7 +2525,7 @@ vu_queue_map_desc(VuDev *dev, VuVirtq *vq, unsigned int idx, size_t sz)
+             }
+             virtqueue_map_desc(dev, &out_num, iov,
+                                VIRTQUEUE_MAX_SIZE, false,
+-                               desc[i].addr, desc[i].len);
++                               ldq_le_p(&desc[i].addr), ldl_le_p(&desc[i].len));
+         }
+ 
+         /* If we've got too many, that implies a descriptor loop. */
+@@ -2712,14 +2721,14 @@ vu_log_queue_fill(VuDev *dev, VuVirtq *vq,
+     max = vq->vring.num;
+     i = elem->index;
+ 
+-    if (desc[i].flags & VRING_DESC_F_INDIRECT) {
+-        if (desc[i].len % sizeof(struct vring_desc)) {
++    if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_INDIRECT) {
++        if (ldl_le_p(&desc[i].len) % sizeof(struct vring_desc)) {
+             vu_panic(dev, "Invalid size for indirect buffer table");
+         }
+ 
+         /* loop over the indirect descriptor table */
+-        desc_addr = desc[i].addr;
+-        desc_len = desc[i].len;
++        desc_addr = ldq_le_p(&desc[i].addr);
++        desc_len = ldl_le_p(&desc[i].len);
+         max = desc_len / sizeof(struct vring_desc);
+         read_len = desc_len;
+         desc = vu_gpa_to_va(dev, &read_len, desc_addr);
+@@ -2745,9 +2754,9 @@ vu_log_queue_fill(VuDev *dev, VuVirtq *vq,
+             return;
+         }
+ 
+-        if (desc[i].flags & VRING_DESC_F_WRITE) {
+-            min = MIN(desc[i].len, len);
+-            vu_log_write(dev, desc[i].addr, min);
++        if (lduw_le_p(&desc[i].flags) & VRING_DESC_F_WRITE) {
++            min = MIN(ldl_le_p(&desc[i].len), len);
++            vu_log_write(dev, ldq_le_p(&desc[i].addr), min);
+             len -= min;
+         }
+ 
+@@ -2772,15 +2781,15 @@ vu_queue_fill(VuDev *dev, VuVirtq *vq,
+ 
+     idx = (idx + vq->used_idx) % vq->vring.num;
+ 
+-    uelem.id = elem->index;
+-    uelem.len = len;
++    stl_le_p(&uelem.id, elem->index);
++    stl_le_p(&uelem.len, len);
+     vring_used_write(dev, vq, &uelem, idx);
+ }
+ 
+ static inline
+ void vring_used_idx_set(VuDev *dev, VuVirtq *vq, uint16_t val)
+ {
+-    vq->vring.used->idx = val;
++    stw_le_p(&vq->vring.used->idx, val);
+     vu_log_write(dev,
+                  vq->vring.log_guest_addr + offsetof(struct vring_used, idx),
+                  sizeof(vq->vring.used->idx));
 -- 
-2.26.2
+2.25.4
 
 
