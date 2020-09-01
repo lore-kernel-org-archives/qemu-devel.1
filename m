@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3580AC433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 851AAC433E7
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:21:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEB06206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:21:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 50BD6206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:21:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0hZRf7x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB06206A5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N+x/ePED"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50BD6206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD2Ty-0005LT-53
+	id 1kD2Ty-0005Mn-G9
 	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:21:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33794)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kD2KT-0003Xp-Jw
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:11:49 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52831
+ id 1kD2KZ-0003lM-3F
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:11:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24641
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kD2KR-0006rS-LF
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:11:49 -0400
+ id 1kD2KX-0006sY-8t
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:11:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598951507;
+ s=mimecast20190719; t=1598951512;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=3Q/ZAsSwM+WifqfwQlCrXnImFd901hQ55k1t7JbU36Q=;
- b=f0hZRf7xg4XHPm4EBhPQTY+PTRddLeuSCMoElu2JfB1Lcz3HYpZrhBbHQL/+Mwu0Q9pO8J
- E+RmsIjJVMymZouB6WvFu0AikhV6GI6CFOKkOKZ8uYpS/uuLXwOoJsqRpfxQ7T667g62KE
- 09P1dtcPSfRm1UlPo/vd7p+PMF1rjqY=
+ bh=CHD/T/2GtcjdtrkJkCuvpJR9JYXGP04bZaW+yoSYPLU=;
+ b=N+x/ePEDQSh5aUbeDsgxye65ZUfgGIQseJ85LI2dYyhJON240QMFrxcycZ1k0UdWRX43+S
+ jqyLLbd8WzOSC0bGIieuvMwNXdkRIhqYEIvr4K+9hIVCIksD6oQ+nfjuRzjkB1JDtwEi0V
+ yFrQZurMwMKSNg5CN/2KnbqhKGAxCzQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-8hIEIB2gMzSakQeNw7WkaQ-1; Tue, 01 Sep 2020 05:11:43 -0400
-X-MC-Unique: 8hIEIB2gMzSakQeNw7WkaQ-1
+ us-mta-183-wGdiUIVnNRCT4FkSV8lq9g-1; Tue, 01 Sep 2020 05:11:43 -0400
+X-MC-Unique: wGdiUIVnNRCT4FkSV8lq9g-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CC3CF801AE2
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5CAD4801FDE
  for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 09:11:42 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7D73B60C04;
- Tue,  1 Sep 2020 09:11:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E7B160C04;
+ Tue,  1 Sep 2020 09:11:41 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/24] meson: pass docdir option
-Date: Tue,  1 Sep 2020 05:11:24 -0400
-Message-Id: <20200901091132.29601-17-pbonzini@redhat.com>
+Subject: [PULL 15/24] meson: use meson datadir instead of qemu_datadir
+Date: Tue,  1 Sep 2020 05:11:23 -0400
+Message-Id: <20200901091132.29601-16-pbonzini@redhat.com>
 In-Reply-To: <20200901091132.29601-1-pbonzini@redhat.com>
 References: <20200901091132.29601-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -104,107 +104,134 @@ Sender: "Qemu-devel"
 
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-When cross-compiling, by default qemu_docdir is 'c:\Program Files\QEMU\'
-which is not recognized as being an absolute path, and meson will end up
-adding the prefix again.
-
-Add an option to pass docdir location to meson, pre-prefixed like we do
-with other directories, build qemu_docdir with the common suffix and use
-that instead of config_host['qemu_docdir'].
+When cross-compiling, by default qemu_datadir is 'c:\Program
+Files\QEMU', which is not recognized as being an absolute path, and
+meson will end up adding the prefix again.
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200826110419.528931-7-marcandre.lureau@redhat.com>
+Message-Id: <20200826110419.528931-6-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure         | 2 +-
- docs/meson.build  | 4 ++--
- meson.build       | 4 +++-
- meson_options.txt | 2 ++
- 4 files changed, 8 insertions(+), 4 deletions(-)
+ contrib/vhost-user-gpu/meson.build | 2 +-
+ meson.build                        | 3 ++-
+ meson_options.txt                  | 2 +-
+ pc-bios/descriptors/meson.build    | 2 +-
+ pc-bios/keymaps/meson.build        | 6 +++---
+ pc-bios/meson.build                | 2 +-
+ tools/virtiofsd/meson.build        | 2 +-
+ trace/meson.build                  | 2 +-
+ 8 files changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/configure b/configure
-index 78aae9c2a0..1f478a46a9 100755
---- a/configure
-+++ b/configure
-@@ -6653,7 +6653,6 @@ echo "sysconfdir=$sysconfdir" >> $config_host_mak
- echo "qemu_confdir=$qemu_confdir" >> $config_host_mak
- echo "qemu_datadir=$qemu_datadir" >> $config_host_mak
- echo "qemu_firmwarepath=$firmwarepath" >> $config_host_mak
--echo "qemu_docdir=$qemu_docdir" >> $config_host_mak
- echo "qemu_moddir=$qemu_moddir" >> $config_host_mak
- if test "$mingw32" = "no" ; then
-   echo "qemu_localstatedir=$local_statedir" >> $config_host_mak
-@@ -8198,6 +8197,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
-         --mandir "${pre_prefix}$mandir" \
-         --sysconfdir "${pre_prefix}$sysconfdir" \
-         --localstatedir "${pre_prefix}$local_statedir" \
-+        -Ddocdir="${pre_prefix}$docdir" \
-         -Dqemu_suffix="$qemu_suffix" \
-         -Doptimization=$(if test "$debug" = yes; then echo 0; else echo 2; fi) \
-         -Ddebug=$(if test "$debug_info" = yes; then echo true; else echo false; fi) \
-diff --git a/docs/meson.build b/docs/meson.build
-index 8b059a8e39..50f367349b 100644
---- a/docs/meson.build
-+++ b/docs/meson.build
-@@ -10,7 +10,7 @@ if build_docs
-   configure_file(output: 'index.html',
-                  input: files('index.html.in'),
-                  configuration: {'VERSION': meson.project_version()},
--                 install_dir: config_host['qemu_docdir'])
-+                 install_dir: qemu_docdir)
-   manuals = [ 'devel', 'interop', 'tools', 'specs', 'system', 'user' ]
-   man_pages = {
-     'interop' : {
-@@ -48,7 +48,7 @@ if build_docs
-                           input_dir, output_dir])
-     sphinxdocs += this_manual
-     if build_docs and manual != 'devel'
--      install_subdir(output_dir, install_dir: config_host['qemu_docdir'])
-+      install_subdir(output_dir, install_dir: qemu_docdir)
-     endif
- 
-     these_man_pages = []
+diff --git a/contrib/vhost-user-gpu/meson.build b/contrib/vhost-user-gpu/meson.build
+index 12d608c2e7..7d9b29da8b 100644
+--- a/contrib/vhost-user-gpu/meson.build
++++ b/contrib/vhost-user-gpu/meson.build
+@@ -10,5 +10,5 @@ if 'CONFIG_TOOLS' in config_host and 'CONFIG_VIRGL' in config_host \
+   configure_file(input: '50-qemu-gpu.json.in',
+                  output: '50-qemu-gpu.json',
+                  configuration: config_host,
+-                 install_dir: config_host['qemu_datadir'] / 'vhost-user')
++                 install_dir: qemu_datadir / 'vhost-user')
+ endif
 diff --git a/meson.build b/meson.build
-index bf6d1b3153..43e2c6e43d 100644
+index 8b28ecff28..bf6d1b3153 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -19,6 +19,7 @@ enable_modules = 'CONFIG_MODULES' in config_host
+@@ -18,6 +18,7 @@ config_all_disas = keyval.load(meson.current_build_dir() / 'config-all-disas.mak
+ enable_modules = 'CONFIG_MODULES' in config_host
  enable_static = 'CONFIG_STATIC' in config_host
  build_docs = 'BUILD_DOCS' in config_host
- qemu_datadir = get_option('datadir') / get_option('qemu_suffix')
-+qemu_docdir = get_option('docdir') / get_option('qemu_suffix')
++qemu_datadir = get_option('datadir') / get_option('qemu_suffix')
  config_host_data = configuration_data()
  genh = []
  
-@@ -1182,7 +1183,7 @@ if build_docs
-                       input: input,
-                       output: output,
-                       install: true,
--                      install_dir: config_host['qemu_docdir'] / 'interop',
-+                      install_dir: qemu_docdir / 'interop',
-                       command: cmd + args)
-       endforeach
-       alias_target(ext, t)
-@@ -1245,6 +1246,7 @@ if targetos != 'windows'
- else
-   summary_info += {'local state directory': 'queried at runtime'}
- endif
-+summary_info += {'Doc directory':     get_option('docdir')}
- summary_info += {'Build directory':   meson.current_build_dir()}
- summary_info += {'Source path':       meson.current_source_dir()}
- summary_info += {'GIT binary':        config_host['GIT']}
+@@ -1055,7 +1056,7 @@ foreach target : target_dirs
+                       output: exe['name'] + stp['ext'],
+                       capture: true,
+                       install: stp['install'],
+-                      install_dir: config_host['qemu_datadir'] / '../systemtap/tapset',
++                      install_dir: qemu_datadir / '../systemtap/tapset',
+                       command: [
+                         tracetool, '--group=all', '--format=' + stp['fmt'],
+                         '--binary=' + stp['bin'],
 diff --git a/meson_options.txt b/meson_options.txt
-index f4275691bd..c3120fa359 100644
+index dfdcf85063..f4275691bd 100644
 --- a/meson_options.txt
 +++ b/meson_options.txt
-@@ -1,5 +1,7 @@
- option('qemu_suffix', type : 'string', value: 'qemu',
+@@ -1,4 +1,4 @@
+-option('qemu_suffix', type : 'string', value: '/qemu',
++option('qemu_suffix', type : 'string', value: 'qemu',
         description: 'Suffix for QEMU data/modules/config directories (can be empty)')
-+option('docdir', type : 'string', value : 'doc',
-+       description: 'Base directory for documentation installation (can be empty)')
  option('gettext', type : 'boolean', value : true)
  option('sdl', type : 'feature', value : 'auto')
- option('sdl_image', type : 'feature', value : 'auto')
+diff --git a/pc-bios/descriptors/meson.build b/pc-bios/descriptors/meson.build
+index 7c715bace8..3798d32372 100644
+--- a/pc-bios/descriptors/meson.build
++++ b/pc-bios/descriptors/meson.build
+@@ -10,5 +10,5 @@ foreach f: [
+                  output: f,
+                  configuration: {'DATADIR': config_host['qemu_datadir']},
+                  install: install_blobs,
+-                 install_dir: config_host['qemu_datadir'] / 'firmware')
++                 install_dir: qemu_datadir / 'firmware')
+ endforeach
+diff --git a/pc-bios/keymaps/meson.build b/pc-bios/keymaps/meson.build
+index b737c82230..bbac83ece3 100644
+--- a/pc-bios/keymaps/meson.build
++++ b/pc-bios/keymaps/meson.build
+@@ -44,13 +44,13 @@ foreach km, args: keymaps
+                      build_by_default: true,
+                      output: km,
+                      command: [native_qemu_keymap, '-f', '@OUTPUT@', args.split()],
+-                     install_dir: config_host['qemu_datadir'] / 'keymaps')
++                     install_dir: qemu_datadir / 'keymaps')
+ endforeach
+ if t.length() > 0
+   alias_target('update-keymaps', t)
+ else
+   # install from the source tree
+-  install_data(keymaps.keys(), install_dir: config_host['qemu_datadir'] / 'keymaps')
++  install_data(keymaps.keys(), install_dir: qemu_datadir / 'keymaps')
+ endif
+ 
+-install_data(['sl', 'sv'], install_dir: config_host['qemu_datadir'] / 'keymaps')
++install_data(['sl', 'sv'], install_dir: qemu_datadir / 'keymaps')
+diff --git a/pc-bios/meson.build b/pc-bios/meson.build
+index f608c2cdba..8087e5c0a7 100644
+--- a/pc-bios/meson.build
++++ b/pc-bios/meson.build
+@@ -19,7 +19,7 @@ if 'DECOMPRESS_EDK2_BLOBS' in config_host
+                   input: '@0@.bz2'.format(f),
+                   capture: true,
+                   install: install_blobs,
+-                  install_dir: config_host['qemu_datadir'],
++                  install_dir: qemu_datadir,
+                   command: [ bzip2, '-dc', '@INPUT0@' ])
+   endforeach
+ endif
+diff --git a/tools/virtiofsd/meson.build b/tools/virtiofsd/meson.build
+index d1e23c5760..50022ed89e 100644
+--- a/tools/virtiofsd/meson.build
++++ b/tools/virtiofsd/meson.build
+@@ -16,4 +16,4 @@ executable('virtiofsd', files(
+ configure_file(input: '50-qemu-virtiofsd.json.in',
+                output: '50-qemu-virtiofsd.json',
+                configuration: config_host,
+-               install_dir: config_host['qemu_datadir'] / 'vhost-user')
++               install_dir: qemu_datadir / 'vhost-user')
+diff --git a/trace/meson.build b/trace/meson.build
+index 1c1fb31a61..b36937d3a6 100644
+--- a/trace/meson.build
++++ b/trace/meson.build
+@@ -58,7 +58,7 @@ trace_events_all = custom_target('trace-events-all',
+                                  command: [ 'cat', '@INPUT@' ],
+                                  capture: true,
+                                  install: true,
+-                                 install_dir: config_host['qemu_datadir'])
++                                 install_dir: qemu_datadir)
+ 
+ foreach d : [
+   ['generated-tcg-tracers.h', 'tcg-h'],
 -- 
 2.26.2
 
