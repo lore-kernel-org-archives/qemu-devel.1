@@ -2,92 +2,87 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C56C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:32:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A5BC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:32:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F382205CB
+	by mail.kernel.org (Postfix) with ESMTPS id C410C2087D
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:32:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="DtMH31QB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F382205CB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
+	dkim=pass (1024-bit key) header.d=yadro.com header.i=@yadro.com header.b="rdFc3pxc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C410C2087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yadro.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD2em-0000Ft-Ig
+	id 1kD2em-0001BL-T4
 	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:32:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34776)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1kD2O6-0002lK-QT; Tue, 01 Sep 2020 05:15:34 -0400
-Received: from mout.web.de ([212.227.17.12]:34913)
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1kD2cI-0007DC-UF
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:30:14 -0400
+Received: from mta-02.yadro.com ([89.207.88.252]:46632 helo=mta-01.yadro.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
- id 1kD2O4-0007JS-Pm; Tue, 01 Sep 2020 05:15:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=dbaedf251592; t=1598951727;
- bh=xAfFk+1GpNfhWU5jVhEM5S9s3tlNI5aCZKFADiMs8rs=;
- h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
- b=DtMH31QBhti5RV02/tizZ5kdNJcATWnln1yV4AeFS8UrPAOjw6PNjDLq4gdHOEMqF
- riYdFzTaCKAFUh2t0PR4QLjDNfQyzqu77zLcQ025CR+CtInARr7VEbeAFu8LCh6EVr
- gmQEheqiVwhCAiKNWQQ/9M7A4TMgo7BGmrYNX6wE=
-X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from luklap ([88.130.61.220]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lc8c5-1kuNwY2Icv-00jZtU; Tue, 01
- Sep 2020 11:15:27 +0200
-Date: Tue, 1 Sep 2020 11:15:25 +0200
-From: Lukas Straub <lukasstraub2@web.de>
-To: qemu-devel <qemu-devel@nongnu.org>
-Subject: [PATCH v8 6/8] io: Document qmp oob suitability of
- qio_channel_shutdown and io_shutdown
-Message-ID: <cd6eaf1915c834e7070a5c3cad083372a43edb82.1598951375.git.lukasstraub2@web.de>
-In-Reply-To: <cover.1598951375.git.lukasstraub2@web.de>
-References: <cover.1598951375.git.lukasstraub2@web.de>
+ (Exim 4.90_1) (envelope-from <r.bolshakov@yadro.com>)
+ id 1kD2cF-0000aj-L6
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:30:14 -0400
+Received: from localhost (unknown [127.0.0.1])
+ by mta-01.yadro.com (Postfix) with ESMTP id 0449850242;
+ Tue,  1 Sep 2020 09:30:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=yadro.com; h=
+ in-reply-to:content-disposition:content-type:content-type
+ :mime-version:references:message-id:subject:subject:from:from
+ :date:date:received:received:received; s=mta-01; t=1598952603;
+ x=1600767004; bh=RlaWe9hCBVtj1Hl/Q5UesD50STglrKphDgGMmiWfOko=; b=
+ rdFc3pxc9waNoNxY1bbaGIlFq8o4mNnsp6YJ0k8Haw7wHFa6UoUdfmUdtSmtkXYz
+ uwx2TUMrwvxRUgDPhi+IJArFNdViERvSvMeXgM1LbcWWmVPCgjpi7hjAOCk5z8cs
+ Mr6rfV6qsUSGa4d2o96aGV5Ub+RjOnRjk6IFxY+dtMQ=
+X-Virus-Scanned: amavisd-new at yadro.com
+Received: from mta-01.yadro.com ([127.0.0.1])
+ by localhost (mta-01.yadro.com [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id KxbegW18iwQB; Tue,  1 Sep 2020 12:30:03 +0300 (MSK)
+Received: from T-EXCH-02.corp.yadro.com (t-exch-02.corp.yadro.com
+ [172.17.10.102])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mta-01.yadro.com (Postfix) with ESMTPS id 8CF1F4D905;
+ Tue,  1 Sep 2020 12:30:02 +0300 (MSK)
+Received: from localhost (172.17.204.212) by T-EXCH-02.corp.yadro.com
+ (172.17.10.102) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384_P384) id 15.1.669.32; Tue, 1 Sep
+ 2020 12:30:02 +0300
+Date: Tue, 1 Sep 2020 12:30:01 +0300
+From: Roman Bolshakov <r.bolshakov@yadro.com>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [PATCH v6 13/16] hvf: remove hvf specific functions from global
+ includes
+Message-ID: <20200901093001.GB22344@SPB-NB-133.local>
+References: <20200901072201.7133-1-cfontana@suse.de>
+ <20200901072201.7133-14-cfontana@suse.de>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/gZoCt9kruQ_rV2X1IiLrSn_";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Provags-ID: V03:K1:GZthgDTWeDdi57QP0iqQtvXjml5F/NRUmThVXeJAHBKiPYRactx
- YaFuhmbhxIiqebyCYID4RiM/PrGx0KTFfKzExVaQOokjTHC8MUl8Xva/b7TpL+sYLQwy7f8
- Mdyt8GpFGj3atNXa5G8GePWEXCUiTTY9vrKp4NxomDD1XiIY67fCGM67IRvXTqqigrOVenm
- TNRtk3aielVoXau5rewXg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QqAxWhWLByg=:pKA1esqGSXSDGiB3m3n2gN
- VL2aCzP49Kj+C1wkk30wIXCsaX2YXAaMOg+t3AreOhTrM2fcy6WXrNHLBANQIXvKetNidFtW/
- x7mV6HEnvXkzvlTUiapmmkwNncNQwdaNff49WuK/tJq8PfxC1r+I/9arJfWfGpXX6Yw5UQXHP
- aa7CHp9yA4ynMb5crWpnv38YZQ63YsMMaShm8jB7SvpLGJsQWixoryUAd8BoF18W635TTxapH
- ibrZjC9frE1Q2dS0XKNV0Ub9gcNIXIk/HxAVOUM54UBwamOVl9UdMwPkczjUoN2rlo99+el8S
- Fd6gBzSteOPVzAvr6N34qHsE+xNPTLmR8fn7IH+Ko9lP6hr6fBt/wtBYR7zLbDFwIRYQkY2Vu
- pCndaEIgIP2EnYc8uoveLVW64Q8gCWeTOFb0HAFtKQ2tkA5P1qn5gPCY30yNOIKYLUxzRgIKW
- 0ZoOCAte4u3wfwYIme54DU7AN6TQUUMl2y0MjxcnG0HQyoH81IrkLwj4jvU6BS91AStrOqW6J
- /FCbf44HKhPvYfrHRrZTj0YcYm+5kbrQRjbHIf03b6UedrbrwSQC6LgCWScp5FLVs+YtlXSOf
- 4rXoI6Px1z7KSq1z5MlPYqSd1TA/VZqGrwfzc4e+xC4LjB5XlIToxt2udfE+KAtSxMjQR6mco
- S8OpsKgok3407nM3xK9fmlmOT/oYk6IeAOzziJKsnE2NoVeXxJObjJgPh5+IKE+m+IUpSPdfJ
- UFNUYPfw9CTjz20AaTkEPMopy2G4AJYL9i+d9rzsx+lrDc781DZ9UhVyY0VBxTyQQpuYMAMiF
- 231LWVm/wxQJCvSUchTjRjrBQnshBU49ez76+MwCn7NsMTteq8UxwKN+ESzw9h1dnPV53+maZ
- StQdFaCmWUBOYqKcNfiX/nB+mZe5tQ9YbgQ9Yw3HXKEk5JcWyFLR9W5UmjHqVJ7khD6X4I0Z0
- 05v52TmA1LMjxU0s/jT2x2lv684d3GTU1ibujDm2Yw1ToOWsvdJJo3NMKxtQH2fiaApa5lkrS
- 6MGM8fu2eBUPMuaiJKbrbz6IOFuePTe673uvsNK7TI/wKHb/CMHbS4Ti1XzNNL7St+uRHunfv
- os+Ty2iXp2cHiKo6/X1kDTbrWJyp8mLTK0YXFB2+wivNhbfqTc7/A2e4H8qt7O6aatzm0ZnJv
- /YWFVyMv/lluGaxg+WFh9hIOhueWXHpXByzviKTr9kAzg5WeZulDOn17AG25xW4lVvaCAh7QZ
- 54Pyc4qdMvdwxZ4p2qrK/p4wIQ40hk9rqJR5sjA==
-Received-SPF: pass client-ip=212.227.17.12; envelope-from=lukasstraub2@web.de;
- helo=mout.web.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:15:13
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -24
-X-Spam_score: -2.5
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20200901072201.7133-14-cfontana@suse.de>
+X-Originating-IP: [172.17.204.212]
+X-ClientProxiedBy: T-EXCH-01.corp.yadro.com (172.17.10.101) To
+ T-EXCH-02.corp.yadro.com (172.17.10.102)
+Received-SPF: pass client-ip=89.207.88.252; envelope-from=r.bolshakov@yadro.com;
+ helo=mta-01.yadro.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:30:08
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,78 +96,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
+ Marcelo Tosatti <mtosatti@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
+ Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/gZoCt9kruQ_rV2X1IiLrSn_
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Tue, Sep 01, 2020 at 09:21:58AM +0200, Claudio Fontana wrote:
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> ---
+>  accel/stubs/hvf-stub.c     | 30 ------------------------------
+>  accel/stubs/meson.build    |  1 -
+>  include/sysemu/hvf.h       |  8 --------
+>  target/i386/hvf/hvf-cpus.h |  8 ++++++++
+>  target/i386/hvf/x86hvf.c   |  2 ++
+>  target/i386/hvf/x86hvf.h   |  1 -
+>  6 files changed, 10 insertions(+), 40 deletions(-)
+>  delete mode 100644 accel/stubs/hvf-stub.c
+> 
 
-Migration and yank code assume that qio_channel_shutdown is thread
--safe and can be called from qmp oob handler. Document this after
-checking the code.
+Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
 
-Signed-off-by: Lukas Straub <lukasstraub2@web.de>
-Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- include/io/channel.h | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/include/io/channel.h b/include/io/channel.h
-index d4557f0930..46156d84f5 100644
---- a/include/io/channel.h
-+++ b/include/io/channel.h
-@@ -98,7 +98,8 @@ struct QIOChannel {
-  * provide additional optional features.
-  *
-  * Consult the corresponding public API docs for a description
-- * of the semantics of each callback
-+ * of the semantics of each callback. io_shutdown in particular
-+ * must be thread-safe, terminate quickly and must not block.
-  */
- struct QIOChannelClass {
-     ObjectClass parent;
-@@ -516,6 +517,8 @@ int qio_channel_close(QIOChannel *ioc,
-  * QIO_CHANNEL_FEATURE_SHUTDOWN prior to calling
-  * this method.
-  *
-+ * This function is thread-safe, terminates quickly and does not block.
-+ *
-  * Returns: 0 on success, -1 on error
-  */
- int qio_channel_shutdown(QIOChannel *ioc,
---
-2.20.1
-
-
---Sig_/gZoCt9kruQ_rV2X1IiLrSn_
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl9OES0ACgkQNasLKJxd
-sljgbQ//ViBrC+Cn+nhiU5HNeyljFEHuM0QQT3Nl4QDTNvVW+pQB6xa0vRdhiO5R
-O/jARDR21pJ2ThQVX2a+72Z4IxVSDhBJEXJkx2RXN7wdvruq2nwfeBQvEfhuzKaY
-7ekASknDbwKIKKM0OMebLUfp9lD3IgrsfO7JOvnmLwL6JMI6CUhMKHurgmTzUPzf
-ALuLw1eVut71VJAymoLy1PL6ar2yoYq8lmYsu5ZlnXV0w5Gdab51CK84D86aFw3p
-ukRZF0itdIEzM6hvBWV4yTJ8YiqiD4C8NIqvbVhAy5SE59n9Lop1paZJ43fRZZNd
-NzY1w6x7wqcfQzDmKbranAUdDbyzkFutITa8R1e1BBzUt+7sZtScDxUPqJ5S8MZF
-a9sKxuZcjFG2UIrUrsMCyU+gpt6KKQRjv52+U1cchIWwkNVbDMXUba/jKEq35JlD
-AtVwYq61ouzwxL3FTIxrFq7NfeXVUxqvy+fp5wrRQ7ZZ38qQtBD+jFFOpTmbSlV+
-Jyb+US7qn9o5nLNQmhXdePGGOUsDPmWOAtCayPB0JzqZ06o45cSxJ4x/RXL9NUuQ
-mQfWuDaFlbzRGhhaAFzZ5wyHB8+04knEvGNdaVjhC6eWqq3IRhpMtjYPqACDvlii
-KPnZD8uNY0WAy0RCKaaoJdW7MMwPYj+qMYNUBKc4EUlc+0s3pA8=
-=nqT3
------END PGP SIGNATURE-----
-
---Sig_/gZoCt9kruQ_rV2X1IiLrSn_--
+Thanks,
+Roman
 
