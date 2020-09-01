@@ -2,92 +2,93 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE554C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 675FEC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:02:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 84864206F0
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 308AA2151B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:02:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WXmcwdNs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84864206F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SASqnb+R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 308AA2151B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD6oP-0007Gy-ML
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:59:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51312)
+	id 1kD6s5-00014x-Am
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:02:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kD6nr-0006mA-Vn
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:58:27 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:29425
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kD6nn-0001xg-B6
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:58:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598968702;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Y/Pf+644+9GonY+Buh0yiHAZpb3UWg9fd+j1ooVbonQ=;
- b=WXmcwdNsoOMHdrTkjkZQvqGWPEZNkvusWj7a3JGKJOkQ8F1214CSVhqEPD5QQt94g9OjdY
- dUzIrPxsCn9CwXKPE86KO9xKqxtK6jnqHv2ziekGp3WNWoKIeJPUoupOgdOnGgLQC3AmFy
- kvEeD11yA/IU3tOyOntROT2Lvu+Is4Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-489-V3zY99p9OCi119ytgcviYA-1; Tue, 01 Sep 2020 09:58:20 -0400
-X-MC-Unique: V3zY99p9OCi119ytgcviYA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EF8A10ABDA8;
- Tue,  1 Sep 2020 13:58:19 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-10.ams2.redhat.com [10.36.114.10])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5ED5D7EB94;
- Tue,  1 Sep 2020 13:58:17 +0000 (UTC)
-Date: Tue, 1 Sep 2020 15:58:15 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH v2 (BROKEN) 0/6] migration: bring improved
- savevm/loadvm/delvm to QMP
-Message-ID: <20200901135815.GA4251@linux.fritz.box>
-References: <20200727150843.3419256-1-berrange@redhat.com>
- <877dtls8ux.fsf@dusky.pond.sub.org>
- <20200826182824.GA190807@redhat.com>
- <874koonyd0.fsf@dusky.pond.sub.org>
- <20200827113411.GP192458@redhat.com>
- <87d035ws1b.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kD6qs-000859-Si; Tue, 01 Sep 2020 10:01:36 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42509)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kD6qr-0002Uf-95; Tue, 01 Sep 2020 10:01:34 -0400
+Received: by mail-wr1-x441.google.com with SMTP id c18so1653591wrm.9;
+ Tue, 01 Sep 2020 07:01:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=nVzUwFb/Pru0mu/Wze/TshCcACe4nWk3tSS2yGusfjU=;
+ b=SASqnb+RFqXx8M5S6P9b80CdwD2fCFwkebYGu8B5gfaEvOEVNTPkN6rz/fDJmoDFBj
+ JMxtuvRF8plK8TholW9XV86jtBye/Drie2Uozi0DS4VBjGs6/LGg8syBYYbEelNZ/yXk
+ MuTLfDdW3AKzDAn/x0X2CE+tqOQDAEktWVGwfQjKSRBOGCOj14x4lBRzn2amo/qV61HS
+ t8zO5C16ck3XHw9FacAEbnGsI2KVx/wAlKnQlns/NYo4g2NCN2F0KzGu5cTLE+/PbZjm
+ CwPOOIwQPgtA5hETnyHTr1JRfYhPPiwwU+3R1+5kEVC0k4ihlEFEtkUrIsq/e80Etq+b
+ +Y3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=nVzUwFb/Pru0mu/Wze/TshCcACe4nWk3tSS2yGusfjU=;
+ b=ET/LQE0AtPuut5v5JNxWPiwemPeVXD1Pyem7HULL/ugHRpfhIDzg4DbrQcs9eEhXVL
+ 3WZml8NbePyUMGsh4eymSruywduqfgQzLfgPZsPt2kOSUs5CHpcreBYmmV6b0jDb3ZAS
+ Brs4Y5llh1EdALcMeVr5yAFGc87bNqq9rzQ+NyuQ3m/rTCyQ2EG67XluovLlOipSWkUl
+ 1DX9YIcgD0AFF7YB0mh8r73mvF7qtbUaClQ72flnBuNIhAcdpqkLadj7bHlkcH+QX4hq
+ bSNdnSTRjCvZuzYRLaqZYCfWkfOty1lMNelXPOGqPM+NKqKBGK55Ebw8iCRHlXgeRhWA
+ lWwg==
+X-Gm-Message-State: AOAM531Gy3nCB6tQ+ONKfMhuV5OcYGHuUr7N2dXjhJRsi6lw64/1qOwC
+ 2EcXDu86lllTsw2wCfkjDuO9c8oOiag=
+X-Google-Smtp-Source: ABdhPJyHdqNk8QmVqS3jLkG35xdwwawsbObdYlpd0LJHEHrzd9qmiLUyRbiNg4MOQIBzb6qrM4vQjQ==
+X-Received: by 2002:a5d:4e03:: with SMTP id p3mr2065703wrt.354.1598968890999; 
+ Tue, 01 Sep 2020 07:01:30 -0700 (PDT)
+Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id m13sm1492107wrr.74.2020.09.01.07.01.30
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 07:01:30 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/3] hw/sd/sdhci: Fix qemu_log_mask() format string
+Date: Tue,  1 Sep 2020 16:01:25 +0200
+Message-Id: <20200901140127.111454-2-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200901140127.111454-1-f4bug@amsat.org>
+References: <20200901140127.111454-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <87d035ws1b.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:08:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,174 +101,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Krempa <pkrempa@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
- John Snow <jsnow@redhat.com>
+Cc: Prasad J Pandit <pjp@fedoraproject.org>, qemu-block@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Alexander Bulekov <alxndr@bu.edu>, bugs-syssec@rub.de,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 01.09.2020 um 15:22 hat Markus Armbruster geschrieben:
-> Daniel P. Berrangé <berrange@redhat.com> writes:
-> 
-> > On Thu, Aug 27, 2020 at 01:04:43PM +0200, Markus Armbruster wrote:
-> >> Daniel P. Berrangé <berrange@redhat.com> writes:
-> >> 
-> >> > On Wed, Aug 26, 2020 at 05:52:06PM +0200, Markus Armbruster wrote:
-> >> > From the POV of practicality, making a design that unifies internal
-> >> > and external snapshots is something I'm considering out of scope.
-> >> > It increases the design time burden, as well as implementation burden.
-> >> > On my side, improving internal snapshots is a "spare time" project,
-> >> > not something I can justify spending weeks or months on.
-> >> 
-> >> I'm not demanding a solution that unifies internal and external
-> >> snapshots.  I'm asking for a bit of serious thought on an interface that
-> >> could compatibly evolve there.  Hours, not weeks or months.
-> >> 
-> >> > My goal is to implement something that is achievable in a short
-> >> > amount of time that gets us out of the hole we've been in for 10
-> >> > years. Minimal refactoring of the internal snapshot code aside
-> >> > from fixing the critical limitations we have today around choice
-> >> > of disks to snapshot.
-> >> >
-> >> > If someone later wants to come up with a grand unified design
-> >> > for everything that's fine, we can deprecate the new QMP commands
-> >> > I'm proposing now.
-> >> 
-> >> Failing at coming up with an interface that has a reasonable chance to
-> >> be future-proof is okay.
-> >> 
-> >> Not even trying is not okay.
-> >
-> > This was raised in my v1 posting:
-> >
-> >   https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg01346.html
-> >
-> > but the conclusion was that it was a non-trivial amount of extra
-> > implementation work
-> 
-> Thanks for the pointer.  I've now read that review thread.
-> 
-> >> Specifically, I'd like you to think about monolothic snapshot command
-> >> (internal snapshots only by design) vs. transaction of individual
-> >> snapshot commands (design is not restricted to internal snapshots, but
-> >> we may want to accept implementation restrictions).
-> >> 
-> >> We already have transactionable individual storage snapshot commands.
-> >> What's missing is a transactionable machine state snapshot command.
-> >
-> > At a high level I consider what I've proposed as being higher level
-> > syntax sugar vs a more generic future impl based on multiple commands
-> > for snapshotting disk & state. I don't think I'd claim that it will
-> > evolve to become the design you're suggesting here, as they are designs
-> > from different levels in the stack. IOW, I think the would ultimately
-> > just exist in parallel. I don't think that's a real problem from a
-> > maint POV, as the large burden from the monolithic snapshot code is
-> > not the HMP/QMP interface, but rather the guts of the internal
-> > impl in the migration/savevm.c and block/snapshot.c files. That code
-> > will exist for as long as the HMP commands exist, and adding a QMP
-> > interface doesn't make that situation worse unless we were intending
-> > to drop the existing HMP commands. If we did change our minds though,
-> > we can just deprecate the QMP command at any time we like.
-> >
-> >
-> >> One restriction I'd readily accept at this time is "the machine state
-> >> snapshot must write to a QCOW2 that is also internally snapshot in the
-> >> same transaction".
-> >> 
-> >> Now explain to me why this is impractical.
-> >
-> > The issues were described by Kevin here:
-> >
-> >   https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg02057.html
-> >
-> > Assuming the migration impl is actually possible to solve, there is
-> > still the question of actually writing it. That's a non-trivial
-> > amount of work someone has to find time for.
-> 
-> Kevin explained how the transactionable machine state snapshot command
-> should be made non-blocking: post-copy.
-> 
-> I don't dispute that creating such a post-copy snapshot is a non-trivial
-> task.  It is out of reach for you and me.  I didn't actually ask for it,
-> though.
-> 
-> You argue that providing a blocking snapshot in QMP is better than
-> nothing, and good enough for quite a few applications.  I agree!  I
-> blocked prior attempts at porting HMP's savevm/loadvm to QMP not because
-> they were blocking, but because they stuck to the HMP interface, and the
-> HMP interface is bonkers.  I would accept the restriction "snapshotting
-> machine state is blocking, i.e. it stops the machine."  As I wrote in
-> 2016, "Limitations: No live internal machine snapshot, yet."
-> 
-> Aside: unless I'm mistaken, taking an internal block device snapshot is
-> also blocking, but unlike taking a machine state snapshot, it's fast
-> enough for the blocking not to matter.  That's the "sync" in
-> blockdev-snapshot-internal-sync.
-> 
-> I asked you to consider the interface design I proposed back in 2016.
-> You point out above that your interface is more high-level, and could be
-> turned into sugar for a low level interface.
-> 
-> If true, this means your proposal doesn't box us into a corner, which is
-> good.
-> 
-> Let me elaborate a bit on the desugaring, just to make sure we're on the
-> same page.  Please correct me where I'm talking nonsense.
-> 
-> snapshot-save creates job that snapshots a set of block devices and the
-> machine state.  The snapshots are consistent, i.e. they are all taken at
-> the same point in time.  The block device snapshots are all internal.
-> The machine state snapshot is saved together with one of the (internal)
-> block device snapshots.
-> 
-> This is basically a transaction of blockdev-snapshot-internal-sync
-> (which exists) plus machine-snapshot-internal-sync (which doesn't exist)
-> wrapped in a job.
-> 
-> Likweise for snapshot-load, except there not even the command for block
-> snapshots exists.
-> 
-> I doubt creating the (transactionable, but blocking) low-level commands
-> is actually out of reach.  It's a matter of adding interfaces to parts
-> of the code you already got working.
-> 
-> I'm not demanding you do that, though.  As I said, my chief concerns are
-> keeping "bonkers" out of QMP, and not boxing us in needlessly.
+Add missing newline character in qemu_log_mask() format.
 
-I doubt this is as easy as it may seem at the first sight. To remind
-everyone, the way internal snapshots with VM state work today is:
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/sd/sdhci.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-1. Write VM state to VM state area inside the image (in qcow2, this is
-   essentially the same as disk content, except at offsets higher than
-   the image size).
-
-2. Create the qcow2 snapshot, which means that the current disk content
-   (including the VM state at higher offsets) becomes COW and the
-   snapshotted copy becomes read-ony.
-
-3. Discard the VM state in the active layer again, we don't need it
-   there.
-
-The implication is that either 1. has to be completed before 2. can
-happen, or that 2. must be able to write into an already taken snapshot
-rather than to the active layer (which in turn implies that the snapshot
-must have completed).
-
-So a naive implementation with a transaction might not give the right
-result. It's not just independent operations, but some ordering between
-them is required.
-
-I feel having a single block job that covers both parts gives us more
-flexibility in how we want to synchronise writing the VM state and
-taking the disk snapshot - or in your words, avoids boxing us into a
-corner.
-
-Kevin
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 1785d7e1f79..e2ef288052e 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -1109,7 +1109,7 @@ sdhci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+         /* Limit block size to the maximum buffer size */
+         if (extract32(s->blksize, 0, 12) > s->buf_maxsz) {
+             qemu_log_mask(LOG_GUEST_ERROR, "%s: Size 0x%x is larger than "
+-                          "the maximum buffer 0x%x", __func__, s->blksize,
++                          "the maximum buffer 0x%x\n", __func__, s->blksize,
+                           s->buf_maxsz);
+ 
+             s->blksize = deposit32(s->blksize, 0, 12, s->buf_maxsz);
+-- 
+2.26.2
 
 
