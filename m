@@ -7,36 +7,38 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39FBEC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 403A2C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF0DA206EB
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:11:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF0DA206EB
+	by mail.kernel.org (Postfix) with ESMTPS id 08794206EB
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:11:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08794206EB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3Fv-0001RP-2u
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:11:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48248)
+	id 1kD3GO-0001yA-24
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:11:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD3F3-0000Ol-Dd; Tue, 01 Sep 2020 06:10:17 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:34447)
+ id 1kD38J-0003YF-8g; Tue, 01 Sep 2020 06:03:19 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:47005)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD3F1-0005o8-8l; Tue, 01 Sep 2020 06:10:17 -0400
+ id 1kD38F-0004zV-Qw; Tue, 01 Sep 2020 06:03:18 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1McHM2-1kj4fv23ZM-00chlO; Tue, 01 Sep 2020 12:10:11 +0200
-Subject: Re: [PATCH] docs/system: Fix grammar in documentation
-To: Stefan Weil <sw@weilnetz.de>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20200827173051.31050-1-sw@weilnetz.de>
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MK3a4-1jretS48Hm-00LUDr; Tue, 01 Sep 2020 12:03:05 +0200
+Subject: Re: [PATCH v3 07/10] vfio/platform: Remove dead assignment in
+ vfio_intp_interrupt()
+To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20200827110311.164316-1-kuhn.chenqun@huawei.com>
+ <20200827110311.164316-8-kuhn.chenqun@huawei.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <39a4a6a3-fcfc-4a85-71a9-2642c002344c@vivier.eu>
-Date: Tue, 1 Sep 2020 12:10:09 +0200
+Message-ID: <53786935-5695-4e1b-a8e4-e7ae5ca5b616@vivier.eu>
+Date: Tue, 1 Sep 2020 12:03:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200827173051.31050-1-sw@weilnetz.de>
+In-Reply-To: <20200827110311.164316-8-kuhn.chenqun@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZdyUzNGbO2vg6BETqP6b0mCGlCeupmLkeprrxcbxMLtlfAirnoQ
- g7eTczzNxrD3kjw2+UsqlWwKl39dZZPtHkf/OkMcGtRjXk9fc5Rb+/lPXtdtHwlhrJqh9NG
- 7S8dCVZKfy3qIplqIWCJxZ4441EKUmJ20UyLbW1OsHjDo4uRolTPuS+sxchBVb+SrlzCeqk
- 1bmzeJhdBM6nmWRhUBIuA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zl8Rs7pkHww=:ncgzZYB+6Ordmw0Bzbl2oS
- FcnMy8cJp9d2nTHHovOZlbjTcrvCvuGpKGIKvD9+vB96EXbcW6+hueMRpU51L31/cpzMUG7Mn
- z/aTm8jC2MttR1AN2rGQgyt7IlQI3puyYRQfPzuTX/4GngyEVq/x/A4p1Gg2pMRgtQGk/6sJC
- 5FmGZsrT1HUJZ8GlBonx4RgFdEuOt6D01AITSoKj9Q/kP0KjF9n8U4oDa6046ELkzHdMXr3qZ
- L5ClS5TvUIzRASI/CxR/3+cSW66QHSXEa8g9B59yag04cm/bNl2ZSUaXYJmwM8Bdy/gG2gDof
- guNltlkm/GdYGxcjbvWgBpAoj37HMM1qLEEnZZ7TluEC2Q7/7/+J3YRD3EZW2Tm7eu1QwSKPG
- Pl9qQ30cmWKDLdMAtfQ9oOboE2GlG+53NYWurzzrQVPErk8j6zVJ2Pe3WVAZJcfI73ZdrJvCb
- 6E1QwafvpYn4KhRxNHK1XoWPysxCHOltFnCciYbcIZREfZN7OdCiU8CEcfCyDQc9rhKWWYeBH
- RGZEX9kuxokbnSPtm3IunkJmUwRMTV4NS79R6LANOKqRJY9OmbRxg5DJdywG77SRuRKn75u2m
- WMfyb0WBjBdMp5dFOvvPUSisYzYwGKDKrpHw6jpVGBBuHUxpskXMEYv4VSMHrhR9/KnlnKZqW
- utiSH7cHX83sbH6ERBr3kufgPGa5NGK5CTaeoN5f6sFdFjS6i2C3YuUmp+i3LNPP7fbfCEh1g
- OYUSNOdbGx4Jj+RXU3r204bdu8h9qPjo/Ydick0C6dlRMifqc1ENdxqAmxVZvPWVaLrqWYVhO
- SnACQtn1eVI4DHvyNLs9oT0yXpGo4AWJmHN7vTooUuBYsThOwlMn/Dy+XjTI1KfheaOap9p
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:uqieTAQNDs50CLq3ZLEjfQeX9NosyJROJ+/shco887RHcqBaaAJ
+ p5ExoItOTUikC6tN6zOw7mXwk/p8vWcTPmp7BduyQmEcrUOygT59+vdeS36fhGFZ0AFsmVR
+ /pJeUwISc15ca7Cu3I+eO/fu7U19K7YidO+qwF4ESxmd2HCxDMOcpVKNkAwcwL89e1Y6Hke
+ zlETs5v0lMswgfxNyQfig==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hVkDWTjahPA=:8dADmCXOlwlBIxSRpeOGx3
+ NfU+dQm9Fs6xtvoxSj6MTaG2GKq/cJiw0JezbPFK5uQugaOLmQJLnFpuJZ8/BiXEwp2o/7nYZ
+ XGob4y8QWkitxYycGe9ATZuvSzAxC+x0IRS9wwHbN2x5y7O2fXGZ9RWbqo2u/lXhpwE1PV1gT
+ apZUh+sSjvsrTIaoiV+/4yMGv9jAYUKJuIV2PjOw90KyNLGPKmxOqoOG+2ZLb4/ftSZmC0tWv
+ cu1fY8BZG+RSa1zRO5488mbj1CEv6Gz70swEv/irwP3nC+f2MnwD/V0tJBY1B1f1XGms7ZRUJ
+ x2Jp4xGZn1nY5HKuMBtIWwRAne0kpTGbH2uXEHPHAPEyO9EeKarZgpCVn7KvSfF8wTOzsC/U/
+ QMs229joUwuesI0zTC9O0plbPfcVXQMcSC9qcZtU7nEtkqwg6TL2rJ9490R1FOqa0Q4dBsKK4
+ 8Dw9McYkEWjabgkZZJAkFa5CdVT49hzy2HIpwFOOjVvqi83D1YQgV1+bx585BNPMDh+XYcoLL
+ BYufM0rdiMXiEMP4OPUBDvdBfHuhoMqAgR58gu9cdDV5qp1mJx8456fu7G3ENRaKOSL9EOEkc
+ t1cprGm40LN2Xe0vL5AoOCCBe+11sRssw+FoW4rwpgzxzZ+LMykwiqzcNEm/tW3LUpJTWRfAz
+ Lxy50n8x6Y+8A24c5/qs95Vw3xb2uWj3YmiMTj1MzllKHynhgEH+IYMeZZLPExmhEbyyT8YeB
+ nHNckWS6/wk1IwfOKSShtAM1RvVqPj/3GmbfuWZe0onqdIluOyuz6xVhaGq+tEU1rgt6Y5G+D
+ NPeXaHjm1jx6axNnXpMTcLXbAWnZk55foqOQoE07N19QvhihOBqzMgsO2ODpuTvUPEtm/gV
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 06:08:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:34:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -128,43 +130,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
+Cc: zhang.zhanghailiang@huawei.com, Li Qiang <liq3ea@gmail.com>,
+ pannengyuan@huawei.com, Eric Auger <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 27/08/2020 à 19:30, Stefan Weil a écrit :
-> Signed-off-by: Stefan Weil <sw@weilnetz.de>
-> ---
->  docs/system/build-platforms.rst | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+Le 27/08/2020 à 13:03, Chen Qun a écrit :
+> Clang static code analyzer show warning:
+> hw/vfio/platform.c:239:9: warning: Value stored to 'ret' is never read
+>         ret = event_notifier_test_and_clear(intp->interrupt);
+>         ^     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 > 
-> diff --git a/docs/system/build-platforms.rst b/docs/system/build-platforms.rst
-> index c2b92a9698..9734eba2f1 100644
-> --- a/docs/system/build-platforms.rst
-> +++ b/docs/system/build-platforms.rst
-> @@ -57,12 +57,12 @@ macOS
->  -----
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Reviewed-by: Eric Auger <eric.auger@redhat.com>
+> Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+> Reviewed-by: Li Qiang <liq3ea@gmail.com>
+> ---
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: Eric Auger <eric.auger@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>  hw/vfio/platform.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+> index ac2cefc9b1..869ed2c39d 100644
+> --- a/hw/vfio/platform.c
+> +++ b/hw/vfio/platform.c
+> @@ -236,7 +236,7 @@ static void vfio_intp_interrupt(VFIOINTp *intp)
+>          trace_vfio_intp_interrupt_set_pending(intp->pin);
+>          QSIMPLEQ_INSERT_TAIL(&vdev->pending_intp_queue,
+>                               intp, pqnext);
+> -        ret = event_notifier_test_and_clear(intp->interrupt);
+> +        event_notifier_test_and_clear(intp->interrupt);
+>          return;
+>      }
 >  
->  The project supports building with the two most recent versions of
-> -macOS, with the current homebrew package set available.
-> +macOS, with the current Homebrew package set available.
->  
->  FreeBSD
->  -------
->  
-> -The project aims to support the all the versions which are not end of
-> +The project aims to support all versions which are not end of
->  life.
->  
->  NetBSD
-> @@ -75,5 +75,5 @@ new major version is released.
->  OpenBSD
->  -------
->  
-> -The project aims to support the all the versions which are not end of
-> +The project aims to support all versions which are not end of
->  life.
 > 
 
 Applied to my trivial-patches branch.
