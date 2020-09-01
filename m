@@ -2,82 +2,92 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AF4C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D4A8C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:42:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0242D21548
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:42:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE1872098B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:42:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eYBKNaLO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0242D21548
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zrzoEfzs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE1872098B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD8QJ-0002JP-4y
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:42:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49014)
+	id 1kD8QR-0002bn-UD
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:42:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48416)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kD85z-0005M2-BD
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:21:15 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22811
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kD85x-0006hb-8G
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:21:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598973672;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=EgvoQ9NQnM9s6iXksNI0/R63KZhXs73+28RhQRIHDUw=;
- b=eYBKNaLOHjQv2i3QB6giT4CwhwRzy9CTJRCK7ZIjtmbTvZI3PdOPKIpogPRrNsCmobAjp1
- CYq5BfsU6VdL7CoxAqtj3+W4iJR4kBWEY8QuExvN9Htd8BkjLWynsziWsNDsS/rNbXR4Bh
- 8a3A5RscWhSqUFN8Fe7Ics1wt0GAVoo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-339-Uxr4ty9PO36_62k55WzRIA-1; Tue, 01 Sep 2020 11:21:08 -0400
-X-MC-Unique: Uxr4ty9PO36_62k55WzRIA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA631425CF;
- Tue,  1 Sep 2020 15:21:07 +0000 (UTC)
-Received: from thuth.com (ovpn-112-188.ams2.redhat.com [10.36.112.188])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8B8CD5D9CD;
- Tue,  1 Sep 2020 15:21:06 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 8/8] hw/m68k: QOMify the mcf5206 system integration module
-Date: Tue,  1 Sep 2020 17:20:50 +0200
-Message-Id: <20200901152050.255165-9-thuth@redhat.com>
-In-Reply-To: <20200901152050.255165-1-thuth@redhat.com>
-References: <20200901152050.255165-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:08:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kD84C-000184-1U
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:24 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:51438)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kD84A-0006LL-8q
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:23 -0400
+Received: by mail-wm1-x344.google.com with SMTP id w2so1550014wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:19:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=KXRF7dKCMKNyNPHCpFwJuF+ejPlwLK3/fbYiZ44r5oU=;
+ b=zrzoEfzsDLRhwM4Uy1TpUCviXcY8Q+EaCLs3x14CRyxCoF3nHsuzUsjoCH5APa+Z3H
+ dhMI8R+aYOHBeDbHTNdl5N8g3sqatEhrgGblGv7+oVnTkiMHprc30HYOJRTBpXB95OIy
+ TUOYzEtR4ZByJ0cAPgpxpNHFqiuntJ+7X9bjU5Llz9JgcF661EWj/SBVH/Z+1OmItKms
+ ji7opVvoXnzMA+Hp36W4lE5ABQUXYNig5THBDAa8WI67tJOz2Map93jpFe7uQ+nwtn4Z
+ 2A0gLEUt2cVbAyEgw22GvqUQZmBRi9kBoaWlJP9bYpQnzcmJb5ah35O+esALxK5rrx8s
+ w1lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=KXRF7dKCMKNyNPHCpFwJuF+ejPlwLK3/fbYiZ44r5oU=;
+ b=ThLxrGeYN+8dGVR7t/Fh1lYvxY1T+7/WmvkYYsomFBi87U+qJx4Nl/uiJaEVUXyXc0
+ xiMpLFJ36er+wdMbabOn8YHav/DprAHQQY6j0Z574qBxVo+SJbHVAgB9qCCAmCcxuYa9
+ kFH2fC9EAqf79qrc2alxnru/jn1e2Gb8yNkad0hxq031vlplF+B9VWVlrj1G8vc6gAHc
+ TI0HXwlU+LH9uPCzI2G19EsOdqlC4s8wPROTGUHnLiBPHZPWyqhV5+ihpAB5Y4mvfLg/
+ +KWdZrvHrU+xUHd6BM0qpRVGS3rvAW0sFQwj9Frt49hSWyQLv5o7Utwb8HDVvt2UyD9g
+ L4uA==
+X-Gm-Message-State: AOAM531k+J0FKkPwjIPKY8mM5aJdLWBMKsnLIcPs+FNePh6RB7L2hSHH
+ ZOvVxvHf5kTJuSNRbG3Vr9cEjBtOwl2V9XkJ
+X-Google-Smtp-Source: ABdhPJwhfOCDgACcinqpKrkJ8y6WMQPaQXQYmf4HsL+UvKWekKfiX9h7EnbRYY1hOUb8ZfkZtrfbzQ==
+X-Received: by 2002:a1c:24c4:: with SMTP id k187mr2266224wmk.148.1598973560529; 
+ Tue, 01 Sep 2020 08:19:20 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id z9sm2242317wma.4.2020.09.01.08.19.19
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 08:19:19 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 45/47] hw/arm/sbsa-ref: add "reg" property to DT cpu nodes
+Date: Tue,  1 Sep 2020 16:18:21 +0100
+Message-Id: <20200901151823.29785-46-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200901151823.29785-1-peter.maydell@linaro.org>
+References: <20200901151823.29785-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -91,164 +101,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ed Maste <emaste@freebsd.org>, Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <huth@tuxfamily.org>
+From: Leif Lindholm <leif@nuviainc.com>
 
-The mcf5206 system integration module should be a proper device.
-Let's finally QOMify it.
+The sbsa-ref platform uses a minimal device tree to pass amount of memory
+as well as number of cpus to the firmware. However, when dumping that
+minimal dtb (with -M sbsa-virt,dumpdtb=<file>), the resulting blob
+generates a warning when decompiled by dtc due to lack of reg property.
 
-Signed-off-by: Thomas Huth <huth@tuxfamily.org>
-Message-Id: <20200819065201.4045-1-huth@tuxfamily.org>
+Add a simple reg property per cpu, representing a 64-bit MPIDR_EL1.
+
+This also ends up being cleaner than having the firmware calculating its
+own IDs for generating APCI.
+
+Signed-off-by: Leif Lindholm <leif@nuviainc.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20200827124335.30586-1-leif@nuviainc.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/m68k/an5206.c      | 14 ++++++++++++--
- hw/m68k/mcf5206.c     | 44 ++++++++++++++++++++++++++++++++++---------
- include/hw/m68k/mcf.h |  3 +--
- 3 files changed, 48 insertions(+), 13 deletions(-)
+ hw/arm/sbsa-ref.c | 29 +++++++++++++++++++++++------
+ 1 file changed, 23 insertions(+), 6 deletions(-)
 
-diff --git a/hw/m68k/an5206.c b/hw/m68k/an5206.c
-index 846f4e40c6..673898b0ea 100644
---- a/hw/m68k/an5206.c
-+++ b/hw/m68k/an5206.c
-@@ -21,7 +21,17 @@
- #define AN5206_MBAR_ADDR 0x10000000
- #define AN5206_RAMBAR_ADDR 0x20000000
- 
--/* Board init.  */
-+static void mcf5206_init(MemoryRegion *sysmem, uint32_t base)
-+{
-+    DeviceState *dev;
-+    SysBusDevice *s;
-+
-+    dev = qdev_new(TYPE_MCF5206_MBAR);
-+    s = SYS_BUS_DEVICE(dev);
-+    sysbus_realize_and_unref(s, &error_fatal);
-+
-+    memory_region_add_subregion(sysmem, base, sysbus_mmio_get_region(s, 0));
-+}
- 
- static void an5206_init(MachineState *machine)
- {
-@@ -51,7 +61,7 @@ static void an5206_init(MachineState *machine)
-     memory_region_init_ram(sram, NULL, "an5206.sram", 512, &error_fatal);
-     memory_region_add_subregion(address_space_mem, AN5206_RAMBAR_ADDR, sram);
- 
--    mcf5206_init(address_space_mem, AN5206_MBAR_ADDR, cpu);
-+    mcf5206_init(address_space_mem, AN5206_MBAR_ADDR);
- 
-     /* Load kernel.  */
-     if (!kernel_filename) {
-diff --git a/hw/m68k/mcf5206.c b/hw/m68k/mcf5206.c
-index 94a37a1a46..51d2e0da1c 100644
---- a/hw/m68k/mcf5206.c
-+++ b/hw/m68k/mcf5206.c
-@@ -15,6 +15,7 @@
- #include "qemu/timer.h"
- #include "hw/ptimer.h"
- #include "sysemu/sysemu.h"
-+#include "hw/sysbus.h"
- 
- /* General purpose timer module.  */
- typedef struct {
-@@ -159,6 +160,8 @@ static m5206_timer_state *m5206_timer_init(qemu_irq irq)
- /* System Integration Module.  */
- 
- typedef struct {
-+    SysBusDevice parent_obj;
-+
-     M68kCPU *cpu;
-     MemoryRegion iomem;
-     m5206_timer_state *timer[2];
-@@ -174,6 +177,8 @@ typedef struct {
-     uint8_t uivr[2];
- } m5206_mbar_state;
- 
-+#define MCF5206_MBAR(obj) OBJECT_CHECK(m5206_mbar_state, (obj), TYPE_MCF5206_MBAR)
-+
- /* Interrupt controller.  */
- 
- static int m5206_find_pending_irq(m5206_mbar_state *s)
-@@ -257,8 +262,10 @@ static void m5206_mbar_set_irq(void *opaque, int irq, int level)
- 
- /* System Integration Module.  */
- 
--static void m5206_mbar_reset(m5206_mbar_state *s)
-+static void m5206_mbar_reset(DeviceState *dev)
- {
-+    m5206_mbar_state *s = MCF5206_MBAR(dev);
-+
-     s->scr = 0xc0;
-     s->icr[1] = 0x04;
-     s->icr[2] = 0x08;
-@@ -578,24 +585,43 @@ static const MemoryRegionOps m5206_mbar_ops = {
-     .endianness = DEVICE_NATIVE_ENDIAN,
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 2a7d9a61fc7..7475aac0dfa 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -138,6 +138,12 @@ static const int sbsa_ref_irqmap[] = {
+     [SBSA_EHCI] = 11,
  };
  
--qemu_irq *mcf5206_init(MemoryRegion *sysmem, uint32_t base, M68kCPU *cpu)
-+static void mcf5206_mbar_realize(DeviceState *dev, Error **errp)
- {
--    m5206_mbar_state *s;
-+    m5206_mbar_state *s = MCF5206_MBAR(dev);
-     qemu_irq *pic;
- 
--    s = g_new0(m5206_mbar_state, 1);
--
-     memory_region_init_io(&s->iomem, NULL, &m5206_mbar_ops, s,
-                           "mbar", 0x00001000);
--    memory_region_add_subregion(sysmem, base, &s->iomem);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
- 
-     pic = qemu_allocate_irqs(m5206_mbar_set_irq, s, 14);
-     s->timer[0] = m5206_timer_init(pic[9]);
-     s->timer[1] = m5206_timer_init(pic[10]);
-     s->uart[0] = mcf_uart_init(pic[12], serial_hd(0));
-     s->uart[1] = mcf_uart_init(pic[13], serial_hd(1));
--    s->cpu = cpu;
-+    s->cpu = M68K_CPU(qemu_get_cpu(0));
++static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
++{
++    uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
++    return arm_cpu_mp_affinity(idx, clustersz);
 +}
 +
-+static void mcf5206_mbar_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
+ /*
+  * Firmware on this machine only uses ACPI table to load OS, these limited
+  * device tree nodes are just to let firmware know the info which varies from
+@@ -183,14 +189,31 @@ static void create_fdt(SBSAMachineState *sms)
+         g_free(matrix);
+     }
  
--    m5206_mbar_reset(s);
--    return pic;
-+    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
-+    dc->desc = "MCF5206 system integration module";
-+    dc->realize = mcf5206_mbar_realize;
-+    dc->reset = m5206_mbar_reset;
++    /*
++     * From Documentation/devicetree/bindings/arm/cpus.yaml
++     *  On ARM v8 64-bit systems this property is required
++     *    and matches the MPIDR_EL1 register affinity bits.
++     *
++     *    * If cpus node's #address-cells property is set to 2
++     *
++     *      The first reg cell bits [7:0] must be set to
++     *      bits [39:32] of MPIDR_EL1.
++     *
++     *      The second reg cell bits [23:0] must be set to
++     *      bits [23:0] of MPIDR_EL1.
++     */
+     qemu_fdt_add_subnode(sms->fdt, "/cpus");
++    qemu_fdt_setprop_cell(sms->fdt, "/cpus", "#address-cells", 2);
++    qemu_fdt_setprop_cell(sms->fdt, "/cpus", "#size-cells", 0x0);
+ 
+     for (cpu = sms->smp_cpus - 1; cpu >= 0; cpu--) {
+         char *nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
+         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(cpu));
+         CPUState *cs = CPU(armcpu);
++        uint64_t mpidr = sbsa_ref_cpu_mp_affinity(sms, cpu);
+ 
+         qemu_fdt_add_subnode(sms->fdt, nodename);
++        qemu_fdt_setprop_u64(sms->fdt, nodename, "reg", mpidr);
+ 
+         if (ms->possible_cpus->cpus[cs->cpu_index].props.has_node_id) {
+             qemu_fdt_setprop_cell(sms->fdt, nodename, "numa-node-id",
+@@ -717,12 +740,6 @@ static void sbsa_ref_init(MachineState *machine)
+     arm_load_kernel(ARM_CPU(first_cpu), machine, &sms->bootinfo);
  }
-+
-+static const TypeInfo mcf5206_mbar_info = {
-+    .name          = TYPE_MCF5206_MBAR,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(m5206_mbar_state),
-+    .class_init    = mcf5206_mbar_class_init,
-+};
-+
-+static void mcf5206_mbar_register_types(void)
-+{
-+    type_register_static(&mcf5206_mbar_info);
-+}
-+
-+type_init(mcf5206_mbar_register_types)
-diff --git a/include/hw/m68k/mcf.h b/include/hw/m68k/mcf.h
-index 0db49c5e60..decf17ce42 100644
---- a/include/hw/m68k/mcf.h
-+++ b/include/hw/m68k/mcf.h
-@@ -18,7 +18,6 @@ qemu_irq *mcf_intc_init(struct MemoryRegion *sysmem,
-                         M68kCPU *cpu);
  
- /* mcf5206.c */
--qemu_irq *mcf5206_init(struct MemoryRegion *sysmem,
--                       uint32_t base, M68kCPU *cpu);
-+#define TYPE_MCF5206_MBAR "mcf5206-mbar"
- 
- #endif
+-static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
+-{
+-    uint8_t clustersz = ARM_DEFAULT_CPUS_PER_CLUSTER;
+-    return arm_cpu_mp_affinity(idx, clustersz);
+-}
+-
+ static const CPUArchIdList *sbsa_ref_possible_cpu_arch_ids(MachineState *ms)
+ {
+     unsigned int max_cpus = ms->smp.max_cpus;
 -- 
-2.18.2
+2.20.1
 
 
