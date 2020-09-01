@@ -2,97 +2,112 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7376CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 19:37:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26DD2C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 19:42:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4080E207D3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 19:37:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5B573206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 19:42:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MBS978pd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4080E207D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O8hGnRzp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5B573206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDC6J-0005Ip-Cw
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 15:37:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32888)
+	id 1kDCBE-00075N-Vi
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 15:42:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kDC5l-0004oq-H6
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 15:37:17 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53504)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kDC5j-0007FQ-Q3
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 15:37:17 -0400
-Received: by mail-wm1-x344.google.com with SMTP id u18so2255168wmc.3
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 12:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=rthAm+JHl6cNIqFyciWQw+aqXoK9/BxqIKqPd4aKZRg=;
- b=MBS978pdtdtMN3aZqlvAtuCrh3VFUS4duflCCBWf2eW3eTh1gUtrH5VD7pKFsBNv0f
- RjduwkAEr9fbN88KqS7iLRnnsAyuuACxZy4+gs1l1BHMImkeuGNwXt13zc28NFhxsbzl
- emhvzcFmxwgUGICMYD1RdugS558zSHt81oMNO8YACHivF2gV1C9j99pfpyEBhVQlKhDH
- siMp1P+1c3n9O1G+dtGXJzxXc+1Q67MMjEO/+Lgt7588B3B9bfJe5wRD1+/DeBUUtZvw
- 3lTGL2RwBV3MkkLL46+bn5sO09MZyU+ctTV4B9E4E1r9OPZvkgO3FpRDyUp+UxIb0ip5
- Me5g==
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kDCAS-0006f4-FI
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 15:42:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58582
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kDCAP-00081j-Fm
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 15:42:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598989323;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7wvuoNF3RQTyE5wvEUAKlhL45NwYwjucFNRxr5XvZSI=;
+ b=O8hGnRzpYY6PZ7iVkWH2ofI7xDqDSRkJ5Dql1/0+/DKkj/S/oic7Da92yCDwFRHEW7NVb+
+ TKYVjSqaUm2zjvXp4zoUr0QXPdZTRWQg/npduv+nQdq40A0aNVnZJvrnOv1wIKjLpGZH+G
+ JXN4ME77jWDlDz9umZyAFif83KEUIzo=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-174-fcFrb1GJOZuZO5vNAVyeqA-1; Tue, 01 Sep 2020 15:35:11 -0400
+X-MC-Unique: fcFrb1GJOZuZO5vNAVyeqA-1
+Received: by mail-qk1-f197.google.com with SMTP id q131so1681895qke.22
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 12:35:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=rthAm+JHl6cNIqFyciWQw+aqXoK9/BxqIKqPd4aKZRg=;
- b=Ph0+bvrCzkEST+zb1Ejm4uOJBRP+gfFbn27VcDVg6LUPn41+YhbQShDRhkBlXns2l1
- ad951m/3u2NQHjtf6FQzdGRHZ6MDfKX47Azen1cnMqt7qbF+oQfIj9l9iLd6czAAdKBS
- 1TX7bekuzMnlcWA2cZX3A6u+aIZi0+JflprdzOU032LPUQjEXh3RmMBaUgER4z8ml2sa
- gfapqAQaTjkzO9BwrAJyGHo5gG1ADqeQnwbft4P/nxJyCc5/GvXLZvkvC1p8unCqrNm5
- Xysz9ql7Mmh1B7YmRZiMd3xy3Y4DUfg09uiR75x5qA/GzAJJcpgKOKPcS25WkmLR6P23
- Aulw==
-X-Gm-Message-State: AOAM532GvGEOwOOZRna8ecfds9IyoOb1IWBCpjo4N3pWXCR71zxGt1+J
- sA6FRnK3kaL9tYZDzp9AK7U=
-X-Google-Smtp-Source: ABdhPJzAU4K7jtyx6nlPBK5nqy/M/hchcjEyhuBkhUWpgLFNawijcMlFw8M4r8OhAICqx39PO9BOGQ==
-X-Received: by 2002:a1c:96c5:: with SMTP id y188mr3396363wmd.72.1598989034184; 
- Tue, 01 Sep 2020 12:37:14 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id l8sm3721510wrx.22.2020.09.01.12.37.09
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Sep 2020 12:37:09 -0700 (PDT)
-Subject: Re: [PATCH 0/7] hppa power button support, graphics updates and
- firmware fixes
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
-References: <20200901183452.24967-1-deller@gmx.de>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <232d08f3-c759-c0b4-1080-1382dda7a81b@amsat.org>
-Date: Tue, 1 Sep 2020 21:37:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=7wvuoNF3RQTyE5wvEUAKlhL45NwYwjucFNRxr5XvZSI=;
+ b=YI+cxlglbtpVVB0ZMsf46/hNSPM0TPnQci5YxBJIlI64kFrkioeyElHKVO56Uk51n7
+ fSkcdqDRFDYDkWFjFSFU8+qKzle7+48XPxPUKlC77V+c93CYrbuXp5ef2CVm90WisbBr
+ blAoJAku3tIxU42/3m9WauhJTeApp/yxrgJnhNULtiVKVgXBzhsAnT0QZOVHB5eUZD2j
+ A2OMBpu8ynlRJOTJTPpYgqLFIdezff0NycHsHvVBfletJvzNcBSxq05FXUnulZoErule
+ hw7Qtyy8IGFpGSxav2lqnsKJP8QmiOh8uMsOQ6G5Ehr3ThBX/AZnPp3qUhiklo8zrMBI
+ O5vg==
+X-Gm-Message-State: AOAM531cWEU5hQ/MkB5d4LcraRrRPLw2lPNJEmUY/o4iK7bO3A6BKbgr
+ SymcrUWC4rkSEadg1Al+mIrTcG4vqBFRJ/ejV1FkDKQ7JCqf4f3LK+ozfI1QgyZqzPrhLrRH+Wg
+ QN4OySUHjl5mOUJw=
+X-Received: by 2002:a37:a5ca:: with SMTP id o193mr3500872qke.126.1598988907830; 
+ Tue, 01 Sep 2020 12:35:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx5vpDPHuEoeRjA+7G76S4eAH4lBpjIIG/bwy6TAuu1zj//t4DLPGHco7+LkaFww59+A1cHUw==
+X-Received: by 2002:a37:a5ca:: with SMTP id o193mr3500847qke.126.1598988907547; 
+ Tue, 01 Sep 2020 12:35:07 -0700 (PDT)
+Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca.
+ [70.53.122.15])
+ by smtp.gmail.com with ESMTPSA id b9sm2540163qtt.39.2020.09.01.12.35.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 12:35:06 -0700 (PDT)
+Date: Tue, 1 Sep 2020 15:35:04 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: Re: [RFC v3 1/1] memory: Skip bad range assertion if notifier
+ supports arbitrary masks
+Message-ID: <20200901193504.GA3053@xz-x1>
+References: <20200811175533.7359-1-eperezma@redhat.com>
+ <20200811175533.7359-2-eperezma@redhat.com>
+ <2443886f-2109-e048-b47f-886c896613ab@redhat.com>
+ <CAJaqyWe0_wcXHgbAVAVNCTpG7O4YKF6FMkgKsf6SfW4dEZ4A5g@mail.gmail.com>
+ <CAJaqyWe+KgnVegtprpRmVvXo7kFVFDL_erK_5Nyp4K=gTUcN=Q@mail.gmail.com>
+ <eb26c5d7-465a-34ed-3f8f-bad11eda5bee@redhat.com>
+ <20200819155051.GA275003@xz-x1>
+ <f010e8c0-6713-a2bc-ce6b-98af5e4638be@redhat.com>
+ <20200821141250.GC358043@xz-x1>
+ <5e06e59d-7810-6863-20c7-d1660099cc51@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200901183452.24967-1-deller@gmx.de>
+In-Reply-To: <5e06e59d-7810-6863-20c7-d1660099cc51@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=peterx@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:11:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,48 +121,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Yan Zhao <yan.y.zhao@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ qemu-devel@nongnu.org, Eugenio Perez Martin <eperezma@redhat.com>,
+ Avi Kivity <avi@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Helge,
-
-On 9/1/20 8:34 PM, Helge Deller wrote:
-> Add emulation for a power button on hppa,
-> fix quite some bugs in seabios-hppa firmware for artist graphics card
-> fix boot with old Linux installation CDs.
-
-I started to review the version you sent last week and took few notes,
-are there big changes in this version (is it a REPOST or a v2)?
-(I think you just appended 2 extra patches posted separately).
-
-Thanks,
-
-Phil.
-
+On Tue, Sep 01, 2020 at 11:05:18AM +0800, Jason Wang wrote:
 > 
-> Helge Deller (7):
->   seabios-hppa: Update SeaBIOS to hppa-qemu-5.2-2 tag
->   hw/hppa: Make number of TLB and BTLB entries configurable
->   hw/hppa: Store boot device in fw_cfg section
->   hw/hppa: Inform SeaBIOS about fw_cfg port address
->   hw/hppa: Add power button emulation
->   hw/display/artist: Fix artist screen resolution
->   target/hppa: Fix boot with old Linux installation CDs
-> 
->  hw/display/artist.c       |  37 +++++++++++++++----------
->  hw/hppa/hppa_hardware.h   |   3 +-
->  hw/hppa/machine.c         |  56 +++++++++++++++++++++++++++++++++++++-
->  pc-bios/hppa-firmware.img | Bin 783192 -> 785696 bytes
->  roms/seabios-hppa         |   2 +-
->  target/hppa/cpu.h         |   5 +++-
->  target/hppa/insns.decode  |  10 +++----
->  7 files changed, 89 insertions(+), 24 deletions(-)
-> 
-> --
-> 2.21.3
+> On 2020/8/21 下午10:12, Peter Xu wrote:
+> > On Thu, Aug 20, 2020 at 10:28:00AM +0800, Jason Wang wrote:
+> > > On 2020/8/19 下午11:50, Peter Xu wrote:
+> > > > On Wed, Aug 19, 2020 at 03:15:26PM +0800, Jason Wang wrote:
+> > > > > Yes, actually, I feel confused after reading the codes. Is notifier->start
+> > > > > IOVA or GPA?
+> > > > > 
+> > > > > In vfio.c, we did:
+> > > > > 
+> > > > >           iommu_notifier_init(&giommu->n, vfio_iommu_map_notify,
+> > > > >                               IOMMU_NOTIFIER_ALL,
+> > > > >                               section->offset_within_region,
+> > > > >                               int128_get64(llend),
+> > > > >                               iommu_idx);
+> > > > > 
+> > > > > So it looks to me the start and end are GPA, but the assertion above check
+> > > > > it against IOVA which seems to be wrong ....
+> > > > It should be iova; both section->offset_within_region and llend are for the
+> > > > device's iova address space.  Thanks,
+> > > > 
+> > > Interesting, how can memory region know which IOVA is used by guest?
+> > Does it need to know? :)
+> > 
+> > AFAICT what we do here is only register with the whole possible IOVA address
+> > space (e.g., across the whole 64bit address space).  Then vfio will get
+> > notifications when there're new iova ranges mapped into it.
 > 
 > 
+> Right, but the whole IOVA address space should be something vIOMMU specific,
+> e.g for Intel it should be calculated by GAW, but I found:
+> 
+>         memory_region_init_iommu(&vtd_dev_as->iommu,
+> sizeof(vtd_dev_as->iommu),
+>                                  TYPE_INTEL_IOMMU_MEMORY_REGION, OBJECT(s),
+>                                  name, UINT64_MAX);
+> 
+> which assumes UINT64_MAX.
+
+Right.  AFAICT it can be reduced to gaw width, but I don't see a problem either
+even with UINT64_MAX (as long as it covers the range specified by gaw).  Or did
+I miss something?  Thanks,
+
+-- 
+Peter Xu
 
 
