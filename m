@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C036C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:16:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA172C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:17:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DAA81206EB
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:16:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DAA81206EB
+	by mail.kernel.org (Postfix) with ESMTPS id AF2EE206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:17:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF2EE206CD
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD75W-0002IX-VB
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:16:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55300)
+	id 1kD76P-0003oA-NY
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:17:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zN-0005XK-2D; Tue, 01 Sep 2020 10:10:21 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:50337)
+ id 1kD6zJ-0005Ok-TX; Tue, 01 Sep 2020 10:10:17 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:47201)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD6zI-0003pH-CR; Tue, 01 Sep 2020 10:10:20 -0400
+ id 1kD6zE-0003lu-C5; Tue, 01 Sep 2020 10:10:17 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MsI0I-1kS2JC1y3e-00tol5; Tue, 01 Sep 2020 16:10:12 +0200
+ id 1MGQaz-1kNJB93WBh-00GmgK; Tue, 01 Sep 2020 16:10:03 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/44] mailmap: Add entry for Greg Kurz
-Date: Tue,  1 Sep 2020 16:09:33 +0200
-Message-Id: <20200901140954.889743-24-laurent@vivier.eu>
+Subject: [PULL 08/44] target/sh4: Remove superfluous breaks
+Date: Tue,  1 Sep 2020 16:09:18 +0200
+Message-Id: <20200901140954.889743-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200901140954.889743-1-laurent@vivier.eu>
 References: <20200901140954.889743-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Uf3LfJJZDIbdPHC+99ooHTXKK3JKZlzUCmccAqEpHi3gy7BrFvl
- szmj6Uetx/LWQ9sQnjqPUZqZ2V22fyWUvy3TMJmp5Qt6aYDe0qHBl4UUxw1tF0drw5l0ieU
- Weo+AEy3cOkfGaOqB8mmGCQbQVZPNTYF+hkxKKOifs32C1FsMmybpXGHOIOUZaciL/jaVMn
- CQ4u9g7q/F3Vab3BGSorg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:dagzQnkpn9I=:Nw5biJ7jPuP1i8Hw0UqDqi
- YxGHcsr97lk/B/wDMVI+Np9HtAt1RaYmxZBfQ2sTOnT/WPZDyqJjhN3fQtOVTf0d0hOm1UUL1
- p6wk+PqYO6cx8veId92DqKckg+lolhy22SQUlrT3ux6kYU5mSHiFFTyEpkoVH1zS9yMovEEOX
- gwcLerDIpQJrN/3CVm1thxxpVDsuj3S42ZlbivYt9dWYG7CXiJchybndnU/SHqT1mR6Awv1+4
- AktDUBtB6dhbe8kf7mtuVjeGlYnKy8Lgu8zfDHwVx5qUHyKdf8ySDADDzbnlL9BJyudWLM1h7
- G8V3ftJu9vh2rtqCDKsJ8CPTVMn+IV23b1oHu0WJP/XQcQ7tUK0UfGZRrNaLrpgyls7OsSuPO
- nJQJOs9jfjDG3WZDViBt7ACLBLOsPi38hhTByh9GgKjKGEKo4t/Ji6tFAM4sLP/3isuanUmse
- /KUkUwYniGeSRFllPPLuPWC3dv20e47wucCGeEJEcNYHWjtty/OoRjRyAIFC15Sb6goV3OVXF
- 79rNNiTPNbDvYbbfjZWw8fYibjOf1+UF5YFtMu3hZQHWpKKJ5XOHZmnLWeOR69db5wgZkzsiX
- RSXgNok02+Vt+ectpUdyPPPuw0meeULPzvExRpVRvPXlfeMrbfzo2m0T+vtob50fYzpx5W5qF
- j516YHo/JSvB78QwkkJAY3S6VF6eZvRyYkvJ2347H1/7Kk7FC3GmVmLXGnoitNyIatBaqo+ud
- Gn9EPJtAVyzLNZ1bEzw4qYBhexe+HYmg46Bqc4JhEkl/YMOobVaVYPij3bxPVuQ4aLwZS6t5T
- cTaRm5g5O7oSFlDvPFBB2/QTn2OlYM/NHnWCeO5Dch48zmF1ox85n3ZipPkbHbQxmdl2KY+
-Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:Mcik9TkeaKMGYqCdcFrXhfx40gE1qlW7PBlZrqP4zLUPcyVZChD
+ 13lly84avryWHAnP6r2HXf23Vj9QwmaZwbXjcdLujdMtBEOONUNeOv1mfGXO6Xaujy7S+Yp
+ V1wBXrgbndhh0Tr95doz0VYWZku5zv9v17j3+3HEyiWGHB1uHkfRc2VA0E7q5llY/qYDjH+
+ WJCfPtfftNBNch+mjBRYg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Kb4Txv76HBI=:fO/W8IRpcaTuf6XW8+J3wI
+ u0wuLJYEWvURKE1Xa+Pf66/A9b+NQ0tCbMtoSkR8yP9qwstunYkw9SaEHi7mj5wyuBtoftExF
+ tD6bTBoSEanWiahEXYMk4X2MaxbeHK0VmjL59hPjqAAN6m4V6gXVHSeeMzCucE5D5lJDwUjn0
+ dBR2qcvETPfEWeB3IdnAnO/QR8jnoobe624jnfGCfsWb/+M0TADuI03XUgMAZ9718pG+39QrI
+ XDmw9T+vH0ZC+asYfpUT3X/0i7UnCeiBAVMrHM+WQOHYWGkICWDA4oafXGFqAHrARGMO7uY+I
+ HBddrBHguFlYqZUewWOo3btcMaB1HhfQM4D89cRs/F5m5FHsg222r7GbXZ3TIlrbt/U3JtTCC
+ 3UtFJDyVNVfxXrOz9HSstVAuCqfJHhj90n1GjgoNDMYJ7BQGSEexk18km5OIXjUu2UNmyo/DB
+ Rs5V8+G10MJS+F6x4LAlqGqRs6dJB6AloOpHaY2CEysDN2qe7lP0whSfh9ItVp52PO2Y8zB09
+ 55L+fhhAwqG97LxGsOuHbuvM6+0drTZhXv8l7v3+ruqkqBlXHMFACZi195UHSemEBJSQBDBCX
+ S9m/P3wYXAecPXzrwIDutBPtCo+JeafrkSNyVyyCex33pqFpQLm4IFVRs/Tk+qXl+aPWHkDid
+ rAov4aLWwEIeYgx8e4lRL9Jy0S6SFspE0M1fl3/fQ/SW4sVOOwTZLvdh2yaosHd+W9y44p9Qb
+ B8ITVVL/89IRvPYgRfg8/59jaAY8PzAdQY5nuolL4dem0R0uYTvoOmkuucTr1igoyWwxTtfvA
+ NYplVdTEkoyk9cYS2uu2JK44nt91C8ewqJgoy1yn3QiG23bsfUUtEJMhtcCvm8GM8Qh8SUD
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:10:08
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
@@ -83,39 +83,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
+Cc: Yi Wang <wang.yi59@zte.com.cn>, Thomas Huth <thuth@redhat.com>,
+ qemu-trivial@nongnu.org, Laurent Vivier <laurent@vivier.eu>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Laurent Vivier <laurent@vivier.eu>, Greg Kurz <groug@kaod.org>
+ Liao Pingfang <liao.pingfang@zte.com.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Liao Pingfang <liao.pingfang@zte.com.cn>
 
-I had stopped using gkurz@linux.vnet.ibm.com a while back already but
-this email address was shutdown last June when I quit IBM. It's about
-time to map it to groug@kaod.org.
+Remove superfluous breaks, as there is a "return" before them.
 
-Signed-off-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Liao Pingfang <liao.pingfang@zte.com.cn>
+Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <159724665142.75339.817685642171828648.stgit@bahia.lan>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <1594631142-36745-1-git-send-email-wang.yi59@zte.com.cn>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- .mailmap | 1 +
- 1 file changed, 1 insertion(+)
+ target/sh4/translate.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/.mailmap b/.mailmap
-index 4f40d1cc6e1b..b914c9e290e0 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -48,6 +48,7 @@ Alexander Graf <agraf@csgraf.de> <agraf@suse.de>
- Anthony Liguori <anthony@codemonkey.ws> Anthony Liguori <aliguori@us.ibm.com>
- Filip Bozuta <filip.bozuta@syrmia.com> <filip.bozuta@rt-rk.com.com>
- Frederic Konrad <konrad@adacore.com> <fred.konrad@greensocs.com>
-+Greg Kurz <groug@kaod.org> <gkurz@linux.vnet.ibm.com>
- James Hogan <jhogan@kernel.org> <james.hogan@imgtec.com>
- Leif Lindholm <leif@nuviainc.com> <leif.lindholm@linaro.org>
- Radoslaw Biernacki <rad@semihalf.com> <radoslaw.biernacki@linaro.org>
+diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+index 6192d83e8c66..60c863d9e1b0 100644
+--- a/target/sh4/translate.c
++++ b/target/sh4/translate.c
+@@ -1542,7 +1542,6 @@ static void _decode_opc(DisasContext * ctx)
+         tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
+                             MO_TEUL | MO_UNALN);
+         return;
+-        break;
+     case 0x40e9:                /* movua.l @Rm+,R0 */
+         CHECK_SH4A
+         /* Load non-boundary-aligned data */
+@@ -1550,7 +1549,6 @@ static void _decode_opc(DisasContext * ctx)
+                             MO_TEUL | MO_UNALN);
+         tcg_gen_addi_i32(REG(B11_8), REG(B11_8), 4);
+         return;
+-        break;
+     case 0x0029:		/* movt Rn */
+         tcg_gen_mov_i32(REG(B11_8), cpu_sr_t);
+ 	return;
+@@ -1638,7 +1636,6 @@ static void _decode_opc(DisasContext * ctx)
+         CHECK_SH4A
+         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+         return;
+-        break;
+     case 0x4024:		/* rotcl Rn */
+ 	{
+ 	    TCGv tmp = tcg_temp_new();
 -- 
 2.26.2
 
