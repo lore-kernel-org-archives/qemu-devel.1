@@ -2,83 +2,84 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C292CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42692C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:41:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 778F42098B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:41:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01A652078B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:41:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NcUqBCiT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 778F42098B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KpRc75Ti"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01A652078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD8PE-0000CS-Fs
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:41:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48946)
+	id 1kD8PP-0000Y0-2d
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:41:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kD85r-0004zA-8B
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:21:07 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:41947)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kD848-0000wU-4J
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:20 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37527)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kD85j-0006fO-BT
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:21:06 -0400
-Received: by mail-pl1-x629.google.com with SMTP id l9so686881plt.8
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:20:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kD845-0006JH-Vn
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:19 -0400
+Received: by mail-wm1-x341.google.com with SMTP id a9so1558287wmm.2
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:19:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cJQwd8RXC2jtaqIhnYKg7+XP5Yhz5tiCGX7IypB/AME=;
- b=NcUqBCiT0fEmG13b6YB85xbPjL/39kA4HDBESchCm8lgXzUmhbMhZXRPlf2t4hRG00
- dHt95dh/yx1mmZInsr/gaTAg7PvYxwooVa4lyz0mBCtbWeRJsJHbsWVcvPGy54R0PwXJ
- +kxFMIYRGm079x2Lv04to3W3DCFL0DTBp3UXI5cfe7l80vNtLu8SEGS3r3g0fmqWfAEu
- FUmGpX5opey314MKJI/IAf085g9pkVZn/unu0HGiPDk2NexMazyLz/EvDWRMgT+TZY5Y
- wUI00nNgguXxTai1SUbTh7RuyO3l5NDFc2G5b4/PiO9dPNMSqUOimskRtMYm53LW09MF
- lDGQ==
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=GR6lFbKq1d/AsODcpG4AtorrRgyAJbj/koKIQIlz/SU=;
+ b=KpRc75Tiye8RQyMZNcSpK4MraIHnz8PuWbTU41v6q9y9/HxL3v12FnDIwubDyCEM6x
+ 47C+6BZayUOsEqiK0DeoexglMesT1XPssD8jvFi6w9ewkriK8VGWcuBN6dM9T4bLfZBL
+ YvaZLil0vlShVl+s8HGpjHK0vNMBRvxbcn14vhAfPERzArkBvbKRCXx6CBza0Qi+USbS
+ SFJFmwaeMnT8hzoioggUG4PslS2J1Dx25BbhIKJ3rzD7jPejbK5CftkXEHPTtdt/2bgZ
+ Tl9CZSQzuaZxRHojtVhdQjarMeYzxJccQ10Wds34+eDPdMJqFAxrW0qZaznKgpVwfIv9
+ u9QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cJQwd8RXC2jtaqIhnYKg7+XP5Yhz5tiCGX7IypB/AME=;
- b=exn1PcNuaVOEP+jCdGLwWkPyPqy+ZNh7dneLL8KNLRefV8hh9aN2mLDynZeTNMgGmV
- 4g7NOW6AlRtwkir14htyiYvAWHFVsomTP1BOPlNTLVCHcy3Ur8ms/7K/EPleEtmKw4ee
- JAKBd6c9968pAA5O9W8ou8HGnvj/ZoXH1Ui2wVa3KEsAow2D8aW3U+MqUMJzZZXTr/bZ
- Q4Oxk2WnaBIhstYumnEESKT5ZN6Up4NYIEj+MfFQMtSUNrMD7k+KYGJJkujoAV8R4OcY
- hibTbq7wj4ZOEAQ/qEDFW59nXD5QUjdCdDWrxrqIq1rHJPCBIdloU648/Cs3k0r9aATw
- KVUA==
-X-Gm-Message-State: AOAM532qvXUA1hJmdnmGqHjDHG+EamqBbY4zqH8Sy7j/ZXvGAkDBozQj
- 5JK3nKJ+wMsVBjJYpgwM9KrANfjexLNzfw==
-X-Google-Smtp-Source: ABdhPJwM59XWZmaQc3f6OZhVNZzTq2HCD03cWS83E/lyM/9P7xZGdIQvQ2YqyefLVJFO1e9RREGHlQ==
-X-Received: by 2002:a17:90a:a50d:: with SMTP id
- a13mr2051816pjq.180.1598973657320; 
- Tue, 01 Sep 2020 08:20:57 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id f28sm2402473pfq.191.2020.09.01.08.20.56
+ bh=GR6lFbKq1d/AsODcpG4AtorrRgyAJbj/koKIQIlz/SU=;
+ b=r1UHmsqiMmddytdkxDO5USBYgd553fux7jKtxW/woJxUtVkBvih8pfigP1F2jCjzHp
+ e7nzKcEP/jAbcEdr/8CqWvChEE7/PViTMVMYpzs9lT0kI6/ChhVGxqsikRlyfiXi3yFG
+ FVUSw/0WR47UtaqRyCu3hvSn8LRgM+ys2Dn2OjeO+H621Hua0wI/KmwdKF42UT1R3Slv
+ MdiNkkQfRN5nA2eW2thZ90kZ+RTQv/UjZVmcyivpz0RFan0J54TkPFvZ+pqxfUGHykQ3
+ CMyy6Nw/z7s5bJxPIE2FPtVam/sYWIPmBU6sARYyTWognXl25UnVKrGdlZHJH66kqXkW
+ IKrg==
+X-Gm-Message-State: AOAM531gLxPrl0v8rfVAv4pu1InYswywBY99JTknC/JwYIFNbmXjOBwn
+ v9maOVwjqr4ZGtzqQP0o5TtLi+KB+vt7v6gW
+X-Google-Smtp-Source: ABdhPJz3wDqARokYsdhZCZhXK2lKDmajicpU8SyQQKZFlCIqNmvn9491Ku++QAgSUJBUX2oe1Tk9UQ==
+X-Received: by 2002:a1c:9909:: with SMTP id b9mr2258655wme.98.1598973556285;
+ Tue, 01 Sep 2020 08:19:16 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id z9sm2242317wma.4.2020.09.01.08.19.15
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Sep 2020 08:20:56 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ Tue, 01 Sep 2020 08:19:15 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 58/76] tcg: Add tcg_get_insn_start_param
-Date: Tue,  1 Sep 2020 08:20:54 -0700
-Message-Id: <20200901152054.922595-2-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200901152054.922595-1-richard.henderson@linaro.org>
-References: <20200901152054.922595-1-richard.henderson@linaro.org>
+Subject: [PULL 41/47] target/arm/vec_helper: Handle oprsz less than 16 bytes
+ in indexed operations
+Date: Tue,  1 Sep 2020 16:18:17 +0100
+Message-Id: <20200901151823.29785-42-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200901151823.29785-1-peter.maydell@linaro.org>
+References: <20200901151823.29785-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x629.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,53 +101,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MicroBlaze will shortly need to update a parameter in place.
-Add an interface to read to match that for write.
+In the gvec helper functions for indexed operations, for AArch32
+Neon the oprsz (total size of the vector) can be less than 16 bytes
+if the operation is on a D reg. Since the inner loop in these
+helpers always goes from 0 to segment, we must clamp it based
+on oprsz to avoid processing a full 16 byte segment when asked to
+handle an 8 byte wide vector.
 
-Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200828183354.27913-43-peter.maydell@linaro.org
 ---
- include/tcg/tcg.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ target/arm/vec_helper.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-index d40c925d04..53ce94c2c5 100644
---- a/include/tcg/tcg.h
-+++ b/include/tcg/tcg.h
-@@ -777,11 +777,26 @@ static inline TCGv_i32 TCGV_HIGH(TCGv_i64 t)
- }
- #endif
- 
-+static inline TCGArg tcg_get_insn_param(TCGOp *op, int arg)
-+{
-+    return op->args[arg];
-+}
-+
- static inline void tcg_set_insn_param(TCGOp *op, int arg, TCGArg v)
- {
-     op->args[arg] = v;
- }
- 
-+static inline target_ulong tcg_get_insn_start_param(TCGOp *op, int arg)
-+{
-+#if TARGET_LONG_BITS <= TCG_TARGET_REG_BITS
-+    return tcg_get_insn_param(op, arg);
-+#else
-+    return tcg_get_insn_param(op, arg * 2) |
-+           ((uint64_t)tcg_get_insn_param(op, arg * 2 + 1) << 32);
-+#endif
-+}
-+
- static inline void tcg_set_insn_start_param(TCGOp *op, int arg, target_ulong v)
- {
- #if TARGET_LONG_BITS <= TCG_TARGET_REG_BITS
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 20f153b47a1..b27b90e1dd8 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -1040,7 +1040,8 @@ DO_MULADD(gvec_vfms_s, float32_mulsub_f, float32)
+ #define DO_MUL_IDX(NAME, TYPE, H) \
+ void HELPER(NAME)(void *vd, void *vn, void *vm, uint32_t desc) \
+ {                                                                          \
+-    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
++    intptr_t i, j, oprsz = simd_oprsz(desc);                               \
++    intptr_t segment = MIN(16, oprsz) / sizeof(TYPE);                      \
+     intptr_t idx = simd_data(desc);                                        \
+     TYPE *d = vd, *n = vn, *m = vm;                                        \
+     for (i = 0; i < oprsz / sizeof(TYPE); i += segment) {                  \
+@@ -1061,7 +1062,8 @@ DO_MUL_IDX(gvec_mul_idx_d, uint64_t, )
+ #define DO_MLA_IDX(NAME, TYPE, OP, H) \
+ void HELPER(NAME)(void *vd, void *vn, void *vm, void *va, uint32_t desc)   \
+ {                                                                          \
+-    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
++    intptr_t i, j, oprsz = simd_oprsz(desc);                               \
++    intptr_t segment = MIN(16, oprsz) / sizeof(TYPE);                      \
+     intptr_t idx = simd_data(desc);                                        \
+     TYPE *d = vd, *n = vn, *m = vm, *a = va;                               \
+     for (i = 0; i < oprsz / sizeof(TYPE); i += segment) {                  \
+@@ -1086,7 +1088,8 @@ DO_MLA_IDX(gvec_mls_idx_d, uint64_t, -,   )
+ #define DO_FMUL_IDX(NAME, TYPE, H) \
+ void HELPER(NAME)(void *vd, void *vn, void *vm, void *stat, uint32_t desc) \
+ {                                                                          \
+-    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
++    intptr_t i, j, oprsz = simd_oprsz(desc);                               \
++    intptr_t segment = MIN(16, oprsz) / sizeof(TYPE);                      \
+     intptr_t idx = simd_data(desc);                                        \
+     TYPE *d = vd, *n = vn, *m = vm;                                        \
+     for (i = 0; i < oprsz / sizeof(TYPE); i += segment) {                  \
+@@ -1108,7 +1111,8 @@ DO_FMUL_IDX(gvec_fmul_idx_d, float64, )
+ void HELPER(NAME)(void *vd, void *vn, void *vm, void *va,                  \
+                   void *stat, uint32_t desc)                               \
+ {                                                                          \
+-    intptr_t i, j, oprsz = simd_oprsz(desc), segment = 16 / sizeof(TYPE);  \
++    intptr_t i, j, oprsz = simd_oprsz(desc);                               \
++    intptr_t segment = MIN(16, oprsz) / sizeof(TYPE);                      \
+     TYPE op1_neg = extract32(desc, SIMD_DATA_SHIFT, 1);                    \
+     intptr_t idx = desc >> (SIMD_DATA_SHIFT + 1);                          \
+     TYPE *d = vd, *n = vn, *m = vm, *a = va;                               \
 -- 
-2.25.1
+2.20.1
 
 
