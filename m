@@ -2,98 +2,64 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6351AC433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E12CBC433E2
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:50:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28E072083B
+	by mail.kernel.org (Postfix) with ESMTPS id A2F202083B
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:50:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DkCGWcUh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E072083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F202083B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD2wJ-0005Xj-8W
+	id 1kD2wJ-0005ZK-Os
 	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:50:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40154)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD2ir-0005lr-K9; Tue, 01 Sep 2020 05:37:01 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53550)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD2iq-0001WV-2U; Tue, 01 Sep 2020 05:37:01 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u18so467405wmc.3;
- Tue, 01 Sep 2020 02:36:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ALob3r9bFnYkN7EHAZCiCAj+Y+B16qSRzKe+iBuntqo=;
- b=DkCGWcUhkNv/jbB5Fb6kbxXQMN7BaA0qx+eq966uT5luSrkvOH+9SM9XOGxnf+OmUx
- qTdPWIwiG0c6xU67duW2D/N/h0B0+ARx8qNkwuPrenttexO8zC0fTcvFoXNxkHjEQsGV
- zpHnR+rJFY2aBXdmZFapV+9DJQbXdD3+onGh2U2ao54yemmT0h2ldHrlwUvi32/uf/zZ
- wtrzCOPkw+Yy2eYQFUGde+1r8cNHd6Tz3TD/OPeMjMuBQRJT5O5ZM8GicWQqlSOg1Dx+
- sN181MFWQiIVrugqs/L4BXMEoOlVkefFLV0QVbrW4WTpYAMDUd+2pErKMNw/FDOXNsJJ
- qQZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ALob3r9bFnYkN7EHAZCiCAj+Y+B16qSRzKe+iBuntqo=;
- b=ctrioyPguwu/KeLyafDkrsbTcRxddKANB5122OyBxqB7lDFvBLlECpZ9UMxdJ6RrRQ
- xXs0KMM6Qii0OLTePkRz+gEJ39OkakXLUxa8X1sIMR6eMGqufdL9V2cFlKPZ3MPNO+fs
- 79WfUEx+xa2jcBKbwZQgcFNuEsMtMRQTkAbvyKo9T1sjx51O0DE3EgstiBnCCU0ri+J8
- aUrOwON9PsV24XmVdWtpTY6ZqqBslNy7bpQraLl+eOMuGW8kgZTaZEdtnQMptyCdcuWY
- 7Vf60Ppr/S5S5gPYKggrjT5ko11nBb/NW/2qPuLNKxcGED9N0tc+PyWkbz/AZGKhVQS5
- HrWg==
-X-Gm-Message-State: AOAM532yHF9GD7roFzElQ9bZlaK7NJDjB2I3ytuR3gbeR1qDX9/8wKYx
- SpZYSWknkctZR+xWYRa8PhY=
-X-Google-Smtp-Source: ABdhPJzaPjXt9c3PuMzsZkVKhW5rlspsuRG+Ua/2DviniWFA6abaRL77aMoiiyxwESV+aX14Z1VD3w==
-X-Received: by 2002:a1c:cc0d:: with SMTP id h13mr891944wmb.44.1598953018312;
- Tue, 01 Sep 2020 02:36:58 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id f1sm1451725wrt.20.2020.09.01.02.36.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Sep 2020 02:36:57 -0700 (PDT)
-Subject: Re: [PATCH v3 01/16] target/riscv: cpu: Add a new 'resetvec' property
-To: Bin Meng <bmeng.cn@gmail.com>, Alistair Francis
- <Alistair.Francis@wdc.com>, Palmer Dabbelt <palmerdabbelt@google.com>,
- qemu-devel@nongnu.org, qemu-riscv@nongnu.org
-References: <1598924352-89526-1-git-send-email-bmeng.cn@gmail.com>
- <1598924352-89526-2-git-send-email-bmeng.cn@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <7f36f344-28a4-79fa-e68c-5e6e667b48f4@amsat.org>
-Date: Tue, 1 Sep 2020 11:36:56 +0200
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD2sa-0006hs-Ax
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:47:04 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49716)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD2sX-0002eD-CW
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:47:03 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 765DEAC97;
+ Tue,  1 Sep 2020 09:47:00 +0000 (UTC)
+Subject: Re: [PATCH v6 12/16] cpus: add handle_interrupt to the CpusAccel
+ interface
+To: Roman Bolshakov <r.bolshakov@yadro.com>
+References: <20200901072201.7133-1-cfontana@suse.de>
+ <20200901072201.7133-13-cfontana@suse.de>
+ <20200901093826.GD22344@SPB-NB-133.local>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <324fcf50-5ff1-4461-d005-ee2b0c892d0a@suse.de>
+Date: Tue, 1 Sep 2020 11:46:59 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <1598924352-89526-2-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <20200901093826.GD22344@SPB-NB-133.local>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:13:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -62
+X-Spam_score: -6.3
+X-Spam_bar: ------
+X-Spam_report: (-6.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,35 +72,334 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- Bin Meng <bin.meng@windriver.com>, Palmer Dabbelt <palmer@dabbelt.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, haxm-team@intel.com,
+ Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
+ Wenchao Wang <wenchao.wang@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Sunil Muthuswamy <sunilmut@microsoft.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/1/20 3:38 AM, Bin Meng wrote:
-> From: Bin Meng <bin.meng@windriver.com>
+On 9/1/20 11:38 AM, Roman Bolshakov wrote:
+> On Tue, Sep 01, 2020 at 09:21:57AM +0200, Claudio Fontana wrote:
+>> kvm: uses the generic handler
+>> qtest: uses the generic handler
+>> whpx: changed to use the generic handler (identical implementation)
+>> hax: changed to use the generic handler (identical implementation)
+>> hvf: changed to use the generic handler (identical implementation)
+>> tcg: adapt tcg-cpus to point to the tcg-specific handler
+>>
+>> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+>> ---
+>>  accel/tcg/tcg-all.c    | 26 --------------------------
+>>  accel/tcg/tcg-cpus.c   | 28 ++++++++++++++++++++++++++++
+>>  hw/core/cpu.c          | 13 -------------
+>>  include/hw/core/cpu.h  | 14 --------------
+>>  include/sysemu/cpus.h  |  2 ++
+>>  softmmu/cpus.c         | 18 ++++++++++++++++++
+>>  target/i386/hax-all.c  | 10 ----------
+>>  target/i386/hvf/hvf.c  |  9 ---------
+>>  target/i386/whpx-all.c | 10 ----------
+>>  9 files changed, 48 insertions(+), 82 deletions(-)
+>>
+>> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+>> index 01957b130d..af9bf5c5bb 100644
+>> --- a/accel/tcg/tcg-all.c
+>> +++ b/accel/tcg/tcg-all.c
+>> @@ -47,31 +47,6 @@ typedef struct TCGState {
+>>  #define TCG_STATE(obj) \
+>>          OBJECT_CHECK(TCGState, (obj), TYPE_TCG_ACCEL)
+>>  
+>> -/* mask must never be zero, except for A20 change call */
+>> -static void tcg_handle_interrupt(CPUState *cpu, int mask)
+>> -{
+>> -    int old_mask;
+>> -    g_assert(qemu_mutex_iothread_locked());
+>> -
+>> -    old_mask = cpu->interrupt_request;
+>> -    cpu->interrupt_request |= mask;
+>> -
+>> -    /*
+>> -     * If called from iothread context, wake the target cpu in
+>> -     * case its halted.
+>> -     */
+>> -    if (!qemu_cpu_is_self(cpu)) {
+>> -        qemu_cpu_kick(cpu);
+>> -    } else {
+>> -        atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
+>> -        if (icount_enabled() &&
+>> -            !cpu->can_do_io
+>> -            && (mask & ~old_mask) != 0) {
+>> -            cpu_abort(cpu, "Raised interrupt while not in I/O function");
+>> -        }
+>> -    }
+>> -}
+>> -
+>>  /*
+>>   * We default to false if we know other options have been enabled
+>>   * which are currently incompatible with MTTCG. Otherwise when each
+>> @@ -128,7 +103,6 @@ static int tcg_init(MachineState *ms)
+>>      TCGState *s = TCG_STATE(current_accel());
+>>  
+>>      tcg_exec_init(s->tb_size * 1024 * 1024);
+>> -    cpu_interrupt_handler = tcg_handle_interrupt;
+>>      mttcg_enabled = s->mttcg_enabled;
+>>      cpus_register_accel(&tcg_cpus);
+>>  
+>> diff --git a/accel/tcg/tcg-cpus.c b/accel/tcg/tcg-cpus.c
+>> index 72696f6d86..2bb209e2c6 100644
+>> --- a/accel/tcg/tcg-cpus.c
+>> +++ b/accel/tcg/tcg-cpus.c
+>> @@ -533,9 +533,37 @@ static int64_t tcg_get_elapsed_ticks(void)
+>>      return cpu_get_ticks();
+>>  }
+>>  
+>> +/* mask must never be zero, except for A20 change call */
+>> +static void tcg_handle_interrupt(CPUState *cpu, int mask)
+>> +{
+>> +    int old_mask;
+>> +    g_assert(qemu_mutex_iothread_locked());
+>> +
+>> +    old_mask = cpu->interrupt_request;
+>> +    cpu->interrupt_request |= mask;
+>> +
+>> +    /*
+>> +     * If called from iothread context, wake the target cpu in
+>> +     * case its halted.
+>> +     */
+>> +    if (!qemu_cpu_is_self(cpu)) {
+>> +        qemu_cpu_kick(cpu);
+>> +    } else {
+>> +        atomic_set(&cpu_neg(cpu)->icount_decr.u16.high, -1);
+>> +        if (icount_enabled() &&
+>> +            !cpu->can_do_io
+>> +            && (mask & ~old_mask) != 0) {
+>> +            cpu_abort(cpu, "Raised interrupt while not in I/O function");
+>> +        }
+>> +    }
+>> +}
+>> +
+>>  const CpusAccel tcg_cpus = {
+>>      .create_vcpu_thread = tcg_start_vcpu_thread,
+>>      .kick_vcpu_thread = tcg_kick_vcpu_thread,
+>> +
+>> +    .handle_interrupt = tcg_handle_interrupt,
+>> +
+>>      .get_virtual_clock = tcg_get_virtual_clock,
+>>      .get_elapsed_ticks = tcg_get_elapsed_ticks,
+>>  };
+>> diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+>> index fa8602493b..451b3d5ee7 100644
+>> --- a/hw/core/cpu.c
+>> +++ b/hw/core/cpu.c
+>> @@ -35,8 +35,6 @@
+>>  #include "qemu/plugin.h"
+>>  #include "sysemu/hw_accel.h"
+>>  
+>> -CPUInterruptHandler cpu_interrupt_handler;
+>> -
+>>  CPUState *cpu_by_arch_id(int64_t id)
+>>  {
+>>      CPUState *cpu;
+>> @@ -394,17 +392,6 @@ static vaddr cpu_adjust_watchpoint_address(CPUState *cpu, vaddr addr, int len)
+>>      return addr;
+>>  }
+>>  
+>> -static void generic_handle_interrupt(CPUState *cpu, int mask)
+>> -{
+>> -    cpu->interrupt_request |= mask;
+>> -
+>> -    if (!qemu_cpu_is_self(cpu)) {
+>> -        qemu_cpu_kick(cpu);
+>> -    }
+>> -}
+>> -
+>> -CPUInterruptHandler cpu_interrupt_handler = generic_handle_interrupt;
+>> -
+>>  static void cpu_class_init(ObjectClass *klass, void *data)
+>>  {
+>>      DeviceClass *dc = DEVICE_CLASS(klass);
+>> diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
+>> index 8f145733ce..efd33d87fd 100644
+>> --- a/include/hw/core/cpu.h
+>> +++ b/include/hw/core/cpu.h
+>> @@ -838,12 +838,6 @@ bool cpu_exists(int64_t id);
+>>   */
+>>  CPUState *cpu_by_arch_id(int64_t id);
+>>  
+>> -#ifndef CONFIG_USER_ONLY
+>> -
+>> -typedef void (*CPUInterruptHandler)(CPUState *, int);
+>> -
+>> -extern CPUInterruptHandler cpu_interrupt_handler;
+>> -
+>>  /**
+>>   * cpu_interrupt:
+>>   * @cpu: The CPU to set an interrupt on.
+>> @@ -851,17 +845,9 @@ extern CPUInterruptHandler cpu_interrupt_handler;
+>>   *
+>>   * Invokes the interrupt handler.
+>>   */
+>> -static inline void cpu_interrupt(CPUState *cpu, int mask)
+>> -{
+>> -    cpu_interrupt_handler(cpu, mask);
+>> -}
+>> -
+>> -#else /* USER_ONLY */
+>>  
+>>  void cpu_interrupt(CPUState *cpu, int mask);
+>>  
+>> -#endif /* USER_ONLY */
+>> -
+>>  #ifdef NEED_CPU_H
+>>  
+>>  #ifdef CONFIG_SOFTMMU
+>> diff --git a/include/sysemu/cpus.h b/include/sysemu/cpus.h
+>> index 26171697f5..231685955d 100644
+>> --- a/include/sysemu/cpus.h
+>> +++ b/include/sysemu/cpus.h
+>> @@ -16,6 +16,8 @@ typedef struct CpusAccel {
+>>      void (*synchronize_state)(CPUState *cpu);
+>>      void (*synchronize_pre_loadvm)(CPUState *cpu);
+>>  
+>> +    void (*handle_interrupt)(CPUState *cpu, int mask);
+>> +
+>>      int64_t (*get_virtual_clock)(void);
+>>      int64_t (*get_elapsed_ticks)(void);
+>>  } CpusAccel;
+>> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+>> index f32ecb4bb9..7068666579 100644
+>> --- a/softmmu/cpus.c
+>> +++ b/softmmu/cpus.c
+>> @@ -225,6 +225,24 @@ int64_t cpus_get_elapsed_ticks(void)
+>>      return cpu_get_ticks();
+>>  }
+>>  
+>> +static void generic_handle_interrupt(CPUState *cpu, int mask)
+>> +{
+>> +    cpu->interrupt_request |= mask;
+>> +
+>> +    if (!qemu_cpu_is_self(cpu)) {
+>> +        qemu_cpu_kick(cpu);
+>> +    }
+>> +}
+>> +
+>> +void cpu_interrupt(CPUState *cpu, int mask)
+>> +{
+>> +    if (cpus_accel->handle_interrupt) {
+>> +        cpus_accel->handle_interrupt(cpu, mask);
+>> +    } else {
+>> +        generic_handle_interrupt(cpu, mask);
+>> +    }
+>> +}
+>> +
 > 
-> Currently the reset vector address is hard-coded in a RISC-V CPU's
-> instance_init() routine. In a real world we can have 2 exact same
-> CPUs except for the reset vector address, which is pretty common in
-> the RISC-V core IP licensing business.
-> 
-> Normally reset vector address is a configurable parameter. Let's
-> create a 64-bit property to store the reset vector address which
-> covers both 32-bit and 64-bit CPUs.
-> 
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-> ---
-> 
-> (no changes since v1)
-> 
->  target/riscv/cpu.h | 1 +
->  target/riscv/cpu.c | 1 +
->  2 files changed, 2 insertions(+)
+> The handlers is not something that dynamically changes, the functions
+> can be assigned once during accel registration.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Data struct is now const though, they are never assigned, only initialized..
+
+>  Accel registraton is
+> also the place where the checks can take place.
+> 
+> Regards,
+> Roman
+> 
+>>  static int do_vm_stop(RunState state, bool send_stop)
+>>  {
+>>      int ret = 0;
+>> diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+>> index b66ddeb8bf..fd1ab673d7 100644
+>> --- a/target/i386/hax-all.c
+>> +++ b/target/i386/hax-all.c
+>> @@ -297,15 +297,6 @@ int hax_vm_destroy(struct hax_vm *vm)
+>>      return 0;
+>>  }
+>>  
+>> -static void hax_handle_interrupt(CPUState *cpu, int mask)
+>> -{
+>> -    cpu->interrupt_request |= mask;
+>> -
+>> -    if (!qemu_cpu_is_self(cpu)) {
+>> -        qemu_cpu_kick(cpu);
+>> -    }
+>> -}
+>> -
+>>  static int hax_init(ram_addr_t ram_size, int max_cpus)
+>>  {
+>>      struct hax_state *hax = NULL;
+>> @@ -350,7 +341,6 @@ static int hax_init(ram_addr_t ram_size, int max_cpus)
+>>      qversion.cur_version = hax_cur_version;
+>>      qversion.min_version = hax_min_version;
+>>      hax_notify_qemu_version(hax->vm->fd, &qversion);
+>> -    cpu_interrupt_handler = hax_handle_interrupt;
+>>  
+>>      return ret;
+>>    error:
+>> diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
+>> index 7ac6987c1b..ed9356565c 100644
+>> --- a/target/i386/hvf/hvf.c
+>> +++ b/target/i386/hvf/hvf.c
+>> @@ -262,14 +262,6 @@ static void update_apic_tpr(CPUState *cpu)
+>>  
+>>  #define VECTORING_INFO_VECTOR_MASK     0xff
+>>  
+>> -static void hvf_handle_interrupt(CPUState * cpu, int mask)
+>> -{
+>> -    cpu->interrupt_request |= mask;
+>> -    if (!qemu_cpu_is_self(cpu)) {
+>> -        qemu_cpu_kick(cpu);
+>> -    }
+>> -}
+>> -
+>>  void hvf_handle_io(CPUArchState *env, uint16_t port, void *buffer,
+>>                    int direction, int size, int count)
+>>  {
+>> @@ -894,7 +886,6 @@ static int hvf_accel_init(MachineState *ms)
+>>      }
+>>    
+>>      hvf_state = s;
+>> -    cpu_interrupt_handler = hvf_handle_interrupt;
+>>      memory_listener_register(&hvf_memory_listener, &address_space_memory);
+>>      cpus_register_accel(&hvf_cpus);
+>>      return 0;
+>> diff --git a/target/i386/whpx-all.c b/target/i386/whpx-all.c
+>> index 8b6986c864..b3d17fbe04 100644
+>> --- a/target/i386/whpx-all.c
+>> +++ b/target/i386/whpx-all.c
+>> @@ -1413,15 +1413,6 @@ static void whpx_memory_init(void)
+>>      memory_listener_register(&whpx_memory_listener, &address_space_memory);
+>>  }
+>>  
+>> -static void whpx_handle_interrupt(CPUState *cpu, int mask)
+>> -{
+>> -    cpu->interrupt_request |= mask;
+>> -
+>> -    if (!qemu_cpu_is_self(cpu)) {
+>> -        qemu_cpu_kick(cpu);
+>> -    }
+>> -}
+>> -
+>>  /*
+>>   * Load the functions from the given library, using the given handle. If a
+>>   * handle is provided, it is used, otherwise the library is opened. The
+>> @@ -1576,7 +1567,6 @@ static int whpx_accel_init(MachineState *ms)
+>>  
+>>      whpx_memory_init();
+>>  
+>> -    cpu_interrupt_handler = whpx_handle_interrupt;
+>>      cpus_register_accel(&whpx_cpus);
+>>  
+>>      printf("Windows Hypervisor Platform accelerator is operational\n");
+>> -- 
+>> 2.26.2
+>>
 
 
