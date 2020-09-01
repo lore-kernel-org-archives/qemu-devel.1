@@ -2,88 +2,91 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B61D4C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 11:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 284A1C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 11:24:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1ECBF206C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 11:21:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2994206C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 11:24:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSHoIpsB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECBF206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U7x6WwJ3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2994206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD4Lk-0006jz-T9
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 07:21:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39072)
+	id 1kD4P6-0000GE-Rn
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 07:24:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kD4Kx-00069s-5a
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 07:20:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22050)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
- id 1kD4Kq-0006w1-6x
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 07:20:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598959218;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=p5fL4nZ34dz/JaDHgORh4kNwj81Q+OD9Qj7nhgGwKcQ=;
- b=XSHoIpsBT7MD4Ma++wF2eJp4AE4mC3gHuZwgKvTrBnAO/U3nPo0xqgJk9gmswpqNb5TPTm
- EdthgLwz/mlQql4yV/R7vtMsx2DTsqTfXDFsILJIg+G3nAvCJHJ0/1XTpZK6opbyoreWN8
- 1lcmuOMMHP3xPf4YlLgM88wekb/uKrM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-KMRXGI4IPEa6HBTP-ed90A-1; Tue, 01 Sep 2020 07:20:16 -0400
-X-MC-Unique: KMRXGI4IPEa6HBTP-ed90A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08C60420EA;
- Tue,  1 Sep 2020 11:20:16 +0000 (UTC)
-Received: from starship (unknown [10.35.206.190])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9CF69672C0;
- Tue,  1 Sep 2020 11:20:14 +0000 (UTC)
-Message-ID: <283e2c4566bfa47e3a996efc7a6220921a00e0b0.camel@redhat.com>
-Subject: Re: [PATCH] qcow2: cleanup created file when qcow2_co_create
-From: Maxim Levitsky <mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kD4Nt-0007RN-8T
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 07:23:29 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51062)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kD4Nr-0007Le-HO
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 07:23:28 -0400
+Received: by mail-wm1-x342.google.com with SMTP id e17so769295wme.0
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 04:23:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=+QxXMhQFsrjlRtR6MdpHMZEV9+kuxTu8qRDE9hc8cHY=;
+ b=U7x6WwJ3u1/EuyA2RidPp7wMlxgl6YVJR4eyNRRO9FQIabNDlhFr4oEuhRk3neQwQv
+ pSRS5ypQO7vyQfRTSzPYjYnjFD+t0WmJQdHmGCnlHyZwBK4uJmTk8aUGmjbAnFo7Noxp
+ bzUMAq0LFpIsFK/XNnWY1lJYaW/PcqWpMzOv7klpsmI/TAr1+dwOgQZ+S8s7SiMgGmKs
+ xQGP/np/usJeewgYorro3deTORz78uzPFYJn70M3IUSJS3w0ibGyhCNkBUAjjfQ823lM
+ S7PaXhFLoFppOIpdbhGOR09l0tSbkhpo2oA8pOLh4JM4tgpVvbJwSF4AghGrC2p62c8D
+ M11g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=+QxXMhQFsrjlRtR6MdpHMZEV9+kuxTu8qRDE9hc8cHY=;
+ b=b00kn98MJWbe5mKhlZJjTvmK9ZISeU0P5BoBB9Gk7MqoXR8i2wFh3ygCDbBwbJu/dg
+ kaxlJcZZhpUYlAZyGw9Vtyo5leM45eD5bByI79s2I/ppF/tlvnz3LX2M2tFverRKWStV
+ 5MAgQMFrHpo6feeFAiShrAQXYVTIhCiHIy/n/GOugFGm8MuRZbNStuhSUETpUIefJ2Xv
+ IdazLq3V/YQWdtZ+8OvYhvlHde2+ZzqB3VocWE5Kz+YBA+A9Nm5CI4G/wMK4UJ9ZsQ5w
+ u2t1EcuD1odUR8hnKn1GyefrWsNwr0/wwoVqqq8/o3n1wxFLVFtg1mo6kYLJTRhCvZR4
+ Z5Aw==
+X-Gm-Message-State: AOAM530l9g/lBSnywEAgrNtm989aSzLS6h6ZOnK6sG3IZFHuNXIey9RR
+ 32OPilEaKghOtEkuv2ruo65N8aAlp4E=
+X-Google-Smtp-Source: ABdhPJzJagobWbapDkdH19O1uyRH9Ad84AU5Mb2OUrhzRL0ahf5as8BJDoScLj+TPDnQihylHC+ZYQ==
+X-Received: by 2002:a1c:4d14:: with SMTP id o20mr1283415wmh.74.1598959405372; 
+ Tue, 01 Sep 2020 04:23:25 -0700 (PDT)
+Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id n11sm1769124wrx.91.2020.09.01.04.23.24
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 01 Sep 2020 04:23:24 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Date: Tue, 01 Sep 2020 14:20:13 +0300
-In-Reply-To: <20200716113359.15656-1-mlevitsk@redhat.com>
-References: <20200716113359.15656-1-mlevitsk@redhat.com>
-User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
+Subject: [PATCH 0/2] hw/core: Move hw_error() out of cpus.c
+Date: Tue,  1 Sep 2020 13:23:21 +0200
+Message-Id: <20200901112323.94969-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlevitsk@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,51 +99,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Claudio Fontana <cfontana@suse.de>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 2020-07-16 at 14:33 +0300, Maxim Levitsky wrote:
-> This is basically the same thing as commit
-> 'crypto.c: cleanup created file when block_crypto_co_create_opts_luks fails'
-> does but for qcow2 files to ensure that we don't leave qcow2 files
-> when creation fails.
-> 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+Move hw_error() out of cpus.c because we already have cpu_abort()
+there.
 
-Very kind ping on this patch.
+Philippe Mathieu-Daudé (2):
+  cpus: Do not dump CPU state when calling hw_error()
+  hw/core: Move hw_error() out of cpus.c
 
-Best regards,
-	Maxim levitsky
+ hw/core/error.c     | 38 ++++++++++++++++++++++++++++++++++++++
+ softmmu/cpus.c      | 17 -----------------
+ hw/core/meson.build |  1 +
+ 3 files changed, 39 insertions(+), 17 deletions(-)
+ create mode 100644 hw/core/error.c
 
-> ---
->  block/qcow2.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/block/qcow2.c b/block/qcow2.c
-> index fadf3422f8..8b848924b5 100644
-> --- a/block/qcow2.c
-> +++ b/block/qcow2.c
-> @@ -3794,6 +3794,17 @@ static int coroutine_fn qcow2_co_create_opts(BlockDriver *drv,
->      /* Create the qcow2 image (format layer) */
->      ret = qcow2_co_create(create_options, errp);
->      if (ret < 0) {
-> +
-> +        Error *local_delete_err = NULL;
-> +        int r_del = bdrv_co_delete_file(bs, &local_delete_err);
-> +        /*
-> +         * ENOTSUP will happen if the block driver doesn't support
-> +         * the 'bdrv_co_delete_file' interface. This is a predictable
-> +         * scenario and shouldn't be reported back to the user.
-> +         */
-> +        if ((r_del < 0) && (r_del != -ENOTSUP)) {
-> +            error_report_err(local_delete_err);
-> +        }
->          goto finish;
->      }
->  
-
+-- 
+2.26.2
 
 
