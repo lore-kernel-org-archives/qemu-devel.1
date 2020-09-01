@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A295AC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:05:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A2A8C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:06:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F1D8204EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:05:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F1D8204EC
+	by mail.kernel.org (Postfix) with ESMTPS id E16F0206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:06:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E16F0206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD3Ae-00009Q-Bz
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:05:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47048)
+	id 1kD3Az-0000uQ-0Z
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:06:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43882)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD39v-0007J0-MT; Tue, 01 Sep 2020 06:04:59 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:38165)
+ id 1kD2zL-0003A2-VH; Tue, 01 Sep 2020 05:54:03 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:58957)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD39t-0005AM-MT; Tue, 01 Sep 2020 06:04:59 -0400
+ id 1kD2zK-0003bp-4g; Tue, 01 Sep 2020 05:54:03 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1Mzz2e-1kXaJq2ynO-00x34Z; Tue, 01 Sep 2020 12:04:48 +0200
-Subject: Re: [PATCH v3 08/10] usb/bus: Remove dead assignment in
- usb_get_fw_dev_path()
+ (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MNKuK-1jx8h6315u-00Olt5; Tue, 01 Sep 2020 11:53:54 +0200
+Subject: Re: [PATCH v3 02/10] hw/arm/omap1:Remove redundant statement in
+ omap_clkdsp_read()
 To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
  qemu-trivial@nongnu.org
 References: <20200827110311.164316-1-kuhn.chenqun@huawei.com>
- <20200827110311.164316-9-kuhn.chenqun@huawei.com>
+ <20200827110311.164316-3-kuhn.chenqun@huawei.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <febed4c6-9fe1-6c7f-da3f-8437656b1132@vivier.eu>
-Date: Tue, 1 Sep 2020 12:04:47 +0200
+Message-ID: <de1fd7c5-6bd3-39e0-e040-b10da548edf5@vivier.eu>
+Date: Tue, 1 Sep 2020 11:53:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200827110311.164316-9-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200827110311.164316-3-kuhn.chenqun@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:iM9bShvqYoETd0r64PiicV8OqiiQOb6NzRVQYhSUHLzLH8or8Hr
- C43SOoRNvFfSpZbdkL04IevsPfRkHvBdaLFvYGPjB0pH6hUGQggbUWfWydpeSEnyIN36I5a
- XZZfHjyiMOFQfCE3TLP8hy3RNJ0/94RJjZqJlQTilh4hfGv1jgIUDn1glDa3JhusicLCk/Z
- Nb1BNZtrzanLFi4LblqrQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:904L66kZorw=:gpjpUEqQ+Kl8U7TGklpoc/
- 6rLkMcOiI7jQKBNN1NaLktYQ1xZOCv65n7qBinb3eC/CFMNRrFIIH1syNb89xHHR2nBWYWfCO
- trTKpGtWyhtFGAP1bdkEZtAaywQ1AaErVOawVMQhrLyXZEM69GYDqO3xFgUtiIbZPz5VB6rX/
- 5Gh0ONe9rQc+ZsoV00br260hMtj8aWPg6T60/Bpo3UjivhIfNJfQ2HxehkCh6x3CyewX1oouu
- aVOIa55TdD/hLckTk4oDYOSrOiQGHAGHsw9Q0NNKlSslcLMp7ll8SIfgoSD5C2OwXUZyUHcdm
- 4gcAog/z0qtKS625lB+f/zUzH7X09vv2+1E8tko3lWPghKN+MeRgF3JV37w7+hmiPK2MnBeEP
- yRX8gtVjVwGd/9xfZ9G21Cj0M+VLPwL/gb2EX4XaXBKKRFiMtuXX0b8kpcstOPiiaS12gdtzh
- Ycmq+pIAq5qFKrpLuvf9n/RvL1EHI/WrFYTmNBhrK8aDzGQB/Gg6jMniaUe4ec9ymi4frE2O7
- 4N4LVBc/Uf/U7NxpvsgI6v+xA0vThPyAjQlKW1Gib+JYwO60DHQ6UfM93HHFNcb/CtNEkMM2E
- 5OvfT0PBxaLUogSvdpz37uRjVz95RhaA9WE5OdAy0iUNQDwohy0pTlQXEHxwwEASNVY9i0m9a
- SRExnkRfhmQDAzcRo3elCQSZ7Ifv7A5m9+QbdilfF0ABuUU+qzbaX+o3LsoBtCvXBhBIdjhZ/
- NXwiqhUygxVcRIM2lZ7T4x4jW9gxQYK+0kZdV3RZyTOsUE5JANBBYb2sF+1b7M7FbdjU3H7OE
- DBR+1EkQ3hY2P17xRJ4Yh6Jn8DtALccZ8lO1uM54RBxjIDTAt7GYjWL5+1gDU2Aw6y71mxw
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:gFTRsUiCDzWWFawcLJ3MHA2mEXDIRWiQMWEMJHA5XX7m+Tj6lGD
+ R5xQahQZX7l0Irc02yRbBqqUU0RsZ74PyZbcBuqSNDFvqTA+kJjZ+nFL+sfDykqhk84Eo/C
+ 6/hgceptOA4PhfFvLHc/Ho8jzdN48VHTdODsTbUBDNirP4EzmnANEY1X/dOvzR/0wDldhki
+ 1URJjDXMnTyh9bI5lrHGg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:RX5m1ijYb4s=:h8EK1n1XwnjZ1aj5EfaKTS
+ VErABeICJOPOkYku8VxbxPVTHNfFUbbSS1HekyIDGQdA0G8dsRky7OP73s68Kty4V47E0GNSI
+ WkRJlLhMgGP7/LrNn75BYW/wGzlUVedELzUO7rSstjw14GPDx/Rp2HV6KKRr41JSDfsGF7nNH
+ nElKYFZPybU2p/0Xzb3SQRwwCohyt4TaHuuZjH7OW8hLCeTRxUGUQflDs1wkU4siy+SeAkB2a
+ 08sDsrDwgC2nVkH+EOIAip1y4OOaj2n0nqBNdQ9F457OW98+KMG8xjWiCxMLeemHzIS31HUxT
+ kxLRWUpP4EzvYaJbko94xrBgL2SQCYI9cgIeI3TNz2Fv9zJ8vxTk6lFgYkUPpCVIfI5eeyrAE
+ gZNpyE+Kcv/4gNzlGZjoARdlYFVNgKJwO+RDq+ZDkcfJy5pokT0TS2chwAq96dIxR9Z1TcVGJ
+ WIL3e6xEp5B2sSvBMOVIHAZ2BpKKCCD5fbzqcdrYIAz9v7hNM23IOUfjgCJ+KrdyxAvtYInoX
+ g1pYPjkdDVnm7w9dt1U4UdS/8nXB1divsNm05v9/I7Ma7Vs3Mz+Wis9CfvAVIbR5aObA9lIzi
+ F9j15mOXsHyXXy7y4KOVOzGqvnq4L9YZqZl4SPWQMMo44DMgYFrfQMnzaCrTTJTgECdsi7iCR
+ vpmkRc79LMoYHZxZ1fYP2/SWYb/kPb5IifdcAVNusUJA2wsxiimjUMGJU/Uf7gSjCjCOfLNuh
+ SdQZ+T+5/FUFXQFA4ef+SKB0H+oYYkp7j3vH9opx2D7pIAn3djmJDUVQGe0Fv5i0JSwfYliIb
+ /aEuqk5qaaBKRg750gMqD8eEbQXtDxb/gpXwg0o2jVpj026DxkW0nN1yJOCN3PsgvtCZIfM
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:34:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:47:22
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -130,44 +130,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, Euler Robot <euler.robot@huawei.com>,
- pannengyuan@huawei.com, zhang.zhanghailiang@huawei.com,
- Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, zhang.zhanghailiang@huawei.com,
+ pannengyuan@huawei.com, Li Qiang <liq3ea@gmail.com>, qemu-arm@nongnu.org,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 27/08/2020 à 13:03, Chen Qun a écrit :
 > Clang static code analyzer show warning:
-> qemu/hw/usb/bus.c:615:13: warning: Value stored to 'pos' is never read
->             pos += snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
+> hw/arm/omap1.c:1760:15: warning: Value stored to 'cpu' during its
+> initialization is never read
+>     CPUState *cpu = CPU(s->cpu);
+>               ^~~   ~~~~~~~~~~~
 > 
 > Reported-by: Euler Robot <euler.robot@huawei.com>
 > Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> Reviewed-by: Li Qiang <liq3ea@gmail.com>
 > ---
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: Markus Armbruster <armbru@redhat.com>
-> 
-> v2->v3: The format of the snprintf statement is modified(Base on Markus review).
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Cc: qemu-arm@nongnu.org
 > ---
->  hw/usb/bus.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  hw/arm/omap1.c | 1 -
+>  1 file changed, 1 deletion(-)
 > 
-> diff --git a/hw/usb/bus.c b/hw/usb/bus.c
-> index b17bda3b29..2b11041451 100644
-> --- a/hw/usb/bus.c
-> +++ b/hw/usb/bus.c
-> @@ -612,8 +612,8 @@ static char *usb_get_fw_dev_path(DeviceState *qdev)
->              in++;
->          } else {
->              /* the device itself */
-> -            pos += snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
-> -                            qdev_fw_name(qdev), nr);
-> +            snprintf(fw_path + pos, fw_len - pos, "%s@%lx",
-> +                     qdev_fw_name(qdev), nr);
->              break;
->          }
+> diff --git a/hw/arm/omap1.c b/hw/arm/omap1.c
+> index 6ba0df6b6d..02c0f66431 100644
+> --- a/hw/arm/omap1.c
+> +++ b/hw/arm/omap1.c
+> @@ -1774,7 +1774,6 @@ static uint64_t omap_clkdsp_read(void *opaque, hwaddr addr,
+>          return s->clkm.dsp_rstct2;
+>  
+>      case 0x18:	/* DSP_SYSST */
+> -        cpu = CPU(s->cpu);
+>          return (s->clkm.clocking_scheme << 11) | s->clkm.cold_start |
+>                  (cpu->halted << 6);      /* Quite useless... */
 >      }
 > 
 
