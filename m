@@ -4,41 +4,39 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E045C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64828C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:01:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC0E5206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:00:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC0E5206A5
+	by mail.kernel.org (Postfix) with ESMTPS id E70B5206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 10:01:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70B5206A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50008 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD35k-0007J6-3H
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:00:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43514)
+	id 1kD36v-0000W0-1x
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 06:01:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD2yi-0002VP-GZ; Tue, 01 Sep 2020 05:53:24 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:59987)
+ id 1kD2sw-0007P6-8n; Tue, 01 Sep 2020 05:47:26 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:48147)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD2yf-0003S8-7L; Tue, 01 Sep 2020 05:53:24 -0400
+ id 1kD2su-0002hu-8t; Tue, 01 Sep 2020 05:47:25 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1MWiYo-1k6Wcv17l2-00X3Sv; Tue, 01 Sep 2020 11:53:09 +0200
-Subject: Re: [PATCH v3 01/10] hw/arm/virt-acpi-build:Remove dead assignment in
- build_madt()
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20200827110311.164316-1-kuhn.chenqun@huawei.com>
- <20200827110311.164316-2-kuhn.chenqun@huawei.com>
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MJW18-1jtJ6f1Mb2-00Jp7u; Tue, 01 Sep 2020 11:47:21 +0200
+Subject: Re: [PATCH] linux-user: Add strace support for printing OFD fcntl
+ operations
+To: Mike Gelfand <mikedld@mikedld.com>, qemu-devel@nongnu.org
+References: <20200830092242.31506-1-mikedld@mikedld.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,32 +80,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <eb8949b0-9aec-5543-c91b-d1f794abc1f4@vivier.eu>
-Date: Tue, 1 Sep 2020 11:53:05 +0200
+Message-ID: <1e2e300c-73e3-18ae-0bf3-5a65ac05673e@vivier.eu>
+Date: Tue, 1 Sep 2020 11:47:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200827110311.164316-2-kuhn.chenqun@huawei.com>
+In-Reply-To: <20200830092242.31506-1-mikedld@mikedld.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:0LMOGjzNdM9/reHRYXjRTnDUOypQRARhiQc8/eRxZHqRkW0zNnh
- 4QcqZ/QPym+VBm7Wak6sP3i0/IBHFTChgjEcEoxXvHdTOe+F8KSDkQ/o6dUVJCQyGxh5d3S
- 9M8fguUI0j4bCcx09pmCGOx9l26bs671VzrTJMeWAARIbOZAAfhgrqEszADowDESBiZK3wc
- cpVWITpsPiQ1h0e57/poA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:KTdMgbEHUXs=:8AHvfgA9jUEebuMfC0n/1g
- UTPB4ZpzvqPRJPTCDVwxrnJ946A4ddz4SwzWzMQXZzyXGKY8nPVumDXhJc8fHkypn0AU8znF4
- PCXrbrpFyOOZxJCJbw0xwIfJluWK1FdGVl1CGDpfr6fbDUmcpk87uphkMQH+dRoTl8Bn3ZP1h
- P3hrehtY2pOvlUEQWAGU7p5uI8MMS0kGGsSU0hJPVg5FHD+x+rWzu8nk0+mlaL3x+CTiu1QPx
- lSjh+zJigQyXgQ9B+NDIviO1+ve+GWFKJrwkmD5W2u35LrM596ZEWxfPDhTcNK3YZ7p4yHbwm
- T1GQGROsiOldy3GIwm1qho8kQcv1noFrdyNDWXRXsJ4//5F2oBlOOTpY7zrTDK5aIOUhl0G77
- xeu1m+2MCbMG177TcolFktrNYlSsr/nP5wWKAQm71EP2bXIP2+XxqHUmoV/06yKJV7TvCEqY2
- O0tjS6ncXLsSYWx5KKKl4Y+/dXHV2X4cWHUIuDT8Vi4XISntBCIt+9iy3mZY9xtSNCasZqtmX
- 5kk7tx07qMRiOL2fkE//NcYEqcSTsAse5xdwdFfB2HDbBsZhh5fxxW5hakOJJEo0ECRDmbmcy
- XvobCycUemqWhS0/X5dXE3aP2ryhuYWF2ew99Gj41LQ4U38OuopM58hUBTu18hrMWHGmla42c
- rG6cfDwg2wdsxFoCuwyj6bUp6B1iDFzyKztl41KZ6nHw+xGP0+4gpwb6SUWUM4ttfacQ4z3Y4
- ayam61d3IF/h412BxbfcHPcYPsPblJZ65TrkR5h4kCw+ZK+qdAQnSG43GnsDSZe13M8lLrCbS
- Z9LFwAwIasD1hNHQwxeqhFOM/jcO51x2UbTtKqy4sJa19Kx82qYC2SdVf4m8Z4GBD46CaNO
+X-Provags-ID: V03:K1:cljSet4TbINxjrSQGI6B3lAS+4dCPrfULPLgpW5eWgKwxy2Z0Pw
+ VgYC3ww+X4HDCGetP72Gi9iTSXQY+Jz4ZYYlVlpr51n0BUFzTPSTKG3dB7cZbQ50ffcvTw0
+ jzvSomqz8ej1rg6bOLeEkMxDJAtda9HeTXCc78IiyD3j/RJHpC8AEqYc5r9p+VtKFOU6l/N
+ vfFNl0Pc3yDp3oDVXmRVQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:tgvlesofVuY=:Zoo1KJIXIo5kUMRzAiIYJv
+ tnqruZrp7xVNYPVFj5NkltBb+ZolNdq+B9MBm4+WPuR1GbcXKAisgU1i2BfN/9faINWvjRUZd
+ z0LJXTUz425ifAmgVfPDds3HkFH/4Q2tIV9bLJ0zq5hjDhujba8uDlaxMfQeo/5b8v7t0Pgw7
+ UJzbVZdExvpyzabRnK91HDk0ipIpqyh885N7vJOJBqkgsA7TiDoIuwBUiIas9oztMfd8Lj3FU
+ 2/FcyPKYKk+savJW5nEpzyA6VSVVM0C8hdKD+YNDYBoRjBkELhcI50LyNVGZF1kLSN5uihwfq
+ fo7imZcTZB9DhsppN7BjchG5pnnRTL/fAndR2AinOau8adIQY5NCsTgA5VpjTeMBKZ9C+/k+/
+ NI/CTKrmjbZuVFdcWUux/9HI0TmWNQTJfKWvXiYuK8va2N8RlvszpnbSVgERDbWQ2Kxr2VGOn
+ AwK5aDCWMAML2mvJrZrvOeGiJiQis8ADIgj7unG3BbpB9o+6lI6nwFOAVKi7/oW9AK6HOuGCA
+ iHRN7gZUT5q+nTh6USM16HtGz1SPDuaKkJqJtI14qONjoqUJxRUr1CHsNtknY+EFY+GgLQohp
+ L5P4Z9u0HLkDOOe6Kdgv0lHAAX0GA8mGmlrpkxN17jMao2ullFLdGLOQ+XiJAgngiI3Mh8FCh
+ g/M0E3jlaTONf1jA6Lr/98617MbDalPfe1DgWaLN0gZTXXQ8aZsHMZaWnJMXpCl7h2JomwD2q
+ yMIhmkE+bu9PSH3pQNca2aJHu+v1pLnIZmbPpffvdT+hVqdQojKTXYT+BfbWuVfZVwqTZ4H/j
+ GVc+IdU1PXXGPX4IOh696s3IW8Y1Lgb1E2UZGgUg27ufe9O+vAjFyR8/U/axKJh1ep/9hqB
 Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:47:22
@@ -130,53 +128,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, zhang.zhanghailiang@huawei.com,
- "Michael S. Tsirkin" <mst@redhat.com>, pannengyuan@huawei.com,
- Li Qiang <liq3ea@gmail.com>, Shannon Zhao <shannon.zhaosl@gmail.com>,
- qemu-arm@nongnu.org, Euler Robot <euler.robot@huawei.com>,
- Igor Mammedov <imammedo@redhat.com>
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 27/08/2020 à 13:03, Chen Qun a écrit :
-> Clang static code analyzer show warning:
-> hw/arm/virt-acpi-build.c:641:5: warning: Value stored to 'madt' is never read
->     madt = acpi_data_push(table_data, sizeof *madt);
->     ^      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Le 30/08/2020 à 11:22, Mike Gelfand a écrit :
+> Signed-off-by: Mike Gelfand <mikedld@mikedld.com>
 > ---
-> Cc: Shannon Zhao <shannon.zhaosl@gmail.com>
-> Cc: Peter Maydell <peter.maydell@linaro.org>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: qemu-arm@nongnu.org
-> ---
->  hw/arm/virt-acpi-build.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
+>  linux-user/strace.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 91f0df7b13..f830f9b779 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -633,12 +633,11 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->      int madt_start = table_data->len;
->      const MemMapEntry *memmap = vms->memmap;
->      const int *irqmap = vms->irqmap;
-> -    AcpiMultipleApicTable *madt;
->      AcpiMadtGenericDistributor *gicd;
->      AcpiMadtGenericMsiFrame *gic_msi;
->      int i;
->  
-> -    madt = acpi_data_push(table_data, sizeof *madt);
-> +    acpi_data_push(table_data, sizeof(AcpiMultipleApicTable));
->  
->      gicd = acpi_data_push(table_data, sizeof *gicd);
->      gicd->type = ACPI_APIC_GENERIC_DISTRIBUTOR;
+> diff --git a/linux-user/strace.c b/linux-user/strace.c
+> index 4f77b0cf76..11fea14fba 100644
+> --- a/linux-user/strace.c
+> +++ b/linux-user/strace.c
+> @@ -2056,6 +2056,18 @@ print_fcntl(void *cpu_env, const struct syscallname *name,
+>          print_pointer(arg2, 1);
+>          break;
+>  #endif
+> +    case TARGET_F_OFD_GETLK:
+> +        qemu_log("F_OFD_GETLK,");
+> +        print_pointer(arg2, 1);
+> +        break;
+> +    case TARGET_F_OFD_SETLK:
+> +        qemu_log("F_OFD_SETLK,");
+> +        print_pointer(arg2, 1);
+> +        break;
+> +    case TARGET_F_OFD_SETLKW:
+> +        qemu_log("F_OFD_SETLKW,");
+> +        print_pointer(arg2, 1);
+> +        break;
+>      case TARGET_F_SETLEASE:
+>          qemu_log("F_SETLEASE,");
+>          print_raw_param(TARGET_ABI_FMT_ld, arg2, 0);
 > 
 
 Applied to my trivial-patches branch.
