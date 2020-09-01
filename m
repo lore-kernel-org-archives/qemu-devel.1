@@ -2,115 +2,118 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C8B7C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:16:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DA02C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:16:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D94B9207D3
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:16:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E01F92100A
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:16:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dpnp7mSC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D94B9207D3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="okEMo1Iq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E01F92100A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD81V-0004kJ-1R
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:16:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43836)
+	id 1kD81f-00051z-2y
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:16:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7sg-0007wK-Ub
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:07:30 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48677
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7sc-0004B2-VU
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:07:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598972845;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=DjSk/e5SXMdCtxWQeU7ZGcAUJHMwTAmNVplEoQQtlYE=;
- b=dpnp7mSC3t7hfa03oOp9AAg6QcNy4PROnlQ1klbaiA8OJYA/jwKr9ipuPmIZ7VdBAMKb+O
- 7tKv8ighD6Ma4HBhpKpLk9ao00NXIPpc5H0fr8Xoji58xlIo3KyTA30Oa0X5k8ik3G/bMv
- v2I2EgbM1eIWkFGRZlRosNmoa+PmPQc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-323-1JMOkRucM0SQq0RJjjHYZA-1; Tue, 01 Sep 2020 11:07:23 -0400
-X-MC-Unique: 1JMOkRucM0SQq0RJjjHYZA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF3268015A8;
- Tue,  1 Sep 2020 15:07:21 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-83.ams2.redhat.com
- [10.36.113.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B2FA619C66;
- Tue,  1 Sep 2020 15:07:16 +0000 (UTC)
-Subject: Re: [PATCH v5 00/10] preallocate filter
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-References: <20200821141123.28538-1-vsementsov@virtuozzo.com>
- <3a810fb7-eedc-bd54-4319-f1862b5382c0@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <1c027e2c-651c-7077-09e3-f94c71c6dde7@redhat.com>
-Date: Tue, 1 Sep 2020 17:07:14 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
+ id 1kD7lz-00031S-UJ
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:00:35 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:61146)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mhartmay@linux.ibm.com>)
+ id 1kD7lw-0002On-QA
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:00:35 -0400
+Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 081EWfSf068396
+ for <qemu-devel@nongnu.org>; Tue, 1 Sep 2020 11:00:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=9opTI5kgrjLtTyU9BqgM0eFZWdpveKQ3E1Mr8mJ/e7E=;
+ b=okEMo1IqvLQQbDl+ipf9NLCZ9VjYzYugGi8j+XUdZjy7LpsAESaWbgyAjA3YNnmjWFif
+ QUCzkD3sIJUXEOIe1RX+uosKagZmVEGRBrCKxRlzi6pbRICWxZCM4M8vG1LvbGTd+bf7
+ 4lBbZUBbqGfu/6eL6ZC+0Kz7ZlL7MeYKzJhrlaAgM76jGWaYqyO75geYfvbTx6hAjGoy
+ v2znHu3xMnwiAuJ85VATuyvD+S7DU/5qWJQsOJqoCO8tV2FbT/JUXIaEb++zC186lEaP
+ 59j3O8yzyIbaF3tctmBPu2kk2iAt8JwKzdIuMCiFm1M0hemFYJXNizgs+kqC3pwu05Nl kg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 339nc5qe0f-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 11:00:31 -0400
+Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 081EqUL3146194
+ for <qemu-devel@nongnu.org>; Tue, 1 Sep 2020 11:00:30 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 339nc5qdvw-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Sep 2020 11:00:30 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 081ExLaE029748;
+ Tue, 1 Sep 2020 15:00:25 GMT
+Received: from b06avi18626390.portsmouth.uk.ibm.com
+ (b06avi18626390.portsmouth.uk.ibm.com [9.149.26.192])
+ by ppma03ams.nl.ibm.com with ESMTP id 337en8bhf5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 01 Sep 2020 15:00:25 +0000
+Received: from d06av22.portsmouth.uk.ibm.com (d06av22.portsmouth.uk.ibm.com
+ [9.149.105.58])
+ by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP
+ id 081Ewq7c16843052
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 1 Sep 2020 14:58:52 GMT
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B2B8C4C088;
+ Tue,  1 Sep 2020 15:00:22 +0000 (GMT)
+Received: from d06av22.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 5CF8D4C090;
+ Tue,  1 Sep 2020 15:00:22 +0000 (GMT)
+Received: from marcibm.ibmuc.com (unknown [9.145.15.189])
+ by d06av22.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Tue,  1 Sep 2020 15:00:22 +0000 (GMT)
+From: Marc Hartmayer <mhartmay@linux.ibm.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH v2 1/2] virtio: add vhost-user-fs-ccw device
+Date: Tue,  1 Sep 2020 17:00:18 +0200
+Message-Id: <20200901150019.29229-2-mhartmay@linux.ibm.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200901150019.29229-1-mhartmay@linux.ibm.com>
+References: <20200901150019.29229-1-mhartmay@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <3a810fb7-eedc-bd54-4319-f1862b5382c0@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="wVzrZ1owYKa5uZaIm51SADd4IX81VQCxR"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:57:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-01_08:2020-09-01,
+ 2020-09-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ spamscore=0 bulkscore=0 mlxscore=0 impostorscore=0 suspectscore=1
+ mlxlogscore=999 phishscore=0 priorityscore=1501 clxscore=1015 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009010122
+Received-SPF: pass client-ip=148.163.156.1;
+ envelope-from=mhartmay@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 09:02:31
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,122 +126,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- nsoffer@redhat.com, stefanha@redhat.com, den@openvz.org
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---wVzrZ1owYKa5uZaIm51SADd4IX81VQCxR
-Content-Type: multipart/mixed; boundary="qy7IAreQaHzq0KRNV7YB2ldsD5ACN7OFz"
+From: Halil Pasic <pasic@linux.ibm.com>
 
---qy7IAreQaHzq0KRNV7YB2ldsD5ACN7OFz
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Wire up the CCW device for vhost-user-fs.
 
-On 27.08.20 23:08, Vladimir Sementsov-Ogievskiy wrote:
-> 21.08.2020 17:11, Vladimir Sementsov-Ogievskiy wrote:
->> Hi all!
->>
->> Here is a filter, which does preallocation on write.
->>
->> In Virtuozzo we have to deal with some custom distributed storage
->> solution, where allocation is relatively expensive operation. We have to
->> workaround it in Qemu, so here is a new filter.
->=20
-> I have a problem now with this thing.
->=20
-> We need preallocation. But we don't want to explicitly specify it in all
-> the management tools.
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Halil Pasic <pasic@linux.ibm.com>
+---
+ hw/s390x/meson.build         |  1 +
+ hw/s390x/vhost-user-fs-ccw.c | 75 ++++++++++++++++++++++++++++++++++++
+ 2 files changed, 76 insertions(+)
+ create mode 100644 hw/s390x/vhost-user-fs-ccw.c
 
-Why?
-
-> So it should be inserted by default.
-
-Why?  You mean without any option?  That seems...  Interesting?
-
-(Also like a recipe for reports of performance regression in some cases.)
-
-> It's OK for
-> us to keep this default different from upstream... But there are
-> problems with the implicitly inserted filter (actually iotests fail and
-> I failed to fix them)
-
-I would suspect even if the iotests passed we would end up with a heap
-of problems that we would only notice at some later point.  I thought
-you too weren=E2=80=99t too fond of the idea of implicit filters.
-
-> 1. I have to set bs->inherits_from for filter and it's child by hand
-> after bdrv_replace_node(), otherwise bdrv_check_perm doesn't work.
->=20
-> 2. I have to set filter_bs->implicit and teach bdrv_refresh_filename()
-> to ignore implicit filters when it checks for drv->bdrv_file_open, to
-> avoid appearing of json in backing file names
->=20
-> 3. And the real design problem, which seems impossible to fix: reopen is
-> broken, just because user is not prepared to the fact that file child is
-> a filter, not a file node and has another options, and don't support
-> options of file-posix.
-
-Well, what should I say.  I feel like we have made efforts in the past
-years to make the block graph fully visible to users and yield the
-responsibility of managing it to the users, too, so I=E2=80=99m not surpris=
-ed if
-a step backwards breaks that.
-
-> And seems all it (and mostly [3]) shows that implicitly inserting the
-> filter is near to be impossible..
->=20
-> So, what are possible solutions?
->=20
-> In virtuozzo7 we have preallocation feature done inside qcow2 driver.
-> This is very uncomfortable: we should to handle each possible over-EOF
-> write to underlying node (to keep data_end in sync to be able to shrink
-> preallocation on close()).. I don't like this way and don't want to port
-> it..
->=20
-> Another option is implementing preallocation inside file-posix driver.
-> Then, instead of BDRV_REQ_NO_WAIT flag I'll need to extend serialising
-> requests API (bdrv_make_request_serialising() is already used in
-> file-posix.c) to dupport no-wait behavior + expanding the serialising
-> request bounds. This option seems feasible, so I'll try this way if no
-> other ideas.
-
-Possible, but you haven=E2=80=99t yet explained what the problem with the
-management layer inserting the preallocation filter is.
-
-> Filter is obviously the true way: we use generic block layer for native
-> request serialising, don't need to catch every write in qcow2 driver,
-> don't need to modify any other driver and get a universal thing. But how
-> to insert it implicitly (or at least automatically in some cases) and
-> avoid all the problems?
-
-I don=E2=80=99t understand why inserting it implicitly is important.
-
-Max
-
-
---qy7IAreQaHzq0KRNV7YB2ldsD5ACN7OFz--
-
---wVzrZ1owYKa5uZaIm51SADd4IX81VQCxR
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9OY6IACgkQ9AfbAGHV
-z0AMFQgAozEDZeU/1iQR9vtRi3rLSjRcauJEYSlA8Jp5a5VBd9ECEM/sm2PxKTTd
-UiuVwk+GTjJAP9u/pNKiofo82zLQPlEMBYugdMaqpBxTrg/Al606GPLteoUBZNYF
-jUN5JJnwIfIeRjuMMkzdSmDVgGJH0ovqzW0RDANC2/bosDAyTOPzCiKKpFyGr8jT
-wZnVO/sL8oyzrwmMCZzY+5N0dF4ve+GYqs/adtsycWD/A4uGSU0W7AzGAZ2hnZzF
-2ylXlUKTs6eqgj3tiWnjpMzZBfy/5Xn+wvXVxjfSki8wW+dqF2gHh/8wZ2VxlySL
-gZkQG+AG/tnt42jCoFf2WIYNMFNXng==
-=MG6k
------END PGP SIGNATURE-----
-
---wVzrZ1owYKa5uZaIm51SADd4IX81VQCxR--
+diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+index b63782d87ab5..948ceae7a7b3 100644
+--- a/hw/s390x/meson.build
++++ b/hw/s390x/meson.build
+@@ -41,6 +41,7 @@ virtio_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio-ccw-scsi.c'))
+ virtio_ss.add(when: 'CONFIG_VIRTIO_SERIAL', if_true: files('virtio-ccw-serial.c'))
+ virtio_ss.add(when: ['CONFIG_VIRTIO_9P', 'CONFIG_VIRTFS'], if_true: files('virtio-ccw-blk.c'))
+ virtio_ss.add(when: 'CONFIG_VHOST_VSOCK', if_true: files('vhost-vsock-ccw.c'))
++virtio_ss.add(when: 'CONFIG_VHOST_USER_FS', if_true: files('vhost-user-fs-ccw.c'))
+ s390x_ss.add_all(when: 'CONFIG_VIRTIO_CCW', if_true: virtio_ss)
+ 
+ hw_arch += {'s390x': s390x_ss}
+diff --git a/hw/s390x/vhost-user-fs-ccw.c b/hw/s390x/vhost-user-fs-ccw.c
+new file mode 100644
+index 000000000000..6c6f26929301
+--- /dev/null
++++ b/hw/s390x/vhost-user-fs-ccw.c
+@@ -0,0 +1,75 @@
++/*
++ * virtio ccw vhost-user-fs implementation
++ *
++ * Copyright 2020 IBM Corp.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++#include "qemu/osdep.h"
++#include "hw/qdev-properties.h"
++#include "qapi/error.h"
++#include "hw/virtio/vhost-user-fs.h"
++#include "virtio-ccw.h"
++
++typedef struct VHostUserFSCcw {
++    VirtioCcwDevice parent_obj;
++    VHostUserFS vdev;
++} VHostUserFSCcw;
++
++#define TYPE_VHOST_USER_FS_CCW "vhost-user-fs-ccw"
++#define VHOST_USER_FS_CCW(obj) \
++        OBJECT_CHECK(VHostUserFSCcw, (obj), TYPE_VHOST_USER_FS_CCW)
++
++
++static Property vhost_user_fs_ccw_properties[] = {
++    DEFINE_PROP_BIT("ioeventfd", VirtioCcwDevice, flags,
++                    VIRTIO_CCW_FLAG_USE_IOEVENTFD_BIT, true),
++    DEFINE_PROP_UINT32("max_revision", VirtioCcwDevice, max_rev,
++                       VIRTIO_CCW_MAX_REV),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void vhost_user_fs_ccw_realize(VirtioCcwDevice *ccw_dev, Error **errp)
++{
++    VHostUserFSCcw *dev = VHOST_USER_FS_CCW(ccw_dev);
++    DeviceState *vdev = DEVICE(&dev->vdev);
++
++    qdev_realize(vdev, BUS(&ccw_dev->bus), errp);
++}
++
++static void vhost_user_fs_ccw_instance_init(Object *obj)
++{
++    VHostUserFSCcw *dev = VHOST_USER_FS_CCW(obj);
++    VirtioCcwDevice *ccw_dev = VIRTIO_CCW_DEVICE(obj);
++
++    ccw_dev->force_revision_1 = true;
++    virtio_instance_init_common(obj, &dev->vdev, sizeof(dev->vdev),
++                                TYPE_VHOST_USER_FS);
++}
++
++static void vhost_user_fs_ccw_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    VirtIOCCWDeviceClass *k = VIRTIO_CCW_DEVICE_CLASS(klass);
++
++    k->realize = vhost_user_fs_ccw_realize;
++    device_class_set_props(dc, vhost_user_fs_ccw_properties);
++    set_bit(DEVICE_CATEGORY_STORAGE, dc->categories);
++}
++
++static const TypeInfo vhost_user_fs_ccw = {
++    .name          = TYPE_VHOST_USER_FS_CCW,
++    .parent        = TYPE_VIRTIO_CCW_DEVICE,
++    .instance_size = sizeof(VHostUserFSCcw),
++    .instance_init = vhost_user_fs_ccw_instance_init,
++    .class_init    = vhost_user_fs_ccw_class_init,
++};
++
++static void vhost_user_fs_ccw_register(void)
++{
++    type_register_static(&vhost_user_fs_ccw);
++}
++
++type_init(vhost_user_fs_ccw_register)
+-- 
+2.25.4
 
 
