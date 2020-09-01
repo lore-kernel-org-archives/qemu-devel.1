@@ -2,86 +2,86 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E876C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:43:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7E48C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:43:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5AEF52176B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:43:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D73C216C4
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:43:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UblzAjPo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AEF52176B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h85QA4xm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D73C216C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49794 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7V0-0006XH-9G
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:43:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33634)
+	id 1kD7Vi-0007xM-Ho
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:43:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7Ms-0006zP-Gx
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:34:38 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21109
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1kD7Fz-0000Qo-Lz
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:27:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49216
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7Mp-000736-ED
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:34:38 -0400
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1kD7FA-0005uU-BF
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:27:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598970873;
+ s=mimecast20190719; t=1598970394;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cKQlddx1iwXuCQ3iGPWLvy2xVEGWarYimbu8WyeYHtg=;
- b=UblzAjPoroLchwEk9iAq1zmpucE612HBIVFj5G2B8yvW2AgKmbCyaoZ9TuX8H+L5yMRBJN
- e8TRWvrhSAUZlKEAjyfeZwrVUVS8miBO4tnBFcqbuNf7u6a2UoeqKP/FZCQANjJiRvbRhV
- /MuIfV+IerPQT7vvbrJ9q0iwBHs2bQc=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=WkC3N89ydXyGnhdjKTzNoR4gv2gAygiFHmbwQ9p7Bbg=;
+ b=h85QA4xmLyygpEx3r0mhLPoeiqH12rxkuVnVGyhcOdrkpliTRtW4bKgM1LTnHO9Vv+pIZx
+ hbmUJr8HJCTWRiEWBsbYMFw/CwWkQ7K0uDNzxPfxQK8a+FScB2Np2h3Hhuf8ryt3V73ziM
+ i1cPT7ZGUVvTF6KXgLlpx1S4jl0vjVg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-lGipOUyDMG6yGCWYVvwoFg-1; Tue, 01 Sep 2020 10:34:30 -0400
-X-MC-Unique: lGipOUyDMG6yGCWYVvwoFg-1
+ us-mta-371-fNduf54ONmawAkAWw2gweg-1; Tue, 01 Sep 2020 10:26:32 -0400
+X-MC-Unique: fNduf54ONmawAkAWw2gweg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5FA4E839A48;
- Tue,  1 Sep 2020 14:34:29 +0000 (UTC)
-Received: from localhost (ovpn-113-83.ams2.redhat.com [10.36.113.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0142B61177;
- Tue,  1 Sep 2020 14:34:28 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v8 01/43] block: Add child access functions
-Date: Tue,  1 Sep 2020 16:33:42 +0200
-Message-Id: <20200901143424.884735-2-mreitz@redhat.com>
-In-Reply-To: <20200901143424.884735-1-mreitz@redhat.com>
-References: <20200901143424.884735-1-mreitz@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A1478015C5;
+ Tue,  1 Sep 2020 14:26:30 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-114-76.ams2.redhat.com [10.36.114.76])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 72BAD60BE2;
+ Tue,  1 Sep 2020 14:26:11 +0000 (UTC)
+From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To: Peter Xu <peterx@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [RFC v8 0/5] memory: Delete assertion in
+ memory_region_unregister_iommu_notifier
+Date: Tue,  1 Sep 2020 16:26:03 +0200
+Message-Id: <20200901142608.24481-1-eperezma@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:16:33
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eperezma@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:57:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,193 +94,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org,
+ Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are BDS children that the general block layer code can access,
-namely bs->file and bs->backing.  Since the introduction of filters and
-external data files, their meaning is not quite clear.  bs->backing can
-be a COW source, or it can be a filtered child; bs->file can be a
-filtered child, it can be data and metadata storage, or it can be just
-metadata storage.
+I am able to hit this assertion when a Red Hat 7 guest virtio_net device
+raises an "Invalidation" of all the TLB entries. This happens in the
+guest's startup if 'intel_iommu=on' argument is passed to the guest
+kernel and right IOMMU/ATS devices are declared in qemu's command line.
 
-This overloading really is not helpful.  This patch adds functions that
-retrieve the correct child for each exact purpose.  Later patches in
-this series will make use of them.  Doing so will allow us to handle
-filter nodes in a meaningful way.
+Command line:
+/home/qemu/x86_64-softmmu/qemu-system-x86_64 -name \
+guest=rhel7-test,debug-threads=on -machine \
+pc-q35-5.1,accel=kvm,usb=off,dump-guest-core=off,kernel_irqchip=split \
+-cpu \
+Broadwell,vme=on,ss=on,vmx=on,f16c=on,rdrand=on,hypervisor=on,arat=on,tsc-adjust=on,umip=on,arch-capabilities=on,xsaveopt=on,pdpe1gb=on,abm=on,skip-l1dfl-vmentry=on,rtm=on,hle=on \
+-m 8096 -realtime mlock=off -smp 2,sockets=2,cores=1,threads=1 -uuid \
+d022ecbf-679e-4755-87ce-eb87fc5bbc5d -display none -no-user-config \
+-nodefaults -rtc base=utc,driftfix=slew -global \
+kvm-pit.lost_tick_policy=delay -no-hpet -no-shutdown -global \
+ICH9-LPC.disable_s3=1 -global ICH9-LPC.disable_s4=1 -boot strict=on \
+-device intel-iommu,intremap=on,device-iotlb=on -device \
+pcie-root-port,port=0x8,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x1 \
+-device \
+pcie-root-port,port=0x9,chassis=2,id=pci.2,bus=pcie.0,addr=0x1.0x1 \
+-device \
+pcie-root-port,port=0xa,chassis=3,id=pci.3,bus=pcie.0,addr=0x1.0x2 \
+-device \
+pcie-root-port,port=0xb,chassis=4,id=pci.4,bus=pcie.0,addr=0x1.0x3 \
+-device \
+pcie-root-port,port=0xc,chassis=5,id=pci.5,bus=pcie.0,addr=0x1.0x4 \
+-device \
+pcie-root-port,port=0xd,chassis=6,id=pci.6,bus=pcie.0,addr=0x1.0x5 \
+-device \
+pcie-root-port,port=0xe,chassis=7,id=pci.7,bus=pcie.0,addr=0x1.0x6 \
+-device qemu-xhci,p2=15,p3=15,id=usb,bus=pci.2,addr=0x0 -device \
+virtio-serial-pci,id=virtio-serial0,bus=pci.3,addr=0x0 -drive \
+file=/home/virtio-test2.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 \
+-device \
+virtio-blk-pci,scsi=off,bus=pci.4,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 \
+-netdev tap,id=hostnet0,vhost=on,vhostforce=on -device \
+virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:0d:1d:f2,bus=pci.1,addr=0x0,iommu_platform=on,ats=on \
+-device virtio-balloon-pci,id=balloon0,bus=pci.5,addr=0x0 -object \
+rng-random,id=objrng0,filename=/dev/urandom -device \
+virtio-rng-pci,rng=objrng0,id=rng0,bus=pci.6,addr=0x0 -s -msg \
+timestamp=on
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- include/block/block_int.h | 44 +++++++++++++++++--
- block.c                   | 91 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 132 insertions(+), 3 deletions(-)
+Full backtrace:
+#0  0x00007ffff521370f in raise () at /lib64/libc.so.6
+#1  0x00007ffff51fdb25 in abort () at /lib64/libc.so.6
+#2  0x00007ffff51fd9f9 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
+#3  0x00007ffff520bcc6 in .annobin_assert.c_end () at /lib64/libc.so.6
+#4  0x0000555555888171 in memory_region_notify_one (notifier=0x7ffde0487fa8,
+                                                    entry=0x7ffde5dfe200)
+                          at /home/qemu/memory.c:1918
+#5  0x0000555555888247 in memory_region_notify_iommu (iommu_mr=0x555556f6c0b0,
+                                                      iommu_idx=0, entry=...)
+                          at /home/qemu/memory.c:1941
+#6  0x0000555555951c8d in vtd_process_device_iotlb_desc (s=0x555557609000,
+                                                       inv_desc=0x7ffde5dfe2d0)
+                          at /home/qemu/hw/i386/intel_iommu.c:2468
+#7  0x0000555555951e6a in vtd_process_inv_desc (s=0x555557609000)
+                          at /home/qemu/hw/i386/intel_iommu.c:2531
+#8  0x0000555555951fa5 in vtd_fetch_inv_desc (s=0x555557609000)
+                          at /home/qemu/hw/i386/intel_iommu.c:2563
+#9  0x00005555559520e5 in vtd_handle_iqt_write (s=0x555557609000)
+                          at /home/qemu/hw/i386/intel_iommu.c:2590
+#10 0x0000555555952b45 in vtd_mem_write (opaque=0x555557609000, addr=136,
+                                         val=2688, size=4)
+                          at /home/qemu/hw/i386/intel_iommu.c:2837
+#11 0x0000555555883e17 in memory_region_write_accessor (mr=0x555557609330,
+                                                        addr=136,
+                                                        value=0x7ffde5dfe478,
+                                                        size=4,
+                                                        shift=0,
+                                                        mask=4294967295,
+                                                        attrs=...)
+                          at /home/qemu/memory.c:483
+#12 0x000055555588401d in access_with_adjusted_size (addr=136,
+                       value=0x7ffde5dfe478,
+                       size=4,
+                       access_size_min=4,
+                       access_size_max=8,
+                       access_fn=0x555555883d38 <memory_region_write_accessor>,
+                       mr=0x555557609330,
+                       attrs=...)
+                       at /home/qemu/memory.c:544
+#13 0x0000555555886f37 in memory_region_dispatch_write (mr=0x555557609330,
+                                                       addr=136,
+                                                       data=2688,
+                                                       op=MO_32,
+                                                       attrs=...)
+                          at /home/qemu/memory.c:1476
+#14 0x0000555555827a03 in flatview_write_continue (fv=0x7ffdd8503150,
+                                                   addr=4275634312,
+                                                   attrs=...,
+                                                   ptr=0x7ffff7ff0028,
+                                                   len=4,
+                                                   addr1=136,
+                                                   l=4,
+                                                   mr=0x555557609330)
+                          at /home/qemu/exec.c:3146
+#15 0x0000555555827b48 in flatview_write (fv=0x7ffdd8503150,
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 9da7a42927..f280a95b26 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -92,9 +92,17 @@ struct BlockDriver {
-     int instance_size;
- 
-     /* set to true if the BlockDriver is a block filter. Block filters pass
--     * certain callbacks that refer to data (see block.c) to their bs->file if
--     * the driver doesn't implement them. Drivers that do not wish to forward
--     * must implement them and return -ENOTSUP.
-+     * certain callbacks that refer to data (see block.c) to their bs->file
-+     * or bs->backing (whichever one exists) if the driver doesn't implement
-+     * them. Drivers that do not wish to forward must implement them and return
-+     * -ENOTSUP.
-+     * Note that filters are not allowed to modify data.
-+     *
-+     * Filters generally cannot have more than a single filtered child,
-+     * because the data they present must at all times be the same as
-+     * that on their filtered child.  That would be impossible to
-+     * achieve for multiple filtered children.
-+     * (And this filtered child must then be bs->file or bs->backing.)
-      */
-     bool is_filter;
-     /*
-@@ -1382,4 +1390,34 @@ BdrvDirtyBitmap *block_dirty_bitmap_remove(const char *node, const char *name,
-                                            BlockDriverState **bitmap_bs,
-                                            Error **errp);
- 
-+BdrvChild *bdrv_cow_child(BlockDriverState *bs);
-+BdrvChild *bdrv_filter_child(BlockDriverState *bs);
-+BdrvChild *bdrv_filter_or_cow_child(BlockDriverState *bs);
-+BdrvChild *bdrv_primary_child(BlockDriverState *bs);
-+
-+static inline BlockDriverState *child_bs(BdrvChild *child)
-+{
-+    return child ? child->bs : NULL;
-+}
-+
-+static inline BlockDriverState *bdrv_cow_bs(BlockDriverState *bs)
-+{
-+    return child_bs(bdrv_cow_child(bs));
-+}
-+
-+static inline BlockDriverState *bdrv_filter_bs(BlockDriverState *bs)
-+{
-+    return child_bs(bdrv_filter_child(bs));
-+}
-+
-+static inline BlockDriverState *bdrv_filter_or_cow_bs(BlockDriverState *bs)
-+{
-+    return child_bs(bdrv_filter_or_cow_child(bs));
-+}
-+
-+static inline BlockDriverState *bdrv_primary_bs(BlockDriverState *bs)
-+{
-+    return child_bs(bdrv_primary_child(bs));
-+}
-+
- #endif /* BLOCK_INT_H */
-diff --git a/block.c b/block.c
-index b204b93a2e..9f866e8676 100644
---- a/block.c
-+++ b/block.c
-@@ -6943,3 +6943,94 @@ int bdrv_make_empty(BdrvChild *c, Error **errp)
- 
-     return 0;
- }
-+
-+/*
-+ * Return the child that @bs acts as an overlay for, and from which data may be
-+ * copied in COW or COR operations.  Usually this is the backing file.
-+ */
-+BdrvChild *bdrv_cow_child(BlockDriverState *bs)
-+{
-+    if (!bs || !bs->drv) {
-+        return NULL;
-+    }
-+
-+    if (bs->drv->is_filter) {
-+        return NULL;
-+    }
-+
-+    if (!bs->backing) {
-+        return NULL;
-+    }
-+
-+    assert(bs->backing->role & BDRV_CHILD_COW);
-+    return bs->backing;
-+}
-+
-+/*
-+ * If @bs acts as a filter for exactly one of its children, return
-+ * that child.
-+ */
-+BdrvChild *bdrv_filter_child(BlockDriverState *bs)
-+{
-+    BdrvChild *c;
-+
-+    if (!bs || !bs->drv) {
-+        return NULL;
-+    }
-+
-+    if (!bs->drv->is_filter) {
-+        return NULL;
-+    }
-+
-+    /* Only one of @backing or @file may be used */
-+    assert(!(bs->backing && bs->file));
-+
-+    c = bs->backing ?: bs->file;
-+    if (!c) {
-+        return NULL;
-+    }
-+
-+    assert(c->role & BDRV_CHILD_FILTERED);
-+    return c;
-+}
-+
-+/*
-+ * Return either the result of bdrv_cow_child() or bdrv_filter_child(),
-+ * whichever is non-NULL.
-+ *
-+ * Return NULL if both are NULL.
-+ */
-+BdrvChild *bdrv_filter_or_cow_child(BlockDriverState *bs)
-+{
-+    BdrvChild *cow_child = bdrv_cow_child(bs);
-+    BdrvChild *filter_child = bdrv_filter_child(bs);
-+
-+    /* Filter nodes cannot have COW backing files */
-+    assert(!(cow_child && filter_child));
-+
-+    return cow_child ?: filter_child;
-+}
-+
-+/*
-+ * Return the primary child of this node: For filters, that is the
-+ * filtered child.  For other nodes, that is usually the child storing
-+ * metadata.
-+ * (A generally more helpful description is that this is (usually) the
-+ * child that has the same filename as @bs.)
-+ *
-+ * Drivers do not necessarily have a primary child; for example quorum
-+ * does not.
-+ */
-+BdrvChild *bdrv_primary_child(BlockDriverState *bs)
-+{
-+    BdrvChild *c, *found = NULL;
-+
-+    QLIST_FOREACH(c, &bs->children, next) {
-+        if (c->role & BDRV_CHILD_PRIMARY) {
-+            assert(!found);
-+            found = c;
-+        }
-+    }
-+
-+    return found;
-+}
+                                          addr=4275634312,
+                                          attrs=...,
+                                          buf=0x7ffff7ff0028,
+                                          len=4)
+                          at /home/qemu/exec.c:3186
+#16 0x0000555555827e9d in address_space_write (
+                                      as=0x5555567ca640 <address_space_memory>,
+                                      addr=4275634312,
+                                      attrs=...,
+                                      buf=0x7ffff7ff0028,
+                                      len=4)
+                          at /home/qemu/exec.c:3277
+#17 0x0000555555827f0a in address_space_rw (
+                                      as=0x5555567ca640 <address_space_memory>,
+                                      addr=4275634312,
+                                      attrs=...,
+                                      buf=0x7ffff7ff0028,
+                                      len=4,
+                                      is_write=true)
+                          at /home/qemu/exec.c:3287
+#18 0x000055555589b633 in kvm_cpu_exec (cpu=0x555556b65640)
+                               at /home/qemu/accel/kvm/kvm-all.c:2511
+#19 0x0000555555876ba8 in qemu_kvm_cpu_thread_fn (arg=0x555556b65640)
+                               at /home/qemu/cpus.c:1284
+#20 0x0000555555dafff1 in qemu_thread_start (args=0x555556b8c3b0)
+                               at util/qemu-thread-posix.c:521
+#21 0x00007ffff55a62de in start_thread () at /lib64/libpthread.so.0
+#22 0x00007ffff52d7e83 in clone () at /lib64/libc.so.6
+
+(gdb) frame 4
+#4  0x0000555555888171 in memory_region_notify_one
+                      (notifier=0x7ffde0487fa8, entry=0x7ffde5dfe200)
+                      at /home/qemu/memory.c:1918
+1918        assert(entry->iova >= notifier->start && entry_end <=
+notifier->end);
+(gdb) p *entry
+$1 = {target_as = 0x555556f6c050, iova = 0, translated_addr = 0,
+addr_mask = 18446744073709551615, perm = IOMMU_NONE}
+--
+
+Tested with vhost-net, host<->guest communication.
+
+v8: Fix use of "tmp" notification in memory.c:memory_region_notify_iommu_one
+
+v7: Add IOMMUTLBNotification, and move introduced "type" from
+    IOMMUTLBEntry to the former.
+
+v6: Introduce "type" field for IOMMUTLBEntry. Fill in all uses.
+    Update tests reports with more fine-tuning (CPU, RPS/XPS tunning).
+
+v5: Skip regular IOTLB notifications in dev_iotlb notifiers
+
+v4: Rename IOMMU_NOTIFIER_IOTLB -> IOMMU_NOTIFIER_DEVIOTLB.
+    Make vhost-net notifier just IOMMU_NOTIFIER_DEVIOTLB, not
+    IOMMU_NOTIFIER_UNMAP
+
+v3: Skip the assertion in case notifier is a IOTLB one, since they can manage
+    arbitrary ranges. Using a flag in the notifier for now, as Peter suggested.
+
+v2: Actually delete assertion instead of just commenting out using C99
+
+Eugenio Pérez (5):
+  memory: Rename memory_region_notify_one to
+    memory_region_notify_iommu_one
+  memory: Add IOMMUTLBEvent
+  memory: Add IOMMU_DEVIOTLB_UNMAP IOMMUTLBNotificationType
+  intel_iommu: Do not notify regular iotlb to device-iotlb notifiers
+  memory: Skip bad range assertion if notifier is DEVIOTLB type
+
+ hw/arm/smmu-common.c  | 13 +++---
+ hw/arm/smmuv3.c       | 13 +++---
+ hw/i386/intel_iommu.c | 94 +++++++++++++++++++++++++------------------
+ hw/misc/tz-mpc.c      | 32 ++++++++-------
+ hw/ppc/spapr_iommu.c  | 15 +++----
+ hw/virtio/vhost.c     |  2 +-
+ include/exec/memory.h | 39 ++++++++++--------
+ softmmu/memory.c      | 27 +++++++------
+ 8 files changed, 134 insertions(+), 101 deletions(-)
+
 -- 
-2.26.2
+2.18.1
 
 
