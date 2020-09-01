@@ -2,95 +2,89 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4D5C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:49:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 084DDC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:52:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88CC1206FA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:49:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA593206EF
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:52:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvQsjUkA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88CC1206FA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DA9e9EY7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA593206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56532 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD6fD-0005Sw-Nk
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:49:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49038)
+	id 1kD6i5-0006oi-Tz
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:52:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD6eH-0004Xl-Ck; Tue, 01 Sep 2020 09:48:33 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46100)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kD6eF-0000pw-9b; Tue, 01 Sep 2020 09:48:33 -0400
-Received: by mail-wr1-x441.google.com with SMTP id o5so1588305wrn.13;
- Tue, 01 Sep 2020 06:48:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=YDzzyttZt2ACMY6s7/wn7fRUYl8HWgLpZeknqVs9FvA=;
- b=RvQsjUkAeAV9nX6A+//yxkR+etotrOf3GPwLC1iTMSTSKQUmsxTK7tp8gi/vuflhF/
- 7ch6x+uL1N4hoY8e6/4cPkwZ2Y++xmpEAXsuS2OsrKVZhkVIOvVyZ3Bi3MEnB7U6wKTf
- aRa+vPByavHsr1TWqF1A/kw3TnmjlH7y8ddVaQkCkxMo2uxMqbe+SjNl2UlJHbw7ydC0
- T2w4FIeVuHwiZ9bDMDFSzSrwWxjcz7Tk9EronaztToMHbaaNlWH3t+DaFwOAcegVxOwp
- qkrps83munNU0GkUkNFqOv9GkXKB/uSTtL30HL8xA4t1ZfjAzFi7W8vP5S+ndCYigmrd
- 6YMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=YDzzyttZt2ACMY6s7/wn7fRUYl8HWgLpZeknqVs9FvA=;
- b=OY+RsyiMOnAeSBVi0TbX6WMTHo0sFwz6UQgAeKN5dEyL2CwPl983hAoPSszzk55oI9
- 9rCdcDFnYNt4kUDroRt7rdXanVXMdYx6V0WI6VxcnSmrO1zlt//GRRDBccFOGMoMqrD1
- Y3iilzPLhnCjs24MsT/g9VDyu3Uk3PelET8GmK+foNFfclSIdMS6pCGG7HzlZw+r2ETA
- iotCV8JDAd7DWBv1i2wGPOsRVBPw0LJcI4/fA2BBsTNWfhHF3hWEB0ufD12my70ZuIrK
- JdT8S9t1Ovks/WQRaWEctqS3ByN92FMjsLSuEA01HIot+09rnHExdizKjgN0ZySzWlSW
- hqIw==
-X-Gm-Message-State: AOAM532DmABV1DC5Q78wwtGsZ0BpL3KfUvYKzan5TH3ZrI+/kfY6gv8K
- S2cJpnIvrfNctAqr6WiXrVs=
-X-Google-Smtp-Source: ABdhPJx1T1mTyKZ8gzr3fa6O80iU2ktfHvGNLbk1xfA62ALCJ2ZOxdinG/LQkYrKkYhIEMBAfK+lRA==
-X-Received: by 2002:adf:e504:: with SMTP id j4mr2058327wrm.205.1598968109323; 
- Tue, 01 Sep 2020 06:48:29 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id h184sm2055701wmh.41.2020.09.01.06.48.28
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 01 Sep 2020 06:48:28 -0700 (PDT)
-Subject: Re: [PATCH] sd: sdhci: check data_count is within fifo_buffer
-To: P J P <ppandit@redhat.com>
-References: <20200827115336.1851276-1-ppandit@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <816b3dbe-527f-1bec-a0cf-555e44068a56@amsat.org>
-Date: Tue, 1 Sep 2020 15:48:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kD6hZ-0006OF-NX
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:51:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29294)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kD6hX-0001FX-3t
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 09:51:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598968313;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ZTwz4mtJxCUSFWTe1NDgtTvK2A1FCjwk1T50rkOWCb0=;
+ b=DA9e9EY7hjhszlSxmfdXhbNiy9ncx0P2BhVVrFKYf9oye+x/zqI/x30Rc0bL0cbFdSctvs
+ hWKmCdOK/XzvhRL+1NJ9dcTsYxtWaDj6VJHSVapey2A3L83Ixll3MLxi/og2ER7Mo0tfOc
+ /MTMsSlnqQz2JzSrt3mDF6bvTeMw1rw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-504-31WjOYnKMHeXAXiRVGUTUA-1; Tue, 01 Sep 2020 09:51:52 -0400
+X-MC-Unique: 31WjOYnKMHeXAXiRVGUTUA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2CD101005E5B;
+ Tue,  1 Sep 2020 13:51:51 +0000 (UTC)
+Received: from imammedo-mac (unknown [10.40.193.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2DB7E78B29;
+ Tue,  1 Sep 2020 13:51:43 +0000 (UTC)
+Date: Tue, 1 Sep 2020 15:51:41 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Ani Sinha <ani@anisinha.ca>
+Subject: Re: [PATCH 2/3] tests/acpi: add a new unit test to test hotplug
+ off/on feature on the root pci bus
+Message-ID: <20200901155141.0a6d93f6@imammedo-mac>
+In-Reply-To: <20200830095915.14402-3-ani@anisinha.ca>
+References: <20200830095915.14402-1-ani@anisinha.ca>
+ <20200830095915.14402-3-ani@anisinha.ca>
 MIME-Version: 1.0
-In-Reply-To: <20200827115336.1851276-1-ppandit@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,42 +97,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ruhr-University <bugs-syssec@rub.de>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/27/20 1:53 PM, P J P wrote:
-> From: Prasad J Pandit <pjp@fedoraproject.org>
-> 
-> While doing multi block SDMA, transfer block size may exceed
-> the 's->fifo_buffer[s->buf_maxsz]' size. It may leave the
-> current element pointer 's->data_count' pointing out of bounds.
-> Leading the subsequent DMA r/w operation to OOB access issue.
-> Add check to avoid it.
-> 
->  -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Fsdhci_oob_write1
+On Sun, 30 Aug 2020 15:29:13 +0530
+Ani Sinha <ani@anisinha.ca> wrote:
 
-This directory is 3 months old, I can't find it on the list...
-Did I missed that or did the list eat the report?
-
->  ==1459837==ERROR: AddressSanitizer: heap-buffer-overflow
->  WRITE of size 54722048 at 0x61500001e280 thread T3
->     #0  __interceptor_memcpy (/lib64/libasan.so.6+0x3a71d)
->     #1  flatview_read_continue ../exec.c:3245
->     #2  flatview_read ../exec.c:3278
->     #3  address_space_read_full ../exec.c:3291
->     #4  address_space_rw ../exec.c:3319
->     #5  dma_memory_rw_relaxed ../include/sysemu/dma.h:87
->     #6  dma_memory_rw ../include/sysemu/dma.h:110
->     #7  dma_memory_read ../include/sysemu/dma.h:116
->     #8  sdhci_sdma_transfer_multi_blocks ../hw/sd/sdhci.c:629
->     #9  sdhci_write ../hw/sd/sdhci.c:1097
->     #10 memory_region_write_accessor ../softmmu/memory.c:483
->     ...
+> Ability to turn hotplug off on the pci root bus for i440fx was added in commit:
+> 3d7e78aa7777f0 ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus")
 > 
-> Reported-by: Ruhr-University <bugs-syssec@rub.de>
-> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+> This change adds a unit test in order to test this feature.
+> 
+> This change has been tested against upstream qemu master branch on top of tag v5.1.0.
+> 
+> Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> ---
+>  tests/qtest/bios-tables-test.c | 14 ++++++++++++++
+>  1 file changed, 14 insertions(+)
+> 
+> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+> index d49b3988ec..8f7d87c0f6 100644
+> --- a/tests/qtest/bios-tables-test.c
+> +++ b/tests/qtest/bios-tables-test.c
+> @@ -709,6 +709,19 @@ static void test_acpi_piix4_tcg_bridge(void)
+>      free_test_data(&data);
+>  }
+>  
+> +static void test_acpi_piix4_root_hotplug(void)
+> +{
+> +    test_data data;
+> +
+> +    memset(&data, 0, sizeof(data));
+> +    data.machine = MACHINE_PC;
+> +    data.variant = ".roothp";
+> +    data.required_struct_types = base_required_struct_types;
+> +    data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
+> +    test_acpi_one("-global PIIX4_PM.acpi-root-pci-hotplug=off", &data);
+
+I'd include here bridge config as well (test_acpi_piix4_tcg_bridge)
+so that ASL diff could show whether bridge was or wasn't affected.
+
+> +    free_test_data(&data);
+> +}
+> +
+>  static void test_acpi_q35_tcg(void)
+>  {
+>      test_data data;
+> @@ -1102,6 +1115,7 @@ int main(int argc, char *argv[])
+>          qtest_add_func("acpi/q35/tpm-tis", test_acpi_q35_tcg_tpm_tis);
+>          qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
+>          qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
+> +        qtest_add_func("acpi/piix4/hotplug", test_acpi_piix4_root_hotplug);
+>          qtest_add_func("acpi/q35", test_acpi_q35_tcg);
+>          qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
+>          qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
+
 
