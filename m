@@ -2,88 +2,132 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74B2BC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 400D8C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:58:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B8F6206A5
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:57:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02DDB206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:58:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nYO6WD7j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B8F6206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K+DyN81y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02DDB206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD32I-0007TE-El
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39368)
+	id 1kD33O-0001QN-4K
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:58:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kD2ey-0001j2-AR
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:33:00 -0400
-Received: from mail-ej1-x62a.google.com ([2a00:1450:4864:20::62a]:34202)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kD2ew-000139-G3
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:32:59 -0400
-Received: by mail-ej1-x62a.google.com with SMTP id d26so701386ejr.1
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 02:32:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=eIALFikHdWrLWCw6KWhv/U0X2Clw9aX1FLRYgDVvF3E=;
- b=nYO6WD7jO2IbWXsVqvSMD4Uu5fb7ZgYJo7usNYtDu0ZDkUoUjbAobp5lapDSupZp5e
- vX75WaK5+8hQ3Xcep3p1QPgD9MD/QDcRBv2gvsg9ZiLOaeIDxK2AmbQu9tW9WFepsqdO
- 478Rc3xL1Y5plDeIBAg1gtDT548HgxI7wG1W26Zv2ceReMwMVb9FTgSSSEoca5Bc26G2
- /t6xw17fmr3aaUxSTZdKBLjchIzbbIwVjmq6GdjAix4NZG5v6bfr+tNF20rbg4DbrIsp
- HJwSW75sGbwXz6b2YQgmNRH9EfNruAgZ7qy8NaJMzUnuMABC3owaRvxe5wbFi5GANZoc
- OiQw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kD32M-0007rJ-H7
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:57:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30389
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kD32K-0004A8-Qk
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:57:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598954228;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=jP5p5m08MY5Ke5ekH/aXsG7IpEvIwI9jDjnp2LckHqs=;
+ b=K+DyN81y53dSpmxY6RtZVPBhrY+TeTxGs1D8DGWkuuKfEMNfyBfYIckLx8wDivVOoWoRIt
+ AKK8G40WtrjMtW0qLTx7jRI5EoDsuWhB6v1pnkWA3XtRfM2ZN8Wik8PAciZwgtiOT+OvRn
+ 1eQOfEb+LNZ3IqU2FpXBZKX7+U6r4vg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-560-iYA0WaSEM7GGlhUIQJ4sYg-1; Tue, 01 Sep 2020 05:57:06 -0400
+X-MC-Unique: iYA0WaSEM7GGlhUIQJ4sYg-1
+Received: by mail-wm1-f69.google.com with SMTP id w3so264739wmg.4
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 02:57:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=eIALFikHdWrLWCw6KWhv/U0X2Clw9aX1FLRYgDVvF3E=;
- b=Hn9bghDHEuAnx5La87mvLrTtU0P6TIsbd40z0a7yA52IvyeLH/ZQz5Q+ZZFKO5Dra1
- 2MpBN4koKem6BiwDGClZlB1ooAgHiwmGDpmky2BPTmd8aKWLF/Nxwn5Cj+HvfZX1YZ8O
- jIAxXMsBN/T4toek/lIslhbdL+NLea0MA5hdk8MqEdlITpMlmR9wyx5ZlhAuSgTjC463
- 551tKj5kFf6crdBXyHw8tzRFC1RwGbGJpmp8YsaJrRtT7IR4sCiwpC/yJNSCc04AsIzN
- tiBY9gTC6LkzpSiztZ/YxJRPLJQbagcOG1Mln1igIqKqeo4y1y2yKoE0oB/UgewDQXjs
- KG7A==
-X-Gm-Message-State: AOAM531PDClVfkQkYlKl7TN6VkFPveRXiDrhjkww1RebbVDGe7Pel1AT
- o2gyukyLeDfZRmVB37pm8FE/EzfOkRrMgK2KYbM=
-X-Google-Smtp-Source: ABdhPJwxomPkeGMrz0v6ORoO2uRRksSkwZEdDX3vOHrVNfgHky8D5c0KCmt0MYvAgE2y6u36a9eYEsa3BZTugFHu6O8=
-X-Received: by 2002:a17:906:c10c:: with SMTP id
- do12mr681743ejc.92.1598952776583; 
- Tue, 01 Sep 2020 02:32:56 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=jP5p5m08MY5Ke5ekH/aXsG7IpEvIwI9jDjnp2LckHqs=;
+ b=NanzCQTciUEAbxTpGPc4BSiSGkyWkmmiyVu/nqqfS3ESp8fEcD1fs0TjiUeeaQw1qi
+ eMc829+e3FEWz2sV0An3QS8iKBIX75g5PRxstSTlPbDcRVTi7OcfV/1ExqoXDB/F6sCi
+ 6gHOihRv4c9Rh+D5fn1NFZwGLUjLrOcyaQ+/g2klJF0YuieMZSwzporA3UopDBmGEUjO
+ /rflaX4MJTQ0iioYKPm4gDp+cs42EjhKVZz1KthwfN4yU7LNHg3ak9uUWK6wgQXRVJcd
+ KXWB1nJQO5KgwKTb+BrioGePsHCPRltpVzOKNKxbzaduc7Bllt3lSBuj4pC3KnxF3paK
+ AXFw==
+X-Gm-Message-State: AOAM533h2qasfp9y8ulJ9ykOSXW8NLaW79WAxu1ZMgKKHTiZ7J5a7onA
+ vxBcJo16c8IaOa2vL25yCRqltk90Mqygi84qzPnGl2L5Am+N3pFjdmzbmMCZfbTatOPip2qffm3
+ VvA2bKfF84MFvlcU=
+X-Received: by 2002:a1c:4381:: with SMTP id q123mr956431wma.108.1598954225257; 
+ Tue, 01 Sep 2020 02:57:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyj3FfRWYunCBXo3Yf0lnPHPsDaMDqBRicH6Suu11odGvvMe+6FkAs/pb0JXpVRLMAQtvPYkQ==
+X-Received: by 2002:a1c:4381:: with SMTP id q123mr956418wma.108.1598954225081; 
+ Tue, 01 Sep 2020 02:57:05 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id f19sm1071990wmh.44.2020.09.01.02.57.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 01 Sep 2020 02:57:04 -0700 (PDT)
+Subject: Re: [PATCH 2/3] ppc/pnv: Fix TypeInfo of PnvLpcController abstract
+ class
+To: David Gibson <david@gibson.dropbear.id.au>, ehabkost@redhat.com
+References: <20200825111627.2007820-1-david@gibson.dropbear.id.au>
+ <20200825111627.2007820-3-david@gibson.dropbear.id.au>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <288bda47-42bd-77cc-e3d8-5076aad50853@redhat.com>
+Date: Tue, 1 Sep 2020 11:56:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200901091132.29601-1-pbonzini@redhat.com>
- <20200901091132.29601-25-pbonzini@redhat.com>
-In-Reply-To: <20200901091132.29601-25-pbonzini@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 1 Sep 2020 13:32:44 +0400
-Message-ID: <CAJ+F1CL8ZV6g0ESiGv9B_z_cVxfCK1LjmzLH8EAdnkgaVJB8Kg@mail.gmail.com>
-Subject: Re: [PULL 24/24] meson: add description to options
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000042d06405ae3d349e"
-Received-SPF: pass client-ip=2a00:1450:4864:20::62a;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x62a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200825111627.2007820-3-david@gibson.dropbear.id.au>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:11:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,173 +140,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000042d06405ae3d349e
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi
-
-On Tue, Sep 1, 2020 at 1:25 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
-
-> This will be useful in the future to generate configure
-> command line parsing from meson_options.txt.
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+On 8/25/20 1:16 PM, David Gibson wrote:
+> From: Cédric Le Goater <clg@kaod.org>
+> 
+> It was missing the instance_size field.
+> 
+> Cc: Eduardo Habkost <ehabkost@redhat.com>
+> Signed-off-by: Cédric Le Goater <clg@kaod.org>
+> Message-Id: <20200822083920.2668930-1-clg@kaod.org>
+> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  meson_options.txt | 29 ++++++++++++++++++++---------
->  1 file changed, 20 insertions(+), 9 deletions(-)
->
-> diff --git a/meson_options.txt b/meson_options.txt
-> index c3120fa359..3e772f55b3 100644
-> --- a/meson_options.txt
-> +++ b/meson_options.txt
-> @@ -2,12 +2,23 @@ option('qemu_suffix', type : 'string', value: 'qemu',
->         description: 'Suffix for QEMU data/modules/config directories (ca=
-n
-> be empty)')
->  option('docdir', type : 'string', value : 'doc',
->         description: 'Base directory for documentation installation (can
-> be empty)')
-> -option('gettext', type : 'boolean', value : true)
-> -option('sdl', type : 'feature', value : 'auto')
-> -option('sdl_image', type : 'feature', value : 'auto')
-> -option('u2f', type : 'feature', value : 'auto')
-> -option('vnc', type : 'feature', value : 'enabled')
-> -option('vnc_jpeg', type : 'feature', value : 'auto')
-> -option('vnc_png', type : 'feature', value : 'auto')
-> -option('vnc_sasl', type : 'feature', value : 'auto')
-> -option('xkbcommon', type : 'feature', value : 'auto')
-> +
-> +option('gettext', type : 'boolean', value : true,
-> +       description: 'Localizationo of the GTK+ user interface')
->
+>  hw/ppc/pnv_lpc.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+> index b5ffa48dac..23f1e09492 100644
+> --- a/hw/ppc/pnv_lpc.c
+> +++ b/hw/ppc/pnv_lpc.c
+> @@ -646,7 +646,6 @@ static void pnv_lpc_power8_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo pnv_lpc_power8_info = {
+>      .name          = TYPE_PNV8_LPC,
+>      .parent        = TYPE_PNV_LPC,
+> -    .instance_size = sizeof(PnvLpcController),
+>      .class_init    = pnv_lpc_power8_class_init,
+>      .interfaces = (InterfaceInfo[]) {
+>          { TYPE_PNV_XSCOM_INTERFACE },
+> @@ -687,7 +686,6 @@ static void pnv_lpc_power9_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo pnv_lpc_power9_info = {
+>      .name          = TYPE_PNV9_LPC,
+>      .parent        = TYPE_PNV_LPC,
+> -    .instance_size = sizeof(PnvLpcController),
+>      .class_init    = pnv_lpc_power9_class_init,
+>  };
+>  
+> @@ -768,6 +766,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, void *data)
+>  static const TypeInfo pnv_lpc_info = {
+>      .name          = TYPE_PNV_LPC,
+>      .parent        = TYPE_DEVICE,
+> +    .instance_size = sizeof(PnvLpcController),
+>      .class_init    = pnv_lpc_class_init,
+>      .class_size    = sizeof(PnvLpcClass),
+>      .abstract      = true,
+> 
 
-Hardly a blocker: "Localization"
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Also, we may want to remove the extra space before ':' for consistency.
-
-+
-> +option('sdl', type : 'feature', value : 'auto',
-> +       description: 'SDL user interface')
-> +option('sdl_image', type : 'feature', value : 'auto',
-> +       description: 'SDL Image support for icons')
-> +option('u2f', type : 'feature', value : 'auto',
-> +       description: 'U2F emulation support')
-> +option('vnc', type : 'feature', value : 'enabled',
-> +       description: 'VNC server')
-> +option('vnc_jpeg', type : 'feature', value : 'auto',
-> +       description: 'JPEG lossy compression for VNC server')
-> +option('vnc_png', type : 'feature', value : 'auto',
-> +       description: 'PNG compression for VNC server')
-> +option('vnc_sasl', type : 'feature', value : 'auto',
-> +       description: 'SASL authentication for VNC server')
-> +option('xkbcommon', type : 'feature', value : 'auto',
-> +       description: 'xkbcommon support')
-> --
-> 2.26.2
->
->
->
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---00000000000042d06405ae3d349e
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Sep 1, 2020 at 1:25 PM Paol=
-o Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a=
->&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Thi=
-s will be useful in the future to generate configure<br>
-command line parsing from meson_options.txt.<br>
-<br>
-Signed-off-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" tar=
-get=3D"_blank">pbonzini@redhat.com</a>&gt;<br>
----<br>
-=C2=A0meson_options.txt | 29 ++++++++++++++++++++---------<br>
-=C2=A01 file changed, 20 insertions(+), 9 deletions(-)<br>
-<br>
-diff --git a/meson_options.txt b/meson_options.txt<br>
-index c3120fa359..3e772f55b3 100644<br>
---- a/meson_options.txt<br>
-+++ b/meson_options.txt<br>
-@@ -2,12 +2,23 @@ option(&#39;qemu_suffix&#39;, type : &#39;string&#39;, va=
-lue: &#39;qemu&#39;,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 description: &#39;Suffix for QEMU data/modules/=
-config directories (can be empty)&#39;)<br>
-=C2=A0option(&#39;docdir&#39;, type : &#39;string&#39;, value : &#39;doc&#3=
-9;,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 description: &#39;Base directory for documentat=
-ion installation (can be empty)&#39;)<br>
--option(&#39;gettext&#39;, type : &#39;boolean&#39;, value : true)<br>
--option(&#39;sdl&#39;, type : &#39;feature&#39;, value : &#39;auto&#39;)<br=
->
--option(&#39;sdl_image&#39;, type : &#39;feature&#39;, value : &#39;auto&#3=
-9;)<br>
--option(&#39;u2f&#39;, type : &#39;feature&#39;, value : &#39;auto&#39;)<br=
->
--option(&#39;vnc&#39;, type : &#39;feature&#39;, value : &#39;enabled&#39;)=
-<br>
--option(&#39;vnc_jpeg&#39;, type : &#39;feature&#39;, value : &#39;auto&#39=
-;)<br>
--option(&#39;vnc_png&#39;, type : &#39;feature&#39;, value : &#39;auto&#39;=
-)<br>
--option(&#39;vnc_sasl&#39;, type : &#39;feature&#39;, value : &#39;auto&#39=
-;)<br>
--option(&#39;xkbcommon&#39;, type : &#39;feature&#39;, value : &#39;auto&#3=
-9;)<br>
-+<br>
-+option(&#39;gettext&#39;, type : &#39;boolean&#39;, value : true,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;Localizationo of the GTK+ use=
-r interface&#39;)<br></blockquote><div><br></div><div>Hardly a blocker: &qu=
-ot;Localization&quot;<br></div><div><br></div><div>Also, we may want to rem=
-ove the extra space before &#39;:&#39; for consistency.<br></div><div><br><=
-/div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bo=
-rder-left:1px solid rgb(204,204,204);padding-left:1ex">
-+<br>
-+option(&#39;sdl&#39;, type : &#39;feature&#39;, value : &#39;auto&#39;,<br=
->
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;SDL user interface&#39;)<br>
-+option(&#39;sdl_image&#39;, type : &#39;feature&#39;, value : &#39;auto&#3=
-9;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;SDL Image support for icons&#=
-39;)<br>
-+option(&#39;u2f&#39;, type : &#39;feature&#39;, value : &#39;auto&#39;,<br=
->
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;U2F emulation support&#39;)<b=
-r>
-+option(&#39;vnc&#39;, type : &#39;feature&#39;, value : &#39;enabled&#39;,=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;VNC server&#39;)<br>
-+option(&#39;vnc_jpeg&#39;, type : &#39;feature&#39;, value : &#39;auto&#39=
-;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;JPEG lossy compression for VN=
-C server&#39;)<br>
-+option(&#39;vnc_png&#39;, type : &#39;feature&#39;, value : &#39;auto&#39;=
-,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;PNG compression for VNC serve=
-r&#39;)<br>
-+option(&#39;vnc_sasl&#39;, type : &#39;feature&#39;, value : &#39;auto&#39=
-;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;SASL authentication for VNC s=
-erver&#39;)<br>
-+option(&#39;xkbcommon&#39;, type : &#39;feature&#39;, value : &#39;auto&#3=
-9;,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0description: &#39;xkbcommon support&#39;)<br>
--- <br>
-2.26.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---00000000000042d06405ae3d349e--
 
