@@ -2,93 +2,90 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EED1CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 03:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D73C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 03:23:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B637720719
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 03:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A027F20719
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 03:23:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hc3nvnYB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B637720719
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aTN9Csae"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A027F20719
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCwp4-0001cv-U9
-	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 23:19:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39900)
+	id 1kCwtJ-0004O6-Or
+	for qemu-devel@archiver.kernel.org; Mon, 31 Aug 2020 23:23:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kCwo4-0000mB-JR
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 23:18:00 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:46624
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kCwnz-0002Zt-7h
- for qemu-devel@nongnu.org; Mon, 31 Aug 2020 23:18:00 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598930273;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UhWlYaTCpKFEvdVrcqy0M8TIDbH2UzIE8/0Zarc8u38=;
- b=Hc3nvnYBf1MsuHiyflNNeIFqNZOrVcGyohnr9mmh3Xhrs/t/l21yMFlXer5XDeKmOJtmZM
- JCQulghMc/GYm2bgkLpcisxaNSdkP6dkVqR8lGUJjv/IqTD7DdLSBC0Avv6sjjfv60CHP+
- Mz0eeh7PIWwPA+6tgUvceb4taQk9anw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-540-LeWAl1EFPsSm6aGVqOORdw-1; Mon, 31 Aug 2020 23:17:51 -0400
-X-MC-Unique: LeWAl1EFPsSm6aGVqOORdw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8D328030A9;
- Tue,  1 Sep 2020 03:17:47 +0000 (UTC)
-Received: from [10.72.13.164] (ovpn-13-164.pek2.redhat.com [10.72.13.164])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E049B5D9CD;
- Tue,  1 Sep 2020 03:17:35 +0000 (UTC)
-Subject: Re: [PATCH v2 0/2] util/hexdump: Cleanup qemu_hexdump()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200822180950.1343963-1-f4bug@amsat.org>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <17019b64-30b7-1cbb-701d-c3760a8e13d4@redhat.com>
-Date: Tue, 1 Sep 2020 11:17:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1kCwsO-0003RQ-86; Mon, 31 Aug 2020 23:22:28 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36174)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1kCwsM-0004Gc-K3; Mon, 31 Aug 2020 23:22:27 -0400
+Received: by mail-oi1-x243.google.com with SMTP id x19so2953101oix.3;
+ Mon, 31 Aug 2020 20:22:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=3d2ZNUUIrmSwsXjDWMA+bBt4z4tiOBcpvhGS/hr11UA=;
+ b=aTN9Csae1tzHG2XWfeFsPGC4I9D82gjbmwz6FCOCU6ybx9Kn5T/6D4+1uH8arPlSMQ
+ 19yOD5BNsO+KxmsXmbV6BQbR6hvMHSMO/bfKxrQmJ4LUTeSaj/k47NgfIFvOYzS7PZec
+ JnpmTVfRawW5vvQYDFs3zimlvobl5NYI7MMa0unCAZjECsLqNddpOzM12zke3jac4fi2
+ ThxiWq640Pm+todqprOxQbtqHb2gnjpyFvmnxPVRkuIZnkXtsMVCrkggF03ApF5lVCfM
+ Uk8v0gxutc60BVpIVqqgkocc4Rex4QVvTXsEQSZJFLu5lhxImegAbX69H0oBtdqZDn2b
+ D/HA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=3d2ZNUUIrmSwsXjDWMA+bBt4z4tiOBcpvhGS/hr11UA=;
+ b=GhsA/VmKcmaOAFNmncYik30xm60qDPbH+ZxpXU6z6dZAPndCkBZFSbDuea+EJ2sEtd
+ iGa2SlF2lIrjpbbnjhsNUM9yV0FnfwU7k6hjFZh7ZZRp8i7cRam2zgtJ9oEjx9EtH3Ip
+ vCUSm45hRurSw8omtL3hLRA9EFRpTIOgQrH5hjSS/n+BRwqZ096rB2SzwrDcZ/VW/3d2
+ OK/7MztIYAH47OTatY6FRvzMXD/AjzkFFtf73rviB7NH6S6ghb57MIn99kCAp2XgY60A
+ JuQeKIyXHLec9E3XVSnwLOk/TpeXfP3IEXmB8+7k+jOtkvBF1jyIYc/upDWDgHwdC3Vd
+ DgBQ==
+X-Gm-Message-State: AOAM531a2vAriG5HepcVye8B9tmRhehQDJhWFkZUM7qUePOPfdHt5rgj
+ E4ln8liUr5YJxBBaNVyrhm6ls+1UNaBi9nzgYHQ=
+X-Google-Smtp-Source: ABdhPJyHzrNOz74TVAvma1tXj8dXwg7djdUhusROVh5iuCmn2aW13X9GElOkt1EKrKhyelVfMobBcb1xB2QIqXDFjRw=
+X-Received: by 2002:a05:6808:49:: with SMTP id v9mr1425819oic.51.1598930545211; 
+ Mon, 31 Aug 2020 20:22:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200822180950.1343963-1-f4bug@amsat.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <cover.1598257838.git.dimastep@yandex-team.ru>
+ <a2eca26b79e1fcc30128a266bfa416237366c533.1598257838.git.dimastep@yandex-team.ru>
+ <CAFubqFsnc3VjkYB-CqgeQ6Knwtvgb0Zyw-nOHD1CugLzTBe9Ew@mail.gmail.com>
+ <20200831083740.GA6083@dimastep-nix>
+In-Reply-To: <20200831083740.GA6083@dimastep-nix>
+From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+Date: Mon, 31 Aug 2020 23:22:14 -0400
+Message-ID: <CAFubqFu8ek_gBVFV1+MaLHnhjkQ=955QYP8Ss84diZrkbuNOAw@mail.gmail.com>
+Subject: Re: [PATCH v2 2/7] vhost: check queue state in the vhost_dev_set_log
+ routine
+To: Dima Stepanov <dimastep@yandex-team.ru>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=raphael.s.norwitz@gmail.com; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,43 +98,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- Li Zhijian <lizhijian@cn.fujitsu.com>, qemu-trivial@nongnu.org,
- Alistair Francis <alistair@alistair23.me>, Zhang Chen <chen.zhang@intel.com>,
- qemu-arm@nongnu.org, qemu-ppc@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
+ QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>, fengli@smartx.com,
+ yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-On 2020/8/23 上午2:09, Philippe Mathieu-Daudé wrote:
-> - Pass const void* buffer
-> - Reorder arguments
+On Mon, Aug 31, 2020 at 4:37 AM Dima Stepanov <dimastep@yandex-team.ru> wro=
+te:
 >
-> Supersedes: <20200822150457.1322519-1-f4bug@amsat.org>
+> On Thu, Aug 27, 2020 at 09:46:03PM -0400, Raphael Norwitz wrote:
+> > On Mon, Aug 24, 2020 at 4:41 AM Dima Stepanov <dimastep@yandex-team.ru>=
+ wrote:
+> > >
+> > > If the vhost-user-blk daemon provides only one virtqueue, but device =
+was
+> > > added with several queues, then QEMU will send more VHOST-USER comman=
+d
+> > > than expected by daemon side. The vhost_virtqueue_start() routine
+> > > handles such case by checking the return value from the
+> > > virtio_queue_get_desc_addr() function call. Add the same check to the
+> > > vhost_dev_set_log() routine.
+> > >
+> > > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> > > ---
+> > >  hw/virtio/vhost.c | 12 ++++++++++++
+> > >  1 file changed, 12 insertions(+)
+> > >
+> > > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
+> > > index ffef7ab..a33ffd4 100644
+> > > --- a/hw/virtio/vhost.c
+> > > +++ b/hw/virtio/vhost.c
+> > > @@ -825,12 +825,24 @@ static int vhost_dev_set_features(struct vhost_=
+dev *dev,
+> > >  static int vhost_dev_set_log(struct vhost_dev *dev, bool enable_log)
+> > >  {
+> > >      int r, i, idx;
+> > > +    hwaddr addr;
+> > > +
+> > >      r =3D vhost_dev_set_features(dev, enable_log);
+> > >      if (r < 0) {
+> > >          goto err_features;
+> > >      }
+> > >      for (i =3D 0; i < dev->nvqs; ++i) {
+> > >          idx =3D dev->vhost_ops->vhost_get_vq_index(dev, dev->vq_inde=
+x + i);
+> > > +        addr =3D virtio_queue_get_desc_addr(dev->vdev, idx);
+> > > +        if (!addr) {
+> > > +            /*
+> > > +             * The queue might not be ready for start. If this
+> > > +             * is the case there is no reason to continue the proces=
+s.
+> > > +             * The similar logic is used by the vhost_virtqueue_star=
+t()
+> > > +             * routine.
+> > > +             */
+> >
+> > Shouldn=E2=80=99t we goto err_vq here to reset the logging state of any=
+ vqs
+> > which have already been set?
+> As i understand it, no we shouldn't reset the state of other queues. In
+> general it is pretty valid case. Let's assume that the backend
+> vhost-user device supports only two queues. But for instance, the QEMU
+> command line is using value 4 to define number of virtqueues of such
+> device. In this case only 2 queues will be initializaed.
+
+I see - makes more sense now.
+
 >
-> Philippe Mathieu-Daudé (2):
->    util/hexdump: Convert to take a void pointer argument
->    util/hexdump: Reorder qemu_hexdump() arguments
->
->   include/qemu-common.h    |  3 ++-
->   hw/dma/xlnx_dpdma.c      |  2 +-
->   hw/net/fsl_etsec/etsec.c |  2 +-
->   hw/net/fsl_etsec/rings.c |  2 +-
->   hw/sd/sd.c               |  2 +-
->   hw/usb/redirect.c        |  2 +-
->   net/colo-compare.c       | 24 ++++++++++++------------
->   net/net.c                |  2 +-
->   util/hexdump.c           |  4 +++-
->   util/iov.c               |  2 +-
->   10 files changed, 24 insertions(+), 21 deletions(-)
+> I've tried to reflect it in the comment section, that the
+> vhost_virtqueue_start() routine has been alread made the same:
+>   "if a queue isn't ready for start, just return 0 without any error"
+> So i made the same here.
 >
 
-Applied.
+In your example is a reason why, if queue 3 is uninitialized, queue 4
+must also be uninitialized? I realize queue 4 being initialized while
+queue 3 is not is a strange case, but it may still make the code more
+robust to use a "continue" here instead of a "break". This also seems
+more like the logic in vhost_virtqueue_start()/vhost_dev_start().
 
-Thanks
-
+> I've found this issue, while testing migration with the default
+> vhost-user-blk daemon. It fails with assert or sigsegv (don't remember),
+> because it receives NULL for the queues it doesn't have. In general
+> the daemon should not fall, because of unexpected VHOST_USER
+> communication, but also there is no reason for QEMU to send additional
+> packets.
+>
+> >
+> > > +            break;
+> > > +        }
+> > >          r =3D vhost_virtqueue_set_addr(dev, dev->vqs + i, idx,
+> > >                                       enable_log);
+> > >          if (r < 0) {
+> > > --
+> > > 2.7.4
+> > >
+> > >
 
