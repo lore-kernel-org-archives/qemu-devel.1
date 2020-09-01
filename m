@@ -2,91 +2,110 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BB3C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 16:10:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12FF5C28E83
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 16:12:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C02CB204EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 16:10:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0DBF204EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 16:12:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ks019DCL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C02CB204EC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aNbcEqn2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0DBF204EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD8rM-0006mS-03
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 12:10:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55214)
+	id 1kD8tR-0001RZ-W8
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 12:12:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kD8Vb-0002Bz-LZ
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:47:43 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:41539)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
- id 1kD8VZ-00026R-36
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:47:43 -0400
-Received: by mail-pl1-x643.google.com with SMTP id l9so726256plt.8
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:47:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=0/OBga6Pud+l6WfxON34v/AXQ0F318WR/QNf6Dv2RV0=;
- b=ks019DCLRzqaulhwBcSJ9GCTtLQ4eU9e+7whdEyDyeGwMMzphHoZGmyoI1sKxVc9va
- Rb+Mqwe2S1hRgBLvXHBJwAps1i+Cb/DsHMFAsA1WrJvkxNKfGasN5JCIwhxuFYA+DQKk
- 8NsU5vjr/oaW+GzT4cEbFDUFD5XFKjuufQ5ygyWiPnU2YbzTXDgFd6uIcP7AN/9Uy8tG
- 1lvPvY4r0Q15UUxjogWsmXTBJSRFuDdrEAmfTqVr9RlhU47Se43Iu6rcHFUrso/JARVj
- r1hGnGLUO2VpTOy7To72XxS+/YV4QSwNwTzyorwgwqeX357KZA86AmyZolgBEm6RyZXa
- AiMA==
+ (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1kD8od-0004Iw-Ee
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 12:07:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45426)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ckuehl@redhat.com>) id 1kD8ob-0004sT-Q8
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 12:07:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598976440;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=G4/0NT+4WIv9LgPBmg4QagojxIRU9na4tbXZ1KKnrE8=;
+ b=aNbcEqn2/bF6hAIJWE1n+z7o+QxiHWv7b1H/jItRbl1oGHyD810qgJBeo4DhnDTtLnD5MA
+ EYSFAICV7hYLyUC2ifjf2NMwJJfOB99o/Kk2eBwC7j3B0ZeJ7E8WlBfuvheqwdf58Ajc+i
+ T9eH/DrDCZv6K8OG6iR5AnQb8ZLRn0Y=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-tuP8ViAINei-Dvf0LKl31Q-1; Tue, 01 Sep 2020 12:07:19 -0400
+X-MC-Unique: tuP8ViAINei-Dvf0LKl31Q-1
+Received: by mail-qk1-f197.google.com with SMTP id y187so1252641qka.10
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 09:07:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=0/OBga6Pud+l6WfxON34v/AXQ0F318WR/QNf6Dv2RV0=;
- b=LPzCpyesIJmC3+eQ4cB0cQx6535pgPFp9156b4PAo/jdTPL758Jls3cERxtAumeiAE
- O7mLa1uIVCGxWdeUNTg6RDJZS330Zn3l2aDoMh7UEE6lcwncyHdFO9jtHnSNYI41UWOW
- 5Bo8MamJqQZI04yWy88WVKijKjapFGFh3xbSDzpxv9pbqozIj6rEegQ6kNJ7YjpToox1
- hG4FTVNShFEFoMjUtPfD+clrz7FsgSw8mLP4yQXkZT9vzsdBAluXx3KqM/iNGe6DqJFE
- Dlhpun4zCCAwwuCf76p7HQ3nDEsUs5q8twn5ajBVkZG4N7MGCvcWq/hDF7RRXAyT156w
- d5dw==
-X-Gm-Message-State: AOAM532qLACUFTPKUeGvKsC/w6SCGpCi6H6EXFql0Torp1ybIBztoNz5
- p0oxcDzZiEhYzzq4HgH2pzaAwA==
-X-Google-Smtp-Source: ABdhPJxvyq1BEE9pLCJUhcLnbrHVLg4cZTaAXYJCjO+xxS5aJ0qqfhc89fGfUOOxnDvl0/kun1E0bQ==
-X-Received: by 2002:a17:90a:fb52:: with SMTP id
- iq18mr2140544pjb.207.1598975259698; 
- Tue, 01 Sep 2020 08:47:39 -0700 (PDT)
-Received: from localhost.localdomain (111-241-104-82.dynamic-ip.hinet.net.
- [111.241.104.82])
- by smtp.gmail.com with ESMTPSA id e17sm2485344pfm.60.2020.09.01.08.47.37
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Sep 2020 08:47:39 -0700 (PDT)
-From: Green Wan <green.wan@sifive.com>
-To: 
-Subject: [RFC PATCH v5 1/2] hw/riscv: sifive_u: Add write operation and
- write-once protection
-Date: Tue,  1 Sep 2020 23:47:10 +0800
-Message-Id: <20200901154711.18457-2-green.wan@sifive.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200901154711.18457-1-green.wan@sifive.com>
-References: <20200901154711.18457-1-green.wan@sifive.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=green.wan@sifive.com; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=G4/0NT+4WIv9LgPBmg4QagojxIRU9na4tbXZ1KKnrE8=;
+ b=L3ng0nQ3M4UpJhXLJCKLodPLGGkgLJiO9vexrXLHONa2SyNHmigFrmbicxFF3oe+Xh
+ T6/ojlJyZRu6bF5t8CVugAOmmSeyRsV8Ty1OR4aQoggCB7dZ7IwrallJQGNwCaH07pjs
+ 7qH4Lu01WFqHUm3GjAtYHOioJPDn3FkzOGC72M70m9sNJsab/QB2BAlcuU8Bb28rdNZh
+ /Qfx21H1z/Ib+ZsCVn6+UsoMvMuXlJ8bjict5y0MsAXETZ1UXgoqxUGVju83zBWUmQGR
+ dZqrZw2ymAmaDj4ZQkjtSi9e0RdR4JkCHTSyPS5GcFhBBAM7UUO40gCGdhWqo4KzX2Qy
+ zIMQ==
+X-Gm-Message-State: AOAM531J1PiLf9p96/F0z5PVv5T05sMrJ5ErUJJnCoXPeYlzXG9wq5Zo
+ qSIQqJEPl+Ou0cS+ijr340j79ZmrW2ZBvLm7jg6o4WhhB4tmH4kKxM5AllkZPBrcyp/Hs9IWl2a
+ r1AgpCYcDn9T/Zmo=
+X-Received: by 2002:ac8:46d7:: with SMTP id h23mr2533091qto.18.1598976438613; 
+ Tue, 01 Sep 2020 09:07:18 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxll8BA4lNJJEZ43GIdPm7MFZYvXUwYS66LhgGCovj2+EUoh34/1aGZ0IU9Ofql5KFEPi6DSw==
+X-Received: by 2002:ac8:46d7:: with SMTP id h23mr2533072qto.18.1598976438359; 
+ Tue, 01 Sep 2020 09:07:18 -0700 (PDT)
+Received: from [192.168.0.172] (ip68-103-222-6.ks.ok.cox.net. [68.103.222.6])
+ by smtp.gmail.com with ESMTPSA id
+ k9sm1840767qke.56.2020.09.01.09.07.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 01 Sep 2020 09:07:17 -0700 (PDT)
+Subject: Re: [PATCH 1/2] Makefile: Add back TAGS/ctags/cscope rules
+To: Paolo Bonzini <pbonzini@redhat.com>, Greg Kurz <groug@kaod.org>,
+ qemu-devel@nongnu.org
+References: <159896923655.442705.11922948674073863022.stgit@bahia.lan>
+ <159897001005.442705.16516671603870288336.stgit@bahia.lan>
+ <f31b9650-9db4-e038-9e4d-bd5faf1f5b96@redhat.com>
+ <8a3c31f0-b9e7-5ae8-2c58-0e8cee06d469@redhat.com>
+From: Connor Kuehl <ckuehl@redhat.com>
+Message-ID: <c79871c5-6ade-b3c6-3bab-a22c90bc4587@redhat.com>
+Date: Tue, 1 Sep 2020 11:07:16 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <8a3c31f0-b9e7-5ae8-2c58-0e8cee06d469@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ckuehl@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ckuehl@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 01:27:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,101 +118,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-riscv@nongnu.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org,
- Green Wan <green.wan@sifive.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, bmeng.cn@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- - Add write operation to update fuse data bit when PWE bit is on.
- - Add array, fuse_wo, to store the 'written' status for all bits
-   of OTP to block the write operation.
+On 9/1/20 11:04 AM, Paolo Bonzini wrote:
+> On 01/09/20 16:59, Connor Kuehl wrote:
+>> On 9/1/20 9:20 AM, Greg Kurz wrote:
+>>> It is a bit of a pain to be forced to run configure before being able
+>>> to use cscope and friends. Add back the rules to build them in-tree
+>>> as before commit a56650518f5b.
+>>>
+>>> Fixes: a56650518f5b ("configure: integrate Meson in the build system")
+>>> Signed-off-by: Greg Kurz <groug@kaod.org>
+>>
+>> This might be a user error on my part, but the way I read this it sounds
+>> like I could do this:
+>>
+>>      $ rm -rf build
+>>      $ make cscope
+>>
+>> and have it emit a cscope file,  but when I do so it complains about the
+>> build dir not existing. As I understand it, running ./configure (or
+>> meson build) is what generates that build dir. Here's the error for
+>> posterity:
+>>
+>> changing dir to build for make "cscope"...
+>> make[1]: *** build: No such file or directory.  Stop.
+>> make: *** [GNUmakefile:11: cscope] Error 2
+> 
+> You have a stray GNUmakefile in your source directory.  It's not
+> introduced by Greg's patch.
+> 
+> I suggest that you remove the GNUmakefile and just use out-of-tree builds.
 
-Signed-off-by: Green Wan <green.wan@sifive.com>
----
- hw/riscv/sifive_u_otp.c         | 30 +++++++++++++++++++++++++++++-
- include/hw/riscv/sifive_u_otp.h |  3 +++
- 2 files changed, 32 insertions(+), 1 deletion(-)
+You're right! There was a stray GNUmakefile. Thanks!
 
-diff --git a/hw/riscv/sifive_u_otp.c b/hw/riscv/sifive_u_otp.c
-index f6ecbaa2ca..b8369e9035 100644
---- a/hw/riscv/sifive_u_otp.c
-+++ b/hw/riscv/sifive_u_otp.c
-@@ -25,6 +25,14 @@
- #include "qemu/module.h"
- #include "hw/riscv/sifive_u_otp.h"
- 
-+#define WRITTEN_BIT_ON 0x1
-+
-+#define SET_FUSEARRAY_BIT(map, i, off, bit)    \
-+    map[i] = bit ? (map[i] | bit << off) : (map[i] & ~(bit << off))
-+
-+#define GET_FUSEARRAY_BIT(map, i, off)    \
-+    ((map[i] >> off) & 0x1)
-+
- static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
- {
-     SiFiveUOTPState *s = opaque;
-@@ -123,7 +131,24 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
-         s->ptrim = val32;
-         break;
-     case SIFIVE_U_OTP_PWE:
--        s->pwe = val32;
-+        s->pwe = val32 & SIFIVE_U_OTP_PWE_EN;
-+
-+        /* PWE is enabled. Ignore PAS=1 (no redundancy cell) */
-+        if (s->pwe && !s->pas) {
-+            if (GET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio)) {
-+                qemu_log_mask(LOG_GUEST_ERROR,
-+                              "Error: write idx<%u>, bit<%u>\n",
-+                              s->pa, s->paio);
-+                break;
-+            }
-+
-+            /* write bit data */
-+            SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
-+
-+            /* update written bit */
-+            SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
-+        }
-+
-         break;
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%" HWADDR_PRIx
-@@ -165,6 +190,9 @@ static void sifive_u_otp_reset(DeviceState *dev)
-     /* Make a valid content of serial number */
-     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
-     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
-+
-+    /* Initialize write-once map */
-+    memset(s->fuse_wo, 0x00, sizeof(s->fuse_wo));
- }
- 
- static void sifive_u_otp_class_init(ObjectClass *klass, void *data)
-diff --git a/include/hw/riscv/sifive_u_otp.h b/include/hw/riscv/sifive_u_otp.h
-index 639297564a..4a5a0acf48 100644
---- a/include/hw/riscv/sifive_u_otp.h
-+++ b/include/hw/riscv/sifive_u_otp.h
-@@ -35,6 +35,8 @@
- #define SIFIVE_U_OTP_PTRIM      0x34
- #define SIFIVE_U_OTP_PWE        0x38
- 
-+#define SIFIVE_U_OTP_PWE_EN     (1 << 0)
-+
- #define SIFIVE_U_OTP_PCE_EN     (1 << 0)
- 
- #define SIFIVE_U_OTP_PDSTB_EN   (1 << 0)
-@@ -73,6 +75,7 @@ typedef struct SiFiveUOTPState {
-     uint32_t ptrim;
-     uint32_t pwe;
-     uint32_t fuse[SIFIVE_U_OTP_NUM_FUSES];
-+    uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
-     /* config */
-     uint32_t serial;
- } SiFiveUOTPState;
--- 
-2.17.1
+Connor
 
 
