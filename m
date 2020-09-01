@@ -2,85 +2,62 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D463FC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:30:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 761D5C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:30:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 87635206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:30:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZFf9tng"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87635206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 372C9206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:30:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 372C9206CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD0k8-0003Mp-6c
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:30:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58316)
+	id 1kD0kr-0004eg-BV
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:30:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kD0eM-0007af-7C
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:24:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47104
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kD0eJ-00007t-3d
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:24:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598945050;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=JqyxXFPQcSkIAR2POo9MMQM7i6HqM+Ttzl+h9zj6moA=;
- b=OZFf9tngGcU2ccPlDyKs5ye11FKCDq5axk+VU3cQsu+UIm80UHvJEX3rz3MpHBMJyxpOcR
- ZE3a8gpfol9DmBPVgaHMVcg7o0yZjVlBjriCbzSc99KgB+fa5jPSnmkiLoxQc7bkgb3HpC
- VhuIxicXs6UsH+rdm6W1399yO/UGktA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-L2mHIKUpPJ-NK1IGQyk75g-1; Tue, 01 Sep 2020 03:24:08 -0400
-X-MC-Unique: L2mHIKUpPJ-NK1IGQyk75g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DA72801AC9
- for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 07:24:07 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D8617D897;
- Tue,  1 Sep 2020 07:24:07 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] configure: remove dead code for in-tree builds
-Date: Tue,  1 Sep 2020 03:24:06 -0400
-Message-Id: <20200901072406.15844-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0dJ-0005GG-AQ
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:23:09 -0400
+Received: from mx2.suse.de ([195.135.220.15]:50366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kD0dH-0008Pw-0I
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:23:09 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id F202AB1AD;
+ Tue,  1 Sep 2020 07:22:55 +0000 (UTC)
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Roman Bolshakov <r.bolshakov@yadro.com>
+Subject: [PATCH v6 15/16] hax: remove hax specific functions from global
+ includes
+Date: Tue,  1 Sep 2020 09:22:00 +0200
+Message-Id: <20200901072201.7133-16-cfontana@suse.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200901072201.7133-1-cfontana@suse.de>
+References: <20200901072201.7133-1-cfontana@suse.de>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:57:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:13:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,60 +71,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alberto Garcia <berto@igalia.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, Colin Xu <colin.xu@intel.com>,
+ Wenchao Wang <wenchao.wang@intel.com>, haxm-team@intel.com,
+ Sunil Muthuswamy <sunilmut@microsoft.com>, Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The $pwd_is_source_path variable is never "y", since
-configure re-executes itself from a build directory.
-Remove code that will never run.
-
-Cc: Daniel P. Berrangé <berrange@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- configure | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+ accel/stubs/hax-stub.c    | 10 ----------
+ include/sysemu/hax.h      | 17 -----------------
+ target/i386/hax-all.c     |  1 -
+ target/i386/hax-cpus.c    |  1 -
+ target/i386/hax-cpus.h    | 16 ++++++++++++++++
+ target/i386/hax-mem.c     |  2 +-
+ target/i386/hax-posix.c   |  3 +--
+ target/i386/hax-windows.c |  2 +-
+ target/i386/hax-windows.h |  2 ++
+ 9 files changed, 21 insertions(+), 33 deletions(-)
 
-diff --git a/configure b/configure
-index 8a3acef89d..7598bfbe4d 100755
---- a/configure
-+++ b/configure
-@@ -665,14 +665,6 @@ QEMU_INCLUDES="$QEMU_INCLUDES -iquote ${source_path}/disas/libvixl"
- CFLAGS="-std=gnu99 -Wall"
- 
- 
--# running configure in the source tree?
--# we know that's the case if configure is there.
--if test -f "./configure"; then
--    pwd_is_source_path="y"
--else
--    pwd_is_source_path="n"
--fi
+diff --git a/accel/stubs/hax-stub.c b/accel/stubs/hax-stub.c
+index 7ad190cae2..1a9da83185 100644
+--- a/accel/stubs/hax-stub.c
++++ b/accel/stubs/hax-stub.c
+@@ -21,13 +21,3 @@ int hax_sync_vcpus(void)
+ {
+     return 0;
+ }
 -
- check_define() {
- cat > $TMPC <<EOF
- #if !defined($1)
-@@ -4261,9 +4253,7 @@ EOF
-       if test -d "${source_path}/dtc/libfdt" || test -e "${source_path}/.git" ; then
-           fdt=git
-           mkdir -p dtc
--          if [ "$pwd_is_source_path" != "y" ] ; then
--              symlink "$source_path/dtc/Makefile" "dtc/Makefile"
--          fi
-+          symlink "$source_path/dtc/Makefile" "dtc/Makefile"
-           fdt_cflags="-I${source_path}/dtc/libfdt"
-           fdt_ldflags="-L$PWD/dtc/libfdt"
-           fdt_libs="$fdt_libs"
-@@ -8097,7 +8087,7 @@ do
- done
- mkdir -p $DIRS
- for f in $LINKS ; do
--    if [ -e "$source_path/$f" ] && [ "$pwd_is_source_path" != "y" ]; then
-+    if [ -e "$source_path/$f" ]; then
-         symlink "$source_path/$f" "$f"
-     fi
- done
+-int hax_init_vcpu(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+-
+-int hax_smp_cpu_exec(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
+index 9b27e65cc7..12fb54f990 100644
+--- a/include/sysemu/hax.h
++++ b/include/sysemu/hax.h
+@@ -22,29 +22,12 @@
+ #ifndef QEMU_HAX_H
+ #define QEMU_HAX_H
+ 
+-
+ int hax_sync_vcpus(void);
+-int hax_init_vcpu(CPUState *cpu);
+-int hax_smp_cpu_exec(CPUState *cpu);
+-int hax_populate_ram(uint64_t va, uint64_t size);
+-
+-void hax_cpu_synchronize_state(CPUState *cpu);
+-void hax_cpu_synchronize_post_reset(CPUState *cpu);
+-void hax_cpu_synchronize_post_init(CPUState *cpu);
+-void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
+ 
+ #ifdef CONFIG_HAX
+ 
+ int hax_enabled(void);
+ 
+-#include "qemu/bitops.h"
+-#include "exec/memory.h"
+-int hax_vcpu_destroy(CPUState *cpu);
+-void hax_raise_event(CPUState *cpu);
+-void hax_reset_vcpu_state(void *opaque);
+-#include "target/i386/hax-interface.h"
+-#include "target/i386/hax-i386.h"
+-
+ #else /* CONFIG_HAX */
+ 
+ #define hax_enabled() (0)
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index fd1ab673d7..fecfe8cd6e 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -28,7 +28,6 @@
+ #include "exec/address-spaces.h"
+ 
+ #include "qemu-common.h"
+-#include "hax-i386.h"
+ #include "sysemu/accel.h"
+ #include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+diff --git a/target/i386/hax-cpus.c b/target/i386/hax-cpus.c
+index 9aad98bc7a..99770e590c 100644
+--- a/target/i386/hax-cpus.c
++++ b/target/i386/hax-cpus.c
+@@ -22,7 +22,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+-#include "hax-i386.h"
+ #include "sysemu/runstate.h"
+ #include "sysemu/cpus.h"
+ #include "qemu/guest-random.h"
+diff --git a/target/i386/hax-cpus.h b/target/i386/hax-cpus.h
+index a64417fe2d..ee8ab7a631 100644
+--- a/target/i386/hax-cpus.h
++++ b/target/i386/hax-cpus.h
+@@ -14,4 +14,20 @@
+ 
+ extern const CpusAccel hax_cpus;
+ 
++#include "hax-interface.h"
++#include "hax-i386.h"
++
++int hax_init_vcpu(CPUState *cpu);
++int hax_smp_cpu_exec(CPUState *cpu);
++int hax_populate_ram(uint64_t va, uint64_t size);
++
++void hax_cpu_synchronize_state(CPUState *cpu);
++void hax_cpu_synchronize_post_reset(CPUState *cpu);
++void hax_cpu_synchronize_post_init(CPUState *cpu);
++void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
++
++int hax_vcpu_destroy(CPUState *cpu);
++void hax_raise_event(CPUState *cpu);
++void hax_reset_vcpu_state(void *opaque);
++
+ #endif /* HAX_CPUS_H */
+diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
+index 6bb5a24917..71e637cf16 100644
+--- a/target/i386/hax-mem.c
++++ b/target/i386/hax-mem.c
+@@ -13,7 +13,7 @@
+ #include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+ 
+-#include "target/i386/hax-i386.h"
++#include "hax-cpus.h"
+ #include "qemu/queue.h"
+ 
+ #define DEBUG_HAX_MEM 0
+diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
+index 6fb7867d11..735a749d4b 100644
+--- a/target/i386/hax-posix.c
++++ b/target/i386/hax-posix.c
+@@ -14,9 +14,8 @@
+ #include "qemu/osdep.h"
+ #include <sys/ioctl.h>
+ 
+-#include "target/i386/hax-i386.h"
+-
+ #include "sysemu/cpus.h"
++#include "hax-cpus.h"
+ 
+ hax_fd hax_mod_open(void)
+ {
+diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
+index 469b48e608..6c82dfb54f 100644
+--- a/target/i386/hax-windows.c
++++ b/target/i386/hax-windows.c
+@@ -12,7 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "hax-i386.h"
++#include "hax-cpus.h"
+ 
+ /*
+  * return 0 when success, -1 when driver not loaded,
+diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
+index 12cbd813dc..a5ce12d663 100644
+--- a/target/i386/hax-windows.h
++++ b/target/i386/hax-windows.h
+@@ -23,6 +23,8 @@
+ #include <winioctl.h>
+ #include <windef.h>
+ 
++#include "hax-cpus.h"
++
+ #define HAX_INVALID_FD INVALID_HANDLE_VALUE
+ 
+ static inline void hax_mod_close(struct hax_state *hax)
 -- 
 2.26.2
 
