@@ -2,88 +2,91 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 872D0C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 17:21:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2599C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 17:24:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53D272087D
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 17:21:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CA472078B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 17:24:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VDfpcsZY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53D272087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ddU4aGdX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CA472078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD9yN-0000pk-HJ
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 13:21:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55664)
+	id 1kDA12-0003UA-Q6
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 13:24:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kD9xa-0000II-Ky
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 13:20:42 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:35946)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kD9xY-000726-Uv
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 13:20:42 -0400
-Received: by mail-ed1-x541.google.com with SMTP id w1so2213108edr.3
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 10:20:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/nq/Zs2ETPVHLa3om9uFeoLEJPwIPqGD1vJtu6srYgc=;
- b=VDfpcsZYzQ1wsFUnHRRdjU+aomzFTI52v21j5Lebh4XlAUAiHKP1e77mAnbN0HwGFu
- QvUIihfVPMVj3dPSdIHUkCI+9kf3Lo59MSMVKWPmGhp9FTjscUYi2HNwNcSa/ZXP7hMw
- UA4dNCkx/7x2RUc6Hw3wnQmlD8UwAtPYInvqxPDMnMcSek5kcsmzN9ydb1zYFGvPFJwc
- D+nU5EnXdU1LZ1v+8D31qMuzyucGnFa3RjPHdEuzNUxQ60sukRhHlxf02wGH3aE45+tq
- ZAEhQVmQ4oYKNIA73pkCwGL+UYj6ub+gKINLOZ/HaDeruK69NfeRFF1gejY/uNZ0SOCf
- eiig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=/nq/Zs2ETPVHLa3om9uFeoLEJPwIPqGD1vJtu6srYgc=;
- b=VZW9+Ri+FPQzz54Sqdc4DfxywDlai9gf2gGP18I2f3G6awVj8Rg/rHzTeHrwR8ffDp
- oTWxU0YpstTg8EI4VJvyMVb6Dxa+1qiXrFIDtw2aQtzf6BdArSrwRmealYJxyL5UnqaR
- al4p5FKsJwecvMEXkRUtEpGVImcBV/DAI/QrKghnlRqKA+AcDekYxy84OBLYg4J2+bbw
- z5FeJ8cHRT+bH7fArcm5NxOsBaDmKMUT4tlxwLXdI8hKyoaJ8RnZ4b/Ku8r5NVYBaazG
- uv7x3t5unEo2V9ViB3AA72RdJ0LEjZUOkwM5zaFvkqZ8vyZEdq9+P3d45sVvaBeRYGmT
- v9OA==
-X-Gm-Message-State: AOAM531lcL0AWz+ApP6gNS13VfGkqiOJBGv/EkyFnOZoPWTSa7dtnStX
- DrdzNwk+i4DgXkBM4QDDpdmZZaPF4SxWldLgA08=
-X-Google-Smtp-Source: ABdhPJxS1hKlUGvWDnNRyuR+FEPEl/BIVZLIkzZokgFSae0rXP3XthHseCdWZtsA+2/1rhwr4+faYVxZzaP43/mJIzU=
-X-Received: by 2002:a50:fc08:: with SMTP id i8mr2759606edr.257.1598980839542; 
- Tue, 01 Sep 2020 10:20:39 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kD9zj-00023a-5B
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 13:22:55 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:48627
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kD9ze-0007HS-Sj
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 13:22:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598980969;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=g3wuo1p6AykMVf3ES8CTJKzKSYWltwLNaCw5B09eSgk=;
+ b=ddU4aGdX/qhXdZGCRTbWNXVGtLCXB7GEcPK75jpmkfklCBxZRM3iSoONAGnXwIJb7fIH1A
+ 5aS6DiPxTfOJPbQv/jwU/+z+k0Yhx/t0lOhf6vzTCzwVdnBXcecE+4F0+ObCvlEhipwT1w
+ mLZ/xIYZ/OcLc/vO+KZM4AF4lSpijFc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-386-lZ4_wePDNHmELRdyaZ_EnQ-1; Tue, 01 Sep 2020 13:22:47 -0400
+X-MC-Unique: lZ4_wePDNHmELRdyaZ_EnQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DE80801A9E;
+ Tue,  1 Sep 2020 17:22:46 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-188.ams2.redhat.com [10.36.112.188])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 10CDD7C549;
+ Tue,  1 Sep 2020 17:22:42 +0000 (UTC)
+Subject: Re: [PATCH v3 4/5] pc-bios: s390x: Save io and external new PSWs
+ before overwriting them
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200831150910.317171-1-frankja@linux.ibm.com>
+ <20200831150910.317171-5-frankja@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <de13e951-212a-0a16-e50c-ceeed688f655@redhat.com>
+Date: Tue, 1 Sep 2020 19:22:41 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200730165900.7030-1-philmd@redhat.com>
- <20200730165900.7030-2-philmd@redhat.com>
-In-Reply-To: <20200730165900.7030-2-philmd@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 1 Sep 2020 21:20:27 +0400
-Message-ID: <CAJ+F1C+LGO-nCEo7ELs4j07-cAahXmrbn=NWDX31=gpMP7OKLA@mail.gmail.com>
-Subject: Re: [PATCH-for-5.2 1/2] hw/mips/mipssim: Use MMIO serial device on
- fake ISA I/O
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000f1964b05ae43bcfb"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200831150910.317171-5-frankja@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:11:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,154 +99,177 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f1964b05ae43bcfb
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-Hi
-
-On Thu, Jul 30, 2020 at 9:04 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
-
-> The 'mipssim' is not a real hardware, it is a simulator.
->
-> There is an ISA MMIO space mapped at 0x1fd00000, however
-> this is not a real ISA bus (no ISA IRQ). So can not use
-> the TYPE_ISA_SERIAL device...
-> Instead we have been using a plain MMIO device, but named
-> it IO.
->
-> TYPE_SERIAL_IO is a superset of TYPE_SERIAL_MM, using
-> regshift=3D0 and endianness=3DDEVICE_LITTLE_ENDIAN.
->
-> Directly use the TYPE_SERIAL_MM device, enforcing the
-> regshift/endianness values. 'regshift' default is already
-> '0'. 'endianness' is meaningless for 8-bit accesses.
->
-> Note, there is no migration problem, because TYPE_SERIAL_IO
-> was not migrated.
->
-
-I am not so sure about that. It has:
-    /* No dc->vmsd: class has no migratable state */
-
-but that doesn't mean it's not migratable I think.
-
-
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+On 31/08/2020 17.09, Janosch Frank wrote:
+> Currently we always overwrite the mentioned exception new PSWs before
+> loading the enabled wait PSW. Let's save the PSW before overwriting
+> and restore it right before starting the loaded kernel.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 > ---
->  hw/mips/mipssim.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/mips/mipssim.c b/hw/mips/mipssim.c
-> index 1b3b762203..853bbaca58 100644
-> --- a/hw/mips/mipssim.c
-> +++ b/hw/mips/mipssim.c
-> @@ -216,9 +216,11 @@ mips_mipssim_init(MachineState *machine)
->       * MIPS CPU INT2, which is interrupt 4.
->       */
->      if (serial_hd(0)) {
-> -        DeviceState *dev =3D qdev_new(TYPE_SERIAL_IO);
-> +        DeviceState *dev =3D qdev_new(TYPE_SERIAL_MM);
->
->          qdev_prop_set_chr(dev, "chardev", serial_hd(0));
-> +        qdev_prop_set_uint8(dev, "regshift", 0);
-> +        qdev_prop_set_uint8(dev, "endianness", DEVICE_LITTLE_ENDIAN);
->          qdev_set_legacy_instance_id(dev, 0x3f8, 2);
->          sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
->          sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, env->irq[4]);
-> --
-> 2.21.3
->
->
->
+>  pc-bios/s390-ccw/jump2ipl.c |  4 +++
+>  pc-bios/s390-ccw/netmain.c  |  3 ++
+>  pc-bios/s390-ccw/start.S    | 62 +++++++++++++++++++++++++++----------
+>  3 files changed, 52 insertions(+), 17 deletions(-)
 
---=20
-Marc-Andr=C3=A9 Lureau
+Patch looks basically fine to me, I just got some questions for my
+understanding below...
 
---000000000000f1964b05ae43bcfb
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+> index 5b8352d257..bb94ba7550 100644
+> --- a/pc-bios/s390-ccw/jump2ipl.c
+> +++ b/pc-bios/s390-ccw/jump2ipl.c
+> @@ -14,6 +14,7 @@
+>  #define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_64)
+>  #define RESET_PSW ((uint64_t)&jump_to_IPL_addr | RESET_PSW_MASK)
+>  
+> +extern uint64_t psw_save_io[], psw_save_ext[];
+>  static uint64_t *reset_psw = 0, save_psw, ipl_continue;
+>  
+>  void write_reset_psw(uint64_t psw)
+> @@ -59,6 +60,9 @@ void jump_to_IPL_code(uint64_t address)
+>      /* Ensure the guest output starts fresh */
+>      sclp_print("\n");
+>  
+> +    memcpy(&lowcore->io_new_psw, psw_save_io, 16);
+> +    memcpy(&lowcore->external_new_psw, psw_save_ext, 16);
+> +
+>      /*
+>       * HACK ALERT.
+>       * We use the load normal reset to keep r15 unchanged. jump_to_IPL_2
+> diff --git a/pc-bios/s390-ccw/netmain.c b/pc-bios/s390-ccw/netmain.c
+> index 056e93a818..74ef28fbc6 100644
+> --- a/pc-bios/s390-ccw/netmain.c
+> +++ b/pc-bios/s390-ccw/netmain.c
+> @@ -32,6 +32,7 @@
+>  #include <time.h>
+>  #include <pxelinux.h>
+>  
+> +#include "s390-arch.h"
+>  #include "s390-ccw.h"
+>  #include "cio.h"
+>  #include "virtio.h"
+> @@ -43,6 +44,8 @@
+>  extern char _start[];
+>  void write_iplb_location(void) {}
+>  
+> +LowCore *lowcore; /* Yes, this *is* a pointer to address 0 */
+> +
+>  #define KERNEL_ADDR             ((void *)0L)
+>  #define KERNEL_MAX_SIZE         ((long)_start)
+>  #define ARCH_COMMAND_LINE_SIZE  896              /* Taken from Linux kernel */
+> diff --git a/pc-bios/s390-ccw/start.S b/pc-bios/s390-ccw/start.S
+> index ce519300a1..939aac3a7c 100644
+> --- a/pc-bios/s390-ccw/start.S
+> +++ b/pc-bios/s390-ccw/start.S
+> @@ -34,7 +34,17 @@ remainder:
+>  	larl	%r2,memsetxc
+>  	ex	%r3,0(%r2)
+>  done:
+> -	j      main		/* And call C */
+> +        /* prepare i/o call handler */
+> +        larl  %r1, io_new_code
+> +        larl  %r2, io_new_psw
+> +        stg   %r1, 8(%r2)
+> +        mvc   0x1f0(16),0(%r2)
+> +        /* prepare external call handler */
+> +        larl  %r1, external_new_code
+> +        larl  %r2, external_new_psw
+> +        stg   %r1, 8(%r2)
 
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Jul 30, 2020 at 9:04 PM Phi=
-lippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@re=
-dhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D=
-"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-le=
-ft:1ex">The &#39;mipssim&#39; is not a real hardware, it is a simulator.<br=
->
-<br>
-There is an ISA MMIO space mapped at 0x1fd00000, however<br>
-this is not a real ISA bus (no ISA IRQ). So can not use<br>
-the TYPE_ISA_SERIAL device...<br>
-Instead we have been using a plain MMIO device, but named<br>
-it IO.<br>
-<br>
-TYPE_SERIAL_IO is a superset of TYPE_SERIAL_MM, using<br>
-regshift=3D0 and endianness=3DDEVICE_LITTLE_ENDIAN.<br>
-<br>
-Directly use the TYPE_SERIAL_MM device, enforcing the<br>
-regshift/endianness values. &#39;regshift&#39; default is already<br>
-&#39;0&#39;. &#39;endianness&#39; is meaningless for 8-bit accesses.<br>
-<br>
-Note, there is no migration problem, because TYPE_SERIAL_IO<br>
-was not migrated.<br></blockquote><div><br></div><div>I am not so sure abou=
-t that. It has:</div><div>=C2=A0 =C2=A0 /* No dc-&gt;vmsd: class has no mig=
-ratable state */</div><div><br></div><div>but that doesn&#39;t mean it&#39;=
-s not migratable I think.<br></div><div> <br></div><blockquote class=3D"gma=
-il_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,2=
-04,204);padding-left:1ex">
-<br>
-Suggested-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org"=
- target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:philmd@red=
-hat.com" target=3D"_blank">philmd@redhat.com</a>&gt;<br>
----<br>
-=C2=A0hw/mips/mipssim.c | 4 +++-<br>
-=C2=A01 file changed, 3 insertions(+), 1 deletion(-)<br>
-<br>
-diff --git a/hw/mips/mipssim.c b/hw/mips/mipssim.c<br>
-index 1b3b762203..853bbaca58 100644<br>
---- a/hw/mips/mipssim.c<br>
-+++ b/hw/mips/mipssim.c<br>
-@@ -216,9 +216,11 @@ mips_mipssim_init(MachineState *machine)<br>
-=C2=A0 =C2=A0 =C2=A0 * MIPS CPU INT2, which is interrupt 4.<br>
-=C2=A0 =C2=A0 =C2=A0 */<br>
-=C2=A0 =C2=A0 =C2=A0if (serial_hd(0)) {<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 DeviceState *dev =3D qdev_new(TYPE_SERIAL_IO);=
-<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 DeviceState *dev =3D qdev_new(TYPE_SERIAL_MM);=
-<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_prop_set_chr(dev, &quot;chardev&quot=
-;, serial_hd(0));<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_uint8(dev, &quot;regshift&quot;,=
- 0);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_prop_set_uint8(dev, &quot;endianness&quot=
-;, DEVICE_LITTLE_ENDIAN);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_set_legacy_instance_id(dev, 0x3f8, 2=
-);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_realize_and_unref(SYS_BUS_DEVICE(d=
-ev), &amp;error_fatal);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0=
-, env-&gt;irq[4]);<br>
--- <br>
-2.21.3<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+Can't you specify the external_new_code and io_new_code in the
+external_new_psw / io_new_psw directly? Or is our relocation code not
+good enough for this?
 
---000000000000f1964b05ae43bcfb--
+> +        mvc   0x1b0(16),0(%r2)
+> +        j      main		/* And call C */
+>  
+>  memsetxc:
+>  	xc	0(1,%r1),0(%r1)
+> @@ -64,13 +74,16 @@ consume_sclp_int:
+>          oi      6(%r15),0x2
+>          lctlg   %c0,%c0,0(%r15)
+>          /* prepare external call handler */
+> -        larl %r1, external_new_code
+> -        stg %r1, 0x1b8
+> -        larl %r1, external_new_mask
+> -        mvc 0x1b0(8),0(%r1)
+> -        /* load enabled wait PSW */
+> -        larl %r1, enabled_wait_psw
+> -        lpswe 0(%r1)
+> +        larl  %r1, external_new_psw
+> +        lghi  %r2, 0x1b0
+> +        /* Is the BIOS' external new PSW already set? */
+> +        clc   0(16, %r1), 0(%r2)
+> +        je    load_ewait
+> +        /* No, save old PSW and write BIOS PSW */
+> +        larl  %r3, psw_save_ext
+> +        mvc   0(16, %r3), 0x1b0
+> +        mvc   0x1b0(16),0(%r1)
+> +        j     load_ewait
+>  
+>  /*
+>   * void consume_io_int(void)
+> @@ -84,11 +97,20 @@ consume_io_int:
+>          oi    4(%r15), 0xff
+>          lctlg %c6,%c6,0(%r15)
+>          /* prepare i/o call handler */
+> -        larl  %r1, io_new_code
+> -        stg   %r1, 0x1f8
+> -        larl  %r1, io_new_mask
+> -        mvc   0x1f0(8),0(%r1)
+> -        /* load enabled wait PSW */
+> +        larl  %r1, io_new_psw
+> +        lghi  %r2, 0x1f0
+> +        /* Is the BIOS' PSW already set? */
+> +        larl  %r3, load_ewait
+> +        clc   0(16, %r1), 0(%r2)
+> +        bcr   8, %r3
+
+Why not a "je load_ewait" again, like in the consume_sclp_int handler?
+
+> +        /* No, save old PSW and write BIOS PSW */
+> +        larl  %r3, psw_save_io
+> +        mvc   0(16, %r3), 0x1f0
+> +        mvc   0x1f0(16),0(%r1)
+> +        j     load_ewait
+> +
+> +load_ewait:
+> +        /* PSW is the correct one, time to load the enabled wait PSW */
+>          larl  %r1, enabled_wait_psw
+>          lpswe 0(%r1)
+>  
+> @@ -107,11 +129,17 @@ io_new_code:
+>          br    %r14
+>  
+>          .align  8
+> +        .globl psw_save_io
+> +        .globl psw_save_ext
+>  disabled_wait_psw:
+>          .quad   0x0002000180000000,0x0000000000000000
+>  enabled_wait_psw:
+>          .quad   0x0302000180000000,0x0000000000000000
+> -external_new_mask:
+> -        .quad   0x0000000180000000
+> -io_new_mask:
+> -        .quad   0x0000000180000000
+> +external_new_psw:
+> +        .quad   0x0000000180000000,0
+> +io_new_psw:
+> +        .quad   0x0000000180000000,0
+> +psw_save_io:
+> +        .quad   0,0
+> +psw_save_ext:
+> +        .quad   0,0
+> 
+
+In case you respin, could you maybe add some local #defines for 0x1f0
+and 0x1b0 ?
+
+ Thomas
+
 
