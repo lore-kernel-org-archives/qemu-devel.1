@@ -2,92 +2,119 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A88C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC7F5C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:36:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C04A206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:34:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95949206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:36:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OMKR/+B+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C04A206CD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="kC3v4Epf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95949206CD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD0oa-0001TG-Id
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:34:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60902)
+	id 1kD0qX-0002Wd-Ow
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:36:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kD0o2-00010p-Jg
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:34:14 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55113
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kD0o0-0001ZW-EI
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:34:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598945651;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=q4lBrRuw0edec2OKkhlM07ktHbg/viv9JALf/WX+Q08=;
- b=OMKR/+B+KOmDA9gQVcteXDCrMkyB6uB011ByiYDG/5njOfHu6H9f+FlT0N6Az2QLonfarl
- LbKryQykm1jZ5ZyxXvgXngQEn+XIYl36EjAeV1lfRzs7c9KqvgsP5AZnvzj/G7F+ZZ1Ohz
- YVS0hjQQ9590M+Lt4PtG2KC+/qVo3ZI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-385-0xtgUkFfNZGANFVQccsl-A-1; Tue, 01 Sep 2020 03:34:09 -0400
-X-MC-Unique: 0xtgUkFfNZGANFVQccsl-A-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5113418BE165;
- Tue,  1 Sep 2020 07:34:08 +0000 (UTC)
-Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B0DD078B40;
- Tue,  1 Sep 2020 07:34:05 +0000 (UTC)
-Subject: Re: [kvm-unit-tests RFC 4/4] spe: Test Profiling Buffer Events
-To: eric.auger.pro@gmail.com, kvm@vger.kernel.org,
- kvmarm@lists.cs.columbia.edu, qemu-devel@nongnu.org, drjones@redhat.com,
- andrew.murray@arm.com, sudeep.holla@arm.com, maz@kernel.org,
- will@kernel.org, haibo.xu@linaro.org
-References: <20200831193414.6951-1-eric.auger@redhat.com>
- <20200831193414.6951-5-eric.auger@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <6007e55f-1b56-a420-31b2-71f87c51fb65@redhat.com>
-Date: Tue, 1 Sep 2020 09:34:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
-MIME-Version: 1.0
-In-Reply-To: <20200831193414.6951-5-eric.auger@redhat.com>
-Content-Type: text/plain; charset=utf-8
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1kD0py-000256-Fc
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:36:14 -0400
+Received: from mail-mw2nam10on2051.outbound.protection.outlook.com
+ ([40.107.94.51]:5824 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1kD0pu-0001yV-Vn
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 03:36:13 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TrfBGVGhJ25ZxSkbHbWWpcnpK+6R2luJDV7Ic+7dt1OjSJ4on5ltuaT4672/rMzr4m0Sy5x4hzKo1y3mXCom0E2r9k2S6NRkXle6dB/HnVr8p4j239nj9y3eDi9cRjpLeO4b3lYf5GyuREqjq8Ka7qx4xNWX4ld8t0xn86mftwyQ5pmy79sVOg0t0/8e5GzXSxkbXyYd4JrXiQVAe+3AcIj7vpRyZVuoboN0h/MHeexkB9dwQygwaOunh/iQCcyrzfaDSaEwM1nC2fYqr+2Fqjfr46Cwcu4WwPmywhbKRlQlPIBX4/k9Sy5FzNmShrtZaWXViX9rm0kDC1xnP2ERtg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E2SscsDuT+vnGf9WL2jEap2i0A5daduckbWtppz6H2Q=;
+ b=Dd+xCxKBQLEa7E2MwD/Bmuac6EBVCZGVt/BqSy8ii14I9Epo3uzsoSdlg7GTRVi8R7OTZTUuzDM3pJ054KR0sA/nmShNshim/AAkAktvB9EVeS3H8dsVO7XbrPHksflFvNvQVk+dIz4bfYp0tXTxlamWZOLiKY5vSBfOEhgkIAkGlnQkttoe7cxdVKgW5zGtjkR3gmEIyyWQlDS0ELByKDM+UZ5CcNsowUbLtr8gPrpg4tLZ+o5uNyj7QPvhIKtH44q1vaFzw6+707lKp8mwqnrvcgtLO4Lqo8oCDklGzaXPRKc7teTDZawPwb0pBmcqE8VBzCfyB8cY1e8mMMnJvQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
+ dkim=pass header.d=xilinx.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=E2SscsDuT+vnGf9WL2jEap2i0A5daduckbWtppz6H2Q=;
+ b=kC3v4Epf1EHA6cHU6dpDufRBbYxfk3mIx3JxqAr/ziVMEvuqKXTKak6mjHuRepPmkKJZ3s0QShr01RxiSmdr8aiJZXjWlHYsJuxD8Qa66B5Dm9OhnlO8XVTfzIXj57FkYF5fmrj+ZOKWqi8kSUGvCfXQ4tpg4ZvkxMIMMzh76xY=
+Received: from BY5PR02MB6772.namprd02.prod.outlook.com (2603:10b6:a03:206::11)
+ by BYAPR02MB4325.namprd02.prod.outlook.com (2603:10b6:a03:5c::25)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19; Tue, 1 Sep
+ 2020 07:36:07 +0000
+Received: from BY5PR02MB6772.namprd02.prod.outlook.com
+ ([fe80::1007:f094:45c9:bb47]) by BY5PR02MB6772.namprd02.prod.outlook.com
+ ([fe80::1007:f094:45c9:bb47%8]) with mapi id 15.20.3326.025; Tue, 1 Sep 2020
+ 07:36:07 +0000
+From: Sai Pavan Boddu <saipava@xilinx.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: RE: [PATCH v4 5/7] misc: Add versal-usb2-regs module
+Thread-Topic: [PATCH v4 5/7] misc: Add versal-usb2-regs module
+Thread-Index: AQHWfW+XdzVFxEXdu0yTjH5fCdo/UqlRzocAgABIbXA=
+Date: Tue, 1 Sep 2020 07:36:07 +0000
+Message-ID: <BY5PR02MB677220F09E4F1EBD5DB76224CA2E0@BY5PR02MB6772.namprd02.prod.outlook.com>
+References: <1598642380-27817-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ <1598642380-27817-6-git-send-email-sai.pavan.boddu@xilinx.com>
+ <20200831070234.bke5kwujclbxcggy@sirius.home.kraxel.org>
+In-Reply-To: <20200831070234.bke5kwujclbxcggy@sirius.home.kraxel.org>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=eric.auger@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:08:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-TNEF-Correlator: 
+authentication-results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=xilinx.com;
+x-originating-ip: [49.205.235.17]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: ecae2889-0d84-4f45-4354-08d84e49b06c
+x-ms-traffictypediagnostic: BYAPR02MB4325:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR02MB4325CC8300FCAB308F414985CA2E0@BYAPR02MB4325.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: dQEJPEqCaoeOyMBkW47Jty62XpbNdugJip6+iGYHWuM1Juy6l6MqtO+qXw1lqN1z4Ma6+ah6G4X8b6FCXNZDjhNJ29CbZnJvlxpSLKKK7O290muieeXr7KRQiB6NSjCM6mAxFT5Pfai3hMZSWhXVoQ8/H6ZSNxFmpm/1mQ3o0W+QJ0GiZf/5LPQsClyL20amo8JOnSBrl6SRi4PaA3ZuLSrUZ3K+0dtfxzoiVbHsnjxI1cRLX/zLWBJyNmXTDTPGvbsC5TkFljBu0m+O4YL7XdluBHCWYns+B0BeXRW/cb6t3GhOtxMrKMKhPUPbunrXqPXhaDc42V8Rgn98raMTVg==
+x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:BY5PR02MB6772.namprd02.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(39860400002)(346002)(366004)(396003)(376002)(136003)(33656002)(6916009)(6506007)(26005)(52536014)(8936002)(7416002)(76116006)(5660300002)(2906002)(53546011)(7696005)(71200400001)(54906003)(83380400001)(9686003)(66476007)(64756008)(478600001)(55016002)(66556008)(8676002)(86362001)(186003)(316002)(4326008)(66446008)(66946007);
+ DIR:OUT; SFP:1101; 
+x-ms-exchange-antispam-messagedata: KoySyRcTzni/QkSSzGXw2+mIkX6bs1MFi3POa7v0oMCNQmAlebJEKUYWuRgfExm9n8eWYJuEY1DE/U43sCwUx0kc8+aPvdwB9gr5cj9/zxFkEQqqn+lttHf0eKb4xm0dgSg3jK68FBiO+S7GdCJ+100/uN3PKYHLlSskVPtKq6A0+33LK1KX1QIMAait62xiCJS/SHTTpuZf+KxL7E1X12f2ubJhisp0jj5Jf7w1pfAfYfiqgRUolVKXxURyQGTb/WJFl+G0wEBxY6XTokxT3Bf3/40krdaPPXs5adY83XsxF30J8e/do39cVJeMadwV8KvONicUx1K6N0L82coVMhC7xekzhdRvXyvHxmoAUuAgBkhEcKtkljK0aCU99l3bgUZHbkRbmUhurCU1OizH031+muRMovol1IhSjeLkpRm2S5Td7rQvKJenKM4Y+sGoDKOkfXe+iHGQpIvucN1QE5aXt2vA/MbPereyANM7XoHi+dmVHLoi1pGsHcCklL/riR9QSZORrJITXBLcCQ5DLRv8DoC8inXSzk7m4XjfcmlD7NLBSmtYtMnFKpf86ve1Vpm+kyBtezpBlUH3wflskLNfuC8mVsADb9sXaagnwl2sKGFqszEM+KrxqeFfsMJguK1xIqjU+Pt8FCuk69NWRA==
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR02MB6772.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ecae2889-0d84-4f45-4354-08d84e49b06c
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Sep 2020 07:36:07.0527 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8H5hDsRnEnEMHbzVu/CgWwWoOsQRy39vqgglz3o8PSv943X++j0WkaLnPcWPT/M8klbnavu0SvBJ0DCLYlKrQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB4325
+Received-SPF: pass client-ip=40.107.94.51; envelope-from=saipava@xilinx.com;
+ helo=NAM10-MW2-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 03:36:08
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,256 +127,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Francisco Eduardo Iglesias <figlesia@xilinx.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Edgar Iglesias <edgari@xilinx.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ =?iso-8859-1?Q?=27Marc-Andr=E9_Lureau=27?= <marcandre.lureau@redhat.com>,
+ Ying Fang <fangying1@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ =?iso-8859-1?Q?=27Philippe_Mathieu-Daud=E9=27?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+Hi Gred,
 
-On 8/31/20 9:34 PM, Eric Auger wrote:
-> Setup the infrastructure to check the occurence of events.
-> The test checks the Buffer Full event occurs when no space
-> is available. The PPI is handled and we check the syndrome register
-> against the expected event.
-> 
-> Signed-off-by: Eric Auger <eric.auger@redhat.com>
-> ---
->  arm/spe.c         | 141 +++++++++++++++++++++++++++++++++++++++++++++-
->  arm/unittests.cfg |   8 +++
->  2 files changed, 148 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arm/spe.c b/arm/spe.c
-> index 7996f79..2f5ee35 100644
-> --- a/arm/spe.c
-> +++ b/arm/spe.c
-> @@ -19,6 +19,7 @@
->  #include "alloc_page.h"
->  #include <bitops.h>
->  #include "alloc.h"
-> +#include <asm/gic.h>
->  
->  struct spe {
->  	int min_interval;
-> @@ -36,13 +37,37 @@ struct spe {
->  	bool unique_record_size;
->  };
->  
-> +enum spe_event_exception_class {
-> +	EC_STAGE1_DATA_ABORT =  0x24,
-> +	EC_STAGE2_DATA_ABORT = 0x25,
-> +	EC_OTHER = 0,
-> +};
-> +
-> +struct spe_event {
-> +	enum spe_event_exception_class ec;
-> +	bool dl;	/* data lost */
-> +	bool ea;	/* external abort */
-> +	bool s;		/* service */
-> +	bool coll;	/* collision */
-> +	union {
-> +		bool buffer_filled; /* ec = other */
-> +	} mss;
-> +};
-> +
->  static struct spe spe;
->  
-> +struct spe_stats {
-> +	struct spe_event observed;
-> +	bool unexpected;
-> +};
-> +static struct spe_stats spe_stats;
-> +
->  #ifdef __arm__
->  
->  static bool spe_probe(void) { return false; }
->  static void test_spe_introspection(void) { }
->  static void test_spe_buffer(void) { }
-> +static void test_spe_events(void) { }
->  
->  #else
->  
-> @@ -95,6 +120,16 @@ static void test_spe_buffer(void) { }
->  #define PMSCR_EL1_TS			0x20
->  #define PMSCR_EL1_PCT			0x40
->  
-> +#define PMBSR_EL1_COLL			0x10000
-> +#define PMBSR_EL1_S			0x20000
-> +#define PMBSR_EL1_EA			0x40000
-> +#define PMBSR_EL1_DL			0x80000
-> +#define PMBSR_EL1_EC_SHIFT		26
-> +#define PMBSR_EL1_EC_MASK		0x3F
-> +#define PMBSR_EL1_MISS_MASK		0xFFFF
-> +
-> +#define SPE_PPI 21
-> +
->  static int min_interval(uint8_t idr_bits)
->  {
->  	switch (idr_bits) {
-> @@ -119,6 +154,44 @@ static int min_interval(uint8_t idr_bits)
->  	}
->  }
->  
-> +static int decode_syndrome_register(uint64_t sr, struct spe_event *event, bool verbose)
-> +{
-> +	if (!sr)
-> +		return 0;
-> +
-> +	if (sr & PMBSR_EL1_S)
-> +		event->s = true;
-> +	if (sr & PMBSR_EL1_COLL)
-> +		event->coll = true;
-> +	if (sr & PMBSR_EL1_EA)
-> +		event->ea = true;
-> +	if (sr & PMBSR_EL1_DL)
-> +		event->dl = true;
-> +	if (verbose)
-> +		report_info("PMBSR_EL1: Service=%d Collision=%d External Fault=%d DataLost=%d",
-> +			    event->s, event->coll, event->ea, event->dl);
-> +
-> +	switch ((sr >> PMBSR_EL1_EC_SHIFT) & PMBSR_EL1_EC_MASK) {
-> +	case EC_OTHER:
-> +		event->ec = EC_OTHER;
-> +		event->mss.buffer_filled = sr & 0x1;
-> +		if (verbose)
-> +			report_info("PMBSR_EL1: EC = OTHER buffer filled=%d", event->mss.buffer_filled);
-> +		break;
-> +	case EC_STAGE1_DATA_ABORT:
-> +		event->ec = EC_STAGE1_DATA_ABORT;
-> +		report_info("PMBSR_EL1: EC = stage 1 data abort");
-> +		break;
-> +	case EC_STAGE2_DATA_ABORT:
-> +		event->ec = EC_STAGE2_DATA_ABORT;
-> +		report_info("PMBSR_EL1: EC = stage 2 data abort");
-> +		break;
-> +	default:
-> +		return -1;
-> +	}
-> +	return 0;
-> +}
-> +
->  static bool spe_probe(void)
->  {
->  	uint64_t pmbidr_el1, pmsidr_el1;
-> @@ -224,6 +297,13 @@ static void reset(void)
->  
->  	/* Make sure the syndrome register is void */
->  	write_sysreg_s(0, PMBSR_EL1);
-> +
-> +	memset(&spe_stats, 0, sizeof(spe_stats));
-> +}
-> +
-> +inline bool event_match(struct spe_event *observed, struct spe_event *expected)
-> +{
-> +	return !memcmp(observed, expected, sizeof(struct spe_event));
->  }
->  
->  static inline void drain(void)
-> @@ -235,6 +315,7 @@ static inline void drain(void)
->  
->  static void test_spe_buffer(void)
->  {
-> +	struct spe_event observed = {}, expected = {};
->  	uint64_t pmbsr_el1, val1, val2;
->  	void *addr = malloc(10 * PAGE_SIZE);
->  
-> @@ -290,7 +371,61 @@ static void test_spe_buffer(void)
->  		report_info("This corresponds to %ld record(s) of %d bytes",
->  			    val2 / spe.maxsize, spe.maxsize);
->  	pmbsr_el1 = read_sysreg_s(PMBSR_EL1);
-> -	report(!pmbsr_el1, "PMBSR_EL1: no event");
-> +	report(!(decode_syndrome_register(pmbsr_el1, &observed, true)) &&
-> +	       event_match(&observed, &expected), "PMBSR_EL1: no event");
-> +
-> +	free(addr);
-> +}
-> +
-> +static void irq_handler(struct pt_regs *regs)
-> +{
-> +	uint32_t irqstat, irqnr;
-> +
-> +	irqstat = gic_read_iar();
-> +	irqnr = gic_iar_irqnr(irqstat);
-> +
-> +	if (irqnr == SPE_PPI) {
-> +		uint64_t pmbsr_el1 = read_sysreg_s(PMBSR_EL1);
-> +
-> +		if (decode_syndrome_register(pmbsr_el1, &spe_stats.observed, true))
-> +			spe_stats.unexpected = true;
-> +		report_info("SPE IRQ! SR=0x%lx", pmbsr_el1);
-> +		write_sysreg_s(0, PMBSR_EL1);
-> +	} else {
-> +		spe_stats.unexpected = true;
-> +	}
-> +	gic_write_eoir(irqstat);
-> +}
-> +
-> +static inline bool has_event_occurred(struct spe_event *expected)
-> +{
-> +	return (!spe_stats.unexpected && event_match(&spe_stats.observed, expected));
-> +}
-> +
-> +static void test_spe_events(void)
-> +{
-> +	struct spe_event expected = {.ec = EC_OTHER, .mss.buffer_filled = true, .s = true};
-> +	void *addr = malloc(10 * PAGE_SIZE);
-> +
-> +	gic_enable_defaults();
-> +	install_irq_handler(EL1H_IRQ, irq_handler);
-> +	local_irq_enable();
-> +	gic_enable_irq(SPE_PPI);
-> +
-> +	reset();
-> +
-> +	/* Willingly set pmblimitr tp pmdptr */
-> +	spe.pmblimitr_el1 = spe.pmbptr_el1;
-> +
-> +	mem_access_loop(addr, 100000, spe.pmblimitr_el1 | PMBLIMITR_EL1_E);
-> +	drain();
-> +	report(has_event_occurred(&expected), "PMBSR_EL1: buffer full event");
-> +
-> +	/* redo it once */
-I noticed I must reset the stats here. I will fix that in next version.
+> -----Original Message-----
+> From: Gerd Hoffmann <kraxel@redhat.com>
+> Sent: Monday, August 31, 2020 12:33 PM
+> To: Sai Pavan Boddu <saipava@xilinx.com>
+> Cc: Peter Maydell <peter.maydell@linaro.org>; Markus Armbruster
+> <armbru@redhat.com>; 'Marc-Andr=E9 Lureau'
+> <marcandre.lureau@redhat.com>; Paolo Bonzini <pbonzini@redhat.com>;
+> Edgar Iglesias <edgari@xilinx.com>; Francisco Eduardo Iglesias
+> <figlesia@xilinx.com>; qemu-devel@nongnu.org; Alistair Francis
+> <alistair.francis@wdc.com>; Eduardo Habkost <ehabkost@redhat.com>;
+> Ying Fang <fangying1@huawei.com>; 'Philippe Mathieu-Daud=E9'
+> <philmd@redhat.com>; Vikram Garhwal <fnuv@xilinx.com>; Paul
+> Zimmerman <pauldzim@gmail.com>
+> Subject: Re: [PATCH v4 5/7] misc: Add versal-usb2-regs module
+>=20
+> On Sat, Aug 29, 2020 at 12:49:38AM +0530, Sai Pavan Boddu wrote:
+> > This is a dummy module to emulate control registers of versal usb2
+> > controller.
+>=20
+> --verbose please.  xhci supports all usb speeds, including usb2.
+[Sai Pavan Boddu] This module is has soc specific control/status register t=
+o control the phy-reset, adjust frame length time  and coherency properties=
+ for the transactions.
 
-Thanks
+>=20
+> So why this hardware is here, what does it on a real device and what is t=
+he
+> emulation doing?  "dummy" sounds like it does just enough to make the
+> guest driver happy, probably pretending nothing is connected?
+Yes, this is added to make guest happy.
 
-Eric
-> +
-> +	mem_access_loop(addr, 100000, spe.pmblimitr_el1 | PMBLIMITR_EL1_E);
-> +	drain();
-> +	report(has_event_occurred(&expected), "PMBSR_EL1: buffer full event");
->  
->  	free(addr);
->  }
-> @@ -317,6 +452,10 @@ int main(int argc, char *argv[])
->  		report_prefix_push(argv[1]);
->  		test_spe_buffer();
->  		report_prefix_pop();
-> +	} else if (strcmp(argv[1], "spe-events") == 0) {
-> +		report_prefix_push(argv[1]);
-> +		test_spe_events();
-> +		report_prefix_pop();
->  	} else {
->  		report_abort("Unknown sub-test '%s'", argv[1]);
->  	}
-> diff --git a/arm/unittests.cfg b/arm/unittests.cfg
-> index bb0e84c..b2b07be 100644
-> --- a/arm/unittests.cfg
-> +++ b/arm/unittests.cfg
-> @@ -150,6 +150,14 @@ extra_params = -append 'spe-buffer'
->  accel = kvm
->  arch = arm64
->  
-> +[spe-events]
-> +file = spe.flat
-> +groups = spe
-> +arch = arm64
-> +extra_params = -append 'spe-events'
-> +accel = kvm
-> +arch = arm64
-> +
->  # Test GIC emulation
->  [gicv2-ipi]
->  file = gic.flat
-> 
+I will the commit message with more info
+
+Regards,
+Sai Pavan
+>=20
+> thanks,
+>   Gerd
 
 
