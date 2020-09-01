@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 887BFC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:35:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9062C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:36:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56DA72068E
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:35:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56DA72068E
+	by mail.kernel.org (Postfix) with ESMTPS id 6533B2087D
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:36:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6533B2087D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCztL-0005zr-Gm
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:35:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46932)
+	id 1kCzts-000702-Kj
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:36:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzsO-00054k-Kg; Tue, 01 Sep 2020 02:34:40 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:56435)
+ id 1kCztB-00061k-S2; Tue, 01 Sep 2020 02:35:29 -0400
+Received: from mout.kundenserver.de ([212.227.17.10]:57985)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzsM-0002RI-UG; Tue, 01 Sep 2020 02:34:40 -0400
+ id 1kCzt9-0002UW-TO; Tue, 01 Sep 2020 02:35:29 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
  (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N3K9E-1kdhcc41nW-010Ke3; Tue, 01 Sep 2020 08:34:21 +0200
-Subject: Re: [PATCH 02/12] target/ppc: Remove superfluous breaks
+ 1MG9wg-1kMsJN2bBE-00Gcsy; Tue, 01 Sep 2020 08:35:17 +0200
+Subject: Re: [PATCH 04/12] scsi: Remove superfluous breaks
 To: Thomas Huth <thuth@redhat.com>, Yi Wang <wang.yi59@zte.com.cn>,
  qemu-devel@nongnu.org
-References: <1594631025-36219-1-git-send-email-wang.yi59@zte.com.cn>
- <9429f7c1-0bcf-5092-9f39-302f6b1cf598@redhat.com>
+References: <1594631062-36341-1-git-send-email-wang.yi59@zte.com.cn>
+ <bba1277b-98cd-7133-ff0c-3e855f9af583@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,35 +81,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <6d8affc9-60d2-4ad4-8954-bccffb239b1d@vivier.eu>
-Date: Tue, 1 Sep 2020 08:34:18 +0200
+Message-ID: <77ebcf0c-3d6e-6d78-748e-c7c52bab8981@vivier.eu>
+Date: Tue, 1 Sep 2020 08:35:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <9429f7c1-0bcf-5092-9f39-302f6b1cf598@redhat.com>
+In-Reply-To: <bba1277b-98cd-7133-ff0c-3e855f9af583@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:4bW2GV2yLkhcDEyWlCPMhKZ65geIVyYFrVKJUUgqE75RJ4VZhe3
- /47hvWwnaVvX48yKjLlQgNpgmukxtIPxic/qUkzexRVQOALexGYfYVLol2sq/IWElDath5/
- 99r5Z7NH11cXBehm9Rk48kS4W25YaRD/9w6zDFDCkN4DfIRRFHRiKCBgaRsF/tlUpX7Bp/s
- LfEikGp80UrVrywLBgzAg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:be5YsKfY67Y=:0QCuznt5Zo8hzKNbPdkIlm
- r3MyffXbUHs2tPwGG5r/DKk75pTkp0jE2R76SgbGJsZXc9suk2c7MAN6XHMr0ZcrqeAaWy9bw
- gEMI88+JUG1XLnr6aT5YRXOzzDQ2JfaZdD6settwYRjze2hieOQHQkOhtPwMzacJFqgm4IdEH
- g8o2m7KY5e00DKAHWtAuvWuCAlVzFaSntvi60DlNYzkx+wHy/D029YELNp18bdyWA2hGcPQe3
- 5Z4evHDp3nucpls49eOpq2gx4D+Qm/gRlCDUnpSHXNBXC0BoD2wwuHSoHh31A2aJPx8SzCLfg
- /wXI7/YluoqeeGbPWF1I+OsitbajJZyRuhM81BjQ1gtA3dF7TQCOgwouZVFMNsraR15115sRW
- fFDwmKnExaIh4ydxZazm+qQ1KTVqVqpfxwT9nqzNa574vAB9RouFmTy5w4K91XyHRUjih+RdJ
- YDLsTJMT6mj77/JNvRPIDgTDD+nt5M42A8SmfI2CSGHuBI47doudbiIZQiELxBYlZXNEMjh5U
- C4Snwy1rujiwVRICmgA21R4amkzE73JO09Kg2ETng+WwAJiTxQTUIm6aBC9c1HIOYy8BI/V8Q
- qr5lGyLaNuOr2g77oNHoUAdjhgcwq1wSWYDI3/df2G/9P+JDKvJrFoRFq7M1+N45oFOcmrXxQ
- MKhMnUdM4k+EJCoN3CRKCj9PPPuxk2zLVvW/SXcwXmAt+OuzI9q6K9YOjCce3zl7IugXC7z+m
- 8pU59LdrRm6koccc79GxdIkxXpdyUVBLxXjvgbwLXoZitGMcpomV0Gep7fOrZFpAjJgP4WmGs
- LOj4jErn8yNP4sLnH2ZrN0gC0E6AA1P5pLoeetXQ/VfA4Y+Yz2TA6Wz1M9ubANmKRU4hUlr
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:Fv92yFig47/fmy/751hbeVyf2lTc0+/I4WMUiKxHVDm5W9rtAJG
+ jSA/WrEU5TQLB2ODfOtmVLJRgkiMLdhk9hf+u1cU0/jJWyxBc+S0E+dgF3bok73fy+03qcE
+ jdGJUhyPCXKgxi3fSUntyNThePh2uHPoPsB4i5eN8j5rAJqYkpcr5PsqKT75v+ZPOAATEAt
+ qLjg4PbbOezn4tRdwYtRg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:F1qOPSGmpzs=:1KamOnSV13MXKVaDlFf7Wf
+ lSPagqvKYzevcjglRbgr80nAIBUgoYUdysJuquut6ui5ne+xVlhcoTLi1cRXIj1LxAeyQkSdL
+ stQHVRbZwCZ942mdLFpXccjuJJypBYiRDDHSvoGAYH4+ZKBD2x1xVYuzLHXTb016p9lwtQBcS
+ tR1cfZJC9y2P1GzH9iNB8awyeJkMtuVcoCVJcr3pjJI+oS4xGBDN6uXhd/IhN9tKNG+73UNQ5
+ BleYESYNEcFke4zagRN9tggqKJy6yaMp/9YLEVSDV49oOz85bDfsRiaV3IkO+S0ul+85s/qVf
+ SCxmCWB1heFhaszlsCOcnAlGv/4iL3+Pwzy2Qa5CsIB+LAHZM+G6NPfFCkjpCPGIRmYwq7N07
+ QJlbJ4/9yDmfUmpR7tEzbW43XpPjfyXqmtwfXM5DtsJ0aE7M0Uiq8Mcor4/vVQz1+75Vl0eBP
+ /Gdj2CJVoQeDG0HrrqbUE/EsLnRbJnONUrmgx7jWUczAtjmAa58PiufFLjIy7ZhjIM9y/PPFU
+ zc2hqfcri9DM/RIXw3gCfY3Tss2Dvy8HHKo/8NdniPmcvSDxlE0JuS6KGvzLZLx6Xu66oUkPk
+ N69fdbATIvUIcT63MZgkclRImNpUQj4eP8w8ggdKlBf1sUe1K95NyMUimsAAuZx8PMTbxutCL
+ rIEXFTjtXExglFKZRKbdhSZ62Hu3laXkX5QVpdVXrXkHvnzt/KKLdZUlyvS7MLhXFI05A9Bko
+ 3miqSla9G4EIYJkDeVBNu91Y5PV7/fuj6VOdOAR0APYCujUhIf1hyt/t/pWfzzJE469JHGObE
+ Ad8LdxCF6ODvX9U8eM0NkrBM7aVnAdXgpKcrnSwV+1bQzrT8ED2Go5BJBP9uyUmtLOCpbQU
+Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:34:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:35:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -129,16 +129,15 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: wang.liang82@zte.com.cn, QEMU Trivial <qemu-trivial@nongnu.org>,
- qemu-ppc@nongnu.org, xue.zhihong@zte.com.cn,
- Liao Pingfang <liao.pingfang@zte.com.cn>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Liao Pingfang <liao.pingfang@zte.com.cn>, wang.liang82@zte.com.cn,
+ xue.zhihong@zte.com.cn
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/07/2020 à 11:30, Thomas Huth a écrit :
-> On 13/07/2020 11.03, Yi Wang wrote:
+Le 13/07/2020 à 11:33, Thomas Huth a écrit :
+> On 13/07/2020 11.04, Yi Wang wrote:
 >> From: Liao Pingfang <liao.pingfang@zte.com.cn>
 >>
 >> Remove superfluous breaks, as there is a "return" before them.
@@ -147,39 +146,31 @@ Le 13/07/2020 à 11:30, Thomas Huth a écrit :
 >> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 >> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org> 
 >> ---
->>  target/ppc/misc_helper.c | 5 -----
->>  1 file changed, 5 deletions(-)
+>>  scsi/utils.c | 4 ----
+>>  1 file changed, 4 deletions(-)
 >>
->> diff --git a/target/ppc/misc_helper.c b/target/ppc/misc_helper.c
->> index 55b68d1..e43a3b4 100644
->> --- a/target/ppc/misc_helper.c
->> +++ b/target/ppc/misc_helper.c
->> @@ -234,25 +234,20 @@ target_ulong helper_clcs(CPUPPCState *env, uint32_t arg)
->>      case 0x0CUL:
->>          /* Instruction cache line size */
->>          return env->icache_line_size;
+>> diff --git a/scsi/utils.c b/scsi/utils.c
+>> index c50e81f..b37c283 100644
+>> --- a/scsi/utils.c
+>> +++ b/scsi/utils.c
+>> @@ -32,17 +32,13 @@ uint32_t scsi_cdb_xfer(uint8_t *buf)
+>>      switch (buf[0] >> 5) {
+>>      case 0:
+>>          return buf[4];
 >> -        break;
->>      case 0x0DUL:
->>          /* Data cache line size */
->>          return env->dcache_line_size;
+>>      case 1:
+>>      case 2:
+>>          return lduw_be_p(&buf[7]);
 >> -        break;
->>      case 0x0EUL:
->>          /* Minimum cache line size */
->>          return (env->icache_line_size < env->dcache_line_size) ?
->>              env->icache_line_size : env->dcache_line_size;
+>>      case 4:
+>>          return ldl_be_p(&buf[10]) & 0xffffffffULL;
 >> -        break;
->>      case 0x0FUL:
->>          /* Maximum cache line size */
->>          return (env->icache_line_size > env->dcache_line_size) ?
->>              env->icache_line_size : env->dcache_line_size;
+>>      case 5:
+>>          return ldl_be_p(&buf[6]) & 0xffffffffULL;
 >> -        break;
 >>      default:
->>          /* Undefined */
->>          return 0;
->> -        break;
+>>          return -1;
 >>      }
->>  }
->>  
 >>
 > 
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
