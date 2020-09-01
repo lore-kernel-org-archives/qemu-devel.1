@@ -4,39 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66564C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13CECC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:01:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 368742087D
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:58:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 368742087D
+	by mail.kernel.org (Postfix) with ESMTPS id D360A2071B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 07:01:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D360A2071B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD0FQ-0007wG-BC
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:58:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51582)
+	id 1kD0I3-0001FT-UM
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 03:01:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD0Et-0007Ov-0S; Tue, 01 Sep 2020 02:57:55 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:55127)
+ id 1kD0HQ-0000dK-Vi; Tue, 01 Sep 2020 03:00:33 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:46367)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kD0Eq-0005JP-Ts; Tue, 01 Sep 2020 02:57:54 -0400
+ id 1kD0HP-0005Zj-9w; Tue, 01 Sep 2020 03:00:32 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
  (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N3bCH-1kdRCk1Wh1-010ZTr; Tue, 01 Sep 2020 08:57:45 +0200
-Subject: Re: [PATCH-for-5.1] hw/misc/milkymist-pfpu: Fix pFPU region size
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20200718093705.7271-1-f4bug@amsat.org>
- <b0eb3028f61e6eaaf9c1f4aedefeaa20@walle.cc>
+ 1MpDa5-1kwCTD1YkR-00qkXW; Tue, 01 Sep 2020 09:00:28 +0200
+Subject: Re: [PATCH] hw/i386/kvm/ioapic.c: fix typo in error message
+To: Kenta Ishiguro <kentaishiguro@slowstart.org>, qemu-devel@nongnu.org
+References: <20200717123514.15406-1-kentaishiguro@slowstart.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +79,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <1819668f-4747-0cb7-69c0-e167af71e8ba@vivier.eu>
-Date: Tue, 1 Sep 2020 08:57:40 +0200
+Message-ID: <7716b971-669b-f055-480a-9243a2c4f6c4@vivier.eu>
+Date: Tue, 1 Sep 2020 09:00:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <b0eb3028f61e6eaaf9c1f4aedefeaa20@walle.cc>
+In-Reply-To: <20200717123514.15406-1-kentaishiguro@slowstart.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:WbBYeDt31EDzWW7GWgeMzrTTqE78DYwFEW7weg4lMLWY7yh5jTU
- yBTA+F98y5CTgC5NI8VvKgjhivrT3yUd+iBpLuH57acVp7MqCnK1teFoa9S2qTRCqdVVBxD
- dPDEtfawXBtXffvq9yalmgl+jnLXfs8S3TMDf8aziRwMQNLd1Vl5ryls2xBF/E+91FADICS
- 5P1dS/GiBk7+bNrq2jcjg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zVM9PVMOVs4=:HeP7MtS29aILNkTVEtZrsU
- RoT6pz1yHR9S2pmQUI/j3FBvHdeWuFthB1itDzfls7QtYcaxoQHQfFCIyi2i62Q4j8NcP13LB
- FjVNq6EI3RdPYhnbg4jm9p8quMF4ZoN+RWg3+9qkt0jRkK/e2YA4sAeDmEYWNXrXh6/aws1WA
- sg1AeUrsDkJ2cCF1u2+bn0xR+DViReQGGXLwb9Jsy9A9/+fLhSzzEpblWilKM/Do++9JkbdGJ
- 13CBLeGdndakVIn9O5FK9s+7SMb4CLdWDuYRsH1pt1steNoO9TYT2IakxHULedehEQcdBu3cN
- OOs4o+ABIUq5nuWqqyAP6pCftacy8qM7fqnsQeVOgQfJZWJtMz59XC4grIKKgLEIrGGJElBbv
- Dpsk+VeaS0ONemhZfmY6x4NbpTTNHfNMD2DaiziNv8qjEBHM8FZnoHLpF70Y0uRtJFPp42LMM
- 6BvoP1sUv3d31Mt+NXVwiPaBLxktgCNRC0+lSZB7wrtgVGJOvtDQvdtJlamJY1LnS+xqxY+ZL
- yFWhMSEc/0hYPV1wpI6Ved+Zlxa70GqUmMqeHkknCm7UjGL+bqDtE62/SEyCyax6B4upfpcmK
- qGnNtnYECVSvk1N3zGRAlgA4AEWYezwgo8tT97JH4J9NRvhlstkscI4blK5umydHMV48kKYFq
- MlYa00BqWCckHlIIqlnUwlmVyK7vMsxWEsyteT1stDrYYWPNTwMTpAHBj/eGRLLC//YgKcBgv
- 8BRDXodq/0uEgQyvxiZdqvTxcFOuIqLWqUeml6IYdXeXPo2y4BmSnkpbF8sxIlxUSgdiVVWv3
- Rlpo4C7E3qSI8jYsmeySu6DmVGjPbe+jSq02VcN+sk8aoreFW/p/5xlrKcsHdF/tLndWsCD
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:unr5s9rEz27JJ6IFffiKbU4VXrCY8M6Tz7Sxc3XXIbTKBxS6MmM
+ UByeHJVNS1s1mOtde9NIg3OpbYTJluZ3sODS0c4BYeMep1uq9U7eN3ObbwTwtZxzZRzQcUV
+ 29dz3dpf5R9ZQWw7hYR5ooUTubemedIwoKxQju6r3+XJ/1KQGOEt/meZYzbEyPQS+b3uRBF
+ t1xTKDOs9DbnNr6F2nGfA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8EJU/jFSqGA=:7f85uotPniuwrO0TfYFSu3
+ IWU4fWxTU14fKfhq5eMJeLromtDa1NccEWNdFRUOdbU8u0VhcZd2y00eCRCpYNAxyI4iLG+aM
+ DnEPKTpPtf/qtofrdKbIPkbgcD8uUY2uw3RwERAHxRZLhxIcRaeDO31HS28bbUNFhXUJ9qJ5v
+ E8nW9IPIqzDbMKLNjYBnJzvWrU59vLk+5kpnuQul7DLgYcXM7zFyKxxBDuucGjzoiZVCe0A5Z
+ xqhhG2xG8PL4/b6v/VYhwm8Cb1sAuZo64At+sVAVpFtoQYeQe6/9k17An4BLO7zfKQC62En2z
+ e7njw6p+S0fd19/a7eSCLbHUvB4d0UhDjet2Ftgt3O+Seh3N9eWsf0QsDUegLVIrmSZ9bupww
+ JnVMYADx3BdWNAYT1iyWF4v2TPsDJ9vze0fIbE9tg8c1k7QUck+p8GuEXkJ8Sct55UptMEQb2
+ SsJWoLYdrjiV7azkiDAKiXNHIQ6G9tyx0w4jV8JEouJRIirdWR32IdHQmEsqZ4zalPB23GLW8
+ Jq5kYUHZAp/lCQfeAd7AEm4RwPzREaAW1wzw8IYx0JATDodHLNm3KIJ/f0TteoIugQfubG+5H
+ nSQdRi+xuMOOjN620S2pLwqUqa1MnTttkYHBKtEfX/FoujiBxdqD1GPU4neU0qBJP0mUnqpw+
+ NOyaVjWQzgFwZqzNBkDOpeDEi6QQwoZjZoltt1mPMl0QV4UdOeCAW2isnnHvugCp5q48r/UZc
+ PNFp1gNJw/rrc49KcMgVTp4a65cpsfrtCJwWX/ejwdTe0bbMkSBRqzi4c+o4WEvSODYAwRQcZ
+ ektyckurL35R2ZCjKw5kfq8VRirgDJVTpDeyJwbW87waQV5o8wghm08LhmR/KuNknvNOOZ6
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:33:59
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 03:00:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -128,49 +127,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Walle <michael@walle.cc>,
- qemu-devel@nongnu.org
+Cc: "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 19/07/2020 à 19:23, Michael Walle a écrit :
-> Hi Philippe,
+Le 17/07/2020 à 14:35, Kenta Ishiguro a écrit :
+> Fix a typo in an error message for KVM_SET_IRQCHIP ioctl:
+> "KVM_GET_IRQCHIP" should be "KVM_SET_IRQCHIP".
 > 
-> Am 2020-07-18 11:37, schrieb Philippe Mathieu-Daudé:
->> The last microcode word (address 0x6000.6ffc) is not reachable.
->> Correct the programmable FPU I/O size (which is 4 KiB) to be
->> able to use all the microcode area.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  hw/misc/milkymist-pfpu.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/hw/misc/milkymist-pfpu.c b/hw/misc/milkymist-pfpu.c
->> index 516825e83d..4fbe3e8971 100644
->> --- a/hw/misc/milkymist-pfpu.c
->> +++ b/hw/misc/milkymist-pfpu.c
->> @@ -507,7 +507,7 @@ static void milkymist_pfpu_realize(DeviceState
->> *dev, Error **errp)
->>      sysbus_init_irq(sbd, &s->irq);
->>
->>      memory_region_init_io(&s->regs_region, OBJECT(dev),
->> &pfpu_mmio_ops, s,
->> -            "milkymist-pfpu", MICROCODE_END * 4);
->> +                          "milkymist-pfpu", 0x1000);
+> Signed-off-by: Kenta Ishiguro <kentaishiguro@slowstart.org>
+> ---
+>  hw/i386/kvm/ioapic.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> Could you use one of the MICROCODE_ macros instead? maybe
-> (MICROCODE_WORDS * 2)?
-> 
-> With that fixed:
-> Reviewed-by: Michael Walle <michael@walle.cc>
+> diff --git a/hw/i386/kvm/ioapic.c b/hw/i386/kvm/ioapic.c
+> index 4ba8e47251..c5528df942 100644
+> --- a/hw/i386/kvm/ioapic.c
+> +++ b/hw/i386/kvm/ioapic.c
+> @@ -97,7 +97,7 @@ static void kvm_ioapic_put(IOAPICCommonState *s)
+>  
+>      ret = kvm_vm_ioctl(kvm_state, KVM_SET_IRQCHIP, &chip);
+>      if (ret < 0) {
+> -        fprintf(stderr, "KVM_GET_IRQCHIP failed: %s\n", strerror(ret));
+> +        fprintf(stderr, "KVM_SET_IRQCHIP failed: %s\n", strerror(ret));
+>          abort();
+>      }
+>  }
 > 
 
-Philippe,
-
-do you plan to repost with the change suggested by Michael?
+Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
+
 
