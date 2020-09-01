@@ -4,83 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9CF7C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA4C7C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A5C2206EB
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:57:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0EF80206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:59:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0JEXMja"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A5C2206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKHSDXeg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EF80206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7jD-0004VB-Ib
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:57:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34980)
+	id 1kD7kT-0007H4-0U
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:59:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7OQ-0001tC-LJ
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:36:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31906)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7Nb-0000Ze-A0
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:35:24 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43355
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7OM-0007Uz-DK
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:36:14 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7NZ-0007D2-7r
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:35:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598970968;
+ s=mimecast20190719; t=1598970920;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=q/NQqRYtuigluypAkZ42OLFu6ysmRizvXC0UjA80+z0=;
- b=B0JEXMja1kO3jDq22BfUv8vPddG5DwpqaHExZXVgNb7V1yjMFqRCWM5nZMb0cSOvHGDTqw
- Rn6fO/wewO5zLUmImlZ/MadgjejXZHquX4T/5Z906INE0p1q3nmztiIWW/ZDcZcgRZrmJR
- E3/tjOwsckaM+YwVG8wUuUjLNaTMq9w=
+ bh=7fK+xuHGvbMdfO2Xqz+6EIV+hLwxBQT3FZX02s6iu1w=;
+ b=dKHSDXegj2iVRfU1gYBUAXOkrgF/DDKdk1ZSFo9vdLjTar8ZCZQ/ljImqHcHjOqyP0IBNy
+ k+h1lkb991teDvctdKEToxkR9yJfaoMu/+cCaNSDRH4ad4T07KGICxluBWsyRsTihVK+W2
+ gyKDLY7eTacS3yCC/ZKBPha3OlH7qtQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-quaER23YOumDHs_inQjijg-1; Tue, 01 Sep 2020 10:36:05 -0400
-X-MC-Unique: quaER23YOumDHs_inQjijg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-11-k9H4yp8dOrG6bZxBEs_5FQ-1; Tue, 01 Sep 2020 10:35:16 -0400
+X-MC-Unique: k9H4yp8dOrG6bZxBEs_5FQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 700818030CD;
- Tue,  1 Sep 2020 14:36:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F68C801AB7;
+ Tue,  1 Sep 2020 14:35:15 +0000 (UTC)
 Received: from localhost (ovpn-113-83.ams2.redhat.com [10.36.113.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D7EC95C1A3;
- Tue,  1 Sep 2020 14:36:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 16ED878B59;
+ Tue,  1 Sep 2020 14:35:14 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v8 40/43] iotests: Add filter commit test cases
-Date: Tue,  1 Sep 2020 16:34:21 +0200
-Message-Id: <20200901143424.884735-41-mreitz@redhat.com>
+Subject: [PATCH v8 21/43] block/snapshot: Fix fallback
+Date: Tue,  1 Sep 2020 16:34:02 +0200
+Message-Id: <20200901143424.884735-22-mreitz@redhat.com>
 In-Reply-To: <20200901143424.884735-1-mreitz@redhat.com>
 References: <20200901143424.884735-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:08:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,214 +102,217 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds some tests on how commit copes with filter nodes.
+If the top node's driver does not provide snapshot functionality and we
+want to fall back to a node down the chain, we need to snapshot all
+non-COW children.  For simplicity's sake, just do not fall back if there
+is more than one such child.  Furthermore, we really only can fall back
+to bs->file and bs->backing, because bdrv_snapshot_goto() has to modify
+the child link (notably, set it to NULL).
 
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/040     | 177 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/040.out |   4 +-
- 2 files changed, 179 insertions(+), 2 deletions(-)
+ block/snapshot.c | 104 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 83 insertions(+), 21 deletions(-)
 
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index f58f50d023..71c6d7f621 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -734,6 +734,183 @@ class TestErrorHandling(iotests.QMPTestCase):
-         self.assertTrue(iotests.compare_images(mid_img, backing_img, fmt2='raw'),
-                         'target image does not match source after commit')
+diff --git a/block/snapshot.c b/block/snapshot.c
+index bd9fb01817..a2bf3a54eb 100644
+--- a/block/snapshot.c
++++ b/block/snapshot.c
+@@ -147,6 +147,56 @@ bool bdrv_snapshot_find_by_id_and_name(BlockDriverState *bs,
+     return ret;
+ }
  
-+class TestCommitWithFilters(iotests.QMPTestCase):
-+    img0 = os.path.join(iotests.test_dir, '0.img')
-+    img1 = os.path.join(iotests.test_dir, '1.img')
-+    img2 = os.path.join(iotests.test_dir, '2.img')
-+    img3 = os.path.join(iotests.test_dir, '3.img')
++/**
++ * Return a pointer to the child BDS pointer to which we can fall
++ * back if the given BDS does not support snapshots.
++ * Return NULL if there is no BDS to (safely) fall back to.
++ *
++ * We need to return an indirect pointer because bdrv_snapshot_goto()
++ * has to modify the BdrvChild pointer.
++ */
++static BdrvChild **bdrv_snapshot_fallback_ptr(BlockDriverState *bs)
++{
++    BdrvChild **fallback;
++    BdrvChild *child;
 +
-+    def do_test_io(self, read_or_write):
-+        for index, pattern_file in enumerate(self.pattern_files):
-+            result = qemu_io('-f', iotests.imgfmt,
-+                             '-c',
-+                             f'{read_or_write} -P {index + 1} {index}M 1M',
-+                             pattern_file)
-+            self.assertFalse('Pattern verification failed' in result)
++    /*
++     * The only BdrvChild pointers that are safe to modify (and which
++     * we can thus return a reference to) are bs->file and
++     * bs->backing.
++     */
++    fallback = &bs->file;
++    if (!*fallback && bs->drv && bs->drv->is_filter) {
++        fallback = &bs->backing;
++    }
 +
-+    def setUp(self):
-+        qemu_img('create', '-f', iotests.imgfmt, self.img0, '64M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img1, '64M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img2, '64M')
-+        qemu_img('create', '-f', iotests.imgfmt, self.img3, '64M')
++    if (!*fallback) {
++        return NULL;
++    }
 +
-+        # Distributions of the patterns in the files; this is checked
-+        # by tearDown() and should be changed by the test cases as is
-+        # necessary
-+        self.pattern_files = [self.img0, self.img1, self.img2, self.img3]
++    /*
++     * Check that there are no other children that would need to be
++     * snapshotted.  If there are, it is not safe to fall back to
++     * *fallback.
++     */
++    QLIST_FOREACH(child, &bs->children, next) {
++        if (child->role & (BDRV_CHILD_DATA | BDRV_CHILD_METADATA |
++                           BDRV_CHILD_FILTERED) &&
++            child != *fallback)
++        {
++            return NULL;
++        }
++    }
 +
-+        self.do_test_io('write')
++    return fallback;
++}
 +
-+        self.vm = iotests.VM()
-+        self.vm.launch()
++static BlockDriverState *bdrv_snapshot_fallback(BlockDriverState *bs)
++{
++    BdrvChild **child_ptr = bdrv_snapshot_fallback_ptr(bs);
++    return child_ptr ? (*child_ptr)->bs : NULL;
++}
 +
-+        result = self.vm.qmp('object-add', qom_type='throttle-group', id='tg')
-+        self.assert_qmp(result, 'return', {})
-+
-+        result = self.vm.qmp('blockdev-add', **{
-+                'node-name': 'top-filter',
-+                'driver': 'throttle',
-+                'throttle-group': 'tg',
-+                'file': {
-+                    'node-name': 'cow-3',
-+                    'driver': iotests.imgfmt,
-+                    'file': {
-+                        'driver': 'file',
-+                        'filename': self.img3
-+                    },
-+                    'backing': {
-+                        'node-name': 'cow-2',
-+                        'driver': iotests.imgfmt,
-+                        'file': {
-+                            'driver': 'file',
-+                            'filename': self.img2
-+                        },
-+                        'backing': {
-+                            'node-name': 'cow-1',
-+                            'driver': iotests.imgfmt,
-+                            'file': {
-+                                'driver': 'file',
-+                                'filename': self.img1
-+                            },
-+                            'backing': {
-+                                'node-name': 'bottom-filter',
-+                                'driver': 'throttle',
-+                                'throttle-group': 'tg',
-+                                'file': {
-+                                    'node-name': 'cow-0',
-+                                    'driver': iotests.imgfmt,
-+                                    'file': {
-+                                        'driver': 'file',
-+                                        'filename': self.img0
-+                                    }
-+                                }
-+                            }
-+                        }
-+                    }
-+                }
-+            })
-+        self.assert_qmp(result, 'return', {})
-+
-+    def tearDown(self):
-+        self.vm.shutdown()
-+        self.do_test_io('read')
-+
-+        os.remove(self.img3)
-+        os.remove(self.img2)
-+        os.remove(self.img1)
-+        os.remove(self.img0)
-+
-+    # Filters make for funny filenames, so we cannot just use
-+    # self.imgX to get them
-+    def get_filename(self, node):
-+        return self.vm.node_info(node)['image']['filename']
-+
-+    def test_filterless_commit(self):
-+        result = self.vm.qmp('block-commit',
-+                             job_id='commit',
-+                             device='top-filter',
-+                             top_node='cow-2',
-+                             base_node='cow-1')
-+        self.assert_qmp(result, 'return', {})
-+        self.wait_until_completed(drive='commit')
-+
-+        self.assertIsNotNone(self.vm.node_info('cow-3'))
-+        self.assertIsNone(self.vm.node_info('cow-2'))
-+        self.assertIsNotNone(self.vm.node_info('cow-1'))
-+
-+        # 2 has been comitted into 1
-+        self.pattern_files[2] = self.img1
-+
-+    def test_commit_through_filter(self):
-+        result = self.vm.qmp('block-commit',
-+                             job_id='commit',
-+                             device='top-filter',
-+                             top_node='cow-1',
-+                             base_node='cow-0')
-+        self.assert_qmp(result, 'return', {})
-+        self.wait_until_completed(drive='commit')
-+
-+        self.assertIsNotNone(self.vm.node_info('cow-2'))
-+        self.assertIsNone(self.vm.node_info('cow-1'))
-+        self.assertIsNone(self.vm.node_info('bottom-filter'))
-+        self.assertIsNotNone(self.vm.node_info('cow-0'))
-+
-+        # 1 has been comitted into 0
-+        self.pattern_files[1] = self.img0
-+
-+    def test_filtered_active_commit_with_filter(self):
-+        # Add a device, so the commit job finds a parent it can change
-+        # to point to the base node (so we can test that top-filter is
-+        # dropped from the graph)
-+        result = self.vm.qmp('device_add', id='drv0', driver='virtio-blk',
-+                             drive='top-filter')
-+        self.assert_qmp(result, 'return', {})
-+
-+        # Try to release our reference to top-filter; that should not
-+        # work because drv0 uses it
-+        result = self.vm.qmp('blockdev-del', node_name='top-filter')
-+        self.assert_qmp(result, 'error/class', 'GenericError')
-+        self.assert_qmp(result, 'error/desc', 'Node top-filter is in use')
-+
-+        result = self.vm.qmp('block-commit',
-+                             job_id='commit',
-+                             device='top-filter',
-+                             base_node='cow-2')
-+        self.assert_qmp(result, 'return', {})
-+        self.complete_and_wait(drive='commit')
-+
-+        # Try to release our reference to top-filter again
-+        result = self.vm.qmp('blockdev-del', node_name='top-filter')
-+        self.assert_qmp(result, 'return', {})
-+
-+        self.assertIsNone(self.vm.node_info('top-filter'))
-+        self.assertIsNone(self.vm.node_info('cow-3'))
-+        self.assertIsNotNone(self.vm.node_info('cow-2'))
-+
-+        # Check that drv0 is now connected to cow-2
-+        blockdevs = self.vm.qmp('query-block')['return']
-+        drv0 = next(dev for dev in blockdevs if '/drv0' in dev['qdev'])
-+        self.assertEqual(drv0['inserted']['node-name'], 'cow-2')
-+
-+        # 3 has been comitted into 2
-+        self.pattern_files[3] = self.img2
-+
-+    def test_filtered_active_commit_without_filter(self):
-+        result = self.vm.qmp('block-commit',
-+                             job_id='commit',
-+                             device='top-filter',
-+                             top_node='cow-3',
-+                             base_node='cow-2')
-+        self.assert_qmp(result, 'return', {})
-+        self.complete_and_wait(drive='commit')
-+
-+        self.assertIsNotNone(self.vm.node_info('top-filter'))
-+        self.assertIsNone(self.vm.node_info('cow-3'))
-+        self.assertIsNotNone(self.vm.node_info('cow-2'))
-+
-+        # 3 has been comitted into 2
-+        self.pattern_files[3] = self.img2
-+
- if __name__ == '__main__':
-     iotests.main(supported_fmts=['qcow2', 'qed'],
-                  supported_protocols=['file'])
-diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
-index 6a917130b6..4823c113d5 100644
---- a/tests/qemu-iotests/040.out
-+++ b/tests/qemu-iotests/040.out
-@@ -1,5 +1,5 @@
--...........................................................
-+...............................................................
- ----------------------------------------------------------------------
--Ran 59 tests
-+Ran 63 tests
+ int bdrv_can_snapshot(BlockDriverState *bs)
+ {
+     BlockDriver *drv = bs->drv;
+@@ -155,8 +205,9 @@ int bdrv_can_snapshot(BlockDriverState *bs)
+     }
  
- OK
+     if (!drv->bdrv_snapshot_create) {
+-        if (bs->file != NULL) {
+-            return bdrv_can_snapshot(bs->file->bs);
++        BlockDriverState *fallback_bs = bdrv_snapshot_fallback(bs);
++        if (fallback_bs) {
++            return bdrv_can_snapshot(fallback_bs);
+         }
+         return 0;
+     }
+@@ -168,14 +219,15 @@ int bdrv_snapshot_create(BlockDriverState *bs,
+                          QEMUSnapshotInfo *sn_info)
+ {
+     BlockDriver *drv = bs->drv;
++    BlockDriverState *fallback_bs = bdrv_snapshot_fallback(bs);
+     if (!drv) {
+         return -ENOMEDIUM;
+     }
+     if (drv->bdrv_snapshot_create) {
+         return drv->bdrv_snapshot_create(bs, sn_info);
+     }
+-    if (bs->file) {
+-        return bdrv_snapshot_create(bs->file->bs, sn_info);
++    if (fallback_bs) {
++        return bdrv_snapshot_create(fallback_bs, sn_info);
+     }
+     return -ENOTSUP;
+ }
+@@ -185,6 +237,7 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+                        Error **errp)
+ {
+     BlockDriver *drv = bs->drv;
++    BdrvChild **fallback_ptr;
+     int ret, open_ret;
+ 
+     if (!drv) {
+@@ -205,39 +258,46 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
+         return ret;
+     }
+ 
+-    if (bs->file) {
+-        BlockDriverState *file;
+-        QDict *options = qdict_clone_shallow(bs->options);
++    fallback_ptr = bdrv_snapshot_fallback_ptr(bs);
++    if (fallback_ptr) {
++        QDict *options;
+         QDict *file_options;
+         Error *local_err = NULL;
++        BlockDriverState *fallback_bs = (*fallback_ptr)->bs;
++        char *subqdict_prefix = g_strdup_printf("%s.", (*fallback_ptr)->name);
++
++        options = qdict_clone_shallow(bs->options);
+ 
+-        file = bs->file->bs;
+         /* Prevent it from getting deleted when detached from bs */
+-        bdrv_ref(file);
++        bdrv_ref(fallback_bs);
+ 
+-        qdict_extract_subqdict(options, &file_options, "file.");
++        qdict_extract_subqdict(options, &file_options, subqdict_prefix);
+         qobject_unref(file_options);
+-        qdict_put_str(options, "file", bdrv_get_node_name(file));
++        g_free(subqdict_prefix);
++
++        qdict_put_str(options, (*fallback_ptr)->name,
++                      bdrv_get_node_name(fallback_bs));
+ 
+         if (drv->bdrv_close) {
+             drv->bdrv_close(bs);
+         }
+-        bdrv_unref_child(bs, bs->file);
+-        bs->file = NULL;
+ 
+-        ret = bdrv_snapshot_goto(file, snapshot_id, errp);
++        bdrv_unref_child(bs, *fallback_ptr);
++        *fallback_ptr = NULL;
++
++        ret = bdrv_snapshot_goto(fallback_bs, snapshot_id, errp);
+         open_ret = drv->bdrv_open(bs, options, bs->open_flags, &local_err);
+         qobject_unref(options);
+         if (open_ret < 0) {
+-            bdrv_unref(file);
++            bdrv_unref(fallback_bs);
+             bs->drv = NULL;
+             /* A bdrv_snapshot_goto() error takes precedence */
+             error_propagate(errp, local_err);
+             return ret < 0 ? ret : open_ret;
+         }
+ 
+-        assert(bs->file->bs == file);
+-        bdrv_unref(file);
++        assert(fallback_bs == (*fallback_ptr)->bs);
++        bdrv_unref(fallback_bs);
+         return ret;
+     }
+ 
+@@ -273,6 +333,7 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
+                          Error **errp)
+ {
+     BlockDriver *drv = bs->drv;
++    BlockDriverState *fallback_bs = bdrv_snapshot_fallback(bs);
+     int ret;
+ 
+     if (!drv) {
+@@ -289,8 +350,8 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
+ 
+     if (drv->bdrv_snapshot_delete) {
+         ret = drv->bdrv_snapshot_delete(bs, snapshot_id, name, errp);
+-    } else if (bs->file) {
+-        ret = bdrv_snapshot_delete(bs->file->bs, snapshot_id, name, errp);
++    } else if (fallback_bs) {
++        ret = bdrv_snapshot_delete(fallback_bs, snapshot_id, name, errp);
+     } else {
+         error_setg(errp, "Block format '%s' used by device '%s' "
+                    "does not support internal snapshot deletion",
+@@ -306,14 +367,15 @@ int bdrv_snapshot_list(BlockDriverState *bs,
+                        QEMUSnapshotInfo **psn_info)
+ {
+     BlockDriver *drv = bs->drv;
++    BlockDriverState *fallback_bs = bdrv_snapshot_fallback(bs);
+     if (!drv) {
+         return -ENOMEDIUM;
+     }
+     if (drv->bdrv_snapshot_list) {
+         return drv->bdrv_snapshot_list(bs, psn_info);
+     }
+-    if (bs->file) {
+-        return bdrv_snapshot_list(bs->file->bs, psn_info);
++    if (fallback_bs) {
++        return bdrv_snapshot_list(fallback_bs, psn_info);
+     }
+     return -ENOTSUP;
+ }
 -- 
 2.26.2
 
