@@ -2,118 +2,110 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9C5EC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:58:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC743C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:59:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BF7E2071B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:58:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A88F32071B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 18:59:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="roatwilL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF7E2071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AERScBus"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A88F32071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDBUX-0004mg-HM
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 14:58:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49106)
+	id 1kDBVN-0005gd-S7
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 14:59:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1kDBCg-00058U-Fq; Tue, 01 Sep 2020 14:40:24 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64608
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bauerman@linux.ibm.com>)
- id 1kDBCd-0000My-8v; Tue, 01 Sep 2020 14:40:22 -0400
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 081IWmm1181308; Tue, 1 Sep 2020 14:39:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=references : from : to :
- cc : subject : in-reply-to : date : message-id : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=9h14+PISC/Rm6tO8J7o4jKPpgd7cER5eghf/Qz7HSyg=;
- b=roatwilL1S/ngtcG6EYlaBy9BVeW8KI1ivG1t+bIJtRVZqG1K2s9aksPKlciUJpY3YLH
- c4kTOA1zQKyI/fkiZjSP8udtA+BYX8zLmCZQspF64kSWf/Os42H7fu46aUykSF1rISgx
- HZ2lo+FarefJOLnnD3Q5bjFBFD3whwh5c1TJDUEhGmmoZizmsVY0aaTU475QU/Qv4bDu
- jqHgsKNBK33yIloQNzoFBARMcVE/r5EmCycm8ayOxRlaTlH4wMaoGlTuneb2bk2s9y9f
- THZuGYzSVtbbI687gER0ON50pZPJLsUPnXOz8UscArBNCPf/PHJzH3RviovQ/yqkTcER Lw== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 339smm4776-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Sep 2020 14:39:54 -0400
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 081IWwVo181986;
- Tue, 1 Sep 2020 14:39:53 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0b-001b2d01.pphosted.com with ESMTP id 339smm476u-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Sep 2020 14:39:53 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 081IXOXi007904;
- Tue, 1 Sep 2020 18:39:52 GMT
-Received: from b03cxnp08028.gho.boulder.ibm.com
- (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
- by ppma01dal.us.ibm.com with ESMTP id 337en9gpng-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 01 Sep 2020 18:39:52 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 081IdpG064291230
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 1 Sep 2020 18:39:51 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 72A0ABE051;
- Tue,  1 Sep 2020 18:39:51 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id E2CA4BE04F;
- Tue,  1 Sep 2020 18:39:45 +0000 (GMT)
-Received: from morokweng.localdomain (unknown [9.211.88.129])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTPS;
- Tue,  1 Sep 2020 18:39:45 +0000 (GMT)
-References: <20200826055535.951207-1-bauerman@linux.ibm.com>
- <20200826055535.951207-5-bauerman@linux.ibm.com>
- <eed4a3dd-2431-8f58-f716-067e86ddcdef@redhat.com>
-User-agent: mu4e 1.4.10; emacs 27.1
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v7 4/8] ppc/e500: Use start-powered-off CPUState property
-In-reply-to: <eed4a3dd-2431-8f58-f716-067e86ddcdef@redhat.com>
-Date: Tue, 01 Sep 2020 15:39:43 -0300
-Message-ID: <873641mjdc.fsf@morokweng.localdomain>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDBDS-0005am-6k
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 14:41:10 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21172
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDBDP-0000b8-T5
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 14:41:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598985666;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cHnibG0oY+2YPBeaoqJM72SJmM+iyP39BF0RO3DNpvE=;
+ b=AERScBusxgZQq7AoRIzaDTVIMn/JSb0yE6/MGZdO5wEXF4GceeuKejcc0uyeLTNtLlGs9K
+ 8dv9IrxsJbr+EuXJsKFLK8B8X6ks5fifRN0LVeqdjuHYTQdEIsT+N0LtsCASiTmKFPzZa+
+ UowjgKIc14NEE01y9OkL3+LEgUjtmLw=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-S0kuQMTOMuuk8sTy0wUrcA-1; Tue, 01 Sep 2020 14:41:01 -0400
+X-MC-Unique: S0kuQMTOMuuk8sTy0wUrcA-1
+Received: by mail-wr1-f72.google.com with SMTP id v12so916176wrm.9
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 11:41:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=cHnibG0oY+2YPBeaoqJM72SJmM+iyP39BF0RO3DNpvE=;
+ b=erzzS5bpkjeb915N3ejp5KkIKhTAi2dc2w81iE/06TvHsA/o9J9rAGGeflh4BaZfoG
+ yNLi3nVZaFx6lVKXP9J3MPTYzTg7395JSuiwopSkWP3viwHzJgffp6sa/5OzTZwxx5rM
+ vLWUkoxrYf908Id/t/HXFkUpyeqtFPzsR7QJ2mrh75ky11KiTRA9rKHkH/8Gm8+roozq
+ YEQi59++Sn6TIGuK+06tjrrjD73Lvkc/Qd65cbLhOMBTBW0ITXMI8yfX865Wf7g7tW9/
+ vYMaXbqhiEI7dDZAbh8fHYpp/22PCXVcRt2msBoaL93M/QFi/PIY9qBLvsdYAgLmpFSV
+ fvKw==
+X-Gm-Message-State: AOAM532vk/aCHTgv9U347CuxH6j5E+ogGOdPs0Pz/KgNCSXxs1jv5ndJ
+ mr57oSeUCtBAsuk279aAuMmUQXy63E+KUrmo+XsHXVb94wns2szXWLPj3jqnAAkNW1yuy2UGHWv
+ R8EqUgw2ewYQVF8o=
+X-Received: by 2002:a7b:cc90:: with SMTP id p16mr3182446wma.100.1598985660318; 
+ Tue, 01 Sep 2020 11:41:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyB2uUsmAMGlkSZcr01tWWvyyS7Sc9/A2dqh30tGZQK7k3UNVNKiyOHP4wLqFuI1nJPJbqe9g==
+X-Received: by 2002:a7b:cc90:: with SMTP id p16mr3182430wma.100.1598985660129; 
+ Tue, 01 Sep 2020 11:41:00 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:7fbd:8007:1fa7:ed17?
+ ([2001:b07:6468:f312:7fbd:8007:1fa7:ed17])
+ by smtp.gmail.com with ESMTPSA id l9sm2857616wmh.1.2020.09.01.11.40.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 01 Sep 2020 11:40:59 -0700 (PDT)
+Subject: Re: [PATCH 03/13] oslib-posix: default exec_dir to bindir
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200901062020.26660-1-pbonzini@redhat.com>
+ <20200901062020.26660-4-pbonzini@redhat.com>
+ <b922b8e3-4ba0-f035-014e-c77df254d6de@linaro.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d0a52a88-25c1-9d18-6ab5-10dc86c989f7@redhat.com>
+Date: Tue, 1 Sep 2020 20:40:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <b922b8e3-4ba0-f035-014e-c77df254d6de@linaro.org>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-01_10:2020-09-01,
- 2020-09-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxlogscore=999
- impostorscore=0 mlxscore=0 adultscore=0 bulkscore=0 phishscore=0
- suspectscore=0 lowpriorityscore=0 spamscore=0 malwarescore=0 clxscore=1015
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009010157
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=bauerman@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 14:40:17
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 05:11:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,49 +118,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Thomas Huth <thuth@redhat.com>, David Gibson <david@gibson.dropbear.id.au>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Greg Kurz <groug@kaod.org>,
- qemu-s390x@nongnu.org, qemu-arm@nongnu.org,
- =?utf-8?Q?C?= =?utf-8?Q?=C3=A9dric?= Le Goater <clg@kaod.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>, Cornelia Huck <cohuck@redhat.com>,
- qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 01/09/20 20:04, Richard Henderson wrote:
+> On 8/31/20 11:20 PM, Paolo Bonzini wrote:
+>> +        exec_dir = g_strdup(CONFIG_BINDIR);
+> 
+> Why the strdup?  The string constant should be fine, IIUC.
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Of course it is.
 
-> On 8/26/20 7:55 AM, Thiago Jung Bauermann wrote:
->> Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), use
->> the start-powered-off property which makes cpu_common_reset() initialize=
- it
->> to 1 in common code.
->>=20
->> Also change creation of CPU object from cpu_create() to object_new() and
->> qdev_realize_and_unref() because cpu_create() realizes the CPU and it's =
-not
->> possible to set a property after the object is realized.
->>=20
->> Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
->> ---
->>  hw/ppc/e500.c | 13 +++++++++----
->>  1 file changed, 9 insertions(+), 4 deletions(-)
->
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+Paolo
 
-Thanks!
-
---=20
-Thiago Jung Bauermann
-IBM Linux Technology Center
 
