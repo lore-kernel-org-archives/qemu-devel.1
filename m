@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B16FC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B1FC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 423EA206EB
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:56:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57D24206EB
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:57:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ie+3+c/Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 423EA206EB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hF4sftd4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57D24206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD8eB-0008Oc-Da
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:56:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48382)
+	id 1kD8fT-0001eI-J3
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:57:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kD849-00011Y-Q9
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:21 -0400
-Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:40716)
+ id 1kD84D-0001Aq-8t
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:25 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:37384)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kD848-0006Jn-2c
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:21 -0400
-Received: by mail-wm1-x32e.google.com with SMTP id v4so1548540wmj.5
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:19:19 -0700 (PDT)
+ id 1kD84B-0006Lh-C1
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 11:19:24 -0400
+Received: by mail-wm1-x335.google.com with SMTP id a9so1558643wmm.2
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 08:19:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=QJKPdWWI2bNrMalgLjLEBjxHbT2RGeUfNlGCficDhQk=;
- b=ie+3+c/QyAvnvK+jw9K5lWEVG0mXXEAzmFl2sVE8hfcUHpYd6mSZgPRSudsWwYBxHI
- Fako960zjFAR5czfLxf6UsOKM0Rmmu2/fKG/9tq2P17QZQliiR+e06mO6c9qPG6IoA8u
- 9dFC2LE5LruRAP6Gfi89dHAssh+bQoIlmVXWNVTrhpEYkySvRH6NowNQbZ0jxRVBf5nE
- Zx8tSxDygbEQLuodStOilmnIXdaalootPNZu1k23s7Fres5Nl2mLGiIN8cSQiIaDzE2V
- oGZpbhMqHcWoPaZT6La4GDX8jY7D1gl1GtigWz/LDVUriew6KUxlQZTJmITeiVv/6eZv
- 5HXw==
+ bh=t+lM5dln5QeSS2yYj3HP1RzZbw3t/4bGgxiwxrpJaOg=;
+ b=hF4sftd4+vRrnQrpswPoBibFsxFtlHRiju5p/WIDNIDHzZ69ynRo6PUgksA5bWvfDd
+ 5RoMwpcWDMkHR7NMVWE/6xH2/42eagW5Jt6G8bCRjmBSq2HjsPPmkN9WD6Rb9iksaWLA
+ p4lokyIBeDA2HxM2mHVFtckHk3O2K8rsEYL4s6gpQjHn6f1cTNN2JN6awNT7Ouz4FCed
+ o+uRwRAzEDB7wIQsthpDsql/4ZLLur4/hL0S+MT68RX/X9Fw1hTU0fznHfP/tW/0xrMM
+ ZOdF9CmJQqLNnHtR/AYkax1r+3MpZydoyek/JLK5oEYYPeqlvirga52aL/2hKfeI2LCS
+ LWWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=QJKPdWWI2bNrMalgLjLEBjxHbT2RGeUfNlGCficDhQk=;
- b=iaxmaVn5gWBesieokymwsm1SXoFRoIQCmqPLYwH4vjjuVeJY7an/9v2SYCz1qyKjPd
- 81gdzm7UBTF7ZK8G+fPQzGEkSpqoMk1wEDRZGuktFwfpZBo/yRPzt09izH7yA0hhisb4
- iRZm0CvMv3w3YLA/uetEWCxdnO2jU38gCLWFaAstsn2pfDkqG6XofcIXfo9vSTRo6lt1
- 3WemkR+Jq7Maqurb1GjfDXwZ7NlrScHB+DluHoDMdM/NEi6pWfLvcA3Tlfd+VD7hAF3/
- /52gC5qI/j5Q7qCltu2utJbuVa+wgPgQUo9457Nm2nzQSyfb9qoBacNJwKlpAMxtRMTg
- JmQA==
-X-Gm-Message-State: AOAM531sortq6L2gBMr2SGBSpg6TplSMXwgjX23oU3X1Oq5CsVh5/xok
- bdouMpCNu0LuIes3WE+y/8SiCWQMi4qruPCB
-X-Google-Smtp-Source: ABdhPJzUsCBF3uIWkz3Q+LyB+FOaN5o2Ksrhvv4Tvz77udvm1Y75wbQUsy4mZgkJlpLEtj4OlLpmIw==
-X-Received: by 2002:a7b:c056:: with SMTP id u22mr2302520wmc.188.1598973558398; 
- Tue, 01 Sep 2020 08:19:18 -0700 (PDT)
+ bh=t+lM5dln5QeSS2yYj3HP1RzZbw3t/4bGgxiwxrpJaOg=;
+ b=M6mbMtLcn7qhIl2uIYbOK52P3SPtnztZR4mst9gfxjSQ4HUO9LhOuN+nxFjlhaAWel
+ qvEJWe/xDm6SV3VeBSS5SHUqw+SR+wVmU31hQgJzC5Ufn3MXMtokqy0grxbI5/EJqi05
+ 9hAUFlwMO1D+IWd99NAntHXQOfURZfQ9xfmy0OJJiinPboUztd5Lz5fVOgc4bEXDM+3R
+ ejLYyRy0gH82FzNxdz7QXN5Te8DzuvQjSYG5xNTjI3MAVS7qt2SZ7mC5eXePLY7Nbz5x
+ VwMqXA/5N3GV14kIJ329SKQY4UdI1AkYaiHtm3RDv3zNiWjlrRWvp9hKYaWZFRo21+a/
+ Knqg==
+X-Gm-Message-State: AOAM533ddgmULKG3gYLWVy44YDMfJPyuU5WdB5EzF7lCWdT7kB7eWT/O
+ oN2cdXFhEMa93o0/aqgnY2oPAYwJs+BZYe/T
+X-Google-Smtp-Source: ABdhPJz06gWBpVKtt/9i0Q4Eu1ptwGL6go5wyavv234OWqdB0zbYZ8l5ZcVBHXHGnexr1k0LvaVjSg==
+X-Received: by 2002:a7b:c2aa:: with SMTP id c10mr2276787wmk.86.1598973561682; 
+ Tue, 01 Sep 2020 08:19:21 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id z9sm2242317wma.4.2020.09.01.08.19.17
+ by smtp.gmail.com with ESMTPSA id z9sm2242317wma.4.2020.09.01.08.19.20
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 01 Sep 2020 08:19:17 -0700 (PDT)
+ Tue, 01 Sep 2020 08:19:20 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 43/47] target/arm: Implement fp16 for Neon VMUL, VMLA, VMLS
-Date: Tue,  1 Sep 2020 16:18:19 +0100
-Message-Id: <20200901151823.29785-44-peter.maydell@linaro.org>
+Subject: [PULL 46/47] hw/misc/sbsa_ec : Add an embedded controller for sbsa-ref
+Date: Tue,  1 Sep 2020 16:18:22 +0100
+Message-Id: <20200901151823.29785-47-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200901151823.29785-1-peter.maydell@linaro.org>
 References: <20200901151823.29785-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32e.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x335.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,148 +104,142 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Convert the Neon floating-point VMUL, VMLA and VMLS to use gvec,
-and use this to implement fp16 support.
+From: Graeme Gregory <graeme@nuviainc.com>
 
+A difference between sbsa platform and the virt platform is PSCI is
+handled by ARM-TF in the sbsa platform. This means that the PSCI code
+there needs to communicate some of the platform power changes down
+to the qemu code for things like shutdown/reset control.
+
+Space has been left to extend the EC if we find other use cases in
+future where ARM-TF and qemu need to communicate.
+
+Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
+Reviewed-by: Leif Lindholm <leif@nuviainc.com>
+Tested-by: Leif Lindholm <leif@nuviainc.com>
+Message-id: 20200826141952.136164-2-graeme@nuviainc.com
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20200828183354.27913-45-peter.maydell@linaro.org
 ---
- target/arm/translate-neon.c.inc | 114 ++++++++++++++++----------------
- 1 file changed, 57 insertions(+), 57 deletions(-)
+ hw/misc/sbsa_ec.c   | 98 +++++++++++++++++++++++++++++++++++++++++++++
+ hw/misc/meson.build |  2 +
+ 2 files changed, 100 insertions(+)
+ create mode 100644 hw/misc/sbsa_ec.c
 
-diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
-index 5726afe4d72..2d4926316a4 100644
---- a/target/arm/translate-neon.c.inc
-+++ b/target/arm/translate-neon.c.inc
-@@ -2432,70 +2432,70 @@ static bool trans_VMLS_2sc(DisasContext *s, arg_2scalar *a)
-     return do_2scalar(s, a, opfn[a->size], accfn[a->size]);
- }
- 
--/*
-- * Rather than have a float-specific version of do_2scalar just for
-- * three insns, we wrap a NeonGenTwoSingleOpFn to turn it into
-- * a NeonGenTwoOpFn.
-- */
--#define WRAP_FP_FN(WRAPNAME, FUNC)                              \
--    static void WRAPNAME(TCGv_i32 rd, TCGv_i32 rn, TCGv_i32 rm) \
--    {                                                           \
--        TCGv_ptr fpstatus = fpstatus_ptr(FPST_STD);             \
--        FUNC(rd, rn, rm, fpstatus);                             \
--        tcg_temp_free_ptr(fpstatus);                            \
-+static bool do_2scalar_fp_vec(DisasContext *s, arg_2scalar *a,
-+                              gen_helper_gvec_3_ptr *fn)
+diff --git a/hw/misc/sbsa_ec.c b/hw/misc/sbsa_ec.c
+new file mode 100644
+index 00000000000..9a7d7f914a9
+--- /dev/null
++++ b/hw/misc/sbsa_ec.c
+@@ -0,0 +1,98 @@
++/*
++ * ARM SBSA Reference Platform Embedded Controller
++ *
++ * A device to allow PSCI running in the secure side of sbsa-ref machine
++ * to communicate platform power states to qemu.
++ *
++ * Copyright (c) 2020 Nuvia Inc
++ * Written by Graeme Gregory <graeme@nuviainc.com>
++ *
++ * SPDX-License-Identifer: GPL-2.0-or-later
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "qemu/log.h"
++#include "hw/sysbus.h"
++#include "sysemu/runstate.h"
++
++typedef struct {
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++} SECUREECState;
++
++#define TYPE_SBSA_EC      "sbsa-ec"
++#define SECURE_EC(obj) OBJECT_CHECK(SECUREECState, (obj), TYPE_SBSA_EC)
++
++enum sbsa_ec_powerstates {
++    SBSA_EC_CMD_POWEROFF = 0x01,
++    SBSA_EC_CMD_REBOOT = 0x02,
++};
++
++static uint64_t sbsa_ec_read(void *opaque, hwaddr offset, unsigned size)
 +{
-+    /* Two registers and a scalar, using gvec */
-+    int vec_size = a->q ? 16 : 8;
-+    int rd_ofs = neon_reg_offset(a->vd, 0);
-+    int rn_ofs = neon_reg_offset(a->vn, 0);
-+    int rm_ofs;
-+    int idx;
-+    TCGv_ptr fpstatus;
++    /* No use for this currently */
++    qemu_log_mask(LOG_GUEST_ERROR, "sbsa-ec: no readable registers");
++    return 0;
++}
 +
-+    if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
-+        return false;
-     }
- 
--WRAP_FP_FN(gen_VMUL_F_mul, gen_helper_vfp_muls)
--WRAP_FP_FN(gen_VMUL_F_add, gen_helper_vfp_adds)
--WRAP_FP_FN(gen_VMUL_F_sub, gen_helper_vfp_subs)
-+    /* UNDEF accesses to D16-D31 if they don't exist. */
-+    if (!dc_isar_feature(aa32_simd_r32, s) &&
-+        ((a->vd | a->vn | a->vm) & 0x10)) {
-+        return false;
++static void sbsa_ec_write(void *opaque, hwaddr offset,
++                     uint64_t value, unsigned size)
++{
++    if (offset == 0) { /* PSCI machine power command register */
++        switch (value) {
++        case SBSA_EC_CMD_POWEROFF:
++            qemu_system_shutdown_request(SHUTDOWN_CAUSE_GUEST_SHUTDOWN);
++            break;
++        case SBSA_EC_CMD_REBOOT:
++            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
++            break;
++        default:
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "sbsa-ec: unknown power command");
++        }
++    } else {
++        qemu_log_mask(LOG_GUEST_ERROR, "sbsa-ec: unknown EC register");
 +    }
- 
--static bool trans_VMUL_F_2sc(DisasContext *s, arg_2scalar *a)
--{
--    static NeonGenTwoOpFn * const opfn[] = {
--        NULL,
--        NULL, /* TODO: fp16 support */
--        gen_VMUL_F_mul,
--        NULL,
--    };
-+    if (!fn) {
-+        /* Bad size (including size == 3, which is a different insn group) */
-+        return false;
-+    }
- 
--    return do_2scalar(s, a, opfn[a->size], NULL);
-+    if (a->q && ((a->vd | a->vn) & 1)) {
-+        return false;
-+    }
++}
 +
-+    if (!vfp_access_check(s)) {
-+        return true;
-+    }
++static const MemoryRegionOps sbsa_ec_ops = {
++    .read = sbsa_ec_read,
++    .write = sbsa_ec_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid.min_access_size = 4,
++    .valid.max_access_size = 4,
++};
 +
-+    /* a->vm is M:Vm, which encodes both register and index */
-+    idx = extract32(a->vm, a->size + 2, 2);
-+    a->vm = extract32(a->vm, 0, a->size + 2);
-+    rm_ofs = neon_reg_offset(a->vm, 0);
++static void sbsa_ec_init(Object *obj)
++{
++    SECUREECState *s = SECURE_EC(obj);
++    SysBusDevice *dev = SYS_BUS_DEVICE(obj);
 +
-+    fpstatus = fpstatus_ptr(a->size == 1 ? FPST_STD_F16 : FPST_STD);
-+    tcg_gen_gvec_3_ptr(rd_ofs, rn_ofs, rm_ofs, fpstatus,
-+                       vec_size, vec_size, idx, fn);
-+    tcg_temp_free_ptr(fpstatus);
-+    return true;
- }
++    memory_region_init_io(&s->iomem, obj, &sbsa_ec_ops, s, "sbsa-ec",
++                          0x1000);
++    sysbus_init_mmio(dev, &s->iomem);
++}
++
++static void sbsa_ec_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    /* No vmstate or reset required: device has no internal state */
++    dc->user_creatable = false;
++}
++
++static const TypeInfo sbsa_ec_info = {
++    .name          = TYPE_SBSA_EC,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(SECUREECState),
++    .instance_init = sbsa_ec_init,
++    .class_init    = sbsa_ec_class_init,
++};
++
++static void sbsa_ec_register_type(void)
++{
++    type_register_static(&sbsa_ec_info);
++}
++
++type_init(sbsa_ec_register_type);
+diff --git a/hw/misc/meson.build b/hw/misc/meson.build
+index 84fed0494d2..e1576b81cf9 100644
+--- a/hw/misc/meson.build
++++ b/hw/misc/meson.build
+@@ -97,3 +97,5 @@ specific_ss.add(when: 'CONFIG_MAC_VIA', if_true: files('mac_via.c'))
  
--static bool trans_VMLA_F_2sc(DisasContext *s, arg_2scalar *a)
--{
--    static NeonGenTwoOpFn * const opfn[] = {
--        NULL,
--        NULL, /* TODO: fp16 support */
--        gen_VMUL_F_mul,
--        NULL,
--    };
--    static NeonGenTwoOpFn * const accfn[] = {
--        NULL,
--        NULL, /* TODO: fp16 support */
--        gen_VMUL_F_add,
--        NULL,
--    };
-+#define DO_VMUL_F_2sc(NAME, FUNC)                                       \
-+    static bool trans_##NAME##_F_2sc(DisasContext *s, arg_2scalar *a)   \
-+    {                                                                   \
-+        static gen_helper_gvec_3_ptr * const opfn[] = {                 \
-+            NULL,                                                       \
-+            gen_helper_##FUNC##_h,                                      \
-+            gen_helper_##FUNC##_s,                                      \
-+            NULL,                                                       \
-+        };                                                              \
-+        if (a->size == MO_16 && !dc_isar_feature(aa32_fp16_arith, s)) { \
-+            return false;                                               \
-+        }                                                               \
-+        return do_2scalar_fp_vec(s, a, opfn[a->size]);                  \
-+    }
- 
--    return do_2scalar(s, a, opfn[a->size], accfn[a->size]);
--}
--
--static bool trans_VMLS_F_2sc(DisasContext *s, arg_2scalar *a)
--{
--    static NeonGenTwoOpFn * const opfn[] = {
--        NULL,
--        NULL, /* TODO: fp16 support */
--        gen_VMUL_F_mul,
--        NULL,
--    };
--    static NeonGenTwoOpFn * const accfn[] = {
--        NULL,
--        NULL, /* TODO: fp16 support */
--        gen_VMUL_F_sub,
--        NULL,
--    };
--
--    return do_2scalar(s, a, opfn[a->size], accfn[a->size]);
--}
-+DO_VMUL_F_2sc(VMUL, gvec_fmul_idx)
-+DO_VMUL_F_2sc(VMLA, gvec_fmla_nf_idx)
-+DO_VMUL_F_2sc(VMLS, gvec_fmls_nf_idx)
- 
- WRAP_ENV_FN(gen_VQDMULH_16, gen_helper_neon_qdmulh_s16)
- WRAP_ENV_FN(gen_VQDMULH_32, gen_helper_neon_qdmulh_s32)
+ specific_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_cmgcr.c', 'mips_cpc.c'))
+ specific_ss.add(when: 'CONFIG_MIPS_ITU', if_true: files('mips_itu.c'))
++
++specific_ss.add(when: 'CONFIG_SBSA_REF', if_true: files('sbsa_ec.c'))
 -- 
 2.20.1
 
