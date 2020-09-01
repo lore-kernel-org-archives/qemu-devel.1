@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 656E4C433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7F36C433E2
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:17:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2991B206A5
+	by mail.kernel.org (Postfix) with ESMTPS id 80F70206A5
 	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 09:17:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TmAM3eYY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2991B206A5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSUC6Boa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80F70206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD2Q8-0006dm-Cf
+	id 1kD2Q8-0006f6-MP
 	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 05:17:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33826)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kD2KV-0003dF-DY
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:11:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28118)
+ id 1kD2KP-0003Mi-Q8
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:11:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35938)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kD2KT-0006rv-Hz
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:11:51 -0400
+ id 1kD2KN-0006qG-NT
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 05:11:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598951508;
+ s=mimecast20190719; t=1598951503;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=b9AKTtufJsM2KUAdKcbxs9ux5QGHnOstuHgTA3nWgas=;
- b=TmAM3eYYczgzYS3cUkUzgnTJrEpqEO17z/JBUivVXMlLUMcLwxaQRC3XeYu5ji3/Y9lVtx
- DvlTfOw1kk6qso1bqrKPi1J7BK1GApXsl/IY4Co+5d1uXnr/U1p3AgiRZuiU64XMRpp0IP
- q0v2f5zu3HQQLF7C8yJNTEvf1xrrFFM=
+ bh=3z48+mTQRrcGpLheH51SDHiog+LS5vtfZFJ1Ox8RXDw=;
+ b=aSUC6BoacAtC/Z7stZSwkJmuUNyEC95ZSjmVjnVLIwuH+I9ka4KGqQzMHhVIxmhwAbK3+e
+ qYijmao+zhLgJbJHIqZMC+DnpdHZTIQiX6uqySIYIbkEWZtcz78L9hX/q2WD1LLXO6YTGy
+ Te71grvEgmfuK5fGuNIhgGXAIwoTnF4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-342---aZYPn4M22r4u2TadzsuA-1; Tue, 01 Sep 2020 05:11:46 -0400
-X-MC-Unique: --aZYPn4M22r4u2TadzsuA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-579-IBTMCpEhMc6aD0kml3OIfg-1; Tue, 01 Sep 2020 05:11:41 -0400
+X-MC-Unique: IBTMCpEhMc6aD0kml3OIfg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1ED4F10082E6
- for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 09:11:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88667801AC9
+ for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 09:11:40 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DF56A78B45
- for <qemu-devel@nongnu.org>; Tue,  1 Sep 2020 09:11:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 397AE60C04;
+ Tue,  1 Sep 2020 09:11:40 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 22/24] meson: use pkg-config method to find dependencies
-Date: Tue,  1 Sep 2020 05:11:30 -0400
-Message-Id: <20200901091132.29601-23-pbonzini@redhat.com>
+Subject: [PULL 11/24] configure: rename confsuffix option
+Date: Tue,  1 Sep 2020 05:11:19 -0400
+Message-Id: <20200901091132.29601-12-pbonzini@redhat.com>
 In-Reply-To: <20200901091132.29601-1-pbonzini@redhat.com>
 References: <20200901091132.29601-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 01:27:29
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -96,128 +96,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We do not need to ask cmake for the dependencies, so just use the
-pkg-config mechanism.  Keep "auto" for SDL so that it tries using
-sdl-config too.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-The documentation is adjusted to use SDL2_image as the example,
-rather than SDL which does not use the "pkg-config" method.
+The value is used to construct conf/mod/data directories.
 
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200826110419.528931-2-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- docs/devel/build-system.rst | 27 ++++++++++++++-------------
- meson.build                 |  8 ++++----
- 2 files changed, 18 insertions(+), 17 deletions(-)
+ configure | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/docs/devel/build-system.rst b/docs/devel/build-system.rst
-index 58bf392430..0c09fb9a54 100644
---- a/docs/devel/build-system.rst
-+++ b/docs/devel/build-system.rst
-@@ -66,46 +66,47 @@ following tasks:
-    upon completion.
+diff --git a/configure b/configure
+index e8946aeefb..46fe7914c3 100755
+--- a/configure
++++ b/configure
+@@ -474,7 +474,7 @@ modules="no"
+ module_upgrades="no"
+ prefix="/usr/local"
+ firmwarepath="\${prefix}/share/qemu-firmware"
+-confsuffix="/qemu"
++qemu_suffix="/qemu"
+ slirp=""
+ oss_lib=""
+ bsd="no"
+@@ -1012,7 +1012,7 @@ if test "$mingw32" = "yes" ; then
+     LIBS="-liberty $LIBS"
+   fi
+   prefix="c:/Program Files/QEMU"
+-  confsuffix=""
++  qemu_suffix=""
+   libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpapi -lnetapi32 $libs_qga"
+ fi
  
- 
--Taking the probe for SDL as an example, we have the following pieces
-+Taking the probe for SDL2_Image as an example, we have the following pieces
- in configure::
- 
-   # Initial variable state
--  sdl=auto
-+  sdl_image=auto
- 
-   ..snip..
- 
-   # Configure flag processing
--  --disable-gnutls) sdl=disabled
-+  --disable-sdl-image) sdl_image=disabled
+@@ -1122,7 +1122,7 @@ for opt do
    ;;
--  --enable-gnutls) sdl=enabled
-+  --enable-sdl-image) sdl_image=enabled
+   --datadir=*) datadir="$optarg"
    ;;
+-  --with-confsuffix=*) confsuffix="$optarg"
++  --with-suffix=*) qemu_suffix="$optarg"
+   ;;
+   --docdir=*) qemu_docdir="$optarg"
+   ;;
+@@ -1832,16 +1832,16 @@ Advanced options (experts only):
+   --with-git=GIT           use specified git [$git]
+   --static                 enable static build [$static]
+   --mandir=PATH            install man pages in PATH
+-  --datadir=PATH           install firmware in PATH$confsuffix
+-  --docdir=PATH            install documentation in PATH$confsuffix
++  --datadir=PATH           install firmware in PATH$qemu_suffix
++  --docdir=PATH            install documentation in PATH$qemu_suffix
+   --bindir=PATH            install binaries in PATH
+   --libdir=PATH            install libraries in PATH
+   --libexecdir=PATH        install helper binaries in PATH
+-  --sysconfdir=PATH        install config in PATH$confsuffix
++  --sysconfdir=PATH        install config in PATH$qemu_suffix
+   --localstatedir=PATH     install local state in PATH (set at runtime on win32)
+   --firmwarepath=PATH      search PATH for firmware files
+   --efi-aarch64=PATH       PATH of efi file to use for aarch64 VMs.
+-  --with-confsuffix=SUFFIX suffix for QEMU data inside datadir/libdir/sysconfdir [$confsuffix]
++  --with-suffix=SUFFIX     suffix for QEMU data inside datadir/libdir/sysconfdir [$qemu_suffix]
+   --with-pkgversion=VERS   use specified string as sub-version of the package
+   --enable-debug           enable common debug build options
+   --enable-sanitizers      enable default sanitizers
+@@ -6449,9 +6449,9 @@ EOF
+     fi
+ fi
  
-   ..snip..
- 
-   # Help output feature message
--  sdl             SDL UI
-+  sdl-image         SDL Image support for icons
- 
-   ..snip..
- 
-   # Meson invocation
--  -Dsdl=$sdl
-+  -Dsdl_image=$sdl_image
- 
- In meson_options.txt::
- 
--  option('sdl', type : 'feature', value : 'auto')
-+  option('sdl', type : 'feature', value : 'auto',
-+         description: 'SDL Image support for icons')
- 
- In meson.build::
- 
-   # Detect dependency
--  sdl = dependency('sdl2',
--                   required: get_option('sdl'),
--                   static: enable_static)
-+  sdl_image = dependency('SDL2_image', required: get_option('sdl_image'),
-+                         method: 'pkg-config',
-+                         static: enable_static)
- 
--  # Create config-host.h
--  config_host_data.set('CONFIG_SDL', sdl.found())
-+  # Create config-host.h (if applicable)
-+  config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
- 
-   # Summary
--  summary_info += {'SDL support':       sdl.found()}
-+  summary_info += {'SDL image support': sdl_image.found()}
- 
- 
- 
-diff --git a/meson.build b/meson.build
-index 78ac86f3a1..0e2d884f5c 100644
---- a/meson.build
-+++ b/meson.build
-@@ -129,7 +129,7 @@ endif
- pixman = not_found
- if have_system or have_tools
-   pixman = dependency('pixman-1', required: have_system, version:'>=0.21.8',
--                      static: enable_static)
-+                      method: 'pkg-config', static: enable_static)
- endif
- pam = not_found
- if 'CONFIG_AUTH_PAM' in config_host
-@@ -168,7 +168,7 @@ if get_option('xkbcommon').auto() and not have_system and not have_tools
-   xkbcommon = not_found
- else
-   xkbcommon = dependency('xkbcommon', required: get_option('xkbcommon'),
--                         static: enable_static)
-+                         method: 'pkg-config', static: enable_static)
- endif
- slirp = not_found
- if config_host.has_key('CONFIG_SLIRP')
-@@ -247,7 +247,7 @@ if sdl.found()
-   sdl = declare_dependency(compile_args: '-Wno-undef',
-                            dependencies: sdl)
-   sdl_image = dependency('SDL2_image', required: get_option('sdl_image'),
--                         static: enable_static)
-+                         method: 'pkg-config', static: enable_static)
- else
-   if get_option('sdl_image').enabled()
-     error('sdl-image required, but SDL was @0@',
-@@ -332,7 +332,7 @@ sasl = not_found
- if get_option('vnc').enabled()
-   vnc = declare_dependency() # dummy dependency
-   png = dependency('libpng', required: get_option('vnc_png'),
--                   static: enable_static)
-+                   method: 'pkg-config', static: enable_static)
-   jpeg = cc.find_library('jpeg', has_headers: ['jpeglib.h'],
-                          required: get_option('vnc_jpeg'),
-                          static: enable_static)
+-qemu_confdir=$sysconfdir$confsuffix
+-qemu_moddir=$libdir$confsuffix
+-qemu_datadir=$datadir$confsuffix
++qemu_confdir=$sysconfdir$qemu_suffix
++qemu_moddir=$libdir$qemu_suffix
++qemu_datadir=$datadir$qemu_suffix
+ qemu_localedir="$datadir/locale"
+ qemu_icondir="$datadir/icons"
+ qemu_desktopdir="$datadir/applications"
 -- 
 2.26.2
 
