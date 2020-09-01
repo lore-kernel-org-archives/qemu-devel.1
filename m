@@ -2,88 +2,88 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CDB8C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 11:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B61D4C433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 11:21:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C291F20C56
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 11:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1ECBF206C0
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 11:21:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c9mMinZq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C291F20C56
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSHoIpsB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECBF206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33668 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD4HM-00057L-PX
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 07:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37458)
+	id 1kD4Lk-0006jz-T9
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 07:21:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kD4Gb-0004Bo-5X; Tue, 01 Sep 2020 07:15:57 -0400
-Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:33731)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
- id 1kD4GZ-0006On-40; Tue, 01 Sep 2020 07:15:56 -0400
-Received: by mail-oo1-xc43.google.com with SMTP id m25so198104oou.0;
- Tue, 01 Sep 2020 04:15:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=GdgaIWJTdxDEGcgYK0aIsqUwGAVcNEhafo2FIe8vbzI=;
- b=c9mMinZqSKBXGKHtWXV6SMsbDpD9S63XX4uDGbKuPBLIHpo5a5iVNOtItdXReOhXez
- 5tvSI4hdbpou961a8FhhVqAy517wprjCN02ny+JOvWIueFm2A6geEqgiHfMQyfBMk0R4
- GjYdAIFh8kFnDT8UQVabwI8dKRdDiNXvjduxJ+ye31LuTP3/5F5EADZiF9OVdDe1u3tX
- 7/NBM2YwCxB3wZGuj+CfKRnpI0u6sEapj+G17GqdCqDXE2USpnLQ6i+PEIJK4iE2GRzl
- 5jG7AndotLkoBPphkgVTsNoFvdJ88DvV8atfRM+lMn1t/kmqp3Nz/urJ8wCqvScVHOUr
- cDWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=GdgaIWJTdxDEGcgYK0aIsqUwGAVcNEhafo2FIe8vbzI=;
- b=TMK3hM/63ChaVaiyicM6g9sd9l1GOjvnNs7YOODxkqQ5TDay54lgwfeNuKc5LCmoxX
- QjW0zqwkzA5m/p9DMa+bFP+vaQP+RHFp9vu51Fg43AHwzK4EtxaGwMtJZ5farPNqkKHN
- VrhGeNXcCvhxRMOIQXwamPNpBiM0UptWcXadn70ajTaThaQwLkvrelOJQUQdprD5JbJz
- 8uuwIY5AKXbwi55uwFiJpnaHmXPcfIwagOvDXkyoh7d/8OxQSfhaWjwSw9czUbD5i0ou
- 3HMjAcwTeNux6y7zW5LXJ3xkgI73RyUOaFFuaziGMD0AxhWgbxu3b3ZVMuan0DlXY+gK
- 14uA==
-X-Gm-Message-State: AOAM533idh9vxlodX0VuAYnDbkwJ/lz/CbX7IA8N5/bPdd3wWHhatNAc
- ip5ZWABY76pngvU8axJM0v37bVvgLNmsNmWDYhI=
-X-Google-Smtp-Source: ABdhPJzNMsKRF3dKW/mbN/4vMCK7o8OwfC1GBTrOfaOHDi6g9O3CrMAAC6qb5WBM2joESShZJr21TEbnSnZLt5UxOT4=
-X-Received: by 2002:a4a:c587:: with SMTP id x7mr878027oop.60.1598958952683;
- Tue, 01 Sep 2020 04:15:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kD4Kx-00069s-5a
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 07:20:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22050)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kD4Kq-0006w1-6x
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 07:20:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598959218;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=p5fL4nZ34dz/JaDHgORh4kNwj81Q+OD9Qj7nhgGwKcQ=;
+ b=XSHoIpsBT7MD4Ma++wF2eJp4AE4mC3gHuZwgKvTrBnAO/U3nPo0xqgJk9gmswpqNb5TPTm
+ EdthgLwz/mlQql4yV/R7vtMsx2DTsqTfXDFsILJIg+G3nAvCJHJ0/1XTpZK6opbyoreWN8
+ 1lcmuOMMHP3xPf4YlLgM88wekb/uKrM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-78-KMRXGI4IPEa6HBTP-ed90A-1; Tue, 01 Sep 2020 07:20:16 -0400
+X-MC-Unique: KMRXGI4IPEa6HBTP-ed90A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 08C60420EA;
+ Tue,  1 Sep 2020 11:20:16 +0000 (UTC)
+Received: from starship (unknown [10.35.206.190])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9CF69672C0;
+ Tue,  1 Sep 2020 11:20:14 +0000 (UTC)
+Message-ID: <283e2c4566bfa47e3a996efc7a6220921a00e0b0.camel@redhat.com>
+Subject: Re: [PATCH] qcow2: cleanup created file when qcow2_co_create
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Tue, 01 Sep 2020 14:20:13 +0300
+In-Reply-To: <20200716113359.15656-1-mlevitsk@redhat.com>
+References: <20200716113359.15656-1-mlevitsk@redhat.com>
+User-Agent: Evolution 3.36.3 (3.36.3-1.fc32)
 MIME-Version: 1.0
-References: <20200831134315.1221-1-pannengyuan@huawei.com>
- <20200831134315.1221-10-pannengyuan@huawei.com>
-In-Reply-To: <20200831134315.1221-10-pannengyuan@huawei.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Tue, 1 Sep 2020 19:15:16 +0800
-Message-ID: <CAKXe6S+H4vHwJnLD0Gw7R7ioE4qN6xnncf4ffaGjz=3DrEk0ag@mail.gmail.com>
-Subject: Re: [PATCH v2 09/10] block/file-posix: fix a possible undefined
- behavior
-To: Pan Nengyuan <pannengyuan@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
- envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/08/31 23:17:53
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,58 +96,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>, qemu-block@nongnu.org,
- Qemu Developers <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>,
- Aarushi Mehta <mehta.aaru20@gmail.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pan Nengyuan <pannengyuan@huawei.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8831=E6=
-=97=A5=E5=91=A8=E4=B8=80 =E4=B8=8B=E5=8D=883:21=E5=86=99=E9=81=93=EF=BC=9A
->
-> local_err is not initialized to NULL, it will cause a assert error as bel=
-ow:
-> qemu/util/error.c:59: error_setv: Assertion `*errp =3D=3D NULL' failed.
->
-> Fixes: c6447510690
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+On Thu, 2020-07-16 at 14:33 +0300, Maxim Levitsky wrote:
+> This is basically the same thing as commit
+> 'crypto.c: cleanup created file when block_crypto_co_create_opts_luks fails'
+> does but for qcow2 files to ensure that we don't leave qcow2 files
+> when creation fails.
+> 
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Very kind ping on this patch.
+
+Best regards,
+	Maxim levitsky
 
 > ---
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Max Reitz <mreitz@redhat.com>
-> Cc: Aarushi Mehta <mehta.aaru20@gmail.com>
-> Cc: qemu-block@nongnu.org
-> ---
-> - V2: no changes in v2.
-> ---
->  block/file-posix.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/block/file-posix.c b/block/file-posix.c
-> index 9a00d4190a..697a7d9eea 100644
-> --- a/block/file-posix.c
-> +++ b/block/file-posix.c
-> @@ -2113,7 +2113,7 @@ static void raw_aio_attach_aio_context(BlockDriverS=
-tate *bs,
->  #endif
->  #ifdef CONFIG_LINUX_IO_URING
->      if (s->use_linux_io_uring) {
-> -        Error *local_err;
-> +        Error *local_err =3D NULL;
->          if (!aio_setup_linux_io_uring(new_context, &local_err)) {
->              error_reportf_err(local_err, "Unable to use linux io_uring, =
-"
->                                           "falling back to thread pool: "=
-);
-> --
-> 2.18.2
->
->
+>  block/qcow2.c | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
+> 
+> diff --git a/block/qcow2.c b/block/qcow2.c
+> index fadf3422f8..8b848924b5 100644
+> --- a/block/qcow2.c
+> +++ b/block/qcow2.c
+> @@ -3794,6 +3794,17 @@ static int coroutine_fn qcow2_co_create_opts(BlockDriver *drv,
+>      /* Create the qcow2 image (format layer) */
+>      ret = qcow2_co_create(create_options, errp);
+>      if (ret < 0) {
+> +
+> +        Error *local_delete_err = NULL;
+> +        int r_del = bdrv_co_delete_file(bs, &local_delete_err);
+> +        /*
+> +         * ENOTSUP will happen if the block driver doesn't support
+> +         * the 'bdrv_co_delete_file' interface. This is a predictable
+> +         * scenario and shouldn't be reported back to the user.
+> +         */
+> +        if ((r_del < 0) && (r_del != -ENOTSUP)) {
+> +            error_report_err(local_delete_err);
+> +        }
+>          goto finish;
+>      }
+>  
+
+
 
