@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0803C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A5AC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:40:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80ECF2098B
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:39:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80ECF2098B
+	by mail.kernel.org (Postfix) with ESMTPS id 9FD072098B
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 06:40:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FD072098B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kCzxA-0001KL-Jb
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:39:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47506)
+	id 1kCzxc-0002UN-QM
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 02:40:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzvP-00085U-Af; Tue, 01 Sep 2020 02:37:47 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:51215)
+ id 1kCzwo-0001Hi-9P; Tue, 01 Sep 2020 02:39:14 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:47697)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kCzvN-0002pK-Md; Tue, 01 Sep 2020 02:37:47 -0400
+ id 1kCzwm-0002wE-Em; Tue, 01 Sep 2020 02:39:14 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue109 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1M42fG-1kCzvG1Rq4-0005Km; Tue, 01 Sep 2020 08:37:38 +0200
-Subject: Re: [PATCH 08/12] block/vmdk: Remove superfluous breaks
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1Mv2gw-1kUOIl3XxA-00qwmN; Tue, 01 Sep 2020 08:38:52 +0200
+Subject: Re: [PATCH 11/12] target/sh4: Remove superfluous breaks
 To: Thomas Huth <thuth@redhat.com>, Yi Wang <wang.yi59@zte.com.cn>,
  qemu-devel@nongnu.org
-References: <1594631107-36574-1-git-send-email-wang.yi59@zte.com.cn>
- <ea32b527-7d78-1c7a-a2a2-30ffa2a9e528@redhat.com>
+References: <1594631142-36745-1-git-send-email-wang.yi59@zte.com.cn>
+ <038e7f75-8c34-0a26-1451-75120d703c3d@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,32 +81,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <ad7366a2-64e9-c088-d988-abdecba8067d@vivier.eu>
-Date: Tue, 1 Sep 2020 08:37:37 +0200
+Message-ID: <be244055-0fc4-bc7a-776e-32cdede9636c@vivier.eu>
+Date: Tue, 1 Sep 2020 08:38:50 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <ea32b527-7d78-1c7a-a2a2-30ffa2a9e528@redhat.com>
+In-Reply-To: <038e7f75-8c34-0a26-1451-75120d703c3d@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:GtLufzURPVJUpet6Yc4lYhCeFrvXHm6g73WgU8h7lGykVBbR+33
- IQxZnQe3Dco9+OwzXQcoF3DP3kOVgGckRWxsdv8Xv+B9JVAwavlfsoMHmOXdfqW+R/GSTyG
- xPd/qRuoalFurEzrwRFzgZmKb5aY1jttjt+Zh6Q4L/soqmjQUhwy/ntsw+7kUSSRsGuhWfN
- yLvjGK3eLIsl8YK7CVShw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zRGVja6Lrvw=:28VSRAQ0amDoB87pnYu8JX
- qge05JmnCWQ7L9PomyMRxpNnFFqB4Jo0/gxVl88KVY+z1mtQHJlUWXAyb0kKLBMenEgO6DFvm
- aubIbVMHSF+Ukf52M/ZfVd22mc2J1Lf6+kdd6Bw0x0vYVjvfipw1nYInvG3yl5eEq85sellCb
- 5KhbwW95A9T519W4BjzxidGsxX6Fr66x2VIld/hw+Rv8LJoy/bFrSoJzedLA+4wLJ9LVR+usi
- Vzn8PTnzSRMKQn7PJBtoD9w5jvj7KXTJ8UHenY8ZUTgGc8VRl49qAIG0UOUPAsblNnKQXbv01
- 4O/my3V2lVPE4n8k43NkChdf+5XtcxyKuCN+8yh7P67kn9gYXteoXuTRmfeVLFyusan2QzBeN
- yxcAm0t+k++b+mhUL9jKpourqHTVvKHMgYQjOMVR1Q2U4NMlm9gKXTeI/FK79685gykVorkGf
- LrW/mShOfofL56Fu1J/iUFQyQF72HcMTfOM8Kwn0liGweJUOTIDQ1qzLoQdHX6SUXNwZPpk8h
- u/igDjX/Nrb8J5cgQUgHMSTDaGBZO7xxGFkRNTXPoGnmvkFsgzgQm3ik3zMr9B6vuT7HXdTxc
- ydyPFa041JU77MCR1rHjgUXcuYArujvAGxq438iOJSNdh8bpmN+BFqw1SA8NKj9APU/v4h8FO
- NE6ARnL6LPKioGu7SEQu6kymaXwl9AStJHpH/3hA6VCZnO7PBF0KWidyfI24A753QVC8pm2lj
- ZcIucj5E5kJqs3ibMMVjoqrsEcvoMneaB7Rw+IwUQXjRLxxKCrjQXVhy+R0C/CLFU+q/Td80K
- iTXVRL/TDo8wXPRPdymVIXWYsTJHpn8C6yyz4Tf3E/+kYInBP4N0AikxLlM6s/2P7T/CnWu
+X-Provags-ID: V03:K1:BlxzRNxxMsvhHyv5MfGELEvgY/rPpnnBYVA1fTPRGv/TuZ+kkVp
+ brGOBzd/izODXElWsF0F2icsBVOvyCy9MSlrhLG4uNLonCors4c4FEdD+PkPg+3xSy7VBjF
+ 4VcrAShT3JtfQDXn4Ns1cg3hNgDe3bRdtTZSd8kkrtd7C+xGYn625OPGXhrukGFSw8bS1CF
+ iIMBnIYxX7t5sS2B5t99w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lKUQvxnqQyk=:QPS17tl8z7d1BLklwnuyZw
+ kGdU1Cxnu0zBXEdQ/7HDwd57AcPQehkzMgHAwlXHURodXma8x59XDyxMCoF2dujQOfn9eD5IF
+ HQtAuxq88fk2WSotwgnFqHizscdnpblt4AV9Zcs1DXRNaiCbFItEmZTCVBXe4gqa2sdTL7112
+ CwPBV5WYv7Cv9T5mX/zVJBiOGlwpwameYEJeRXJFxupDW104X4aCzuINzYK7TESGkZgWG4wPg
+ +V9qQqwmODVU88ZHZavatgf7zylqxD+kWXfXpcttj9xO6Nn5sLcA/LUipSerhJDIQCw3OCaaQ
+ kjI7A0q2qy7AfHPNul3IFQvCliuPb7rpFYn8esGI+8Tpkgo+MS96GFyAd/g3TTtdg5fm79s1Z
+ opUyS50rIbtoFU+QeqKAMCSFuXBtytFieuuBkEJYdHpnOj62/YW+c3qj2uycP3b7AXt8VrtyC
+ JJkbmQiIXdUwUj5+BCOoyyEPj9oWnM0vDlMQe17vgub4NghHLptqJiSEKAPYwcLjfwZ1VDNCD
+ V15dCvhA6CnKjGosvfglH7XASBHWvkuzlK6QR5quqJ2Fvl8dUqkg9jIe68EtHfuxJsqCc7Fj0
+ iw49J/4/VrdphgUaWyo3qVjsQb1oCLNmUSA8URQ1hUryfX26eX7m6P6Qs7lUgfdcKCI6YF6zB
+ CzSKMVI6Qi2yOuYXxiOeHOzwWLSatQ0dAbCIeLyKSBh5STl4mbXWXZlCy8ufgP0PEYtHIHCY2
+ 3/2Xn/osP/KB+jv2DlB+gfDjqRIDUPHb65i57E6+RuwnbfS0oNNTFdS1otfk8OnL35eoYDceB
+ rXsY8BiGlF0+msT+87eOJ7nvW8Dr8naDfJT9feFC0MXhvSD6ruSjVR9MjyOSpuSF3unYPEk
 Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:33:59
@@ -129,14 +129,14 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, wang.liang82@zte.com.cn,
- Liao Pingfang <liao.pingfang@zte.com.cn>, Qemu-block <qemu-block@nongnu.org>,
- xue.zhihong@zte.com.cn
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Liao Pingfang <liao.pingfang@zte.com.cn>, wang.liang82@zte.com.cn,
+ xue.zhihong@zte.com.cn, Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 13/07/2020 à 11:36, Thomas Huth a écrit :
+Le 13/07/2020 à 11:38, Thomas Huth a écrit :
 > On 13/07/2020 11.05, Yi Wang wrote:
 >> From: Liao Pingfang <liao.pingfang@zte.com.cn>
 >>
@@ -146,28 +146,37 @@ Le 13/07/2020 à 11:36, Thomas Huth a écrit :
 >> Signed-off-by: Yi Wang <wang.yi59@zte.com.cn>
 >> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 >> ---
->>  block/vmdk.c | 3 ---
+>>  target/sh4/translate.c | 3 ---
 >>  1 file changed, 3 deletions(-)
 >>
->> diff --git a/block/vmdk.c b/block/vmdk.c
->> index 28cec50..8f222e3 100644
->> --- a/block/vmdk.c
->> +++ b/block/vmdk.c
->> @@ -1053,14 +1053,11 @@ static int vmdk_open_sparse(BlockDriverState *bs, BdrvChild *file, int flags,
->>      switch (magic) {
->>          case VMDK3_MAGIC:
->>              return vmdk_open_vmfs_sparse(bs, file, flags, errp);
->> -            break;
->>          case VMDK4_MAGIC:
->>              return vmdk_open_vmdk4(bs, file, flags, options, errp);
->> -            break;
->>          default:
->>              error_setg(errp, "Image not in VMDK format");
->>              return -EINVAL;
->> -            break;
->>      }
->>  }
->>  
+>> diff --git a/target/sh4/translate.c b/target/sh4/translate.c
+>> index 6192d83..60c863d 100644
+>> --- a/target/sh4/translate.c
+>> +++ b/target/sh4/translate.c
+>> @@ -1542,7 +1542,6 @@ static void _decode_opc(DisasContext * ctx)
+>>          tcg_gen_qemu_ld_i32(REG(0), REG(B11_8), ctx->memidx,
+>>                              MO_TEUL | MO_UNALN);
+>>          return;
+>> -        break;
+>>      case 0x40e9:                /* movua.l @Rm+,R0 */
+>>          CHECK_SH4A
+>>          /* Load non-boundary-aligned data */
+>> @@ -1550,7 +1549,6 @@ static void _decode_opc(DisasContext * ctx)
+>>                              MO_TEUL | MO_UNALN);
+>>          tcg_gen_addi_i32(REG(B11_8), REG(B11_8), 4);
+>>          return;
+>> -        break;
+>>      case 0x0029:		/* movt Rn */
+>>          tcg_gen_mov_i32(REG(B11_8), cpu_sr_t);
+>>  	return;
+>> @@ -1638,7 +1636,6 @@ static void _decode_opc(DisasContext * ctx)
+>>          CHECK_SH4A
+>>          tcg_gen_mb(TCG_MO_ALL | TCG_BAR_SC);
+>>          return;
+>> -        break;
+>>      case 0x4024:		/* rotcl Rn */
+>>  	{
+>>  	    TCGv tmp = tcg_temp_new();
 >>
 > 
 > Reviewed-by: Thomas Huth <thuth@redhat.com>
