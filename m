@@ -2,89 +2,90 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40228C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 16:55:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A4DC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 17:00:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2DEF206C0
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 16:55:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F445206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 17:00:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aF49WbYn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2DEF206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sq3orPNB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F445206FA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD9Ym-0006rx-1X
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 12:55:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47302)
+	id 1kD9eE-0000gO-6k
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 13:00:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kD9Y6-00062q-4Z
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 12:54:22 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:42698)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kD9Y4-0003DK-Gt
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 12:54:21 -0400
-Received: by mail-ed1-x541.google.com with SMTP id l63so2126781edl.9
- for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 09:54:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8WxRbOgX4F6Jk4oE+IqQYZBsB80JQnkE+t8+Xel50sA=;
- b=aF49WbYnM5fesl9rzOqXOTX/tSONIzg7NHqmLMbGbWb0X8l/fOlo7H77Ta8eUin9NZ
- KyX3ZSgpbrDrqV34U7FjAZfh+d1g3Z/L/2Jr9tEBm9dAQUoVjvzt3Dq0A+8+h3uBsti/
- 28EipeWo8q7hJFpYxzmMtYKqOflCcPbezuWzZopwCiIHf/kx4+soy5Ofwbp+MGHBlBV9
- CUc269cT7vQ1kyJYknv5G2CjfHRFeZBD0CA2FgX7prStRigJij4EdwV+QnQfcBMUk+WW
- 4LdmWyeTOb/M+LrbJ6aLjde/bMyKyO+bPek6Pwc2FbRtvq0nwr56QrbWO7Dylslo6sGK
- ZFNA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8WxRbOgX4F6Jk4oE+IqQYZBsB80JQnkE+t8+Xel50sA=;
- b=maznd/oO9u5DnaF69xU9GBEt+KNuaSl7hnDbA8ZrWCgVJM3fcXwJkSBu8ySaAUZkZC
- 07AbP+OVFFLtWd4Uz66t1KlWgDaXuJ86NXlbJu9oJDKivEwCpqCMUIo29GplnCv6c08G
- +pi3CZOhB83rYLAtpaePezdx9+PHdPnzN+5AI3xK1w7JW9tfr1VbXS7djEcubdaRI0QQ
- fU+TVJR4XyowYsEHz8ZDAHIbNlxwT07Vk+bn/lO8Il5gT4cufly8AUI8VBJBWHjW+ogB
- IxQlVshy2bjEcV/MCRbgXTe0rN8xPD6skcPu8olSmUHBjZ0KbFCOcxnW3l2WYdnpiCui
- 0iMA==
-X-Gm-Message-State: AOAM530yQ6FDJwZwG/yrPOeAiw4MthjB5iSZBfatvPEoi63JOr9MwHt9
- 4SnW9hkB9qfjgXKptdaO+o9TX3rrFDORVzDKjws=
-X-Google-Smtp-Source: ABdhPJwBw3UsM2FvL8DKGo5AViuFePsupfNG8yxct1eJyjVNI0kZLuFCQHPJ0x1Rw5voUKOAqrgIgNcyAcerR1gqtI4=
-X-Received: by 2002:a50:bb65:: with SMTP id y92mr2536358ede.53.1598979257876; 
- Tue, 01 Sep 2020 09:54:17 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kD9dQ-00008W-Vz
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 12:59:53 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:39718
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kD9dN-0003y8-DR
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 12:59:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1598979587;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0xR1D8rBb7TH8HsmBIL1nDoqd/t9mVuuagEHoEN0j1c=;
+ b=Sq3orPNB9Z4CJegC1GZu/zJ1gU8ZwvKYS+R91C184jAn73QY0UDWtjrfFwwpLOpaC1c/pU
+ euMaH9z4rpc4UXecEeJmvRU4VS+oeEZrfEIJJFalXKdC1G9VCuWJMNHSyHMcuEKI7A2r8W
+ 8z7iSn6k1UjwyGLWJf1C9KZ+AJJCnWQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-155-NdyNc9HkOU6OMsAXZypHfw-1; Tue, 01 Sep 2020 12:59:46 -0400
+X-MC-Unique: NdyNc9HkOU6OMsAXZypHfw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED6EB80B702;
+ Tue,  1 Sep 2020 16:59:44 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-188.ams2.redhat.com [10.36.112.188])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5B2C560BE2;
+ Tue,  1 Sep 2020 16:59:40 +0000 (UTC)
+Subject: Re: [PATCH v3 3/5] pc-bios: s390x: Use reset PSW if avaliable
+To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
+References: <20200831150910.317171-1-frankja@linux.ibm.com>
+ <20200831150910.317171-4-frankja@linux.ibm.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <b935f110-d835-e326-d7a9-60d848f970f7@redhat.com>
+Date: Tue, 1 Sep 2020 18:59:39 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200806130340.17316-1-f4bug@amsat.org>
- <bc283986-6f08-fb1c-2219-9b4af64eaaa0@amsat.org>
- <CAFEAcA_XP+XbsfE3XhyrB=yO7iaz69j_rydanao1abVz8jaPKg@mail.gmail.com>
- <CAAdtpL7=Q8zTftQYJQGbj=xtCyLu3tusd+M_P8qtbNTOubceEw@mail.gmail.com>
-In-Reply-To: <CAAdtpL7=Q8zTftQYJQGbj=xtCyLu3tusd+M_P8qtbNTOubceEw@mail.gmail.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 1 Sep 2020 20:54:05 +0400
-Message-ID: <CAJ+F1CLJJCFSWRYaGNnV7=hUPNPmiZ0wT+UaDbF=tnFuCewfsQ@mail.gmail.com>
-Subject: Re: [PATCH-for-5.2 0/4] hw/char/serial: Use the Clock API to feed the
- UART reference clock
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: multipart/alternative; boundary="000000000000ab45c605ae435e07"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200831150910.317171-4-frankja@linux.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 00:57:59
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,130 +98,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>, Paolo Bonzini <pbonzini@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: borntraeger@de.ibm.com, cohuck@redhat.com, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ab45c605ae435e07
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 31/08/2020 17.09, Janosch Frank wrote:
+> If a blob provides a reset PSW then we should use it instead of
+> branching to the PSW address and using our own mask.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  pc-bios/s390-ccw/bootmap.c  |  3 ++-
+>  pc-bios/s390-ccw/jump2ipl.c | 22 +++++++++++++++++-----
+>  pc-bios/s390-ccw/s390-ccw.h |  1 +
+>  3 files changed, 20 insertions(+), 6 deletions(-)
+> 
+> diff --git a/pc-bios/s390-ccw/bootmap.c b/pc-bios/s390-ccw/bootmap.c
+> index 8747c4ea26..5a03b1eb8b 100644
+> --- a/pc-bios/s390-ccw/bootmap.c
+> +++ b/pc-bios/s390-ccw/bootmap.c
+> @@ -515,7 +515,8 @@ static void zipl_run(ScsiBlockPtr *pte)
+>      IPL_assert(entry->component_type == ZIPL_COMP_ENTRY_EXEC, "No EXEC entry");
+>  
+>      /* should not return */
+> -    jump_to_IPL_code(entry->compdat.load_psw & PSW_MASK_SHORT_ADDR);
+> +    write_reset_psw(entry->compdat.load_psw);
+> +    jump_to_IPL_code(0);
+>  }
+>  
+>  static void ipl_scsi(void)
+> diff --git a/pc-bios/s390-ccw/jump2ipl.c b/pc-bios/s390-ccw/jump2ipl.c
+> index b6aad32def..5b8352d257 100644
+> --- a/pc-bios/s390-ccw/jump2ipl.c
+> +++ b/pc-bios/s390-ccw/jump2ipl.c
+> @@ -12,15 +12,21 @@
+>  
+>  #define KERN_IMAGE_START 0x010000UL
+>  #define RESET_PSW_MASK (PSW_MASK_SHORTPSW | PSW_MASK_64)
+> +#define RESET_PSW ((uint64_t)&jump_to_IPL_addr | RESET_PSW_MASK)
+>  
+>  static uint64_t *reset_psw = 0, save_psw, ipl_continue;
+>  
+> +void write_reset_psw(uint64_t psw)
+> +{
+> +    *reset_psw = psw;
+> +}
+> +
+>  static void jump_to_IPL_addr(void)
+>  {
+>      __attribute__((noreturn)) void (*ipl)(void) = (void *)ipl_continue;
+>  
+>      /* Restore reset PSW */
+> -    *reset_psw = save_psw;
+> +    write_reset_psw(save_psw);
+>  
+>      ipl();
+>      /* should not return */
+> @@ -43,9 +49,10 @@ void jump_to_IPL_code(uint64_t address)
+>       * content of non-BIOS memory after we loaded the guest, so we
+>       * save the original content and restore it in jump_to_IPL_2.
+>       */
+> -    save_psw = *reset_psw;
+> -    *reset_psw = (uint64_t) &jump_to_IPL_addr;
+> -    *reset_psw |= RESET_PSW_MASK;
+> +    if (address) {
+> +        save_psw = *reset_psw;
+> +        write_reset_psw(RESET_PSW);
+> +    }
+>      ipl_continue = address;
+>      debug_print_int("set IPL addr to", ipl_continue);
 
-Hi
+In case you respin this series, I think I'd move the "ipl_continue =
+address" into the if-statement, too, and change the debug_print_int line
+to use address instead of ipl_continue.
 
-On Wed, Aug 26, 2020 at 1:52 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g>
-wrote:
+> @@ -77,7 +84,12 @@ void jump_to_low_kernel(void)
+>  
+>      /* Trying to get PSW at zero address */
+>      if (*((uint64_t *)0) & RESET_PSW_MASK) {
+> -        jump_to_IPL_code((*((uint64_t *)0)) & PSW_MASK_SHORT_ADDR);
+> +        /*
+> +         * Surely nobody will try running directly from lowcore, so
+> +         * let's use 0 as an indication that we want to load the reset
+> +         * psw at 0x0 and not jump to the entry.
+> +         */
+> +        jump_to_IPL_code(0);
+>      }
+>  
+>      /* No other option left, so use the Linux kernel start address */
+> diff --git a/pc-bios/s390-ccw/s390-ccw.h b/pc-bios/s390-ccw/s390-ccw.h
+> index 36b884cced..7090720422 100644
+> --- a/pc-bios/s390-ccw/s390-ccw.h
+> +++ b/pc-bios/s390-ccw/s390-ccw.h
+> @@ -78,6 +78,7 @@ int virtio_read(ulong sector, void *load_addr);
+>  void zipl_load(void);
+>  
+>  /* jump2ipl.c */
+> +void write_reset_psw(uint64_t psw);
+>  void jump_to_IPL_code(uint64_t address);
+>  void jump_to_low_kernel(void);
 
-> Hi Peter,
->
-> Le lun. 24 ao=C3=BBt 2020 17:20, Peter Maydell <peter.maydell@linaro.org>=
- a
-> =C3=A9crit :
->
->> On Sat, 22 Aug 2020 at 21:00, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg>
->> wrote:
->> >
->> > On 8/6/20 3:03 PM, Philippe Mathieu-Daud=C3=A9 wrote:
->> > > This series improve tracing of multiple UART device in the same
->> > > chipset, and allow to use the Clock API to feed each device with
->> > > an (updatable) input clock.
->> > >
->> > > Based-on: <20200730165900.7030-1-philmd@redhat.com>
->> > > "hw/char: Remove TYPE_SERIAL_IO"
->> > >
->> > > Philippe Mathieu-Daud=C3=A9 (4):
->> > >   hw/char/serial: Replace commented DPRINTF() by trace event
->> > >   hw/char/serial: Remove old DEBUG_SERIAL commented code
->> > >   hw/char/serial: Let SerialState have an 'id' field
->> > >   hw/char/serial: Use the Clock API to feed the UART reference clock
->> > >
->> > >  include/hw/char/serial.h |  4 +++
->> > >  hw/char/serial.c         | 55
->> +++++++++++++++++++++++-----------------
->> > >  hw/char/trace-events     |  5 ++--
->> > >  3 files changed, 39 insertions(+), 25 deletions(-)
->> > >
->> >
->> > ping? Should I resend with the typo from patch 4 fixed?
->>
->> Which tree are you expecting the patches to go in via ?
->>
->
-> I cc'ed you because having reviewed the Clock API series you are familiar
-> with it.
-> However I expect this series to be merged by the chardev maintainers.
-> In particular to verify the default values (when no input clock provided)=
-.
->
+Looks sane to me:
 
-Sorry, I am not of much help here. (other than it looks reasonable to me)
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---000000000000ab45c605ae435e07
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Aug 26, 2020 at 1:52 PM Phi=
-lippe Mathieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org">f4bug@amsat=
-.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"mar=
-gin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1=
-ex"><div dir=3D"auto"><div>Hi Peter,<br><br><div class=3D"gmail_quote"><div=
- dir=3D"ltr" class=3D"gmail_attr">Le lun. 24 ao=C3=BBt 2020 17:20, Peter Ma=
-ydell &lt;<a href=3D"mailto:peter.maydell@linaro.org" target=3D"_blank">pet=
-er.maydell@linaro.org</a>&gt; a =C3=A9crit=C2=A0:<br></div><blockquote clas=
-s=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid r=
-gb(204,204,204);padding-left:1ex">On Sat, 22 Aug 2020 at 21:00, Philippe Ma=
-thieu-Daud=C3=A9 &lt;<a href=3D"mailto:f4bug@amsat.org" rel=3D"noreferrer" =
-target=3D"_blank">f4bug@amsat.org</a>&gt; wrote:<br>
-&gt;<br>
-&gt; On 8/6/20 3:03 PM, Philippe Mathieu-Daud=C3=A9 wrote:<br>
-&gt; &gt; This series improve tracing of multiple UART device in the same<b=
-r>
-&gt; &gt; chipset, and allow to use the Clock API to feed each device with<=
-br>
-&gt; &gt; an (updatable) input clock.<br>
-&gt; &gt;<br>
-&gt; &gt; Based-on: &lt;<a href=3D"mailto:20200730165900.7030-1-philmd@redh=
-at.com" rel=3D"noreferrer" target=3D"_blank">20200730165900.7030-1-philmd@r=
-edhat.com</a>&gt;<br>
-&gt; &gt; &quot;hw/char: Remove TYPE_SERIAL_IO&quot;<br>
-&gt; &gt;<br>
-&gt; &gt; Philippe Mathieu-Daud=C3=A9 (4):<br>
-&gt; &gt;=C2=A0 =C2=A0hw/char/serial: Replace commented DPRINTF() by trace =
-event<br>
-&gt; &gt;=C2=A0 =C2=A0hw/char/serial: Remove old DEBUG_SERIAL commented cod=
-e<br>
-&gt; &gt;=C2=A0 =C2=A0hw/char/serial: Let SerialState have an &#39;id&#39; =
-field<br>
-&gt; &gt;=C2=A0 =C2=A0hw/char/serial: Use the Clock API to feed the UART re=
-ference clock<br>
-&gt; &gt;<br>
-&gt; &gt;=C2=A0 include/hw/char/serial.h |=C2=A0 4 +++<br>
-&gt; &gt;=C2=A0 hw/char/serial.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 55 ++++=
-+++++++++++++++++++-----------------<br>
-&gt; &gt;=C2=A0 hw/char/trace-events=C2=A0 =C2=A0 =C2=A0|=C2=A0 5 ++--<br>
-&gt; &gt;=C2=A0 3 files changed, 39 insertions(+), 25 deletions(-)<br>
-&gt; &gt;<br>
-&gt;<br>
-&gt; ping? Should I resend with the typo from patch 4 fixed?<br>
-<br>
-Which tree are you expecting the patches to go in via ?<br></blockquote></d=
-iv></div><div dir=3D"auto"><br></div><div dir=3D"auto">I cc&#39;ed you beca=
-use having reviewed the Clock API series you are familiar with it.</div><di=
-v dir=3D"auto">However I expect this series to be merged by the chardev mai=
-ntainers.</div><div dir=3D"auto">In particular to verify the default values=
- (when no input clock provided).</div></div></blockquote><div><br></div><di=
-v>Sorry, I am not of much help here. (other than it looks reasonable to me)=
-<br></div></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"gmai=
-l_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---000000000000ab45c605ae435e07--
 
