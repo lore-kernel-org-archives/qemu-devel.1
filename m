@@ -2,76 +2,94 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.6 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C6AC433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:49:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4D5C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:49:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B10D8206FA
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:49:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B10D8206FA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 88CC1206FA
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 13:49:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvQsjUkA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88CC1206FA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56532 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD6f1-00059D-Of
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:49:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48926)
+	id 1kD6fD-0005Sw-Nk
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 09:49:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49038)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kD6dr-00043k-6w; Tue, 01 Sep 2020 09:48:07 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:49847)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kD6dn-0000l6-Ry; Tue, 01 Sep 2020 09:48:06 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.20.149])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 3B439564199A;
- Tue,  1 Sep 2020 15:48:00 +0200 (CEST)
-Received: from kaod.org (37.59.142.104) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 1 Sep 2020
- 15:47:59 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R0051a96b3e1-278c-45df-8a5c-e50aa7a49441,
- 38EE1E9FF4E34D4C85F4190D418CEE501B878519) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH 2/2] m25p80: Add the n25q256a SFDP table
-To: Francisco Iglesias <frasse.iglesias@gmail.com>
-References: <20200827091130.3525790-1-clg@kaod.org>
- <20200827091130.3525790-3-clg@kaod.org>
- <20200901133840.caw6abo4noq5choz@fralle-msi>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <0a2bcbfa-833d-358a-6699-298f64918549@kaod.org>
-Date: Tue, 1 Sep 2020 15:47:59 +0200
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kD6eH-0004Xl-Ck; Tue, 01 Sep 2020 09:48:33 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:46100)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kD6eF-0000pw-9b; Tue, 01 Sep 2020 09:48:33 -0400
+Received: by mail-wr1-x441.google.com with SMTP id o5so1588305wrn.13;
+ Tue, 01 Sep 2020 06:48:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=YDzzyttZt2ACMY6s7/wn7fRUYl8HWgLpZeknqVs9FvA=;
+ b=RvQsjUkAeAV9nX6A+//yxkR+etotrOf3GPwLC1iTMSTSKQUmsxTK7tp8gi/vuflhF/
+ 7ch6x+uL1N4hoY8e6/4cPkwZ2Y++xmpEAXsuS2OsrKVZhkVIOvVyZ3Bi3MEnB7U6wKTf
+ aRa+vPByavHsr1TWqF1A/kw3TnmjlH7y8ddVaQkCkxMo2uxMqbe+SjNl2UlJHbw7ydC0
+ T2w4FIeVuHwiZ9bDMDFSzSrwWxjcz7Tk9EronaztToMHbaaNlWH3t+DaFwOAcegVxOwp
+ qkrps83munNU0GkUkNFqOv9GkXKB/uSTtL30HL8xA4t1ZfjAzFi7W8vP5S+ndCYigmrd
+ 6YMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=YDzzyttZt2ACMY6s7/wn7fRUYl8HWgLpZeknqVs9FvA=;
+ b=OY+RsyiMOnAeSBVi0TbX6WMTHo0sFwz6UQgAeKN5dEyL2CwPl983hAoPSszzk55oI9
+ 9rCdcDFnYNt4kUDroRt7rdXanVXMdYx6V0WI6VxcnSmrO1zlt//GRRDBccFOGMoMqrD1
+ Y3iilzPLhnCjs24MsT/g9VDyu3Uk3PelET8GmK+foNFfclSIdMS6pCGG7HzlZw+r2ETA
+ iotCV8JDAd7DWBv1i2wGPOsRVBPw0LJcI4/fA2BBsTNWfhHF3hWEB0ufD12my70ZuIrK
+ JdT8S9t1Ovks/WQRaWEctqS3ByN92FMjsLSuEA01HIot+09rnHExdizKjgN0ZySzWlSW
+ hqIw==
+X-Gm-Message-State: AOAM532DmABV1DC5Q78wwtGsZ0BpL3KfUvYKzan5TH3ZrI+/kfY6gv8K
+ S2cJpnIvrfNctAqr6WiXrVs=
+X-Google-Smtp-Source: ABdhPJx1T1mTyKZ8gzr3fa6O80iU2ktfHvGNLbk1xfA62ALCJ2ZOxdinG/LQkYrKkYhIEMBAfK+lRA==
+X-Received: by 2002:adf:e504:: with SMTP id j4mr2058327wrm.205.1598968109323; 
+ Tue, 01 Sep 2020 06:48:29 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id h184sm2055701wmh.41.2020.09.01.06.48.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 01 Sep 2020 06:48:28 -0700 (PDT)
+Subject: Re: [PATCH] sd: sdhci: check data_count is within fifo_buffer
+To: P J P <ppandit@redhat.com>
+References: <20200827115336.1851276-1-ppandit@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <816b3dbe-527f-1bec-a0cf-555e44068a56@amsat.org>
+Date: Tue, 1 Sep 2020 15:48:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200901133840.caw6abo4noq5choz@fralle-msi>
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200827115336.1851276-1-ppandit@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.104]
-X-ClientProxiedBy: DAG4EX2.mxp5.local (172.16.2.32) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: 6872353f-00a0-41c6-b53c-97fa054bcfac
-X-Ovh-Tracer-Id: 5841168718214826857
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefjedgjedtucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepuffvfhfhkffffgggjggtgfhisehtkeertddtfeejnecuhfhrohhmpeevrogurhhitggpnfgvpgfiohgrthgvrhcuoegtlhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheeutdehgefhvdehtdeuleetgedvfeeukedtfeeihfffffeiuddutdduhffgvedtnecuffhomhgrihhnpehgihhthhhusgdrtghomhenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepfhhrrghsshgvrdhighhlvghsihgrshesghhmrghilhdrtghomh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=clg@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 08:45:33
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -85,152 +103,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Alistair Francis <alistair@alistair23.me>, qemu-devel@nongnu.org,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
+Cc: Ruhr-University <bugs-syssec@rub.de>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/1/20 3:38 PM, Francisco Iglesias wrote:
-> Hi Cedric,
+On 8/27/20 1:53 PM, P J P wrote:
+> From: Prasad J Pandit <pjp@fedoraproject.org>
 > 
-> We need to rebase the patch and modify for meson build (I wasn't able to apply
-> it).
-
-Yes. You will find the patches and more support on my aspeed branch :
-
-  https://github.com/legoater/qemu/tree/aspeed-5.2
-
-  23c93a8f69c8 m25p80: Add the w25q512jv SFPD table
-  51c73585a3a0 m25p80: Add the w25q256 SFPD table
-  c1d31a41dd38 m25p80: Add the mx66l1g45g SFDP table
-  4c66b8670fe2 m25p80: Add the mx25l25635f SFPD table
-  070620851124 m25p80: Add the mx25l25635e SFPD table
-  a51a58218157 m25p80: Add the n25q256a SFDP table
-  bd6574bba30a m25p80: Add basic support for the SFDP command
-
-
-Thanks,
-
-C. 
-
-> Best regards,
-> Francisco 
+> While doing multi block SDMA, transfer block size may exceed
+> the 's->fifo_buffer[s->buf_maxsz]' size. It may leave the
+> current element pointer 's->data_count' pointing out of bounds.
+> Leading the subsequent DMA r/w operation to OOB access issue.
+> Add check to avoid it.
 > 
-> On [2020 Aug 27] Thu 11:11:30, Cédric Le Goater wrote:
->> The same values were collected on 4 differents OpenPower systems,
->> palmettos, romulus and tacoma.
->>
->> Signed-off-by: Cédric Le Goater <clg@kaod.org>
->> ---
->>  hw/block/m25p80_sfdp.h |  2 ++
->>  hw/block/m25p80.c      |  6 ++++--
->>  hw/block/m25p80_sfdp.c | 49 ++++++++++++++++++++++++++++++++++++++++++
->>  hw/block/Makefile.objs |  2 +-
->>  4 files changed, 56 insertions(+), 3 deletions(-)
->>  create mode 100644 hw/block/m25p80_sfdp.c
->>
->> diff --git a/hw/block/m25p80_sfdp.h b/hw/block/m25p80_sfdp.h
->> index b75fd0b0c13f..ca2658a676e0 100644
->> --- a/hw/block/m25p80_sfdp.h
->> +++ b/hw/block/m25p80_sfdp.h
->> @@ -12,4 +12,6 @@
->>  
->>  #define M25P80_SFDP_AREA_SIZE 0x100
->>  
->> +extern const uint8_t m25p80_sfdp_n25q256a[M25P80_SFDP_AREA_SIZE];
->> +
->>  #endif
->> diff --git a/hw/block/m25p80.c b/hw/block/m25p80.c
->> index 32925589ec7a..d053bdbb2805 100644
->> --- a/hw/block/m25p80.c
->> +++ b/hw/block/m25p80.c
->> @@ -233,11 +233,13 @@ static const FlashPartInfo known_devices[] = {
->>      { INFO("n25q128a11",  0x20bb18,      0,  64 << 10, 256, ER_4K) },
->>      { INFO("n25q128a13",  0x20ba18,      0,  64 << 10, 256, ER_4K) },
->>      { INFO("n25q256a11",  0x20bb19,      0,  64 << 10, 512, ER_4K) },
->> -    { INFO("n25q256a13",  0x20ba19,      0,  64 << 10, 512, ER_4K) },
->> +    { INFO("n25q256a13",  0x20ba19,      0,  64 << 10, 512, ER_4K),
->> +      .sfdp = m25p80_sfdp_n25q256a },
->>      { INFO("n25q512a11",  0x20bb20,      0,  64 << 10, 1024, ER_4K) },
->>      { INFO("n25q512a13",  0x20ba20,      0,  64 << 10, 1024, ER_4K) },
->>      { INFO("n25q128",     0x20ba18,      0,  64 << 10, 256, 0) },
->> -    { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K) },
->> +    { INFO("n25q256a",    0x20ba19,      0,  64 << 10, 512, ER_4K),
->> +      .sfdp = m25p80_sfdp_n25q256a },
->>      { INFO("n25q512a",    0x20ba20,      0,  64 << 10, 1024, ER_4K) },
->>      { INFO_STACKED("n25q00",    0x20ba21, 0x1000, 64 << 10, 2048, ER_4K, 4) },
->>      { INFO_STACKED("n25q00a",   0x20bb21, 0x1000, 64 << 10, 2048, ER_4K, 4) },
->> diff --git a/hw/block/m25p80_sfdp.c b/hw/block/m25p80_sfdp.c
->> new file mode 100644
->> index 000000000000..def94bd4ea02
->> --- /dev/null
->> +++ b/hw/block/m25p80_sfdp.c
->> @@ -0,0 +1,49 @@
->> +/*
->> + * M25P80 Serial Flash Discoverable Parameter (SFDP)
->> + *
->> + * Copyright (c) 2020, IBM Corporation.
->> + *
->> + * This code is licensed under the GPL version 2 or later. See the
->> + * COPYING file in the top-level directory.
->> + */
->> +
->> +#include "qemu/osdep.h"
->> +#include "m25p80_sfdp.h"
->> +
->> +/*
->> + * Micron
->> + */
->> +const uint8_t m25p80_sfdp_n25q256a[M25P80_SFDP_AREA_SIZE] = {
->> +    0x53, 0x46, 0x44, 0x50, 0x00, 0x01, 0x00, 0xff,
->> +    0x00, 0x00, 0x01, 0x09, 0x30, 0x00, 0x00, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xe5, 0x20, 0xfb, 0xff, 0xff, 0xff, 0xff, 0x0f,
->> +    0x29, 0xeb, 0x27, 0x6b, 0x08, 0x3b, 0x27, 0xbb,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x27, 0xbb,
->> +    0xff, 0xff, 0x29, 0xeb, 0x0c, 0x20, 0x10, 0xd8,
->> +    0x00, 0x00, 0x00, 0x00, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +    0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
->> +};
->> diff --git a/hw/block/Makefile.objs b/hw/block/Makefile.objs
->> index 8855c2265639..b65a12c52b52 100644
->> --- a/hw/block/Makefile.objs
->> +++ b/hw/block/Makefile.objs
->> @@ -1,6 +1,6 @@
->>  common-obj-y += block.o cdrom.o hd-geometry.o
->>  common-obj-$(CONFIG_FDC) += fdc.o
->> -common-obj-$(CONFIG_SSI_M25P80) += m25p80.o
->> +common-obj-$(CONFIG_SSI_M25P80) += m25p80.o m25p80_sfdp.o
->>  common-obj-$(CONFIG_NAND) += nand.o
->>  common-obj-$(CONFIG_PFLASH_CFI01) += pflash_cfi01.o
->>  common-obj-$(CONFIG_PFLASH_CFI02) += pflash_cfi02.o
->> -- 
->> 2.25.4
->>
+>  -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Fsdhci_oob_write1
 
+This directory is 3 months old, I can't find it on the list...
+Did I missed that or did the list eat the report?
+
+>  ==1459837==ERROR: AddressSanitizer: heap-buffer-overflow
+>  WRITE of size 54722048 at 0x61500001e280 thread T3
+>     #0  __interceptor_memcpy (/lib64/libasan.so.6+0x3a71d)
+>     #1  flatview_read_continue ../exec.c:3245
+>     #2  flatview_read ../exec.c:3278
+>     #3  address_space_read_full ../exec.c:3291
+>     #4  address_space_rw ../exec.c:3319
+>     #5  dma_memory_rw_relaxed ../include/sysemu/dma.h:87
+>     #6  dma_memory_rw ../include/sysemu/dma.h:110
+>     #7  dma_memory_read ../include/sysemu/dma.h:116
+>     #8  sdhci_sdma_transfer_multi_blocks ../hw/sd/sdhci.c:629
+>     #9  sdhci_write ../hw/sd/sdhci.c:1097
+>     #10 memory_region_write_accessor ../softmmu/memory.c:483
+>     ...
+> 
+> Reported-by: Ruhr-University <bugs-syssec@rub.de>
+> Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
 
