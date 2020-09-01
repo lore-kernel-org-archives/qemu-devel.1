@@ -2,85 +2,88 @@ Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC0CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3CBBC433E6
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:09:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F342120BED
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:08:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86FB120BED
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 15:09:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HO10umcn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F342120BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RFqOUgxN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86FB120BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7u1-0002OQ-6J
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:08:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34784)
+	id 1kD7ub-0003Ev-Kw
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 11:09:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7OD-0001cp-EX
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:36:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38822)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7O7-0007St-R5
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:35:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598970955;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Y4bnpkmjYeSwvxYLcWwOlFGjlYiMNCIOHtmJ22FA6MQ=;
- b=HO10umcnM868L+FvOXf80dLF8ycQN7Tj/FWzqkDCkFGrACP6nk5Nvpd1CrjxbIUm9L6IJf
- 7dOkAttnt6D3hHrRB+M32CWqoGH6A9YIBfiHAh1g/7a9QukadbjMjJQRSLHPlsHGJlVZaa
- OC0OqG1A+WLifcL77+R+EHBcz1tgQQc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-569-5DjAG88wO3-u-AuJEcJ8Hg-1; Tue, 01 Sep 2020 10:35:52 -0400
-X-MC-Unique: 5DjAG88wO3-u-AuJEcJ8Hg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82F12801AEC;
- Tue,  1 Sep 2020 14:35:49 +0000 (UTC)
-Received: from localhost (ovpn-113-83.ams2.redhat.com [10.36.113.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 23DD019C4F;
- Tue,  1 Sep 2020 14:35:48 +0000 (UTC)
-From: Max Reitz <mreitz@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v8 34/43] block: Drop backing_bs()
-Date: Tue,  1 Sep 2020 16:34:15 +0200
-Message-Id: <20200901143424.884735-35-mreitz@redhat.com>
-In-Reply-To: <20200901143424.884735-1-mreitz@redhat.com>
-References: <20200901143424.884735-1-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kD7gM-0005rP-Kz
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:54:46 -0400
+Received: from mail-ej1-x62e.google.com ([2a00:1450:4864:20::62e]:34272)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kD7gK-0001ch-UP
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:54:46 -0400
+Received: by mail-ej1-x62e.google.com with SMTP id d26so2119307ejr.1
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 07:54:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=lMRN5sWr/UE11rJ/A1OXPMu5tKqDrmEaA2nfrCVk/io=;
+ b=RFqOUgxNYwberug2DRNwWvh8soNDbJXqDZ9+hkvoouuyfi6As/7MqgUO+KVBQgoAO0
+ 74VIWsP07vO6/2OLMRqUndNBuV8Hr65x3uRMY8m7PGIma/O4R8l/d5nT4jZAoCb5Bzy4
+ US2cXdHXYX7s9YFObnLitRpClaY0xAQwhGyOseyK8Z9CviAI/y1GPUOhth8KzFbgtlbu
+ ONUmdWQ9JXo2zwoZDfyEpDfCZQTRlhYqAi3+m/2/Ys3Kn/z27WXHR6RITogNFkavv3/O
+ 1y5QWooZD+ACgcYB9akJbormQyK3bBzsWnze5OoRHC/LTxHW4PhO+z1UcTSTxxdCJkju
+ Q12w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=lMRN5sWr/UE11rJ/A1OXPMu5tKqDrmEaA2nfrCVk/io=;
+ b=hYyARWeefXFfRRxjoO5v2uskvLTZ0Z9y3AmJzYgqvSHGuX7bBuCqr5BUOgYqKQYaxj
+ +Ljz+ri1upc6RIms4ONJIUa2HmWdv4GYP8vABkWLp+v71Dsc4l1LwHroMgJhL8RW4aja
+ zWhNDPxwoMySAdKQsIxALbr6UiWLIvpC7GvFroAmIHGf2KzgrOSs1CQuevOUJhDRz8FX
+ cfMyQUSyjKK4dTGSZJnSwPAdZEkqZLX5qtSGbwz6vJeqFYtiZHOuUzXNiZH8uzgBVAv+
+ Pz30BWJg+2O7/hbJo7DH/EG7mw80LzRcyk1dYPmegsFl7DYL4n6PRvyTkT0I8zhSjN4a
+ UuHQ==
+X-Gm-Message-State: AOAM532eoc8lodzEB/NCFyYkMaX+/QPzeTQU2TG+E0dI8BkC5sLxsTtv
+ UNCxt6GRQJoj75oU+amMs3iEqr2aeWXSJYLfDGCpYg==
+X-Google-Smtp-Source: ABdhPJynlm0u1cRwMzFLQGMmRdd2s1/t3pWM2TlMIdPF/2c57I+ymK9g1LbC4c678AeU7VQr1tKZaUMquiQIQo+qT+E=
+X-Received: by 2002:a17:906:d8ca:: with SMTP id
+ re10mr1722560ejb.382.1598972083403; 
+ Tue, 01 Sep 2020 07:54:43 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 01:27:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200831110416.15176-1-kraxel@redhat.com>
+ <CAFEAcA99xWV2=12YeZL2Aq+U5kDGLx9eC2vfEVtbqs=Avz78Pw@mail.gmail.com>
+ <20200901141628.nfvsojjje2d7vgfa@sirius.home.kraxel.org>
+In-Reply-To: <20200901141628.nfvsojjje2d7vgfa@sirius.home.kraxel.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 1 Sep 2020 15:54:29 +0100
+Message-ID: <CAFEAcA90KpnJF2kF7QmVE3DJCSk7W_RriM6TbT3oweRjNUJSvA@mail.gmail.com>
+Subject: Re: [PULL 0/5] Ui 20200831 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62e;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,43 +96,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We want to make it explicit where bs->backing is used, and we have done
-so.  The old role of backing_bs() is now effectively taken by
-bdrv_cow_bs().
+On Tue, 1 Sep 2020 at 15:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+>   Hi,
+>
+> > Generating ar with a custom command
+> > cp: '../../pc-bios/keymaps/ar' and 'pc-bios/keymaps/ar' are the same file
+>
+> Hmm, strange.  No failures in gitlab ci:
+>         https://gitlab.com/kraxel/qemu/-/pipelines/183769485
+>
+> Any chance this is an old build tree?  Specifically created before
+> commit ddcf607fa3d6 ("meson: drop keymaps symlink") was merged, and the
+> symlink is present still?
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/block_int.h | 5 -----
- 1 file changed, 5 deletions(-)
+Yeah, mostly my build trees don't get regenerated. We like
+incremental builds to continue to work.
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 8205ccaa62..bb3d1c8a8c 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1003,11 +1003,6 @@ typedef enum BlockMirrorBackingMode {
-     MIRROR_LEAVE_BACKING_CHAIN,
- } BlockMirrorBackingMode;
- 
--static inline BlockDriverState *backing_bs(BlockDriverState *bs)
--{
--    return bs->backing ? bs->backing->bs : NULL;
--}
--
- 
- /* Essential block drivers which must always be statically linked into qemu, and
-  * which therefore can be accessed without using bdrv_find_format() */
--- 
-2.26.2
-
+thanks
+-- PMM
 
