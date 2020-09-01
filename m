@@ -1,76 +1,76 @@
-Return-Path: <SRS0=/2J2=CK=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2674C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 23:28:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30045C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 00:11:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E246206EF
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 23:28:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE0632068E
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 00:11:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZeGnr5G9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E246206EF
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DP+IpnT4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE0632068E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50452 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDFhw-0006lS-4v
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 19:28:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51376)
+	id 1kDGNY-0005Ba-1x
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 20:11:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kDFhG-0006Bb-9R; Tue, 01 Sep 2020 19:28:14 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:36578)
+ id 1kDGM7-0004Vd-VL; Tue, 01 Sep 2020 20:10:28 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:40022)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kDFhE-0007ws-JC; Tue, 01 Sep 2020 19:28:13 -0400
-Received: by mail-io1-xd43.google.com with SMTP id d190so3837238iof.3;
- Tue, 01 Sep 2020 16:28:10 -0700 (PDT)
+ id 1kDGM5-0003iu-Oy; Tue, 01 Sep 2020 20:10:27 -0400
+Received: by mail-io1-xd44.google.com with SMTP id j2so3917228ioj.7;
+ Tue, 01 Sep 2020 17:10:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=iwaxBwxxQkEUUSaCQNlszdrDUR8DQFyolFLsT2H18lo=;
- b=ZeGnr5G9cuca3MrHlEyaIG5ZvGF51G5qqVbzPy+EYLw6tpaQHYAZ9sqcnsKXmfDLvn
- PUqz4FyQOYXiYhkrgp7ZCjU+TEFTj2Qm+0apZncfYJIOdju5KV5oWf96xfN5/FOYB805
- B5+fyidT2qiyM2bPBXeci1p2nqHlRvd5wk1CacK5C7FoeGyjI0+HaOtyrnQgTtLv5aUO
- C7GV7XXoA0alpblHrRzXcRmRSpz1OYXBrXUry9Tb5pikqMBA08SOOp3U3BBRLliAUokg
- NKOcl8TS4hwa3aLqFJr602jKSOvqb4XnDNEQ+uWtq82hNCfx1wFjwvzAhvpytcy5g5EC
- HORw==
+ :cc; bh=yeU1FPunAPmsBSs9Tjosk06eY4V5ULE2ckvo7jl6YJY=;
+ b=DP+IpnT4hLRjd3e6wtRGHXnIPChg5vrkUnACRMPZ9dmzEe1eHnrXsR5UEsNe7IZiPz
+ 4NnnyQIJeslLWoDGdgel8Teb2U5/cnLAMSyNaY7Nc0Iun//NSmvWs1/JpV3O3KTnlT7G
+ v4IeCvRgXngGv1cLgZ5x6irGea4/kvFlJsFZzPgZ9OjsgZdm1HdHIIhSvzg+sTy6HHIg
+ s5GZ/e/rCum9woxuoP10LDWpR0ysEME8Vjrtel/Vt9oI41Z7gVovwXCh+Kha9LwRhpD6
+ vW1ixFExt8jJmjJPEEifYtUcndHKxHpBsKuxwmqUBdDgQfjq/m3QzW3/38nxPe/rl5e2
+ jlmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=iwaxBwxxQkEUUSaCQNlszdrDUR8DQFyolFLsT2H18lo=;
- b=L9f4tqtcwjlf/CGvXHggaYnsqdb/6dYKCXeNza36j6Dl6GAn8OBSVNHRGZZtzJXIop
- kQOiG6tQ0u9LOdtuXnFmnq2lja0q0WbL5S8WaRo0F0rmqBS0008buFBclClV6ryMxdrk
- HXl3wIlN01iku/o4EdHEw9A1neWr4W7EBrUAdt1BfYfLMiP67cSvkveNY01CupxHeqFX
- GZ+2NITLTLTv5wAP2RzuKXIjiZLP8T9vfzFOGyZkvY1i37RKrP6agyyqSDG9FLqME5we
- YVF1rfZgJ+1GsKFCWfCQvoO5UB80GB+anCToZKwdAlfTqtoT91VRpp69BXZF+C/Csev5
- HqNQ==
-X-Gm-Message-State: AOAM5300Aoq97UdpH85gCfs26wVAkHhUuV1oFmeRwPi/WDK0d3p1UmDC
- 9p+d0en7QIRZiBfZdH+SMyElbjGHsuKT3EsH6SQ=
-X-Google-Smtp-Source: ABdhPJxYCFJOHtB5427cf7yJFbRzZoOJMmjG/vl1MP9zpUz/fmIy0i8bnS+oDGN25mtUrl+fXwjnX8ntBponr7TJdVU=
-X-Received: by 2002:a6b:3e84:: with SMTP id l126mr1260689ioa.118.1599002889953; 
- Tue, 01 Sep 2020 16:28:09 -0700 (PDT)
+ bh=yeU1FPunAPmsBSs9Tjosk06eY4V5ULE2ckvo7jl6YJY=;
+ b=eIDu7DVWTtcJt51g8+saCz/Uw9k8SSOu4wLy5/zhFdAccSOM0otS4eKFAVVYj85f2X
+ KxOApVYcqnK0VNPpi1+MQTsfyBhkm+B3w9kIHvRkxPtjqz1ecphdALiXWjJ+kin2tDJF
+ YPnfjXfEKT7v24E2thrHjsvKuHl0dDE7FzdYqmv7lS76G9BjJqMJlz/fpxmDPn2bpqKe
+ E0UNYnmpZ8Z2z3YetAqmaG2nmeLff57JJcRVghnu9/gURx1giRJDrkgMq5hGiUPsu31h
+ D6UAmdkcJd8J+V0NQo8EWw2blERO0RX9v7Da4Q0D9lgVPPeh+VU4GkNlkzzdQ7EPXzRT
+ PGxA==
+X-Gm-Message-State: AOAM531KesPg3sWjkyUX8F9OfNZSSoZ7hsbXpjyNAVs5uamE2zg29JN6
+ ohqZBnUs+SniE0vHKfKAf+JrHNVHEIH0DSdVd5U=
+X-Google-Smtp-Source: ABdhPJzL2WzNImOSX7VI14NaRdvpJDLD0JA+ZjHdwG098uZxuZsTXrYBcDPFRu4iTheviqsbsC3IVLX3wYhIjQt7TL0=
+X-Received: by 2002:a05:6602:2f88:: with SMTP id
+ u8mr1335112iow.175.1599005423899; 
+ Tue, 01 Sep 2020 17:10:23 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200901055822.2721209-1-natechancellor@gmail.com>
 In-Reply-To: <20200901055822.2721209-1-natechancellor@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 1 Sep 2020 16:17:16 -0700
-Message-ID: <CAKmqyKP9hX-+9CEAKPWU-ZvCWBSUH7E5DYNX0qKU9wtkkSKCeQ@mail.gmail.com>
+Date: Tue, 1 Sep 2020 16:59:29 -0700
+Message-ID: <CAKmqyKNRMmJgmZSPK6wqqNQW41QLHwChPi+1cjqao_x1Q_iryQ@mail.gmail.com>
 Subject: Re: [PATCH] riscv: sifive_test: Allow 16-bit writes to memory region
 To: Nathan Chancellor <natechancellor@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -147,7 +147,9 @@ On Mon, Aug 31, 2020 at 10:59 PM Nathan Chancellor
 > Fixes: 5d971f9e67 ("memory: Revert "memory: accept mismatching sizes in memory_region_access_valid"")
 > Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Thanks!
+
+Applied to riscv-to-apply.next
 
 Alistair
 
