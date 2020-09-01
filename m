@@ -4,84 +4,84 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA4C7C433E6
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57202C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:59:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EF80206CD
-	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FE5E206CD
+	for <qemu-devel@archiver.kernel.org>; Tue,  1 Sep 2020 14:59:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKHSDXeg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EF80206CD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KE7B7Q7B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FE5E206CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kD7kT-0007H4-0U
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:59:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34290)
+	id 1kD7kV-0007MS-99
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 10:59:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7Nb-0000Ze-A0
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:35:24 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:43355
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7OT-00022o-UA
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:36:17 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:55416
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7NZ-0007D2-7r
- for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:35:23 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kD7OQ-0007W1-U4
+ for qemu-devel@nongnu.org; Tue, 01 Sep 2020 10:36:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1598970920;
+ s=mimecast20190719; t=1598970974;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7fK+xuHGvbMdfO2Xqz+6EIV+hLwxBQT3FZX02s6iu1w=;
- b=dKHSDXegj2iVRfU1gYBUAXOkrgF/DDKdk1ZSFo9vdLjTar8ZCZQ/ljImqHcHjOqyP0IBNy
- k+h1lkb991teDvctdKEToxkR9yJfaoMu/+cCaNSDRH4ad4T07KGICxluBWsyRsTihVK+W2
- gyKDLY7eTacS3yCC/ZKBPha3OlH7qtQ=
+ bh=SfRbSD7CvrY7rU++lJ4+89wpJRu6V2Zzk8T5NDMc+/o=;
+ b=KE7B7Q7Btstw+xZm2DsB3pnV+ubqMoXnzgxImxF8WW4BGOuzg6nezr2wVx/tnG5Mm00QMf
+ Hnql6evanHJUpSEI6+xXFd4QlXUK1Wzk1rm8IdSiYffOomjufYZqz5buKUagL/lfqgi7DO
+ ats306T+QQPemS/+XtFH8lew9EKnvjg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-k9H4yp8dOrG6bZxBEs_5FQ-1; Tue, 01 Sep 2020 10:35:16 -0400
-X-MC-Unique: k9H4yp8dOrG6bZxBEs_5FQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-224-IhGyAPRNNeSJ6UraqSoJHg-1; Tue, 01 Sep 2020 10:36:10 -0400
+X-MC-Unique: IhGyAPRNNeSJ6UraqSoJHg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F68C801AB7;
- Tue,  1 Sep 2020 14:35:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15B1810ABDA8;
+ Tue,  1 Sep 2020 14:36:09 +0000 (UTC)
 Received: from localhost (ovpn-113-83.ams2.redhat.com [10.36.113.83])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 16ED878B59;
- Tue,  1 Sep 2020 14:35:14 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id ABF2F7EB94;
+ Tue,  1 Sep 2020 14:36:08 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH v8 21/43] block/snapshot: Fix fallback
-Date: Tue,  1 Sep 2020 16:34:02 +0200
-Message-Id: <20200901143424.884735-22-mreitz@redhat.com>
+Subject: [PATCH v8 42/43] iotests: Add test for commit in sub directory
+Date: Tue,  1 Sep 2020 16:34:23 +0200
+Message-Id: <20200901143424.884735-43-mreitz@redhat.com>
 In-Reply-To: <20200901143424.884735-1-mreitz@redhat.com>
 References: <20200901143424.884735-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 02:08:15
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 10:16:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,217 +102,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the top node's driver does not provide snapshot functionality and we
-want to fall back to a node down the chain, we need to snapshot all
-non-COW children.  For simplicity's sake, just do not fall back if there
-is more than one such child.  Furthermore, we really only can fall back
-to bs->file and bs->backing, because bdrv_snapshot_goto() has to modify
-the child link (notably, set it to NULL).
+Add a test for committing an overlay in a sub directory to one of the
+images in its backing chain, using both relative and absolute filenames.
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/snapshot.c | 104 +++++++++++++++++++++++++++++++++++++----------
- 1 file changed, 83 insertions(+), 21 deletions(-)
+ tests/qemu-iotests/020     | 44 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/020.out | 10 +++++++++
+ 2 files changed, 54 insertions(+)
 
-diff --git a/block/snapshot.c b/block/snapshot.c
-index bd9fb01817..a2bf3a54eb 100644
---- a/block/snapshot.c
-+++ b/block/snapshot.c
-@@ -147,6 +147,56 @@ bool bdrv_snapshot_find_by_id_and_name(BlockDriverState *bs,
-     return ret;
+diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
+index a0782937b0..596505be2d 100755
+--- a/tests/qemu-iotests/020
++++ b/tests/qemu-iotests/020
+@@ -31,6 +31,11 @@ _cleanup()
+     _cleanup_test_img
+     _rm_test_img "$TEST_IMG.base"
+     _rm_test_img "$TEST_IMG.orig"
++
++    _rm_test_img "$TEST_DIR/subdir/t.$IMGFMT.base"
++    _rm_test_img "$TEST_DIR/subdir/t.$IMGFMT.mid"
++    _rm_test_img "$TEST_DIR/subdir/t.$IMGFMT"
++    rmdir "$TEST_DIR/subdir" &> /dev/null
  }
+ trap "_cleanup; exit \$status" 0 1 2 3 15
  
-+/**
-+ * Return a pointer to the child BDS pointer to which we can fall
-+ * back if the given BDS does not support snapshots.
-+ * Return NULL if there is no BDS to (safely) fall back to.
-+ *
-+ * We need to return an indirect pointer because bdrv_snapshot_goto()
-+ * has to modify the BdrvChild pointer.
-+ */
-+static BdrvChild **bdrv_snapshot_fallback_ptr(BlockDriverState *bs)
-+{
-+    BdrvChild **fallback;
-+    BdrvChild *child;
+@@ -139,6 +144,45 @@ $QEMU_IO -c 'writev 0 64k' "$TEST_IMG" | _filter_qemu_io
+ $QEMU_IMG commit "$TEST_IMG"
+ _cleanup
+ 
 +
-+    /*
-+     * The only BdrvChild pointers that are safe to modify (and which
-+     * we can thus return a reference to) are bs->file and
-+     * bs->backing.
-+     */
-+    fallback = &bs->file;
-+    if (!*fallback && bs->drv && bs->drv->is_filter) {
-+        fallback = &bs->backing;
-+    }
++echo
++echo 'Testing commit in sub-directory with relative filenames'
++echo
 +
-+    if (!*fallback) {
-+        return NULL;
-+    }
++pushd "$TEST_DIR" > /dev/null
 +
-+    /*
-+     * Check that there are no other children that would need to be
-+     * snapshotted.  If there are, it is not safe to fall back to
-+     * *fallback.
-+     */
-+    QLIST_FOREACH(child, &bs->children, next) {
-+        if (child->role & (BDRV_CHILD_DATA | BDRV_CHILD_METADATA |
-+                           BDRV_CHILD_FILTERED) &&
-+            child != *fallback)
-+        {
-+            return NULL;
-+        }
-+    }
++mkdir subdir
 +
-+    return fallback;
-+}
++TEST_IMG="subdir/t.$IMGFMT.base" _make_test_img 1M
++TEST_IMG="subdir/t.$IMGFMT.mid" _make_test_img -b "t.$IMGFMT.base" -F $IMGFMT
++TEST_IMG="subdir/t.$IMGFMT" _make_test_img -b "t.$IMGFMT.mid" -F $IMGFMT
 +
-+static BlockDriverState *bdrv_snapshot_fallback(BlockDriverState *bs)
-+{
-+    BdrvChild **child_ptr = bdrv_snapshot_fallback_ptr(bs);
-+    return child_ptr ? (*child_ptr)->bs : NULL;
-+}
++# Should work
++$QEMU_IMG commit -b "t.$IMGFMT.mid" "subdir/t.$IMGFMT"
 +
- int bdrv_can_snapshot(BlockDriverState *bs)
- {
-     BlockDriver *drv = bs->drv;
-@@ -155,8 +205,9 @@ int bdrv_can_snapshot(BlockDriverState *bs)
-     }
- 
-     if (!drv->bdrv_snapshot_create) {
--        if (bs->file != NULL) {
--            return bdrv_can_snapshot(bs->file->bs);
-+        BlockDriverState *fallback_bs = bdrv_snapshot_fallback(bs);
-+        if (fallback_bs) {
-+            return bdrv_can_snapshot(fallback_bs);
-         }
-         return 0;
-     }
-@@ -168,14 +219,15 @@ int bdrv_snapshot_create(BlockDriverState *bs,
-                          QEMUSnapshotInfo *sn_info)
- {
-     BlockDriver *drv = bs->drv;
-+    BlockDriverState *fallback_bs = bdrv_snapshot_fallback(bs);
-     if (!drv) {
-         return -ENOMEDIUM;
-     }
-     if (drv->bdrv_snapshot_create) {
-         return drv->bdrv_snapshot_create(bs, sn_info);
-     }
--    if (bs->file) {
--        return bdrv_snapshot_create(bs->file->bs, sn_info);
-+    if (fallback_bs) {
-+        return bdrv_snapshot_create(fallback_bs, sn_info);
-     }
-     return -ENOTSUP;
- }
-@@ -185,6 +237,7 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
-                        Error **errp)
- {
-     BlockDriver *drv = bs->drv;
-+    BdrvChild **fallback_ptr;
-     int ret, open_ret;
- 
-     if (!drv) {
-@@ -205,39 +258,46 @@ int bdrv_snapshot_goto(BlockDriverState *bs,
-         return ret;
-     }
- 
--    if (bs->file) {
--        BlockDriverState *file;
--        QDict *options = qdict_clone_shallow(bs->options);
-+    fallback_ptr = bdrv_snapshot_fallback_ptr(bs);
-+    if (fallback_ptr) {
-+        QDict *options;
-         QDict *file_options;
-         Error *local_err = NULL;
-+        BlockDriverState *fallback_bs = (*fallback_ptr)->bs;
-+        char *subqdict_prefix = g_strdup_printf("%s.", (*fallback_ptr)->name);
++# Might theoretically work, but does not in practice (we have to
++# decide between this and the above; and since we always represent
++# backing file names as relative to the overlay, we go for the above)
++$QEMU_IMG commit -b "subdir/t.$IMGFMT.mid" "subdir/t.$IMGFMT" 2>&1 | \
++    _filter_imgfmt
 +
-+        options = qdict_clone_shallow(bs->options);
- 
--        file = bs->file->bs;
-         /* Prevent it from getting deleted when detached from bs */
--        bdrv_ref(file);
-+        bdrv_ref(fallback_bs);
- 
--        qdict_extract_subqdict(options, &file_options, "file.");
-+        qdict_extract_subqdict(options, &file_options, subqdict_prefix);
-         qobject_unref(file_options);
--        qdict_put_str(options, "file", bdrv_get_node_name(file));
-+        g_free(subqdict_prefix);
++# This should work as well
++$QEMU_IMG commit -b "$TEST_DIR/subdir/t.$IMGFMT.mid" "subdir/t.$IMGFMT"
 +
-+        qdict_put_str(options, (*fallback_ptr)->name,
-+                      bdrv_get_node_name(fallback_bs));
- 
-         if (drv->bdrv_close) {
-             drv->bdrv_close(bs);
-         }
--        bdrv_unref_child(bs, bs->file);
--        bs->file = NULL;
- 
--        ret = bdrv_snapshot_goto(file, snapshot_id, errp);
-+        bdrv_unref_child(bs, *fallback_ptr);
-+        *fallback_ptr = NULL;
++popd > /dev/null
 +
-+        ret = bdrv_snapshot_goto(fallback_bs, snapshot_id, errp);
-         open_ret = drv->bdrv_open(bs, options, bs->open_flags, &local_err);
-         qobject_unref(options);
-         if (open_ret < 0) {
--            bdrv_unref(file);
-+            bdrv_unref(fallback_bs);
-             bs->drv = NULL;
-             /* A bdrv_snapshot_goto() error takes precedence */
-             error_propagate(errp, local_err);
-             return ret < 0 ? ret : open_ret;
-         }
- 
--        assert(bs->file->bs == file);
--        bdrv_unref(file);
-+        assert(fallback_bs == (*fallback_ptr)->bs);
-+        bdrv_unref(fallback_bs);
-         return ret;
-     }
- 
-@@ -273,6 +333,7 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
-                          Error **errp)
- {
-     BlockDriver *drv = bs->drv;
-+    BlockDriverState *fallback_bs = bdrv_snapshot_fallback(bs);
-     int ret;
- 
-     if (!drv) {
-@@ -289,8 +350,8 @@ int bdrv_snapshot_delete(BlockDriverState *bs,
- 
-     if (drv->bdrv_snapshot_delete) {
-         ret = drv->bdrv_snapshot_delete(bs, snapshot_id, name, errp);
--    } else if (bs->file) {
--        ret = bdrv_snapshot_delete(bs->file->bs, snapshot_id, name, errp);
-+    } else if (fallback_bs) {
-+        ret = bdrv_snapshot_delete(fallback_bs, snapshot_id, name, errp);
-     } else {
-         error_setg(errp, "Block format '%s' used by device '%s' "
-                    "does not support internal snapshot deletion",
-@@ -306,14 +367,15 @@ int bdrv_snapshot_list(BlockDriverState *bs,
-                        QEMUSnapshotInfo **psn_info)
- {
-     BlockDriver *drv = bs->drv;
-+    BlockDriverState *fallback_bs = bdrv_snapshot_fallback(bs);
-     if (!drv) {
-         return -ENOMEDIUM;
-     }
-     if (drv->bdrv_snapshot_list) {
-         return drv->bdrv_snapshot_list(bs, psn_info);
-     }
--    if (bs->file) {
--        return bdrv_snapshot_list(bs->file->bs, psn_info);
-+    if (fallback_bs) {
-+        return bdrv_snapshot_list(fallback_bs, psn_info);
-     }
-     return -ENOTSUP;
- }
++# Now let's try with just absolute filenames
++# (This will not work with external data files, though, because when
++# using relative paths for those, qemu will always resolve them
++# relative to its CWD.  Therefore, it cannot find those data files now
++# that we left $TEST_DIR.)
++if _get_data_file '' > /dev/null; then
++    echo 'Image committed.' # Skip test
++else
++    $QEMU_IMG commit -b "$TEST_DIR/subdir/t.$IMGFMT.mid" \
++        "$TEST_DIR/subdir/t.$IMGFMT"
++fi
++
+ # success, all done
+ echo "*** done"
+ rm -f $seq.full
+diff --git a/tests/qemu-iotests/020.out b/tests/qemu-iotests/020.out
+index 5936bc1cae..a5db1962ad 100644
+--- a/tests/qemu-iotests/020.out
++++ b/tests/qemu-iotests/020.out
+@@ -1083,4 +1083,14 @@ Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=json:{'driv
+ wrote 65536/65536 bytes at offset 0
+ 64 KiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ qemu-img: Block job failed: No space left on device
++
++Testing commit in sub-directory with relative filenames
++
++Formatting 'subdir/t.IMGFMT.base', fmt=IMGFMT size=1048576
++Formatting 'subdir/t.IMGFMT.mid', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.base backing_fmt=IMGFMT
++Formatting 'subdir/t.IMGFMT', fmt=IMGFMT size=1048576 backing_file=t.IMGFMT.mid backing_fmt=IMGFMT
++Image committed.
++qemu-img: Did not find 'subdir/t.IMGFMT.mid' in the backing chain of 'subdir/t.IMGFMT'
++Image committed.
++Image committed.
+ *** done
 -- 
 2.26.2
 
