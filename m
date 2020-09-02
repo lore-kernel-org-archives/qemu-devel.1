@@ -4,66 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87596C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 11:57:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E808C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 11:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BF9B20758
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 11:57:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1406720758
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 11:57:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VYd7Xc/w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BF9B20758
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VLTgnSCg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1406720758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDROI-000116-Gf
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 07:57:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46858)
+	id 1kDROO-0001Bf-8t
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 07:57:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDRKd-000235-Df
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 07:53:39 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:51129
+ id 1kDRKq-0002Wo-FT
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 07:53:52 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42874
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDRKa-0006uc-TB
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 07:53:39 -0400
+ id 1kDRKo-0006wx-MW
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 07:53:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599047616;
+ s=mimecast20190719; t=1599047629;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pfYTI1I5EIgdxhpe/Wpcte7uI9Wu5nsgYYM2BcF4In0=;
- b=VYd7Xc/wpxJVPorN7nFnnIWKaj2dE9oJyRjGlkooHq+FMkZa/DP70DXMq+jAUYEhDTUxdi
- g5qNu+vAc2OHwt/NOQxctsxOcvc5kg+AcXt2RBaBL7fYhyhFPER3GTkODxSsuUT2uop3RM
- P/8OuV6zV+VeLPp+dCMKsPtBxMX1MPE=
+ bh=mqMbYocOSRC6uLOxCbQmjQSgI1P6nxtcXOiuw2oFExw=;
+ b=VLTgnSCgzfqgQD8sKDKdD0isiq/yX/9YVbYHaReBOLRAdCcdoOmghP/jkWNESTRxPWHUF3
+ QyH0aZdycU+uc/AfmDuusYd6gRIJjJJek5XjictXA/ef1+kGO7EM7pCQ+RJhy0jyXRqv2O
+ Wfxo72B1D9WQhtoA5MbYNHXG2PGfQD0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-qlWfYu5HMK6A5PbkLDJ9Dg-1; Wed, 02 Sep 2020 07:53:34 -0400
-X-MC-Unique: qlWfYu5HMK6A5PbkLDJ9Dg-1
+ us-mta-468-D9WKrV5tPyK7nZ256Mdncw-1; Wed, 02 Sep 2020 07:53:45 -0400
+X-MC-Unique: D9WKrV5tPyK7nZ256Mdncw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE2F9801AED;
- Wed,  2 Sep 2020 11:53:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D2DA801FD4;
+ Wed,  2 Sep 2020 11:53:44 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A3BE27C5C6;
- Wed,  2 Sep 2020 11:53:32 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 472967C609;
+ Wed,  2 Sep 2020 11:53:44 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 04/20] rdma: Rename INTERFACE_RDMA_PROVIDER_CLASS macro
-Date: Wed,  2 Sep 2020 07:53:07 -0400
-Message-Id: <20200902115323.850385-5-ehabkost@redhat.com>
+Subject: [PULL 13/20] Revert "i386: Introduce use_epyc_apic_id_encoding in
+ X86CPUDefinition"
+Date: Wed,  2 Sep 2020 07:53:16 -0400
+Message-Id: <20200902115323.850385-14-ehabkost@redhat.com>
 In-Reply-To: <20200902115323.850385-1-ehabkost@redhat.com>
 References: <20200902115323.850385-1-ehabkost@redhat.com>
 MIME-Version: 1.0
@@ -74,17 +75,17 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:33:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 03:24:55
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,52 +98,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Babu Moger <babu.moger@amd.com>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename the macro to be consistent with RDMA_PROVIDER and
-RDMA_PROVIDER_GET_CLASS.
+From: Babu Moger <babu.moger@amd.com>
 
-This will make future conversion to OBJECT_DECLARE* easier.
+This reverts commit 0c1538cb1a26287c072645f4759b9872b1596d79.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20200825192110.3528606-48-ehabkost@redhat.com>
+Remove the EPYC specific apicid decoding and use the generic
+default decoding.
+
+Signed-off-by: Babu Moger <babu.moger@amd.com>
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <159889935015.21294.1425332462852607813.stgit@naples-babu.amd.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/rdma/rdma.h    | 2 +-
- hw/rdma/vmw/pvrdma_main.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ target/i386/cpu.h |  1 -
+ target/i386/cpu.c | 16 ----------------
+ 2 files changed, 17 deletions(-)
 
-diff --git a/include/hw/rdma/rdma.h b/include/hw/rdma/rdma.h
-index 68290fb58c..fd3d70103d 100644
---- a/include/hw/rdma/rdma.h
-+++ b/include/hw/rdma/rdma.h
-@@ -19,7 +19,7 @@
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index d5ad42d694..5ff8ad8427 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1918,7 +1918,6 @@ void cpu_clear_apic_feature(CPUX86State *env);
+ void host_cpuid(uint32_t function, uint32_t count,
+                 uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
+ void host_vendor_fms(char *vendor, int *family, int *model, int *stepping);
+-bool cpu_x86_use_epyc_apic_id_encoding(const char *cpu_type);
  
- #define INTERFACE_RDMA_PROVIDER "rdma"
+ /* helper.c */
+ bool x86_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index c9c1e681c2..b72b4b08ac 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -1638,10 +1638,6 @@ typedef struct X86CPUDefinition {
+     FeatureWordArray features;
+     const char *model_id;
+     CPUCaches *cache_info;
+-
+-    /* Use AMD EPYC encoding for apic id */
+-    bool use_epyc_apic_id_encoding;
+-
+     /*
+      * Definitions for alternative versions of CPU model.
+      * List is terminated by item with version == 0.
+@@ -1683,18 +1679,6 @@ static const X86CPUVersionDefinition *x86_cpu_def_get_versions(X86CPUDefinition
+     return def->versions ?: default_version_list;
+ }
  
--#define INTERFACE_RDMA_PROVIDER_CLASS(klass) \
-+#define RDMA_PROVIDER_CLASS(klass) \
-     OBJECT_CLASS_CHECK(RdmaProviderClass, (klass), \
-                        INTERFACE_RDMA_PROVIDER)
- #define RDMA_PROVIDER_GET_CLASS(obj) \
-diff --git a/hw/rdma/vmw/pvrdma_main.c b/hw/rdma/vmw/pvrdma_main.c
-index 3254aadb6e..77b1235a3f 100644
---- a/hw/rdma/vmw/pvrdma_main.c
-+++ b/hw/rdma/vmw/pvrdma_main.c
-@@ -681,7 +681,7 @@ static void pvrdma_class_init(ObjectClass *klass, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(klass);
-     PCIDeviceClass *k = PCI_DEVICE_CLASS(klass);
--    RdmaProviderClass *ir = INTERFACE_RDMA_PROVIDER_CLASS(klass);
-+    RdmaProviderClass *ir = RDMA_PROVIDER_CLASS(klass);
- 
-     k->realize = pvrdma_realize;
-     k->vendor_id = PCI_VENDOR_ID_VMWARE;
+-bool cpu_x86_use_epyc_apic_id_encoding(const char *cpu_type)
+-{
+-    X86CPUClass *xcc = X86_CPU_CLASS(object_class_by_name(cpu_type));
+-
+-    assert(xcc);
+-    if (xcc->model && xcc->model->cpudef) {
+-        return xcc->model->cpudef->use_epyc_apic_id_encoding;
+-    } else {
+-        return false;
+-    }
+-}
+-
+ static CPUCaches epyc_cache_info = {
+     .l1d_cache = &(CPUCacheInfo) {
+         .type = DATA_CACHE,
 -- 
 2.26.2
 
