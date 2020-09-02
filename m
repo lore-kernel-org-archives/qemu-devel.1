@@ -4,78 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1400EC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 440ADC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:58:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC8BF20767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:58:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0A96820767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:58:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ra4nDJGB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC8BF20767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LiR3StZg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A96820767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDbi5-0007r5-Uc
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:58:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35540)
+	id 1kDbiS-0000Ga-7z
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:58:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbVD-0004bM-Bq
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:45:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:20772
+ id 1kDbUq-0003hL-FE
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21478
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbVB-00005o-AP
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:45:14 -0400
+ id 1kDbUo-0008Sd-De
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599086712;
+ s=mimecast20190719; t=1599086689;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZOGdFaTOCSQgkm1cUvnKEEVM+LkWfbdeSgjtcCPvnNE=;
- b=Ra4nDJGB/kJV+f+I5m1Vpj9XayVjeA0G/oVwUs/STS9fOM7q6yLm0QYkG4xnP4We7r4IUr
- Fd6ADZXBpRCYsr0HoKFwHWY7gVQkHb4JOoc5H2hp+taN+MXK8VnEUUw8FOEr3YMCVhRSc3
- dyB7ZzLwZH4slpJsVxIznMpjKWDuv/c=
+ bh=U6ofSfJYUOIijxDXEI+ln7bb/vVelslorwkvaNNaAT8=;
+ b=LiR3StZgmoHQzRPVjmQ7VNP9KgvAezBdvXPKpmYc/Yh7c965cnrsITEZFOj2x6UGXjriNp
+ 9iURdhK3jnd7IQtiqQJ+5V6uotVZ4njz02M6GT0JR5Xq/IXTj53bi8upl4w4D+6gYBPMvv
+ cZEqAJEcsciZx/3Sx5D7UuvaT1piiNI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-422-ZBCrlIXkPd2omv7hczqngw-1; Wed, 02 Sep 2020 18:45:10 -0400
-X-MC-Unique: ZBCrlIXkPd2omv7hczqngw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-379-w1iS8sOaO5CJBWjCPVQJ1w-1; Wed, 02 Sep 2020 18:44:48 -0400
+X-MC-Unique: w1iS8sOaO5CJBWjCPVQJ1w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C64AD1074642;
- Wed,  2 Sep 2020 22:45:09 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 169718030C7;
+ Wed,  2 Sep 2020 22:44:47 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 921E36198B;
- Wed,  2 Sep 2020 22:45:09 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8DB215D9CC;
+ Wed,  2 Sep 2020 22:44:41 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 41/63] lance: Rename SYSBUS_PCNET to LANCE
-Date: Wed,  2 Sep 2020 18:42:49 -0400
-Message-Id: <20200902224311.1321159-42-ehabkost@redhat.com>
+Subject: [PATCH 31/63] virtio-console: Rename TYPE_VIRTIO_CONSOLE_SERIAL_PORT
+ to TYPE_VIRTIO_CONSOLE
+Date: Wed,  2 Sep 2020 18:42:39 -0400
+Message-Id: <20200902224311.1321159-32-ehabkost@redhat.com>
 In-Reply-To: <20200902224311.1321159-1-ehabkost@redhat.com>
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 16:20:39
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 16:25:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -96,84 +97,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Jason Wang <jasowang@redhat.com>, berrange@redhat.com,
- Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, berrange@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>, Amit Shah <amit@kernel.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the type checking macro name consistent with the TYPE_*
-constant.
+This will make the type name constant consistent with the name of
+the type checking macro.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+Cc: Laurent Vivier <lvivier@redhat.com>
+Cc: Amit Shah <amit@kernel.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- include/hw/net/lance.h | 2 +-
- hw/net/lance.c         | 6 +++---
- hw/sparc/sun4m.c       | 2 +-
- 3 files changed, 5 insertions(+), 5 deletions(-)
+ hw/char/virtio-console.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/net/lance.h b/include/hw/net/lance.h
-index f645d6af67..a0434f1254 100644
---- a/include/hw/net/lance.h
-+++ b/include/hw/net/lance.h
-@@ -36,7 +36,7 @@
+diff --git a/hw/char/virtio-console.c b/hw/char/virtio-console.c
+index bc752cf90f..cf4c0a0a95 100644
+--- a/hw/char/virtio-console.c
++++ b/hw/char/virtio-console.c
+@@ -21,10 +21,10 @@
+ #include "qapi/qapi-events-char.h"
+ #include "qom/object.h"
  
- #define TYPE_LANCE "lance"
- typedef struct SysBusPCNetState SysBusPCNetState;
--DECLARE_INSTANCE_CHECKER(SysBusPCNetState, SYSBUS_PCNET,
-+DECLARE_INSTANCE_CHECKER(SysBusPCNetState, LANCE,
-                          TYPE_LANCE)
+-#define TYPE_VIRTIO_CONSOLE_SERIAL_PORT "virtserialport"
++#define TYPE_VIRTIO_CONSOLE "virtserialport"
+ typedef struct VirtConsole VirtConsole;
+ DECLARE_INSTANCE_CHECKER(VirtConsole, VIRTIO_CONSOLE,
+-                         TYPE_VIRTIO_CONSOLE_SERIAL_PORT)
++                         TYPE_VIRTIO_CONSOLE)
  
- struct SysBusPCNetState {
-diff --git a/hw/net/lance.c b/hw/net/lance.c
-index 4c5f01baad..47ab7e1847 100644
---- a/hw/net/lance.c
-+++ b/hw/net/lance.c
-@@ -103,7 +103,7 @@ static const VMStateDescription vmstate_lance = {
- static void lance_realize(DeviceState *dev, Error **errp)
- {
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
--    SysBusPCNetState *d = SYSBUS_PCNET(dev);
-+    SysBusPCNetState *d = LANCE(dev);
-     PCNetState *s = &d->state;
+ struct VirtConsole {
+     VirtIOSerialPort parent_obj;
+@@ -269,7 +269,7 @@ static void virtconsole_class_init(ObjectClass *klass, void *data)
  
-     memory_region_init_io(&s->mmio, OBJECT(d), &lance_mem_ops, d,
-@@ -122,14 +122,14 @@ static void lance_realize(DeviceState *dev, Error **errp)
+ static const TypeInfo virtconsole_info = {
+     .name          = "virtconsole",
+-    .parent        = TYPE_VIRTIO_CONSOLE_SERIAL_PORT,
++    .parent        = TYPE_VIRTIO_CONSOLE,
+     .class_init    = virtconsole_class_init,
+ };
  
- static void lance_reset(DeviceState *dev)
- {
--    SysBusPCNetState *d = SYSBUS_PCNET(dev);
-+    SysBusPCNetState *d = LANCE(dev);
- 
-     pcnet_h_reset(&d->state);
+@@ -293,7 +293,7 @@ static void virtserialport_class_init(ObjectClass *klass, void *data)
  }
  
- static void lance_instance_init(Object *obj)
- {
--    SysBusPCNetState *d = SYSBUS_PCNET(obj);
-+    SysBusPCNetState *d = LANCE(obj);
-     PCNetState *s = &d->state;
- 
-     device_add_bootindex_property(obj, &s->conf.bootindex,
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 3ee7ef4590..192cb87658 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -353,7 +353,7 @@ static void *sparc32_dma_init(hwaddr dma_base,
-                                  OBJECT(dma), "ledma"));
-     sysbus_connect_irq(SYS_BUS_DEVICE(ledma), 0, ledma_irq);
- 
--    lance = SYSBUS_PCNET(object_resolve_path_component(
-+    lance = LANCE(object_resolve_path_component(
-                          OBJECT(ledma), "lance"));
-     sysbus_mmio_map(SYS_BUS_DEVICE(lance), 0, le_base);
- 
+ static const TypeInfo virtserialport_info = {
+-    .name          = TYPE_VIRTIO_CONSOLE_SERIAL_PORT,
++    .name          = TYPE_VIRTIO_CONSOLE,
+     .parent        = TYPE_VIRTIO_SERIAL_PORT,
+     .instance_size = sizeof(VirtConsole),
+     .class_init    = virtserialport_class_init,
 -- 
 2.26.2
 
