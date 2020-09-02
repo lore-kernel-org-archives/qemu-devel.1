@@ -2,84 +2,83 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F37EC433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0462C43461
 	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:38:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B669D20E65
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:38:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E3D220C56
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:38:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="lBWnwpxg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B669D20E65
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="I9qRaalW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E3D220C56
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDYaf-0008Cq-EI
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:38:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51966)
+	id 1kDYag-0008E0-Eo
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:38:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDYXK-000604-Kx
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:35:14 -0400
-Received: from mout.gmx.net ([212.227.15.18]:51587)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDYXM-00060E-Ol
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:35:16 -0400
+Received: from mout.gmx.net ([212.227.15.19]:52429)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDYXF-0002lw-38
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:35:12 -0400
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDYXG-0002mv-OS
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:35:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1599075301;
- bh=WA3W6eKxwf38HVLnDXvoFo7dYyUUcLm5A0v5cXNG0m8=;
- h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=lBWnwpxgnRv54LJvPhSveyYUub+1yXZefUGSb55/wzeN2742BRBwKz94iJwjU8dtP
- sbbm+c+Oic9PXhMU417LCzDyrCJDhIzuZ1E9ClLDodtuZ3OEB3/p3d2EU4GrsmOt4t
- e6o2zlHnml4PpLnHYHre6MrTM/yGpp6Ew6WNixFE=
+ s=badeba3b8450; t=1599075299;
+ bh=AT/VFGFerYkGtMsVFEm0mYFBBfJA9/85DRiOtKqXMK0=;
+ h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+ b=I9qRaalWm2TyPL9rMqjPtuz4wUraigZI6vFCjDPNVR7eA6K9TLFNe59gTcCv8eDGE
+ mYHsCPjE39UWAbLzU7UEpBJC3kmsQOc/b49bjJfAzrjd52BvPOiT2m2iWFZQvpf4f2
+ LisRnKnPwmcL8xxLw8+GKQL5CMbUtYUBkWD8R7RM=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from ls3530.fritz.box ([92.116.155.63]) by mail.gmx.com (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MrQEn-1kxq6d427T-00oXwL; Wed, 02
- Sep 2020 21:35:01 +0200
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1Ma24s-1k7wLH0UKa-00VurO; Wed, 02
+ Sep 2020 21:34:59 +0200
 From: Helge Deller <deller@gmx.de>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 4/8] hw/hppa: Change fw_cfg port address
-Date: Wed,  2 Sep 2020 21:34:52 +0200
-Message-Id: <20200902193456.29844-5-deller@gmx.de>
+Subject: [PATCH v3 0/8] hppa: power button support, artist graphics fixes,
+ firmware fixes, ...
+Date: Wed,  2 Sep 2020 21:34:48 +0200
+Message-Id: <20200902193456.29844-1-deller@gmx.de>
 X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200902193456.29844-1-deller@gmx.de>
-References: <20200902193456.29844-1-deller@gmx.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:Mf1z7W/g49/kes2kEb4E2JlNpGr3vXZxlgZ8NtJUldXE5usrpOd
- PrjWaB8sUeUQKPeEBV9fZOQ12Fubk4JafkZvbq/es9t2PLFF3StcNDbV4a8EWxs5ZL+mNJ8
- tJWTMiAjU20D3JSEho+HsHGLwaiDwBiotcGyCBXfffyKAOQ8hzTw6b1PlXZNx0ohKmPWqu1
- 5NjSrHS6q/J58YjHZ1yvQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uWWbXhelCu8=:YZ3IFewHSN0Qpp4nWQP3P6
- DHrBP7oVVcV5A0vkKoU1m1nJyiYZoFhSq0WuUkiGE5O04Fqz14sSzQY8Axsc+SO97Tn09Kx7w
- sjcmOLQtnF7RvFRDqx4J3L/ez3HMjBNIvHAs4A3BsCR2jQ59d48QxgS8Lhys5GPmrkiDV6k+N
- kB6q+OhkyRkwFHCRMpGm+RM/t4CJpLs4S0hEOlKNRP9Y+PJoPfi7IPi7CtU/6FbvemlZwXOMq
- z0wP/YUqoUCAG6GInAOQd7hxo1IWKYSxssxerJI/eft1SXol0Fe9r5kxWVKieaXjctMdF+64p
- cwZr6dj7uVNMQfKtRzcBEw04n7IpdsYOlq7ULEXtYO1BzL9gZOb32xQrI3Cii867vctWo6HDb
- zV7HPdkne2fq2J/cZgBS/2F63r5RxZSARxbJemcWyX6RERKnKuZq61d4Q6VID+dM1WzCeHs4x
- gH+7yBZIKK2qvpWKpgU8F0E8kcTY/0GIj7f516lnBfsdS7+hT8yKCijJgvmLJOGOXKdLboQBs
- 6JrYts241rpB0dbrEV+vELov5Tq7h1BrQq0I0zLtH0fcMNByQ4tF0T6EaWdl20Hnb1VDVCheY
- LAl40dy5DAYzcV+KXbK7dr7vPWrwqn8fF6FFz/oQbj0NuqdkDpsaWB7JcU+N3YzDiOigMP63k
- 9p7wJaLVfWkcYslyi3+ymvQCDfzxgTMd5BpAdo21kAf9FhM/VDz6vYZ4h1CF8dia+1kCu3nIY
- UCpNMqr5qvPbguHJosQCH/wLLXjwRrh8WMnYBGwj6pnXCRePAE/LVTiYLK0ROCqDq3/9CRTpG
- mbE0U7/5JJYPmkuFOKRINRdrafYy3Vij40e5MSMjc4xA4hFya4Gz8jAFSqtDxgefH11L18ljB
- 2Q6a5FJiFkk53kBeVfR7hrI/XzQU0WcWGf/FtkMVebbuSaRP2/Ng28skdXL+phhnq/+jXn3zv
- 9eZtw4RtJLxz+yEbfhfSAnSV9S0oLloLtIZ3Xd7P4g2nC687Sj1O68fOBB8w+KVDqvWF/Pcz1
- qUSTEM/icSa1cljxRI34HNqs5bsg5rVxQeZidWbnOiL9MylX9fIDB6aQ6F6elvoXITOjFf+ui
- 5Esidc88Q/JrAt4ImOw4ZHPRQM78uunWOqf7CYZpBBaGtxMP2EKRxBiiumDJxYBcUzwA9uRI7
- ZEDPTnjWeMNnpNZHkDFiyRD+QOxCDt0CDQCq3Q9qGfK1oENs9qx3915RxXehgJVnvxAPiMvQD
- cWhrz+sVGAXg6hZ9j
-Received-SPF: pass client-ip=212.227.15.18; envelope-from=deller@gmx.de;
+X-Provags-ID: V03:K1:0gpzV0XMIPD+elR5UZDI87SWS6Dl1HpFSpMDShfAhJTl8kUomul
+ mkLW7MmSdDnwpvolYjbj0vZzqogK2Q9Vf1uVK/LeNHm8kkS31p2Yv+Y1UEUVG5/f9ZAEXME
+ sPIUL0U5Z0Wa6mnuPLCHmDmPcwLamEb2rqhP8pD8EHL8Xw0YybuSKHkoBpBTPhWi5HzCTx/
+ E+t02D94D9SwpKPBbIZng==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:FptaSqa9y+Q=:9b1CoSWFxsZRZEWmGyMXWj
+ gBNS32/vUdQY51g2cWqbLrpNpJ42ryl6ytnY1UT3lTfdWxp5x5p34VwWFQ9AYSdTeB4/h17ny
+ p81ri/Xew9avgQhcrn/pIhbRBc7GFPC3dWfeOh/k+k+u58pkZ1k8k/4J0iS1AcfXhKsVtsaoD
+ 1QGqVq9T+5VJNwZEDfcmRWXQcjlWjFCqsFrNvTyfzZvB/rqoAd0PT/DEzYqM5OHhZZ6dGDRJB
+ XjIySpjSS+9rDA7cv+myvPVDzohF6gdrC+mquFHk8gpDeG9awYxUv+Jzz8t4t73CB7vdR8i9e
+ /e5+N0qaCMf0aHz8YJbkbUVZqyF2YTcr3ZnqJa9nzHM5uyvIh1QwabmjOZ20z1h99ed9NFdmb
+ mMpFt9zX4+kG8PQM+KP+9qh7Kq9Z8uDYoQXTaB9ArFHf1sUBFcUk7WAzF86Hbc7nrF9jJPn4h
+ kEqnUF9+hCqFr7djAc5FFcIqSjz17ggcjDmd4kEB/tdZNBaiY5ap3YdWTb9sLrzvntbHrUKPc
+ yUnf77tuY0HMBgmXh4PMr8HY4/onnNGv57Jds2g8kAr8kfmTUn6ujlkVXzwLFVHbg3F0CxZb2
+ E7AIwdrjO+iCKiWHbfYCDmIrleGpTStpqDzdMtm0c0fogo1SE+sun6J5Ayq3HGal0wawW1vfc
+ oysv6xSQrgwapZKyJkqqJuIs54A7EXbwGiwrIzKYp4GzhYGAHYBaxBBeH/3EnkZKtC9+5Uj27
+ +ZHv5sW1rMln/SaDX11LfemH2iOT2ebvSpfJ5v9hnUWbDH5ajGeo/l+gpxJ+arch+vMAQo5TK
+ 8I3z1A3Ekg1FCzRvDGkds3D9BDaz5ed8JBwlcFYEM3N0ruyDnXR+mV9tm6SC5kc3B4Rvp4PMT
+ T26mKPrTeCuFAM1likv1PuB7yp6mxtGfA6lFKFDFD+kGZdGHQQMCFUezpeK1bI1GKbip+jYP/
+ EDF2rf+Czavy6OfFPcB7xaCp5hE/icd9nryv9v0KvgbEKLrxJn3kYtG+H0/yRxH2hqzBZcysR
+ /ymcsh29V3TE2tSZYxdpMuQw2q01060SskC22Jji+elPSkvmuXePiKqtp3CCwV2kEKHquYYda
+ Mev6roDsdkmDPnyWa1l+JVjyS7DDvOXx1j1xpB5LJ6oY7njDOgbbvPTDm8dRKwawmF+xe/ew9
+ TPI6VhMA7wWSAwN51fpgNWlHQ1kbCK8Ft3q83w7JyHCarwcn+QszcjKIrkvMxHoV2nCebNxcu
+ GSxqXU5P6dLFQd3R2
+Received-SPF: pass client-ip=212.227.15.19; envelope-from=deller@gmx.de;
  helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 15:35:05
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 15:35:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -25
 X-Spam_score: -2.6
@@ -105,33 +104,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Devices on hppa occupy at least 4k starting at the HPA, so MEMORY_HPA+4k i=
-s
-blocked (by Linux) for the memory module.  I noticed this when testing the=
- new
-Linux kernel patch to let the fw_cfg entries show up in Linux under /proc.
-The Linux kernel driver could not allocate the region for fw_cfg.
-This new base address seems to not conflict.
+Add emulation for a power button on hppa,
+fix quite some bugs in seabios-hppa firmware for artist graphics card,
+fix boot with old Linux installation CDs,
+TLB preparation patches and fw_cfg port addresss handover to SeaBIOS.
 
-Signed-off-by: Helge Deller <deller@gmx.de>
-=2D--
- hw/hppa/hppa_hardware.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+The git tree can be pulled from here:
+git://github.com/hdeller/qemu-hppa.git  target-hppa
 
-diff --git a/hw/hppa/hppa_hardware.h b/hw/hppa/hppa_hardware.h
-index cdb7fa6240..b2fbbc2eec 100644
-=2D-- a/hw/hppa/hppa_hardware.h
-+++ b/hw/hppa/hppa_hardware.h
-@@ -38,8 +38,7 @@
- #define PORT_PCI_CMD    (PCI_HPA + DINO_PCI_ADDR)
- #define PORT_PCI_DATA   (PCI_HPA + DINO_CONFIG_DATA)
+Helge Deller (8):
+  seabios-hppa: Update SeaBIOS to hppa-qemu-5.2-2 tag
+  hw/hppa: Make number of TLB and BTLB entries configurable
+  hw/hppa: Store boot device in fw_cfg section
+  hw/hppa: Change fw_cfg port address
+  hw/hppa: Tell SeaBIOS port address of fw_cfg
+  hw/hppa: Add power button emulation
+  hw/display/artist: Fix artist screen resolution
+  target/hppa: Fix boot with old Linux installation CDs
 
--/* QEMU fw_cfg interface port */
--#define QEMU_FW_CFG_IO_BASE     (MEMORY_HPA + 0x80)
-+#define QEMU_FW_CFG_IO_BASE     0xfffa0000
+ hw/display/artist.c       |  37 +++++++++++++++----------
+ hw/hppa/hppa_hardware.h   |   3 +-
+ hw/hppa/machine.c         |  56 +++++++++++++++++++++++++++++++++++++-
+ pc-bios/hppa-firmware.img | Bin 783192 -> 785696 bytes
+ roms/seabios-hppa         |   2 +-
+ target/hppa/cpu.h         |   5 +++-
+ target/hppa/insns.decode  |  10 +++----
+ 7 files changed, 89 insertions(+), 24 deletions(-)
 
- #define PORT_SERIAL1    (DINO_UART_HPA + 0x800)
- #define PORT_SERIAL2    (LASI_UART_HPA + 0x800)
 =2D-
 2.21.3
 
