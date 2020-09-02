@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BE6C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80237C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4233920767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 489BE20767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rgt0MR5w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4233920767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XwjztFV/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 489BE20767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDVx2-0006bC-DC
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 12:49:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41470)
+	id 1kDVx9-0006uK-FB
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 12:49:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwI-0005EX-RL
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33582
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwM-0005N8-Dh
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:60241
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwH-0006r8-6h
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:50 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwK-0006rh-Vr
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599065328;
+ s=mimecast20190719; t=1599065332;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cVDPPpEZfgvBqHPYP78ibHeFywV1qIbiXW18X7UxDPg=;
- b=Rgt0MR5whOBQBqIIIRIXtke4oROAGxzr/7cqCc/3SXd8u4vKqNQxl4HL0ghspQorDyzq7o
- 4+tsWKpoj2zoWRIo+ZUQ/4hrgHUIOwZdQJdpZa49KratNxU2je9rgqRHqT09QurxkPwTi6
- jtf7iy39+pbMgMT5lHd9eiWPHLvg1I4=
+ bh=MGWVOZqO5sQSbVg4HnXyePdWDQ+gGvYfruwCmlWmsS4=;
+ b=XwjztFV/dSXUFKj/pu0f7EanIUZ/K1oP5EWrrbgLDrcY8Hi1/UGUI6L8EMOXwFNg2bqE6G
+ tbrCZryp2qROnjIawX5aFl/umb+SsNwoLMSVAXUUita4A6BZ3kZSDBr6Ftni7pt5CBED9j
+ 4O1QTGYonHRMLPDNop+MGC7B9cTe0RI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-OEsDglB4OEq2YjHXxr7pOw-1; Wed, 02 Sep 2020 12:48:46 -0400
-X-MC-Unique: OEsDglB4OEq2YjHXxr7pOw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-104-pkDLpt6RMhez_T19b-VCrg-1; Wed, 02 Sep 2020 12:48:48 -0400
+X-MC-Unique: pkDLpt6RMhez_T19b-VCrg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DD611091065;
- Wed,  2 Sep 2020 16:48:45 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4F869100854F;
+ Wed,  2 Sep 2020 16:48:47 +0000 (UTC)
 Received: from localhost (ovpn-114-169.ams2.redhat.com [10.36.114.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C67C17C5B5;
- Wed,  2 Sep 2020 16:48:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E7E9E10098AC;
+ Wed,  2 Sep 2020 16:48:46 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 1/3] mirror: Set s->base_overlay only if s->base is set
-Date: Wed,  2 Sep 2020 18:48:39 +0200
-Message-Id: <20200902164841.214948-2-mreitz@redhat.com>
+Subject: [PATCH 2/3] mirror: Freeze backing chain for sync=top
+Date: Wed,  2 Sep 2020 18:48:40 +0200
+Message-Id: <20200902164841.214948-3-mreitz@redhat.com>
 In-Reply-To: <20200902164841.214948-1-mreitz@redhat.com>
 References: <20200902164841.214948-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0.001
@@ -100,47 +100,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This way, sync=full will not need a reference to any node other than the
-source and the target.
-
+Reported-by: Kevin Wolf <kwolf@redhat.com>
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/mirror.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ block/mirror.c | 20 +++++++++++++++++---
+ 1 file changed, 17 insertions(+), 3 deletions(-)
 
 diff --git a/block/mirror.c b/block/mirror.c
-index 26acf4af6f..11ebffdf99 100644
+index 11ebffdf99..27422ab7a5 100644
 --- a/block/mirror.c
 +++ b/block/mirror.c
-@@ -42,6 +42,7 @@ typedef struct MirrorBlockJob {
-     BlockBackend *target;
-     BlockDriverState *mirror_top_bs;
-     BlockDriverState *base;
-+    /* Overlay of @base if @base is non-NULL; NULL otherwise */
-     BlockDriverState *base_overlay;
+@@ -649,8 +649,8 @@ static int mirror_exit_common(Job *job)
+     src = mirror_top_bs->backing->bs;
+     target_bs = blk_bs(s->target);
  
-     /* The name of the graph node to replace */
-@@ -839,8 +840,9 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-             return 0;
-         }
+-    if (bdrv_chain_contains(src, target_bs)) {
+-        bdrv_unfreeze_backing_chain(mirror_top_bs, target_bs);
++    if (s->base) {
++        bdrv_unfreeze_backing_chain(mirror_top_bs, s->base);
+     }
  
--        ret = bdrv_is_allocated_above(bs, s->base_overlay, true, offset, bytes,
--                                      &count);
-+        ret = bdrv_is_allocated_above(bs, s->base_overlay,
-+                                      s->base_overlay != NULL,
-+                                      offset, bytes, &count);
-         if (ret < 0) {
-             return ret;
+     bdrv_release_dirty_bitmap(s->dirty_bitmap);
+@@ -1780,8 +1780,22 @@ static BlockJob *mirror_start_job(
+                 goto fail;
+             }
          }
-@@ -1710,7 +1712,7 @@ static BlockJob *mirror_start_job(
-     s->zero_target = zero_target;
-     s->copy_mode = copy_mode;
-     s->base = base;
--    s->base_overlay = bdrv_find_overlay(bs, base);
-+    s->base_overlay = base ? bdrv_find_overlay(bs, base) : NULL;
-     s->granularity = granularity;
-     s->buf_size = ROUND_UP(buf_size, granularity);
-     s->unmap = unmap;
++    }
++
++    if (s->base) {
++        /*
++         * For active commit or mirror with sync=top, we need to
++         * freeze the backing chain down to the base, because we keep
++         * pointers to it and its overlay.  For other cases (mirror
++         * with sync=full or sync=none), we do not, so there is no
++         * need to freeze any part of the chain.
++         * (s->base is non-NULL only in these cases.)
++         */
++        if (target_is_backing) {
++            assert(s->base == target);
++        }
+ 
+-        if (bdrv_freeze_backing_chain(mirror_top_bs, target, errp) < 0) {
++        if (bdrv_freeze_backing_chain(mirror_top_bs, s->base, errp) < 0) {
+             goto fail;
+         }
+     }
 -- 
 2.26.2
 
