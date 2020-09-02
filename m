@@ -2,59 +2,89 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78A5AC433E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:24:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61351C433E6
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:25:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A6F320709
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:24:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A6F320709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 2C75020709
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:25:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hNhnLxIJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C75020709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDO4f-0002Aq-Ee
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:24:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44428)
+	id 1kDO4j-0002IT-BL
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:25:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kDNwx-0002gE-4h
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:59 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:38704)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kDNwr-00034h-2L
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:58 -0400
-Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 13E4740A928D;
- Wed,  2 Sep 2020 08:16:51 +0000 (UTC)
-Subject: [PATCH v3 11/15] gdbstub: add reverse step support in replay mode
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-To: qemu-devel@nongnu.org
-Date: Wed, 02 Sep 2020 11:16:50 +0300
-Message-ID: <159903461078.28509.9310557942659425312.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
-References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
-User-Agent: StGit/0.17.1-dirty
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kDNxO-0003ge-IM
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:17:26 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:21506
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kDNxM-00039G-Qm
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:17:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599034643;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=Mzks7dACQ3aINxrT3K2SJgHZLlXfnSPn/IUFBXHTK2o=;
+ b=hNhnLxIJx8QbCI1z+qXnHtQm78tdnyR16IBURHe274bz3TMIXzKjkxlxweR2bQeYYUi4zT
+ +U0DKeWDUcbaQVUZQer9PdAfO3lhIs/nyI0Q59lE/Y2uFmm/JZlGdBF3LBH/JAS0xIyiif
+ T5ONyb52wZQTHRXZ0CXcG4Bxhn/kG8g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-v_aOMMIhM_KCOKYmKKTkJQ-1; Wed, 02 Sep 2020 04:17:22 -0400
+X-MC-Unique: v_aOMMIhM_KCOKYmKKTkJQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 28F001008570;
+ Wed,  2 Sep 2020 08:17:21 +0000 (UTC)
+Received: from redhat.com (ovpn-114-158.ams2.redhat.com [10.36.114.158])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E8A4219C71;
+ Wed,  2 Sep 2020 08:17:16 +0000 (UTC)
+Date: Wed, 2 Sep 2020 09:17:13 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "kraxel@redhat.com" <kraxel@redhat.com>
+Subject: Re: ui: fix potential compile error.
+Message-ID: <20200902081713.GD403297@redhat.com>
+References: <370e6ed66acf43e68f1ef2bffc3026f7@tencent.com>
+ <20200902052313.unmxqfgsix6kuerb@sirius.home.kraxel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=83.149.199.84;
- envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 04:15:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200902052313.unmxqfgsix6kuerb@sirius.home.kraxel.org>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 03:24:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,279 +97,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wrampazz@redhat.com, pavel.dovgalyuk@ispras.ru,
- ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
- armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: =?utf-8?B?cnVpcHBhbijmvZjnnb8p?= <ruippan@tencent.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Wed, Sep 02, 2020 at 07:23:13AM +0200, kraxel@redhat.com wrote:
+>   Hi,
+> 
+> > 1.     CentOS7 with Python 2.7.5
+> 
+> > Root cause is my argparse and python version. But change the invoking order can adapt both new and old argparse.
+> 
+> python2 is EOL and not supported any more.
+> please "yum install python3" (yes, centos7 has it, was added in 7.8).
 
-GDB remote protocol supports two reverse debugging commands:
-reverse step and reverse continue.
-This patch adds support of the first one to the gdbstub.
-Reverse step is intended to step one instruction in the backwards
-direction. This is not possible in regular execution.
-But replayed execution is deterministic, therefore we can load one of
-the prior snapshots and proceed to the desired step. It is equivalent
-to stepping one instruction back.
-There should be at least one snapshot preceding the debugged part of
-the replay log.
+Hmm, I'm surpised the build even got this far.  configure should be checking
+python version and refusing to run with python2 at all before even starting
+the build process.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
----
- accel/tcg/translator.c    |    1 +
- exec.c                    |    7 ++++++
- gdbstub.c                 |   55 +++++++++++++++++++++++++++++++++++++++++++--
- include/sysemu/replay.h   |   11 +++++++++
- replay/replay-debugging.c |   33 +++++++++++++++++++++++++++
- softmmu/cpus.c            |   14 +++++++++--
- stubs/replay.c            |    5 ++++
- 7 files changed, 121 insertions(+), 5 deletions(-)
-
-diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-index 603d17ff83..fb1e19c585 100644
---- a/accel/tcg/translator.c
-+++ b/accel/tcg/translator.c
-@@ -17,6 +17,7 @@
- #include "exec/log.h"
- #include "exec/translator.h"
- #include "exec/plugin-gen.h"
-+#include "sysemu/replay.h"
- 
- /* Pairs with tcg_clear_temp_count.
-    To be called by #TranslatorOps.{translate_insn,tb_stop} if
-diff --git a/exec.c b/exec.c
-index 7683afb6a8..47512e950c 100644
---- a/exec.c
-+++ b/exec.c
-@@ -2750,6 +2750,13 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr addr, vaddr len,
-     QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
-         if (watchpoint_address_matches(wp, addr, len)
-             && (wp->flags & flags)) {
-+            if (replay_running_debug()) {
-+                /*
-+                 * Don't process the watchpoints when we are
-+                 * in a reverse debugging operation.
-+                 */
-+                return;
-+            }
-             if (flags == BP_MEM_READ) {
-                 wp->flags |= BP_WATCHPOINT_HIT_READ;
-             } else {
-diff --git a/gdbstub.c b/gdbstub.c
-index 9dfb6e4142..79e8ccc050 100644
---- a/gdbstub.c
-+++ b/gdbstub.c
-@@ -51,6 +51,7 @@
- #include "sysemu/runstate.h"
- #include "hw/semihosting/semihost.h"
- #include "exec/exec-all.h"
-+#include "sysemu/replay.h"
- 
- #ifdef CONFIG_USER_ONLY
- #define GDB_ATTACHED "0"
-@@ -375,6 +376,20 @@ typedef struct GDBState {
-  */
- static int sstep_flags = SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
- 
-+/* Retrieves flags for single step mode. */
-+static int get_sstep_flags(void)
-+{
-+    /*
-+     * In replay mode all events written into the log should be replayed.
-+     * That is why NOIRQ flag is removed in this mode.
-+     */
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        return SSTEP_ENABLE;
-+    } else {
-+        return sstep_flags;
-+    }
-+}
-+
- static GDBState gdbserver_state;
- 
- static void init_gdbserver_state(void)
-@@ -501,7 +516,7 @@ static int gdb_continue_partial(char *newstates)
-                 break; /* nothing to do here */
-             case 's':
-                 trace_gdbstub_op_stepping(cpu->cpu_index);
--                cpu_single_step(cpu, sstep_flags);
-+                cpu_single_step(cpu, get_sstep_flags());
-                 cpu_resume(cpu);
-                 flag = 1;
-                 break;
-@@ -1874,10 +1889,31 @@ static void handle_step(GdbCmdContext *gdb_ctx, void *user_ctx)
-         gdb_set_cpu_pc((target_ulong)gdb_ctx->params[0].val_ull);
-     }
- 
--    cpu_single_step(gdbserver_state.c_cpu, sstep_flags);
-+    cpu_single_step(gdbserver_state.c_cpu, get_sstep_flags());
-     gdb_continue();
- }
- 
-+static void handle_backward(GdbCmdContext *gdb_ctx, void *user_ctx)
-+{
-+    if (replay_mode != REPLAY_MODE_PLAY) {
-+        put_packet("E22");
-+    }
-+    if (gdb_ctx->num_params == 1) {
-+        switch (gdb_ctx->params[0].opcode) {
-+        case 's':
-+            if (replay_reverse_step()) {
-+                gdb_continue();
-+            } else {
-+                put_packet("E14");
-+            }
-+            return;
-+        }
-+    }
-+
-+    /* Default invalid command */
-+    put_packet("");
-+}
-+
- static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
- {
-     put_packet("vCont;c;C;s;S");
-@@ -2124,6 +2160,10 @@ static void handle_query_supported(GdbCmdContext *gdb_ctx, void *user_ctx)
-         g_string_append(gdbserver_state.str_buf, ";qXfer:features:read+");
-     }
- 
-+    if (replay_mode == REPLAY_MODE_PLAY) {
-+        g_string_append(gdbserver_state.str_buf, ";ReverseStep+");
-+    }
-+
-     if (gdb_ctx->num_params &&
-         strstr(gdb_ctx->params[0].data, "multiprocess+")) {
-         gdbserver_state.multiprocess = true;
-@@ -2460,6 +2500,17 @@ static int gdb_handle_packet(const char *line_buf)
-             cmd_parser = &step_cmd_desc;
-         }
-         break;
-+    case 'b':
-+        {
-+            static const GdbCmdParseEntry backward_cmd_desc = {
-+                .handler = handle_backward,
-+                .cmd = "b",
-+                .cmd_startswith = 1,
-+                .schema = "o0"
-+            };
-+            cmd_parser = &backward_cmd_desc;
-+        }
-+        break;
-     case 'F':
-         {
-             static const GdbCmdParseEntry file_io_cmd_desc = {
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 239c01e7df..13a8123b09 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -75,6 +75,17 @@ void replay_finish(void);
- void replay_add_blocker(Error *reason);
- /* Returns name of the replay log file */
- const char *replay_get_filename(void);
-+/*
-+ * Start making one step in backward direction.
-+ * Used by gdbstub for backwards debugging.
-+ * Returns true on success.
-+ */
-+bool replay_reverse_step(void);
-+/*
-+ * Returns true if replay module is processing
-+ * reverse_continue or reverse_step request
-+ */
-+bool replay_running_debug(void);
- 
- /* Processing the instructions */
- 
-diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-index cfd0221692..aa3ca040e2 100644
---- a/replay/replay-debugging.c
-+++ b/replay/replay-debugging.c
-@@ -22,6 +22,13 @@
- #include "block/snapshot.h"
- #include "migration/snapshot.h"
- 
-+static bool replay_is_debugging;
-+
-+bool replay_running_debug(void)
-+{
-+    return replay_is_debugging;
-+}
-+
- void hmp_info_replay(Monitor *mon, const QDict *qdict)
- {
-     if (replay_mode == REPLAY_MODE_NONE) {
-@@ -219,3 +226,29 @@ void hmp_replay_seek(Monitor *mon, const QDict *qdict)
-         return;
-     }
- }
-+
-+static void replay_stop_vm_debug(void *opaque)
-+{
-+    replay_is_debugging = false;
-+    vm_stop(RUN_STATE_DEBUG);
-+    replay_delete_break();
-+}
-+
-+bool replay_reverse_step(void)
-+{
-+    Error *err = NULL;
-+
-+    assert(replay_mode == REPLAY_MODE_PLAY);
-+
-+    if (replay_get_current_icount() != 0) {
-+        replay_seek(replay_get_current_icount() - 1, replay_stop_vm_debug, &err);
-+        if (err) {
-+            error_free(err);
-+            return false;
-+        }
-+        replay_is_debugging = true;
-+        return true;
-+    }
-+
-+    return false;
-+}
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index a802e899ab..377fe3298c 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -1004,9 +1004,17 @@ static bool cpu_can_run(CPUState *cpu)
- 
- static void cpu_handle_guest_debug(CPUState *cpu)
- {
--    gdb_set_stop_cpu(cpu);
--    qemu_system_debug_request();
--    cpu->stopped = true;
-+    if (!replay_running_debug()) {
-+        gdb_set_stop_cpu(cpu);
-+        qemu_system_debug_request();
-+        cpu->stopped = true;
-+    } else {
-+        if (!cpu->singlestep_enabled) {
-+            cpu_single_step(cpu, SSTEP_ENABLE);
-+        } else {
-+            cpu_single_step(cpu, 0);
-+        }
-+    }
- }
- 
- #ifdef CONFIG_LINUX
-diff --git a/stubs/replay.c b/stubs/replay.c
-index eacb366aa8..d5b52302e9 100644
---- a/stubs/replay.c
-+++ b/stubs/replay.c
-@@ -93,3 +93,8 @@ uint64_t replay_get_current_icount(void)
- {
-     return 0;
- }
-+
-+bool replay_reverse_step(void)
-+{
-+    return false;
-+}
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
