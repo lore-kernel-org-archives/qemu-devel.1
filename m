@@ -2,87 +2,91 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2E11C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F37EC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:38:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64C6120773
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B669D20E65
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:38:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKQemhz3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64C6120773
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="lBWnwpxg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B669D20E65
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41676 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDYYx-000790-Ju
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:36:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52220)
+	id 1kDYaf-0008Cq-EI
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:38:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDYYF-0006T6-8Z
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:36:11 -0400
-Received: from mail-lj1-x232.google.com ([2a00:1450:4864:20::232]:35411)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDYYD-000339-4t
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:36:10 -0400
-Received: by mail-lj1-x232.google.com with SMTP id a15so602170ljk.2
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 12:36:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=a8wJuPdo+yEwcxbXlCgHoqooCQgqtpIyp9ItDTCp9bE=;
- b=MKQemhz3l0t0YBb5Ye6nBP1kIYNbHnNIwy7rvcG/M5s1awzMkIUp8uLxnh6gtVbgfY
- R8Tv2vtuT11zKYn5gJXs3bHS2j6uMAP1Ye5WGwTS6iM3qUb1ZRi387y9EPzOsUKxMfuk
- 7NEdqTPTbdyl9p/5tL/SCCCsi8HVBKcOAckHLghk7fRCyWIuwtSkfL7IbL6bHT+EMAHw
- i5OYajE9v+fE5KxNL9yulVBR7N1G1kzTI/KcUc15LJLed1AuXAAbM9jXusfNTY1Vh/Rw
- WI7avy/ket8P/NotqzOFiUsYDPV34LC6PyIekPBb0S28+YvTrl9r0VWdk0DLKzZ5vk55
- Zl2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=a8wJuPdo+yEwcxbXlCgHoqooCQgqtpIyp9ItDTCp9bE=;
- b=ZDCeT4tFTu5/h79H2sLyLvbzx4beDZw/+WO0XKOQNQk2+5iC142qUmW77vZ2RRPqUe
- Jszibi5HESk+AHmjRg7JZ1B/4x87qBE2xzIhoB1wHE8vwl0Yzk8FTYWASymaIln26xmu
- eJKtJvp5uS2veVs2bSaizcHUYA9eYaMdgm3NCysOsKOhpicEZ+AMsKSmiztNwy4LhXvJ
- bVbiEHLqUcpdXrDygySX96nozhfKLs41n6s8a1Kr2FIrJr6Dwkq9KzLiKuu85pBPGa1S
- zQjtjBF3D9vZQC7r7Maa8G0XuetCp8wPxclX4T/ZroXdSSO/pPOkdGpW8nh8AIwGHaFv
- WWgA==
-X-Gm-Message-State: AOAM531ZtRPlXVAK2/MiM96Rt238yTH2Y3LjCSEKWfaHHQydW7G8D7Co
- igRKYOTaMpUA1046OIL48zNexsxAV41ltwo7sxr98/dAhvIyjcRa
-X-Google-Smtp-Source: ABdhPJzp5rCVD9erR0+mjMAzxDTd/KhOl3YwK3k/bUp2/mXCdWh7wDU8V+eYAgkK+yZecqiWG7V64g9yk61ueAN/W7U=
-X-Received: by 2002:a2e:2a83:: with SMTP id q125mr4188104ljq.242.1599075366983; 
- Wed, 02 Sep 2020 12:36:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDYXK-000604-Kx
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:35:14 -0400
+Received: from mout.gmx.net ([212.227.15.18]:51587)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDYXF-0002lw-38
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:35:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=badeba3b8450; t=1599075301;
+ bh=WA3W6eKxwf38HVLnDXvoFo7dYyUUcLm5A0v5cXNG0m8=;
+ h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
+ b=lBWnwpxgnRv54LJvPhSveyYUub+1yXZefUGSb55/wzeN2742BRBwKz94iJwjU8dtP
+ sbbm+c+Oic9PXhMU417LCzDyrCJDhIzuZ1E9ClLDodtuZ3OEB3/p3d2EU4GrsmOt4t
+ e6o2zlHnml4PpLnHYHre6MrTM/yGpp6Ew6WNixFE=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from ls3530.fritz.box ([92.116.155.63]) by mail.gmx.com (mrgmx005
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MrQEn-1kxq6d427T-00oXwL; Wed, 02
+ Sep 2020 21:35:01 +0200
+From: Helge Deller <deller@gmx.de>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 4/8] hw/hppa: Change fw_cfg port address
+Date: Wed,  2 Sep 2020 21:34:52 +0200
+Message-Id: <20200902193456.29844-5-deller@gmx.de>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200902193456.29844-1-deller@gmx.de>
+References: <20200902193456.29844-1-deller@gmx.de>
 MIME-Version: 1.0
-References: <CAE2XoE8VqiSFAuRL--VZtj-wOsGcGPn0FO3SOLeVfXwrP12_ig@mail.gmail.com>
- <20727adf-8d8c-ada2-c95b-a4f8d7653c91@redhat.com>
-In-Reply-To: <20727adf-8d8c-ada2-c95b-a4f8d7653c91@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Thu, 3 Sep 2020 03:35:55 +0800
-Message-ID: <CAE2XoE90HDXjQDOFyR_Ar2jxABLgZHhjZ+fFkwngTPzt7aSjyQ@mail.gmail.com>
-Subject: Re: new msys2 testing failure,
- does this fixe? undefined reference to `qemu_lock_fd_test'
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000037db5105ae59bf5d"
-Received-SPF: pass client-ip=2a00:1450:4864:20::232;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x232.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:Mf1z7W/g49/kes2kEb4E2JlNpGr3vXZxlgZ8NtJUldXE5usrpOd
+ PrjWaB8sUeUQKPeEBV9fZOQ12Fubk4JafkZvbq/es9t2PLFF3StcNDbV4a8EWxs5ZL+mNJ8
+ tJWTMiAjU20D3JSEho+HsHGLwaiDwBiotcGyCBXfffyKAOQ8hzTw6b1PlXZNx0ohKmPWqu1
+ 5NjSrHS6q/J58YjHZ1yvQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:uWWbXhelCu8=:YZ3IFewHSN0Qpp4nWQP3P6
+ DHrBP7oVVcV5A0vkKoU1m1nJyiYZoFhSq0WuUkiGE5O04Fqz14sSzQY8Axsc+SO97Tn09Kx7w
+ sjcmOLQtnF7RvFRDqx4J3L/ez3HMjBNIvHAs4A3BsCR2jQ59d48QxgS8Lhys5GPmrkiDV6k+N
+ kB6q+OhkyRkwFHCRMpGm+RM/t4CJpLs4S0hEOlKNRP9Y+PJoPfi7IPi7CtU/6FbvemlZwXOMq
+ z0wP/YUqoUCAG6GInAOQd7hxo1IWKYSxssxerJI/eft1SXol0Fe9r5kxWVKieaXjctMdF+64p
+ cwZr6dj7uVNMQfKtRzcBEw04n7IpdsYOlq7ULEXtYO1BzL9gZOb32xQrI3Cii867vctWo6HDb
+ zV7HPdkne2fq2J/cZgBS/2F63r5RxZSARxbJemcWyX6RERKnKuZq61d4Q6VID+dM1WzCeHs4x
+ gH+7yBZIKK2qvpWKpgU8F0E8kcTY/0GIj7f516lnBfsdS7+hT8yKCijJgvmLJOGOXKdLboQBs
+ 6JrYts241rpB0dbrEV+vELov5Tq7h1BrQq0I0zLtH0fcMNByQ4tF0T6EaWdl20Hnb1VDVCheY
+ LAl40dy5DAYzcV+KXbK7dr7vPWrwqn8fF6FFz/oQbj0NuqdkDpsaWB7JcU+N3YzDiOigMP63k
+ 9p7wJaLVfWkcYslyi3+ymvQCDfzxgTMd5BpAdo21kAf9FhM/VDz6vYZ4h1CF8dia+1kCu3nIY
+ UCpNMqr5qvPbguHJosQCH/wLLXjwRrh8WMnYBGwj6pnXCRePAE/LVTiYLK0ROCqDq3/9CRTpG
+ mbE0U7/5JJYPmkuFOKRINRdrafYy3Vij40e5MSMjc4xA4hFya4Gz8jAFSqtDxgefH11L18ljB
+ 2Q6a5FJiFkk53kBeVfR7hrI/XzQU0WcWGf/FtkMVebbuSaRP2/Ng28skdXL+phhnq/+jXn3zv
+ 9eZtw4RtJLxz+yEbfhfSAnSV9S0oLloLtIZ3Xd7P4g2nC687Sj1O68fOBB8w+KVDqvWF/Pcz1
+ qUSTEM/icSa1cljxRI34HNqs5bsg5rVxQeZidWbnOiL9MylX9fIDB6aQ6F6elvoXITOjFf+ui
+ 5Esidc88Q/JrAt4ImOw4ZHPRQM78uunWOqf7CYZpBBaGtxMP2EKRxBiiumDJxYBcUzwA9uRI7
+ ZEDPTnjWeMNnpNZHkDFiyRD+QOxCDt0CDQCq3Q9qGfK1oENs9qx3915RxXehgJVnvxAPiMvQD
+ cWhrz+sVGAXg6hZ9j
+Received-SPF: pass client-ip=212.227.15.18; envelope-from=deller@gmx.de;
+ helo=mout.gmx.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 15:35:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,141 +100,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: qemu-level <qemu-devel@nongnu.org>
+Cc: Helge Deller <deller@gmx.de>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000037db5105ae59bf5d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Devices on hppa occupy at least 4k starting at the HPA, so MEMORY_HPA+4k i=
+s
+blocked (by Linux) for the memory module.  I noticed this when testing the=
+ new
+Linux kernel patch to let the fw_cfg entries show up in Linux under /proc.
+The Linux kernel driver could not allocate the region for fw_cfg.
+This new base address seems to not conflict.
 
-On Thu, Sep 3, 2020 at 3:33 AM Thomas Huth <thuth@redhat.com> wrote:
+Signed-off-by: Helge Deller <deller@gmx.de>
+=2D--
+ hw/hppa/hppa_hardware.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> On 02/09/2020 21.13, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
-> >
-> >
-> C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../..=
-/../x86_64-w64-mingw32/bin/ld.exe:
-> > tests/test-image-locking.o: in function `check_locked_bytes':
-> > 5564D:/a/qemu/qemu/tests/test-image-locking.c:69: undefined reference t=
-o
-> > `qemu_lock_fd_test'
-> >
-> 5565C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../.=
-./../../x86_64-w64-mingw32/bin/ld.exe:
-> > D:/a/qemu/qemu/tests/test-image-locking.c:71: undefined reference to
-> > `qemu_lock_fd_test'
-> >
-> 5566C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../.=
-./../../x86_64-w64-mingw32/bin/ld.exe:
-> > D:/a/qemu/qemu/tests/test-image-locking.c:62: undefined reference to
-> > `qemu_lock_fd_test'
-> >
-> 5567C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../.=
-./../../x86_64-w64-mingw32/bin/ld.exe:
-> > tests/test-image-locking.o: in function `main':
-> > 5568D:/a/qemu/qemu/tests/test-image-locking.c:152: undefined reference
-> > to `qemu_has_ofd_lock'
-> > 5569collect2.exe: error: ld returned 1 exit status
-> > 5570make: *** [D:/a/qemu/qemu/rules.mak:88:
-> > tests/test-image-locking.exe] Error 1
-> > 5571make: *** Waiting for unfinished jobs....
->
-> You need this patch here:
->
-> https://lore.kernel.org/qemu-devel/20200823111757.72002-4-thuth@redhat.co=
-m/
->
-> and also:
->
-> https://lore.kernel.org/qemu-devel/20200823111757.72002-5-thuth@redhat.co=
-m/
->
->   Well, about test-replication, I've already fixes the test code
-directly, so enable it on win32 is a better option
+diff --git a/hw/hppa/hppa_hardware.h b/hw/hppa/hppa_hardware.h
+index cdb7fa6240..b2fbbc2eec 100644
+=2D-- a/hw/hppa/hppa_hardware.h
++++ b/hw/hppa/hppa_hardware.h
+@@ -38,8 +38,7 @@
+ #define PORT_PCI_CMD    (PCI_HPA + DINO_PCI_ADDR)
+ #define PORT_PCI_DATA   (PCI_HPA + DINO_CONFIG_DATA)
 
+-/* QEMU fw_cfg interface port */
+-#define QEMU_FW_CFG_IO_BASE     (MEMORY_HPA + 0x80)
++#define QEMU_FW_CFG_IO_BASE     0xfffa0000
 
-> ... or wait for Paolo's next meson pull request which will convert
-> tests/Makefile to meson.
->
->  Thomas
->
->
+ #define PORT_SERIAL1    (DINO_UART_HPA + 0x800)
+ #define PORT_SERIAL2    (LASI_UART_HPA + 0x800)
+=2D-
+2.21.3
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---00000000000037db5105ae59bf5d
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><div><span style=3D"color:rgb(0,0,0);font=
--size:13px;white-space:pre-wrap"><br></span></div></div><br><div class=3D"g=
-mail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Sep 3, 2020 at 3:=
-33 AM Thomas Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com<=
-/a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0=
-px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">O=
-n 02/09/2020 21.13, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:<br>
-&gt; <br>
-&gt; C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../..=
-/../../x86_64-w64-mingw32/bin/ld.exe:<br>
-&gt; tests/test-image-locking.o: in function `check_locked_bytes&#39;:<br>
-&gt; 5564D:/a/qemu/qemu/tests/test-image-locking.c:69: undefined reference =
-to<br>
-&gt; `qemu_lock_fd_test&#39;<br>
-&gt; 5565C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/.=
-./../../../x86_64-w64-mingw32/bin/ld.exe:<br>
-&gt; D:/a/qemu/qemu/tests/test-image-locking.c:71: undefined reference to<b=
-r>
-&gt; `qemu_lock_fd_test&#39;<br>
-&gt; 5566C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/.=
-./../../../x86_64-w64-mingw32/bin/ld.exe:<br>
-&gt; D:/a/qemu/qemu/tests/test-image-locking.c:62: undefined reference to<b=
-r>
-&gt; `qemu_lock_fd_test&#39;<br>
-&gt; 5567C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/.=
-./../../../x86_64-w64-mingw32/bin/ld.exe:<br>
-&gt; tests/test-image-locking.o: in function `main&#39;:<br>
-&gt; 5568D:/a/qemu/qemu/tests/test-image-locking.c:152: undefined reference=
-<br>
-&gt; to `qemu_has_ofd_lock&#39;<br>
-&gt; 5569collect2.exe: error: ld returned 1 exit status<br>
-&gt; 5570make: *** [D:/a/qemu/qemu/rules.mak:88:<br>
-&gt; tests/test-image-locking.exe] Error 1<br>
-&gt; 5571make: *** Waiting for unfinished jobs....<br>
-<br>
-You need this patch here:<br>
-<br>
-<a href=3D"https://lore.kernel.org/qemu-devel/20200823111757.72002-4-thuth@=
-redhat.com/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.org/q=
-emu-devel/20200823111757.72002-4-thuth@redhat.com/</a><br>
-<br>
-and also:<br>
-<br>
-<a href=3D"https://lore.kernel.org/qemu-devel/20200823111757.72002-5-thuth@=
-redhat.com/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.org/q=
-emu-devel/20200823111757.72002-5-thuth@redhat.com/</a><br>
-<br></blockquote>=C2=A0 Well, about=C2=A0<span style=3D"color:rgb(0,0,0);fo=
-nt-size:13px;white-space:pre-wrap">test-replication, I&#39;ve already fixes=
- the test code directly, so enable it on win32 is a better option</span><di=
-v></div><div>=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:=
-0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-... or wait for Paolo&#39;s next meson pull request which will convert<br>
-tests/Makefile to meson.<br>
-<br>
-=C2=A0Thomas<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---00000000000037db5105ae59bf5d--
 
