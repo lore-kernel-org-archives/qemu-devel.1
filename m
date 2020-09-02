@@ -2,91 +2,88 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A292C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:04:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D92C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:05:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 113232067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:04:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD5C92067C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:05:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bp3QDYZk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 113232067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hr8OKmIW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD5C92067C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDWBq-0006tr-7G
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 13:04:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45412)
+	id 1kDWC3-00079M-Uo
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 13:05:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDW8V-0000Ri-VR
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:28 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42650)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDW8S-0000IY-SL
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:27 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 17so3167908pfw.9
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 10:01:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=u7amQF5+q+U5pyEjmTJks994NcpROaetfXoezQ8sulo=;
- b=Bp3QDYZkDWAFIC5efp20wcNZ+OgfGQ8P6EY3Hoz+xXikKTAMZO2J7LziiCEVW6BQy1
- QABQXpmxofN0ykvY0yQo5mvklix0N0jZGpibP6I4I/UqikUtWGLCnPIPEoyR7QA2CT3G
- FbaEoTjRBSs2wdnaFq90i8ugkeUMKwX73KYhuuKNhRYFufEzk30s5R5rOwfQZHDHHPvx
- iJTQWgaDJn04pZvR3JaRGcULBbA/IA3etfDFTp5A59l1O2+uYgmYFhOf0M/RhljOaRBR
- qlmc7d6eroHTeNCIOpx9ys8oUc4khV6giEeE51XNVW1xyuvy1lDA7R5Lrf9zzaLslNbd
- TYvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=u7amQF5+q+U5pyEjmTJks994NcpROaetfXoezQ8sulo=;
- b=APl3rSNKUcEJrD99Ko10QEIDAXMyo28S0xETVUvMUaatVZD0iKTuQ52zp1RfQT/D4I
- Z1GLSNcdgurbpkleb5v7h5q7Z18Ob9Xs2EljwX/KEvwM71onHlcOfJcSS+yq1mKKYI8k
- 3tswgCS/SAsocsiMYrZFEEv/H/poIe5rOt1IUPNteILE7mkTS2wjSHHh+VIyOsE5YfSl
- 75g1LBVxxT06+TMEkqyW71rEUMHxRsb+2YlZ9nCqCMfrjxCFPpX8sZVvLIxcC3g9pFq9
- aRyqEQEm0Ytl5A8b8O4Yer65dphRTcT4s2GVjiau5lAxAbbYe103BIcE5IQJttKDkOHK
- g9oA==
-X-Gm-Message-State: AOAM533rl9sMh9BcZcNfz9yZwwEpSfbQZXDVVew1cnq0iyJzLU93HUC2
- NLyEgf+sFuHmgJeg1YPatXmzpJ0FE/E=
-X-Google-Smtp-Source: ABdhPJxDw9pl3N5Wby6b52DGngWNm9jBMjySuqs/jE0KWAavhEBacW6L0LsxEeFbbuYH6u4Sgn2+Qg==
-X-Received: by 2002:a65:4689:: with SMTP id h9mr2566983pgr.50.1599066082825;
- Wed, 02 Sep 2020 10:01:22 -0700 (PDT)
-Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id x4sm40527pfm.86.2020.09.02.10.01.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Sep 2020 10:01:22 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 5/6] tests: handling signal on win32 properly
-Date: Thu,  3 Sep 2020 01:00:53 +0800
-Message-Id: <20200902170054.810-6-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.27.0.windows.1
-In-Reply-To: <20200902170054.810-1-luoyonggang@gmail.com>
-References: <20200902170054.810-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kDW9j-0003J8-1I
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:02:43 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30613
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kDW9h-0000QH-B6
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:02:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599066160;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=NBZkgyPn2tMrU3wpqI8ygh7fYXrL1AZhv/zr9+cbOz0=;
+ b=hr8OKmIWIstPVR55LTQwh+ZGq7oHiIlOBp3ir0qmZhMMoquta0CtpFeJiKN8uzM0xc81Gm
+ MitQ4T1AN93lmQYZ5RKC7p7Rs6LsI8ReNF5owyOP+erVEkIuAjxAGvpVB+nOq/IVSDBrqg
+ P5WxezU93fXKnJzvI0Nr3yVXtjkjzbc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-577-2uHJPzbcMOaCqbfWCRRRRQ-1; Wed, 02 Sep 2020 13:02:37 -0400
+X-MC-Unique: 2uHJPzbcMOaCqbfWCRRRRQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EFB74800FFF;
+ Wed,  2 Sep 2020 17:02:35 +0000 (UTC)
+Received: from kaapi (unknown [10.74.8.118])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9334C5D9D3;
+ Wed,  2 Sep 2020 17:02:33 +0000 (UTC)
+Date: Wed, 2 Sep 2020 22:32:30 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH] sd: sdhci: check data_count is within fifo_buffer
+In-Reply-To: <816b3dbe-527f-1bec-a0cf-555e44068a56@amsat.org>
+Message-ID: <nycvar.YSQ.7.78.906.2009022216510.2047119@xnncv>
+References: <20200827115336.1851276-1-ppandit@redhat.com>
+ <816b3dbe-527f-1bec-a0cf-555e44068a56@amsat.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/mixed;
+ boundary="-1463810047-2029472028-1599066155=:2047119"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:33:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,46 +97,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
+Cc: Ruhr-University <bugs-syssec@rub.de>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SIGABRT should use signal(SIGABRT, sigabrt_handler) to handle on win32
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463810047-2029472028-1599066155=:2047119
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-The error:
-E:/CI-Cor-Ready/xemu/qemu.org/tests/test-replication.c:559:33: error: invalid use of undefined type 'struct sigaction'
-  559 |     sigact = (struct sigaction) {
-      |                                 ^
++-- On Tue, 1 Sep 2020, Philippe Mathieu-Daudé wrote --+
+| >  -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Fsdhci_oob_write1
+| 
+| This directory is 3 months old, I can't find it on the list...
+| Did I missed that or did the list eat the report?
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
----
- tests/test-replication.c | 4 ++++
- 1 file changed, 4 insertions(+)
+  No, it was reported to [qemu-security] contacts. These are few last 
+remaining old issues. We shall have better response time now.
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index e0b03dafc2..9ab3666a90 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -554,6 +554,9 @@ static void sigabrt_handler(int signo)
- 
- static void setup_sigabrt_handler(void)
- {
-+#ifdef _WIN32
-+    signal(SIGABRT, sigabrt_handler);
-+#else
-     struct sigaction sigact;
- 
-     sigact = (struct sigaction) {
-@@ -562,6 +565,7 @@ static void setup_sigabrt_handler(void)
-     };
-     sigemptyset(&sigact.sa_mask);
-     sigaction(SIGABRT, &sigact, NULL);
-+#endif
- }
- 
- int main(int argc, char **argv)
--- 
-2.27.0.windows.1
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+---1463810047-2029472028-1599066155=:2047119--
 
 
