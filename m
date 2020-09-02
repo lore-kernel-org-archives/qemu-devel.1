@@ -2,60 +2,70 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50B21C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54203C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:23:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24A1720829
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:18:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24A1720829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 1BC0B2072A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:23:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="K4br/FT4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BC0B2072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDVST-0001oB-A3
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 12:18:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34182)
+	id 1kDVXy-00049V-9i
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 12:23:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDVRv-0001NU-SN
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:17:27 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:53527)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDVRu-00023u-6o
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:17:27 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 082GH6wg030708
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Wed, 2 Sep 2020 12:17:10 -0400
-Date: Wed, 2 Sep 2020 12:17:06 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/3] meson: specify fuzz linker script as a project arg
-Message-ID: <20200902161706.qrjygforqz4fzbza@mozz.bu.edu>
-References: <20200902143800.124073-1-alxndr@bu.edu>
- <20200902143800.124073-2-alxndr@bu.edu>
- <a629fc46-de76-50f0-f4b1-52031ee79267@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a629fc46-de76-50f0-f4b1-52031ee79267@redhat.com>
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 10:34:22
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -31
-X-Spam_score: -3.2
-X-Spam_bar: ---
-X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1kDVWw-0002wU-K7
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:22:38 -0400
+Received: from mail-m971.mail.163.com ([123.126.97.1]:43348)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <liq3ea@163.com>) id 1kDVWr-0002tk-Mr
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:22:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+ s=s110527; h=From:Subject:Date:Message-Id; bh=8UIiwRgsKl8WlxdmkY
+ LeQLB+g8f0Xe5OXlpajz/OoiE=; b=K4br/FT4nUH1f/lHlLxGzYz/2pGJEph2zC
+ ABIlXFP3O17u1KnZKwVTvbxdzEg1gL0OL/ebVxi3OnZpWjELc2Hhz1a/fSXso3yX
+ LKSXkn06AAUNgutBfNh1DtZCXB9jqKnt6Amn/lnvMQkMaPhL1Ttl+NTlmiZNp35N
+ Ri8V8+wmA=
+Received: from localhost.localdomain (unknown [183.134.168.235])
+ by smtp1 (Coremail) with SMTP id GdxpCgAXbyO1xk9fAIYUAQ--.82S4;
+ Thu, 03 Sep 2020 00:22:14 +0800 (CST)
+From: Li Qiang <liq3ea@163.com>
+To: mst@redhat.com, kraxel@redhat.com, dmitry.fleytman@gmail.com,
+ jasowang@redhat.com, alxndr@bu.edu, peter.maydell@linaro.org,
+ pbonzini@redhat.com
+Subject: [RFC 0/3] try to solve the DMA to MMIO issue
+Date: Wed,  2 Sep 2020 09:22:03 -0700
+Message-Id: <20200902162206.101872-1-liq3ea@163.com>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: GdxpCgAXbyO1xk9fAIYUAQ--.82S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxAF1DZryrZrW3CF48Zw4xWFg_yoW5GF4rpF
+ WFga4rCr1DKFnIkw1fZr48Wr1Yyr1kCr4rWFyxW3yUKws8Jry5Zry7tw4UW3y7Ar18KFyU
+ WFWjgr1UGr4vv3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UGQ6XUUUUU=
+X-Originating-IP: [183.134.168.235]
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBLxeTbVUMN7h+dAAAsa
+Received-SPF: pass client-ip=123.126.97.1; envelope-from=liq3ea@163.com;
+ helo=mail-m971.mail.163.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 12:22:24
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -69,41 +79,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, darren.kenny@oracle.com, bsd@redhat.com,
- stefanha@redhat.com
+Cc: Li Qiang <liq3ea@163.com>, liq3ea@gmail.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 200902 1745, Paolo Bonzini wrote:
-> On 02/09/20 16:37, Alexander Bulekov wrote:
-> > With this change, the fuzzer-linker script should be specified outside
-> > any --start-group/--end-group pairs. We need this on oss-fuzz, where
-> > partially applying the linker-script results in a linker failure
-> 
-> Is this okay also for targets that don't link to the fuzzing static library?
-> 
-> Paolo
-> 
+The qemu device fuzzer has found several DMA to MMIO issue.
+These issues is caused by the guest driver programs the DMA
+address, then in the device MMIO handler it trigger the DMA
+and as the DMA address is MMIO it will trigger another dispatch
+and reenter the MMIO handler again. However most of the device
+is not reentrant.
 
-To be honest, I still do not completely understand why there is a
-different behavior when we specify the script within a group. The man
-page for ld.bfd doesn't talk about linker arguments between
---start-group and --end-group that are not archives. If I understand the
-purpose of these linker groups, the linker script should still apply to
-everything (regardless where it is specified). I would expect there to
-be no change in behavior, or a complaint about passing linker arguments
-that are not archive paths.
+DMA to MMIO will cause issues depend by the device emulator,
+mostly it will crash the qemu. Following is three classic 
+DMA to MMIO issue.
 
-I was also worried about what would happen to all the __wrap_qtest
-arguments, since those are still in the group, and they can fail silently.
-Disassembling the binary confirmed that all the calls to
-qtest_{in*,out*} are still wrapped.
+e1000e: https://bugs.launchpad.net/qemu/+bug/1886362
+xhci: https://bugs.launchpad.net/qemu/+bug/1891354
+virtio-gpu: https://bugs.launchpad.net/qemu/+bug/1888606
 
-Anyways.. I tested this series with and without LIB_FUZZING_ENGINE, and
-used nm to confirm that the layout of the symbols/data is correct in
-both cases (at least on my machine and the oss-fuzz docker) ..
+The DMA to MMIO issue I think can be classified as following:
+1. DMA to the device itself
+2. device A DMA to device B and to device C
+3. device A DMA to device B and to device A
 
--Alex
+The first case of course should not be allowed.
+The second case I think it ok as the device IO handler has no
+assumption about the IO data came from no matter it come from
+device or other device. This is for P2P DMA.
+The third case I think it also should not be allowed.
+
+So our issue has been reduced by one case: not allowed the
+device's IO handler reenter.
+
+Paolo suggested that we can refactor the device emulation with
+BH. However it is a lot of work.
+I have thought several propose to address this, also discuss
+this with Jason Wang in private email.
+
+I have can solve this issue in core framework or in specific device.
+After try several methods I choose address it in per-device for
+following reason:
+1. If we address it in core framwork we have to recored and check the 
+device or MR info in MR dispatch write function. Unfortunally we have
+no these info in core framework.
+2. The performance will also be decrease largely
+3. Only the device itself know its IO
+
+The (most of the) device emulation is protected by BQL one time only
+a device emulation code can be run. We can add a flag to indicate the
+IO is running. The first two patches does this. For simplicity at the
+RFC stage I just set it while enter the IO callback and clear it exit
+the IO callback. It should be check/set/clean according the per-device's
+IO emulation.
+The second issue which itself suffers a race condition so I uses a
+atomic.
+
+
+
+
+Li Qiang (3):
+  e1000e: make the IO handler reentrant
+  xhci: make the IO handler reentrant
+  virtio-gpu: make the IO handler reentrant
+
+ hw/display/virtio-gpu.c        | 10 ++++++
+ hw/net/e1000e.c                | 35 +++++++++++++++++++-
+ hw/usb/hcd-xhci.c              | 60 ++++++++++++++++++++++++++++++++++
+ hw/usb/hcd-xhci.h              |  1 +
+ include/hw/virtio/virtio-gpu.h |  1 +
+ 5 files changed, 106 insertions(+), 1 deletion(-)
+
+-- 
+2.17.1
+
 
