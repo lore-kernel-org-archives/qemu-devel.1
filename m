@@ -2,86 +2,84 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D2CC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:02:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3E1AC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:03:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1BA1A2067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:02:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9C6822067C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:03:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvkRQQvn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA1A2067C
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uMuBq4Kx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C6822067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDW9P-0001yB-5k
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 13:02:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45354)
+	id 1kDWAR-0004PS-RD
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 13:03:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDW8Q-0000Ew-Db
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:22 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42994)
+ id 1kDW8P-0000Ce-DN
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:21 -0400
+Received: from mail-pj1-x1032.google.com ([2607:f8b0:4864:20::1032]:53743)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDW8O-0000I3-BS
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:22 -0400
-Received: by mail-pl1-x643.google.com with SMTP id j11so31339plk.9
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 10:01:19 -0700 (PDT)
+ id 1kDW8M-0000HT-2g
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:21 -0400
+Received: by mail-pj1-x1032.google.com with SMTP id k15so99976pji.3
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 10:01:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gZugdAc0YYQQQMUJH814Yqj9KG0APjmY2BrDJE6YAjA=;
- b=rvkRQQvnFKYlB9Fk9yNrnqjpzSTP7BNzoPCS7ACQ1zsJigcJytrv4b9rBkKsPRUD2+
- 1tsZR9dfiKMnC1FVyJyTAzJVHH6oQsl3epmNZIxSkvL1aIMT4AZWPBniRVIhy1CgP/s6
- 6N9QO0U84pHwkBSASHBXtk/TWM9LVrrIfZ0zzy9aIjhMGj6r7+zqNzOKPD0hXHN+21f6
- vjQmCS3LCBPmYKxlYUtgGomE0cuhI6q5+9SluMxlIhwppPDoofFBojyhz+ED1D/ge2Io
- oJMHjWJknPaAwOkkaUNhrI9LQrhVFZC7NHCPBNFVug3f2UJGoi7EC8pFY+u+/a2CO96+
- XlnA==
+ bh=gXdMGjV38SOiNDEgk4FsmaPwx8AV6p28A6aPTTIcZkk=;
+ b=uMuBq4KxTJuXXtE5VTdFDmM5ejiph+4vTByJrfd9GaH8Unb5n+DYqJcugvHg7/EYqq
+ QXXs3+4OqdH61BRTLVS8SimUVf0FrnRUpMSVrBemOCGVOPsqJjpzgUAqi+6capilZO6J
+ Rf2YGEmHF3xvHyvTEP2grZ/I4R7T7omopBcyD3PX+niXsFGzsEaAMtLoZhgCS+VYLQI/
+ cNK+/6Qy+S+UXOuHCzU2Huf1TNb1LUdVLCq/YE01eNAoayX/0JOAD0Y+qowuPTOuZjQg
+ f0qUlpD1/HagWRAccw+PfQk9Hplls5h3ctt3cx0BEr+CaVkNgiu4vlxgOg/W8tMiPteP
+ FgrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gZugdAc0YYQQQMUJH814Yqj9KG0APjmY2BrDJE6YAjA=;
- b=pI7nFviyhvwNbptTWTbiFPplu2heBU0PRCuY335vHhQuDpVZ0xtOJ4RvBoM32BHLMo
- 1Nk5QehcPiHNeEnZXhwPm4lMgDO0/ceeJ7VEGmR6UV2IQl+JNOCktXysVSvE/yYctz/a
- 8QA3Uo5ntZSxAge70gEkHMsosQkKTFFv0zmVcspdwC6oRw4eJKM9gwL0933+rXM8M5M1
- 7F6CB/2Hf4cSQZ2iVAPavE0QNGfW+PiayDLlXRq18fnq8Q3OsgVC7m4VIIfyMrdhy3Nc
- +11aLy1/pKf3eng/sDjrxDxftl87ncW69aals0Pd+C14jqpn7v6KkNuelwhIgql2dCjq
- Urnw==
-X-Gm-Message-State: AOAM530ldhCI54zIm+48XdzmBDSP2d4Z//lSvcR+hLZeFcjN1Zj7RseK
- CxO2tOUYlxPCtVCFybOGfJOFby3Ny94=
-X-Google-Smtp-Source: ABdhPJyQaWqgXwZIJUlgmFK8GZFOYxD6y4pov31ZKOfQ5JGByy8/1rKhOZP0s13INLg5aef+VHvpMA==
-X-Received: by 2002:a17:90b:88d:: with SMTP id
- bj13mr2981044pjb.80.1599066078441; 
- Wed, 02 Sep 2020 10:01:18 -0700 (PDT)
+ bh=gXdMGjV38SOiNDEgk4FsmaPwx8AV6p28A6aPTTIcZkk=;
+ b=RsG1/cBZTPv8z8VD7MHNwA5rWCtFo9aMvDvHbTQ+M2T5Lq9WeJNSqv4JlW9uKKARBV
+ uLXSl5aHE16+hare2wZTFb19i6rABbXxtGwp/g50bWdeVdFM5YktmEqq2VEevPgE6zRo
+ AJAldhRM6GU1joA2XpqyTZ357r3ck09X5ZfMmcGUBY1UVlhd9vNJrWhGiukxcMGyXBFx
+ YPRI3wkp0Jp0TmHaNCPra7Ttq99WgWxdBI0b3dZB9oeRJICboOJ5RNbcR3Lnbkp097LI
+ 7OQsE92qniMMTrmEdljrewnSggWpD1fs/ciICLFxrxAYBrIUBBsHIv0gCtvC2W6XHozm
+ DsDg==
+X-Gm-Message-State: AOAM531Sr+9ZswHYQl5YEwIXZ9+cufDmP5tw1fDOQOg/lq+7NXgNoO0k
+ jOm9Wz+3mvUP6XvkuZPpKgGpRUHPXUs=
+X-Google-Smtp-Source: ABdhPJzFrJmSCRQfDLPfyFTlaMpKaq9Vxg9U4sVpM7E/j7wBPsORXwhDBfXtmYH52VG5ZGwpnexiYQ==
+X-Received: by 2002:a17:90a:29a3:: with SMTP id
+ h32mr874950pjd.135.1599066076175; 
+ Wed, 02 Sep 2020 10:01:16 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id x4sm40527pfm.86.2020.09.02.10.01.16
+ by smtp.googlemail.com with ESMTPSA id x4sm40527pfm.86.2020.09.02.10.01.14
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Sep 2020 10:01:17 -0700 (PDT)
+ Wed, 02 Sep 2020 10:01:15 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 3/6] ci: Install msys2 in a proper way refer to
- https://github.com/cirruslabs/cirrus-ci-docs/issues/699 Enable msys2 ci in
- cirrus
-Date: Thu,  3 Sep 2020 01:00:51 +0800
-Message-Id: <20200902170054.810-4-luoyonggang@gmail.com>
+Subject: [PATCH 2/6] meson: Convert undefsym.sh to undefsym.py
+Date: Thu,  3 Sep 2020 01:00:50 +0800
+Message-Id: <20200902170054.810-3-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20200902170054.810-1-luoyonggang@gmail.com>
 References: <20200902170054.810-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1032;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1032.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,133 +106,119 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
----
- .cirrus.yml                         | 23 ++++++++++++++++
- scripts/ci/windows/msys2_build.sh   | 35 ++++++++++++++++++++++++
- scripts/ci/windows/msys2_install.sh | 41 +++++++++++++++++++++++++++++
- 3 files changed, 99 insertions(+)
- create mode 100644 scripts/ci/windows/msys2_build.sh
- create mode 100644 scripts/ci/windows/msys2_install.sh
+undefsym.sh are not msys2 compatible, convert it to python script
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index f287d23c5b..d377c28412 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -40,3 +40,26 @@ macos_xcode_task:
-     - ../configure --cc=clang || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
-     - gmake check
-+
-+windows_msys2_task:
-+  windows_container:
-+    image: cirrusci/windowsservercore:cmake
-+    os_version: 2019
-+    cpu: 8
-+    memory: 8G
-+  env:
-+    MSYS: winsymlinks:nativestrict
-+    MSYSTEM: MINGW64
-+    CHERE_INVOKING: 1
-+  printenv_script: C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
-+  install_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Sy --noconfirm"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --needed --noconfirm -S bash pacman pacman-mirrors msys2-runtime"
-+    - taskkill /F /IM gpg-agent.exe
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "sh scripts/ci/windows/msys2_install.sh"
-+  script:
-+    C:\tools\msys64\usr\bin\bash.exe -lc "sh scripts/ci/windows/msys2_build.sh"
-diff --git a/scripts/ci/windows/msys2_build.sh b/scripts/ci/windows/msys2_build.sh
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ meson.build         |  2 +-
+ scripts/undefsym.py | 57 +++++++++++++++++++++++++++++++++++++++++++++
+ scripts/undefsym.sh | 20 ----------------
+ 3 files changed, 58 insertions(+), 21 deletions(-)
+ create mode 100644 scripts/undefsym.py
+ delete mode 100755 scripts/undefsym.sh
+
+diff --git a/meson.build b/meson.build
+index 55c7d2318c..c9f5d05664 100644
+--- a/meson.build
++++ b/meson.build
+@@ -863,7 +863,7 @@ foreach d, list : modules
+ endforeach
+ 
+ nm = find_program('nm')
+-undefsym = find_program('scripts/undefsym.sh')
++undefsym = find_program('scripts/undefsym.py')
+ block_syms = custom_target('block.syms', output: 'block.syms',
+                              input: [libqemuutil, block_mods],
+                              capture: true,
+diff --git a/scripts/undefsym.py b/scripts/undefsym.py
 new file mode 100644
-index 0000000000..0363ef402a
+index 0000000000..c690f88c7a
 --- /dev/null
-+++ b/scripts/ci/windows/msys2_build.sh
-@@ -0,0 +1,35 @@
-+export QEMU_DIR=$PWD
-+mkdir ../qemu-build
-+cd ../qemu-build
-+$QEMU_DIR/configure \
-+  --python=python3 \
-+  --cross-prefix=x86_64-w64-mingw32- \
-+  --enable-gtk --enable-sdl \
-+  --enable-capstone=git \
-+  --enable-stack-protector \
-+  --ninja=ninja \
-+  --enable-gnutls \
-+  --enable-nettle \
-+  --enable-vnc \
-+  --enable-vnc-sasl \
-+  --enable-vnc-jpeg \
-+  --enable-vnc-png \
-+  --enable-membarrier \
-+  --enable-slirp=git \
-+  --disable-kvm \
-+  --enable-hax \
-+  --enable-whpx \
-+  --disable-spice \
-+  --enable-lzo \
-+  --enable-snappy \
-+  --enable-bzip2 \
-+  --enable-vdi \
-+  --enable-qcow1 \
-+  --enable-tools \
-+  --enable-libusb \
-+  --enable-usb-redir \
-+  --disable-libnfs \
-+  --enable-libssh \
-+  --disable-pie
-+make -j$NUMBER_OF_PROCESSORS
-+# make -j$NUMBER_OF_PROCESSORS check
-diff --git a/scripts/ci/windows/msys2_install.sh b/scripts/ci/windows/msys2_install.sh
-new file mode 100644
-index 0000000000..3a5392cd99
---- /dev/null
-+++ b/scripts/ci/windows/msys2_install.sh
-@@ -0,0 +1,41 @@
-+pacman --noconfirm -S --needed \
-+base-devel \
-+git \
-+mingw-w64-x86_64-python \
-+mingw-w64-x86_64-python-setuptools \
-+mingw-w64-x86_64-toolchain \
-+mingw-w64-x86_64-SDL2 \
-+mingw-w64-x86_64-SDL2_image \
-+mingw-w64-x86_64-gtk3 \
-+mingw-w64-x86_64-ninja \
-+mingw-w64-x86_64-make \
-+mingw-w64-x86_64-lzo2 \
-+mingw-w64-x86_64-libjpeg-turbo \
-+mingw-w64-x86_64-pixman \
-+mingw-w64-x86_64-libgcrypt \
-+mingw-w64-x86_64-capstone \
-+mingw-w64-x86_64-libpng \
-+mingw-w64-x86_64-libssh \
-+mingw-w64-x86_64-libxml2 \
-+mingw-w64-x86_64-snappy \
-+mingw-w64-x86_64-libusb \
-+mingw-w64-x86_64-usbredir \
-+mingw-w64-x86_64-libtasn1 \
-+mingw-w64-x86_64-libnfs \
-+mingw-w64-x86_64-nettle \
-+mingw-w64-x86_64-cyrus-sasl \
-+mingw-w64-x86_64-curl \
-+mingw-w64-x86_64-gnutls \
-+mingw-w64-x86_64-zstd \
-+mingw-w64-x86_64-glib2
++++ b/scripts/undefsym.py
+@@ -0,0 +1,57 @@
++#!/usr/bin/env python3
++# -*- coding: utf-8 -*-
 +
-+cd /mingw64/bin
-+cp x86_64-w64-mingw32-gcc-ar.exe x86_64-w64-mingw32-ar.exe
-+cp x86_64-w64-mingw32-gcc-ranlib.exe x86_64-w64-mingw32-ranlib.exe
-+cp x86_64-w64-mingw32-gcc-nm.exe x86_64-w64-mingw32-nm.exe
-+cp windres.exe x86_64-w64-mingw32-windres.exe
-+cp strip.exe x86_64-w64-mingw32-strip.exe
-+cp objcopy.exe x86_64-w64-mingw32-objcopy.exe
-+cp ld x86_64-w64-mingw32-ld.exe
-+cp as x86_64-w64-mingw32-as.exe
-+cp sdl2-config x86_64-w64-mingw32-sdl2-config
++# Before a shared module's DSO is produced, a static library is built for it
++# and passed to this script.  The script generates -Wl,-u options to force
++# the inclusion of symbol from libqemuutil.a if the shared modules need them,
++# This is necessary because the modules may use functions not needed by the
++# executable itself, which would cause the function to not be linked in.
++# Then the DSO loading would fail because of the missing symbol.
++
++
++"""
++Compare the static library with the shared module for compute the symbol duplication
++"""
++
++import sys
++import subprocess
++
++def filter_lines_set(stdout, is_static = True):
++    linesSet = set()
++    for line in stdout.splitlines():
++        tokens = line.split(b' ')
++        if len(tokens) >= 1:
++            if len(tokens) > 1:
++                if is_static and tokens[1] == b'U':
++                    continue
++                if not is_static and tokens[1] != b'U':
++                    continue
++            new_line = b'-Wl,-u,' + tokens[0]
++            if not new_line in linesSet:
++                linesSet.add(new_line)
++    return linesSet
++
++def main(args):
++    if len(args) <= 3:
++        sys.exit(0)
++
++    nm = args[1]
++    staticlib = args[2]
++    pc = subprocess.run([nm, "-P", "-g", staticlib], stdout=subprocess.PIPE)
++    if pc.returncode != 0:
++        sys.exit(-1)
++    lines_set_left = filter_lines_set(pc.stdout)
++
++    shared_modules = args[3:]
++    pc = subprocess.run([nm, "-P", "-g"] + shared_modules, stdout=subprocess.PIPE)
++    if pc.returncode != 0:
++        sys.exit(-1)
++    lines_set_right = filter_lines_set(pc.stdout, False)
++    lines = []
++    for line in sorted(list(lines_set_right)):
++        if line in lines_set_left:
++            lines.append(line)
++    sys.stdout.write(b'\n'.join(lines).decode())
++
++if __name__ == "__main__":
++    main(sys.argv)
+diff --git a/scripts/undefsym.sh b/scripts/undefsym.sh
+deleted file mode 100755
+index b9ec332e95..0000000000
+--- a/scripts/undefsym.sh
++++ /dev/null
+@@ -1,20 +0,0 @@
+-#! /usr/bin/env bash
+-
+-# Before a shared module's DSO is produced, a static library is built for it
+-# and passed to this script.  The script generates -Wl,-u options to force
+-# the inclusion of symbol from libqemuutil.a if the shared modules need them,
+-# This is necessary because the modules may use functions not needed by the
+-# executable itself, which would cause the function to not be linked in.
+-# Then the DSO loading would fail because of the missing symbol.
+-
+-if test $# -le 2; then
+-  exit 0
+-fi
+-
+-NM=$1
+-staticlib=$2
+-shift 2
+-# Find symbols defined in static libraries and undefined in shared modules
+-comm -12 \
+-  <( $NM -P -g $staticlib | awk '$2!="U"{print "-Wl,-u," $1}' | sort -u) \
+-  <( $NM -P -g "$@" | awk '$2=="U"{print "-Wl,-u," $1}' | sort -u)
 -- 
 2.27.0.windows.1
 
