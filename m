@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21375C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D877C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:19:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E51A32084C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:18:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E51A32084C
+	by mail.kernel.org (Postfix) with ESMTPS id D125B2084C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:19:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D125B2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDNyf-0006Jh-Sf
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:18:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44134)
+	id 1kDNzO-0007NZ-VS
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:19:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kDNw8-0001Ji-OV
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:10 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:38536)
+ id 1kDNwV-0001yW-UG
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:31 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:38616)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kDNw6-000309-Sd
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:08 -0400
+ id 1kDNwT-00032e-TB
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:31 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id DE63040A928D;
- Wed,  2 Sep 2020 08:16:04 +0000 (UTC)
-Subject: [PATCH v3 03/15] qcow2: introduce icount field for snapshots
+ by mail.ispras.ru (Postfix) with ESMTPSA id 0513540A928D;
+ Wed,  2 Sep 2020 08:16:27 +0000 (UTC)
+Subject: [PATCH v3 07/15] replay: introduce info hmp/qmp command
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Wed, 02 Sep 2020 11:16:04 +0300
-Message-ID: <159903456460.28509.9651965084200703277.stgit@pasha-ThinkPad-X280>
+Date: Wed, 02 Sep 2020 11:16:27 +0300
+Message-ID: <159903458772.28509.3505459451115210791.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
 References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
@@ -77,78 +77,176 @@ Sender: "Qemu-devel"
 
 From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 
-This patch introduces the icount field for saving within the snapshot.
-It is required for navigation between the snapshots in record/replay mode.
+This patch introduces 'info replay' monitor command and
+corresponding qmp request.
+These commands request the current record/replay mode, replay log file
+name, and the instruction count (number of recorded/replayed
+instructions).  The instruction count can be used with the
+replay_seek/replay_break commands added in the next two patches.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Acked-by: Kevin Wolf <kwolf@redhat.com>
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Acked-by: Markus Armbruster <armbru@redhat.com>
 ---
- block/qcow2-snapshot.c |    7 +++++++
- block/qcow2.h          |    3 +++
- docs/interop/qcow2.txt |    5 +++++
- 3 files changed, 15 insertions(+)
+ hmp-commands-info.hx      |   11 +++++++++++
+ include/monitor/hmp.h     |    1 +
+ qapi/block-core.json      |    3 ++-
+ qapi/replay.json          |   39 +++++++++++++++++++++++++++++++++++++++
+ replay/meson.build        |    1 +
+ replay/replay-debugging.c |   43 +++++++++++++++++++++++++++++++++++++++++++
+ 6 files changed, 97 insertions(+), 1 deletion(-)
+ create mode 100644 replay/replay-debugging.c
 
-diff --git a/block/qcow2-snapshot.c b/block/qcow2-snapshot.c
-index 2756b37d24..d14e7be1aa 100644
---- a/block/qcow2-snapshot.c
-+++ b/block/qcow2-snapshot.c
-@@ -164,6 +164,12 @@ static int qcow2_do_read_snapshots(BlockDriverState *bs, bool repair,
-             sn->disk_size = bs->total_sectors * BDRV_SECTOR_SIZE;
-         }
+diff --git a/hmp-commands-info.hx b/hmp-commands-info.hx
+index 30209e3903..117ba25f91 100644
+--- a/hmp-commands-info.hx
++++ b/hmp-commands-info.hx
+@@ -881,4 +881,15 @@ SRST
+     Show SEV information.
+ ERST
  
-+        if (sn->extra_data_size >= endof(QCowSnapshotExtraData, icount)) {
-+            sn->icount = be64_to_cpu(extra.icount);
-+        } else {
-+            sn->icount = -1ULL;
-+        }
++    {
++        .name       = "replay",
++        .args_type  = "",
++        .params     = "",
++        .help       = "show record/replay information",
++        .cmd        = hmp_info_replay,
++    },
+ 
++SRST
++  ``info replay``
++    Display the record/replay information: mode and the current icount.
++ERST
+diff --git a/include/monitor/hmp.h b/include/monitor/hmp.h
+index c986cfd28b..a790589b9e 100644
+--- a/include/monitor/hmp.h
++++ b/include/monitor/hmp.h
+@@ -130,5 +130,6 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict);
+ void hmp_info_vm_generation_id(Monitor *mon, const QDict *qdict);
+ void hmp_info_memory_size_summary(Monitor *mon, const QDict *qdict);
+ void hmp_info_sev(Monitor *mon, const QDict *qdict);
++void hmp_info_replay(Monitor *mon, const QDict *qdict);
+ 
+ #endif
+diff --git a/qapi/block-core.json b/qapi/block-core.json
+index 0d8265a78e..1fe45625d6 100644
+--- a/qapi/block-core.json
++++ b/qapi/block-core.json
+@@ -29,7 +29,8 @@
+ #
+ # @icount: Current instruction count. Appears when execution record/replay
+ #          is enabled. Used for "time-traveling" to match the moment
+-#          in the recorded execution with the snapshots. (since 5.2)
++#          in the recorded execution with the snapshots. This counter may
++#          be obtained through @query-replay command (since 5.2)
+ #
+ # Since: 1.3
+ #
+diff --git a/qapi/replay.json b/qapi/replay.json
+index 9e13551d20..e6b3f6001d 100644
+--- a/qapi/replay.json
++++ b/qapi/replay.json
+@@ -24,3 +24,42 @@
+ ##
+ { 'enum': 'ReplayMode',
+   'data': [ 'none', 'record', 'play' ] }
 +
-         if (sn->extra_data_size > sizeof(extra)) {
-             uint64_t extra_data_end;
-             size_t unknown_extra_data_size;
-@@ -333,6 +339,7 @@ int qcow2_write_snapshots(BlockDriverState *bs)
-         memset(&extra, 0, sizeof(extra));
-         extra.vm_state_size_large = cpu_to_be64(sn->vm_state_size);
-         extra.disk_size = cpu_to_be64(sn->disk_size);
-+        extra.icount = cpu_to_be64(sn->icount);
- 
-         id_str_size = strlen(sn->id_str);
-         name_size = strlen(sn->name);
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 065ec3df0b..c39a1e1265 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -200,6 +200,7 @@ typedef struct QEMU_PACKED QCowSnapshotHeader {
- typedef struct QEMU_PACKED QCowSnapshotExtraData {
-     uint64_t vm_state_size_large;
-     uint64_t disk_size;
-+    uint64_t icount;
- } QCowSnapshotExtraData;
- 
- 
-@@ -213,6 +214,8 @@ typedef struct QCowSnapshot {
-     uint32_t date_sec;
-     uint32_t date_nsec;
-     uint64_t vm_clock_nsec;
-+    /* icount value for the moment when snapshot was taken */
-+    uint64_t icount;
-     /* Size of all extra data, including QCowSnapshotExtraData if available */
-     uint32_t extra_data_size;
-     /* Data beyond QCowSnapshotExtraData, if any */
-diff --git a/docs/interop/qcow2.txt b/docs/interop/qcow2.txt
-index 7da0d81df8..0463f761ef 100644
---- a/docs/interop/qcow2.txt
-+++ b/docs/interop/qcow2.txt
-@@ -707,6 +707,11 @@ Snapshot table entry:
- 
-                     Byte 48 - 55:   Virtual disk size of the snapshot in bytes
- 
-+                    Byte 56 - 63:   icount value which corresponds to
-+                                    the record/replay instruction count
-+                                    when the snapshot was taken. Set to -1
-+                                    if icount was disabled
++##
++# @ReplayInfo:
++#
++# Record/replay information.
++#
++# @mode: current mode.
++#
++# @filename: name of the record/replay log file.
++#            It is present only in record or replay modes, when the log
++#            is recorded or replayed.
++#
++# @icount: current number of executed instructions.
++#
++# Since: 5.2
++#
++##
++{ 'struct': 'ReplayInfo',
++  'data': { 'mode': 'ReplayMode', '*filename': 'str', 'icount': 'int' } }
 +
-                     Version 3 images must include extra data at least up to
-                     byte 55.
- 
++##
++# @query-replay:
++#
++# Retrieve the record/replay information.
++# It includes current instruction count which may be used for
++# @replay-break and @replay-seek commands.
++#
++# Returns: record/replay information.
++#
++# Since: 5.2
++#
++# Example:
++#
++# -> { "execute": "query-replay" }
++# <- { "return": { "mode": "play", "filename": "log.rr", "icount": 220414 } }
++#
++##
++{ 'command': 'query-replay',
++  'returns': 'ReplayInfo' }
+diff --git a/replay/meson.build b/replay/meson.build
+index 8783aea7c8..f91163fb1e 100644
+--- a/replay/meson.build
++++ b/replay/meson.build
+@@ -9,4 +9,5 @@ softmmu_ss.add(files(
+   'replay-net.c',
+   'replay-audio.c',
+   'replay-random.c',
++  'replay-debugging.c',
+ ))
+diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
+new file mode 100644
+index 0000000000..51a6de4e81
+--- /dev/null
++++ b/replay/replay-debugging.c
+@@ -0,0 +1,43 @@
++/*
++ * replay-debugging.c
++ *
++ * Copyright (c) 2010-2020 Institute for System Programming
++ *                         of the Russian Academy of Sciences.
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qapi/error.h"
++#include "sysemu/replay.h"
++#include "replay-internal.h"
++#include "monitor/hmp.h"
++#include "monitor/monitor.h"
++#include "qapi/qapi-commands-replay.h"
++
++void hmp_info_replay(Monitor *mon, const QDict *qdict)
++{
++    if (replay_mode == REPLAY_MODE_NONE) {
++        monitor_printf(mon, "Record/replay is not active\n");
++    } else {
++        monitor_printf(mon,
++            "%s execution '%s': instruction count = %"PRId64"\n",
++            replay_mode == REPLAY_MODE_RECORD ? "Recording" : "Replaying",
++            replay_get_filename(), replay_get_current_icount());
++    }
++}
++
++ReplayInfo *qmp_query_replay(Error **errp)
++{
++    ReplayInfo *retval = g_new0(ReplayInfo, 1);
++
++    retval->mode = replay_mode;
++    if (replay_get_filename()) {
++        retval->filename = g_strdup(replay_get_filename());
++        retval->has_filename = true;
++    }
++    retval->icount = replay_get_current_icount();
++    return retval;
++}
 
 
