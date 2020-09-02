@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51AD0C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:29:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43518C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:30:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 237EE207D3
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:29:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 237EE207D3
+	by mail.kernel.org (Postfix) with ESMTPS id 15129207D3
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:30:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15129207D3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDcC4-0008Vq-Bl
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 19:29:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43218)
+	id 1kDcCl-0001ZP-6P
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 19:30:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9o-0003u4-UC
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9o-0003tH-HA
  for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:12 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:54747)
+Received: from mout.kundenserver.de ([217.72.192.73]:41287)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9m-0004qw-Cu
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9m-0004qz-4p
  for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:12 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1Myb8N-1kUboK0IAf-00yvd7; Thu, 03 Sep 2020 01:27:05 +0200
+ id 1MBUuP-1kQUzv22gB-00D1nL; Thu, 03 Sep 2020 01:27:04 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/9] linux-user: Add support for a group of btrfs ioctls used
- for snapshots
-Date: Thu,  3 Sep 2020 01:26:55 +0200
-Message-Id: <20200902232701.13299-4-laurent@vivier.eu>
+Subject: [PULL 2/9] linux-user: Add support for a group of btrfs ioctls used
+ for subvolumes
+Date: Thu,  3 Sep 2020 01:26:54 +0200
+Message-Id: <20200902232701.13299-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200902232701.13299-1-laurent@vivier.eu>
 References: <20200902232701.13299-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:u0bdTmRet6VW8OPBniGbiLEHiNDAcwQKuMNb2shHik9DtKLopjm
- fIR67QSweahIlL56gMZ5H5qlSQyl62huJ1mW+y0eR1ODlP/pcPYllqel5wVebGyOJ9w6Hf7
- Jn2isK8ZdvRbUKiFG7ClheTXjolgS8/RX7V046Q+TQmNltWx4BZ0f8cSZU6fylbh/dTcJ1a
- fEq8JwDBKclsBVF6EhYiA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ZakMDyDZCZc=:dK3jebn48ZW8qGnd54RJoz
- OtqxvQyeI6WkbLjx9XMZXDj2L9NOYihvstZIGzQspwpSaOfRQ1XLZpG9XW88VBR5XA4/aOWc6
- nRl6v0umh0WKKQXXrXLM9pG2sB9K/KdyyJJFdRdkavEA5k7PeHL7kzZpiM799aERPZoiWPn5z
- 8ylIEcurRMUGSo5HMIh3pGHR+a4bJVGvUWoq/84bg3KKKtV0kbCpCl4iAgku8rgd3Zewc9lgM
- Y+5XjF0AX3Hlg/PnHgtFcpecJBJcJjBI3IDchJhrJHG9KUn/XRT19KuYozI/O3t6LYAgj1OGQ
- sA0cW4T3gYTbWExv6PU69u1epGr0WBextVndTb0iW1EXARUZgiWur2nkauv1H5zQErze2NOuT
- +8DfrcVJBclL28DvnGnvtg+5+4j/kuqRy8kmfooE+d7Z4dDps9aGAotOWK390OzUsIrdMu64J
- LwO2375Kgx8M/Vac0Kxgsutk/Yqb8m76oONmM7fcb3qsGKtgqPltH0uVII6jzPTfRPjJW+qdD
- YFP51M5Co3JTy3HyxWlBuXDioaYZ8Jste0GodY8pPpLGKZA0Qi5HReL1VWAXOMj84bXnLFHlt
- 06ksqe1TOE3Jo6v1aPtEfdzUJbNjtErVorR/DOYPVrvCK6Mf/zOmfTOHj+pVV6rSz59SEG0D1
- k/3yVXl81B6eooJ4nSApaLND8OPbVZYGhlFyacW/GvFAbxdYuP1Gi5QeSMtKA8JvJSh6e2S97
- mIyvZvpauEmpxpp+adlgzCRwDkRVBvfjAzAy+HoTeRdt0x2odHliNS6PL/larBS+meXz2X80T
- Un3PTAw8SCKiFIB5PVtZwK6zkELekUVBz+n2s2JCV6j4LlZ6u4cpW+HAQZ2/d5gh+bgfI79
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:zn9gYu5UfeT2hZy0Js40LovIHhXLYYaeu0jTgEMwx6z9zzqdYHZ
+ rE0/8PwkEusGYsFjFWuWauqpZLJd/DUMF5qmf6fvZUDB2uR3BBDof2z0V11lijx+iYWOvur
+ ZV4A2oQ5D5vRHtSLmunXWUqt1okRnXDr+uh8g4whRzfhUAhSfkttc9MwvtSEMvwc88AR3yi
+ weotV7rIghS+Znfk7pQjA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:RJJdgBrRLhg=:oysfC+uKOSwX2fj/SUxk1p
+ 1WR4TftK0nDkZtvZM/HuJ0twrJ+D7nOpms4EuDn8oImPD2WmzQL2aP1TfHCNf4iENZdtoBvZa
+ bd6Ytx55C8R6EPpy8NeltVpyKMfFR79pnsp1ZGS4GYmQwCLu0jsMPqgIqCD0GS2k9T0BoFb9c
+ Flxl1f01JjtnezPU5FzouZssN2G/9/tVfRleO7gIChUKmj1wp0z18FMcaQoL/hwIz0bIkUdLs
+ RsMnS3ta5e7nLaA1YddLTPQH5GFJWx+vU+gBkUSooOlKjS05ingg+8UIfZ4lud+R8aiOJbI0a
+ FjHasDnk7yPnxOdIo0msK2c3hMBVGl0Ekm6X+IOid83tWTRVjSXC6HbYgrzyHPEQu/oUKS4GU
+ BKuSOSi6ajdHUtzGOopE+1xOs5IAj0Qrt4G3LMKOAsUs2ufsvkLKw7HnIwjU8yOAhK5nvFxbI
+ 7RbuXtDSFaO/ywx7+VkfG7nBgaupEzJQnD7PSzfWBjfCH7IcZHJhIs/b3s9f6qU3/m7XNXpLS
+ gfdKclgsZUz8qfKRzrnHVWnpcZiQTGpy+OhQjvaJibQU7LfrIrvkTkekb1gyxvWGBSxcD425k
+ z21Cqo9+scTIn+2/y/rvaCj9eq99w2gvkB19W7zdwLZ0ZOSIKTxuKQImdPn8XRyk+SyW5d2VJ
+ JOz4M4y/zApNk+UJgRiwSQ7ZJrwF0n+30EElwj4quGEAmXvhPnfr39Wd70k+6PBtfegwdRBJ4
+ ZQjiVn6PLtdG1sOsSPX6lJG12OfQnpVbMbVlTf7W2XWhlrXdPxjv9C5g9sJhH0LRz5F+kyvXi
+ 8pqyPYKNMFHGlt4OMoTa04L+ImyZasVqNYzt4+qMP1kiqurrS8rnvxrPJswsjjYHphnPo2w
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 19:27:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -92,92 +92,258 @@ Sender: "Qemu-devel"
 
 From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
-This patch implements functionality for following ioctls:
+This patch implements functionality of following ioctls:
 
-BTRFS_IOC_SNAP_CREATE - Creating a subvolume snapshot
+BTRFS_IOC_SUBVOL_CREATE - Creating a btrfs subvolume
 
-    Create a snapshot of a btrfs subvolume. The snapshot is created using the
-    ioctl's third argument that is a pointer to a 'struct btrfs_ioctl_vol_args'
-    (which was mentioned in the previous patch). Before calling this ioctl,
-    the fields of the structure should be filled with aproppriate values for
-    the file descriptor and path of the subvolume for which the snapshot is to
-    be created.
+    Create a btrfs subvolume. The subvolume is created using the ioctl's
+    third argument which represents a pointer to a following structure
+    type:
 
-BTRFS_IOC_SNAP_DESTROY - Removing a subvolume snapshot
+    struct btrfs_ioctl_vol_args {
+	__s64 fd;
+	char name[BTRFS_PATH_NAME_MAX + 1];
+    };
 
-    Delete a snapshot of a btrfs subvolume. The snapshot is deleted using the
-    ioctl's third argument that is a pointer to a 'struct btrfs_ioctl_vol_args'
-    (which was mentioned in the previous patch). Before calling this ioctl,
-    the fields of the structure should be filled with aproppriate values for
-    the file descriptor and path of the subvolume for which the snapshot is to
-    be deleted.
+    Before calling this ioctl, the fields of this structure should be filled
+    with aproppriate values. The fd field represents the file descriptor
+    value of the subvolume and the name field represents the subvolume
+    path.
+
+BTRFS_IOC_SUBVOL_GETFLAGS - Getting subvolume flags
+
+    Read the flags of the btrfs subvolume. The flags are read using
+    the ioctl's third argument that is a pointer of __u64 (unsigned long).
+    The third argument represents a bit mask that can be composed of following
+    values:
+    BTRFS_SUBVOL_RDONLY           (1ULL << 1)
+    BTRFS_SUBVOL_QGROUP_INHERIT   (1ULL << 2)
+    BTRFS_DEVICE_SPEC_BY_ID       (1ULL << 3)
+    BTRFS_SUBVOL_SPEC_BY_ID       (1ULL << 4)
+
+BTRFS_IOC_SUBVOL_SETFLAGS - Setting subvolume flags
+
+    Set the flags of the btrfs subvolume. The flags are set using the
+    ioctl's third argument that is a pointer of __u64 (unsigned long).
+    The third argument represents a bit mask that can be composed of same
+    values as in the case of previous ioctl (BTRFS_IOC_SUBVOL_GETFLAGS).
+
+BTRFS_IOC_SUBVOL_GETINFO - Getting subvolume information
+
+    Read information about the subvolume. The subvolume information is
+    returned in the ioctl's third argument which represents a pointer to
+    a following structure type:
+
+    struct btrfs_ioctl_get_subvol_info_args {
+	/* Id of this subvolume */
+	__u64 treeid;
+
+	/* Name of this subvolume, used to get the real name at mount point */
+	char name[BTRFS_VOL_NAME_MAX + 1];
+
+	/*
+	 * Id of the subvolume which contains this subvolume.
+	 * Zero for top-level subvolume or a deleted subvolume.
+	 */
+	__u64 parent_id;
+
+	/*
+	 * Inode number of the directory which contains this subvolume.
+	 * Zero for top-level subvolume or a deleted subvolume
+	 */
+	__u64 dirid;
+
+	/* Latest transaction id of this subvolume */
+	__u64 generation;
+
+	/* Flags of this subvolume */
+	__u64 flags;
+
+	/* UUID of this subvolume */
+	__u8 uuid[BTRFS_UUID_SIZE];
+
+	/*
+	 * UUID of the subvolume of which this subvolume is a snapshot.
+	 * All zero for a non-snapshot subvolume.
+	 */
+	__u8 parent_uuid[BTRFS_UUID_SIZE];
+
+	/*
+	 * UUID of the subvolume from which this subvolume was received.
+	 * All zero for non-received subvolume.
+	 */
+	__u8 received_uuid[BTRFS_UUID_SIZE];
+
+	/* Transaction id indicating when change/create/send/receive happened */
+	__u64 ctransid;
+	__u64 otransid;
+	__u64 stransid;
+	__u64 rtransid;
+	/* Time corresponding to c/o/s/rtransid */
+	struct btrfs_ioctl_timespec ctime;
+	struct btrfs_ioctl_timespec otime;
+	struct btrfs_ioctl_timespec stime;
+	struct btrfs_ioctl_timespec rtime;
+
+	/* Must be zero */
+	__u64 reserved[8];
+     };
+
+     All of the fields of this structure are filled after the ioctl call.
 
 Implementation notes:
 
-    Since the thunk type 'struct btrfs_ioctl_vol_args' is defined in the
-    previous patch, the implementation for these ioctls was straightforward.
+    Ioctls BTRFS_IOC_SUBVOL_CREATE and BTRFS_IOC_SUBVOL_GETINFO have structure
+    types as third arguments. That is the reason why a corresponding definition
+    are added in file 'linux-user/syscall_types.h'.
+
+    The line '#include <linux/btrfs.h>' is added in file 'linux-user/syscall.c' to
+    recognise preprocessor definitions for these ioctls. Since the file "linux/btrfs.h"
+    was added in the kernel version 3.9, it is enwrapped in an #ifdef statement
+    with parameter CONFIG_BTRFS which is defined in 'configure' if the
+    header file is present.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Tested-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200823195014.116226-3-Filip.Bozuta@syrmia.com>
+Message-Id: <20200823195014.116226-2-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h        | 8 ++++++++
- linux-user/syscall_defs.h  | 2 ++
- linux-user/syscall_types.h | 3 ++-
- 3 files changed, 12 insertions(+), 1 deletion(-)
+ configure                  |  9 +++++++++
+ linux-user/ioctls.h        | 15 +++++++++++++++
+ linux-user/syscall.c       |  3 +++
+ linux-user/syscall_defs.h  |  8 ++++++++
+ linux-user/syscall_types.h | 32 ++++++++++++++++++++++++++++++++
+ 5 files changed, 67 insertions(+)
 
+diff --git a/configure b/configure
+index 8a3acef89d91..277b70f2594e 100755
+--- a/configure
++++ b/configure
+@@ -4920,6 +4920,12 @@ if check_include sys/kcov.h ; then
+     kcov=yes
+ fi
+ 
++# check for btrfs filesystem support (kernel must be 3.9+)
++btrfs=no
++if check_include linux/btrfs.h ; then
++    btrfs=yes
++fi
++
+ # If we're making warnings fatal, apply this to Sphinx runs as well
+ sphinx_werror=""
+ if test "$werror" = "yes"; then
+@@ -6898,6 +6904,9 @@ fi
+ if test "$kcov" = "yes" ; then
+   echo "CONFIG_KCOV=y" >> $config_host_mak
+ fi
++if test "$btrfs" = "yes" ; then
++  echo "CONFIG_BTRFS=y" >> $config_host_mak
++fi
+ if test "$inotify" = "yes" ; then
+   echo "CONFIG_INOTIFY=y" >> $config_host_mak
+ fi
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index bf89b96d27b0..bddeaca9e7ec 100644
+index e2fc09b5a5ee..bf89b96d27b0 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -174,10 +174,18 @@
+@@ -174,6 +174,21 @@
       IOCTL(FS_IOC32_GETVERSION, IOC_R, MK_PTR(TYPE_INT))
       IOCTL(FS_IOC32_SETVERSION, IOC_W, MK_PTR(TYPE_INT))
  
-+#ifdef BTRFS_IOC_SNAP_CREATE
-+     IOCTL(BTRFS_IOC_SNAP_CREATE, IOC_W,
++#ifdef BTRFS_IOC_SUBVOL_CREATE
++     IOCTL(BTRFS_IOC_SUBVOL_CREATE, IOC_W,
 +           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
 +#endif
- #ifdef BTRFS_IOC_SUBVOL_CREATE
-      IOCTL(BTRFS_IOC_SUBVOL_CREATE, IOC_W,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
- #endif
-+#ifdef BTRFS_IOC_SNAP_DESTROY
-+     IOCTL(BTRFS_IOC_SNAP_DESTROY, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
++#ifdef BTRFS_IOC_SUBVOL_GETFLAGS
++     IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
 +#endif
- #ifdef BTRFS_IOC_SUBVOL_GETFLAGS
-      IOCTL(BTRFS_IOC_SUBVOL_GETFLAGS, IOC_R, MK_PTR(TYPE_ULONGLONG))
- #endif
++#ifdef BTRFS_IOC_SUBVOL_SETFLAGS
++     IOCTL(BTRFS_IOC_SUBVOL_SETFLAGS, IOC_W, MK_PTR(TYPE_ULONGLONG))
++#endif
++#ifdef BTRFS_IOC_GET_SUBVOL_INFO
++     IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
++           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
++#endif
++
+ #ifdef CONFIG_USBFS
+   /* USB ioctls */
+   IOCTL(USBDEVFS_CONTROL, IOC_RW,
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index d14d849a720c..93da3b972852 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -112,6 +112,9 @@
+ #include <linux/if_alg.h>
+ #include <linux/rtc.h>
+ #include <sound/asound.h>
++#ifdef CONFIG_BTRFS
++#include <linux/btrfs.h>
++#endif
+ #ifdef HAVE_DRM_H
+ #include <libdrm/drm.h>
+ #include <libdrm/i915_drm.h>
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index cae79f8492e1..1519de7a5565 100644
+index 9d07991176b8..cae79f8492e1 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -1006,7 +1006,9 @@ struct target_rtc_pll_info {
+@@ -1005,6 +1005,14 @@ struct target_rtc_pll_info {
+ #define TARGET_FS_IOC32_GETVERSION TARGET_IOR('v', 1, int)
  #define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
  
- /* btrfs ioctls */
-+#define TARGET_BTRFS_IOC_SNAP_CREATE            TARGET_IOWU(BTRFS_IOCTL_MAGIC, 1)
- #define TARGET_BTRFS_IOC_SUBVOL_CREATE          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 14)
-+#define TARGET_BTRFS_IOC_SNAP_DESTROY           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 15)
- #define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, 25,\
-                                                            abi_ullong)
- #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, 26,\
++/* btrfs ioctls */
++#define TARGET_BTRFS_IOC_SUBVOL_CREATE          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 14)
++#define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, 25,\
++                                                           abi_ullong)
++#define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, 26,\
++                                                           abi_ullong)
++#define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IORU(BTRFS_IOCTL_MAGIC, 60)
++
+ /* usb ioctls */
+ #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
+ #define TARGET_USBDEVFS_BULK TARGET_IOWRU('U', 2)
 diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 0ce58d77727c..853b91d21275 100644
+index 12bf3484e2bd..0ce58d77727c 100644
 --- a/linux-user/syscall_types.h
 +++ b/linux-user/syscall_types.h
-@@ -358,7 +358,8 @@ STRUCT(blkpg_partition,
+@@ -358,6 +358,38 @@ STRUCT(blkpg_partition,
         MK_ARRAY(TYPE_CHAR, BLKPG_DEVNAMELTH), /* devname */
         MK_ARRAY(TYPE_CHAR, BLKPG_VOLNAMELTH)) /* volname */
  
--#ifdef BTRFS_IOC_SUBVOL_CREATE
-+#if defined(BTRFS_IOC_SUBVOL_CREATE) || defined(BTRFS_IOC_SNAP_CREATE) || \
-+    defined(BTRFS_IOC_SNAP_DESTROY)
- STRUCT(btrfs_ioctl_vol_args,
-        TYPE_LONGLONG, /* fd */
-        MK_ARRAY(TYPE_CHAR, BTRFS_PATH_NAME_MAX + 1)) /* name */
++#ifdef BTRFS_IOC_SUBVOL_CREATE
++STRUCT(btrfs_ioctl_vol_args,
++       TYPE_LONGLONG, /* fd */
++       MK_ARRAY(TYPE_CHAR, BTRFS_PATH_NAME_MAX + 1)) /* name */
++#endif
++
++#ifdef BTRFS_IOC_GET_SUBVOL_INFO
++STRUCT(btrfs_ioctl_timespec,
++       TYPE_ULONGLONG, /* sec */
++       TYPE_INT) /* nsec */
++
++STRUCT(btrfs_ioctl_get_subvol_info_args,
++       TYPE_ULONGLONG, /* treeid */
++       MK_ARRAY(TYPE_CHAR, BTRFS_VOL_NAME_MAX + 1),
++       TYPE_ULONGLONG, /* parentid */
++       TYPE_ULONGLONG, /* dirid */
++       TYPE_ULONGLONG, /* generation */
++       TYPE_ULONGLONG, /* flags */
++       MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* uuid */
++       MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* parent_uuid */
++       MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* received_uuid */
++       TYPE_ULONGLONG, /* ctransid */
++       TYPE_ULONGLONG, /* otransid */
++       TYPE_ULONGLONG, /* stransid */
++       TYPE_ULONGLONG, /* rtransid */
++       MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* ctime */
++       MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* otime */
++       MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* stime */
++       MK_STRUCT(STRUCT_btrfs_ioctl_timespec), /* rtime */
++       MK_ARRAY(TYPE_ULONGLONG, 8)) /* reserved */
++#endif
++
+ STRUCT(rtc_time,
+        TYPE_INT, /* tm_sec */
+        TYPE_INT, /* tm_min */
 -- 
 2.26.2
 
