@@ -4,78 +4,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC56C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:48:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB9F2C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:48:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7796420767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:48:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A651420767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:48:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L18ZhFKl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7796420767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RL1h9WMN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A651420767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDbYG-0001T0-Gj
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:48:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34798)
+	id 1kDbYm-0002An-P6
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:48:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbTu-0001UE-ID
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:43:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40723
- helo=us-smtp-1.mimecast.com)
+ id 1kDbUC-0002F1-JW
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:12 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:37079
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbTs-0008Ij-Rq
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:43:54 -0400
+ id 1kDbUA-0008LW-RJ
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599086632;
+ s=mimecast20190719; t=1599086650;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=eSyanX0HZcjRpEvE7z+qG2l7qfXB4wIkDLHXO1NBL8E=;
- b=L18ZhFKlEqwy8ZIJ6H9QqP4zfWWDS8WjJkyy8YzMOMYr+mTn6zvE1+L01C4E4HyxuIhiTQ
- Tg8d0J54M9EWOIcgX7BRTAl/o1W6qjVxNvUmTIlN023YHYxFs7MkaPwF5Fpe9u6K4GtpdH
- pQbHCqUQ3TGsUo4vwO89SW0Djtnshxc=
+ bh=QwtDvCHQzjINymb31Ge9PCZIU0/FWVcz5SJd4ITY3yk=;
+ b=RL1h9WMNgVUn5qFO+G21wn6tcG5Wd2gKo3ukkIi1z58p97FH8VhkZjBQKgq+1+faUrdIWu
+ afg1zCmwct9ZLg//fGPcyDziFSeTEcwONG7e0tfQQWgny9Vz6iCGDioQAgj63xTWOK6l0y
+ SLV9eNhWIKcuseuI+g+q38rYmnsLdrw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-369-qnKEbevUMlGF-6Hvx7IQdw-1; Wed, 02 Sep 2020 18:43:49 -0400
-X-MC-Unique: qnKEbevUMlGF-6Hvx7IQdw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-385-um_Uo9j-MziSkLKhsX_KCQ-1; Wed, 02 Sep 2020 18:44:08 -0400
+X-MC-Unique: um_Uo9j-MziSkLKhsX_KCQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 673621074642;
- Wed,  2 Sep 2020 22:43:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E680801AB3
+ for <qemu-devel@nongnu.org>; Wed,  2 Sep 2020 22:44:07 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E8B3819C59;
- Wed,  2 Sep 2020 22:43:44 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6DAAE5C1C4;
+ Wed,  2 Sep 2020 22:44:07 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/63] vfio: Rename VFIO_AP_DEVICE_TYPE to TYPE_VFIO_AP_DEVICE
-Date: Wed,  2 Sep 2020 18:42:16 -0400
-Message-Id: <20200902224311.1321159-9-ehabkost@redhat.com>
+Subject: [PATCH 15/63] i8259: Rename TYPE_I8259 to TYPE_PIC
+Date: Wed,  2 Sep 2020 18:42:23 -0400
+Message-Id: <20200902224311.1321159-16-ehabkost@redhat.com>
 In-Reply-To: <20200902224311.1321159-1-ehabkost@redhat.com>
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 16:25:58
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 17:54:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -96,12 +96,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- berrange@redhat.com, Pierre Morel <pmorel@linux.ibm.com>,
- Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,59 +107,57 @@ the type checking macro.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Cc: Pierre Morel <pmorel@linux.ibm.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-s390x@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/vfio/ap.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/intc/i8259.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index 68ed059b39..582c091a24 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -30,7 +30,7 @@
- #include "exec/address-spaces.h"
- #include "qom/object.h"
+diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
+index 344fd04db1..e536cc90be 100644
+--- a/hw/intc/i8259.c
++++ b/hw/intc/i8259.c
+@@ -37,10 +37,10 @@
  
--#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
-+#define TYPE_VFIO_AP_DEVICE      "vfio-ap"
+ //#define DEBUG_IRQ_LATENCY
  
- struct VFIOAPDevice {
-     APDevice apdev;
-@@ -39,7 +39,7 @@ struct VFIOAPDevice {
- typedef struct VFIOAPDevice VFIOAPDevice;
+-#define TYPE_I8259 "isa-i8259"
++#define TYPE_PIC "isa-i8259"
+ typedef struct PICClass PICClass;
+ DECLARE_CLASS_CHECKERS(PICClass, PIC,
+-                       TYPE_I8259)
++                       TYPE_PIC)
  
- DECLARE_INSTANCE_CHECKER(VFIOAPDevice, VFIO_AP_DEVICE,
--                         VFIO_AP_DEVICE_TYPE)
-+                         TYPE_VFIO_AP_DEVICE)
+ /**
+  * PICClass:
+@@ -418,7 +418,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
  
- static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
- {
-@@ -72,7 +72,7 @@ static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
+     irq_set = g_new0(qemu_irq, ISA_NUM_IRQS);
  
-     if (!group_path) {
-         error_setg(errp, "%s: no iommu_group found for %s: %s",
--                   VFIO_AP_DEVICE_TYPE, vapdev->vdev.sysfsdev, gerror->message);
-+                   TYPE_VFIO_AP_DEVICE, vapdev->vdev.sysfsdev, gerror->message);
-         g_error_free(gerror);
-         return NULL;
-     }
-@@ -176,7 +176,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
+-    isadev = i8259_init_chip(TYPE_I8259, bus, true);
++    isadev = i8259_init_chip(TYPE_PIC, bus, true);
+     dev = DEVICE(isadev);
+ 
+     qdev_connect_gpio_out(dev, 0, parent_irq);
+@@ -428,7 +428,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
+ 
+     isa_pic = dev;
+ 
+-    isadev = i8259_init_chip(TYPE_I8259, bus, false);
++    isadev = i8259_init_chip(TYPE_PIC, bus, false);
+     dev = DEVICE(isadev);
+ 
+     qdev_connect_gpio_out(dev, 0, irq_set[2]);
+@@ -451,7 +451,7 @@ static void i8259_class_init(ObjectClass *klass, void *data)
  }
  
- static const TypeInfo vfio_ap_info = {
--    .name = VFIO_AP_DEVICE_TYPE,
-+    .name = TYPE_VFIO_AP_DEVICE,
-     .parent = TYPE_AP_DEVICE,
-     .instance_size = sizeof(VFIOAPDevice),
-     .class_init = vfio_ap_class_init,
+ static const TypeInfo i8259_info = {
+-    .name       = TYPE_I8259,
++    .name       = TYPE_PIC,
+     .instance_size = sizeof(PICCommonState),
+     .parent     = TYPE_PIC_COMMON,
+     .class_init = i8259_class_init,
 -- 
 2.26.2
 
