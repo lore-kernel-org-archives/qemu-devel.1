@@ -2,95 +2,87 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2C6C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:04:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A4CC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:19:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC193206EB
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 57072207EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:19:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TOx9gj7s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC193206EB
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SNSnKS9g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57072207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDX7C-0002qi-QQ
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 14:04:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60810)
+	id 1kDXLp-0007PS-71
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 14:19:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDX6P-0002Hw-2w
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:03:21 -0400
-Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:43071)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDXL0-0006V4-EU
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:18:26 -0400
+Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:34202)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDX6N-0008CG-6l
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:03:20 -0400
-Received: by mail-pg1-x532.google.com with SMTP id d19so47906pgl.10
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 11:03:18 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDXKy-0001ic-OK
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:18:26 -0400
+Received: by mail-ej1-x62d.google.com with SMTP id d26so76620ejr.1
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 11:18:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:from:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=sGh/6pvSh445QkHwpBkvpg2uvxcbLBkSjD0rDe5zCp0=;
- b=TOx9gj7sfgjXATX51ZkcosJSvbzXwkdfmkwBc9NaBe3qatuckL2cQslhYjzZxZzxqw
- 6/tNZGYf2cRSXrrJzrZ4cWRbb76/HN6N9SHnUqKQXNmc+3J7ZZAArGQ+H90cjEq06Vmd
- znu0BekT7rtweWytbDYnwH73Y6XbWa8Mo6Qo1fbMMTZv+pYP3zXjd9rzdokcjU+U0sRw
- QaqNrM5VKdNGYNvqO3Lkg6BkIHbVfaTMJPw301DDi7TxZSpruqbU4d+rfyPwlTD8cJzk
- SfcA3xo7JKdbVVG06rh+699eGogdXk3pvcUmj9hODSbjTcb6Nf5FHYH/h4yWUQsi0q7b
- Zi3w==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=D3wTSXZChbmEZYUHhRGIEeAxCcKUKyqSfx7J/61yesA=;
+ b=SNSnKS9geg7DKS9qKOkSpqIHUoPrEUAopGdGM7L0upYtr94G38HouHVqqJ9noKcOxk
+ Sui3mS3DhYub0h6N2bI5u/3YDOV+TiLl4Vhdzdqmm3p+qCYrUBV44qeHBO/bJRaV3yJR
+ fsQJg6Kx6mKIyNCoe8Cm3XUkgK0z3lVOlJMYlYgmQNh+0kkYj1m7xQMfGF2XJfs8XXDe
+ UhZXE6audIHFg7TFoM/Z71Tv9i/EYe6+DrwKwCB9VXacSNpuQ+mzKi6MfZR2rv6DwZRX
+ tRtX411QtWKl4JbTU9kqlrOdPanBEhJJJoPY4vht1tRsdMFdu9I+nao7jipGzoL+Z6nL
+ g3ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:from:to:cc:references:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sGh/6pvSh445QkHwpBkvpg2uvxcbLBkSjD0rDe5zCp0=;
- b=SkZigBEAKH75zbDyPHKt4C0VVQ774HRQANpBCFtmyl8cWV2cGBYMBhnX2OI5s0P2SO
- lx9OXEN1Ajyt1qQ1weO1HHwViFs6twuKf/Nl3L8d5PGXiEb7ZD/Edp44LLoX1Zm753nb
- SxzAsW/LQLvgfN+WraNLcvhw0A1iNdqrj31bqwLsQPS+yOG4Hl9St9ICPkAKRSh2XqFv
- 2qbZfY0yoUEMkdWjM+h/Ztzx1DdDa4WSD8EdTeL6BOy3me+S3W3DR2SQnLn5Pdruq1dE
- ljAfpGb7igyMxkAA20eFeIlo/HzzJYBIB1IcwhTbI5uRWLQTx82Z6i/0qqKIlYi9kUIS
- G9vQ==
-X-Gm-Message-State: AOAM530hkF6//PG8eY35w8n8zYy4Bz0RLZjFtb6/0K8rl5dzrg7R3Fgi
- ZP6VQZTxJdIvGFkMTVY3+uzQGw==
-X-Google-Smtp-Source: ABdhPJyHCCFpbMg3vN8RPHi0NbeV+T8hWFdqGcYqf9lFR51qetprlbtTmQ8yt+uSLfmq8+8BJapYHQ==
-X-Received: by 2002:aa7:92d7:: with SMTP id k23mr4218601pfa.295.1599069797501; 
- Wed, 02 Sep 2020 11:03:17 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id i11sm75577pjg.50.2020.09.02.11.03.16
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 02 Sep 2020 11:03:16 -0700 (PDT)
-Subject: Re: [PATCH 7/7] target/microblaze: Diagnose invalid insns in delay
- slots
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-References: <20200902163559.1077728-1-richard.henderson@linaro.org>
- <20200902163559.1077728-8-richard.henderson@linaro.org>
-Message-ID: <9d51eb8c-d803-ab7a-76f9-a590f5c8ef39@linaro.org>
-Date: Wed, 2 Sep 2020 11:03:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=D3wTSXZChbmEZYUHhRGIEeAxCcKUKyqSfx7J/61yesA=;
+ b=I3smVT0aRVraxi9BBfHaAPzMYjUPvCv1xfSqg6G+9HLIr7SXB7hTwxl+yTKBZ+PcqP
+ qx1Mnvj+4G0sf61Xn8f88Iz1JwfLm0rOtmb9lH28HnPs7/np7bFt/NcNTVNKqW9o4H8h
+ j2xjSdKFJcN6AWJm+tzUzxwfTi4EvKF8bprKSaiq6pNa6Iexs8Ba7+McuGAtTd/TAQyU
+ 9jtFUqbV4vUQB/SOyogA1x3amGKbwa1Vte0DiScyP7vBpXVQVveeqvQNP4QyQiqPt7e2
+ pwriYo2XQUp1xXzOVS7ymsXh8sCqKIJxImPxiD24CmIjeSmHCDuYtHYptIxUiUZE1DcV
+ 1/xg==
+X-Gm-Message-State: AOAM532YpP7+lwobE75TH/MdFTNcTqGh+SWqKrlV2Bf41L3CcGiGwnFv
+ dqYAcmtFEkYISqD5qVGjtx5mX+a2AYBOJirOPmwvOQ==
+X-Google-Smtp-Source: ABdhPJyTn7hxfTYL51w/tLslG2AAgcCKoncg1AsPm3Al9SL+kDvL1GeS3lBRiI/NrmAdaNEGgXx8bOga6FVJF5bhu5A=
+X-Received: by 2002:a17:906:59b:: with SMTP id 27mr1379011ejn.56.1599070702869; 
+ Wed, 02 Sep 2020 11:18:22 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200902163559.1077728-8-richard.henderson@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::532;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x532.google.com
+References: <bbdacc80-a321-5f06-e430-973a38e7e037@amsat.org>
+ <CAFEAcA8mwjWP-KhJ5bp_Qo_h81Mt_yn8k_5oepgMas9COBQgWQ@mail.gmail.com>
+ <f7b28480-c841-f0d7-a848-b5f1775ec12d@amsat.org>
+In-Reply-To: <f7b28480-c841-f0d7-a848-b5f1775ec12d@amsat.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 2 Sep 2020 19:18:11 +0100
+Message-ID: <CAFEAcA-3bkPkxuMXN7Wd-zBKajzXOr+Vib7XzCzsT_8YYQzTzQ@mail.gmail.com>
+Subject: Re: hw/clock: What clock rate for virt machines?
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.324,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -105,20 +97,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/2/20 9:35 AM, Richard Henderson wrote:
-> +static bool invalid_delay_slot(DisasContext *dc, const char *insn_type)
-> +{
-> +    if (dc->tb_flags & D_FLAG) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "Invalid insn in delay slot: %s\n", insn_type);
+On Wed, 2 Sep 2020 at 18:03, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
+wrote:
+>
+> On 9/2/20 6:49 PM, Peter Maydell wrote:
+> > On Wed, 2 Sep 2020 at 17:35, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
+> >> Peter said "'clock' is basically meaningless for virt machines",
+> >>
+> >> I understand and agree. But how to make that explicit/obvious in
+> >> the code, when a device expects a clock frequency/period?
+> >
+> > When a particular *device* needs a clock, then presumably
+> > it has a defined purpose for it, and we can pick a
+> > frequency for it then.
+> >
+> >> See for example hw/riscv/virt.c, it uses the following (confusing
+> >> to me) in virt_machine_init():
+> >>
+> >>    serial_mm_init(system_memory, memmap[VIRT_UART0].base,
+> >>        0, qdev_get_gpio_in(DEVICE(mmio_plic), UART0_IRQ), 399193,
+> >>        serial_hd(0), DEVICE_LITTLE_ENDIAN);
+> >
+> > In this case, the board has a model of a 16550A UART on it,
+> > which uses its input clock to determine what the actual baud
+> > rate is for particular guest settings of the divisor registers.
+> > So we need to look at:
+> >  * what does guest software expect the frequency to be?
+>
+> QEMU is supposed to model machine with no knowledge of the guest,
+> but the virt case is a particular one indeed... as it has to know
+> it is virtualized.
+>
+> >  * what is a "good" frequency which gives the guest the best
+> >    possible choices of baud rate?
+>
+> I'll think about it...
 
-I should probably log the pc as well.
+My guess is that guest code assumes "same frequency an
+x86 PC uses", but a risc-v person might know better...
 
+(For QEMU I think it only makes a visible difference when
+you pass a host serial port through to the guest as
+otherwise we ignore whatever baud rate the guest sets.)
 
-r~
+thanks
+-- PMM
 
