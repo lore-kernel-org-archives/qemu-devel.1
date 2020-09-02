@@ -2,88 +2,89 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E9DDC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:08:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B550C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:08:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B01420767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:08:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E676920767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:08:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JM3sEwJH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B01420767
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eiAsYNhB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E676920767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57602 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDSUt-0005Fy-Es
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 09:08:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36816)
+	id 1kDSVN-0006AO-2E
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 09:08:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDSMR-00063S-Tf
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40484)
+ id 1kDSMT-00067a-EB
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36678
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDSMO-00076a-NF
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:35 -0400
+ id 1kDSMQ-00077n-JB
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599051571;
+ s=mimecast20190719; t=1599051573;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Ote373+rr37GfoSVxXxgWrx4xpHJ21H9c/MjWrwzfNA=;
- b=JM3sEwJHQkco7ZTN3ccDO65RE3bc3FaXfr+9GN3lcpylMqO0TrHp28J9kvTg/W8kc+DYzx
- dRKs/Oy4kb65eYuBH38gaBcF8Z3AziiFj7GlcJfwS+sVzGeC9PPLvL9ax+OgqQXsm68A9l
- HIN8gkbh5bnUOf1HPDcpPa6h1ezOU5U=
+ bh=hNC++EisQar/f/E7gimpP8924iax8X00AoPinplBz/Y=;
+ b=eiAsYNhBqcAO9YZ763I4pPAWAoq4A1+gwD2WRR/381CJjM6tTFLEPq2L63Jo4tPeCKyz2Y
+ BxkuCRQv0QLypdNTzdsn0ORAKz1BYMqmxxAEHRbpLZqR8vRm8h2h7+HTj77rJeSCjWOptK
+ CDHCf/oqKgD9/8F+ZWuIkuzhSWnvF0o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-xfjfRgM2NKGNbpVommp92g-1; Wed, 02 Sep 2020 08:59:28 -0400
-X-MC-Unique: xfjfRgM2NKGNbpVommp92g-1
+ us-mta-473-aP9SzZqeOGKYecEnDnTmcg-1; Wed, 02 Sep 2020 08:59:31 -0400
+X-MC-Unique: aP9SzZqeOGKYecEnDnTmcg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26EA1107B7C4;
- Wed,  2 Sep 2020 12:59:23 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DDB9805EF2
+ for <qemu-devel@nongnu.org>; Wed,  2 Sep 2020 12:59:27 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A9D1D76E01;
- Wed,  2 Sep 2020 12:59:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 19B117B90B;
+ Wed,  2 Sep 2020 12:59:27 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 10/39] meson: fix libqos linking
-Date: Wed,  2 Sep 2020 08:58:48 -0400
-Message-Id: <20200902125917.26021-11-pbonzini@redhat.com>
+Subject: [PATCH 17/39] meson: move keyutils dependency check
+Date: Wed,  2 Sep 2020 08:58:55 -0400
+Message-Id: <20200902125917.26021-18-pbonzini@redhat.com>
 In-Reply-To: <20200902125917.26021-1-pbonzini@redhat.com>
 References: <20200902125917.26021-1-pbonzini@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:07:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,49 +97,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, Claudio Fontana <cfontana@suse.de>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add genh to the sources to avoid race conditions between QAPI
-file generation and libqos compilation.
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
-Make the name_suffix .fa for consistency with other link_whole
-static libraries and to work around a Meson issue where
-lots of linker flags are placed between -Wl,--start-group and
--Wl,--end-group and this breaks the fork-fuzz.ld linker script.
+Since there is not minimum version specified, and it's a test-only
+dependency, it's fair to depend on a version that ships with a .pc I
+suppose.
 
-Reported-by: Claudio Fontana <cfontana@suse.de>
-Reported-by: Alexander Bulekov <alxndr@bu.edu>
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Message-Id: <20200828110734.1638685-8-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/qtest/libqos/meson.build | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ configure   | 25 -------------------------
+ meson.build |  7 +++----
+ 2 files changed, 3 insertions(+), 29 deletions(-)
 
-diff --git a/tests/qtest/libqos/meson.build b/tests/qtest/libqos/meson.build
-index 19931b9248..1cddf5bdaa 100644
---- a/tests/qtest/libqos/meson.build
-+++ b/tests/qtest/libqos/meson.build
-@@ -1,5 +1,4 @@
--libqos = static_library('qos',
--  files('../libqtest.c',
-+libqos_srcs = files('../libqtest.c',
-         'qgraph.c',
-         'qos_external.c',
-         'pci.c',
-@@ -52,6 +51,10 @@ libqos = static_library('qos',
-         'arm-xilinx-zynq-a9-machine.c',
-         'ppc64_pseries-machine.c',
-         'x86_64_pc-machine.c',
--), build_by_default: false)
-+)
-+
-+libqos = static_library('qos', libqos_srcs + genh,
-+                        name_suffix: 'fa',
-+                        build_by_default: false)
+diff --git a/configure b/configure
+index 6a43ef6c2d..82b2211936 100755
+--- a/configure
++++ b/configure
+@@ -6305,28 +6305,6 @@ but not implemented on your system"
+     fi
+ fi
  
- qos = declare_dependency(link_whole: libqos)
+-##########################################
+-# check for usable keyutils.h
+-
+-if test "$linux" = "yes" ; then
+-
+-    have_keyutils=no
+-    cat > $TMPC << EOF
+-#include <errno.h>
+-#include <asm/unistd.h>
+-#include <unistd.h>
+-#include <sys/types.h>
+-#include <keyutils.h>
+-int main(void) {
+-    return request_key("user", NULL, NULL, 0);
+-}
+-EOF
+-    if compile_prog "" "-lkeyutils"; then
+-        have_keyutils=yes
+-    fi
+-fi
+-
+-
+ ##########################################
+ # End of CC checks
+ # After here, no more $cc or $ld runs
+@@ -7510,9 +7488,6 @@ fi
+ 
+ if test "$secret_keyring" = "yes" ; then
+   echo "CONFIG_SECRET_KEYRING=y" >> $config_host_mak
+-  if test "$have_keyutils" = "yes" ; then
+-    echo "CONFIG_KEYUTILS=y" >> $config_host_mak
+-  fi
+ fi
+ 
+ if test "$tcg_interpreter" = "yes"; then
+diff --git a/meson.build b/meson.build
+index fc46273491..7c714bb49c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -410,10 +410,8 @@ if 'CONFIG_TASN1' in config_host
+   tasn1 = declare_dependency(compile_args: config_host['TASN1_CFLAGS'].split(),
+                              link_args: config_host['TASN1_LIBS'].split())
+ endif
+-keyutils = not_found
+-if 'CONFIG_KEYUTILS' in config_host
+-  keyutils = declare_dependency(link_args: '-lkeyutils')
+-endif
++keyutils = dependency('libkeyutils', required: false,
++                      method: 'pkg-config', static: enable_static)
+ 
+ # Create config-host.h
+ 
+@@ -424,6 +422,7 @@ config_host_data.set('CONFIG_VNC_JPEG', jpeg.found())
+ config_host_data.set('CONFIG_VNC_PNG', png.found())
+ config_host_data.set('CONFIG_VNC_SASL', sasl.found())
+ config_host_data.set('CONFIG_XKBCOMMON', xkbcommon.found())
++config_host_data.set('CONFIG_KEYUTILS', keyutils.found())
+ config_host_data.set('QEMU_VERSION', '"@0@"'.format(meson.project_version()))
+ config_host_data.set('QEMU_VERSION_MAJOR', meson.project_version().split('.')[0])
+ config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1])
 -- 
 2.26.2
 
