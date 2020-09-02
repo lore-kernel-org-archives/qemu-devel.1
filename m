@@ -2,94 +2,108 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CD75C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:33:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 554CFC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:33:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE7772071B
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11C632071B
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:33:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sq7xLhdZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE7772071B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MRlJ8zeR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11C632071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60288 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDQ4s-0003G0-Sy
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 06:33:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54098)
+	id 1kDQ5G-0003Wx-6J
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 06:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kDQ3o-0001hI-Bn
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:32:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35492)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDQ3q-0001lu-Uw
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:32:14 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29483
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kDQ3h-0004pQ-Qp
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:32:12 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDQ3o-0004rC-Vy
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:32:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599042724;
+ s=mimecast20190719; t=1599042732;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=R9ykzupfu4NoXws0CerMJptVJaOeEsZ+5sF0spxcLyM=;
- b=Sq7xLhdZzZhcHw04PirIsXsU5/xbHc/qpncWHQHArmHVCu+YJQm9s6bwsrITJ+BKwuXVFt
- uGwrGr90t/6zraKdwJHVHvWIsyHbiioZsl14wJIWLWEF+TbzXfEOzBQ8GbLrGPB3d2yJyK
- cO7VpsHHJaqbsKLsSqYXbQoQ4rVg3zw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-1F7Ax41RPi25nUlbhnc1yQ-1; Wed, 02 Sep 2020 06:32:01 -0400
-X-MC-Unique: 1F7Ax41RPi25nUlbhnc1yQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5F31801FDE;
- Wed,  2 Sep 2020 10:31:59 +0000 (UTC)
-Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B16AB5D9CC;
- Wed,  2 Sep 2020 10:31:47 +0000 (UTC)
-Subject: Re: [RFC v8 3/5] memory: Add IOMMU_DEVIOTLB_UNMAP
- IOMMUTLBNotificationType
-To: =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
- Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-References: <20200901142608.24481-1-eperezma@redhat.com>
- <20200901142608.24481-4-eperezma@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <58783cf8-ef7f-1481-8c5e-acd76a8b752f@redhat.com>
-Date: Wed, 2 Sep 2020 12:31:46 +0200
+ bh=jRUlzfvsrvOthE2gqfOlIs+PryRqo3WH7GaI4+tUqfg=;
+ b=MRlJ8zeRPvCZPGjYlJGMI/AG8QZJyiYUx1xb+wfijp/Zd3zPUsCM+J6LDq1iqyNqNHSYpE
+ RTQ5y4zR0Wxv6NXX9O+7mUakifXFE7YkcaFEStnDPHq3vwvknUy1LOpfZJdTDXUY57J6T8
+ uuCtE+lP3ft+XFt5kKKpucmek/aSfAQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-104-5PFqxnfDNSqgs9Ky0Qnc_Q-1; Wed, 02 Sep 2020 06:32:10 -0400
+X-MC-Unique: 5PFqxnfDNSqgs9Ky0Qnc_Q-1
+Received: by mail-wr1-f71.google.com with SMTP id e14so1805114wrr.7
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 03:32:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jRUlzfvsrvOthE2gqfOlIs+PryRqo3WH7GaI4+tUqfg=;
+ b=Nu0Fr0kcbkzmX6XKwFLeVu+vFlGacLEFiuD5aZ+1BJyp2UYrtw47+mX/Yv5OUCJds8
+ x6V3jfnhvpF0yNWbKUD/iO0InscI6wsB/g13ojwaGhUQvysXcjZgdbyYvCnYV0AZb1dQ
+ yfZtphOHQ2vK3z5wgZg9GZsuVl/Qym8SNWfRjaDGc9aJR9q4Ve2sEFPrZXdC0Gb3yczt
+ oj4qpEjJTrDCuFchglwelKMoj1L8EKcj33EXDFXribAYwdHNEWRPC+fab3klz4ur0Kg5
+ SQNGlnfMhxk8DmIzfbqcXDOeTwKrHIjqR6ackRDp7uQsQVHCA/seyHzSMZY/sug7jf/p
+ nfqQ==
+X-Gm-Message-State: AOAM530dquxK+ul6Dl+UplaAly/04yQTcIlJ9Re9XpY+4lPrl90MEKuJ
+ sFXy0BHtVt0dbdfc211mPS3td2a6QmZFVCtk2F0E1wdSXpG8xWXs2qdxXeE/pg++slJMC+vmmt2
+ B6Gq4sRtB2xG8gFA=
+X-Received: by 2002:a1c:6607:: with SMTP id a7mr5975495wmc.142.1599042729443; 
+ Wed, 02 Sep 2020 03:32:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJznC9hqf+BCj8+LdVDb3vgMq+KxqSqESJYwj+OpSlnaXQ+lWlqgybiyCFFU+54gwjQsBDmrJg==
+X-Received: by 2002:a1c:6607:: with SMTP id a7mr5975480wmc.142.1599042729195; 
+ Wed, 02 Sep 2020 03:32:09 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.173.193])
+ by smtp.gmail.com with ESMTPSA id n11sm6500264wrx.91.2020.09.02.03.32.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 02 Sep 2020 03:32:08 -0700 (PDT)
+Subject: Re: [PATCH] stubs: Move qemu_timer_notify_cb() and remove
+ qemu_notify_event() stub
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200902102433.304737-1-thuth@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <cb02c4e8-6bc4-733e-ead9-bdbf5cd95b83@redhat.com>
+Date: Wed, 2 Sep 2020 12:32:07 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200901142608.24481-4-eperezma@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200902102433.304737-1-thuth@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eric.auger@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:26:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
 X-Spam_bar: ----
 X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,79 +116,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Claudio Fontana <cfontana@suse.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eugenio,
-
-On 9/1/20 4:26 PM, Eugenio Pérez wrote:
-> Adapt intel and vhost to use this new notification type
-I think you should explain in the commit message what is the benefice to
-introduce this new event type.
+On 02/09/20 12:24, Thomas Huth wrote:
+> When cross-compiling with MinGW, there are sometimes some weird linker
+> errors like:
 > 
-> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> ibqemuutil.a(util_main-loop.c.obj): In function `qemu_notify_event':
+> /builds/huth/qemu/build/../util/main-loop.c:139: multiple definition of
+>  `qemu_notify_event'
+> libqemuutil.a(stubs_notify-event.c.obj):/builds/huth/qemu/stubs/notify-event.c:5:
+>  first defined here
+> collect2: error: ld returned 1 exit status
+> /builds/huth/qemu/rules.mak:88: recipe for target 'tests/test-timed-average.exe'
+>  failed
+> 
+> It seems like it works better when the qemu_timer_notify_cb() stub (which
+> calls qemu_notify_event()) is in a separate file - then we can also even
+> remove the qemu_notify_event() stub now.
+> 
+> This patch is based on ideas from the patch "stubs: Remove qemu_notify_event()"
+> by Philippe Mathieu-Daudé and the patch "cpu-timers, icount: new modules" from
+> Claudio Fontana.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->  hw/i386/intel_iommu.c | 2 +-
->  hw/virtio/vhost.c     | 2 +-
->  include/exec/memory.h | 2 ++
->  3 files changed, 4 insertions(+), 2 deletions(-)
+>  stubs/cpu-get-icount.c       | 5 -----
+>  stubs/meson.build            | 2 +-
+>  stubs/notify-event.c         | 6 ------
+>  stubs/qemu-timer-notify-cb.c | 8 ++++++++
+>  4 files changed, 9 insertions(+), 12 deletions(-)
+>  delete mode 100644 stubs/notify-event.c
+>  create mode 100644 stubs/qemu-timer-notify-cb.c
 > 
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 0c4aef5cb5..cdddb089e7 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -2468,7 +2468,7 @@ static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
->          sz = VTD_PAGE_SIZE;
->      }
->  
-> -    event.type = IOMMU_NOTIFIER_UNMAP;
-> +    event.type = IOMMU_NOTIFIER_DEVIOTLB;
-If this is used only for device IOTLB cache invalidation, shouldn't this
-be named IOMMU_NOTIFIER_DEVIOTLB_UNMAP to be consistent with the rest?
->      event.entry.target_as = &vtd_dev_as->as;
->      event.entry.addr_mask = sz - 1;
->      event.entry.iova = addr;
-> diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> index 1a1384e7a6..6ca168b47e 100644
-> --- a/hw/virtio/vhost.c
-> +++ b/hw/virtio/vhost.c
-> @@ -729,7 +729,7 @@ static void vhost_iommu_region_add(MemoryListener *listener,
->      iommu_idx = memory_region_iommu_attrs_to_index(iommu_mr,
->                                                     MEMTXATTRS_UNSPECIFIED);
->      iommu_notifier_init(&iommu->n, vhost_iommu_unmap_notify,
-> -                        IOMMU_NOTIFIER_UNMAP,
-> +                        IOMMU_NOTIFIER_DEVIOTLB,
->                          section->offset_within_region,
->                          int128_get64(end),
->                          iommu_idx);
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 8a56707169..215e23973d 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -87,6 +87,8 @@ typedef enum {
->      IOMMU_NOTIFIER_UNMAP = 0x1,
->      /* Notify entry changes (newly created entries) */
->      IOMMU_NOTIFIER_MAP = 0x2,
-> +    /* Notify changes on device IOTLB entries */
-> +    IOMMU_NOTIFIER_DEVIOTLB = 0x04,
->  } IOMMUNotifierFlag;
->  
->  #define IOMMU_NOTIFIER_ALL (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP)
-shouldn't we rename this one??
+> diff --git a/stubs/cpu-get-icount.c b/stubs/cpu-get-icount.c
+> index b35f844638..4001613240 100644
+> --- a/stubs/cpu-get-icount.c
+> +++ b/stubs/cpu-get-icount.c
+> @@ -14,8 +14,3 @@ int64_t cpu_get_icount_raw(void)
+>  {
+>      abort();
+>  }
+> -
+> -void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
+> -{
+> -    qemu_notify_event();
+> -}
+> diff --git a/stubs/meson.build b/stubs/meson.build
+> index 019bd79c7a..e2dfedc2a7 100644
+> --- a/stubs/meson.build
+> +++ b/stubs/meson.build
+> @@ -24,9 +24,9 @@ stub_ss.add(files('machine-init-done.c'))
+>  stub_ss.add(files('migr-blocker.c'))
+>  stub_ss.add(files('monitor.c'))
+>  stub_ss.add(files('monitor-core.c'))
+> -stub_ss.add(files('notify-event.c'))
+>  stub_ss.add(files('pci-bus.c'))
+>  stub_ss.add(files('pci-host-piix.c'))
+> +stub_ss.add(files('qemu-timer-notify-cb.c'))
+>  stub_ss.add(files('qmp_memory_device.c'))
+>  stub_ss.add(files('qtest.c'))
+>  stub_ss.add(files('ram-block.c'))
+> diff --git a/stubs/notify-event.c b/stubs/notify-event.c
+> deleted file mode 100644
+> index 827bb52d1a..0000000000
+> --- a/stubs/notify-event.c
+> +++ /dev/null
+> @@ -1,6 +0,0 @@
+> -#include "qemu/osdep.h"
+> -#include "qemu/main-loop.h"
+> -
+> -void qemu_notify_event(void)
+> -{
+> -}
+> diff --git a/stubs/qemu-timer-notify-cb.c b/stubs/qemu-timer-notify-cb.c
+> new file mode 100644
+> index 0000000000..054b408b1c
+> --- /dev/null
+> +++ b/stubs/qemu-timer-notify-cb.c
+> @@ -0,0 +1,8 @@
+> +#include "qemu/osdep.h"
+> +#include "sysemu/cpus.h"
+> +#include "qemu/main-loop.h"
+> +
+> +void qemu_timer_notify_cb(void *opaque, QEMUClockType type)
+> +{
+> +    qemu_notify_event();
+> +}
 > 
 
-Thanks
-
-Eric
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 
 
