@@ -2,90 +2,90 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D8BC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 07:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D102C433E6
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 07:31:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7242F2072A
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 07:28:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE1D72084C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 07:31:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gZsf8kJH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7242F2072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="UY+DkVK3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE1D72084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53038 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDNCH-0007zS-Ed
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 03:28:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59496)
+	id 1kDNEa-0001ul-QX
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 03:31:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kDNBO-0006kj-To
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 03:27:50 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48722
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kDNBM-0004wq-R6
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 03:27:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599031667;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FtQpAMyW3IbW9x2ckekNUQ2U8uKpXy7SI7wb/h9+BWU=;
- b=gZsf8kJHhLuVPAO5UM3KFRpwN/D13eSyefbPsn6LfsdgUcUTHZACacYxlix2Z8OUY/Z/Da
- 1Rkf0aF/33XlcpAggIvn/cwmc9PweMToNeeweBrpee3Qikr+kGjdl1fcRlJhy1eR9cv+Da
- mgSzizaB9C0hYD17jfo17F6W+tqBZpc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-79-S5XOGiUEOb-fcJVOahpUgw-1; Wed, 02 Sep 2020 03:27:46 -0400
-X-MC-Unique: S5XOGiUEOb-fcJVOahpUgw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 442D118A224D;
- Wed,  2 Sep 2020 07:27:45 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3D3375D9CD;
- Wed,  2 Sep 2020 07:27:38 +0000 (UTC)
-Date: Wed, 2 Sep 2020 09:27:37 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Ani Sinha <ani@anisinha.ca>
-Subject: Re: [PATCH v2 2/3] tests/acpi: add a new unit test to test hotplug
- off/on feature on the root pci bus
-Message-ID: <20200902092737.2bce1fa6@redhat.com>
-In-Reply-To: <20200901150928.12428-2-ani@anisinha.ca>
-References: <20200901150928.12428-1-ani@anisinha.ca>
- <20200901150928.12428-2-ani@anisinha.ca>
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kDNDv-0001Mw-7d
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 03:30:27 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:42413)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kDNDs-0005JN-Mq
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 03:30:26 -0400
+Received: by mail-pg1-x542.google.com with SMTP id m5so2103090pgj.9
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 00:30:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=date:from:to:cc:message-id:in-reply-to:references:subject
+ :mime-version; bh=kWVpW+gWWWBqDl5SebnLaaj25XD9fLzA5xyD4D9dZ/A=;
+ b=UY+DkVK3uF9f0U5U3Weikz8Z8pT/zNTx73X6sIYQ2qj8qOjIgjD2SJxRG7+FCTdIxx
+ 7XKWNPZ0DHOiekwuN+I4pq0Mhiv7y3QV6UmIERTIaAZBTqZtzIL6jIRlldnTTRco4pf6
+ 41VLleNVjgydDF1gSj1TI64E2YlHkX9TqJAtVb5rjwxVR/1lUMaGyaDcBFR0L/MzGL5U
+ 4YDJRAHG4x5PH16yAQlu0kB+s9M+Z/C41uXtFmXmjGyT92zJ1MJCBOxfutpKiuJOmXGR
+ zbzv9X3Yq5HLvXJYX8mJ6IESNW9GLX6gIV/sRrYpEnifD0Jw0GuTNx+bkjybkpkPGaXO
+ wdpg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:message-id:in-reply-to
+ :references:subject:mime-version;
+ bh=kWVpW+gWWWBqDl5SebnLaaj25XD9fLzA5xyD4D9dZ/A=;
+ b=neWcfSBCna0u2Msm88kYyeNnNh3hXWSZhC4kLv7m2Y403Cw3wVLSAiYIuWon2x4XGE
+ AV5UK1/Nt8dRhGNP/eSQWFL61fc3D074OjdxjGFAYgefSwItHLRzC7GppEKGR9btzDRY
+ vA0kWrTKrnTmDZmm8VQXtbaK0e33HRcuceiKI3zJcz8NulKCSCa5IyqFZICl9fguwScb
+ j6NO7Tfq+UcVFHn224BFL8nrRGQJv6nAkdk3hW5g+5MeysOpwUy+4qEJgSLmiWdc0C5j
+ 5EgzTXPgrj9mdsxFNnifY/qc/8nZWRa/dTonbLpCL/amAQKFt9oC6Hb+mtAUrjI0NR7s
+ dUwQ==
+X-Gm-Message-State: AOAM532XUev8fh+AnYpkJnfpYzhETl1kSDvpe8uV+SbJcIvwH1Nf/UlG
+ FMrT0djfdcPtmyR6vyhXFNLyNI7GqZzT4Q1/
+X-Google-Smtp-Source: ABdhPJxMWlrrDSVMdfzYi+ZfxQyZ1d9z/AoiVcFyqbs+lIFFaA5De12VbikmrxGNxrURW7lLez257g==
+X-Received: by 2002:a63:344f:: with SMTP id b76mr922270pga.388.1599031822805; 
+ Wed, 02 Sep 2020 00:30:22 -0700 (PDT)
+Received: from [2401:4900:110e:f9c1:40ce:e686:200:0]
+ ([2401:4900:110e:f9c1:9c90:3089:1abf:7d25])
+ by smtp.gmail.com with ESMTPSA id 8sm3816551pjx.14.2020.09.02.00.30.19
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Wed, 02 Sep 2020 00:30:22 -0700 (PDT)
+Date: Wed, 2 Sep 2020 13:00:01 +0530
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Message-ID: <07c02231-daa5-4822-8003-f15fe21dad5f@Spark>
+In-Reply-To: <20200829081233.10120-1-ani@anisinha.ca>
+References: <20200829081233.10120-1-ani@anisinha.ca>
+Subject: Re: [PATCH] Fix a gap where acpi_pcihp_find_hotplug_bus()
+ returns a non-hotpluggable bus
+X-Readdle-Message-ID: 07c02231-daa5-4822-8003-f15fe21dad5f@Spark
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:07:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/alternative; boundary="5f4f49ff_12200854_239"
+Received-SPF: none client-ip=2607:f8b0:4864:20::542;
+ envelope-from=ani@anisinha.ca; helo=mail-pg1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,63 +98,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>, jusual@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue,  1 Sep 2020 20:39:27 +0530
-Ani Sinha <ani@anisinha.ca> wrote:
+--5f4f49ff_12200854_239
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
 
-> Ability to turn hotplug off on the pci root bus for i440fx was added in commit:
-> 3d7e78aa7777f0 ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus")
-> 
-> This change adds a unit test in order to test this feature.
-> 
-> This change has been tested against upstream qemu master branch on top of tag v5.1.0.
-> 
+Can someone please review this?
+On Aug 29, 2020, 13:42 +0530, Ani Sinha <ani@anisinha.ca>, wrote:
+> When ACPI hotplug for the root bus is disabled, the bsel property for that
+> bus is not set. Please see the following commit:
+>
+> 3d7e78aa7777f ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus").
+>
+> As a result, when acpi_pcihp_find_hotplug_bus() is called
+> with bsel set to 0, it may return the root bus. This would be wrong since the
+> root bus is not hotpluggable. In general, this can potentially happen to other
+> buses as well.
+> In this patch, we fix the issue in this function by checking if the bus returned
+> by the function is actually hotpluggable. If not, we simply return NULL. This
+> avoids the scenario where we are actually returning a non-hotpluggable bus.
+>
 > Signed-off-by: Ani Sinha <ani@anisinha.ca>
-
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-
 > ---
->  tests/qtest/bios-tables-test.c | 15 +++++++++++++++
->  1 file changed, 15 insertions(+)
-> 
-> diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
-> index d49b3988ec..a2c0070306 100644
-> --- a/tests/qtest/bios-tables-test.c
-> +++ b/tests/qtest/bios-tables-test.c
-> @@ -709,6 +709,20 @@ static void test_acpi_piix4_tcg_bridge(void)
->      free_test_data(&data);
->  }
->  
-> +static void test_acpi_piix4_root_hotplug(void)
-> +{
-> +    test_data data;
+> hw/acpi/pcihp.c | 15 +++++++++++++++
+> 1 file changed, 15 insertions(+)
+>
+> diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+> index 39b1f74442..f148e73c89 100644
+> --- a/hw/acpi/pcihp.c
+> +++ b/hw/acpi/pcihp.c
+> @@ -147,6 +147,21 @@ static PCIBus *acpi_pcihp_find_hotplug_bus(AcpiPciHpState *s, int bsel)
+> if (!bsel && !find.bus) {
+> find.bus = s->root;
+> }
 > +
-> +    memset(&data, 0, sizeof(data));
-> +    data.machine = MACHINE_PC;
-> +    data.variant = ".roothp";
-> +    data.required_struct_types = base_required_struct_types;
-> +    data.required_struct_types_len = ARRAY_SIZE(base_required_struct_types);
-> +    test_acpi_one("-global PIIX4_PM.acpi-root-pci-hotplug=off "
-> +                  "-device pci-bridge,chassis_nr=1", &data);
-> +    free_test_data(&data);
-> +}
-> +
->  static void test_acpi_q35_tcg(void)
->  {
->      test_data data;
-> @@ -1102,6 +1116,7 @@ int main(int argc, char *argv[])
->          qtest_add_func("acpi/q35/tpm-tis", test_acpi_q35_tcg_tpm_tis);
->          qtest_add_func("acpi/piix4", test_acpi_piix4_tcg);
->          qtest_add_func("acpi/piix4/bridge", test_acpi_piix4_tcg_bridge);
-> +        qtest_add_func("acpi/piix4/hotplug", test_acpi_piix4_root_hotplug);
->          qtest_add_func("acpi/q35", test_acpi_q35_tcg);
->          qtest_add_func("acpi/q35/bridge", test_acpi_q35_tcg_bridge);
->          qtest_add_func("acpi/q35/mmio64", test_acpi_q35_tcg_mmio64);
+> + /*
+> + * Check if find.bus is actually hotpluggable. If bsel is set to
+> + * NULL for example on the root bus in order to make it
+> + * non-hotpluggable, find.bus will match the root bus when bsel
+> + * is 0. See acpi_pcihp_test_hotplug_bus() above. Since the
+> + * bus is not hotpluggable however, we should not select the bus.
+> + * Instead, we should set find.bus to NULL in that case. In the check
+> + * below, we generalize this case for all buses, not just the root bus.
+> + * The callers of this function check for a null return value and
+> + * handle them appropriately.
+> + */
+> + if (!qbus_is_hotpluggable(BUS(find.bus))) {
+> + find.bus = NULL;
+> + }
+> return find.bus;
+> }
+>
+> --
+> 2.17.1
+>
+
+--5f4f49ff_12200854_239
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+
+<html xmlns=3D=22http://www.w3.org/1999/xhtml=22>
+<head>
+<title></title>
+</head>
+<body>
+<div name=3D=22messageBodySection=22>
+<div dir=3D=22auto=22>Can someone please review this=3F</div>
+</div>
+<div name=3D=22messageReplySection=22>On Aug 29, 2020, 13:42 +0530, Ani S=
+inha &lt;ani=40anisinha.ca&gt;, wrote:<br />
+<blockquote type=3D=22cite=22 style=3D=22border-left-color: grey; border-=
+left-width: thin; border-left-style: solid; margin: 5px 5px;padding-left:=
+ 10px;=22>When ACPI hotplug for the root bus is disabled, the bsel proper=
+ty for that<br />
+bus is not set. Please see the following commit:<br />
+<br />
+3d7e78aa7777f (=22Introduce a new flag for i440fx to disable PCI hotplug =
+on the root bus=22).<br />
+<br />
+As a result, when acpi=5Fpcihp=5Ffind=5Fhotplug=5Fbus() is called<br />
+with bsel set to 0, it may return the root bus. This would be wrong since=
+ the<br />
+root bus is not hotpluggable. In general, this can potentially happen to =
+other<br />
+buses as well.<br />
+In this patch, we fix the issue in this function by checking if the bus r=
+eturned<br />
+by the function is actually hotpluggable. If not, we simply return NULL. =
+This<br />
+avoids the scenario where we are actually returning a non-hotpluggable bu=
+s.<br />
+<br />
+Signed-off-by: Ani Sinha &lt;ani=40anisinha.ca&gt;<br />
+---<br />
+hw/acpi/pcihp.c =7C 15 +++++++++++++++<br />
+1 file changed, 15 insertions(+)<br />
+<br />
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c<br />
+index 39b1f74442..f148e73c89 100644<br />
+--- a/hw/acpi/pcihp.c<br />
++++ b/hw/acpi/pcihp.c<br />
+=40=40 -147,6 +147,21 =40=40 static PCIBus *acpi=5Fpcihp=5Ffind=5Fhotplug=
+=5Fbus(AcpiPciHpState *s, int bsel)<br />
+if (=21bsel &amp;&amp; =21find.bus) =7B<br />
+find.bus =3D s-&gt;root;<br />
+=7D<br />
++<br />
++ /*<br />
++ * Check if find.bus is actually hotpluggable. If bsel is set to<br />
++ * NULL for example on the root bus in order to make it<br />
++ * non-hotpluggable, find.bus will match the root bus when bsel<br />
++ * is 0. See acpi=5Fpcihp=5Ftest=5Fhotplug=5Fbus() above. Since the<br /=
+>
++ * bus is not hotpluggable however, we should not select the bus.<br />
++ * Instead, we should set find.bus to NULL in that case. In the check<br=
+ />
++ * below, we generalize this case for all buses, not just the root bus.<=
+br />
++ * The callers of this function check for a null return value and<br />
++ * handle them appropriately.<br />
++ */<br />
++ if (=21qbus=5Fis=5Fhotpluggable(BUS(find.bus))) =7B<br />
++ find.bus =3D NULL;<br />
++ =7D<br />
+return find.bus;<br />
+=7D<br />
+<br />
+--<br />
+2.17.1<br />
+<br /></blockquote>
+</div>
+</body>
+</html>
+
+--5f4f49ff_12200854_239--
 
 
