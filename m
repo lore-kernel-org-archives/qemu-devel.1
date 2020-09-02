@@ -2,86 +2,95 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9D05C433E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 05:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB22C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 06:10:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D46B207EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 05:23:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XkDDEX3/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D46B207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 202DE20758
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 06:10:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 202DE20758
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39742 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDLFR-00021g-Rf
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 01:23:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56844)
+	id 1kDLyP-00023e-85
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 02:10:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kDLEv-0001UY-CT
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 01:23:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42892)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kDLEs-00064d-S9
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 01:23:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599024197;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=vRSWZqsX8ONcKvVYC9hyDXTgMtKWRx3+2q4ne+LmgmE=;
- b=XkDDEX3/a6h8iNOIMKfrh2oCce8apBTv2C8Dq89qnzFqAo34mj/GT0GDosXiZkSb7cYUum
- 4VVwsKfQCINiixAOaswODIVk5Dx+HEPLN52Jcfok0pePuw6dEy1qutWk5fXBJ5a5FL6kDf
- SDH9hIkQLcfji5N1jz0g9bTV31w06jI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-WgsWDjn1P8-iSSLEsTPqKA-1; Wed, 02 Sep 2020 01:23:16 -0400
-X-MC-Unique: WgsWDjn1P8-iSSLEsTPqKA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07F9F10ABDAB;
- Wed,  2 Sep 2020 05:23:15 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
- [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8CCC95C1BB;
- Wed,  2 Sep 2020 05:23:14 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 99B659C87; Wed,  2 Sep 2020 07:23:13 +0200 (CEST)
-Date: Wed, 2 Sep 2020 07:23:13 +0200
-From: "kraxel@redhat.com" <kraxel@redhat.com>
-To: =?utf-8?B?cnVpcHBhbijmvZjnnb8p?= <ruippan@tencent.com>
-Subject: Re: ui: fix potential compile error.
-Message-ID: <20200902052313.unmxqfgsix6kuerb@sirius.home.kraxel.org>
-References: <370e6ed66acf43e68f1ef2bffc3026f7@tencent.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDLxn-0001dQ-2M
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 02:09:43 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:48914
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDLxk-0003Ht-Ck
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 02:09:42 -0400
+Received: from host86-179-247-31.range86-179.btcentralplus.com
+ ([86.179.247.31] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDLy9-0006HQ-S9; Wed, 02 Sep 2020 07:10:10 +0100
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20200901062020.26660-1-pbonzini@redhat.com>
+ <156da43a-4744-ac6c-fc4b-54788a40b3e9@ilande.co.uk>
+ <CABgObfYcaCsZNYof9nd7gzCOY_6qN5MV+xD6dw7W4D4ircsdaQ@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <7516c253-0448-b5cd-18a0-45caaebc1d05@ilande.co.uk>
+Date: Wed, 2 Sep 2020 07:09:29 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <370e6ed66acf43e68f1ef2bffc3026f7@tencent.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 01:13:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+In-Reply-To: <CABgObfYcaCsZNYof9nd7gzCOY_6qN5MV+xD6dw7W4D4ircsdaQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.179.247.31
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 00/13] Make QEMU installation relocatable
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,21 +104,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+On 01/09/2020 22:22, Paolo Bonzini wrote:
 
-> 1.     CentOS7 with Python 2.7.5
+> Il mar 1 set 2020, 23:15 Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk
+> <mailto:mark.cave-ayland@ilande.co.uk>> ha scritto:
+> 
+>     I think this means that it's missing something from Yonggang Luo's patch here:
+>     https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg07668.html.
+> 
+> 
+> Yes, I am a bit afraid of that patch. I don't understand exactly why it's needed and
+> I need to look more closely.
+> 
+> Paolo
 
-> Root cause is my argparse and python version. But change the invoking order can adapt both new and old argparse.
+I did a quick experiment first thing this morning and it really is just the Windows
+linker ld.exe that requires a Windows-style path, since I was able to successfully
+build with just this:
 
-python2 is EOL and not supported any more.
-please "yum install python3" (yes, centos7 has it, was added in 7.8).
+diff --git a/configure b/configure
+index f6638abadf..cb56d31a5d 100755
+--- a/configure
++++ b/configure
+@@ -1015,6 +1015,9 @@ if test "$mingw32" = "yes" ; then
+   prefix="/qemu"
+   confsuffix=""
+   libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpapi -lnetapi32
+$libs_qga"
++  ld_pwd=$(pwd -W)
++else
++  ld_pwd=$(pwd)
+ fi
 
-take care,
-  Gerd
+ werror=""
+@@ -4290,7 +4293,7 @@ EOF
+               symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+           fi
+           fdt_cflags="-I${source_path}/dtc/libfdt"
+-          fdt_ldflags="-L$PWD/dtc/libfdt"
++          fdt_ldflags="-L${ld_pwd}/dtc/libfdt"
+           fdt_libs="$fdt_libs"
+       elif test "$fdt" = "yes" ; then
+           # Not a git build & no libfdt found, prompt for system install
+@@ -5275,7 +5278,7 @@ case "$capstone" in
+     else
+       LIBCAPSTONE=libcapstone.a
+     fi
+-    capstone_libs="-L$PWD/capstone -lcapstone"
++    capstone_libs="-L${ld_pwd}/capstone -lcapstone"
+     capstone_cflags="-I${source_path}/capstone/include"
+     ;;
 
+@@ -6276,7 +6279,7 @@ case "$slirp" in
+     fi
+     mkdir -p slirp
+     slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
+-    slirp_libs="-L$PWD/slirp -lslirp"
++    slirp_libs="-L${ld_pwd}/slirp -lslirp"
+     if test "$mingw32" = "yes" ; then
+       slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
+     fi
+
+
+I'll try again with the relocatable install later - do I still need to pass --prefix
+into configure or should I leave that for now and just use DESTDIR?
+
+
+ATB,
+
+Mark.
 
