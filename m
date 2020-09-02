@@ -2,91 +2,90 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C9EC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 09:37:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD44FC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 09:42:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 915152078B
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 09:37:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 581B72078B
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 09:42:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fl1w7bcL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 915152078B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fAJH+0Eu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 581B72078B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDPCx-0003Vl-Ms
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 05:37:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37270)
+	id 1kDPI9-0005at-I4
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 05:42:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDPCB-0002Cv-Gm
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 05:36:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42695
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kDPHU-00058t-35
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 05:42:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34079)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDPC8-0005Fq-EQ
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 05:36:47 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kDPHS-00062b-EH
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 05:42:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599039403;
+ s=mimecast20190719; t=1599039733;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=28gjQHVMLRQJlueyEpERR+r5nwbJZ65a04wSvCw0iMo=;
- b=Fl1w7bcLTrUUr78lA7PXAg6PtykmvQ2Ma44ieJKODKXsHMEpEvWN4y62lMO+V8fN7K8g4S
- 3iIZjxn+xpcf5Jd2JZAvWco6+GcHyvf9nk2Igro9uZI6Y6585mcTLr44gHc8Hqwh8wwTx0
- 7MPkuvQ2JRpp9SgheLo45/XWFxXY/PA=
+ bh=OyOjltA50Waxq+dHVfu2lZff5euOQPxwZc+6hx8qCHY=;
+ b=fAJH+0EuVNj70jjRGW20tjjSdkHOftOeNPC1sgd03u7XGE6pDpG7mCAgx1+ChRR9tGU4iq
+ 51B8UmkSzMHwQiDuiGP4FR+0GvApUhh+fNkpDPOiILwHXa8Ljc/zOX82Vbr3CS76cqKMLg
+ SWAJZ9CP2q51H9joKSJFO5yq0QuhwYQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-74zgXo5xOQmH3pAlm4PHtg-1; Wed, 02 Sep 2020 05:36:41 -0400
-X-MC-Unique: 74zgXo5xOQmH3pAlm4PHtg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-3-Mo2-gfINPg2T0we8iavQCw-1; Wed, 02 Sep 2020 05:42:10 -0400
+X-MC-Unique: Mo2-gfINPg2T0we8iavQCw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A1E3080B702;
- Wed,  2 Sep 2020 09:36:40 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-129.ams2.redhat.com [10.36.112.129])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3764078B3C;
- Wed,  2 Sep 2020 09:36:39 +0000 (UTC)
-Subject: Re: [PATCH] tests/qtest/ahci: Improve error handling
- (NEGATIVE_RETURNS)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200902080552.159806-1-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5f909473-7d29-2413-12aa-67be4ca24abf@redhat.com>
-Date: Wed, 2 Sep 2020 11:36:38 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B55621DE00;
+ Wed,  2 Sep 2020 09:42:09 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
+ [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7B2B561983;
+ Wed,  2 Sep 2020 09:42:09 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id F3E7531E23; Wed,  2 Sep 2020 11:42:07 +0200 (CEST)
+Date: Wed, 2 Sep 2020 11:42:07 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 0/5] Ui 20200831 patches
+Message-ID: <20200902094207.plxixzyy5jhyrbld@sirius.home.kraxel.org>
+References: <20200831110416.15176-1-kraxel@redhat.com>
+ <CAFEAcA99xWV2=12YeZL2Aq+U5kDGLx9eC2vfEVtbqs=Avz78Pw@mail.gmail.com>
+ <20200901141628.nfvsojjje2d7vgfa@sirius.home.kraxel.org>
+ <CAFEAcA90KpnJF2kF7QmVE3DJCSk7W_RriM6TbT3oweRjNUJSvA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200902080552.159806-1-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <CAFEAcA90KpnJF2kF7QmVE3DJCSk7W_RriM6TbT3oweRjNUJSvA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:26:30
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 01:13:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,39 +98,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/09/2020 10.05, Philippe Mathieu-Daudé wrote:
-> Fix an error handling issue reported by Coverity:
+On Tue, Sep 01, 2020 at 03:54:29PM +0100, Peter Maydell wrote:
+> On Tue, 1 Sep 2020 at 15:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+> >
+> >   Hi,
+> >
+> > > Generating ar with a custom command
+> > > cp: '../../pc-bios/keymaps/ar' and 'pc-bios/keymaps/ar' are the same file
+> >
+> > Hmm, strange.  No failures in gitlab ci:
+> >         https://gitlab.com/kraxel/qemu/-/pipelines/183769485
+> >
+> > Any chance this is an old build tree?  Specifically created before
+> > commit ddcf607fa3d6 ("meson: drop keymaps symlink") was merged, and the
+> > symlink is present still?
 > 
->   /qemu/tests/qtest/ahci-test.c: 1452 in prepare_iso()
->   1444         int fd = mkstemp(cdrom_path);
->   >>>     CID 1432375:  Error handling issues  (NEGATIVE_RETURNS)
->   >>>     "fd" is passed to a parameter that cannot be negative.
->   1452         ret = write(fd, patt, size);
-> 
-> Reported-by: Coverity (CID 1432375)
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  tests/qtest/ahci-test.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/tests/qtest/ahci-test.c b/tests/qtest/ahci-test.c
-> index ca4294f44f3..5e1954852e7 100644
-> --- a/tests/qtest/ahci-test.c
-> +++ b/tests/qtest/ahci-test.c
-> @@ -1443,6 +1443,7 @@ static int prepare_iso(size_t size, unsigned char **buf, char **name)
->      ssize_t ret;
->      int fd = mkstemp(cdrom_path);
->  
-> +    g_assert(fd != -1);
+> Yeah, mostly my build trees don't get regenerated. We like
+> incremental builds to continue to work.
 
-Should be good enough for a qtest.
+So just not creating the symlink isn't enough, i.e. configure must
+remove it if present?
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+Or is requiring fresh build trees ok if announced in the
+cover letter / pull request?
+
+thanks,
+  Gerd
 
 
