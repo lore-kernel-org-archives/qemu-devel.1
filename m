@@ -2,109 +2,97 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E2DC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:29:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A736C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:30:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 003902065E
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E643D2065E
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:30:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B4CNm6uw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 003902065E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zrpe5hds"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E643D2065E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDQ1K-0007MX-NX
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 06:29:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52798)
+	id 1kDQ1i-0007yB-0r
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 06:30:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53134)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDPzf-00062b-6F
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:27:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59344)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDPzc-0004Gb-TN
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:27:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599042471;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xbIfG6vUeEt5W8wW8UTuRXpr1fDL+Ojv/u1KCvupiFA=;
- b=B4CNm6uwiShxxnMXJeOmzf8iI9+2zVZ5oCrNDrGkavRFk1/was5fJzQT5W4T8CiekDk+eu
- 2iwMQOQgyO/e5LOmzEWrdGunPJbExNbRvh1eNdmYGItAjaZzcbRrPSLgZDVHTw4ZDF/9dc
- ueGSzZicd2qikVanFO7E03Y3e1cKYEo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-Hkae1_ZCNMydFdFQr3zRIw-1; Wed, 02 Sep 2020 06:27:50 -0400
-X-MC-Unique: Hkae1_ZCNMydFdFQr3zRIw-1
-Received: by mail-wm1-f70.google.com with SMTP id s24so1467639wmh.1
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 03:27:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kDQ10-000770-OJ
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:29:18 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55907)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kDQ0z-0004Md-7K
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:29:18 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a65so3855809wme.5
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 03:29:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=fOvhcYPbnMCTDcfb7OdWyEoEKQdLEu4uXBWkS2Bf9/o=;
+ b=Zrpe5hds5O4EE498iwapsmuOlcKg2N4AF1nw1D5j4bZzQghmLFvNJ4EsOYDBpwZML+
+ ts6BSGVAwPnbOLESdirUesFnC3X6f+laXJTallLUBAHnRso2vZqCy3Eqx607P5dhtlkD
+ 9+vEoHsKIGkUR3YzuwuWUqx/9O8ncIY14RgM5zEKM+eUiZ4qpdCUfx7R+4XWJamlZAog
+ waGSBuDrchfwi13cL/txRTn4f+wWFwziaCbyosxMh+bmLvcBKxOqtOwx6CsfBHP/OwXs
+ aeEsNz3YXBZLDSB+Ob+LybU3eXAZ4SdKMXJtGwfGfD+29xqugvpyRjDPlsfOTukYdcqq
+ Fc5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=xbIfG6vUeEt5W8wW8UTuRXpr1fDL+Ojv/u1KCvupiFA=;
- b=N4TiuEzVAjpfSdqsyJKRNzySQ1fkomTOEI1sgN56GbQMamP+CV1vAF12KvKxdV2szt
- vwJj85XlouRjNeDEeXf9QeGmbjVISNOQ3VEBGILS3puR5a+/J8gCk1A7Y2ulEDRAN+IJ
- lElWzRuEUFFt4lrE9aCf5qkNJcz8948DmybrmEPpgE8NU4xmzcxNGQfZVzpyIX7bgLOy
- JLKzK/+owdIrdaHs2joy0aZzVfdFcc9hCfrDN1Cq6AQvhVsFgHRtVdZM6nau20KF4a4K
- MsHfQsK5dYNbmUqEedXgvHVcQYFycWsPT6cmt3mN22MwBzFF/JFPXxw2rgZPHfRi/fN6
- gbTA==
-X-Gm-Message-State: AOAM531uKW5k9yq7dht9UUW5zQfwcTYQNL+7LPRSCk0nTIZmgbaFEY2E
- mzHPB8s8hSPfpoBm0PetgkJymDJSdrpghO1jkKhkcZ/IpwFDmDln2y/jHNz4xr93v43N7HXcskh
- RH3nLj5OGcl9Y+XY=
-X-Received: by 2002:a05:600c:228e:: with SMTP id
- 14mr6523425wmf.17.1599042468815; 
- Wed, 02 Sep 2020 03:27:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyS348gPAURWVoyajTIN3yYQvnWXc9IpSWehvRc3GpgTu+9qwRGD6FjUPI+YoYF0sGQpHQ5Cg==
-X-Received: by 2002:a05:600c:228e:: with SMTP id
- 14mr6523410wmf.17.1599042468576; 
- Wed, 02 Sep 2020 03:27:48 -0700 (PDT)
-Received: from [192.168.178.58] ([151.21.173.193])
- by smtp.gmail.com with ESMTPSA id 201sm6300411wma.27.2020.09.02.03.27.47
+ bh=fOvhcYPbnMCTDcfb7OdWyEoEKQdLEu4uXBWkS2Bf9/o=;
+ b=d/90zwDW44OQIi09ldJSKYndXRQuLcNCcf3fYktF/jHYGkjH0MHaeIpKAVifxeOM+O
+ /lXIvtO35s6A21f4mm1ZB6nq74ACPLqB6WhVY41XVTpe46q9fhjS2YAqt9H/3BxBpRQV
+ GY3QNIdZxAjLfgqPALrWRfzRsPJgdN2EB5OlZh90jVEseu7D1pPEgpDmncy3PagFUZFt
+ PpuB+0xEMs63nzU0SY08COx+AyX+FBE+6kfv8pKNn1226Rejv9k5Duuf8DWW1Cyrry3o
+ Z7R2TX1rUu2PV+zX9sOdz2XI9etc172cPBw0m8KKVSK29FWhwSNlPS0hjlMMMeu3Fo+n
+ iaWg==
+X-Gm-Message-State: AOAM530cy6NyiyMZrsBknvnvVd05R+SeKhvieuzQVFuoCGwBpy14Vy/R
+ Bh/7e3WLqIz/oGJRUQQKeVtM42oczyw=
+X-Google-Smtp-Source: ABdhPJzgiEq5M1VblkkJIFOtWyLMQ6zC4PMSHRAZ5S7bXLuXW6VvH5nLvfydnId6SoaDlqY68c9LBA==
+X-Received: by 2002:a1c:f207:: with SMTP id s7mr395wmc.22.1599042555680;
+ Wed, 02 Sep 2020 03:29:15 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id x10sm5988647wmi.37.2020.09.02.03.29.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 02 Sep 2020 03:27:48 -0700 (PDT)
-Subject: Re: meson build failure, configure without tcg, fixed by running make
- again
-To: Claudio Fontana <cfontana@suse.de>
-References: <c9971e27-fded-3e5d-d489-b1fb539b8ec1@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <41c09bb2-1704-47c0-9638-9f1eff010e8c@redhat.com>
-Date: Wed, 2 Sep 2020 12:27:47 +0200
+ Wed, 02 Sep 2020 03:29:14 -0700 (PDT)
+Subject: Re: [PATCH] linux-user: fix implicit conversion from enumeration type
+ error
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20200901153321.920490-1-laurent@vivier.eu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <79712add-76f8-43d0-c242-1668959dc3e8@amsat.org>
+Date: Wed, 2 Sep 2020 12:29:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <c9971e27-fded-3e5d-d489-b1fb539b8ec1@suse.de>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200901153321.920490-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 01:13:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -38
+X-Spam_score: -3.9
+X-Spam_bar: ---
+X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,42 +106,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/09/20 12:03, Claudio Fontana wrote:
-> Hi Paolo,
+On 9/1/20 5:33 PM, Laurent Vivier wrote:
+> MK_ARRAY(type,size) is used to fill the field_types buffer, and if the
+> "size" parameter is an enum type, clang [-Werror,-Wenum-conversion] reports
+> an error when it is assigned to field_types which is also an enum, argtypes.
 > 
-> there seems to be some parallelism or race condition somewhere?
+> To avoid that, convert "size" to "int" in MK_ARRAY(). "int" is the type
+> used for the size evaluation in thunk_type_size().
 > 
-> with master, commit 8d90bfc5c31ad60f6049dd39be636b06bc00b652
-> I am doing:
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
+>  include/exec/user/thunk.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> mkdir build-nontcg
-> cd build-nontcg
-> ../configure --disable-tcg --enable-kvm --enable-hax
-> make -j120
-> make -j120 check
-> 
-> I am getting:
+> diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+> index a5bbb2c73331..b798fcb69cf4 100644
+> --- a/include/exec/user/thunk.h
+> +++ b/include/exec/user/thunk.h
+> @@ -42,7 +42,7 @@ typedef enum argtype {
+>  } argtype;
+>  
+>  #define MK_PTR(type) TYPE_PTR, type
+> -#define MK_ARRAY(type, size) TYPE_ARRAY, size, type
+> +#define MK_ARRAY(type, size) TYPE_ARRAY, (int)size, type
 
-Yes:
+You need to use parenthesis:
 
-diff --git a/tests/qtest/libqos/meson.build b/tests/qtest/libqos/meson.build
-index 19931b9248..268ea23803 100644
---- a/tests/qtest/libqos/meson.build
-+++ b/tests/qtest/libqos/meson.build
-@@ -52,6 +52,6 @@ libqos = static_library('qos',
-         'arm-xilinx-zynq-a9-machine.c',
-         'ppc64_pseries-machine.c',
-         'x86_64_pc-machine.c',
--), build_by_default: false)
-+) + genh, build_by_default: false)
- 
- qos = declare_dependency(link_whole: libqos)
+  #define MK_ARRAY(type, size) TYPE_ARRAY, (int)(size), type
 
-Paolo
+See:
+
+  MK_ARRAY(TYPE_CHAR, USBDEVFS_MAXDRIVERNAME + 1)) /* driver */
+
+While here I'd also add them to 'type'.
+
+With parenthesis:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>  #define MK_STRUCT(id) TYPE_STRUCT, id
+>  
+>  #define THUNK_TARGET 0
+> 
 
 
