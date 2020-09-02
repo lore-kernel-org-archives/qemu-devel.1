@@ -2,98 +2,82 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 939B3C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:47:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 830B0C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6112D20767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:47:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4DCB020767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qHLDjH8r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6112D20767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VszKf4y6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DCB020767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDVv2-000479-KK
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 12:47:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40940)
+	id 1kDVx0-0006X8-GP
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 12:49:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDVu2-00030a-D6
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:46:30 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:38664)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDVu0-0006fB-Kj
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:46:30 -0400
-Received: by mail-pf1-x441.google.com with SMTP id d22so3150775pfn.5
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 09:46:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=fDsBYm8xqvgH9QuPlr+UYKFUquY9Em5y4Nb9tpZXsE4=;
- b=qHLDjH8rID6dkx6XZ75KMSjkoGPKnA3Ij5ASH+qnvC9JRieuQoT/tGQR+3eMvZd79R
- auiYNfm8fkiFvo8cpOWa9d0Pg/MpTWfFEaKDWkM8pUN6Pf3QkUf5amWXvsEk5wandmxS
- 01Ek2+zyJcX/2LyvFB4jLOCAQPyFWZyoAleUMrsN2OEy4hdzktQ9PIWCaaX16C4HuOPi
- mR2m9sVuqi8uu5QFpzN5j2grRVeXiY9E2fabPgZpRIzdl4HOstC5hyZzHyEU4IwKV1w6
- Kqr0gwMzsTvtkdG9ULJuWgKr2asdREhgzke40Yk18zFJDQTNcIDBkbGlssG7KPrgJRIp
- 5hqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fDsBYm8xqvgH9QuPlr+UYKFUquY9Em5y4Nb9tpZXsE4=;
- b=V9MFC5WpeTRKOJrl9smyks6u0Ul3BDGyMDvB+k+28Tc8fcWA1kCTNRYseN+nHZOTZ+
- L2pJ/Ukv3JEN0EvE2r9Ou/TpcqShNFGFekT5757rYynuz+hIGu33kdZfdMndKVQPoKC9
- ktYuACbNEuu1AjsUN3YFYs7I/Tp2SwqU/GiVZXrMbn+vH3+0X7yyhoZ0EK81xjCRruZC
- M12TYWjxMsNJeVkHRbIo30GIpfdpjrXfNkXTiItF/jTzoLWzVJLoPVQJ19bGFiqHzVBD
- aPRKbJB30vpFVeQPmRjepExV6S3pvSS6PJszN29BvWRs1UfvB0e+jBrCPOxuP2IObPaz
- 7VXA==
-X-Gm-Message-State: AOAM532SY3D7/wP5La5rLeyYbiJU8/wlUhr9q1RyGnVnnC9Rbsj1Mcvi
- aGWGSXHJTq0O2Fe89S5yxRvBzA==
-X-Google-Smtp-Source: ABdhPJyrhN6hId/2RX+lV0kQ+wN/pbHiGF7+dMjdKtdXlgbxYulCRWxEm1sFFYAmNBBwd1acy8BS3A==
-X-Received: by 2002:a63:e747:: with SMTP id j7mr2554925pgk.107.1599065186912; 
- Wed, 02 Sep 2020 09:46:26 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 194sm17295pfy.44.2020.09.02.09.46.25
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 02 Sep 2020 09:46:26 -0700 (PDT)
-Subject: Re: [PATCH 4/7] hw/hppa: Inform SeaBIOS about fw_cfg port address
-To: Helge Deller <deller@gmx.de>, qemu-devel@nongnu.org
-References: <20200901183452.24967-1-deller@gmx.de>
- <20200901183452.24967-5-deller@gmx.de>
- <6385bd44-9cf8-95c3-1e59-0e1fb209863f@linaro.org>
- <a56b96b3-9afc-0708-27bf-97d8095bde07@gmx.de>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <853e1911-81c3-709b-6a9c-b1f7ffd8f826@linaro.org>
-Date: Wed, 2 Sep 2020 09:46:24 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwH-0005DQ-1v
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:49 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50008
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwF-0006qq-3d
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599065325;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=tHDKc/REg/30yOgPpdb4g2AK0OfgET4VEn/0qpTHzlk=;
+ b=VszKf4y6BGS5tqNRMqy8PIY4fFjbD/6jALbfierfdHNTFlEnBPu/8hhZ6QcWK1bMfqyF+l
+ evemgTZlLpKaVYbwn+cQk/wVzD8i72IE7pAXmoh8nfdoJsQGvFPldaZJZg/QA3m3A/T98Z
+ BQ8ierZEvQI0268MdT3hsNqNh8Ko1/E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-kE_uApKNNiaRz5v05pLeYg-1; Wed, 02 Sep 2020 12:48:44 -0400
+X-MC-Unique: kE_uApKNNiaRz5v05pLeYg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07E77640A2;
+ Wed,  2 Sep 2020 16:48:43 +0000 (UTC)
+Received: from localhost (ovpn-114-169.ams2.redhat.com [10.36.114.169])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A22785C1D7;
+ Wed,  2 Sep 2020 16:48:42 +0000 (UTC)
+From: Max Reitz <mreitz@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH 0/3] mirror: Freeze backing chain for sync=top
+Date: Wed,  2 Sep 2020 18:48:38 +0200
+Message-Id: <20200902164841.214948-1-mreitz@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <a56b96b3-9afc-0708-27bf-97d8095bde07@gmx.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:33:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.324,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,31 +90,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, John Snow <jsnow@redhat.com>,
+ qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/2/20 4:24 AM, Helge Deller wrote:
-> On 01.09.20 23:39, Richard Henderson wrote:
->> On 9/1/20 11:34 AM, Helge Deller wrote:
->>> -/* QEMU fw_cfg interface port */
->>> -#define QEMU_FW_CFG_IO_BASE     (MEMORY_HPA + 0x80)
->>> +#define FW_CFG_IO_BASE  0xfffa0000
->>
->> Why is this value changing?
-> 
-> Devices on hppa occupy at least 4k starting at the HPA,
-> so MEMORY_HPA+4k is blocked (by Linux) for the memory module.
-> I noticed this when testing the new Linux kernel patch to
-> let the fw_cfg entries show up in Linux under /proc:
-> https://patchwork.kernel.org/patch/11715133/
-> The Linux kernel driver could not allocate the region for fw_cfg.
-> This new base address seems to not conflict.
+Hi,
 
-Then that information should be in a patch description, and the change should
-be a completely separate patch.
+On review of the “Deal with filters” series, Kevin noted that mirror
+doesn’t freeze its backing chain, even though we keep references to the
+base (for sync=top).  That seems like a recipe for disaster, and as the
+test added in patch 3 shows, indeed it is.
+
+Patch 1 could also be squashed into “mirror: Deal with filters”.
+
+As for patch 2; maybe it would be sufficient to freeze the backing chain
+only down to base_overlay and until mirror_dirty_init() is done.  Then
+we bdrv_ref(s->base) so can always be attached to the target when mirror
+completes.  But I think the conservative approach I implemented here is
+fine until someone complains.
 
 
-r~
+Max Reitz (3):
+  mirror: Set s->base_overlay only if s->base is set
+  mirror: Freeze backing chain for sync=top
+  iotests/041: x-blockdev-reopen during mirror
+
+ block/mirror.c             | 28 +++++++++---
+ tests/qemu-iotests/041     | 92 ++++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/041.out |  4 +-
+ 3 files changed, 116 insertions(+), 8 deletions(-)
+
+-- 
+2.26.2
+
 
