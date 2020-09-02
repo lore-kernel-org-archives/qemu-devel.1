@@ -2,88 +2,96 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A9D4C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:03:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2C6C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:04:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17D90206EB
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:03:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC193206EB
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:04:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BUZJEb0k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17D90206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TOx9gj7s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC193206EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55398 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDX68-0001or-52
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 14:03:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60526)
+	id 1kDX7C-0002qi-QQ
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 14:04:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kDX5b-0001PM-1V
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:02:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46090)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kDX5Y-00087j-9h
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:02:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599069747;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1cR5qRoDOF0gGHS0+5pyxsOVTqSbv1nmTgctGehP/pY=;
- b=BUZJEb0ktaTVtqQ/cngFoi/ncTkcO4YIvOMYhSz9LN9DF227Hrpw4JqvppGdn0Ydt2ULbm
- 0Nq96Xs2Vrxzp/Akg+JTu2713cet3rpuZg6NHqE872VaqvciX11OTul7iMpZXa181T35o5
- uFFGhw5xjZS4SsKl+pgP8vauzvau2xY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-HlHWN3WaPeKQUrF3BG4XeA-1; Wed, 02 Sep 2020 14:02:25 -0400
-X-MC-Unique: HlHWN3WaPeKQUrF3BG4XeA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D1B28015A5;
- Wed,  2 Sep 2020 18:02:24 +0000 (UTC)
-Received: from [10.10.117.63] (ovpn-117-63.rdu2.redhat.com [10.10.117.63])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E66661002D40;
- Wed,  2 Sep 2020 18:02:22 +0000 (UTC)
-Subject: Re: [PATCH] ide:do nothing for identify cmd if no any device attached
-To: zhaoxinRockCuioc <RockCui-oc@zhaoxin.com>, qemu-devel@nongnu.org
-References: <20200817033803.14014-1-RockCui-oc@zhaoxin.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <8dbcc856-879a-af83-1a76-a2a875da3699@redhat.com>
-Date: Wed, 2 Sep 2020 14:02:22 -0400
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDX6P-0002Hw-2w
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:03:21 -0400
+Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:43071)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDX6N-0008CG-6l
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:03:20 -0400
+Received: by mail-pg1-x532.google.com with SMTP id d19so47906pgl.10
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 11:03:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=sGh/6pvSh445QkHwpBkvpg2uvxcbLBkSjD0rDe5zCp0=;
+ b=TOx9gj7sfgjXATX51ZkcosJSvbzXwkdfmkwBc9NaBe3qatuckL2cQslhYjzZxZzxqw
+ 6/tNZGYf2cRSXrrJzrZ4cWRbb76/HN6N9SHnUqKQXNmc+3J7ZZAArGQ+H90cjEq06Vmd
+ znu0BekT7rtweWytbDYnwH73Y6XbWa8Mo6Qo1fbMMTZv+pYP3zXjd9rzdokcjU+U0sRw
+ QaqNrM5VKdNGYNvqO3Lkg6BkIHbVfaTMJPw301DDi7TxZSpruqbU4d+rfyPwlTD8cJzk
+ SfcA3xo7JKdbVVG06rh+699eGogdXk3pvcUmj9hODSbjTcb6Nf5FHYH/h4yWUQsi0q7b
+ Zi3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=sGh/6pvSh445QkHwpBkvpg2uvxcbLBkSjD0rDe5zCp0=;
+ b=SkZigBEAKH75zbDyPHKt4C0VVQ774HRQANpBCFtmyl8cWV2cGBYMBhnX2OI5s0P2SO
+ lx9OXEN1Ajyt1qQ1weO1HHwViFs6twuKf/Nl3L8d5PGXiEb7ZD/Edp44LLoX1Zm753nb
+ SxzAsW/LQLvgfN+WraNLcvhw0A1iNdqrj31bqwLsQPS+yOG4Hl9St9ICPkAKRSh2XqFv
+ 2qbZfY0yoUEMkdWjM+h/Ztzx1DdDa4WSD8EdTeL6BOy3me+S3W3DR2SQnLn5Pdruq1dE
+ ljAfpGb7igyMxkAA20eFeIlo/HzzJYBIB1IcwhTbI5uRWLQTx82Z6i/0qqKIlYi9kUIS
+ G9vQ==
+X-Gm-Message-State: AOAM530hkF6//PG8eY35w8n8zYy4Bz0RLZjFtb6/0K8rl5dzrg7R3Fgi
+ ZP6VQZTxJdIvGFkMTVY3+uzQGw==
+X-Google-Smtp-Source: ABdhPJyHCCFpbMg3vN8RPHi0NbeV+T8hWFdqGcYqf9lFR51qetprlbtTmQ8yt+uSLfmq8+8BJapYHQ==
+X-Received: by 2002:aa7:92d7:: with SMTP id k23mr4218601pfa.295.1599069797501; 
+ Wed, 02 Sep 2020 11:03:17 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id i11sm75577pjg.50.2020.09.02.11.03.16
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 02 Sep 2020 11:03:16 -0700 (PDT)
+Subject: Re: [PATCH 7/7] target/microblaze: Diagnose invalid insns in delay
+ slots
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+References: <20200902163559.1077728-1-richard.henderson@linaro.org>
+ <20200902163559.1077728-8-richard.henderson@linaro.org>
+Message-ID: <9d51eb8c-d803-ab7a-76f9-a590f5c8ef39@linaro.org>
+Date: Wed, 2 Sep 2020 11:03:14 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200817033803.14014-1-RockCui-oc@zhaoxin.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20200902163559.1077728-8-richard.henderson@linaro.org>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 01:13:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::532;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x532.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -23
 X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.324, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.324,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,70 +105,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, CobeChen@zhaoxin.com,
- Max Reitz <mreitz@redhat.com>
+Cc: edgar.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-(CC Max for block backend model confusion, see below)
+On 9/2/20 9:35 AM, Richard Henderson wrote:
+> +static bool invalid_delay_slot(DisasContext *dc, const char *insn_type)
+> +{
+> +    if (dc->tb_flags & D_FLAG) {
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "Invalid insn in delay slot: %s\n", insn_type);
 
-On 8/16/20 11:38 PM, zhaoxin\RockCuioc wrote:
-> This patch is for avoiding win7 IDE driver polling 0x1f7 when
-> no any device attached. During Win7 VM boot procedure, if use virtio for
-> disk and there is no any device be attached on hda & hdb, the win7 IDE driver
-> would poll 0x1f7 for a while. This action may be stop windows LOGO atomic for
-> a while too on a poor performance CPU.
-> 
+I should probably log the pc as well.
 
-A few questions:
 
-(1) How slow is the probing?
-
-(2) If there are no devices attached, why don't you remove the IDE 
-controller so that Windows doesn't have to probe it?
-
-> Signed-off-by: zhaoxin\RockCuioc <RockCui-oc@zhaoxin.com>
-> ---
->   hw/ide/core.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ide/core.c b/hw/ide/core.c
-> index d997a78e47..26d86f4b40 100644
-> --- a/hw/ide/core.c
-> +++ b/hw/ide/core.c
-> @@ -2073,8 +2073,9 @@ void ide_exec_cmd(IDEBus *bus, uint32_t val)
->       s = idebus_active_if(bus);
->       trace_ide_exec_cmd(bus, s, val);
->   
-> -    /* ignore commands to non existent slave */
-> -    if (s != bus->ifs && !s->blk) {
-> +    /* ignore commands if no any device exist or non existent slave */
-> +    if ((!bus->ifs[0].blk && !bus->ifs[1].blk) ||
-> +        (s != bus->ifs && !s->blk)) {
->           return;
->       }
->   
-
-I think it's the case that Empty CD-ROM drives will have an anonymous 
-block backend representing the empty drive, so I suppose this is maybe fine?
-
-I suppose the idea is that with no drives on the bus that it's fine to 
-ignore the register writes, as there are no devices to record those writes.
-
-(But then, why did we ever only check device1? ...)
-
-Maybe before the block-backend split we used to have to check to see if 
-we had attached media or not, but I think nowadays we should always have 
-a blk pointer if we have a device model intended to be operating at this 
-address.
-
-So I guess it can be simplified ...?
-
-if (!s->blk) {
-     return;
-}
-
---js
-
+r~
 
