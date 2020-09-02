@@ -8,78 +8,77 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15D2CC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 21:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5812CC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 21:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D271120758
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 21:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F68220758
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 21:47:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hW6cBlfc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D271120758
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kLHNaPqV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F68220758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDaaK-0003fW-Um
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 17:46:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52280)
+	id 1kDabE-0004vV-AL
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 17:47:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDaWn-0006QF-Rv
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 17:42:49 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51354)
+ id 1kDaWt-0006WG-C9
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 17:42:55 -0400
+Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:33269)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDaWm-0001S3-2g
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 17:42:49 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id ds1so443394pjb.1
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 14:42:47 -0700 (PDT)
+ id 1kDaWr-0001SQ-PO
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 17:42:55 -0400
+Received: by mail-pf1-x435.google.com with SMTP id u20so472812pfn.0
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 14:42:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GpJDUB+NTOpYLTsODXQZZlUf4Fh9xeN4S0uES7H+cp0=;
- b=hW6cBlfcSLSMGdfxFovxzmlmzEtNMgB6i0hLH37Z9VaOnXYYkBe5TRFazscS/QxL6g
- MHC7xG6CHPPdf9h3A8rYR9+l7rbDIt8GoNokSTU8cQgoSOjki87AQ7UTXNommOWmyZYy
- AguT5jbx+Y1VGYihpQZZflP3/i78tJP3Dal46I5eylcfhgCxZZdPvZYsPz+D03CX3SQ7
- svVDTgcUn0uVo9ePKaVRwGvOP1xIcWXmxbzD2+N27AkgK436nsUZafZLwf7uW4bIeBtW
- jFjXczr3AWhWABtwZXZcuSzYo4zi32qs2a/9QhvS80KcQ9bb1alqJs1yaIpCk9ickRs6
- CRCw==
+ bh=Gc5Ac+SIhTGBbDN48ShDt50S5XEQuese4No18vImHG0=;
+ b=kLHNaPqVC4VDpLVoX+sYDv7RwU+3RPgfnajFdYjiN/cjG0yFuhfh3xpOXBfRALdrNr
+ PeiHSs7Pxmpx1RUTjjQSOh6JvgYsjV0oKZ+M7A29BAZUO0L8LgynMBUALpdchmUVxepJ
+ 3UoyADOKVLjQ+UjFms87GX1OOGMiVNo7j+9rGjmrhhRSSzwER2NVwC+K2Am3UgKbMkUa
+ YLREMon2dzdI0etLz4IhLA+62x+Sl3QAePxSewMnI6gOqVKMaAGZdiUHC3z8s5gS9J4Q
+ 3SKLUFNuhiT8cpMl9b39305+LBimNo2O0Op02S64zdLfgk+FkO691yH06IdmnB7qN12j
+ KSJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GpJDUB+NTOpYLTsODXQZZlUf4Fh9xeN4S0uES7H+cp0=;
- b=iJhdlHWvkFygQo4qUGl/MBbLLq5O8/cEW9Cg/MSfuUf3k8pp7J2f4you7f2YCYCQAt
- i4HhA+aS3ck8KoAUxxJqMzMYfOw+0iAteRagLXzhRL2S267FbWyDYu1+bVjhgWURHrgU
- 6eBkuGnIf4i1BkZia2ws0KpqDAkvmZS8UrhyuH+G3S7tlevGuAepV6TOOQjt7vvOnSuV
- m929JFr6OdoW/j2t/gUh+lb/XAkSflt3tdM9vBOC3HPIugTtQH2Y17Nik+MeI/eNnKfB
- Y28qORfEUS/C4qe5mRI1C6EQeFhC4qEsxgWLvp+fdNCkI4hpEIQOYqjkydZVcyDJy0Wu
- ipgA==
-X-Gm-Message-State: AOAM531HLMDIw+1T7MPWJPIX3CQlPze4iVkyoaxU64EwTqRQ5ljaLzyw
- VK9uOX/+J9qxzyMJ+s8pI0qiOHJPQv5aVA==
-X-Google-Smtp-Source: ABdhPJxBcWfRaet6odgvDP77F9rPuTSW2I9k3RJl4qWhhcPRWUtqZIoLewZWNYRw69TVeuyLHHw/JQ==
-X-Received: by 2002:a17:90b:1988:: with SMTP id
- mv8mr4042914pjb.23.1599082966242; 
- Wed, 02 Sep 2020 14:42:46 -0700 (PDT)
+ bh=Gc5Ac+SIhTGBbDN48ShDt50S5XEQuese4No18vImHG0=;
+ b=ZInBVnOOTkOITmC7TpKIvHlWfspILOokRnPQ022Blh5A2FyViizXRBR7baojkZUX42
+ FsE9LwsAHFYQYAYGE24QHtMNnE0sVK7W12L0V4MhGeVPgn/vNSMv054pAfAfbPBco5L0
+ f+bUTqsoN8FLaG9YDMEbboxGs0hWBWjiZcGR/V4nUmAtFBnICA4YQbZuXyuFhukYFo+g
+ Syl2prkgtusDASAJuxuuQqk3pCSjBL8J8upa8bJjSCtdqRbOjqCsUMOwKGy66WRBW6R2
+ p+tyOSsp6QrJ8/ebce8AQVdEKB84V0OuNP3L1cirkRCNXkrgIZJ3Ep96bSJ8UYtyqiLy
+ DULQ==
+X-Gm-Message-State: AOAM531PpJsXEgvFqsEkVsFIOpmcjYVGDZkCz/U8qAWdYyN4UZLyM16u
+ UQDLOeiEAQkJUKR0viWOKbEEHdIwS0hHLw==
+X-Google-Smtp-Source: ABdhPJyh403W32VjNpM7W+gLHYyf+2WzzoO3E/KJP/QGUKqhzITxi6CmQPfxvDBrYgzHmNeBxRP69A==
+X-Received: by 2002:a63:5c1a:: with SMTP id q26mr3481252pgb.223.1599082971266; 
+ Wed, 02 Sep 2020 14:42:51 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id x12sm328863pjq.43.2020.09.02.14.42.44
+ by smtp.googlemail.com with ESMTPSA id x12sm328863pjq.43.2020.09.02.14.42.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Sep 2020 14:42:45 -0700 (PDT)
+ Wed, 02 Sep 2020 14:42:50 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 6/9] block: Fixes nfs on msys2/mingw
-Date: Thu,  3 Sep 2020 05:42:08 +0800
-Message-Id: <20200902214211.337-7-luoyonggang@gmail.com>
+Subject: [PATCH v2 8/9] ci: fixes msys2 build by upgrading capstone to 4.0.2
+Date: Thu,  3 Sep 2020 05:42:10 +0800
+Message-Id: <20200902214211.337-9-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20200902214211.337-1-luoyonggang@gmail.com>
 References: <20200902214211.337-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::435;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x435.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,113 +107,38 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- block/nfs.c | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+ capstone  | 2 +-
+ configure | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index 61a249a9fc..34b2cd5708 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -24,7 +24,9 @@
+diff --git a/capstone b/capstone
+index 22ead3e0bf..1d23053284 160000
+--- a/capstone
++++ b/capstone
+@@ -1 +1 @@
+-Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
++Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1
+diff --git a/configure b/configure
+index 5f2bcc4b57..e42d210e5f 100755
+--- a/configure
++++ b/configure
+@@ -5248,14 +5248,14 @@ case "$capstone" in
+       git_submodules="${git_submodules} capstone"
+     fi
+     mkdir -p capstone
+-    QEMU_CFLAGS="$QEMU_CFLAGS -I${source_path}/capstone/include"
++    QEMU_CFLAGS="$QEMU_CFLAGS -I${source_path}/capstone/include -I${source_path}/capstone/include/capstone"
+     if test "$mingw32" = "yes"; then
+       LIBCAPSTONE=capstone.lib
+     else
+       LIBCAPSTONE=libcapstone.a
+     fi
+     capstone_libs="-L${build_path}/capstone -lcapstone"
+-    capstone_cflags="-I${source_path}/capstone/include"
++    capstone_cflags="-I${source_path}/capstone/include -I${source_path}/capstone/include/capstone"
+     ;;
  
- #include "qemu/osdep.h"
- 
-+#if !defined(_WIN32)
- #include <poll.h>
-+#endif
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-@@ -51,6 +53,12 @@
- #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
- #define QEMU_NFS_MAX_DEBUG_LEVEL 2
- 
-+#if defined (_WIN32)
-+#define nfs_stat __stat64
-+#else
-+#define nfs_stat stat
-+#endif
-+
- typedef struct NFSClient {
-     struct nfs_context *context;
-     struct nfsfh *fh;
-@@ -58,7 +66,7 @@ typedef struct NFSClient {
-     bool has_zero_init;
-     AioContext *aio_context;
-     QemuMutex mutex;
--    blkcnt_t st_blocks;
-+    int64_t st_size;
-     bool cache_used;
-     NFSServer *server;
-     char *path;
-@@ -70,7 +78,7 @@ typedef struct NFSRPC {
-     int ret;
-     int complete;
-     QEMUIOVector *iov;
--    struct stat *st;
-+    struct nfs_stat *st;
-     Coroutine *co;
-     NFSClient *client;
- } NFSRPC;
-@@ -419,7 +427,7 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
-                                int flags, int open_flags, Error **errp)
- {
-     int64_t ret = -EINVAL;
--    struct stat st;
-+    struct nfs_stat st;
-     char *file = NULL, *strp = NULL;
- 
-     qemu_mutex_init(&client->mutex);
-@@ -545,7 +553,7 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
-     }
- 
-     ret = DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
--    client->st_blocks = st.st_blocks;
-+    client->st_size = st.st_size;
-     client->has_zero_init = S_ISREG(st.st_mode);
-     *strp = '/';
-     goto out;
-@@ -729,11 +737,11 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
- {
-     NFSClient *client = bs->opaque;
-     NFSRPC task = {0};
--    struct stat st;
-+    struct nfs_stat st;
- 
-     if (bdrv_is_read_only(bs) &&
-         !(bs->open_flags & BDRV_O_NOCACHE)) {
--        return client->st_blocks * 512;
-+        return client->st_size;
-     }
- 
-     task.bs = bs;
-@@ -746,7 +754,7 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
-     nfs_set_events(client);
-     BDRV_POLL_WHILE(bs, !task.complete);
- 
--    return (task.ret < 0 ? task.ret : st.st_blocks * 512);
-+    return (task.ret < 0 ? task.ret : st.st_size);
- }
- 
- static int coroutine_fn
-@@ -778,7 +786,7 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
-                               BlockReopenQueue *queue, Error **errp)
- {
-     NFSClient *client = state->bs->opaque;
--    struct stat st;
-+    struct nfs_stat st;
-     int ret = 0;
- 
-     if (state->flags & BDRV_O_RDWR && bdrv_is_read_only(state->bs)) {
-@@ -800,7 +808,7 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
-                        nfs_get_error(client->context));
-             return ret;
-         }
--        client->st_blocks = st.st_blocks;
-+        client->st_size = st.st_size;
-     }
- 
-     return 0;
+   system)
 -- 
 2.27.0.windows.1
 
