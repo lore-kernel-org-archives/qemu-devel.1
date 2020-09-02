@@ -2,74 +2,78 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 830B0C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75BE6C43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4DCB020767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4233920767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 16:49:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VszKf4y6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DCB020767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rgt0MR5w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4233920767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60160 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDVx0-0006X8-GP
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 12:49:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41446)
+	id 1kDVx2-0006bC-DC
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 12:49:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwH-0005DQ-1v
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:49 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50008
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwI-0005EX-RL
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:50 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33582
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwF-0006qq-3d
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:48 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDVwH-0006r8-6h
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 12:48:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599065325;
+ s=mimecast20190719; t=1599065328;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=tHDKc/REg/30yOgPpdb4g2AK0OfgET4VEn/0qpTHzlk=;
- b=VszKf4y6BGS5tqNRMqy8PIY4fFjbD/6jALbfierfdHNTFlEnBPu/8hhZ6QcWK1bMfqyF+l
- evemgTZlLpKaVYbwn+cQk/wVzD8i72IE7pAXmoh8nfdoJsQGvFPldaZJZg/QA3m3A/T98Z
- BQ8ierZEvQI0268MdT3hsNqNh8Ko1/E=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=cVDPPpEZfgvBqHPYP78ibHeFywV1qIbiXW18X7UxDPg=;
+ b=Rgt0MR5whOBQBqIIIRIXtke4oROAGxzr/7cqCc/3SXd8u4vKqNQxl4HL0ghspQorDyzq7o
+ 4+tsWKpoj2zoWRIo+ZUQ/4hrgHUIOwZdQJdpZa49KratNxU2je9rgqRHqT09QurxkPwTi6
+ jtf7iy39+pbMgMT5lHd9eiWPHLvg1I4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-325-kE_uApKNNiaRz5v05pLeYg-1; Wed, 02 Sep 2020 12:48:44 -0400
-X-MC-Unique: kE_uApKNNiaRz5v05pLeYg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-514-OEsDglB4OEq2YjHXxr7pOw-1; Wed, 02 Sep 2020 12:48:46 -0400
+X-MC-Unique: OEsDglB4OEq2YjHXxr7pOw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07E77640A2;
- Wed,  2 Sep 2020 16:48:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2DD611091065;
+ Wed,  2 Sep 2020 16:48:45 +0000 (UTC)
 Received: from localhost (ovpn-114-169.ams2.redhat.com [10.36.114.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A22785C1D7;
- Wed,  2 Sep 2020 16:48:42 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C67C17C5B5;
+ Wed,  2 Sep 2020 16:48:44 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 0/3] mirror: Freeze backing chain for sync=top
-Date: Wed,  2 Sep 2020 18:48:38 +0200
-Message-Id: <20200902164841.214948-1-mreitz@redhat.com>
+Subject: [PATCH 1/3] mirror: Set s->base_overlay only if s->base is set
+Date: Wed,  2 Sep 2020 18:48:39 +0200
+Message-Id: <20200902164841.214948-2-mreitz@redhat.com>
+In-Reply-To: <20200902164841.214948-1-mreitz@redhat.com>
+References: <20200902164841.214948-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:33:32
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:26:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -96,32 +100,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+This way, sync=full will not need a reference to any node other than the
+source and the target.
 
-On review of the “Deal with filters” series, Kevin noted that mirror
-doesn’t freeze its backing chain, even though we keep references to the
-base (for sync=top).  That seems like a recipe for disaster, and as the
-test added in patch 3 shows, indeed it is.
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/mirror.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Patch 1 could also be squashed into “mirror: Deal with filters”.
-
-As for patch 2; maybe it would be sufficient to freeze the backing chain
-only down to base_overlay and until mirror_dirty_init() is done.  Then
-we bdrv_ref(s->base) so can always be attached to the target when mirror
-completes.  But I think the conservative approach I implemented here is
-fine until someone complains.
-
-
-Max Reitz (3):
-  mirror: Set s->base_overlay only if s->base is set
-  mirror: Freeze backing chain for sync=top
-  iotests/041: x-blockdev-reopen during mirror
-
- block/mirror.c             | 28 +++++++++---
- tests/qemu-iotests/041     | 92 ++++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/041.out |  4 +-
- 3 files changed, 116 insertions(+), 8 deletions(-)
-
+diff --git a/block/mirror.c b/block/mirror.c
+index 26acf4af6f..11ebffdf99 100644
+--- a/block/mirror.c
++++ b/block/mirror.c
+@@ -42,6 +42,7 @@ typedef struct MirrorBlockJob {
+     BlockBackend *target;
+     BlockDriverState *mirror_top_bs;
+     BlockDriverState *base;
++    /* Overlay of @base if @base is non-NULL; NULL otherwise */
+     BlockDriverState *base_overlay;
+ 
+     /* The name of the graph node to replace */
+@@ -839,8 +840,9 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
+             return 0;
+         }
+ 
+-        ret = bdrv_is_allocated_above(bs, s->base_overlay, true, offset, bytes,
+-                                      &count);
++        ret = bdrv_is_allocated_above(bs, s->base_overlay,
++                                      s->base_overlay != NULL,
++                                      offset, bytes, &count);
+         if (ret < 0) {
+             return ret;
+         }
+@@ -1710,7 +1712,7 @@ static BlockJob *mirror_start_job(
+     s->zero_target = zero_target;
+     s->copy_mode = copy_mode;
+     s->base = base;
+-    s->base_overlay = bdrv_find_overlay(bs, base);
++    s->base_overlay = base ? bdrv_find_overlay(bs, base) : NULL;
+     s->granularity = granularity;
+     s->buf_size = ROUND_UP(buf_size, granularity);
+     s->unmap = unmap;
 -- 
 2.26.2
 
