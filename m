@@ -2,101 +2,96 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75A5CC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B88F0C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:03:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13F68207EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:01:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13F68207EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 7B839207EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:03:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r9op1vm+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B839207EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDY0M-000742-6w
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:01:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45688)
+	id 1kDY27-0007yk-M1
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:02:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46200)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kDXzW-0006VL-0L
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:00:18 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:52166
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kDXzT-0007Eq-18
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:00:17 -0400
-Received: from host86-148-246-76.range86-148.btcentralplus.com
- ([86.148.246.76] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kDXzr-0001Pk-HL; Wed, 02 Sep 2020 20:00:45 +0100
-To: luoyonggang@gmail.com
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDY1N-0007YA-Jc
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:02:14 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:36928)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDY1L-0007a8-Fl
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:02:13 -0400
+Received: by mail-lf1-x141.google.com with SMTP id z19so404102lfr.4
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 12:02:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=5TCONfHYjFOAMEhCAt4e+ATddQxcV8124gr6RdxN27c=;
+ b=r9op1vm+E/pWI5vEkRiFjVPH7iafVP/6lvZNfRAlvIwUzJX1he6k4C+BfqOusarK9f
+ YJIXa/Nh5gcE3ef4jptdnQacX4VbodE+oBlLFjxabkIpjL2uyRXO0xpnel+7R3hR7A3R
+ ulyV1szeUrWJoEY55JSRLAVNLUxdngG5nTOqhd25c9BVZUgEoaZtB9W1MS9u4CQCqYUG
+ iFE3wNofHu0cmW61+NYrdsHD1rOnvWxljEA/NLLcFvzXRCYbZ8Aa0KDPJWKgcapN7M8B
+ raZ2CfVEGISMWp/oQuIwIC0WI2OO8ki37LJRBvct13L06Oseqn8k+uYkt/Z3ye0dGNPO
+ 2QUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=5TCONfHYjFOAMEhCAt4e+ATddQxcV8124gr6RdxN27c=;
+ b=BYt/W/RfTfiEE4pURog+NUyOtXY0WV4qHsV1WEt/owKyoqd6BSjf23/WsCZY1tXNeQ
+ ap/64MjutYwgmUQ2gyeZGs1I/6+ny8smg68/Gcx2cLz+HsbBKs8E7ACy3PBu1UweUFd5
+ XmuI6X9OUHCskOg2nDyFDrKhX0DWuXT695cGS3vkymMteCWYbaWrLP1oF2KMZZf/zHR2
+ 9jU12ljWuRgu5vUe8uRjYEdwl9II3rQQhYWeY7ewiJkufoCNM5jLL8dyOLR5zMzaVCAY
+ NMPBN5puFn+MM1F7z0NV1T9qgS5NyaxUF4ZNErId7oId6WZbG8Gjb3Qy2FoceFkmvI0I
+ taJA==
+X-Gm-Message-State: AOAM533S3ui9r73/QhaobfdKF9av/KUWiVgmXDco17z2kMlWE2iZtq6m
+ X+G2Z+mPC8GvShYKFJTbksUGSimP9GWSAIR89Dk=
+X-Google-Smtp-Source: ABdhPJx8U2AYW0m6DLUGVc6r1ZOxcCBfUqGAXz5LhbkWkEZ399vTCHVopFWMSgo1EyR7wE6x40QFl2VjzKhGAvyg2K8=
+X-Received: by 2002:a05:6512:4cb:: with SMTP id
+ w11mr3949014lfq.33.1599073328508; 
+ Wed, 02 Sep 2020 12:02:08 -0700 (PDT)
+MIME-Version: 1.0
 References: <20200902170054.810-1-luoyonggang@gmail.com>
  <20200902170054.810-4-luoyonggang@gmail.com>
  <5cde63a0-46fe-2944-f96e-1f3268e49af8@amsat.org>
  <CAE2XoE8bsq7jzbw6FMW3TybhQGiNEJ-F_NKPm3LHzkHm69hSdw@mail.gmail.com>
  <19b8d23c-c2e7-2d8e-50de-a4e977bae786@ilande.co.uk>
  <CAE2XoE_yO5kkQBFzJk+FzspJG-3gHD0Xvf7BSkOk45qhp1h4PA@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <0b52fa43-fa48-0add-40e2-cf3f06983c0c@ilande.co.uk>
-Date: Wed, 2 Sep 2020 20:00:05 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
-MIME-Version: 1.0
-In-Reply-To: <CAE2XoE_yO5kkQBFzJk+FzspJG-3gHD0Xvf7BSkOk45qhp1h4PA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.246.76
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+ <0b52fa43-fa48-0add-40e2-cf3f06983c0c@ilande.co.uk>
+In-Reply-To: <0b52fa43-fa48-0add-40e2-cf3f06983c0c@ilande.co.uk>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 3 Sep 2020 03:01:56 +0800
+Message-ID: <CAE2XoE-DyKcYMDR2KsZA=1-7zr4jXOMh9ZMSA7OA=tbo4tr0PQ@mail.gmail.com>
 Subject: Re: [PATCH 3/6] ci: Install msys2 in a proper way refer to
  https://github.com/cirruslabs/cirrus-ci-docs/issues/699 Enable msys2 ci in
  cirrus
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Content-Type: multipart/alternative; boundary="000000000000b733ec05ae594591"
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.324,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,216 +104,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: luoyonggang@gmail.com
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
  qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/09/2020 19:56, 罗勇刚(Yonggang Luo) wrote:
+--000000000000b733ec05ae594591
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> On Thu, Sep 3, 2020 at 2:55 AM Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk
-> <mailto:mark.cave-ayland@ilande.co.uk>> wrote:
-> 
->     On 02/09/2020 18:50, 罗勇刚(Yonggang Luo) wrote:
-> 
->     > On Thu, Sep 3, 2020 at 1:30 AM Philippe Mathieu-Daudé <f4bug@amsat.org
->     <mailto:f4bug@amsat.org>
->     > <mailto:f4bug@amsat.org <mailto:f4bug@amsat.org>>> wrote:
->     >
->     >     On 9/2/20 7:00 PM, Yonggang Luo wrote:
->     >     > ---
->     >     >  .cirrus.yml                         | 23 ++++++++++++++++
->     >     >  scripts/ci/windows/msys2_build.sh   | 35 ++++++++++++++++++++++++
->     >     >  scripts/ci/windows/msys2_install.sh | 41 +++++++++++++++++++++++++++++
->     >     >  3 files changed, 99 insertions(+)
->     >     >  create mode 100644 scripts/ci/windows/msys2_build.sh
->     >     >  create mode 100644 scripts/ci/windows/msys2_install.sh
->     >     >
->     >     > diff --git a/.cirrus.yml b/.cirrus.yml
->     >     > index f287d23c5b..d377c28412 100644
->     >     > --- a/.cirrus.yml
->     >     > +++ b/.cirrus.yml
->     >     > @@ -40,3 +40,26 @@ macos_xcode_task:
->     >     >      - ../configure --cc=clang || { cat config.log; exit 1; }
->     >     >      - gmake -j$(sysctl -n hw.ncpu)
->     >     >      - gmake check
->     >     > +
->     >     > +windows_msys2_task:
->     >     > +  windows_container:
->     >     > +    image: cirrusci/windowsservercore:cmake
->     >     > +    os_version: 2019
->     >     > +    cpu: 8
->     >     > +    memory: 8G
->     >     > +  env:
->     >     > +    MSYS: winsymlinks:nativestrict
->     >     > +    MSYSTEM: MINGW64
->     >     > +    CHERE_INVOKING: 1
->     >     > +  printenv_script: C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
->     >     > +  install_script:
->     >     > +    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O
->     >     http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
->     >     > +    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O
->     >   
->      http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
->     >     > +    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && pacman -U
->     >     --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
->     >     > +    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Sy --noconfirm"
->     >     > +    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --needed --noconfirm -S
->     >     bash pacman pacman-mirrors msys2-runtime"
->     >     > +    - taskkill /F /IM gpg-agent.exe
->     >     > +    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
->     >     > +    - C:\tools\msys64\usr\bin\bash.exe -lc "sh
->     >     scripts/ci/windows/msys2_install.sh"
->     >     > +  script:
->     >     > +    C:\tools\msys64\usr\bin\bash.exe -lc "sh
->     scripts/ci/windows/msys2_build.sh"
->     >     > diff --git a/scripts/ci/windows/msys2_build.sh
->     b/scripts/ci/windows/msys2_build.sh
->     >     > new file mode 100644
->     >     > index 0000000000..0363ef402a
->     >     > --- /dev/null
->     >     > +++ b/scripts/ci/windows/msys2_build.sh
->     >     > @@ -0,0 +1,35 @@
->     >     > +export QEMU_DIR=$PWD
->     >     > +mkdir ../qemu-build
->     >     > +cd ../qemu-build
->     >     > +$QEMU_DIR/configure \
->     >     > +  --python=python3 \
->     >     > +  --cross-prefix=x86_64-w64-mingw32- \
->     >
->     >     Isn't the prefix 'x86_64-w64-mingw32-gcc-'?
->     >
->     >     > +  --enable-gtk --enable-sdl \
->     >     > +  --enable-capstone=git \
->     >     > +  --enable-stack-protector \
->     >     > +  --ninja=ninja \
->     >     > +  --enable-gnutls \
->     >     > +  --enable-nettle \
->     >     > +  --enable-vnc \
->     >     > +  --enable-vnc-sasl \
->     >     > +  --enable-vnc-jpeg \
->     >     > +  --enable-vnc-png \
->     >     > +  --enable-membarrier \
->     >     > +  --enable-slirp=git \
->     >     > +  --disable-kvm \
->     >     > +  --enable-hax \
->     >     > +  --enable-whpx \
->     >     > +  --disable-spice \
->     >     > +  --enable-lzo \
->     >     > +  --enable-snappy \
->     >     > +  --enable-bzip2 \
->     >     > +  --enable-vdi \
->     >     > +  --enable-qcow1 \
->     >     > +  --enable-tools \
->     >     > +  --enable-libusb \
->     >     > +  --enable-usb-redir \
->     >     > +  --disable-libnfs \
->     >     > +  --enable-libssh \
->     >     > +  --disable-pie
->     >     > +make -j$NUMBER_OF_PROCESSORS
->     >     > +# make -j$NUMBER_OF_PROCESSORS check
->     >     > diff --git a/scripts/ci/windows/msys2_install.sh
->     >     b/scripts/ci/windows/msys2_install.sh
->     >     > new file mode 100644
->     >     > index 0000000000..3a5392cd99
->     >     > --- /dev/null
->     >     > +++ b/scripts/ci/windows/msys2_install.sh
->     >     > @@ -0,0 +1,41 @@
->     >     > +pacman --noconfirm -S --needed \
->     >     > +base-devel \
->     >     > +git \
->     >     > +mingw-w64-x86_64-python \
->     >     > +mingw-w64-x86_64-python-setuptools \
->     >     > +mingw-w64-x86_64-toolchain \
->     >     > +mingw-w64-x86_64-SDL2 \
->     >     > +mingw-w64-x86_64-SDL2_image \
->     >     > +mingw-w64-x86_64-gtk3 \
->     >     > +mingw-w64-x86_64-ninja \
->     >     > +mingw-w64-x86_64-make \
->     >     > +mingw-w64-x86_64-lzo2 \
->     >     > +mingw-w64-x86_64-libjpeg-turbo \
->     >     > +mingw-w64-x86_64-pixman \
->     >     > +mingw-w64-x86_64-libgcrypt \
->     >     > +mingw-w64-x86_64-capstone \
->     >     > +mingw-w64-x86_64-libpng \
->     >     > +mingw-w64-x86_64-libssh \
->     >     > +mingw-w64-x86_64-libxml2 \
->     >     > +mingw-w64-x86_64-snappy \
->     >     > +mingw-w64-x86_64-libusb \
->     >     > +mingw-w64-x86_64-usbredir \
->     >     > +mingw-w64-x86_64-libtasn1 \
->     >     > +mingw-w64-x86_64-libnfs \
->     >     > +mingw-w64-x86_64-nettle \
->     >     > +mingw-w64-x86_64-cyrus-sasl \
->     >     > +mingw-w64-x86_64-curl \
->     >     > +mingw-w64-x86_64-gnutls \
->     >     > +mingw-w64-x86_64-zstd \
->     >     > +mingw-w64-x86_64-glib2
->     >     > +
->     >     > +cd /mingw64/bin
->     >     > +cp x86_64-w64-mingw32-gcc-ar.exe x86_64-w64-mingw32-ar.exe
->     >     > +cp x86_64-w64-mingw32-gcc-ranlib.exe x86_64-w64-mingw32-ranlib.exe
->     >     > +cp x86_64-w64-mingw32-gcc-nm.exe x86_64-w64-mingw32-nm.exe
->     >     > +cp windres.exe x86_64-w64-mingw32-windres.exe
->     >     > +cp strip.exe x86_64-w64-mingw32-strip.exe
->     >     > +cp objcopy.exe x86_64-w64-mingw32-objcopy.exe
->     >     > +cp ld x86_64-w64-mingw32-ld.exe
->     >     > +cp as x86_64-w64-mingw32-as.exe
->     >     > +cp sdl2-config x86_64-w64-mingw32-sdl2-config
->     >
->     >     Why is that needed?
->     >
->     >     Thanks,
->     >
->     >     Phil.
->     >
->     > Hi, I am looking for suggestion for building  with msys2, this is comes from
->     wiki, if
->     > you have better idea, then tell me.
->     >
->     > https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2 
-> 
->     FWIW I did a clean install of MSYS2 after the meson changes were merged and it seems
->     to make things a bit simpler for Windows. Once Paolo's latest PR has been applied you
->     should be able to do the following (from my notes for PPC builds):
-> 
->     # As per https://www.msys2.org/
->     pacman -Syu
->     pacman -Su
-> 
->     # QEMU build environment
->     pacman -S \
->       base-devel \
->       mingw-w64-x86_64-toolchain \
->       git \
->       mingw64/mingw-w64-x86_64-python3 \
->       mingw64/mingw-w64-x86_64-python-setuptools \
->       mingw64/mingw-w64-x86_64-ninja
-> 
->     # Basic GTK/SDL build
->     pacman -S \
->       mingw-w64-x86_64-glib2 \
->       mingw64/mingw-w64-x86_64-gtk3 \
->       mingw64/mingw-w64-x86_64-SDL2
-> 
->     # Build
->     ./configure --target-list="ppc-softmmu" --ninja=ninja
->     make -j6
-> 
->     That should be enough to get a basic working Windows build with GTK/SDL2 UI, although
->     I see you've added a lot more options.
-> 
-> I am trying to enable all possible feature on the CI for monitoring the regression,
-> at least from the compiling points of view 
+>
+>
+> Yes indeed, it looks like a very comprehensive build :)  Note that with
+> the meson
+> build I no longer have to copy/rename toolchain exes compared to your
+> .cirrus.yml
+> file so maybe that issue is now fixed?
+>
+> That's not fixed, I am building a full build, so I will use any possible
+toolchain, and you may not use it at all.
 
-Yes indeed, it looks like a very comprehensive build :)  Note that with the meson
-build I no longer have to copy/rename toolchain exes compared to your .cirrus.yml
-file so maybe that issue is now fixed?
+>
+> ATB,
+>
+> Mark.
+>
 
 
-ATB,
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-Mark.
+--000000000000b733ec05ae594591
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><div class=3D"gmail_quote"><blo=
+ckquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left=
+:1px solid rgb(204,204,204);padding-left:1ex"><br>
+<br>
+Yes indeed, it looks like a very comprehensive build :)=C2=A0 Note that wit=
+h the meson<br>
+build I no longer have to copy/rename toolchain exes compared to your .cirr=
+us.yml<br>
+file so maybe that issue is now fixed?<br>
+<br></blockquote><div>That&#39;s not fixed, I am building a full build, so =
+I will use any possible toolchain, and you may not use it at all.=C2=A0</di=
+v><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
+r-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+ATB,<br>
+<br>
+Mark.<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
+
+--000000000000b733ec05ae594591--
 
