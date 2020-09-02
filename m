@@ -2,89 +2,86 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36F2FC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD75C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:08:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E907520767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:02:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C614C20767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:08:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VZ1vhhDm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E907520767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GR8GriRB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C614C20767
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47246 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDapQ-0007D7-5h
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:02:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55652)
+	id 1kDava-0000n4-Ta
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:08:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kDaon-0006mS-J1
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:01:25 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33295
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kDaok-0003Zp-W2
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:01:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599084081;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=ennddmD2gwTE81qugDoZlHQ1zw0Fe7+JgPfD8k9KQS8=;
- b=VZ1vhhDmSkvw4PNbyFJZdHgXYww+v2bnwUxiPFbibbepsWYHId3ZASdAuibLlB2qWL3Kd8
- tMrJBn4bz+sp/QpX4atBJFWWUH9k07Y5OSfmGArpQsZ3I+5gtWtd/Mj0R1Sqv4srjWGkCu
- 9eFBFd5YdHyEn0qeVjiyUK4FSh03UK8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-531-2s1ud1WZMnWlJewhoOu83w-1; Wed, 02 Sep 2020 18:01:15 -0400
-X-MC-Unique: 2s1ud1WZMnWlJewhoOu83w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1B311805EE2;
- Wed,  2 Sep 2020 22:01:14 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-120-166.rdu2.redhat.com
- [10.10.120.166])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EBD9C5D9CC;
- Wed,  2 Sep 2020 22:01:09 +0000 (UTC)
-Date: Wed, 2 Sep 2020 18:01:08 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Erik Skultety <eskultet@redhat.com>
-Subject: Re: [PATCH v2 1/2] GitLab Gating CI: introduce pipeline-status
- contrib script
-Message-ID: <20200902220108.GA55646@localhost.localdomain>
-References: <20200709024657.2500558-1-crosa@redhat.com>
- <20200709024657.2500558-2-crosa@redhat.com>
- <20200709085519.GB536480@nautilus.usersys.redhat.com>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDav3-0000M4-ED; Wed, 02 Sep 2020 18:07:53 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:37229)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDav1-0004BC-Gn; Wed, 02 Sep 2020 18:07:53 -0400
+Received: by mail-lj1-x244.google.com with SMTP id w14so1051106ljj.4;
+ Wed, 02 Sep 2020 15:07:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=1uY1eMqGj6p/ib8rcdiGL3bg8mhpmrAj6tvF2fAi4M0=;
+ b=GR8GriRBBQ2JEUWLWQlsqxncFr9xuhHdzCHjon5ITg2p+sFruSvv4zxYglkDTxS1jd
+ 7dJgA0jT3KU4jAq5l2m1zPOV5+7UM66VHqCH6w6YlVIQxbrE0uNKt9ariReCEbwwnY3D
+ A4lEahzpcCMTO0aAXGVzmW0I6sCia2D3lslJQSgHy9dO8Q2ttwhU0LL2FX9X3PK9AZWz
+ DwTu0XPONWl1+px/jvVKPK3bp2lgAKg/mUCVgUJBfUtPpea9wnemenMl/z8ayxPYnpSv
+ a1UXlWHtjrNmJZ4uvMDqXFZGeWdpuy28bBFEWw/S87mFwme5cd+3ihkoylEDSQb3encu
+ GMYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=1uY1eMqGj6p/ib8rcdiGL3bg8mhpmrAj6tvF2fAi4M0=;
+ b=oWHpCxjEUnKS0DJXRgJxx+UJfgQ3EoolBNUeS7BD4CJA914pKwRFRXhKMcM4OlfdCj
+ p6ySLc3MxWTytTvKTE9MhWz70B2Kq8NhUaEEKf9E7EISaWAxjkEApkzsNIcBN1Q+//T5
+ 0XOmEmRNfF45KUJd7wYpcLuJmVjYHAQuwNNsT71GLlQy+RM2003ZkzGkEU+X8toSxDFk
+ 08WBsY6b8L0KlxO6qnnnVrH+X5JIWcNpgH6S0aOyleWc/bkrAabpmii94Z640RRCbvFQ
+ Kgpc+xh+c/vN9scxw+zpVdeaJIArB6TOpR0z7pxssWRb654OPxganM35qQoBLevtmlNW
+ l8xg==
+X-Gm-Message-State: AOAM531XiwXomdyIVHaM6k3KIH8uiWmBkeSzLUkMuqh+EGp5VDhGITAu
+ WvNtl2ADhYehYtZQmNVSkmjYTMyM0rDhL0jIHE4=
+X-Google-Smtp-Source: ABdhPJzF/axP2gNfd0JQVNJ4VbREmnvsj9ElScagqGchiwvcDsz0XpzsaEXaa0m/wRwTmazJIJf0SvXobdPy0Lc7U5k=
+X-Received: by 2002:a05:651c:1119:: with SMTP id
+ d25mr6523ljo.300.1599084469274; 
+ Wed, 02 Sep 2020 15:07:49 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200709085519.GB536480@nautilus.usersys.redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=crosa@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 16:25:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200825103850.119911-1-berrange@redhat.com>
+ <20200825103850.119911-4-berrange@redhat.com>
+In-Reply-To: <20200825103850.119911-4-berrange@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 3 Sep 2020 06:07:36 +0800
+Message-ID: <CAE2XoE_8E0gYBnPn9GtB94zQ4Rr+ihOi1gvw4mvnNj5CRxv6DA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] nbd: disable signals and forking on Windows builds
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000c1ce1005ae5bdd43"
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,237 +95,172 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Beraldo Leal <bleal@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---9amGYk9869ThD9tj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+--000000000000c1ce1005ae5bdd43
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 09, 2020 at 10:55:19AM +0200, Erik Skultety wrote:
-> On Wed, Jul 08, 2020 at 10:46:56PM -0400, Cleber Rosa wrote:
-> > This script is intended to be used right after a push to a branch.
-> >
-> > By default, it will look for the pipeline associated with the commit
-> > that is the HEAD of the *local* staging branch.  It can be used as a
-> > one time check, or with the `--wait` option to wait until the pipeline
-> > completes.
-> >
-> > If the pipeline is successful, then a merge of the staging branch into
-> > the master branch should be the next step.
-> >
-> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > ---
-> >  scripts/ci/gitlab-pipeline-status | 156 ++++++++++++++++++++++++++++++
-> >  1 file changed, 156 insertions(+)
-> >  create mode 100755 scripts/ci/gitlab-pipeline-status
-> >
-> > diff --git a/scripts/ci/gitlab-pipeline-status b/scripts/ci/gitlab-pipe=
-line-status
-> > new file mode 100755
-> > index 0000000000..4a9de39872
-> > --- /dev/null
-> > +++ b/scripts/ci/gitlab-pipeline-status
-> > @@ -0,0 +1,156 @@
-> > +#!/usr/bin/env python3
-> > +#
-> > +# Copyright (c) 2019-2020 Red Hat, Inc.
-> > +#
-> > +# Author:
-> > +#  Cleber Rosa <crosa@redhat.com>
-> > +#
-> > +# This work is licensed under the terms of the GNU GPL, version 2 or
-> > +# later.  See the COPYING file in the top-level directory.
-> > +
-> > +"""
-> > +Checks the GitLab pipeline status for a given commit commit
->=20
-> s/commit$/(hash|sha|ID|)
->=20
+On Tue, Aug 25, 2020 at 6:40 PM Daniel P. Berrang=C3=A9 <berrange@redhat.co=
+m>
+wrote:
 
-Just for the record, this was picked up by Thomas (thanks Thomas!).
+> Disabling these parts are sufficient to get the qemu-nbd program
+> compiling in a Windows build.
+>
+> Signed-off-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> ---
+>  meson.build | 7 ++-----
+>  qemu-nbd.c  | 5 +++++
+>  2 files changed, 7 insertions(+), 5 deletions(-)
+>
+> diff --git a/meson.build b/meson.build
+> index df5bf728b5..1071871605 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -1074,12 +1074,9 @@ if have_tools
+>               dependencies: [authz, block, crypto, io, qom, qemuutil],
+> install: true)
+>    qemu_io =3D executable('qemu-io', files('qemu-io.c'),
+>               dependencies: [block, qemuutil], install: true)
+> -  qemu_block_tools +=3D [qemu_img, qemu_io]
+> -  if targetos =3D=3D 'linux' or targetos =3D=3D 'sunos' or
+> targetos.endswith('bsd')
+> -    qemu_nbd =3D executable('qemu-nbd', files('qemu-nbd.c'),
+> +  qemu_nbd =3D executable('qemu-nbd', files('qemu-nbd.c'),
+>                 dependencies: [block, qemuutil], install: true)
+> -    qemu_block_tools +=3D [qemu_nbd]
+> -  endif
+> +  qemu_block_tools +=3D [qemu_img, qemu_io, qemu_nbd]
+>
+>    subdir('storage-daemon')
+>    subdir('contrib/rdmacm-mux')
+> diff --git a/qemu-nbd.c b/qemu-nbd.c
+> index dc6ef089af..33476a1000 100644
+> --- a/qemu-nbd.c
+> +++ b/qemu-nbd.c
+> @@ -899,6 +899,7 @@ int main(int argc, char **argv)
+>  #endif
+>
+>      if ((device && !verbose) || fork_process) {
+> +#ifndef WIN32
+>          int stderr_fd[2];
+>          pid_t pid;
+>          int ret;
+> @@ -962,6 +963,10 @@ int main(int argc, char **argv)
+>               */
+>              exit(errors);
+>          }
+> +#else /* WIN32 */
+> +        error_report("Unable to fork into background on Windows hosts");
+> +        exit(EXIT_FAILURE);
+> +#endif /* WIN32 */
+>      }
+>
+May us replace fork with alternative such as spawn?
 
-> > +"""
-> > +
-> > +# pylint: disable=3DC0103
-> > +
-> > +import argparse
-> > +import http.client
-> > +import json
-> > +import os
-> > +import subprocess
-> > +import time
-> > +import sys
-> > +
-> > +
-> > +def get_local_staging_branch_commit():
-> > +    """
-> > +    Returns the commit sha1 for the *local* branch named "staging"
-> > +    """
-> > +    result =3D subprocess.run(['git', 'rev-parse', 'staging'],
->=20
-> If one day Peter decides that "staging" is not a cool name anymore and us=
-e a
-> different name for the branch :) we should account for that and make it a
-> variable, possibly even parametrize this function with it.
+>
+>      if (device !=3D NULL && sockpath =3D=3D NULL) {
+> --
+> 2.26.2
+>
+>
 >
 
-This function is currently only called to set a default for the
--c/--commit command line option, so users can always set it to the
-commit ID of any branch.  But, your point still holds with regards to
-future extensibility.  I'll send a patch with that change.
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-> > +                            stdin=3Dsubprocess.DEVNULL,
-> > +                            stdout=3Dsubprocess.PIPE,
-> > +                            stderr=3Dsubprocess.DEVNULL,
-> > +                            cwd=3Dos.path.dirname(__file__),
-> > +                            universal_newlines=3DTrue).stdout.strip()
-> > +    if result =3D=3D 'staging':
-> > +        raise ValueError("There's no local staging branch")
->=20
-> "There's no local branch named 'staging'" would IMO be more descriptive, =
-so as
-> not to confuse it with staging in git.
->
+--000000000000c1ce1005ae5bdd43
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ack, also picked up by Thomas.
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Aug 25, 2020 at 6:40 PM Danie=
+l P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@redh=
+at.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">Disabling these parts are sufficient to get the qemu-nbd program<br>
+compiling in a Windows build.<br>
+<br>
+Signed-off-by: Daniel P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redha=
+t.com" target=3D"_blank">berrange@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0meson.build | 7 ++-----<br>
+=C2=A0qemu-nbd.c=C2=A0 | 5 +++++<br>
+=C2=A02 files changed, 7 insertions(+), 5 deletions(-)<br>
+<br>
+diff --git a/meson.build b/meson.build<br>
+index df5bf728b5..1071871605 100644<br>
+--- a/meson.build<br>
++++ b/meson.build<br>
+@@ -1074,12 +1074,9 @@ if have_tools<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dependencies: [authz, bloc=
+k, crypto, io, qom, qemuutil], install: true)<br>
+=C2=A0 =C2=A0qemu_io =3D executable(&#39;qemu-io&#39;, files(&#39;qemu-io.c=
+&#39;),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dependencies: [block, qemu=
+util], install: true)<br>
+-=C2=A0 qemu_block_tools +=3D [qemu_img, qemu_io]<br>
+-=C2=A0 if targetos =3D=3D &#39;linux&#39; or targetos =3D=3D &#39;sunos&#3=
+9; or targetos.endswith(&#39;bsd&#39;)<br>
+-=C2=A0 =C2=A0 qemu_nbd =3D executable(&#39;qemu-nbd&#39;, files(&#39;qemu-=
+nbd.c&#39;),<br>
++=C2=A0 qemu_nbd =3D executable(&#39;qemu-nbd&#39;, files(&#39;qemu-nbd.c&#=
+39;),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 dependencies: [bloc=
+k, qemuutil], install: true)<br>
+-=C2=A0 =C2=A0 qemu_block_tools +=3D [qemu_nbd]<br>
+-=C2=A0 endif<br>
++=C2=A0 qemu_block_tools +=3D [qemu_img, qemu_io, qemu_nbd]<br>
+<br>
+=C2=A0 =C2=A0subdir(&#39;storage-daemon&#39;)<br>
+=C2=A0 =C2=A0subdir(&#39;contrib/rdmacm-mux&#39;)<br>
+diff --git a/qemu-nbd.c b/qemu-nbd.c<br>
+index dc6ef089af..33476a1000 100644<br>
+--- a/qemu-nbd.c<br>
++++ b/qemu-nbd.c<br>
+@@ -899,6 +899,7 @@ int main(int argc, char **argv)<br>
+=C2=A0#endif<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0if ((device &amp;&amp; !verbose) || fork_process) {<br>
++#ifndef WIN32<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int stderr_fd[2];<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0pid_t pid;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0int ret;<br>
+@@ -962,6 +963,10 @@ int main(int argc, char **argv)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 */<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0exit(errors);<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
++#else /* WIN32 */<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 error_report(&quot;Unable to fork into backgro=
+und on Windows hosts&quot;);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 exit(EXIT_FAILURE);<br>
++#endif /* WIN32 */<br>
+=C2=A0 =C2=A0 =C2=A0}<br></blockquote><div>May us replace fork with alterna=
+tive such as spawn?=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">
+<br>
+=C2=A0 =C2=A0 =C2=A0if (device !=3D NULL &amp;&amp; sockpath =3D=3D NULL) {=
+<br>
+-- <br>
+2.26.2<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
 
-> > +    if len(result) !=3D 40:
-> > +        raise ValueError("Branch staging HEAD doesn't look like a sha1=
-")
-> > +    return result
-> > +
-> > +
-> > +def get_pipeline_status(project_id, commit_sha1):
-> > +    """
-> > +    Returns the JSON content of the pipeline status API response
-> > +    """
-> > +    url =3D '/api/v4/projects/{}/pipelines?sha=3D{}'.format(project_id=
-,
-> > +                                                        commit_sha1)
-> > +    connection =3D http.client.HTTPSConnection('gitlab.com')
-> > +    connection.request('GET', url=3Durl)
-> > +    response =3D connection.getresponse()
-> > +    if response.code !=3D http.HTTPStatus.OK:
-> > +        raise ValueError("Failed to receive a successful response")
-> > +    json_response =3D json.loads(response.read())
->=20
-> a blank line separating the commentary block would slightly help readabil=
-ity
->
-
-It would also be a good idea to follow PEP 257, but since there's currently
-no check/enforcement, I'll defer to one it's introduced (hopefully soon).
-
-> > +    # afaict, there should one one pipeline for the same project + com=
-mit
->=20
-> s/one one/be only one/
->
-
-Ack, also picked up by Thomas (thanks again!).
-
-> > +    # if this assumption is false, we can add further filters to the
-> > +    # url, such as username, and order_by.
-> > +    if not json_response:
-> > +        raise ValueError("No pipeline found")
-> > +    return json_response[0]
-> > +
-> > +
-> > +def wait_on_pipeline_success(timeout, interval,
-> > +                             project_id, commit_sha):
-> > +    """
-> > +    Waits for the pipeline to end up to the timeout given
->=20
-> "Waits for the pipeline to finish within the given timeout"
->=20
-
-Absolutely better, and also picked up by Thomas.
-
-> > +    """
-> > +    start =3D time.time()
-> > +    while True:
-> > +        if time.time() >=3D (start + timeout):
-> > +            print("Waiting on the pipeline success timed out")
->=20
-> s/success//
-> (the pipeline doesn't always have to finish with success)
->
-
-You're right, your suggestion improves the message, indeed.
-
-But, I think the wording is still confusing as it took me some time to
-understand that this timeout was about how long this script will wait.
-(my fault here).  So I'm going to propose that this changes to:
-
-"Timeout (-t/--timeout) of %i seconds reached, won't wait any longer
-for the pipeline to complete".
-
-> > +            return False
-> > +
-> > +        status =3D get_pipeline_status(project_id, commit_sha)
-> > +        if status['status'] =3D=3D 'running':
-> > +            time.sleep(interval)
-> > +            print('running...')
-> > +            continue
-> > +
-> > +        if status['status'] =3D=3D 'success':
-> > +            return True
-> > +
-> > +        msg =3D "Pipeline ended unsuccessfully, check: %s" % status['w=
-eb_url']
->=20
-> I think more common expression is "Pipeline failed"
->
-
-Agreed, and already addressed by Thomas (will I run out of thanks?).
-
-> > +        print(msg)
-> > +        return False
-> > +
-> ...
->=20
-> Code-wise looks OK to me, but since I don't know what Peter's requirement=
-s
-> on/expectations of this script are, I can't do a more thorough review.
->=20
-> Regards,
-> Erik
-
-Thanks Erik!
-
-- Cleber.
-
---9amGYk9869ThD9tj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl9QFiAACgkQZX6NM6Xy
-CfOJpg/+JDz9GtPJFIFi9ypsp3ADvxYU4C9xYHnK7eXcIe08LDU6qFNC9sdog26d
-r7YG3ddUB/CO0DrU86YHtJuN/7mx6HODaEVc9kDaZaC4QQMYr/b2pH7KS6iHmsMY
-2WRbXRFKZGz2+nY+S2YatxC745/5JstdAjBL0yuhKluwoDtTGpV3FbHJXpFxRmjp
-8KYnZjI/+bzP44vmMad/mmgL0SWsrYN59mtQZ5+n4HTlLkAquDZ8wbXADOYl+WFM
-9gdSDJweeZQ5UTaPRaA2FJMa9zoZiGmmgg3luYkTS/oGd6JmsPNBP4fdLdag+NWS
-t9dhMR7vywJ7neqqrUGN24TpZ30BOjFynNFIMmIF1XDaYezgYTxeE5meI74IWhJ7
-eB/J7K8fSVKf+5WZ40LGNhg5wRleFLdkYTDKC/yST0Ni8Pghp5pOPAYK7zq4H9mr
-ERvq7Qhr0FEYgDZr+V+h1fi36559TiEeSgFJaEE6hR6kIq+wylBH2D06MOTPc/bz
-OCYhCOqO3WxsT4+gD89dlv74TQNbMPx1j3RSTLWG0dqkA6MkpsEvj/d6PkWXD+SX
-omZXdNQSPN1ZgOi5ETAbZlb+phHGI2/UJLHU2ftozmz1ZLlRf8puZjlJOafsJtt8
-fsR3AVe4qchPeREmYV/KZOVsgCb4x4rOzN0teJBN7Hg4U2xurps=
-=p9Aq
------END PGP SIGNATURE-----
-
---9amGYk9869ThD9tj--
-
+--000000000000c1ce1005ae5bdd43--
 
