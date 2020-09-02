@@ -2,76 +2,85 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8049C433E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 06:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0F6DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 07:21:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FC802067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 06:55:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FC802067C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7C91F2072A
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 07:21:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bV00paD+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C91F2072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41458 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDMfp-0007sX-9R
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 02:55:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50884)
+	id 1kDN5R-0004IE-LH
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 03:21:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kDMeF-00066e-8c; Wed, 02 Sep 2020 02:53:35 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:33189)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <clg@kaod.org>)
- id 1kDMeC-0000QS-JB; Wed, 02 Sep 2020 02:53:34 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.123])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 83DAC5D06B68;
- Wed,  2 Sep 2020 08:53:19 +0200 (CEST)
-Received: from kaod.org (37.59.142.101) by DAG4EX1.mxp5.local (172.16.2.31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Wed, 2 Sep 2020
- 08:53:18 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-101G0048ac43cfe-bc6d-40ae-a34e-729923152ec4,
- 725C0B02AD5EA5A9EE23B5614217EC25792C566F) smtp.auth=clg@kaod.org
-Subject: Re: [PATCH 3/5] hw/ppc/ppc4xx_pci: Use ARRAY_SIZE() instead of magic
- value
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- <qemu-devel@nongnu.org>
-References: <20200901104043.91383-1-f4bug@amsat.org>
- <20200901104043.91383-4-f4bug@amsat.org>
-From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-Message-ID: <0ffcf77e-9b1a-24e6-c763-4a94614b1549@kaod.org>
-Date: Wed, 2 Sep 2020 08:53:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1kDN4S-0003p7-Kw
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 03:20:40 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:33416)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1kDN4Q-0003wD-OT
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 03:20:40 -0400
+Received: by mail-io1-xd43.google.com with SMTP id g14so4769446iom.0
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 00:20:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zVFOIVqx+taeQIVzVnUUbjAm2esGq23+lCReOrUG5JU=;
+ b=bV00paD+5b9mgIBAt0uPYpFW+fN9fq4cPzF/z8m596bTMkWtp2s9ZMTDwxR03gnJ70
+ LfT4tgblBq1JvT3+btwGd0ZNKm3hJlgw0KFqASxGezteCdjVfsBGj+073q2faTWOFopj
+ MFQeHpU4BWQRbTVsnmvK6ON/rAHjZptVicEhcMq2ZM9/R1TqWlw04i0ish9mqb8QcdGI
+ bK86pOF3J7hESJOmDFVMdKNPHcYuySFDGOb6SKWkYcent9LAql6mwG3xEM0jO/erP5mx
+ cDyF5pLaaY2X2/iHhXfCjm81RIPewutMBFAuvwqn6JHT51UCjL1plbJrnwXhzPNjh2bj
+ gsLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zVFOIVqx+taeQIVzVnUUbjAm2esGq23+lCReOrUG5JU=;
+ b=sruK6y2yGo5sG/p/fd0ajzkVw4SircyPV+hGhNhoh58/Mi1K0WffCTJPaqQ6DGxL0x
+ dgpPEKZOZcjmsgDOtkjzfvodPL+obX6TzPmse36N8Ne9uGGmoBq94QDD3YfNGxcwIqDR
+ oxPUWrgpoPGFqnUZc+BmY+7i9HQcI7fUATXKfS/J9GBC6Fsra2gYnoOSqKEltyYNBTss
+ 9lXhyw5mEkD/bZpAPcdI/X4VQAUQOTf+7U1/M0sZMfvwzGBE0kRQLdNP5ZDfijQF5oo8
+ 2TnXTYbCQyviaGAg9dtJ4/VXql4ouCxg9Rqwf8TedVWfTcejtmwkr1br1Ur0FSK58Cqi
+ Lq4Q==
+X-Gm-Message-State: AOAM533SRfQlCjhl8HJmVzf1nEWwmeSsGVf2LNNHpaLQLmzFPsn3VQ1V
+ VL8h8mOq2Cx3JPyFA0y78HyP1DLZFSt75xCZGWQ=
+X-Google-Smtp-Source: ABdhPJyCoVUJjepxeCTAnvD0II9mi3LRJXkDGxGiWi3dOt5NnILghTKAwU7snIlknOaAc7MOPEruVutefvMReJJ17pI=
+X-Received: by 2002:a6b:d603:: with SMTP id w3mr2475574ioa.29.1599031237263;
+ Wed, 02 Sep 2020 00:20:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200901104043.91383-4-f4bug@amsat.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [37.59.142.101]
-X-ClientProxiedBy: DAG3EX1.mxp5.local (172.16.2.21) To DAG4EX1.mxp5.local
- (172.16.2.31)
-X-Ovh-Tracer-GUID: d9b36a0f-30f8-438e-9295-807c83e4cb17
-X-Ovh-Tracer-Id: 4710202263967533886
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudefkedguddufecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomheptghlgheskhgrohgurdhorhhgpdhrtghpthhtohepfhegsghughesrghmshgrthdrohhrgh
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:53:21
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+References: <159897580089.30750.12581669374705391794.stgit@naples-babu.amd.com>
+ <159897584649.30750.3939159632943292252.stgit@naples-babu.amd.com>
+In-Reply-To: <159897584649.30750.3939159632943292252.stgit@naples-babu.amd.com>
+From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date: Wed, 2 Sep 2020 09:20:25 +0200
+Message-ID: <CAM9Jb+juk1pdvMmyn+fsixpbBXPudV=G_9+_k-wh6aXoE1178A@mail.gmail.com>
+Subject: Re: [PATCH v7 1/2] i386: Simplify CPUID_8000_001d for AMD
+To: Babu Moger <babu.moger@amd.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=pankaj.gupta.linux@gmail.com; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -86,44 +95,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-trivial@nongnu.org,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S . Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/1/20 12:40 PM, Philippe Mathieu-Daudé wrote:
-> Replace the magic '4' by ARRAY_SIZE(s->irq) which is more explicit.
-
-We could also define the 'irq' array with PCI_NUM_PINS instead of 4.
-
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-
+> Remove all the hardcoded values and replace with generalized
+> fields.
+>
+> Signed-off-by: Babu Moger <babu.moger@amd.com>
 > ---
->  hw/ppc/ppc4xx_pci.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
-> index 3ea47df71fe..cd3f192a138 100644
-> --- a/hw/ppc/ppc4xx_pci.c
-> +++ b/hw/ppc/ppc4xx_pci.c
-> @@ -320,7 +320,8 @@ static void ppc4xx_pcihost_realize(DeviceState *dev, Error **errp)
->  
->      b = pci_register_root_bus(dev, NULL, ppc4xx_pci_set_irq,
->                                ppc4xx_pci_map_irq, s->irq, get_system_memory(),
-> -                              get_system_io(), 0, 4, TYPE_PCI_BUS);
-> +                              get_system_io(), 0, ARRAY_SIZE(s->irq),
-> +                              TYPE_PCI_BUS);
->      h->bus = b;
->  
->      pci_create_simple(b, 0, "ppc4xx-host-bridge");
-> 
-
+>  target/i386/cpu.c |   31 ++++++++++++++++---------------
+>  1 file changed, 16 insertions(+), 15 deletions(-)
+>
+> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+> index ba4667b33c..b12addf323 100644
+> --- a/target/i386/cpu.c
+> +++ b/target/i386/cpu.c
+> @@ -395,11 +395,12 @@ static int cores_in_core_complex(int nr_cores)
+>  }
+>
+>  /* Encode cache info for CPUID[8000001D] */
+> -static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
+> -                                uint32_t *eax, uint32_t *ebx,
+> -                                uint32_t *ecx, uint32_t *edx)
+> +static void encode_cache_cpuid8000001d(CPUCacheInfo *cache,
+> +                                       X86CPUTopoInfo *topo_info,
+> +                                       uint32_t *eax, uint32_t *ebx,
+> +                                       uint32_t *ecx, uint32_t *edx)
+>  {
+> -    uint32_t l3_cores;
+> +    uint32_t l3_threads;
+>      assert(cache->size == cache->line_size * cache->associativity *
+>                            cache->partitions * cache->sets);
+>
+> @@ -408,10 +409,10 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
+>
+>      /* L3 is shared among multiple cores */
+>      if (cache->level == 3) {
+> -        l3_cores = cores_in_core_complex(cs->nr_cores);
+> -        *eax |= ((l3_cores * cs->nr_threads) - 1) << 14;
+> +        l3_threads = topo_info->cores_per_die * topo_info->threads_per_core;
+> +        *eax |= (l3_threads - 1) << 14;
+>      } else {
+> -        *eax |= ((cs->nr_threads - 1) << 14);
+> +        *eax |= ((topo_info->threads_per_core - 1) << 14);
+>      }
+>
+>      assert(cache->line_size > 0);
+> @@ -5994,20 +5995,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+>          }
+>          switch (count) {
+>          case 0: /* L1 dcache info */
+> -            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, cs,
+> -                                       eax, ebx, ecx, edx);
+> +            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache,
+> +                                       &topo_info, eax, ebx, ecx, edx);
+>              break;
+>          case 1: /* L1 icache info */
+> -            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache, cs,
+> -                                       eax, ebx, ecx, edx);
+> +            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache,
+> +                                       &topo_info, eax, ebx, ecx, edx);
+>              break;
+>          case 2: /* L2 cache info */
+> -            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache, cs,
+> -                                       eax, ebx, ecx, edx);
+> +            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache,
+> +                                       &topo_info, eax, ebx, ecx, edx);
+>              break;
+>          case 3: /* L3 cache info */
+> -            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache, cs,
+> -                                       eax, ebx, ecx, edx);
+> +            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache,
+> +                                       &topo_info, eax, ebx, ecx, edx);
+>              break;
+>          default: /* end of info */
+>              *eax = *ebx = *ecx = *edx = 0;
+>
+Nice clean up.
+Reviewed-by: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
 
