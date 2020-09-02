@@ -2,66 +2,64 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 135CDC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:27:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 073F8C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:27:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5F4A20758
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:27:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5F4A20758
+	by mail.kernel.org (Postfix) with ESMTPS id CEF3B20758
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:27:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF3B20758
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDcAQ-0004zZ-VS
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 19:27:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43120)
+	id 1kDcAS-00050r-1K
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 19:27:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9k-0003pF-6k
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9k-0003pM-Ra
  for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:08 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:39709)
+Received: from mout.kundenserver.de ([217.72.192.74]:54179)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9i-0004qS-Gl
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:07 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9i-0004qR-Gm
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:08 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1My3AX-1kV9mC3tfj-00zTax; Thu, 03 Sep 2020 01:27:04 +0200
+ id 1MF39S-1kKBkF2I00-00FWdU; Thu, 03 Sep 2020 01:27:03 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/9] linux-user: fix implicit conversion from enumeration type
- error
-Date: Thu,  3 Sep 2020 01:26:53 +0200
-Message-Id: <20200902232701.13299-2-laurent@vivier.eu>
+Subject: [PULL 0/9] Linux user for 5.2 patches
+Date: Thu,  3 Sep 2020 01:26:52 +0200
+Message-Id: <20200902232701.13299-1-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200902232701.13299-1-laurent@vivier.eu>
-References: <20200902232701.13299-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BF5KImGEIkpO0eoBG+XYKykPNC8DYx//J6NyWjNPDhcQHLaymDN
- +tj7fQPvQ5UOykUqg60ynkw76N5phaFrwuMEgKJf5Mnbcn/DdMFNYlpv4Rs70/0k/Zsi889
- QpG/ZfKXSOvbauM7mJnx04GvY7hQfUQynr8Ko7KP0Mp32+kp25L6wvLCz2BArQSxpm9pwoL
- MzoBgavgzTeyDySYgPhDg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:cgIW17SNrhY=:cFC0MqCJAnXeVWUNnVZOnu
- kgJKryIdGnfhQnlFtdxft6nMg5EQUxze3DQvJ/9sgRWHqZRrAuA+Fmlc5JZDu/EhikxBhcW22
- ixKabhLgOxV8IGNS5T2iCs3mkUrQvz/CKZ9zvTdKjiSy4rVtn+fWmyUlUya1Y3bPhXFPj+6YZ
- fSbDNkPCKmcmBKDbpIE7AjH8Bnk6ikoOZiZpb4BMALOyYWYKcgh/IHhcFHOG2maJkBpl+Yw4M
- q7x7AYWGDqG1inPDqeSug7XHUJafeB8LMilwYCv7HrEKBOuUuv2d5CL8NMTupK74DXBfrcfaL
- ODfCZ35CPNn/ewL8TUs0heD7cY8DlFlGlV+qng/K5+IC4i5M58G4tW3E/bvJ75wKX5HqqdhaY
- NToa9eErdNgNS3fTVOWLl0OlHtUFqV33uHVmgmCGykoUBQTBo1e8YIy/KLntjcxNk5Rtru6kJ
- dzQkHcpam3vGwez8BTyZg07GsYxQvfMW1QDXyyZ9QDv/u7eDj3xf+tqyhIiXlj0bb6CIVZT8I
- 1Ni6B3fA3Yb/kE9OoWvu9RIVeCnF2ruHlVTeFTgp5Vk5a4Lz5bzX4quP81C8jboNWGU4LhiRW
- zZrhktIAwO99Tbn3a+3lVBO9yvuWzwz79bKKcppKLk/wMafZC0MRANLg+JNQC+arPHN4RZsig
- F+Ae53+gnMKosL/ecYqnkkphSIqTRg7UNETk77OdDqygH7bM06kGyJ6VXGucBHljB674mRd0H
- 43EjTI2agbIcsMbevZziutImbBlH1drnAJdvJlTqW0uj7zE7/nlwJf/09251WmdusbEu6i6TZ
- duevqrEglwwgjICae8M9/FMofo3ZvS3qxITNGS8dtf9pBJNKlzRchFcyYS2znBQl+89jnIr
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:2pjEquMmmsWlBNvpoJOCrFYc43yWRmaHcIirFyDXXG+04LfXj0I
+ E/xx8Jugui+jkoKgGP76P+YNUUZiZyQMiCYhVfsSfR3mrAr40SMpmdNaEkFgd81VtFcalqj
+ 6HXCYjIeg9f2/+EGSoGbq8g/0Wah6NfUcEnUCGDuAgV9wGfdbCii5gfaKpVHVsQkaqWlKDy
+ PVSRztP39TfgUgFiM2bmw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:ihP82OEoS/M=:p0fpX+B35WwQsvFLKE+eJD
+ fCVw4Lp+8pQozehG4fsk8UDismZNrpopaA5P2TZMAh1LvzlSgrOs2+YGcc2OdRpEgMqwqsxLK
+ Px3WYx3an2ZFf4uMTAka23HcPWXNC0U7tMmm5DJaxSqGuzby6nMgTIxb9ZrrmwjB197/MIeV8
+ IHh4ewVnDjfQyZAEmZdFqdpTGJ5Lp+Ts+TehHKBYKuLKLZXxjhPeMUyfLwUFUXwNwogtCJ9oX
+ tsjyp7Y5cD3gQHz1GlqTZYEayP4ETEt3YqwCyaj5vq7g56bGoF3c7AVYjvdSvOpL3exqGes1K
+ MtgW2jfSNwA+M99uCxgKDvnnRmFX3ISPEdAIq4CHVZ+JWZMlkGqnlkHN9LyXj9qDT7iZIKl+l
+ g6uCDVxZxjLQtjX2qtp995hFlVGslReIIN3wyI5wPsmzrezQFzgri0EJfhw1A/s71h/APrT0G
+ aPkWBDJ3osxYWfd/Eqiuj+752ALWbmad1y3YasTW+8wms9h75DKQj1yvB7id45H/rUfE1s4/l
+ ev5PeCL5zJ6d5mrZb7v22AtOGnlqLuT4KsTIap3jB6d5DhbOLtb/w0BUGUPqVGCYsJT7+fMA8
+ NysEeP9pkbPwQAvlYAumEC88h1zsQf9e4eQO9Jk7ahp1H9bZxtoHicZyIEJ+gTxuiu/f3LHID
+ KW9pVqxREJqKwUk4JEsv+mbkffqft/GJYUKdHAEywMFNHdMX/1xmk4TDtEmoBYXlPPUDf1T8W
+ QXpODq4IZPUDZXgnMMKGR50hCHqQgelHza8a7WYfPjE/hSd8re1mRiks93wA0efgwL9EoNxzf
+ UjAR9Gp7VxzvFmlQJcKg32KZB61iThLom4rTsyai+in9vPcO7xppJb0spVihM6oTiMlBfry
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 19:27:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
@@ -88,33 +86,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MK_ARRAY(type,size) is used to fill the field_types buffer, and if the
-"size" parameter is an enum type, clang [-Werror,-Wenum-conversion] reports
-an error when it is assigned to field_types which is also an enum, argtypes.
-
-To avoid that, convert "size" to "int" in MK_ARRAY(). "int" is the type
-used for the size evaluation in thunk_type_size().
-
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200902125752.1033524-1-laurent@vivier.eu>
----
- include/exec/user/thunk.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
-index a5bbb2c73331..b281dfa30f8c 100644
---- a/include/exec/user/thunk.h
-+++ b/include/exec/user/thunk.h
-@@ -42,7 +42,7 @@ typedef enum argtype {
- } argtype;
- 
- #define MK_PTR(type) TYPE_PTR, type
--#define MK_ARRAY(type, size) TYPE_ARRAY, size, type
-+#define MK_ARRAY(type, size) TYPE_ARRAY, (int)(size), type
- #define MK_STRUCT(id) TYPE_STRUCT, id
- 
- #define THUNK_TARGET 0
--- 
-2.26.2
-
+The following changes since commit 887adde81d1f1f3897f1688d37ec6851b4fdad86=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/bonzini-gitlab/tags/for-upstream' i=
+nt=3D=0D
+o staging (2020-09-01 22:50:23 +0100)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request=0D
+=0D
+for you to fetch changes up to 9a5a5a05523651d4c887388a6e0d0e446ffb279d:=0D
+=0D
+  linux-user: Add support for btrfs ioctls used to scrub a filesystem (2020=
+-0=3D=0D
+9-03 01:09:35 +0200)=0D
+=0D
+----------------------------------------------------------------=0D
+Add btrfs support=0D
+Fix MK_ARRAY()=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+Filip Bozuta (8):=0D
+  linux-user: Add support for a group of btrfs ioctls used for=0D
+    subvolumes=0D
+  linux-user: Add support for a group of btrfs ioctls used for snapshots=0D
+  linux-user: Add support for btrfs ioctls used to manipulate with=0D
+    devices=0D
+  linux-user: Add support for btrfs ioctls used to get/set features=0D
+  linux-user: Add support for a group of btrfs inode ioctls=0D
+  linux-user: Add support for two btrfs ioctls used for subvolume=0D
+  linux-user: Add support for btrfs ioctls used to manage quota=0D
+  linux-user: Add support for btrfs ioctls used to scrub a filesystem=0D
+=0D
+Laurent Vivier (1):=0D
+  linux-user: fix implicit conversion from enumeration type error=0D
+=0D
+ configure                  |   9 ++=0D
+ include/exec/user/thunk.h  |   2 +-=0D
+ linux-user/ioctls.h        | 124 ++++++++++++++++++++++++++++=0D
+ linux-user/syscall.c       |   3 +=0D
+ linux-user/syscall_defs.h  |  37 +++++++++=0D
+ linux-user/syscall_types.h | 163 +++++++++++++++++++++++++++++++++++++=0D
+ 6 files changed, 337 insertions(+), 1 deletion(-)=0D
+=0D
+--=3D20=0D
+2.26.2=0D
+=0D
 
