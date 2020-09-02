@@ -2,59 +2,87 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A12C433E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:21:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 825E1C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06DE620709
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:21:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06DE620709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id 4AC4E20709
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:22:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I8qkeQCS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4AC4E20709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37116 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDO1f-0004QK-5J
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:21:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44382)
+	id 1kDO28-0005Wl-Dz
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:22:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kDNwn-0002RU-64
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:49 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:38692)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kDNwl-00034L-B3
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:48 -0400
-Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 4D5C040A2055;
- Wed,  2 Sep 2020 08:16:45 +0000 (UTC)
-Subject: [PATCH v3 10/15] replay: flush rr queue before loading the vmstate
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-To: qemu-devel@nongnu.org
-Date: Wed, 02 Sep 2020 11:16:45 +0300
-Message-ID: <159903460499.28509.244825487566769241.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
-References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
-User-Agent: StGit/0.17.1-dirty
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kDNzf-00008B-0o
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:19:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57222)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kDNzb-0003J9-SQ
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:19:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599034782;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=4BeLEdjvY4Anlj3N4o45LhnY1vZAiOSAXRl8/6c7mAk=;
+ b=I8qkeQCSmjyEAXLraXFooL5eBLiruXQjFgIJgccFgFYmt42QWthvuLnDujbLddxNJjAUW8
+ Ptvv5W34zGZlKZWHrp1HhCvuqIACu9faUGIKWXz6NrG/LIXQCZLvGKMvXHx8sDDHyahhoh
+ WaOwludCU29JPCZdy9lSF2e/yutfqzc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-68-fRv2aTtiN--YHgKhCnTN1Q-1; Wed, 02 Sep 2020 04:19:38 -0400
+X-MC-Unique: fRv2aTtiN--YHgKhCnTN1Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6FC521074642;
+ Wed,  2 Sep 2020 08:19:37 +0000 (UTC)
+Received: from redhat.com (ovpn-114-158.ams2.redhat.com [10.36.114.158])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 32EB018B59;
+ Wed,  2 Sep 2020 08:19:36 +0000 (UTC)
+Date: Wed, 2 Sep 2020 09:19:33 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] qemu-iotests: move check-block back to Makefiles
+Message-ID: <20200902081933.GE403297@redhat.com>
+References: <20200902080046.10412-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=83.149.199.84;
- envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 04:15:48
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200902080046.10412-1-pbonzini@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,101 +95,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wrampazz@redhat.com, pavel.dovgalyuk@ispras.ru,
- ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
- armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com,
- pbonzini@redhat.com, philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: alex.bennee@linaro.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+On Wed, Sep 02, 2020 at 04:00:46AM -0400, Paolo Bonzini wrote:
+> check-block has its own test harness, unlike every other test.  If
+> we capture its output, as is in general nicer to do without V=1,
+> there will be no sign of progress.  So for lack of a better option
+> just move the invocation of the test back to Makefile rules.
 
-Non-empty record/replay queue prevents saving and loading the VM state,
-because it includes pending bottom halves and block coroutines.
-But when the new VM state is loaded, we don't have to preserve the consistency
-of the current state anymore. Therefore this patch just flushes the queue
-allowing the coroutines to finish and removes checking for empty rr queue
-for load_snapshot function.
+I expect the correct long term solution here is to stop using the
+check-block.sh script.  Instead have code which sets up each
+of the I/O tests as an explicit test target in meson. We could
+use meson's test grouping features too.
 
-Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
----
- include/sysemu/replay.h  |    2 ++
- migration/savevm.c       |   12 ++++++------
- replay/replay-events.c   |    4 ++++
- replay/replay-internal.h |    2 --
- 4 files changed, 12 insertions(+), 8 deletions(-)
 
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index e00ed2f4a5..239c01e7df 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -149,6 +149,8 @@ void replay_disable_events(void);
- void replay_enable_events(void);
- /*! Returns true when saving events is enabled */
- bool replay_events_enabled(void);
-+/* Flushes events queue */
-+void replay_flush_events(void);
- /*! Adds bottom half event to the queue */
- void replay_bh_schedule_event(QEMUBH *bh);
- /* Adds oneshot bottom half event to the queue */
-diff --git a/migration/savevm.c b/migration/savevm.c
-index 74378f8ebd..7905aab053 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2880,12 +2880,6 @@ int load_snapshot(const char *name, Error **errp)
-     AioContext *aio_context;
-     MigrationIncomingState *mis = migration_incoming_get_current();
- 
--    if (!replay_can_snapshot()) {
--        error_setg(errp, "Record/replay does not allow loading snapshot "
--                   "right now. Try once more later.");
--        return -EINVAL;
--    }
--
-     if (!bdrv_all_can_snapshot(&bs)) {
-         error_setg(errp,
-                    "Device '%s' is writable but does not support snapshots",
-@@ -2919,6 +2913,12 @@ int load_snapshot(const char *name, Error **errp)
-         return -EINVAL;
-     }
- 
-+    /*
-+     * Flush the record/replay queue. Now the VM state is going
-+     * to change. Therefore we don't need to preserve its consistency
-+     */
-+    replay_flush_events();
-+
-     /* Flush all IO requests so they don't interfere with the new state.  */
-     bdrv_drain_all_begin();
- 
-diff --git a/replay/replay-events.c b/replay/replay-events.c
-index 302b84043a..a1c6bb934e 100644
---- a/replay/replay-events.c
-+++ b/replay/replay-events.c
-@@ -77,6 +77,10 @@ bool replay_has_events(void)
- 
- void replay_flush_events(void)
- {
-+    if (replay_mode == REPLAY_MODE_NONE) {
-+        return;
-+    }
-+
-     g_assert(replay_mutex_locked());
- 
-     while (!QTAILQ_EMPTY(&events_list)) {
-diff --git a/replay/replay-internal.h b/replay/replay-internal.h
-index 2f6145ec7c..97649ed8d7 100644
---- a/replay/replay-internal.h
-+++ b/replay/replay-internal.h
-@@ -149,8 +149,6 @@ void replay_read_next_clock(unsigned int kind);
- void replay_init_events(void);
- /*! Clears internal data structures for events handling */
- void replay_finish_events(void);
--/*! Flushes events queue */
--void replay_flush_events(void);
- /*! Returns true if there are any unsaved events in the queue */
- bool replay_has_events(void);
- /*! Saves events from queue into the file */
+> 
+> As a side effect, this will also fix "make check" in --disable-tools
+> builds, as they were trying to run qemu-iotests without having
+> made qemu-img before.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  meson.build                    |  2 --
+>  tests/Makefile.include         | 15 ++++++++++++---
+>  tests/qemu-iotests/meson.build |  4 ----
+>  3 files changed, 12 insertions(+), 9 deletions(-)
+> 
+> diff --git a/meson.build b/meson.build
+> index 55c7d2318c..356af9142c 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -1095,11 +1095,9 @@ if have_tools
+>               dependencies: [authz, block, crypto, io, qom, qemuutil], install: true)
+>    qemu_io = executable('qemu-io', files('qemu-io.c'),
+>               dependencies: [block, qemuutil], install: true)
+> -  qemu_block_tools += [qemu_img, qemu_io]
+>    if targetos != 'windows'
+>      qemu_nbd = executable('qemu-nbd', files('qemu-nbd.c'),
+>                 dependencies: [block, qemuutil], install: true)
+> -    qemu_block_tools += [qemu_nbd]
+>    endif
+>  
+>    subdir('storage-daemon')
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index 9ac8f5b86a..08301f5bc9 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -468,7 +468,6 @@ check-tcg: $(RUN_TCG_TARGET_RULES)
+>  .PHONY: clean-tcg
+>  clean-tcg: $(CLEAN_TCG_TARGET_RULES)
+>  
+> -
+>  # Python venv for running tests
+>  
+>  .PHONY: check-venv check-acceptance
+> @@ -523,8 +522,18 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
+>  # Consolidated targets
+>  
+>  .PHONY: check-block check-unit check check-clean get-vm-images
+> -check-block:
+> -check-build: build-unit
+> +check:
+> +
+> +ifeq ($(CONFIG_TOOLS)$(CONFIG_POSIX),yy)
+> +QEMU_IOTESTS_HELPERS-$(CONFIG_LINUX) = tests/qemu-iotests/socket_scm_helper$(EXESUF)
+> +check: check-block
+> +check-block: $(SRC_PATH)/tests/check-block.sh qemu-img$(EXESUF) \
+> +		qemu-io$(EXESUF) qemu-nbd$(EXESUF) $(QEMU_IOTESTS_HELPERS-y) \
+> +		$(patsubst %-softmmu,qemu-system-%,$(filter %-softmmu,$(TARGET_DIRS)))
+> +	@$<
+> +endif
+> +
+> +check-build: build-unit $(QEMU_IOTESTS_HELPERS-y)
+>  
+>  check-clean:
+>  	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
+> diff --git a/tests/qemu-iotests/meson.build b/tests/qemu-iotests/meson.build
+> index 3de09fb8fa..60470936b4 100644
+> --- a/tests/qemu-iotests/meson.build
+> +++ b/tests/qemu-iotests/meson.build
+> @@ -4,7 +4,3 @@ if 'CONFIG_LINUX' in config_host
+>  else
+>      socket_scm_helper = []
+>  endif
+> -test('qemu-iotests', sh, args: [files('../check-block.sh')],
+> -     depends: [qemu_block_tools, emulators, socket_scm_helper],
+> -     suite: 'block', timeout: 10000)
+> -
+> -- 
+> 2.26.2
+> 
+> 
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
