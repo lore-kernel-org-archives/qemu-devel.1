@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 036E8C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:57:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D48C9C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:57:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B676A20767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:57:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D6E020767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:57:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVyGuQ4O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B676A20767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8rvH6ro"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D6E020767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDbgl-0004U6-Ol
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:57:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35536)
+	id 1kDbgv-0004vN-Ax
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:57:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbVD-0004aj-2a
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:45:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24854)
+ id 1kDbUj-0003Yg-Jo
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:45 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21343
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbVA-00005E-Ee
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:45:14 -0400
+ id 1kDbUh-0008Rn-Ta
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599086711;
+ s=mimecast20190719; t=1599086682;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=IPetTMzLYz11r/Erv8tLpBN2X3ShMJWpUMu9gtOoBQg=;
- b=TVyGuQ4OKc7bnNi6Ee0tptQQVytbiabZfvlIIu0C5/NBy8Vm3jPSnIXovBKgJEduGs/ie4
- mQcL1qQ9qp4wPL6hBPKMzltrJSO6lqakfacEkZdvn/E6cJC7qGmOIyn0bvakdKF/orlKbg
- dg966WjcCg94WUDR2akYaszUpin/lIQ=
+ bh=VveOuf1NqcZqKq/VckNh6Ry5KVWolwLEYxHftHR/p48=;
+ b=K8rvH6rojohOaZkDzXPbIJAu43yTBdNUGuUdzoK7CEpn+IkKeLK02n7wdZvcu7SMblmQ79
+ xFzFojdPszrGq9veOkzRrth7VV8jJPQ81Gadm/2D+EMKOX1z24xJtrq63lJ15YljtPkxOU
+ mI9cwDvrHIoAYcaTlPzT0nsS5ucw0eI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-NZ2JxzKuOse_0AGzn29J7Q-1; Wed, 02 Sep 2020 18:45:10 -0400
-X-MC-Unique: NZ2JxzKuOse_0AGzn29J7Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-30-mT8hOFRsNoOWDa1VAE63jQ-1; Wed, 02 Sep 2020 18:44:40 -0400
+X-MC-Unique: mT8hOFRsNoOWDa1VAE63jQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9FA51005E66;
- Wed,  2 Sep 2020 22:45:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E54238064BF;
+ Wed,  2 Sep 2020 22:44:39 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A9FBD1C4;
- Wed,  2 Sep 2020 22:45:03 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AC5F95D9CC;
+ Wed,  2 Sep 2020 22:44:39 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 40/63] filter-rewriter: Rename FILTER_COLO_REWRITER to
- FILTER_REWRITER
-Date: Wed,  2 Sep 2020 18:42:48 -0400
-Message-Id: <20200902224311.1321159-41-ehabkost@redhat.com>
+Subject: [PATCH 29/63] versatile: Rename TYPE_VERSATILE_PCI_HOST to
+ TYPE_PCI_VPB_HOST
+Date: Wed,  2 Sep 2020 18:42:37 -0400
+Message-Id: <20200902224311.1321159-30-ehabkost@redhat.com>
 In-Reply-To: <20200902224311.1321159-1-ehabkost@redhat.com>
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 17:27:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,109 +97,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- berrange@redhat.com, Li Zhijian <lizhijian@cn.fujitsu.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the type checking macro name consistent with the TYPE_*
-constant.
+This will make the type name constant consistent with the name of
+the type checking macro.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Zhang Chen <chen.zhang@intel.com>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: qemu-arm@nongnu.org
 Cc: qemu-devel@nongnu.org
 ---
- net/filter-rewriter.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ hw/pci-host/versatile.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index 113e293207..44f6021dd8 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -25,7 +25,7 @@
+diff --git a/hw/pci-host/versatile.c b/hw/pci-host/versatile.c
+index 3553277f94..7b6a754b8b 100644
+--- a/hw/pci-host/versatile.c
++++ b/hw/pci-host/versatile.c
+@@ -161,9 +161,9 @@ static const VMStateDescription pci_vpb_vmstate = {
+ DECLARE_INSTANCE_CHECKER(PCIVPBState, PCI_VPB,
+                          TYPE_VERSATILE_PCI)
  
- #define TYPE_FILTER_REWRITER "filter-rewriter"
- typedef struct RewriterState RewriterState;
--DECLARE_INSTANCE_CHECKER(RewriterState, FILTER_COLO_REWRITER,
-+DECLARE_INSTANCE_CHECKER(RewriterState, FILTER_REWRITER,
-                          TYPE_FILTER_REWRITER)
+-#define TYPE_VERSATILE_PCI_HOST "versatile_pci_host"
++#define TYPE_PCI_VPB_HOST "versatile_pci_host"
+ DECLARE_INSTANCE_CHECKER(PCIDevice, PCI_VPB_HOST,
+-                         TYPE_VERSATILE_PCI_HOST)
++                         TYPE_PCI_VPB_HOST)
  
- #define FAILOVER_MODE_ON  true
-@@ -47,7 +47,7 @@ static void filter_rewriter_failover_mode(RewriterState *s)
+ typedef enum {
+     PCI_IMAP0 = 0x0,
+@@ -410,7 +410,7 @@ static void pci_vpb_realize(DeviceState *dev, Error **errp)
+                              PCI_DEVFN(11, 0), TYPE_PCI_BUS);
+     h->bus = &s->pci_bus;
  
- static void filter_rewriter_flush(NetFilterState *nf)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(nf);
-+    RewriterState *s = FILTER_REWRITER(nf);
+-    object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_VERSATILE_PCI_HOST);
++    object_initialize(&s->pci_dev, sizeof(s->pci_dev), TYPE_PCI_VPB_HOST);
  
-     if (!qemu_net_queue_flush(s->incoming_queue)) {
-         /* Unable to empty the queue, purge remaining packets */
-@@ -252,7 +252,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
-                                          int iovcnt,
-                                          NetPacketSent *sent_cb)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(nf);
-+    RewriterState *s = FILTER_REWRITER(nf);
-     Connection *conn;
-     ConnectionKey key;
-     Packet *pkt;
-@@ -350,7 +350,7 @@ static gboolean offset_is_nonzero(gpointer key,
- static void colo_rewriter_handle_event(NetFilterState *nf, int event,
-                                        Error **errp)
- {
--    RewriterState *rs = FILTER_COLO_REWRITER(nf);
-+    RewriterState *rs = FILTER_REWRITER(nf);
- 
-     switch (event) {
-     case COLO_EVENT_CHECKPOINT:
-@@ -370,7 +370,7 @@ static void colo_rewriter_handle_event(NetFilterState *nf, int event,
- 
- static void colo_rewriter_cleanup(NetFilterState *nf)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(nf);
-+    RewriterState *s = FILTER_REWRITER(nf);
- 
-     /* flush packets */
-     if (s->incoming_queue) {
-@@ -381,7 +381,7 @@ static void colo_rewriter_cleanup(NetFilterState *nf)
- 
- static void colo_rewriter_setup(NetFilterState *nf, Error **errp)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(nf);
-+    RewriterState *s = FILTER_REWRITER(nf);
- 
-     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
-                                                       connection_key_equal,
-@@ -392,7 +392,7 @@ static void colo_rewriter_setup(NetFilterState *nf, Error **errp)
- 
- static bool filter_rewriter_get_vnet_hdr(Object *obj, Error **errp)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+    RewriterState *s = FILTER_REWRITER(obj);
- 
-     return s->vnet_hdr;
- }
-@@ -401,14 +401,14 @@ static void filter_rewriter_set_vnet_hdr(Object *obj,
-                                          bool value,
-                                          Error **errp)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+    RewriterState *s = FILTER_REWRITER(obj);
- 
-     s->vnet_hdr = value;
+     for (i = 0; i < 4; i++) {
+         sysbus_init_irq(sbd, &s->irq[i]);
+@@ -487,7 +487,7 @@ static void versatile_pci_host_class_init(ObjectClass *klass, void *data)
  }
  
- static void filter_rewriter_init(Object *obj)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+    RewriterState *s = FILTER_REWRITER(obj);
- 
-     s->vnet_hdr = false;
-     s->failover_mode = FAILOVER_MODE_OFF;
+ static const TypeInfo versatile_pci_host_info = {
+-    .name          = TYPE_VERSATILE_PCI_HOST,
++    .name          = TYPE_PCI_VPB_HOST,
+     .parent        = TYPE_PCI_DEVICE,
+     .instance_size = sizeof(PCIDevice),
+     .class_init    = versatile_pci_host_class_init,
 -- 
 2.26.2
 
