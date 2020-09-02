@@ -2,73 +2,93 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6255C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:16:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4436EC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:18:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E72B20829
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:16:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E72B20829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id EA8D72078B
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 10:18:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aGYOM6A8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA8D72078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDPp4-0004Sj-F7
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 06:16:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48146)
+	id 1kDPqF-0005cQ-5o
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 06:18:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kDPoU-0003wc-DS
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:16:22 -0400
-Resent-Date: Wed, 02 Sep 2020 06:16:22 -0400
-Resent-Message-Id: <E1kDPoU-0003wc-DS@lists.gnu.org>
-Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21364)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kDPpa-0004xd-42
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:17:30 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43825
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kDPoP-00026N-4R
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:16:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1599041771; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=WHTkmDKO1hQU+F1jM0QL7RdaCrNcuxYhHpdeltWby+zOVs/aobRx2/LIwP1rBjV5sjMHmpoerUcP1x7CyySeoEhJA+usCecz3+2BfVeEcLjLI3uE6xjUzi/6OV3nBZ+W4owxQ9TUl7b3nUs2z830lSROz+EHzkzM/UlkwKkZuXM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1599041771;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=OdPq3iz5DNqK5xXK5OgDjEDBagistPMKbCS/4lTpc5o=; 
- b=gBid9w3nuwVmskNBMgv+p/gNJcdZuRvkLDQw1SIZUmAEbYLny9O6ZTQpXDeXH8imJebsd8cbY2Lo7uf4kOuhPu5M14i7IZS1ccvKPZ2exV/XqJcc3Vhnl/TrgaFdu9JClwL+PWoxhm4WjTRA9FkCyvzjrddl2jDygHccELXRIUU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1599041770640728.4265588846557;
- Wed, 2 Sep 2020 03:16:10 -0700 (PDT)
-Subject: Re: [PULL 00/47] target-arm queue
-Message-ID: <159904176961.21843.17769338973288236442@66eaa9a8a123>
-In-Reply-To: <20200901151823.29785-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kDPpU-0002DZ-Ua
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 06:17:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599041844;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=lcJL0eoqJ9IodXPgx7yeqPedjjrMmpiKOi7Qo5Cdc0g=;
+ b=aGYOM6A89HzOSXnhju/nwJM41Ox1o5C/dayCuEYf3fxn1zE6Iw2lL2pRcixEgNW21GC6Pg
+ 0NLpQ3c1PxLxeLBNqJK72QPkRcX4z1iUBBwldvPwLQ7WoBPW/H8rp+PVG1cvnk/QmHenoe
+ oiP0IRfJLEmXgnZoow/ge2DmBuxo8m0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-164-B1nYwVIvMUiN33EQoabS-A-1; Wed, 02 Sep 2020 06:17:22 -0400
+X-MC-Unique: B1nYwVIvMUiN33EQoabS-A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00D4D1DDF6;
+ Wed,  2 Sep 2020 10:17:20 +0000 (UTC)
+Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8AD7919C59;
+ Wed,  2 Sep 2020 10:17:05 +0000 (UTC)
+Subject: Re: [RFC v8 2/5] memory: Add IOMMUTLBEvent
+To: =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+ Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
+References: <20200901142608.24481-1-eperezma@redhat.com>
+ <20200901142608.24481-3-eperezma@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <00f148d1-9922-6a57-18da-91bbbbaf8f9e@redhat.com>
+Date: Wed, 2 Sep 2020 12:17:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: peter.maydell@linaro.org
-Date: Wed, 2 Sep 2020 03:16:10 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o53.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 06:16:14
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200901142608.24481-3-eperezma@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:26:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,228 +101,549 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkwMTE1MTgyMy4yOTc4
-NS0xLXBldGVyLm1heWRlbGxAbGluYXJvLm9yZy8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0
-byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgpt
-b3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAwOTAxMTUxODIz
-LjI5Nzg1LTEtcGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnClN1YmplY3Q6IFtQVUxMIDAwLzQ3XSB0
-YXJnZXQtYXJtIHF1ZXVlCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdp
-dCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2Fs
-IGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hl
-Y2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBk
-YXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBz
-Oi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBw
-YXRjaGV3LzE1OTkwMzQ1NDcxNC4yODUwOS43NDM5NDUzMzA5MTE2NzM0Mzc0LnN0Z2l0QHBhc2hh
-LVRoaW5rUGFkLVgyODAgLT4gcGF0Y2hldy8xNTk5MDM0NTQ3MTQuMjg1MDkuNzQzOTQ1MzMwOTEx
-NjczNDM3NC5zdGdpdEBwYXNoYS1UaGlua1BhZC1YMjgwCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBh
-dGNoZXcvMjAyMDA4MjgxMDQxMDIuNDQ5MC0xLWFobWVka2hhbGVka2FyYW1hbkBnbWFpbC5jb20g
-LT4gcGF0Y2hldy8yMDIwMDgyODEwNDEwMi40NDkwLTEtYWhtZWRraGFsZWRrYXJhbWFuQGdtYWls
-LmNvbQogLSBbdGFnIHVwZGF0ZV0gICAgICBwYXRjaGV3LzIwMjAwOTAxMTAxOTUxLjg1ODkyLTEt
-ZjRidWdAYW1zYXQub3JnIC0+IHBhdGNoZXcvMjAyMDA5MDExMDE5NTEuODU4OTItMS1mNGJ1Z0Bh
-bXNhdC5vcmcKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMDkwMTE0MzQyNC44ODQ3
-MzUtMS1tcmVpdHpAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAwOTAxMTQzNDI0Ljg4NDczNS0x
-LW1yZWl0ekByZWRoYXQuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDA5MDIw
-ODA1NTIuMTU5ODA2LTEtcGhpbG1kQHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIwMDkwMjA4MDU1
-Mi4xNTk4MDYtMS1waGlsbWRAcmVkaGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3
-LzIwMjAwOTAyMDgwODAxLjE2MDY1Mi0xLXBoaWxtZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAy
-MDA5MDIwODA4MDEuMTYwNjUyLTEtcGhpbG1kQHJlZGhhdC5jb20KICogW25ldyB0YWddICAgICAg
-ICAgcGF0Y2hldy8yMDIwMDkwMjA4MDkwOS4xNjEwMzQtMS1waGlsbWRAcmVkaGF0LmNvbSAtPiBw
-YXRjaGV3LzIwMjAwOTAyMDgwOTA5LjE2MTAzNC0xLXBoaWxtZEByZWRoYXQuY29tCiAqIFtuZXcg
-dGFnXSAgICAgICAgIHBhdGNoZXcvMjAyMDA5MDIwODE0NDUuMzI5MS0xLWtyYXhlbEByZWRoYXQu
-Y29tIC0+IHBhdGNoZXcvMjAyMDA5MDIwODE0NDUuMzI5MS0xLWtyYXhlbEByZWRoYXQuY29tClN3
-aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKODY3ZjEyZSBody9hcm0vc2JzYS1yZWYgOiBB
-ZGQgZW1iZWRkZWQgY29udHJvbGxlciBpbiBzZWN1cmUgbWVtb3J5CmVmOWI5Y2IgaHcvbWlzYy9z
-YnNhX2VjIDogQWRkIGFuIGVtYmVkZGVkIGNvbnRyb2xsZXIgZm9yIHNic2EtcmVmCjg0NWY0OGEg
-aHcvYXJtL3Nic2EtcmVmOiBhZGQgInJlZyIgcHJvcGVydHkgdG8gRFQgY3B1IG5vZGVzCjNjYWMy
-OTAgdGFyZ2V0L2FybTogRW5hYmxlIEZQMTYgaW4gJy1jcHUgbWF4Jwo3YWMxMzA1IHRhcmdldC9h
-cm06IEltcGxlbWVudCBmcDE2IGZvciBOZW9uIFZNVUwsIFZNTEEsIFZNTFMKOGU3ZDllMyB0YXJn
-ZXQvYXJtL3ZlY19oZWxwZXI6IEFkZCBndmVjIGZwIGluZGV4ZWQgbXVsdGlwbHktYW5kLWFkZCBv
-cGVyYXRpb25zCjJmYjM0MjQgdGFyZ2V0L2FybS92ZWNfaGVscGVyOiBIYW5kbGUgb3Byc3ogbGVz
-cyB0aGFuIDE2IGJ5dGVzIGluIGluZGV4ZWQgb3BlcmF0aW9ucwpkYjcxOWY5IHRhcmdldC9hcm06
-IEltcGxlbWVudCBmcDE2IGZvciBOZW9uIFZSSU5UWAowN2Q2ZjAyIHRhcmdldC9hcm06IEltcGxl
-bWVudCBmcDE2IGZvciBOZW9uIFZSSU5ULXdpdGgtc3BlY2lmaWVkLXJvdW5kaW5nLW1vZGUKMDQ4
-MDk4NCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAxNiBmb3IgTmVvbiBWQ1ZUIHdpdGggcm91bmRp
-bmcgbW9kZXMKNmZhMTFmYiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAxNiBmb3IgTmVvbiBWQ1ZU
-IGZpeGVkLXBvaW50CjlhNzUyMmEgdGFyZ2V0L2FybTogQ29udmVydCBOZW9uIFZDVlQgZml4ZWQt
-cG9pbnQgdG8gZ3ZlYwpkZmYwNDAyIHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZvciBOZW9u
-IGZsb2F0LWludGVnZXIgVkNWVAo3OGJkYTg5IHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZv
-ciBOZW9uIHBhaXJ3aXNlIGZwIG9wcwo3Y2MzMThlIHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2
-IGZvciBOZW9uIFZSU1FSVFMKNTY2MmY0MCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAxNiBmb3Ig
-TmVvbiBWUkVDUFMKOTQzYjkyNiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAxNiBmb3IgTmVvbiBm
-cCBjb21wYXJlLXZzLTAKM2EwZDEyMSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAxNiBmb3IgTmVv
-biBWRk1BLCBWTUZTCmZmNWI0MmMgdGFyZ2V0L2FybTogSW1wbGVtZW50IGZwMTYgZm9yIE5lb24g
-Vk1MQSwgVk1MUyBvcGVyYXRpb25zCmE2MTEyYmEgdGFyZ2V0L2FybTogSW1wbGVtZW50IGZwMTYg
-Zm9yIE5lb24gVk1BWE5NLCBWTUlOTk0KZDJlNmFkZCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAx
-NiBmb3IgTmVvbiBWTUFYLCBWTUlOCmRiODNmNjQgdGFyZ2V0L2FybTogSW1wbGVtZW50IGZwMTYg
-Zm9yIFZBQ0dFLCBWQUNHVAphZThhOWYzIHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZvciBW
-Q0VRLCBWQ0dFLCBWQ0dUIGNvbXBhcmlzb25zCjYzODNhNjcgdGFyZ2V0L2FybTogSW1wbGVtZW50
-IGZwMTYgZm9yIE5lb24gVkFCUywgVk5FRyBvZiBmbG9hdHMKYWE5ZmVjYyB0YXJnZXQvYXJtOiBJ
-bXBsZW1lbnQgZnAxNiBmb3IgTmVvbiBWUkVDUEUsIFZSU1FSVEUgdXNpbmcgZ3ZlYwpjY2M5ZTZl
-IHRhcmdldC9hcm06IEltcGxlbWVudCBGUDE2IGZvciBOZW9uIFZBREQsIFZTVUIsIFZBQkQsIFZN
-VUwKZmU3ODJjMSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQIGZwMTYgVk1PViBiZXR3ZWVuIGdw
-IGFuZCBoYWxmcHJlYyByZWdpc3RlcnMKNzdjYTU3YyB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgbmV3
-IFZGUCBmcDE2IGluc24gVk1PVlgKOTJhYmE0OCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgbmV3IFZG
-UCBmcDE2IGluc24gVklOUwplZTJkZTQ1IHRhcmdldC9hcm06IEltcGxlbWVudCBWRlAgZnAxNiBW
-UklOVCoKM2MxOGU4NSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQIGZwMTYgVlNFTAowNjU5MGMz
-IHRhcmdldC9hcm06IEltcGxlbWVudCBWRlAgdnAxNiBWQ1ZULXdpdGgtc3BlY2lmaWVkLXJvdW5k
-aW5nLW1vZGUKYmM0MjFkNSB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQIGZwMTYgVkNWVCBiZXR3
-ZWVuIGZsb2F0IGFuZCBmaXhlZC1wb2ludAphZDFjYjgxIHRhcmdldC9hcm06IFVzZSBtYWNyb3Mg
-aW5zdGVhZCBvZiBvcGVuLWNvZGluZyBmcDE2IGNvbnZlcnNpb24gaGVscGVycwo5M2Y3ZDllIHRh
-cmdldC9hcm06IE1ha2UgVkZQX0NPTlZfRklYIG1hY3JvcyB0YWtlIHNlcGFyYXRlIGZsb2F0IHR5
-cGUgYW5kIGZsb2F0IHNpemUKOWMzNGRmOCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQIGZwMTYg
-VkNWVCBiZXR3ZWVuIGZsb2F0IGFuZCBpbnRlZ2VyCjMyNDMxYjcgdGFyZ2V0L2FybTogSW1wbGVt
-ZW50IFZGUCBmcDE2IFZMRFIgYW5kIFZTVFIKOWU3YWQ4ZCB0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
-VkZQIGZwMTYgVkNNUAoyMTllNWU3IHRhcmdldC9hcm06IEltcGxlbWVudCBWRlAgZnAxNiBmb3Ig
-Vk1PViBpbW1lZGlhdGUKMTY2MjVhYiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQIGZwMTYgZm9y
-IFZBQlMsIFZORUcsIFZTUVJUCmFmNzhhZjAgdGFyZ2V0L2FybTogTWFjcm9pZnkgdXNlcyBvZiBk
-b192ZnBfMm9wX3NwKCkgYW5kIGRvX3ZmcF8yb3BfZHAoKQo3OTBjNjgzIHRhcmdldC9hcm06IElt
-cGxlbWVudCBWRlAgZnAxNiBmb3IgZnVzZWQtbXVsdGlwbHktYWRkCjAzMDExZWQgdGFyZ2V0L2Fy
-bTogTWFjcm9pZnkgdHJhbnMgZnVuY3Rpb25zIGZvciBWRk1BLCBWRk1TLCBWRk5NQSwgVkZOTVMK
-OWU4NjY2ZiB0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQIGZwMTYgVk1MQSwgVk1MUywgVk5NTFMs
-IFZOTUxBLCBWTk1VTApkYzA3ZWYwIHRhcmdldC9hcm06IEltcGxlbWVudCBWRlAgZnAxNiBmb3Ig
-VkZQX0JJTk9QIG9wZXJhdGlvbnMKZWFjM2ZjMCB0YXJnZXQvYXJtOiBVc2UgY29ycmVjdCBJRCBy
-ZWdpc3RlciBjaGVjayBmb3IgYWEzMl9mcDE2X2FyaXRoCjM0OGFjYzkgdGFyZ2V0L2FybTogUmVt
-b3ZlIGxvY2FsIGRlZmluaXRpb25zIG9mIGZsb2F0IGNvbnN0YW50cwoKPT09IE9VVFBVVCBCRUdJ
-TiA9PT0KMS80NyBDaGVja2luZyBjb21taXQgMzQ4YWNjOWM1ODhlICh0YXJnZXQvYXJtOiBSZW1v
-dmUgbG9jYWwgZGVmaW5pdGlvbnMgb2YgZmxvYXQgY29uc3RhbnRzKQoyLzQ3IENoZWNraW5nIGNv
-bW1pdCBlYWMzZmMwYjhkMzIgKHRhcmdldC9hcm06IFVzZSBjb3JyZWN0IElEIHJlZ2lzdGVyIGNo
-ZWNrIGZvciBhYTMyX2ZwMTZfYXJpdGgpCjMvNDcgQ2hlY2tpbmcgY29tbWl0IGRjMDdlZjA5YTQ5
-OCAodGFyZ2V0L2FybTogSW1wbGVtZW50IFZGUCBmcDE2IGZvciBWRlBfQklOT1Agb3BlcmF0aW9u
-cykKNC80NyBDaGVja2luZyBjb21taXQgOWU4NjY2ZmIyMmQ1ICh0YXJnZXQvYXJtOiBJbXBsZW1l
-bnQgVkZQIGZwMTYgVk1MQSwgVk1MUywgVk5NTFMsIFZOTUxBLCBWTk1VTCkKNS80NyBDaGVja2lu
-ZyBjb21taXQgMDMwMTFlZGM2Zjg1ICh0YXJnZXQvYXJtOiBNYWNyb2lmeSB0cmFucyBmdW5jdGlv
-bnMgZm9yIFZGTUEsIFZGTVMsIFZGTk1BLCBWRk5NUykKNi80NyBDaGVja2luZyBjb21taXQgNzkw
-YzY4M2Q2NTRlICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQIGZwMTYgZm9yIGZ1c2VkLW11bHRp
-cGx5LWFkZCkKNy80NyBDaGVja2luZyBjb21taXQgYWY3OGFmMDVhNjZiICh0YXJnZXQvYXJtOiBN
-YWNyb2lmeSB1c2VzIG9mIGRvX3ZmcF8yb3Bfc3AoKSBhbmQgZG9fdmZwXzJvcF9kcCgpKQo4LzQ3
-IENoZWNraW5nIGNvbW1pdCAxNjYyNWFiYzA1NjkgKHRhcmdldC9hcm06IEltcGxlbWVudCBWRlAg
-ZnAxNiBmb3IgVkFCUywgVk5FRywgVlNRUlQpCjkvNDcgQ2hlY2tpbmcgY29tbWl0IDIxOWU1ZTc0
-NzZmMSAodGFyZ2V0L2FybTogSW1wbGVtZW50IFZGUCBmcDE2IGZvciBWTU9WIGltbWVkaWF0ZSkK
-MTAvNDcgQ2hlY2tpbmcgY29tbWl0IDllN2FkOGQxMjU3ZCAodGFyZ2V0L2FybTogSW1wbGVtZW50
-IFZGUCBmcDE2IFZDTVApCjExLzQ3IENoZWNraW5nIGNvbW1pdCAzMjQzMWI3ZGEwZTQgKHRhcmdl
-dC9hcm06IEltcGxlbWVudCBWRlAgZnAxNiBWTERSIGFuZCBWU1RSKQoxMi80NyBDaGVja2luZyBj
-b21taXQgOWMzNGRmOGMyZTA2ICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQIGZwMTYgVkNWVCBi
-ZXR3ZWVuIGZsb2F0IGFuZCBpbnRlZ2VyKQoxMy80NyBDaGVja2luZyBjb21taXQgOTNmN2Q5ZTIz
-YjQ4ICh0YXJnZXQvYXJtOiBNYWtlIFZGUF9DT05WX0ZJWCBtYWNyb3MgdGFrZSBzZXBhcmF0ZSBm
-bG9hdCB0eXBlIGFuZCBmbG9hdCBzaXplKQoxNC80NyBDaGVja2luZyBjb21taXQgYWQxY2I4MWRi
-NWM3ICh0YXJnZXQvYXJtOiBVc2UgbWFjcm9zIGluc3RlYWQgb2Ygb3Blbi1jb2RpbmcgZnAxNiBj
-b252ZXJzaW9uIGhlbHBlcnMpCjE1LzQ3IENoZWNraW5nIGNvbW1pdCBiYzQyMWQ1M2I3OTYgKHRh
-cmdldC9hcm06IEltcGxlbWVudCBWRlAgZnAxNiBWQ1ZUIGJldHdlZW4gZmxvYXQgYW5kIGZpeGVk
-LXBvaW50KQoxNi80NyBDaGVja2luZyBjb21taXQgMDY1OTBjMzFkZTY5ICh0YXJnZXQvYXJtOiBJ
-bXBsZW1lbnQgVkZQIHZwMTYgVkNWVC13aXRoLXNwZWNpZmllZC1yb3VuZGluZy1tb2RlKQoxNy80
-NyBDaGVja2luZyBjb21taXQgM2MxOGU4NWJiNDJiICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQgVkZQ
-IGZwMTYgVlNFTCkKMTgvNDcgQ2hlY2tpbmcgY29tbWl0IGVlMmRlNDVjYTVmYSAodGFyZ2V0L2Fy
-bTogSW1wbGVtZW50IFZGUCBmcDE2IFZSSU5UKikKMTkvNDcgQ2hlY2tpbmcgY29tbWl0IDkyYWJh
-NDgxMzBhYSAodGFyZ2V0L2FybTogSW1wbGVtZW50IG5ldyBWRlAgZnAxNiBpbnNuIFZJTlMpCjIw
-LzQ3IENoZWNraW5nIGNvbW1pdCA3N2NhNTdjNzMyMGYgKHRhcmdldC9hcm06IEltcGxlbWVudCBu
-ZXcgVkZQIGZwMTYgaW5zbiBWTU9WWCkKMjEvNDcgQ2hlY2tpbmcgY29tbWl0IGZlNzgyYzFjMGIw
-NyAodGFyZ2V0L2FybTogSW1wbGVtZW50IFZGUCBmcDE2IFZNT1YgYmV0d2VlbiBncCBhbmQgaGFs
-ZnByZWMgcmVnaXN0ZXJzKQoyMi80NyBDaGVja2luZyBjb21taXQgY2NjOWU2ZWEyMWJkICh0YXJn
-ZXQvYXJtOiBJbXBsZW1lbnQgRlAxNiBmb3IgTmVvbiBWQURELCBWU1VCLCBWQUJELCBWTVVMKQoy
-My80NyBDaGVja2luZyBjb21taXQgYWE5ZmVjY2FlNWRmICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
-ZnAxNiBmb3IgTmVvbiBWUkVDUEUsIFZSU1FSVEUgdXNpbmcgZ3ZlYykKMjQvNDcgQ2hlY2tpbmcg
-Y29tbWl0IDYzODNhNjdkZjBlYiAodGFyZ2V0L2FybTogSW1wbGVtZW50IGZwMTYgZm9yIE5lb24g
-VkFCUywgVk5FRyBvZiBmbG9hdHMpCjI1LzQ3IENoZWNraW5nIGNvbW1pdCBhZThhOWYzNTNhMjkg
-KHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZvciBWQ0VRLCBWQ0dFLCBWQ0dUIGNvbXBhcmlz
-b25zKQoyNi80NyBDaGVja2luZyBjb21taXQgZGI4M2Y2NDVlNzU0ICh0YXJnZXQvYXJtOiBJbXBs
-ZW1lbnQgZnAxNiBmb3IgVkFDR0UsIFZBQ0dUKQoyNy80NyBDaGVja2luZyBjb21taXQgZDJlNmFk
-ZDU0ZmEyICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAxNiBmb3IgTmVvbiBWTUFYLCBWTUlOKQoy
-OC80NyBDaGVja2luZyBjb21taXQgYTYxMTJiYTdiMDJhICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
-ZnAxNiBmb3IgTmVvbiBWTUFYTk0sIFZNSU5OTSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzIzOiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5oOjY1NjoKK0RFRl9IRUxQRVJfRkxB
-R1NfNShndmVjX2ZtYXhudW1faCwgVENHX0NBTExfTk9fUldHLCB2b2lkLCBwdHIsIHB0ciwgcHRy
-LCBwdHIsIGkzMikKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyNDogRklMRTog
-dGFyZ2V0L2FybS9oZWxwZXIuaDo2NTc6CitERUZfSEVMUEVSX0ZMQUdTXzUoZ3ZlY19mbWF4bnVt
-X3MsIFRDR19DQUxMX05PX1JXRywgdm9pZCwgcHRyLCBwdHIsIHB0ciwgcHRyLCBpMzIpCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjY6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVy
-Lmg6NjU5OgorREVGX0hFTFBFUl9GTEFHU181KGd2ZWNfZm1pbm51bV9oLCBUQ0dfQ0FMTF9OT19S
-V0csIHZvaWQsIHB0ciwgcHRyLCBwdHIsIHB0ciwgaTMyKQoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzI3OiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBlci5oOjY2MDoKK0RFRl9IRUxQ
-RVJfRkxBR1NfNShndmVjX2ZtaW5udW1fcywgVENHX0NBTExfTk9fUldHLCB2b2lkLCBwdHIsIHB0
-ciwgcHRyLCBwdHIsIGkzMikKCnRvdGFsOiAwIGVycm9ycywgNCB3YXJuaW5ncywgNjcgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMjgvNDcgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAg
-SWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRv
-IHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjkvNDcgQ2hl
-Y2tpbmcgY29tbWl0IGZmNWI0MmM2NGQwZiAodGFyZ2V0L2FybTogSW1wbGVtZW50IGZwMTYgZm9y
-IE5lb24gVk1MQSwgVk1MUyBvcGVyYXRpb25zKQozMC80NyBDaGVja2luZyBjb21taXQgM2EwZDEy
-MWFhOWJlICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAxNiBmb3IgTmVvbiBWRk1BLCBWTUZTKQoz
-MS80NyBDaGVja2luZyBjb21taXQgOTQzYjkyNmQwZWU0ICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQg
-ZnAxNiBmb3IgTmVvbiBmcCBjb21wYXJlLXZzLTApCjMyLzQ3IENoZWNraW5nIGNvbW1pdCA1NjYy
-ZjQwN2RkYjAgKHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZvciBOZW9uIFZSRUNQUykKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzM1OiBGSUxFOiB0YXJnZXQvYXJtL2hlbHBl
-ci5oOjY3NjoKK0RFRl9IRUxQRVJfRkxBR1NfNShndmVjX3JlY3BzX25mX2gsIFRDR19DQUxMX05P
-X1JXRywgdm9pZCwgcHRyLCBwdHIsIHB0ciwgcHRyLCBpMzIpCgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojMzY6IEZJTEU6IHRhcmdldC9hcm0vaGVscGVyLmg6Njc3OgorREVGX0hF
-TFBFUl9GTEFHU181KGd2ZWNfcmVjcHNfbmZfcywgVENHX0NBTExfTk9fUldHLCB2b2lkLCBwdHIs
-IHB0ciwgcHRyLCBwdHIsIGkzMikKCnRvdGFsOiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTExIGxp
-bmVzIGNoZWNrZWQKClBhdGNoIDMyLzQ3IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmll
-dy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhl
-bSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjMzLzQ3
-IENoZWNraW5nIGNvbW1pdCA3Y2MzMThlOWYzZWMgKHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2
-IGZvciBOZW9uIFZSU1FSVFMpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNDog
-RklMRTogdGFyZ2V0L2FybS9oZWxwZXIuaDo2Nzg6CitERUZfSEVMUEVSX0ZMQUdTXzUoZ3ZlY19y
-c3FydHNfbmZfaCwgVENHX0NBTExfTk9fUldHLCB2b2lkLCBwdHIsIHB0ciwgcHRyLCBwdHIsIGkz
-MikKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzNTogRklMRTogdGFyZ2V0L2Fy
-bS9oZWxwZXIuaDo2Nzk6CitERUZfSEVMUEVSX0ZMQUdTXzUoZ3ZlY19yc3FydHNfbmZfcywgVENH
-X0NBTExfTk9fUldHLCB2b2lkLCBwdHIsIHB0ciwgcHRyLCBwdHIsIGkzMikKCnRvdGFsOiAwIGVy
-cm9ycywgMiB3YXJuaW5ncywgMTEyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDMzLzQ3IGhhcyBzdHls
-ZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZh
-bHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFU
-Q0ggaW4gTUFJTlRBSU5FUlMuCjM0LzQ3IENoZWNraW5nIGNvbW1pdCA3OGJkYTg5ZWQ4NjcgKHRh
-cmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZvciBOZW9uIHBhaXJ3aXNlIGZwIG9wcykKV0FSTklO
-RzogQmxvY2sgY29tbWVudHMgdXNlIGEgbGVhZGluZyAvKiBvbiBhIHNlcGFyYXRlIGxpbmUKIzEy
-ODogRklMRTogdGFyZ2V0L2FybS92ZWNfaGVscGVyLmM6MTc4NToKKyAgICAgICAgLyogUmVhZCBh
-bGwgaW5wdXRzIGJlZm9yZSB3cml0aW5nIG91dHB1dHMgaW4gY2FzZSB2bSA9PSB2ZCAqLyAgIFwK
-CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBs
-aW5lCiMxNDU6IEZJTEU6IHRhcmdldC9hcm0vdmVjX2hlbHBlci5jOjE4MDI6CisgICAgICAgIC8q
-IFJlYWQgYWxsIGlucHV0cyBiZWZvcmUgd3JpdGluZyBvdXRwdXRzIGluIGNhc2Ugdm0gPT0gdmQg
-Ki8gICBcCgp0b3RhbDogMCBlcnJvcnMsIDIgd2FybmluZ3MsIDEyOCBsaW5lcyBjaGVja2VkCgpQ
-YXRjaCAzNC80NyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2Yg
-dGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozNS80NyBDaGVja2luZyBjb21t
-aXQgZGZmMDQwMmI4Mzg3ICh0YXJnZXQvYXJtOiBJbXBsZW1lbnQgZnAxNiBmb3IgTmVvbiBmbG9h
-dC1pbnRlZ2VyIFZDVlQpCjM2LzQ3IENoZWNraW5nIGNvbW1pdCA5YTc1MjJhMWE3N2QgKHRhcmdl
-dC9hcm06IENvbnZlcnQgTmVvbiBWQ1ZUIGZpeGVkLXBvaW50IHRvIGd2ZWMpCjM3LzQ3IENoZWNr
-aW5nIGNvbW1pdCA2ZmExMWZiMTY3MGUgKHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZvciBO
-ZW9uIFZDVlQgZml4ZWQtcG9pbnQpCjM4LzQ3IENoZWNraW5nIGNvbW1pdCAwNDgwOTg0N2Q5MjYg
-KHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZvciBOZW9uIFZDVlQgd2l0aCByb3VuZGluZyBt
-b2RlcykKMzkvNDcgQ2hlY2tpbmcgY29tbWl0IDA3ZDZmMDIzNGU3OSAodGFyZ2V0L2FybTogSW1w
-bGVtZW50IGZwMTYgZm9yIE5lb24gVlJJTlQtd2l0aC1zcGVjaWZpZWQtcm91bmRpbmctbW9kZSkK
-NDAvNDcgQ2hlY2tpbmcgY29tbWl0IGRiNzE5ZjljN2FiMSAodGFyZ2V0L2FybTogSW1wbGVtZW50
-IGZwMTYgZm9yIE5lb24gVlJJTlRYKQo0MS80NyBDaGVja2luZyBjb21taXQgMmZiMzQyNDRlNzkx
-ICh0YXJnZXQvYXJtL3ZlY19oZWxwZXI6IEhhbmRsZSBvcHJzeiBsZXNzIHRoYW4gMTYgYnl0ZXMg
-aW4gaW5kZXhlZCBvcGVyYXRpb25zKQo0Mi80NyBDaGVja2luZyBjb21taXQgOGU3ZDllM2FlNDky
-ICh0YXJnZXQvYXJtL3ZlY19oZWxwZXI6IEFkZCBndmVjIGZwIGluZGV4ZWQgbXVsdGlwbHktYW5k
-LWFkZCBvcGVyYXRpb25zKQpFUlJPUjogc3BhY2UgcHJvaGliaXRlZCBiZWZvcmUgdGhhdCBjbG9z
-ZSBwYXJlbnRoZXNpcyAnKScKIzY5OiBGSUxFOiB0YXJnZXQvYXJtL3ZlY19oZWxwZXIuYzoxMTEx
-OgorRE9fRk1VTF9JRFgoZ3ZlY19mbXVsX2lkeF9kLCBub3AsIGZsb2F0NjQsICkKCnRvdGFsOiAx
-IGVycm9ycywgMCB3YXJuaW5ncywgNjEgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNDIvNDcgaGFzIHN0
-eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUg
-ZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQ
-QVRDSCBpbiBNQUlOVEFJTkVSUy4KCjQzLzQ3IENoZWNraW5nIGNvbW1pdCA3YWMxMzA1ZTc1ODUg
-KHRhcmdldC9hcm06IEltcGxlbWVudCBmcDE2IGZvciBOZW9uIFZNVUwsIFZNTEEsIFZNTFMpCjQ0
-LzQ3IENoZWNraW5nIGNvbW1pdCAzY2FjMjkwYmZjMTEgKHRhcmdldC9hcm06IEVuYWJsZSBGUDE2
-IGluICctY3B1IG1heCcpCjQ1LzQ3IENoZWNraW5nIGNvbW1pdCA4NDVmNDhhYzkyMTEgKGh3L2Fy
-bS9zYnNhLXJlZjogYWRkICJyZWciIHByb3BlcnR5IHRvIERUIGNwdSBub2RlcykKNDYvNDcgQ2hl
-Y2tpbmcgY29tbWl0IGVmOWI5Y2JlYWVlNiAoaHcvbWlzYy9zYnNhX2VjIDogQWRkIGFuIGVtYmVk
-ZGVkIGNvbnRyb2xsZXIgZm9yIHNic2EtcmVmKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVs
-ZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiMzNDogCm5ldyBm
-aWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDEwMyBsaW5lcyBj
-aGVja2VkCgpQYXRjaCA0Ni80NyBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0Ny80NyBDaGVj
-a2luZyBjb21taXQgODY3ZjEyZTg3M2YyIChody9hcm0vc2JzYS1yZWYgOiBBZGQgZW1iZWRkZWQg
-Y29udHJvbGxlciBpbiBzZWN1cmUgbWVtb3J5KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29t
-bWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApo
-dHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMDkwMTE1MTgyMy4yOTc4NS0xLXBldGVyLm1heWRl
-bGxAbGluYXJvLm9yZy90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWls
-IGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcv
-XS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Hi Eugenio,
+
+On 9/1/20 4:26 PM, Eugenio Pérez wrote:
+> This way we can tell between regulars IOMMURLBEntries (entry of IOMMU
+> hardware) and notifications.>
+> In the notifications, we set explicitly if it is a MAPs or an UNMAP,
+> instead of trusting in entry permissions to differenciate them.
+differentiate
+
+Is it the real justification or is the rationale behind adding this type
+to be able to add new types of events?
+> 
+> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> ---
+>  hw/arm/smmu-common.c  | 13 ++++---
+>  hw/arm/smmuv3.c       | 13 ++++---
+>  hw/i386/intel_iommu.c | 88 ++++++++++++++++++++++++-------------------
+>  hw/misc/tz-mpc.c      | 32 +++++++++-------
+>  hw/ppc/spapr_iommu.c  | 15 ++++----
+>  include/exec/memory.h | 31 ++++++++-------
+>  softmmu/memory.c      | 16 +++-----
+>  7 files changed, 112 insertions(+), 96 deletions(-)
+
+you may add "orderFile = scripts/git.orderfile" in your .git/config diff
+section to get headers first
+
+[diff]
+        orderFile = scripts/git.orderfile
+
+> 
+> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+> index 88d2c454f0..405d5c5325 100644
+> --- a/hw/arm/smmu-common.c
+> +++ b/hw/arm/smmu-common.c
+> @@ -465,14 +465,15 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
+>  /* Unmap the whole notifier's range */
+>  static void smmu_unmap_notifier_range(IOMMUNotifier *n)
+>  {
+> -    IOMMUTLBEntry entry;
+> +    IOMMUTLBEvent event;
+>  
+> -    entry.target_as = &address_space_memory;
+> -    entry.iova = n->start;
+> -    entry.perm = IOMMU_NONE;
+> -    entry.addr_mask = n->end - n->start;
+> +    event.type = IOMMU_NOTIFIER_UNMAP;
+> +    event.entry.target_as = &address_space_memory;
+> +    event.entry.iova = n->start;
+> +    event.entry.perm = IOMMU_NONE;
+> +    event.entry.addr_mask = n->end - n->start;
+>  
+> -    memory_region_notify_iommu_one(n, &entry);
+> +    memory_region_notify_iommu_one(n, &event);
+>  }
+>  
+>  /* Unmap all notifiers attached to @mr */
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index 0a893ae918..62b0e289ca 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -799,7 +799,7 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
+>                                 uint8_t tg, uint64_t num_pages)
+>  {
+>      SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
+> -    IOMMUTLBEntry entry;
+> +    IOMMUTLBEvent event;
+>      uint8_t granule = tg;
+>  
+>      if (!tg) {
+> @@ -822,12 +822,13 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
+>          granule = tt->granule_sz;
+>      }
+>  
+> -    entry.target_as = &address_space_memory;
+> -    entry.iova = iova;
+> -    entry.addr_mask = num_pages * (1 << granule) - 1;
+> -    entry.perm = IOMMU_NONE;
+> +    event.type = IOMMU_NOTIFIER_UNMAP;
+> +    event.entry.target_as = &address_space_memory;
+> +    event.entry.iova = iova;
+> +    event.entry.addr_mask = num_pages * (1 << granule) - 1;
+> +    event.entry.perm = IOMMU_NONE;
+>  
+> -    memory_region_notify_iommu_one(n, &entry);
+> +    memory_region_notify_iommu_one(n, &event);
+>  }
+>  
+>  /* invalidate an asid/iova range tuple in all mr's */
+> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> index 2ad6b9d796..0c4aef5cb5 100644
+> --- a/hw/i386/intel_iommu.c
+> +++ b/hw/i386/intel_iommu.c
+> @@ -1073,7 +1073,7 @@ static int vtd_iova_to_slpte(IntelIOMMUState *s, VTDContextEntry *ce,
+>      }
+>  }
+>  
+> -typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
+> +typedef int (*vtd_page_walk_hook)(IOMMUTLBEvent *event, void *private);
+>  
+>  /**
+>   * Constant information used during page walking
+> @@ -1094,11 +1094,12 @@ typedef struct {
+>      uint16_t domain_id;
+>  } vtd_page_walk_info;
+>  
+> -static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
+> +static int vtd_page_walk_one(IOMMUTLBEvent *event, vtd_page_walk_info *info)
+>  {
+>      VTDAddressSpace *as = info->as;
+>      vtd_page_walk_hook hook_fn = info->hook_fn;
+>      void *private = info->private;
+> +    IOMMUTLBEntry *entry = &event->entry;
+>      DMAMap target = {
+>          .iova = entry->iova,
+>          .size = entry->addr_mask,
+> @@ -1107,7 +1108,7 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
+>      };
+>      DMAMap *mapped = iova_tree_find(as->iova_tree, &target);
+>  
+> -    if (entry->perm == IOMMU_NONE && !info->notify_unmap) {
+> +    if (event->type == IOMMU_NOTIFIER_UNMAP && !info->notify_unmap) {
+>          trace_vtd_page_walk_one_skip_unmap(entry->iova, entry->addr_mask);
+>          return 0;
+>      }
+> @@ -1115,7 +1116,7 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
+>      assert(hook_fn);
+>  
+>      /* Update local IOVA mapped ranges */
+> -    if (entry->perm) {
+> +    if (event->type == IOMMU_NOTIFIER_MAP) {
+>          if (mapped) {
+>              /* If it's exactly the same translation, skip */
+>              if (!memcmp(mapped, &target, sizeof(target))) {
+> @@ -1141,19 +1142,21 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
+>                  int ret;
+>  
+>                  /* Emulate an UNMAP */
+> +                event->type = IOMMU_NOTIFIER_UNMAP;
+>                  entry->perm = IOMMU_NONE;
+>                  trace_vtd_page_walk_one(info->domain_id,
+>                                          entry->iova,
+>                                          entry->translated_addr,
+>                                          entry->addr_mask,
+>                                          entry->perm);
+> -                ret = hook_fn(entry, private);
+> +                ret = hook_fn(event, private);
+>                  if (ret) {
+>                      return ret;
+>                  }
+>                  /* Drop any existing mapping */
+>                  iova_tree_remove(as->iova_tree, &target);
+> -                /* Recover the correct permission */
+> +                /* Recover the correct type */
+> +                event->type = IOMMU_NOTIFIER_MAP;
+>                  entry->perm = cache_perm;
+>              }
+>          }
+> @@ -1170,7 +1173,7 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
+>      trace_vtd_page_walk_one(info->domain_id, entry->iova,
+>                              entry->translated_addr, entry->addr_mask,
+>                              entry->perm);
+> -    return hook_fn(entry, private);
+> +    return hook_fn(event, private);
+>  }
+>  
+>  /**
+> @@ -1191,7 +1194,7 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+>      uint32_t offset;
+>      uint64_t slpte;
+>      uint64_t subpage_size, subpage_mask;
+> -    IOMMUTLBEntry entry;
+> +    IOMMUTLBEvent event;
+>      uint64_t iova = start;
+>      uint64_t iova_next;
+>      int ret = 0;
+> @@ -1245,13 +1248,15 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
+>               *
+>               * In either case, we send an IOTLB notification down.
+>               */
+> -            entry.target_as = &address_space_memory;
+> -            entry.iova = iova & subpage_mask;
+> -            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+> -            entry.addr_mask = ~subpage_mask;
+> +            event.entry.target_as = &address_space_memory;
+> +            event.entry.iova = iova & subpage_mask;
+> +            event.entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
+> +            event.entry.addr_mask = ~subpage_mask;
+>              /* NOTE: this is only meaningful if entry_valid == true */
+> -            entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
+> -            ret = vtd_page_walk_one(&entry, info);
+> +            event.entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
+> +            event.type = event.entry.perm ? IOMMU_NOTIFIER_MAP :
+> +                                            IOMMU_NOTIFIER_UNMAP;
+> +            ret = vtd_page_walk_one(&event, info);
+>          }
+>  
+>          if (ret < 0) {
+> @@ -1430,10 +1435,10 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
+>      return 0;
+>  }
+>  
+> -static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
+> +static int vtd_sync_shadow_page_hook(IOMMUTLBEvent *event,
+>                                       void *private)
+>  {
+> -    memory_region_notify_iommu((IOMMUMemoryRegion *)private, 0, *entry);
+> +    memory_region_notify_iommu((IOMMUMemoryRegion *)private, 0, *event);
+>      return 0;
+>  }
+>  
+> @@ -1993,14 +1998,17 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
+>                   * page tables.  We just deliver the PSI down to
+>                   * invalidate caches.
+>                   */
+> -                IOMMUTLBEntry entry = {
+> -                    .target_as = &address_space_memory,
+> -                    .iova = addr,
+> -                    .translated_addr = 0,
+> -                    .addr_mask = size - 1,
+> -                    .perm = IOMMU_NONE,
+> +                IOMMUTLBEvent event = {
+> +                    .type = IOMMU_NOTIFIER_UNMAP,
+> +                    .entry = {
+> +                        .target_as = &address_space_memory,
+> +                        .iova = addr,
+> +                        .translated_addr = 0,
+> +                        .addr_mask = size - 1,
+> +                        .perm = IOMMU_NONE,
+> +                    },
+>                  };
+> -                memory_region_notify_iommu(&vtd_as->iommu, 0, entry);
+> +                memory_region_notify_iommu(&vtd_as->iommu, 0, event);
+>              }
+>          }
+>      }
+> @@ -2412,7 +2420,7 @@ static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
+>                                            VTDInvDesc *inv_desc)
+>  {
+>      VTDAddressSpace *vtd_dev_as;
+> -    IOMMUTLBEntry entry;
+> +    IOMMUTLBEvent event;
+>      struct VTDBus *vtd_bus;
+>      hwaddr addr;
+>      uint64_t sz;
+> @@ -2460,12 +2468,13 @@ static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
+>          sz = VTD_PAGE_SIZE;
+>      }
+>  
+> -    entry.target_as = &vtd_dev_as->as;
+> -    entry.addr_mask = sz - 1;
+> -    entry.iova = addr;
+> -    entry.perm = IOMMU_NONE;
+> -    entry.translated_addr = 0;
+> -    memory_region_notify_iommu(&vtd_dev_as->iommu, 0, entry);
+> +    event.type = IOMMU_NOTIFIER_UNMAP;
+> +    event.entry.target_as = &vtd_dev_as->as;
+> +    event.entry.addr_mask = sz - 1;
+> +    event.entry.iova = addr;
+> +    event.entry.perm = IOMMU_NONE;
+> +    event.entry.translated_addr = 0;
+> +    memory_region_notify_iommu(&vtd_dev_as->iommu, 0, event);
+>  
+>  done:
+>      return true;
+> @@ -3486,19 +3495,20 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+>      size = remain = end - start + 1;
+>  
+>      while (remain >= VTD_PAGE_SIZE) {
+> -        IOMMUTLBEntry entry;
+> +        IOMMUTLBEvent event;
+>          uint64_t mask = get_naturally_aligned_size(start, remain, s->aw_bits);
+>  
+>          assert(mask);
+>  
+> -        entry.iova = start;
+> -        entry.addr_mask = mask - 1;
+> -        entry.target_as = &address_space_memory;
+> -        entry.perm = IOMMU_NONE;
+> +        event.type = IOMMU_NOTIFIER_UNMAP;
+> +        event.entry.iova = start;
+> +        event.entry.addr_mask = mask - 1;
+> +        event.entry.target_as = &address_space_memory;
+> +        event.entry.perm = IOMMU_NONE;
+>          /* This field is meaningless for unmap */
+> -        entry.translated_addr = 0;
+> +        event.entry.translated_addr = 0;
+>  
+> -        memory_region_notify_iommu_one(n, &entry);
+> +        memory_region_notify_iommu_one(n, &event);
+>  
+>          start += mask;
+>          remain -= mask;
+> @@ -3534,9 +3544,9 @@ static void vtd_address_space_refresh_all(IntelIOMMUState *s)
+>      vtd_switch_address_space_all(s);
+>  }
+>  
+> -static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
+> +static int vtd_replay_hook(IOMMUTLBEvent *event, void *private)
+>  {
+> -    memory_region_notify_iommu_one((IOMMUNotifier *)private, entry);
+> +    memory_region_notify_iommu_one((IOMMUNotifier *)private, event);
+>      return 0;
+>  }
+>  
+> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
+> index 98f151237f..30481e1c90 100644
+> --- a/hw/misc/tz-mpc.c
+> +++ b/hw/misc/tz-mpc.c
+> @@ -82,8 +82,10 @@ static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
+>      /* Called when the LUT word at lutidx has changed from oldlut to newlut;
+>       * must call the IOMMU notifiers for the changed blocks.
+>       */
+> -    IOMMUTLBEntry entry = {
+> -        .addr_mask = s->blocksize - 1,
+> +    IOMMUTLBEvent event = {
+> +        .entry = {
+> +            .addr_mask = s->blocksize - 1,
+> +        }
+>      };
+>      hwaddr addr = lutidx * s->blocksize * 32;
+>      int i;
+> @@ -100,26 +102,28 @@ static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
+>          block_is_ns = newlut & (1 << i);
+>  
+>          trace_tz_mpc_iommu_notify(addr);
+> -        entry.iova = addr;
+> -        entry.translated_addr = addr;
+> +        event.entry.iova = addr;
+> +        event.entry.translated_addr = addr;
+>  
+> -        entry.perm = IOMMU_NONE;
+> -        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
+> -        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
+> +        event.type = IOMMU_NOTIFIER_UNMAP;
+> +        event.entry.perm = IOMMU_NONE;
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, event);
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, event);
+>  
+> -        entry.perm = IOMMU_RW;
+> +        event.type = IOMMU_NOTIFIER_MAP;
+> +        event.entry.perm = IOMMU_RW;
+>          if (block_is_ns) {
+> -            entry.target_as = &s->blocked_io_as;
+> +            event.entry.target_as = &s->blocked_io_as;
+>          } else {
+> -            entry.target_as = &s->downstream_as;
+> +            event.entry.target_as = &s->downstream_as;
+>          }
+> -        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, event);
+>          if (block_is_ns) {
+> -            entry.target_as = &s->downstream_as;
+> +            event.entry.target_as = &s->downstream_as;
+>          } else {
+> -            entry.target_as = &s->blocked_io_as;
+> +            event.entry.target_as = &s->blocked_io_as;
+>          }
+> -        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
+> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, event);
+>      }
+>  }
+>  
+> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
+> index 0fecabc135..8bc3cff05d 100644
+> --- a/hw/ppc/spapr_iommu.c
+> +++ b/hw/ppc/spapr_iommu.c
+> @@ -445,7 +445,7 @@ static void spapr_tce_reset(DeviceState *dev)
+>  static target_ulong put_tce_emu(SpaprTceTable *tcet, target_ulong ioba,
+>                                  target_ulong tce)
+>  {
+> -    IOMMUTLBEntry entry;
+> +    IOMMUTLBEvent event;
+>      hwaddr page_mask = IOMMU_PAGE_MASK(tcet->page_shift);
+>      unsigned long index = (ioba - tcet->bus_offset) >> tcet->page_shift;
+>  
+> @@ -457,12 +457,13 @@ static target_ulong put_tce_emu(SpaprTceTable *tcet, target_ulong ioba,
+>  
+>      tcet->table[index] = tce;
+>  
+> -    entry.target_as = &address_space_memory,
+> -    entry.iova = (ioba - tcet->bus_offset) & page_mask;
+> -    entry.translated_addr = tce & page_mask;
+> -    entry.addr_mask = ~page_mask;
+> -    entry.perm = spapr_tce_iommu_access_flags(tce);
+> -    memory_region_notify_iommu(&tcet->iommu, 0, entry);
+> +    event.entry.target_as = &address_space_memory,
+> +    event.entry.iova = (ioba - tcet->bus_offset) & page_mask;
+> +    event.entry.translated_addr = tce & page_mask;
+> +    event.entry.addr_mask = ~page_mask;
+> +    event.entry.perm = spapr_tce_iommu_access_flags(tce);
+> +    event.type = entry.perm ? IOMMU_NOTIFIER_MAP : IOMMU_NOTIFIER_UNMAP;
+> +    memory_region_notify_iommu(&tcet->iommu, 0, event);
+>  
+>      return H_SUCCESS;
+>  }
+> diff --git a/include/exec/memory.h b/include/exec/memory.h
+> index 22c5f564d1..8a56707169 100644
+> --- a/include/exec/memory.h
+> +++ b/include/exec/memory.h
+> @@ -70,11 +70,11 @@ typedef enum {
+>  #define IOMMU_ACCESS_FLAG(r, w) (((r) ? IOMMU_RO : 0) | ((w) ? IOMMU_WO : 0))
+>  
+>  struct IOMMUTLBEntry {
+> -    AddressSpace    *target_as;
+> -    hwaddr           iova;
+> -    hwaddr           translated_addr;
+> -    hwaddr           addr_mask;  /* 0xfff = 4k translation */
+> -    IOMMUAccessFlags perm;
+> +    AddressSpace            *target_as;
+> +    hwaddr                   iova;
+> +    hwaddr                   translated_addr;
+> +    hwaddr                   addr_mask;  /* 0xfff = 4k translation */
+> +    IOMMUAccessFlags         perm;
+>  };
+>  
+>  /*
+> @@ -106,6 +106,11 @@ struct IOMMUNotifier {
+>  };
+>  typedef struct IOMMUNotifier IOMMUNotifier;
+>  
+> +typedef struct IOMMUTLBEvent {
+> +    IOMMUTLBEntry entry;
+> +    IOMMUNotifierFlag type;
+nit: I would put the type field before the entry
+> +} IOMMUTLBEvent;
+> +
+>  /* RAM is pre-allocated and passed into qemu_ram_alloc_from_ptr */
+>  #define RAM_PREALLOC   (1 << 0)
+>  
+> @@ -1265,13 +1270,13 @@ uint64_t memory_region_iommu_get_min_page_size(IOMMUMemoryRegion *iommu_mr);
+>   *
+
+Above there is:
+
+ * The notification type will be decided by entry.perm bits:
+ *
+ * - For UNMAP (cache invalidation) notifies: set entry.perm to IOMMU_NONE.
+ * - For MAP (newly added entry) notifies: set entry.perm to the
+ *   permission of the page (which is definitely !IOMMU_NONE).
+
+I think this should be updated as the main selector now is the type.
+
+I am a little bit concerned by the fact nothing really checks perm =
+IOMMU_NONE is consistent with UNMAP type. New call sites may forget
+this? shouldn't we check this in memory_region_notify_(one)_iommu?
+
+>   * @iommu_mr: the memory region that was changed
+>   * @iommu_idx: the IOMMU index for the translation table which has changed
+> - * @entry: the new entry in the IOMMU translation table.  The entry
+> - *         replaces all old entries for the same virtual I/O address range.
+> - *         Deleted entries have .@perm == 0.
+> + * @event: TLB event with the new entry in the IOMMU translation table.
+> + *         The entry replaces all old entries for the same virtual I/O address
+> + *         range.
+>   */
+>  void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+>                                  int iommu_idx,
+> -                                IOMMUTLBEntry entry);
+> +                                IOMMUTLBEvent event);
+>  
+>  /**
+>   * memory_region_notify_iommu_one: notify a change in an IOMMU translation
+> @@ -1281,12 +1286,12 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+>   * notifies a specific notifier, not all of them.
+>   *
+>   * @notifier: the notifier to be notified
+> - * @entry: the new entry in the IOMMU translation table.  The entry
+> - *         replaces all old entries for the same virtual I/O address range.
+> - *         Deleted entries have .@perm == 0.
+> + * @event: TLB event with the new entry in the IOMMU translation table.
+> + *         The entry replaces all old entries for the same virtual I/O address
+> + *         range.
+>   */
+>  void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
+> -                              IOMMUTLBEntry *entry);
+> +                                    IOMMUTLBEvent *event);
+>  
+>  /**
+>   * memory_region_register_iommu_notifier: register a notifier for changes to
+> diff --git a/softmmu/memory.c b/softmmu/memory.c
+> index 961c25b42f..09b3443eac 100644
+> --- a/softmmu/memory.c
+> +++ b/softmmu/memory.c
+> @@ -1891,9 +1891,9 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+>  }
+>  
+>  void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
+> -                                    IOMMUTLBEntry *entry)
+> +                                    IOMMUTLBEvent *event)
+>  {
+> -    IOMMUNotifierFlag request_flags;
+> +    IOMMUTLBEntry *entry = &event->entry;
+>      hwaddr entry_end = entry->iova + entry->addr_mask;
+>  
+>      /*
+> @@ -1906,20 +1906,14 @@ void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
+>  
+>      assert(entry->iova >= notifier->start && entry_end <= notifier->end);
+>  
+> -    if (entry->perm & IOMMU_RW) {
+> -        request_flags = IOMMU_NOTIFIER_MAP;
+> -    } else {
+> -        request_flags = IOMMU_NOTIFIER_UNMAP;
+> -    }
+> -
+> -    if (notifier->notifier_flags & request_flags) {
+> +    if (event->type & notifier->notifier_flags) {
+>          notifier->notify(notifier, entry);
+>      }
+>  }
+>  
+>  void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+>                                  int iommu_idx,
+> -                                IOMMUTLBEntry entry)
+> +                                IOMMUTLBEvent event)
+>  {
+>      IOMMUNotifier *iommu_notifier;
+>  
+> @@ -1927,7 +1921,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+>  
+>      IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
+>          if (iommu_notifier->iommu_idx == iommu_idx) {
+> -            memory_region_notify_iommu_one(iommu_notifier, &entry);
+> +            memory_region_notify_iommu_one(iommu_notifier, &event);
+>          }
+>      }
+>  }
+> 
+Thanks
+
+Eric
+
 
