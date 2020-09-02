@@ -7,65 +7,65 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C475FC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3227AC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:52:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C13920767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E999120767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:52:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmufvpH9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C13920767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XrVDOWe6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E999120767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDbbZ-0000a6-La
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:51:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35112)
+	id 1kDbc2-0001s4-3l
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:52:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35126)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbUP-0002lh-Q1
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25152)
+ id 1kDbUT-0002w4-EF
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47151)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbUO-0008OP-27
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:25 -0400
+ id 1kDbUR-0008Og-Lc
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599086663;
+ s=mimecast20190719; t=1599086666;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nbDsGxI0emGG/j7nIsqF0JY6xFaieK9fcpfWIroPNf4=;
- b=fmufvpH9JGdZDgrTrmLS8XVDl+1CIzKjVosC0K7z2pF7miFexDDfDfx07U8zebS4JyiPu+
- 015Bc+L+mA1SRekCqWTfZzwTS8Bp6ViWfe9s041lxbrrejsg7OXPb5ktfg+4CspYznEU3l
- UzhuZGBcXnCnjc3VPEiteQ1dbnbGcfo=
+ bh=QSHmEGrAQPMPu/4JEtSptfteVriYua5heYz3/u5Gb3s=;
+ b=XrVDOWe6GAhY0d3IZ9jbZZQkCEAKJQk5a18okmavrQV4I+rJ0GjdKBfFm1poRBOTaX3txA
+ DDcD7iB4k4OPMNr5dDADqGZSeeWf/q7cW9r6BXpWm1QAzce1eJsz4cu4ix762y2jzR1j1u
+ Q/L3NAtxkHdkarWAti422q9tHIrtzMc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-454-UbyF-T1QO56pANVHRlGXOA-1; Wed, 02 Sep 2020 18:44:21 -0400
-X-MC-Unique: UbyF-T1QO56pANVHRlGXOA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-386-BZC6z5O4OX6yrDVmJ0WEPQ-1; Wed, 02 Sep 2020 18:44:25 -0400
+X-MC-Unique: BZC6z5O4OX6yrDVmJ0WEPQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69673801AAE;
- Wed,  2 Sep 2020 22:44:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41E258030C7;
+ Wed,  2 Sep 2020 22:44:24 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5282B7EEA7;
- Wed,  2 Sep 2020 22:44:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 416127E313;
+ Wed,  2 Sep 2020 22:44:21 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 21/63] pxb: Rename TYPE_PXB_DEVICE to TYPE_PXB_DEV
-Date: Wed,  2 Sep 2020 18:42:29 -0400
-Message-Id: <20200902224311.1321159-22-ehabkost@redhat.com>
+Subject: [PATCH 22/63] pxb: Rename TYPE_PXB_PCIE_DEVICE to TYPE_PXB_PCIE_DEV
+Date: Wed,  2 Sep 2020 18:42:30 -0400
+Message-Id: <20200902224311.1321159-23-ehabkost@redhat.com>
 In-Reply-To: <20200902224311.1321159-1-ehabkost@redhat.com>
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
@@ -113,31 +113,30 @@ Cc: qemu-devel@nongnu.org
  1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/hw/pci-bridge/pci_expander_bridge.c b/hw/pci-bridge/pci_expander_bridge.c
-index aedded1064..42e58d5850 100644
+index 42e58d5850..1517ae5fa2 100644
 --- a/hw/pci-bridge/pci_expander_bridge.c
 +++ b/hw/pci-bridge/pci_expander_bridge.c
-@@ -41,10 +41,10 @@ struct PXBBus {
-     char bus_path[8];
- };
- 
--#define TYPE_PXB_DEVICE "pxb"
-+#define TYPE_PXB_DEV "pxb"
- typedef struct PXBDev PXBDev;
+@@ -46,9 +46,9 @@ typedef struct PXBDev PXBDev;
  DECLARE_INSTANCE_CHECKER(PXBDev, PXB_DEV,
--                         TYPE_PXB_DEVICE)
-+                         TYPE_PXB_DEV)
+                          TYPE_PXB_DEV)
  
- #define TYPE_PXB_PCIE_DEVICE "pxb-pcie"
+-#define TYPE_PXB_PCIE_DEVICE "pxb-pcie"
++#define TYPE_PXB_PCIE_DEV "pxb-pcie"
  DECLARE_INSTANCE_CHECKER(PXBDev, PXB_PCIE_DEV,
-@@ -322,7 +322,7 @@ static void pxb_dev_class_init(ObjectClass *klass, void *data)
+-                         TYPE_PXB_PCIE_DEVICE)
++                         TYPE_PXB_PCIE_DEV)
+ 
+ struct PXBDev {
+     /*< private >*/
+@@ -360,7 +360,7 @@ static void pxb_pcie_dev_class_init(ObjectClass *klass, void *data)
  }
  
- static const TypeInfo pxb_dev_info = {
--    .name          = TYPE_PXB_DEVICE,
-+    .name          = TYPE_PXB_DEV,
+ static const TypeInfo pxb_pcie_dev_info = {
+-    .name          = TYPE_PXB_PCIE_DEVICE,
++    .name          = TYPE_PXB_PCIE_DEV,
      .parent        = TYPE_PCI_DEVICE,
      .instance_size = sizeof(PXBDev),
-     .class_init    = pxb_dev_class_init,
+     .class_init    = pxb_pcie_dev_class_init,
 -- 
 2.26.2
 
