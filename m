@@ -2,87 +2,94 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D64CC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BC8DC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:27:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C708320829
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:26:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4736D20829
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:27:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dem60d81"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C708320829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jv33P+4q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4736D20829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDRqR-0007jz-V6
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 08:26:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56430)
+	id 1kDRrR-0000YT-Cw
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 08:27:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kDRpu-0007H5-DJ
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:25:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21320
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kDRps-00033r-Hp
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:25:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599049555;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=cZ56duPwHcmKh/FS4V4XfTijjn9YZgh6c+U+7cpk1r4=;
- b=dem60d81RXXM4RfywwFj70swEICG6+rw979WN8nhdcMdbtsbVnQHflL1KzkpbPI17A9KJg
- m8x2dw1NFBXpsgSHvo94Z578K4aMrDOGtnXLIC3svUJbhzwQMzbfY5F2JsOZ+nijmdCDRt
- yiUhvOJf2ncE2Nakjdfctmv9DeYC0RE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-fgcl3rJjPjCohBfDA4riOQ-1; Wed, 02 Sep 2020 08:25:52 -0400
-X-MC-Unique: fgcl3rJjPjCohBfDA4riOQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CABF310ABDB7;
- Wed,  2 Sep 2020 12:25:50 +0000 (UTC)
-Received: from redhat.com (ovpn-114-158.ams2.redhat.com [10.36.114.158])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id EB8D37C5BA;
- Wed,  2 Sep 2020 12:25:49 +0000 (UTC)
-Date: Wed, 2 Sep 2020 13:25:47 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH] 9pfs: log warning if msize <= 8192
-Message-ID: <20200902122547.GH403297@redhat.com>
-References: <E1kDR8W-0001s4-Sr@lizzy.crudebyte.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kDRqW-0007xv-Bm; Wed, 02 Sep 2020 08:26:36 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38144)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kDRqU-00036t-N8; Wed, 02 Sep 2020 08:26:36 -0400
+Received: by mail-wr1-x442.google.com with SMTP id g4so4536310wrs.5;
+ Wed, 02 Sep 2020 05:26:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=lV4TsDfxVdncS0hihVVEcQkF+phPF2SxR9yJGcmFyyg=;
+ b=Jv33P+4qkDuP388Biz1Gg2JtfkYKpjQSA+fEhRgw4Umj2HMhkmG0ahtO+oi7F/HDXu
+ eS5vWRhcLxzdN+gNYE3DHhpDhpSlF70brqFi7eIRLvQIWyb5QFgpQ2znFjOewiQRcFjK
+ 2efCpaY/0lFNxcVKPysK4ttFhmtJsfxKh2iPPor9K2ulARt34nmfH5IixvxAlq//kMop
+ T59+Hgc9B0LmskYmxOLm51j0tUMQtxkfJltW0d869xUBwpvi0D+JIBE1Sm3BO+ip/eOE
+ dxqspDyuQjn1oNDIALC8NPPE+Z1t4NCfLtTtcS5/rlAQ0qFQ6kP/0HU4OvtEUCjzPDV6
+ pg2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=lV4TsDfxVdncS0hihVVEcQkF+phPF2SxR9yJGcmFyyg=;
+ b=kQwDBqoiYK2TDfLcXY99zfjNUbHQHarBlVK+vQK12AXm4ifdflUQuelYv5ZmMv53E/
+ MTbbhsmYd1/HZMN4rVYI1TrlZIBLos8tqEia7lKFK80ylYw5VFczl5MQk4KskQAdlDU4
+ FNX4pkQpvj2JXEc6JBNsnYIbJx67wQQ3cIyK29JIlQcQ7eruhXm21PWzyhrSTVneFfS1
+ xvQqtEZapOnkTkZcJbzYWZK1aIZR7ejL8z5TTVkgIcyJ0uhBPOtzUPOn8aqHNq9Z+1sf
+ zAcgzCOFPwyl9Z2EADP6CXa/FGkD3GexXYOZ1e7wnQtbg1A1BcAVECCGWcI2DDmz+xw8
+ DaUw==
+X-Gm-Message-State: AOAM531k1j9/txmtw5YZbZx4yWpovG6Jj9ivfKkakKl+OgXUh7/+EqcR
+ y9Xd95ZNpA0cOqzklcn7+cM=
+X-Google-Smtp-Source: ABdhPJztYRCQMR6qA4IarZPnlwxw+DP4y7Q/jsN0XoQPt7h5V1ahKRm4OsHqX7ZEc6qKYGNm+DqH0A==
+X-Received: by 2002:a5d:67d2:: with SMTP id n18mr6921070wrw.223.1599049592875; 
+ Wed, 02 Sep 2020 05:26:32 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id q3sm5924110wmq.12.2020.09.02.05.26.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 02 Sep 2020 05:26:32 -0700 (PDT)
+Subject: Re: [PATCH 0/2] hw/net/opencores_eth: Trivial patches
+To: qemu-devel@nongnu.org
+References: <20200608091508.19838-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <e472244f-d764-6cd6-70cd-86d71358b999@amsat.org>
+Date: Wed, 2 Sep 2020 14:26:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <E1kDR8W-0001s4-Sr@lizzy.crudebyte.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200608091508.19838-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:26:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-0.324,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,63 +103,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Greg Kurz <groug@kaod.org>
+Cc: qemu-trivial@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 02, 2020 at 01:22:49PM +0200, Christian Schoenebeck wrote:
-> It is essential to choose a reasonable high value for 'msize' to avoid
-> severe degraded file I/O performance. This parameter has to be chosen
-> on client/guest side, and a Linux client defaults to an 'msize' of only
-> 8192 if the user did not explicitly specify a value for 'msize'.
+On 6/8/20 11:15 AM, Philippe Mathieu-Daudé wrote:
+> Remove unnecessary mask, use #define instead of magic.
 > 
-> Unfortunately many users are not aware that they should specify an
-> appropriate value for 'msize' to avoid severe performance issues, so
-> log a performance warning on host side in that case to make it more
-> clear.
-
-What is a more reasonable "msize" value to pick instead of 8k ?
-ie at what msize is I/O not several degraded ?
-
-If there a reason that Linux can't pick a better default ?
- 
+> Philippe Mathieu-Daudé (2):
+>   hw/net/opencores_eth: Use definitions instead of magic values
+>   hw/net/opencores_eth: Remove unnecessary address masking
 > 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
->  hw/9pfs/9p.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 7bb994bbf2..33e948d636 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -1353,6 +1353,14 @@ static void coroutine_fn v9fs_version(void *opaque)
->          goto out;
->      }
->  
-> +    /* 8192 is the default msize of Linux clients */
-> +    if (s->msize <= 8192) {
-> +        warn_report_once(
-> +            "9p: degraded performance: a reasonable high msize should be "
-> +            "chosen on client/guest side (chosen msize is <= 8192)."
-> +        );
-> +    }
-> +
->  marshal:
->      err = pdu_marshal(pdu, offset, "ds", s->msize, &version);
->      if (err < 0) {
-> -- 
-> 2.20.1
-> 
+>  hw/net/opencores_eth.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
 > 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Ping to Jason as the series is reviewed :)
 
