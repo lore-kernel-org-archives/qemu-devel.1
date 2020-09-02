@@ -2,91 +2,96 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1AAEC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:47:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6259C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:48:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A95902078E
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:47:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D19A2078E
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:48:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cg0MtUJd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A95902078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FK0a4BG5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D19A2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDU3I-0007lJ-Rm
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 10:47:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36592)
+	id 1kDU46-0000Sv-PS
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 10:48:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDU2K-0006wg-Bd
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:46:56 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:22377
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDU2F-0003vB-Lm
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:46:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599058009;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=XGwkAR0IElB3MEYB7s4oSUMxgyVI7QkiqmTN+xWrzew=;
- b=cg0MtUJd8VSN3TDlP0aPWCCz6DRQNT5jSlCBTuDjmRyDzXzRRdiIH3wye3PgFUUMqfifAK
- OydP/0Xl/AYeqCKb9KX46xEjWJ+TJ4p+/Sv/BVLgU76oiv8OZjIWMa6wQg9SVNuUyOSQSh
- ES+MuBqCjeb+XmerwCNusL9T2VDlj2s=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-yx7x4-7aOLuayT8RugFsQQ-1; Wed, 02 Sep 2020 10:46:45 -0400
-X-MC-Unique: yx7x4-7aOLuayT8RugFsQQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03A97801AAE;
- Wed,  2 Sep 2020 14:46:44 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-129.ams2.redhat.com [10.36.112.129])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 204015D9D3;
- Wed,  2 Sep 2020 14:46:40 +0000 (UTC)
-Subject: Re: [PULL 1/1] tricore: added triboard with tc27x_soc
-To: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>, qemu-devel@nongnu.org
-References: <20200901095924.21738-1-kbastian@mail.uni-paderborn.de>
- <20200901095924.21738-2-kbastian@mail.uni-paderborn.de>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <f5bbb1bb-0ab9-7bcd-3cca-3891ecaef812@redhat.com>
-Date: Wed, 2 Sep 2020 16:46:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kDU3E-00082n-SM
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:47:55 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36972)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kDU3C-00041L-KQ
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:47:52 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a9so4854930wmm.2
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 07:47:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=I6KyCIC0XSdOqI+M+7jzVngfvjTlucsuEn/3jZVCJQo=;
+ b=FK0a4BG5HPkRWBP3DINqlvjTeF5IKnEIf6U9yZ8AZ1lGfrz3wivfwN5KlahQCBp6jS
+ oGgX3eetfP3oqxEOPBR905GqozORrEYjRNQwX9URINM8m0CoziHENmEtFSYCNC6zRCVK
+ H6//GRU6ttObq7SVvgq4/GphnQAcXlULiCvIE2c47OfIGPvbARDgETwj7V55bkiTwnoK
+ 94NYsROLavoCAYhoXboq/gOplwz8HCpUe4UyZzebKyytHGNHcJ2NMi3rGOQkjF0gRFjH
+ hggBYW2V5dPViCEZ9YjhWvwsPjERFyeF2kRo38J4+jdlBSbTmu42eyh9hKCbQvCfscns
+ mKug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=I6KyCIC0XSdOqI+M+7jzVngfvjTlucsuEn/3jZVCJQo=;
+ b=SF2i0xN4XQ7Qi7BA9xob1w5tFxhFi0HPiU3vQPTE2DGIuyld5M751T8uWHCAqh8fLQ
+ pIF4LukADaXtNjbuKyvGeDqaCKIEe0LEcL3VXJKnWeEVxD/n9lhNSl32n6zZKwG7EwdL
+ 5SJR2eSDlgxuzCpb9l+YJCn1Mp7pIM5FNOzMUkhL/BHTp2QDp++dTrsTDuamJacE506v
+ JuaXE+P67YLNmJpz77I5hUARDFerr8uosaPtXJmbtMaX08nzsZfwO0Hon0TKhxAAnFMg
+ iOF0dC6p2dGhNqm4BUXmr/pwjHrJc/7Ry75W73irBoNtFmSxU/6kD9ckkI43eeom2qkI
+ oT0A==
+X-Gm-Message-State: AOAM532BvkXZ4xHYcCXVrWQWhyhDJ+c46FFPa00X/socy21gQx7hrg5z
+ iPvZWQqVCyul+yPIZwV8ORfBufPu7QYKnw==
+X-Google-Smtp-Source: ABdhPJw7FdxJwkN4wXtrPT8T2+6p7AYyg1zDKX7exGA51XPmjnrsQ4MVfBzINQ6b4zFg22n2dvcE7Q==
+X-Received: by 2002:a7b:ce0d:: with SMTP id m13mr1070562wmc.83.1599058068549; 
+ Wed, 02 Sep 2020 07:47:48 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id y6sm7647181wrt.80.2020.09.02.07.47.47
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 02 Sep 2020 07:47:47 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id C9A4E1FF7E;
+ Wed,  2 Sep 2020 15:47:46 +0100 (BST)
+References: <20200902125917.26021-1-pbonzini@redhat.com>
+ <20200902125917.26021-2-pbonzini@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 01/39] configure: Add system = 'linux' for meson when
+ cross-compiling
+In-reply-to: <20200902125917.26021-2-pbonzini@redhat.com>
+Date: Wed, 02 Sep 2020 15:47:46 +0100
+Message-ID: <87tuwg44ml.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200901095924.21738-2-kbastian@mail.uni-paderborn.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 03:24:55
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.324, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,75 +105,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, Lars Biermanski <lars.biermanski@efs-auto.de>,
- Georg Hofstetter <georg.hofstetter@efs-auto.de>,
- David Brenken <david.brenken@efs-auto.de>,
- Robert Rasche <robert.rasche@efs-auto.de>,
- Andreas Konopik <andreas.konopik@efs-auto.de>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?utf-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
- Hi,
 
-On 01/09/2020 11.59, Bastian Koppelmann wrote:
-> From: Andreas Konopik <andreas.konopik@efs-auto.de>
-> 
-> Signed-off-by: Andreas Konopik <andreas.konopik@efs-auto.de>
-> Signed-off-by: David Brenken <david.brenken@efs-auto.de>
-> Signed-off-by: Georg Hofstetter <georg.hofstetter@efs-auto.de>
-> Signed-off-by: Robert Rasche <robert.rasche@efs-auto.de>
-> Signed-off-by: Lars Biermanski <lars.biermanski@efs-auto.de>
-> Message-Id: <20200622131934.10328-2-david.brenken@efs-auto.org>
-> Signed-off-by: Bastian Koppelmann <kbastian@mail.uni-paderborn.de>
-> [BK: Fixed build system to use meson]
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> From: Thomas Huth <thuth@redhat.com>
+>
+> Meson needs the "system =3D xyz" line when cross-compiling. We are already
+> adding a "system =3D 'windows'" for the MinGW cross-compilation case here,
+> so let's add a "system =3D 'linux'" now for Linux hosts, too.
+>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+> Message-Id: <20200823111757.72002-2-thuth@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
 > ---
->  hw/tricore/Kconfig             |   8 ++
->  hw/tricore/meson.build         |   2 +
->  hw/tricore/tc27x_soc.c         | 246 +++++++++++++++++++++++++++++++++
->  hw/tricore/triboard.c          | 102 ++++++++++++++
->  include/hw/tricore/tc27x_soc.h | 139 +++++++++++++++++++
->  include/hw/tricore/triboard.h  |  53 +++++++
->  6 files changed, 550 insertions(+)
->  create mode 100644 hw/tricore/tc27x_soc.c
->  create mode 100644 hw/tricore/triboard.c
->  create mode 100644 include/hw/tricore/tc27x_soc.h
->  create mode 100644 include/hw/tricore/triboard.h
-> 
-> diff --git a/hw/tricore/Kconfig b/hw/tricore/Kconfig
-> index 9313409309..44d3e906a1 100644
-> --- a/hw/tricore/Kconfig
-> +++ b/hw/tricore/Kconfig
-> @@ -1,2 +1,10 @@
->  config TRICORE
->      bool
-> +    select TRIBOARD
-> +
-> +config TRIBOARD
-> +    bool
-> +    select TC27X_SOC
+>  configure | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/configure b/configure
+> index 8a3acef89d..b58627f4aa 100755
+> --- a/configure
+> +++ b/configure
+> @@ -8163,6 +8163,9 @@ if test -n "$cross_prefix"; then
+>              ?:*) pre_prefix=3D/ ;;
+>          esac
+>      fi
+> +    if test "$linux" =3D "yes" ; then
+> +        echo "system =3D 'linux'" >> $cross
+> +    fi
+>      case "$ARCH" in
+>          i386|x86_64)
+>              echo "cpu_family =3D 'x86'" >> $cross
 
-I think it would be more common to do it the other way round: TRIBOARD
-should select TRICORE, and then use "CONFIG_TRIBOARD=y" in the
-default-configs/tricore-softmmu.mak file instead.
-(We usually set CONFIG_SOMEBOARD=y in the default-configs/*.mak files,
-and the boards then select the required components)
 
-> +config TC27X_SOC
-> +    bool
-> diff --git a/hw/tricore/meson.build b/hw/tricore/meson.build
-> index 579aa13c78..305f7f27db 100644
-> --- a/hw/tricore/meson.build
-> +++ b/hw/tricore/meson.build
-> @@ -1,4 +1,6 @@
->  tricore_ss = ss.source_set()
->  tricore_ss.add(when: 'CONFIG_TRICORE', if_true: files('tricore_testboard.c'))
-> +tricore_ss.add(when: 'CONFIG_TRICORE', if_true: files('tc27x_soc.c'))
-> +tricore_ss.add(when: 'CONFIG_TRICORE', if_true: files('triboard.c'))
-
-You should maybe rather use CONFIG_TRIBOARD and CONFIG_TC27X_SOC here
-since you've also introduced these symbols in the Kconfig file.
-
- Thomas
-
+--=20
+Alex Benn=C3=A9e
 
