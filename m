@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF41FC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17261C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:17:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FF0E2087C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:17:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FF0E2087C
+	by mail.kernel.org (Postfix) with ESMTPS id CE25F2084C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:17:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE25F2084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDNxJ-00030Z-J3
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:17:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44122)
+	id 1kDNxm-0003zQ-Vs
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:17:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44090)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kDNw7-0001GB-4k
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:07 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:38522)
+ id 1kDNvy-00016r-S3
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:15:58 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:38500)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kDNw1-0002zb-8j
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:16:06 -0400
+ id 1kDNvx-0002w0-1D
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:15:58 -0400
 Received: from [127.0.1.1] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 275E440A2055;
- Wed,  2 Sep 2020 08:15:59 +0000 (UTC)
-Subject: [PATCH v3 02/15] replay: provide an accessor for rr filename
+ by mail.ispras.ru (Postfix) with ESMTPSA id 5744240A928D;
+ Wed,  2 Sep 2020 08:15:53 +0000 (UTC)
+Subject: [PATCH v3 01/15] replay: don't record interrupt poll
 From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 To: qemu-devel@nongnu.org
-Date: Wed, 02 Sep 2020 11:15:58 +0300
-Message-ID: <159903455881.28509.5188905225759443923.stgit@pasha-ThinkPad-X280>
+Date: Wed, 02 Sep 2020 11:15:53 +0300
+Message-ID: <159903455305.28509.6834799024577960185.stgit@pasha-ThinkPad-X280>
 In-Reply-To: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
 References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
 User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=83.149.199.84;
  envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 04:15:48
@@ -75,44 +75,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
-
-This patch adds an accessor function for the name of the record/replay
-log file. Adding an accessor instead of making variable global,
-prevents accidental modification of this variable by other modules.
+Interrupt poll is not a real interrupt event. It is needed only for
+thread safety. This interrupt is used for i386 and converted
+to hardware interrupt by cpu_handle_interrupt function.
+Therefore it is not needed to be recorded, because hardware
+interrupt will be recorded after converting.
 
 Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
 ---
- include/sysemu/replay.h |    2 ++
- replay/replay.c         |    5 +++++
- 2 files changed, 7 insertions(+)
+ accel/tcg/cpu-exec.c |   11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-index 5471bb514d..c9c896ae8d 100644
---- a/include/sysemu/replay.h
-+++ b/include/sysemu/replay.h
-@@ -72,6 +72,8 @@ void replay_start(void);
- void replay_finish(void);
- /*! Adds replay blocker with the specified error description */
- void replay_add_blocker(Error *reason);
-+/* Returns name of the replay log file */
-+const char *replay_get_filename(void);
- 
- /* Processing the instructions */
- 
-diff --git a/replay/replay.c b/replay/replay.c
-index 83ed9e0e24..42e82f7bc7 100644
---- a/replay/replay.c
-+++ b/replay/replay.c
-@@ -399,3 +399,8 @@ void replay_add_blocker(Error *reason)
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 66d38f9d85..28aff1bb1e 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -429,8 +429,7 @@ static inline bool cpu_handle_halt(CPUState *cpu)
  {
-     replay_blockers = g_slist_prepend(replay_blockers, reason);
- }
-+
-+const char *replay_get_filename(void)
-+{
-+    return replay_filename;
-+}
+     if (cpu->halted) {
+ #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
+-        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
+-            && replay_interrupt()) {
++        if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
+             X86CPU *x86_cpu = X86_CPU(cpu);
+             qemu_mutex_lock_iothread();
+             apic_poll_irq(x86_cpu->apic_state);
+@@ -587,7 +586,13 @@ static inline bool cpu_handle_interrupt(CPUState *cpu,
+            and via longjmp via cpu_loop_exit.  */
+         else {
+             if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
+-                replay_interrupt();
++                if (true
++#if defined(TARGET_I386)
++                    && !(interrupt_request & CPU_INTERRUPT_POLL)
++#endif
++                ) {
++                    replay_interrupt();
++                }
+                 /*
+                  * After processing the interrupt, ensure an EXCP_DEBUG is
+                  * raised when single-stepping so that GDB doesn't miss the
 
 
