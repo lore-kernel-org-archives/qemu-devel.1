@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4096EC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:09:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BE37C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:10:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04D4120767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:09:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C792720767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:10:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W0vkR+KL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04D4120767
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="drj/S/Ie"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C792720767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDSWT-0008PN-5Z
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 09:09:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36918)
+	id 1kDSWY-0000DL-Un
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 09:10:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDSMU-0006At-Qj
+ id 1kDSMT-00068k-PB
  for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34615)
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:34382
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDSMS-00078g-2u
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:38 -0400
+ id 1kDSMR-00078G-08
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599051575;
+ s=mimecast20190719; t=1599051574;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=LqZiTsy/tPatniTvh2PwE6XUEqzGQb6peikuf9IxSLw=;
- b=W0vkR+KLk65ZwLmhdMXuIUM/JO8aLoNQyaOgRadpZK6oASuJl+u3kI8BbswKF4cVbmChoc
- W5nq7HjmN+hAveIjYxofFzQjQlW+zvI8JL4t4OIko9GircSJQhiFoVokXp8vSgNHfyhH6i
- WZqhPGI30W2IFSz8lGxAh8NQF38Wf+g=
+ bh=MpnvhkuY94YofkmT++ed5KWHesYrjJBLpFzTMzeP1+0=;
+ b=drj/S/IeFxsRoazY61h/VPyc+3p8oI6mgDBeTtKGafOjwNSxAUjuwI2iZjwVFl2FG4d1XN
+ pXFmL76Ccd++Fa0l2Jsx6/byPk234PFPMZezryODKGRny9qMnvDatKNrNEaOXiPHMpj/eu
+ rEmoQnrVUBu2ZIXAjGnBH3BwQFh2vFE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-535-7T_j5DsUM7KQzvLE8EdLmg-1; Wed, 02 Sep 2020 08:59:33 -0400
-X-MC-Unique: 7T_j5DsUM7KQzvLE8EdLmg-1
+ us-mta-507-GqS6OwEEOcuoaidG_mMbqg-1; Wed, 02 Sep 2020 08:59:31 -0400
+X-MC-Unique: GqS6OwEEOcuoaidG_mMbqg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3CA5118BFEF1
- for <qemu-devel@nongnu.org>; Wed,  2 Sep 2020 12:59:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5E31F1008542
+ for <qemu-devel@nongnu.org>; Wed,  2 Sep 2020 12:59:28 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CC0BA76E01;
- Wed,  2 Sep 2020 12:59:28 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0D15F76E01;
+ Wed,  2 Sep 2020 12:59:27 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 20/39] meson: convert atomic*-bench
-Date: Wed,  2 Sep 2020 08:58:58 -0400
-Message-Id: <20200902125917.26021-21-pbonzini@redhat.com>
+Subject: [PATCH 19/39] meson: convert vhost-user-bridge
+Date: Wed,  2 Sep 2020 08:58:57 -0400
+Message-Id: <20200902125917.26021-20-pbonzini@redhat.com>
 In-Reply-To: <20200902125917.26021-1-pbonzini@redhat.com>
 References: <20200902125917.26021-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,17 +74,17 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 01:13:52
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:07:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,50 +105,46 @@ Sender: "Qemu-devel"
 From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
 Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200828110734.1638685-11-marcandre.lureau@redhat.com>
+Message-Id: <20200828110734.1638685-10-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include |  5 -----
- tests/meson.build      | 10 ++++++++++
- 2 files changed, 10 insertions(+), 5 deletions(-)
+ tests/Makefile.include | 2 --
+ tests/meson.build      | 9 +++++++++
+ 2 files changed, 9 insertions(+), 2 deletions(-)
 
 diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 04ffda66a5..0388a0e4fd 100644
+index b68911833f..04ffda66a5 100644
 --- a/tests/Makefile.include
 +++ b/tests/Makefile.include
-@@ -44,11 +44,6 @@ check-speed-$(CONFIG_BLOCK) += tests/benchmark-crypto-cipher$(EXESUF)
+@@ -65,8 +65,6 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
+ 	rm $(INITRD_WORK_DIR)/init
+ 	rmdir $(INITRD_WORK_DIR)
  
- QEMU_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
- 
--# Deps that are common to various different sets of tests below
--test-util-obj-y = libqemuutil.a
--tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
--tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
+-tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-obj-y) libvhost-user.a
 -
- tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
- tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
- tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
+ SPEED = quick
+ 
+ # gtester tests, possibly with verbose output
 diff --git a/tests/meson.build b/tests/meson.build
-index 8c6ace25ef..2c87e16fad 100644
+index bd5d13f6f9..8c6ace25ef 100644
 --- a/tests/meson.build
 +++ b/tests/meson.build
-@@ -4,6 +4,16 @@ qht_bench = executable('qht-bench',
-                        sources: 'qht-bench.c',
-                        dependencies: [qemuutil])
+@@ -221,6 +221,15 @@ foreach test_name, extra: tests
+        suite: ['unit'])
+ endforeach
  
-+executable('atomic_add-bench',
-+           sources: files('atomic_add-bench.c'),
-+           dependencies: [qemuutil],
-+           build_by_default: false)
 +
-+executable('atomic64-bench',
-+           sources: files('atomic64-bench.c'),
-+           dependencies: [qemuutil],
-+           build_by_default: false)
++if have_tools and 'CONFIG_VHOST_USER' in config_host
++  executable('vhost-user-bridge',
++             sources: files('vhost-user-bridge.c'),
++             link_with: [libvhost_user],
++             dependencies: [qemuutil],
++             build_by_default: false)
++endif
 +
- test_qapi_outputs = [
-   'qapi-builtin-types.c',
-   'qapi-builtin-types.h',
+ if have_system and 'CONFIG_POSIX' in config_host
+   subdir('qemu-iotests')
+ endif
 -- 
 2.26.2
 
