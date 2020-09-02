@@ -3,44 +3,43 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B25B4C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19319C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:36:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 829B320767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:34:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 829B320767
+	by mail.kernel.org (Postfix) with ESMTPS id DE4D420767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:36:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE4D420767
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46816 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDTqh-0007nL-L4
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 10:34:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33552)
+	id 1kDTsg-0000NX-57
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 10:36:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDTqC-0007Mv-PK
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:34:24 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:50210)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDTsB-0008Nx-Vq
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:36:28 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:50269)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDTqA-0002Kj-RD
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:34:24 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDTs9-0002dy-HI
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:36:27 -0400
 X-Envelope-From: alxndr@bu.edu
 X-BU-AUTH: mozz.bu.edu [128.197.127.33]
 Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
  bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 082EXP6F005633
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 082EZpg6007613
  (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Wed, 2 Sep 2020 10:33:28 -0400
-Date: Wed, 2 Sep 2020 10:33:25 -0400
+ Wed, 2 Sep 2020 10:35:54 -0400
+Date: Wed, 2 Sep 2020 10:35:51 -0400
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
 Subject: Re: [PATCH 0/2] Fix oss-fuzz builds post-meson integration
-Message-ID: <20200902143325.x4jasicsnxdonr67@mozz.bu.edu>
+Message-ID: <20200902143551.kiudougufezbhtlp@mozz.bu.edu>
 References: <20200902142657.112879-1-alxndr@bu.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -68,14 +67,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, bsd@redhat.com, stefanha@redhat.com,
- darren.kenny@oracle.com
+Cc: bonzini@redhat.com, darren.kenny@oracle.com, bsd@redhat.com,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Arg.. I made a mistake in Paolo's email address. Please remove
-"bonzini@redhat.com" from replies so you don't get bounce spam.
+This series is missing a patch. Re-sending..
 
 On 200902 1026, Alexander Bulekov wrote:
 > QEMU stopped building on oss-fuzz, after the meson integration, due to
