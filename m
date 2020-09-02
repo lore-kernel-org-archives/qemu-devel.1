@@ -4,85 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02401C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:47:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC56C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:48:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A545720767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7796420767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:48:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SjRNOa5r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A545720767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L18ZhFKl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7796420767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDbXm-0000or-Pi
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:47:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34832)
+	id 1kDbYG-0001T0-Gj
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:48:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbTx-0001cS-QG
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:43:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50227)
+ id 1kDbTu-0001UE-ID
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:43:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40723
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbTv-0008JD-Rg
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:43:57 -0400
+ id 1kDbTs-0008Ij-Rq
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:43:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599086635;
+ s=mimecast20190719; t=1599086632;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=I5oINIvJ6g0gJtBhiodyhTj34EeSSzAlhxZdmmgOA5c=;
- b=SjRNOa5rqIg3J60zq2nt3nnWwwZY4VgCd2CE7OXXioqwJX5jZCCDqOO3HqKUqsWMkJvPrw
- 8ktJMqUpPShR/muGQRDc/qKjacjG50h1daMoWIm5pwXsZ9vn7VTNbWf+LoSj5ThfgxPR9x
- b+2A35Sfus45mlBnnffDgOqs/romhY8=
+ bh=eSyanX0HZcjRpEvE7z+qG2l7qfXB4wIkDLHXO1NBL8E=;
+ b=L18ZhFKlEqwy8ZIJ6H9QqP4zfWWDS8WjJkyy8YzMOMYr+mTn6zvE1+L01C4E4HyxuIhiTQ
+ Tg8d0J54M9EWOIcgX7BRTAl/o1W6qjVxNvUmTIlN023YHYxFs7MkaPwF5Fpe9u6K4GtpdH
+ pQbHCqUQ3TGsUo4vwO89SW0Djtnshxc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-243-ZOXGs3vEN9WrMvlSIIWtyw-1; Wed, 02 Sep 2020 18:43:53 -0400
-X-MC-Unique: ZOXGs3vEN9WrMvlSIIWtyw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-369-qnKEbevUMlGF-6Hvx7IQdw-1; Wed, 02 Sep 2020 18:43:49 -0400
+X-MC-Unique: qnKEbevUMlGF-6Hvx7IQdw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2FF331DE00
- for <qemu-devel@nongnu.org>; Wed,  2 Sep 2020 22:43:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 673621074642;
+ Wed,  2 Sep 2020 22:43:48 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 168571C4;
- Wed,  2 Sep 2020 22:43:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8B3819C59;
+ Wed,  2 Sep 2020 22:43:44 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/63] vmcoreinfo: Rename VMCOREINFO_DEVICE to TYPE_VMCOREINFO
-Date: Wed,  2 Sep 2020 18:42:17 -0400
-Message-Id: <20200902224311.1321159-10-ehabkost@redhat.com>
+Subject: [PATCH 08/63] vfio: Rename VFIO_AP_DEVICE_TYPE to TYPE_VFIO_AP_DEVICE
+Date: Wed,  2 Sep 2020 18:42:16 -0400
+Message-Id: <20200902224311.1321159-9-ehabkost@redhat.com>
 In-Reply-To: <20200902224311.1321159-1-ehabkost@redhat.com>
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 17:54:06
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 16:25:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,8 +96,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- berrange@redhat.com
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ berrange@redhat.com, Pierre Morel <pmorel@linux.ibm.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -106,68 +111,59 @@ the type checking macro.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>
+Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+Cc: Halil Pasic <pasic@linux.ibm.com>
+Cc: Pierre Morel <pmorel@linux.ibm.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: qemu-s390x@nongnu.org
 Cc: qemu-devel@nongnu.org
 ---
- include/hw/misc/vmcoreinfo.h | 6 +++---
- hw/misc/vmcoreinfo.c         | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ hw/vfio/ap.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/misc/vmcoreinfo.h b/include/hw/misc/vmcoreinfo.h
-index ebada6617a..6e523c3892 100644
---- a/include/hw/misc/vmcoreinfo.h
-+++ b/include/hw/misc/vmcoreinfo.h
-@@ -16,10 +16,10 @@
- #include "standard-headers/linux/qemu_fw_cfg.h"
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index 68ed059b39..582c091a24 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -30,7 +30,7 @@
+ #include "exec/address-spaces.h"
  #include "qom/object.h"
  
--#define VMCOREINFO_DEVICE "vmcoreinfo"
-+#define TYPE_VMCOREINFO "vmcoreinfo"
- typedef struct VMCoreInfoState VMCoreInfoState;
- DECLARE_INSTANCE_CHECKER(VMCoreInfoState, VMCOREINFO,
--                         VMCOREINFO_DEVICE)
-+                         TYPE_VMCOREINFO)
+-#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
++#define TYPE_VFIO_AP_DEVICE      "vfio-ap"
  
- typedef struct fw_cfg_vmcoreinfo FWCfgVMCoreInfo;
+ struct VFIOAPDevice {
+     APDevice apdev;
+@@ -39,7 +39,7 @@ struct VFIOAPDevice {
+ typedef struct VFIOAPDevice VFIOAPDevice;
  
-@@ -33,7 +33,7 @@ struct VMCoreInfoState {
- /* returns NULL unless there is exactly one device */
- static inline VMCoreInfoState *vmcoreinfo_find(void)
+ DECLARE_INSTANCE_CHECKER(VFIOAPDevice, VFIO_AP_DEVICE,
+-                         VFIO_AP_DEVICE_TYPE)
++                         TYPE_VFIO_AP_DEVICE)
+ 
+ static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
  {
--    Object *o = object_resolve_path_type("", VMCOREINFO_DEVICE, NULL);
-+    Object *o = object_resolve_path_type("", TYPE_VMCOREINFO, NULL);
+@@ -72,7 +72,7 @@ static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
  
-     return o ? VMCOREINFO(o) : NULL;
- }
-diff --git a/hw/misc/vmcoreinfo.c b/hw/misc/vmcoreinfo.c
-index a9d718fc23..a68e3ad68c 100644
---- a/hw/misc/vmcoreinfo.c
-+++ b/hw/misc/vmcoreinfo.c
-@@ -47,13 +47,13 @@ static void vmcoreinfo_realize(DeviceState *dev, Error **errp)
-      */
-     if (!vmcoreinfo_find()) {
-         error_setg(errp, "at most one %s device is permitted",
--                   VMCOREINFO_DEVICE);
-+                   TYPE_VMCOREINFO);
-         return;
+     if (!group_path) {
+         error_setg(errp, "%s: no iommu_group found for %s: %s",
+-                   VFIO_AP_DEVICE_TYPE, vapdev->vdev.sysfsdev, gerror->message);
++                   TYPE_VFIO_AP_DEVICE, vapdev->vdev.sysfsdev, gerror->message);
+         g_error_free(gerror);
+         return NULL;
      }
- 
-     if (!fw_cfg || !fw_cfg->dma_enabled) {
-         error_setg(errp, "%s device requires fw_cfg with DMA",
--                   VMCOREINFO_DEVICE);
-+                   TYPE_VMCOREINFO);
-         return;
-     }
- 
-@@ -94,7 +94,7 @@ static void vmcoreinfo_device_class_init(ObjectClass *klass, void *data)
+@@ -176,7 +176,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
  }
  
- static const TypeInfo vmcoreinfo_device_info = {
--    .name          = VMCOREINFO_DEVICE,
-+    .name          = TYPE_VMCOREINFO,
-     .parent        = TYPE_DEVICE,
-     .instance_size = sizeof(VMCoreInfoState),
-     .class_init    = vmcoreinfo_device_class_init,
+ static const TypeInfo vfio_ap_info = {
+-    .name = VFIO_AP_DEVICE_TYPE,
++    .name = TYPE_VFIO_AP_DEVICE,
+     .parent = TYPE_AP_DEVICE,
+     .instance_size = sizeof(VFIOAPDevice),
+     .class_init = vfio_ap_class_init,
 -- 
 2.26.2
 
