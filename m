@@ -2,94 +2,93 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0DE9C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 875A0C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:45:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83D5B20773
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:41:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4E66E20767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:45:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aOBCpcUN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83D5B20773
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TnzwXnPm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E66E20767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48146 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDT0z-00042Z-Oi
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 09:41:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47982)
+	id 1kDT5J-00062b-H3
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 09:45:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kDSzv-0002bZ-8f
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 09:40:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43643)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kDT4j-0005VR-Ja
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 09:45:21 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:53703
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kDSzs-00042e-5O
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 09:40:22 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kDT4h-0004gj-9z
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 09:45:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599054018;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1599054318;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wtKBUNmK8N3oL2BVotOhU94bRl1pZuSZnWwTjChQByc=;
- b=aOBCpcUN/mUYVTdeppJfB0qMNKagCL3QyH1bvJ4X8by8/nZBkp7JzgzsEzUgdJE/zh8zqC
- CI6lNxuy11vSQlkehxhw8ohH0C+S97qYatNMlQYXL7eFF5xb7BGCeP1bDgCiJKm1m5tGJa
- pD23EjdIVqMPZNG4RWriJJ+F6fmLfYc=
+ bh=2+MPsbofg30OLOlchA9jxow2R8EzQAAlztB9M04RxP4=;
+ b=TnzwXnPmvVuc05NPa1kidKBJcsZa/En2cYQyzwiVH6ia2qN0PH0pmSqEak4nmGx/mGFFJY
+ VElROd47c7D0ukAP8BZ/wZhkf91n+eqGp8FFq4y2OStbXb6ZanBc8MU2O03ip8tWemCMQ7
+ oegOu4WvcQSmeq7/dGv3soOU8IeuFPg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-176-tLwMjqlbOQqYVsVGDQ0MYA-1; Wed, 02 Sep 2020 09:40:16 -0400
-X-MC-Unique: tLwMjqlbOQqYVsVGDQ0MYA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-375-A0wrBHelMgWcyhYGf3wcjQ-1; Wed, 02 Sep 2020 09:45:07 -0400
+X-MC-Unique: A0wrBHelMgWcyhYGf3wcjQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7ED541005504;
- Wed,  2 Sep 2020 13:40:14 +0000 (UTC)
-Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A32EE76E01;
- Wed,  2 Sep 2020 13:39:58 +0000 (UTC)
-Subject: Re: [RFC v8 2/5] memory: Add IOMMUTLBEvent
-To: Eugenio Perez Martin <eperezma@redhat.com>
-References: <20200901142608.24481-1-eperezma@redhat.com>
- <20200901142608.24481-3-eperezma@redhat.com>
- <00f148d1-9922-6a57-18da-91bbbbaf8f9e@redhat.com>
- <CAJaqyWeM53WFuT9FernakkiRNacqCcOj8ALAvUYubqOxpitUsw@mail.gmail.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <3fb3aaef-f540-d494-d37a-e1b9ce1e6e2d@redhat.com>
-Date: Wed, 2 Sep 2020 15:39:56 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A626D873117;
+ Wed,  2 Sep 2020 13:45:06 +0000 (UTC)
+Received: from redhat.com (ovpn-114-158.ams2.redhat.com [10.36.114.158])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B9F44672C6;
+ Wed,  2 Sep 2020 13:45:05 +0000 (UTC)
+Date: Wed, 2 Sep 2020 14:45:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] 9pfs: log warning if msize <= 8192
+Message-ID: <20200902134503.GJ403297@redhat.com>
+References: <E1kDR8W-0001s4-Sr@lizzy.crudebyte.com>
+ <20200902122547.GH403297@redhat.com> <399764553.t4N7NBxW8t@silver>
+ <20200902153934.5a2d7f86@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <CAJaqyWeM53WFuT9FernakkiRNacqCcOj8ALAvUYubqOxpitUsw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200902153934.5a2d7f86@bahia.lan>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eric.auger@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:07:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.324, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,600 +101,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
- Peter Xu <peterx@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Christian Schoenebeck <qemu_oss@crudebyte.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eugenio,
+On Wed, Sep 02, 2020 at 03:39:34PM +0200, Greg Kurz wrote:
+> On Wed, 02 Sep 2020 14:52:33 +0200
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> 
+> > On Mittwoch, 2. September 2020 14:25:47 CEST Daniel P. Berrangé wrote:
+> > > On Wed, Sep 02, 2020 at 01:22:49PM +0200, Christian Schoenebeck wrote:
+> > > > It is essential to choose a reasonable high value for 'msize' to avoid
+> > > > severe degraded file I/O performance. This parameter has to be chosen
+> > > > on client/guest side, and a Linux client defaults to an 'msize' of only
+> > > > 8192 if the user did not explicitly specify a value for 'msize'.
+> > > > 
+> > > > Unfortunately many users are not aware that they should specify an
+> > > > appropriate value for 'msize' to avoid severe performance issues, so
+> > > > log a performance warning on host side in that case to make it more
+> > > > clear.
+> > > 
+> > > What is a more reasonable "msize" value to pick instead of 8k ?
+> > > ie at what msize is I/O not several degraded ?
+> > 
+> > A good value depends on the file I/O potential of the underlying storage on 
+> > host side, and then you still would need to trade off between performance 
+> > profit and additional RAM costs, i.e. with growing msize (RAM occupation), 
+> > performance still increases, but performance delta will shrink continuously.
+> > 
+> > So in practice you might e.g. choose anything between 10MiB ... >100MiB for a 
+> > SATA spindle disk storage, and a much higher value for anything PCIe based 
+> > flash storage. So a user probably should benchmark and decide what's 
+> > reasonable for the intended use case.
+> > 
+> > > If there a reason that Linux can't pick a better default ?
+> > 
+> > I was not involved when that default value was picked on Linux side, so I 
+> > don't know why exactly this value (8192) had been chosen as default 'msize' 
+> > years ago.
+> > 
+> 
+> The original size back in 2005 was 9000:
+> 
+> [greg@bahia kernel-linus]$ git show 9e82cf6a802a7 | grep 9000
+> +	v9ses->maxdata = 9000;
+> +	if (v9ses->maxdata != 9000)
+> 
+> which was later converted to 8192.
+> 
+> I couldn't find any hint on why such a small size was chosen.
+> 
+> Maybe you can try to contact 9pfs father ?
+> 
+> Eric Van Hensbergen <ericvh@gmail.com>
+> 
+> > It certainly (sh/c)ould be higher, as it is already close to the theoreticaly 
+> > minimum msize of 4096. However how should a Linux guest automatically pick a 
+> > reasonable msize if it does not have any knowlege of host's storage features?
+> > 
+> > But even if this will be addressed on Linux kernel side, I still think users 
+> > of old kernels should be made aware of this issue, as it is not obvious to the 
+> > user.
+> > 
+> 
+> I tend to agree. Until linux decides of a better default, we should only
+> warn the user if they decide to go below the current one.
 
-On 9/2/20 3:18 PM, Eugenio Perez Martin wrote:
-> On Wed, Sep 2, 2020 at 12:17 PM Auger Eric <eric.auger@redhat.com> wrote:
->>
->> Hi Eugenio,
->>
->> On 9/1/20 4:26 PM, Eugenio Pérez wrote:
->>> This way we can tell between regulars IOMMURLBEntries (entry of IOMMU
->>> hardware) and notifications.>
->>> In the notifications, we set explicitly if it is a MAPs or an UNMAP,
->>> instead of trusting in entry permissions to differenciate them.
->> differentiate
->>
->> Is it the real justification or is the rationale behind adding this type
->> to be able to add new types of events?
-> 
-> Hi Eric,
-> 
-> Actually, the flag is to be able to tell the difference between
-> pre-existing events that were mixed. No new type of event involved,
-> just making it explicit.
+To be clear, I'm not objecting to warning - just that the proposed warning
+doesn't give any useful information about what is considered to be a
+sensible alternative size, and nor does the commit message.
 
-Well IOMMU_NOTIFIER_DEVIOTLB, introduced in subsequent patch is a new
-type of event.
+Just like to see the commit message provide the background info above,
+and ideally have the warning message at least give the user a suggestion
+that is in the sensible order of magnitude they should be looking at.
 
-By the way in,
-[RFC v8 3/5] memory: Add IOMMU_DEVIOTLB_UNMAP IOMMUTLBNotificationType
-you should fix the commit msg (IOMMU_DEVIOTLB_UNMAP) or effectively use
-IOMMU_DEVIOTLB_UNMAP as suggested in a previous email. Hopefully you did
-not get the advise to rename before ;-) Sorry I joined the review too late.
+eg tell them to aim for 1 MB (or whatever value) as a starting point to
+tuning.
 
 
-> 
->>>
->>> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
->>> ---
->>>  hw/arm/smmu-common.c  | 13 ++++---
->>>  hw/arm/smmuv3.c       | 13 ++++---
->>>  hw/i386/intel_iommu.c | 88 ++++++++++++++++++++++++-------------------
->>>  hw/misc/tz-mpc.c      | 32 +++++++++-------
->>>  hw/ppc/spapr_iommu.c  | 15 ++++----
->>>  include/exec/memory.h | 31 ++++++++-------
->>>  softmmu/memory.c      | 16 +++-----
->>>  7 files changed, 112 insertions(+), 96 deletions(-)
->>
->> you may add "orderFile = scripts/git.orderfile" in your .git/config diff
->> section to get headers first
->>
->> [diff]
->>         orderFile = scripts/git.orderfile
->>
-> 
-> Didn't realize that, thanks!
-> 
->>>
->>> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
->>> index 88d2c454f0..405d5c5325 100644
->>> --- a/hw/arm/smmu-common.c
->>> +++ b/hw/arm/smmu-common.c
->>> @@ -465,14 +465,15 @@ IOMMUMemoryRegion *smmu_iommu_mr(SMMUState *s, uint32_t sid)
->>>  /* Unmap the whole notifier's range */
->>>  static void smmu_unmap_notifier_range(IOMMUNotifier *n)
->>>  {
->>> -    IOMMUTLBEntry entry;
->>> +    IOMMUTLBEvent event;
->>>
->>> -    entry.target_as = &address_space_memory;
->>> -    entry.iova = n->start;
->>> -    entry.perm = IOMMU_NONE;
->>> -    entry.addr_mask = n->end - n->start;
->>> +    event.type = IOMMU_NOTIFIER_UNMAP;
->>> +    event.entry.target_as = &address_space_memory;
->>> +    event.entry.iova = n->start;
->>> +    event.entry.perm = IOMMU_NONE;
->>> +    event.entry.addr_mask = n->end - n->start;
->>>
->>> -    memory_region_notify_iommu_one(n, &entry);
->>> +    memory_region_notify_iommu_one(n, &event);
->>>  }
->>>
->>>  /* Unmap all notifiers attached to @mr */
->>> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
->>> index 0a893ae918..62b0e289ca 100644
->>> --- a/hw/arm/smmuv3.c
->>> +++ b/hw/arm/smmuv3.c
->>> @@ -799,7 +799,7 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
->>>                                 uint8_t tg, uint64_t num_pages)
->>>  {
->>>      SMMUDevice *sdev = container_of(mr, SMMUDevice, iommu);
->>> -    IOMMUTLBEntry entry;
->>> +    IOMMUTLBEvent event;
->>>      uint8_t granule = tg;
->>>
->>>      if (!tg) {
->>> @@ -822,12 +822,13 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
->>>          granule = tt->granule_sz;
->>>      }
->>>
->>> -    entry.target_as = &address_space_memory;
->>> -    entry.iova = iova;
->>> -    entry.addr_mask = num_pages * (1 << granule) - 1;
->>> -    entry.perm = IOMMU_NONE;
->>> +    event.type = IOMMU_NOTIFIER_UNMAP;
->>> +    event.entry.target_as = &address_space_memory;
->>> +    event.entry.iova = iova;
->>> +    event.entry.addr_mask = num_pages * (1 << granule) - 1;
->>> +    event.entry.perm = IOMMU_NONE;
->>>
->>> -    memory_region_notify_iommu_one(n, &entry);
->>> +    memory_region_notify_iommu_one(n, &event);
->>>  }
->>>
->>>  /* invalidate an asid/iova range tuple in all mr's */
->>> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
->>> index 2ad6b9d796..0c4aef5cb5 100644
->>> --- a/hw/i386/intel_iommu.c
->>> +++ b/hw/i386/intel_iommu.c
->>> @@ -1073,7 +1073,7 @@ static int vtd_iova_to_slpte(IntelIOMMUState *s, VTDContextEntry *ce,
->>>      }
->>>  }
->>>
->>> -typedef int (*vtd_page_walk_hook)(IOMMUTLBEntry *entry, void *private);
->>> +typedef int (*vtd_page_walk_hook)(IOMMUTLBEvent *event, void *private);
->>>
->>>  /**
->>>   * Constant information used during page walking
->>> @@ -1094,11 +1094,12 @@ typedef struct {
->>>      uint16_t domain_id;
->>>  } vtd_page_walk_info;
->>>
->>> -static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
->>> +static int vtd_page_walk_one(IOMMUTLBEvent *event, vtd_page_walk_info *info)
->>>  {
->>>      VTDAddressSpace *as = info->as;
->>>      vtd_page_walk_hook hook_fn = info->hook_fn;
->>>      void *private = info->private;
->>> +    IOMMUTLBEntry *entry = &event->entry;
->>>      DMAMap target = {
->>>          .iova = entry->iova,
->>>          .size = entry->addr_mask,
->>> @@ -1107,7 +1108,7 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
->>>      };
->>>      DMAMap *mapped = iova_tree_find(as->iova_tree, &target);
->>>
->>> -    if (entry->perm == IOMMU_NONE && !info->notify_unmap) {
->>> +    if (event->type == IOMMU_NOTIFIER_UNMAP && !info->notify_unmap) {
->>>          trace_vtd_page_walk_one_skip_unmap(entry->iova, entry->addr_mask);
->>>          return 0;
->>>      }
->>> @@ -1115,7 +1116,7 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
->>>      assert(hook_fn);
->>>
->>>      /* Update local IOVA mapped ranges */
->>> -    if (entry->perm) {
->>> +    if (event->type == IOMMU_NOTIFIER_MAP) {
->>>          if (mapped) {
->>>              /* If it's exactly the same translation, skip */
->>>              if (!memcmp(mapped, &target, sizeof(target))) {
->>> @@ -1141,19 +1142,21 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
->>>                  int ret;
->>>
->>>                  /* Emulate an UNMAP */
->>> +                event->type = IOMMU_NOTIFIER_UNMAP;
->>>                  entry->perm = IOMMU_NONE;
->>>                  trace_vtd_page_walk_one(info->domain_id,
->>>                                          entry->iova,
->>>                                          entry->translated_addr,
->>>                                          entry->addr_mask,
->>>                                          entry->perm);
->>> -                ret = hook_fn(entry, private);
->>> +                ret = hook_fn(event, private);
->>>                  if (ret) {
->>>                      return ret;
->>>                  }
->>>                  /* Drop any existing mapping */
->>>                  iova_tree_remove(as->iova_tree, &target);
->>> -                /* Recover the correct permission */
->>> +                /* Recover the correct type */
->>> +                event->type = IOMMU_NOTIFIER_MAP;
->>>                  entry->perm = cache_perm;
->>>              }
->>>          }
->>> @@ -1170,7 +1173,7 @@ static int vtd_page_walk_one(IOMMUTLBEntry *entry, vtd_page_walk_info *info)
->>>      trace_vtd_page_walk_one(info->domain_id, entry->iova,
->>>                              entry->translated_addr, entry->addr_mask,
->>>                              entry->perm);
->>> -    return hook_fn(entry, private);
->>> +    return hook_fn(event, private);
->>>  }
->>>
->>>  /**
->>> @@ -1191,7 +1194,7 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->>>      uint32_t offset;
->>>      uint64_t slpte;
->>>      uint64_t subpage_size, subpage_mask;
->>> -    IOMMUTLBEntry entry;
->>> +    IOMMUTLBEvent event;
->>>      uint64_t iova = start;
->>>      uint64_t iova_next;
->>>      int ret = 0;
->>> @@ -1245,13 +1248,15 @@ static int vtd_page_walk_level(dma_addr_t addr, uint64_t start,
->>>               *
->>>               * In either case, we send an IOTLB notification down.
->>>               */
->>> -            entry.target_as = &address_space_memory;
->>> -            entry.iova = iova & subpage_mask;
->>> -            entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
->>> -            entry.addr_mask = ~subpage_mask;
->>> +            event.entry.target_as = &address_space_memory;
->>> +            event.entry.iova = iova & subpage_mask;
->>> +            event.entry.perm = IOMMU_ACCESS_FLAG(read_cur, write_cur);
->>> +            event.entry.addr_mask = ~subpage_mask;
->>>              /* NOTE: this is only meaningful if entry_valid == true */
->>> -            entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
->>> -            ret = vtd_page_walk_one(&entry, info);
->>> +            event.entry.translated_addr = vtd_get_slpte_addr(slpte, info->aw);
->>> +            event.type = event.entry.perm ? IOMMU_NOTIFIER_MAP :
->>> +                                            IOMMU_NOTIFIER_UNMAP;
->>> +            ret = vtd_page_walk_one(&event, info);
->>>          }
->>>
->>>          if (ret < 0) {
->>> @@ -1430,10 +1435,10 @@ static int vtd_dev_to_context_entry(IntelIOMMUState *s, uint8_t bus_num,
->>>      return 0;
->>>  }
->>>
->>> -static int vtd_sync_shadow_page_hook(IOMMUTLBEntry *entry,
->>> +static int vtd_sync_shadow_page_hook(IOMMUTLBEvent *event,
->>>                                       void *private)
->>>  {
->>> -    memory_region_notify_iommu((IOMMUMemoryRegion *)private, 0, *entry);
->>> +    memory_region_notify_iommu((IOMMUMemoryRegion *)private, 0, *event);
->>>      return 0;
->>>  }
->>>
->>> @@ -1993,14 +1998,17 @@ static void vtd_iotlb_page_invalidate_notify(IntelIOMMUState *s,
->>>                   * page tables.  We just deliver the PSI down to
->>>                   * invalidate caches.
->>>                   */
->>> -                IOMMUTLBEntry entry = {
->>> -                    .target_as = &address_space_memory,
->>> -                    .iova = addr,
->>> -                    .translated_addr = 0,
->>> -                    .addr_mask = size - 1,
->>> -                    .perm = IOMMU_NONE,
->>> +                IOMMUTLBEvent event = {
->>> +                    .type = IOMMU_NOTIFIER_UNMAP,
->>> +                    .entry = {
->>> +                        .target_as = &address_space_memory,
->>> +                        .iova = addr,
->>> +                        .translated_addr = 0,
->>> +                        .addr_mask = size - 1,
->>> +                        .perm = IOMMU_NONE,
->>> +                    },
->>>                  };
->>> -                memory_region_notify_iommu(&vtd_as->iommu, 0, entry);
->>> +                memory_region_notify_iommu(&vtd_as->iommu, 0, event);
->>>              }
->>>          }
->>>      }
->>> @@ -2412,7 +2420,7 @@ static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
->>>                                            VTDInvDesc *inv_desc)
->>>  {
->>>      VTDAddressSpace *vtd_dev_as;
->>> -    IOMMUTLBEntry entry;
->>> +    IOMMUTLBEvent event;
->>>      struct VTDBus *vtd_bus;
->>>      hwaddr addr;
->>>      uint64_t sz;
->>> @@ -2460,12 +2468,13 @@ static bool vtd_process_device_iotlb_desc(IntelIOMMUState *s,
->>>          sz = VTD_PAGE_SIZE;
->>>      }
->>>
->>> -    entry.target_as = &vtd_dev_as->as;
->>> -    entry.addr_mask = sz - 1;
->>> -    entry.iova = addr;
->>> -    entry.perm = IOMMU_NONE;
->>> -    entry.translated_addr = 0;
->>> -    memory_region_notify_iommu(&vtd_dev_as->iommu, 0, entry);
->>> +    event.type = IOMMU_NOTIFIER_UNMAP;
->>> +    event.entry.target_as = &vtd_dev_as->as;
->>> +    event.entry.addr_mask = sz - 1;
->>> +    event.entry.iova = addr;
->>> +    event.entry.perm = IOMMU_NONE;
->>> +    event.entry.translated_addr = 0;
->>> +    memory_region_notify_iommu(&vtd_dev_as->iommu, 0, event);
->>>
->>>  done:
->>>      return true;
->>> @@ -3486,19 +3495,20 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->>>      size = remain = end - start + 1;
->>>
->>>      while (remain >= VTD_PAGE_SIZE) {
->>> -        IOMMUTLBEntry entry;
->>> +        IOMMUTLBEvent event;
->>>          uint64_t mask = get_naturally_aligned_size(start, remain, s->aw_bits);
->>>
->>>          assert(mask);
->>>
->>> -        entry.iova = start;
->>> -        entry.addr_mask = mask - 1;
->>> -        entry.target_as = &address_space_memory;
->>> -        entry.perm = IOMMU_NONE;
->>> +        event.type = IOMMU_NOTIFIER_UNMAP;
->>> +        event.entry.iova = start;
->>> +        event.entry.addr_mask = mask - 1;
->>> +        event.entry.target_as = &address_space_memory;
->>> +        event.entry.perm = IOMMU_NONE;
->>>          /* This field is meaningless for unmap */
->>> -        entry.translated_addr = 0;
->>> +        event.entry.translated_addr = 0;
->>>
->>> -        memory_region_notify_iommu_one(n, &entry);
->>> +        memory_region_notify_iommu_one(n, &event);
->>>
->>>          start += mask;
->>>          remain -= mask;
->>> @@ -3534,9 +3544,9 @@ static void vtd_address_space_refresh_all(IntelIOMMUState *s)
->>>      vtd_switch_address_space_all(s);
->>>  }
->>>
->>> -static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
->>> +static int vtd_replay_hook(IOMMUTLBEvent *event, void *private)
->>>  {
->>> -    memory_region_notify_iommu_one((IOMMUNotifier *)private, entry);
->>> +    memory_region_notify_iommu_one((IOMMUNotifier *)private, event);
->>>      return 0;
->>>  }
->>>
->>> diff --git a/hw/misc/tz-mpc.c b/hw/misc/tz-mpc.c
->>> index 98f151237f..30481e1c90 100644
->>> --- a/hw/misc/tz-mpc.c
->>> +++ b/hw/misc/tz-mpc.c
->>> @@ -82,8 +82,10 @@ static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
->>>      /* Called when the LUT word at lutidx has changed from oldlut to newlut;
->>>       * must call the IOMMU notifiers for the changed blocks.
->>>       */
->>> -    IOMMUTLBEntry entry = {
->>> -        .addr_mask = s->blocksize - 1,
->>> +    IOMMUTLBEvent event = {
->>> +        .entry = {
->>> +            .addr_mask = s->blocksize - 1,
->>> +        }
->>>      };
->>>      hwaddr addr = lutidx * s->blocksize * 32;
->>>      int i;
->>> @@ -100,26 +102,28 @@ static void tz_mpc_iommu_notify(TZMPC *s, uint32_t lutidx,
->>>          block_is_ns = newlut & (1 << i);
->>>
->>>          trace_tz_mpc_iommu_notify(addr);
->>> -        entry.iova = addr;
->>> -        entry.translated_addr = addr;
->>> +        event.entry.iova = addr;
->>> +        event.entry.translated_addr = addr;
->>>
->>> -        entry.perm = IOMMU_NONE;
->>> -        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
->>> -        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
->>> +        event.type = IOMMU_NOTIFIER_UNMAP;
->>> +        event.entry.perm = IOMMU_NONE;
->>> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, event);
->>> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, event);
->>>
->>> -        entry.perm = IOMMU_RW;
->>> +        event.type = IOMMU_NOTIFIER_MAP;
->>> +        event.entry.perm = IOMMU_RW;
->>>          if (block_is_ns) {
->>> -            entry.target_as = &s->blocked_io_as;
->>> +            event.entry.target_as = &s->blocked_io_as;
->>>          } else {
->>> -            entry.target_as = &s->downstream_as;
->>> +            event.entry.target_as = &s->downstream_as;
->>>          }
->>> -        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, entry);
->>> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_S, event);
->>>          if (block_is_ns) {
->>> -            entry.target_as = &s->downstream_as;
->>> +            event.entry.target_as = &s->downstream_as;
->>>          } else {
->>> -            entry.target_as = &s->blocked_io_as;
->>> +            event.entry.target_as = &s->blocked_io_as;
->>>          }
->>> -        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, entry);
->>> +        memory_region_notify_iommu(&s->upstream, IOMMU_IDX_NS, event);
->>>      }
->>>  }
->>>
->>> diff --git a/hw/ppc/spapr_iommu.c b/hw/ppc/spapr_iommu.c
->>> index 0fecabc135..8bc3cff05d 100644
->>> --- a/hw/ppc/spapr_iommu.c
->>> +++ b/hw/ppc/spapr_iommu.c
->>> @@ -445,7 +445,7 @@ static void spapr_tce_reset(DeviceState *dev)
->>>  static target_ulong put_tce_emu(SpaprTceTable *tcet, target_ulong ioba,
->>>                                  target_ulong tce)
->>>  {
->>> -    IOMMUTLBEntry entry;
->>> +    IOMMUTLBEvent event;
->>>      hwaddr page_mask = IOMMU_PAGE_MASK(tcet->page_shift);
->>>      unsigned long index = (ioba - tcet->bus_offset) >> tcet->page_shift;
->>>
->>> @@ -457,12 +457,13 @@ static target_ulong put_tce_emu(SpaprTceTable *tcet, target_ulong ioba,
->>>
->>>      tcet->table[index] = tce;
->>>
->>> -    entry.target_as = &address_space_memory,
->>> -    entry.iova = (ioba - tcet->bus_offset) & page_mask;
->>> -    entry.translated_addr = tce & page_mask;
->>> -    entry.addr_mask = ~page_mask;
->>> -    entry.perm = spapr_tce_iommu_access_flags(tce);
->>> -    memory_region_notify_iommu(&tcet->iommu, 0, entry);
->>> +    event.entry.target_as = &address_space_memory,
->>> +    event.entry.iova = (ioba - tcet->bus_offset) & page_mask;
->>> +    event.entry.translated_addr = tce & page_mask;
->>> +    event.entry.addr_mask = ~page_mask;
->>> +    event.entry.perm = spapr_tce_iommu_access_flags(tce);
->>> +    event.type = entry.perm ? IOMMU_NOTIFIER_MAP : IOMMU_NOTIFIER_UNMAP;
->>> +    memory_region_notify_iommu(&tcet->iommu, 0, event);
->>>
->>>      return H_SUCCESS;
->>>  }
->>> diff --git a/include/exec/memory.h b/include/exec/memory.h
->>> index 22c5f564d1..8a56707169 100644
->>> --- a/include/exec/memory.h
->>> +++ b/include/exec/memory.h
->>> @@ -70,11 +70,11 @@ typedef enum {
->>>  #define IOMMU_ACCESS_FLAG(r, w) (((r) ? IOMMU_RO : 0) | ((w) ? IOMMU_WO : 0))
->>>
->>>  struct IOMMUTLBEntry {
->>> -    AddressSpace    *target_as;
->>> -    hwaddr           iova;
->>> -    hwaddr           translated_addr;
->>> -    hwaddr           addr_mask;  /* 0xfff = 4k translation */
->>> -    IOMMUAccessFlags perm;
->>> +    AddressSpace            *target_as;
->>> +    hwaddr                   iova;
->>> +    hwaddr                   translated_addr;
->>> +    hwaddr                   addr_mask;  /* 0xfff = 4k translation */
->>> +    IOMMUAccessFlags         perm;
->>>  };
->>>
->>>  /*
->>> @@ -106,6 +106,11 @@ struct IOMMUNotifier {
->>>  };
->>>  typedef struct IOMMUNotifier IOMMUNotifier;
->>>
->>> +typedef struct IOMMUTLBEvent {
->>> +    IOMMUTLBEntry entry;
->>> +    IOMMUNotifierFlag type;
->> nit: I would put the type field before the entry
->>> +} IOMMUTLBEvent;
->>> +
->>>  /* RAM is pre-allocated and passed into qemu_ram_alloc_from_ptr */
->>>  #define RAM_PREALLOC   (1 << 0)
->>>
->>> @@ -1265,13 +1270,13 @@ uint64_t memory_region_iommu_get_min_page_size(IOMMUMemoryRegion *iommu_mr);
->>>   *
->>
->> Above there is:
->>
->>  * The notification type will be decided by entry.perm bits:
->>  *
->>  * - For UNMAP (cache invalidation) notifies: set entry.perm to IOMMU_NONE.
->>  * - For MAP (newly added entry) notifies: set entry.perm to the
->>  *   permission of the page (which is definitely !IOMMU_NONE).
->>
->> I think this should be updated as the main selector now is the type.
->>
-> 
-> Definitely it needs to be updated, thanks!
-> 
->> I am a little bit concerned by the fact nothing really checks perm =
->> IOMMU_NONE is consistent with UNMAP type. New call sites may forget
->> this? shouldn't we check this in memory_region_notify_(one)_iommu?
->>
-> 
-> So it should be not checked that way from now on, but by the use of
-> `IOMMUTLBEvent.type`. So the caller should be responsible for set it
-> properly.
-> 
-> Another way of making it explicit is by making that type a parameter
-> of memory_region_notify_(one)_iommu, and to keep IOMMUTLBEvent private
-> tomemory.c, but I'm not sure if the notification will need more and
-> more parameters, and I felt it scale better this way.
-Yep just wanted to share my concern. UNMAP necessary means
-perm=IOMMU_NONE. New callers may forget this ... an assert may enforce
-it but well.
-
-Thanks
-
-Eric
-> 
-> Thanks!
-> 
->>>   * @iommu_mr: the memory region that was changed
->>>   * @iommu_idx: the IOMMU index for the translation table which has changed
->>> - * @entry: the new entry in the IOMMU translation table.  The entry
->>> - *         replaces all old entries for the same virtual I/O address range.
->>> - *         Deleted entries have .@perm == 0.
->>> + * @event: TLB event with the new entry in the IOMMU translation table.
->>> + *         The entry replaces all old entries for the same virtual I/O address
->>> + *         range.
->>>   */
->>>  void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
->>>                                  int iommu_idx,
->>> -                                IOMMUTLBEntry entry);
->>> +                                IOMMUTLBEvent event);
->>>
->>>  /**
->>>   * memory_region_notify_iommu_one: notify a change in an IOMMU translation
->>> @@ -1281,12 +1286,12 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
->>>   * notifies a specific notifier, not all of them.
->>>   *
->>>   * @notifier: the notifier to be notified
->>> - * @entry: the new entry in the IOMMU translation table.  The entry
->>> - *         replaces all old entries for the same virtual I/O address range.
->>> - *         Deleted entries have .@perm == 0.
->>> + * @event: TLB event with the new entry in the IOMMU translation table.
->>> + *         The entry replaces all old entries for the same virtual I/O address
->>> + *         range.
->>>   */
->>>  void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
->>> -                              IOMMUTLBEntry *entry);
->>> +                                    IOMMUTLBEvent *event);
->>>
->>>  /**
->>>   * memory_region_register_iommu_notifier: register a notifier for changes to
->>> diff --git a/softmmu/memory.c b/softmmu/memory.c
->>> index 961c25b42f..09b3443eac 100644
->>> --- a/softmmu/memory.c
->>> +++ b/softmmu/memory.c
->>> @@ -1891,9 +1891,9 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
->>>  }
->>>
->>>  void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
->>> -                                    IOMMUTLBEntry *entry)
->>> +                                    IOMMUTLBEvent *event)
->>>  {
->>> -    IOMMUNotifierFlag request_flags;
->>> +    IOMMUTLBEntry *entry = &event->entry;
->>>      hwaddr entry_end = entry->iova + entry->addr_mask;
->>>
->>>      /*
->>> @@ -1906,20 +1906,14 @@ void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
->>>
->>>      assert(entry->iova >= notifier->start && entry_end <= notifier->end);
->>>
->>> -    if (entry->perm & IOMMU_RW) {
->>> -        request_flags = IOMMU_NOTIFIER_MAP;
->>> -    } else {
->>> -        request_flags = IOMMU_NOTIFIER_UNMAP;
->>> -    }
->>> -
->>> -    if (notifier->notifier_flags & request_flags) {
->>> +    if (event->type & notifier->notifier_flags) {
->>>          notifier->notify(notifier, entry);
->>>      }
->>>  }
->>>
->>>  void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
->>>                                  int iommu_idx,
->>> -                                IOMMUTLBEntry entry)
->>> +                                IOMMUTLBEvent event)
->>>  {
->>>      IOMMUNotifier *iommu_notifier;
->>>
->>> @@ -1927,7 +1921,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
->>>
->>>      IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
->>>          if (iommu_notifier->iommu_idx == iommu_idx) {
->>> -            memory_region_notify_iommu_one(iommu_notifier, &entry);
->>> +            memory_region_notify_iommu_one(iommu_notifier, &event);
->>>          }
->>>      }
->>>  }
->>>
->> Thanks
->>
->> Eric
->>
-> 
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
