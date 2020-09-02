@@ -2,73 +2,90 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1054C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:58:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91A09C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:00:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC09820709
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:58:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC09820709
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 4C6FF2071B
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 13:00:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F0eY0Qh/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C6FF2071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43732 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDSLX-0005Cu-R0
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 08:58:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36058)
+	id 1kDSNi-0007ep-CY
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 09:00:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDSKu-0003qb-IT
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:58:00 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:60299)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDSKs-0006sV-R3
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:58:00 -0400
-Received: from localhost.localdomain ([82.252.135.186]) by
- mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MhUDj-1kq4XJ1rNr-00ebXT; Wed, 02 Sep 2020 14:57:54 +0200
-From: Laurent Vivier <laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDSML-0005sF-6a
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:28148
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDSMJ-00074C-1d
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:59:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599051565;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ToVJIl/N/QJy1DVq9D07nTMl7p5rtFZIuuC+zFhQ+SA=;
+ b=F0eY0Qh//Whv/FYIdrdvoDLelK/w4NqYmnc6xWTucEEG57qPOdqGkznu34qf5BtwKD9cfs
+ A7KKnJAIfA2d4SIcFaGgex3r5BTYmmL2hCa0fg+u0Z2Eq+3DROhWDOWCyNE2RwKt+nbh+9
+ gFbjv6Q6ojffx4o8psZoMXO8blTjiXs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-484-KB_KvkfVNJa05stwYzr3dA-1; Wed, 02 Sep 2020 08:59:23 -0400
+X-MC-Unique: KB_KvkfVNJa05stwYzr3dA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 266F55703E
+ for <qemu-devel@nongnu.org>; Wed,  2 Sep 2020 12:59:19 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B978F5D9CC;
+ Wed,  2 Sep 2020 12:59:18 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2] linux-user: fix implicit conversion from enumeration type
- error
-Date: Wed,  2 Sep 2020 14:57:52 +0200
-Message-Id: <20200902125752.1033524-1-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
+Subject: [PATCH 01/39] configure: Add system = 'linux' for meson when
+ cross-compiling
+Date: Wed,  2 Sep 2020 08:58:39 -0400
+Message-Id: <20200902125917.26021-2-pbonzini@redhat.com>
+In-Reply-To: <20200902125917.26021-1-pbonzini@redhat.com>
+References: <20200902125917.26021-1-pbonzini@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:gvEqwXmBaIrlhBX1mj0oaC0WTvEwYq2UWm+cp7LK1cRhHidNSjJ
- +Wo/oRaokKTRVJc1kFyg3pVwpex7PJ7IUpflILgG0yD2gL6mxWATSZAt/MJyLWDBd0wtoLW
- uYQDy8Jjn8+uyD3HeIM0KwTtqEOUd/5xFXBP3z1fn8AhGXu+hAJQJUe+9MgjXbve5MkFFlC
- 4TX4XVDsS7RJAZddJnHoQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:kcuyfCzr53U=:X/8nppnkxh/fBO3moCa2GM
- zUx2eYcq7bmUfzg76wUDqk+rX21GNi1VBZ8qzJgdrhQ+34J3AyHiSbdIzpYkPuWdsTgkHbkfa
- DnOZuIovqt4qo1W0HYrFh4hnJ6p+wMwfVZ5pKC+C8jeUF21QbwBlaNblu0uR0M/UnIwYn1jFM
- SHQGOgsNxV8NBiaiBWJ3ceifNjGBHsclLw4TuYcTK/hkhWp5nFaz/yhBEQ+fORFXgJ+2ui8dw
- R5GWNp3uYs5T66d3QNJH5p2OI0DGwV8ThoAVt/3rhP4VaWw0huUlIJua9+v33TCQ4/pOS+GVc
- QuX9l/L/MFiO8F21zEg9Z48rXAFPxXe9mzzUo67LGouyfqWd37e1OQhXlEOIkkujX52wUVmZ4
- OMws4u2sB1f7IT6cLmJUV7N48mYdseM4Bw28XpD56IEDSTU8jhQONDRaiVwDEKS9M4e8/xEjs
- /hEW4q5iNgpi0wMXKi+BymBWcSJmCwLmsW3eHjr6WwiymXUXQ1AbGu07POP37J60Wv5PosN7E
- ytl6R/RMxPYqir+HjnlTXSPeC2wiuCiuMRyWVeL9I6oXpPEN/hsNwLVTOZEbEDlaZWEGnruZa
- X85MJxyHoVZON/7GInlWB8vsozcb721+GBlTQHkp9j7mjv9VY1k9jTPm2gh4SIA2h3435dBVj
- kom+gliAsbdmyuyHFu22yw8ufuylGZb8+WQNLSGmcqL/53tqsvGtj2fwaO7PgAfEH/+mxz7Kj
- LPhElHKavf2AT+JU9roDyJFO6ljlnPb0oCVCGqmo/p4HnPIVFGhmuw+BROj4x/t6av/2uyTlh
- dNBxFkTxFQTsMmuojLqan9L6JL0cCjHexZyXmuH5uFZ3RGctdWFLyMatZG509q5MbWp+rcC
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 08:57:56
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:26:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,42 +98,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Filip Bozuta <Filip.Bozuta@syrmia.com>, Laurent Vivier <laurent@vivier.eu>
+Cc: Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MK_ARRAY(type,size) is used to fill the field_types buffer, and if the
-"size" parameter is an enum type, clang [-Werror,-Wenum-conversion] reports
-an error when it is assigned to field_types which is also an enum, argtypes.
+From: Thomas Huth <thuth@redhat.com>
 
-To avoid that, convert "size" to "int" in MK_ARRAY(). "int" is the type
-used for the size evaluation in thunk_type_size().
+Meson needs the "system = xyz" line when cross-compiling. We are already
+adding a "system = 'windows'" for the MinGW cross-compilation case here,
+so let's add a "system = 'linux'" now for Linux hosts, too.
 
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200823111757.72002-2-thuth@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
+ configure | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Notes:
-    v2: put "size" in parentheses as it can be an expression
-
- include/exec/user/thunk.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
-index a5bbb2c73331..b281dfa30f8c 100644
---- a/include/exec/user/thunk.h
-+++ b/include/exec/user/thunk.h
-@@ -42,7 +42,7 @@ typedef enum argtype {
- } argtype;
- 
- #define MK_PTR(type) TYPE_PTR, type
--#define MK_ARRAY(type, size) TYPE_ARRAY, size, type
-+#define MK_ARRAY(type, size) TYPE_ARRAY, (int)(size), type
- #define MK_STRUCT(id) TYPE_STRUCT, id
- 
- #define THUNK_TARGET 0
+diff --git a/configure b/configure
+index 8a3acef89d..b58627f4aa 100755
+--- a/configure
++++ b/configure
+@@ -8163,6 +8163,9 @@ if test -n "$cross_prefix"; then
+             ?:*) pre_prefix=/ ;;
+         esac
+     fi
++    if test "$linux" = "yes" ; then
++        echo "system = 'linux'" >> $cross
++    fi
+     case "$ARCH" in
+         i386|x86_64)
+             echo "cpu_family = 'x86'" >> $cross
 -- 
 2.26.2
+
 
 
