@@ -2,84 +2,86 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 604BBC2BBD0
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D2CC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:02:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2D4542067C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BA1A2067C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:02:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qEZtLshl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D4542067C
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvkRQQvn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA1A2067C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDW9J-0001ix-Br
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 13:02:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45294)
+	id 1kDW9P-0001yB-5k
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 13:02:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDW8L-0008WN-NB
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:17 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:39299)
+ id 1kDW8Q-0000Ew-Db
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:22 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:42994)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDW8J-0000Gt-Pk
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:17 -0400
-Received: by mail-pl1-x642.google.com with SMTP id x18so40130pll.6
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 10:01:15 -0700 (PDT)
+ id 1kDW8O-0000I3-BS
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:01:22 -0400
+Received: by mail-pl1-x643.google.com with SMTP id j11so31339plk.9
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 10:01:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=38x0lAOA2AfvsIyHP+ReuB52i8b3LJOhHNpZq8BiwHk=;
- b=qEZtLshlbaYxYZeA2n1+SfYzq5CEui0yQ8Pqer+EZpYeTt/IGUtC3f4+vEbYdZmuvG
- WcqHnFQpPfA+EJKdhl6db062f9PVgx8V0XPGrKeIvNOmGnX99/rjpFd3bybtYNBuBQUL
- pIMAxVgIWpCCnwDls9rKhu0vca7/yimnLhbhpWGvm/+ZAj3o72k5eu8IiAk7pfZ6+18V
- 1aXcVFIzB9EKU1YspEKe0T8mYER/XbqEtu42G5CTke+5shlIDbcw6KlNwU7x4xkC4JOz
- YnRclJHjzAIN14OGl4RJN3fqSSWXFeomuwNsn+9RzGz54BUBNJ0IThEo2jSkS7820et0
- siyA==
+ bh=gZugdAc0YYQQQMUJH814Yqj9KG0APjmY2BrDJE6YAjA=;
+ b=rvkRQQvnFKYlB9Fk9yNrnqjpzSTP7BNzoPCS7ACQ1zsJigcJytrv4b9rBkKsPRUD2+
+ 1tsZR9dfiKMnC1FVyJyTAzJVHH6oQsl3epmNZIxSkvL1aIMT4AZWPBniRVIhy1CgP/s6
+ 6N9QO0U84pHwkBSASHBXtk/TWM9LVrrIfZ0zzy9aIjhMGj6r7+zqNzOKPD0hXHN+21f6
+ vjQmCS3LCBPmYKxlYUtgGomE0cuhI6q5+9SluMxlIhwppPDoofFBojyhz+ED1D/ge2Io
+ oJMHjWJknPaAwOkkaUNhrI9LQrhVFZC7NHCPBNFVug3f2UJGoi7EC8pFY+u+/a2CO96+
+ XlnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=38x0lAOA2AfvsIyHP+ReuB52i8b3LJOhHNpZq8BiwHk=;
- b=sFiPD2FD48gpJJxp88NkTCl89bR9hHSi3uu4DAuPnuAzAFHgOBoWwsME0SXlKaDOvF
- AM9nwDkytM6CbIdwQWK+KChYBUe3xDWJpzyBQNID+FOIphjffV6e8mQM1zICHwPjJgAN
- J1biXapJcJc6AF9xhHOyehEh+pepOee7FdKWZn5THIbXAXckWH5Ku0Mnnlx7KF+zS11O
- qg0tZbcDqrAQiaY6Cpz8d9KDxNBtdUP1qP61wyVtKLXUSOKAeWxsZHzX5bME1odiuI4T
- jRrgzN+8wf7QY/+CKme4evbbauKePX7tWYqqcwE6jPytTlaZVteSKupvnUeV4JGZ0VFA
- xGPA==
-X-Gm-Message-State: AOAM532H+7f59zPVFJuk2Nx1rqQabdp42BdIpioGz4SFT5zbMZ8u/uPw
- 5PCilrKysN5r5zlw6PU1JrA4LNKsvVI=
-X-Google-Smtp-Source: ABdhPJzJdvKDp8fqKbceWE4+l/g2etGf7lxfHWl26+9n7bmdUtuefTnn+iofL4QFdFhPWQ4b+uHyLQ==
-X-Received: by 2002:a17:90a:8d85:: with SMTP id
- d5mr2849276pjo.45.1599066073897; 
- Wed, 02 Sep 2020 10:01:13 -0700 (PDT)
+ bh=gZugdAc0YYQQQMUJH814Yqj9KG0APjmY2BrDJE6YAjA=;
+ b=pI7nFviyhvwNbptTWTbiFPplu2heBU0PRCuY335vHhQuDpVZ0xtOJ4RvBoM32BHLMo
+ 1Nk5QehcPiHNeEnZXhwPm4lMgDO0/ceeJ7VEGmR6UV2IQl+JNOCktXysVSvE/yYctz/a
+ 8QA3Uo5ntZSxAge70gEkHMsosQkKTFFv0zmVcspdwC6oRw4eJKM9gwL0933+rXM8M5M1
+ 7F6CB/2Hf4cSQZ2iVAPavE0QNGfW+PiayDLlXRq18fnq8Q3OsgVC7m4VIIfyMrdhy3Nc
+ +11aLy1/pKf3eng/sDjrxDxftl87ncW69aals0Pd+C14jqpn7v6KkNuelwhIgql2dCjq
+ Urnw==
+X-Gm-Message-State: AOAM530ldhCI54zIm+48XdzmBDSP2d4Z//lSvcR+hLZeFcjN1Zj7RseK
+ CxO2tOUYlxPCtVCFybOGfJOFby3Ny94=
+X-Google-Smtp-Source: ABdhPJyQaWqgXwZIJUlgmFK8GZFOYxD6y4pov31ZKOfQ5JGByy8/1rKhOZP0s13INLg5aef+VHvpMA==
+X-Received: by 2002:a17:90b:88d:: with SMTP id
+ bj13mr2981044pjb.80.1599066078441; 
+ Wed, 02 Sep 2020 10:01:18 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id x4sm40527pfm.86.2020.09.02.10.01.11
+ by smtp.googlemail.com with ESMTPSA id x4sm40527pfm.86.2020.09.02.10.01.16
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Sep 2020 10:01:13 -0700 (PDT)
+ Wed, 02 Sep 2020 10:01:17 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/6] configure: fixes dtc not cloned when running msys2 CI
-Date: Thu,  3 Sep 2020 01:00:49 +0800
-Message-Id: <20200902170054.810-2-luoyonggang@gmail.com>
+Subject: [PATCH 3/6] ci: Install msys2 in a proper way refer to
+ https://github.com/cirruslabs/cirrus-ci-docs/issues/699 Enable msys2 ci in
+ cirrus
+Date: Thu,  3 Sep 2020 01:00:51 +0800
+Message-Id: <20200902170054.810-4-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20200902170054.810-1-luoyonggang@gmail.com>
 References: <20200902170054.810-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x642.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,54 +108,133 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Symlink dtc after git submodule update, because on win32 symlink to non-exist folder are forbidden.
-
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- configure | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ .cirrus.yml                         | 23 ++++++++++++++++
+ scripts/ci/windows/msys2_build.sh   | 35 ++++++++++++++++++++++++
+ scripts/ci/windows/msys2_install.sh | 41 +++++++++++++++++++++++++++++
+ 3 files changed, 99 insertions(+)
+ create mode 100644 scripts/ci/windows/msys2_build.sh
+ create mode 100644 scripts/ci/windows/msys2_install.sh
 
-diff --git a/configure b/configure
-index 8a3acef89d..30f8c4db29 100755
---- a/configure
-+++ b/configure
-@@ -2053,9 +2053,6 @@ fi
- if test "$meson" = git; then
-     git_submodules="${git_submodules} meson"
- fi
--if test "$git_update" = yes; then
--    (cd "${source_path}" && GIT="$git" "./scripts/git-submodule.sh" update "$git_submodules")
--fi
- 
- case "$meson" in
-     git | internal)
-@@ -4261,9 +4258,6 @@ EOF
-       if test -d "${source_path}/dtc/libfdt" || test -e "${source_path}/.git" ; then
-           fdt=git
-           mkdir -p dtc
--          if [ "$pwd_is_source_path" != "y" ] ; then
--              symlink "$source_path/dtc/Makefile" "dtc/Makefile"
--          fi
-           fdt_cflags="-I${source_path}/dtc/libfdt"
-           fdt_ldflags="-L$PWD/dtc/libfdt"
-           fdt_libs="$fdt_libs"
-@@ -6593,6 +6587,16 @@ if test "$cpu" = "s390x" ; then
-   fi
- fi
- 
-+if test $git_update = 'yes' ; then
-+    (cd "${source_path}" && GIT="$git" "./scripts/git-submodule.sh" update "$git_submodules")
+diff --git a/.cirrus.yml b/.cirrus.yml
+index f287d23c5b..d377c28412 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -40,3 +40,26 @@ macos_xcode_task:
+     - ../configure --cc=clang || { cat config.log; exit 1; }
+     - gmake -j$(sysctl -n hw.ncpu)
+     - gmake check
 +
-+    if test "$fdt" = "git" ; then
-+        if [ "$pwd_is_source_path" != "y" ] ; then
-+            symlink "$source_path/dtc/Makefile" "dtc/Makefile"
-+        fi
-+    fi
-+fi
++windows_msys2_task:
++  windows_container:
++    image: cirrusci/windowsservercore:cmake
++    os_version: 2019
++    cpu: 8
++    memory: 8G
++  env:
++    MSYS: winsymlinks:nativestrict
++    MSYSTEM: MINGW64
++    CHERE_INVOKING: 1
++  printenv_script: C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
++  install_script:
++    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
++    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
++    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
++    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Sy --noconfirm"
++    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --needed --noconfirm -S bash pacman pacman-mirrors msys2-runtime"
++    - taskkill /F /IM gpg-agent.exe
++    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
++    - C:\tools\msys64\usr\bin\bash.exe -lc "sh scripts/ci/windows/msys2_install.sh"
++  script:
++    C:\tools\msys64\usr\bin\bash.exe -lc "sh scripts/ci/windows/msys2_build.sh"
+diff --git a/scripts/ci/windows/msys2_build.sh b/scripts/ci/windows/msys2_build.sh
+new file mode 100644
+index 0000000000..0363ef402a
+--- /dev/null
++++ b/scripts/ci/windows/msys2_build.sh
+@@ -0,0 +1,35 @@
++export QEMU_DIR=$PWD
++mkdir ../qemu-build
++cd ../qemu-build
++$QEMU_DIR/configure \
++  --python=python3 \
++  --cross-prefix=x86_64-w64-mingw32- \
++  --enable-gtk --enable-sdl \
++  --enable-capstone=git \
++  --enable-stack-protector \
++  --ninja=ninja \
++  --enable-gnutls \
++  --enable-nettle \
++  --enable-vnc \
++  --enable-vnc-sasl \
++  --enable-vnc-jpeg \
++  --enable-vnc-png \
++  --enable-membarrier \
++  --enable-slirp=git \
++  --disable-kvm \
++  --enable-hax \
++  --enable-whpx \
++  --disable-spice \
++  --enable-lzo \
++  --enable-snappy \
++  --enable-bzip2 \
++  --enable-vdi \
++  --enable-qcow1 \
++  --enable-tools \
++  --enable-libusb \
++  --enable-usb-redir \
++  --disable-libnfs \
++  --enable-libssh \
++  --disable-pie
++make -j$NUMBER_OF_PROCESSORS
++# make -j$NUMBER_OF_PROCESSORS check
+diff --git a/scripts/ci/windows/msys2_install.sh b/scripts/ci/windows/msys2_install.sh
+new file mode 100644
+index 0000000000..3a5392cd99
+--- /dev/null
++++ b/scripts/ci/windows/msys2_install.sh
+@@ -0,0 +1,41 @@
++pacman --noconfirm -S --needed \
++base-devel \
++git \
++mingw-w64-x86_64-python \
++mingw-w64-x86_64-python-setuptools \
++mingw-w64-x86_64-toolchain \
++mingw-w64-x86_64-SDL2 \
++mingw-w64-x86_64-SDL2_image \
++mingw-w64-x86_64-gtk3 \
++mingw-w64-x86_64-ninja \
++mingw-w64-x86_64-make \
++mingw-w64-x86_64-lzo2 \
++mingw-w64-x86_64-libjpeg-turbo \
++mingw-w64-x86_64-pixman \
++mingw-w64-x86_64-libgcrypt \
++mingw-w64-x86_64-capstone \
++mingw-w64-x86_64-libpng \
++mingw-w64-x86_64-libssh \
++mingw-w64-x86_64-libxml2 \
++mingw-w64-x86_64-snappy \
++mingw-w64-x86_64-libusb \
++mingw-w64-x86_64-usbredir \
++mingw-w64-x86_64-libtasn1 \
++mingw-w64-x86_64-libnfs \
++mingw-w64-x86_64-nettle \
++mingw-w64-x86_64-cyrus-sasl \
++mingw-w64-x86_64-curl \
++mingw-w64-x86_64-gnutls \
++mingw-w64-x86_64-zstd \
++mingw-w64-x86_64-glib2
 +
- # Check that the C++ compiler exists and works with the C compiler.
- # All the QEMU_CXXFLAGS are based on QEMU_CFLAGS. Keep this at the end to don't miss any other that could be added.
- if has $cxx; then
++cd /mingw64/bin
++cp x86_64-w64-mingw32-gcc-ar.exe x86_64-w64-mingw32-ar.exe
++cp x86_64-w64-mingw32-gcc-ranlib.exe x86_64-w64-mingw32-ranlib.exe
++cp x86_64-w64-mingw32-gcc-nm.exe x86_64-w64-mingw32-nm.exe
++cp windres.exe x86_64-w64-mingw32-windres.exe
++cp strip.exe x86_64-w64-mingw32-strip.exe
++cp objcopy.exe x86_64-w64-mingw32-objcopy.exe
++cp ld x86_64-w64-mingw32-ld.exe
++cp as x86_64-w64-mingw32-as.exe
++cp sdl2-config x86_64-w64-mingw32-sdl2-config
 -- 
 2.27.0.windows.1
 
