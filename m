@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5929DC433E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 01:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE347C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 01:21:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 193F820707
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 01:21:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 594B820707
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 01:21:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZAgoIYin"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 193F820707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YzUo+KFQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 594B820707
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45508 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45616 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDHSq-0001ff-Tt
-	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 21:21:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45554)
+	id 1kDHSu-0001iN-FF
+	for qemu-devel@archiver.kernel.org; Tue, 01 Sep 2020 21:21:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kDHRb-0000Id-Sj; Tue, 01 Sep 2020 21:20:11 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:49455 helo=ozlabs.org)
+ id 1kDHRb-0000Ic-QC; Tue, 01 Sep 2020 21:20:11 -0400
+Received: from ozlabs.org ([203.11.71.1]:45701)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kDHRZ-00033x-Bd; Tue, 01 Sep 2020 21:20:11 -0400
+ id 1kDHRZ-00033y-9g; Tue, 01 Sep 2020 21:20:11 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bh5hg40RFz9sVC; Wed,  2 Sep 2020 11:20:03 +1000 (AEST)
+ id 4Bh5hg4WR6z9sVB; Wed,  2 Sep 2020 11:20:03 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1599009603;
- bh=/0Fr68ZLatqgPD2Ci5FuiRZsFR3bvwm+hPOl1XlWBAE=;
+ bh=2cYAGQ2lNa6gMCGD9qDWp1XaH9iLwnixTvAlsiyhYhc=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ZAgoIYin2FAgD8kDjGTHbFHdDuMhJgdVBFQ+bzAn51/ITDYmtYGfIsc5pULCHDBZd
- WdU8cfGVz/Gjy3tGzNAyOY9jIUYJamfBnBFCtKOYzUROO/J7yV3yFGF/MPKt7xlV9k
- za6bpwg0LuuwzBMWQEnerH+RfCT8x7nm/wDs14ag=
-Date: Wed, 2 Sep 2020 11:16:46 +1000
+ b=YzUo+KFQJzudPzGE6ztsrWURVDJYCf62L8nOfMIOPWpJl59y2JrRaR8Cs8xwrodHx
+ D1iEGe10M0KNFKvaKsNUxrW9PeDb0AbTnwhW0aULG6KD3ye4dR5JMuD58qv15MZ7YH
+ v2kaVRc5VITOqTqlMID2bs5oTa/BhfmhF7OdB150=
+Date: Wed, 2 Sep 2020 11:17:08 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH 3/5] hw/ppc/ppc4xx_pci: Use ARRAY_SIZE() instead of magic
- value
-Message-ID: <20200902011646.GD1897@yekko.fritz.box>
+Subject: Re: [PATCH 4/5] hw/ppc/ppc4xx_pci: Replace pointless warning by
+ assert()
+Message-ID: <20200902011708.GE1897@yekko.fritz.box>
 References: <20200901104043.91383-1-f4bug@amsat.org>
- <20200901104043.91383-4-f4bug@amsat.org>
+ <20200901104043.91383-5-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="hxkXGo8AKqTJ+9QI"
+ protocol="application/pgp-signature"; boundary="Q8BnQc91gJZX4vDc"
 Content-Disposition: inline
-In-Reply-To: <20200901104043.91383-4-f4bug@amsat.org>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+In-Reply-To: <20200901104043.91383-5-f4bug@amsat.org>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/01 21:20:04
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -19
 X-Spam_score: -2.0
 X-Spam_bar: --
@@ -87,38 +87,42 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---hxkXGo8AKqTJ+9QI
+--Q8BnQc91gJZX4vDc
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 01, 2020 at 12:40:41PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Replace the magic '4' by ARRAY_SIZE(s->irq) which is more explicit.
+On Tue, Sep 01, 2020 at 12:40:42PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> We call pci_register_root_bus() to register 4 IRQs with the
+> ppc4xx_pci_set_irq() handler. As it can only be called with
+> values in the [0-4[ range, replace the pointless warning by
+> an assert().
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=E9 <f4bug@amsat.org>
 
 Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/ppc/ppc4xx_pci.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  hw/ppc/ppc4xx_pci.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 >=20
 > diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
-> index 3ea47df71fe..cd3f192a138 100644
+> index cd3f192a138..503ef46b39a 100644
 > --- a/hw/ppc/ppc4xx_pci.c
 > +++ b/hw/ppc/ppc4xx_pci.c
-> @@ -320,7 +320,8 @@ static void ppc4xx_pcihost_realize(DeviceState *dev, =
-Error **errp)
+> @@ -256,10 +256,7 @@ static void ppc4xx_pci_set_irq(void *opaque, int irq=
+_num, int level)
+>      qemu_irq *pci_irqs =3D opaque;
 > =20
->      b =3D pci_register_root_bus(dev, NULL, ppc4xx_pci_set_irq,
->                                ppc4xx_pci_map_irq, s->irq, get_system_mem=
-ory(),
-> -                              get_system_io(), 0, 4, TYPE_PCI_BUS);
-> +                              get_system_io(), 0, ARRAY_SIZE(s->irq),
-> +                              TYPE_PCI_BUS);
->      h->bus =3D b;
+>      trace_ppc4xx_pci_set_irq(irq_num);
+> -    if (irq_num < 0) {
+> -        fprintf(stderr, "%s: PCI irq %d\n", __func__, irq_num);
+> -        return;
+> -    }
+> +    assert(irq_num >=3D 0);
+>      qemu_set_irq(pci_irqs[irq_num], level);
+>  }
 > =20
->      pci_create_simple(b, 0, "ppc4xx-host-bridge");
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -126,25 +130,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---hxkXGo8AKqTJ+9QI
+--Q8BnQc91gJZX4vDc
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9O8nwACgkQbDjKyiDZ
-s5ISdw/+Ni8dI57O4f+4QVXKXRlk4CHa6MGCPttZD3sTvlp/gmvUUUu+cD4exKck
-gQWqpH3+mYZxILRI8bk0Ep6D2lGGgwvbLIQjN6WbDbX8arLgQ/BZqgQtDutD9Ugb
-+CUIaQxP9ewl15HIz7jM00dkwESUpdeigbbAp2wp8WUFLzASjvyooiI5OTfrYL3I
-ZpS14gpYSI4A2ULLLKgSTA5hzEmdLULA1EXhKeaqTgrn2jBSJxUyB2xGh4fhSOeW
-uG4whEF61bjjFzpHA9daeT2cZfHnLF5KHpnySnj5cB5nqGOkg050DfmQ2rRvkRr+
-rOWJAbNZ61G2+Rfch1T/AmcgwiCmaHtF4+Y2qIN3NOeNymoPOInjJnXxUz+KDdRb
-VeSc5ZSBIfMgTCBcXYdOi29fIt6wrqB1eeaB5MLC74SmihDMDNRinvQfH1Ii7Mxm
-JgXU/QfBBwnzbxehyV3OzzxrLKMa2013cTGTQ+X0qmkxoNwsNG8txmurMzcGHCBc
-zldTFFC/08F+IjzVrGj+p/b3CtCB+JAGCT7wfFLRMkzyupDgDYOMd0+A1PrvLR83
-d8E1g7HfsyAGDbEloYMGtfABpK2O7DSAFlSqF1jH5FH3fdf/hxRjDe+2PAtLv/6H
-/oVtSUvYsygKNo+3JdZzYoGGrzT+UyoL68oBhr4m5z0krn/VC6U=
-=ITJa
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9O8pQACgkQbDjKyiDZ
+s5KJww/8DJKc+Z8Cyw/JmqNHIWsPxtWYOpEure+y3N/0w8qmxlWWupDbGGgynPqe
+Ry2eZR7tEMap4X7qGOUGxvv4MvIVlqqOIrgWXnWgXWK+C2KR9qJm/rXuH0U4wuqr
+L9h2kKAN1ppF1UBAVjZSf9BFA7XiLnWwJqDZC22ad4jJkztWnwVifoQa1E1J6Uy0
+4WfG3yRfk5ESsN/HBn+mi2UdV7iv3bm8aQUA7mFMPT1r/V7u816z0i/u/mPPRRBL
+WSUPOYiucE+kSAxL2QNHNFgQ8ZxqE9QBhiF+qxu8ZVwwbhYjI0AoC5jGkhVcSAU0
+XCa2AkpPC9YM1Z6LyEsXbE8BorUZGZ321ZaR3DQFFhZlHITzzyUjauGE6dTbk65l
+/J3+yg2GNVMQmjg+8ANmPd/vQtcgsCl27qZjVRudlJXxGJu9zR0nAMMo2XAWlMUq
+shAxQge4LFK/zd4YoM9l9RJl47tpkAp+ZP8BloVyKGGqVeIOU6zN4zdkOQ4b2wLJ
+txvdfts+Alx5k1myRawpJRkE8ypuy9cVTk8ADdLxR6Cq/CHRq0teSKoD31+q1y2S
+ryVDy3lgUeaSyQqHV6MXVvVjM5F3aG3sa/nWko1QHtlNC0c0u/S4Buz3gnKDQ921
++eNNmFTt5tGtx7G3tq3OVBgZLv9Pjn6op3DGnXwp3JTnCczaDT0=
+=A0Tt
 -----END PGP SIGNATURE-----
 
---hxkXGo8AKqTJ+9QI--
+--Q8BnQc91gJZX4vDc--
 
