@@ -2,86 +2,73 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44AD5C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:58:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1054C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:58:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01CEA20709
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:58:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n3DfBcD2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01CEA20709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id AC09820709
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:58:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC09820709
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDSL9-0003xu-4v
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 08:58:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35660)
+	id 1kDSLX-0005Cu-R0
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 08:58:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDSJT-0002bJ-VH
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:56:32 -0400
-Received: from mail-ej1-x630.google.com ([2a00:1450:4864:20::630]:35140)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDSJS-0006i9-31
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:56:31 -0400
-Received: by mail-ej1-x630.google.com with SMTP id a26so6518680ejc.2
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 05:56:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=TWuuyNJEPdWgZVQHUW0W9PJcGJCL85OrMbndK73xZiE=;
- b=n3DfBcD24wH3K3/4eck8VsXEcV7yJvkhaWBXy+YThGS2SfdXmuy6addjcj+OharHTD
- yjexKH73absiKohv8iqHRbbkQAtqXBUWEj56Le8lo7UFEP6CTi1+F2acNujk6pRSr5Xz
- oyhL0X7uhXvEqbBJPBmMpoGnaYmlgWI8qfZ3q5zB/DpKnZJsUy1VY61NIqu+jQGn7ALT
- p3BGA71fCwiq+GIxYBJNIPo26tgn/0Ta5aHoWLX1GgZoXPO2Rvy2OaUKtI1ezH5oCrzn
- unnIa4DFrdHXqpij6r4qsUQGkc6jtFKa22QTaXfY/UOyTVIVWzuu2xasIxFtqQ+okFkP
- 5VCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=TWuuyNJEPdWgZVQHUW0W9PJcGJCL85OrMbndK73xZiE=;
- b=hZPp1Os2lHly8ZU12R59IbJKRRh4iAO6zGuytdj8ROFa04ZVnkB44QrRwmPx3G1Zkn
- BbrHY+JUXoEEYK30UGdKpctEni9t+z7q+BEckW1VU3hRX0hqjW8yMShavpjxsyqSIvOI
- KOYM8eSeP4/Ww9ovFH+qAAYfbk3PKFLjKwVtuX+O7wnjbbbKKIySUBXOG4fU+MfzY5Ld
- 4xj6NesK5CM4/MjwNHq0GQgKxrl+CBA2Ox+x52nkdMrtfJDcuF8ni8bbTxOw494NeGGR
- Ig0ILO5zJCclmx5807K8Gri/G4Ds7nrzDs17CgUdVr4fdhMUWhkeD5DRGVIVwVFGyLiF
- 80Mw==
-X-Gm-Message-State: AOAM530T/vryeF57jWRFJQkroIzgZsQys+5pmFuhJbAYhYOHNRvsvPco
- iM3swyUNoHoU/hcN5LKYc4BLQxLp2HBYuI6BkhNJ+CBvqKaUiQ==
-X-Google-Smtp-Source: ABdhPJxBkKSGv5xf7DP0pO3k7tSCYiyXkfevn4Mg5RUY1x+tMTGZthUqx9ndS3CpMC66rlA7z3YjaNrjJeTvqt1/dJg=
-X-Received: by 2002:a17:906:59b:: with SMTP id 27mr6525504ejn.56.1599051388534; 
- Wed, 02 Sep 2020 05:56:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDSKu-0003qb-IT
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:58:00 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:60299)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDSKs-0006sV-R3
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:58:00 -0400
+Received: from localhost.localdomain ([82.252.135.186]) by
+ mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1MhUDj-1kq4XJ1rNr-00ebXT; Wed, 02 Sep 2020 14:57:54 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] linux-user: fix implicit conversion from enumeration type
+ error
+Date: Wed,  2 Sep 2020 14:57:52 +0200
+Message-Id: <20200902125752.1033524-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20200901152050.255165-1-thuth@redhat.com>
-In-Reply-To: <20200901152050.255165-1-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 2 Sep 2020 13:56:16 +0100
-Message-ID: <CAFEAcA-RpQHgafHGvgBE_w2xZjJ4abWKNWXO3VO9yXwD5V=vNA@mail.gmail.com>
-Subject: Re: [PULL 0/8] Cirrus-CI improvements, and other CI-related fixes,
- m68k
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::630;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x630.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:gvEqwXmBaIrlhBX1mj0oaC0WTvEwYq2UWm+cp7LK1cRhHidNSjJ
+ +Wo/oRaokKTRVJc1kFyg3pVwpex7PJ7IUpflILgG0yD2gL6mxWATSZAt/MJyLWDBd0wtoLW
+ uYQDy8Jjn8+uyD3HeIM0KwTtqEOUd/5xFXBP3z1fn8AhGXu+hAJQJUe+9MgjXbve5MkFFlC
+ 4TX4XVDsS7RJAZddJnHoQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:kcuyfCzr53U=:X/8nppnkxh/fBO3moCa2GM
+ zUx2eYcq7bmUfzg76wUDqk+rX21GNi1VBZ8qzJgdrhQ+34J3AyHiSbdIzpYkPuWdsTgkHbkfa
+ DnOZuIovqt4qo1W0HYrFh4hnJ6p+wMwfVZ5pKC+C8jeUF21QbwBlaNblu0uR0M/UnIwYn1jFM
+ SHQGOgsNxV8NBiaiBWJ3ceifNjGBHsclLw4TuYcTK/hkhWp5nFaz/yhBEQ+fORFXgJ+2ui8dw
+ R5GWNp3uYs5T66d3QNJH5p2OI0DGwV8ThoAVt/3rhP4VaWw0huUlIJua9+v33TCQ4/pOS+GVc
+ QuX9l/L/MFiO8F21zEg9Z48rXAFPxXe9mzzUo67LGouyfqWd37e1OQhXlEOIkkujX52wUVmZ4
+ OMws4u2sB1f7IT6cLmJUV7N48mYdseM4Bw28XpD56IEDSTU8jhQONDRaiVwDEKS9M4e8/xEjs
+ /hEW4q5iNgpi0wMXKi+BymBWcSJmCwLmsW3eHjr6WwiymXUXQ1AbGu07POP37J60Wv5PosN7E
+ ytl6R/RMxPYqir+HjnlTXSPeC2wiuCiuMRyWVeL9I6oXpPEN/hsNwLVTOZEbEDlaZWEGnruZa
+ X85MJxyHoVZON/7GInlWB8vsozcb721+GBlTQHkp9j7mjv9VY1k9jTPm2gh4SIA2h3435dBVj
+ kom+gliAsbdmyuyHFu22yw8ufuylGZb8+WQNLSGmcqL/53tqsvGtj2fwaO7PgAfEH/+mxz7Kj
+ LPhElHKavf2AT+JU9roDyJFO6ljlnPb0oCVCGqmo/p4HnPIVFGhmuw+BROj4x/t6av/2uyTlh
+ dNBxFkTxFQTsMmuojLqan9L6JL0cCjHexZyXmuH5uFZ3RGctdWFLyMatZG509q5MbWp+rcC
+Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 08:57:56
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,38 +81,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ed Maste <emaste@freebsd.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Li-Wen Hsu <lwhsu@freebsd.org>
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Filip Bozuta <Filip.Bozuta@syrmia.com>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 1 Sep 2020 at 16:21, Thomas Huth <thuth@redhat.com> wrote:
->
->  Hi Peter,
->
-> the following changes since commit 2f4c51c0f384d7888a04b4815861e6d5fd244d75:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/usb-20200831-pull-request' into staging (2020-08-31 19:39:13 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2020-09-01
->
-> for you to fetch changes up to df496fb0532758cffb5ad4075b4e60a43c723492:
->
->   hw/m68k: QOMify the mcf5206 system integration module (2020-09-01 17:09:17 +0200)
->
-> ----------------------------------------------------------------
-> - Cirrus-CI improvements and fixes (compile with -Werror & fix for 1h problem)
-> - Two build system fixes to fix some failures the CI
-> - One m68k QOMification patch
-> ----------------------------------------------------------------
+MK_ARRAY(type,size) is used to fill the field_types buffer, and if the
+"size" parameter is an enum type, clang [-Werror,-Wenum-conversion] reports
+an error when it is assigned to field_types which is also an enum, argtypes.
 
-Hi -- this has a conflict in pc-bios/keymaps/meson.build (probably
-a clash with Paolo's series I just merged). Could you rebase and
-resend, please?
+To avoid that, convert "size" to "int" in MK_ARRAY(). "int" is the type
+used for the size evaluation in thunk_type_size().
 
-thanks
--- PMM
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+
+Notes:
+    v2: put "size" in parentheses as it can be an expression
+
+ include/exec/user/thunk.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/exec/user/thunk.h b/include/exec/user/thunk.h
+index a5bbb2c73331..b281dfa30f8c 100644
+--- a/include/exec/user/thunk.h
++++ b/include/exec/user/thunk.h
+@@ -42,7 +42,7 @@ typedef enum argtype {
+ } argtype;
+ 
+ #define MK_PTR(type) TYPE_PTR, type
+-#define MK_ARRAY(type, size) TYPE_ARRAY, size, type
++#define MK_ARRAY(type, size) TYPE_ARRAY, (int)(size), type
+ #define MK_STRUCT(id) TYPE_STRUCT, id
+ 
+ #define THUNK_TARGET 0
+-- 
+2.26.2
+
 
