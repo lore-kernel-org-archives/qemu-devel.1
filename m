@@ -2,113 +2,72 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1955C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:28:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AE90C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:29:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7594C20829
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:28:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O2Vp1+6G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7594C20829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5BF3B20829
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 12:29:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BF3B20829
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDRs4-000199-Lu
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 08:28:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56728)
+	id 1kDRtM-0002WE-J9
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 08:29:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDRr2-00008I-A8
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:27:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37810)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kDRsO-0001iy-1R
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:28:32 -0400
+Resent-Date: Wed, 02 Sep 2020 08:28:32 -0400
+Resent-Message-Id: <E1kDRsO-0001iy-1R@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21771)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDRr0-00039M-BH
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:27:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599049625;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=8jiyOWYmohyZgiQ4ibRHDdsvp8hxzlYq33ig7wCAe0k=;
- b=O2Vp1+6GeMaxqPi6bwJ51BcXcS15WO715LrPt3AFqhk4wKRiB7fBsnqMdF2kWvspn9qnRi
- /wSzFcwve1nscE9bNlIFOx+3z2chIAGfYDbgs7ds5H177wKJeRG+v9gEYxAULLHpdm+plP
- nnaH6x3xUVScVvv+dYHBpEmvA5wzk78=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-SWaG_W57PJq3f9UouE05jw-1; Wed, 02 Sep 2020 08:26:38 -0400
-X-MC-Unique: SWaG_W57PJq3f9UouE05jw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 61BA8189E609;
- Wed,  2 Sep 2020 12:26:37 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-169.ams2.redhat.com
- [10.36.114.169])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 52A375C1C4;
- Wed,  2 Sep 2020 12:26:36 +0000 (UTC)
-Subject: Re: [PATCH v8 00/43] block: Deal with filters
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200901143424.884735-1-mreitz@redhat.com>
- <20200902102337.GC5765@linux.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6aabacc9-3a01-0858-cf20-31e82816c93f@redhat.com>
-Date: Wed, 2 Sep 2020 14:26:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kDRs4-0003HY-3A
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 08:28:31 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1599049681; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=Keszl2o3kLqUUs+iz9kcGn2rbKO8tpcf3Sv+UWOFduZm6y6zu4PVfjzmoBCkLBy3dVhdxqih02tm/0dLZYp8WRZsb3i0rW/jA6MhIeW1l50e5Yg0d186wBD04K0laUGqmLpYCfRzScC4mQUZx9u5pwjhV1gsr30LppIa1iUE96Y=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1599049681;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=x98jtfBiq+rW0rLyOc7dGHQAg7SgZf66gjMf3d9OBLM=; 
+ b=nSmkCsh1S9QwUSCRuExbtJKnGDJfEQBxhex5jI+5/GjBk4cDIDrzHfy0hOsnO5P9JG0ePZupzaBBPiPYsMZ4pm/wsO7QU0rjFF8tB5ds/EQ2IO4RZdPVz7MmUEMWyYOzLYZl69O80Z14KVQjJ6EJkx8nrWdm2kT6p7J5q/MIU4Y=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1599049679489954.6427928269442;
+ Wed, 2 Sep 2020 05:27:59 -0700 (PDT)
+Subject: Re: [PATCH] fuzz: Add support for custom fuzzing library
+Message-ID: <159904967802.21843.3647751940094975439@66eaa9a8a123>
+In-Reply-To: <20200901181800.326382-1-alxndr@bu.edu>
 MIME-Version: 1.0
-In-Reply-To: <20200902102337.GC5765@linux.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="hc2aBzM7ghO5cgvHH1jfFIH7FMwoeHzQO"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
-X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.324, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alxndr@bu.edu
+Date: Wed, 2 Sep 2020 05:27:59 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 08:28:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -122,65 +81,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Reply-To: qemu-devel@nongnu.org
+Cc: lvivier@redhat.com, thuth@redhat.com, qemu-devel@nongnu.org, alxndr@bu.edu,
+ bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---hc2aBzM7ghO5cgvHH1jfFIH7FMwoeHzQO
-Content-Type: multipart/mixed; boundary="RhVPHD2TZYRWN24yB7wCrBjkd7Fx43Md7"
-
---RhVPHD2TZYRWN24yB7wCrBjkd7Fx43Md7
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 02.09.20 12:23, Kevin Wolf wrote:
-> Am 01.09.2020 um 16:33 hat Max Reitz geschrieben:
->> v6: https://lists.nongnu.org/archive/html/qemu-devel/2019-08/msg01715.ht=
-ml
->> v7: https://lists.nongnu.org/archive/html/qemu-block/2020-06/msg01357.ht=
-ml
->>
->> Branch: https://github.com/XanClic/qemu.git child-access-functions-v8
->> Branch: https://git.xanclic.moe/XanClic/qemu.git child-access-functions-=
-v8
->>
->>
->> Hi,
->>
->> In v8, there is not too much that has changed in respect to v7.  I tried
->> to address all of your comments and hope I got it right.  I also hope I
->> got the R-bs right.
->=20
-> Thanks, fixed up the typo in the commit message of patch 35 and applied
-> to the block branch.
-
-A day to celebrate! :)
-
-
---RhVPHD2TZYRWN24yB7wCrBjkd7Fx43Md7--
-
---hc2aBzM7ghO5cgvHH1jfFIH7FMwoeHzQO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9Pj3oACgkQ9AfbAGHV
-z0AiBAf/fwpkTPdXiTiLcu7Kf+88oVytnJfcbvR3c5+dztkljrL8+V9SebsOTmz4
-hqlqwWfp+cVyaCD3edc/uwF1GRKY6PH9n2D5zOc3cFy1B6WLlAAEg/MXWddsEbJL
-HMKaABVRycVgMpMfLiHFXllHyxQgrlina7uLdvRPpnkSg/oG8hWVd3Njcx3yz2TX
-wvXfwd/DM4jXyuvvJAYG/3bj6PbwJ7uLeBCiN+seL7eEiNHeF24tjCxMBMUr5dGl
-72vxtpYmLQXVeSUDFBsKCYRn+w11xJ5ClIyT4pYZi7e06IM8Pfgzhj+v3f1RJLtE
-fTv8DmwpOYxPupATbXLuFC9WvhlpYA==
-=jucp
------END PGP SIGNATURE-----
-
---hc2aBzM7ghO5cgvHH1jfFIH7FMwoeHzQO--
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkwMTE4MTgwMC4zMjYz
+ODItMS1hbHhuZHJAYnUuZWR1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
+ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
+YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDA5MDExODE4MDAuMzI2MzgyLTEt
+YWx4bmRyQGJ1LmVkdQpTdWJqZWN0OiBbUEFUQ0hdIGZ1eno6IEFkZCBzdXBwb3J0IGZvciBjdXN0
+b20gZnV6emluZyBsaWJyYXJ5Cgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+U3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjZWMwMWRkIGZ1eno6IEFkZCBzdXBwb3J0
+IGZvciBjdXN0b20gZnV6emluZyBsaWJyYXJ5Cgo9PT0gT1VUUFVUIEJFR0lOID09PQpFUlJPUjog
+TWlzc2luZyBTaWduZWQtb2ZmLWJ5OiBsaW5lKHMpCgp0b3RhbDogMSBlcnJvcnMsIDAgd2Fybmlu
+Z3MsIDY0IGxpbmVzIGNoZWNrZWQKCkNvbW1pdCBjZWMwMWRkMDE4NzMgKGZ1eno6IEFkZCBzdXBw
+b3J0IGZvciBjdXN0b20gZnV6emluZyBsaWJyYXJ5KSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
+ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
+b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
+Lgo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoK
+VGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIw
+MDkwMTE4MTgwMC4zMjYzODItMS1hbHhuZHJAYnUuZWR1L3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlw
+ZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBb
+aHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNo
+ZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
