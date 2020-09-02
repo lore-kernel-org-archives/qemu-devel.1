@@ -2,66 +2,69 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 073F8C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D06DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:28:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CEF3B20758
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:27:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEF3B20758
+	by mail.kernel.org (Postfix) with ESMTPS id 2F63220758
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:28:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F63220758
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46850 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47550 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDcAS-00050r-1K
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 19:27:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43130)
+	id 1kDcAZ-0005Hj-AE
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 19:27:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9k-0003pM-Ra
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:08 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:54179)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9q-0003yC-Rz
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:14 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:43415)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9i-0004qR-Gm
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:08 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9n-0004rB-6h
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:14 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MF39S-1kKBkF2I00-00FWdU; Thu, 03 Sep 2020 01:27:03 +0200
+ id 1Macay-1kpgnI0ej4-00c9oQ; Thu, 03 Sep 2020 01:27:06 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/9] Linux user for 5.2 patches
-Date: Thu,  3 Sep 2020 01:26:52 +0200
-Message-Id: <20200902232701.13299-1-laurent@vivier.eu>
+Subject: [PULL 5/9] linux-user: Add support for btrfs ioctls used to get/set
+ features
+Date: Thu,  3 Sep 2020 01:26:57 +0200
+Message-Id: <20200902232701.13299-6-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200902232701.13299-1-laurent@vivier.eu>
+References: <20200902232701.13299-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:2pjEquMmmsWlBNvpoJOCrFYc43yWRmaHcIirFyDXXG+04LfXj0I
- E/xx8Jugui+jkoKgGP76P+YNUUZiZyQMiCYhVfsSfR3mrAr40SMpmdNaEkFgd81VtFcalqj
- 6HXCYjIeg9f2/+EGSoGbq8g/0Wah6NfUcEnUCGDuAgV9wGfdbCii5gfaKpVHVsQkaqWlKDy
- PVSRztP39TfgUgFiM2bmw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ihP82OEoS/M=:p0fpX+B35WwQsvFLKE+eJD
- fCVw4Lp+8pQozehG4fsk8UDismZNrpopaA5P2TZMAh1LvzlSgrOs2+YGcc2OdRpEgMqwqsxLK
- Px3WYx3an2ZFf4uMTAka23HcPWXNC0U7tMmm5DJaxSqGuzby6nMgTIxb9ZrrmwjB197/MIeV8
- IHh4ewVnDjfQyZAEmZdFqdpTGJ5Lp+Ts+TehHKBYKuLKLZXxjhPeMUyfLwUFUXwNwogtCJ9oX
- tsjyp7Y5cD3gQHz1GlqTZYEayP4ETEt3YqwCyaj5vq7g56bGoF3c7AVYjvdSvOpL3exqGes1K
- MtgW2jfSNwA+M99uCxgKDvnnRmFX3ISPEdAIq4CHVZ+JWZMlkGqnlkHN9LyXj9qDT7iZIKl+l
- g6uCDVxZxjLQtjX2qtp995hFlVGslReIIN3wyI5wPsmzrezQFzgri0EJfhw1A/s71h/APrT0G
- aPkWBDJ3osxYWfd/Eqiuj+752ALWbmad1y3YasTW+8wms9h75DKQj1yvB7id45H/rUfE1s4/l
- ev5PeCL5zJ6d5mrZb7v22AtOGnlqLuT4KsTIap3jB6d5DhbOLtb/w0BUGUPqVGCYsJT7+fMA8
- NysEeP9pkbPwQAvlYAumEC88h1zsQf9e4eQO9Jk7ahp1H9bZxtoHicZyIEJ+gTxuiu/f3LHID
- KW9pVqxREJqKwUk4JEsv+mbkffqft/GJYUKdHAEywMFNHdMX/1xmk4TDtEmoBYXlPPUDf1T8W
- QXpODq4IZPUDZXgnMMKGR50hCHqQgelHza8a7WYfPjE/hSd8re1mRiks93wA0efgwL9EoNxzf
- UjAR9Gp7VxzvFmlQJcKg32KZB61iThLom4rTsyai+in9vPcO7xppJb0spVihM6oTiMlBfry
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:gG2r/H+rBXfZoOpQc5Jmx+QrUTVWoZ6p91ttUrw+Ri8Raw1AL/+
+ USGqtP7jI3MrFzri+1GMSpkRmUMKmUbXmvIw1iZh1VGzhuV4mkx3cXTIgCN9kUOkE6blBPo
+ urTkUC7dF4Su+oPEefYzrtrUrgaELTzcx8k17ZKsRbePT5eBlMZPDux0qZBBIe3h0G8ESOV
+ 8JiYY/yQecRviT6Sh1D8A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:OPXeMJHN4L0=:z6zH9ZDTB765fRkUMskNhK
+ pTrC/wlekthK5ZfPYAw0BaJtSMvm4/RJPwFarJxO/ITfC2g5AVKmUVTaWZBqHwT1WCp0/ZmLU
+ dLYuz/okB5BJNAV4iWklvxv8NoquJK6TBmew2lX2zrpiP57RbPusfbnXiqsV9Hrlz8uBZovl4
+ Inw3F9SZz+u2V0x9KPXMn0QwDShpbe1y89+XihWz9ovba8XyNtkYs7dFw6K2Bfs4I7JfoQ6Ob
+ BKjCATeRSIQV8rPBjvSAowNc/KD7zfSn9d87SupJdF0nMcYG1vPjP7ujQxtaRNfy/SCtw0mR9
+ qujQhh46GOGM5C6PPmStALDfh5N8uJPpgyITJl4x4Cn273CR6+u2zu5LXAbQq+Wy06B2iNpoL
+ b6alwuZ5ViGDFlvN8nrKqIftyGsvBTODN+FnjHGx5ClqoQ3X4i3ggN0GDxHxf0/KZykzpTLcT
+ eB80L9FkAjKdvFUzYHfpCENtNXLpL/yfFStyKeYuyVG01ivuZ8j4i3Lhf4MoPDa3DEOErXHfy
+ 31VABnh/wFMfBkUqOcfnWb+vSDKZHophhJFkdtDMEY0UOWvnVU7wv/smjoO4bhfcYIIepZA8B
+ 3FIBBwNqVUg9dDSR/7SPhetlxplEHVWanGO8CdOVhUPv7jxIr3iHHuaKVQqqspCQtz4UODsXG
+ 10RsgBbbCMSw0dRZrzfMi9GBfpfTIaEJLErvoKAMmjeKLSUUPI3gcsen/lraXCOWNrfC44Gkr
+ Au9fuUlLhvWsT2BBuEUDQl7iXQQuGvJzih5zgpyXo9bgZOpnMGe/Mlq+5ObnVQm7XOBnRomo5
+ 3mraw5W/gC5lhdj/sSC0b13eUHqDqrRY41s+aq6hc3/K0yiw/4Eqa6SS9/ouZpViRPCptVw
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 19:27:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 19:27:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -81,58 +84,123 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Laurent Vivier <laurent@vivier.eu>, Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 887adde81d1f1f3897f1688d37ec6851b4fdad86=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/bonzini-gitlab/tags/for-upstream' i=
-nt=3D=0D
-o staging (2020-09-01 22:50:23 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request=0D
-=0D
-for you to fetch changes up to 9a5a5a05523651d4c887388a6e0d0e446ffb279d:=0D
-=0D
-  linux-user: Add support for btrfs ioctls used to scrub a filesystem (2020=
--0=3D=0D
-9-03 01:09:35 +0200)=0D
-=0D
-----------------------------------------------------------------=0D
-Add btrfs support=0D
-Fix MK_ARRAY()=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Filip Bozuta (8):=0D
-  linux-user: Add support for a group of btrfs ioctls used for=0D
-    subvolumes=0D
-  linux-user: Add support for a group of btrfs ioctls used for snapshots=0D
-  linux-user: Add support for btrfs ioctls used to manipulate with=0D
-    devices=0D
-  linux-user: Add support for btrfs ioctls used to get/set features=0D
-  linux-user: Add support for a group of btrfs inode ioctls=0D
-  linux-user: Add support for two btrfs ioctls used for subvolume=0D
-  linux-user: Add support for btrfs ioctls used to manage quota=0D
-  linux-user: Add support for btrfs ioctls used to scrub a filesystem=0D
-=0D
-Laurent Vivier (1):=0D
-  linux-user: fix implicit conversion from enumeration type error=0D
-=0D
- configure                  |   9 ++=0D
- include/exec/user/thunk.h  |   2 +-=0D
- linux-user/ioctls.h        | 124 ++++++++++++++++++++++++++++=0D
- linux-user/syscall.c       |   3 +=0D
- linux-user/syscall_defs.h  |  37 +++++++++=0D
- linux-user/syscall_types.h | 163 +++++++++++++++++++++++++++++++++++++=0D
- 6 files changed, 337 insertions(+), 1 deletion(-)=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+From: Filip Bozuta <Filip.Bozuta@syrmia.com>
+
+This patch implements functionality for following ioctls:
+
+BTRFS_IOC_GET_FEATURES - Getting feature flags
+
+    Read feature flags for a btrfs filesystem. The feature flags
+    are returned inside the ioctl's third argument which represents
+    a pointer to a following structure type:
+
+    struct btrfs_ioctl_feature_flags {
+	__u64 compat_flags;
+	__u64 compat_ro_flags;
+	__u64 incompat_flags;
+    };
+
+    All of the structure field represent bit masks that can be composed
+    of values which can be found on:
+    https://elixir.bootlin.com/linux/latest/source/fs/btrfs/ctree.h#L282
+
+BTRFS_IOC_SET_FEATURES - Setting feature flags
+
+    Set and clear feature flags for a btrfs filesystem. The feature flags
+    are set using the ioctl's third argument which represents a
+    'struct btrfs_ioctl_feature_flags[2]' array. The first element of the
+    array represent flags which are to be cleared and the second element of
+    the array represent flags which are to be set. The second element has the
+    priority over the first, which means that if there are matching flags
+    in the elements, they will be set in the filesystem. If the flag values
+    in the third argument aren't correctly set to be composed of the available
+    predefined flag values, errno ENOPERM ("Operation not permitted") is returned.
+
+BTRFS_IOC_GET_SUPPORTED_FEATURES - Getting supported feature flags
+
+    Read supported feature flags for a btrfs filesystem. The supported
+    feature flags are read using the ioctl's third argument which represents
+    a 'struct btrfs_ioctl_feature_flags[3]' array. The first element of this
+    array represents all of the supported flags in the btrfs filesystem.
+    The second element represents flags that can be safely set and third element
+    represent flags that can be safely clearead.
+
+Implementation notes:
+
+    All of the implemented ioctls use 'struct btrfs_ioctl_feature_flags' as
+    third argument. That is the reason why a corresponding defintion was added
+    in file 'linux-user/syscall_types.h'.
+
+Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
+Tested-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200823195014.116226-5-Filip.Bozuta@syrmia.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/ioctls.h        | 12 ++++++++++++
+ linux-user/syscall_defs.h  |  3 +++
+ linux-user/syscall_types.h |  5 +++++
+ 3 files changed, 20 insertions(+)
+
+diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
+index 74d73994f691..11d7361848dd 100644
+--- a/linux-user/ioctls.h
++++ b/linux-user/ioctls.h
+@@ -216,6 +216,18 @@
+      IOCTL(BTRFS_IOC_GET_DEV_STATS, IOC_RW,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_dev_stats)))
+ #endif
++#ifdef BTRFS_IOC_GET_FEATURES
++     IOCTL(BTRFS_IOC_GET_FEATURES, IOC_R,
++           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_feature_flags)))
++#endif
++#ifdef BTRFS_IOC_SET_FEATURES
++     IOCTL(BTRFS_IOC_SET_FEATURES, IOC_W,
++           MK_PTR(MK_ARRAY(MK_STRUCT(STRUCT_btrfs_ioctl_feature_flags), 2)))
++#endif
++#ifdef BTRFS_IOC_GET_SUPPORTED_FEATURES
++     IOCTL(BTRFS_IOC_GET_SUPPORTED_FEATURES, IOC_R,
++           MK_PTR(MK_ARRAY(MK_STRUCT(STRUCT_btrfs_ioctl_feature_flags), 3)))
++#endif
+ #ifdef BTRFS_IOC_GET_SUBVOL_INFO
+      IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index d11279b78bbe..f70138979704 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1019,6 +1019,9 @@ struct target_rtc_pll_info {
+                                                            abi_ullong)
+ #define TARGET_BTRFS_IOC_DEV_INFO               TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 30)
+ #define TARGET_BTRFS_IOC_GET_DEV_STATS          TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 52)
++#define TARGET_BTRFS_IOC_GET_FEATURES           TARGET_IORU(BTRFS_IOCTL_MAGIC, 57)
++#define TARGET_BTRFS_IOC_SET_FEATURES           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 57)
++#define TARGET_BTRFS_IOC_GET_SUPPORTED_FEATURES TARGET_IORU(BTRFS_IOCTL_MAGIC, 57)
+ #define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IORU(BTRFS_IOCTL_MAGIC, 60)
+ 
+ /* usb ioctls */
+diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
+index 7e52b7aec5d9..eba0c43d4493 100644
+--- a/linux-user/syscall_types.h
++++ b/linux-user/syscall_types.h
+@@ -413,6 +413,11 @@ STRUCT(btrfs_ioctl_get_dev_stats,
+                 128 - 2 - BTRFS_DEV_STAT_VALUES_MAX)) /* unused */
+ #endif
+ 
++STRUCT(btrfs_ioctl_feature_flags,
++       TYPE_ULONGLONG, /* compat_flags */
++       TYPE_ULONGLONG, /* compat_ro_flags */
++       TYPE_ULONGLONG) /* incompat_flags */
++
+ STRUCT(rtc_time,
+        TYPE_INT, /* tm_sec */
+        TYPE_INT, /* tm_min */
+-- 
+2.26.2
+
 
