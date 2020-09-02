@@ -2,102 +2,56 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1DFC433E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6510BC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:17:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FC8D2087C
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:16:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OjpSRz3q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FC8D2087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3B1922087C
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 08:17:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B1922087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDNwq-0001yk-30
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:16:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43942)
+	id 1kDNxB-0002gu-76
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 04:17:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44054)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
- id 1kDNva-0000T5-5E
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:15:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:27431
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
- id 1kDNvY-0002s2-Pl
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:15:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599034532;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=YQJKHpot4c6uspshmywfzJykIZy5wv13h4yti1lCgAs=;
- b=OjpSRz3qMsUp0Ojr+MXPFWHUAs3gb00wJCBwcPDZYxOzOF/QzY1KtEHYeHWS1W3HhOVIZq
- mV/okGgcmWNXpjlhlvjR+mUP8l6wLKnM0WIrYm50D/CFX7rYXQQh3U0AUqSIYr3t2APfWJ
- UHdB2BWkoTgMlNy4yn7re6TvN7Rx48o=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-ehemqOxWPRecWhk2YW9CTA-1; Wed, 02 Sep 2020 04:15:28 -0400
-X-MC-Unique: ehemqOxWPRecWhk2YW9CTA-1
-Received: by mail-qk1-f198.google.com with SMTP id u23so2846576qku.17
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 01:15:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=YQJKHpot4c6uspshmywfzJykIZy5wv13h4yti1lCgAs=;
- b=MBIAPuG58s/Q/QegElcXv4OiG2LrzbY48xH0Pi+eqSY1A4sKilNAvXVx1r2jMIUqeL
- Eu9SeV3/laAYa859T7jEiHkUxoEJ5A1sXOYTkvjXiDVCYLXwytN1hD/MrKr9L/bYmcwj
- KTvE9pBE/sc+y4rzW4nmbUJ4Qj0Xz4JJ9KP9KK8ec/VNtZCN1L01epwTQ0VLW9QPH55e
- lxFAFUsrjse4hc+6X8CcxXq3SAZv+cgrtBGxwpC39/Lr36+HyWrbIjy1/v17f35kmwGp
- 0zYBB+V6waqBoyJaRX6OBQH0zvHSc3UaLvDxPcxkpd3O4mi2z7iolxgh0wAYVlnbhS1r
- jTNQ==
-X-Gm-Message-State: AOAM533nDmNflbCqmqZdTo24I5dS/n1HbVqiKWoQzebYMbGx4w4NySHw
- Z0OxrZz7ByrakbPfGge8kfYSAtOaj7P4lpoPlA5BNAovXrZA7GQHYP/YiYoWNOm+VCbyVJYlVIN
- EbLjtWyL4UIOzcmouciXycIxSJV9D1sA=
-X-Received: by 2002:a05:620a:b1a:: with SMTP id
- t26mr5745404qkg.353.1599034528183; 
- Wed, 02 Sep 2020 01:15:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwZyjfIfEVBtvA9aXcgxfeSp0D+gam18FAA53vhCeJYgbEuwGfokmaxgNULEP9btO5O02yWYkxz6pW16C7T3HQ=
-X-Received: by 2002:a05:620a:b1a:: with SMTP id
- t26mr5745387qkg.353.1599034527966; 
- Wed, 02 Sep 2020 01:15:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kDNvv-00011X-ML
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:15:55 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:38484)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kDNvt-0002tZ-27
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 04:15:55 -0400
+Received: from [127.0.1.1] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 8CC7740A2055;
+ Wed,  2 Sep 2020 08:15:47 +0000 (UTC)
+Subject: [PATCH v3 00/15] Reverse debugging
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+To: qemu-devel@nongnu.org
+Date: Wed, 02 Sep 2020 11:15:47 +0300
+Message-ID: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
+User-Agent: StGit/0.17.1-dirty
 MIME-Version: 1.0
-References: <20200901142608.24481-1-eperezma@redhat.com>
- <20200901142608.24481-3-eperezma@redhat.com>
- <20200901205458.GD3053@xz-x1>
-In-Reply-To: <20200901205458.GD3053@xz-x1>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Wed, 2 Sep 2020 10:14:51 +0200
-Message-ID: <CAJaqyWfSHPH=ULrGxEZc+bvWhN7Sk_YBU194a7YPJv9MTHCjNQ@mail.gmail.com>
-Subject: Re: [RFC v8 2/5] memory: Add IOMMUTLBEvent
-To: Peter Xu <peterx@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=eperezma@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:07:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 04:15:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,61 +64,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-ppc@nongnu.org,
- Jason Wang <jasowang@redhat.com>, Juan Quintela <quintela@redhat.com>,
- qemu-level <qemu-devel@nongnu.org>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm@nongnu.org, =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: kwolf@redhat.com, wrampazz@redhat.com, pavel.dovgalyuk@ispras.ru,
+ ehabkost@redhat.com, alex.bennee@linaro.org, mtosatti@redhat.com,
+ armbru@redhat.com, mreitz@redhat.com, stefanha@redhat.com, crosa@redhat.com,
+ pbonzini@redhat.com, philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 1, 2020 at 10:55 PM Peter Xu <peterx@redhat.com> wrote:
->
-> On Tue, Sep 01, 2020 at 04:26:05PM +0200, Eugenio P=C3=A9rez wrote:
-> > This way we can tell between regulars IOMMURLBEntries (entry of IOMMU
-> > hardware) and notifications.
->
-> s/regulars IOMMURLBEntries/regular IOMMUTLBEntry/
->
-> >
-> > In the notifications, we set explicitly if it is a MAPs or an UNMAP,
-> > instead of trusting in entry permissions to differenciate them.
-> >
-> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
->
-> [...]
->
-> >  struct IOMMUTLBEntry {
-> > -    AddressSpace    *target_as;
-> > -    hwaddr           iova;
-> > -    hwaddr           translated_addr;
-> > -    hwaddr           addr_mask;  /* 0xfff =3D 4k translation */
-> > -    IOMMUAccessFlags perm;
-> > +    AddressSpace            *target_as;
-> > +    hwaddr                   iova;
-> > +    hwaddr                   translated_addr;
-> > +    hwaddr                   addr_mask;  /* 0xfff =3D 4k translation *=
-/
-> > +    IOMMUAccessFlags         perm;
-> >  };
->
-> If these lines are identical, then we can avoid touching the spaces.
->
+GDB remote protocol supports reverse debugging of the targets.
+It includes 'reverse step' and 'reverse continue' operations.
+The first one finds the previous step of the execution,
+and the second one is intended to stop at the last breakpoint that
+would happen when the program is executed normally.
 
-Thanks for the catches! Didn't notice them rebasing.
+Reverse debugging is possible in the replay mode, when at least
+one snapshot was created at the record or replay phase.
+QEMU can use these snapshots for travelling back in time with GDB.
 
-> With above changes, please feel free to add:
->
-> Reviewed-by: Peter Xu <peterx@redhat.com>
->
-> --
-> Peter Xu
->
+Running the execution in replay mode allows using GDB reverse debugging
+commands:
+ - reverse-stepi (or rsi): Steps one instruction to the past.
+   QEMU loads on of the prior snapshots and proceeds to the desired
+   instruction forward. When that step is reaches, execution stops.
+ - reverse-continue (or rc): Runs execution "backwards".
+   QEMU tries to find breakpoint or watchpoint by loaded prior snapshot
+   and replaying the execution. Then QEMU loads snapshots again and
+   replays to the latest breakpoint. When there are no breakpoints in
+   the examined section of the execution, QEMU finds one more snapshot
+   and tries again. After the first snapshot is processed, execution
+   stops at this snapshot.
 
+The set of patches include the following modifications:
+ - gdbstub update for reverse debugging support
+ - functions that automatically perform reverse step and reverse
+   continue operations
+ - hmp/qmp commands for manipulating the replay process
+ - improvement of the snapshotting for saving the execution step
+   in the snapshot parameters
+ - avocado-based acceptance tests for reverse debugging
+
+The patches are available in the repository:
+https://github.com/ispras/qemu/tree/rr-200901
+
+v3 changes:
+ - rebased to support the new build system
+ - bumped avocado framework version for using fixed remote gdb client
+v2 changes:
+ - rebased to the latest upstream version
+ - fixed replaying of the POLL interrupts after the latest debug changes
+
+---
+
+Pavel Dovgaluk (14):
+      replay: provide an accessor for rr filename
+      qcow2: introduce icount field for snapshots
+      migration: introduce icount field for snapshots
+      iotests: update snapshot test for new output format
+      qapi: introduce replay.json for record/replay-related stuff
+      replay: introduce info hmp/qmp command
+      replay: introduce breakpoint at the specified step
+      replay: implement replay-seek command
+      replay: flush rr queue before loading the vmstate
+      gdbstub: add reverse step support in replay mode
+      gdbstub: add reverse continue support in replay mode
+      replay: describe reverse debugging in docs/replay.txt
+      tests: bump avocado version
+      tests/acceptance: add reverse debugging test
+
+Pavel Dovgalyuk (1):
+      replay: don't record interrupt poll
+
+
+ MAINTAINERS                           |    2 
+ accel/tcg/cpu-exec.c                  |   11 +
+ accel/tcg/translator.c                |    1 
+ block/qapi.c                          |   18 +-
+ block/qcow2-snapshot.c                |    9 +
+ block/qcow2.h                         |    3 
+ blockdev.c                            |   10 +
+ docs/interop/qcow2.txt                |    5 +
+ docs/replay.txt                       |   33 +++
+ exec.c                                |    8 +
+ gdbstub.c                             |   63 ++++++
+ hmp-commands-info.hx                  |   11 +
+ hmp-commands.hx                       |   50 +++++
+ include/block/snapshot.h              |    1 
+ include/monitor/hmp.h                 |    4 
+ include/sysemu/replay.h               |   24 ++
+ migration/savevm.c                    |   17 +-
+ qapi/block-core.json                  |   11 +
+ qapi/meson.build                      |    1 
+ qapi/misc.json                        |   18 --
+ qapi/qapi-schema.json                 |    1 
+ qapi/replay.json                      |  121 ++++++++++++
+ replay/meson.build                    |    1 
+ replay/replay-debugging.c             |  325 +++++++++++++++++++++++++++++++++
+ replay/replay-events.c                |    4 
+ replay/replay-internal.h              |    6 -
+ replay/replay.c                       |   22 ++
+ softmmu/cpus.c                        |   19 ++
+ stubs/replay.c                        |   15 ++
+ tests/Makefile.include                |    2 
+ tests/acceptance/reverse_debugging.py |  203 +++++++++++++++++++++
+ tests/qemu-iotests/267.out            |   48 ++---
+ tests/requirements.txt                |    2 
+ 33 files changed, 1003 insertions(+), 66 deletions(-)
+ create mode 100644 qapi/replay.json
+ create mode 100644 replay/replay-debugging.c
+ create mode 100644 tests/acceptance/reverse_debugging.py
+
+--
+Pavel Dovgalyuk
 
