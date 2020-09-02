@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A3DC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84041C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:47:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5F8320767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:45:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42D6620767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 22:47:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PoZuveSq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5F8320767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LN4+jCeM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42D6620767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDbVu-0005oC-0E
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:45:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34738)
+	id 1kDbWz-0007Gn-89
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 18:47:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34970)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbTn-0001Dl-2J
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:43:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42636)
+ id 1kDbUB-0002CP-JH
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51126)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDbTl-0008HS-CW
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:43:46 -0400
+ id 1kDbU9-0008LQ-S9
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 18:44:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599086624;
+ s=mimecast20190719; t=1599086649;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WXJ/b0LkDVNKrk5vHQjxjP6R69KmWMuMwiYPAGzJ5gM=;
- b=PoZuveSqSJOQo+8P0CMO9tzPbFbHlkId/yy1R1cLjgR9dUY04EjtKtlicCC7HQTonNjuoo
- 6Qm1FiCrR+IKxnqTJXnH0cQcrocl78+T/SpbJ9YlN1IRv/vnOdQ+4yZr95IicUvNnAn0/Y
- PTm8hX9UncjDprvmVP/DP6RdaqCx9/s=
+ bh=uTALatBGn4QE8HCwwyt8rDGqJUgIq8Z7wmi2LLpMhT0=;
+ b=LN4+jCeMk4fesuBIZvU5CEekxj5FL+UhpMXZS2/togmaeBACJdc1UVIvirhK3IRnqxnrBM
+ 9WSRTDfJVjbql7k68xfKF/aVKCsEgC99kOHXwtgRrGNCz6yQFa6WfWdsHfVlkCXFk0NbmQ
+ DFK1fE3hAr+sdh1uy0k0TNmfDOSD7+Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-570-1cciWdVGP4mQP_vem-JdZg-1; Wed, 02 Sep 2020 18:43:40 -0400
-X-MC-Unique: 1cciWdVGP4mQP_vem-JdZg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-335-XT1KqSkjNqq_bn-aIWMx6Q-1; Wed, 02 Sep 2020 18:44:07 -0400
+X-MC-Unique: XT1KqSkjNqq_bn-aIWMx6Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F2F651074642;
- Wed,  2 Sep 2020 22:43:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BBF7F801AAE
+ for <qemu-devel@nongnu.org>; Wed,  2 Sep 2020 22:44:06 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3BBB61045EAF;
- Wed,  2 Sep 2020 22:43:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B61C65C1C4;
+ Wed,  2 Sep 2020 22:44:03 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/63] ap-device: Rename AP_DEVICE_TYPE to TYPE_AP_DEVICE
-Date: Wed,  2 Sep 2020 18:42:13 -0400
-Message-Id: <20200902224311.1321159-6-ehabkost@redhat.com>
+Subject: [PATCH 14/63] i8254: Rename TYPE_I8254 to TYPE_PIT
+Date: Wed,  2 Sep 2020 18:42:22 -0400
+Message-Id: <20200902224311.1321159-15-ehabkost@redhat.com>
 In-Reply-To: <20200902224311.1321159-1-ehabkost@redhat.com>
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 17:54:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -82,7 +82,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,13 +95,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- berrange@redhat.com, Pierre Morel <pmorel@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-s390x@nongnu.org, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -111,70 +106,58 @@ the type checking macro.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
-Cc: Christian Borntraeger <borntraeger@de.ibm.com>
-Cc: Tony Krowiak <akrowiak@linux.ibm.com>
-Cc: Halil Pasic <pasic@linux.ibm.com>
-Cc: Pierre Morel <pmorel@linux.ibm.com>
-Cc: Richard Henderson <rth@twiddle.net>
-Cc: David Hildenbrand <david@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Cc: qemu-s390x@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- include/hw/s390x/ap-device.h | 4 ++--
- hw/s390x/ap-device.c         | 2 +-
- hw/vfio/ap.c                 | 2 +-
- 3 files changed, 4 insertions(+), 4 deletions(-)
+ include/hw/timer/i8254.h | 4 ++--
+ hw/timer/i8254.c         | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
-index fb250a20f3..e502745de5 100644
---- a/include/hw/s390x/ap-device.h
-+++ b/include/hw/s390x/ap-device.h
-@@ -14,7 +14,7 @@
- #include "hw/qdev-core.h"
- #include "qom/object.h"
+diff --git a/include/hw/timer/i8254.h b/include/hw/timer/i8254.h
+index 1a522a2457..ddd925074f 100644
+--- a/include/hw/timer/i8254.h
++++ b/include/hw/timer/i8254.h
+@@ -45,7 +45,7 @@ typedef struct PITCommonClass PITCommonClass;
+ DECLARE_OBJ_CHECKERS(PITCommonState, PITCommonClass,
+                      PIT_COMMON, TYPE_PIT_COMMON)
  
--#define AP_DEVICE_TYPE       "ap-device"
-+#define TYPE_AP_DEVICE       "ap-device"
+-#define TYPE_I8254 "isa-pit"
++#define TYPE_PIT "isa-pit"
+ #define TYPE_KVM_I8254 "kvm-pit"
  
- struct APDevice {
-     DeviceState parent_obj;
-@@ -22,6 +22,6 @@ struct APDevice {
- typedef struct APDevice APDevice;
+ static inline ISADevice *i8254_pit_init(ISABus *bus, int base, int isa_irq,
+@@ -54,7 +54,7 @@ static inline ISADevice *i8254_pit_init(ISABus *bus, int base, int isa_irq,
+     DeviceState *dev;
+     ISADevice *d;
  
- DECLARE_INSTANCE_CHECKER(APDevice, AP_DEVICE,
--                         AP_DEVICE_TYPE)
-+                         TYPE_AP_DEVICE)
+-    d = isa_new(TYPE_I8254);
++    d = isa_new(TYPE_PIT);
+     dev = DEVICE(d);
+     qdev_prop_set_uint32(dev, "iobase", base);
+     isa_realize_and_unref(d, bus, &error_fatal);
+diff --git a/hw/timer/i8254.c b/hw/timer/i8254.c
+index c01ee2c72a..86f455f67e 100644
+--- a/hw/timer/i8254.c
++++ b/hw/timer/i8254.c
+@@ -39,7 +39,7 @@
  
- #endif /* HW_S390X_AP_DEVICE_H */
-diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
-index fc0b41e937..237d1f19c5 100644
---- a/hw/s390x/ap-device.c
-+++ b/hw/s390x/ap-device.c
-@@ -21,7 +21,7 @@ static void ap_class_init(ObjectClass *klass, void *data)
+ typedef struct PITClass PITClass;
+ DECLARE_CLASS_CHECKERS(PITClass, PIT,
+-                       TYPE_I8254)
++                       TYPE_PIT)
+ 
+ struct PITClass {
+     PITCommonClass parent_class;
+@@ -370,7 +370,7 @@ static void pit_class_initfn(ObjectClass *klass, void *data)
  }
  
- static const TypeInfo ap_device_info = {
--    .name = AP_DEVICE_TYPE,
-+    .name = TYPE_AP_DEVICE,
-     .parent = TYPE_DEVICE,
-     .instance_size = sizeof(APDevice),
-     .class_size = sizeof(DeviceClass),
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index f399ec0a31..68ed059b39 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -177,7 +177,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
- 
- static const TypeInfo vfio_ap_info = {
-     .name = VFIO_AP_DEVICE_TYPE,
--    .parent = AP_DEVICE_TYPE,
-+    .parent = TYPE_AP_DEVICE,
-     .instance_size = sizeof(VFIOAPDevice),
-     .class_init = vfio_ap_class_init,
- };
+ static const TypeInfo pit_info = {
+-    .name          = TYPE_I8254,
++    .name          = TYPE_PIT,
+     .parent        = TYPE_PIT_COMMON,
+     .instance_size = sizeof(PITCommonState),
+     .class_init    = pit_class_initfn,
 -- 
 2.26.2
 
