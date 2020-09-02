@@ -2,103 +2,84 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F61C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:14:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54DF6C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:14:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2E8720758
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:14:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2E8720758
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 1ECD120758
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:14:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O50dKhk3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1ECD120758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDYDO-00047b-Si
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:14:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48474)
+	id 1kDYDS-0004DB-9r
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:14:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kDYCl-0003JB-Ru
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:13:59 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:52186
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kDYCj-0000Ty-TW
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:13:59 -0400
-Received: from host86-148-246-76.range86-148.btcentralplus.com
- ([86.148.246.76] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kDYD7-0001VH-MW; Wed, 02 Sep 2020 20:14:27 +0100
-To: luoyonggang@gmail.com
-References: <20200902170054.810-1-luoyonggang@gmail.com>
- <20200902170054.810-4-luoyonggang@gmail.com>
- <5cde63a0-46fe-2944-f96e-1f3268e49af8@amsat.org>
- <CAE2XoE8bsq7jzbw6FMW3TybhQGiNEJ-F_NKPm3LHzkHm69hSdw@mail.gmail.com>
- <19b8d23c-c2e7-2d8e-50de-a4e977bae786@ilande.co.uk>
- <CAE2XoE_yO5kkQBFzJk+FzspJG-3gHD0Xvf7BSkOk45qhp1h4PA@mail.gmail.com>
- <0b52fa43-fa48-0add-40e2-cf3f06983c0c@ilande.co.uk>
- <CAE2XoE-DyKcYMDR2KsZA=1-7zr4jXOMh9ZMSA7OA=tbo4tr0PQ@mail.gmail.com>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
- mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
- 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
- E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
- PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
- PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
- AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
- OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
- NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
- mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
- z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
- T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
- DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
- y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
- 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
- 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
- YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
- Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
- BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
- opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
- NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
- Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
- KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
- imgcU9TTGC5qd9g=
-Message-ID: <5347d8f6-4caf-dffd-8677-a70d78808d21@ilande.co.uk>
-Date: Wed, 2 Sep 2020 20:13:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDYCj-0003HM-Bq
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:13:57 -0400
+Received: from mail-lj1-x230.google.com ([2a00:1450:4864:20::230]:39820)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDYCg-0000Tt-IJ
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:13:56 -0400
+Received: by mail-lj1-x230.google.com with SMTP id e11so492008ljn.6
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 12:13:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:reply-to:from:date:message-id:subject:to;
+ bh=xV0wittsj6u8+/JcEX/EaM6zv+OcnGX7iVErLpcsqj8=;
+ b=O50dKhk33os9P+uRrVBj6auTYL9bJFAGrem7HAbUYPGEHKs7PvGp0UhQjJBm7M+WNS
+ 9+IFST1W8HNK0/6YuVMDK1x4L8tA7nB+trn+xVVO4PnQYD/hcsKr6RpR/YUHx/uuivl0
+ HH0KDKzuu+hmczf9WNELU7s9+xHpA7UCFOjpWeFS+UtrXj6rhNG3AekkTf+EJO1/5Zcr
+ ag6ONjpmRpRcXAcEtYVQhL1ctjGxoZkkYBdyIUC6DTP02luz11twNEdBkaC5AyMma5ro
+ AjRQkWymVI7XF3YHfezeuPgxunTehJm90WiqscBJauerxQGw2hMi5pMotNZtIDtpqvLz
+ J0rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:reply-to:from:date:message-id
+ :subject:to;
+ bh=xV0wittsj6u8+/JcEX/EaM6zv+OcnGX7iVErLpcsqj8=;
+ b=UeibsYMOUqbM7kOCtiG5tQwIBL4J02/nDOlM1YoVMOJgSnCjQgW1LwJSslQ49xaSpA
+ c3rhWvBt6E8ruO6bj69WA4LPORH+W537T1xcGZI7oR08TURfhP/tjAzx+OlyZEgoNxRy
+ hghKbhM3zyqHGnYLGYuV4jym6Olztg+2rgwcsxUQxj/IaOFxS6pry/xjwdK4V47fTe85
+ sujkPIb7DGbRoLfuHnBdjfrjdZECfDOsazLzmh0O4fU3CqzxaGYMO5FTyJjZQDJl/Ln9
+ X6YDG2g57YhWQhach7D4/ii+eM9Fy1q2Ot4s4kCLigjtVcrzLyMLbzAq7Tyv4PJfKvBk
+ brJw==
+X-Gm-Message-State: AOAM531zYXbrPWPGFvLtIFi+Rh5ujH+vDg9kXV0XDX83unRkZ951vUkg
+ wkxapGmTY7V98Z+SAbokPaKua3L9AFhMPilw1fWOalTYAzgy9w==
+X-Google-Smtp-Source: ABdhPJzPirbXE0XNIJ87kjFHEvJ0BvQ2vsdg9xmubnhRiascKUwmz211NRPgxofHV52K1gh2v0vFDlFbDO3QhpV9dQ4=
+X-Received: by 2002:a2e:854c:: with SMTP id u12mr3923493ljj.120.1599074031930; 
+ Wed, 02 Sep 2020 12:13:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAE2XoE-DyKcYMDR2KsZA=1-7zr4jXOMh9ZMSA7OA=tbo4tr0PQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.246.76
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 3/6] ci: Install msys2 in a proper way refer to
- https://github.com/cirruslabs/cirrus-ci-docs/issues/699 Enable msys2 ci in
- cirrus
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 3 Sep 2020 03:13:40 +0800
+Message-ID: <CAE2XoE8VqiSFAuRL--VZtj-wOsGcGPn0FO3SOLeVfXwrP12_ig@mail.gmail.com>
+Subject: new msys2 testing failure,
+ does this fixe? undefined reference to `qemu_lock_fd_test'
+To: qemu-level <qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary="000000000000a4956905ae596f79"
+Received-SPF: pass client-ip=2a00:1450:4864:20::230;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x230.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.324,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,28 +92,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-level <qemu-devel@nongnu.org>
+Reply-To: luoyonggang@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 02/09/2020 20:01, 罗勇刚(Yonggang Luo) wrote:
+--000000000000a4956905ae596f79
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->     Yes indeed, it looks like a very comprehensive build :)  Note that with the meson
->     build I no longer have to copy/rename toolchain exes compared to your .cirrus.yml
->     file so maybe that issue is now fixed?
-> 
-> That's not fixed, I am building a full build, so I will use any possible toolchain,
-> and you may not use it at all. 
+C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../.=
+./x86_64-w64-mingw32/bin/ld.exe:
+tests/test-image-locking.o: in function `check_locked_bytes':
+5564D:/a/qemu/qemu/tests/test-image-locking.c:69: undefined reference to
+`qemu_lock_fd_test'
+5565C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../=
+../../x86_64-w64-mingw32/bin/ld.exe:
+D:/a/qemu/qemu/tests/test-image-locking.c:71: undefined reference to
+`qemu_lock_fd_test'
+5566C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../=
+../../x86_64-w64-mingw32/bin/ld.exe:
+D:/a/qemu/qemu/tests/test-image-locking.c:62: undefined reference to
+`qemu_lock_fd_test'
+5567C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../=
+../../x86_64-w64-mingw32/bin/ld.exe:
+tests/test-image-locking.o: in function `main':
+5568D:/a/qemu/qemu/tests/test-image-locking.c:152: undefined reference to
+`qemu_has_ofd_lock'
+5569collect2.exe: error: ld returned 1 exit status
+5570make: *** [D:/a/qemu/qemu/rules.mak:88: tests/test-image-locking.exe]
+Error 1
+5571make: *** Waiting for unfinished jobs....
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-Hmmm. I'd expect meson to detect the toolchain once and use it throughout the build,
-so perhaps this is still using some Makefile logic? I think Paolo's latest PR should
-help improve this.
+--000000000000a4956905ae596f79
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+<div dir=3D"ltr"><br>C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-ming=
+w32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe: tests/test-image-lock=
+ing.o: in function `check_locked_bytes&#39;:<br>5564D:/a/qemu/qemu/tests/te=
+st-image-locking.c:69: undefined reference to `qemu_lock_fd_test&#39;<br>55=
+65C:/tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../..=
+/../x86_64-w64-mingw32/bin/ld.exe: D:/a/qemu/qemu/tests/test-image-locking.=
+c:71: undefined reference to `qemu_lock_fd_test&#39;<br>5566C:/tools/msys64=
+/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mi=
+ngw32/bin/ld.exe: D:/a/qemu/qemu/tests/test-image-locking.c:62: undefined r=
+eference to `qemu_lock_fd_test&#39;<br>5567C:/tools/msys64/mingw64/bin/../l=
+ib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw32/bin/ld.exe:=
+ tests/test-image-locking.o: in function `main&#39;:<br>5568D:/a/qemu/qemu/=
+tests/test-image-locking.c:152: undefined reference to `qemu_has_ofd_lock&#=
+39;<br>5569collect2.exe: error: ld returned 1 exit status<br>5570make: *** =
+[D:/a/qemu/qemu/rules.mak:88: tests/test-image-locking.exe] Error 1<br>5571=
+make: *** Waiting for unfinished jobs....<br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br=
+>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div>
 
-ATB,
-
-Mark.
+--000000000000a4956905ae596f79--
 
