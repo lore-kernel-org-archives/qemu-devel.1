@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA94C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C14FFC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:29:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 80D462078E
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:29:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80D462078E
+	by mail.kernel.org (Postfix) with ESMTPS id 92755207D3
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 23:29:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92755207D3
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53064 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDcBa-0007Ux-Mo
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 19:29:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43178)
+	id 1kDcBl-0007nI-Qp
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 19:29:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9n-0003rG-Cz
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:11 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:37321)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9s-000411-B5
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:16 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:42957)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9l-0004qk-4i
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:11 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kDc9p-0004rW-AG
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 19:27:16 -0400
 Received: from localhost.localdomain ([82.252.135.186]) by
  mrelayeu.kundenserver.de (mreue109 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MKKd7-1k0Cfe2Qf9-00LizX; Thu, 03 Sep 2020 01:27:05 +0200
+ id 1Mr9O4-1ksz861SYI-00oJQE; Thu, 03 Sep 2020 01:27:08 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 4/9] linux-user: Add support for btrfs ioctls used to
- manipulate with devices
-Date: Thu,  3 Sep 2020 01:26:56 +0200
-Message-Id: <20200902232701.13299-5-laurent@vivier.eu>
+Subject: [PULL 9/9] linux-user: Add support for btrfs ioctls used to scrub a
+ filesystem
+Date: Thu,  3 Sep 2020 01:27:01 +0200
+Message-Id: <20200902232701.13299-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200902232701.13299-1-laurent@vivier.eu>
 References: <20200902232701.13299-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:OOyM7f6BMCgQ+soBPxVhsJOVNIpVGRiBrRDu3I0C6mDbf4sgSOE
- kDk5MiwQllN7Q2UJmClv4wvjJ7nvWCreMwWW5ukiKyd35rIbwVjPHkVpLUONkBNlLY4dDrc
- 07gQv9Eremjxtct9y6Io9AjrgjPRl3RXDNgFHibRfQCoQ61ygyvIuWoU6EUIZO1N9tCpIYy
- kA7vtLmHpDTplNXbPHN4A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9o8pD2Qazbg=:fONlKjQEpMkSPSdjYi6E1e
- arUFHHXAd8AB17+IpM2kmSBs6wRjM2QrwbOeBjAXBsALE370Q9XOtu7EOHtcCIgfUq1mMOA5E
- BUg83FeYSv1npDeZNGQOwMkecYLuhlmhumgiRrVBIfv2xRMzpQpiqvn00/Jv1+nNighHGhcjE
- bqkSwstyPnGlx+/g5z30qR6Aqm4r65vL7R6KYMciHfkAfDbZnzchMoCJoAKXFt8s1gEBUgTBS
- hM29eloZ+Mbqh7r8m7hH2+xDVuSCmUUsdCpPGSu36rwhaDhl/rE465syDP/tZud38N80LMp6F
- /bhQUprDgveaCK7eR7Lk2c7s+y46RHyQvzymQvRlcpyFR+/Fcco3JRW0osW40ajKm3Gdwb+Sh
- 8kOKxHiTyNA0xY5oATyVGcKGDuov/cobrKuWLMtQQH0KIX76dfoWBa1WDFPBUiwNGBXtuHcCg
- HAzUTO5gui4wTOH0K4D0N2knprydoKBBjODi1wdNrAdAejBgNJQlhivPJ+F11fxV6KHseXqFG
- yGhIGCcOEEe3ZKJcqT38IMyI413HkMoDFLeXF7FJ4kjoQU96c6GEWU/KRYZMgw8jn9BbeVTGF
- DBCpKQc9/KA07T/6DKjmmKlquGZ2VbutyZZza1lhzeqfXKBy6lLTuhcKE5JU/hvP4gtGLZMUj
- UfjTtVUiG9QEkhh4AM/Lv+ZAcC684XNEkPbzxME/R91iRn24/iIpBb9QCLVTiTZIUIXDxWMR2
- Vy04m9YQUnGRRJcpqNgVRXsrOEF6Zy103zbr3YeKgCDqLuGcJYkTbF35H2TjInHOp1e3S2yQH
- lD6kbe6A0+rEHsYZhjzOLd+GAQsZDqn5sYbYdyzssVcFBChh73Qf28sy399WNyaP7JhRViu
-Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:FbOUrguhhfiM7OosGDDPqj0/2XY0hrbALcGsIXLPDphSnIE1AQi
+ E4xsLjGNh/oxcMl42+0VpgZRukVIrIEx7IGLmPdi4m2w/+yJ5DJh+UM/iTUs6HpVRw5Ysse
+ OpDzkoEVn4+5l2nkelCJbLIc+/DgttMwCF33IWiC4zTr6i/7wsxCK12/bbW/RnQ5hCk95JP
+ SCkM0rRNs/PlZ88KCSfBw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+GQE7kHLKF4=:Wew5pawjjurEfTA1H2vMJ7
+ 5udrLUNsl5X+GAJgub0QUU/J3KFhRoB2b8T8+xbKIhl+Jv9YO+bp3wUdpljQFBiZA4lBoNsBL
+ +64CChk761wxWKKtiZtBNeJpYIwiA9zcDiZi2Tt0ar3IXoQi50hle4kILfG+vMyqWz4EAqjzP
+ Ic0mwyS5WtSHX3f4v7op3wPsBW/2r2Ze342NqOklhRQzNc4MWxQWU3sDY41d9Yj4CMpdtHvyb
+ cE812e1f787CRsXCkhGHbJJ5kIVoMGSHA2PcxrBPYD60HyipjS7zjAQrNW60s+FaS2XsllHv9
+ hl9E3scyXhP5v0UnLomGSeObvmfscR2gBZEqJHw5RB6qCvhOv0d9yYCk3Aw//aOBoVAJ+9Iol
+ JUQTbgQ+qCfhODiNcivFePY8TR2ZaZcXWYiqS/1/54qNDErORM7Piu1Q1sDCs4999jY+nejUE
+ loXUMDVJXsovzFfbJ4XBPRT62EQ9h+feIRMAwm4v1aHlxdjqYwptMphttnanbv1y+B1KSsnA+
+ o+UlrE+fg5fJKQeegxaWK7C/Zv6rcPcNBYRgc6shrGGkubifd/zAOmexspT0uwl6SE5vEZo1F
+ wvwLCNEbwPzCrvLU4fV5g9nqhVn7ia7VZ7HsPa0qABa24sZi7yPHc/9J+NWcEJNiLvQ9n3L82
+ b9CINSBo98ROne82MiO1lYVCV0GraYgIDDtyZL79TaWmS7MhrZ4Rt+r0hrL7JcUcULO1RrvzI
+ AMK6qcq1qomZMjWsXBK2wMvVxOWVAVwbUUqv7AnsTgMAy7b5q/FGOmSJcm6h+24v6Fyyg2oY+
+ O5nxm+KEvRSNDY5rUiA235mVw26cT+6rMeT8nArZNXjcQaWlMBFoPMU3F1Pya6m8IAyhao/
+Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 19:27:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 19:27:08
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -94,214 +94,134 @@ From: Filip Bozuta <Filip.Bozuta@syrmia.com>
 
 This patch implements functionality for following ioctls:
 
-BTRFS_IOC_SCAN_DEV - Scanning device for a btrfs filesystem
+BTRFS_IOC_SCRUB - Starting a btrfs filesystem scrub
 
-    Scan a device for a btrfs filesystem. The device that is to
-    be scanned is passed in the ioctl's third argument which
-    represents a pointer to a 'struct ioc_vol_args' (which was
-    mentioned in a previous patch). Before calling this ioctl,
-    the name field of this structure should be filled with the
-    aproppriate name value which represents a path for the device.
-    If the device contains a btrfs filesystem, the ioctl returns 0,
-    otherwise a negative value is returned.
+    Start a btrfs filesystem scrub. The third ioctls argument
+    is a pointer to a following type:
 
-BTRFS_IOC_ADD_DEV - Adding a device to a btrfs filesystem
-
-    Add a device to a btrfs filesystem. The device that is to be
-    added is passed in the ioctl's third argument which represents
-    a pointer to a 'struct ioc_vol_args' (which was mentioned in
-    a previous patch). Before calling this ioctl, the name field of
-    this structure should be filled with the aproppriate name value
-    which represents a path for the device.
-
-BTRFS_IOC_RM_DEV - Removing a device from a btrfs filesystem
-
-    Remove a device from a btrfs filesystem. The device that is to be
-    removed is passed in the ioctl's third argument which represents
-    a pointer to a 'struct ioc_vol_args' (which was mentioned in
-    a previous patch). Before calling this ioctl, the name field of
-    this structure should be filled with the aproppriate name value
-    which represents a path for the device.
-
-BTRFS_IOC_DEV_INFO - Getting information about a device
-
-    Obtain information for device in a btrfs filesystem. The information
-    is gathered in the ioctl's third argument which represents a pointer
-    to a following structure type:
-
-    struct btrfs_ioctl_dev_info_args {
-	__u64 devid;				/* in/out */
-	__u8 uuid[BTRFS_UUID_SIZE];		/* in/out */
-	__u64 bytes_used;			/* out */
-	__u64 total_bytes;			/* out */
-	__u64 unused[379];			/* pad to 4k */
-	__u8 path[BTRFS_DEVICE_PATH_NAME_MAX];	/* out */
-    };
-
-    Before calling this ioctl, field "devid" should be set with the id value
-    for the device for which the information is to be obtained. If this field
-    is not aproppriately set, the errno ENODEV ("No such device") is returned.
-
-BTRFS_IOC_GET_DEV_STATS - Getting device statistics
-
-    Obtain stats informatin for device in a btrfs filesystem. The information
-    is gathered in the ioctl's third argument which represents a pointer to
-    a following structure type:
-
-    struct btrfs_ioctl_get_dev_stats {
+    struct btrfs_ioctl_scrub_args {
 	__u64 devid;				/* in */
-	__u64 nr_items;				/* in/out */
-	__u64 flags;				/* in/out */
-
-	/* out values: */
-	__u64 values[BTRFS_DEV_STAT_VALUES_MAX];
-
-	/*
-	 * This pads the struct to 1032 bytes. It was originally meant to pad to
-	 * 1024 bytes, but when adding the flags field, the padding calculation
-	 * was not adjusted.
-	 */
-	__u64 unused[128 - 2 - BTRFS_DEV_STAT_VALUES_MAX];
+	__u64 start;				/* in */
+	__u64 end;				/* in */
+	__u64 flags;				/* in */
+	struct btrfs_scrub_progress progress;	/* out */
+	/* pad to 1k */
+	__u64 unused[(1024-32-sizeof(struct btrfs_scrub_progress))/8];
     };
 
-    Before calling this ioctl, field "devid" should be set with the id value
-    for the device for which the information is to be obtained. If this field
-    is not aproppriately set, the errno ENODEV ("No such device") is returned.
+    Before calling this ioctl, field 'devid' should be filled
+    with value that represents the device id of the btrfs filesystem
+    for which the scrub is to be started.
 
-BTRFS_IOC_FORGET_DEV - Remove unmounted devices
+BTRFS_IOC_SCRUB_CANCEL - Canceling scrub of a btrfs filesystem
 
-    Search and remove all stale devices (devices which are not mounted).
-    The third ioctl argument is a pointer to a 'struct btrfs_ioctl_vol_args'.
-    The ioctl call will release all unmounted devices which match the path
-    which is specified in the "name" field of the structure. If an empty
-    path ("") is specified, all unmounted devices will be released.
+    Cancel a btrfs filesystem scrub if it is running. The third
+    ioctls argument is ignored.
 
-Implementation notes:
+BTRFS_IOC_SCRUB_PROGRESS - Getting status of a running scrub
 
-    Ioctls BTRFS_IOC_DEV_INFO and BTRFS_IOC_GET_DEV_STATS use types
-    'struct btrfs_ioctl_dev_info_args' and ' struct btrfs_ioctl_get_dev_stats'
-    as third argument types. That is the reason why corresponding structure
-    definitions were added in file 'linux-user/syscall_types.h'.
-    Since the thunk type for 'struct ioc_vol_args' was already added in a
-    previous patch, the rest of the implementation was straightforward.
+    Read the status of a running btrfs filesystem scrub. The third
+    ioctls argument is a pointer to the above mentioned
+    'struct btrfs_ioctl_scrub_args'. Similarly as with 'BTRFS_IOC_SCRUB',
+    the 'devid' field should be filled with value that represents the
+    id of the btrfs device for which the scrub has started. The status
+    of a running scrub is returned in the field 'progress' which is
+    of type 'struct btrfs_scrub_progress' and its definition can be
+    found at:
+    https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/btrfs.h#L150
+
+Implementation nots:
+
+    Ioctls in this patch use type 'struct btrfs_ioctl_scrub_args' as their
+    third argument. That is the reason why an aproppriate thunk type
+    definition is added in file 'syscall_types.h'.
 
 Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 Tested-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200823195014.116226-4-Filip.Bozuta@syrmia.com>
+Message-Id: <20200823195014.116226-9-Filip.Bozuta@syrmia.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/ioctls.h        | 24 ++++++++++++++++++++++++
- linux-user/syscall_defs.h  |  6 ++++++
- linux-user/syscall_types.h | 24 +++++++++++++++++++++++-
- 3 files changed, 53 insertions(+), 1 deletion(-)
+ linux-user/ioctls.h        | 11 +++++++++++
+ linux-user/syscall_defs.h  |  3 +++
+ linux-user/syscall_types.h | 29 +++++++++++++++++++++++++++++
+ 3 files changed, 43 insertions(+)
 
 diff --git a/linux-user/ioctls.h b/linux-user/ioctls.h
-index bddeaca9e7ec..74d73994f691 100644
+index 42759c0778b4..585874f090ff 100644
 --- a/linux-user/ioctls.h
 +++ b/linux-user/ioctls.h
-@@ -178,6 +178,22 @@
-      IOCTL(BTRFS_IOC_SNAP_CREATE, IOC_W,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
- #endif
-+#ifdef BTRFS_IOC_SCAN_DEV
-+     IOCTL(BTRFS_IOC_SCAN_DEV, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
-+#endif
-+#ifdef BTRFS_IOC_FORGET_DEV
-+     IOCTL(BTRFS_IOC_FORGET_DEV, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
-+#endif
-+#ifdef BTRFS_IOC_ADD_DEV
-+     IOCTL(BTRFS_IOC_ADD_DEV, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
-+#endif
-+#ifdef BTRFS_IOC_RM_DEV
-+     IOCTL(BTRFS_IOC_RM_DEV, IOC_W,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
-+#endif
- #ifdef BTRFS_IOC_SUBVOL_CREATE
-      IOCTL(BTRFS_IOC_SUBVOL_CREATE, IOC_W,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_vol_args)))
-@@ -192,6 +208,14 @@
+@@ -215,6 +215,17 @@
  #ifdef BTRFS_IOC_SUBVOL_SETFLAGS
       IOCTL(BTRFS_IOC_SUBVOL_SETFLAGS, IOC_W, MK_PTR(TYPE_ULONGLONG))
  #endif
-+#ifdef BTRFS_IOC_DEV_INFO
-+     IOCTL(BTRFS_IOC_DEV_INFO, IOC_RW,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_dev_info_args)))
++#ifdef BTRFS_IOC_SCRUB
++     IOCTL(BTRFS_IOC_SCRUB, IOC_RW,
++           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_scrub_args)))
 +#endif
-+#ifdef BTRFS_IOC_GET_DEV_STATS
-+     IOCTL(BTRFS_IOC_GET_DEV_STATS, IOC_RW,
-+           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_dev_stats)))
++#ifdef BTRFS_IOC_SCRUB_CANCEL
++     IOCTL(BTRFS_IOC_SCRUB_CANCEL, 0, TYPE_NULL)
 +#endif
- #ifdef BTRFS_IOC_GET_SUBVOL_INFO
-      IOCTL(BTRFS_IOC_GET_SUBVOL_INFO, IOC_R,
-            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_get_subvol_info_args)))
++#ifdef BTRFS_IOC_SCRUB_PROGRESS
++     IOCTL(BTRFS_IOC_SCRUB_PROGRESS, IOC_RW,
++           MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_scrub_args)))
++#endif
+ #ifdef BTRFS_IOC_DEV_INFO
+      IOCTL(BTRFS_IOC_DEV_INFO, IOC_RW,
+            MK_PTR(MK_STRUCT(STRUCT_btrfs_ioctl_dev_info_args)))
 diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
-index 1519de7a5565..d11279b78bbe 100644
+index b557b07eec85..33a414c50f19 100644
 --- a/linux-user/syscall_defs.h
 +++ b/linux-user/syscall_defs.h
-@@ -1007,12 +1007,18 @@ struct target_rtc_pll_info {
- 
- /* btrfs ioctls */
- #define TARGET_BTRFS_IOC_SNAP_CREATE            TARGET_IOWU(BTRFS_IOCTL_MAGIC, 1)
-+#define TARGET_BTRFS_IOC_SCAN_DEV               TARGET_IOWU(BTRFS_IOCTL_MAGIC, 4)
-+#define TARGET_BTRFS_IOC_FORGET_DEV             TARGET_IOWU(BTRFS_IOCTL_MAGIC, 5)
-+#define TARGET_BTRFS_IOC_ADD_DEV                TARGET_IOWU(BTRFS_IOCTL_MAGIC, 10)
-+#define TARGET_BTRFS_IOC_RM_DEV                 TARGET_IOWU(BTRFS_IOCTL_MAGIC, 11)
- #define TARGET_BTRFS_IOC_SUBVOL_CREATE          TARGET_IOWU(BTRFS_IOCTL_MAGIC, 14)
- #define TARGET_BTRFS_IOC_SNAP_DESTROY           TARGET_IOWU(BTRFS_IOCTL_MAGIC, 15)
- #define TARGET_BTRFS_IOC_SUBVOL_GETFLAGS        TARGET_IOR(BTRFS_IOCTL_MAGIC, 25,\
+@@ -1020,6 +1020,9 @@ struct target_rtc_pll_info {
                                                             abi_ullong)
  #define TARGET_BTRFS_IOC_SUBVOL_SETFLAGS        TARGET_IOW(BTRFS_IOCTL_MAGIC, 26,\
                                                             abi_ullong)
-+#define TARGET_BTRFS_IOC_DEV_INFO               TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 30)
-+#define TARGET_BTRFS_IOC_GET_DEV_STATS          TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 52)
- #define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IORU(BTRFS_IOCTL_MAGIC, 60)
- 
- /* usb ioctls */
++#define TARGET_BTRFS_IOC_SCRUB                  TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 27)
++#define TARGET_BTRFS_IOC_SCRUB_CANCEL           TARGET_IO(BTRFS_IOCTL_MAGIC, 28)
++#define TARGET_BTRFS_IOC_SCRUB_PROGRESS         TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 29)
+ #define TARGET_BTRFS_IOC_DEV_INFO               TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 30)
+ #define TARGET_BTRFS_IOC_INO_PATHS              TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 35)
+ #define TARGET_BTRFS_IOC_LOGICAL_INO            TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 36)
 diff --git a/linux-user/syscall_types.h b/linux-user/syscall_types.h
-index 853b91d21275..7e52b7aec5d9 100644
+index 51d9931b9546..ba2c1518eb5c 100644
 --- a/linux-user/syscall_types.h
 +++ b/linux-user/syscall_types.h
-@@ -359,7 +359,9 @@ STRUCT(blkpg_partition,
-        MK_ARRAY(TYPE_CHAR, BLKPG_VOLNAMELTH)) /* volname */
- 
- #if defined(BTRFS_IOC_SUBVOL_CREATE) || defined(BTRFS_IOC_SNAP_CREATE) || \
--    defined(BTRFS_IOC_SNAP_DESTROY)
-+    defined(BTRFS_IOC_SNAP_DESTROY)  || defined(BTRFS_IOC_SCAN_DEV)  || \
-+    defined(BTRFS_IOC_FORGET_DEV)    || defined(BTRFS_IOC_ADD_DEV) || \
-+    defined(BTRFS_IOC_RM_DEV)        || defined(BTRFS_IOC_DEV_INFO)
- STRUCT(btrfs_ioctl_vol_args,
-        TYPE_LONGLONG, /* fd */
-        MK_ARRAY(TYPE_CHAR, BTRFS_PATH_NAME_MAX + 1)) /* name */
-@@ -391,6 +393,26 @@ STRUCT(btrfs_ioctl_get_subvol_info_args,
-        MK_ARRAY(TYPE_ULONGLONG, 8)) /* reserved */
+@@ -425,6 +425,35 @@ STRUCT(btrfs_ioctl_ino_lookup_user_args,
+        MK_ARRAY(TYPE_CHAR, BTRFS_INO_LOOKUP_USER_PATH_MAX)) /* path */
  #endif
  
-+#ifdef BTRFS_IOC_DEV_INFO
-+STRUCT(btrfs_ioctl_dev_info_args,
-+       TYPE_ULONGLONG, /* devid */
-+       MK_ARRAY(TYPE_CHAR, BTRFS_UUID_SIZE), /* uuid */
-+       TYPE_ULONGLONG, /* bytes_used */
-+       TYPE_ULONGLONG, /* total_bytes */
-+       MK_ARRAY(TYPE_ULONGLONG, 379), /* unused */
-+       MK_ARRAY(TYPE_CHAR, BTRFS_DEVICE_PATH_NAME_MAX)) /* path */
-+#endif
++#if defined(BTRFS_IOC_SCRUB) || defined(BTRFS_IOC_SCRUB_PROGRESS)
++STRUCT(btrfs_scrub_progress,
++       TYPE_ULONGLONG, /* data_extents_scrubbed */
++       TYPE_ULONGLONG, /* tree_extents_scrubbed */
++       TYPE_ULONGLONG, /* data_bytes_scrubbed */
++       TYPE_ULONGLONG, /* tree_bytes_scrubbed */
++       TYPE_ULONGLONG, /* read_errors */
++       TYPE_ULONGLONG, /* csum_errors */
++       TYPE_ULONGLONG, /* verify_errors */
++       TYPE_ULONGLONG, /* no_csum */
++       TYPE_ULONGLONG, /* csum_discards */
++       TYPE_ULONGLONG, /* super_errors */
++       TYPE_ULONGLONG, /* malloc_errors */
++       TYPE_ULONGLONG, /* uncorrectable_errors */
++       TYPE_ULONGLONG, /* corrected_er */
++       TYPE_ULONGLONG, /* last_physical */
++       TYPE_ULONGLONG) /* unverified_errors */
 +
-+#ifdef BTRFS_IOC_GET_DEV_STATS
-+STRUCT(btrfs_ioctl_get_dev_stats,
++STRUCT(btrfs_ioctl_scrub_args,
 +       TYPE_ULONGLONG, /* devid */
-+       TYPE_ULONGLONG, /* nr_items */
++       TYPE_ULONGLONG, /* start */
++       TYPE_ULONGLONG, /* end */
 +       TYPE_ULONGLONG, /* flags */
-+       MK_ARRAY(TYPE_ULONGLONG, BTRFS_DEV_STAT_VALUES_MAX), /* values */
++       MK_STRUCT(STRUCT_btrfs_scrub_progress), /* progress */
 +       MK_ARRAY(TYPE_ULONGLONG,
-+                128 - 2 - BTRFS_DEV_STAT_VALUES_MAX)) /* unused */
++                (1024 - 32 -
++                 sizeof(struct btrfs_scrub_progress)) / 8)) /* unused */
 +#endif
 +
- STRUCT(rtc_time,
-        TYPE_INT, /* tm_sec */
-        TYPE_INT, /* tm_min */
+ #ifdef BTRFS_IOC_DEV_INFO
+ STRUCT(btrfs_ioctl_dev_info_args,
+        TYPE_ULONGLONG, /* devid */
 -- 
 2.26.2
 
