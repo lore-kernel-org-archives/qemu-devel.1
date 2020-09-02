@@ -2,87 +2,112 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6662EC433E6
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 06:43:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26CF3C433E6
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 06:44:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B39E20826
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 06:43:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D897920826
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 06:44:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ezgMG7P+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B39E20826
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0I/1ROz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D897920826
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDMU7-0003Rp-BI
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 02:43:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47854)
+	id 1kDMUy-0004Kq-PA
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 02:44:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kDMTZ-00030W-B3
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 02:42:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48111)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDMTn-0003EZ-6f
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 02:42:47 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50615
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kDMTW-0007Wg-RJ
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 02:42:33 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDMTl-0007YC-1F
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 02:42:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599028949;
+ s=mimecast20190719; t=1599028964;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=a3dtdCqmLWGoOl2NJVmRnPt8gmbcaGUCUjJWvaZGGyE=;
- b=ezgMG7P+eDrBrmG2GYTjJTvFBHzONEU7PxSfesXHgY0gtC6pH24zoOA8C6tdUy3SZ+QBay
- c2tH1Btwn1b6zVsA21afx2n762bdhn4aJIp2Xa2WKGifcfoKXvbWnrzqtqmLQ2NiNpr6Qq
- M0iF6GXbKTMpLgUO3fkaQVJ1SwbeOoM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-0Tuvh76NPZKSFywXMP_-JA-1; Wed, 02 Sep 2020 02:42:27 -0400
-X-MC-Unique: 0Tuvh76NPZKSFywXMP_-JA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05584189E609;
- Wed,  2 Sep 2020 06:42:26 +0000 (UTC)
-Received: from localhost (unknown [10.43.2.114])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE4575C1BB;
- Wed,  2 Sep 2020 06:42:21 +0000 (UTC)
-Date: Wed, 2 Sep 2020 08:42:20 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Babu Moger <babu.moger@amd.com>
-Subject: Re: [PATCH v7 1/2] i386: Simplify CPUID_8000_001d for AMD
-Message-ID: <20200902084220.4b334daa@redhat.com>
-In-Reply-To: <159897584649.30750.3939159632943292252.stgit@naples-babu.amd.com>
-References: <159897580089.30750.12581669374705391794.stgit@naples-babu.amd.com>
- <159897584649.30750.3939159632943292252.stgit@naples-babu.amd.com>
+ bh=nzM1DzRVL/n2TB90t4MdAXjdGRJNek7MVjYEWzqQoR0=;
+ b=R0I/1ROzKsz3lD28pxhApAABo++zx36OBBlskmjkEABkydM9Ca3OtMgbeu0E2IepIZxUuw
+ YBHADjehk00oGjhvxNHoiOEktK4B7f7PYF8GpHznF7bW42IcjlDr/uHlz645Mbo+TzuSvU
+ dSYNwT20NxkeA/bnuWPUOR0JQAL4oaw=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-143-vQl9_OPhP7-p6owS3dO0cg-1; Wed, 02 Sep 2020 02:42:42 -0400
+X-MC-Unique: vQl9_OPhP7-p6owS3dO0cg-1
+Received: by mail-wm1-f69.google.com with SMTP id 23so1206567wmk.8
+ for <qemu-devel@nongnu.org>; Tue, 01 Sep 2020 23:42:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=nzM1DzRVL/n2TB90t4MdAXjdGRJNek7MVjYEWzqQoR0=;
+ b=rbdgfnrr8TXjrnaynSTWdRaSkfbV0VQBBkTs1Rnq2Q+yRcWLCrKb0PWraWADZu/u21
+ h4ukTP94IbKdokYTiq7DkhL4oFtnGzXFkVGGuIwtAsQWQjJFuaYqJS992Ql7Zotuu78S
+ Bs5XlNN84QP0B3dQfkoqClbIiRs40uuoZiqqAtT9GriYB0Vq8cOJsG3wAcgWTDkWdBJX
+ JO4ubwqdu1dMleZy9FaCGdnSFuhO2CibLLFrT9jP14vLLNSVFxw74G4uJSFMea5eU4KG
+ Wn1Z2GVwRt1/ed1Aoh6sBhuggYrs69lJEH/Vl+HBHkkoPsjWydvzFZ6KpyR0MRSy1qBz
+ JmJw==
+X-Gm-Message-State: AOAM533Wujnb7ClfMjVCIOuB2G41OfZF1Gd79MioNQGzrJHe9csGJ8YN
+ Ge213izoowHlvpsR3V1GraPiuor+Rbpe01DcEX3bL+TUW7ABwmVq3DAAN9dF73WBd6TtO0Dv94/
+ 72f2pdl6PL6wc1Mk=
+X-Received: by 2002:a05:6000:118a:: with SMTP id
+ g10mr640885wrx.67.1599028961187; 
+ Tue, 01 Sep 2020 23:42:41 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzQR0B/FD2IzPydlXJYfZzN+q0qmYeIoheU0QoIlmnCpP+LtkUOajkACQhcdUjFZJT2akCnsA==
+X-Received: by 2002:a05:6000:118a:: with SMTP id
+ g10mr640865wrx.67.1599028960909; 
+ Tue, 01 Sep 2020 23:42:40 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:e108:3b03:aa6f:d766?
+ ([2001:b07:6468:f312:e108:3b03:aa6f:d766])
+ by smtp.gmail.com with ESMTPSA id b1sm5669643wru.54.2020.09.01.23.42.40
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 01 Sep 2020 23:42:40 -0700 (PDT)
+Subject: Re: [PATCH 00/13] Make QEMU installation relocatable
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+References: <20200901062020.26660-1-pbonzini@redhat.com>
+ <156da43a-4744-ac6c-fc4b-54788a40b3e9@ilande.co.uk>
+ <CABgObfYcaCsZNYof9nd7gzCOY_6qN5MV+xD6dw7W4D4ircsdaQ@mail.gmail.com>
+ <7516c253-0448-b5cd-18a0-45caaebc1d05@ilande.co.uk>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <0db09727-a909-71db-3628-4edb3ce87f2b@redhat.com>
+Date: Wed, 2 Sep 2020 08:42:40 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <7516c253-0448-b5cd-18a0-45caaebc1d05@ilande.co.uk>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:33:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,90 +121,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: ehabkost@redhat.com, mst@redhat.com, qemu-devel@nongnu.org,
- pbonzini@redhat.com, rth@twiddle.net
+Cc: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 01 Sep 2020 10:57:26 -0500
-Babu Moger <babu.moger@amd.com> wrote:
+On 02/09/20 08:09, Mark Cave-Ayland wrote:
+> diff --git a/configure b/configure
+> index f6638abadf..cb56d31a5d 100755
+> --- a/configure
+> +++ b/configure
+> @@ -1015,6 +1015,9 @@ if test "$mingw32" = "yes" ; then
+>    prefix="/qemu"
+>    confsuffix=""
+>    libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpapi -lnetapi32
+> $libs_qga"
+> +  ld_pwd=$(pwd -W)
+> +else
+> +  ld_pwd=$(pwd)
+>  fi
 
-> Remove all the hardcoded values and replace with generalized
-> fields.
-> 
-> Signed-off-by: Babu Moger <babu.moger@amd.com>
+That wouldn't work for cross-compilation, but I got the idea. :)
 
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+>  werror=""
+> @@ -4290,7 +4293,7 @@ EOF
+>                symlink "$source_path/dtc/Makefile" "dtc/Makefile"
+>            fi
+>            fdt_cflags="-I${source_path}/dtc/libfdt"
+> -          fdt_ldflags="-L$PWD/dtc/libfdt"
+> +          fdt_ldflags="-L${ld_pwd}/dtc/libfdt"
+>            fdt_libs="$fdt_libs"
+>        elif test "$fdt" = "yes" ; then
+>            # Not a git build & no libfdt found, prompt for system install
+> @@ -5275,7 +5278,7 @@ case "$capstone" in
+>      else
+>        LIBCAPSTONE=libcapstone.a
+>      fi
+> -    capstone_libs="-L$PWD/capstone -lcapstone"
+> +    capstone_libs="-L${ld_pwd}/capstone -lcapstone"
+>      capstone_cflags="-I${source_path}/capstone/include"
+>      ;;
+> 
+> @@ -6276,7 +6279,7 @@ case "$slirp" in
+>      fi
+>      mkdir -p slirp
+>      slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
+> -    slirp_libs="-L$PWD/slirp -lslirp"
+> +    slirp_libs="-L${ld_pwd}/slirp -lslirp"
+>      if test "$mingw32" = "yes" ; then
+>        slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
+>      fi
 
-> ---
->  target/i386/cpu.c |   31 ++++++++++++++++---------------
->  1 file changed, 16 insertions(+), 15 deletions(-)
-> 
-> diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-> index ba4667b33c..b12addf323 100644
-> --- a/target/i386/cpu.c
-> +++ b/target/i386/cpu.c
-> @@ -395,11 +395,12 @@ static int cores_in_core_complex(int nr_cores)
->  }
->  
->  /* Encode cache info for CPUID[8000001D] */
-> -static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
-> -                                uint32_t *eax, uint32_t *ebx,
-> -                                uint32_t *ecx, uint32_t *edx)
-> +static void encode_cache_cpuid8000001d(CPUCacheInfo *cache,
-> +                                       X86CPUTopoInfo *topo_info,
-> +                                       uint32_t *eax, uint32_t *ebx,
-> +                                       uint32_t *ecx, uint32_t *edx)
->  {
-> -    uint32_t l3_cores;
-> +    uint32_t l3_threads;
->      assert(cache->size == cache->line_size * cache->associativity *
->                            cache->partitions * cache->sets);
->  
-> @@ -408,10 +409,10 @@ static void encode_cache_cpuid8000001d(CPUCacheInfo *cache, CPUState *cs,
->  
->      /* L3 is shared among multiple cores */
->      if (cache->level == 3) {
-> -        l3_cores = cores_in_core_complex(cs->nr_cores);
-> -        *eax |= ((l3_cores * cs->nr_threads) - 1) << 14;
-> +        l3_threads = topo_info->cores_per_die * topo_info->threads_per_core;
-> +        *eax |= (l3_threads - 1) << 14;
->      } else {
-> -        *eax |= ((cs->nr_threads - 1) << 14);
-> +        *eax |= ((topo_info->threads_per_core - 1) << 14);
->      }
->  
->      assert(cache->line_size > 0);
-> @@ -5994,20 +5995,20 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
->          }
->          switch (count) {
->          case 0: /* L1 dcache info */
-> -            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache, cs,
-> -                                       eax, ebx, ecx, edx);
-> +            encode_cache_cpuid8000001d(env->cache_info_amd.l1d_cache,
-> +                                       &topo_info, eax, ebx, ecx, edx);
->              break;
->          case 1: /* L1 icache info */
-> -            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache, cs,
-> -                                       eax, ebx, ecx, edx);
-> +            encode_cache_cpuid8000001d(env->cache_info_amd.l1i_cache,
-> +                                       &topo_info, eax, ebx, ecx, edx);
->              break;
->          case 2: /* L2 cache info */
-> -            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache, cs,
-> -                                       eax, ebx, ecx, edx);
-> +            encode_cache_cpuid8000001d(env->cache_info_amd.l2_cache,
-> +                                       &topo_info, eax, ebx, ecx, edx);
->              break;
->          case 3: /* L3 cache info */
-> -            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache, cs,
-> -                                       eax, ebx, ecx, edx);
-> +            encode_cache_cpuid8000001d(env->cache_info_amd.l3_cache,
-> +                                       &topo_info, eax, ebx, ecx, edx);
->              break;
->          default: /* end of info */
->              *eax = *ebx = *ecx = *edx = 0;
-> 
+Since there is no recursive make anymore, these can be just
+-Ldtc/libfdt, -Lcapstone and -Lslirp.  Nice. :)
+
+> I'll try again with the relocatable install later - do I still need to pass --prefix
+> into configure or should I leave that for now and just use DESTDIR?
+
+You can just use DESTDIR.
+
+Paolo
 
 
