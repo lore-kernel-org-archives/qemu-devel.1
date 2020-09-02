@@ -2,89 +2,60 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61349C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:33:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B25B4C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:34:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 226C320767
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:33:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K2ann2z2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 226C320767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 829B320767
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 14:34:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 829B320767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDTph-0006v3-BE
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 10:33:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33102)
+	id 1kDTqh-0007nL-L4
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 10:34:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDTnl-0005Zq-VG
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:31:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57008)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDTnj-0002At-RR
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:31:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599057110;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=0yORoHf+y2VBuN+BVg4KUjcNP9e47M8P2beAG2B1io0=;
- b=K2ann2z25EGn9c+I0CdbJzC0AXCyY9bEQfriF7KctLwfAxoMzF6F2hFz6Z0ysRZ8XZhPoS
- IX2ctHhQz1XwUcXiUMYuC26zzJIpHHvGvkd6QwVtJBdO0cPWC/2fANyuf8cdWY70x+k9Nm
- 4lXmGFj5l/uaoiMZYigvOIaYmkvONaI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-evXiPp4DOe2UI0mQ1aqh3Q-1; Wed, 02 Sep 2020 10:31:48 -0400
-X-MC-Unique: evXiPp4DOe2UI0mQ1aqh3Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 958C4640E1
- for <qemu-devel@nongnu.org>; Wed,  2 Sep 2020 14:31:34 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
- [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 64D5B19C59;
- Wed,  2 Sep 2020 14:31:34 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id D87E3113865F; Wed,  2 Sep 2020 16:31:32 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] libqtest: Rename qmp_assert_error_class() to
- qmp_expect_error_and_unref()
-References: <20200902115733.1229537-1-armbru@redhat.com>
- <b7cdce86-ad58-d8fc-d081-ce5410dbcc57@redhat.com>
-Date: Wed, 02 Sep 2020 16:31:32 +0200
-In-Reply-To: <b7cdce86-ad58-d8fc-d081-ce5410dbcc57@redhat.com> (Thomas Huth's
- message of "Wed, 2 Sep 2020 14:00:33 +0200")
-Message-ID: <87eenk8d2z.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDTqC-0007Mv-PK
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:34:24 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:50210)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kDTqA-0002Kj-RD
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 10:34:24 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 082EXP6F005633
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 2 Sep 2020 10:33:28 -0400
+Date: Wed, 2 Sep 2020 10:33:25 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH 0/2] Fix oss-fuzz builds post-meson integration
+Message-ID: <20200902143325.x4jasicsnxdonr67@mozz.bu.edu>
+References: <20200902142657.112879-1-alxndr@bu.edu>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:42:29
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200902142657.112879-1-alxndr@bu.edu>
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 10:34:22
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,26 +68,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, bsd@redhat.com, stefanha@redhat.com,
+ darren.kenny@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
+Arg.. I made a mistake in Paolo's email address. Please remove
+"bonzini@redhat.com" from replies so you don't get bounce spam.
 
-> On 02/09/2020 13.57, Markus Armbruster wrote:
->> qmp_assert_error_class() does more than just assert: it also unrefs
->> the @rsp argument.  Rename to qmp_assert_error_class() to reduce
->> confusion.
->
-> s/to qmp_assert_error_class()/to qmp_expect_error_and_unref()/
-
-I once again demonstrate that I'm unable to read what I wrote myself.
-
-> With that nit fixed (I can do it when picking up the patch):
->
-> Acked-by: Thomas Huth <thuth@redhat.com>
-
-Thanks!
-
+On 200902 1026, Alexander Bulekov wrote:
+> QEMU stopped building on oss-fuzz, after the meson integration, due to
+> some linking issues:
+> 
+> https://oss-fuzz-build-logs.storage.googleapis.com/log-3eaddfbd-7e05-4ddd-9d86-ee4b16c0fac6.txt
+> 
+> Those problems should be partially fixed by:
+> 
+> Depends-on: meson: fix libqos linking
+> (https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg00802.html)
+> 
+> These patches:
+> 1. Build on the above patch to fix the way we specify the linker script,
+>    to ensure that it is not specified within start-group/end-group linker
+>    pairs
+> 2. Add support for running --enable-fuzzing with a custom LIB_FUZZING_ENGINE
+> 3. Fix a problem with how we specify custom rpath in the oss-fuzz
+>    build-script
+> 
+> Alexander Bulekov (2):
+>   fuzz: Add support for custom fuzzing library
+>   scripts/oss-fuzz/build.sh: fix rpath
+> 
+>  configure                    | 12 ++++++++++--
+>  scripts/oss-fuzz/build.sh    |  2 +-
+>  tests/qtest/fuzz/meson.build |  4 ++--
+>  3 files changed, 13 insertions(+), 5 deletions(-)
+> 
+> -- 
+> 2.28.0
+> 
 
