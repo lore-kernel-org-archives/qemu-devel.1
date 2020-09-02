@@ -2,98 +2,108 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B791C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:06:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65566C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:07:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53DBD20709
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:06:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25F4E20709
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 17:07:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i+OOxo4F"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53DBD20709
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X5UAt9og"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25F4E20709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDWDa-0001in-DK
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 13:06:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46240)
+	id 1kDWEj-0003Ub-85
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 13:07:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <wrampazz@redhat.com>)
- id 1kDWB0-0005fx-G9
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:04:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46418
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDWCV-0000BL-M3
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:05:35 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45720
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <wrampazz@redhat.com>)
- id 1kDWAy-0000Y4-AB
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:04:02 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDWCT-0000lZ-PC
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 13:05:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599066238;
+ s=mimecast20190719; t=1599066333;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y7+OkQxZ9zZMzEvjWG4Zf3Tz59qT8JJg3f5jc7jmrzU=;
- b=i+OOxo4FIrIwvB5uvPbudZJ4BLGXkdNSwjVCcfb0Ko6k8pAQBIE8DBGE/kKL4aa1yN6NSs
- R00kMNx0vA/grTo58sslghPAsg/xQ9ROrntgCpMAvayNqKvY5O2ZTPQP0zxw1rmerIOxsg
- bhRKq0EVpNGz+h0bjuaIoVYW95yt0eU=
-Received: from mail-vs1-f72.google.com (mail-vs1-f72.google.com
- [209.85.217.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-550-2U5iuCJEMuC7q0Dfdx9l6A-1; Wed, 02 Sep 2020 13:02:48 -0400
-X-MC-Unique: 2U5iuCJEMuC7q0Dfdx9l6A-1
-Received: by mail-vs1-f72.google.com with SMTP id n128so1066262vsd.5
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 10:02:48 -0700 (PDT)
+ bh=p6TlbH7y+xa+GJxis15YXQ64WYenOB8iouw1DBJ0B9M=;
+ b=X5UAt9oguKerRUoB/LGm6ARpN8T1fCJMSTsHFzLo1H5cg72728+AJTw/oil2cA37oCtamW
+ +HmwA600wFMZXltHlUNmwfhTN0z2e/CqWfe24CKkJjdnk33c3KT6+mgqnfaZoqmq94zJ9v
+ azuYQYC7LLAWyKqA9rTuvYvLShL8Qq4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-37-ACVfyPP_MmS27AkPVoHkVQ-1; Wed, 02 Sep 2020 13:05:31 -0400
+X-MC-Unique: ACVfyPP_MmS27AkPVoHkVQ-1
+Received: by mail-wm1-f70.google.com with SMTP id z1so2229321wmk.1
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 10:05:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=y7+OkQxZ9zZMzEvjWG4Zf3Tz59qT8JJg3f5jc7jmrzU=;
- b=sEmTGJi8jZ3sru4x+WxXVqJW6XvK1ubCQxxtciVpMfqPgWiUjA+UtT5eMmxdYEXsun
- RauHljZVGlBJUNEM+dbVPrAhjwqgaDugO5oCA6vvD/jIq/rRXGV/y477UyGGjB1wF8e7
- aAXonbwP1/COviLN4QqbNl4ni8XEi6HQIgt1n+D59pBjyoEYsbRmJGI201KCUvi1+uDS
- rjFq74krRZJX+thF0WQ0p8MNd4U/e7slfsO8WicRSUh02AvO02DlQdqDs4eIreYy1Yjd
- of8J5y/7k1/+/jBxg4wIXE18NQ1zexh/8/lJg4FKRsTZiRtongt2DH1Sx+kKz7JKsi7Y
- svzA==
-X-Gm-Message-State: AOAM531LXOpsETQnSP3odIHYJeL9Yepu4SGPtGLXIprRapSMrJ2JXnJP
- 3Kbu+KKnvJ02x+bOxWRoqUc3ws2pANtUc1w23clQk6rv+k2RAq3+1yXI4lop7AJJUwZbRXs0u1Q
- oLy6hFNQMdr/QfU7WoO+JJUSDAh/jeHQ=
-X-Received: by 2002:a67:ea56:: with SMTP id r22mr6269052vso.29.1599066168202; 
- Wed, 02 Sep 2020 10:02:48 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzTDgA4uFn7x6WQf9a5mQydh7p9W3+XDVmmoltu1AM1uwl0P3Q7V/weJWYiI1WTHpb40/sl5UcZfoDzIfLpyjI=
-X-Received: by 2002:a67:ea56:: with SMTP id r22mr6269014vso.29.1599066167936; 
- Wed, 02 Sep 2020 10:02:47 -0700 (PDT)
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=p6TlbH7y+xa+GJxis15YXQ64WYenOB8iouw1DBJ0B9M=;
+ b=qFRz7Ac5tTpmxXGQ287YqIUQFccuww8BvNnFVwgcSXmj0qj9TCOGj/ySbHwct4sBYf
+ ZJ5a1yOhNrWK7lQN2l0CZJ74llLhk6o46v9ieKxY3t9WnTPCi+mGrP2XehaZZ1aUjq9q
+ Obuo7FqjRw8F62kRvoi1fQc23HrVRXeUEkLsXzDzTNhOHItGrD/UnfnTzajgkMrv4C6o
+ W+VqnvOk1/v/G2SC6clZvi37nGIyuakztcy9UphEmcHVBmzb8yTnlygo0B0ip16vS4YX
+ sPUvR17spjsLws3UDrX773fBRPqxmbPSD+2Q4sJBb68vBbY7PPkEto7N6KSybR6pfZLz
+ R8xg==
+X-Gm-Message-State: AOAM532p3wNeohUhGIVxBGJUQ6ToCH1furZUCGmvPehTGKLcvmAlAkN5
+ mj3sUuBCi87snTO1zwkAUiJkuA+iPKtCl/2RrTcVTbxgFPagIAh/h/2+bc1x1m3DLX2lsOOK4+t
+ qcuUQMG4TtItXdgI=
+X-Received: by 2002:adf:f508:: with SMTP id q8mr7739685wro.233.1599066329696; 
+ Wed, 02 Sep 2020 10:05:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyWZ42mgdXAepRb7H+MHbtlSZoclFM+cLddJXDzH0dxcBwjCJ1HhUyVhQ6XSr59/96tMe+M4g==
+X-Received: by 2002:adf:f508:: with SMTP id q8mr7739664wro.233.1599066329464; 
+ Wed, 02 Sep 2020 10:05:29 -0700 (PDT)
+Received: from [192.168.178.58] ([151.21.173.193])
+ by smtp.gmail.com with ESMTPSA id p11sm397407wma.11.2020.09.02.10.05.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 02 Sep 2020 10:05:28 -0700 (PDT)
+Subject: Re: [PATCH 6/6] configure: Fix include and linkage issue on msys2
+To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
+References: <20200902170054.810-1-luoyonggang@gmail.com>
+ <20200902170054.810-7-luoyonggang@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <436ea293-8fba-e762-fdff-d84534f5baee@redhat.com>
+Date: Wed, 2 Sep 2020 19:05:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
- <159903462803.28509.16851113546106095750.stgit@pasha-ThinkPad-X280>
-In-Reply-To: <159903462803.28509.16851113546106095750.stgit@pasha-ThinkPad-X280>
-From: Willian Rampazzo <wrampazz@redhat.com>
-Date: Wed, 2 Sep 2020 14:02:37 -0300
-Message-ID: <CAKJDGDZiT9VxMj_8HYSq6iSZ7TEvEHCDD4nm4ZPFFjT1XBAnpA@mail.gmail.com>
-Subject: Re: [PATCH v3 14/15] tests: bump avocado version
-To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+In-Reply-To: <20200902170054.810-7-luoyonggang@gmail.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=wrampazz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=wrampazz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:07:24
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:33:32
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.324, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,59 +116,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Marcelo Tosatti <mtosatti@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
- armbru@redhat.com, Stefan Hajnoczi <stefanha@redhat.com>,
- Cleber Rosa Junior <crosa@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- mreitz@redhat.com, Philippe Mathieu Daude <philmd@redhat.com>,
- zhiwei_liu@c-sky.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 2, 2020 at 5:17 AM Pavel Dovgalyuk
-<pavel.dovgalyuk@ispras.ru> wrote:
->
-> From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
->
-> Reverse debugging test uses gdb remote client of avocado framework.
-> This client was fixed since the currently used version 76.
-> Therefore this patch bumps the version to 81 and fixes command
-> line version compatibility issue.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-> ---
->  tests/Makefile.include |    2 +-
->  tests/requirements.txt |    2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 9ac8f5b86a..0687c8bcda 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -517,7 +517,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
->              --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
->              --filter-by-tags-include-empty --filter-by-tags-include-empty-key \
->              $(AVOCADO_TAGS) \
-> -            $(if $(GITLAB_CI),,--failfast=on) tests/acceptance, \
-> +            $(if $(GITLAB_CI),,--failfast) tests/acceptance, \
->              "AVOCADO", "tests/acceptance")
->
->  # Consolidated targets
-> diff --git a/tests/requirements.txt b/tests/requirements.txt
-> index f9c84b4ba1..036691c922 100644
-> --- a/tests/requirements.txt
-> +++ b/tests/requirements.txt
-> @@ -1,5 +1,5 @@
->  # Add Python module requirements, one per line, to be installed
->  # in the tests/venv Python virtual environment. For more info,
->  # refer to: https://pip.pypa.io/en/stable/user_guide/#id1
-> -avocado-framework==76.0
-> +avocado-framework==81.0
->  pycdlib==1.9.0
->
+On 02/09/20 19:00, Yonggang Luo wrote:
+> On msys2, the -I/e/path/to/qemu -L/e/path/to/qemu are not recognized by the compiler
+> Cause $PWD are result posix style path such as /e/path/to/qemu that can not be recognized
+> by mingw gcc, and `pwd -W` are result Windows style path such as E:/path/to/qemu that can
+> be recognized by the mingw gcc. So we replace all $PWD with $build_path that can
+> building qemu under msys2/mingw environment.
+> 
+> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 
-Reviewed-by: Willian Rampazzo <willianr@redhat.com>
+I'm dropping this patch in favor of relative -L and -I paths.
+
+Paolo
+
+>  configure | 28 +++++++++++++++++++---------
+>  1 file changed, 19 insertions(+), 9 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 30f8c4db29..5f2bcc4b57 100755
+> --- a/configure
+> +++ b/configure
+> @@ -13,8 +13,13 @@ export CCACHE_RECACHE=yes
+>  
+>  # make source path absolute
+>  source_path=$(cd "$(dirname -- "$0")"; pwd)
+> +build_path=$PWD
+> +if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
+> +source_path=$(cd "$(dirname -- "$0")"; pwd -W)
+> +build_path=`pwd -W`
+> +fi
+>  
+> -if test "$PWD" = "$source_path"
+> +if test "$build_path" = "$source_path"
+>  then
+>      echo "Using './build' as the directory for build output"
+>  
+> @@ -346,7 +351,12 @@ ld_has() {
+>      $ld --help 2>/dev/null | grep ".$1" >/dev/null 2>&1
+>  }
+>  
+> -if printf %s\\n "$source_path" "$PWD" | grep -q "[[:space:]:]";
+> +check_valid_build_path="[[:space:]:]"
+> +if [ "$MSYSTEM" = "MINGW64" -o  "$MSYSTEM" = "MINGW32" ]; then
+> +check_valid_build_path="[[:space:]]"
+> +fi
+> +
+> +if printf %s\\n "$source_path" "$build_path" | grep -q "$check_valid_build_path";
+>  then
+>    error_exit "main directory cannot contain spaces nor colons"
+>  fi
+> @@ -943,7 +953,7 @@ Linux)
+>    linux="yes"
+>    linux_user="yes"
+>    kvm="yes"
+> -  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I$PWD/linux-headers $QEMU_INCLUDES"
+> +  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -I${build_path}/linux-headers $QEMU_INCLUDES"
+>    libudev="yes"
+>  ;;
+>  esac
+> @@ -4259,7 +4269,7 @@ EOF
+>            fdt=git
+>            mkdir -p dtc
+>            fdt_cflags="-I${source_path}/dtc/libfdt"
+> -          fdt_ldflags="-L$PWD/dtc/libfdt"
+> +          fdt_ldflags="-L${build_path}/dtc/libfdt"
+>            fdt_libs="$fdt_libs"
+>        elif test "$fdt" = "yes" ; then
+>            # Not a git build & no libfdt found, prompt for system install
+> @@ -5244,7 +5254,7 @@ case "$capstone" in
+>      else
+>        LIBCAPSTONE=libcapstone.a
+>      fi
+> -    capstone_libs="-L$PWD/capstone -lcapstone"
+> +    capstone_libs="-L${build_path}/capstone -lcapstone"
+>      capstone_cflags="-I${source_path}/capstone/include"
+>      ;;
+>  
+> @@ -6244,8 +6254,8 @@ case "$slirp" in
+>        git_submodules="${git_submodules} slirp"
+>      fi
+>      mkdir -p slirp
+> -    slirp_cflags="-I${source_path}/slirp/src -I$PWD/slirp/src"
+> -    slirp_libs="-L$PWD/slirp -lslirp"
+> +    slirp_cflags="-I${source_path}/slirp/src -I${build_path}/slirp/src"
+> +    slirp_libs="-L${build_path}/slirp -lslirp"
+>      if test "$mingw32" = "yes" ; then
+>        slirp_libs="$slirp_libs -lws2_32 -liphlpapi"
+>      fi
+> @@ -8190,7 +8200,7 @@ fi
+>  mv $cross config-meson.cross
+>  
+>  rm -rf meson-private meson-info meson-logs
+> -NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+> +NINJA=${ninja:-${build_path}/ninjatool} $meson setup \
+>          --prefix "${pre_prefix}$prefix" \
+>          --libdir "${pre_prefix}$libdir" \
+>          --libexecdir "${pre_prefix}$libexecdir" \
+> @@ -8212,7 +8222,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+>  	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+>  	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f\
+>          $cross_arg \
+> -        "$PWD" "$source_path"
+> +        "$build_path" "$source_path"
+>  
+>  if test "$?" -ne 0 ; then
+>      error_exit "meson setup failed"
+> 
 
 
