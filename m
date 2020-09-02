@@ -2,89 +2,103 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BC91C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:10:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F61C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:14:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C53120758
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:10:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Un70O3il"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C53120758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B2E8720758
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 19:14:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2E8720758
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDY9f-0002YL-69
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:10:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47706)
+	id 1kDYDO-00047b-Si
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 15:14:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48474)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDY8z-00022r-BN
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:10:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29869)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDY8w-0008QU-UL
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:10:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599073801;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WcBPAzTgAgGZTYEKS3Kbvdyqp+iXM5ANJs+vnmXOjvo=;
- b=Un70O3ilVQsWo3/zYtXs/JZZEllpVCxyX7WIQjRd7ZKclMq1c1y1v2rY5VoxgHwK7REbv4
- YzxQOdwC1ojOaEDKRgnCr+m6hy/EKSh3nET1E7DphmgQIzhwBzfOIYY3oQRKA7eCSY2Xub
- YgPJPQfkL+E/d5XhQktY3+UMYI96YUI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-pSKPFxU6NtSCYvauckOPBw-1; Wed, 02 Sep 2020 15:09:59 -0400
-X-MC-Unique: pSKPFxU6NtSCYvauckOPBw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88A96109106A;
- Wed,  2 Sep 2020 19:09:58 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-76.ams2.redhat.com [10.36.112.76])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 348B687E24;
- Wed,  2 Sep 2020 19:09:56 +0000 (UTC)
-Subject: Re: [PULL v2 00/76] target/microblaze improvements
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200901152054.922595-1-richard.henderson@linaro.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <3eb9a404-b856-6337-680c-462a765e2b42@redhat.com>
-Date: Wed, 2 Sep 2020 21:09:56 +0200
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDYCl-0003JB-Ru
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:13:59 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:52186
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDYCj-0000Ty-TW
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 15:13:59 -0400
+Received: from host86-148-246-76.range86-148.btcentralplus.com
+ ([86.148.246.76] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kDYD7-0001VH-MW; Wed, 02 Sep 2020 20:14:27 +0100
+To: luoyonggang@gmail.com
+References: <20200902170054.810-1-luoyonggang@gmail.com>
+ <20200902170054.810-4-luoyonggang@gmail.com>
+ <5cde63a0-46fe-2944-f96e-1f3268e49af8@amsat.org>
+ <CAE2XoE8bsq7jzbw6FMW3TybhQGiNEJ-F_NKPm3LHzkHm69hSdw@mail.gmail.com>
+ <19b8d23c-c2e7-2d8e-50de-a4e977bae786@ilande.co.uk>
+ <CAE2XoE_yO5kkQBFzJk+FzspJG-3gHD0Xvf7BSkOk45qhp1h4PA@mail.gmail.com>
+ <0b52fa43-fa48-0add-40e2-cf3f06983c0c@ilande.co.uk>
+ <CAE2XoE-DyKcYMDR2KsZA=1-7zr4jXOMh9ZMSA7OA=tbo4tr0PQ@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <5347d8f6-4caf-dffd-8677-a70d78808d21@ilande.co.uk>
+Date: Wed, 2 Sep 2020 20:13:47 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200901152054.922595-1-richard.henderson@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAE2XoE-DyKcYMDR2KsZA=1-7zr4jXOMh9ZMSA7OA=tbo4tr0PQ@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 01:13:52
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.148.246.76
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 3/6] ci: Install msys2 in a proper way refer to
+ https://github.com/cirruslabs/cirrus-ci-docs/issues/699 Enable msys2 ci in
+ cirrus
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.324, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.324,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,28 +111,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- peter.maydell@linaro.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 01/09/2020 17.20, Richard Henderson wrote:
-> Version 2.  Serves me right for not testing 32-bit host
-> when I knew there was a patch that mattered.
+On 02/09/2020 20:01, 罗勇刚(Yonggang Luo) wrote:
 
- Hi Richard,
+>     Yes indeed, it looks like a very comprehensive build :)  Note that with the meson
+>     build I no longer have to copy/rename toolchain exes compared to your .cirrus.yml
+>     file so maybe that issue is now fixed?
+> 
+> That's not fixed, I am building a full build, so I will use any possible toolchain,
+> and you may not use it at all. 
 
-I'm afraid, but I think this PR broke the
-tests/acceptance/replay_kernel.py:ReplayKernel.test_microblaze_s3adsp1800 acceptance
-test:
+Hmmm. I'd expect meson to detect the toolchain once and use it throughout the build,
+so perhaps this is still using some Makefile logic? I think Paolo's latest PR should
+help improve this.
 
-https://gitlab.com/qemu-project/qemu/-/jobs/716158589#L176
 
-Could you please have a look?
+ATB,
 
- Thanks,
-  Thomas
-
+Mark.
 
