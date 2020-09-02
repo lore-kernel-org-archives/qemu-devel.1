@@ -5,80 +5,81 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F6DCC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 21:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4B9C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 21:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9232207EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 21:44:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE92F207EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 21:45:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UhzYLV5v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9232207EA
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsZFW+6N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE92F207EA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43986 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDaYs-0001nd-0c
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 17:44:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52230)
+	id 1kDaYw-0001u5-3G
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 17:45:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDaWe-0006BS-20
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 17:42:40 -0400
-Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:43182)
+ id 1kDaWi-0006IQ-DP
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 17:42:44 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:36416)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDaWc-0001QT-8J
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 17:42:39 -0400
-Received: by mail-pf1-x42e.google.com with SMTP id f18so437309pfa.10
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 14:42:37 -0700 (PDT)
+ id 1kDaWg-0001Rp-VL
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 17:42:44 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id q1so431403pjd.1
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 14:42:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=gXdMGjV38SOiNDEgk4FsmaPwx8AV6p28A6aPTTIcZkk=;
- b=UhzYLV5vWPiSvSsh9YGdpVHOF5mjM19qoZL0dwmXISwV0dJnNiFd/ot3bqmtW8QIUO
- cmAfIfPZC9vxR3rht5lZo0tFHkMTsvjFhbPYI0P26PFZKqhude0XpqOwYW0KHAkr+3OC
- 3my8YMKsAkasmyIq79zu930gHNMkfaMP0k9McZ6gZBpzgqLPcFWzNmn+hQk0QPDh/8rM
- uczjIPg6fgiUPAqcKNVRzkpqYI/16BZP+YHXE3yIzyVQanfOnah5S01ZB99ku2b9GW9J
- NguLKkz940mPHJ6P3Arhw24W5N5cJuKerNnbd1YF2ZCkOi0i0iDM0uHdjjjWNd4svm7T
- 28Mw==
+ bh=u7amQF5+q+U5pyEjmTJks994NcpROaetfXoezQ8sulo=;
+ b=nsZFW+6NFvhRxDTCR9w4RsQMRNpjqR1B9WX+0jsI3LocbOeVvJKET9cPCUjpgzo6mI
+ ar+zzLbrEgyFSWcBnBdgxrq4Mrpe0l1ytMVIW8oLM2Y2gmltIRosG6mtv0KgwwPcj3tm
+ jGmSQbRVTbBf1r4k2/zbcE5dgcwYgtzoNXGCy3Kb+8dYXUDpYklmI+hbaLAi+UlBvG6i
+ BAHhkgtVdPWERuYmoqiPMRNXAeCMMhV4c1rUGHFMZeI2pD+r5XScGrZDoprFnzmcMUoF
+ p4ssAW0iZykc6Yr+yjVOlciYlijFIGQjYeG6TWBOItWOGXzfeZvIPZHdSZq3OZfje5AK
+ i5aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=gXdMGjV38SOiNDEgk4FsmaPwx8AV6p28A6aPTTIcZkk=;
- b=WC+TOAQmtQArj8PnSYKGySazankiuBLNLglNjez2Z8Pc1sk+mU4aAiozHeWC5MYLr2
- MHvOIERCgbmEU6GD1bkEaJZtDPtBBsBAklNNRYCCNFAHec7lDTMdtx8G4iahTUNlpd5O
- 5kcsZgEpr65k/Oe1IN+fFdVI5PNjvga81pjwzk8NiG8qxJvTcu0l/XTZE0/MvqQzzPmq
- i+OHzMqZ6wlR2cYprb5/ZUG8YNfdFFOWwmBquOBmkfqHAwyYleA+BYU3G4JYAF1dQIyh
- 3MXXPSGwPHYHAdJxFGZ1QbfbgkLpvltIjDXzIKbCdFTwa/6e3xDhZUOlxtc0YOabyUUI
- Pmkg==
-X-Gm-Message-State: AOAM532TNwVBRHaJNgT9Kaa9aqqW0eDeRDHLmlTSMCeX55A76MzhTtCJ
- qD4gUDro8N/YIvFsTrMPKpQSp1nZPpJoNA==
-X-Google-Smtp-Source: ABdhPJznp2r7Twd6gr2KvHb0Q0Yoc+VuN3M6q2QLlF0sqS1iQEBFRVZDJHkBFnHmFhcNvEE+2HvlQw==
-X-Received: by 2002:a17:902:a607:: with SMTP id u7mr383155plq.45.1599082956285; 
- Wed, 02 Sep 2020 14:42:36 -0700 (PDT)
+ bh=u7amQF5+q+U5pyEjmTJks994NcpROaetfXoezQ8sulo=;
+ b=OLKy62LfZPBmYD/LD3+3YLaJufk0o/sQ73LNY27PQ0TDxqHXNhThH4/+jmktNUDCi/
+ UX7KhnqZzJtk6C7US3H5Otvl4ACFDZtq8eP+0/Ri85vyrdvtyNRMzaFMYt7BCHqQIE6t
+ CC2/h7gbQKdMcIbRWM/aDOYu7WIxI7+mrprEjYTksKLCp+zKcwzaXIabPE6Tel/nzzOQ
+ /knmJioL4wLyvYPRpP6iIoJUlm91Chc2xTy95iIa8J72Nmsd0XZmpXVmZq+kJIuFqkBo
+ oBtlE04AHwkV5NXEwDjkv6zOpJwGreGa3kXbWp0Sct3/nHS4oGXERUKqubAzkSyys1Ka
+ 9QKA==
+X-Gm-Message-State: AOAM531CjOjxCdLVhSyG2iTpdNhgbz7JlT1foYyClYliEE0VK76OjUNq
+ WpYuI1zUDAwv//F3YSGaATDMaBByrt6SQg==
+X-Google-Smtp-Source: ABdhPJyC1UQu01pFcxLnAH4+34pKid3oy2MW8FqB4/OdeBHE/Gd8y+NKAimT3EMEZ+A4t9pe/1q+4Q==
+X-Received: by 2002:a17:90a:3948:: with SMTP id
+ n8mr4197824pjf.156.1599082961210; 
+ Wed, 02 Sep 2020 14:42:41 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id x12sm328863pjq.43.2020.09.02.14.42.34
+ by smtp.googlemail.com with ESMTPSA id x12sm328863pjq.43.2020.09.02.14.42.39
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 02 Sep 2020 14:42:35 -0700 (PDT)
+ Wed, 02 Sep 2020 14:42:40 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/9] meson: Convert undefsym.sh to undefsym.py
-Date: Thu,  3 Sep 2020 05:42:04 +0800
-Message-Id: <20200902214211.337-3-luoyonggang@gmail.com>
+Subject: [PATCH v2 4/9] tests: handling signal on win32 properly
+Date: Thu,  3 Sep 2020 05:42:06 +0800
+Message-Id: <20200902214211.337-5-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.27.0.windows.1
 In-Reply-To: <20200902214211.337-1-luoyonggang@gmail.com>
 References: <20200902214211.337-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42e;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42e.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,119 +106,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-undefsym.sh are not msys2 compatible, convert it to python script
+SIGABRT should use signal(SIGABRT, sigabrt_handler) to handle on win32
+
+The error:
+E:/CI-Cor-Ready/xemu/qemu.org/tests/test-replication.c:559:33: error: invalid use of undefined type 'struct sigaction'
+  559 |     sigact = (struct sigaction) {
+      |                                 ^
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- meson.build         |  2 +-
- scripts/undefsym.py | 57 +++++++++++++++++++++++++++++++++++++++++++++
- scripts/undefsym.sh | 20 ----------------
- 3 files changed, 58 insertions(+), 21 deletions(-)
- create mode 100644 scripts/undefsym.py
- delete mode 100755 scripts/undefsym.sh
+ tests/test-replication.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/meson.build b/meson.build
-index 55c7d2318c..c9f5d05664 100644
---- a/meson.build
-+++ b/meson.build
-@@ -863,7 +863,7 @@ foreach d, list : modules
- endforeach
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index e0b03dafc2..9ab3666a90 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -554,6 +554,9 @@ static void sigabrt_handler(int signo)
  
- nm = find_program('nm')
--undefsym = find_program('scripts/undefsym.sh')
-+undefsym = find_program('scripts/undefsym.py')
- block_syms = custom_target('block.syms', output: 'block.syms',
-                              input: [libqemuutil, block_mods],
-                              capture: true,
-diff --git a/scripts/undefsym.py b/scripts/undefsym.py
-new file mode 100644
-index 0000000000..c690f88c7a
---- /dev/null
-+++ b/scripts/undefsym.py
-@@ -0,0 +1,57 @@
-+#!/usr/bin/env python3
-+# -*- coding: utf-8 -*-
-+
-+# Before a shared module's DSO is produced, a static library is built for it
-+# and passed to this script.  The script generates -Wl,-u options to force
-+# the inclusion of symbol from libqemuutil.a if the shared modules need them,
-+# This is necessary because the modules may use functions not needed by the
-+# executable itself, which would cause the function to not be linked in.
-+# Then the DSO loading would fail because of the missing symbol.
-+
-+
-+"""
-+Compare the static library with the shared module for compute the symbol duplication
-+"""
-+
-+import sys
-+import subprocess
-+
-+def filter_lines_set(stdout, is_static = True):
-+    linesSet = set()
-+    for line in stdout.splitlines():
-+        tokens = line.split(b' ')
-+        if len(tokens) >= 1:
-+            if len(tokens) > 1:
-+                if is_static and tokens[1] == b'U':
-+                    continue
-+                if not is_static and tokens[1] != b'U':
-+                    continue
-+            new_line = b'-Wl,-u,' + tokens[0]
-+            if not new_line in linesSet:
-+                linesSet.add(new_line)
-+    return linesSet
-+
-+def main(args):
-+    if len(args) <= 3:
-+        sys.exit(0)
-+
-+    nm = args[1]
-+    staticlib = args[2]
-+    pc = subprocess.run([nm, "-P", "-g", staticlib], stdout=subprocess.PIPE)
-+    if pc.returncode != 0:
-+        sys.exit(-1)
-+    lines_set_left = filter_lines_set(pc.stdout)
-+
-+    shared_modules = args[3:]
-+    pc = subprocess.run([nm, "-P", "-g"] + shared_modules, stdout=subprocess.PIPE)
-+    if pc.returncode != 0:
-+        sys.exit(-1)
-+    lines_set_right = filter_lines_set(pc.stdout, False)
-+    lines = []
-+    for line in sorted(list(lines_set_right)):
-+        if line in lines_set_left:
-+            lines.append(line)
-+    sys.stdout.write(b'\n'.join(lines).decode())
-+
-+if __name__ == "__main__":
-+    main(sys.argv)
-diff --git a/scripts/undefsym.sh b/scripts/undefsym.sh
-deleted file mode 100755
-index b9ec332e95..0000000000
---- a/scripts/undefsym.sh
-+++ /dev/null
-@@ -1,20 +0,0 @@
--#! /usr/bin/env bash
--
--# Before a shared module's DSO is produced, a static library is built for it
--# and passed to this script.  The script generates -Wl,-u options to force
--# the inclusion of symbol from libqemuutil.a if the shared modules need them,
--# This is necessary because the modules may use functions not needed by the
--# executable itself, which would cause the function to not be linked in.
--# Then the DSO loading would fail because of the missing symbol.
--
--if test $# -le 2; then
--  exit 0
--fi
--
--NM=$1
--staticlib=$2
--shift 2
--# Find symbols defined in static libraries and undefined in shared modules
--comm -12 \
--  <( $NM -P -g $staticlib | awk '$2!="U"{print "-Wl,-u," $1}' | sort -u) \
--  <( $NM -P -g "$@" | awk '$2=="U"{print "-Wl,-u," $1}' | sort -u)
+ static void setup_sigabrt_handler(void)
+ {
++#ifdef _WIN32
++    signal(SIGABRT, sigabrt_handler);
++#else
+     struct sigaction sigact;
+ 
+     sigact = (struct sigaction) {
+@@ -562,6 +565,7 @@ static void setup_sigabrt_handler(void)
+     };
+     sigemptyset(&sigact.sa_mask);
+     sigaction(SIGABRT, &sigact, NULL);
++#endif
+ }
+ 
+ int main(int argc, char **argv)
 -- 
 2.27.0.windows.1
 
