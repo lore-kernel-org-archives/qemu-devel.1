@@ -2,94 +2,120 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 433D1C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 09:06:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E23C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 09:10:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0135020709
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 09:06:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F6Bdl5uO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0135020709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 96D432071B
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 09:10:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96D432071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDOiW-0005BM-44
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 05:06:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58064)
+	id 1kDOmT-0006q5-PY
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 05:10:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kDOhm-0004Wt-NE
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 05:05:22 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39874
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kDOhk-00013Q-7e
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 05:05:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599037518;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=axE/fs2aZuurUhl2Q5ehpYdYBvUCAyYy+9CW8OCvSyo=;
- b=F6Bdl5uOvSswOQmCxY0jUv8+MvDpOWt0R/dW0BuSj6OgZRDM8BetBxxKe9IiazVfTf94yS
- Ep09vHQ4MKJpSu+lzFz26RzZrI1RsCG1Z/rva+DK18ZSOYGEC9aOs2J/ZpqmKFXSdcD5Az
- COsllIxmKI4ZUYdIQY+eNcX6HVFzHms=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-7i1HXHRHM_CbVFWVS7GtvA-1; Wed, 02 Sep 2020 05:05:16 -0400
-X-MC-Unique: 7i1HXHRHM_CbVFWVS7GtvA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89A5118B9ED1;
- Wed,  2 Sep 2020 09:05:14 +0000 (UTC)
-Received: from [10.36.112.51] (ovpn-112-51.ams2.redhat.com [10.36.112.51])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C5B105C1C4;
- Wed,  2 Sep 2020 09:04:56 +0000 (UTC)
-Subject: Re: [RFC v8 1/5] memory: Rename memory_region_notify_one to
- memory_region_notify_iommu_one
-To: =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
- Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-References: <20200901142608.24481-1-eperezma@redhat.com>
- <20200901142608.24481-2-eperezma@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <b3471660-74c6-b0d2-c08a-d21919a92347@redhat.com>
-Date: Wed, 2 Sep 2020 11:04:55 +0200
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kDOlv-0006Cj-ML; Wed, 02 Sep 2020 05:09:39 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:40477)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kDOlt-0001a5-Rx; Wed, 02 Sep 2020 05:09:39 -0400
+Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1MMoT4-1judQr46cO-00IkVo; Wed, 02 Sep 2020 11:09:30 +0200
+Subject: Re: [PATCH] hw/acpi/tco: Remove unused definitions
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200901101951.85892-1-f4bug@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <d722a487-4f15-750c-8d52-03d52a5ef4c6@vivier.eu>
+Date: Wed, 2 Sep 2020 11:09:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200901142608.24481-2-eperezma@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200901101951.85892-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 02:26:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+X-Provags-ID: V03:K1:9dMOplVT3qvpDQEl5QAwn/9bIZNPV42l2ZmbaHCgwn9jVvg+cGg
+ T/7hD2QLKCzgexCgR/Z0LGFkPCj67540kpcWCet/wIIqjn6ThSqZLwsZFVXLEjaHcOg1ZMT
+ wFJ4+dAE5PAGXI1aBeZIbacmmWQutFLPvW2d0TiO5BEg2vY6V9vAnMNarl+g8Ra7nBtlU3F
+ TqfirRDQbBr4Gmisbsy0g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:opi5VZmkdXQ=:0RvIK05nU50fKHkou/mkaL
+ 5447j7lIvebQ+vjR70A1WOv9EVVGf27IpnyWFtqyzJDHeQ0Qatyx0KBpaMGvQ2YRdIxouR6pw
+ dJ8GLBbWN6rbQhrZtsgDT6PGtpdAg1A5ESD5QiYYyJBsh0hemyB6SJKm7nO/VQeZL0bksbjSQ
+ zuywMvRlYKiGsaZIYOAEyig31GxjGLb8/zu+bTIEM4SjUHYDLHBZqStwuRR0UWhvm8HloPTq0
+ 0NeYK67NXMGr4mpizNHuTHo94uvWe4nILuBUqPj3YwSCsjntaoyiEUgaBvH0ixRtjIu25uXno
+ 9ae3V5yrb9APgKDVOkfsmlvRWZw8/WAZibfZ+bDxlF32EwNuYcGBtJ/IIpnx6cOoPXpuNEbdq
+ nyKv12vP4E5YzjGvGWxAhz3RAipNbTPP3DEzlpehWtZhQ6I400MzdOr2qhloZDpsFNqm5bYiQ
+ J2JuzNma39vD5JysITaHNKIol7jBdo/dFsaJ87XLemPBUEACp86LcEd5WvSZmCxamdbMPxQJS
+ LiRqRxVm2C0t2xUSqgEUq+xNqS9eFtwulKqaDPByd4KPGVLh+2sk1RtSY+Tqntl4/KqGDAI19
+ U/4KsIghI0e3GIu7KoJ4t03SeFApnc/DJN+On5WZeXwpptuyVExkPghvf9lP2if9f9WcQxGp9
+ UH3H/7CrHpqSxWmAqGNmWdIeHsY8m08jV/PxvzpsC26ssE6i2wIU2+9w5S2AtSlK8deOXUesr
+ CVmKVsElCl5/CRYKiMpAYouyRW0i269yKW0rxEliLONJYdbUvPFiwuKOawh9u4Kmj70niT4Ff
+ n7vXujMvwL63QGdAzbOwk1WnpyLw6aZvQaLd29O/685ZUrIPlRXSFUKr/4racDWMVXnZsGS
+Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 05:09:34
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -39
+X-Spam_score: -4.0
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.13, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.13,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,142 +128,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paulo Alcantara <pcacjr@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Eugenio,
-
-On 9/1/20 4:26 PM, Eugenio Pérez wrote:
-> Previous name didn't reflect the iommu operation.
+Le 01/09/2020 à 12:19, Philippe Mathieu-Daudé a écrit :
+> TCO_DEBUG() and DEBUG definitions are not used, remove them.
 > 
-> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-
-Thanks
-
-Eric
-
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/arm/smmu-common.c  | 2 +-
->  hw/arm/smmuv3.c       | 2 +-
->  hw/i386/intel_iommu.c | 4 ++--
->  include/exec/memory.h | 6 +++---
->  softmmu/memory.c      | 6 +++---
->  5 files changed, 10 insertions(+), 10 deletions(-)
+>  hw/acpi/tco.c | 11 -----------
+>  1 file changed, 11 deletions(-)
 > 
-> diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
-> index 3838db1395..88d2c454f0 100644
-> --- a/hw/arm/smmu-common.c
-> +++ b/hw/arm/smmu-common.c
-> @@ -472,7 +472,7 @@ static void smmu_unmap_notifier_range(IOMMUNotifier *n)
->      entry.perm = IOMMU_NONE;
->      entry.addr_mask = n->end - n->start;
+> diff --git a/hw/acpi/tco.c b/hw/acpi/tco.c
+> index fb9052dbca2..cf1e68a5393 100644
+> --- a/hw/acpi/tco.c
+> +++ b/hw/acpi/tco.c
+> @@ -15,17 +15,6 @@
+>  #include "hw/acpi/tco.h"
+>  #include "trace.h"
 >  
-> -    memory_region_notify_one(n, &entry);
-> +    memory_region_notify_iommu_one(n, &entry);
->  }
->  
->  /* Unmap all notifiers attached to @mr */
-> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
-> index 0122700e72..0a893ae918 100644
-> --- a/hw/arm/smmuv3.c
-> +++ b/hw/arm/smmuv3.c
-> @@ -827,7 +827,7 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
->      entry.addr_mask = num_pages * (1 << granule) - 1;
->      entry.perm = IOMMU_NONE;
->  
-> -    memory_region_notify_one(n, &entry);
-> +    memory_region_notify_iommu_one(n, &entry);
->  }
->  
->  /* invalidate an asid/iova range tuple in all mr's */
-> diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
-> index 5284bb68b6..2ad6b9d796 100644
-> --- a/hw/i386/intel_iommu.c
-> +++ b/hw/i386/intel_iommu.c
-> @@ -3498,7 +3498,7 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
->          /* This field is meaningless for unmap */
->          entry.translated_addr = 0;
->  
-> -        memory_region_notify_one(n, &entry);
-> +        memory_region_notify_iommu_one(n, &entry);
->  
->          start += mask;
->          remain -= mask;
-> @@ -3536,7 +3536,7 @@ static void vtd_address_space_refresh_all(IntelIOMMUState *s)
->  
->  static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
->  {
-> -    memory_region_notify_one((IOMMUNotifier *)private, entry);
-> +    memory_region_notify_iommu_one((IOMMUNotifier *)private, entry);
->      return 0;
->  }
->  
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 0cfe987ab4..22c5f564d1 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -226,7 +226,7 @@ enum IOMMUMemoryRegionAttr {
->   * The IOMMU implementation must use the IOMMU notifier infrastructure
->   * to report whenever mappings are changed, by calling
->   * memory_region_notify_iommu() (or, if necessary, by calling
-> - * memory_region_notify_one() for each registered notifier).
-> + * memory_region_notify_iommu_one() for each registered notifier).
->   *
->   * Conceptually an IOMMU provides a mapping from input address
->   * to an output TLB entry. If the IOMMU is aware of memory transaction
-> @@ -1274,7 +1274,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
->                                  IOMMUTLBEntry entry);
->  
->  /**
-> - * memory_region_notify_one: notify a change in an IOMMU translation
-> + * memory_region_notify_iommu_one: notify a change in an IOMMU translation
->   *                           entry to a single notifier
->   *
->   * This works just like memory_region_notify_iommu(), but it only
-> @@ -1285,7 +1285,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
->   *         replaces all old entries for the same virtual I/O address range.
->   *         Deleted entries have .@perm == 0.
->   */
-> -void memory_region_notify_one(IOMMUNotifier *notifier,
-> +void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
->                                IOMMUTLBEntry *entry);
->  
->  /**
-> diff --git a/softmmu/memory.c b/softmmu/memory.c
-> index 70b93104e8..961c25b42f 100644
-> --- a/softmmu/memory.c
-> +++ b/softmmu/memory.c
-> @@ -1890,8 +1890,8 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
->      memory_region_update_iommu_notify_flags(iommu_mr, NULL);
->  }
->  
-> -void memory_region_notify_one(IOMMUNotifier *notifier,
-> -                              IOMMUTLBEntry *entry)
-> +void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
-> +                                    IOMMUTLBEntry *entry)
->  {
->      IOMMUNotifierFlag request_flags;
->      hwaddr entry_end = entry->iova + entry->addr_mask;
-> @@ -1927,7 +1927,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
->  
->      IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
->          if (iommu_notifier->iommu_idx == iommu_idx) {
-> -            memory_region_notify_one(iommu_notifier, &entry);
-> +            memory_region_notify_iommu_one(iommu_notifier, &entry);
->          }
->      }
->  }
+> -//#define DEBUG
+> -
+> -#ifdef DEBUG
+> -#define TCO_DEBUG(fmt, ...)                                     \
+> -    do {                                                        \
+> -        fprintf(stderr, "%s "fmt, __func__, ## __VA_ARGS__);    \
+> -    } while (0)
+> -#else
+> -#define TCO_DEBUG(fmt, ...) do { } while (0)
+> -#endif
+> -
+>  enum {
+>      TCO_RLD_DEFAULT         = 0x0000,
+>      TCO_DAT_IN_DEFAULT      = 0x00,
 > 
 
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
