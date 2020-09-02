@@ -2,89 +2,82 @@ Return-Path: <SRS0=ff1W=CL=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A4CC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:19:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90C48C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:19:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57072207EA
-	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:19:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C990207EA
+	for <qemu-devel@archiver.kernel.org>; Wed,  2 Sep 2020 18:19:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SNSnKS9g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57072207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D8pkFBjQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C990207EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDXLp-0007PS-71
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 14:19:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35920)
+	id 1kDXME-0008OI-Au
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 14:19:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDXL0-0006V4-EU
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:18:26 -0400
-Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:34202)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDXKy-0001ic-OK
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:18:26 -0400
-Received: by mail-ej1-x62d.google.com with SMTP id d26so76620ejr.1
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 11:18:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=D3wTSXZChbmEZYUHhRGIEeAxCcKUKyqSfx7J/61yesA=;
- b=SNSnKS9geg7DKS9qKOkSpqIHUoPrEUAopGdGM7L0upYtr94G38HouHVqqJ9noKcOxk
- Sui3mS3DhYub0h6N2bI5u/3YDOV+TiLl4Vhdzdqmm3p+qCYrUBV44qeHBO/bJRaV3yJR
- fsQJg6Kx6mKIyNCoe8Cm3XUkgK0z3lVOlJMYlYgmQNh+0kkYj1m7xQMfGF2XJfs8XXDe
- UhZXE6audIHFg7TFoM/Z71Tv9i/EYe6+DrwKwCB9VXacSNpuQ+mzKi6MfZR2rv6DwZRX
- tRtX411QtWKl4JbTU9kqlrOdPanBEhJJJoPY4vht1tRsdMFdu9I+nao7jipGzoL+Z6nL
- g3ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=D3wTSXZChbmEZYUHhRGIEeAxCcKUKyqSfx7J/61yesA=;
- b=I3smVT0aRVraxi9BBfHaAPzMYjUPvCv1xfSqg6G+9HLIr7SXB7hTwxl+yTKBZ+PcqP
- qx1Mnvj+4G0sf61Xn8f88Iz1JwfLm0rOtmb9lH28HnPs7/np7bFt/NcNTVNKqW9o4H8h
- j2xjSdKFJcN6AWJm+tzUzxwfTi4EvKF8bprKSaiq6pNa6Iexs8Ba7+McuGAtTd/TAQyU
- 9jtFUqbV4vUQB/SOyogA1x3amGKbwa1Vte0DiScyP7vBpXVQVveeqvQNP4QyQiqPt7e2
- pwriYo2XQUp1xXzOVS7ymsXh8sCqKIJxImPxiD24CmIjeSmHCDuYtHYptIxUiUZE1DcV
- 1/xg==
-X-Gm-Message-State: AOAM532YpP7+lwobE75TH/MdFTNcTqGh+SWqKrlV2Bf41L3CcGiGwnFv
- dqYAcmtFEkYISqD5qVGjtx5mX+a2AYBOJirOPmwvOQ==
-X-Google-Smtp-Source: ABdhPJyTn7hxfTYL51w/tLslG2AAgcCKoncg1AsPm3Al9SL+kDvL1GeS3lBRiI/NrmAdaNEGgXx8bOga6FVJF5bhu5A=
-X-Received: by 2002:a17:906:59b:: with SMTP id 27mr1379011ejn.56.1599070702869; 
- Wed, 02 Sep 2020 11:18:22 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kDXLF-0006jM-Rp
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:18:41 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43690
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kDXLD-0001jb-34
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 14:18:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599070717;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=euUt4Kf3yQt8AKxbvf4ONpjuLbUUYo6WLGT4KriOvYU=;
+ b=D8pkFBjQgmXUWd5p7h/2zT3Ev9XH01CQJCO+yf2/BCRNCViOfCFcNyW41Fv3N3RuEb5S+V
+ PdNal1MCl5jxaeQOVB0lMlmZU3qiapRZBcFqvJXAdMskMopBq3IfRVR8cKhXZJNx/3NQz6
+ Z5QBMp7hK3Yne5I1bVc8a65c3Sv0IGQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-182-JxJ2od-VPKuiyQqe8Xsuyg-1; Wed, 02 Sep 2020 14:18:33 -0400
+X-MC-Unique: JxJ2od-VPKuiyQqe8Xsuyg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E89E18BA281;
+ Wed,  2 Sep 2020 18:18:32 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-113-128.phx2.redhat.com [10.3.113.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0CBC410013BD;
+ Wed,  2 Sep 2020 18:18:31 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v4 0/5] block: add block-dirty-bitmap-populate job
+Date: Wed,  2 Sep 2020 13:18:26 -0500
+Message-Id: <20200902181831.2570048-1-eblake@redhat.com>
 MIME-Version: 1.0
-References: <bbdacc80-a321-5f06-e430-973a38e7e037@amsat.org>
- <CAFEAcA8mwjWP-KhJ5bp_Qo_h81Mt_yn8k_5oepgMas9COBQgWQ@mail.gmail.com>
- <f7b28480-c841-f0d7-a848-b5f1775ec12d@amsat.org>
-In-Reply-To: <f7b28480-c841-f0d7-a848-b5f1775ec12d@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 2 Sep 2020 19:18:11 +0100
-Message-ID: <CAFEAcA-3bkPkxuMXN7Wd-zBKajzXOr+Vib7XzCzsT_8YYQzTzQ@mail.gmail.com>
-Subject: Re: hw/clock: What clock rate for virt machines?
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62d.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 03:24:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,58 +90,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- qemu-devel <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: kwolf@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
+ armbru@redhat.com, mreitz@redhat.com, vsementsov@virtuozzo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 2 Sep 2020 at 18:03, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =
-wrote:
->
-> On 9/2/20 6:49 PM, Peter Maydell wrote:
-> > On Wed, 2 Sep 2020 at 17:35, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> >> Peter said "'clock' is basically meaningless for virt machines",
-> >>
-> >> I understand and agree. But how to make that explicit/obvious in
-> >> the code, when a device expects a clock frequency/period?
-> >
-> > When a particular *device* needs a clock, then presumably
-> > it has a defined purpose for it, and we can pick a
-> > frequency for it then.
-> >
-> >> See for example hw/riscv/virt.c, it uses the following (confusing
-> >> to me) in virt_machine_init():
-> >>
-> >>    serial_mm_init(system_memory, memmap[VIRT_UART0].base,
-> >>        0, qdev_get_gpio_in(DEVICE(mmio_plic), UART0_IRQ), 399193,
-> >>        serial_hd(0), DEVICE_LITTLE_ENDIAN);
-> >
-> > In this case, the board has a model of a 16550A UART on it,
-> > which uses its input clock to determine what the actual baud
-> > rate is for particular guest settings of the divisor registers.
-> > So we need to look at:
-> >  * what does guest software expect the frequency to be?
->
-> QEMU is supposed to model machine with no knowledge of the guest,
-> but the virt case is a particular one indeed... as it has to know
-> it is virtualized.
->
-> >  * what is a "good" frequency which gives the guest the best
-> >    possible choices of baud rate?
->
-> I'll think about it...
+This is NOT the final version of this patch series, but I'm posting it
+to revive conversation on the topic while fixing it to compile on top
+of meson changes.
 
-My guess is that guest code assumes "same frequency an
-x86 PC uses", but a risc-v person might know better...
+v3 was: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06258.html
 
-(For QEMU I think it only makes a visible difference when
-you pass a host serial port through to the guest as
-otherwise we ignore whatever baud rate the guest sets.)
+001/5:[0025] [FC] 'block: add bitmap-populate job'
+002/5:[----] [--] 'blockdev: combine DriveBackupState and BlockdevBackupState'
+003/5:[0004] [FC] 'qmp: expose block-dirty-bitmap-populate'
+004/5:[----] [--] 'iotests: move bitmap helpers into their own file'
+005/5:[----] [-C] 'iotests: add 298 for block-dirty-bitmap-populate'
 
-thanks
--- PMM
+I'm still trying to find the right QAPI contract (affects patch 1 and
+3 for the qapi, and 5 for invoking the command in iotests), but right
+now, I'm leaning towards:
+
+{ "execute": "block-dirty-bitmap-populate", "arguments": {
+    "job-id": "job0", "node": "target_node", "name": "target_bitmap",
+    "sources": [ { "pattern": "allocation", "node": "from_node" } ] } }
+
+which allows expansion into multiple sources, so that we can combine a
+populate action with a bitmap merge rather than having to do those as
+separate commands, like:
+
+{ "execute": "block-dirty-bitmap-populate", "arguments": {
+    "job-id": "job0", "node": "target_node", "name": "target_bitmap",
+    "sources": [ { "pattern": "allocation", "node": "from_node" },
+                 { "pattern": "bitmap", "node": "from_node",
+		     "bitmap": "from_bitmap" } ] } }
+
+John Snow (5):
+  block: add bitmap-populate job
+  blockdev: combine DriveBackupState and BlockdevBackupState
+  qmp: expose block-dirty-bitmap-populate
+  iotests: move bitmap helpers into their own file
+  iotests: add 298 for block-dirty-bitmap-populate
+
+ qapi/block-core.json          |   66 +
+ qapi/job.json                 |    6 +-
+ qapi/transaction.json         |    2 +
+ include/block/block.h         |    1 +
+ include/block/block_int.h     |   21 +
+ block/bitmap-populate.c       |  207 ++
+ blockdev.c                    |  104 +-
+ blockjob.c                    |    3 +-
+ MAINTAINERS                   |    1 +
+ block/meson.build             |    1 +
+ tests/qemu-iotests/257        |  110 +-
+ tests/qemu-iotests/298        |  232 ++
+ tests/qemu-iotests/298.out    | 4544 +++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/bitmaps.py |  131 +
+ tests/qemu-iotests/group      |    1 +
+ 15 files changed, 5301 insertions(+), 129 deletions(-)
+ create mode 100644 block/bitmap-populate.c
+ create mode 100755 tests/qemu-iotests/298
+ create mode 100644 tests/qemu-iotests/298.out
+ create mode 100644 tests/qemu-iotests/bitmaps.py
+
+-- 
+2.28.0
+
 
