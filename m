@@ -4,76 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4C6C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:38:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA671C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:38:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 496F920665
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:38:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B0E6206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:38:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gl+8yXAY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496F920665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r+Bw11oB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B0E6206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwvt-0001H0-FD
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:38:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58722)
+	id 1kDwwD-0001zJ-W2
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:38:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLR-00042w-D6; Thu, 03 Sep 2020 17:00:33 -0400
-Received: from mail-ot1-x32a.google.com ([2607:f8b0:4864:20::32a]:44661)
+ id 1kDwLT-00047Y-IH; Thu, 03 Sep 2020 17:00:35 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37569)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLK-0007f2-JX; Thu, 03 Sep 2020 17:00:30 -0400
-Received: by mail-ot1-x32a.google.com with SMTP id a2so3981328otr.11;
- Thu, 03 Sep 2020 14:00:25 -0700 (PDT)
+ id 1kDwLR-0007fx-Ax; Thu, 03 Sep 2020 17:00:35 -0400
+Received: by mail-oi1-x244.google.com with SMTP id e6so4528435oii.4;
+ Thu, 03 Sep 2020 14:00:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=bZwBA4peLRyGs8ohtkAt1JRxKXRjQb8BlHQpeJ+7qBM=;
- b=gl+8yXAY9Qy03h4KXWVLSI715zYwZY0Y6cZA0UPXXUtkLR3g2WvW1/MMdvl+1c72a/
- C7R0MeSVJ12nC2t0ra0abC4LcKnIzBmJlQgQXDuCGgK015s/uXDSauguW+edMLLU5/YI
- VS9TZk+vwOtrJKO/cOzwmjXGtzSuQGCqVUZFXNz5laW85CTcQbswMhPam4zAsTeQfdYR
- 5HexfJ/mLMOg/CWqxqyR0Z8V6NH00zNUmwBQB2eWKtEGQl5yWZ3NwItV+oNMag3C7f5E
- 1xtN+z/viOcqPKnM1bbuwTPFa0FzGih7KOfVIZYIsiSqd9aJQKrb7J0+fGtSG/cLshit
- LNgQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=HbS47WUaBPPEuio8+cvg8pxNjw1ZKqWkDcR3X6WFFTw=;
+ b=r+Bw11oB7WI5MhRV+Z5dEdiKCXNlWcc+dC/9HH/7jaDsOVwLTuGQU2KLHgqdgqzwxN
+ kpVHwkGzeZql599jVO1ughlAX3IPQ/5IaKEqmbIN/oQ1MXFESGwfVZww+6SL+XdSJlez
+ /jKqOZa/V6K2wjWDWyoT9HY2wky4j6YK9zoMiL2amwpSAenSfMsDKQ2QMdrsoMSHw7ct
+ udSGeCQMTy0EZXbpc3LYjl7HtKg3KJBwgFyfan6SMvmoEAoyz27NTMkrhrDzpz1rP9qh
+ Lqs3hugFEv2s9bobvIepIuGuUI9f/9CligwyBDfqeJmADaXRt03NPj0A6xp4k/EBUBBS
+ b51Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=bZwBA4peLRyGs8ohtkAt1JRxKXRjQb8BlHQpeJ+7qBM=;
- b=uFvgiFcGaXL0ovqdl6TsoMbes9JbpwK/zctjYpCIbGOOq90EjqjUf61nvAoPR0+Rz1
- g55+7IvQfdgu4qaRMmicZzi5FSTaz9V/DSuEHFC6TMCsba3JIPtL5hMPBND7fbS47kvD
- ouKZBaoGx4a/ouP/hxBKP5EzII54+Dm2g9qGwSzYxfVSVIjVqC0GOA5wSXFC/uJ8Z7R1
- O79jmFsL7i2SQ/jC8NGYAPnNTJ2R9GVEcSZvScf6gaMi5B7gaJknQvfwzDJznzmyacuZ
- WVKJ2t86IuLxEQ2juYnAlBWspJYYI4s4jtiC5/75/YO9TbRmD4cYGIUIC6612QY5A1W2
- wQRQ==
-X-Gm-Message-State: AOAM532W8M/4JQ7hrZ8rpWN2bxyBcidPfDOIPMLhQ/jv88RpVHPbLiCk
- obzBYNjWaOW/4nEwOKAQzbxjGxArV4U=
-X-Google-Smtp-Source: ABdhPJy99SGG5AIzkQH1kFBC0VKy93XlH+nU5+TdBGgzjffCfQ/LCf4OWtpQQaulynD/0A0muud7Vg==
-X-Received: by 2002:a9d:170e:: with SMTP id i14mr3217027ota.170.1599166824814; 
- Thu, 03 Sep 2020 14:00:24 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=HbS47WUaBPPEuio8+cvg8pxNjw1ZKqWkDcR3X6WFFTw=;
+ b=IQKleItYMAh4tJ1AUzl2emP3lhJRppBUceOk+j1inc2/fmHlAohC2qMWGSDxIjPaao
+ rIKqXZynOyoOEz5AeSHpJ8FN9uMEMocFqbyY7FYb+dJywaKg/rONKK5Znr+4UpZFeGpA
+ oIXgJiTY0K72CnfDHfVl54kbCXk0Rq8HCdTLBrmNCGRAaFayBXE6v9MbUcdrcIWfvsWP
+ etetSbczZ34LCNUiS3l+4MAFzJS7V2O4XoFIGrhcbLlDFo/LYOgW4x7Hjxzo6m2CUNPY
+ venRCmzSwlN8JZUcys+jniKk48vjNYAe0oXOS9+110mxf+Nt6Yi0wxXUejXJtBvSJLp0
+ mxrw==
+X-Gm-Message-State: AOAM531TVguPIXGNvn/YgAvRVcY+gTJK19MkA4WCZ6d0D6+ebi13Z4TK
+ UvaoldQSpCyGcdeZGlwMTbIWkhQOFLw=
+X-Google-Smtp-Source: ABdhPJwmI0ezm+PloNz/xyzsTTmPzD2K527tKEou5niUMlTIg83L6wmUXk3eYAyo0jWY9CoCMt3dIw==
+X-Received: by 2002:aca:1716:: with SMTP id j22mr3442432oii.44.1599166828689; 
+ Thu, 03 Sep 2020 14:00:28 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id 92sm764752ota.38.2020.09.03.14.00.24
+ by smtp.gmail.com with ESMTPSA id v35sm763455otb.32.2020.09.03.14.00.28
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:24 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:28 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 35/77] virtiofsd: Whitelist fchmod
-Date: Thu,  3 Sep 2020 15:58:53 -0500
-Message-Id: <20200903205935.27832-36-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 38/77] error: Use error_reportf_err() where appropriate
+Date: Thu,  3 Sep 2020 15:58:56 -0500
+Message-Id: <20200903205935.27832-39-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::32a;
- envelope-from=flukshun@gmail.com; helo=mail-ot1-x32a.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -96,72 +100,160 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Max Reitz <mreitz@redhat.com>
+Cc: qemu-stable@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Markus Armbruster <armbru@redhat.com>
 
-lo_setattr() invokes fchmod() in a rarely used code path, so it should
-be whitelisted or virtiofsd will crash with EBADSYS.
+Replace
 
-Said code path can be triggered for example as follows:
+    error_report("...: %s", ..., error_get_pretty(err));
 
-On the host, in the shared directory, create a file with the sticky bit
-set and a security.capability xattr:
-(1) # touch foo
-(2) # chmod u+s foo
-(3) # setcap '' foo
+by
 
-Then in the guest let some process truncate that file after it has
-dropped all of its capabilities (at least CAP_FSETID):
+    error_reportf_err(err, "...: ", ...);
 
-int main(int argc, char *argv[])
-{
-    capng_setpid(getpid());
-    capng_clear(CAPNG_SELECT_BOTH);
-    capng_updatev(CAPNG_ADD, CAPNG_PERMITTED | CAPNG_EFFECTIVE, 0);
-    capng_apply(CAPNG_SELECT_BOTH);
+One of the replaced messages lacked a colon.  Add it.
 
-    ftruncate(open(argv[1], O_RDWR), 0);
-}
-
-This will cause the guest kernel to drop the sticky bit (i.e. perform a
-mode change) as part of the truncate (where FATTR_FH is set), and that
-will cause virtiofsd to invoke fchmod() instead of fchmodat().
-
-(A similar configuration exists further below with futimens() vs.
-utimensat(), but the former is not a syscall but just a wrapper for the
-latter, so no further whitelisting is required.)
-
-Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1842667
-Reported-by: Qian Cai <caiqian@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200608093111.14942-1-mreitz@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Vivek Goyal <vgoyal@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-(cherry picked from commit 63659fe74e76f5c5285466f0c5cfbdca65b3688e)
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200505101908.6207-6-armbru@redhat.com>
+(cherry picked from commit 5217f1887a8041c51495fbd5d3f767d96a242000)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tools/virtiofsd/seccomp.c | 1 +
- 1 file changed, 1 insertion(+)
+ chardev/char-socket.c | 5 +++--
+ hw/sd/pxa2xx_mmci.c   | 4 ++--
+ hw/sd/sd.c            | 4 ++--
+ hw/usb/dev-mtp.c      | 9 +++++----
+ qemu-nbd.c            | 7 +++----
+ scsi/qemu-pr-helper.c | 4 ++--
+ 6 files changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/tools/virtiofsd/seccomp.c b/tools/virtiofsd/seccomp.c
-index bd9e7b083c..3b1522acdd 100644
---- a/tools/virtiofsd/seccomp.c
-+++ b/tools/virtiofsd/seccomp.c
-@@ -42,6 +42,7 @@ static const int syscall_whitelist[] = {
-     SCMP_SYS(exit_group),
-     SCMP_SYS(fallocate),
-     SCMP_SYS(fchdir),
-+    SCMP_SYS(fchmod),
-     SCMP_SYS(fchmodat),
-     SCMP_SYS(fchownat),
-     SCMP_SYS(fcntl),
+diff --git a/chardev/char-socket.c b/chardev/char-socket.c
+index 185fe38dda..e5ee685f8c 100644
+--- a/chardev/char-socket.c
++++ b/chardev/char-socket.c
+@@ -138,8 +138,9 @@ static void check_report_connect_error(Chardev *chr,
+     SocketChardev *s = SOCKET_CHARDEV(chr);
+ 
+     if (!s->connect_err_reported) {
+-        error_report("Unable to connect character device %s: %s",
+-                     chr->label, error_get_pretty(err));
++        error_reportf_err(err,
++                          "Unable to connect character device %s: ",
++                          chr->label);
+         s->connect_err_reported = true;
+     }
+     qemu_chr_socket_restart_timer(chr);
+diff --git a/hw/sd/pxa2xx_mmci.c b/hw/sd/pxa2xx_mmci.c
+index 8f9ab0ec16..f9c50ddda5 100644
+--- a/hw/sd/pxa2xx_mmci.c
++++ b/hw/sd/pxa2xx_mmci.c
+@@ -497,12 +497,12 @@ PXA2xxMMCIState *pxa2xx_mmci_init(MemoryRegion *sysmem,
+     carddev = qdev_create(qdev_get_child_bus(dev, "sd-bus"), TYPE_SD_CARD);
+     qdev_prop_set_drive(carddev, "drive", blk, &err);
+     if (err) {
+-        error_report("failed to init SD card: %s", error_get_pretty(err));
++        error_reportf_err(err, "failed to init SD card: ");
+         return NULL;
+     }
+     object_property_set_bool(OBJECT(carddev), true, "realized", &err);
+     if (err) {
+-        error_report("failed to init SD card: %s", error_get_pretty(err));
++        error_reportf_err(err, "failed to init SD card: ");
+         return NULL;
+     }
+ 
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index 71a9af09ab..3c06a0ac6d 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -703,13 +703,13 @@ SDState *sd_init(BlockBackend *blk, bool is_spi)
+     dev = DEVICE(obj);
+     qdev_prop_set_drive(dev, "drive", blk, &err);
+     if (err) {
+-        error_report("sd_init failed: %s", error_get_pretty(err));
++        error_reportf_err(err, "sd_init failed: ");
+         return NULL;
+     }
+     qdev_prop_set_bit(dev, "spi", is_spi);
+     object_property_set_bool(obj, true, "realized", &err);
+     if (err) {
+-        error_report("sd_init failed: %s", error_get_pretty(err));
++        error_reportf_err(err, "sd_init failed: ");
+         return NULL;
+     }
+ 
+diff --git a/hw/usb/dev-mtp.c b/hw/usb/dev-mtp.c
+index 20717f026b..168428156b 100644
+--- a/hw/usb/dev-mtp.c
++++ b/hw/usb/dev-mtp.c
+@@ -631,8 +631,9 @@ static void usb_mtp_object_readdir(MTPState *s, MTPObject *o)
+         int64_t id = qemu_file_monitor_add_watch(s->file_monitor, o->path, NULL,
+                                                  file_monitor_event, s, &err);
+         if (id == -1) {
+-            error_report("usb-mtp: failed to add watch for %s: %s", o->path,
+-                         error_get_pretty(err));
++            error_reportf_err(err,
++                              "usb-mtp: failed to add watch for %s: ",
++                              o->path);
+             error_free(err);
+         } else {
+             trace_usb_mtp_file_monitor_event(s->dev.addr, o->path,
+@@ -1276,8 +1277,8 @@ static void usb_mtp_command(MTPState *s, MTPControl *c)
+ 
+         s->file_monitor = qemu_file_monitor_new(&err);
+         if (err) {
+-            error_report("usb-mtp: file monitoring init failed: %s",
+-                         error_get_pretty(err));
++            error_reportf_err(err,
++                              "usb-mtp: file monitoring init failed: ");
+             error_free(err);
+         } else {
+             QTAILQ_INIT(&s->events);
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 306e44fb0a..d2657b8db5 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -856,8 +856,7 @@ int main(int argc, char **argv)
+         }
+         tlscreds = nbd_get_tls_creds(tlscredsid, list, &local_err);
+         if (local_err) {
+-            error_report("Failed to get TLS creds %s",
+-                         error_get_pretty(local_err));
++            error_reportf_err(local_err, "Failed to get TLS creds: ");
+             exit(EXIT_FAILURE);
+         }
+     } else {
+@@ -983,8 +982,8 @@ int main(int argc, char **argv)
+                                              &local_err);
+             if (sioc == NULL) {
+                 object_unref(OBJECT(server));
+-                error_report("Failed to use socket activation: %s",
+-                             error_get_pretty(local_err));
++                error_reportf_err(local_err,
++                                  "Failed to use socket activation: ");
+                 exit(EXIT_FAILURE);
+             }
+             qio_net_listener_add(server, sioc);
+diff --git a/scsi/qemu-pr-helper.c b/scsi/qemu-pr-helper.c
+index 181ed4a186..57ad830d54 100644
+--- a/scsi/qemu-pr-helper.c
++++ b/scsi/qemu-pr-helper.c
+@@ -1030,8 +1030,8 @@ int main(int argc, char **argv)
+         server_ioc = qio_channel_socket_new_fd(FIRST_SOCKET_ACTIVATION_FD,
+                                                &local_err);
+         if (server_ioc == NULL) {
+-            error_report("Failed to use socket activation: %s",
+-                         error_get_pretty(local_err));
++            error_reportf_err(local_err,
++                              "Failed to use socket activation: ");
+             exit(EXIT_FAILURE);
+         }
+     }
 -- 
 2.17.1
 
