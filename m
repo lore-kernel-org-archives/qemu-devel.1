@@ -2,55 +2,72 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E327DC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:36:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48FFAC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:42:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9CFB206D4
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:36:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9CFB206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.com
+	by mail.kernel.org (Postfix) with ESMTPS id 11B5D206D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:42:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11B5D206D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDrI4-0004qw-OC
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 11:36:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54134)
+	id 1kDrNh-0008BH-7P
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 11:42:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <brogers@suse.com>) id 1kDrHB-0003aF-IW
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:35:49 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34402)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kDrMy-0007kk-UL
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:41:48 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:60105)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <brogers@suse.com>) id 1kDrH6-0001kU-UY
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:35:48 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id ABD63B1AE;
- Thu,  3 Sep 2020 15:35:44 +0000 (UTC)
-From: Bruce Rogers <brogers@suse.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] meson: install ivshmem-client and ivshmem-server
-Date: Thu,  3 Sep 2020 09:35:24 -0600
-Message-Id: <20200903153524.98168-1-brogers@suse.com>
-X-Mailer: git-send-email 2.28.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kDrMw-0002kV-SK
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:41:48 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.1.250])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 089AB5DA41A6;
+ Thu,  3 Sep 2020 17:41:26 +0200 (CEST)
+Received: from kaod.org (37.59.142.104) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 3 Sep 2020
+ 17:41:25 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-104R005b2557445-b99f-49c3-811d-cb483725bcff,
+ FF22E3E2F99647A0705B7EB067E934078DCBDF97) smtp.auth=groug@kaod.org
+Date: Thu, 3 Sep 2020 17:41:23 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v2 0/1] 9pfs: log warning if msize <= 8192
+Message-ID: <20200903174123.6b754055@bahia.lan>
+In-Reply-To: <20200903171931.3bfe611a@bahia.lan>
+References: <cover.1599144062.git.qemu_oss@crudebyte.com>
+ <20200903171931.3bfe611a@bahia.lan>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=brogers@suse.com;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 00:06:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.104]
+X-ClientProxiedBy: DAG3EX2.mxp5.local (172.16.2.22) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 556f5d21-284a-4ed6-83ee-947d7bc46e45
+X-Ovh-Tracer-Id: 1055249691815156189
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudeguddgleegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheeggedvvdethfdttddvhfeiudetvdfgjedtudetgfevheeijeeileevffegkeehnecuffhomhgrihhnpehqvghmuhdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepsggvrhhrrghnghgvsehrvgguhhgrthdrtghomh
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 11:41:43
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -64,41 +81,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, Bruce Rogers <brogers@suse.com>,
- marcandre.lureau@redhat.com
+Cc: berrange@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Turn on the meson install flag for these executables
+On Thu, 3 Sep 2020 17:19:31 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-Signed-off-by: Bruce Rogers <brogers@suse.com>
----
- contrib/ivshmem-client/meson.build | 2 +-
- contrib/ivshmem-server/meson.build | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> On Thu, 3 Sep 2020 16:41:02 +0200
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> 
+> > I have updated the QEMU 9P setup wiki page about this 'msize' issue. For
+> > some reason the dedicated anchor 'msize' does not work though:
+> > 
+> > https://wiki.qemu.org/Documentation/9psetup#msize
+> > 
+> 
+> AFAICT the wiki derives the anchor from the section name, ie.
+> 
+> https://wiki.qemu.org/Documentation/9psetup#Performance_Considerations
+> 
+> It's a bit longer than #msize but it works. I don't know if you can
+> add anchors manually in the wiki.
+> 
 
-diff --git a/contrib/ivshmem-client/meson.build b/contrib/ivshmem-client/meson.build
-index 1b171efb4f..83a559117f 100644
---- a/contrib/ivshmem-client/meson.build
-+++ b/contrib/ivshmem-client/meson.build
-@@ -1,4 +1,4 @@
- executable('ivshmem-client', files('ivshmem-client.c', 'main.c'),
-            dependencies: glib,
-            build_by_default: targetos == 'linux',
--           install: false)
-+           install: true)
-diff --git a/contrib/ivshmem-server/meson.build b/contrib/ivshmem-server/meson.build
-index 3a53942201..a1c39aa3b3 100644
---- a/contrib/ivshmem-server/meson.build
-+++ b/contrib/ivshmem-server/meson.build
-@@ -1,4 +1,4 @@
- executable('ivshmem-server', files('ivshmem-server.c', 'main.c'),
-            dependencies: [qemuutil, rt],
-            build_by_default: targetos == 'linux',
--           install: false)
-+           install: true)
--- 
-2.28.0
+It seems you could achieve this without the template:
+
+== <span id="msize">Performance Considerations</span> ==
+
+> > Not sure whether that's a wiki installation problem? When I view the wiki
+> > source, it looks like it is showing some errors there.
+> > 
+> > v1->v2:
+> > 
+> >   * Updated commit log message to make it more clear why the client cannot
+> >     auto pick a good value for 'msize'.
+> > 
+> >   * Added a web link to the log message, pointing to the appropriate QEMU
+> >     wiki page which explains the 'msize' issue in detail.
+> > 
+> > Message-ID of previous version (v1):
+> >   E1kDR8W-0001s4-Sr@lizzy.crudebyte.com
+> > 
+> > Christian Schoenebeck (1):
+> >   9pfs: log warning if msize <= 8192
+> > 
+> >  hw/9pfs/9p.c | 9 +++++++++
+> >  1 file changed, 9 insertions(+)
+> > 
+> 
 
 
