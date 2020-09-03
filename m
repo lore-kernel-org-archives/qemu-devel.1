@@ -2,85 +2,90 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC93C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A27C5C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:45:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 71A7E206EF
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:44:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A19D20658
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:45:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="QTvTvRTU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A7E206EF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OrXUZh7/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A19D20658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDqT7-0005gz-5m
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 10:44:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36680)
+	id 1kDqUd-0007Ck-Ci
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 10:45:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kDqSF-0005Cp-Js
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 10:43:11 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:45581)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDqTY-0006GT-0d
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 10:44:32 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45809)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kDqSD-0001Qi-LR
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 10:43:11 -0400
-Received: by mail-pg1-x544.google.com with SMTP id 67so2294133pgd.12
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 07:43:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id;
- bh=tEAwouppKcqLoUUt/zy+obwBHv3Stl5Siq36velS/qU=;
- b=QTvTvRTUYZIfA5H5sXYEejaZLytUJtROMKBHanqC7snMT5OWivkG25Yt5br50kgF4X
- +TcKDrzAZ3I7/MWk4pBYFZBwtwdMTfS1m8jcqrl8N0G8Fz28vWeHtB4GH1+3z25qs63J
- oT4Csj3shQR71lhYfdfLu0641iO5EzxD2ufCUdV2Z8UHKrZz5Si7AUFdUIESf9xpqo8B
- 0IqiOnUzdtTHH87B1W3Mpv1lawmTltL/6l66B02SCG+3Teo78QFXeDAzKPCFu0jmLmpF
- 5McaU5ULYv1Ug8DHAvDJiwT7yNcT4wM/mcCZ+VWNQg9anbc55VrxJWTJjS5Y2qrNznro
- HMJA==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDqTV-0001WX-Sp
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 10:44:31 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x14so3488452wrl.12
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 07:44:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Rr+JVKyDamSf0xBTUVSv5bImqBYLa2yDIIfkheqLG6Y=;
+ b=OrXUZh7/O1gy1jYEFfJW1KL+f26VkUM1Ol2OtT7BEy4ouDH0mBIkzQghrYe3+QhIzg
+ HnK5VExGhKDRiP5nqWfiM19+/ATy/mZYxiaDIL+yt9WxiCnbeM/Q2BC+cFzcRw5Wh7f/
+ mZ9P5z4UqsS6slLkGV5Wydli/qOWpVm1JbCL9r8p0kh/mGBzl3jCMeBZ8e9KITDTNhXu
+ DGUKOclaYkI20gtBE/E3JrKfcqA6RmYUkOBD3wr4AZl6877r0OjdrtmC1kShXWxO4ySR
+ MSQToQCXZuvWOvwqQHmD2SGh3uYoEs9PGvjhUWm6XfV7PH1F5B2WCoIk6T8GqfnnYUuJ
+ SQbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=tEAwouppKcqLoUUt/zy+obwBHv3Stl5Siq36velS/qU=;
- b=VqnmD2ioQBqBHOPZZyo3wAqJy6bWjqxeMkVZtT6YdTmQgSaPLHiQgKofNS6IYrrfk9
- MRxntod1VjitZINS5FJpYWYG99iPu20gx6YIcU8tjRTweyoQdGqBq7KZ4274+AXGoUcG
- nysGSFvHzUKqA41IbXRVZSue8hM46v27Qoaw+uABKrRv2bdwM++BTocU/sp3GAY/iNE/
- GF22Rk1OewTlpTdYHqwycsyMu1ura4+Rq0NW9GD2kiwK2fHfdJk6Qw0lW5ybx7/lRArp
- pq2hLawUONumkZXwYopvwYty/Ma6NMr+LzcN+hRTWtknHWVBheLMWXigroqszIH/G/kT
- mepQ==
-X-Gm-Message-State: AOAM5309nVCpDSu2ozOxSf1daxsm7BInD5hqrC4Iwagcy0Fts+zg4qso
- 6Wlp2g80W8budigyvkRzC/q4zbcVOtFv4Q==
-X-Google-Smtp-Source: ABdhPJxc/cn3KUzc2rpGZaTE+Jbyt9hxj6mX3HlH9yIWAgp1x4y6+hmoG0ECxLnhdGI4vO7POZWZaw==
-X-Received: by 2002:aa7:9910:: with SMTP id z16mr4169032pff.120.1599144186948; 
- Thu, 03 Sep 2020 07:43:06 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.154.91])
- by smtp.googlemail.com with ESMTPSA id
- g206sm3565593pfb.178.2020.09.03.07.43.01
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Rr+JVKyDamSf0xBTUVSv5bImqBYLa2yDIIfkheqLG6Y=;
+ b=IDBfAzq5jPoWdsqwie5NBx9/ztv8IsxxaEfzfCkJVO47KwBtDHrpAUGUT69kRw2i4W
+ ZHWdY2rkSVXOwuYy3HHTit9Db9WzKMaLDS99WOyXOUGUWpvfI0N0pcnJpSYOaW9h8r8f
+ +4gTVzh9RXwPjL8EowFuSSoyiuJRbIWHAy34MhyCB9nqqNF0xHMs2WhwKhMd/+F5qRbl
+ hHMl6mi4WGBp5RgPrHjS1nrxBIKMFSwRkbWWis3qLGxjEFAPD0S8Ey4cJ9kZ6IFpwVxW
+ NpYOQ21jgtb+reEkvGLMjDX8MacbJuKgXwlIXZZl7WfZqAt8cTcZYCTqxmXyVjUYgLO8
+ bvoQ==
+X-Gm-Message-State: AOAM531L3UwurZHwVppK7vRsaHfwOTu8PPVPaL93hnxf2IY0V0t4y9gv
+ D2qZx90O/rit2bIQrUElUA5ptQ==
+X-Google-Smtp-Source: ABdhPJzMl8nmR4XPE+WvVlhkVejfP10/DTXlMv+OYk2eoh4EJnIx34IOeRbm6UZX8du9aF9soqjNgQ==
+X-Received: by 2002:adf:fc43:: with SMTP id e3mr2746747wrs.28.1599144268324;
+ Thu, 03 Sep 2020 07:44:28 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id o2sm5369091wrh.70.2020.09.03.07.44.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 07:43:06 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3] Fix a gap where acpi_pcihp_find_hotplug_bus() returns a
- non-hotpluggable bus
-Date: Thu,  3 Sep 2020 20:12:48 +0530
-Message-Id: <20200903144248.3790-1-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: none client-ip=2607:f8b0:4864:20::544;
- envelope-from=ani@anisinha.ca; helo=mail-pg1-x544.google.com
+ Thu, 03 Sep 2020 07:44:26 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] hw/arm/mps2: New board model mps2-386
+Date: Thu,  3 Sep 2020 15:44:25 +0100
+Message-Id: <20200903144425.11060-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,70 +98,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ani Sinha <ani@anisinha.ca>, Igor Mammedov <imammedo@redhat.com>,
- jusual@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kumar Gala <kumar.gala@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When ACPI hotplug for the root bus is disabled, the bsel property for that
-bus is not set. Please see the following commit:
+Implement a model of the MPS2 with the AN386 firmware. This is
+essentially identical to the AN385 firmware, but it has a
+Cortex-M4 rather than a Cortex-M3.
 
-3d7e78aa7777f ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus").
-
-As a result, when acpi_pcihp_find_hotplug_bus() is called
-with bsel set to 0, it may return the root bus. This can cause devices attached to
-the root bus to get hot-unplugged if the user issues the following set of commands:
-
-outl 0xae10 0
-outl 0xae08 your_slot
-
-Thanks to Julia for pointing this out here:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg734548.html
-
-In this patch, we fix the issue in this function by checking if the bus which is
-returned by the function is actually hotpluggable. If not, we simply return NULL.
-This avoids the scenario where we were returning a non-hotpluggable bus.
-
-This patch is based off of tag v5.10
-
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/acpi/pcihp.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ hw/arm/mps2.c | 30 +++++++++++++++++++++++++++---
+ 1 file changed, 27 insertions(+), 3 deletions(-)
 
-Changelog:
-v3: fix a bug where we were dereferencing null pointer when find.bus was null.
-v2: update commit log to include more details.
-
-
-diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
-index 39b1f74442..32ae8b2c0a 100644
---- a/hw/acpi/pcihp.c
-+++ b/hw/acpi/pcihp.c
-@@ -147,6 +147,21 @@ static PCIBus *acpi_pcihp_find_hotplug_bus(AcpiPciHpState *s, int bsel)
-     if (!bsel && !find.bus) {
-         find.bus = s->root;
-     }
+diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+index 9f12934ca8f..559b297e788 100644
+--- a/hw/arm/mps2.c
++++ b/hw/arm/mps2.c
+@@ -15,6 +15,7 @@
+  * as seen by the guest depend significantly on the FPGA image.
+  * We model the following FPGA images:
+  *  "mps2-an385" -- Cortex-M3 as documented in ARM Application Note AN385
++ *  "mps2-an386" -- Cortex-M4 as documented in ARM Application Note AN386
+  *  "mps2-an511" -- Cortex-M3 'DesignStart' as documented in AN511
+  *
+  * Links to the TRM for the board itself and to the various Application
+@@ -47,6 +48,7 @@
+ 
+ typedef enum MPS2FPGAType {
+     FPGA_AN385,
++    FPGA_AN386,
+     FPGA_AN511,
+ } MPS2FPGAType;
+ 
+@@ -79,6 +81,7 @@ typedef struct {
+ 
+ #define TYPE_MPS2_MACHINE "mps2"
+ #define TYPE_MPS2_AN385_MACHINE MACHINE_TYPE_NAME("mps2-an385")
++#define TYPE_MPS2_AN386_MACHINE MACHINE_TYPE_NAME("mps2-an386")
+ #define TYPE_MPS2_AN511_MACHINE MACHINE_TYPE_NAME("mps2-an511")
+ 
+ #define MPS2_MACHINE(obj)                                       \
+@@ -142,7 +145,7 @@ static void mps2_common_init(MachineState *machine)
+      *
+      * Common to both boards:
+      *  0x21000000..0x21ffffff : PSRAM (16MB)
+-     * AN385 only:
++     * AN385/AN386 only:
+      *  0x00000000 .. 0x003fffff : ZBT SSRAM1
+      *  0x00400000 .. 0x007fffff : mirror of ZBT SSRAM1
+      *  0x20000000 .. 0x203fffff : ZBT SSRAM 2&3
+@@ -157,7 +160,7 @@ static void mps2_common_init(MachineState *machine)
+      *  0x20000000 .. 0x2001ffff : SRAM
+      *  0x20400000 .. 0x207fffff : ZBT SSRAM 2&3
+      *
+-     * The AN385 has a feature where the lowest 16K can be mapped
++     * The AN385/AN386 has a feature where the lowest 16K can be mapped
+      * either to the bottom of the ZBT SSRAM1 or to the block RAM.
+      * This is of no use for QEMU so we don't implement it (as if
+      * zbt_boot_ctrl is always zero).
+@@ -166,6 +169,7 @@ static void mps2_common_init(MachineState *machine)
+ 
+     switch (mmc->fpga_type) {
+     case FPGA_AN385:
++    case FPGA_AN386:
+         make_ram(&mms->ssram1, "mps.ssram1", 0x0, 0x400000);
+         make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", &mms->ssram1, 0x400000);
+         make_ram(&mms->ssram23, "mps.ssram23", 0x20000000, 0x400000);
+@@ -193,6 +197,7 @@ static void mps2_common_init(MachineState *machine)
+     armv7m = DEVICE(&mms->armv7m);
+     switch (mmc->fpga_type) {
+     case FPGA_AN385:
++    case FPGA_AN386:
+         qdev_prop_set_uint32(armv7m, "num-irq", 32);
+         break;
+     case FPGA_AN511:
+@@ -229,6 +234,7 @@ static void mps2_common_init(MachineState *machine)
+ 
+     switch (mmc->fpga_type) {
+     case FPGA_AN385:
++    case FPGA_AN386:
+     {
+         /* The overflow IRQs for UARTs 0, 1 and 2 are ORed together.
+          * Overflow for UARTs 4 and 5 doesn't trigger any interrupt.
+@@ -380,7 +386,7 @@ static void mps2_common_init(MachineState *machine)
+      */
+     lan9118_init(&nd_table[0], 0x40200000,
+                  qdev_get_gpio_in(armv7m,
+-                                  mmc->fpga_type == FPGA_AN385 ? 13 : 47));
++                                  mmc->fpga_type == FPGA_AN511 ? 47 : 13));
+ 
+     system_clock_scale = NANOSECONDS_PER_SECOND / SYSCLK_FRQ;
+ 
+@@ -409,6 +415,17 @@ static void mps2_an385_class_init(ObjectClass *oc, void *data)
+     mmc->scc_id = 0x41043850;
+ }
+ 
++static void mps2_an386_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    MPS2MachineClass *mmc = MPS2_MACHINE_CLASS(oc);
 +
-+    /*
-+     * Check if find.bus is actually hotpluggable. If bsel is set to
-+     * NULL for example on the root bus in order to make it
-+     * non-hotpluggable, find.bus will match the root bus when bsel
-+     * is 0. See acpi_pcihp_test_hotplug_bus() above. Since the
-+     * bus is not hotpluggable however, we should not select the bus.
-+     * Instead, we should set find.bus to NULL in that case. In the check
-+     * below, we generalize this case for all buses, not just the root bus.
-+     * The callers of this function check for a null return value and
-+     * handle them appropriately.
-+     */
-+    if (find.bus && !qbus_is_hotpluggable(BUS(find.bus))) {
-+        find.bus = NULL;
-+    }
-     return find.bus;
++    mc->desc = "ARM MPS2 with AN386 FPGA image for Cortex-M4";
++    mmc->fpga_type = FPGA_AN386;
++    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m4");
++    mmc->scc_id = 0x41043860;
++}
++
+ static void mps2_an511_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -435,6 +452,12 @@ static const TypeInfo mps2_an385_info = {
+     .class_init = mps2_an385_class_init,
+ };
+ 
++static const TypeInfo mps2_an386_info = {
++    .name = TYPE_MPS2_AN386_MACHINE,
++    .parent = TYPE_MPS2_MACHINE,
++    .class_init = mps2_an386_class_init,
++};
++
+ static const TypeInfo mps2_an511_info = {
+     .name = TYPE_MPS2_AN511_MACHINE,
+     .parent = TYPE_MPS2_MACHINE,
+@@ -445,6 +468,7 @@ static void mps2_machine_init(void)
+ {
+     type_register_static(&mps2_info);
+     type_register_static(&mps2_an385_info);
++    type_register_static(&mps2_an386_info);
+     type_register_static(&mps2_an511_info);
  }
  
 -- 
-2.17.1
+2.20.1
 
 
