@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 505B4C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 18:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95DB8C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 18:04:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B74C120716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 18:04:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64CEC20716
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 18:04:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IxDDfjuE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B74C120716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sak+nULS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64CEC20716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDtb0-0006mD-QY
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 14:04:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36308)
+	id 1kDtbD-0006yL-GQ
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 14:04:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36288)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDtYp-0003iO-44
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 14:02:11 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:34548
+ id 1kDtYj-0003X6-8H
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 14:02:05 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:33014
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDtYn-0007QJ-9d
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 14:02:10 -0400
+ id 1kDtYg-0007Pu-NJ
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 14:02:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599156128;
+ s=mimecast20190719; t=1599156121;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hKgwPgUlma51em3nmlbtaR4HUKEwx/6kfLC5jfNaNJc=;
- b=IxDDfjuEhfZH4tgy6PiIIg+znyJ+ScMbcL0mgdFn7I5qeJ0QqT/eZJcjmSreeLX409GA/D
- OQXt/4vfhGN/d062ZiOvLM7tJ5x2zkVHhaMd7B4q1HnyvG0Ru9ARtIgErtOKn0v/PRIh2U
- qQbFmRvZMG/Vr4odmsItAv7447TVmUc=
+ bh=+yYChecXXfVTCuX6u0USpK6l7VFOUYL7LdClOPgVsEU=;
+ b=Sak+nULSfH28TEulgm6qb9KM3Xdu7zD6sjIbxi5U7wSj8pA4QCwlMt0gY4hGya38Fjusfh
+ V4S/3wft+GiObBJq2PX5MUplHuJYkPJiOtOozhyRPFywAvA3xy/izDl80z1GN1xLl3GyT+
+ 96eArdjaRvSQ6jWps4qluo0KOPBq95s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-573-T518Nt2iOP-hzx9hqZgp5w-1; Thu, 03 Sep 2020 14:02:06 -0400
-X-MC-Unique: T518Nt2iOP-hzx9hqZgp5w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-266-OIJkdQD-P428NRdus78pRQ-1; Thu, 03 Sep 2020 14:01:57 -0400
+X-MC-Unique: OIJkdQD-P428NRdus78pRQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B437F185A0C0;
- Thu,  3 Sep 2020 18:02:03 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B58E1185A0C0;
+ Thu,  3 Sep 2020 18:01:56 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 68F0281195;
- Thu,  3 Sep 2020 18:01:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8080D1002D46;
+ Thu,  3 Sep 2020 18:01:50 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	"Daniel P. Berrange" <berrange@redhat.com>
-Subject: [PATCH 4/8] i8259: Rename PIC to ISA_I8259
-Date: Thu,  3 Sep 2020 14:01:24 -0400
-Message-Id: <20200903180128.1523959-5-ehabkost@redhat.com>
+Subject: [PATCH 3/8] i8259: Rename TYPE_I8259 to TYPE_ISA_I8259
+Date: Thu,  3 Sep 2020 14:01:23 -0400
+Message-Id: <20200903180128.1523959-4-ehabkost@redhat.com>
 In-Reply-To: <20200903180128.1523959-1-ehabkost@redhat.com>
 References: <20200903180128.1523959-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:28:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,52 +106,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename the type checking function to be consistent with the type
-name constant (TYPE_ISA_I8259) and the QOM type name string
-("isa-i8259").
+This will make the type name constant consistent with QOM
+type name string ("isa-i8259").
 
 Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Suggested-by: "Daniel P. Berrangé" <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
+Changes v1 ->v2:
+* v1 subject was "i8259: Rename TYPE_I8259 to TYPE_PIC"
+* Rename it to TYPE_ISA_I8259 instead, to be consistent
+  with the QOM type name ("isa-i8259")
+---
 Cc: "Michael S. Tsirkin" <mst@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>
 Cc: qemu-devel@nongnu.org
 ---
- hw/intc/i8259.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/intc/i8259.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
-index ab55163340..61422e6fef 100644
+index 344fd04db1..ab55163340 100644
 --- a/hw/intc/i8259.c
 +++ b/hw/intc/i8259.c
-@@ -39,7 +39,7 @@
+@@ -37,10 +37,10 @@
  
- #define TYPE_ISA_I8259 "isa-i8259"
+ //#define DEBUG_IRQ_LATENCY
+ 
+-#define TYPE_I8259 "isa-i8259"
++#define TYPE_ISA_I8259 "isa-i8259"
  typedef struct PICClass PICClass;
--DECLARE_CLASS_CHECKERS(PICClass, PIC,
-+DECLARE_CLASS_CHECKERS(PICClass, ISA_I8259,
-                        TYPE_ISA_I8259)
+ DECLARE_CLASS_CHECKERS(PICClass, PIC,
+-                       TYPE_I8259)
++                       TYPE_ISA_I8259)
  
  /**
-@@ -396,7 +396,7 @@ static const MemoryRegionOps pic_elcr_ioport_ops = {
- static void pic_realize(DeviceState *dev, Error **errp)
- {
-     PICCommonState *s = PIC_COMMON(dev);
--    PICClass *pc = PIC_GET_CLASS(dev);
-+    PICClass *pc = ISA_I8259_GET_CLASS(dev);
+  * PICClass:
+@@ -418,7 +418,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
  
-     memory_region_init_io(&s->base_io, OBJECT(s), &pic_base_ioport_ops, s,
-                           "pic", 2);
-@@ -443,7 +443,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
+     irq_set = g_new0(qemu_irq, ISA_NUM_IRQS);
  
- static void i8259_class_init(ObjectClass *klass, void *data)
- {
--    PICClass *k = PIC_CLASS(klass);
-+    PICClass *k = ISA_I8259_CLASS(klass);
-     DeviceClass *dc = DEVICE_CLASS(klass);
+-    isadev = i8259_init_chip(TYPE_I8259, bus, true);
++    isadev = i8259_init_chip(TYPE_ISA_I8259, bus, true);
+     dev = DEVICE(isadev);
  
-     device_class_set_parent_realize(dc, pic_realize, &k->parent_realize);
+     qdev_connect_gpio_out(dev, 0, parent_irq);
+@@ -428,7 +428,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
+ 
+     isa_pic = dev;
+ 
+-    isadev = i8259_init_chip(TYPE_I8259, bus, false);
++    isadev = i8259_init_chip(TYPE_ISA_I8259, bus, false);
+     dev = DEVICE(isadev);
+ 
+     qdev_connect_gpio_out(dev, 0, irq_set[2]);
+@@ -451,7 +451,7 @@ static void i8259_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static const TypeInfo i8259_info = {
+-    .name       = TYPE_I8259,
++    .name       = TYPE_ISA_I8259,
+     .instance_size = sizeof(PICCommonState),
+     .parent     = TYPE_PIC_COMMON,
+     .class_init = i8259_class_init,
 -- 
 2.26.2
 
