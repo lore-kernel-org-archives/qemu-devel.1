@@ -2,88 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81C5AC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DB55C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:02:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42E08206B8
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:00:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C21DA20684
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:02:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JgQViCzQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E08206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ju8X7eDJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C21DA20684
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwL7-00039x-B8
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56324)
+	id 1kDwMp-0005v8-Vh
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:02:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEa-00013k-1g
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25432)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEW-0006bZ-0e
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599166403;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Y+oHo64EvoiaTMi66DVtt06upr/08pRVnAZcNgeussI=;
- b=JgQViCzQTPSx/mej0g+j/HW8qWFNZobBg/Menu7ZVkTk2sY1OJNVXHld+2PcA0w4Ivj70H
- lH0mTX9DvcvwRO5LskWzng41qB1/FYVzO7Zo7R9iWEdw+j9Kd1Epw9KUg3wv6QQUvG2c1U
- Kp1IgJ0IgRJ83ickpuV0Z5ta7Rr0bic=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-359-i9LarM1ANwS-7I3_Dpq8Jw-1; Thu, 03 Sep 2020 16:53:18 -0400
-X-MC-Unique: i9LarM1ANwS-7I3_Dpq8Jw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D868D10BBED0;
- Thu,  3 Sep 2020 20:53:17 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A23C52D07D;
- Thu,  3 Sep 2020 20:53:17 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 17/27] vfio: Rename VFIO_AP_DEVICE_TYPE to TYPE_VFIO_AP_DEVICE
-Date: Thu,  3 Sep 2020 16:52:37 -0400
-Message-Id: <20200903205247.1667472-18-ehabkost@redhat.com>
-In-Reply-To: <20200903205247.1667472-1-ehabkost@redhat.com>
-References: <20200903205247.1667472-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwKr-00038x-Sz; Thu, 03 Sep 2020 16:59:57 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38595)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwKp-0007L4-R3; Thu, 03 Sep 2020 16:59:57 -0400
+Received: by mail-oi1-x244.google.com with SMTP id y6so4511523oie.5;
+ Thu, 03 Sep 2020 13:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=l6xlQJHOv7dE9T6NcBrhJXAaTtTntr3y7qC5ZPuIlyE=;
+ b=Ju8X7eDJBDWIZ/ftmBP6PQKMZUrjC4yQDoSKIYEveB8PMZZBFgshceJXS7WdpQ3+og
+ qTd6sKLqU22g630PezRVi+N/DZ60DXHULrTJvaf8iRpJNQH3IuVl1PJuaaWZ1wagydY9
+ RQ9PKwJPK5aHOS2xWXEEgwsccdjoU2w8li6//d2pesARyk6NYfl13Yex0zvevTJ1YwL7
+ 8d34qTLt3FNnmcGmX1JMP0PhGqr1xSUKNuZ3tI+RtX+HXYoOS36Di+5eJ4lzgzkwrC6H
+ BZ7MSkbPSltzkZyJhyheVwFF9hDAEYD46uLtIt0z7KBLGzKp1xp5rX3E08fLL/8sK5FL
+ dh7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=l6xlQJHOv7dE9T6NcBrhJXAaTtTntr3y7qC5ZPuIlyE=;
+ b=GctU440dxVDxwcPQUHlGCutCxaWlMap2UAeXJFTSDcNrsPbFoQQmURzX6eM3RZqqVt
+ wrUYEapu/5qjwxnm9qH/0PryltYaDdxu9gg8cJhbYis7P3hqxLBNyBHeWbfdddyb6FnD
+ aP5PfygT8nlE8jPPNRuRgqeuOs///6IEvkfyyoTisAwp85VATZVQUeWHHecpeap3LHhr
+ OFkxFj4bTsZ8cL1UojxOp8IpVksACvu54np3ovDkThbvc/kT0vKuiSRzlMh/zvSXoxAR
+ BjDhVD8oFKUxDk3IJhI6sOzG/9mZUQvDu7CsRCwVdtFpKiB7ei0A9UGTUIde22YXLYDS
+ daAg==
+X-Gm-Message-State: AOAM531Typ1Yz57YnUl5cFShW5yBjiJUetuccgFZG80C2xu8/F++5shB
+ 8p7+xCitSy73MNJFN46teG8YrD6+I0c=
+X-Google-Smtp-Source: ABdhPJyNvG8jRaAfFGH7RKA9jD7Gsv0p3mUYK68UHEjMR/K23SQsIynjcyrsLbM3aXTNw8Bd0hQLOw==
+X-Received: by 2002:aca:2b0c:: with SMTP id i12mr3392493oik.77.1599166794177; 
+ Thu, 03 Sep 2020 13:59:54 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id b79sm713535oii.33.2020.09.03.13.59.53
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 03 Sep 2020 13:59:53 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 11/77] 9pfs: local: ignore O_NOATIME if we don't have
+ permissions
+Date: Thu,  3 Sep 2020 15:58:29 -0500
+Message-Id: <20200903205935.27832-12-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,64 +97,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Greg Kurz <groug@kaod.org>, qemu-stable@nongnu.org,
+ Omar Sandoval <osandov@fb.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This will make the type name constant consistent with the name of
-the type checking macro.
+From: Omar Sandoval <osandov@fb.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20200902224311.1321159-9-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+QEMU's local 9pfs server passes through O_NOATIME from the client. If
+the QEMU process doesn't have permissions to use O_NOATIME (namely, it
+does not own the file nor have the CAP_FOWNER capability), the open will
+fail. This causes issues when from the client's point of view, it
+believes it has permissions to use O_NOATIME (e.g., a process running as
+root in the virtual machine). Additionally, overlayfs on Linux opens
+files on the lower layer using O_NOATIME, so in this case a 9pfs mount
+can't be used as a lower layer for overlayfs (cf.
+https://github.com/osandov/drgn/blob/dabfe1971951701da13863dbe6d8a1d172ad9650/vmtest/onoatimehack.c
+and https://github.com/NixOS/nixpkgs/issues/54509).
+
+Luckily, O_NOATIME is effectively a hint, and is often ignored by, e.g.,
+network filesystems. open(2) notes that O_NOATIME "may not be effective
+on all filesystems. One example is NFS, where the server maintains the
+access time." This means that we can honor it when possible but fall
+back to ignoring it.
+
+Acked-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Signed-off-by: Omar Sandoval <osandov@fb.com>
+Message-Id: <e9bee604e8df528584693a4ec474ded6295ce8ad.1587149256.git.osandov@fb.com>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+(cherry picked from commit a5804fcf7b22fc7d1f9ec794dd284c7d504bd16b)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/vfio/ap.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ hw/9pfs/9p-util.h | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
-index 68ed059b39..582c091a24 100644
---- a/hw/vfio/ap.c
-+++ b/hw/vfio/ap.c
-@@ -30,7 +30,7 @@
- #include "exec/address-spaces.h"
- #include "qom/object.h"
- 
--#define VFIO_AP_DEVICE_TYPE      "vfio-ap"
-+#define TYPE_VFIO_AP_DEVICE      "vfio-ap"
- 
- struct VFIOAPDevice {
-     APDevice apdev;
-@@ -39,7 +39,7 @@ struct VFIOAPDevice {
- typedef struct VFIOAPDevice VFIOAPDevice;
- 
- DECLARE_INSTANCE_CHECKER(VFIOAPDevice, VFIO_AP_DEVICE,
--                         VFIO_AP_DEVICE_TYPE)
-+                         TYPE_VFIO_AP_DEVICE)
- 
- static void vfio_ap_compute_needs_reset(VFIODevice *vdev)
+diff --git a/hw/9pfs/9p-util.h b/hw/9pfs/9p-util.h
+index 79ed6b233e..546f46dc7d 100644
+--- a/hw/9pfs/9p-util.h
++++ b/hw/9pfs/9p-util.h
+@@ -37,9 +37,22 @@ static inline int openat_file(int dirfd, const char *name, int flags,
  {
-@@ -72,7 +72,7 @@ static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
+     int fd, serrno, ret;
  
-     if (!group_path) {
-         error_setg(errp, "%s: no iommu_group found for %s: %s",
--                   VFIO_AP_DEVICE_TYPE, vapdev->vdev.sysfsdev, gerror->message);
-+                   TYPE_VFIO_AP_DEVICE, vapdev->vdev.sysfsdev, gerror->message);
-         g_error_free(gerror);
-         return NULL;
++again:
+     fd = openat(dirfd, name, flags | O_NOFOLLOW | O_NOCTTY | O_NONBLOCK,
+                 mode);
+     if (fd == -1) {
++        if (errno == EPERM && (flags & O_NOATIME)) {
++            /*
++             * The client passed O_NOATIME but we lack permissions to honor it.
++             * Rather than failing the open, fall back without O_NOATIME. This
++             * doesn't break the semantics on the client side, as the Linux
++             * open(2) man page notes that O_NOATIME "may not be effective on
++             * all filesystems". In particular, NFS and other network
++             * filesystems ignore it entirely.
++             */
++            flags &= ~O_NOATIME;
++            goto again;
++        }
+         return -1;
      }
-@@ -176,7 +176,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
- }
  
- static const TypeInfo vfio_ap_info = {
--    .name = VFIO_AP_DEVICE_TYPE,
-+    .name = TYPE_VFIO_AP_DEVICE,
-     .parent = TYPE_AP_DEVICE,
-     .instance_size = sizeof(VFIOAPDevice),
-     .class_init = vfio_ap_class_init,
 -- 
-2.26.2
+2.17.1
 
 
