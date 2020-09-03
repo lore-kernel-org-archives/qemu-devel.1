@@ -2,89 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FFF8C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:07:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42672C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:07:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33401206CA
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:07:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F36FB20709
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:07:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmyAgXY3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33401206CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xh5MWP8M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F36FB20709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwRv-0005v3-Dg
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:07:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56400)
+	id 1kDwSD-0006Ef-5R
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:07:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEh-00018c-8K
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:36 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:22769
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEZ-0006bu-O0
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599166406;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oFZO6p04Xo1cCQTwbHus+a7/KxGBO0PW+N9S1mCxOuY=;
- b=cmyAgXY3N5Cuv2KANXdmSL1iHGBBWUiFmDp5M8g1AWNu/SZUyOLc3csAOtO9Xeyr0G1VYH
- OeYMi6Zf1ytpXni9c98UyB8igoWDZ0trjgLFTr2QP2okVUb288GvXdgckqroV90jiFCPne
- nyjzLSnLbhJKOchpRTggqXPm8dCjHtU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-_6trVGtCPKS0yf-t0hgKVg-1; Thu, 03 Sep 2020 16:53:24 -0400
-X-MC-Unique: _6trVGtCPKS0yf-t0hgKVg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9851B10BBEC4;
- Thu,  3 Sep 2020 20:53:23 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 62E695C1C2;
- Thu,  3 Sep 2020 20:53:23 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 23/27] sabre: Rename SABRE_DEVICE to SABRE
-Date: Thu,  3 Sep 2020 16:52:43 -0400
-Message-Id: <20200903205247.1667472-24-ehabkost@redhat.com>
-In-Reply-To: <20200903205247.1667472-1-ehabkost@redhat.com>
-References: <20200903205247.1667472-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwL8-0003jY-EQ; Thu, 03 Sep 2020 17:00:14 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:46522)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwL6-0007RB-IP; Thu, 03 Sep 2020 17:00:13 -0400
+Received: by mail-ot1-x343.google.com with SMTP id c10so3973471otm.13;
+ Thu, 03 Sep 2020 14:00:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Zl94h+JEwFYHtOa8NK8LtKSrwdxSjFyOtdM3NqVIwV8=;
+ b=Xh5MWP8MW/HvNcD9TwlDOk51UAS4Jt/YKgfbXABNKvIGkaXmcRqJs5LmOPKDWMW+Mb
+ gwdk8EAtEvcjC9xNqwOUp8h7Xz0e206cbmd7gH3gKOMfTfphwaWjqk68U5tjuNL4Sr3x
+ QgqlubfkZ7KT1CgsJdVIa41A+6UvZDU9EmQ0Imm8/p8APBXLdukRxG+SOba3su/MlY3a
+ qYqokwsKeXZgIUKsIiAOki3rsz6rGZeDPrEyNw+trATuDYyWSnr2Zt1zT5/gwaO1aNul
+ B3cX7D+xVHs8mHt9NUeTUkqoXXCCaf/GGnGczE72xqejEGOrnuJAZfnMTfShmEullInq
+ /z8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=Zl94h+JEwFYHtOa8NK8LtKSrwdxSjFyOtdM3NqVIwV8=;
+ b=ELW+xjt8P8Utycc0T3m+Jok9PI/2BVOXrd3b8heeOyiaC8XFHs2qsF0Z06BrUb16So
+ R6VRmgbbvRscqbi3YqLdGY2qg9Lx5pu45Z3NePGun8fEtPgkhRSgnPZp1vRdX7Q3B/ea
+ 6gqCr7bTT8nu7ggrDIbRTQFyC3grMn3oXtJlXNWIR7ejSoKPbrWJZuy7AkhSrqy1rOWQ
+ JZx51t4up2eVBLoV58LKiXlC9CQHkXU7rlMc4boPz2JHfbEOYElvTpqY3rUHtjl45yu9
+ uK1KcJiTb3wP1aGkRmlGsQkgLOkOTp3G9NMkV7RilduLaxfo1TpLTcCImZnwdxLoxhj8
+ K61w==
+X-Gm-Message-State: AOAM531atdUa4tElEgVqjudVw485xeO8Qit2aB9/iUpghpLqDi9ezCWn
+ m9P6VzfEsJeZF09PTrz/7l//JFzUNro=
+X-Google-Smtp-Source: ABdhPJxDTnOLfoq67xc1VrZXc9OEErwBbHmUTOeU0jbI5ygkWlfbHXRnq0EVOBHcdTJsHHzIIdi23g==
+X-Received: by 2002:a05:6830:19ee:: with SMTP id
+ t14mr3082333ott.171.1599166810293; 
+ Thu, 03 Sep 2020 14:00:10 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id w125sm710943oia.57.2020.09.03.14.00.09
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 03 Sep 2020 14:00:09 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 23/77] KVM: x86: believe what KVM says about WAITPKG
+Date: Thu,  3 Sep 2020 15:58:41 -0500
+Message-Id: <20200903205935.27832-24-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,93 +97,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the type checking macro name consistent with the TYPE_*
-constant.
+From: Paolo Bonzini <pbonzini@redhat.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200902224311.1321159-49-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Currently, QEMU is overriding KVM_GET_SUPPORTED_CPUID's answer for
+the WAITPKG bit depending on the "-overcommit cpu-pm" setting.  This is a
+bad idea because it does not even check if the host supports it, but it
+can be done in x86_cpu_realizefn just like we do for the MONITOR bit.
+
+This patch moves it there, while making it conditional on host
+support for the related UMWAIT MSR.
+
+Cc: qemu-stable@nongnu.org
+Reported-by: Maxim Levitsky <mlevitsk@redhat.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+(cherry picked from commit e1e43813e7908b063938a3d01f172f88f6190c80)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- include/hw/pci-host/sabre.h | 2 +-
- hw/pci-host/sabre.c         | 8 ++++----
- hw/sparc64/sun4u.c          | 2 +-
- 3 files changed, 6 insertions(+), 6 deletions(-)
+ target/i386/cpu.c      |  3 +++
+ target/i386/kvm.c      | 11 +++++------
+ target/i386/kvm_i386.h |  1 +
+ 3 files changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
-index 597bf70d69..7a76de4b9e 100644
---- a/include/hw/pci-host/sabre.h
-+++ b/include/hw/pci-host/sabre.h
-@@ -51,7 +51,7 @@ struct SabreState {
- typedef struct SabreState SabreState;
- 
- #define TYPE_SABRE "sabre"
--DECLARE_INSTANCE_CHECKER(SabreState, SABRE_DEVICE,
-+DECLARE_INSTANCE_CHECKER(SabreState, SABRE,
-                          TYPE_SABRE)
- 
- #endif
-diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-index 0cc68585f8..5ac6283623 100644
---- a/hw/pci-host/sabre.c
-+++ b/hw/pci-host/sabre.c
-@@ -338,7 +338,7 @@ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
- 
- static void sabre_reset(DeviceState *d)
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 90ffc5f3b1..471db0724f 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6491,6 +6491,9 @@ static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+             host_cpuid(5, 0, &cpu->mwait.eax, &cpu->mwait.ebx,
+                        &cpu->mwait.ecx, &cpu->mwait.edx);
+             env->features[FEAT_1_ECX] |= CPUID_EXT_MONITOR;
++            if (kvm_enabled() && kvm_has_waitpkg()) {
++                env->features[FEAT_7_0_ECX] |= CPUID_7_0_ECX_WAITPKG;
++            }
+         }
+         if (kvm_enabled() && cpu->ucode_rev == 0) {
+             cpu->ucode_rev = kvm_arch_get_supported_msr_feature(kvm_state,
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 4901c6dd74..f9c873bcad 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -407,12 +407,6 @@ uint32_t kvm_arch_get_supported_cpuid(KVMState *s, uint32_t function,
+         if (host_tsx_blacklisted()) {
+             ret &= ~(CPUID_7_0_EBX_RTM | CPUID_7_0_EBX_HLE);
+         }
+-    } else if (function == 7 && index == 0 && reg == R_ECX) {
+-        if (enable_cpu_pm) {
+-            ret |= CPUID_7_0_ECX_WAITPKG;
+-        } else {
+-            ret &= ~CPUID_7_0_ECX_WAITPKG;
+-        }
+     } else if (function == 7 && index == 0 && reg == R_EDX) {
+         /*
+          * Linux v4.17-v4.20 incorrectly return ARCH_CAPABILITIES on SVM hosts.
+@@ -4678,3 +4672,8 @@ int kvm_arch_msi_data_to_gsi(uint32_t data)
  {
--    SabreState *s = SABRE_DEVICE(d);
-+    SabreState *s = SABRE(d);
-     PCIDevice *pci_dev;
-     unsigned int i;
-     uint16_t cmd;
-@@ -376,7 +376,7 @@ static const MemoryRegionOps pci_config_ops = {
+     abort();
+ }
++
++bool kvm_has_waitpkg(void)
++{
++    return has_msr_umwait;
++}
+diff --git a/target/i386/kvm_i386.h b/target/i386/kvm_i386.h
+index 00bde7acaf..064b8798a2 100644
+--- a/target/i386/kvm_i386.h
++++ b/target/i386/kvm_i386.h
+@@ -44,6 +44,7 @@ void kvm_put_apicbase(X86CPU *cpu, uint64_t value);
  
- static void sabre_realize(DeviceState *dev, Error **errp)
- {
--    SabreState *s = SABRE_DEVICE(dev);
-+    SabreState *s = SABRE(dev);
-     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(s);
-     PCIDevice *pci_dev;
-@@ -421,7 +421,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+ bool kvm_enable_x2apic(void);
+ bool kvm_has_x2apic_api(void);
++bool kvm_has_waitpkg(void);
  
- static void sabre_init(Object *obj)
- {
--    SabreState *s = SABRE_DEVICE(obj);
-+    SabreState *s = SABRE(obj);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
-     unsigned int i;
+ bool kvm_hv_vpindex_settable(void);
  
-@@ -502,7 +502,7 @@ static const TypeInfo sabre_pci_info = {
- 
- static char *sabre_ofw_unit_address(const SysBusDevice *dev)
- {
--    SabreState *s = SABRE_DEVICE(dev);
-+    SabreState *s = SABRE(dev);
- 
-     return g_strdup_printf("%x,%x",
-                (uint32_t)((s->special_base >> 32) & 0xffffffff),
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 67985414e2..b4aabfc076 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -585,7 +585,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     prom_init(hwdef->prom_addr, bios_name);
- 
-     /* Init sabre (PCI host bridge) */
--    sabre = SABRE_DEVICE(qdev_new(TYPE_SABRE));
-+    sabre = SABRE(qdev_new(TYPE_SABRE));
-     qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
-     qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
-     object_property_set_link(OBJECT(sabre), "iommu", OBJECT(iommu),
 -- 
-2.26.2
+2.17.1
 
 
