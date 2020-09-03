@@ -7,77 +7,76 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27CB3C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF14C43461
 	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:29:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6A7820767
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:29:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7382520767
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:29:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IoWjTzfB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6A7820767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M8nig7ln"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7382520767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50612 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDkcO-0004xp-RE
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 04:29:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51342)
+	id 1kDkcO-0004y8-Vo
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 04:29:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kDkaC-0001qb-OE
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:27:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30226
- helo=us-smtp-1.mimecast.com)
+ id 1kDkZo-0000y1-O1
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:26:36 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54653
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kDka8-0000X0-3N
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:27:00 -0400
+ id 1kDkZk-0000UP-8Z
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:26:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599121615;
+ s=mimecast20190719; t=1599121591;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=77OpJDd/CLI9Jy3Ev5v2HOVz5Wz6pjwmRATvWxkI6jI=;
- b=IoWjTzfBcbY8XlZnE6nQ+MNtl44ilsciYBgrszcK31uAa1i7vsnOBkkixT99RM7/0jy/P8
- ACl9ajgRq44SOCGizVg6NEX1a88Qb+alfBZDig8Se5sattiqTzEGJRr6QVRZc0cgEs+hi9
- cFukZOBWQYCIMbPbC0GxEPsVFkYIHn8=
+ bh=BvMPoL4hS3mNqmQuvpZBy0r4G59F0slnpb4Zx3S0OtE=;
+ b=M8nig7lnXFbfc7w3VrNIebTLx3qj/l46iJKeOfa6FrMmOEeC8G565S8aanOw3ALJ8E84OF
+ w+47WD1Yn7vJ59hoJpEOlADimLgg+7JEKgKK+re20tFOf34ERwCc2TAhfrBcj28naDYGOJ
+ JAjgWowMksKmu93/19ZWuytby5J2RWY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-HBf-17zIO4K63u0c7lJr5g-1; Thu, 03 Sep 2020 04:26:53 -0400
-X-MC-Unique: HBf-17zIO4K63u0c7lJr5g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-459-nKLApNC8M_6c-SvJVJPZ5g-1; Thu, 03 Sep 2020 04:26:26 -0400
+X-MC-Unique: nKLApNC8M_6c-SvJVJPZ5g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41C9081F010;
- Thu,  3 Sep 2020 08:26:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6BFF281F00F;
+ Thu,  3 Sep 2020 08:26:25 +0000 (UTC)
 Received: from redhat.com (ovpn-114-170.ams2.redhat.com [10.36.114.170])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A9C0219C59;
- Thu,  3 Sep 2020 08:26:50 +0000 (UTC)
-Date: Thu, 3 Sep 2020 09:26:47 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8939F78B40;
+ Thu,  3 Sep 2020 08:26:23 +0000 (UTC)
+Date: Thu, 3 Sep 2020 09:26:20 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Yonggang Luo <luoyonggang@gmail.com>
-Subject: Re: [PATCH v3 07/12] osdep: These function are only available on
- Non-Win32 system.
-Message-ID: <20200903082647.GE441291@redhat.com>
+Subject: Re: [PATCH v3 06/12] block: Fixes nfs on msys2/mingw
+Message-ID: <20200903082620.GD441291@redhat.com>
 References: <20200903074313.1498-1-luoyonggang@gmail.com>
- <20200903074313.1498-8-luoyonggang@gmail.com>
+ <20200903074313.1498-7-luoyonggang@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200903074313.1498-8-luoyonggang@gmail.com>
+In-Reply-To: <20200903074313.1498-7-luoyonggang@gmail.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0.004
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -104,1397 +103,1834 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 03, 2020 at 03:43:08PM +0800, Yonggang Luo wrote:
-> int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
-> int qemu_unlock_fd(int fd, int64_t start, int64_t len);
-> int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
-> bool qemu_has_ofd_lock(void);
-> 
+On Thu, Sep 03, 2020 at 03:43:07PM +0800, Yonggang Luo wrote:
 > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 > ---
->  include/qemu/osdep.h | 1372 +++++++++++++++++++++---------------------
->  1 file changed, 686 insertions(+), 686 deletions(-)
+>  block/nfs.c | 1812 ++++++++++++++++++++++++++-------------------------
+>  1 file changed, 910 insertions(+), 902 deletions(-)
 
-Again, the diff is messed up adding/removing every single line.
+The diff for this file is totally messed up, adding/removing every
+single line. I presume you've change line endings to DOS style,
+so please revert that.
 
 > 
-> diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-> index 412962d91a..e80fddd1e8 100644
-> --- a/include/qemu/osdep.h
-> +++ b/include/qemu/osdep.h
-> @@ -1,686 +1,686 @@
+> diff --git a/block/nfs.c b/block/nfs.c
+> index 61a249a9fc..34b2cd5708 100644
+> --- a/block/nfs.c
+> +++ b/block/nfs.c
+> @@ -1,902 +1,910 @@
 > -/*
-> - * OS includes and handling of OS dependencies
+> - * QEMU Block driver for native access to files on NFS shares
 > - *
-> - * This header exists to pull in some common system headers that
-> - * most code in QEMU will want, and to fix up some possible issues with
-> - * it (missing defines, Windows weirdness, and so on).
+> - * Copyright (c) 2014-2017 Peter Lieven <pl@kamp.de>
 > - *
-> - * To avoid getting into possible circular include dependencies, this
-> - * file should not include any other QEMU headers, with the exceptions
-> - * of config-host.h, config-target.h, qemu/compiler.h,
-> - * sysemu/os-posix.h, sysemu/os-win32.h, glib-compat.h and
-> - * qemu/typedefs.h, all of which are doing a similar job to this file
-> - * and are under similar constraints.
+> - * Permission is hereby granted, free of charge, to any person obtaining a copy
+> - * of this software and associated documentation files (the "Software"), to deal
+> - * in the Software without restriction, including without limitation the rights
+> - * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> - * copies of the Software, and to permit persons to whom the Software is
+> - * furnished to do so, subject to the following conditions:
 > - *
-> - * This header also contains prototypes for functions defined in
-> - * os-*.c and util/oslib-*.c; those would probably be better split
-> - * out into separate header files.
+> - * The above copyright notice and this permission notice shall be included in
+> - * all copies or substantial portions of the Software.
 > - *
-> - * In an ideal world this header would contain only:
-> - *  (1) things which everybody needs
-> - *  (2) things without which code would work on most platforms but
-> - *      fail to compile or misbehave on a minority of host OSes
-> - *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> - * See the COPYING file in the top-level directory.
-> - */
-> -#ifndef QEMU_OSDEP_H
-> -#define QEMU_OSDEP_H
-> -
-> -#include "config-host.h"
-> -#ifdef NEED_CPU_H
-> -#include CONFIG_TARGET
-> -#else
-> -#include "exec/poison.h"
-> -#endif
-> -
-> -#include "qemu/compiler.h"
-> -
-> -/* Older versions of C++ don't get definitions of various macros from
-> - * stdlib.h unless we define these macros before first inclusion of
-> - * that system header.
-> - */
-> -#ifndef __STDC_CONSTANT_MACROS
-> -#define __STDC_CONSTANT_MACROS
-> -#endif
-> -#ifndef __STDC_LIMIT_MACROS
-> -#define __STDC_LIMIT_MACROS
-> -#endif
-> -#ifndef __STDC_FORMAT_MACROS
-> -#define __STDC_FORMAT_MACROS
-> -#endif
-> -
-> -/* The following block of code temporarily renames the daemon() function so the
-> - * compiler does not see the warning associated with it in stdlib.h on OSX
-> - */
-> -#ifdef __APPLE__
-> -#define daemon qemu_fake_daemon_function
-> -#include <stdlib.h>
-> -#undef daemon
-> -extern int daemon(int, int);
-> -#endif
-> -
-> -#ifdef _WIN32
-> -/* as defined in sdkddkver.h */
-> -#ifndef _WIN32_WINNT
-> -#define _WIN32_WINNT 0x0600 /* Vista */
-> -#endif
-> -/* reduces the number of implicitly included headers */
-> -#ifndef WIN32_LEAN_AND_MEAN
-> -#define WIN32_LEAN_AND_MEAN
-> -#endif
-> -#endif
-> -
-> -/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
-> -#ifdef __MINGW32__
-> -#define __USE_MINGW_ANSI_STDIO 1
-> -#endif
-> -
-> -#include <stdarg.h>
-> -#include <stddef.h>
-> -#include <stdbool.h>
-> -#include <stdint.h>
-> -#include <sys/types.h>
-> -#include <stdlib.h>
-> -#include <stdio.h>
-> -
-> -#include <string.h>
-> -#include <strings.h>
-> -#include <inttypes.h>
-> -#include <limits.h>
-> -/* Put unistd.h before time.h as that triggers localtime_r/gmtime_r
-> - * function availability on recentish Mingw-w64 platforms. */
-> -#include <unistd.h>
-> -#include <time.h>
-> -#include <ctype.h>
-> -#include <errno.h>
-> -#include <fcntl.h>
-> -#include <getopt.h>
-> -#include <sys/stat.h>
-> -#include <sys/time.h>
-> -#include <assert.h>
-> -/* setjmp must be declared before sysemu/os-win32.h
-> - * because it is redefined there. */
-> -#include <setjmp.h>
-> -#include <signal.h>
-> -
-> -#ifdef HAVE_SYS_SIGNAL_H
-> -#include <sys/signal.h>
-> -#endif
-> -
-> -#ifndef _WIN32
-> -#include <sys/wait.h>
-> -#else
-> -#define WIFEXITED(x)   1
-> -#define WEXITSTATUS(x) (x)
-> -#endif
-> -
-> -#ifdef _WIN32
-> -#include "sysemu/os-win32.h"
-> -#endif
-> -
-> -#ifdef CONFIG_POSIX
-> -#include "sysemu/os-posix.h"
-> -#endif
-> -
-> -#include "glib-compat.h"
-> -#include "qemu/typedefs.h"
-> -
-> -/*
-> - * For mingw, as of v6.0.0, the function implementing the assert macro is
-> - * not marked as noreturn, so the compiler cannot delete code following an
-> - * assert(false) as unused.  We rely on this within the code base to delete
-> - * code that is unreachable when features are disabled.
-> - * All supported versions of Glib's g_assert() satisfy this requirement.
-> - */
-> -#ifdef __MINGW32__
-> -#undef assert
-> -#define assert(x)  g_assert(x)
-> -#endif
-> -
-> -/*
-> - * According to waitpid man page:
-> - * WCOREDUMP
-> - *  This  macro  is  not  specified  in POSIX.1-2001 and is not
-> - *  available on some UNIX implementations (e.g., AIX, SunOS).
-> - *  Therefore, enclose its use inside #ifdef WCOREDUMP ... #endif.
-> - */
-> -#ifndef WCOREDUMP
-> -#define WCOREDUMP(status) 0
-> -#endif
-> -/*
-> - * We have a lot of unaudited code that may fail in strange ways, or
-> - * even be a security risk during migration, if you disable assertions
-> - * at compile-time.  You may comment out these safety checks if you
-> - * absolutely want to disable assertion overhead, but it is not
-> - * supported upstream so the risk is all yours.  Meanwhile, please
-> - * submit patches to remove any side-effects inside an assertion, or
-> - * fixing error handling that should use Error instead of assert.
-> - */
-> -#ifdef NDEBUG
-> -#error building with NDEBUG is not supported
-> -#endif
-> -#ifdef G_DISABLE_ASSERT
-> -#error building with G_DISABLE_ASSERT is not supported
-> -#endif
-> -
-> -#ifndef O_LARGEFILE
-> -#define O_LARGEFILE 0
-> -#endif
-> -#ifndef O_BINARY
-> -#define O_BINARY 0
-> -#endif
-> -#ifndef MAP_ANONYMOUS
-> -#define MAP_ANONYMOUS MAP_ANON
-> -#endif
-> -#ifndef MAP_FIXED_NOREPLACE
-> -#define MAP_FIXED_NOREPLACE 0
-> -#endif
-> -#ifndef ENOMEDIUM
-> -#define ENOMEDIUM ENODEV
-> -#endif
-> -#if !defined(ENOTSUP)
-> -#define ENOTSUP 4096
-> -#endif
-> -#if !defined(ECANCELED)
-> -#define ECANCELED 4097
-> -#endif
-> -#if !defined(EMEDIUMTYPE)
-> -#define EMEDIUMTYPE 4098
-> -#endif
-> -#if !defined(ESHUTDOWN)
-> -#define ESHUTDOWN 4099
-> -#endif
-> -
-> -/* time_t may be either 32 or 64 bits depending on the host OS, and
-> - * can be either signed or unsigned, so we can't just hardcode a
-> - * specific maximum value. This is not a C preprocessor constant,
-> - * so you can't use TIME_MAX in an #ifdef, but for our purposes
-> - * this isn't a problem.
+> - * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> - * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> - * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> - * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> - * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> - * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> - * THE SOFTWARE.
 > - */
 > -
-> -/* The macros TYPE_SIGNED, TYPE_WIDTH, and TYPE_MAXIMUM are from
-> - * Gnulib, and are under the LGPL v2.1 or (at your option) any
-> - * later version.
-> - */
+> -#include "qemu/osdep.h"
 > -
-> -/* True if the real type T is signed.  */
-> -#define TYPE_SIGNED(t) (!((t)0 < (t)-1))
+> -#include <poll.h>
+> -#include "qemu/config-file.h"
+> -#include "qemu/error-report.h"
+> -#include "qapi/error.h"
+> -#include "block/block_int.h"
+> -#include "block/qdict.h"
+> -#include "trace.h"
+> -#include "qemu/iov.h"
+> -#include "qemu/main-loop.h"
+> -#include "qemu/module.h"
+> -#include "qemu/option.h"
+> -#include "qemu/uri.h"
+> -#include "qemu/cutils.h"
+> -#include "sysemu/sysemu.h"
+> -#include "sysemu/replay.h"
+> -#include "qapi/qapi-visit-block-core.h"
+> -#include "qapi/qmp/qdict.h"
+> -#include "qapi/qmp/qstring.h"
+> -#include "qapi/qobject-input-visitor.h"
+> -#include "qapi/qobject-output-visitor.h"
+> -#include <nfsc/libnfs.h>
 > -
-> -/* The width in bits of the integer type or expression T.
-> - * Padding bits are not supported.
-> - */
-> -#define TYPE_WIDTH(t) (sizeof(t) * CHAR_BIT)
 > -
-> -/* The maximum and minimum values for the integer type T.  */
-> -#define TYPE_MAXIMUM(t)                                                \
-> -  ((t) (!TYPE_SIGNED(t)                                                \
-> -        ? (t)-1                                                        \
-> -        : ((((t)1 << (TYPE_WIDTH(t) - 2)) - 1) * 2 + 1)))
+> -#define QEMU_NFS_MAX_READAHEAD_SIZE 1048576
+> -#define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
+> -#define QEMU_NFS_MAX_DEBUG_LEVEL 2
 > -
-> -#ifndef TIME_MAX
-> -#define TIME_MAX TYPE_MAXIMUM(time_t)
-> -#endif
+> -typedef struct NFSClient {
+> -    struct nfs_context *context;
+> -    struct nfsfh *fh;
+> -    int events;
+> -    bool has_zero_init;
+> -    AioContext *aio_context;
+> -    QemuMutex mutex;
+> -    blkcnt_t st_blocks;
+> -    bool cache_used;
+> -    NFSServer *server;
+> -    char *path;
+> -    int64_t uid, gid, tcp_syncnt, readahead, pagecache, debug;
+> -} NFSClient;
 > -
-> -/* HOST_LONG_BITS is the size of a native pointer in bits. */
-> -#if UINTPTR_MAX == UINT32_MAX
-> -# define HOST_LONG_BITS 32
-> -#elif UINTPTR_MAX == UINT64_MAX
-> -# define HOST_LONG_BITS 64
-> -#else
-> -# error Unknown pointer size
-> -#endif
+> -typedef struct NFSRPC {
+> -    BlockDriverState *bs;
+> -    int ret;
+> -    int complete;
+> -    QEMUIOVector *iov;
+> -    struct stat *st;
+> -    Coroutine *co;
+> -    NFSClient *client;
+> -} NFSRPC;
 > -
-> -/* Mac OSX has a <stdint.h> bug that incorrectly defines SIZE_MAX with
-> - * the wrong type. Our replacement isn't usable in preprocessor
-> - * expressions, but it is sufficient for our needs. */
-> -#if defined(HAVE_BROKEN_SIZE_MAX) && HAVE_BROKEN_SIZE_MAX
-> -#undef SIZE_MAX
-> -#define SIZE_MAX ((size_t)-1)
-> -#endif
-> -
-> -/*
-> - * Two variations of MIN/MAX macros. The first is for runtime use, and
-> - * evaluates arguments only once (so it is safe even with side
-> - * effects), but will not work in constant contexts (such as array
-> - * size declarations) because of the '{}'.  The second is for constant
-> - * expression use, where evaluating arguments twice is safe because
-> - * the result is going to be constant anyway, but will not work in a
-> - * runtime context because of a void expression where a value is
-> - * expected.  Thus, both gcc and clang will fail to compile if you use
-> - * the wrong macro (even if the error may seem a bit cryptic).
-> - *
-> - * Note that neither form is usable as an #if condition; if you truly
-> - * need to write conditional code that depends on a minimum or maximum
-> - * determined by the pre-processor instead of the compiler, you'll
-> - * have to open-code it.  Sadly, Coverity is severely confused by the
-> - * constant variants, so we have to dumb things down there.
-> - */
-> -#undef MIN
-> -#define MIN(a, b)                                       \
-> -    ({                                                  \
-> -        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-> -        _a < _b ? _a : _b;                              \
-> -    })
-> -#undef MAX
-> -#define MAX(a, b)                                       \
-> -    ({                                                  \
-> -        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-> -        _a > _b ? _a : _b;                              \
-> -    })
-> -
-> -#ifdef __COVERITY__
-> -# define MIN_CONST(a, b) ((a) < (b) ? (a) : (b))
-> -# define MAX_CONST(a, b) ((a) > (b) ? (a) : (b))
-> -#else
-> -# define MIN_CONST(a, b)                                        \
-> -    __builtin_choose_expr(                                      \
-> -        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-> -        (a) < (b) ? (a) : (b),                                  \
-> -        ((void)0))
-> -# define MAX_CONST(a, b)                                        \
-> -    __builtin_choose_expr(                                      \
-> -        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-> -        (a) > (b) ? (a) : (b),                                  \
-> -        ((void)0))
-> -#endif
-> -
-> -/*
-> - * Minimum function that returns zero only if both values are zero.
-> - * Intended for use with unsigned values only.
-> - */
-> -#ifndef MIN_NON_ZERO
-> -#define MIN_NON_ZERO(a, b)                              \
-> -    ({                                                  \
-> -        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-> -        _a == 0 ? _b : (_b == 0 || _b > _a) ? _a : _b;  \
-> -    })
-> -#endif
-> -
-> -/* Round number down to multiple */
-> -#define QEMU_ALIGN_DOWN(n, m) ((n) / (m) * (m))
-> -
-> -/* Round number up to multiple. Safe when m is not a power of 2 (see
-> - * ROUND_UP for a faster version when a power of 2 is guaranteed) */
-> -#define QEMU_ALIGN_UP(n, m) QEMU_ALIGN_DOWN((n) + (m) - 1, (m))
-> -
-> -/* Check if n is a multiple of m */
-> -#define QEMU_IS_ALIGNED(n, m) (((n) % (m)) == 0)
-> -
-> -/* n-byte align pointer down */
-> -#define QEMU_ALIGN_PTR_DOWN(p, n) \
-> -    ((typeof(p))QEMU_ALIGN_DOWN((uintptr_t)(p), (n)))
-> -
-> -/* n-byte align pointer up */
-> -#define QEMU_ALIGN_PTR_UP(p, n) \
-> -    ((typeof(p))QEMU_ALIGN_UP((uintptr_t)(p), (n)))
-> -
-> -/* Check if pointer p is n-bytes aligned */
-> -#define QEMU_PTR_IS_ALIGNED(p, n) QEMU_IS_ALIGNED((uintptr_t)(p), (n))
-> -
-> -/* Round number up to multiple. Requires that d be a power of 2 (see
-> - * QEMU_ALIGN_UP for a safer but slower version on arbitrary
-> - * numbers); works even if d is a smaller type than n.  */
-> -#ifndef ROUND_UP
-> -#define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
-> -#endif
-> -
-> -#ifndef DIV_ROUND_UP
-> -#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
-> -#endif
-> -
-> -/*
-> - * &(x)[0] is always a pointer - if it's same type as x then the argument is a
-> - * pointer, not an array.
-> - */
-> -#define QEMU_IS_ARRAY(x) (!__builtin_types_compatible_p(typeof(x), \
-> -                                                        typeof(&(x)[0])))
-> -#ifndef ARRAY_SIZE
-> -#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + \
-> -                       QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(x)))
-> -#endif
-> -
-> -int qemu_daemon(int nochdir, int noclose);
-> -void *qemu_try_memalign(size_t alignment, size_t size);
-> -void *qemu_memalign(size_t alignment, size_t size);
-> -void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared);
-> -void qemu_vfree(void *ptr);
-> -void qemu_anon_ram_free(void *ptr, size_t size);
-> -
-> -#define QEMU_MADV_INVALID -1
-> -
-> -#if defined(CONFIG_MADVISE)
-> -
-> -#define QEMU_MADV_WILLNEED  MADV_WILLNEED
-> -#define QEMU_MADV_DONTNEED  MADV_DONTNEED
-> -#ifdef MADV_DONTFORK
-> -#define QEMU_MADV_DONTFORK  MADV_DONTFORK
-> -#else
-> -#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
-> -#endif
-> -#ifdef MADV_MERGEABLE
-> -#define QEMU_MADV_MERGEABLE MADV_MERGEABLE
-> -#else
-> -#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
-> -#endif
-> -#ifdef MADV_UNMERGEABLE
-> -#define QEMU_MADV_UNMERGEABLE MADV_UNMERGEABLE
-> -#else
-> -#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
-> -#endif
-> -#ifdef MADV_DODUMP
-> -#define QEMU_MADV_DODUMP MADV_DODUMP
-> -#else
-> -#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
-> -#endif
-> -#ifdef MADV_DONTDUMP
-> -#define QEMU_MADV_DONTDUMP MADV_DONTDUMP
-> -#else
-> -#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
-> -#endif
-> -#ifdef MADV_HUGEPAGE
-> -#define QEMU_MADV_HUGEPAGE MADV_HUGEPAGE
-> -#else
-> -#define QEMU_MADV_HUGEPAGE QEMU_MADV_INVALID
-> -#endif
-> -#ifdef MADV_NOHUGEPAGE
-> -#define QEMU_MADV_NOHUGEPAGE MADV_NOHUGEPAGE
-> -#else
-> -#define QEMU_MADV_NOHUGEPAGE QEMU_MADV_INVALID
-> -#endif
-> -#ifdef MADV_REMOVE
-> -#define QEMU_MADV_REMOVE MADV_REMOVE
-> -#else
-> -#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
-> -#endif
-> -
-> -#elif defined(CONFIG_POSIX_MADVISE)
-> -
-> -#define QEMU_MADV_WILLNEED  POSIX_MADV_WILLNEED
-> -#define QEMU_MADV_DONTNEED  POSIX_MADV_DONTNEED
-> -#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
-> -#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
-> -#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
-> -#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
-> -#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
-> -#define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
-> -#define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
-> -#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
-> -
-> -#else /* no-op */
-> -
-> -#define QEMU_MADV_WILLNEED  QEMU_MADV_INVALID
-> -#define QEMU_MADV_DONTNEED  QEMU_MADV_INVALID
-> -#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
-> -#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
-> -#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
-> -#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
-> -#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
-> -#define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
-> -#define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
-> -#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
-> -
-> -#endif
-> -
-> -#ifdef _WIN32
-> -#define HAVE_CHARDEV_SERIAL 1
-> -#elif defined(__linux__) || defined(__sun__) || defined(__FreeBSD__)    \
-> -    || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) \
-> -    || defined(__GLIBC__) || defined(__APPLE__)
-> -#define HAVE_CHARDEV_SERIAL 1
-> -#endif
-> -
-> -#if defined(__linux__) || defined(__FreeBSD__) ||               \
-> -    defined(__FreeBSD_kernel__) || defined(__DragonFly__)
-> -#define HAVE_CHARDEV_PARPORT 1
-> -#endif
-> -
-> -#if defined(__HAIKU__)
-> -#define SIGIO SIGPOLL
-> -#endif
-> -
-> -#if defined(CONFIG_LINUX)
-> -#ifndef BUS_MCEERR_AR
-> -#define BUS_MCEERR_AR 4
-> -#endif
-> -#ifndef BUS_MCEERR_AO
-> -#define BUS_MCEERR_AO 5
-> -#endif
-> -#endif
-> -
-> -#if defined(__linux__) && \
-> -    (defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) \
-> -     || defined(__powerpc64__))
-> -   /* Use 2 MiB alignment so transparent hugepages can be used by KVM.
-> -      Valgrind does not support alignments larger than 1 MiB,
-> -      therefore we need special code which handles running on Valgrind. */
-> -#  define QEMU_VMALLOC_ALIGN (512 * 4096)
-> -#elif defined(__linux__) && defined(__s390x__)
-> -   /* Use 1 MiB (segment size) alignment so gmap can be used by KVM. */
-> -#  define QEMU_VMALLOC_ALIGN (256 * 4096)
-> -#elif defined(__linux__) && defined(__sparc__)
-> -#include <sys/shm.h>
-> -#  define QEMU_VMALLOC_ALIGN MAX(qemu_real_host_page_size, SHMLBA)
-> -#else
-> -#  define QEMU_VMALLOC_ALIGN qemu_real_host_page_size
-> -#endif
-> -
-> -#ifdef CONFIG_POSIX
-> -struct qemu_signalfd_siginfo {
-> -    uint32_t ssi_signo;   /* Signal number */
-> -    int32_t  ssi_errno;   /* Error number (unused) */
-> -    int32_t  ssi_code;    /* Signal code */
-> -    uint32_t ssi_pid;     /* PID of sender */
-> -    uint32_t ssi_uid;     /* Real UID of sender */
-> -    int32_t  ssi_fd;      /* File descriptor (SIGIO) */
-> -    uint32_t ssi_tid;     /* Kernel timer ID (POSIX timers) */
-> -    uint32_t ssi_band;    /* Band event (SIGIO) */
-> -    uint32_t ssi_overrun; /* POSIX timer overrun count */
-> -    uint32_t ssi_trapno;  /* Trap number that caused signal */
-> -    int32_t  ssi_status;  /* Exit status or signal (SIGCHLD) */
-> -    int32_t  ssi_int;     /* Integer sent by sigqueue(2) */
-> -    uint64_t ssi_ptr;     /* Pointer sent by sigqueue(2) */
-> -    uint64_t ssi_utime;   /* User CPU time consumed (SIGCHLD) */
-> -    uint64_t ssi_stime;   /* System CPU time consumed (SIGCHLD) */
-> -    uint64_t ssi_addr;    /* Address that generated signal
-> -                             (for hardware-generated signals) */
-> -    uint8_t  pad[48];     /* Pad size to 128 bytes (allow for
-> -                             additional fields in the future) */
-> -};
-> -
-> -int qemu_signalfd(const sigset_t *mask);
-> -void sigaction_invoke(struct sigaction *action,
-> -                      struct qemu_signalfd_siginfo *info);
-> -#endif
-> -
-> -int qemu_madvise(void *addr, size_t len, int advice);
-> -int qemu_mprotect_rwx(void *addr, size_t size);
-> -int qemu_mprotect_none(void *addr, size_t size);
-> -
-> -int qemu_open(const char *name, int flags, ...);
-> -int qemu_close(int fd);
-> -int qemu_unlink(const char *name);
-> -#ifndef _WIN32
-> -int qemu_dup(int fd);
-> -#endif
-> -int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
-> -int qemu_unlock_fd(int fd, int64_t start, int64_t len);
-> -int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
-> -bool qemu_has_ofd_lock(void);
-> -
-> -#if defined(__HAIKU__) && defined(__i386__)
-> -#define FMT_pid "%ld"
-> -#elif defined(WIN64)
-> -#define FMT_pid "%" PRId64
-> -#else
-> -#define FMT_pid "%d"
-> -#endif
-> -
-> -bool qemu_write_pidfile(const char *pidfile, Error **errp);
-> -
-> -int qemu_get_thread_id(void);
-> -
-> -#ifndef CONFIG_IOVEC
-> -struct iovec {
-> -    void *iov_base;
-> -    size_t iov_len;
-> -};
-> -/*
-> - * Use the same value as Linux for now.
-> - */
-> -#define IOV_MAX 1024
-> -
-> -ssize_t readv(int fd, const struct iovec *iov, int iov_cnt);
-> -ssize_t writev(int fd, const struct iovec *iov, int iov_cnt);
-> -#else
-> -#include <sys/uio.h>
-> -#endif
-> -
-> -#ifdef _WIN32
-> -static inline void qemu_timersub(const struct timeval *val1,
-> -                                 const struct timeval *val2,
-> -                                 struct timeval *res)
+> -static int nfs_parse_uri(const char *filename, QDict *options, Error **errp)
 > -{
-> -    res->tv_sec = val1->tv_sec - val2->tv_sec;
-> -    if (val1->tv_usec < val2->tv_usec) {
-> -        res->tv_sec--;
-> -        res->tv_usec = val1->tv_usec - val2->tv_usec + 1000 * 1000;
+> -    URI *uri = NULL;
+> -    QueryParams *qp = NULL;
+> -    int ret = -EINVAL, i;
+> -
+> -    uri = uri_parse(filename);
+> -    if (!uri) {
+> -        error_setg(errp, "Invalid URI specified");
+> -        goto out;
+> -    }
+> -    if (g_strcmp0(uri->scheme, "nfs") != 0) {
+> -        error_setg(errp, "URI scheme must be 'nfs'");
+> -        goto out;
+> -    }
+> -
+> -    if (!uri->server) {
+> -        error_setg(errp, "missing hostname in URI");
+> -        goto out;
+> -    }
+> -
+> -    if (!uri->path) {
+> -        error_setg(errp, "missing file path in URI");
+> -        goto out;
+> -    }
+> -
+> -    qp = query_params_parse(uri->query);
+> -    if (!qp) {
+> -        error_setg(errp, "could not parse query parameters");
+> -        goto out;
+> -    }
+> -
+> -    qdict_put_str(options, "server.host", uri->server);
+> -    qdict_put_str(options, "server.type", "inet");
+> -    qdict_put_str(options, "path", uri->path);
+> -
+> -    for (i = 0; i < qp->n; i++) {
+> -        unsigned long long val;
+> -        if (!qp->p[i].value) {
+> -            error_setg(errp, "Value for NFS parameter expected: %s",
+> -                       qp->p[i].name);
+> -            goto out;
+> -        }
+> -        if (parse_uint_full(qp->p[i].value, &val, 0)) {
+> -            error_setg(errp, "Illegal value for NFS parameter: %s",
+> -                       qp->p[i].name);
+> -            goto out;
+> -        }
+> -        if (!strcmp(qp->p[i].name, "uid")) {
+> -            qdict_put_str(options, "user", qp->p[i].value);
+> -        } else if (!strcmp(qp->p[i].name, "gid")) {
+> -            qdict_put_str(options, "group", qp->p[i].value);
+> -        } else if (!strcmp(qp->p[i].name, "tcp-syncnt")) {
+> -            qdict_put_str(options, "tcp-syn-count", qp->p[i].value);
+> -        } else if (!strcmp(qp->p[i].name, "readahead")) {
+> -            qdict_put_str(options, "readahead-size", qp->p[i].value);
+> -        } else if (!strcmp(qp->p[i].name, "pagecache")) {
+> -            qdict_put_str(options, "page-cache-size", qp->p[i].value);
+> -        } else if (!strcmp(qp->p[i].name, "debug")) {
+> -            qdict_put_str(options, "debug", qp->p[i].value);
+> -        } else {
+> -            error_setg(errp, "Unknown NFS parameter name: %s",
+> -                       qp->p[i].name);
+> -            goto out;
+> -        }
+> -    }
+> -    ret = 0;
+> -out:
+> -    if (qp) {
+> -        query_params_free(qp);
+> -    }
+> -    if (uri) {
+> -        uri_free(uri);
+> -    }
+> -    return ret;
+> -}
+> -
+> -static bool nfs_has_filename_options_conflict(QDict *options, Error **errp)
+> -{
+> -    const QDictEntry *qe;
+> -
+> -    for (qe = qdict_first(options); qe; qe = qdict_next(options, qe)) {
+> -        if (!strcmp(qe->key, "host") ||
+> -            !strcmp(qe->key, "path") ||
+> -            !strcmp(qe->key, "user") ||
+> -            !strcmp(qe->key, "group") ||
+> -            !strcmp(qe->key, "tcp-syn-count") ||
+> -            !strcmp(qe->key, "readahead-size") ||
+> -            !strcmp(qe->key, "page-cache-size") ||
+> -            !strcmp(qe->key, "debug") ||
+> -            strstart(qe->key, "server.", NULL))
+> -        {
+> -            error_setg(errp, "Option %s cannot be used with a filename",
+> -                       qe->key);
+> -            return true;
+> -        }
+> -    }
+> -
+> -    return false;
+> -}
+> -
+> -static void nfs_parse_filename(const char *filename, QDict *options,
+> -                               Error **errp)
+> -{
+> -    if (nfs_has_filename_options_conflict(options, errp)) {
+> -        return;
+> -    }
+> -
+> -    nfs_parse_uri(filename, options, errp);
+> -}
+> -
+> -static void nfs_process_read(void *arg);
+> -static void nfs_process_write(void *arg);
+> -
+> -/* Called with QemuMutex held.  */
+> -static void nfs_set_events(NFSClient *client)
+> -{
+> -    int ev = nfs_which_events(client->context);
+> -    if (ev != client->events) {
+> -        aio_set_fd_handler(client->aio_context, nfs_get_fd(client->context),
+> -                           false,
+> -                           (ev & POLLIN) ? nfs_process_read : NULL,
+> -                           (ev & POLLOUT) ? nfs_process_write : NULL,
+> -                           NULL, client);
+> -
+> -    }
+> -    client->events = ev;
+> -}
+> -
+> -static void nfs_process_read(void *arg)
+> -{
+> -    NFSClient *client = arg;
+> -
+> -    qemu_mutex_lock(&client->mutex);
+> -    nfs_service(client->context, POLLIN);
+> -    nfs_set_events(client);
+> -    qemu_mutex_unlock(&client->mutex);
+> -}
+> -
+> -static void nfs_process_write(void *arg)
+> -{
+> -    NFSClient *client = arg;
+> -
+> -    qemu_mutex_lock(&client->mutex);
+> -    nfs_service(client->context, POLLOUT);
+> -    nfs_set_events(client);
+> -    qemu_mutex_unlock(&client->mutex);
+> -}
+> -
+> -static void nfs_co_init_task(BlockDriverState *bs, NFSRPC *task)
+> -{
+> -    *task = (NFSRPC) {
+> -        .co             = qemu_coroutine_self(),
+> -        .bs             = bs,
+> -        .client         = bs->opaque,
+> -    };
+> -}
+> -
+> -static void nfs_co_generic_bh_cb(void *opaque)
+> -{
+> -    NFSRPC *task = opaque;
+> -
+> -    task->complete = 1;
+> -    aio_co_wake(task->co);
+> -}
+> -
+> -/* Called (via nfs_service) with QemuMutex held.  */
+> -static void
+> -nfs_co_generic_cb(int ret, struct nfs_context *nfs, void *data,
+> -                  void *private_data)
+> -{
+> -    NFSRPC *task = private_data;
+> -    task->ret = ret;
+> -    assert(!task->st);
+> -    if (task->ret > 0 && task->iov) {
+> -        if (task->ret <= task->iov->size) {
+> -            qemu_iovec_from_buf(task->iov, 0, data, task->ret);
+> -        } else {
+> -            task->ret = -EIO;
+> -        }
+> -    }
+> -    if (task->ret < 0) {
+> -        error_report("NFS Error: %s", nfs_get_error(nfs));
+> -    }
+> -    replay_bh_schedule_oneshot_event(task->client->aio_context,
+> -                                     nfs_co_generic_bh_cb, task);
+> -}
+> -
+> -static int coroutine_fn nfs_co_preadv(BlockDriverState *bs, uint64_t offset,
+> -                                      uint64_t bytes, QEMUIOVector *iov,
+> -                                      int flags)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -    NFSRPC task;
+> -
+> -    nfs_co_init_task(bs, &task);
+> -    task.iov = iov;
+> -
+> -    WITH_QEMU_LOCK_GUARD(&client->mutex) {
+> -        if (nfs_pread_async(client->context, client->fh,
+> -                            offset, bytes, nfs_co_generic_cb, &task) != 0) {
+> -            return -ENOMEM;
+> -        }
+> -
+> -        nfs_set_events(client);
+> -    }
+> -    while (!task.complete) {
+> -        qemu_coroutine_yield();
+> -    }
+> -
+> -    if (task.ret < 0) {
+> -        return task.ret;
+> -    }
+> -
+> -    /* zero pad short reads */
+> -    if (task.ret < iov->size) {
+> -        qemu_iovec_memset(iov, task.ret, 0, iov->size - task.ret);
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+> -static int coroutine_fn nfs_co_pwritev(BlockDriverState *bs, uint64_t offset,
+> -                                       uint64_t bytes, QEMUIOVector *iov,
+> -                                       int flags)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -    NFSRPC task;
+> -    char *buf = NULL;
+> -    bool my_buffer = false;
+> -
+> -    nfs_co_init_task(bs, &task);
+> -
+> -    if (iov->niov != 1) {
+> -        buf = g_try_malloc(bytes);
+> -        if (bytes && buf == NULL) {
+> -            return -ENOMEM;
+> -        }
+> -        qemu_iovec_to_buf(iov, 0, buf, bytes);
+> -        my_buffer = true;
 > -    } else {
-> -        res->tv_usec = val1->tv_usec - val2->tv_usec;
+> -        buf = iov->iov[0].iov_base;
+> -    }
+> -
+> -    WITH_QEMU_LOCK_GUARD(&client->mutex) {
+> -        if (nfs_pwrite_async(client->context, client->fh,
+> -                             offset, bytes, buf,
+> -                             nfs_co_generic_cb, &task) != 0) {
+> -            if (my_buffer) {
+> -                g_free(buf);
+> -            }
+> -            return -ENOMEM;
+> -        }
+> -
+> -        nfs_set_events(client);
+> -    }
+> -    while (!task.complete) {
+> -        qemu_coroutine_yield();
+> -    }
+> -
+> -    if (my_buffer) {
+> -        g_free(buf);
+> -    }
+> -
+> -    if (task.ret != bytes) {
+> -        return task.ret < 0 ? task.ret : -EIO;
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+> -static int coroutine_fn nfs_co_flush(BlockDriverState *bs)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -    NFSRPC task;
+> -
+> -    nfs_co_init_task(bs, &task);
+> -
+> -    WITH_QEMU_LOCK_GUARD(&client->mutex) {
+> -        if (nfs_fsync_async(client->context, client->fh, nfs_co_generic_cb,
+> -                            &task) != 0) {
+> -            return -ENOMEM;
+> -        }
+> -
+> -        nfs_set_events(client);
+> -    }
+> -    while (!task.complete) {
+> -        qemu_coroutine_yield();
+> -    }
+> -
+> -    return task.ret;
+> -}
+> -
+> -static void nfs_detach_aio_context(BlockDriverState *bs)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -
+> -    aio_set_fd_handler(client->aio_context, nfs_get_fd(client->context),
+> -                       false, NULL, NULL, NULL, NULL);
+> -    client->events = 0;
+> -}
+> -
+> -static void nfs_attach_aio_context(BlockDriverState *bs,
+> -                                   AioContext *new_context)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -
+> -    client->aio_context = new_context;
+> -    nfs_set_events(client);
+> -}
+> -
+> -static void nfs_client_close(NFSClient *client)
+> -{
+> -    if (client->context) {
+> -        qemu_mutex_lock(&client->mutex);
+> -        aio_set_fd_handler(client->aio_context, nfs_get_fd(client->context),
+> -                           false, NULL, NULL, NULL, NULL);
+> -        qemu_mutex_unlock(&client->mutex);
+> -        if (client->fh) {
+> -            nfs_close(client->context, client->fh);
+> -            client->fh = NULL;
+> -        }
+> -#ifdef LIBNFS_FEATURE_UMOUNT
+> -        nfs_umount(client->context);
+> -#endif
+> -        nfs_destroy_context(client->context);
+> -        client->context = NULL;
+> -    }
+> -    g_free(client->path);
+> -    qemu_mutex_destroy(&client->mutex);
+> -    qapi_free_NFSServer(client->server);
+> -    client->server = NULL;
+> -}
+> -
+> -static void nfs_file_close(BlockDriverState *bs)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -    nfs_client_close(client);
+> -}
+> -
+> -static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
+> -                               int flags, int open_flags, Error **errp)
+> -{
+> -    int64_t ret = -EINVAL;
+> -    struct stat st;
+> -    char *file = NULL, *strp = NULL;
+> -
+> -    qemu_mutex_init(&client->mutex);
+> -
+> -    client->path = g_strdup(opts->path);
+> -
+> -    strp = strrchr(client->path, '/');
+> -    if (strp == NULL) {
+> -        error_setg(errp, "Invalid URL specified");
+> -        goto fail;
+> -    }
+> -    file = g_strdup(strp);
+> -    *strp = 0;
+> -
+> -    /* Steal the NFSServer object from opts; set the original pointer to NULL
+> -     * to avoid use after free and double free. */
+> -    client->server = opts->server;
+> -    opts->server = NULL;
+> -
+> -    client->context = nfs_init_context();
+> -    if (client->context == NULL) {
+> -        error_setg(errp, "Failed to init NFS context");
+> -        goto fail;
+> -    }
+> -
+> -    if (opts->has_user) {
+> -        client->uid = opts->user;
+> -        nfs_set_uid(client->context, client->uid);
+> -    }
+> -
+> -    if (opts->has_group) {
+> -        client->gid = opts->group;
+> -        nfs_set_gid(client->context, client->gid);
+> -    }
+> -
+> -    if (opts->has_tcp_syn_count) {
+> -        client->tcp_syncnt = opts->tcp_syn_count;
+> -        nfs_set_tcp_syncnt(client->context, client->tcp_syncnt);
+> -    }
+> -
+> -#ifdef LIBNFS_FEATURE_READAHEAD
+> -    if (opts->has_readahead_size) {
+> -        if (open_flags & BDRV_O_NOCACHE) {
+> -            error_setg(errp, "Cannot enable NFS readahead "
+> -                             "if cache.direct = on");
+> -            goto fail;
+> -        }
+> -        client->readahead = opts->readahead_size;
+> -        if (client->readahead > QEMU_NFS_MAX_READAHEAD_SIZE) {
+> -            warn_report("Truncating NFS readahead size to %d",
+> -                        QEMU_NFS_MAX_READAHEAD_SIZE);
+> -            client->readahead = QEMU_NFS_MAX_READAHEAD_SIZE;
+> -        }
+> -        nfs_set_readahead(client->context, client->readahead);
+> -#ifdef LIBNFS_FEATURE_PAGECACHE
+> -        nfs_set_pagecache_ttl(client->context, 0);
+> -#endif
+> -        client->cache_used = true;
+> -    }
+> -#endif
+> -
+> -#ifdef LIBNFS_FEATURE_PAGECACHE
+> -    if (opts->has_page_cache_size) {
+> -        if (open_flags & BDRV_O_NOCACHE) {
+> -            error_setg(errp, "Cannot enable NFS pagecache "
+> -                             "if cache.direct = on");
+> -            goto fail;
+> -        }
+> -        client->pagecache = opts->page_cache_size;
+> -        if (client->pagecache > QEMU_NFS_MAX_PAGECACHE_SIZE) {
+> -            warn_report("Truncating NFS pagecache size to %d pages",
+> -                        QEMU_NFS_MAX_PAGECACHE_SIZE);
+> -            client->pagecache = QEMU_NFS_MAX_PAGECACHE_SIZE;
+> -        }
+> -        nfs_set_pagecache(client->context, client->pagecache);
+> -        nfs_set_pagecache_ttl(client->context, 0);
+> -        client->cache_used = true;
+> -    }
+> -#endif
+> -
+> -#ifdef LIBNFS_FEATURE_DEBUG
+> -    if (opts->has_debug) {
+> -        client->debug = opts->debug;
+> -        /* limit the maximum debug level to avoid potential flooding
+> -         * of our log files. */
+> -        if (client->debug > QEMU_NFS_MAX_DEBUG_LEVEL) {
+> -            warn_report("Limiting NFS debug level to %d",
+> -                        QEMU_NFS_MAX_DEBUG_LEVEL);
+> -            client->debug = QEMU_NFS_MAX_DEBUG_LEVEL;
+> -        }
+> -        nfs_set_debug(client->context, client->debug);
+> -    }
+> -#endif
+> -
+> -    ret = nfs_mount(client->context, client->server->host, client->path);
+> -    if (ret < 0) {
+> -        error_setg(errp, "Failed to mount nfs share: %s",
+> -                   nfs_get_error(client->context));
+> -        goto fail;
+> -    }
+> -
+> -    if (flags & O_CREAT) {
+> -        ret = nfs_creat(client->context, file, 0600, &client->fh);
+> -        if (ret < 0) {
+> -            error_setg(errp, "Failed to create file: %s",
+> -                       nfs_get_error(client->context));
+> -            goto fail;
+> -        }
+> -    } else {
+> -        ret = nfs_open(client->context, file, flags, &client->fh);
+> -        if (ret < 0) {
+> -            error_setg(errp, "Failed to open file : %s",
+> -                       nfs_get_error(client->context));
+> -            goto fail;
+> -        }
+> -    }
+> -
+> -    ret = nfs_fstat(client->context, client->fh, &st);
+> -    if (ret < 0) {
+> -        error_setg(errp, "Failed to fstat file: %s",
+> -                   nfs_get_error(client->context));
+> -        goto fail;
+> -    }
+> -
+> -    ret = DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
+> -    client->st_blocks = st.st_blocks;
+> -    client->has_zero_init = S_ISREG(st.st_mode);
+> -    *strp = '/';
+> -    goto out;
+> -
+> -fail:
+> -    nfs_client_close(client);
+> -out:
+> -    g_free(file);
+> -    return ret;
+> -}
+> -
+> -static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
+> -                                                     Error **errp)
+> -{
+> -    BlockdevOptionsNfs *opts = NULL;
+> -    Visitor *v;
+> -    const QDictEntry *e;
+> -
+> -    v = qobject_input_visitor_new_flat_confused(options, errp);
+> -    if (!v) {
+> -        return NULL;
+> -    }
+> -
+> -    visit_type_BlockdevOptionsNfs(v, NULL, &opts, errp);
+> -    visit_free(v);
+> -    if (!opts) {
+> -        return NULL;
+> -    }
+> -
+> -    /* Remove the processed options from the QDict (the visitor processes
+> -     * _all_ options in the QDict) */
+> -    while ((e = qdict_first(options))) {
+> -        qdict_del(options, e->key);
+> -    }
+> -
+> -    return opts;
+> -}
+> -
+> -static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
+> -                                     int flags, int open_flags, Error **errp)
+> -{
+> -    BlockdevOptionsNfs *opts;
+> -    int ret;
+> -
+> -    opts = nfs_options_qdict_to_qapi(options, errp);
+> -    if (opts == NULL) {
+> -        ret = -EINVAL;
+> -        goto fail;
+> -    }
+> -
+> -    ret = nfs_client_open(client, opts, flags, open_flags, errp);
+> -fail:
+> -    qapi_free_BlockdevOptionsNfs(opts);
+> -    return ret;
+> -}
+> -
+> -static int nfs_file_open(BlockDriverState *bs, QDict *options, int flags,
+> -                         Error **errp) {
+> -    NFSClient *client = bs->opaque;
+> -    int64_t ret;
+> -
+> -    client->aio_context = bdrv_get_aio_context(bs);
+> -
+> -    ret = nfs_client_open_qdict(client, options,
+> -                                (flags & BDRV_O_RDWR) ? O_RDWR : O_RDONLY,
+> -                                bs->open_flags, errp);
+> -    if (ret < 0) {
+> -        return ret;
+> -    }
+> -
+> -    bs->total_sectors = ret;
+> -    if (client->has_zero_init) {
+> -        bs->supported_truncate_flags = BDRV_REQ_ZERO_WRITE;
+> -    }
+> -    return 0;
+> -}
+> -
+> -static QemuOptsList nfs_create_opts = {
+> -    .name = "nfs-create-opts",
+> -    .head = QTAILQ_HEAD_INITIALIZER(nfs_create_opts.head),
+> -    .desc = {
+> -        {
+> -            .name = BLOCK_OPT_SIZE,
+> -            .type = QEMU_OPT_SIZE,
+> -            .help = "Virtual disk size"
+> -        },
+> -        { /* end of list */ }
+> -    }
+> -};
+> -
+> -static int nfs_file_co_create(BlockdevCreateOptions *options, Error **errp)
+> -{
+> -    BlockdevCreateOptionsNfs *opts = &options->u.nfs;
+> -    NFSClient *client = g_new0(NFSClient, 1);
+> -    int ret;
+> -
+> -    assert(options->driver == BLOCKDEV_DRIVER_NFS);
+> -
+> -    client->aio_context = qemu_get_aio_context();
+> -
+> -    ret = nfs_client_open(client, opts->location, O_CREAT, 0, errp);
+> -    if (ret < 0) {
+> -        goto out;
+> -    }
+> -    ret = nfs_ftruncate(client->context, client->fh, opts->size);
+> -    nfs_client_close(client);
+> -
+> -out:
+> -    g_free(client);
+> -    return ret;
+> -}
+> -
+> -static int coroutine_fn nfs_file_co_create_opts(BlockDriver *drv,
+> -                                                const char *url,
+> -                                                QemuOpts *opts,
+> -                                                Error **errp)
+> -{
+> -    BlockdevCreateOptions *create_options;
+> -    BlockdevCreateOptionsNfs *nfs_opts;
+> -    QDict *options;
+> -    int ret;
+> -
+> -    create_options = g_new0(BlockdevCreateOptions, 1);
+> -    create_options->driver = BLOCKDEV_DRIVER_NFS;
+> -    nfs_opts = &create_options->u.nfs;
+> -
+> -    /* Read out options */
+> -    nfs_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+> -                              BDRV_SECTOR_SIZE);
+> -
+> -    options = qdict_new();
+> -    ret = nfs_parse_uri(url, options, errp);
+> -    if (ret < 0) {
+> -        goto out;
+> -    }
+> -
+> -    nfs_opts->location = nfs_options_qdict_to_qapi(options, errp);
+> -    if (nfs_opts->location == NULL) {
+> -        ret = -EINVAL;
+> -        goto out;
+> -    }
+> -
+> -    ret = nfs_file_co_create(create_options, errp);
+> -    if (ret < 0) {
+> -        goto out;
+> -    }
+> -
+> -    ret = 0;
+> -out:
+> -    qobject_unref(options);
+> -    qapi_free_BlockdevCreateOptions(create_options);
+> -    return ret;
+> -}
+> -
+> -static int nfs_has_zero_init(BlockDriverState *bs)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -    return client->has_zero_init;
+> -}
+> -
+> -/* Called (via nfs_service) with QemuMutex held.  */
+> -static void
+> -nfs_get_allocated_file_size_cb(int ret, struct nfs_context *nfs, void *data,
+> -                               void *private_data)
+> -{
+> -    NFSRPC *task = private_data;
+> -    task->ret = ret;
+> -    if (task->ret == 0) {
+> -        memcpy(task->st, data, sizeof(struct stat));
+> -    }
+> -    if (task->ret < 0) {
+> -        error_report("NFS Error: %s", nfs_get_error(nfs));
+> -    }
+> -
+> -    /* Set task->complete before reading bs->wakeup.  */
+> -    atomic_mb_set(&task->complete, 1);
+> -    bdrv_wakeup(task->bs);
+> -}
+> -
+> -static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -    NFSRPC task = {0};
+> -    struct stat st;
+> -
+> -    if (bdrv_is_read_only(bs) &&
+> -        !(bs->open_flags & BDRV_O_NOCACHE)) {
+> -        return client->st_blocks * 512;
+> -    }
+> -
+> -    task.bs = bs;
+> -    task.st = &st;
+> -    if (nfs_fstat_async(client->context, client->fh, nfs_get_allocated_file_size_cb,
+> -                        &task) != 0) {
+> -        return -ENOMEM;
+> -    }
+> -
+> -    nfs_set_events(client);
+> -    BDRV_POLL_WHILE(bs, !task.complete);
+> -
+> -    return (task.ret < 0 ? task.ret : st.st_blocks * 512);
+> -}
+> -
+> -static int coroutine_fn
+> -nfs_file_co_truncate(BlockDriverState *bs, int64_t offset, bool exact,
+> -                     PreallocMode prealloc, BdrvRequestFlags flags,
+> -                     Error **errp)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -    int ret;
+> -
+> -    if (prealloc != PREALLOC_MODE_OFF) {
+> -        error_setg(errp, "Unsupported preallocation mode '%s'",
+> -                   PreallocMode_str(prealloc));
+> -        return -ENOTSUP;
+> -    }
+> -
+> -    ret = nfs_ftruncate(client->context, client->fh, offset);
+> -    if (ret < 0) {
+> -        error_setg_errno(errp, -ret, "Failed to truncate file");
+> -        return ret;
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+> -/* Note that this will not re-establish a connection with the NFS server
+> - * - it is effectively a NOP.  */
+> -static int nfs_reopen_prepare(BDRVReopenState *state,
+> -                              BlockReopenQueue *queue, Error **errp)
+> -{
+> -    NFSClient *client = state->bs->opaque;
+> -    struct stat st;
+> -    int ret = 0;
+> -
+> -    if (state->flags & BDRV_O_RDWR && bdrv_is_read_only(state->bs)) {
+> -        error_setg(errp, "Cannot open a read-only mount as read-write");
+> -        return -EACCES;
+> -    }
+> -
+> -    if ((state->flags & BDRV_O_NOCACHE) && client->cache_used) {
+> -        error_setg(errp, "Cannot disable cache if libnfs readahead or"
+> -                         " pagecache is enabled");
+> -        return -EINVAL;
+> -    }
+> -
+> -    /* Update cache for read-only reopens */
+> -    if (!(state->flags & BDRV_O_RDWR)) {
+> -        ret = nfs_fstat(client->context, client->fh, &st);
+> -        if (ret < 0) {
+> -            error_setg(errp, "Failed to fstat file: %s",
+> -                       nfs_get_error(client->context));
+> -            return ret;
+> -        }
+> -        client->st_blocks = st.st_blocks;
+> -    }
+> -
+> -    return 0;
+> -}
+> -
+> -static void nfs_refresh_filename(BlockDriverState *bs)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -
+> -    if (client->uid && !client->gid) {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> -                 "nfs://%s%s?uid=%" PRId64, client->server->host, client->path,
+> -                 client->uid);
+> -    } else if (!client->uid && client->gid) {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> -                 "nfs://%s%s?gid=%" PRId64, client->server->host, client->path,
+> -                 client->gid);
+> -    } else if (client->uid && client->gid) {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> -                 "nfs://%s%s?uid=%" PRId64 "&gid=%" PRId64,
+> -                 client->server->host, client->path, client->uid, client->gid);
+> -    } else {
+> -        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> -                 "nfs://%s%s", client->server->host, client->path);
 > -    }
 > -}
-> -#else
-> -#define qemu_timersub timersub
-> -#endif
 > -
-> -void qemu_set_cloexec(int fd);
-> -
-> -/* Starting on QEMU 2.5, qemu_hw_version() returns "2.5+" by default
-> - * instead of QEMU_VERSION, so setting hw_version on MachineClass
-> - * is no longer mandatory.
-> - *
-> - * Do NOT change this string, or it will break compatibility on all
-> - * machine classes that don't set hw_version.
-> - */
-> -#define QEMU_HW_VERSION "2.5+"
-> -
-> -/* QEMU "hardware version" setting. Used to replace code that exposed
-> - * QEMU_VERSION to guests in the past and need to keep compatibility.
-> - * Do not use qemu_hw_version() in new code.
-> - */
-> -void qemu_set_hw_version(const char *);
-> -const char *qemu_hw_version(void);
-> -
-> -void fips_set_state(bool requested);
-> -bool fips_get_state(void);
-> -
-> -/* Return a dynamically allocated pathname denoting a file or directory that is
-> - * appropriate for storing local state.
-> - *
-> - * @relative_pathname need not start with a directory separator; one will be
-> - * added automatically.
-> - *
-> - * The caller is responsible for releasing the value returned with g_free()
-> - * after use.
-> - */
-> -char *qemu_get_local_state_pathname(const char *relative_pathname);
-> -
-> -/* Find program directory, and save it for later usage with
-> - * qemu_get_exec_dir().
-> - * Try OS specific API first, if not working, parse from argv0. */
-> -void qemu_init_exec_dir(const char *argv0);
-> -
-> -/* Get the saved exec dir.
-> - *
-> - * The caller is responsible for releasing the value returned with g_free()
-> - * after use.
-> - */
-> -char *qemu_get_exec_dir(void);
-> -
-> -/**
-> - * qemu_getauxval:
-> - * @type: the auxiliary vector key to lookup
-> - *
-> - * Search the auxiliary vector for @type, returning the value
-> - * or 0 if @type is not present.
-> - */
-> -unsigned long qemu_getauxval(unsigned long type);
-> -
-> -void qemu_set_tty_echo(int fd, bool echo);
-> -
-> -void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
-> -                     Error **errp);
-> -
-> -/**
-> - * qemu_get_pid_name:
-> - * @pid: pid of a process
-> - *
-> - * For given @pid fetch its name. Caller is responsible for
-> - * freeing the string when no longer needed.
-> - * Returns allocated string on success, NULL on failure.
-> - */
-> -char *qemu_get_pid_name(pid_t pid);
-> -
-> -/**
-> - * qemu_fork:
-> - *
-> - * A version of fork that avoids signal handler race
-> - * conditions that can lead to child process getting
-> - * signals that are otherwise only expected by the
-> - * parent. It also resets all signal handlers to the
-> - * default settings.
-> - *
-> - * Returns 0 to child process, pid number to parent
-> - * or -1 on failure.
-> - */
-> -pid_t qemu_fork(Error **errp);
-> -
-> -/* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
-> - * when intptr_t is 32-bit and we are aligning a long long.
-> - */
-> -extern uintptr_t qemu_real_host_page_size;
-> -extern intptr_t qemu_real_host_page_mask;
-> -
-> -extern int qemu_icache_linesize;
-> -extern int qemu_icache_linesize_log;
-> -extern int qemu_dcache_linesize;
-> -extern int qemu_dcache_linesize_log;
-> -
-> -/*
-> - * After using getopt or getopt_long, if you need to parse another set
-> - * of options, then you must reset optind.  Unfortunately the way to
-> - * do this varies between implementations of getopt.
-> - */
-> -static inline void qemu_reset_optind(void)
+> -static char *nfs_dirname(BlockDriverState *bs, Error **errp)
 > -{
-> -#ifdef HAVE_OPTRESET
-> -    optind = 1;
-> -    optreset = 1;
-> -#else
-> -    optind = 0;
-> -#endif
+> -    NFSClient *client = bs->opaque;
+> -
+> -    if (client->uid || client->gid) {
+> -        bdrv_refresh_filename(bs);
+> -        error_setg(errp, "Cannot generate a base directory for NFS node '%s'",
+> -                   bs->filename);
+> -        return NULL;
+> -    }
+> -
+> -    return g_strdup_printf("nfs://%s%s/", client->server->host, client->path);
 > -}
 > -
-> -/**
-> - * qemu_get_host_name:
-> - * @errp: Error object
-> - *
-> - * Operating system agnostic way of querying host name.
-> - *
-> - * Returns allocated hostname (caller should free), NULL on failure.
-> - */
-> -char *qemu_get_host_name(Error **errp);
-> -
-> -/**
-> - * qemu_get_host_physmem:
-> - *
-> - * Operating system agnostic way of querying host memory.
-> - *
-> - * Returns amount of physical memory on the system. This is purely
-> - * advisery and may return 0 if we can't work it out. At the other
-> - * end we saturate to SIZE_MAX if you are lucky enough to have that
-> - * much memory.
-> - */
-> -size_t qemu_get_host_physmem(void);
-> -
+> -#ifdef LIBNFS_FEATURE_PAGECACHE
+> -static void coroutine_fn nfs_co_invalidate_cache(BlockDriverState *bs,
+> -                                                 Error **errp)
+> -{
+> -    NFSClient *client = bs->opaque;
+> -    nfs_pagecache_invalidate(client->context, client->fh);
+> -}
 > -#endif
+> -
+> -static const char *nfs_strong_runtime_opts[] = {
+> -    "path",
+> -    "user",
+> -    "group",
+> -    "server.",
+> -
+> -    NULL
+> -};
+> -
+> -static BlockDriver bdrv_nfs = {
+> -    .format_name                    = "nfs",
+> -    .protocol_name                  = "nfs",
+> -
+> -    .instance_size                  = sizeof(NFSClient),
+> -    .bdrv_parse_filename            = nfs_parse_filename,
+> -    .create_opts                    = &nfs_create_opts,
+> -
+> -    .bdrv_has_zero_init             = nfs_has_zero_init,
+> -    .bdrv_get_allocated_file_size   = nfs_get_allocated_file_size,
+> -    .bdrv_co_truncate               = nfs_file_co_truncate,
+> -
+> -    .bdrv_file_open                 = nfs_file_open,
+> -    .bdrv_close                     = nfs_file_close,
+> -    .bdrv_co_create                 = nfs_file_co_create,
+> -    .bdrv_co_create_opts            = nfs_file_co_create_opts,
+> -    .bdrv_reopen_prepare            = nfs_reopen_prepare,
+> -
+> -    .bdrv_co_preadv                 = nfs_co_preadv,
+> -    .bdrv_co_pwritev                = nfs_co_pwritev,
+> -    .bdrv_co_flush_to_disk          = nfs_co_flush,
+> -
+> -    .bdrv_detach_aio_context        = nfs_detach_aio_context,
+> -    .bdrv_attach_aio_context        = nfs_attach_aio_context,
+> -    .bdrv_refresh_filename          = nfs_refresh_filename,
+> -    .bdrv_dirname                   = nfs_dirname,
+> -
+> -    .strong_runtime_opts            = nfs_strong_runtime_opts,
+> -
+> -#ifdef LIBNFS_FEATURE_PAGECACHE
+> -    .bdrv_co_invalidate_cache       = nfs_co_invalidate_cache,
+> -#endif
+> -};
+> -
+> -static void nfs_block_init(void)
+> -{
+> -    bdrv_register(&bdrv_nfs);
+> -}
+> -
+> -block_init(nfs_block_init);
 > +/*
-> + * OS includes and handling of OS dependencies
+> + * QEMU Block driver for native access to files on NFS shares
 > + *
-> + * This header exists to pull in some common system headers that
-> + * most code in QEMU will want, and to fix up some possible issues with
-> + * it (missing defines, Windows weirdness, and so on).
+> + * Copyright (c) 2014-2017 Peter Lieven <pl@kamp.de>
 > + *
-> + * To avoid getting into possible circular include dependencies, this
-> + * file should not include any other QEMU headers, with the exceptions
-> + * of config-host.h, config-target.h, qemu/compiler.h,
-> + * sysemu/os-posix.h, sysemu/os-win32.h, glib-compat.h and
-> + * qemu/typedefs.h, all of which are doing a similar job to this file
-> + * and are under similar constraints.
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
 > + *
-> + * This header also contains prototypes for functions defined in
-> + * os-*.c and util/oslib-*.c; those would probably be better split
-> + * out into separate header files.
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
 > + *
-> + * In an ideal world this header would contain only:
-> + *  (1) things which everybody needs
-> + *  (2) things without which code would work on most platforms but
-> + *      fail to compile or misbehave on a minority of host OSes
-> + *
-> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> + * See the COPYING file in the top-level directory.
-> + */
-> +#ifndef QEMU_OSDEP_H
-> +#define QEMU_OSDEP_H
-> +
-> +#include "config-host.h"
-> +#ifdef NEED_CPU_H
-> +#include CONFIG_TARGET
-> +#else
-> +#include "exec/poison.h"
-> +#endif
-> +
-> +#include "qemu/compiler.h"
-> +
-> +/* Older versions of C++ don't get definitions of various macros from
-> + * stdlib.h unless we define these macros before first inclusion of
-> + * that system header.
-> + */
-> +#ifndef __STDC_CONSTANT_MACROS
-> +#define __STDC_CONSTANT_MACROS
-> +#endif
-> +#ifndef __STDC_LIMIT_MACROS
-> +#define __STDC_LIMIT_MACROS
-> +#endif
-> +#ifndef __STDC_FORMAT_MACROS
-> +#define __STDC_FORMAT_MACROS
-> +#endif
-> +
-> +/* The following block of code temporarily renames the daemon() function so the
-> + * compiler does not see the warning associated with it in stdlib.h on OSX
-> + */
-> +#ifdef __APPLE__
-> +#define daemon qemu_fake_daemon_function
-> +#include <stdlib.h>
-> +#undef daemon
-> +extern int daemon(int, int);
-> +#endif
-> +
-> +#ifdef _WIN32
-> +/* as defined in sdkddkver.h */
-> +#ifndef _WIN32_WINNT
-> +#define _WIN32_WINNT 0x0600 /* Vista */
-> +#endif
-> +/* reduces the number of implicitly included headers */
-> +#ifndef WIN32_LEAN_AND_MEAN
-> +#define WIN32_LEAN_AND_MEAN
-> +#endif
-> +#endif
-> +
-> +/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
-> +#ifdef __MINGW32__
-> +#define __USE_MINGW_ANSI_STDIO 1
-> +#endif
-> +
-> +#include <stdarg.h>
-> +#include <stddef.h>
-> +#include <stdbool.h>
-> +#include <stdint.h>
-> +#include <sys/types.h>
-> +#include <stdlib.h>
-> +#include <stdio.h>
-> +
-> +#include <string.h>
-> +#include <strings.h>
-> +#include <inttypes.h>
-> +#include <limits.h>
-> +/* Put unistd.h before time.h as that triggers localtime_r/gmtime_r
-> + * function availability on recentish Mingw-w64 platforms. */
-> +#include <unistd.h>
-> +#include <time.h>
-> +#include <ctype.h>
-> +#include <errno.h>
-> +#include <fcntl.h>
-> +#include <getopt.h>
-> +#include <sys/stat.h>
-> +#include <sys/time.h>
-> +#include <assert.h>
-> +/* setjmp must be declared before sysemu/os-win32.h
-> + * because it is redefined there. */
-> +#include <setjmp.h>
-> +#include <signal.h>
-> +
-> +#ifdef HAVE_SYS_SIGNAL_H
-> +#include <sys/signal.h>
-> +#endif
-> +
-> +#ifndef _WIN32
-> +#include <sys/wait.h>
-> +#else
-> +#define WIFEXITED(x)   1
-> +#define WEXITSTATUS(x) (x)
-> +#endif
-> +
-> +#ifdef _WIN32
-> +#include "sysemu/os-win32.h"
-> +#endif
-> +
-> +#ifdef CONFIG_POSIX
-> +#include "sysemu/os-posix.h"
-> +#endif
-> +
-> +#include "glib-compat.h"
-> +#include "qemu/typedefs.h"
-> +
-> +/*
-> + * For mingw, as of v6.0.0, the function implementing the assert macro is
-> + * not marked as noreturn, so the compiler cannot delete code following an
-> + * assert(false) as unused.  We rely on this within the code base to delete
-> + * code that is unreachable when features are disabled.
-> + * All supported versions of Glib's g_assert() satisfy this requirement.
-> + */
-> +#ifdef __MINGW32__
-> +#undef assert
-> +#define assert(x)  g_assert(x)
-> +#endif
-> +
-> +/*
-> + * According to waitpid man page:
-> + * WCOREDUMP
-> + *  This  macro  is  not  specified  in POSIX.1-2001 and is not
-> + *  available on some UNIX implementations (e.g., AIX, SunOS).
-> + *  Therefore, enclose its use inside #ifdef WCOREDUMP ... #endif.
-> + */
-> +#ifndef WCOREDUMP
-> +#define WCOREDUMP(status) 0
-> +#endif
-> +/*
-> + * We have a lot of unaudited code that may fail in strange ways, or
-> + * even be a security risk during migration, if you disable assertions
-> + * at compile-time.  You may comment out these safety checks if you
-> + * absolutely want to disable assertion overhead, but it is not
-> + * supported upstream so the risk is all yours.  Meanwhile, please
-> + * submit patches to remove any side-effects inside an assertion, or
-> + * fixing error handling that should use Error instead of assert.
-> + */
-> +#ifdef NDEBUG
-> +#error building with NDEBUG is not supported
-> +#endif
-> +#ifdef G_DISABLE_ASSERT
-> +#error building with G_DISABLE_ASSERT is not supported
-> +#endif
-> +
-> +#ifndef O_LARGEFILE
-> +#define O_LARGEFILE 0
-> +#endif
-> +#ifndef O_BINARY
-> +#define O_BINARY 0
-> +#endif
-> +#ifndef MAP_ANONYMOUS
-> +#define MAP_ANONYMOUS MAP_ANON
-> +#endif
-> +#ifndef MAP_FIXED_NOREPLACE
-> +#define MAP_FIXED_NOREPLACE 0
-> +#endif
-> +#ifndef ENOMEDIUM
-> +#define ENOMEDIUM ENODEV
-> +#endif
-> +#if !defined(ENOTSUP)
-> +#define ENOTSUP 4096
-> +#endif
-> +#if !defined(ECANCELED)
-> +#define ECANCELED 4097
-> +#endif
-> +#if !defined(EMEDIUMTYPE)
-> +#define EMEDIUMTYPE 4098
-> +#endif
-> +#if !defined(ESHUTDOWN)
-> +#define ESHUTDOWN 4099
-> +#endif
-> +
-> +/* time_t may be either 32 or 64 bits depending on the host OS, and
-> + * can be either signed or unsigned, so we can't just hardcode a
-> + * specific maximum value. This is not a C preprocessor constant,
-> + * so you can't use TIME_MAX in an #ifdef, but for our purposes
-> + * this isn't a problem.
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
 > + */
 > +
-> +/* The macros TYPE_SIGNED, TYPE_WIDTH, and TYPE_MAXIMUM are from
-> + * Gnulib, and are under the LGPL v2.1 or (at your option) any
-> + * later version.
-> + */
+> +#include "qemu/osdep.h"
 > +
-> +/* True if the real type T is signed.  */
-> +#define TYPE_SIGNED(t) (!((t)0 < (t)-1))
-> +
-> +/* The width in bits of the integer type or expression T.
-> + * Padding bits are not supported.
-> + */
-> +#define TYPE_WIDTH(t) (sizeof(t) * CHAR_BIT)
-> +
-> +/* The maximum and minimum values for the integer type T.  */
-> +#define TYPE_MAXIMUM(t)                                                \
-> +  ((t) (!TYPE_SIGNED(t)                                                \
-> +        ? (t)-1                                                        \
-> +        : ((((t)1 << (TYPE_WIDTH(t) - 2)) - 1) * 2 + 1)))
-> +
-> +#ifndef TIME_MAX
-> +#define TIME_MAX TYPE_MAXIMUM(time_t)
+> +#if !defined(_WIN32)
+> +#include <poll.h>
 > +#endif
+> +#include "qemu/config-file.h"
+> +#include "qemu/error-report.h"
+> +#include "qapi/error.h"
+> +#include "block/block_int.h"
+> +#include "block/qdict.h"
+> +#include "trace.h"
+> +#include "qemu/iov.h"
+> +#include "qemu/main-loop.h"
+> +#include "qemu/module.h"
+> +#include "qemu/option.h"
+> +#include "qemu/uri.h"
+> +#include "qemu/cutils.h"
+> +#include "sysemu/sysemu.h"
+> +#include "sysemu/replay.h"
+> +#include "qapi/qapi-visit-block-core.h"
+> +#include "qapi/qmp/qdict.h"
+> +#include "qapi/qmp/qstring.h"
+> +#include "qapi/qobject-input-visitor.h"
+> +#include "qapi/qobject-output-visitor.h"
+> +#include <nfsc/libnfs.h>
 > +
-> +/* HOST_LONG_BITS is the size of a native pointer in bits. */
-> +#if UINTPTR_MAX == UINT32_MAX
-> +# define HOST_LONG_BITS 32
-> +#elif UINTPTR_MAX == UINT64_MAX
-> +# define HOST_LONG_BITS 64
+> +
+> +#define QEMU_NFS_MAX_READAHEAD_SIZE 1048576
+> +#define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
+> +#define QEMU_NFS_MAX_DEBUG_LEVEL 2
+> +
+> +#if defined (_WIN32)
+> +#define nfs_stat __stat64
 > +#else
-> +# error Unknown pointer size
+> +#define nfs_stat stat
 > +#endif
 > +
-> +/* Mac OSX has a <stdint.h> bug that incorrectly defines SIZE_MAX with
-> + * the wrong type. Our replacement isn't usable in preprocessor
-> + * expressions, but it is sufficient for our needs. */
-> +#if defined(HAVE_BROKEN_SIZE_MAX) && HAVE_BROKEN_SIZE_MAX
-> +#undef SIZE_MAX
-> +#define SIZE_MAX ((size_t)-1)
-> +#endif
+> +typedef struct NFSClient {
+> +    struct nfs_context *context;
+> +    struct nfsfh *fh;
+> +    int events;
+> +    bool has_zero_init;
+> +    AioContext *aio_context;
+> +    QemuMutex mutex;
+> +    int64_t st_size;
+> +    bool cache_used;
+> +    NFSServer *server;
+> +    char *path;
+> +    int64_t uid, gid, tcp_syncnt, readahead, pagecache, debug;
+> +} NFSClient;
 > +
-> +/*
-> + * Two variations of MIN/MAX macros. The first is for runtime use, and
-> + * evaluates arguments only once (so it is safe even with side
-> + * effects), but will not work in constant contexts (such as array
-> + * size declarations) because of the '{}'.  The second is for constant
-> + * expression use, where evaluating arguments twice is safe because
-> + * the result is going to be constant anyway, but will not work in a
-> + * runtime context because of a void expression where a value is
-> + * expected.  Thus, both gcc and clang will fail to compile if you use
-> + * the wrong macro (even if the error may seem a bit cryptic).
-> + *
-> + * Note that neither form is usable as an #if condition; if you truly
-> + * need to write conditional code that depends on a minimum or maximum
-> + * determined by the pre-processor instead of the compiler, you'll
-> + * have to open-code it.  Sadly, Coverity is severely confused by the
-> + * constant variants, so we have to dumb things down there.
-> + */
-> +#undef MIN
-> +#define MIN(a, b)                                       \
-> +    ({                                                  \
-> +        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-> +        _a < _b ? _a : _b;                              \
-> +    })
-> +#undef MAX
-> +#define MAX(a, b)                                       \
-> +    ({                                                  \
-> +        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-> +        _a > _b ? _a : _b;                              \
-> +    })
+> +typedef struct NFSRPC {
+> +    BlockDriverState *bs;
+> +    int ret;
+> +    int complete;
+> +    QEMUIOVector *iov;
+> +    struct nfs_stat *st;
+> +    Coroutine *co;
+> +    NFSClient *client;
+> +} NFSRPC;
 > +
-> +#ifdef __COVERITY__
-> +# define MIN_CONST(a, b) ((a) < (b) ? (a) : (b))
-> +# define MAX_CONST(a, b) ((a) > (b) ? (a) : (b))
-> +#else
-> +# define MIN_CONST(a, b)                                        \
-> +    __builtin_choose_expr(                                      \
-> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-> +        (a) < (b) ? (a) : (b),                                  \
-> +        ((void)0))
-> +# define MAX_CONST(a, b)                                        \
-> +    __builtin_choose_expr(                                      \
-> +        __builtin_constant_p(a) && __builtin_constant_p(b),     \
-> +        (a) > (b) ? (a) : (b),                                  \
-> +        ((void)0))
-> +#endif
-> +
-> +/*
-> + * Minimum function that returns zero only if both values are zero.
-> + * Intended for use with unsigned values only.
-> + */
-> +#ifndef MIN_NON_ZERO
-> +#define MIN_NON_ZERO(a, b)                              \
-> +    ({                                                  \
-> +        typeof(1 ? (a) : (b)) _a = (a), _b = (b);       \
-> +        _a == 0 ? _b : (_b == 0 || _b > _a) ? _a : _b;  \
-> +    })
-> +#endif
-> +
-> +/* Round number down to multiple */
-> +#define QEMU_ALIGN_DOWN(n, m) ((n) / (m) * (m))
-> +
-> +/* Round number up to multiple. Safe when m is not a power of 2 (see
-> + * ROUND_UP for a faster version when a power of 2 is guaranteed) */
-> +#define QEMU_ALIGN_UP(n, m) QEMU_ALIGN_DOWN((n) + (m) - 1, (m))
-> +
-> +/* Check if n is a multiple of m */
-> +#define QEMU_IS_ALIGNED(n, m) (((n) % (m)) == 0)
-> +
-> +/* n-byte align pointer down */
-> +#define QEMU_ALIGN_PTR_DOWN(p, n) \
-> +    ((typeof(p))QEMU_ALIGN_DOWN((uintptr_t)(p), (n)))
-> +
-> +/* n-byte align pointer up */
-> +#define QEMU_ALIGN_PTR_UP(p, n) \
-> +    ((typeof(p))QEMU_ALIGN_UP((uintptr_t)(p), (n)))
-> +
-> +/* Check if pointer p is n-bytes aligned */
-> +#define QEMU_PTR_IS_ALIGNED(p, n) QEMU_IS_ALIGNED((uintptr_t)(p), (n))
-> +
-> +/* Round number up to multiple. Requires that d be a power of 2 (see
-> + * QEMU_ALIGN_UP for a safer but slower version on arbitrary
-> + * numbers); works even if d is a smaller type than n.  */
-> +#ifndef ROUND_UP
-> +#define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
-> +#endif
-> +
-> +#ifndef DIV_ROUND_UP
-> +#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
-> +#endif
-> +
-> +/*
-> + * &(x)[0] is always a pointer - if it's same type as x then the argument is a
-> + * pointer, not an array.
-> + */
-> +#define QEMU_IS_ARRAY(x) (!__builtin_types_compatible_p(typeof(x), \
-> +                                                        typeof(&(x)[0])))
-> +#ifndef ARRAY_SIZE
-> +#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + \
-> +                       QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(x)))
-> +#endif
-> +
-> +int qemu_daemon(int nochdir, int noclose);
-> +void *qemu_try_memalign(size_t alignment, size_t size);
-> +void *qemu_memalign(size_t alignment, size_t size);
-> +void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared);
-> +void qemu_vfree(void *ptr);
-> +void qemu_anon_ram_free(void *ptr, size_t size);
-> +
-> +#define QEMU_MADV_INVALID -1
-> +
-> +#if defined(CONFIG_MADVISE)
-> +
-> +#define QEMU_MADV_WILLNEED  MADV_WILLNEED
-> +#define QEMU_MADV_DONTNEED  MADV_DONTNEED
-> +#ifdef MADV_DONTFORK
-> +#define QEMU_MADV_DONTFORK  MADV_DONTFORK
-> +#else
-> +#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
-> +#endif
-> +#ifdef MADV_MERGEABLE
-> +#define QEMU_MADV_MERGEABLE MADV_MERGEABLE
-> +#else
-> +#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
-> +#endif
-> +#ifdef MADV_UNMERGEABLE
-> +#define QEMU_MADV_UNMERGEABLE MADV_UNMERGEABLE
-> +#else
-> +#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
-> +#endif
-> +#ifdef MADV_DODUMP
-> +#define QEMU_MADV_DODUMP MADV_DODUMP
-> +#else
-> +#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
-> +#endif
-> +#ifdef MADV_DONTDUMP
-> +#define QEMU_MADV_DONTDUMP MADV_DONTDUMP
-> +#else
-> +#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
-> +#endif
-> +#ifdef MADV_HUGEPAGE
-> +#define QEMU_MADV_HUGEPAGE MADV_HUGEPAGE
-> +#else
-> +#define QEMU_MADV_HUGEPAGE QEMU_MADV_INVALID
-> +#endif
-> +#ifdef MADV_NOHUGEPAGE
-> +#define QEMU_MADV_NOHUGEPAGE MADV_NOHUGEPAGE
-> +#else
-> +#define QEMU_MADV_NOHUGEPAGE QEMU_MADV_INVALID
-> +#endif
-> +#ifdef MADV_REMOVE
-> +#define QEMU_MADV_REMOVE MADV_REMOVE
-> +#else
-> +#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
-> +#endif
-> +
-> +#elif defined(CONFIG_POSIX_MADVISE)
-> +
-> +#define QEMU_MADV_WILLNEED  POSIX_MADV_WILLNEED
-> +#define QEMU_MADV_DONTNEED  POSIX_MADV_DONTNEED
-> +#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
-> +#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
-> +#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
-> +#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
-> +#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
-> +#define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
-> +#define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
-> +#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
-> +
-> +#else /* no-op */
-> +
-> +#define QEMU_MADV_WILLNEED  QEMU_MADV_INVALID
-> +#define QEMU_MADV_DONTNEED  QEMU_MADV_INVALID
-> +#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
-> +#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
-> +#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
-> +#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
-> +#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
-> +#define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
-> +#define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
-> +#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
-> +
-> +#endif
-> +
-> +#ifdef _WIN32
-> +#define HAVE_CHARDEV_SERIAL 1
-> +#elif defined(__linux__) || defined(__sun__) || defined(__FreeBSD__)    \
-> +    || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__) \
-> +    || defined(__GLIBC__) || defined(__APPLE__)
-> +#define HAVE_CHARDEV_SERIAL 1
-> +#endif
-> +
-> +#if defined(__linux__) || defined(__FreeBSD__) ||               \
-> +    defined(__FreeBSD_kernel__) || defined(__DragonFly__)
-> +#define HAVE_CHARDEV_PARPORT 1
-> +#endif
-> +
-> +#if defined(__HAIKU__)
-> +#define SIGIO SIGPOLL
-> +#endif
-> +
-> +#if defined(CONFIG_LINUX)
-> +#ifndef BUS_MCEERR_AR
-> +#define BUS_MCEERR_AR 4
-> +#endif
-> +#ifndef BUS_MCEERR_AO
-> +#define BUS_MCEERR_AO 5
-> +#endif
-> +#endif
-> +
-> +#if defined(__linux__) && \
-> +    (defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) \
-> +     || defined(__powerpc64__))
-> +   /* Use 2 MiB alignment so transparent hugepages can be used by KVM.
-> +      Valgrind does not support alignments larger than 1 MiB,
-> +      therefore we need special code which handles running on Valgrind. */
-> +#  define QEMU_VMALLOC_ALIGN (512 * 4096)
-> +#elif defined(__linux__) && defined(__s390x__)
-> +   /* Use 1 MiB (segment size) alignment so gmap can be used by KVM. */
-> +#  define QEMU_VMALLOC_ALIGN (256 * 4096)
-> +#elif defined(__linux__) && defined(__sparc__)
-> +#include <sys/shm.h>
-> +#  define QEMU_VMALLOC_ALIGN MAX(qemu_real_host_page_size, SHMLBA)
-> +#else
-> +#  define QEMU_VMALLOC_ALIGN qemu_real_host_page_size
-> +#endif
-> +
-> +#ifdef CONFIG_POSIX
-> +struct qemu_signalfd_siginfo {
-> +    uint32_t ssi_signo;   /* Signal number */
-> +    int32_t  ssi_errno;   /* Error number (unused) */
-> +    int32_t  ssi_code;    /* Signal code */
-> +    uint32_t ssi_pid;     /* PID of sender */
-> +    uint32_t ssi_uid;     /* Real UID of sender */
-> +    int32_t  ssi_fd;      /* File descriptor (SIGIO) */
-> +    uint32_t ssi_tid;     /* Kernel timer ID (POSIX timers) */
-> +    uint32_t ssi_band;    /* Band event (SIGIO) */
-> +    uint32_t ssi_overrun; /* POSIX timer overrun count */
-> +    uint32_t ssi_trapno;  /* Trap number that caused signal */
-> +    int32_t  ssi_status;  /* Exit status or signal (SIGCHLD) */
-> +    int32_t  ssi_int;     /* Integer sent by sigqueue(2) */
-> +    uint64_t ssi_ptr;     /* Pointer sent by sigqueue(2) */
-> +    uint64_t ssi_utime;   /* User CPU time consumed (SIGCHLD) */
-> +    uint64_t ssi_stime;   /* System CPU time consumed (SIGCHLD) */
-> +    uint64_t ssi_addr;    /* Address that generated signal
-> +                             (for hardware-generated signals) */
-> +    uint8_t  pad[48];     /* Pad size to 128 bytes (allow for
-> +                             additional fields in the future) */
-> +};
-> +
-> +int qemu_signalfd(const sigset_t *mask);
-> +void sigaction_invoke(struct sigaction *action,
-> +                      struct qemu_signalfd_siginfo *info);
-> +#endif
-> +
-> +int qemu_madvise(void *addr, size_t len, int advice);
-> +int qemu_mprotect_rwx(void *addr, size_t size);
-> +int qemu_mprotect_none(void *addr, size_t size);
-> +
-> +int qemu_open(const char *name, int flags, ...);
-> +int qemu_close(int fd);
-> +int qemu_unlink(const char *name);
-> +#ifndef _WIN32
-> +int qemu_dup(int fd);
-> +int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
-> +int qemu_unlock_fd(int fd, int64_t start, int64_t len);
-> +int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
-> +bool qemu_has_ofd_lock(void);
-> +#endif
-> +
-> +#if defined(__HAIKU__) && defined(__i386__)
-> +#define FMT_pid "%ld"
-> +#elif defined(WIN64)
-> +#define FMT_pid "%" PRId64
-> +#else
-> +#define FMT_pid "%d"
-> +#endif
-> +
-> +bool qemu_write_pidfile(const char *pidfile, Error **errp);
-> +
-> +int qemu_get_thread_id(void);
-> +
-> +#ifndef CONFIG_IOVEC
-> +struct iovec {
-> +    void *iov_base;
-> +    size_t iov_len;
-> +};
-> +/*
-> + * Use the same value as Linux for now.
-> + */
-> +#define IOV_MAX 1024
-> +
-> +ssize_t readv(int fd, const struct iovec *iov, int iov_cnt);
-> +ssize_t writev(int fd, const struct iovec *iov, int iov_cnt);
-> +#else
-> +#include <sys/uio.h>
-> +#endif
-> +
-> +#ifdef _WIN32
-> +static inline void qemu_timersub(const struct timeval *val1,
-> +                                 const struct timeval *val2,
-> +                                 struct timeval *res)
+> +static int nfs_parse_uri(const char *filename, QDict *options, Error **errp)
 > +{
-> +    res->tv_sec = val1->tv_sec - val2->tv_sec;
-> +    if (val1->tv_usec < val2->tv_usec) {
-> +        res->tv_sec--;
-> +        res->tv_usec = val1->tv_usec - val2->tv_usec + 1000 * 1000;
+> +    URI *uri = NULL;
+> +    QueryParams *qp = NULL;
+> +    int ret = -EINVAL, i;
+> +
+> +    uri = uri_parse(filename);
+> +    if (!uri) {
+> +        error_setg(errp, "Invalid URI specified");
+> +        goto out;
+> +    }
+> +    if (g_strcmp0(uri->scheme, "nfs") != 0) {
+> +        error_setg(errp, "URI scheme must be 'nfs'");
+> +        goto out;
+> +    }
+> +
+> +    if (!uri->server) {
+> +        error_setg(errp, "missing hostname in URI");
+> +        goto out;
+> +    }
+> +
+> +    if (!uri->path) {
+> +        error_setg(errp, "missing file path in URI");
+> +        goto out;
+> +    }
+> +
+> +    qp = query_params_parse(uri->query);
+> +    if (!qp) {
+> +        error_setg(errp, "could not parse query parameters");
+> +        goto out;
+> +    }
+> +
+> +    qdict_put_str(options, "server.host", uri->server);
+> +    qdict_put_str(options, "server.type", "inet");
+> +    qdict_put_str(options, "path", uri->path);
+> +
+> +    for (i = 0; i < qp->n; i++) {
+> +        unsigned long long val;
+> +        if (!qp->p[i].value) {
+> +            error_setg(errp, "Value for NFS parameter expected: %s",
+> +                       qp->p[i].name);
+> +            goto out;
+> +        }
+> +        if (parse_uint_full(qp->p[i].value, &val, 0)) {
+> +            error_setg(errp, "Illegal value for NFS parameter: %s",
+> +                       qp->p[i].name);
+> +            goto out;
+> +        }
+> +        if (!strcmp(qp->p[i].name, "uid")) {
+> +            qdict_put_str(options, "user", qp->p[i].value);
+> +        } else if (!strcmp(qp->p[i].name, "gid")) {
+> +            qdict_put_str(options, "group", qp->p[i].value);
+> +        } else if (!strcmp(qp->p[i].name, "tcp-syncnt")) {
+> +            qdict_put_str(options, "tcp-syn-count", qp->p[i].value);
+> +        } else if (!strcmp(qp->p[i].name, "readahead")) {
+> +            qdict_put_str(options, "readahead-size", qp->p[i].value);
+> +        } else if (!strcmp(qp->p[i].name, "pagecache")) {
+> +            qdict_put_str(options, "page-cache-size", qp->p[i].value);
+> +        } else if (!strcmp(qp->p[i].name, "debug")) {
+> +            qdict_put_str(options, "debug", qp->p[i].value);
+> +        } else {
+> +            error_setg(errp, "Unknown NFS parameter name: %s",
+> +                       qp->p[i].name);
+> +            goto out;
+> +        }
+> +    }
+> +    ret = 0;
+> +out:
+> +    if (qp) {
+> +        query_params_free(qp);
+> +    }
+> +    if (uri) {
+> +        uri_free(uri);
+> +    }
+> +    return ret;
+> +}
+> +
+> +static bool nfs_has_filename_options_conflict(QDict *options, Error **errp)
+> +{
+> +    const QDictEntry *qe;
+> +
+> +    for (qe = qdict_first(options); qe; qe = qdict_next(options, qe)) {
+> +        if (!strcmp(qe->key, "host") ||
+> +            !strcmp(qe->key, "path") ||
+> +            !strcmp(qe->key, "user") ||
+> +            !strcmp(qe->key, "group") ||
+> +            !strcmp(qe->key, "tcp-syn-count") ||
+> +            !strcmp(qe->key, "readahead-size") ||
+> +            !strcmp(qe->key, "page-cache-size") ||
+> +            !strcmp(qe->key, "debug") ||
+> +            strstart(qe->key, "server.", NULL))
+> +        {
+> +            error_setg(errp, "Option %s cannot be used with a filename",
+> +                       qe->key);
+> +            return true;
+> +        }
+> +    }
+> +
+> +    return false;
+> +}
+> +
+> +static void nfs_parse_filename(const char *filename, QDict *options,
+> +                               Error **errp)
+> +{
+> +    if (nfs_has_filename_options_conflict(options, errp)) {
+> +        return;
+> +    }
+> +
+> +    nfs_parse_uri(filename, options, errp);
+> +}
+> +
+> +static void nfs_process_read(void *arg);
+> +static void nfs_process_write(void *arg);
+> +
+> +/* Called with QemuMutex held.  */
+> +static void nfs_set_events(NFSClient *client)
+> +{
+> +    int ev = nfs_which_events(client->context);
+> +    if (ev != client->events) {
+> +        aio_set_fd_handler(client->aio_context, nfs_get_fd(client->context),
+> +                           false,
+> +                           (ev & POLLIN) ? nfs_process_read : NULL,
+> +                           (ev & POLLOUT) ? nfs_process_write : NULL,
+> +                           NULL, client);
+> +
+> +    }
+> +    client->events = ev;
+> +}
+> +
+> +static void nfs_process_read(void *arg)
+> +{
+> +    NFSClient *client = arg;
+> +
+> +    qemu_mutex_lock(&client->mutex);
+> +    nfs_service(client->context, POLLIN);
+> +    nfs_set_events(client);
+> +    qemu_mutex_unlock(&client->mutex);
+> +}
+> +
+> +static void nfs_process_write(void *arg)
+> +{
+> +    NFSClient *client = arg;
+> +
+> +    qemu_mutex_lock(&client->mutex);
+> +    nfs_service(client->context, POLLOUT);
+> +    nfs_set_events(client);
+> +    qemu_mutex_unlock(&client->mutex);
+> +}
+> +
+> +static void nfs_co_init_task(BlockDriverState *bs, NFSRPC *task)
+> +{
+> +    *task = (NFSRPC) {
+> +        .co             = qemu_coroutine_self(),
+> +        .bs             = bs,
+> +        .client         = bs->opaque,
+> +    };
+> +}
+> +
+> +static void nfs_co_generic_bh_cb(void *opaque)
+> +{
+> +    NFSRPC *task = opaque;
+> +
+> +    task->complete = 1;
+> +    aio_co_wake(task->co);
+> +}
+> +
+> +/* Called (via nfs_service) with QemuMutex held.  */
+> +static void
+> +nfs_co_generic_cb(int ret, struct nfs_context *nfs, void *data,
+> +                  void *private_data)
+> +{
+> +    NFSRPC *task = private_data;
+> +    task->ret = ret;
+> +    assert(!task->st);
+> +    if (task->ret > 0 && task->iov) {
+> +        if (task->ret <= task->iov->size) {
+> +            qemu_iovec_from_buf(task->iov, 0, data, task->ret);
+> +        } else {
+> +            task->ret = -EIO;
+> +        }
+> +    }
+> +    if (task->ret < 0) {
+> +        error_report("NFS Error: %s", nfs_get_error(nfs));
+> +    }
+> +    replay_bh_schedule_oneshot_event(task->client->aio_context,
+> +                                     nfs_co_generic_bh_cb, task);
+> +}
+> +
+> +static int coroutine_fn nfs_co_preadv(BlockDriverState *bs, uint64_t offset,
+> +                                      uint64_t bytes, QEMUIOVector *iov,
+> +                                      int flags)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +    NFSRPC task;
+> +
+> +    nfs_co_init_task(bs, &task);
+> +    task.iov = iov;
+> +
+> +    WITH_QEMU_LOCK_GUARD(&client->mutex) {
+> +        if (nfs_pread_async(client->context, client->fh,
+> +                            offset, bytes, nfs_co_generic_cb, &task) != 0) {
+> +            return -ENOMEM;
+> +        }
+> +
+> +        nfs_set_events(client);
+> +    }
+> +    while (!task.complete) {
+> +        qemu_coroutine_yield();
+> +    }
+> +
+> +    if (task.ret < 0) {
+> +        return task.ret;
+> +    }
+> +
+> +    /* zero pad short reads */
+> +    if (task.ret < iov->size) {
+> +        qemu_iovec_memset(iov, task.ret, 0, iov->size - task.ret);
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int coroutine_fn nfs_co_pwritev(BlockDriverState *bs, uint64_t offset,
+> +                                       uint64_t bytes, QEMUIOVector *iov,
+> +                                       int flags)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +    NFSRPC task;
+> +    char *buf = NULL;
+> +    bool my_buffer = false;
+> +
+> +    nfs_co_init_task(bs, &task);
+> +
+> +    if (iov->niov != 1) {
+> +        buf = g_try_malloc(bytes);
+> +        if (bytes && buf == NULL) {
+> +            return -ENOMEM;
+> +        }
+> +        qemu_iovec_to_buf(iov, 0, buf, bytes);
+> +        my_buffer = true;
 > +    } else {
-> +        res->tv_usec = val1->tv_usec - val2->tv_usec;
+> +        buf = iov->iov[0].iov_base;
+> +    }
+> +
+> +    WITH_QEMU_LOCK_GUARD(&client->mutex) {
+> +        if (nfs_pwrite_async(client->context, client->fh,
+> +                             offset, bytes, buf,
+> +                             nfs_co_generic_cb, &task) != 0) {
+> +            if (my_buffer) {
+> +                g_free(buf);
+> +            }
+> +            return -ENOMEM;
+> +        }
+> +
+> +        nfs_set_events(client);
+> +    }
+> +    while (!task.complete) {
+> +        qemu_coroutine_yield();
+> +    }
+> +
+> +    if (my_buffer) {
+> +        g_free(buf);
+> +    }
+> +
+> +    if (task.ret != bytes) {
+> +        return task.ret < 0 ? task.ret : -EIO;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static int coroutine_fn nfs_co_flush(BlockDriverState *bs)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +    NFSRPC task;
+> +
+> +    nfs_co_init_task(bs, &task);
+> +
+> +    WITH_QEMU_LOCK_GUARD(&client->mutex) {
+> +        if (nfs_fsync_async(client->context, client->fh, nfs_co_generic_cb,
+> +                            &task) != 0) {
+> +            return -ENOMEM;
+> +        }
+> +
+> +        nfs_set_events(client);
+> +    }
+> +    while (!task.complete) {
+> +        qemu_coroutine_yield();
+> +    }
+> +
+> +    return task.ret;
+> +}
+> +
+> +static void nfs_detach_aio_context(BlockDriverState *bs)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +
+> +    aio_set_fd_handler(client->aio_context, nfs_get_fd(client->context),
+> +                       false, NULL, NULL, NULL, NULL);
+> +    client->events = 0;
+> +}
+> +
+> +static void nfs_attach_aio_context(BlockDriverState *bs,
+> +                                   AioContext *new_context)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +
+> +    client->aio_context = new_context;
+> +    nfs_set_events(client);
+> +}
+> +
+> +static void nfs_client_close(NFSClient *client)
+> +{
+> +    if (client->context) {
+> +        qemu_mutex_lock(&client->mutex);
+> +        aio_set_fd_handler(client->aio_context, nfs_get_fd(client->context),
+> +                           false, NULL, NULL, NULL, NULL);
+> +        qemu_mutex_unlock(&client->mutex);
+> +        if (client->fh) {
+> +            nfs_close(client->context, client->fh);
+> +            client->fh = NULL;
+> +        }
+> +#ifdef LIBNFS_FEATURE_UMOUNT
+> +        nfs_umount(client->context);
+> +#endif
+> +        nfs_destroy_context(client->context);
+> +        client->context = NULL;
+> +    }
+> +    g_free(client->path);
+> +    qemu_mutex_destroy(&client->mutex);
+> +    qapi_free_NFSServer(client->server);
+> +    client->server = NULL;
+> +}
+> +
+> +static void nfs_file_close(BlockDriverState *bs)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +    nfs_client_close(client);
+> +}
+> +
+> +static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
+> +                               int flags, int open_flags, Error **errp)
+> +{
+> +    int64_t ret = -EINVAL;
+> +    struct nfs_stat st;
+> +    char *file = NULL, *strp = NULL;
+> +
+> +    qemu_mutex_init(&client->mutex);
+> +
+> +    client->path = g_strdup(opts->path);
+> +
+> +    strp = strrchr(client->path, '/');
+> +    if (strp == NULL) {
+> +        error_setg(errp, "Invalid URL specified");
+> +        goto fail;
+> +    }
+> +    file = g_strdup(strp);
+> +    *strp = 0;
+> +
+> +    /* Steal the NFSServer object from opts; set the original pointer to NULL
+> +     * to avoid use after free and double free. */
+> +    client->server = opts->server;
+> +    opts->server = NULL;
+> +
+> +    client->context = nfs_init_context();
+> +    if (client->context == NULL) {
+> +        error_setg(errp, "Failed to init NFS context");
+> +        goto fail;
+> +    }
+> +
+> +    if (opts->has_user) {
+> +        client->uid = opts->user;
+> +        nfs_set_uid(client->context, client->uid);
+> +    }
+> +
+> +    if (opts->has_group) {
+> +        client->gid = opts->group;
+> +        nfs_set_gid(client->context, client->gid);
+> +    }
+> +
+> +    if (opts->has_tcp_syn_count) {
+> +        client->tcp_syncnt = opts->tcp_syn_count;
+> +        nfs_set_tcp_syncnt(client->context, client->tcp_syncnt);
+> +    }
+> +
+> +#ifdef LIBNFS_FEATURE_READAHEAD
+> +    if (opts->has_readahead_size) {
+> +        if (open_flags & BDRV_O_NOCACHE) {
+> +            error_setg(errp, "Cannot enable NFS readahead "
+> +                             "if cache.direct = on");
+> +            goto fail;
+> +        }
+> +        client->readahead = opts->readahead_size;
+> +        if (client->readahead > QEMU_NFS_MAX_READAHEAD_SIZE) {
+> +            warn_report("Truncating NFS readahead size to %d",
+> +                        QEMU_NFS_MAX_READAHEAD_SIZE);
+> +            client->readahead = QEMU_NFS_MAX_READAHEAD_SIZE;
+> +        }
+> +        nfs_set_readahead(client->context, client->readahead);
+> +#ifdef LIBNFS_FEATURE_PAGECACHE
+> +        nfs_set_pagecache_ttl(client->context, 0);
+> +#endif
+> +        client->cache_used = true;
+> +    }
+> +#endif
+> +
+> +#ifdef LIBNFS_FEATURE_PAGECACHE
+> +    if (opts->has_page_cache_size) {
+> +        if (open_flags & BDRV_O_NOCACHE) {
+> +            error_setg(errp, "Cannot enable NFS pagecache "
+> +                             "if cache.direct = on");
+> +            goto fail;
+> +        }
+> +        client->pagecache = opts->page_cache_size;
+> +        if (client->pagecache > QEMU_NFS_MAX_PAGECACHE_SIZE) {
+> +            warn_report("Truncating NFS pagecache size to %d pages",
+> +                        QEMU_NFS_MAX_PAGECACHE_SIZE);
+> +            client->pagecache = QEMU_NFS_MAX_PAGECACHE_SIZE;
+> +        }
+> +        nfs_set_pagecache(client->context, client->pagecache);
+> +        nfs_set_pagecache_ttl(client->context, 0);
+> +        client->cache_used = true;
+> +    }
+> +#endif
+> +
+> +#ifdef LIBNFS_FEATURE_DEBUG
+> +    if (opts->has_debug) {
+> +        client->debug = opts->debug;
+> +        /* limit the maximum debug level to avoid potential flooding
+> +         * of our log files. */
+> +        if (client->debug > QEMU_NFS_MAX_DEBUG_LEVEL) {
+> +            warn_report("Limiting NFS debug level to %d",
+> +                        QEMU_NFS_MAX_DEBUG_LEVEL);
+> +            client->debug = QEMU_NFS_MAX_DEBUG_LEVEL;
+> +        }
+> +        nfs_set_debug(client->context, client->debug);
+> +    }
+> +#endif
+> +
+> +    ret = nfs_mount(client->context, client->server->host, client->path);
+> +    if (ret < 0) {
+> +        error_setg(errp, "Failed to mount nfs share: %s",
+> +                   nfs_get_error(client->context));
+> +        goto fail;
+> +    }
+> +
+> +    if (flags & O_CREAT) {
+> +        ret = nfs_creat(client->context, file, 0600, &client->fh);
+> +        if (ret < 0) {
+> +            error_setg(errp, "Failed to create file: %s",
+> +                       nfs_get_error(client->context));
+> +            goto fail;
+> +        }
+> +    } else {
+> +        ret = nfs_open(client->context, file, flags, &client->fh);
+> +        if (ret < 0) {
+> +            error_setg(errp, "Failed to open file : %s",
+> +                       nfs_get_error(client->context));
+> +            goto fail;
+> +        }
+> +    }
+> +
+> +    ret = nfs_fstat(client->context, client->fh, &st);
+> +    if (ret < 0) {
+> +        error_setg(errp, "Failed to fstat file: %s",
+> +                   nfs_get_error(client->context));
+> +        goto fail;
+> +    }
+> +
+> +    ret = DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
+> +    client->st_size = st.st_size;
+> +    client->has_zero_init = S_ISREG(st.st_mode);
+> +    *strp = '/';
+> +    goto out;
+> +
+> +fail:
+> +    nfs_client_close(client);
+> +out:
+> +    g_free(file);
+> +    return ret;
+> +}
+> +
+> +static BlockdevOptionsNfs *nfs_options_qdict_to_qapi(QDict *options,
+> +                                                     Error **errp)
+> +{
+> +    BlockdevOptionsNfs *opts = NULL;
+> +    Visitor *v;
+> +    const QDictEntry *e;
+> +
+> +    v = qobject_input_visitor_new_flat_confused(options, errp);
+> +    if (!v) {
+> +        return NULL;
+> +    }
+> +
+> +    visit_type_BlockdevOptionsNfs(v, NULL, &opts, errp);
+> +    visit_free(v);
+> +    if (!opts) {
+> +        return NULL;
+> +    }
+> +
+> +    /* Remove the processed options from the QDict (the visitor processes
+> +     * _all_ options in the QDict) */
+> +    while ((e = qdict_first(options))) {
+> +        qdict_del(options, e->key);
+> +    }
+> +
+> +    return opts;
+> +}
+> +
+> +static int64_t nfs_client_open_qdict(NFSClient *client, QDict *options,
+> +                                     int flags, int open_flags, Error **errp)
+> +{
+> +    BlockdevOptionsNfs *opts;
+> +    int ret;
+> +
+> +    opts = nfs_options_qdict_to_qapi(options, errp);
+> +    if (opts == NULL) {
+> +        ret = -EINVAL;
+> +        goto fail;
+> +    }
+> +
+> +    ret = nfs_client_open(client, opts, flags, open_flags, errp);
+> +fail:
+> +    qapi_free_BlockdevOptionsNfs(opts);
+> +    return ret;
+> +}
+> +
+> +static int nfs_file_open(BlockDriverState *bs, QDict *options, int flags,
+> +                         Error **errp) {
+> +    NFSClient *client = bs->opaque;
+> +    int64_t ret;
+> +
+> +    client->aio_context = bdrv_get_aio_context(bs);
+> +
+> +    ret = nfs_client_open_qdict(client, options,
+> +                                (flags & BDRV_O_RDWR) ? O_RDWR : O_RDONLY,
+> +                                bs->open_flags, errp);
+> +    if (ret < 0) {
+> +        return ret;
+> +    }
+> +
+> +    bs->total_sectors = ret;
+> +    if (client->has_zero_init) {
+> +        bs->supported_truncate_flags = BDRV_REQ_ZERO_WRITE;
+> +    }
+> +    return 0;
+> +}
+> +
+> +static QemuOptsList nfs_create_opts = {
+> +    .name = "nfs-create-opts",
+> +    .head = QTAILQ_HEAD_INITIALIZER(nfs_create_opts.head),
+> +    .desc = {
+> +        {
+> +            .name = BLOCK_OPT_SIZE,
+> +            .type = QEMU_OPT_SIZE,
+> +            .help = "Virtual disk size"
+> +        },
+> +        { /* end of list */ }
+> +    }
+> +};
+> +
+> +static int nfs_file_co_create(BlockdevCreateOptions *options, Error **errp)
+> +{
+> +    BlockdevCreateOptionsNfs *opts = &options->u.nfs;
+> +    NFSClient *client = g_new0(NFSClient, 1);
+> +    int ret;
+> +
+> +    assert(options->driver == BLOCKDEV_DRIVER_NFS);
+> +
+> +    client->aio_context = qemu_get_aio_context();
+> +
+> +    ret = nfs_client_open(client, opts->location, O_CREAT, 0, errp);
+> +    if (ret < 0) {
+> +        goto out;
+> +    }
+> +    ret = nfs_ftruncate(client->context, client->fh, opts->size);
+> +    nfs_client_close(client);
+> +
+> +out:
+> +    g_free(client);
+> +    return ret;
+> +}
+> +
+> +static int coroutine_fn nfs_file_co_create_opts(BlockDriver *drv,
+> +                                                const char *url,
+> +                                                QemuOpts *opts,
+> +                                                Error **errp)
+> +{
+> +    BlockdevCreateOptions *create_options;
+> +    BlockdevCreateOptionsNfs *nfs_opts;
+> +    QDict *options;
+> +    int ret;
+> +
+> +    create_options = g_new0(BlockdevCreateOptions, 1);
+> +    create_options->driver = BLOCKDEV_DRIVER_NFS;
+> +    nfs_opts = &create_options->u.nfs;
+> +
+> +    /* Read out options */
+> +    nfs_opts->size = ROUND_UP(qemu_opt_get_size_del(opts, BLOCK_OPT_SIZE, 0),
+> +                              BDRV_SECTOR_SIZE);
+> +
+> +    options = qdict_new();
+> +    ret = nfs_parse_uri(url, options, errp);
+> +    if (ret < 0) {
+> +        goto out;
+> +    }
+> +
+> +    nfs_opts->location = nfs_options_qdict_to_qapi(options, errp);
+> +    if (nfs_opts->location == NULL) {
+> +        ret = -EINVAL;
+> +        goto out;
+> +    }
+> +
+> +    ret = nfs_file_co_create(create_options, errp);
+> +    if (ret < 0) {
+> +        goto out;
+> +    }
+> +
+> +    ret = 0;
+> +out:
+> +    qobject_unref(options);
+> +    qapi_free_BlockdevCreateOptions(create_options);
+> +    return ret;
+> +}
+> +
+> +static int nfs_has_zero_init(BlockDriverState *bs)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +    return client->has_zero_init;
+> +}
+> +
+> +/* Called (via nfs_service) with QemuMutex held.  */
+> +static void
+> +nfs_get_allocated_file_size_cb(int ret, struct nfs_context *nfs, void *data,
+> +                               void *private_data)
+> +{
+> +    NFSRPC *task = private_data;
+> +    task->ret = ret;
+> +    if (task->ret == 0) {
+> +        memcpy(task->st, data, sizeof(struct stat));
+> +    }
+> +    if (task->ret < 0) {
+> +        error_report("NFS Error: %s", nfs_get_error(nfs));
+> +    }
+> +
+> +    /* Set task->complete before reading bs->wakeup.  */
+> +    atomic_mb_set(&task->complete, 1);
+> +    bdrv_wakeup(task->bs);
+> +}
+> +
+> +static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +    NFSRPC task = {0};
+> +    struct nfs_stat st;
+> +
+> +    if (bdrv_is_read_only(bs) &&
+> +        !(bs->open_flags & BDRV_O_NOCACHE)) {
+> +        return client->st_size;
+> +    }
+> +
+> +    task.bs = bs;
+> +    task.st = &st;
+> +    if (nfs_fstat_async(client->context, client->fh, nfs_get_allocated_file_size_cb,
+> +                        &task) != 0) {
+> +        return -ENOMEM;
+> +    }
+> +
+> +    nfs_set_events(client);
+> +    BDRV_POLL_WHILE(bs, !task.complete);
+> +
+> +    return (task.ret < 0 ? task.ret : st.st_size);
+> +}
+> +
+> +static int coroutine_fn
+> +nfs_file_co_truncate(BlockDriverState *bs, int64_t offset, bool exact,
+> +                     PreallocMode prealloc, BdrvRequestFlags flags,
+> +                     Error **errp)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +    int ret;
+> +
+> +    if (prealloc != PREALLOC_MODE_OFF) {
+> +        error_setg(errp, "Unsupported preallocation mode '%s'",
+> +                   PreallocMode_str(prealloc));
+> +        return -ENOTSUP;
+> +    }
+> +
+> +    ret = nfs_ftruncate(client->context, client->fh, offset);
+> +    if (ret < 0) {
+> +        error_setg_errno(errp, -ret, "Failed to truncate file");
+> +        return ret;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +/* Note that this will not re-establish a connection with the NFS server
+> + * - it is effectively a NOP.  */
+> +static int nfs_reopen_prepare(BDRVReopenState *state,
+> +                              BlockReopenQueue *queue, Error **errp)
+> +{
+> +    NFSClient *client = state->bs->opaque;
+> +    struct nfs_stat st;
+> +    int ret = 0;
+> +
+> +    if (state->flags & BDRV_O_RDWR && bdrv_is_read_only(state->bs)) {
+> +        error_setg(errp, "Cannot open a read-only mount as read-write");
+> +        return -EACCES;
+> +    }
+> +
+> +    if ((state->flags & BDRV_O_NOCACHE) && client->cache_used) {
+> +        error_setg(errp, "Cannot disable cache if libnfs readahead or"
+> +                         " pagecache is enabled");
+> +        return -EINVAL;
+> +    }
+> +
+> +    /* Update cache for read-only reopens */
+> +    if (!(state->flags & BDRV_O_RDWR)) {
+> +        ret = nfs_fstat(client->context, client->fh, &st);
+> +        if (ret < 0) {
+> +            error_setg(errp, "Failed to fstat file: %s",
+> +                       nfs_get_error(client->context));
+> +            return ret;
+> +        }
+> +        client->st_size = st.st_size;
+> +    }
+> +
+> +    return 0;
+> +}
+> +
+> +static void nfs_refresh_filename(BlockDriverState *bs)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +
+> +    if (client->uid && !client->gid) {
+> +        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +                 "nfs://%s%s?uid=%" PRId64, client->server->host, client->path,
+> +                 client->uid);
+> +    } else if (!client->uid && client->gid) {
+> +        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +                 "nfs://%s%s?gid=%" PRId64, client->server->host, client->path,
+> +                 client->gid);
+> +    } else if (client->uid && client->gid) {
+> +        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +                 "nfs://%s%s?uid=%" PRId64 "&gid=%" PRId64,
+> +                 client->server->host, client->path, client->uid, client->gid);
+> +    } else {
+> +        snprintf(bs->exact_filename, sizeof(bs->exact_filename),
+> +                 "nfs://%s%s", client->server->host, client->path);
 > +    }
 > +}
-> +#else
-> +#define qemu_timersub timersub
-> +#endif
 > +
-> +void qemu_set_cloexec(int fd);
-> +
-> +/* Starting on QEMU 2.5, qemu_hw_version() returns "2.5+" by default
-> + * instead of QEMU_VERSION, so setting hw_version on MachineClass
-> + * is no longer mandatory.
-> + *
-> + * Do NOT change this string, or it will break compatibility on all
-> + * machine classes that don't set hw_version.
-> + */
-> +#define QEMU_HW_VERSION "2.5+"
-> +
-> +/* QEMU "hardware version" setting. Used to replace code that exposed
-> + * QEMU_VERSION to guests in the past and need to keep compatibility.
-> + * Do not use qemu_hw_version() in new code.
-> + */
-> +void qemu_set_hw_version(const char *);
-> +const char *qemu_hw_version(void);
-> +
-> +void fips_set_state(bool requested);
-> +bool fips_get_state(void);
-> +
-> +/* Return a dynamically allocated pathname denoting a file or directory that is
-> + * appropriate for storing local state.
-> + *
-> + * @relative_pathname need not start with a directory separator; one will be
-> + * added automatically.
-> + *
-> + * The caller is responsible for releasing the value returned with g_free()
-> + * after use.
-> + */
-> +char *qemu_get_local_state_pathname(const char *relative_pathname);
-> +
-> +/* Find program directory, and save it for later usage with
-> + * qemu_get_exec_dir().
-> + * Try OS specific API first, if not working, parse from argv0. */
-> +void qemu_init_exec_dir(const char *argv0);
-> +
-> +/* Get the saved exec dir.
-> + *
-> + * The caller is responsible for releasing the value returned with g_free()
-> + * after use.
-> + */
-> +char *qemu_get_exec_dir(void);
-> +
-> +/**
-> + * qemu_getauxval:
-> + * @type: the auxiliary vector key to lookup
-> + *
-> + * Search the auxiliary vector for @type, returning the value
-> + * or 0 if @type is not present.
-> + */
-> +unsigned long qemu_getauxval(unsigned long type);
-> +
-> +void qemu_set_tty_echo(int fd, bool echo);
-> +
-> +void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
-> +                     Error **errp);
-> +
-> +/**
-> + * qemu_get_pid_name:
-> + * @pid: pid of a process
-> + *
-> + * For given @pid fetch its name. Caller is responsible for
-> + * freeing the string when no longer needed.
-> + * Returns allocated string on success, NULL on failure.
-> + */
-> +char *qemu_get_pid_name(pid_t pid);
-> +
-> +/**
-> + * qemu_fork:
-> + *
-> + * A version of fork that avoids signal handler race
-> + * conditions that can lead to child process getting
-> + * signals that are otherwise only expected by the
-> + * parent. It also resets all signal handlers to the
-> + * default settings.
-> + *
-> + * Returns 0 to child process, pid number to parent
-> + * or -1 on failure.
-> + */
-> +pid_t qemu_fork(Error **errp);
-> +
-> +/* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
-> + * when intptr_t is 32-bit and we are aligning a long long.
-> + */
-> +extern uintptr_t qemu_real_host_page_size;
-> +extern intptr_t qemu_real_host_page_mask;
-> +
-> +extern int qemu_icache_linesize;
-> +extern int qemu_icache_linesize_log;
-> +extern int qemu_dcache_linesize;
-> +extern int qemu_dcache_linesize_log;
-> +
-> +/*
-> + * After using getopt or getopt_long, if you need to parse another set
-> + * of options, then you must reset optind.  Unfortunately the way to
-> + * do this varies between implementations of getopt.
-> + */
-> +static inline void qemu_reset_optind(void)
+> +static char *nfs_dirname(BlockDriverState *bs, Error **errp)
 > +{
-> +#ifdef HAVE_OPTRESET
-> +    optind = 1;
-> +    optreset = 1;
-> +#else
-> +    optind = 0;
-> +#endif
+> +    NFSClient *client = bs->opaque;
+> +
+> +    if (client->uid || client->gid) {
+> +        bdrv_refresh_filename(bs);
+> +        error_setg(errp, "Cannot generate a base directory for NFS node '%s'",
+> +                   bs->filename);
+> +        return NULL;
+> +    }
+> +
+> +    return g_strdup_printf("nfs://%s%s/", client->server->host, client->path);
 > +}
 > +
-> +/**
-> + * qemu_get_host_name:
-> + * @errp: Error object
-> + *
-> + * Operating system agnostic way of querying host name.
-> + *
-> + * Returns allocated hostname (caller should free), NULL on failure.
-> + */
-> +char *qemu_get_host_name(Error **errp);
-> +
-> +/**
-> + * qemu_get_host_physmem:
-> + *
-> + * Operating system agnostic way of querying host memory.
-> + *
-> + * Returns amount of physical memory on the system. This is purely
-> + * advisery and may return 0 if we can't work it out. At the other
-> + * end we saturate to SIZE_MAX if you are lucky enough to have that
-> + * much memory.
-> + */
-> +size_t qemu_get_host_physmem(void);
-> +
+> +#ifdef LIBNFS_FEATURE_PAGECACHE
+> +static void coroutine_fn nfs_co_invalidate_cache(BlockDriverState *bs,
+> +                                                 Error **errp)
+> +{
+> +    NFSClient *client = bs->opaque;
+> +    nfs_pagecache_invalidate(client->context, client->fh);
+> +}
 > +#endif
+> +
+> +static const char *nfs_strong_runtime_opts[] = {
+> +    "path",
+> +    "user",
+> +    "group",
+> +    "server.",
+> +
+> +    NULL
+> +};
+> +
+> +static BlockDriver bdrv_nfs = {
+> +    .format_name                    = "nfs",
+> +    .protocol_name                  = "nfs",
+> +
+> +    .instance_size                  = sizeof(NFSClient),
+> +    .bdrv_parse_filename            = nfs_parse_filename,
+> +    .create_opts                    = &nfs_create_opts,
+> +
+> +    .bdrv_has_zero_init             = nfs_has_zero_init,
+> +    .bdrv_get_allocated_file_size   = nfs_get_allocated_file_size,
+> +    .bdrv_co_truncate               = nfs_file_co_truncate,
+> +
+> +    .bdrv_file_open                 = nfs_file_open,
+> +    .bdrv_close                     = nfs_file_close,
+> +    .bdrv_co_create                 = nfs_file_co_create,
+> +    .bdrv_co_create_opts            = nfs_file_co_create_opts,
+> +    .bdrv_reopen_prepare            = nfs_reopen_prepare,
+> +
+> +    .bdrv_co_preadv                 = nfs_co_preadv,
+> +    .bdrv_co_pwritev                = nfs_co_pwritev,
+> +    .bdrv_co_flush_to_disk          = nfs_co_flush,
+> +
+> +    .bdrv_detach_aio_context        = nfs_detach_aio_context,
+> +    .bdrv_attach_aio_context        = nfs_attach_aio_context,
+> +    .bdrv_refresh_filename          = nfs_refresh_filename,
+> +    .bdrv_dirname                   = nfs_dirname,
+> +
+> +    .strong_runtime_opts            = nfs_strong_runtime_opts,
+> +
+> +#ifdef LIBNFS_FEATURE_PAGECACHE
+> +    .bdrv_co_invalidate_cache       = nfs_co_invalidate_cache,
+> +#endif
+> +};
+> +
+> +static void nfs_block_init(void)
+> +{
+> +    bdrv_register(&bdrv_nfs);
+> +}
+> +
+> +block_init(nfs_block_init);
 > -- 
 > 2.28.0.windows.1
 > 
