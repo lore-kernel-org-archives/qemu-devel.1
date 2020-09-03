@@ -7,86 +7,84 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CB1C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:11:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF256C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:14:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F18452072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:11:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D81E2072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:14:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U/CG57ly"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F18452072A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ry1bhgQu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D81E2072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52790 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDo5q-0005ol-3G
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:11:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48834)
+	id 1kDo8L-000726-Of
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:14:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDo56-00052U-FV
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:11:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51122)
+ id 1kDo7c-0006Yf-S3
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:13:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44791)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDo54-0005jJ-Jk
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:11:08 -0400
+ id 1kDo7a-0005vQ-RZ
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:13:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599135065;
+ s=mimecast20190719; t=1599135221;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=CbpgAWV4n4xWnUnCBN0ErTyAAfGn8vkn04spAe4H9Yc=;
- b=U/CG57lyR1v+GD7tuP8j2jMyJ5eVAsG6ac1Pk3GS52WfzwALtW+IV+Mt2GXCN/HtrZo9Fk
- afyqed9e43T/RhCzqS3NiXC126EpMLlEaQNTv+lKOrNkv+lu/fIT3kqvGPEIfQU2oX/CMj
- YC7mF8VsetyRwJ2y1FclfFcCgml7yMo=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-373-mwMrgOQNPGyN6tGC_KJIiA-1; Thu, 03 Sep 2020 08:11:03 -0400
-X-MC-Unique: mwMrgOQNPGyN6tGC_KJIiA-1
-Received: by mail-ej1-f72.google.com with SMTP id y10so1142417ejd.1
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:11:01 -0700 (PDT)
+ bh=KM+pXzBKOu/ypS/w1IYgz3FGqmRSR3DkbQ/18aGndIg=;
+ b=Ry1bhgQul/inMyUR2SCO+u9z3TTqOa8ha36jV63YV2lakAY72YhtCWVVMN+7YEZLv45M71
+ HAR5yt6iCPrigpoNJWQVbyEzXK4pTSx8hbFFIVaGtK9H7/1y+Jf0eFhe8A7HurjsHoE85f
+ /hd1JLZozWsfMqJ1/41OMFejmUMDP1s=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-366-LZBTsFpPPWipkMpQTy19bQ-1; Thu, 03 Sep 2020 08:13:37 -0400
+X-MC-Unique: LZBTsFpPPWipkMpQTy19bQ-1
+Received: by mail-ej1-f71.google.com with SMTP id i21so1147943ejj.0
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:13:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=CbpgAWV4n4xWnUnCBN0ErTyAAfGn8vkn04spAe4H9Yc=;
- b=oqYNU471rQHc6XHI/VmnaTfUMDDQdifkD9noanaKMG1nqZcag9lFVSEKA6I1jtV1ID
- kb1FFXjNOndtbyRAXZ3PC5G/bU5u0KOKvIwaRYi9agvoW2SV7NH4bjUg9Ccv3xuEfp0o
- 2nZtpqb6Lh27lrSpA3Sdc6j91Tj6TN5WEH6y42rih71R5TtROHzLiJqTLK+jMzEiTuL1
- qZ2EJk2tUXpLDhl/LTQPPA9P+1igzsOGD4x6N3UF0spsCER19zZWquXLCVswxjzLedYD
- D8tLkZgYTfV58EJedXRL3sV8VinCMgIJ53TMDc3fwdmNwSSsSaLbqIEtQ26han+u5dcg
- jc9w==
-X-Gm-Message-State: AOAM532eUnWlSsCTJN0+sc7/B6MSpxtqZufC801TYefHcRhnzvTAuFO0
- zjO3GXPsukkgE4cr+eAKyNpkjVznnhYhCUsD4CfVQeJ2ZqopjiVzOBZaxgbQnlhliBNyYcoJCB3
- 29SHjfWfOq9ClleQIMmTXhVQssBeCjZU=
-X-Received: by 2002:a17:906:c001:: with SMTP id
- e1mr1886744ejz.390.1599135060190; 
- Thu, 03 Sep 2020 05:11:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz4vnjrHxDrfQ7VQ+tcnxuGjhV4JmGC5HIyGAYJdJoxWzSuZ0AJCx+TB8TnJapvXQbz9hHyM0NjyDixBtUPUQA=
-X-Received: by 2002:a17:906:c001:: with SMTP id
- e1mr1886725ejz.390.1599135059995; 
- Thu, 03 Sep 2020 05:10:59 -0700 (PDT)
+ bh=KM+pXzBKOu/ypS/w1IYgz3FGqmRSR3DkbQ/18aGndIg=;
+ b=HEfJVHpKpx6aw+4RPpQUm6x/BpLuHqdTNWXEO2b9hIW2aA3Dtf1VIkgQSMNFSnF0JQ
+ nA71jVH1p7mqlOfnhLwQm7ewaUqpz1zsLfx5mKLOrbKcd6wvUmkMwH+8rgTiTmtx9p35
+ 9dRTVCinAWgmx1CQR6C1fSsJVisxhj0/G1GLg9yy/F00D0KEInepsOU+cAXjS64HBUqG
+ idKFaNcNPn8XDUkVLwyOjFK8y1iXGeDIksq4J2//oVjLD53ldGNoYilQ7wikGWoK6c58
+ 6jHsu9dYQQN2cyxPxx3iDVWErjWZs4uRTf9Z0WLpbih3ztulKZuw+vuv52LD58zC3AlN
+ kQrw==
+X-Gm-Message-State: AOAM531hVf3CGIXGF+HnUxKYggv/X2oS8KKMX3pZLZQ4pDemhlLKU5/B
+ gqQJahnQ4Z1xcnz/KI2zaJ8/FGO5TlgXGZ90iRgKXl85cwox4rMf29Tmm7KrPfj94o+aG0AC5p4
+ JN9k7DeTiqIJ7fqHvACtH9ycAPouu18A=
+X-Received: by 2002:aa7:d043:: with SMTP id n3mr2600700edo.243.1599135216351; 
+ Thu, 03 Sep 2020 05:13:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyaqet8yN+jd1hLERq1/HPi7pXhWP24MVjp5VpcMEfSJ9yzIzypi1mby95axC6omv3mUqOiCbG0NZti8+KafcE=
+X-Received: by 2002:aa7:d043:: with SMTP id n3mr2600674edo.243.1599135216125; 
+ Thu, 03 Sep 2020 05:13:36 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200903112107.27367-1-alex.bennee@linaro.org>
- <20200903112107.27367-7-alex.bennee@linaro.org>
-In-Reply-To: <20200903112107.27367-7-alex.bennee@linaro.org>
+ <20200903112107.27367-9-alex.bennee@linaro.org>
+In-Reply-To: <20200903112107.27367-9-alex.bennee@linaro.org>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 3 Sep 2020 14:10:47 +0200
-Message-ID: <CABgObfZ_Xdd-pnRjpWO=8NjEznZhz84DTq95OzCdjL_rxnw=XQ@mail.gmail.com>
-Subject: Re: [PATCH v1 6/8] tests/meson.build: fp tests don't need CONFIG_TCG
+Date: Thu, 3 Sep 2020 14:13:24 +0200
+Message-ID: <CABgObfZCiQZ2RhriWj+xmCuYfAXVkXmAAJFKpNA7VS0avo4qUA@mail.gmail.com>
+Subject: Re: [PATCH v1 8/8] migration: use pstrcpy to copy run state
 To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000033052a05ae67a56e"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Content-Type: multipart/alternative; boundary="00000000000081655005ae67ae85"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -109,72 +107,67 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- richard.henderson@linaro.org, qemu-devel <qemu-devel@nongnu.org>,
- f4bug@amsat.org, "Emilio G. Cota" <cota@braap.org>, stefanha@redhat.com,
+ Juan Quintela <quintela@redhat.com>, richard.henderson@linaro.org,
+ qemu-devel <qemu-devel@nongnu.org>, f4bug@amsat.org,
+ "Emilio G. Cota" <cota@braap.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, stefanha@redhat.com,
  marcandre.lureau@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000033052a05ae67a56e
+--00000000000081655005ae67ae85
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Il gio 3 set 2020, 13:21 Alex Benn=C3=A9e <alex.bennee@linaro.org> ha scrit=
 to:
 
-> As the tests build only softfloat.c no actual TCG machinary is neede
-> to test them (as is evidenced by GCC check-softfloat). Might as well
-> fix the wording on Travis while at it.
+> The gcov build triggered:
+>
+>   ../../migration/global_state.c:47:5: error: =E2=80=98strncpy=E2=80=99 s=
+pecified
+>       bound 100 equals destination size [-Werror=3Dstringop-truncation]
+>       strncpy((char *)global_state.runstate
+>
+> As we shouldn't be using strncpy anyway lets use the suggested
+> pstrcpy.
 >
 
-The reason is that softfloat is not built at all into QEMU if !CONFIG_TCG.
-We similarly skip block layer tests if !CONFIG_SOFTMMU && !CONFIG_TOOLS.
+This is wrong, we want the all-zeros behavior of strncpy that pstrcpy lacks=
+.
 
 Paolo
 
 
+>
 > Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 > ---
->  .travis.yml       | 2 +-
->  tests/meson.build | 3 ++-
->  2 files changed, 3 insertions(+), 2 deletions(-)
+>  migration/global_state.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 >
-> diff --git a/.travis.yml b/.travis.yml
-> index 1d0ade0a133..65341634d02 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -138,7 +138,7 @@ jobs:
+> diff --git a/migration/global_state.c b/migration/global_state.c
+> index 25311479a4b..5fbe6d1ff07 100644
+> --- a/migration/global_state.c
+> +++ b/migration/global_state.c
+> @@ -44,8 +44,8 @@ void global_state_store_running(void)
+>  {
+>      const char *state =3D RunState_str(RUN_STATE_RUNNING);
+>      assert(strlen(state) < sizeof(global_state.runstate));
+> -    strncpy((char *)global_state.runstate,
+> -           state, sizeof(global_state.runstate));
+> +    pstrcpy((char *)global_state.runstate, sizeof(global_state.runstate)=
+,
+> +            state);
+>  }
 >
->
->      # Just build tools and run minimal unit and softfloat checks
-> -    - name: "GCC check-softfloat (user)"
-> +    - name: "GCC check-unit and check-softfloat"
->        env:
->          - BASE_CONFIG=3D"--enable-tools"
->          - CONFIG=3D"--disable-user --disable-system"
-> diff --git a/tests/meson.build b/tests/meson.build
-> index fe2c6d8e6b6..bdcc5d75293 100644
-> --- a/tests/meson.build
-> +++ b/tests/meson.build
-> @@ -7,8 +7,9 @@ test('decodetree', sh,
->       workdir: meson.current_source_dir() / 'decode',
->       suite: 'decodetree')
->
-> +subdir('fp')
-> +
->  if 'CONFIG_TCG' in config_host
-> -  subdir('fp')
->    if 'CONFIG_PLUGIN' in config_host
->      subdir('plugin')
->    endif
+>  bool global_state_received(void)
 > --
 > 2.20.1
 >
 >
 
---00000000000033052a05ae67a56e
+--00000000000081655005ae67ae85
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
@@ -182,61 +175,52 @@ Content-Transfer-Encoding: quoted-printable
 class=3D"gmail_attr">Il gio 3 set 2020, 13:21 Alex Benn=C3=A9e &lt;<a href=
 =3D"mailto:alex.bennee@linaro.org">alex.bennee@linaro.org</a>&gt; ha scritt=
 o:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bo=
-rder-left:1px #ccc solid;padding-left:1ex">As the tests build only softfloa=
-t.c no actual TCG machinary is neede<br>
-to test them (as is evidenced by GCC check-softfloat). Might as well<br>
-fix the wording on Travis while at it.<br></blockquote></div></div><div dir=
-=3D"auto"><br></div><div dir=3D"auto">The reason is that softfloat is not b=
-uilt at all into QEMU if !CONFIG_TCG. We similarly skip block layer tests i=
-f !CONFIG_SOFTMMU &amp;&amp; !CONFIG_TOOLS.</div><div dir=3D"auto"><br></di=
-v><div dir=3D"auto">Paolo<br></div><div dir=3D"auto"><br></div><div dir=3D"=
-auto"><div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D=
-"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+rder-left:1px #ccc solid;padding-left:1ex">The gcov build triggered:<br>
 <br>
+=C2=A0 ../../migration/global_state.c:47:5: error: =E2=80=98strncpy=E2=80=
+=99 specified<br>
+=C2=A0 =C2=A0 =C2=A0 bound 100 equals destination size [-Werror=3Dstringop-=
+truncation]<br>
+=C2=A0 =C2=A0 =C2=A0 strncpy((char *)global_state.runstate<br>
+<br>
+As we shouldn&#39;t be using strncpy anyway lets use the suggested<br>
+pstrcpy.<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
+=3D"auto">This is wrong, we want the all-zeros behavior of strncpy that pst=
+rcpy lacks.</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><=
+div dir=3D"auto"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
+ccc solid;padding-left:1ex">
+<br><br>
 Signed-off-by: Alex Benn=C3=A9e &lt;<a href=3D"mailto:alex.bennee@linaro.or=
 g" target=3D"_blank" rel=3D"noreferrer">alex.bennee@linaro.org</a>&gt;<br>
 ---<br>
-=C2=A0.travis.yml=C2=A0 =C2=A0 =C2=A0 =C2=A0| 2 +-<br>
-=C2=A0tests/meson.build | 3 ++-<br>
-=C2=A02 files changed, 3 insertions(+), 2 deletions(-)<br>
+=C2=A0migration/global_state.c | 4 ++--<br>
+=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
 <br>
-diff --git a/.travis.yml b/.travis.yml<br>
-index 1d0ade0a133..65341634d02 100644<br>
---- a/.travis.yml<br>
-+++ b/.travis.yml<br>
-@@ -138,7 +138,7 @@ jobs:<br>
+diff --git a/migration/global_state.c b/migration/global_state.c<br>
+index 25311479a4b..5fbe6d1ff07 100644<br>
+--- a/migration/global_state.c<br>
++++ b/migration/global_state.c<br>
+@@ -44,8 +44,8 @@ void global_state_store_running(void)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0const char *state =3D RunState_str(RUN_STATE_RUNNING);<=
+br>
+=C2=A0 =C2=A0 =C2=A0assert(strlen(state) &lt; sizeof(global_state.runstate)=
+);<br>
+-=C2=A0 =C2=A0 strncpy((char *)global_state.runstate,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0state, sizeof(global_state.runsta=
+te));<br>
++=C2=A0 =C2=A0 pstrcpy((char *)global_state.runstate, sizeof(global_state.r=
+unstate),<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 state);<br>
+=C2=A0}<br>
 <br>
-<br>
-=C2=A0 =C2=A0 =C2=A0# Just build tools and run minimal unit and softfloat c=
-hecks<br>
--=C2=A0 =C2=A0 - name: &quot;GCC check-softfloat (user)&quot;<br>
-+=C2=A0 =C2=A0 - name: &quot;GCC check-unit and check-softfloat&quot;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0env:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- BASE_CONFIG=3D&quot;--enable-tools&quot=
-;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- CONFIG=3D&quot;--disable-user --disable=
--system&quot;<br>
-diff --git a/tests/meson.build b/tests/meson.build<br>
-index fe2c6d8e6b6..bdcc5d75293 100644<br>
---- a/tests/meson.build<br>
-+++ b/tests/meson.build<br>
-@@ -7,8 +7,9 @@ test(&#39;decodetree&#39;, sh,<br>
-=C2=A0 =C2=A0 =C2=A0 workdir: meson.current_source_dir() / &#39;decode&#39;=
-,<br>
-=C2=A0 =C2=A0 =C2=A0 suite: &#39;decodetree&#39;)<br>
-<br>
-+subdir(&#39;fp&#39;)<br>
-+<br>
-=C2=A0if &#39;CONFIG_TCG&#39; in config_host<br>
--=C2=A0 subdir(&#39;fp&#39;)<br>
-=C2=A0 =C2=A0if &#39;CONFIG_PLUGIN&#39; in config_host<br>
-=C2=A0 =C2=A0 =C2=A0subdir(&#39;plugin&#39;)<br>
-=C2=A0 =C2=A0endif<br>
+=C2=A0bool global_state_received(void)<br>
 -- <br>
 2.20.1<br>
 <br>
 </blockquote></div></div></div>
 
---00000000000033052a05ae67a56e--
+--00000000000081655005ae67ae85--
 
 
