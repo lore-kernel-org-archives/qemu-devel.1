@@ -4,85 +4,85 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D90C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:50:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7914C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:51:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6711208FE
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:50:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 833672065F
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:51:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="xKS12qs4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6711208FE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="R39uBhOd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 833672065F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDkx1-0000c9-P7
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 04:50:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58138)
+	id 1kDkxt-0001Vz-Kq
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 04:51:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kDkwM-00007k-Jb
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:49:54 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:51956)
+ id 1kDkwl-0000TZ-W0
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:50:20 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:52656)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kDkwK-0003rL-OG
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:49:54 -0400
+ id 1kDkwk-0003w4-6k
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:50:19 -0400
 Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0838mw2C193257;
- Thu, 3 Sep 2020 08:49:49 GMT
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0838mvJI193189;
+ Thu, 3 Sep 2020 08:50:15 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : in-reply-to : references : date : message-id : mime-version :
  content-type; s=corp-2020-01-29;
- bh=Ccsm97qJS6MAIgnZgzOAyP8F/LrlBgvfHkDEOsD1hEA=;
- b=xKS12qs4i0hqZ3Wg7nuHkHalF4CkXx2IOO/pnUmyivCudlmPpAUgCbwFIyqV7DAyjWwq
- uiB4jfOiDkq/0eU27K0A8JGXrlM/VyT88nwyAauNk/NYNv40TehsrY+xLwjVQusjj5ZC
- Wp5x+C2WW7eKvo/miWx9JeeWASCmtgrOj4QqXKrhKWHrQP0gm7vdd9Zl2acIhkKp6qXQ
- MeKx1+KmW/N9baMkp1ZZhnaT5HZPSA+M7mD7tJRTUMYwf0XGFlUZhOHk/ic5v1223s7N
- ovk2ApWkbtgcufez6WAuXbKOtBgW5iVgHHi9OWla4NldRmJRKPnel4K7IEERbCDeszpz wA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2130.oracle.com with ESMTP id 337eer7gpt-1
+ bh=URKUbVRt2VBnaQr1iHIBg3OY8YM1Q3u7gh+wje0xXcE=;
+ b=R39uBhOdH7pL+BcuYu+mFaQ/DHsxC0iGHlJv4Qt1t94Jw1KlsYEGACI/kqUxu3YFOq4x
+ 6RzefqZNNOxf3lcLdtMIbc3oIjBO3RFDcP3GPxp73ZNhxI/7Hjkyw48J81MOEWvgjlD0
+ 9YwhoqfRVp89uYYYE3Cg1BETh+e3VOTnKC/iMUCpoQhYOe/gYlKUctpql5d7BmweQDtW
+ QTXIfmdRSVD/wSUuicwDRKGp6BNmxduVA1DWkXqNl9hJAannmRd24EAEbt2NnJ8lxzRo
+ Af5/MAk2gTffdZvB+WEJuvj3eiOSoCWd3nuHzKkKOAcB94+l8IKE+dQR4f3e9+g9jDQ7 XQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 337eer7gxb-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 03 Sep 2020 08:49:49 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0838jHG9115934;
- Thu, 3 Sep 2020 08:49:48 GMT
+ Thu, 03 Sep 2020 08:50:15 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0838nmZE161786;
+ Thu, 3 Sep 2020 08:50:15 GMT
 Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 3380krdfsq-1
+ by userp3030.oracle.com with ESMTP id 3380y1g2ad-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 03 Sep 2020 08:49:48 +0000
-Received: from abhmp0019.oracle.com (abhmp0019.oracle.com [141.146.116.25])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0838nlDf009472;
- Thu, 3 Sep 2020 08:49:47 GMT
+ Thu, 03 Sep 2020 08:50:15 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0838oEp1010972;
+ Thu, 3 Sep 2020 08:50:14 GMT
 Received: from starbug-mbp.localdomain (/79.97.215.145)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 03 Sep 2020 01:49:47 -0700
+ with ESMTP ; Thu, 03 Sep 2020 01:50:13 -0700
 Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id 91DE5134F2B8; Thu,  3 Sep 2020 09:49:44 +0100 (IST)
+ id 154F3134F2E3; Thu,  3 Sep 2020 09:50:10 +0100 (IST)
 From: Darren Kenny <darren.kenny@oracle.com>
 To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 08/15] fuzz: add a DISABLE_PCI op to general-fuzzer
-In-Reply-To: <20200819061110.1320568-9-alxndr@bu.edu>
+Subject: Re: [PATCH v2 07/15] fuzz: Add support for custom crossover functions
+In-Reply-To: <20200819061110.1320568-8-alxndr@bu.edu>
 References: <20200819061110.1320568-1-alxndr@bu.edu>
- <20200819061110.1320568-9-alxndr@bu.edu>
-Date: Thu, 03 Sep 2020 09:49:44 +0100
-Message-ID: <m2pn73s0rb.fsf@oracle.com>
+ <20200819061110.1320568-8-alxndr@bu.edu>
+Date: Thu, 03 Sep 2020 09:50:10 +0100
+Message-ID: <m2mu27s0ql.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9732
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- spamscore=0 adultscore=0
- mlxscore=0 suspectscore=1 malwarescore=0 mlxlogscore=999 bulkscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ adultscore=0 phishscore=0
+ malwarescore=0 bulkscore=0 mlxscore=0 mlxlogscore=999 suspectscore=1
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009030080
+ definitions=main-2009030081
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9732
  signatures=668679
 X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
@@ -121,85 +121,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wednesday, 2020-08-19 at 02:11:03 -04, Alexander Bulekov wrote:
-> This new operation is used in the next commit, which concatenates two
-> fuzzer-generated inputs. With this operation, we can prevent the second
-> input from clobbering the PCI configuration performed by the first.
+On Wednesday, 2020-08-19 at 02:11:02 -04, Alexander Bulekov wrote:
+> libfuzzer supports a "custom crossover function". Libfuzzer often tries
+> to blend two inputs to create a new interesting input. Sometimes, we
+> have a better idea about how to blend inputs together. This change
+> allows fuzzers to specify a custom function for blending two inputs
+> together.
 >
 > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 
 Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 
 > ---
->  tests/qtest/fuzz/general_fuzz.c | 13 +++++++++++--
->  1 file changed, 11 insertions(+), 2 deletions(-)
+>  tests/qtest/fuzz/fuzz.c | 13 +++++++++++++
+>  tests/qtest/fuzz/fuzz.h | 26 ++++++++++++++++++++++++++
+>  2 files changed, 39 insertions(+)
 >
-> diff --git a/tests/qtest/fuzz/general_fuzz.c b/tests/qtest/fuzz/general_fuzz.c
-> index 36d41acea0..26fcd69e45 100644
-> --- a/tests/qtest/fuzz/general_fuzz.c
-> +++ b/tests/qtest/fuzz/general_fuzz.c
-> @@ -40,6 +40,7 @@ enum cmds{
->      OP_WRITE,
->      OP_PCI_READ,
->      OP_PCI_WRITE,
-> +    OP_DISABLE_PCI,
->      OP_ADD_DMA_PATTERN,
->      OP_CLEAR_DMA_PATTERNS,
->      OP_CLOCK_STEP,
-> @@ -93,6 +94,7 @@ static GArray *dma_regions;
->  
->  static GArray *dma_patterns;
->  static int dma_pattern_index;
-> +static bool pci_disabled = false;
->  
->  void fuzz_dma_read_cb(size_t addr, size_t len, MemoryRegion *mr, bool is_write);
->  
-> @@ -433,7 +435,7 @@ static void op_pci_read(QTestState *s, const unsigned char * data, size_t len)
->          uint8_t base;
->          uint8_t offset;
->      } a;
-> -    if (len < sizeof(a) || fuzzable_pci_devices->len == 0) {
-> +    if (len < sizeof(a) || fuzzable_pci_devices->len == 0 || pci_disabled) {
->          return;
->      }
->      memcpy(&a, data, sizeof(a));
-> @@ -463,7 +465,7 @@ static void op_pci_write(QTestState *s, const unsigned char * data, size_t len)
->          uint8_t offset;
->          uint32_t value;
->      } a;
-> -    if (len < sizeof(a) || fuzzable_pci_devices->len == 0) {
-> +    if (len < sizeof(a) || fuzzable_pci_devices->len == 0 || pci_disabled) {
->          return;
->      }
->      memcpy(&a, data, sizeof(a));
-> @@ -518,6 +520,11 @@ static void op_clock_step(QTestState *s, const unsigned char *data, size_t len)
->      qtest_clock_step_next(s);
+> diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+> index 8234b68754..248fab5f37 100644
+> --- a/tests/qtest/fuzz/fuzz.c
+> +++ b/tests/qtest/fuzz/fuzz.c
+> @@ -118,6 +118,19 @@ static FuzzTarget *fuzz_get_target(char* name)
 >  }
 >  
-> +static void op_disable_pci(QTestState *s, const unsigned char *data, size_t len)
+>  
+> +/* Sometimes called by libfuzzer to mutate two inputs into one */
+> +size_t LLVMFuzzerCustomCrossOver(const uint8_t *data1, size_t size1,
+> +                                 const uint8_t *data2, size_t size2,
+> +                                 uint8_t *out, size_t max_out_size,
+> +                                 unsigned int seed)
 > +{
-> +    pci_disabled = true;
+> +    if(fuzz_target->crossover) {
+> +        return fuzz_target->crossover(data1, size1, data2, size2, out,
+> +                                      max_out_size, seed);
+> +    }
+> +    return 0;
 > +}
 > +
->  static void handle_timeout(int sig)
+>  /* Executed for each fuzzing-input */
+>  int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size)
 >  {
->      if (getenv("QTEST_LOG")) {
-> @@ -559,6 +566,7 @@ static void general_fuzz(QTestState *s, const unsigned char *Data, size_t Size)
->          [OP_WRITE]              = op_write,
->          [OP_PCI_READ]           = op_pci_read,
->          [OP_PCI_WRITE]          = op_pci_write,
-> +        [OP_DISABLE_PCI]        = op_disable_pci,
->          [OP_ADD_DMA_PATTERN]    = op_add_dma_pattern,
->          [OP_CLEAR_DMA_PATTERNS] = op_clear_dma_patterns,
->          [OP_CLOCK_STEP]         = op_clock_step,
-> @@ -591,6 +599,7 @@ static void general_fuzz(QTestState *s, const unsigned char *Data, size_t Size)
->          }
+> diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
+> index 9ca3d107c5..d36642b5ec 100644
+> --- a/tests/qtest/fuzz/fuzz.h
+> +++ b/tests/qtest/fuzz/fuzz.h
+> @@ -77,6 +77,28 @@ typedef struct FuzzTarget {
+>       */
+>      void(*fuzz)(QTestState *, const unsigned char *, size_t);
 >  
->          op_clear_dma_patterns(s, NULL, 0);
-> +        pci_disabled = false;
+> +    /*
+> +     * The fuzzer can specify a "Custom Crossover" function for combining two
+> +     * inputs from the corpus. This function is sometimes called by libfuzzer
+> +     * when mutating inputs.
+> +     *
+> +     * data1: location of first input
+> +     * size1: length of first input
+> +     * data1: location of second input
+> +     * size1: length of second input
+> +     * out: where to place the resulting, mutated input
+> +     * max_out_size: the maximum length of the input that can be placed in out
+> +     * seed: the seed that should be used to make mutations deterministic, when needed
+> +     *
+> +     * See libfuzzer's LLVMFuzzerCustomCrossOver API for more info.
+> +     *
+> +     * Can be NULL
+> +     */
+> +    size_t(*crossover)(const uint8_t *data1, size_t size1,
+> +                       const uint8_t *data2, size_t size2,
+> +                       uint8_t *out, size_t max_out_size,
+> +                       unsigned int seed);
+> +
+>  } FuzzTarget;
 >  
->          while (cmd && Size) {
->              /* Get the length until the next command or end of input */
+>  void flush_events(QTestState *);
+> @@ -91,6 +113,10 @@ void fuzz_qtest_set_serialize(bool option);
+>   */
+>  void fuzz_add_target(const FuzzTarget *target);
+>  
+> +size_t LLVMFuzzerCustomCrossOver(const uint8_t *data1, size_t size1,
+> +                                 const uint8_t *data2, size_t size2,
+> +                                 uint8_t *out, size_t max_out_size,
+> +                                 unsigned int seed);
+>  int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size);
+>  int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp);
+>  
 > -- 
 > 2.27.0
 
