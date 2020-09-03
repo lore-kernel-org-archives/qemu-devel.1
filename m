@@ -2,97 +2,75 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 716A3C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F340C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:39:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2157B206EB
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:38:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59B9F206EB
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:39:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IFUUr761"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2157B206EB
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0DazbsO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59B9F206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDoVq-0006TB-7F
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:38:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53386)
+	id 1kDoWU-0007l6-7V
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:39:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoM4-0008JP-Lb
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:28:40 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:40468
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDoP5-0004jb-2M
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:31:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37847
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoM1-0007pt-TY
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:28:40 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDoP2-0008HT-1Q
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:31:46 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599136117;
+ s=mimecast20190719; t=1599136303;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=TpInLQtjibVwG+zHArB9u5D41zSFCvAlrqN3dTWS+aM=;
- b=IFUUr7611XcwQORD9cLpiLrR0GqqBhaRWRiv3ZpML8zvkfbq5iy1RwG1ryqNM/pvViIOkj
- s4lbO5LeJU0/O4B/r0tBUcnMROGo2gS8NPimUgtcD66TNCpiclIDBYQ1cU9G0qrGwwJkOn
- 48p0kD2mO/gML6k1MSyAhUMFHv8HhFc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-551-KbZxYBdGPOufh3muQOhwfg-1; Thu, 03 Sep 2020 08:28:36 -0400
-X-MC-Unique: KbZxYBdGPOufh3muQOhwfg-1
-Received: by mail-wr1-f70.google.com with SMTP id n15so1005834wrv.23
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:28:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=TpInLQtjibVwG+zHArB9u5D41zSFCvAlrqN3dTWS+aM=;
- b=QOZ+PDBCpepYte9qVlFz5oALBMvmDb/DWRHYUUmpKndRTkxO1DgdEI032XFYmYYEvy
- WIqNnFj9cmNVrFXjydLLIw7mPyPlmvhJIHSsHiYqgQ04iot8WThAGVgHftIRmQ7b1OKg
- oPqfzjh13fWdYCoO6Rqu/KaM9ff6hJfjcgD2TWoZtDZbhPZyp+IGWo3rLeTABlX2WO2S
- zM7A9qW0SkY/pLPui432r0oiKhMlIEbNxRyHkb9XxGneNPBfa9hqeCmD98DUmK6+pfgQ
- 4ikdLxiD+bqXydMnDHjYEyFPUJWcHwnV0eKPFyMZqKuz3DY2dCt7Ie8qxu1Fc/OvKq2Z
- v+mA==
-X-Gm-Message-State: AOAM530Nuhe2thWBj4azTu6tApsQNVtde0J0Vcee8emHYo9m9lpiVgw7
- eowPE/niUExXYP+cZlIbllECyqU499lxK3sUbFiObyWT3APkr3JAl9OHN/GQosM+5MyZmGBkAwT
- mw7gvfnUzfHB97tQ=
-X-Received: by 2002:a5d:6852:: with SMTP id o18mr2196693wrw.113.1599136114514; 
- Thu, 03 Sep 2020 05:28:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz8CmIhwAQ9b93PJpqyYHFIs49vhIFH4Ne2ggMTM6P2hhq/nbFCE1VZQ5IjKH/daarphlDDJg==
-X-Received: by 2002:a5d:6852:: with SMTP id o18mr2196671wrw.113.1599136114366; 
- Thu, 03 Sep 2020 05:28:34 -0700 (PDT)
-Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id y207sm4495098wmc.17.2020.09.03.05.28.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 05:28:33 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 06/15] block/nvme: Use common error path in
- nvme_add_io_queue()
-Date: Thu,  3 Sep 2020 14:27:54 +0200
-Message-Id: <20200903122803.405265-7-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200903122803.405265-1-philmd@redhat.com>
-References: <20200903122803.405265-1-philmd@redhat.com>
-MIME-Version: 1.0
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=IGT2ePio+C2hsEldTT04onhkAN0WzzQ5DzluG26/Gv8=;
+ b=I0DazbsOh8ZzFsYaUZopUfoRjXSqd3Zo+J0oLBiPxpP/p3a4wJJbY6O0sLUAe0IWaQ95Gl
+ rXw+Hloo2vBe1kTBEsv3aMdETAKjJAcFD9dWD5Z2dhQyE6r82D/gjRChVvGNgkYP9uQ9kI
+ LEJ3LK1BMdSSXCySSuUzrMpyXXb8yIs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-302-dibmwhefOXOC44RhflhQ8w-1; Thu, 03 Sep 2020 08:31:39 -0400
+X-MC-Unique: dibmwhefOXOC44RhflhQ8w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A44110ABDC2;
+ Thu,  3 Sep 2020 12:31:38 +0000 (UTC)
+Received: from thuth.com (ovpn-114-10.ams2.redhat.com [10.36.114.10])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 26BCF60250;
+ Thu,  3 Sep 2020 12:31:36 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL v3 06/15] meson: fix keymaps without qemu-keymap
+Date: Thu,  3 Sep 2020 14:31:30 +0200
+Message-Id: <20200903123130.451577-2-thuth@redhat.com>
+In-Reply-To: <20200903123130.451577-1-thuth@redhat.com>
+References: <20200903123130.451577-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -100,7 +78,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,60 +91,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Keith Busch <kbusch@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rearrange nvme_add_io_queue() by using a common error path.
-This will be proven useful in few commits where we add IRQ
-notification to the IO queues.
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+In case the qemu-keymap tool generating them is neither installed on the
+system nor built from sources (due to xkbcommon not being available)
+qemu will not find the keymaps when started directly from the build
+tree,
+
+This happens because commit ddcf607fa3d6 ("meson: drop keymaps symlink")
+removed the symlink to the source tree, and the special handling for
+install doesn't help in case we do not install qemu.
+
+Lets fix that by simply copying over the file from the source tree as
+fallback.
+
+Reported-by: Thomas Huth <thuth@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-Id: <20200827102617.14448-1-kraxel@redhat.com>
+[thuth: Rebased, changed "config_host['qemu_datadir']" to "qemu_datadir",
+        added Gerd's UNLINK fix to configure script]
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- block/nvme.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ configure                   |  9 +++++++++
+ pc-bios/keymaps/meson.build | 28 +++++++++++++++++++---------
+ 2 files changed, 28 insertions(+), 9 deletions(-)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 91dba4ec5db..909a565184d 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -649,8 +649,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-     };
-     if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to create CQ io queue [%d]", n);
--        nvme_free_queue_pair(q);
--        return false;
-+        goto out_error;
-     }
-     cmd = (NvmeCmd) {
-         .opcode = NVME_ADM_CMD_CREATE_SQ,
-@@ -660,13 +659,15 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-     };
-     if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to create SQ io queue [%d]", n);
--        nvme_free_queue_pair(q);
--        return false;
-+        goto out_error;
-     }
-     s->queues = g_renew(NVMeQueuePair *, s->queues, n + 1);
-     s->queues[n] = q;
-     s->nr_queues++;
-     return true;
-+out_error:
-+    nvme_free_queue_pair(q);
-+    return false;
- }
+diff --git a/configure b/configure
+index 5645575688..be5434793c 100755
+--- a/configure
++++ b/configure
+@@ -8065,6 +8065,9 @@ fi
+ # so the build tree will be missing the link back to the new file, and
+ # tests might fail. Prefer to keep the relevant files in their own
+ # directory and symlink the directory instead.
++# UNLINK is used to remove symlinks from older development versions
++# that might get into the way when doing "git update" without doing
++# a "make distclean" in between.
+ DIRS="tests tests/tcg tests/tcg/lm32 tests/qapi-schema tests/qtest/libqos"
+ DIRS="$DIRS tests/qtest tests/qemu-iotests tests/vm tests/fp tests/qgraph"
+ DIRS="$DIRS docs docs/interop fsdev scsi"
+@@ -8081,6 +8084,7 @@ LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
+ LINKS="$LINKS tests/acceptance tests/data"
+ LINKS="$LINKS tests/qemu-iotests/check"
+ LINKS="$LINKS python"
++UNLINK="pc-bios/keymaps"
+ for bios_file in \
+     $source_path/pc-bios/*.bin \
+     $source_path/pc-bios/*.elf \
+@@ -8101,6 +8105,11 @@ for f in $LINKS ; do
+         symlink "$source_path/$f" "$f"
+     fi
+ done
++for f in $UNLINK ; do
++    if [ -L "$f" ]; then
++        rm -f "$f"
++    fi
++done
  
- static bool nvme_poll_cb(void *opaque)
+ (for i in $cross_cc_vars; do
+   export $i
+diff --git a/pc-bios/keymaps/meson.build b/pc-bios/keymaps/meson.build
+index bbac83ece3..2e2e0dfa3b 100644
+--- a/pc-bios/keymaps/meson.build
++++ b/pc-bios/keymaps/meson.build
+@@ -38,19 +38,29 @@ if meson.is_cross_build() or 'CONFIG_XKBCOMMON' not in config_host
+ else
+   native_qemu_keymap = qemu_keymap
+ endif
++
+ t = []
+ foreach km, args: keymaps
+-  t += custom_target(km,
+-                     build_by_default: true,
+-                     output: km,
+-                     command: [native_qemu_keymap, '-f', '@OUTPUT@', args.split()],
+-                     install_dir: qemu_datadir / 'keymaps')
++  if native_qemu_keymap.found()
++    # generate with qemu-kvm
++    t += custom_target(km,
++                       build_by_default: true,
++                       output: km,
++                       command: [native_qemu_keymap, '-f', '@OUTPUT@', args.split()],
++                       install_dir: qemu_datadir / 'keymaps')
++  else
++    # copy from source tree
++    t += custom_target(km,
++                       build_by_default: true,
++                       input: km,
++                       output: km,
++                       command: ['cp', '@INPUT@', '@OUTPUT@'],
++                       install_dir: qemu_datadir / 'keymaps')
++  endif
+ endforeach
+-if t.length() > 0
++
++if native_qemu_keymap.found()
+   alias_target('update-keymaps', t)
+-else
+-  # install from the source tree
+-  install_data(keymaps.keys(), install_dir: qemu_datadir / 'keymaps')
+ endif
+ 
+ install_data(['sl', 'sv'], install_dir: qemu_datadir / 'keymaps')
 -- 
-2.26.2
+2.18.2
 
 
