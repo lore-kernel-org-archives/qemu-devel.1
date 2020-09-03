@@ -2,90 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,TVD_SPACE_RATIO,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10022C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:47:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E20BC433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:49:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6A8A206EB
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:47:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2CC48206EB
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:49:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="boLuaaNZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A8A206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E+MHF/mw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CC48206EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDniJ-000668-FV
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:47:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42162)
+	id 1kDnjg-0007FD-By
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:49:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDnhj-0005fX-Fl
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:46:59 -0400
-Received: from mail-pg1-x536.google.com ([2607:f8b0:4864:20::536]:37742)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDnhh-0002B8-Rr
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:46:59 -0400
-Received: by mail-pg1-x536.google.com with SMTP id 5so1933456pgl.4
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:46:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/soWbwhyXIQvyhXLT89cpgQV3vO3BDPhxGB8xLxnnps=;
- b=boLuaaNZMNMK0K008EdMkYiGACU0jgkAkOoTNWeMj4Qvp36d1YSs5pv9c99GdWdI6o
- TFyfOAC7YYxBrlawV78SbSU/PfN2f/PwTqnuA+HrlGPn5aFpY3IW0Ih+CWWWDKqLVluK
- wEZVHFlRufvhvrwujk0jFQ5Et1HmFUrA6Nn0YyCfmjMRFK/K0K+RhVoFmGi0U4HcilBM
- KVmgSBdC8uLcn/vdH6BCo17AADpsRajnGzKMFYnq8lDZXpQm/tw2PuqojWM3vWcCM7pB
- fMnZF8pHlNGAQXKmVHRuImpz3dr3oQWhpPSvmODbK3vrHEvFupyyi7pIBrhLEDBEBQZb
- hlig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=/soWbwhyXIQvyhXLT89cpgQV3vO3BDPhxGB8xLxnnps=;
- b=JNJ20UFfPhcj/xSZX29/tlqayxlsFnMBzKdONPyWxkK+2S0mcUrr3pLW0LnhWN6cjb
- UwvlItGh3x9ngLzGj81aX/8fG71YcIhuMLWHkWCo208ryUPAPTuUOzK2v5xrt72gDRI+
- 2GRwPU4b2KbMje2VvEt6pq8KtWuuRdCdGtUeQMye+e+NZ84P3poD8nNBUP0/Vs1rizPA
- hhln12aZWFilSngw/G84oM+AjcNPsgewEDxn0T+KYWBaXqysDXvRHGh6jNY56W3AITxK
- 0n4MV+KXys+dyVGzxDI4S+PAR3duL0i/Cw1Pp4TLT3cunx0qiac93yrPmDE8xd4PuNqr
- JcQQ==
-X-Gm-Message-State: AOAM533S+DhSBk8IgAEjR3VUUoC5vNumvqDlS74coanx1CpQmeiSL6go
- REs93IH5szSr7duVDLgXyxm9rNcsKTO3QdiR
-X-Google-Smtp-Source: ABdhPJwYbadXrOXttMHujQbtE/fkhJ0Q/UFsVUDpXcSa73xwFTd7eNBBRl64vsZa11GvzTW20rKKLQ==
-X-Received: by 2002:a63:4e5e:: with SMTP id o30mr2627602pgl.254.1599133615914; 
- Thu, 03 Sep 2020 04:46:55 -0700 (PDT)
-Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id y3sm2466717pjg.8.2020.09.03.04.46.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 04:46:55 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] docker: Add win32/msys2/mingw64 docker
-Date: Thu,  3 Sep 2020 19:46:42 +0800
-Message-Id: <20200903114642.1620-1-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDnj4-0006fL-Ik
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:48:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52495)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDnj0-0002Gn-SW
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:48:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599133696;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=mzNSoeywjXO6rdCV2kJtu7Hk8SJX50hh0HmN1ZRX/Wk=;
+ b=E+MHF/mwwG6vH2Y2VPzLqIw/x8aRjHjub8ngKHnATUMqoBZ+ydoq0tA0ReAs/ABUxPSgp0
+ z0apTUoYYNHL+5478Quk0AK2vpppIpg3BrMK2CtyjvRPtzTt/BgNepmy3DFtcuECj7K1j2
+ Urm9nLVNipB9MF4JZRUoPjEYjJkNtrw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-gTXyq0w9OxaV4EmhoTRceQ-1; Thu, 03 Sep 2020 07:48:15 -0400
+X-MC-Unique: gTXyq0w9OxaV4EmhoTRceQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31DD881CBEB;
+ Thu,  3 Sep 2020 11:48:14 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D70507EECB;
+ Thu,  3 Sep 2020 11:48:10 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 51C3D113865F; Thu,  3 Sep 2020 13:48:09 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: duboisj@gmail.com
+Subject: Re: [PATCH] trace/simple: Enable tracing on startup only if the
+ user specifies a trace option
+References: <20200816174610.20253-1-josh@joshdubois.com>
+Date: Thu, 03 Sep 2020 13:48:09 +0200
+In-Reply-To: <20200816174610.20253-1-josh@joshdubois.com> (duboisj@gmail.com's
+ message of "Sun, 16 Aug 2020 12:46:10 -0500")
+Message-ID: <87r1rjkrnq.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::536;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x536.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,35 +97,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
+Cc: qemu-trivial@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel@nongnu.org, Josh DuBois <josh@joshdubois.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
----
- tests/docker/dockerfiles/msys2.docker | 11 +++++++++++
- 1 file changed, 11 insertions(+)
- create mode 100644 tests/docker/dockerfiles/msys2.docker
+duboisj@gmail.com writes:
 
-diff --git a/tests/docker/dockerfiles/msys2.docker b/tests/docker/dockerfiles/msys2.docker
-new file mode 100644
-index 0000000000..f898e0803d
---- /dev/null
-+++ b/tests/docker/dockerfiles/msys2.docker
-@@ -0,0 +1,11 @@
-+FROM cirrusci/windowsservercore:cmake
-+RUN echo | choco install -y --no-progress --ignore-package-exit-codes --params "/NoUpdate /InstallDir:C:\tools\msys64" msys2
-+COPY msys2_install.sh C:/tools
-+RUN C:\tools\msys64\usr\bin\bash.exe -lc "grep -rl 'repo.msys2.org/' /etc/pacman.d/mirrorlist.* | xargs sed -i 's/repo.msys2.org\//mirrors.ustc.edu.cn\/msys2\//g'"
-+RUN C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Sy"
-+RUN C:\tools\msys64\usr\bin\bash.exe -lc "sh /c/tools/msys2_install.sh"
-+RUN C:\tools\msys64\usr\bin\bash.exe -lc "rm -rf /var/cache/pacman/pkg/*"
-+
-+# docker build --tag lygstate/windowsservercore:msys2 -f "../../../tests/docker/dockerfiles/msys2.docker" .
-+# docker run -it lygstate/windowsservercore:msys2 cmd
-+# docker push lygstate/windowsservercore:msys2
--- 
-2.28.0.windows.1
+> From: Josh DuBois <josh@joshdubois.com>
+>
+> Tracing can be enabled at the command line or via the
+> monitor. Command-line trace options are recorded during
+> trace_opt_parse(), but tracing is not enabled until the various
+> front-ends later call trace_init_file(). If the user passes a trace
+> option on the command-line, remember that and enable tracing during
+> trace_init_file().  Otherwise, trace_init_file() should record the
+> trace file specified by the frontend and avoid enabling traces
+> until the user requests them via the monitor.
+>
+> This fixes 1b7157be3a8c4300fc8044d40f4b2e64a152a1b4 and also
+> db25d56c014aa1a96319c663e0a60346a223b31e, by allowing the user
+> to enable traces on the command line and also avoiding
+> unwanted trace-<pid> files when the user has not asked for them.
+>
+> Fixes: 1b7157be3a8c4300fc8044d40f4b2e64a152a1b4
+> Signed-off-by: Josh DuBois <josh@joshdubois.com>
+> ---
+>  trace/control.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/trace/control.c b/trace/control.c
+> index 6558b5c906..8f94f09444 100644
+> --- a/trace/control.c
+> +++ b/trace/control.c
+> @@ -39,6 +39,7 @@ static TraceEventGroup *event_groups;
+>  static size_t nevent_groups;
+>  static uint32_t next_id;
+>  static uint32_t next_vcpu_id;
+> +static bool init_trace_on_startup;
+>  
+>  QemuOptsList qemu_trace_opts = {
+>      .name = "trace",
+> @@ -225,7 +226,9 @@ void trace_init_file(const char *file)
+>  {
+>  #ifdef CONFIG_TRACE_SIMPLE
+>      st_set_trace_file(file);
+> -    st_set_trace_file_enabled(true);
+> +    if (init_trace_on_startup) {
+> +        st_set_trace_file_enabled(true);
+> +    }
+>  #elif defined CONFIG_TRACE_LOG
+>      /*
+>       * If both the simple and the log backends are enabled, "--trace file"
+> @@ -299,6 +302,7 @@ char *trace_opt_parse(const char *optarg)
+>      }
+>      trace_init_events(qemu_opt_get(opts, "events"));
+>      trace_file = g_strdup(qemu_opt_get(opts, "file"));
+> +    init_trace_on_startup = true;
+>      qemu_opts_del(opts);
+>  
+>      return trace_file;
+
+Stops the littering for me.
+
+Stefan, please have a closer look.
 
 
