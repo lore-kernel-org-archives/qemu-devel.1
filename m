@@ -2,90 +2,90 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE7A8C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDDF0C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:33:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE06B206EF
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 729CC2072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:33:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cq5b3n6+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE06B206EF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bqlRJZlq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 729CC2072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDpE3-0004Nw-PX
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:24:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42042)
+	id 1kDpMO-0008VZ-Da
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:33:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kDpDW-0003pU-Dd
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:23:54 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38097
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kDpDT-0006l7-GF
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:23:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599139430;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=HcxJFieVY4YuZVuY/Wsb12wMqPxs6kbweiJuP3IE9QE=;
- b=Cq5b3n6+Hp/N9lvslF1EaXcR5dhCqqE1Tm0Fzi1JoHvDLxxy2hRxDNfqicW8iksU0Me/o3
- m0gPZdJsfA5YgBrMBOqvUsD45yuekqZL5oea8Svg2zGuJakqGn6OKLhGHoFu7OL7XyqB7G
- 0RfREtsfeMLtbC+f3qbybVk9SMmcn0E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-179-mJtYZgH-N7ydNqznqchFxA-1; Thu, 03 Sep 2020 09:23:47 -0400
-X-MC-Unique: mJtYZgH-N7ydNqznqchFxA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D189418BA28C;
- Thu,  3 Sep 2020 13:23:46 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-114-183.ams2.redhat.com [10.36.114.183])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 18B1E5D9CC;
- Thu,  3 Sep 2020 13:23:44 +0000 (UTC)
-Date: Thu, 3 Sep 2020 15:23:43 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [RFC qemu 0/6] mirror: implement incremental and bitmap modes
-Message-ID: <20200903132343.GD8835@linux.fritz.box>
-References: <20200218100740.2228521-1-f.gruenbichler@proxmox.com>
- <d35a76de-78d5-af56-0b34-f7bd2bbd3733@redhat.com>
- <1599127031.9uxdp5h9o2.astroid@nora.none>
- <ef545f46-7cbb-43f0-2ab8-f3d49643d1e6@redhat.com>
- <20200903123850.GB8835@linux.fritz.box>
- <ec747431-b2fa-2e67-984b-3cf70e0c79e4@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDpLc-0007HH-4j
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:32:16 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:38326)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDpLa-0007up-98
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:32:15 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id g4so3263522wrs.5
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 06:32:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=IS2FHzcfT+ool6leykwthfQBd2V3RQBhWX+2lK4kgQI=;
+ b=bqlRJZlqNn/GTIJmJrTh5zrBPGPKEnn1llMYtjSitorBlIHMCVxqvLy7zCrjdwjFpz
+ /KTRQQAyD9wfmDogOlQ9ttZ7kJ5Qp01Kg7MMAzOBHmjpXTqpMq/i/0exwINk0cnfDdhy
+ eyG2oh8gnChxqKdGPostdg1y57vKdF2HSGCu4+m8AqD5NhKcOE00FNLfJUWC/SM2kr+x
+ hl+IUzd0yGz9gQpvvRpjxcMVLpdRhsoCm/WeZaYZdkhX0R+3uCqqqzupYLgDOaNZPV2c
+ R1YaqJo+Pe+QRkXAyQYdyghAcSaPyZPh/K2hiXHo3t6MR4IZECSZKIoF9ZlBYFjmM+Kh
+ 2+ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=IS2FHzcfT+ool6leykwthfQBd2V3RQBhWX+2lK4kgQI=;
+ b=GU960iRU0WEwGvkicMKuH54HlfmDdlgtWtyCj3VCF8aYBvxDFnglL57SQNrXgkPhec
+ 49wcz5F84LS8jwHToR9jlGhHN/kEP6ZMxHEIbkeHrlb5QsPq2ZCqIQufxMfgU02W2C8b
+ 7Xx42E7s9nKNNlaJQBrvhKcY4IGoR4Qv4b998L/yDUxi/jLnjfc24PNinE+tyr/K6iYH
+ oIjlICybLGV/rmYKbgng7eYqi+zbBAJNwAEYVg+YOQ3SiLq6XPB7CTBsOlPtTqENJxkJ
+ DalEj6+FruHkhzK2u6g9G9Q0StnzE9yn0NJIByu44aZdFLxeRjzxuNCVFA82PpWYiVgr
+ HQqw==
+X-Gm-Message-State: AOAM530naX/FzHe0yaU/MIaxjHe/VxBVMpeoTcfuZt3OQw8NVdDARvEX
+ r60cHofczhwmeDUMrt4gdpSOeg==
+X-Google-Smtp-Source: ABdhPJzg+ZuDr+RB0S/GbP7z1E/qXXpoH/JvlR0Dbk07Tyok3gkqTvUqdoulD8ZReWJJABd3o9kHWw==
+X-Received: by 2002:adf:f808:: with SMTP id s8mr2476180wrp.268.1599139932186; 
+ Thu, 03 Sep 2020 06:32:12 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id k24sm4301988wmj.19.2020.09.03.06.32.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 06:32:11 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 0/3] target/arm: Decode Neon fp sizes in decodetree
+Date: Thu,  3 Sep 2020 14:32:06 +0100
+Message-Id: <20200903133209.5141-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <ec747431-b2fa-2e67-984b-3cf70e0c79e4@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="8GpibOaaTibBMecb"
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 00:24:51
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,78 +98,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>,
- Fabian =?iso-8859-1?Q?Gr=FCnbichler?= <f.gruenbichler@proxmox.com>,
- John Snow <jsnow@redhat.com>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---8GpibOaaTibBMecb
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patchset fixes something that Richard pointed out during
+review of my fp16 patchset.
 
-Am 03.09.2020 um 14:57 hat Max Reitz geschrieben:
-> On 03.09.20 14:38, Kevin Wolf wrote:
-> > Am 03.09.2020 um 13:04 hat Max Reitz geschrieben:
-> >> On 03.09.20 12:13, Fabian Gr=C3=BCnbichler wrote:
-> >>> On August 21, 2020 3:03 pm, Max Reitz wrote:
-> >>>> On 18.02.20 11:07, Fabian Gr=C3=BCnbichler wrote:
-> >>> I am not sure how=20
-> >>> the S-O-B by John is supposed to enter the mix - should I just includ=
-e=20
-> >>> it in the squashed patch (which would be partly authored, but=20
-> >>> not-yet-signed-off by him otherwise?)?
-> >>
-> >> I=E2=80=99m not too sure on the proceedings, actually.  I think it sho=
-uld be
-> >> fine if you put his S-o-b there, as long as your patch is somehow base=
-d
-> >> on a patch that he sent earlier with his S-o-b underneath.  But I=E2=
-=80=99m not
-> >> sure.
-> >=20
-> > Signed-off-by means that John certifies the DCO for the patch (at least
-> > the original version that you possibly modified), so you cannot just ad=
-d
-> > it without asking him.
->=20
-> But what if you take a patch from someone and heavily modify it =E2=80=93
-> wouldn=E2=80=99t you keep the original S-o-b and explain the modification=
-s in
-> the commit message?
+In the Neon instruction set, integer operations always have a 2-bit
+size field with an encoding corresponding to QEMU's MO_{8,16,32,64}
+constants: 0 for 8 bit, 1 for 16 bit, 2 for 32 bit and 3 for 64-bit.
+However for the floating point instructions, since only 16-bit
+and 32-bit floats are supported some instructions use one of the
+size bits as part of decode, leaving only a 1-bit size field,
+which might be encoded either as 0 for 16-bit float and 1 for
+32-bit float, or the other way around as 0 for 32-bit float and
+1 for 16-bit float.
 
-Ah, if that patch already had a S-o-b, then yes. You keep it not only to
-show who touched the patch, but also because your own S-o-b depends on
-the one from the original author (you only have the rights to contribute
-it because the original author had them and could pass them on to you).
+Currently we simply pass the raw size field values through from
+decodetree to the trans_ functions, which means that when reading
+or writing the code for a trans_ function you need to know the
+encoding of the size field for that insn. This patchset moves
+the handling of the different possible encodings into the decodetree
+file, so that the trans_ function is always passed a MO_* value
+for the size.
 
-I thought it was based on a patch that came without S-o-b.
+thanks
+-- PMM
 
-Kevin
+Peter Maydell (3):
+  target/arm: Convert Neon 3-same-fp size field to MO_* in decode
+  target/arm: Convert Neon VCVT fp size field to MO_* in decode
+  target/arm: Convert VCMLA, VCADD size field to MO_* in decode
 
---8GpibOaaTibBMecb
-Content-Type: application/pgp-signature; name="signature.asc"
+ target/arm/neon-dp.decode       | 18 ++++++++------
+ target/arm/neon-shared.decode   | 18 +++++++++-----
+ target/arm/translate-neon.c.inc | 42 ++++++++++++++++++++-------------
+ 3 files changed, 48 insertions(+), 30 deletions(-)
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl9Q7l8ACgkQfwmycsiP
-L9a4ew//Vbi0G8WyFc/ntdpijv4EJATjbUDAHm9W488y0g9MCwiWvPlOb1BnZuf9
-US6A3VkjtmTlSWEvMYe0XgQ+BI58aCOFmYdZTsUydGyrVauaTkBDov43DS/YJfB9
-V2GIBWr5lFRhXtB+xhfFjvwHA4NhOM09HHGpYjm1Vjmih2QWhYiVn/E/wtVZ+FFg
-vpgpNcrG6bydARrX06fiNH8QmdxZ7UaPTHNLJXjK7iecNT0b5zycnPtPgAPgWbDs
-ySKWkS2y4Jw2VQx1n45290J61BdEc7g7VgG0/8CSDXNjM6F5M7lhbekmEHBAgtPQ
-tirUKL1pQDSnj4N1hRbtc4D8hEKKh/Rq79043lmJte10B/k1y+C2y/A/L51YVB4I
-7Oivo/sOkQiLN+446TmMthf+5ExkRqMSp0I/94doHlQyHQDSawzq0xR2X+QYQN7g
-yqpLEkM9j7AFLnSDB5ZfGoUSwuGUxdQ52PoJnWHR41i7fLir5q1x/nDLYtDDVO4D
-XaBo3+c5c3MgZLPgN4MNimNtzdv9M19q9jqSFw1xeNfaSujwh1SUP73MtSUTiZZk
-M+ZACmzKquiNmjAVBsioFeyDc69qTYDx6a2cA1Zu0BdhqOBQp/wyx9SH52Pv7ra1
-T2baiacZRTYP7F4ZAsZVL6WxeZk+uT3lbuhZyWsbFrBy1FVOH6w=
-=36rc
------END PGP SIGNATURE-----
-
---8GpibOaaTibBMecb--
+-- 
+2.20.1
 
 
