@@ -2,71 +2,82 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C258C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 518B2C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD5D320665
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:46:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1AA2020665
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:47:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8rUORF1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD5D320665
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXxsJ3Gc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA2020665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53312 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDi4c-0000dC-38
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 01:46:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50586)
+	id 1kDi6I-0001pm-B5
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 01:47:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDi3f-000063-02
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:45:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21592)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kDi5f-00017b-Gb
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:47:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38497)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDi3b-0006fR-2e
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:45:14 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kDi5d-0007MV-Vh
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:47:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599111909;
+ s=mimecast20190719; t=1599112037;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=5To05iZyCKjCChYbkY8p3ROFswdIR4gTrfcFvLIeb7w=;
- b=c8rUORF11lndEkvVL16vHe0UmbqYWHRlP5ERSJ9ss8mKLAe/k1iuIMFM1x0Jii/DJYvBC8
- k91QQddxUafHer+sxghbiP9pMdebYobThrk/PdFRmt2gpy4A47q92m9Zd0SDEQhH3ecTz0
- uZN40Uazxkhv5bsXH3FB88cHM88mgjo=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Yvp/ImzPMt39bxPyLCzp6LQbYjuKLzWAteVcqDwfdXg=;
+ b=PXxsJ3GcUkCkOFR8h7tC//znnMTg63VwU7112DpGdMqbgEUgpWfrYOltYILFpMp8TaFSEQ
+ Qb5GmOg6CCRlFesMsPSx0YeTOcplI0UBgg7C7J4FmXkMFLKEq4Ox4XLhtJ/e6eQS5R/TWz
+ Y9gZc7sZXDA503fZaduxwTvkj2GxuHg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-yDVDMx2YPna7bCDDFYAAVg-1; Thu, 03 Sep 2020 01:45:07 -0400
-X-MC-Unique: yDVDMx2YPna7bCDDFYAAVg-1
+ us-mta-217-ehLh0cbXNVGULK0wC0Byag-1; Thu, 03 Sep 2020 01:47:13 -0400
+X-MC-Unique: ehLh0cbXNVGULK0wC0Byag-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 963BB801AE0
- for <qemu-devel@nongnu.org>; Thu,  3 Sep 2020 05:45:06 +0000 (UTC)
-Received: from thuth.com (ovpn-112-90.ams2.redhat.com [10.36.112.90])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 74E187E670;
- Thu,  3 Sep 2020 05:45:05 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] stubs: Move qemu_fd_register stub to util/main-loop.c
-Date: Thu,  3 Sep 2020 07:45:03 +0200
-Message-Id: <20200903054503.425435-1-thuth@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F55C1DDE8;
+ Thu,  3 Sep 2020 05:47:12 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
+ [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1DCF378B3C;
+ Thu,  3 Sep 2020 05:47:12 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 3E3D016E31; Thu,  3 Sep 2020 07:47:11 +0200 (CEST)
+Date: Thu, 3 Sep 2020 07:47:11 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PULL v2 00/15] Cirrus-CI improvements, and other CI-related
+ fixes, m68k
+Message-ID: <20200903054711.q7uvc32qlchtugau@sirius.home.kraxel.org>
+References: <20200902154932.390595-1-thuth@redhat.com>
+ <CAFEAcA89Pjp_k5pJh26juFDO1a3M8H_s0+5cGBoZq5v7=ZYing@mail.gmail.com>
+ <cd4a7bf7-c525-1aab-dab6-dcc0d22bf538@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <cd4a7bf7-c525-1aab-dab6-dcc0d22bf538@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 23:55:14
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -87,75 +98,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The linker of MinGW sometimes runs into the following problem:
+  Hi,
 
-libqemuutil.a(util_main-loop.c.obj): In function `qemu_fd_register':
-/builds/huth/qemu/build/../util/main-loop.c:331: multiple definition of
- `qemu_fd_register'
-libqemuutil.a(stubs_fd-register.c.obj):/builds/huth/qemu/stubs/fd-register.c:5:
- first defined here
-collect2: error: ld returned 1 exit status
-/builds/huth/qemu/rules.mak:88: recipe for target 'tests/test-timed-average.exe'
- failed
+> Darn. I've added Gerd's patch since it is needed to fix the acceptance
+> tests in the Gitlab-CI. Could we maybe revert the patch that introduced
+> the regression instead, as long as no other proper fix is available? The
+> failing CI is really bugging me.
 
-qemu_fd_register() is defined in util/main-loop.c for WIN32, so let's simply
-move the stub also there in the #else part of the corresponding #ifndef
-to fix this problem.
+Well, ddcf607fa3d6 fixes another nasty issue (builds modifying the
+source tree), so reverting that isn't really an option.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- stubs/fd-register.c | 6 ------
- stubs/meson.build   | 1 -
- util/main-loop.c    | 4 ++++
- 3 files changed, 4 insertions(+), 7 deletions(-)
- delete mode 100644 stubs/fd-register.c
+We could have configure remove the symlink in case is present.  That way
+old build trees with the symlink already created should work too.  Right
+now only build trees created with ddcf607fa3d6 present are working
+properly.
 
-diff --git a/stubs/fd-register.c b/stubs/fd-register.c
-deleted file mode 100644
-index 63a4abdb20..0000000000
---- a/stubs/fd-register.c
-+++ /dev/null
-@@ -1,6 +0,0 @@
--#include "qemu/osdep.h"
--#include "qemu/main-loop.h"
--
--void qemu_fd_register(int fd)
--{
--}
-diff --git a/stubs/meson.build b/stubs/meson.build
-index e2dfedc2a7..e0b322bc28 100644
---- a/stubs/meson.build
-+++ b/stubs/meson.build
-@@ -9,7 +9,6 @@ stub_ss.add(files('cpu-get-clock.c'))
- stub_ss.add(files('cpu-get-icount.c'))
- stub_ss.add(files('dump.c'))
- stub_ss.add(files('error-printf.c'))
--stub_ss.add(files('fd-register.c'))
- stub_ss.add(files('fdset.c'))
- stub_ss.add(files('fw_cfg.c'))
- stub_ss.add(files('gdbstub.c'))
-diff --git a/util/main-loop.c b/util/main-loop.c
-index f69f055013..217c8d6056 100644
---- a/util/main-loop.c
-+++ b/util/main-loop.c
-@@ -179,6 +179,10 @@ static int max_priority;
- static int glib_pollfds_idx;
- static int glib_n_poll_fds;
+Untested patch below.
+
+take care,
+  Gerd
+
+diff --git a/configure b/configure
+index b1e11397a827..493b4e86da62 100755
+--- a/configure
++++ b/configure
+@@ -8107,6 +8107,7 @@ LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
+ LINKS="$LINKS tests/acceptance tests/data"
+ LINKS="$LINKS tests/qemu-iotests/check"
+ LINKS="$LINKS python"
++UNLINK="pc-bios/keymaps"
+ for bios_file in \
+     $source_path/pc-bios/*.bin \
+     $source_path/pc-bios/*.elf \
+@@ -8127,6 +8128,11 @@ for f in $LINKS ; do
+         symlink "$source_path/$f" "$f"
+     fi
+ done
++for f in $UNLINK ; do
++    if [ -L "$f" ]; then
++        rm -f "$f"
++    fi
++done
  
-+void qemu_fd_register(int fd)
-+{
-+}
-+
- static void glib_pollfds_fill(int64_t *cur_timeout)
- {
-     GMainContext *context = g_main_context_default();
--- 
-2.18.2
+ (for i in $cross_cc_vars; do
+   export $i
 
 
