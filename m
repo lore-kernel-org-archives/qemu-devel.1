@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97667C43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04450C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:26:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 53880206D4
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:26:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8D4E206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:26:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ORoJUkCP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 53880206D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jeC5bky8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8D4E206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwk3-0003Ck-IZ
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:25:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58240)
+	id 1kDwkq-0004eK-S2
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:26:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwKz-0003QG-Qz; Thu, 03 Sep 2020 17:00:05 -0400
-Received: from mail-oo1-xc42.google.com ([2607:f8b0:4864:20::c42]:39605)
+ id 1kDwLA-0003pR-EB; Thu, 03 Sep 2020 17:00:16 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:34043)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwKx-0007Nh-Lu; Thu, 03 Sep 2020 17:00:05 -0400
-Received: by mail-oo1-xc42.google.com with SMTP id m4so1126893oos.6;
- Thu, 03 Sep 2020 14:00:02 -0700 (PDT)
+ id 1kDwL8-0007Sj-CI; Thu, 03 Sep 2020 17:00:15 -0400
+Received: by mail-ot1-x344.google.com with SMTP id h17so3207875otr.1;
+ Thu, 03 Sep 2020 14:00:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=lEZNnKO9GNhaKz9yEgVcPyYgxdyKZQb+4Kbbi2ont1w=;
- b=ORoJUkCP18n5CA8qn/xcmNJ4nPw8c7zyG2zl3XQzYyhQWgSTcAZ36spSzTfoiCFi3U
- fkhzIKYRVPVdVnTG2OfqkOiMa3rNwyIwI9ykCet+BRFiiZp+FcDctdmMa14FfZ6VJJXg
- WvRfTA9W7JloRmRpH/Ro0YDyfTr5AU47UdQfOvGR7cSDftXFfhq611O8v53tcqGg2YOI
- XeuGf1oLBDxg+fp9oljuB+Yjaig/AzTs1o8hni6wSII57KyOPvUhs0TKmEQ0ic8SuDhg
- bh8obQGi6V8ZXzyAb8uKvlqwiEYF+0Cl/LfFntxFInjlGG3HE4QTIsFUTiDniD0IZhTv
- 17vg==
+ bh=3SuwZW28eAjJ3YWBTzrGv938b6MDi9p5c1iamVmgVTs=;
+ b=jeC5bky8i6iuk9jTkRdmcsM7MPX4//PdxWYf0UrMhtLcNDBFofCqLrGeeYfb4nlRd/
+ VHWa+QAiJdFXz6V5HnQdM/XHSGbM60QV4Y0f4cp/aLdmGJNovsrgFChTHQ94cpxu+lAS
+ qVQJkq/a/LdkKx1JCeoTIME6ovIph3nxrokvtwxnAJhk14wChuuy9PWAur1MHQgHXIWS
+ lE6B0o405c9R2j4bVwKKl1WpbSdEchokLpZrbTqyxtW1CK+ecTNu/uZ/EPjVp8DEDE5U
+ ixwwwVJLx76lohrOhoKQprWSm0szhlD0Cbiiaii3k43KoIob3oPLU62OZE5oHmx0gpql
+ 5PXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=lEZNnKO9GNhaKz9yEgVcPyYgxdyKZQb+4Kbbi2ont1w=;
- b=bocVLuA8PBl80QHMOwjFfutI1kB/Ch6JaeRyaVasOoG0SQrPgy72ndRHHBwtZ7lex1
- L+aPwdi8oTGCo1c1HAsF95hvSEyCFAQq0woAE3uYmVBogLy8jIfZ1pcVxveMiCnJiCKd
- KpUARHkJKw4ElkpxQjL2oSzyOcyKlDQLlupiVPBCcwirQ8hLB7FfpqheToI3vb/YqChI
- 8I3zPGMsSvt0lhNdAnObn6KJ2BO3asiu7Nu3nkM7/gI3nMupZTIL5emVAbhVtopOb5fs
- Mw+YCNtSobFUdzPLWa9C6YOedssqEpQlFif7npb3FvQsVjrSAMOs7II/CRoRU25C2hKF
- Cd1A==
-X-Gm-Message-State: AOAM532zaN7vyZduFUGLRFStjSjCCdXCxGIRh9C+xTXjCoUN2CwPy7OT
- EAiIBO477Es3p8vpJMjpTlsgC1qkMeg=
-X-Google-Smtp-Source: ABdhPJzuuAdkGdnNqY/27WYME5ji4tDb2hojvGZMo5k1rgYqPxMR2ZhtHSY+GoqKNMfj4+meLm5Wdw==
-X-Received: by 2002:a4a:bb05:: with SMTP id f5mr3353415oop.5.1599166801381;
- Thu, 03 Sep 2020 14:00:01 -0700 (PDT)
+ bh=3SuwZW28eAjJ3YWBTzrGv938b6MDi9p5c1iamVmgVTs=;
+ b=i3fMOhjMEHRxjjQ3UQ3RACN7wYpxW7htsmAh9TpeAUUOOsfbojv1E2QKi9G5c4lJa4
+ CCSHJpBG+V3ZeDf/xzGAGWzdVuJgLNBVoc4xq0WizMUMIOQ6sl610L5sFI3Dt9WpdC5L
+ wIfwXaQp99wyExd00sNU4+lcvlKSdAXaS7EH/hw3BQ0nHx1dDYLhwsFqmJfJ1KhGLptW
+ JSygj1pBErPgHsrMIe9UangT7EieQsqx4TGsKsx2eEDTcbVmX9XF8o8IJn7J03/BSB/5
+ sd0S0nBai2px98d9VcstrcROvE56Xqjsf90u7R+c32D/E3zruDXFJRWTqrQxn897jEAd
+ mc1g==
+X-Gm-Message-State: AOAM533ie7ivFLw48qdy8TLoZGz0z/zRX7qeTzHCplUgyvTPFY3ksZIk
+ /wjT13c4mVcxmU83yIe3m19RI8zhtnE=
+X-Google-Smtp-Source: ABdhPJxlBge35zxuhUGxEOkO3ktrro7su289ePXOBdgPTNUFvl6IpxX3+XvnnjyYTb+P3tex3KfC4g==
+X-Received: by 2002:a9d:6c98:: with SMTP id c24mr3097488otr.208.1599166812398; 
+ Thu, 03 Sep 2020 14:00:12 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id g21sm829342oos.36.2020.09.03.14.00.00
+ by smtp.gmail.com with ESMTPSA id z17sm836651oop.15.2020.09.03.14.00.11
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:00 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:11 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 17/77] es1370: check total frame count against current frame
-Date: Thu,  3 Sep 2020 15:58:35 -0500
-Message-Id: <20200903205935.27832-18-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 25/77] aio-posix: disable fdmon-io_uring when GSource is used
+Date: Thu,  3 Sep 2020 15:58:43 -0500
+Message-Id: <20200903205935.27832-26-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c42;
- envelope-from=flukshun@gmail.com; helo=mail-oo1-xc42.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -96,68 +96,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-A guest user may set channel frame count via es1370_write()
-such that, in es1370_transfer_audio(), total frame count
-'size' is lesser than the number of frames that are processed
-'cnt'.
+The glib event loop does not call fdmon_io_uring_wait() so fd handlers
+waiting to be submitted build up in the list. There is no benefit is
+using io_uring when the glib GSource is being used, so disable it
+instead of implementing a more complex fix.
 
-    int cnt = d->frame_cnt >> 16;
-    int size = d->frame_cnt & 0xffff;
+This fixes a memory leak where AioHandlers would build up and increasing
+amounts of CPU time were spent iterating them in aio_pending(). The
+symptom is that guests become slow when QEMU is built with io_uring
+support.
 
-if (size < cnt), it results in incorrect calculations leading
-to OOB access issue(s). Add check to avoid it.
-
-Reported-by: Ren Ding <rding@gatech.edu>
-Reported-by: Hanqing Zhao <hanqing@gatech.edu>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
-Message-id: 20200514200608.1744203-1-ppandit@redhat.com
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-(cherry picked from commit 369ff955a8497988d079c4e3fa1e93c2570c1c69)
+Buglink: https://bugs.launchpad.net/qemu/+bug/1877716
+Fixes: 73fd282e7b6dd4e4ea1c3bbb3d302c8db51e4ccf ("aio-posix: add io_uring fd monitoring implementation")
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Tested-by: Oleksandr Natalenko <oleksandr@redhat.com>
+Message-id: 20200511183630.279750-3-stefanha@redhat.com
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+(cherry picked from commit ba607ca8bff4d2c2062902f8355657c865ac7c29)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/audio/es1370.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ include/block/aio.h |  3 +++
+ util/aio-posix.c    | 12 ++++++++++++
+ util/aio-win32.c    |  4 ++++
+ util/async.c        |  1 +
+ 4 files changed, 20 insertions(+)
 
-diff --git a/hw/audio/es1370.c b/hw/audio/es1370.c
-index 89c4dabcd4..5f8a83ff56 100644
---- a/hw/audio/es1370.c
-+++ b/hw/audio/es1370.c
-@@ -643,6 +643,9 @@ static void es1370_transfer_audio (ES1370State *s, struct chan *d, int loop_sel,
-     int csc_bytes = (csc + 1) << d->shift;
-     int cnt = d->frame_cnt >> 16;
-     int size = d->frame_cnt & 0xffff;
-+    if (size < cnt) {
-+        return;
-+    }
-     int left = ((size - cnt + 1) << 2) + d->leftover;
-     int transferred = 0;
-     int temp = MIN (max, MIN (left, csc_bytes));
-@@ -651,7 +654,7 @@ static void es1370_transfer_audio (ES1370State *s, struct chan *d, int loop_sel,
-     addr += (cnt << 2) + d->leftover;
+diff --git a/include/block/aio.h b/include/block/aio.h
+index 62ed954344..b2f703fa3f 100644
+--- a/include/block/aio.h
++++ b/include/block/aio.h
+@@ -701,6 +701,9 @@ void aio_context_setup(AioContext *ctx);
+  */
+ void aio_context_destroy(AioContext *ctx);
  
-     if (index == ADC_CHANNEL) {
--        while (temp) {
-+        while (temp > 0) {
-             int acquired, to_copy;
++/* Used internally, do not call outside AioContext code */
++void aio_context_use_g_source(AioContext *ctx);
++
+ /**
+  * aio_context_set_poll_params:
+  * @ctx: the aio context
+diff --git a/util/aio-posix.c b/util/aio-posix.c
+index 8af334ab19..1b2a3af65b 100644
+--- a/util/aio-posix.c
++++ b/util/aio-posix.c
+@@ -682,6 +682,18 @@ void aio_context_destroy(AioContext *ctx)
+     aio_free_deleted_handlers(ctx);
+ }
  
-             to_copy = MIN ((size_t) temp, sizeof (tmpbuf));
-@@ -669,7 +672,7 @@ static void es1370_transfer_audio (ES1370State *s, struct chan *d, int loop_sel,
-     else {
-         SWVoiceOut *voice = s->dac_voice[index];
++void aio_context_use_g_source(AioContext *ctx)
++{
++    /*
++     * Disable io_uring when the glib main loop is used because it doesn't
++     * support mixed glib/aio_poll() usage. It relies on aio_poll() being
++     * called regularly so that changes to the monitored file descriptors are
++     * submitted, otherwise a list of pending fd handlers builds up.
++     */
++    fdmon_io_uring_destroy(ctx);
++    aio_free_deleted_handlers(ctx);
++}
++
+ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+                                  int64_t grow, int64_t shrink, Error **errp)
+ {
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index 729d533faf..953c56ab48 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -414,6 +414,10 @@ void aio_context_destroy(AioContext *ctx)
+ {
+ }
  
--        while (temp) {
-+        while (temp > 0) {
-             int copied, to_copy;
++void aio_context_use_g_source(AioContext *ctx)
++{
++}
++
+ void aio_context_set_poll_params(AioContext *ctx, int64_t max_ns,
+                                  int64_t grow, int64_t shrink, Error **errp)
+ {
+diff --git a/util/async.c b/util/async.c
+index 3165a28f2f..1319eee3bc 100644
+--- a/util/async.c
++++ b/util/async.c
+@@ -362,6 +362,7 @@ static GSourceFuncs aio_source_funcs = {
  
-             to_copy = MIN ((size_t) temp, sizeof (tmpbuf));
+ GSource *aio_get_g_source(AioContext *ctx)
+ {
++    aio_context_use_g_source(ctx);
+     g_source_ref(&ctx->source);
+     return &ctx->source;
+ }
 -- 
 2.17.1
 
