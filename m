@@ -2,88 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADE3C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:18:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FBEC43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:18:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1DB5206CA
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:18:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBC06206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:18:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bkt1z+27"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1DB5206CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K41zXm3y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBC06206CA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwcL-0004av-0W
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:18:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56438)
+	id 1kDwcz-0005wZ-07
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:18:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEm-00019b-9h
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56816)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEg-0006dl-W4
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599166412;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=9d3w3vq3xDiGR0tvfJkqLbBaoO9YQl9D9kE2nTayO1o=;
- b=bkt1z+27yaQ8/smTjtQ9tF9q+/0hLLRs7wKtpnBWX1m+61HfaLBl1OoHMhr4uQQnSfBO6f
- cTArvv3lhEwrJom1AIvq1Cd+lgPXxLPllJm8XktzUab244ovTVnTOhSKLlQ0L1TNPRgPOS
- m4opdD9roAUKZYcdIUoy1F1EMKAIrY0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-164-5dFFosv0Ob-pFREjY1941w-1; Thu, 03 Sep 2020 16:53:29 -0400
-X-MC-Unique: 5dFFosv0Ob-pFREjY1941w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6266F81CBF1;
- Thu,  3 Sep 2020 20:53:28 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 548385C1C2;
- Thu,  3 Sep 2020 20:53:25 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 25/27] vfio: Rename PCI_VFIO to VFIO_PCI
-Date: Thu,  3 Sep 2020 16:52:45 -0400
-Message-Id: <20200903205247.1667472-26-ehabkost@redhat.com>
-In-Reply-To: <20200903205247.1667472-1-ehabkost@redhat.com>
-References: <20200903205247.1667472-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwKv-0003Ib-Ta; Thu, 03 Sep 2020 17:00:01 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:45185)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwKt-0007M9-LA; Thu, 03 Sep 2020 17:00:01 -0400
+Received: by mail-oi1-x244.google.com with SMTP id d189so4477635oig.12;
+ Thu, 03 Sep 2020 13:59:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=toeoNpfYSl/ElO5L5zgrTHQpTRhSexoIT3AHev1/A18=;
+ b=K41zXm3yPtZh66GpNio+YEWXfx2h3USDuminp96CCGrnPTsjJPH7Mv+Q+v2ily4vrR
+ VD600XticEOJmBhV7mSZUM/JdpjMuAxDZkZi6viR1glwHyrdTAbtn6uYnUeMZ5S+dgdu
+ f9zmQGcYRr7eVMeeFncJmTFN0HIx6gLcBX7AyeKc9Imi3e0/qOsOyn4wln818Fzo/08O
+ 2vm9fffAyKAiEPJMH1rp7PGxXbbHgHyuw/Ti8lP9H/30HmV8U3tBuQqjKPcCEQ7uzNPE
+ WUVlx3xU+vPutCFclczIL2gCsyIRdPhwkex9KFb1gQuGn23WkaAtLQhg3R3Gqdaikivk
+ /3RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=toeoNpfYSl/ElO5L5zgrTHQpTRhSexoIT3AHev1/A18=;
+ b=IocqSO2O7rRe9UiEv/pGu5jPQU7n8mglw+QA2DX5jUss599pBlGAQi6GzAeC428mru
+ hznzUCKNyubQC3/ia4W8cQ/lEvSUOiAZ1uaXimKL/UFAlmuEbQOj1KcjkRCiYYtnzXXW
+ OUHkDs8kcwfIQTyquvepyMtjWVU5YVyPnSR8D5e5zdIgXTCqWLZqmLpziCZQfivdVQOO
+ rLHEJIiGLqLGXJ0pjHAeFf2021500qBDdaA2/Qc4/PTAxw8T2bVgVy9/T7iINApEvV1W
+ XvcuwZS3xljjotgVo4WpevEVW3HYLRF6APLiKEf/5I9u7TODoiS5yVTwI7Q1IY66wfso
+ KvPA==
+X-Gm-Message-State: AOAM533DPtdRygmtkn8XBGciVVxW2OWWWpW1N+x204y9MsdU6LqcR43d
+ gEDXUE2WZlqylUvXRmaa1TGCcXdgSEs=
+X-Google-Smtp-Source: ABdhPJw49Z3GJLeQk1dhBFzMfFm9GkJSIRfSrfwMwKoSukVDGPeuLP2DD7WhDOO/2VzeQpBrasWvCQ==
+X-Received: by 2002:a05:6808:2d7:: with SMTP id
+ a23mr3225672oid.51.1599166797905; 
+ Thu, 03 Sep 2020 13:59:57 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id u19sm729310oic.10.2020.09.03.13.59.57
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 03 Sep 2020 13:59:57 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 14/77] Revert "9p: init_in_iov_from_pdu can truncate the size"
+Date: Thu,  3 Sep 2020 15:58:32 -0500
+Message-Id: <20200903205935.27832-15-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,142 +97,211 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eric Auger <eric.auger@redhat.com>
+Cc: Stefano Stabellini <stefano.stabellini@xilinx.com>, qemu-stable@nongnu.org,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the type checking macro name consistent with the TYPE_*
-constant.
+From: Stefano Stabellini <stefano.stabellini@xilinx.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Message-Id: <20200902224311.1321159-56-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+This reverts commit 16724a173049ac29c7b5ade741da93a0f46edff7.
+It causes https://bugs.launchpad.net/bugs/1877688.
+
+Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Message-Id: <20200521192627.15259-1-sstabellini@kernel.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+(cherry picked from commit cf45183b718f02b1369e18c795dc51bc1821245d)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/vfio/pci.h |  2 +-
- hw/vfio/pci.c | 22 +++++++++++-----------
- 2 files changed, 12 insertions(+), 12 deletions(-)
+ hw/9pfs/9p.c               | 33 +++++++++++----------------------
+ hw/9pfs/9p.h               |  2 +-
+ hw/9pfs/virtio-9p-device.c | 11 ++++-------
+ hw/9pfs/xen-9p-backend.c   | 15 ++++++---------
+ 4 files changed, 22 insertions(+), 39 deletions(-)
 
-diff --git a/hw/vfio/pci.h b/hw/vfio/pci.h
-index 846d60e56c..5e53d5b863 100644
---- a/hw/vfio/pci.h
-+++ b/hw/vfio/pci.h
-@@ -116,7 +116,7 @@ typedef struct VFIOMSIXInfo {
- 
- #define TYPE_VFIO_PCI "vfio-pci"
- typedef struct VFIOPCIDevice VFIOPCIDevice;
--DECLARE_INSTANCE_CHECKER(VFIOPCIDevice, PCI_VFIO,
-+DECLARE_INSTANCE_CHECKER(VFIOPCIDevice, VFIO_PCI,
-                          TYPE_VFIO_PCI)
- 
- struct VFIOPCIDevice {
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 3611dcd38b..0d83eb0e47 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -230,7 +230,7 @@ static void vfio_intx_update(VFIOPCIDevice *vdev, PCIINTxRoute *route)
- 
- static void vfio_intx_routing_notifier(PCIDevice *pdev)
- {
--    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(pdev);
-     PCIINTxRoute route;
- 
-     if (vdev->interrupt != VFIO_INT_INTx) {
-@@ -456,7 +456,7 @@ static void vfio_update_kvm_msi_virq(VFIOMSIVector *vector, MSIMessage msg,
- static int vfio_msix_vector_do_use(PCIDevice *pdev, unsigned int nr,
-                                    MSIMessage *msg, IOHandler *handler)
- {
--    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(pdev);
-     VFIOMSIVector *vector;
-     int ret;
- 
-@@ -541,7 +541,7 @@ static int vfio_msix_vector_use(PCIDevice *pdev,
- 
- static void vfio_msix_vector_release(PCIDevice *pdev, unsigned int nr)
- {
--    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(pdev);
-     VFIOMSIVector *vector = &vdev->msi_vectors[nr];
- 
-     trace_vfio_msix_vector_release(vdev->vbasedev.name, nr);
-@@ -1048,7 +1048,7 @@ static const MemoryRegionOps vfio_vga_ops = {
+diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
+index 3301e82eb6..1b729af6e8 100644
+--- a/hw/9pfs/9p.c
++++ b/hw/9pfs/9p.c
+@@ -2103,29 +2103,22 @@ out_nofid:
+  * with qemu_iovec_destroy().
   */
- static void vfio_sub_page_bar_update_mapping(PCIDevice *pdev, int bar)
+ static void v9fs_init_qiov_from_pdu(QEMUIOVector *qiov, V9fsPDU *pdu,
+-                                    size_t skip, size_t *size,
++                                    size_t skip, size_t size,
+                                     bool is_write)
  {
--    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(pdev);
-     VFIORegion *region = &vdev->bars[bar].region;
-     MemoryRegion *mmap_mr, *region_mr, *base_mr;
-     PCIIORegion *r;
-@@ -1094,7 +1094,7 @@ static void vfio_sub_page_bar_update_mapping(PCIDevice *pdev, int bar)
-  */
- uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len)
+     QEMUIOVector elem;
+     struct iovec *iov;
+     unsigned int niov;
+-    size_t alloc_size = *size + skip;
+ 
+     if (is_write) {
+-        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov, alloc_size);
++        pdu->s->transport->init_out_iov_from_pdu(pdu, &iov, &niov, size + skip);
+     } else {
+-        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, &alloc_size);
+-    }
+-
+-    if (alloc_size < skip) {
+-        *size = 0;
+-    } else {
+-        *size = alloc_size - skip;
++        pdu->s->transport->init_in_iov_from_pdu(pdu, &iov, &niov, size + skip);
+     }
+ 
+     qemu_iovec_init_external(&elem, iov, niov);
+     qemu_iovec_init(qiov, niov);
+-    qemu_iovec_concat(qiov, &elem, skip, *size);
++    qemu_iovec_concat(qiov, &elem, skip, size);
+ }
+ 
+ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
+@@ -2133,14 +2126,15 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
  {
--    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(pdev);
-     uint32_t emu_bits = 0, emu_val = 0, phys_val = 0, val;
+     ssize_t err;
+     size_t offset = 7;
+-    size_t read_count;
++    uint64_t read_count;
+     QEMUIOVector qiov_full;
  
-     memcpy(&emu_bits, vdev->emulated_config_bits + addr, len);
-@@ -1127,7 +1127,7 @@ uint32_t vfio_pci_read_config(PCIDevice *pdev, uint32_t addr, int len)
- void vfio_pci_write_config(PCIDevice *pdev,
-                            uint32_t addr, uint32_t val, int len)
+     if (fidp->fs.xattr.len < off) {
+         read_count = 0;
+-    } else if (fidp->fs.xattr.len - off < max_count) {
+-        read_count = fidp->fs.xattr.len - off;
+     } else {
++        read_count = fidp->fs.xattr.len - off;
++    }
++    if (read_count > max_count) {
+         read_count = max_count;
+     }
+     err = pdu_marshal(pdu, offset, "d", read_count);
+@@ -2149,7 +2143,7 @@ static int v9fs_xattr_read(V9fsState *s, V9fsPDU *pdu, V9fsFidState *fidp,
+     }
+     offset += err;
+ 
+-    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &read_count, false);
++    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, read_count, false);
+     err = v9fs_pack(qiov_full.iov, qiov_full.niov, 0,
+                     ((char *)fidp->fs.xattr.value) + off,
+                     read_count);
+@@ -2278,11 +2272,9 @@ static void coroutine_fn v9fs_read(void *opaque)
+         QEMUIOVector qiov_full;
+         QEMUIOVector qiov;
+         int32_t len;
+-        size_t size = max_count;
+ 
+-        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, &size, false);
++        v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset + 4, max_count, false);
+         qemu_iovec_init(&qiov, qiov_full.niov);
+-        max_count = size;
+         do {
+             qemu_iovec_reset(&qiov);
+             qemu_iovec_concat(&qiov, &qiov_full, count, qiov_full.size - count);
+@@ -2533,7 +2525,6 @@ static void coroutine_fn v9fs_write(void *opaque)
+     int32_t len = 0;
+     int32_t total = 0;
+     size_t offset = 7;
+-    size_t size;
+     V9fsFidState *fidp;
+     V9fsPDU *pdu = opaque;
+     V9fsState *s = pdu->s;
+@@ -2546,9 +2537,7 @@ static void coroutine_fn v9fs_write(void *opaque)
+         return;
+     }
+     offset += err;
+-    size = count;
+-    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, &size, true);
+-    count = size;
++    v9fs_init_qiov_from_pdu(&qiov_full, pdu, offset, count, true);
+     trace_v9fs_write(pdu->tag, pdu->id, fid, off, count, qiov_full.niov);
+ 
+     fidp = get_fid(pdu, fid);
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index c381fe091a..656527beb9 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -436,7 +436,7 @@ struct V9fsTransport {
+     ssize_t     (*pdu_vunmarshal)(V9fsPDU *pdu, size_t offset, const char *fmt,
+                                   va_list ap);
+     void        (*init_in_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
+-                                        unsigned int *pniov, size_t *size);
++                                        unsigned int *pniov, size_t size);
+     void        (*init_out_iov_from_pdu)(V9fsPDU *pdu, struct iovec **piov,
+                                          unsigned int *pniov, size_t size);
+     void        (*push_and_notify)(V9fsPDU *pdu);
+diff --git a/hw/9pfs/virtio-9p-device.c b/hw/9pfs/virtio-9p-device.c
+index 536447a355..f821236356 100644
+--- a/hw/9pfs/virtio-9p-device.c
++++ b/hw/9pfs/virtio-9p-device.c
+@@ -147,22 +147,19 @@ static ssize_t virtio_pdu_vunmarshal(V9fsPDU *pdu, size_t offset,
+ }
+ 
+ static void virtio_init_in_iov_from_pdu(V9fsPDU *pdu, struct iovec **piov,
+-                                        unsigned int *pniov, size_t *size)
++                                        unsigned int *pniov, size_t size)
  {
--    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(pdev);
-     uint32_t val_le = cpu_to_le32(val);
+     V9fsState *s = pdu->s;
+     V9fsVirtioState *v = container_of(s, V9fsVirtioState, state);
+     VirtQueueElement *elem = v->elems[pdu->idx];
+     size_t buf_size = iov_size(elem->in_sg, elem->in_num);
  
-     trace_vfio_pci_write_config(vdev->vbasedev.name, addr, val, len);
-@@ -2701,7 +2701,7 @@ static void vfio_unregister_req_notifier(VFIOPCIDevice *vdev)
+-    if (buf_size < P9_IOHDRSZ) {
++    if (buf_size < size) {
+         VirtIODevice *vdev = VIRTIO_DEVICE(v);
  
- static void vfio_realize(PCIDevice *pdev, Error **errp)
+         virtio_error(vdev,
+-                     "VirtFS reply type %d needs %zu bytes, buffer has %zu, less than minimum",
+-                     pdu->id + 1, *size, buf_size);
+-    }
+-    if (buf_size < *size) {
+-        *size = buf_size;
++                     "VirtFS reply type %d needs %zu bytes, buffer has %zu",
++                     pdu->id + 1, size, buf_size);
+     }
+ 
+     *piov = elem->in_sg;
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index f04caabfe5..fc197f6c8a 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -188,7 +188,7 @@ static void xen_9pfs_init_out_iov_from_pdu(V9fsPDU *pdu,
+ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+                                           struct iovec **piov,
+                                           unsigned int *pniov,
+-                                          size_t *size)
++                                          size_t size)
  {
--    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(pdev);
-     VFIODevice *vbasedev_iter;
-     VFIOGroup *group;
-     char *tmp, *subsys, group_path[PATH_MAX], *group_name;
-@@ -3033,7 +3033,7 @@ error:
+     Xen9pfsDev *xen_9pfs = container_of(pdu->s, Xen9pfsDev, state);
+     Xen9pfsRing *ring = &xen_9pfs->rings[pdu->tag % xen_9pfs->num_rings];
+@@ -198,19 +198,16 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+     g_free(ring->sg);
  
- static void vfio_instance_finalize(Object *obj)
- {
--    VFIOPCIDevice *vdev = PCI_VFIO(obj);
-+    VFIOPCIDevice *vdev = VFIO_PCI(obj);
-     VFIOGroup *group = vdev->vbasedev.group;
+     ring->sg = g_new0(struct iovec, 2);
+-    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, *size);
++    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
  
-     vfio_display_finalize(vdev);
-@@ -3057,7 +3057,7 @@ static void vfio_instance_finalize(Object *obj)
+     buf_size = iov_size(ring->sg, num);
+-    if (buf_size  < P9_IOHDRSZ) {
+-        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs reply type %d needs "
+-                      "%zu bytes, buffer has %zu, less than minimum\n",
+-                      pdu->id + 1, *size, buf_size);
++    if (buf_size  < size) {
++        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
++                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
++                buf_size);
+         xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
+         xen_9pfs_disconnect(&xen_9pfs->xendev);
+     }
+-    if (buf_size  < *size) {
+-        *size = buf_size;
+-    }
  
- static void vfio_exitfn(PCIDevice *pdev)
- {
--    VFIOPCIDevice *vdev = PCI_VFIO(pdev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(pdev);
- 
-     vfio_unregister_req_notifier(vdev);
-     vfio_unregister_err_notifier(vdev);
-@@ -3075,7 +3075,7 @@ static void vfio_exitfn(PCIDevice *pdev)
- 
- static void vfio_pci_reset(DeviceState *dev)
- {
--    VFIOPCIDevice *vdev = PCI_VFIO(dev);
-+    VFIOPCIDevice *vdev = VFIO_PCI(dev);
- 
-     trace_vfio_pci_reset(vdev->vbasedev.name);
- 
-@@ -3115,7 +3115,7 @@ post_reset:
- static void vfio_instance_init(Object *obj)
- {
-     PCIDevice *pci_dev = PCI_DEVICE(obj);
--    VFIOPCIDevice *vdev = PCI_VFIO(obj);
-+    VFIOPCIDevice *vdev = VFIO_PCI(obj);
- 
-     device_add_bootindex_property(obj, &vdev->bootindex,
-                                   "bootindex", NULL,
+     *piov = ring->sg;
+     *pniov = num;
 -- 
-2.26.2
+2.17.1
 
 
