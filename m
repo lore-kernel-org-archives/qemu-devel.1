@@ -2,88 +2,93 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A79C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68408C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:12:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11E43206C9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:10:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3001320709
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:12:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BbGyt8Fa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11E43206C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKRgVDgj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3001320709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50050 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwVK-0002W8-5x
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:10:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56310)
+	id 1kDwX6-0004kD-CC
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:12:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEZ-000131-Ls
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38693)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEV-0006bQ-Cj
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599166402;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Zqa6aaKmwm6Igb+aD9Zq+/iOUndIFn2SdOJEhdzGFFY=;
- b=BbGyt8FaS+KPUiNpn5CtHwCT6fQe17h16HZY/jKyWTLgrkpabUfh9jUmUAK/a64szyOZmh
- uxvGYydvzOINTq8JtlmiFWBit3Esf66dAB8K+LQOCKWH08dgLV51xhHEm8NixONRXB5p1N
- ZnNwy2EhO7suWnU2W3AFqyGAhq2LcXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-128-vsYtSVjvOCurm16WUs9gJA-1; Thu, 03 Sep 2020 16:53:20 -0400
-X-MC-Unique: vsYtSVjvOCurm16WUs9gJA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B266181F00A;
- Thu,  3 Sep 2020 20:53:19 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 811CA5C1C2;
- Thu,  3 Sep 2020 20:53:19 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 19/27] ahci: Rename ICH_AHCI to ICH9_AHCI
-Date: Thu,  3 Sep 2020 16:52:39 -0400
-Message-Id: <20200903205247.1667472-20-ehabkost@redhat.com>
-In-Reply-To: <20200903205247.1667472-1-ehabkost@redhat.com>
-References: <20200903205247.1667472-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwLR-00042h-8V; Thu, 03 Sep 2020 17:00:33 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36666)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwLK-0007eq-CQ; Thu, 03 Sep 2020 17:00:29 -0400
+Received: by mail-oi1-x242.google.com with SMTP id x19so4533844oix.3;
+ Thu, 03 Sep 2020 14:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=OV98AiSKpkunegu+hWzJKS6snwZunhiA7NZUV3WFBUk=;
+ b=MKRgVDgj2FZNdNzR+l+hsU/YG+JXwYGnJxNinGOdCu438kHwACj9iqt+VGSUhPPmRn
+ tgyOz5scd5zlNxDCVH7ACf/zz+KxwCMdmtjE6YSK5k6SSWbUu3A/JwhmqUBBdzMII+xC
+ mKbReXFYWz06tvx1ak3nvs3PVS53QtiTT+e8vOGKAU9GJjJwb+0dleXE52X2fvlmAB/Y
+ U6hLfbLQgXIPV++5+xcPHhFhgWkPrVxEQ2EeVYuCVnSQDaRWmvURzI5mGOrWY/rmEkap
+ JcCX330WkrRg54ydFStTc1HwuyOeKUdzcU6WiMHBSqF/pyQpkpPex6biakuTVAbloCdF
+ y4Lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=OV98AiSKpkunegu+hWzJKS6snwZunhiA7NZUV3WFBUk=;
+ b=NVKHOIYhU+GPDe+YO77Mo+aQUuC/UjPQR57uTZ6jtdbgUWayQfjGxIUZNQ9HqfCyF5
+ 1kfT7X7n+Fmsn3Z4jlFEz89t+0gTL5UojKhQsJ/1lDGQoG5/ybG+b0HZ9p6fOm7mJM/6
+ Df0I9lM/e1SkNsWVv3SDkSaYZU5JREA80vz1eRrLJYOcypxnotNtKsfmfiaO0nmo7+Ci
+ fcapP//Hf/aTjVOUjMKoVqRazfSv9Y7haEM0E/PhH/wKZbpERfDwHlz/gg3vZxlM2Htn
+ RgPlWGPQPVnaht38OFaFKSA8GGePs+tw8MmJg6UnAbBNk9yCz/GwE/0Ds/gImvkzF2cS
+ hx7w==
+X-Gm-Message-State: AOAM530mqYQXp1MMvmNUceE/5Yo97rT/ucifIQxpeHiBsMmjMidxMLhG
+ wKoSdPCxYwPSBqm46VtZv9VjjHd7yEQ=
+X-Google-Smtp-Source: ABdhPJzuSw7aM2YMePGtWdBFOfx8GyNKtieQT+gVhgdxaUptLiMmE3z5ELUFaRcSRDkMciZ/JDGfOw==
+X-Received: by 2002:aca:4b12:: with SMTP id y18mr3253674oia.28.1599166823736; 
+ Thu, 03 Sep 2020 14:00:23 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id y83sm714235oiy.35.2020.09.03.14.00.23
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 03 Sep 2020 14:00:23 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 34/77] hw/net/e1000e: Do not abort() on invalid PSRCTL
+ register value
+Date: Thu,  3 Sep 2020 15:58:52 -0500
+Message-Id: <20200903205935.27832-35-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,101 +101,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the type checking macro name consistent with the TYPE_*
-constant.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200902224311.1321159-33-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+libFuzzer found using 'qemu-system-i386 -M q35':
+
+qemu: hardware error: e1000e: PSRCTL.BSIZE0 cannot be zero
+CPU #0:
+EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000663
+ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
+EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
+ES =0000 00000000 0000ffff 00009300
+CS =f000 ffff0000 0000ffff 00009b00
+SS =0000 00000000 0000ffff 00009300
+DS =0000 00000000 0000ffff 00009300
+FS =0000 00000000 0000ffff 00009300
+GS =0000 00000000 0000ffff 00009300
+LDT=0000 00000000 0000ffff 00008200
+TR =0000 00000000 0000ffff 00008b00
+GDT=     00000000 0000ffff
+IDT=     00000000 0000ffff
+CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000000
+DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
+DR6=ffff0ff0 DR7=00000400
+EFER=0000000000000000
+FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
+FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
+FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
+FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
+FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
+XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
+XMM02=00000000000000000000000000000000 XMM03=00000000000000000000000000000000
+XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
+XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
+==1988== ERROR: libFuzzer: deadly signal
+    #6 0x7fae4d3ea894 in __GI_abort (/lib64/libc.so.6+0x22894)
+    #7 0x563f4cc59a1d in hw_error (qemu-fuzz-i386+0xe8ca1d)
+    #8 0x563f4d7c93f2 in e1000e_set_psrctl (qemu-fuzz-i386+0x19fc3f2)
+    #9 0x563f4d7b798f in e1000e_core_write (qemu-fuzz-i386+0x19ea98f)
+    #10 0x563f4d7afc46 in e1000e_mmio_write (qemu-fuzz-i386+0x19e2c46)
+    #11 0x563f4cc9a0a7 in memory_region_write_accessor (qemu-fuzz-i386+0xecd0a7)
+    #12 0x563f4cc99c13 in access_with_adjusted_size (qemu-fuzz-i386+0xeccc13)
+    #13 0x563f4cc987b4 in memory_region_dispatch_write (qemu-fuzz-i386+0xecb7b4)
+
+It simply sent the following 2 I/O command to the e1000e
+PCI BAR #2 I/O region:
+
+  writew 0x0100 0x0c00 # RCTL =   E1000_RCTL_DTYP_MASK
+  writeb 0x2170 0x00   # PSRCTL = 0
+
+2813 static void
+2814 e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
+2815 {
+2816     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
+2817
+2818         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
+2819             hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
+2820         }
+
+Instead of calling hw_error() which abort the process (it is
+meant for CPU fatal error condition, not for device logging),
+log the invalid request with qemu_log_mask(LOG_GUEST_ERROR)
+and return, ignoring the request.
+
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+(cherry picked from commit fda43b1204aecd1db158b3255c591d227fbdd629)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- include/hw/ide/ahci.h | 2 +-
- hw/ide/ahci.c         | 4 ++--
- hw/ide/ich.c          | 8 ++++----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ hw/net/e1000e_core.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-diff --git a/include/hw/ide/ahci.h b/include/hw/ide/ahci.h
-index 4cf6813d80..da3cddcc65 100644
---- a/include/hw/ide/ahci.h
-+++ b/include/hw/ide/ahci.h
-@@ -54,7 +54,7 @@ typedef struct AHCIState {
- typedef struct AHCIPCIState AHCIPCIState;
+diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+index d5676871fa..bcd186cac5 100644
+--- a/hw/net/e1000e_core.c
++++ b/hw/net/e1000e_core.c
+@@ -34,9 +34,9 @@
+ */
  
- #define TYPE_ICH9_AHCI "ich9-ahci"
--DECLARE_INSTANCE_CHECKER(AHCIPCIState, ICH_AHCI,
-+DECLARE_INSTANCE_CHECKER(AHCIPCIState, ICH9_AHCI,
-                          TYPE_ICH9_AHCI)
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "net/net.h"
+ #include "net/tap.h"
+-#include "hw/hw.h"
+ #include "hw/pci/msi.h"
+ #include "hw/pci/msix.h"
+ #include "sysemu/runstate.h"
+@@ -2816,11 +2816,15 @@ e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
+     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
  
- int32_t ahci_get_num_ports(PCIDevice *dev);
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index b696c6291a..ee1d47ff75 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -1819,7 +1819,7 @@ type_init(sysbus_ahci_register_types)
+         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
+-            hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "e1000e: PSRCTL.BSIZE0 cannot be zero");
++            return;
+         }
  
- int32_t ahci_get_num_ports(PCIDevice *dev)
- {
--    AHCIPCIState *d = ICH_AHCI(dev);
-+    AHCIPCIState *d = ICH9_AHCI(dev);
-     AHCIState *ahci = &d->ahci;
+         if ((val & E1000_PSRCTL_BSIZE1_MASK) == 0) {
+-            hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "e1000e: PSRCTL.BSIZE1 cannot be zero");
++            return;
+         }
+     }
  
-     return ahci->ports;
-@@ -1827,7 +1827,7 @@ int32_t ahci_get_num_ports(PCIDevice *dev)
- 
- void ahci_ide_create_devs(PCIDevice *dev, DriveInfo **hd)
- {
--    AHCIPCIState *d = ICH_AHCI(dev);
-+    AHCIPCIState *d = ICH9_AHCI(dev);
-     AHCIState *ahci = &d->ahci;
-     int i;
- 
-diff --git a/hw/ide/ich.c b/hw/ide/ich.c
-index eff3188fff..51cd2f38b7 100644
---- a/hw/ide/ich.c
-+++ b/hw/ide/ich.c
-@@ -91,14 +91,14 @@ static const VMStateDescription vmstate_ich9_ahci = {
- 
- static void pci_ich9_reset(DeviceState *dev)
- {
--    AHCIPCIState *d = ICH_AHCI(dev);
-+    AHCIPCIState *d = ICH9_AHCI(dev);
- 
-     ahci_reset(&d->ahci);
- }
- 
- static void pci_ich9_ahci_init(Object *obj)
- {
--    struct AHCIPCIState *d = ICH_AHCI(obj);
-+    struct AHCIPCIState *d = ICH9_AHCI(obj);
- 
-     ahci_init(&d->ahci, DEVICE(obj));
- }
-@@ -108,7 +108,7 @@ static void pci_ich9_ahci_realize(PCIDevice *dev, Error **errp)
-     struct AHCIPCIState *d;
-     int sata_cap_offset;
-     uint8_t *sata_cap;
--    d = ICH_AHCI(dev);
-+    d = ICH9_AHCI(dev);
-     int ret;
- 
-     ahci_realize(&d->ahci, DEVICE(dev), pci_get_address_space(dev), 6);
-@@ -154,7 +154,7 @@ static void pci_ich9_ahci_realize(PCIDevice *dev, Error **errp)
- static void pci_ich9_uninit(PCIDevice *dev)
- {
-     struct AHCIPCIState *d;
--    d = ICH_AHCI(dev);
-+    d = ICH9_AHCI(dev);
- 
-     msi_uninit(dev);
-     ahci_uninit(&d->ahci);
 -- 
-2.26.2
+2.17.1
 
 
