@@ -2,91 +2,85 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41070C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:41:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC93C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:44:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B64E206EB
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:41:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71A7E206EF
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:44:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SmnYlZyW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B64E206EB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="QTvTvRTU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71A7E206EF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDqQc-0004aX-92
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 10:41:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35830)
+	id 1kDqT7-0005gz-5m
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 10:44:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDqPm-00046C-NQ
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 10:40:38 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:45300
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDqPk-0000vP-IJ
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 10:40:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599144031;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qPyZ0K9KWXVHQxk3tStrUiGpoqxyDMNmbiN7HX3eo2Q=;
- b=SmnYlZyWaFH6l8WX8iwWTfQbsh575LelETXb3m1rrMO4tCmyUyUNVK3CEuH59gWUF/CXU+
- U9xNfcPtmWIdTXU0QiF261CDcmAiXAChAnXFCp4KPIBo1v/LlUipNLNfbLGKmX+zdxwXOC
- G/GJuyiCktbKNLO6ItR41+HyQj9FArw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-153-O3MsSn70PuG0AFnoiR-wZg-1; Thu, 03 Sep 2020 10:40:29 -0400
-X-MC-Unique: O3MsSn70PuG0AFnoiR-wZg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B09411084D65;
- Thu,  3 Sep 2020 14:40:27 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-114-10.ams2.redhat.com [10.36.114.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1550010013D7;
- Thu,  3 Sep 2020 14:40:25 +0000 (UTC)
-Subject: Re: [PATCH v4 06/12] block: Fixes nfs on msys2/mingw
-To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
-References: <20200903083147.707-1-luoyonggang@gmail.com>
- <20200903083147.707-7-luoyonggang@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <75fef7ab-6c42-02b9-8c94-f633ae614ad9@redhat.com>
-Date: Thu, 3 Sep 2020 16:40:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <20200903083147.707-7-luoyonggang@gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kDqSF-0005Cp-Js
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 10:43:11 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:45581)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kDqSD-0001Qi-LR
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 10:43:11 -0400
+Received: by mail-pg1-x544.google.com with SMTP id 67so2294133pgd.12
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 07:43:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id;
+ bh=tEAwouppKcqLoUUt/zy+obwBHv3Stl5Siq36velS/qU=;
+ b=QTvTvRTUYZIfA5H5sXYEejaZLytUJtROMKBHanqC7snMT5OWivkG25Yt5br50kgF4X
+ +TcKDrzAZ3I7/MWk4pBYFZBwtwdMTfS1m8jcqrl8N0G8Fz28vWeHtB4GH1+3z25qs63J
+ oT4Csj3shQR71lhYfdfLu0641iO5EzxD2ufCUdV2Z8UHKrZz5Si7AUFdUIESf9xpqo8B
+ 0IqiOnUzdtTHH87B1W3Mpv1lawmTltL/6l66B02SCG+3Teo78QFXeDAzKPCFu0jmLmpF
+ 5McaU5ULYv1Ug8DHAvDJiwT7yNcT4wM/mcCZ+VWNQg9anbc55VrxJWTJjS5Y2qrNznro
+ HMJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=tEAwouppKcqLoUUt/zy+obwBHv3Stl5Siq36velS/qU=;
+ b=VqnmD2ioQBqBHOPZZyo3wAqJy6bWjqxeMkVZtT6YdTmQgSaPLHiQgKofNS6IYrrfk9
+ MRxntod1VjitZINS5FJpYWYG99iPu20gx6YIcU8tjRTweyoQdGqBq7KZ4274+AXGoUcG
+ nysGSFvHzUKqA41IbXRVZSue8hM46v27Qoaw+uABKrRv2bdwM++BTocU/sp3GAY/iNE/
+ GF22Rk1OewTlpTdYHqwycsyMu1ura4+Rq0NW9GD2kiwK2fHfdJk6Qw0lW5ybx7/lRArp
+ pq2hLawUONumkZXwYopvwYty/Ma6NMr+LzcN+hRTWtknHWVBheLMWXigroqszIH/G/kT
+ mepQ==
+X-Gm-Message-State: AOAM5309nVCpDSu2ozOxSf1daxsm7BInD5hqrC4Iwagcy0Fts+zg4qso
+ 6Wlp2g80W8budigyvkRzC/q4zbcVOtFv4Q==
+X-Google-Smtp-Source: ABdhPJxc/cn3KUzc2rpGZaTE+Jbyt9hxj6mX3HlH9yIWAgp1x4y6+hmoG0ECxLnhdGI4vO7POZWZaw==
+X-Received: by 2002:aa7:9910:: with SMTP id z16mr4169032pff.120.1599144186948; 
+ Thu, 03 Sep 2020 07:43:06 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.154.91])
+ by smtp.googlemail.com with ESMTPSA id
+ g206sm3565593pfb.178.2020.09.03.07.43.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 07:43:06 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3] Fix a gap where acpi_pcihp_find_hotplug_bus() returns a
+ non-hotpluggable bus
+Date: Thu,  3 Sep 2020 20:12:48 +0530
+Message-Id: <20200903144248.3790-1-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: none client-ip=2607:f8b0:4864:20::544;
+ envelope-from=ani@anisinha.ca; helo=mail-pg1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,125 +93,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Peter Lieven <pl@kamp.de>,
- Qemu-block <qemu-block@nongnu.org>
+Cc: Ani Sinha <ani@anisinha.ca>, Igor Mammedov <imammedo@redhat.com>,
+ jusual@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+When ACPI hotplug for the root bus is disabled, the bsel property for that
+bus is not set. Please see the following commit:
 
-CC: NFS maintainer + qemu-block
+3d7e78aa7777f ("Introduce a new flag for i440fx to disable PCI hotplug on the root bus").
 
-On 03/09/2020 10.31, Yonggang Luo wrote:
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> ---
->  block/nfs.c | 26 +++++++++++++++++---------
->  1 file changed, 17 insertions(+), 9 deletions(-)
-> 
-> diff --git a/block/nfs.c b/block/nfs.c
-> index 61a249a9fc..34b2cd5708 100644
-> --- a/block/nfs.c
-> +++ b/block/nfs.c
-> @@ -24,7 +24,9 @@
->  
->  #include "qemu/osdep.h"
->  
-> +#if !defined(_WIN32)
->  #include <poll.h>
-> +#endif
->  #include "qemu/config-file.h"
->  #include "qemu/error-report.h"
->  #include "qapi/error.h"
-> @@ -51,6 +53,12 @@
->  #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
->  #define QEMU_NFS_MAX_DEBUG_LEVEL 2
->  
-> +#if defined (_WIN32)
-> +#define nfs_stat __stat64
-> +#else
-> +#define nfs_stat stat
-> +#endif
-> +
->  typedef struct NFSClient {
->      struct nfs_context *context;
->      struct nfsfh *fh;
-> @@ -58,7 +66,7 @@ typedef struct NFSClient {
->      bool has_zero_init;
->      AioContext *aio_context;
->      QemuMutex mutex;
-> -    blkcnt_t st_blocks;
-> +    int64_t st_size;
->      bool cache_used;
->      NFSServer *server;
->      char *path;
-> @@ -70,7 +78,7 @@ typedef struct NFSRPC {
->      int ret;
->      int complete;
->      QEMUIOVector *iov;
-> -    struct stat *st;
-> +    struct nfs_stat *st;
->      Coroutine *co;
->      NFSClient *client;
->  } NFSRPC;
-> @@ -419,7 +427,7 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
->                                 int flags, int open_flags, Error **errp)
->  {
->      int64_t ret = -EINVAL;
-> -    struct stat st;
-> +    struct nfs_stat st;
->      char *file = NULL, *strp = NULL;
->  
->      qemu_mutex_init(&client->mutex);
-> @@ -545,7 +553,7 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
->      }
->  
->      ret = DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
-> -    client->st_blocks = st.st_blocks;
-> +    client->st_size = st.st_size;
->      client->has_zero_init = S_ISREG(st.st_mode);
->      *strp = '/';
->      goto out;
-> @@ -729,11 +737,11 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
->  {
->      NFSClient *client = bs->opaque;
->      NFSRPC task = {0};
-> -    struct stat st;
-> +    struct nfs_stat st;
->  
->      if (bdrv_is_read_only(bs) &&
->          !(bs->open_flags & BDRV_O_NOCACHE)) {
-> -        return client->st_blocks * 512;
-> +        return client->st_size;
->      }
->  
->      task.bs = bs;
-> @@ -746,7 +754,7 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
->      nfs_set_events(client);
->      BDRV_POLL_WHILE(bs, !task.complete);
->  
-> -    return (task.ret < 0 ? task.ret : st.st_blocks * 512);
-> +    return (task.ret < 0 ? task.ret : st.st_size);
->  }
->  
->  static int coroutine_fn
-> @@ -778,7 +786,7 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
->                                BlockReopenQueue *queue, Error **errp)
->  {
->      NFSClient *client = state->bs->opaque;
-> -    struct stat st;
-> +    struct nfs_stat st;
->      int ret = 0;
->  
->      if (state->flags & BDRV_O_RDWR && bdrv_is_read_only(state->bs)) {
-> @@ -800,7 +808,7 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
->                         nfs_get_error(client->context));
->              return ret;
->          }
-> -        client->st_blocks = st.st_blocks;
-> +        client->st_size = st.st_size;
->      }
->  
->      return 0;
-> 
+As a result, when acpi_pcihp_find_hotplug_bus() is called
+with bsel set to 0, it may return the root bus. This can cause devices attached to
+the root bus to get hot-unplugged if the user issues the following set of commands:
+
+outl 0xae10 0
+outl 0xae08 your_slot
+
+Thanks to Julia for pointing this out here:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg734548.html
+
+In this patch, we fix the issue in this function by checking if the bus which is
+returned by the function is actually hotpluggable. If not, we simply return NULL.
+This avoids the scenario where we were returning a non-hotpluggable bus.
+
+This patch is based off of tag v5.10
+
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+---
+ hw/acpi/pcihp.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+Changelog:
+v3: fix a bug where we were dereferencing null pointer when find.bus was null.
+v2: update commit log to include more details.
+
+
+diff --git a/hw/acpi/pcihp.c b/hw/acpi/pcihp.c
+index 39b1f74442..32ae8b2c0a 100644
+--- a/hw/acpi/pcihp.c
++++ b/hw/acpi/pcihp.c
+@@ -147,6 +147,21 @@ static PCIBus *acpi_pcihp_find_hotplug_bus(AcpiPciHpState *s, int bsel)
+     if (!bsel && !find.bus) {
+         find.bus = s->root;
+     }
++
++    /*
++     * Check if find.bus is actually hotpluggable. If bsel is set to
++     * NULL for example on the root bus in order to make it
++     * non-hotpluggable, find.bus will match the root bus when bsel
++     * is 0. See acpi_pcihp_test_hotplug_bus() above. Since the
++     * bus is not hotpluggable however, we should not select the bus.
++     * Instead, we should set find.bus to NULL in that case. In the check
++     * below, we generalize this case for all buses, not just the root bus.
++     * The callers of this function check for a null return value and
++     * handle them appropriately.
++     */
++    if (find.bus && !qbus_is_hotpluggable(BUS(find.bus))) {
++        find.bus = NULL;
++    }
+     return find.bus;
+ }
+ 
+-- 
+2.17.1
 
 
