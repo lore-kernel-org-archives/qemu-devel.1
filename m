@@ -2,90 +2,138 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E925C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B532C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:39:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52B0020737
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:29:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D2D7A206EB
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:39:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FuiuBB5O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52B0020737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="Pht3lVqa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2D7A206EB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDikh-0007Z0-F4
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 02:29:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57736)
+	id 1kDiuT-0001LT-Rv
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 02:39:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kDik8-00078H-EL
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:29:08 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:42786)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kDik6-0003XS-3O
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:29:08 -0400
-Received: by mail-oi1-x241.google.com with SMTP id x14so1966175oic.9
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 23:29:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=coW6mEXkbJIZpGedgRHKkaohcq/+ycRzMPWZhVtpfjc=;
- b=FuiuBB5OkgJDAbg65TPJCGEu8DoTaBhZEf8tJ1e5z88UI3qA46KjIEIrx9KR51aCmV
- 2FCb2W2JS7TNDyrzJcinlxf7pKJ6cpoHy+J+2y1pd7pNq7wdqGsHKqB64A4kjnY8PU9h
- 2/pNqutISbUmCy/oy5mZ+ms3Wr9uRI+PIBxmKG5+74Nb5DpJzS8uTHtZVm4Skw7r5MMT
- +WXlN9dGn4p8ed8JbdXeF5pqjQULYLRjMcqj7ALCIEgyR16mcwkfazrqh06YG8Smpw0E
- RmRpVG0V7MwvlTxsmDCGurz45syzujks0Dy5TfJH7YeESDmCn9JJOv3DX6xUPbdYRR2a
- sJYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=coW6mEXkbJIZpGedgRHKkaohcq/+ycRzMPWZhVtpfjc=;
- b=rCaw0U17A2sAnw6Yu7AskRHTCRkoJLQk8J/UtDyhnimdqW5QmKnB+pRX/OmpQlPlqo
- Rp9UBty7pX5oH5IzKWbEDM5mEyx2kk3hiZXjwsXfv8bzS96oSHrV/yv0zVw1UR66CsAS
- Q++Zwnw2PkKz6Qc6UdPWwcbem4C/TtFsq7uugcF30IjHkX98hW3hd1gR9X6webVy/3xu
- Uxl5GZgJn0h5uaMHIiN7jl8GNYSJFbB9DUMVQHEhgxEYX1IdP0Z1Y+t2ex4IHlLeRvy5
- J3AmKGP99Zmj+nB0B8LaC9tvjFY/ktGOOMYoHz8WTBQD7FSwwTNgTFvDXOdYEMxG9Gsl
- q3tQ==
-X-Gm-Message-State: AOAM533O7gR9zlRvq4N2AgePnCu/A8biKD6KdzcePK0K0fBP4M/Vp99R
- svQPEp1JFMx5xPeRkNDt0Zqj1YQslbbbRUM5wxc=
-X-Google-Smtp-Source: ABdhPJyJUDLEq8GWXawgJeZUuh/IaEpNCrITYC/IQRhVZOwzk9udmSCFjUTpJBsZD4rg/ldleLwYsqc9qn0Uqi0MzS0=
-X-Received: by 2002:aca:1117:: with SMTP id 23mr1128074oir.97.1599114544745;
- Wed, 02 Sep 2020 23:29:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1kDitQ-0000dg-97
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:38:44 -0400
+Received: from mail-dm6nam10on2077.outbound.protection.outlook.com
+ ([40.107.93.77]:51968 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1kDitK-0004Vi-7X
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:38:43 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WYSNJsVFXtqlTbKfcgG7+LUbpCPx4CuQFdvmxVEG6+Zf/L8YDVwXatP8Z3GhfVanQwMaueTLHiTFloJxaglYei9qivVJ2aITxHuUkO77UIJxBWZOFfJ3tYIAi1ZUjUgfRxg5jPULapqyBjDWeDokMIBLphQgxQF/BfvCzYqJDHqPun+Wvqv2USBlEqYDMwdEUvKnrWFVBZDne1AHijcbzqMn27cGWVZeyWpLwo+4us86ooX9KE53Wo/nGnrhlixRSmSc+kYZXZ0UzVhhXImYqrM1rQfwQNJbMvcEWfBKVaxpKKh/a1aE6OdHnDkI0TRFIuZ3JyDmCbwhdT2SmZI+nA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O1eP3A3sAOL3Bfq2YAOn0ZQU0uEsMVMrcsthF44s4/8=;
+ b=klTQ+7fCIEn6eiJv1o32ZVmj7rPDeC3a+mxzOLNYh+2mdM2ZxQT/UYJb+t5TgKIUa7jBcjXdbq0xPUxAUFDBbF3e+nCEsguB0k/gCxj2qapHczavh+d3E/O+4PLIdejsDsee8sxJu49ZTkbDg1NhRwTvQNDpSNvc8HreNV27N7Hc/0lSPVwkld56lkweUlNFk/UwiRPYfQfSvoXJd4EZnKp/OlfdU66MbNZvm/sjjRZ4LfAvo0deI+e3BX5MCtpx2PUmBF2pKfZ2rN68vOD0/sIPKB+oIeCD6XeyTss3oBH4qkLWMnl5fO/K0vmWFmTbZgrGiO8augjCb8zBMQ8bFg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=cmp.felk.cvut.cz smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=O1eP3A3sAOL3Bfq2YAOn0ZQU0uEsMVMrcsthF44s4/8=;
+ b=Pht3lVqaaU26rYRfu+VgqtJK0XtpHnPsW9ZZWRZW4ubVkqXS15AzzRhzY5Y0pIAInA24SMQhP0qLDwlIvkagx/xtddgH3IvYUGHI9AH0cY0fu8VRJGxhdxoCvytFJAlqJfOW/zdmWWcCkIkDMcZ3V9KzvEKpAjxqu4lrXAzLKto=
+Received: from MN2PR16CA0029.namprd16.prod.outlook.com (2603:10b6:208:134::42)
+ by CH2PR02MB6373.namprd02.prod.outlook.com (2603:10b6:610:7::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Thu, 3 Sep
+ 2020 06:38:34 +0000
+Received: from BL2NAM02FT024.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:208:134:cafe::a5) by MN2PR16CA0029.outlook.office365.com
+ (2603:10b6:208:134::42) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19 via Frontend
+ Transport; Thu, 3 Sep 2020 06:38:34 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; cmp.felk.cvut.cz; dkim=none (message not signed)
+ header.d=none;cmp.felk.cvut.cz; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ BL2NAM02FT024.mail.protection.outlook.com (10.152.77.62) with Microsoft SMTP
+ Server id 15.20.3326.19 via Frontend Transport; Thu, 3 Sep 2020 06:38:33
+ +0000
+Received: from [149.199.38.66] (port=37227 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <fnu.vikram@xilinx.com>)
+ id 1kDit9-0007WK-Sw; Wed, 02 Sep 2020 23:38:27 -0700
+Received: from [127.0.0.1] (helo=xsj-pvapsmtp01)
+ by smtp.xilinx.com with esmtp (Exim 4.63)
+ (envelope-from <fnu.vikram@xilinx.com>)
+ id 1kDitF-0005wN-9W; Wed, 02 Sep 2020 23:38:33 -0700
+Received: from [172.19.2.115] (helo=xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <fnu.vikram@xilinx.com>)
+ id 1kDitE-0005wI-Ul; Wed, 02 Sep 2020 23:38:32 -0700
+Date: Wed, 2 Sep 2020 23:38:32 -0700
+From: Vikram Garhwal <fnu.vikram@xilinx.com>
+To: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Subject: Re: [PATCH v1 3/6] net/can: Add can_dlc2len and can_len2dlc for CAN
+ FD.
+Message-ID: <20200903063832.GA173424@xilinx.com>
+References: <cover.1594725647.git.pisa@cmp.felk.cvut.cz>
+ <30758547c49f254b3965fc12500735bea8265c97.1594725647.git.pisa@cmp.felk.cvut.cz>
+ <20200903054329.GA405867@xilinx.com>
+ <202009030812.42855.pisa@cmp.felk.cvut.cz>
 MIME-Version: 1.0
-References: <20200902162206.101872-1-liq3ea@163.com>
- <b840aab8-542d-af43-43e5-0a07f442b5d5@redhat.com>
- <20200903040611.fjam4nwqopec723y@mozz.bu.edu>
- <801411e4-e847-6d79-fc54-7cdd692b9c43@redhat.com>
- <CAKXe6SLB280LqvMzfMbRvMNff6Yt21unVpCs7TygF_bSPCTe8w@mail.gmail.com>
- <b6c01013-7b26-5da2-ba8b-401ff3e58256@redhat.com>
-In-Reply-To: <b6c01013-7b26-5da2-ba8b-401ff3e58256@redhat.com>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 3 Sep 2020 14:28:28 +0800
-Message-ID: <CAKXe6SKMzWTy_Wcy7iWEjFBwUVwUj_+N0fGZLVY1U42Da+em0A@mail.gmail.com>
-Subject: Re: [RFC 0/3] try to solve the DMA to MMIO issue
-To: Jason Wang <jasowang@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=liq3ea@gmail.com; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <202009030812.42855.pisa@cmp.felk.cvut.cz>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 46c6e040-3c01-45e4-9561-08d84fd3fac2
+X-MS-TrafficTypeDiagnostic: CH2PR02MB6373:
+X-Microsoft-Antispam-PRVS: <CH2PR02MB63736B746FF5B2A3396D937ABC2C0@CH2PR02MB6373.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:989;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Ty8QzvGLd13DuyCl3jL7fIEI7my/4eKYDxBbU2g4l5WKCiag3pgGWxbj8XE2NKJCGEkw6tCNCT/n5SNQwXydxARtsF8+EBXbWT9skwbHESAovDxR6lFxY8yd2BuQrz2HgyIJXQGkyF4YYVW0goxxlZHyiV6MMEWabbMai3MMRTEXUO0G8mpoUJv5JLjQZw06GpwY+tmRAbYpQrt1dtB48Hl9lGPSkr5e345PnRHgOWHMgHWgGc79HM8ueNShxl3j1OO5tmZzfvW/P+9RQIIwgeKElfG68ReyrW1GAHI/aLUlp1GgIbQ06IQ3gcWSDZa6Gpkd7V4/P9M/IAjD1FaKOHrleEYC0302cKl4IELRbMD/j70VzOVWyAcXN6EiR/h4R5VADeR3O6s4GSbtqOTi23mViFwAvuCzYjiLurv5v/gpj7RUjW/js2LuNX9r9N3gQ1kfo2TvgZUy8T8Qdg0mKUZ/uo7J6m+unoq0AyCixhcYV4avMR/EH7eirahubTBN
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(396003)(136003)(376002)(346002)(39850400004)(46966005)(2616005)(70586007)(70206006)(26005)(186003)(336012)(356005)(6916009)(47076004)(1076003)(8676002)(82310400003)(4326008)(426003)(81166007)(82740400003)(9786002)(316002)(966005)(36756003)(7696005)(5660300002)(33656002)(7416002)(54906003)(8936002)(478600001)(2906002)(27376004);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2020 06:38:33.6385 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46c6e040-3c01-45e4-9561-08d84fd3fac2
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT024.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR02MB6373
+Received-SPF: pass client-ip=40.107.93.77; envelope-from=fnuv@xilinx.com;
+ helo=NAM10-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 02:38:35
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,186 +146,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Li Qiang <liq3ea@163.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marek Vasut <marex@denx.de>, Jiri Novak <jnovak@fel.cvut.cz>,
+ Oliver Hartkopp <socketcan@hartkopp.net>, Deniz Eren <deniz.eren@icloud.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Konrad Frederic <frederic.konrad@adacore.com>,
+ Jan Kiszka <jan.kiszka@siemens.com>, Jan Charvat <charvj10@fel.cvut.cz>,
+ Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Ondrej Ille <ondrej.ille@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Jason Wang <jasowang@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=883=E6=97=A5=
-=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=882:16=E5=86=99=E9=81=93=EF=BC=9A
->
->
-> On 2020/9/3 =E4=B8=8B=E5=8D=8812:50, Li Qiang wrote:
-> > Jason Wang <jasowang@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=883=E6=
-=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=8812:24=E5=86=99=E9=81=93=EF=BC=9A
-> >>
-> >> On 2020/9/3 =E4=B8=8B=E5=8D=8812:06, Alexander Bulekov wrote:
-> >>> On 200903 1154, Jason Wang wrote:
-> >>>> On 2020/9/3 =E4=B8=8A=E5=8D=8812:22, Li Qiang wrote:
-> >>>>> The qemu device fuzzer has found several DMA to MMIO issue.
-> >>>>> These issues is caused by the guest driver programs the DMA
-> >>>>> address, then in the device MMIO handler it trigger the DMA
-> >>>>> and as the DMA address is MMIO it will trigger another dispatch
-> >>>>> and reenter the MMIO handler again. However most of the device
-> >>>>> is not reentrant.
-> >>>>>
-> >>>>> DMA to MMIO will cause issues depend by the device emulator,
-> >>>>> mostly it will crash the qemu. Following is three classic
-> >>>>> DMA to MMIO issue.
-> >>>>>
-> >>>>> e1000e: https://bugs.launchpad.net/qemu/+bug/1886362
-> >>>>> xhci: https://bugs.launchpad.net/qemu/+bug/1891354
-> >>>>> virtio-gpu: https://bugs.launchpad.net/qemu/+bug/1888606
-> >>>>>
-> >>>>> The DMA to MMIO issue I think can be classified as following:
-> >>>>> 1. DMA to the device itself
-> >>>>> 2. device A DMA to device B and to device C
-> >>>>> 3. device A DMA to device B and to device A
-> >>>>>
-> >>>>> The first case of course should not be allowed.
-> >>>>> The second case I think it ok as the device IO handler has no
-> >>>>> assumption about the IO data came from no matter it come from
-> >>>>> device or other device. This is for P2P DMA.
-> >>>>> The third case I think it also should not be allowed.
-> >>>>>
-> >>>>> So our issue has been reduced by one case: not allowed the
-> >>>>> device's IO handler reenter.
-> >>>>>
-> >>>>> Paolo suggested that we can refactor the device emulation with
-> >>>>> BH. However it is a lot of work.
-> >>>>> I have thought several propose to address this, also discuss
-> >>>>> this with Jason Wang in private email.
-> >>>>>
-> >>>>> I have can solve this issue in core framework or in specific device=
-.
-> >>>>> After try several methods I choose address it in per-device for
-> >>>>> following reason:
-> >>>>> 1. If we address it in core framwork we have to recored and check t=
-he
-> >>>>> device or MR info in MR dispatch write function. Unfortunally we ha=
-ve
-> >>>>> no these info in core framework.
-> >>>>> 2. The performance will also be decrease largely
-> >>>>> 3. Only the device itself know its IO
-> >>>> I think we still need to seek a way to address this issue completely=
-.
-> >>>>
-> >>>> How about adding a flag in MemoryRegionOps and detect the reentrancy=
- through
-> >>>> that flag?
-> >>> What happens for devices with multiple MemoryRegions? Make all the
-> >>> MemoryRegionOps share the same flag?
-> >>
-> >> I think there could be two approaches:
-> >>
-> >> 1) record the device in MR as Qiang mentioned
-> > I have tried this as we discussed. But has following consideration:
-> > 1. The performance, we need to check/record/clean the MR in an array/ha=
-shtable.
-> >
-> > 2. The multiple MR and alias MR process in the memory layer. It is
-> > complicated and performance effective.
-> > So If we let the MR issue to the device itself, it is just as this
-> > patch does-let the device address the reentrancy issue.f
-> >
-> > Another solution. We connects a MR with the corresponding device. Now
-> > the device often tight MR with an 'opaque' field.
-> > Just uses it in the calling of MR callback. Then we add a flag in the
-> > device and needs to modify the MR register interface.
-> >
-> > So in the memory layer we can check/record/clean the MR->device->flag.
-> > But this is can't address the DMA (in BH) to MMIO issue as the BH runs
-> > in main thread.
->
->
-> This is probably good enough to start. To my point of view, there're two
-> different issues:
->
-> 1) re-entrant MMIO handler
-> 2) MMIO hanlder sync with BH
->
+On Thu, Sep 03, 2020 at 08:12:42AM +0200, Pavel Pisa wrote:
+Hey Pavel,
+Thanks for clarifying this and sharing the relevant links.
 
-Agree, here I want to address these two kind of issue in a manner so
-it just be left to the device itself.
-I  will try to add a new memory register function
-memory_region_init_io_with_device
-to connect the MR and device. And solve it in the memory layer.
-
-
-Thanks,
-Li Qiang
-
-> For 1), we'd better solve it at core, For 2) it can only be solved in
-> the device.
+Regards,
+Vikram
+> Hello Vikram,
 >
-> Thanks
+> On Thursday 03 of September 2020 07:43:34 Vikram Garhwal wrote:
+> > On Tue, Jul 14, 2020 at 02:20:16PM +0200, pisa@cmp.felk.cvut.cz wrote:
+> > Hi Pavel,
+> >
+> > > From: Jan Charvat <charvj10@fel.cvut.cz>
+> > >
+> > > Signed-off-by: Jan Charvat <charvj10@fel.cvut.cz>
+> > > Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Reviewed-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+> > > ---
+> > >  include/net/can_emu.h |  4 ++++
+> > >  net/can/can_core.c    | 36 ++++++++++++++++++++++++++++++++++++
+> > >  2 files changed, 40 insertions(+)
+> > >
+> > > diff --git a/include/net/can_emu.h b/include/net/can_emu.h
+> > > index c6164dcfb4..7d395fbb9b 100644
+> > > --- a/include/net/can_emu.h
+> > > +++ b/include/net/can_emu.h
+> > > @@ -127,4 +127,8 @@ int can_bus_client_set_filters(CanBusClientState *,
+> > >                                 const struct qemu_can_filter *filters,
+> > >                                 size_t filters_cnt);
+> > >
+> > > +uint8_t can_dlc2len(uint8_t can_dlc);
+> > > +
+> > > +uint8_t can_len2dlc(uint8_t len);
+> > > +
+> >
+> > These function are aimed for canfd. Perhaps rename these to canfd_dlc2len
+> > and canfd_len2dlc for better distinction?
+> > Rest of the patch looks good to me.
 >
+> I do not insits on name. But function correspond 1:1 to the Linux
+> kernel ones
 >
-> >
-> > Thanks,
-> > Li Qiang
-> >
-> >
-> >
-> >> 2) Only forbid the reentrancy in MMIO handler and depends on the devic=
-e
-> >> to solve the multiple Memory Region issue, if the regions want to acce=
-ss
-> >> the same data, it needs to be synchronized internally
-> >>
-> >> But the point is still to try to solve it in the layer of memory
-> >> regions. Otherwise we may still hit similar issues.
-> >>
-> >>
-> >>> What about the virtio-gpu bug, where the problem happens in a bh->mmi=
-o
-> >>> access rather than an mmio->mmio access?
-> >>
-> >> Yes, it needs more thought, but as a first step, we can try to fix the
-> >> MMIO handler issue and do bh fix on top.
-> >
-> >
-> >> Thanks
-> >>
-> >>
-> >>> -Alex
-> >>>
-> >>>> Thanks
-> >>>>
-> >>>>
-> >>>>> The (most of the) device emulation is protected by BQL one time onl=
-y
-> >>>>> a device emulation code can be run. We can add a flag to indicate t=
-he
-> >>>>> IO is running. The first two patches does this. For simplicity at t=
-he
-> >>>>> RFC stage I just set it while enter the IO callback and clear it ex=
-it
-> >>>>> the IO callback. It should be check/set/clean according the per-dev=
-ice's
-> >>>>> IO emulation.
-> >>>>> The second issue which itself suffers a race condition so I uses a
-> >>>>> atomic.
-> >>>>>
-> >>>>>
-> >>>>>
-> >>>>>
-> >>>>> Li Qiang (3):
-> >>>>>      e1000e: make the IO handler reentrant
-> >>>>>      xhci: make the IO handler reentrant
-> >>>>>      virtio-gpu: make the IO handler reentrant
-> >>>>>
-> >>>>>     hw/display/virtio-gpu.c        | 10 ++++++
-> >>>>>     hw/net/e1000e.c                | 35 +++++++++++++++++++-
-> >>>>>     hw/usb/hcd-xhci.c              | 60 +++++++++++++++++++++++++++=
-+++++++
-> >>>>>     hw/usb/hcd-xhci.h              |  1 +
-> >>>>>     include/hw/virtio/virtio-gpu.h |  1 +
-> >>>>>     5 files changed, 106 insertions(+), 1 deletion(-)
-> >>>>>
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/can/dev.c#L34
 >
+> These functions/tables are very short, but may it be, we should add comment
+> about their origin. This part of original file is Oliver Hartkopp
+> contribution
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/net/can/dev.c?h=v5.9-rc3&id=1e0625facab2e871472472b7df87d8fbe6caf75a
+>
+> some other helpers are from Wolfgang Grandegger and me.
+>
+> Best wishes,
+>
+> Pavel
 
