@@ -2,58 +2,58 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EAAFC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:57:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD15C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:58:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A82E2072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:57:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 439FA2072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:58:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="YvQZaDSb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A82E2072A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="os6b1Vje"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439FA2072A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDeVd-0001ov-9j
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 21:57:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43064)
+	id 1kDeWB-0002mc-Bp
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 21:58:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kDeUm-000067-Lf; Wed, 02 Sep 2020 21:57:00 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:53413 helo=ozlabs.org)
+ id 1kDeUn-00006T-SF; Wed, 02 Sep 2020 21:57:01 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:58751 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kDeUj-0005bp-0G; Wed, 02 Sep 2020 21:57:00 -0400
+ id 1kDeUi-0005bo-VF; Wed, 02 Sep 2020 21:57:01 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BhkSc75Ddz9sTS; Thu,  3 Sep 2020 11:56:48 +1000 (AEST)
+ id 4BhkSd31b0z9sTm; Thu,  3 Sep 2020 11:56:49 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1599098209;
- bh=edv6LMM9HLzKFcIP+RvflRSsamdIAWI6/S3XGluvPHE=;
+ bh=v3aST9MNftOGyuSLWQg5BuJzjT2jU+BBOq8T6BptK/c=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=YvQZaDSbSD/OIc1JzVEeb51KkkKOY2jUfQzDywvrgdrq4rTnw0tT1VH6Cpvjx1NG9
- kVkDICMarNJemDNqZ1Gh8C8Qove6p+fmXRzDVBAR3b3LFWt8/HvFpgmOXEBKuqtsQw
- ScFzLKdaeb6v6sw+na82k2aoC+Mqfli9JYM4bc60=
-Date: Thu, 3 Sep 2020 11:34:30 +1000
+ b=os6b1VjefpCrzvT44iAJvVXBW/WJAAENvGPrxP7wqd8/Sbf/hNEx/mjchTUL9EI35
+ 4dnspT0SHGBrKkFIuL2b0ZFgxy2/Ge2kfa8j8gLpyiFK95TTGlVhtp8saGHKofkAdW
+ uYxTh4d4gJ2vquvRFDoe5adUzwhptuvcXYvdnRT4=
+Date: Thu, 3 Sep 2020 11:51:48 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v2 5/7] spapr, spapr_numa: move lookup-arrays handling to
- spapr_numa.c
-Message-ID: <20200903013430.GG1897@yekko.fritz.box>
+Subject: Re: [PATCH v2 3/7] spapr: introduce
+ SpaprMachineClass::numa_assoc_array
+Message-ID: <20200903015148.GK1897@yekko.fritz.box>
 References: <20200901125645.118026-1-danielhb413@gmail.com>
- <20200901125645.118026-6-danielhb413@gmail.com>
+ <20200901125645.118026-4-danielhb413@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="TdkiTnkLhLQllcMS"
+ protocol="application/pgp-signature"; boundary="KjSGHOmKKB2VUiQn"
 Content-Disposition: inline
-In-Reply-To: <20200901125645.118026-6-danielhb413@gmail.com>
+In-Reply-To: <20200901125645.118026-4-danielhb413@gmail.com>
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -82,152 +82,64 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---TdkiTnkLhLQllcMS
+--KjSGHOmKKB2VUiQn
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Sep 01, 2020 at 09:56:43AM -0300, Daniel Henrique Barboza wrote:
-> In a similar fashion as the previous patch, let's move the
-> handling of ibm,associativity-lookup-arrays from spapr.c to
-> spapr_numa.c. A spapr_numa_write_assoc_lookup_arrays() helper was
-> created, and spapr_dt_dynamic_reconfiguration_memory() can now
-> use it to advertise the lookup-arrays.
+On Tue, Sep 01, 2020 at 09:56:41AM -0300, Daniel Henrique Barboza wrote:
+> The next step to centralize all NUMA/associativity handling in
+> the spapr machine is to create a 'one stop place' for all
+> things ibm,associativity.
+>=20
+> This patch introduces numa_assoc_array, a 2 dimensional array
+> that will store all ibm,associativity arrays of all NUMA nodes.
+> This array is initialized in a new spapr_numa_associativity_init()
+> function, called in spapr_machine_init(). It is being initialized
+> with the same values used in other ibm,associativity properties
+> around spapr files (i.e. all zeros, last value is node_id).
+> The idea is to remove all hardcoded definitions and FDT writes
+> of ibm,associativity arrays, doing instead a call to the new
+> helper spapr_numa_write_associativity_dt() helper, that will
+> be able to write the DT with the correct values.
+>=20
+> We'll start small, handling the trivial cases first. The
+> remaining instances of ibm,associativity will be handled
+> next.
 >=20
 > Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hw/ppc/spapr.c              | 25 ++----------------------
->  hw/ppc/spapr_numa.c         | 39 +++++++++++++++++++++++++++++++++++++
->  include/hw/ppc/spapr_numa.h |  2 ++
->  3 files changed, 43 insertions(+), 23 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index 172f965fe0..65d2ccd578 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -535,13 +535,10 @@ static int spapr_dt_dynamic_reconfiguration_memory(=
-SpaprMachineState *spapr,
->                                                     void *fdt)
->  {
->      MachineState *machine =3D MACHINE(spapr);
-> -    int nb_numa_nodes =3D machine->numa_state->num_nodes;
-> -    int ret, i, offset;
-> +    int ret, offset;
->      uint64_t lmb_size =3D SPAPR_MEMORY_BLOCK_SIZE;
->      uint32_t prop_lmb_size[] =3D {cpu_to_be32(lmb_size >> 32),
->                                  cpu_to_be32(lmb_size & 0xffffffff)};
-> -    uint32_t *int_buf, *cur_index, buf_len;
-> -    int nr_nodes =3D nb_numa_nodes ? nb_numa_nodes : 1;
->      MemoryDeviceInfoList *dimms =3D NULL;
-> =20
->      /*
-> @@ -582,25 +579,7 @@ static int spapr_dt_dynamic_reconfiguration_memory(S=
-paprMachineState *spapr,
->          return ret;
->      }
-> =20
-> -    /* ibm,associativity-lookup-arrays */
-> -    buf_len =3D (nr_nodes * 4 + 2) * sizeof(uint32_t);
-> -    cur_index =3D int_buf =3D g_malloc0(buf_len);
-> -    int_buf[0] =3D cpu_to_be32(nr_nodes);
-> -    int_buf[1] =3D cpu_to_be32(4); /* Number of entries per associativit=
-y list */
-> -    cur_index +=3D 2;
-> -    for (i =3D 0; i < nr_nodes; i++) {
-> -        uint32_t associativity[] =3D {
-> -            cpu_to_be32(0x0),
-> -            cpu_to_be32(0x0),
-> -            cpu_to_be32(0x0),
-> -            cpu_to_be32(i)
-> -        };
-> -        memcpy(cur_index, associativity, sizeof(associativity));
-> -        cur_index +=3D 4;
-> -    }
-> -    ret =3D fdt_setprop(fdt, offset, "ibm,associativity-lookup-arrays", =
-int_buf,
-> -            (cur_index - int_buf) * sizeof(uint32_t));
-> -    g_free(int_buf);
-> +    ret =3D spapr_numa_write_assoc_lookup_arrays(spapr, fdt, offset);
-> =20
->      return ret;
->  }
-> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-> index b8882d209e..9eb4bdbe80 100644
-> --- a/hw/ppc/spapr_numa.c
-> +++ b/hw/ppc/spapr_numa.c
-> @@ -75,6 +75,45 @@ int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, =
-void *fdt,
->                         vcpu_assoc, sizeof(vcpu_assoc));
->  }
-> =20
-> +
-> +int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void =
-*fdt,
-> +                                         int offset)
+
+The idea is great, but there's one small but significant problem here:
+
+> +void spapr_numa_associativity_init(MachineState *machine)
 > +{
-> +    MachineState *machine =3D MACHINE(spapr);
-> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
 > +    int nb_numa_nodes =3D machine->numa_state->num_nodes;
-> +    int nr_nodes =3D nb_numa_nodes ? nb_numa_nodes : 1;
-> +    uint32_t *int_buf, *cur_index, buf_len;
-> +    int ret, i, j;
+> +    int i;
 > +
-> +    /* ibm,associativity-lookup-arrays */
-> +    buf_len =3D (nr_nodes * MAX_DISTANCE_REF_POINTS + 2) * sizeof(uint32=
-_t);
-> +    cur_index =3D int_buf =3D g_malloc0(buf_len);
-> +    int_buf[0] =3D cpu_to_be32(nr_nodes);
-> +     /* Number of entries per associativity list */
-> +    int_buf[1] =3D cpu_to_be32(MAX_DISTANCE_REF_POINTS);
-> +    cur_index +=3D 2;
-> +    for (i =3D 0; i < nr_nodes; i++) {
-> +        /*
-> +         * For the lookup-array we use the ibm,associativity array,
-> +         * from numa_assoc_array. without the first element (size).
-> +         */
-> +        uint32_t associativity[MAX_DISTANCE_REF_POINTS];
-> +
-> +        for (j =3D 0; j < MAX_DISTANCE_REF_POINTS; j++) {
-> +            associativity[j] =3D smc->numa_assoc_array[i][j + 1];
-> +        }
-> +
-> +        memcpy(cur_index, associativity, sizeof(associativity));
+> +    /*
+> +     * For all associativity arrays: first position is the size,
+> +     * position MAX_DISTANCE_REF_POINTS is always the numa_id,
+> +     * represented by the index 'i'.
+> +     *
+> +     * This will break on sparse NUMA setups, when/if QEMU starts
+> +     * to support it, because there will be no more guarantee that
+> +     * 'i' will be a valid node_id set by the user.
+> +     */
+> +    for (i =3D 0; i < nb_numa_nodes; i++) {
+> +        smc->numa_assoc_array[i][0] =3D cpu_to_be32(MAX_DISTANCE_REF_POI=
+NTS);
+> +        smc->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] =3D cpu_to_be3=
+2(i);
 
-AFAICT, you could just use a single memcpy() to copy from the
-numa_assoc_array() into the property here, rather than using a loop
-and temporary array.
+This initialization is called on a machine *instance*, which means it
+should treat the machine class as read-only.  i.e. the
+numa_assoc_array should be in the SpaprMachineState, rather than the
+class.
 
-> +        cur_index +=3D 4;
-
-Shouldn't this be  +=3D MAX_DISTANCE_REF_POINTS?
-
-> +    }
-> +    ret =3D fdt_setprop(fdt, offset, "ibm,associativity-lookup-arrays", =
-int_buf,
-> +                      (cur_index - int_buf) * sizeof(uint32_t));
-> +    g_free(int_buf);
-> +
-> +    return ret;
-> +}
-> +
->  /*
->   * Helper that writes ibm,associativity-reference-points and
->   * max-associativity-domains in the RTAS pointed by @rtas
-> diff --git a/include/hw/ppc/spapr_numa.h b/include/hw/ppc/spapr_numa.h
-> index f92fb4f28a..f6127501a6 100644
-> --- a/include/hw/ppc/spapr_numa.h
-> +++ b/include/hw/ppc/spapr_numa.h
-> @@ -22,6 +22,8 @@ void spapr_numa_write_associativity_dt(SpaprMachineStat=
-e *spapr, void *fdt,
->                                         int offset, int nodeid);
->  int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
->                              int offset, PowerPCCPU *cpu);
-> +int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void =
-*fdt,
-> +                                         int offset);
-> =20
-> =20
->  #endif /* HW_SPAPR_NUMA_H */
+I mean, we'd get away with it in practice, since there's only ever
+likely to be a single machine instance, but still we should correct
+this.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -235,25 +147,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---TdkiTnkLhLQllcMS
+--KjSGHOmKKB2VUiQn
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9QSCQACgkQbDjKyiDZ
-s5JYlg/+N5M7zI3v19h2hL0EDaPOS91s2ypAltpPwR6ADkYrrPb5vEcSDUdnoA2t
-OQaI5ugRNCyUruRxUfPeRTXNTj7+83s+MWX61zoMQliyBjaH526k91AhBQHJzzLa
-PdMu6U1pUJMooIlMmmx8geU0XYGkqJ9YFRCJY9b96+pGK2ckWSNC2r17vcAH3AXQ
-PQGDGXv1nIOjEbcr0CfZziMLp0EluzQa2clh9izh7EtjQF+6eMQDTm8DzZIMiljc
-RwkkPp4jAJXF3mMGlURi3ZmmHb2oYwIDXxuqfr4A06htB71OcTitNRX8lTs5kAJG
-Z9F36Co41cPwQ58BeQYAs26jBwhRBCqSbvS6P5GMmz3uPq/kGVoaueDi6j6JNstC
-d2xQBURrjJrNRqFeLXRljjkxhdwx0Kr3UaWYl5P9QEWmk/0kyd3H8vztwB9AprbO
-ACUOpsw1EIHJjyj+yjDZ5sMHwrGmhTkQBttQdn6CKONzR3ze1yJ1IGA7PDayQNdq
-u26dgYD2b5uxIf2Sav1rzrU+jpFB8FtJSYBDOaJSIxxZis90sEmlsn3AyO/m3Rp+
-v5XON61kS0UhEGjCDhYSqbeI7j17BtxgKU1nn2ZRPN8lNo+bQ7XmEZRoo9R0UYYY
-aBH3Zc6ey2HcFw2gVmbZyaaMADouXYIYDOFf+DqrudCIq5cUMV4=
-=pLjN
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9QTDQACgkQbDjKyiDZ
+s5LwYxAAxnEWnR2TranT4UbYq7fjwFJJkaRJ9Nq5moflYdxfVzrqFvhIKwq1Wm3v
+3MVKWOX4qeE4TLHumPNcVAmEYPsqTDkLyr1WYz5bQmSPFTQg2GClE6TT3n3ifMxU
+ILgEW6+b8z8EcdQgj+ivdIkPLkLSqruPlTBSj/RX/xPxS9LI5hRFWuoWpn16g9uT
+3TyOgWZlYbZaxPc7o2h0Shu4zW5wcomiKngHoz120pP4WTQEL67YLoF/Y9MqGlI4
+1i533vJKbKUMrIsPR48LtHF3/j8dKj75JaRlvqbQO8pikjcixX6cJYxBcPdhdTa+
+7pc43+KRX1xM9ujYE4H+P2yTQjXKHfclukhDN7KDPVi7Fty5h8oY4aepzHviKAMU
+pxo1MROCVGfkNL9khTcXSskyb+rIwrfDkFwAZBkiDaa2Deokf6yzGb3LEntoRnss
+j5bkidbXboW8+6fgTX4BWJx8IsUUsTwmF+R2sX54hM6YWLrZP26MRrb1sY4RZ1Gj
+aCSyc8hXcF/52effIhFrh+EOBRYFrbNxl6UN+/+nOkO3rovzB3Rq+TyIFn3hQdbL
+t+OBFBFBlM22kFgr/vGDd2gmejDFFCZpv8FjA8DkLMVw0UyI5z2tCLwzPLCzLcTT
+3MWO9tMNF5I40TZy6sMU+F2VFt7cg9SpB2UYwL0ei9B4t7C0cTE=
+=ylLd
 -----END PGP SIGNATURE-----
 
---TdkiTnkLhLQllcMS--
+--KjSGHOmKKB2VUiQn--
 
