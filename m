@@ -5,110 +5,128 @@ X-Spam-Level:
 X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CEEEC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:55:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86ACFC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:55:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0F952072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:55:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FBDB20767
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:55:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBOgslaV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F952072A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/d7ijan"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FBDB20767
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDom1-00014C-1K
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:55:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59930)
+	id 1kDomQ-0001q5-Cs
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:55:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60056)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDolN-0000PK-Gd
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:54:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43992)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDolk-0000ut-7A
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:55:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43220
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDolL-0002m3-PM
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:54:49 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoli-0002qG-La
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:55:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599137687;
+ s=mimecast20190719; t=1599137709;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3QapDBHr5jneETXb0Ohi0LvOU6mMvJiz3PvYvPp2wpU=;
- b=EBOgslaVrwjOzsDhAhWB0VvaxsOIov0EiQ2sA+QvD4UFaGDFgV3Ay6o85l3DnN9jR4DqgD
- 1o2PdUE3x4Gxz+K8F4YXXKkR+AuVHjNgA97KID2zXMXsc4X8ICiv5uM8+DZNY9mHk7Fdbd
- QgMlxRCmx5hcysoyr4FDD659VV56gpc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-498-dGcgPzWgPwCuxqCxfw6QLA-1; Thu, 03 Sep 2020 08:54:45 -0400
-X-MC-Unique: dGcgPzWgPwCuxqCxfw6QLA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA4EC18BE16D;
- Thu,  3 Sep 2020 12:54:33 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-164.ams2.redhat.com
- [10.36.112.164])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B662C39A47;
- Thu,  3 Sep 2020 12:54:32 +0000 (UTC)
-Subject: Re: [PATCH] iotests: Allow running from different directory
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200902110326.257115-1-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <170e9e09-5d81-f75b-fbb1-b60ed0d2e776@redhat.com>
-Date: Thu, 3 Sep 2020 14:54:29 +0200
+ bh=nW2YLL6YTqwqrXOqYzrEQueyuerwCqac4JkAVTAjUJQ=;
+ b=W/d7ijanMt9uU7AR3WzX92s2s9s6nV3vUXi+5trglJgMl/o1ee5NF3y/fd90n7hvccN6G+
+ 9sxLGlSokNy8OPWvwSMSZJOmqA2sEcLbskyn6u4bvOQlsPn8XHnMrO+DvjhEGXrQzvPKaj
+ c0YM0tXVxrVHQlpP+RT0kunVaiMDxcY=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-343-MVAocKzHO3WQJlpWMSneMg-1; Thu, 03 Sep 2020 08:55:08 -0400
+X-MC-Unique: MVAocKzHO3WQJlpWMSneMg-1
+Received: by mail-wr1-f69.google.com with SMTP id l15so1048034wro.10
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:55:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=nW2YLL6YTqwqrXOqYzrEQueyuerwCqac4JkAVTAjUJQ=;
+ b=WwPJuvOG/EjYan+ozfL3VqoaBEYMzSvBArMigjGtaSLcRfruwE/UCUYzJx3FnlpDrx
+ 6lqWYhbloVyaVl1P8Tk+6FHH2raWUmJ5n9jwpYq7EoGgYaxA1DKRPpqRxNWkmZoaazdP
+ fNSg6r2MiCyGt1Iyd2d7a5lu7XarNEOorqvnNxdKBAdhaCODDmI3E/O3zxSmB7TuixTm
+ 3u37HJZMCv8mq0OJO4/qqdQNiJQqe3xBUjiLKDA6dOeO9Tjz4SYN8NCJTw/9rQEDRq+y
+ M/OgwUaa8iufTVjv4vDUKZNElwq/RFruSVOl+kzD3wy8p8vfcqUQrDXFvoZilmQYWJMl
+ hnNA==
+X-Gm-Message-State: AOAM531hJG0Lvs1f36BSdELszwK/KceE5DOLz/2xd7kyAsD07jXlsHk+
+ EsTI7mh7ePCION0Vnmln4mhkPqI/DwZfngqrettS20e8m34MI0xCRNHeq5zconThzt3tCFpEXlX
+ Z71dTUgVM8kR9mw8=
+X-Received: by 2002:a5d:4bc6:: with SMTP id l6mr2518882wrt.132.1599137707386; 
+ Thu, 03 Sep 2020 05:55:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxOTz1O1U1PHlR9iSJzqDk5pVG6vlpz08+ozbOWNtaGeQoHq93p30PLsRaFVqPHKkbqXuVMeg==
+X-Received: by 2002:a5d:4bc6:: with SMTP id l6mr2518865wrt.132.1599137707233; 
+ Thu, 03 Sep 2020 05:55:07 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id h5sm4648395wrt.31.2020.09.03.05.55.06
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Sep 2020 05:55:06 -0700 (PDT)
+Subject: Re: [PATCH 24/63] scsi: Rename TYPE_AM53C974_DEVICE to TYPE_PCI_ESP
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20200902224311.1321159-1-ehabkost@redhat.com>
+ <20200902224311.1321159-25-ehabkost@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <cb06c88c-d6e4-c951-5bcd-e0b029bdce81@redhat.com>
+Date: Thu, 3 Sep 2020 14:55:06 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200902110326.257115-1-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20200902224311.1321159-25-ehabkost@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="fTwkj1uMJtYsftFtfd5VXVCAViCRVEFF5"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 00:24:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -44
 X-Spam_score: -4.5
 X-Spam_bar: ----
 X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,92 +139,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
+ berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---fTwkj1uMJtYsftFtfd5VXVCAViCRVEFF5
-Content-Type: multipart/mixed; boundary="sez01Tm0Co2Kj8mhWWtws8clRNuqn9OoR"
-
---sez01Tm0Co2Kj8mhWWtws8clRNuqn9OoR
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 02.09.20 13:03, Kevin Wolf wrote:
-> It is convenient to be able to edit the tests and run them without
-> changing the current working directory back and forth. Instead of
-> assuming that $PWD is the qemu-iotests build directory, derive the build
-> directory from the executed script.
->=20
-> This allows 'check' to find the required files even when called from
-> another directory. The scratch directory will still be in the current
-> working directory.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On 9/3/20 12:42 AM, Eduardo Habkost wrote:
+> This will make the type name constant consistent with the name of
+> the type checking macro.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
->  tests/qemu-iotests/check | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
-> index 3ab859ac1a..22ada6a549 100755
-> --- a/tests/qemu-iotests/check
-> +++ b/tests/qemu-iotests/check
-> @@ -44,7 +44,7 @@ then
->          _init_error "failed to obtain source tree name from check symlin=
-k"
->      fi
->      source_iotests=3D$(cd "$source_iotests"; pwd) || _init_error "failed=
- to enter source tree"
-> -    build_iotests=3D$PWD
-> +    build_iotests=3D$(dirname "$0")
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Fam Zheng <fam@euphon.net>
+> Cc: qemu-devel@nongnu.org
+> ---
+>  hw/scsi/esp-pci.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
+> index 2ce96dc56e..2b1198380b 100644
+> --- a/hw/scsi/esp-pci.c
+> +++ b/hw/scsi/esp-pci.c
+> @@ -35,11 +35,11 @@
+>  #include "qemu/module.h"
+>  #include "qom/object.h"
+>  
+> -#define TYPE_AM53C974_DEVICE "am53c974"
+> +#define TYPE_PCI_ESP "am53c974"
 
-This breaks running check from the build tree.
-(i.e. cd $build/tests/qemu-iotests; ./check)
-
-The problem is that to run the test, we do cd to the source directory
-($source_iotests), and so $build_iotests then becomes invalid if it=E2=80=
-=99s
-just a relative path.  In my case, this leads to the following error:
-
--Formatting 'TEST_DIR/t.IMGFMT', fmt=3DIMGFMT size=3D1048576
-+./common.rc: line 139: $QEMU/tests/qemu-iotests/../../qemu-img: No such
-file or directory
-
-I think this could be resolved by wrapping the $(dirname) in
-$(realpath), i.e.
-
-build_iotests=3D$(realpath "$(dirname "$0")")
-
-Max
-
->  else
->      # called from the source tree
->      source_iotests=3D$PWD
->=20
-
-
---sez01Tm0Co2Kj8mhWWtws8clRNuqn9OoR--
-
---fTwkj1uMJtYsftFtfd5VXVCAViCRVEFF5
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9Q54UACgkQ9AfbAGHV
-z0DatggAhRtnU9C254cIQ1CW0Qiju0JooaTBqlGDYBkKO+O4TdIq9yXHKjIY+MWX
-ft/zeVcuC+lIi0c6CU3t0B1lC8ngUezRLBtxUbczzqZ+zNz6SPBJsJglhHKovUc4
-knaGzR/8YpdHZ5lN1RnAKIyBpnNLb+K+Hac7yzi83whfSU3tZsQEyPEEqC92M63Q
-YzZuSXQOTPbsE55uwG7RSiiNjVh7XFSvIsyPibKT7wpNvZAa19CoWe/e6MUkqKER
-wg6L2fWfyOFvzzdaE0hYMeZU1CN0yHlCD8dcCiGZQgtVDYBrCQslyWVCV68QsOtZ
-0xkLHtQwF9NPOt+ke9Pyv6yUcHb20w==
-=5VuR
------END PGP SIGNATURE-----
-
---fTwkj1uMJtYsftFtfd5VXVCAViCRVEFF5--
+We are loosing information helpful to reviewers :(
 
 
