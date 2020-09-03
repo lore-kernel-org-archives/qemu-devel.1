@@ -2,92 +2,99 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8853C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 869D7C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:56:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0B11206A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:56:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A734206A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:56:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BA2Us3VD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0B11206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lih9ADrL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A734206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDsX5-0008Ve-Sn
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:56:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47402)
+	id 1kDsXP-0000Xn-E7
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:56:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDsWC-0007Lx-Fg
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:55:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60078)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDsW9-0006Yd-TO
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:55:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599152119;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4gA54MDOFVg8MWzvqUShddu13u2PcM6g0YChuGpv+Yo=;
- b=BA2Us3VDqYK2bTqZYDyhkS5SLGIwkoAHvqGpS14zjMDU3bdG7HfmznArqkdPGKrsjsYIG8
- AyaJidV6scxJNYfGfjeWiVt7vgzg7H1zHGEo5pgQA7QRYBLbuT6WB/sG7+MWPEQnKOkFFY
- iaqxbDVhBFUytDGwjGuXNCQy77a3SZk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-tQrQAq70NGyWcB1tTWNL9w-1; Thu, 03 Sep 2020 12:55:18 -0400
-X-MC-Unique: tQrQAq70NGyWcB1tTWNL9w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7691B81F002
- for <qemu-devel@nongnu.org>; Thu,  3 Sep 2020 16:55:15 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4D32C6198B;
- Thu,  3 Sep 2020 16:55:12 +0000 (UTC)
-Date: Thu, 3 Sep 2020 12:55:11 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH 14/63] i8254: Rename TYPE_I8254 to TYPE_PIT
-Message-ID: <20200903165511.GP4940@habkost.net>
-References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-15-ehabkost@redhat.com>
- <9a2be0a5-1d7f-1813-5bdb-2c741f07c593@redhat.com>
- <20200903161809.GH4940@habkost.net>
- <20200903164429.GD441291@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDsWI-0007XR-7n
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:55:30 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:37621)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDsWE-0006cG-W4
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:55:29 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id mw10so1757124pjb.2
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 09:55:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=xixXR6txDil36bLKtu6slbQXCG/+KT1Mjn/eTXmikks=;
+ b=lih9ADrLRCXPbI3l1xg0nfTg3elLhZaXvVe9UdkPlUrjgfBOHdwpLQl6JhDsGUdXUM
+ rn0Hrpn4/YpHd8y4A39IIUec+arZ/USdHWTzQOwhTEFnv/GBDJ2Q3SVhC+EGu8khhACx
+ S13KnhNhHNmfkSru/ODLKLDbzDtr7O1vtn7BPnDdV9WdvdWlLQ8gQdMoC0RDEqtZBgA/
+ B+n5PapThpHhKBVEhXYx7pH8HxPwwpzfBiSkFhH9BEeJ2fAaGn97bfHxNM7lHi6ShMB4
+ 5hy2Dya2y1B9T3PpGVUS5l2iDWz9IhW+Jos7bJZKU2tD/edTLwJEhUQ6vin3pVMy0cjp
+ t1WQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xixXR6txDil36bLKtu6slbQXCG/+KT1Mjn/eTXmikks=;
+ b=ktccQfUvh8aGpYfFF79d9zqUYnygsmNC68NROW7YBA/QRIiUxEEefVsTpRbcUsw1yN
+ UKcZuE327ioachG7/7xVqkalfaALigEJsJujdhhG+q1hC3H5qbeokq/5ZmGStfO7rLmk
+ N5ks8EeQoo5LC9ux7Kl2LkhEgA6tpSOosIDQ3BTjSHRKRH6h7ipy2lauHykAXhOHVZFM
+ ovvfgFb3WGWPEclIhetgh+yBPu/JHcf728aeS2o486cxrWhZY4Vwxxsitk1NsM9zvnbY
+ Yvgtu9aEfs3VU4e02f9zADjkrK3fJYGsXrYsrpWHhaPZybQIywxqSulSBceZPWd8qlpA
+ vvpw==
+X-Gm-Message-State: AOAM532AvHqJFAn/8ZLrJmPL3Y+K5nHIDKDVDH1x7yNh71FevDSReXGR
+ 0VvwpnDIpgm7oxYPzYnYhlxykA==
+X-Google-Smtp-Source: ABdhPJxGzqj3v2i4rYAmf0h1VGRnpVvExzso6TPRAhd+XTuQcZLIfzxa/YS0p7GotxHFs5E/3Vl2BA==
+X-Received: by 2002:a17:90a:468d:: with SMTP id
+ z13mr4125450pjf.105.1599152125573; 
+ Thu, 03 Sep 2020 09:55:25 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id p190sm3744879pfp.9.2020.09.03.09.55.24
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Sep 2020 09:55:24 -0700 (PDT)
+Subject: Re: [PATCH v6 7/8] util: give a specific error message when O_DIRECT
+ doesn't work
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200903152210.1917355-1-berrange@redhat.com>
+ <20200903152210.1917355-8-berrange@redhat.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c741505d-853e-774f-5adf-f28327a06678@linaro.org>
+Date: Thu, 3 Sep 2020 09:55:22 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200903164429.GD441291@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+In-Reply-To: <20200903152210.1917355-8-berrange@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -44
+X-Spam_score: -4.5
+X-Spam_bar: ----
+X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.403,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,57 +107,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Markus Armbruster <armbru@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 03, 2020 at 05:44:29PM +0100, Daniel P. Berrangé wrote:
-> On Thu, Sep 03, 2020 at 12:18:09PM -0400, Eduardo Habkost wrote:
-> > On Thu, Sep 03, 2020 at 02:47:03PM +0200, Philippe Mathieu-DaudÃƒÂ© wrote:
-> > > On 9/3/20 12:42 AM, Eduardo Habkost wrote:
-> > > > This will make the type name constant consistent with the name of
-> > > > the type checking macro.
-> > > > 
-> > > > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > > > ---
-> > > > Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> > > > Cc: Paolo Bonzini <pbonzini@redhat.com>
-> > > > Cc: qemu-devel@nongnu.org
-> > > > ---
-> > > >  include/hw/timer/i8254.h | 4 ++--
-> > > >  hw/timer/i8254.c         | 4 ++--
-> > > >  2 files changed, 4 insertions(+), 4 deletions(-)
-> > > > 
-> > > > diff --git a/include/hw/timer/i8254.h b/include/hw/timer/i8254.h
-> > > > index 1a522a2457..ddd925074f 100644
-> > > > --- a/include/hw/timer/i8254.h
-> > > > +++ b/include/hw/timer/i8254.h
-> > > > @@ -45,7 +45,7 @@ typedef struct PITCommonClass PITCommonClass;
-> > > >  DECLARE_OBJ_CHECKERS(PITCommonState, PITCommonClass,
-> > > >                       PIT_COMMON, TYPE_PIT_COMMON)
-> > > >  
-> > > > -#define TYPE_I8254 "isa-pit"
-> > > > +#define TYPE_PIT "isa-pit"
-> > > 
-> > > I disagree with this patch, as we have various PIT and only one I8254.
-> > 
-> > I was unsure about this, and I agree with your point.  I will
-> > suggest renaming the PIT macro to I8254 instead.
+On 9/3/20 8:22 AM, Daniel P. Berrangé wrote:
+> A common error scenario is to tell QEMU to use O_DIRECT in combination
+> with a filesystem that doesn't support it. To aid users to diagnosing
+> their mistake we want to provide a clear error message when this happens.
 > 
-> IMHO the macro name should be directly related to the object name
-> string with non-alnum characters replaced by underscore.
-> 
-> ie since the object type is "isa-pit", then the macro should be
-> TYPE_ISA_PIT
+> Reviewed-by: Markus Armbruster <armbru@redhat.com>
+> Reviewed-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
+>  util/osdep.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
 
-I think that's a good idea in this specific case because it's a
-short name (I will do it).  But I don't think we'll be able to
-always follow that rule, as the QOM type name is user-visible.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
--- 
-Eduardo
+r~
 
 
