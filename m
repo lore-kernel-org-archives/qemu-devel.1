@@ -2,90 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0557C43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:13:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC982C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:14:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C51C20716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:13:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B3DB20716
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:14:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n1cQdJJS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C51C20716
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nWxcHhti"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B3DB20716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50420 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDxTw-0008Kg-NL
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 18:13:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45124)
+	id 1kDxUv-0001io-Mx
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 18:14:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kDxNp-0006TE-6G; Thu, 03 Sep 2020 18:07:05 -0400
-Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:35154)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDxNy-0006rD-Qo
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 18:07:14 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:33072)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kDxNn-0007Tc-FQ; Thu, 03 Sep 2020 18:07:04 -0400
-Received: by mail-qt1-x844.google.com with SMTP id p65so3224346qtd.2;
- Thu, 03 Sep 2020 15:07:02 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDxNu-0007UO-Cp
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 18:07:14 -0400
+Received: by mail-pf1-x444.google.com with SMTP id u20so3462903pfn.0
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 15:07:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=AmzNVohi0vwbsaqxAbNb8kEnz44H4NjHT8oXYcEsNLg=;
- b=n1cQdJJSnZbw2pBzG2+iLwIZhW0rSdJEbo8Bd+/Ni9L5sEoRnDsKqJsEzxMXh4IyCI
- FdPfR7E2X5Dl9l5GUYUjz8N1wT3QaKR3rOnHh2lrCCKAWROsHMkQ+Do1cNxk1a/Gx4mj
- 3EW6pGrEiWY9yTnNC+w8cIusPZCHf3Fs3ju0mSyxB+m75rvcdfMzsNj9ndvjyLktxiSm
- qWGdY82E9nDaUvEd4O2hVxk40vlolbJla6Aezsn7XRwtFhYxjiUYh4ipvUYXB6RmcMn7
- iHQJ1rBXlfWvQxHs8qZYTLjmCQdEHGsZocVGhiWvfvij//X1ozwxbfw5phOJ1IykdRTP
- CELg==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=S0CdT7EJuAl1EvDXm+oKp2XSA+jKypIYBOFAUPRceZg=;
+ b=nWxcHhtim+SJ0TqIpLvEQNeKszcNMKWmh2fb+avlWbUhavvyzvPa4n3jZoRH8Y8Prw
+ FTTjfXBcYAAmXq7t1ilzbpq3+w4gBDDpaiVDbrqYynSiAMB5JCgdrcqw0y2//NQ4fVs9
+ gZ/rXVV1lsXhegA7dLNMtAk+hQ1FA3W9zb7J12nEYNuPMR/nHuHRsTtITz0uhOmbFNhS
+ 9f/b9kQ1iLRveFdMAsxGo4PQohqV9M32cFgsT5LpLvMKGJBt7zcQCBNEJp/YyIoiO0hu
+ OmVGKiHO1Jp8tzDpjzLgXyMUvho73xZwgffJ6Q7j+zZNwio1TjFdRE8o/cFW6hKzlpzl
+ NoZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=AmzNVohi0vwbsaqxAbNb8kEnz44H4NjHT8oXYcEsNLg=;
- b=T2t9DcMD00fwtRY5pjhkK83sPRV8UkfQGsIYkkv6aEBwT3IYP2vJZkDET9LrD2Hl/D
- bl1elBGgW/JW0jlWgPqn2e4IGRQsZDOwzKTrQ9nH2QSDMhBcTcghu4c8BSWcDq6iMCw1
- lqXH21Tajyjq7kh6fedXqiHsLzmK21mRTJB3cScW+BMcdJlNd+/fz88eB0uyYHCrqePN
- JPmIDeqYy9qwZ8/D9F0jZehxs8Vn/6Zdb20X5NkYzip/R2rxbEJyyhCWF60wKrVWr+el
- JPBY/KpQQFQS9YdUVx3PhjJSETSJ+LHiIDG6xGqEOMiVGEKIRznwsub8fHNI6o6zZxS2
- 0F/w==
-X-Gm-Message-State: AOAM53315XkQV6sJ6sQB5KvXwheM2E7vdw5U6X2WS8Ux/kZjK9AcViDl
- URTq1/Q/0/a+utazF3AafOmO8RRxgTSZ8g==
-X-Google-Smtp-Source: ABdhPJwnJ/9cY6RgLzrv0X9KibGTIVaE//n/OtpSof4zYwM1DtDRO2JTkqL1zVFMvrss00nR1mnj3g==
-X-Received: by 2002:ac8:22ea:: with SMTP id g39mr5824130qta.146.1599170821730; 
- Thu, 03 Sep 2020 15:07:01 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
- by smtp.gmail.com with ESMTPSA id j1sm1798757qtk.91.2020.09.03.15.07.00
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=S0CdT7EJuAl1EvDXm+oKp2XSA+jKypIYBOFAUPRceZg=;
+ b=AlRWKphqg3I8TH5vWBgmjOSl3ZoKSNdXB2cKODDrH8SXzJQZV/7OesLCoZ4ctKrnWE
+ zNS7muASvzT413S8rCBRVYDby2+KgPNQI2LKBxB/cCprMXRhHa7Adn0cqAAaY9SAWPQn
+ FbNJYbRGwMtVLK48nzuN4XImMdhQmtIzp6SIlmkFSneWZobnfZC7OFEx6G6DQGU7UDgs
+ AVjdkSTThUXt6ediUrIY4RjtHkqvjfl6FZK/1pBcdMljhg9laei1O4pOx1uJu8f1nI+v
+ Xml7hHCmQEAC6YbE2wuzxDvWwkdUQFoVyeL2ZW7bmdnO5AGryfm5aX/RSZYppr4ODWQO
+ jRPg==
+X-Gm-Message-State: AOAM5326/6tfYJASmv7yJdfft7V3pEsdVpM2jUMXrlqGmr6mtwsljweV
+ Aq/yBXQe2h9Xf0N8NAXRT6sWTw4FQJIIbw==
+X-Google-Smtp-Source: ABdhPJwfPsblUJqDec1QCC5LY9ewDiTXTxtCSnaEqx24ODuYNo2mHNCWjPqYX6glLwJcx9b4PqFhLQ==
+X-Received: by 2002:a17:902:bcc5:b029:d0:89f3:28d0 with SMTP id
+ o5-20020a170902bcc5b02900d089f328d0mr4309862pls.12.1599170828517; 
+ Thu, 03 Sep 2020 15:07:08 -0700 (PDT)
+Received: from localhost.localdomain ([222.95.248.6])
+ by smtp.googlemail.com with ESMTPSA id g5sm4393218pfh.168.2020.09.03.15.07.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 15:07:01 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+ Thu, 03 Sep 2020 15:07:07 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 7/7] spapr_numa: use spapr_numa_get_vcpu_assoc() in
- home_node hcall
-Date: Thu,  3 Sep 2020 19:06:39 -0300
-Message-Id: <20200903220639.563090-8-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200903220639.563090-1-danielhb413@gmail.com>
-References: <20200903220639.563090-1-danielhb413@gmail.com>
+Subject: [PATCH v2] tests: Trying fixes test-replication.c on msys2.
+Date: Fri,  4 Sep 2020 06:06:55 +0800
+Message-Id: <20200903220655.1333-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::844;
- envelope-from=danielhb413@gmail.com; helo=mail-qt1-x844.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,86 +99,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current implementation of h_home_node_associativity hard codes
-the values of associativity domains of the vcpus. Let's make
-it consider the values already initialized in spapr->numa_assoc_array,
-via the spapr_numa_get_vcpu_assoc() helper.
-
-We want to set it and forget it, and for that we also need to
-assert that we don't overflow the registers of the hypercall.
-From R4 to R9 we can squeeze in 12 associativity domains, so
-let's assert that MAX_DISTANCE_REF_POINTS isn't greater
-than that.
-
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- hw/ppc/spapr_numa.c | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+ tests/test-replication.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index abc7361921..850e61bf98 100644
---- a/hw/ppc/spapr_numa.c
-+++ b/hw/ppc/spapr_numa.c
-@@ -185,10 +185,12 @@ target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-                                        target_ulong opcode,
-                                        target_ulong *args)
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index 9ab3666a90..d0e06f8d77 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -23,14 +23,18 @@
+ 
+ /* primary */
+ #define P_ID "primary-id"
+-static char p_local_disk[] = "/tmp/p_local_disk.XXXXXX";
++#define P_LOCAL_DISK "%s/p_local_disk.XXXXXX"
++static char p_local_disk[PATH_MAX];
+ 
+ /* secondary */
+ #define S_ID "secondary-id"
+ #define S_LOCAL_DISK_ID "secondary-local-disk-id"
+-static char s_local_disk[] = "/tmp/s_local_disk.XXXXXX";
+-static char s_active_disk[] = "/tmp/s_active_disk.XXXXXX";
+-static char s_hidden_disk[] = "/tmp/s_hidden_disk.XXXXXX";
++#define S_LOCAL_DISK "%s/s_local_disk.XXXXXX"
++static char s_local_disk[PATH_MAX];
++#define S_ACTIVE_DISK "%s/s_active_disk.XXXXXX"
++static char s_active_disk[PATH_MAX];
++#define S_HIDDEN_DISK "%s/s_hidden_disk.XXXXXX"
++static char s_hidden_disk[PATH_MAX];
+ 
+ /* FIXME: steal from blockdev.c */
+ QemuOptsList qemu_drive_opts = {
+@@ -571,7 +575,12 @@ static void setup_sigabrt_handler(void)
+ int main(int argc, char **argv)
  {
-+    g_autofree uint32_t *vcpu_assoc = NULL;
-     target_ulong flags = args[0];
-     target_ulong procno = args[1];
-     PowerPCCPU *tcpu;
--    int idx;
-+    uint vcpu_assoc_size;
-+    int idx, assoc_idx;
+     int ret;
++    const char *tmpdir = g_get_tmp_dir();
+     qemu_init_main_loop(&error_fatal);
++    sprintf(p_local_disk, P_LOCAL_DISK, tmpdir);
++    sprintf(s_local_disk, S_LOCAL_DISK, tmpdir);
++    sprintf(s_active_disk, S_ACTIVE_DISK, tmpdir);
++    sprintf(s_hidden_disk, S_HIDDEN_DISK, tmpdir);
+     bdrv_init();
  
-     /* only support procno from H_REGISTER_VPA */
-     if (flags != 0x1) {
-@@ -200,16 +202,31 @@ target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-         return H_P2;
-     }
- 
--    /* sequence is the same as in the "ibm,associativity" property */
-+    /*
-+     * Given that we want to be flexible with the sizes and indexes,
-+     * we must consider that there is a hard limit of how many
-+     * associativities domain we can fit in R4 up to o R9, which
-+     * would be 12. Assert and bail if that's not the case.
-+     */
-+    g_assert(MAX_DISTANCE_REF_POINTS <= 12);
-+
-+    vcpu_assoc = spapr_numa_get_vcpu_assoc(spapr, tcpu, &vcpu_assoc_size);
-+    vcpu_assoc_size /= sizeof(uint32_t);
-+    /* assoc_idx starts at 1 to skip associativity size */
-+    assoc_idx = 1;
- 
--    idx = 0;
- #define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
-                              ((uint64_t)(b) & 0xffffffff))
--    args[idx++] = ASSOCIATIVITY(0, 0);
--    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
--    args[idx++] = ASSOCIATIVITY(procno, -1);
--    for ( ; idx < 6; idx++) {
--        args[idx] = -1;
-+
-+    for (idx = 0; idx < 6; idx++) {
-+        int8_t a, b;
-+
-+        a = assoc_idx < vcpu_assoc_size ?
-+            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
-+        b = assoc_idx < vcpu_assoc_size ?
-+            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
-+
-+        args[idx] = ASSOCIATIVITY(a, b);
-     }
- #undef ASSOCIATIVITY
- 
+     g_test_init(&argc, &argv, NULL);
 -- 
-2.26.2
+2.28.0.windows.1
 
 
