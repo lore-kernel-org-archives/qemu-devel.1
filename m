@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4922CC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:58:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F28A7C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:58:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 076CE248E6
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:58:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1B5E206B8
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:58:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hgaqr22o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 076CE248E6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z25tsNXU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1B5E206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60286 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwIx-0008Uf-4x
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:58:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56038)
+	id 1kDwJU-000138-V5
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:58:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56294)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwE7-0000La-Tc
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23964)
+ id 1kDwEW-00010m-9p
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44610)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwE5-0006XM-3x
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:52:59 -0400
+ id 1kDwEU-0006bC-Fd
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599166375;
+ s=mimecast20190719; t=1599166401;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=r9wpfpFY9cCriCCJs74ijsD+iryOC4RfWojjLq6lqRU=;
- b=hgaqr22ocIscFakUHCh+wU+FLMSNoT6nl0H0hIqD78R5LspoSSaIb0E++sbtudhDLTtnlR
- x1JEInTpmhbzIrD5J00TcFgFoCG9jN3nBi0GSqa4NJZaBWt6+0GK44TKrjFuNFyJ4dF7c/
- EI5ythMqCxwQykSQIpD8jXWWj7t4i3c=
+ bh=STycltGk/N79qHEc2F8EjCKOe0jyH7lhTX7lgq0Xm6w=;
+ b=Z25tsNXUvVEpaWTBAPGCeK2jPu9aP5K1T95FnZKxdehyeNc0w531cAAQb2Jbw1T0O0+vDi
+ HaZhOtSnPjWDfUnc0PNQM3G9DWIs6kJeMGl3bOdSQcbMNB56puwnBBA+wxYf3KoIlcNID1
+ vEHBIxtT7LigEaQzh5579HxWBLgF0CU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-54-Lybpom90O4-M6kL0k5YN8w-1; Thu, 03 Sep 2020 16:52:52 -0400
-X-MC-Unique: Lybpom90O4-M6kL0k5YN8w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-212-drxr-OJ-NKq0_ULs0-3WAA-1; Thu, 03 Sep 2020 16:53:19 -0400
+X-MC-Unique: drxr-OJ-NKq0_ULs0-3WAA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CD9510BBEC3;
- Thu,  3 Sep 2020 20:52:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2A5418BA292;
+ Thu,  3 Sep 2020 20:53:18 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2E2519D7D;
- Thu,  3 Sep 2020 20:52:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8E6526CE4E;
+ Thu,  3 Sep 2020 20:53:18 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 03/27] qom: Allow class type name to be specified in
- OBJECT_DECLARE*
-Date: Thu,  3 Sep 2020 16:52:23 -0400
-Message-Id: <20200903205247.1667472-4-ehabkost@redhat.com>
+Subject: [PULL 18/27] vmgenid: Rename VMGENID_DEVICE to TYPE_VMGENID
+Date: Thu,  3 Sep 2020 16:52:38 -0400
+Message-Id: <20200903205247.1667472-19-ehabkost@redhat.com>
 In-Reply-To: <20200903205247.1667472-1-ehabkost@redhat.com>
 References: <20200903205247.1667472-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -98,98 +97,86 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Many QOM types don't follow the Type/TypeClass pattern
-on the instance/struct names.  Let the class struct name
-be specified in the OBJECT_DECLARE* macros.
+This will make the type name constant consistent with the name of
+the type checking macro.
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Message-Id: <20200831210740.126168-4-ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200902224311.1321159-11-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/qom/object.h | 35 ++++++++++++++++++-----------------
- 1 file changed, 18 insertions(+), 17 deletions(-)
+ include/hw/acpi/vmgenid.h | 6 +++---
+ hw/acpi/vmgenid.c         | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/include/qom/object.h b/include/qom/object.h
-index f515230f61..500e7dfa99 100644
---- a/include/qom/object.h
-+++ b/include/qom/object.h
-@@ -555,7 +555,8 @@ struct Object
+diff --git a/include/hw/acpi/vmgenid.h b/include/hw/acpi/vmgenid.h
+index 86cd1da605..aff574df5f 100644
+--- a/include/hw/acpi/vmgenid.h
++++ b/include/hw/acpi/vmgenid.h
+@@ -6,7 +6,7 @@
+ #include "qemu/uuid.h"
+ #include "qom/object.h"
  
- /**
-  * OBJECT_DECLARE_TYPE:
-- * @ModuleObjName: the object name with initial capitalization
-+ * @InstanceType: instance struct name
-+ * @ClassType: class struct name
-  * @module_obj_name: the object name in lowercase with underscore separators
-  * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-  *
-@@ -567,33 +568,33 @@ struct Object
-  *
-  * The object struct and class struct need to be declared manually.
-  */
--#define OBJECT_DECLARE_TYPE(ModuleObjName, module_obj_name, MODULE_OBJ_NAME) \
--    typedef struct ModuleObjName ModuleObjName; \
--    typedef struct ModuleObjName##Class ModuleObjName##Class; \
-+#define OBJECT_DECLARE_TYPE(InstanceType, ClassType, module_obj_name, MODULE_OBJ_NAME) \
-+    typedef struct InstanceType InstanceType; \
-+    typedef struct ClassType ClassType; \
-     \
--    G_DEFINE_AUTOPTR_CLEANUP_FUNC(ModuleObjName, object_unref) \
-+    G_DEFINE_AUTOPTR_CLEANUP_FUNC(InstanceType, object_unref) \
-     \
--    static inline G_GNUC_UNUSED ModuleObjName##Class * \
-+    static inline G_GNUC_UNUSED ClassType * \
-     MODULE_OBJ_NAME##_GET_CLASS(void *obj) \
--    { return OBJECT_GET_CLASS(ModuleObjName##Class, obj, \
-+    { return OBJECT_GET_CLASS(ClassType, obj, \
-                               TYPE_##MODULE_OBJ_NAME); } \
-     \
--    static inline G_GNUC_UNUSED ModuleObjName##Class * \
-+    static inline G_GNUC_UNUSED ClassType * \
-     MODULE_OBJ_NAME##_CLASS(void *klass) \
--    { return OBJECT_CLASS_CHECK(ModuleObjName##Class, klass, \
-+    { return OBJECT_CLASS_CHECK(ClassType, klass, \
-                                 TYPE_##MODULE_OBJ_NAME); } \
-     \
--    static inline G_GNUC_UNUSED ModuleObjName * \
-+    static inline G_GNUC_UNUSED InstanceType * \
-     MODULE_OBJ_NAME(void *obj) \
--    { return OBJECT_CHECK(ModuleObjName, obj, \
-+    { return OBJECT_CHECK(InstanceType, obj, \
-                           TYPE_##MODULE_OBJ_NAME); }
+-#define VMGENID_DEVICE           "vmgenid"
++#define TYPE_VMGENID           "vmgenid"
+ #define VMGENID_GUID             "guid"
+ #define VMGENID_GUID_FW_CFG_FILE      "etc/vmgenid_guid"
+ #define VMGENID_ADDR_FW_CFG_FILE      "etc/vmgenid_addr"
+@@ -18,7 +18,7 @@
  
- /**
-  * OBJECT_DECLARE_SIMPLE_TYPE:
-- * @ModuleObjName: the object name with initial caps
-+ * @InstanceType: instance struct name
-  * @module_obj_name: the object name in lowercase with underscore separators
-  * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
-- * @ParentModuleObjName: the parent object name with initial caps
-+ * @ParentClassType: class struct name of parent type
-  *
-  * This does the same as OBJECT_DECLARE_TYPE(), but also declares
-  * the class struct, thus only the object struct needs to be declare
-@@ -602,10 +603,10 @@ struct Object
-  * This macro should be used unless the class struct needs to have
-  * virtual methods declared.
-  */
--#define OBJECT_DECLARE_SIMPLE_TYPE(ModuleObjName, module_obj_name, \
--                                   MODULE_OBJ_NAME, ParentModuleObjName) \
--    OBJECT_DECLARE_TYPE(ModuleObjName, module_obj_name, MODULE_OBJ_NAME) \
--    struct ModuleObjName##Class { ParentModuleObjName##Class parent_class; };
-+#define OBJECT_DECLARE_SIMPLE_TYPE(InstanceType, module_obj_name, \
-+                                   MODULE_OBJ_NAME, ParentClassType) \
-+    OBJECT_DECLARE_TYPE(InstanceType, InstanceType##Class, module_obj_name, MODULE_OBJ_NAME) \
-+    struct InstanceType##Class { ParentClassType parent_class; };
+ typedef struct VmGenIdState VmGenIdState;
+ DECLARE_INSTANCE_CHECKER(VmGenIdState, VMGENID,
+-                         VMGENID_DEVICE)
++                         TYPE_VMGENID)
  
+ struct VmGenIdState {
+     DeviceClass parent_obj;
+@@ -29,7 +29,7 @@ struct VmGenIdState {
+ /* returns NULL unless there is exactly one device */
+ static inline Object *find_vmgenid_dev(void)
+ {
+-    return object_resolve_path_type("", VMGENID_DEVICE, NULL);
++    return object_resolve_path_type("", TYPE_VMGENID, NULL);
+ }
  
- /**
+ void vmgenid_build_acpi(VmGenIdState *vms, GArray *table_data, GArray *guid,
+diff --git a/hw/acpi/vmgenid.c b/hw/acpi/vmgenid.c
+index 2df7623d74..53db6af75d 100644
+--- a/hw/acpi/vmgenid.c
++++ b/hw/acpi/vmgenid.c
+@@ -198,7 +198,7 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
+ 
+     if (!bios_linker_loader_can_write_pointer()) {
+         error_setg(errp, "%s requires DMA write support in fw_cfg, "
+-                   "which this machine type does not provide", VMGENID_DEVICE);
++                   "which this machine type does not provide", TYPE_VMGENID);
+         return;
+     }
+ 
+@@ -206,7 +206,7 @@ static void vmgenid_realize(DeviceState *dev, Error **errp)
+      * device. Check if there are several.
+      */
+     if (!find_vmgenid_dev()) {
+-        error_setg(errp, "at most one %s device is permitted", VMGENID_DEVICE);
++        error_setg(errp, "at most one %s device is permitted", TYPE_VMGENID);
+         return;
+     }
+ 
+@@ -232,7 +232,7 @@ static void vmgenid_device_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static const TypeInfo vmgenid_device_info = {
+-    .name          = VMGENID_DEVICE,
++    .name          = TYPE_VMGENID,
+     .parent        = TYPE_DEVICE,
+     .instance_size = sizeof(VmGenIdState),
+     .class_init    = vmgenid_device_class_init,
 -- 
 2.26.2
 
