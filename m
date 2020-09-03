@@ -2,73 +2,92 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11840C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:04:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E856C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:04:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CED6520678
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:04:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED6520678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmp.felk.cvut.cz
+	by mail.kernel.org (Postfix) with ESMTPS id 0991520678
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:04:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fbUCyK71"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0991520678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40238 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42554 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDxL8-0002tH-Sz
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 18:04:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42758)
+	id 1kDxLb-0003pT-7l
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 18:04:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pisa@cmp.felk.cvut.cz>)
- id 1kDxE4-0000Qn-Nw
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:57:01 -0400
-Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:16513)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pisa@cmp.felk.cvut.cz>) id 1kDxE2-0006Fx-HI
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:57:00 -0400
-Received: from cmp.felk.cvut.cz (haar.felk.cvut.cz [147.32.84.19])
- by relay.felk.cvut.cz (8.15.2/8.15.2) with ESMTP id 083Lto3Q032294;
- Thu, 3 Sep 2020 23:55:50 +0200 (CEST)
- (envelope-from pisa@cmp.felk.cvut.cz)
-Received: from haar.felk.cvut.cz (localhost [127.0.0.1])
- by cmp.felk.cvut.cz (8.14.0/8.12.3/SuSE Linux 0.6) with ESMTP id
- 083Ltnbg026790; Thu, 3 Sep 2020 23:55:49 +0200
-Received: (from pisa@localhost)
- by haar.felk.cvut.cz (8.14.0/8.13.7/Submit) id 083Ltn3f026789;
- Thu, 3 Sep 2020 23:55:49 +0200
-From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 6/7] hw/net/can: Documentation for CTU CAN FD IP open
- hardware core emulation.
-Date: Thu,  3 Sep 2020 23:48:22 +0200
-Message-Id: <056921c7b2651d77e4d034b10a53550d4cd4b656.1599168753.git.pisa@cmp.felk.cvut.cz>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1599168753.git.pisa@cmp.felk.cvut.cz>
-References: <cover.1599168753.git.pisa@cmp.felk.cvut.cz>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDwyr-0007TK-Hs
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:41:17 -0400
+Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:38145)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDwym-0004al-N9
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:41:16 -0400
+Received: by mail-pg1-x52c.google.com with SMTP id l191so3164590pgd.5
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 14:41:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=XhMSwJ2jkxWxuBTzeCmlaoUshyrdzQ2sWDC5rvAjlMw=;
+ b=fbUCyK71YOSWuyozk4rmhaR+mgQzn6PTYzicPW2WJwUIlYN0XCHpvUl3c5flK5GtzU
+ 3u30FNI5Z5AshCtiqjot4nCgd3tTPAkTX5IdpUWysy2annB0xTtNg+MxCc8J2AfWv/Sn
+ va7rd+ocBjm7q+5zyynog+PE0GwqP4YlBHo0PcmlcfPUOXALZoJMrxA33zeJYudab5HY
+ ggFA74cdKdlWz5Se+Lp9WTDwzuJh2XtCanRg3rtvB+Mph+tx2rOlp4psptYRexemkBo0
+ EtAHIkHqaBZHq9QehCI46fdH60EiDSoWfaHVxKIjrUW+J3n6iqMuh7y3WyV6GopXTMdw
+ 3XHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=XhMSwJ2jkxWxuBTzeCmlaoUshyrdzQ2sWDC5rvAjlMw=;
+ b=LiMCzOB04keSnzHnC0A4iIdMd7LVmir/bnFI25nbTkP96+MT3M27Yemh5AFdKLLk/k
+ KEj/Xb4lFFDdbYb1AJ5h0E9RtD/HSfTY5mT80h5jqHljnXXUWZTYmoGAzgT1FvSyFK0m
+ +RVplJT/YGo+PnbaE2WDu3i/Uo0/4jXGXe1YqWU9JTiQgYBXCOV+dLSOCUlYWYOGzfI5
+ 9pU6jJ6NfrdaYWuPupORBk+i4Owa/jFvt2NADCH+iQeSxeyLLa0Om8clK5iF3W4EW9Lz
+ +ZXvp9OA3HnOYlGs54HrahciNxflqMCiajQ/12T5o2/bHmkiRoiNktn9WYfCSy8Xhfrg
+ 0goA==
+X-Gm-Message-State: AOAM5318tQLNxgy9X+dz0I4BW14StmZcIE8uER5bOlcxapvXPrw6DsYg
+ 1WL622NYobDN1cOIHofAfetLQ98QiTIxSw==
+X-Google-Smtp-Source: ABdhPJyUyOCLK1s2Ur/M1ErMpX8tT3GnMLFycu0N1b7WGAJUMprdpvI+xLd8Zf3/bWtlWE+VZq6dfw==
+X-Received: by 2002:a62:1d44:: with SMTP id d65mr5725038pfd.150.1599169270638; 
+ Thu, 03 Sep 2020 14:41:10 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id v17sm4113290pfn.24.2020.09.03.14.41.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 14:41:10 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 5/5] tcg: Implement 256-bit dup for tcg_gen_gvec_dup_mem
+Date: Thu,  3 Sep 2020 14:41:01 -0700
+Message-Id: <20200903214101.1746878-6-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200903214101.1746878-1-richard.henderson@linaro.org>
+References: <20200903214101.1746878-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-FELK-MailScanner-Information: 
-X-MailScanner-ID: 083Lto3Q032294
-X-FELK-MailScanner: Found to be clean
-X-FELK-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
- score=-0.098, required 6, BAYES_00 -0.50, KHOP_HELO_FCRDNS 0.40,
- SPF_HELO_NONE 0.00, SPF_NONE 0.00)
-X-FELK-MailScanner-From: pisa@cmp.felk.cvut.cz
-X-FELK-MailScanner-Watermark: 1599774954.16717@lnmXgk7QqbmkKldq1xtV+Q
-Received-SPF: none client-ip=2001:718:2:1611:0:1:0:70;
- envelope-from=pisa@cmp.felk.cvut.cz; helo=relay.felk.cvut.cz
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 17:39:24
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52c;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,195 +100,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Vikram Garhwal <fnu.vikram@xilinx.com>,
- Jiri Novak <jnovak@fel.cvut.cz>, Stefan Hajnoczi <stefanha@gmail.com>,
- Deniz Eren <deniz.eren@icloud.com>, Markus Armbruster <armbru@redhat.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Konrad Frederic <frederic.konrad@adacore.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Jan Charvat <charvj10@fel.cvut.cz>,
- Oliver Hartkopp <socketcan@hartkopp.net>, Ondrej Ille <ondrej.ille@gmail.com>,
- Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Updated MAINTAINERS for CAN bus related emulation as well.
+We already support duplication of 128-bit blocks.  This extends
+that support to 256-bit blocks.  This will be needed by SVE2.
 
-Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- MAINTAINERS  |   9 ++++
- docs/can.txt | 113 ++++++++++++++++++++++++++++++++++++++++++++++-----
- 2 files changed, 111 insertions(+), 11 deletions(-)
+ tcg/tcg-op-gvec.c | 52 ++++++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 49 insertions(+), 3 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b233da2a73..c22d5f2647 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -2069,6 +2069,15 @@ F: hw/rx/
- F: include/hw/intc/rx_icu.h
- F: include/hw/rx/
+diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
+index fcc25b04e6..7ebd9e8298 100644
+--- a/tcg/tcg-op-gvec.c
++++ b/tcg/tcg-op-gvec.c
+@@ -1570,12 +1570,10 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t dofs, uint32_t aofs,
+             do_dup(vece, dofs, oprsz, maxsz, NULL, in, 0);
+             tcg_temp_free_i64(in);
+         }
+-    } else {
++    } else if (vece == 4) {
+         /* 128-bit duplicate.  */
+-        /* ??? Dup to 256-bit vector.  */
+         int i;
  
-+CAN bus subsystem and hardware
-+M: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-+M: Vikram Garhwal <fnu.vikram@xilinx.com>
-+S: Maintained
-+W: https://canbus.pages.fel.cvut.cz/
-+F: net/can/*
-+F: hw/net/can/*
-+F: include/net/can_*.h
+-        tcg_debug_assert(vece == 4);
+         tcg_debug_assert(oprsz >= 16);
+         if (TCG_TARGET_HAS_v128) {
+             TCGv_vec in = tcg_temp_new_vec(TCG_TYPE_V128);
+@@ -1601,6 +1599,54 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t dofs, uint32_t aofs,
+         if (oprsz < maxsz) {
+             expand_clr(dofs + oprsz, maxsz - oprsz);
+         }
++    } else if (vece == 5) {
++        /* 256-bit duplicate.  */
++        int i;
 +
- Subsystems
- ----------
- Audio
-diff --git a/docs/can.txt b/docs/can.txt
-index 11ed8f2d68..5838f6620c 100644
---- a/docs/can.txt
-+++ b/docs/can.txt
-@@ -8,13 +8,22 @@ can be connected to host system CAN API (at this time only Linux
- SocketCAN is supported).
++        tcg_debug_assert(oprsz >= 32);
++        tcg_debug_assert(oprsz % 32 == 0);
++        if (TCG_TARGET_HAS_v256) {
++            TCGv_vec in = tcg_temp_new_vec(TCG_TYPE_V256);
++
++            tcg_gen_ld_vec(in, cpu_env, aofs);
++            for (i = (aofs == dofs) * 32; i < oprsz; i += 32) {
++                tcg_gen_st_vec(in, cpu_env, dofs + i);
++            }
++            tcg_temp_free_vec(in);
++        } else if (TCG_TARGET_HAS_v128) {
++            TCGv_vec in0 = tcg_temp_new_vec(TCG_TYPE_V128);
++            TCGv_vec in1 = tcg_temp_new_vec(TCG_TYPE_V128);
++
++            tcg_gen_ld_vec(in0, cpu_env, aofs);
++            tcg_gen_ld_vec(in1, cpu_env, aofs + 16);
++            for (i = (aofs == dofs) * 32; i < oprsz; i += 32) {
++                tcg_gen_st_vec(in0, cpu_env, dofs + i);
++                tcg_gen_st_vec(in1, cpu_env, dofs + i + 16);
++            }
++            tcg_temp_free_vec(in0);
++            tcg_temp_free_vec(in1);
++        } else {
++            TCGv_i64 in[4];
++            int j;
++
++            for (j = 0; j < 4; ++j) {
++                in[j] = tcg_temp_new_i64();
++                tcg_gen_ld_i64(in[j], cpu_env, aofs + j * 8);
++            }
++            for (i = (aofs == dofs) * 32; i < oprsz; i += 32) {
++                for (j = 0; j < 4; ++j) {
++                    tcg_gen_st_i64(in[j], cpu_env, dofs + i + j * 8);
++                }
++            }
++            for (j = 0; j < 4; ++j) {
++                tcg_temp_free_i64(in[j]);
++            }
++        }
++        if (oprsz < maxsz) {
++            expand_clr(dofs + oprsz, maxsz - oprsz);
++        }
++    } else {
++        g_assert_not_reached();
+     }
+ }
  
- The concept of busses is generic and different CAN controllers
--can be implemented for it but at this time only SJA1000 chip
--controller is implemented.
-+can be implemented.
-+
-+The initial submission implemented SJA1000 controller which
-+is common and well supported by by drivers for the most operating
-+systems.
- 
- The PCI addon card hardware has been selected as the first CAN
- interface to implement because such device can be easily connected
- to systems with different CPU architectures (x86, PowerPC, Arm, etc.).
- 
-+In 2020, CTU CAN FD controller model has been added as part
-+of the bachelor theses of Jan Charvat. This controller is complete
-+open-source/design/hardware solution. The core designer
-+of the project is Ondrej Ille, the financial support has been
-+provided by CTU, and more companies including Volkswagen subsidiaries.
-+
- The project has been initially started in frame of RTEMS GSoC 2013
- slot by Jin Yang under our mentoring  The initial idea was to provide generic
- CAN subsystem for RTEMS. But lack of common environment for code and RTEMS
-@@ -22,8 +31,8 @@ testing lead to goal change to provide environment which provides complete
- emulated environment for testing and RTEMS GSoC slot has been donated
- to work on CAN hardware emulation on QEMU.
- 
--Examples how to use CAN emulation
--=================================
-+Examples how to use CAN emulation for SJA1000 based borads
-+==========================================================
- 
- When QEMU with CAN PCI support is compiled then one of the next
- CAN boards can be selected
-@@ -90,18 +99,100 @@ traffic with "candump" command which is included in "can-utils".
- 
-   candump can0
- 
-+CTU CAN FD support examples
-+===========================
-+
-+This open-source core provides CAN FD support. CAN FD drames are
-+delivered even to the host systems when SocketCAN interface is found
-+CAN FD capable.
-+
-+The PCIe borad emulation is provided for now (the device identifier is
-+ctucan_pci). The defauld build defines two CTU CAN FD cores
-+on the board.
-+
-+Example how to connect the canbus0-bus (virtual wire) to the host
-+Linux system (SocketCAN used) and to both CTU CAN FD cores emulated
-+on the corresponding PCI card expects that host system CAN bus
-+is setup according to the previous SJA1000 section.
-+
-+  qemu-system-x86_64 -enable-kvm -kernel /boot/vmlinuz-4.19.52+ \
-+      -initrd ramdisk.cpio \
-+      -virtfs local,path=shareddir,security_model=none,mount_tag=shareddir \
-+      -vga cirrus \
-+      -append "console=ttyS0" \
-+      -object can-bus,id=canbus0-bus \
-+      -object can-host-socketcan,if=can0,canbus=canbus0-bus,id=canbus0-socketcan \
-+      -device ctucan_pci,canbus0=canbus0-bus,canbus1=canbus0-bus \
-+      -nographic
-+
-+Setup of CTU CAN FD controller in a guest Linux system
-+
-+  insmod ctucanfd.ko || modprobe ctucanfd
-+  insmod ctucanfd_pci.ko || modprobe ctucanfd_pci
-+
-+  for ifc in /sys/class/net/can* ; do
-+    if [ -e  $ifc/device/vendor ] ; then
-+      if ! grep -q 0x1760 $ifc/device/vendor ; then
-+        continue;
-+      fi
-+    else
-+      continue;
-+    fi
-+    if [ -e  $ifc/device/device ] ; then
-+       if ! grep -q 0xff00 $ifc/device/device ; then
-+         continue;
-+       fi
-+    else
-+      continue;
-+    fi
-+    ifc=$(basename $ifc)
-+    /bin/ip link set $ifc type can bitrate 1000000 dbitrate 10000000 fd on
-+    /bin/ip link set $ifc up
-+  done
-+
-+The test can run for example
-+
-+  candump can1
-+
-+in the guest system and next commands in the host system for basic CAN
-+
-+  cangen can0
-+
-+for CAN FD without bitrate switch
-+
-+  cangen can0 -f
-+
-+and with bitrate switch
-+
-+  cangen can0 -b
-+
-+The test can be run viceversa, generate messages in the guest system and capture them
-+in the host one and much more combinations.
-+
- Links to other resources
- ========================
- 
-- (1) Repository with development branch can-pci at Czech Technical University
--     https://gitlab.fel.cvut.cz/canbus/qemu-canbus
-- (2) GitHub repository with can-pci and our other changes included
-+ (1) CAN related projects at Czech Technical University, Faculty of Electrical Engineering
-+     http://canbus.pages.fel.cvut.cz/
-+ (2) Repository with development can-pci branch at Czech Technical University
-      https://gitlab.fel.cvut.cz/canbus/qemu-canbus
-  (3) RTEMS page describing project
-      https://devel.rtems.org/wiki/Developer/Simulators/QEMU/CANEmulation
-  (4) RTLWS 2015 article about the project and its use with CANopen emulation
--     http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can.pdf
--     Slides
--     http://rtime.felk.cvut.cz/publications/public/rtlws2015-qemu-can-slides.pdf
-- (5) Linux SocketCAN utilities
-+     http://cmp.felk.cvut.cz/~pisa/can/doc/rtlws-17-pisa-qemu-can.pdf
-+ (5) GNU/Linux, CAN and CANopen in Real-time Control Applications
-+     Slides from LinuxDays 2017 (include updated RTLWS 2015 content)
-+     https://www.linuxdays.cz/2017/video/Pavel_Pisa-CAN_canopen.pdf
-+ (6) Linux SocketCAN utilities
-      https://github.com/linux-can/can-utils/
-+ (7) CTU CAN FD project including core VHDL design, Linux driver,
-+     test utilities etc.
-+     https://gitlab.fel.cvut.cz/canbus/ctucanfd_ip_core
-+ (8) CTU CAN FD Core Datasheet Documentation
-+     http://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/Progdokum.pdf
-+ (9) CTU CAN FD Core System Architecture Documentation
-+     http://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/ctu_can_fd_architecture.pdf
-+ (10) CTU CAN FD Driver Documentation
-+     http://canbus.pages.fel.cvut.cz/ctucanfd_ip_core/driver_doc/ctucanfd-driver.html
-+ (11) Integration with PCIe interfacing for Intel/Altera Cyclone IV based board
-+     https://gitlab.fel.cvut.cz/canbus/pcie-ctu_can_fd
 -- 
-2.20.1
+2.25.1
 
 
