@@ -2,91 +2,97 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E47BEC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:30:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1B00C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:31:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D5DD208B3
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:30:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64143206A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:31:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QgeEsAZX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D5DD208B3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/+L6CGk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64143206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDnRZ-0007VR-LM
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:30:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38086)
+	id 1kDnT0-0000Jf-Hd
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:31:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDnMI-0008LV-4I
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:24:50 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43184)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kDnPT-0004cy-96; Thu, 03 Sep 2020 07:28:07 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:36236)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDnMF-0007xC-VT
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:24:49 -0400
-Received: by mail-pg1-x544.google.com with SMTP id d19so1869336pgl.10
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:24:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
+ id 1kDnPR-0008NR-BW; Thu, 03 Sep 2020 07:28:06 -0400
+Received: by mail-qt1-x842.google.com with SMTP id n10so1589761qtv.3;
+ Thu, 03 Sep 2020 04:28:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=lsA7UTbQIVwjmQ1n8RjT7+1kHRkAR2apyw1QSZWj5d4=;
- b=QgeEsAZXPujk7YXUc+sE7RSQ040MsbCpRwoQVHi8FKKg2hnYcN+EVpK51CoTqkxXS5
- nlQzK6p+eXj49PFnKdKB2TOEh7sYGhimRCVUZD1+fhN5LaDD03ey3ikTjlDZKXgOa5vB
- xscpFAHJCRlb8iUZ/QmH4T2/GEc9Qqt+jik5CsyvAVJbJ/GUWVU3/ekAYLO7H9zdeTwB
- eUCWKB75SR8LMlw++yZ+YQfkOMj8go+kRlXNLiuzyTN0DhmrndxCMiBMG4rMMbfye27C
- XFAJvL0blQA8atX0nlkKRHY9lL+AnjyuPqQ+yc9P22pul05xi5gHRUQi+pHQxWXICAS4
- e2vA==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9ekIUoYeHzoslT4Dhtfeg/PWay7LeWwFREJahHpoRvE=;
+ b=L/+L6CGk7mxm9J7cczGfx1hLhReGWTBLjrt286V4vXiOQE7yZn/PM/wZEsKH3qJJDJ
+ JEoWO1ed776bfKZf0w3P0S3RvQn8JZmfQTOEmiFHPz0YgjA0Z9s0dUMpXqihkLMCY6m0
+ leA0bUiI4jQUtgTSCwdnWkNUGIBFfrSYsOxJPvxFCV88dDkZiXWoEUfEEo3127YCf+pp
+ eELGNNrekX5NIZ8qxyqrVwGLlX5YLR9XFKKPVTsSfnuUeEfhvz6zMAZxZwMJAOZMSqTE
+ AGPvC/2j8IV/dCiQG9QT22FZymWEJio8+ywfwoVZSM7lVA2Ak7d+lKowA11wSam8mf1O
+ 7i0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=lsA7UTbQIVwjmQ1n8RjT7+1kHRkAR2apyw1QSZWj5d4=;
- b=KnR+LaNwGwbdffijcJeWqm2Sh8hW/cQYh59tZf2Hr5ytSveY7mkowlvjRiYtzyZWoj
- X8rk4uuSlBU135IIwdobnAbH6F05OjkeX873R9/7n1WsSkxOpiBwTMMP3Ht255Oi0Yni
- O5pbVRo+oOxNJaPksJb2Vg+SeqLCZAFbfPyeMWMH29Wj0ndNB1ZaNvboF0+pMgE9iluZ
- OFu+7UvDTXzOUB0M7VhZgXBDGORRUNOcwEtQuWp4G4Cs6jkkQu53Z03EVxbhMYGAzspd
- erc6FST153nNLVV/SkmBaTrNTFJEUyHT2Le2IT6MznUhg2JNWOMOq2oxM7/PCH5rji+E
- 5LjQ==
-X-Gm-Message-State: AOAM533/v1L0TWc6LB0BiQDPb6pc18tagVlIJBc4TtCFEZ6lNmlbGe1r
- 1fEgRSLvxQ5Glz5iV18BlzcwxB4VQS52YDVs
-X-Google-Smtp-Source: ABdhPJxmWLHbBy98QykdP6UwccJSLbVj1RE5ZMbXhkax5JttigY4d/XECAGtS9mVS5OnqWGyTFlkNg==
-X-Received: by 2002:aa7:93a8:0:b029:13c:1611:6534 with SMTP id
- x8-20020aa793a80000b029013c16116534mr1730169pff.6.1599132285770; 
- Thu, 03 Sep 2020 04:24:45 -0700 (PDT)
-Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id y3sm2394249pjg.8.2020.09.03.04.24.43
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 04:24:45 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] ci: Enable msys2 ci in cirrus
-Date: Thu,  3 Sep 2020 19:24:23 +0800
-Message-Id: <20200903112423.1765-3-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200903112423.1765-1-luoyonggang@gmail.com>
-References: <20200903112423.1765-1-luoyonggang@gmail.com>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9ekIUoYeHzoslT4Dhtfeg/PWay7LeWwFREJahHpoRvE=;
+ b=JlVHBHmwaim2b8tfA7xzW7sQKjRghVVpR21O6gtRPLc/OdcGaDV1XmfjLkHTVVxGyz
+ MovDRNLS8DLU/SHU5HmLzp0EwrHzek6OP6y1ua97K3S9Ix0h4FsvaxQ3zuznpIFth0gW
+ ILnJ7Nxq86mSP5zVG75W3z0AWVCk/ThvsrTXG9tqLPvl+c62+K8i/eEK1B1qz59nDw5Y
+ 5ggAjsWRG/nljOc5YShLTllEezJMVb/tmY66bgFxnYMtJda+J81PqfGQxk5tGQCqBqEq
+ 5b2/3SndFh+Try8x+ovf0LtqCvncExc6qSHUAQOPrEa1frH+9n/wSOIVUzn68aPjzkMF
+ xaWg==
+X-Gm-Message-State: AOAM530dUc0uT+9qiTB0QHP+ZYY5YWDpuMjzPhv8CqeF79oTDUvd8ND4
+ bm7C8PkPRYy6wSlYN1ZWkbmr270Engs=
+X-Google-Smtp-Source: ABdhPJyu/wHnpYUVoyfx2welbhG+6EQaz7he5zVnHZBjwGweFIYZ2+79XNi8R8BLm4lU50zGvUzBEQ==
+X-Received: by 2002:aed:2c63:: with SMTP id f90mr2919675qtd.262.1599132483277; 
+ Thu, 03 Sep 2020 04:28:03 -0700 (PDT)
+Received: from ?IPv6:2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca?
+ ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
+ by smtp.gmail.com with ESMTPSA id s192sm387864qke.50.2020.09.03.04.28.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Sep 2020 04:28:02 -0700 (PDT)
+Subject: Re: [PATCH v2 3/7] spapr: introduce
+ SpaprMachineClass::numa_assoc_array
+To: David Gibson <david@gibson.dropbear.id.au>
+References: <20200901125645.118026-1-danielhb413@gmail.com>
+ <20200901125645.118026-4-danielhb413@gmail.com>
+ <20200903015148.GK1897@yekko.fritz.box>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-ID: <d493d0d8-7104-40a4-a957-156b6cd1d5b6@gmail.com>
+Date: Thu, 3 Sep 2020 08:28:00 -0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x544.google.com
+In-Reply-To: <20200903015148.GK1897@yekko.fritz.box>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
+ envelope-from=danielhb413@gmail.com; helo=mail-qt1-x842.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, NICE_REPLY_A=-2.403,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -101,139 +107,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Install msys2 in a proper way refer to https://github.com/cirruslabs/cirrus-ci-docs/issues/699
-The https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2 need to be updated.
-There is no need of --cross-prefix, open mingw64.exe instead of msys2.exe then we don't
-need the --cross-prefix, besides we using environment variable settings:
-    MSYS: winsymlinks:nativestrict
-    MSYSTEM: MINGW64
-    CHERE_INVOKING: 1
-to opening mingw64 native shell.
-We now running tests with make -i check to skip tests errors.
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
----
- .cirrus.yml                         | 24 +++++++++++++++++++++
- scripts/ci/windows/msys2_build.sh   | 33 +++++++++++++++++++++++++++++
- scripts/ci/windows/msys2_install.sh | 31 +++++++++++++++++++++++++++
- 3 files changed, 88 insertions(+)
- create mode 100644 scripts/ci/windows/msys2_build.sh
- create mode 100644 scripts/ci/windows/msys2_install.sh
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index f287d23c5b..0bfb465193 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -40,3 +40,27 @@ macos_xcode_task:
-     - ../configure --cc=clang || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
-     - gmake check
-+
-+windows_msys2_task:
-+  windows_container:
-+    image: cirrusci/windowsservercore:cmake
-+    os_version: 2019
-+    cpu: 8
-+    memory: 8G
-+  env:
-+    MSYS: winsymlinks:nativestrict
-+    MSYSTEM: MINGW64
-+    CHERE_INVOKING: 1
-+  printenv_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
-+  install_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Sy --noconfirm"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --needed --noconfirm -S bash pacman pacman-mirrors msys2-runtime"
-+    - taskkill /F /IM gpg-agent.exe
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "sh scripts/ci/windows/msys2_install.sh"
-+  script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "sh scripts/ci/windows/msys2_build.sh"
-diff --git a/scripts/ci/windows/msys2_build.sh b/scripts/ci/windows/msys2_build.sh
-new file mode 100644
-index 0000000000..f46b92daf8
---- /dev/null
-+++ b/scripts/ci/windows/msys2_build.sh
-@@ -0,0 +1,33 @@
-+mkdir build
-+cd build
-+../configure \
-+  --python=python3 \
-+  --enable-gtk --enable-sdl \
-+  --enable-capstone=git \
-+  --enable-stack-protector \
-+  --ninja=ninja \
-+  --enable-gnutls \
-+  --enable-nettle \
-+  --enable-vnc \
-+  --enable-vnc-sasl \
-+  --enable-vnc-jpeg \
-+  --enable-vnc-png \
-+  --enable-membarrier \
-+  --enable-slirp=git \
-+  --disable-kvm \
-+  --enable-hax \
-+  --enable-whpx \
-+  --disable-spice \
-+  --enable-lzo \
-+  --enable-snappy \
-+  --enable-bzip2 \
-+  --enable-vdi \
-+  --enable-qcow1 \
-+  --enable-tools \
-+  --enable-libusb \
-+  --enable-usb-redir \
-+  --enable-libnfs \
-+  --enable-libssh \
-+  --disable-pie
-+make -j$NUMBER_OF_PROCESSORS
-+make -i check
-diff --git a/scripts/ci/windows/msys2_install.sh b/scripts/ci/windows/msys2_install.sh
-new file mode 100644
-index 0000000000..ff35b73ef2
---- /dev/null
-+++ b/scripts/ci/windows/msys2_install.sh
-@@ -0,0 +1,31 @@
-+pacman --noconfirm -S --needed \
-+base-devel \
-+git \
-+mingw-w64-x86_64-python \
-+mingw-w64-x86_64-python-setuptools \
-+mingw-w64-x86_64-toolchain \
-+mingw-w64-x86_64-SDL2 \
-+mingw-w64-x86_64-SDL2_image \
-+mingw-w64-x86_64-gtk3 \
-+mingw-w64-x86_64-ninja \
-+mingw-w64-x86_64-make \
-+mingw-w64-x86_64-lzo2 \
-+mingw-w64-x86_64-libjpeg-turbo \
-+mingw-w64-x86_64-pixman \
-+mingw-w64-x86_64-libgcrypt \
-+mingw-w64-x86_64-capstone \
-+mingw-w64-x86_64-libpng \
-+mingw-w64-x86_64-libssh \
-+mingw-w64-x86_64-libxml2 \
-+mingw-w64-x86_64-snappy \
-+mingw-w64-x86_64-libusb \
-+mingw-w64-x86_64-usbredir \
-+mingw-w64-x86_64-libtasn1 \
-+mingw-w64-x86_64-libnfs \
-+mingw-w64-x86_64-nettle \
-+mingw-w64-x86_64-cyrus-sasl \
-+mingw-w64-x86_64-curl \
-+mingw-w64-x86_64-gnutls \
-+mingw-w64-x86_64-zstd \
-+mingw-w64-x86_64-glib2
-+
--- 
-2.28.0.windows.1
+On 9/2/20 10:51 PM, David Gibson wrote:
+> On Tue, Sep 01, 2020 at 09:56:41AM -0300, Daniel Henrique Barboza wrote:
+>> The next step to centralize all NUMA/associativity handling in
+>> the spapr machine is to create a 'one stop place' for all
+>> things ibm,associativity.
+>>
+>> This patch introduces numa_assoc_array, a 2 dimensional array
+>> that will store all ibm,associativity arrays of all NUMA nodes.
+>> This array is initialized in a new spapr_numa_associativity_init()
+>> function, called in spapr_machine_init(). It is being initialized
+>> with the same values used in other ibm,associativity properties
+>> around spapr files (i.e. all zeros, last value is node_id).
+>> The idea is to remove all hardcoded definitions and FDT writes
+>> of ibm,associativity arrays, doing instead a call to the new
+>> helper spapr_numa_write_associativity_dt() helper, that will
+>> be able to write the DT with the correct values.
+>>
+>> We'll start small, handling the trivial cases first. The
+>> remaining instances of ibm,associativity will be handled
+>> next.
+>>
+>> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> 
+> The idea is great, but there's one small but significant problem here:
+> 
+>> +void spapr_numa_associativity_init(MachineState *machine)
+>> +{
+>> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(machine);
+>> +    int nb_numa_nodes = machine->numa_state->num_nodes;
+>> +    int i;
+>> +
+>> +    /*
+>> +     * For all associativity arrays: first position is the size,
+>> +     * position MAX_DISTANCE_REF_POINTS is always the numa_id,
+>> +     * represented by the index 'i'.
+>> +     *
+>> +     * This will break on sparse NUMA setups, when/if QEMU starts
+>> +     * to support it, because there will be no more guarantee that
+>> +     * 'i' will be a valid node_id set by the user.
+>> +     */
+>> +    for (i = 0; i < nb_numa_nodes; i++) {
+>> +        smc->numa_assoc_array[i][0] = cpu_to_be32(MAX_DISTANCE_REF_POINTS);
+>> +        smc->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] = cpu_to_be32(i);
+> 
+> This initialization is called on a machine *instance*, which means it
+> should treat the machine class as read-only.  i.e. the
+> numa_assoc_array should be in the SpaprMachineState, rather than the
+> class.
+> 
+> I mean, we'd get away with it in practice, since there's only ever
+> likely to be a single machine instance, but still we should correct
+> this.
 
+Got it. I'll move it to SpaprMachineState. This will also spare a handful of lines
+everywhere else since I was instantiating the class just to manipulate the matrix
+(and now, in hindsight, I figured that this was a warning about the weirdness
+of what I was doing).
+
+
+Thanks,
+
+
+DHB
+
+> 
 
