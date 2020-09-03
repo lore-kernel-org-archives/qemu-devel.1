@@ -2,48 +2,48 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BACDC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 076FEC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:04:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DAC020767
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:04:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DAC020767
+	by mail.kernel.org (Postfix) with ESMTPS id C2E5720767
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:04:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2E5720767
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDn2p-0000vO-4o
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:04:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59300)
+	id 1kDn2x-0001H1-QW
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:04:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmuq-0002zF-1Z
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48964)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmv3-0003Nu-Jo
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:41 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49070)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmun-0004Yl-CG
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:27 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmv0-0004Zi-7w
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:41 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id F3F9FB6A8;
- Thu,  3 Sep 2020 10:56:23 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id EE0FBB6AC;
+ Thu,  3 Sep 2020 10:56:27 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [PATCH v7 09/16] cpus: extract out hvf-specific code to
- target/i386/hvf/
-Date: Thu,  3 Sep 2020 12:56:07 +0200
-Message-Id: <20200903105614.17772-10-cfontana@suse.de>
+Subject: [PATCH v7 15/16] hax: remove hax specific functions from global
+ includes
+Date: Thu,  3 Sep 2020 12:56:13 +0200
+Message-Id: <20200903105614.17772-16-cfontana@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200903105614.17772-1-cfontana@suse.de>
 References: <20200903105614.17772-1-cfontana@suse.de>
@@ -82,320 +82,175 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-register a "CpusAccel" interface for HVF as well.
-
-Signed-off-by: Claudio Fontana <cfontana@suse.de>
-Reviewed-by: Roman Bolshakov <r.bolshakov@yadro.com>
-[added const]
 Signed-off-by: Claudio Fontana <cfontana@suse.de>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- softmmu/cpus.c              |  66 ------------------
- target/i386/hvf/hvf-cpus.c  | 131 ++++++++++++++++++++++++++++++++++++
- target/i386/hvf/hvf-cpus.h  |  17 +++++
- target/i386/hvf/hvf.c       |   3 +
- target/i386/hvf/meson.build |   1 +
- 5 files changed, 152 insertions(+), 66 deletions(-)
- create mode 100644 target/i386/hvf/hvf-cpus.c
- create mode 100644 target/i386/hvf/hvf-cpus.h
+ accel/stubs/hax-stub.c    | 10 ----------
+ include/sysemu/hax.h      | 17 -----------------
+ target/i386/hax-all.c     |  1 -
+ target/i386/hax-cpus.c    |  1 -
+ target/i386/hax-cpus.h    | 16 ++++++++++++++++
+ target/i386/hax-mem.c     |  2 +-
+ target/i386/hax-posix.c   |  3 +--
+ target/i386/hax-windows.c |  2 +-
+ target/i386/hax-windows.h |  2 ++
+ 9 files changed, 21 insertions(+), 33 deletions(-)
 
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index a99eacd6a6..2420a447eb 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -33,7 +33,6 @@
- #include "exec/gdbstub.h"
- #include "sysemu/hw_accel.h"
- #include "sysemu/kvm.h"
--#include "sysemu/hvf.h"
- #include "exec/exec-all.h"
- #include "qemu/thread.h"
- #include "qemu/plugin.h"
-@@ -198,9 +197,6 @@ void cpu_synchronize_pre_loadvm(CPUState *cpu)
-     if (cpus_accel && cpus_accel->synchronize_pre_loadvm) {
-         cpus_accel->synchronize_pre_loadvm(cpu);
-     }
--    if (hvf_enabled()) {
--        hvf_cpu_synchronize_pre_loadvm(cpu);
--    }
- }
- 
- int64_t cpus_get_virtual_clock(void)
-@@ -390,48 +386,6 @@ void qemu_wait_io_event(CPUState *cpu)
-     qemu_wait_io_event_common(cpu);
- }
- 
--/* The HVF-specific vCPU thread function. This one should only run when the host
-- * CPU supports the VMX "unrestricted guest" feature. */
--static void *qemu_hvf_cpu_thread_fn(void *arg)
--{
--    CPUState *cpu = arg;
--
--    int r;
--
--    assert(hvf_enabled());
--
--    rcu_register_thread();
--
--    qemu_mutex_lock_iothread();
--    qemu_thread_get_self(cpu->thread);
--
--    cpu->thread_id = qemu_get_thread_id();
--    cpu->can_do_io = 1;
--    current_cpu = cpu;
--
--    hvf_init_vcpu(cpu);
--
--    /* signal CPU creation */
--    cpu_thread_signal_created(cpu);
--    qemu_guest_random_seed_thread_part2(cpu->random_seed);
--
--    do {
--        if (cpu_can_run(cpu)) {
--            r = hvf_vcpu_exec(cpu);
--            if (r == EXCP_DEBUG) {
--                cpu_handle_guest_debug(cpu);
--            }
--        }
--        qemu_wait_io_event(cpu);
--    } while (!cpu->unplug || cpu_can_run(cpu));
--
--    hvf_vcpu_destroy(cpu);
--    cpu_thread_signal_destroyed(cpu);
--    qemu_mutex_unlock_iothread();
--    rcu_unregister_thread();
--    return NULL;
--}
--
- void cpus_kick_thread(CPUState *cpu)
+diff --git a/accel/stubs/hax-stub.c b/accel/stubs/hax-stub.c
+index 7ad190cae2..1a9da83185 100644
+--- a/accel/stubs/hax-stub.c
++++ b/accel/stubs/hax-stub.c
+@@ -21,13 +21,3 @@ int hax_sync_vcpus(void)
  {
- #ifndef _WIN32
-@@ -602,24 +556,6 @@ void cpu_remove_sync(CPUState *cpu)
-     qemu_mutex_lock_iothread();
- }
- 
--static void qemu_hvf_start_vcpu(CPUState *cpu)
--{
--    char thread_name[VCPU_THREAD_NAME_SIZE];
--
--    /* HVF currently does not support TCG, and only runs in
--     * unrestricted-guest mode. */
--    assert(hvf_enabled());
--
--    cpu->thread = g_malloc0(sizeof(QemuThread));
--    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
--    qemu_cond_init(cpu->halt_cond);
--
--    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
--             cpu->cpu_index);
--    qemu_thread_create(cpu->thread, thread_name, qemu_hvf_cpu_thread_fn,
--                       cpu, QEMU_THREAD_JOINABLE);
--}
--
- void cpus_register_accel(const CpusAccel *ca)
- {
-     assert(ca != NULL);
-@@ -647,8 +583,6 @@ void qemu_init_vcpu(CPUState *cpu)
-     if (cpus_accel) {
-         /* accelerator already implements the CpusAccel interface */
-         cpus_accel->create_vcpu_thread(cpu);
--    } else if (hvf_enabled()) {
--        qemu_hvf_start_vcpu(cpu);
-     } else {
-         g_assert_not_reached();
-     }
-diff --git a/target/i386/hvf/hvf-cpus.c b/target/i386/hvf/hvf-cpus.c
-new file mode 100644
-index 0000000000..817b3d7452
---- /dev/null
-+++ b/target/i386/hvf/hvf-cpus.c
-@@ -0,0 +1,131 @@
-+/*
-+ * Copyright 2008 IBM Corporation
-+ *           2008 Red Hat, Inc.
-+ * Copyright 2011 Intel Corporation
-+ * Copyright 2016 Veertu, Inc.
-+ * Copyright 2017 The Android Open Source Project
-+ *
-+ * QEMU Hypervisor.framework support
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of version 2 of the GNU General Public
-+ * License as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-+ * General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, see <http://www.gnu.org/licenses/>.
-+ *
-+ * This file contain code under public domain from the hvdos project:
-+ * https://github.com/mist64/hvdos
-+ *
-+ * Parts Copyright (c) 2011 NetApp, Inc.
-+ * All rights reserved.
-+ *
-+ * Redistribution and use in source and binary forms, with or without
-+ * modification, are permitted provided that the following conditions
-+ * are met:
-+ * 1. Redistributions of source code must retain the above copyright
-+ *    notice, this list of conditions and the following disclaimer.
-+ * 2. Redistributions in binary form must reproduce the above copyright
-+ *    notice, this list of conditions and the following disclaimer in the
-+ *    documentation and/or other materials provided with the distribution.
-+ *
-+ * THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
-+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-+ * ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
-+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-+ * SUCH DAMAGE.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/error-report.h"
-+#include "qemu/main-loop.h"
-+#include "sysemu/hvf.h"
-+#include "sysemu/runstate.h"
-+#include "target/i386/cpu.h"
-+#include "qemu/guest-random.h"
-+
-+#include "hvf-cpus.h"
-+
-+/*
-+ * The HVF-specific vCPU thread function. This one should only run when the host
-+ * CPU supports the VMX "unrestricted guest" feature.
-+ */
-+static void *hvf_cpu_thread_fn(void *arg)
-+{
-+    CPUState *cpu = arg;
-+
-+    int r;
-+
-+    assert(hvf_enabled());
-+
-+    rcu_register_thread();
-+
-+    qemu_mutex_lock_iothread();
-+    qemu_thread_get_self(cpu->thread);
-+
-+    cpu->thread_id = qemu_get_thread_id();
-+    cpu->can_do_io = 1;
-+    current_cpu = cpu;
-+
-+    hvf_init_vcpu(cpu);
-+
-+    /* signal CPU creation */
-+    cpu_thread_signal_created(cpu);
-+    qemu_guest_random_seed_thread_part2(cpu->random_seed);
-+
-+    do {
-+        if (cpu_can_run(cpu)) {
-+            r = hvf_vcpu_exec(cpu);
-+            if (r == EXCP_DEBUG) {
-+                cpu_handle_guest_debug(cpu);
-+            }
-+        }
-+        qemu_wait_io_event(cpu);
-+    } while (!cpu->unplug || cpu_can_run(cpu));
-+
-+    hvf_vcpu_destroy(cpu);
-+    cpu_thread_signal_destroyed(cpu);
-+    qemu_mutex_unlock_iothread();
-+    rcu_unregister_thread();
-+    return NULL;
-+}
-+
-+static void hvf_start_vcpu_thread(CPUState *cpu)
-+{
-+    char thread_name[VCPU_THREAD_NAME_SIZE];
-+
-+    /*
-+     * HVF currently does not support TCG, and only runs in
-+     * unrestricted-guest mode.
-+     */
-+    assert(hvf_enabled());
-+
-+    cpu->thread = g_malloc0(sizeof(QemuThread));
-+    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-+    qemu_cond_init(cpu->halt_cond);
-+
-+    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/HVF",
-+             cpu->cpu_index);
-+    qemu_thread_create(cpu->thread, thread_name, hvf_cpu_thread_fn,
-+                       cpu, QEMU_THREAD_JOINABLE);
-+}
-+
-+const CpusAccel hvf_cpus = {
-+    .create_vcpu_thread = hvf_start_vcpu_thread,
-+
-+    .synchronize_post_reset = hvf_cpu_synchronize_post_reset,
-+    .synchronize_post_init = hvf_cpu_synchronize_post_init,
-+    .synchronize_state = hvf_cpu_synchronize_state,
-+    .synchronize_pre_loadvm = hvf_cpu_synchronize_pre_loadvm,
-+};
-diff --git a/target/i386/hvf/hvf-cpus.h b/target/i386/hvf/hvf-cpus.h
-new file mode 100644
-index 0000000000..262e449fd6
---- /dev/null
-+++ b/target/i386/hvf/hvf-cpus.h
-@@ -0,0 +1,17 @@
-+/*
-+ * Accelerator CPUS Interface
-+ *
-+ * Copyright 2020 SUSE LLC
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HVF_CPUS_H
-+#define HVF_CPUS_H
-+
-+#include "sysemu/cpus.h"
-+
-+extern const CpusAccel hvf_cpus;
-+
-+#endif /* HVF_CPUS_H */
-diff --git a/target/i386/hvf/hvf.c b/target/i386/hvf/hvf.c
-index d81f569aed..7ac6987c1b 100644
---- a/target/i386/hvf/hvf.c
-+++ b/target/i386/hvf/hvf.c
-@@ -72,6 +72,8 @@
- #include "sysemu/accel.h"
- #include "target/i386/cpu.h"
- 
-+#include "hvf-cpus.h"
-+
- HVFState *hvf_state;
- 
- static void assert_hvf_ok(hv_return_t ret)
-@@ -894,6 +896,7 @@ static int hvf_accel_init(MachineState *ms)
-     hvf_state = s;
-     cpu_interrupt_handler = hvf_handle_interrupt;
-     memory_listener_register(&hvf_memory_listener, &address_space_memory);
-+    cpus_register_accel(&hvf_cpus);
      return 0;
  }
+-
+-int hax_init_vcpu(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+-
+-int hax_smp_cpu_exec(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
+index 9b27e65cc7..12fb54f990 100644
+--- a/include/sysemu/hax.h
++++ b/include/sysemu/hax.h
+@@ -22,29 +22,12 @@
+ #ifndef QEMU_HAX_H
+ #define QEMU_HAX_H
  
-diff --git a/target/i386/hvf/meson.build b/target/i386/hvf/meson.build
-index c8a43717ee..409c9a3f14 100644
---- a/target/i386/hvf/meson.build
-+++ b/target/i386/hvf/meson.build
-@@ -1,5 +1,6 @@
- i386_softmmu_ss.add(when: [hvf, 'CONFIG_HVF'], if_true: files(
-   'hvf.c',
-+  'hvf-cpus.c',
-   'x86.c',
-   'x86_cpuid.c',
-   'x86_decode.c',
+-
+ int hax_sync_vcpus(void);
+-int hax_init_vcpu(CPUState *cpu);
+-int hax_smp_cpu_exec(CPUState *cpu);
+-int hax_populate_ram(uint64_t va, uint64_t size);
+-
+-void hax_cpu_synchronize_state(CPUState *cpu);
+-void hax_cpu_synchronize_post_reset(CPUState *cpu);
+-void hax_cpu_synchronize_post_init(CPUState *cpu);
+-void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
+ 
+ #ifdef CONFIG_HAX
+ 
+ int hax_enabled(void);
+ 
+-#include "qemu/bitops.h"
+-#include "exec/memory.h"
+-int hax_vcpu_destroy(CPUState *cpu);
+-void hax_raise_event(CPUState *cpu);
+-void hax_reset_vcpu_state(void *opaque);
+-#include "target/i386/hax-interface.h"
+-#include "target/i386/hax-i386.h"
+-
+ #else /* CONFIG_HAX */
+ 
+ #define hax_enabled() (0)
+diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
+index fd1ab673d7..fecfe8cd6e 100644
+--- a/target/i386/hax-all.c
++++ b/target/i386/hax-all.c
+@@ -28,7 +28,6 @@
+ #include "exec/address-spaces.h"
+ 
+ #include "qemu-common.h"
+-#include "hax-i386.h"
+ #include "sysemu/accel.h"
+ #include "sysemu/reset.h"
+ #include "sysemu/runstate.h"
+diff --git a/target/i386/hax-cpus.c b/target/i386/hax-cpus.c
+index 9aad98bc7a..99770e590c 100644
+--- a/target/i386/hax-cpus.c
++++ b/target/i386/hax-cpus.c
+@@ -22,7 +22,6 @@
+ #include "qemu/osdep.h"
+ #include "qemu/error-report.h"
+ #include "qemu/main-loop.h"
+-#include "hax-i386.h"
+ #include "sysemu/runstate.h"
+ #include "sysemu/cpus.h"
+ #include "qemu/guest-random.h"
+diff --git a/target/i386/hax-cpus.h b/target/i386/hax-cpus.h
+index a64417fe2d..ee8ab7a631 100644
+--- a/target/i386/hax-cpus.h
++++ b/target/i386/hax-cpus.h
+@@ -14,4 +14,20 @@
+ 
+ extern const CpusAccel hax_cpus;
+ 
++#include "hax-interface.h"
++#include "hax-i386.h"
++
++int hax_init_vcpu(CPUState *cpu);
++int hax_smp_cpu_exec(CPUState *cpu);
++int hax_populate_ram(uint64_t va, uint64_t size);
++
++void hax_cpu_synchronize_state(CPUState *cpu);
++void hax_cpu_synchronize_post_reset(CPUState *cpu);
++void hax_cpu_synchronize_post_init(CPUState *cpu);
++void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
++
++int hax_vcpu_destroy(CPUState *cpu);
++void hax_raise_event(CPUState *cpu);
++void hax_reset_vcpu_state(void *opaque);
++
+ #endif /* HAX_CPUS_H */
+diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
+index 6bb5a24917..71e637cf16 100644
+--- a/target/i386/hax-mem.c
++++ b/target/i386/hax-mem.c
+@@ -13,7 +13,7 @@
+ #include "exec/address-spaces.h"
+ #include "qemu/error-report.h"
+ 
+-#include "target/i386/hax-i386.h"
++#include "hax-cpus.h"
+ #include "qemu/queue.h"
+ 
+ #define DEBUG_HAX_MEM 0
+diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
+index 6fb7867d11..735a749d4b 100644
+--- a/target/i386/hax-posix.c
++++ b/target/i386/hax-posix.c
+@@ -14,9 +14,8 @@
+ #include "qemu/osdep.h"
+ #include <sys/ioctl.h>
+ 
+-#include "target/i386/hax-i386.h"
+-
+ #include "sysemu/cpus.h"
++#include "hax-cpus.h"
+ 
+ hax_fd hax_mod_open(void)
+ {
+diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
+index 469b48e608..6c82dfb54f 100644
+--- a/target/i386/hax-windows.c
++++ b/target/i386/hax-windows.c
+@@ -12,7 +12,7 @@
+ 
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+-#include "hax-i386.h"
++#include "hax-cpus.h"
+ 
+ /*
+  * return 0 when success, -1 when driver not loaded,
+diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
+index 12cbd813dc..a5ce12d663 100644
+--- a/target/i386/hax-windows.h
++++ b/target/i386/hax-windows.h
+@@ -23,6 +23,8 @@
+ #include <winioctl.h>
+ #include <windef.h>
+ 
++#include "hax-cpus.h"
++
+ #define HAX_INVALID_FD INVALID_HANDLE_VALUE
+ 
+ static inline void hax_mod_close(struct hax_state *hax)
 -- 
 2.26.2
 
