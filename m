@@ -2,90 +2,91 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B693C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5A49C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08D8220897
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:26:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A4A620897
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:26:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H1k9jDWQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08D8220897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eLwR4cj2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A4A620897
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDkZk-0000CU-1j
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 04:26:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50350)
+	id 1kDkZm-0000J3-EH
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 04:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50636)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDkXE-0003Az-0U
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:23:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43394
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kDkXq-0004gG-DG
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:24:34 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:43950
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDkXC-0008Sz-6M
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:23:55 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kDkXo-00007P-Hz
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:24:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599121433;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1599121471;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N0JziJwIPg15gd9mgKvmfLdw/a954O02VSniHury53g=;
- b=H1k9jDWQk51ipTH5m9R6TDpQ5cu+TH/eXu3xkn/FdLvKw8KlRxb9TWiU2s/QadIO8y5Q61
- YMuKDy7qN4YZ8+f3l2a7RoegbgjL76X7Hq830cqra/X9D2eYQ3aCSF+T0n0cND2CZoDSDc
- +KVC5OE/S/6ACZMdFAGespOLqTMCANQ=
+ bh=uWUVD1AMxwYlhHgLy9NbxCNpT1a2+skmCBvE/G/yI9A=;
+ b=eLwR4cj2XIZCNlzmAHD/cmmv+hp2ua24XKYMo+AKh6rgGz29IGJ0ZeMRVTJ8rpqUu+H1K8
+ v7yShuYhaL0g5fF5kOEX5wPRrFOScGBk+eRO7zUUrjoJ+uqmzPy0okVmsF2aKN0/y4H2fm
+ R5SXPtPeOT+K15cpS3c6Lm3JkdMJ6tE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-9JYimAZwM02iDNXKwXzsUQ-1; Thu, 03 Sep 2020 04:23:48 -0400
-X-MC-Unique: 9JYimAZwM02iDNXKwXzsUQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-524-LnrqHawSMRSqycILt91ReA-1; Thu, 03 Sep 2020 04:24:30 -0400
+X-MC-Unique: LnrqHawSMRSqycILt91ReA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0E8F427C4;
- Thu,  3 Sep 2020 08:23:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
- [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3B7265D9DC;
- Thu,  3 Sep 2020 08:23:46 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B7D9E113846B; Thu,  3 Sep 2020 10:23:44 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 2/8] qapi/block-core.json: Remove stale description of
- 'blockdev-add'
-Date: Thu,  3 Sep 2020 10:23:38 +0200
-Message-Id: <20200903082344.1877175-3-armbru@redhat.com>
-In-Reply-To: <20200903082344.1877175-1-armbru@redhat.com>
-References: <20200903082344.1877175-1-armbru@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4DAA2801AE0
+ for <qemu-devel@nongnu.org>; Thu,  3 Sep 2020 08:24:29 +0000 (UTC)
+Received: from redhat.com (ovpn-114-170.ams2.redhat.com [10.36.114.170])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 341B078B38;
+ Thu,  3 Sep 2020 08:24:28 +0000 (UTC)
+Date: Thu, 3 Sep 2020 09:24:25 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH] stubs: Move qemu_fd_register stub to util/main-loop.c
+Message-ID: <20200903082425.GC441291@redhat.com>
+References: <20200903054503.425435-1-thuth@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20200903054503.425435-1-thuth@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:28:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,65 +99,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org,
- Kashyap Chamarthy <kchamart@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kashyap Chamarthy <kchamart@redhat.com>
+On Thu, Sep 03, 2020 at 07:45:03AM +0200, Thomas Huth wrote:
+> The linker of MinGW sometimes runs into the following problem:
+> 
+> libqemuutil.a(util_main-loop.c.obj): In function `qemu_fd_register':
+> /builds/huth/qemu/build/../util/main-loop.c:331: multiple definition of
+>  `qemu_fd_register'
+> libqemuutil.a(stubs_fd-register.c.obj):/builds/huth/qemu/stubs/fd-register.c:5:
+>  first defined here
+> collect2: error: ld returned 1 exit status
+> /builds/huth/qemu/rules.mak:88: recipe for target 'tests/test-timed-average.exe'
+>  failed
+> 
+> qemu_fd_register() is defined in util/main-loop.c for WIN32, so let's simply
+> move the stub also there in the #else part of the corresponding #ifndef
+> to fix this problem.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  stubs/fd-register.c | 6 ------
+>  stubs/meson.build   | 1 -
+>  util/main-loop.c    | 4 ++++
 
-On a 'qemu-discuss' thread[1], Kevin identifies that the current doc
-blurb for @blockdev-add is stale:
+>  3 files changed, 4 insertions(+), 7 deletions(-)
+>  delete mode 100644 stubs/fd-register.c
 
-    This is actually a documentation bug. @id doesn't exist,
-    blockdev-add never creates a BlockBackend. This was different in the
-    very first versions of the patches to add blockdev-add and we
-    probably just forgot to update the documentation after removing it.
+The util/meson.build only adds main-loop.c under 'if have_block'.
 
-So remove the stale bits.
+Since you didn't remove that conditional, I assume that nothing
+built in a "if not have_block" scenario was relying on the existing
+stub ?
 
-And the requirement for 'node-name' is already mentioned in the
-documentation of @BlockdevOptions:
+Assuming the answer is yes and/or CI passes 
 
-    [...]
-    # @node-name: the node name of the new node (Since 2.0).
-    #             This option is required on the top level of blockdev-add.
-    #             Valid node names start with an alphabetic character and may
-    #             contain only alphanumeric characters, '-', '.' and '_'. Their
-    #             maximum length is 31 characters.
-    [...]
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
-[1] https://lists.nongnu.org/archive/html/qemu-discuss/2020-07/msg00071.html
-    -- equivalent to "-drive if=ide,id=disk0....."
 
-Fixes: be4b67bc7d ("blockdev: Allow creation of BDS trees without BB")
-
-Signed-off-by: Kashyap Chamarthy <kchamart@redhat.com>
-Suggested-by: Kevin Wolf <kwolf@redhat.com>
-Message-Id: <20200805100158.1239390-1-kchamart@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- qapi/block-core.json | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index db08c58d78..55b58ba892 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -4036,9 +4036,7 @@
- ##
- # @blockdev-add:
- #
--# Creates a new block device. If the @id option is given at the top level, a
--# BlockBackend will be created; otherwise, @node-name is mandatory at the top
--# level and no BlockBackend will be created.
-+# Creates a new block device.
- #
- # Since: 2.9
- #
+Regards,
+Daniel
 -- 
-2.26.2
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
