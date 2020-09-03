@@ -2,93 +2,87 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C85FCC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E86DC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:25:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B6092078E
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:25:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C86A12078E
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:25:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t1aDoHg3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B6092078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nV5izIHq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C86A12078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDnN5-0000nM-GT
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:25:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37176)
+	id 1kDnNH-00014f-U9
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:25:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kDnIw-0002dT-Af
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:21:22 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50352)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kDnM0-0007ir-EF
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:24:32 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36413)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kDnIt-0007a1-Td
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:21:21 -0400
-Received: by mail-wm1-x342.google.com with SMTP id e17so2494405wme.0
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:21:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=mJNKp9y1F6rLirIyiQ2tKjhVz1svga6dJmHJIZK3pwc=;
- b=t1aDoHg3niacDPuDcWpr7qRaEPmYyH/SKmum2XKpJ/TVFZW7TZiEOphvFg7PiN0gni
- l8OfPZWnmnwCYb0jMIjLl8ouGm5y2QHldXvsPQkgHVdDyIYWVNlEyq0fInDIAJcvfErO
- B4HRS08UC3NvxxwRYuFiIt5bafDPrjoZrPfbwOZVmFP8/m0GGc2ptQdAjpon2cm6Jy3L
- 4/vWW+muyQh+FeK0iJTuEgFjvKw28DwEn/Iy662h+6jYWqRUh0jOwIw3TCOD1u0Zlwmh
- zTSUwtnZzOu2kCezKdsNqmPWcYBT1QHXU65ArJNtlZYU/BTPbGWTWI/EuIyxwi13BiAo
- m8Ow==
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kDnLy-0007tH-LX
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:24:32 -0400
+Received: by mail-oi1-x242.google.com with SMTP id x19so2762965oix.3
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:24:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=St9MZx/EfqmLNHCoBSrRYeKBxvrNhLYvuCsb+sSs/Bc=;
+ b=nV5izIHqmSND2yGX758uYDicmmwWvuHr0uqaGbVhFxk8zxkErbMCcXXIRjH6QkRr5Z
+ fOCgX3hhmk01+N9Q0zQ2gdgVMacY3tVD2uyhfkTCJ+5BVB5kX/4476EoStKxDecRQZ1P
+ QlX7bgdB4QViR4rIqsDwdGUJKFt4ppObnquIASKmQZ40/+7cBEBT8ei2mL1UXtiT3qc8
+ ju8QTJ5uAr6RN1s2HreqDYc0olBJme8JsIA0S1lSxGMGze2Y9zeQS2sId8XRl80MLo6z
+ 3XE9iXJVwA7l3nKclas+QUCAZCqjgI7qoCWmB4as0zIG4YuUzIWNl7sAQBFo7dROHkCg
+ Mphg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=mJNKp9y1F6rLirIyiQ2tKjhVz1svga6dJmHJIZK3pwc=;
- b=Lr631Tjekk4OPM/XWh+RA43INRebIKef7YkxNE9rmk9uJvNGFZ7BzMpjmN4lXt/WWT
- G9BohilfYyX/zgP5nZ4ZEOslK/wfWyLpXuJqFcLgXafPuFECAHUc7ac0VcGcj2sgRmnY
- f5sPkJ5GzkHy5ulv5xW7xbHCzB6mzkLz7zBUO6DPLf4Y97Yvtw6z7XpR6gG6+U1mtY2L
- rzJdrFVo27F0H/dHIWrb0KO3wgQyy0fq9UknGQf5EjdER393NToWmmY7ijHo9qP2PeCw
- ChSWiGrd+gESMK4kRwGlcmUfS3vTWu158eGNs0N0sA1djiprIY7EnVjwgaMAWzBoQQzm
- iBcQ==
-X-Gm-Message-State: AOAM530u409+jTg/BP2Tk7/TvGkpTL5Rwfl9ZDjoajbknFHWytueCOyL
- aII0wLqmpjlw6+EcDMHlwQhSqw==
-X-Google-Smtp-Source: ABdhPJw+NjrxzImcq6EfdBJH7dMlSgesVzMeNN8YA4ILC+PkNomH6Is4CNDu1fcAb4ikywDbJ5hgOg==
-X-Received: by 2002:a1c:6a08:: with SMTP id f8mr156661wmc.151.1599132078701;
- Thu, 03 Sep 2020 04:21:18 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z203sm4057517wmc.31.2020.09.03.04.21.10
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 04:21:12 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 88E721FF96;
- Thu,  3 Sep 2020 12:21:08 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 8/8] migration: use pstrcpy to copy run state
-Date: Thu,  3 Sep 2020 12:21:07 +0100
-Message-Id: <20200903112107.27367-9-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200903112107.27367-1-alex.bennee@linaro.org>
-References: <20200903112107.27367-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=St9MZx/EfqmLNHCoBSrRYeKBxvrNhLYvuCsb+sSs/Bc=;
+ b=kpMI5a/kzmOrFAhVzpekWAUy0bC2dYZ04wFpk4Ig4vWfrY8F5liHs3hkFSbhOtEboF
+ kery3BjdcuP2CzcRBDRBDLxYpxjb+J34i+9eiVlvTAZAC/EZMrYxn14a9Jef6/BAPN3l
+ lkaFGXaenpb5eaKNVnhXdAhLBeczULKv1M1eP69utQ0a6gG5FPjTSyjfWu8M84Uewvzr
+ DdSI4Ah79AeDDFchkRvItbJFT3dqgCEUbufTjAbG8awDTKMXVmIU/H7O+aN8XHWTWRX/
+ 5Uv+pofPGrJwt0Nt/4Ab2MXPhp3Qpd1NqAxB4FnP/hgUsUASJ3gE246kqWe7OIn+0cYt
+ Wz6w==
+X-Gm-Message-State: AOAM5325CVZ8GBSt64pBjrNT/JzxUCISinK9Jta4Y5k1smL3bIk+lYqG
+ Ado/urEnT9YN1wxzA6rNXjj9blNqljoxZOLgU18=
+X-Google-Smtp-Source: ABdhPJxJ5J+TnStDKNd3PkVieHJNVBrmPfmbBop6/ZtHttAKS72AeJNFs8GzcIs6F7VqCwu6Yb9RIsFlKYRktSmjoqQ=
+X-Received: by 2002:aca:c0c1:: with SMTP id q184mr1787224oif.56.1599132269425; 
+ Thu, 03 Sep 2020 04:24:29 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+References: <20200902162206.101872-1-liq3ea@163.com>
+ <b840aab8-542d-af43-43e5-0a07f442b5d5@redhat.com>
+ <CAFEAcA9mvMaR5MJJ74Vv63TG6frWnMeSZA19Zxv8TUceudPUTQ@mail.gmail.com>
+ <CAKXe6SLYgkiTAYa81nppHUMEzoeGy3988OmrzZyw8-VY8ajE3w@mail.gmail.com>
+ <CAFEAcA9TEpfBmfOOtpfR9JCAFkMF0fy20L=DBVDTFaLp6J3Lfg@mail.gmail.com>
+In-Reply-To: <CAFEAcA9TEpfBmfOOtpfR9JCAFkMF0fy20L=DBVDTFaLp6J3Lfg@mail.gmail.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 3 Sep 2020 19:23:53 +0800
+Message-ID: <CAKXe6SKgVo5HBL2Uf8AscEn5ohZOJZGLMmT3NZL5cEbcQzgivg@mail.gmail.com>
+Subject: Re: [RFC 0/3] try to solve the DMA to MMIO issue
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -103,46 +97,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Juan Quintela <quintela@redhat.com>, richard.henderson@linaro.org,
- f4bug@amsat.org, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- cota@braap.org, stefanha@redhat.com, marcandre.lureau@redhat.com,
- pbonzini@redhat.com, aurelien@aurel32.net
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@163.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alexander Bulekov <alxndr@bu.edu>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The gcov build triggered:
+Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B49=E6=9C=883=
+=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=887:19=E5=86=99=E9=81=93=EF=BC=
+=9A
+>
+> On Thu, 3 Sep 2020 at 12:11, Li Qiang <liq3ea@gmail.com> wrote:
+> >
+> > Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B49=E6=9C=
+=883=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=886:53=E5=86=99=E9=81=93=EF=
+=BC=9A
+> > >
+> > > On Thu, 3 Sep 2020 at 04:55, Jason Wang <jasowang@redhat.com> wrote:
+> > > > I think we still need to seek a way to address this issue completel=
+y.
+> > > >
+> > > > How about adding a flag in MemoryRegionOps and detect the reentranc=
+y
+> > > > through that flag?
+> > >
+> > > This won't catch everything. Consider this situation:
+> > >   Device A makes DMA access to device B
+> > >   Device B's write-handling causes it to raise an
+> > >    outbound qemu_irq signal
+> > >   The qemu_irq signal is connected to device A
+> >
+> > Here mean device A is an interrupt controller?
+>
+> No. Any device can have an inbound or outbound qemu_irq line.
+> We use them not just for actual IRQ lines but for any
+> situation where we need to pass an on-or-off signal from
+> one device to another.
 
-  ../../migration/global_state.c:47:5: error: ‘strncpy’ specified
-      bound 100 equals destination size [-Werror=stringop-truncation]
-      strncpy((char *)global_state.runstate
+Could you please provide some example, I haven't noticed this before. Thank=
+s.
 
-As we shouldn't be using strncpy anyway lets use the suggested
-pstrcpy.
+>
+> > This is special case I think.
+>
+> It's an example of why looking purely at MMIO is not
+> sufficient. We should prefer to see if we can come up with
+> a design principle that works for all between-device
+> coordination before we implement something that is specific
+> to MMIO.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- migration/global_state.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+So first we may be define a clean boundary/interface between device
+coordination?
 
-diff --git a/migration/global_state.c b/migration/global_state.c
-index 25311479a4b..5fbe6d1ff07 100644
---- a/migration/global_state.c
-+++ b/migration/global_state.c
-@@ -44,8 +44,8 @@ void global_state_store_running(void)
- {
-     const char *state = RunState_str(RUN_STATE_RUNNING);
-     assert(strlen(state) < sizeof(global_state.runstate));
--    strncpy((char *)global_state.runstate,
--           state, sizeof(global_state.runstate));
-+    pstrcpy((char *)global_state.runstate, sizeof(global_state.runstate),
-+            state);
- }
- 
- bool global_state_received(void)
--- 
-2.20.1
+Thanks,
+Li Qiang
 
+>
+> thanks
+> -- PMM
 
