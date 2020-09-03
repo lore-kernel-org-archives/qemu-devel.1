@@ -2,88 +2,90 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23429C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9499FC433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:34:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CAD9320716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BE2C20716
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:34:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YacqIgbN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAD9320716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CFIDD0hh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BE2C20716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDmYt-0008Ex-Q0
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 06:33:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53908)
+	id 1kDmZm-0001jU-CZ
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 06:34:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kDmYN-0007md-2t
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:33:15 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:40131)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kDmYL-0000rd-8h
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:33:14 -0400
-Received: by mail-ot1-x341.google.com with SMTP id e23so2228728otk.7
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 03:33:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=V80vNAg/HOUUazKvW0DcPk5b7fBEIMqHUpgsEIVwMZA=;
- b=YacqIgbNe9WUOZhWa3ERcdZ1u51vTjW0YeX8pUWm367joc4rT+bxcJvZeKclFEHBy7
- mPWmb8pC3StqxcPehVEmkhY5Njj+vKdAgrt88TX6UhIZpQJGrrtOPbrgjxKIsaeyu14t
- kZXxmuyfGtggEmxF8mu0BG0JP6zWUrKL/UlKRAM7g1uqF1y7L339OUr7y51fVlnyiN9Q
- +vOraBheh7AzeHfIDISh88RPVjbxdYL7BgZLt1cQAUsNvcfOr6ZyM2xJhogLLC7Gkf1y
- YfC40kKDlUkLe5Iz8+Xs2aLZkV9z7AUlZLirHrB//SVYhrp6lzuR4KX82bBePFsURn+C
- 1vwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=V80vNAg/HOUUazKvW0DcPk5b7fBEIMqHUpgsEIVwMZA=;
- b=aIFxM95NG/b+mrROqneIze0bk+mHgOdHUmNetevCC0BiXtSOchbNL3apykxRJp2mV7
- ptXvLKNGY8HQnIrIJ538z7sdtygCEDff+DhnW+vU8hj3GvUg/djPyYFHKEGunTUZVVGz
- vxfcYzMJ4voK2/uJG0C1TXitLMoUFvX4EYgw9aiAt2Hhkr2qxxVBwbHtlVLUPYqL7JqZ
- YBhXRlBVtEw5RIrexE9jGNxzRJaz9ddXXMvWHFoA+8TsZ/iKmla6F8i22JgohGjWDHO0
- NB6pvV5yEE7WIis5lTWXe0wi7tuYTEqSh84Q4AwAssgh3imY7LB7wFvxIoTACOTWX5eX
- c+WA==
-X-Gm-Message-State: AOAM532awyJn0N3lo/dYpQttDrHnQhrFitWgRJxEnsrotvUURSyHbE22
- ZrXgd8iDGT3ZtfIJvtqkV3T0Vds8DfdTB5F5T08=
-X-Google-Smtp-Source: ABdhPJyAabJ/2hY2hmi8t9LrpdsPdV0wlKbvDJr5/KJ8ofss1vQgjXp5EqxaAvIFEYG6+JPKDsAs/ycpjP/JqXj2EOg=
-X-Received: by 2002:a05:6830:610:: with SMTP id
- w16mr989235oti.353.1599129192067; 
- Thu, 03 Sep 2020 03:33:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDmZ4-0000Je-8k
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:33:58 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:24732
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDmZ2-0001Dw-7F
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:33:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599129235;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JII04JBkQInx0VX1qd9SF79bbAmdEjqOUUOR0/iVqaI=;
+ b=CFIDD0hhYp9pG790IAY9cwm7aQo1IBkCe7ePFh/CKK8FEUkuo1ZrewS07q+jd5x/QarTKH
+ kfeE3o1GHw8AQ7xu+hV65oxObVt7LEASmRIvNpveo/w8f+iuREWGQt1FL9ais3m/lJMF4C
+ d7q9CyZKruRhWES3lSO6bwQbw6OCHP8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-559-WrkEPX92PaK3u0yKZm7UQw-1; Thu, 03 Sep 2020 06:33:51 -0400
+X-MC-Unique: WrkEPX92PaK3u0yKZm7UQw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C4B62801AB8;
+ Thu,  3 Sep 2020 10:33:49 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-90.ams2.redhat.com [10.36.112.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2DD217EED3;
+ Thu,  3 Sep 2020 10:33:37 +0000 (UTC)
+Subject: Re: [PATCH 05/63] ap-device: Rename AP_DEVICE_TYPE to TYPE_AP_DEVICE
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20200902224311.1321159-1-ehabkost@redhat.com>
+ <20200902224311.1321159-6-ehabkost@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <96a6b874-5770-021d-5073-f7873f2da8a5@redhat.com>
+Date: Thu, 3 Sep 2020 12:33:36 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <20200902162206.101872-1-liq3ea@163.com>
- <20200902162206.101872-4-liq3ea@163.com>
- <01e9f449-00c8-5a9d-b212-4df0147b6e5c@msgid.tls.msk.ru>
-In-Reply-To: <01e9f449-00c8-5a9d-b212-4df0147b6e5c@msgid.tls.msk.ru>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Thu, 3 Sep 2020 18:32:36 +0800
-Message-ID: <CAKXe6SKcoqAGP0TwbSwqe4=QC6b-841Nj4YY6c4WhPX2ZXVM9Q@mail.gmail.com>
-Subject: Re: [RFC 3/3] virtio-gpu: make the IO handler reentrant
-To: Michael Tokarev <mjt@tls.msk.ru>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20200902224311.1321159-6-ehabkost@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.324, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,47 +98,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Li Qiang <liq3ea@163.com>, Qemu Developers <qemu-devel@nongnu.org>,
- Alexander Bulekov <alxndr@bu.edu>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Tony Krowiak <akrowiak@linux.ibm.com>, berrange@redhat.com,
+ Pierre Morel <pmorel@linux.ibm.com>, David Hildenbrand <david@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, qemu-s390x@nongnu.org,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Michael Tokarev <mjt@tls.msk.ru> =E4=BA=8E2020=E5=B9=B49=E6=9C=883=E6=97=A5=
-=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=881:12=E5=86=99=E9=81=93=EF=BC=9A
->
-> 02.09.2020 19:22, Li Qiang wrote:
-> ..
-> > @@ -809,6 +809,10 @@ void virtio_gpu_process_cmdq(VirtIOGPU *g)
-> >  {
-> >      struct virtio_gpu_ctrl_command *cmd;
-> >
-> > +    if (atomic_read(&g->in_io)) {
-> > +        return;
-> > +    }
-> > +    atomic_set(&g->in_io, 1);
->
-> Can't we race in these two instructions? Both
-> threads atomic_reads at the same time, both see zero,
-> and both are trying to set it to 1, no?
->
-> Just asking really, b/c despite of the atomic_ prefix,
-> to me this look a bit unsafe..
+On 03/09/2020 00.42, Eduardo Habkost wrote:
+> This will make the type name constant consistent with the name of
+> the type checking macro.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Cc: Christian Borntraeger <borntraeger@de.ibm.com>
+> Cc: Tony Krowiak <akrowiak@linux.ibm.com>
+> Cc: Halil Pasic <pasic@linux.ibm.com>
+> Cc: Pierre Morel <pmorel@linux.ibm.com>
+> Cc: Richard Henderson <rth@twiddle.net>
+> Cc: David Hildenbrand <david@redhat.com>
+> Cc: Cornelia Huck <cohuck@redhat.com>
+> Cc: Thomas Huth <thuth@redhat.com>
+> Cc: Alex Williamson <alex.williamson@redhat.com>
+> Cc: qemu-s390x@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  include/hw/s390x/ap-device.h | 4 ++--
+>  hw/s390x/ap-device.c         | 2 +-
+>  hw/vfio/ap.c                 | 2 +-
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+> index fb250a20f3..e502745de5 100644
+> --- a/include/hw/s390x/ap-device.h
+> +++ b/include/hw/s390x/ap-device.h
+> @@ -14,7 +14,7 @@
+>  #include "hw/qdev-core.h"
+>  #include "qom/object.h"
+>  
+> -#define AP_DEVICE_TYPE       "ap-device"
+> +#define TYPE_AP_DEVICE       "ap-device"
+>  
+>  struct APDevice {
+>      DeviceState parent_obj;
+> @@ -22,6 +22,6 @@ struct APDevice {
+>  typedef struct APDevice APDevice;
+>  
+>  DECLARE_INSTANCE_CHECKER(APDevice, AP_DEVICE,
+> -                         AP_DEVICE_TYPE)
+> +                         TYPE_AP_DEVICE)
+>  
+>  #endif /* HW_S390X_AP_DEVICE_H */
+> diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
+> index fc0b41e937..237d1f19c5 100644
+> --- a/hw/s390x/ap-device.c
+> +++ b/hw/s390x/ap-device.c
+> @@ -21,7 +21,7 @@ static void ap_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo ap_device_info = {
+> -    .name = AP_DEVICE_TYPE,
+> +    .name = TYPE_AP_DEVICE,
+>      .parent = TYPE_DEVICE,
+>      .instance_size = sizeof(APDevice),
+>      .class_size = sizeof(DeviceClass),
+> diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+> index f399ec0a31..68ed059b39 100644
+> --- a/hw/vfio/ap.c
+> +++ b/hw/vfio/ap.c
+> @@ -177,7 +177,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
+>  
+>  static const TypeInfo vfio_ap_info = {
+>      .name = VFIO_AP_DEVICE_TYPE,
+> -    .parent = AP_DEVICE_TYPE,
+> +    .parent = TYPE_AP_DEVICE,
+>      .instance_size = sizeof(VFIOAPDevice),
+>      .class_init = vfio_ap_class_init,
+>  };
+> 
 
-Yes you're right. My patch is wrong. Here I try to address race
-condition and DMA to MMIO issue at the same time.
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
-I will first focus the DMA to MMIO issue in the revision patch.
-
-Thanks,
-Li Qiang
-
->
-> Thanks,
->
-> /mjt
 
