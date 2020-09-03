@@ -2,94 +2,81 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 518B2C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BDE9C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AA2020665
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:47:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PXxsJ3Gc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AA2020665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 36D3D20665
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:51:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D3D20665
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDi6I-0001pm-B5
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 01:47:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50870)
+	id 1kDi9T-00033I-CM
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 01:51:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51434)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kDi5f-00017b-Gb
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:47:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38497)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kDi5d-0007MV-Vh
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:47:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599112037;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Yvp/ImzPMt39bxPyLCzp6LQbYjuKLzWAteVcqDwfdXg=;
- b=PXxsJ3GcUkCkOFR8h7tC//znnMTg63VwU7112DpGdMqbgEUgpWfrYOltYILFpMp8TaFSEQ
- Qb5GmOg6CCRlFesMsPSx0YeTOcplI0UBgg7C7J4FmXkMFLKEq4Ox4XLhtJ/e6eQS5R/TWz
- Y9gZc7sZXDA503fZaduxwTvkj2GxuHg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-217-ehLh0cbXNVGULK0wC0Byag-1; Thu, 03 Sep 2020 01:47:13 -0400
-X-MC-Unique: ehLh0cbXNVGULK0wC0Byag-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F55C1DDE8;
- Thu,  3 Sep 2020 05:47:12 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
- [10.36.112.62])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1DCF378B3C;
- Thu,  3 Sep 2020 05:47:12 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 3E3D016E31; Thu,  3 Sep 2020 07:47:11 +0200 (CEST)
-Date: Thu, 3 Sep 2020 07:47:11 +0200
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PULL v2 00/15] Cirrus-CI improvements, and other CI-related
- fixes, m68k
-Message-ID: <20200903054711.q7uvc32qlchtugau@sirius.home.kraxel.org>
-References: <20200902154932.390595-1-thuth@redhat.com>
- <CAFEAcA89Pjp_k5pJh26juFDO1a3M8H_s0+5cGBoZq5v7=ZYing@mail.gmail.com>
- <cd4a7bf7-c525-1aab-dab6-dcc0d22bf538@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kDi8u-0002dv-K7
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:50:40 -0400
+Received: from indium.canonical.com ([91.189.90.7]:32962)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kDi8s-0007fs-3i
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:50:40 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kDi8q-0001Pk-Jm
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:50:36 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 7FE772E80EA
+ for <qemu-devel@nongnu.org>; Thu,  3 Sep 2020 05:50:36 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <cd4a7bf7-c525-1aab-dab6-dcc0d22bf538@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 03 Sep 2020 05:42:05 -0000
+From: Paolo Bonzini <1893758@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Won't Fix; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bonzini philmd
+X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
+ =?utf-8?q?=29?=
+X-Launchpad-Bug-Modifier: Paolo Bonzini (bonzini)
+References: <159895503437.23051.7002685011475326158.malonedeb@wampee.canonical.com>
+Message-Id: <159911172557.20713.515724951157935446.malone@chaenomeles.canonical.com>
+Subject: [Bug 1893758] Re: meson: scary KeyboardInterrupt backtrace displayed
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
+X-Launchpad-Hash: 19d9224e3eda0fb26fb55338a92b2bc5a98b03b4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 00:20:39
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,55 +85,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1893758 <1893758@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  Hi,
+That's just how Python works. :-(
 
-> Darn. I've added Gerd's patch since it is needed to fix the acceptance
-> tests in the Gitlab-CI. Could we maybe revert the patch that introduced
-> the regression instead, as long as no other proper fix is available? The
-> failing CI is really bugging me.
+https://bugs.python.org/issue14229
 
-Well, ddcf607fa3d6 fixes another nasty issue (builds modifying the
-source tree), so reverting that isn't really an option.
+** Bug watch added: Python Roundup #14229
+   http://bugs.python.org/issue14229
 
-We could have configure remove the symlink in case is present.  That way
-old build trees with the symlink already created should work too.  Right
-now only build trees created with ddcf607fa3d6 present are working
-properly.
+** Changed in: qemu
+       Status: New =3D> Won't Fix
 
-Untested patch below.
+-- =
 
-take care,
-  Gerd
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1893758
 
-diff --git a/configure b/configure
-index b1e11397a827..493b4e86da62 100755
---- a/configure
-+++ b/configure
-@@ -8107,6 +8107,7 @@ LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
- LINKS="$LINKS tests/acceptance tests/data"
- LINKS="$LINKS tests/qemu-iotests/check"
- LINKS="$LINKS python"
-+UNLINK="pc-bios/keymaps"
- for bios_file in \
-     $source_path/pc-bios/*.bin \
-     $source_path/pc-bios/*.elf \
-@@ -8127,6 +8128,11 @@ for f in $LINKS ; do
-         symlink "$source_path/$f" "$f"
-     fi
- done
-+for f in $UNLINK ; do
-+    if [ -L "$f" ]; then
-+        rm -f "$f"
-+    fi
-+done
- 
- (for i in $cross_cc_vars; do
-   export $i
+Title:
+  meson: scary KeyboardInterrupt backtrace displayed
 
+Status in QEMU:
+  Won't Fix
+
+Bug description:
+  Pressing ^C while building (calling 'make') sometime displays
+  KeyboardInterrupt exception backtrace (host Fedora 32):
+
+  $ make qemu-system-arm
+  Generating qemu-version.h with a meson_exe.py custom command
+  ^CTraceback (most recent call last):
+    File "/usr/bin/meson", line 6, in <module>
+      from pkg_resources import load_entry_point
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 3252, in <module>
+      def _initialize_master_working_set():
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 3235, in _call_aside
+      f(*args, **kwargs)
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 3277, in _initialize_master_working_set
+      tuple(
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 3278, in <genexpr>
+      dist.activate(replace=3DFalse)
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 2782, in activate
+      fixup_namespace_packages(self.location)
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 2295, in fixup_namespace_packages
+      subpath =3D _handle_ns(package, path_item)
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 2194, in _handle_ns
+      importer =3D get_importer(path_item)
+    File "/usr/lib64/python3.8/pkgutil.py", line 415, in get_importer
+      importer =3D sys.path_importer_cache[path_item]
+  KeyboardInterrupt
+
+  =
+
+  $ make
+  [...]
+  Compiling C object libcommon.fa.p/disas_alpha.c.o
+  Compiling C object libcommon.fa.p/hw_isa_smc37c669-superio.c.o
+  Compiling C object libcommon.fa.p/hw_isa_isa-superio.c.o
+  Compiling C object libcommon.fa.p/hw_char_serial-isa.c.o
+  Compiling C object libcommon.fa.p/hw_acpi_aml-build-stub.c.o
+  ^CTraceback (most recent call last):
+    File "/usr/bin/meson", line 6, in <module>
+      from pkg_resources import load_entry_point
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 3252, in <module>
+  make: *** [Makefile.ninja:994: libcommon.fa.p/disas_alpha.c.o] Interrupt
+  make: *** [Makefile.ninja:998: libcommon.fa.p/hw_isa_smc37c669-superio.c.=
+o] Interrupt
+  make: *** [Makefile.ninja:1025: libcommon.fa.p/hw_isa_isa-superio.c.o] In=
+terrupt
+  make: *** [Makefile.ninja:1069: libcommon.fa.p/hw_char_serial-isa.c.o] In=
+terrupt
+  make: *** [Makefile.ninja:1102: libcommon.fa.p/hw_acpi_aml-build-stub.c.o=
+] Interrupt
+  make: *** [Makefile.ninja:2138: qemu-system-alpha.p/softmmu_main.c.o] Int=
+errupt
+  make: *** [Makefile.ninja:949: libblock.fa.p/block_qcow2.c.o] Interrupt
+      def _initialize_master_working_set():
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 3235, in _call_aside
+      f(*args, **kwargs)
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 3287, in _initialize_master_working_set
+      list(map(working_set.add_entry, sys.path))
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 623, in add_entry
+      for dist in find_distributions(entry, True):
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 2065, in find_on_path
+      for dist in factory(fullpath):
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 2134, in distributions_from_metadata
+      yield Distribution.from_location(
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 2590, in from_location
+      return cls(
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 2571, in __init__
+      self._version =3D safe_version(version)
+    File "/usr/lib/python3.8/site-packages/pkg_resources/__init__.py", line=
+ 1331, in safe_version
+      return str(packaging.version.Version(version))
+    File "/usr/lib/python3.8/site-packages/pkg_resources/_vendor/packaging/=
+version.py", line 205, in __init__
+      self._version =3D _Version(
+    File "<string>", line 1, in __new__
+  KeyboardInterrupt
+  make: *** [Makefile.ninja:875: qemu.syms.stamp] Interrupt
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1893758/+subscriptions
 
