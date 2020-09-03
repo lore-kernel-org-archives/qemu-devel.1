@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAB5CC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9DD2C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:02:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C0BB20709
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:54:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C0BB20709
+	by mail.kernel.org (Postfix) with ESMTPS id 5F6A52071B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:02:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F6A52071B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58178 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDlwk-0000Ko-Kl
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 05:54:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43316)
+	id 1kDm49-0002wa-FD
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 06:02:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kDltS-0003r0-Cw
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:50:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60352)
+ id 1kDm3c-0002XM-DR
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:01:28 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35876)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kDltP-0003SE-3R
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:50:58 -0400
+ id 1kDm3Z-0004w5-DG
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:01:28 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kDltK-0001HX-N1
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 09:50:51 +0000
+ id 1kDm3V-0003Cp-S2
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 10:01:22 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id E808C2E8122
- for <qemu-devel@nongnu.org>; Thu,  3 Sep 2020 09:50:49 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id B94682E8138
+ for <qemu-devel@nongnu.org>; Thu,  3 Sep 2020 10:01:20 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 03 Sep 2020 09:37:07 -0000
+Date: Thu, 03 Sep 2020 09:47:40 -0000
 From: "Tony.LI" <1894071@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -49,18 +49,18 @@ X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bigboy0822
+X-Launchpad-Bug-Commenters: bigboy0822 laurent-vivier
 X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
 X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
 References: <159912571834.28358.2492164063235416189.malonedeb@soybean.canonical.com>
-Message-Id: <159912582761.21637.8119747326205694244.malone@chaenomeles.canonical.com>
+Message-Id: <159912646103.27069.16496098988566839856.malone@soybean.canonical.com>
 Subject: [Bug 1894071] Re: qemu-i386-static ioctl return -14 (Bad Address)
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="195cbfa84cb75815472f69dd83d46f006869050b"; Instance="production"
-X-Launchpad-Hash: 48385ca07b246b761993963321c276a8dc7976c3
+X-Launchpad-Hash: 858aca03f7a19d3278638f8cc7be8965e5889382
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:31:20
@@ -88,9 +88,9 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Attachment added: "modeset.c"
-   https://bugs.launchpad.net/qemu/+bug/1894071/+attachment/5407367/+files/=
-modeset.c
+My environment is that:
+schroot + debian(bullseye-i386)
+qemu: 5.1.0-rc3
 
 -- =
 
