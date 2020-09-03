@@ -2,109 +2,85 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05AB5C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 964DDC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:46:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C52ED20665
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:45:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C40A20786
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:46:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Id9BzbkV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C52ED20665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0N/guqd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C40A20786
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDrQb-0003tN-J8
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 11:45:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56702)
+	id 1kDrRd-0005az-Gc
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 11:46:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDrPc-0002ZM-KV
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:44:32 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:27484
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDrPa-000384-RB
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:44:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599147869;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=vuLKCoKgit6xEHkXQdTADwN4AZsISvSLLTgZxWqBBwI=;
- b=Id9BzbkV/WpOUFgSoV5S/EDFG6btLAPEhn+Ltm3yLY/5vkZ3k5z11/xSjr5zwzSKzC+T4x
- KAdh7bguG/WowZ94uZfX//7hPVuOPFBEhcbEY7cOmeN42YfuBk+FMmJs3TMKgEgTjuQ14J
- gp6G75A3O5bMHs/Wprm/3Z/UKhPkaHs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-520-MJnepSK_Mem0ynS-xbO1LA-1; Thu, 03 Sep 2020 11:44:28 -0400
-X-MC-Unique: MJnepSK_Mem0ynS-xbO1LA-1
-Received: by mail-wr1-f72.google.com with SMTP id b7so1228810wrn.6
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 08:44:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kDrQS-00049G-7A
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:45:24 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:39674)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kDrQQ-0003Jp-FZ
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:45:23 -0400
+Received: by mail-ed1-x542.google.com with SMTP id c10so3146405edk.6
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 08:45:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=gbwZRlflHVl/ilYGKX2fH33/klrazdTt9WM1Pj2xZgI=;
+ b=H0N/guqdBl2YgloJD+riNGcEEU2iquEB5RT51GrJfsrEzR+2tUTalFoh3L3ZQ98LM9
+ 5YYqb8MDQYCnX8elwgqPmOjMVUuemXawhjDdIiBxcpv9xasvkda9OTwdusJcdRVzg4aa
+ C8qOqwNCuZ8c8yVs9D5NQJJvGO3OfG8VJWg/TtMSXL0xUulHtTvSjpTfIngvu+sS/FT+
+ obtcb1OWOMr1wgv/7grpSCHALCjr+9dySsqvsPuFooO1DpBEBmsn/h5bf5GCwJejqXDp
+ H48lmQ0YlC03rkYRA1ixIupejrbwCRxexDmPFO9vIA6V2jEtLYpxxNWWFNTM6HlZaQ4y
+ xajA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=vuLKCoKgit6xEHkXQdTADwN4AZsISvSLLTgZxWqBBwI=;
- b=dyMMfpbldU+TBtzPAYvqQSNj+0FinKHZnnmIUWbV1ZN9Sf3rVA/EiwGd2WGhzhkhef
- 1oW1T/9e54hv22IAjelP73waCpkyJIt0p71yWO47RRRAw6An2aKzumIEtfTCH6xni539
- qEfd16X8HHxeKC8+ZbY0t17UK4BwYAISRVw/uA332XjNlYOZ1hplaqGyGfqZgxVako/+
- Fik/KS22a0Ta/bnuzrQtpm0KLm+M1Ooo+7yP6Ii1zTFyhzF1uaz1piDMD/3IxzXo/4wa
- wz1n2kV8xxB4//vLWNHrJqX20VIGRBW8AXaGLhlmZQxSj8fu25+wOeDhRMYEjNxcofw4
- dMmA==
-X-Gm-Message-State: AOAM5313fC8CzU/lCQsTHWqtLyCRlQ6IPbayuTBAyzXgzo97pw7EkzaW
- Xik26dxbhN+2/jypgnCRYa4besb46tJQlPjS9JFEQO0Ws8q+gmhCgMDE8D8X7KLB4zqbzsBLPjD
- W1bYcBEvMOElvs1A=
-X-Received: by 2002:a1c:7c14:: with SMTP id x20mr753492wmc.72.1599147866872;
- Thu, 03 Sep 2020 08:44:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyx6fV+zJDNep2N2tB0OfbuK/bATgNpRnT1qIWdsmw7TH271X+v9SoJdIvnRzJ3TNGkxofmZg==
-X-Received: by 2002:a1c:7c14:: with SMTP id x20mr753480wmc.72.1599147866672;
- Thu, 03 Sep 2020 08:44:26 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:197c:daa0:48d1:20b2?
- ([2001:b07:6468:f312:197c:daa0:48d1:20b2])
- by smtp.gmail.com with ESMTPSA id o5sm4812190wmc.33.2020.09.03.08.44.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 08:44:26 -0700 (PDT)
-Subject: Re: [PATCH] meson: install ivshmem-client and ivshmem-server
-To: Bruce Rogers <brogers@suse.com>, qemu-devel@nongnu.org
-References: <20200903153524.98168-1-brogers@suse.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <4eba2feb-a9b3-8bb7-6ed7-6b02c79519b1@redhat.com>
-Date: Thu, 3 Sep 2020 17:44:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=gbwZRlflHVl/ilYGKX2fH33/klrazdTt9WM1Pj2xZgI=;
+ b=UH8XDA+BMhOulWFE5em9/avZqdyZFI1yui8YeShezHjawV2w8Ryi5IFLrdjX1gU0yS
+ RpzhGkLcc6v+LfjS8VKTjSg8Q7oV7PQ5qXih76hScVd3xm8yKZQYbllO13Xrshwiagfh
+ YlPeEnF7pAjV3CZQkDbp8pypdHopVghjOWuRSRQnk28ujsiG95yLKFtWolus8hvy80jM
+ YSTtp5R4OpYzmAXXYQirh/VdYFTzVRiO4qTNYalkZyDVQXwldhjV6rHO6cj0WoDM+qC5
+ cxU2LCKl3Kj19cchME4jFw6iOeUMHg7qdiLFwZoXP4CzhJ7LY574KFq1P0UyjHKIH7BG
+ +pdA==
+X-Gm-Message-State: AOAM531B20CGqCbUmJ+hGN97YcKe8g+4xo3xRiK79YFKV1tk0/43npAm
+ NUFOw3xDjXdk9fdRQfqiQD9Q19UoqFbqEp13h2Y=
+X-Google-Smtp-Source: ABdhPJyohxFRbpZWKKopIMFivRoG2D5j0HCJ95HSzNsFzW6nktrCgxKLk4cUPR6n/+3y2FX6E0u898QMIA08218cnNQ=
+X-Received: by 2002:aa7:ca17:: with SMTP id y23mr3837081eds.245.1599147920196; 
+ Thu, 03 Sep 2020 08:45:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200903153524.98168-1-brogers@suse.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:28:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20200903152933.97838-1-brogers@suse.com>
+In-Reply-To: <20200903152933.97838-1-brogers@suse.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Thu, 3 Sep 2020 19:45:08 +0400
+Message-ID: <CAJ+F1C+2P9Z_YLVxwjkwOCrCCqMwPg5_OnS7dYvhWDN-iXHyOg@mail.gmail.com>
+Subject: Re: [PATCH] meson: remove linkage of sdl to baum
+To: Bruce Rogers <brogers@suse.com>
+Content-Type: multipart/alternative; boundary="000000000000ba0b5305ae6aa349"
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,44 +94,118 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/09/20 17:35, Bruce Rogers wrote:
-> Turn on the meson install flag for these executables
-> 
+--000000000000ba0b5305ae6aa349
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hi
+
+On Thu, Sep 3, 2020 at 7:33 PM Bruce Rogers <brogers@suse.com> wrote:
+
+> Ever since commit 537fe2d63f744e7c96ff45b60d09486a81958e06 there
+> has been a 'linkage' to sdl for compiling baum.c. Originally it
+> had to do with including sdl cflags for any file including sdl
+> headers. There is no longer any such need for baum.c, but the
+> association has persisted in the make system, and with the switch
+> to meson it has now become a hard requirement, which now causes
+> chardev-baum.so to not be produced if sdl is not configured.
+> Remove this bogus linkage.
+>
 > Signed-off-by: Bruce Rogers <brogers@suse.com>
-> ---
->  contrib/ivshmem-client/meson.build | 2 +-
->  contrib/ivshmem-server/meson.build | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/contrib/ivshmem-client/meson.build b/contrib/ivshmem-client/meson.build
-> index 1b171efb4f..83a559117f 100644
-> --- a/contrib/ivshmem-client/meson.build
-> +++ b/contrib/ivshmem-client/meson.build
-> @@ -1,4 +1,4 @@
->  executable('ivshmem-client', files('ivshmem-client.c', 'main.c'),
->             dependencies: glib,
->             build_by_default: targetos == 'linux',
-> -           install: false)
-> +           install: true)
-> diff --git a/contrib/ivshmem-server/meson.build b/contrib/ivshmem-server/meson.build
-> index 3a53942201..a1c39aa3b3 100644
-> --- a/contrib/ivshmem-server/meson.build
-> +++ b/contrib/ivshmem-server/meson.build
-> @@ -1,4 +1,4 @@
->  executable('ivshmem-server', files('ivshmem-server.c', 'main.c'),
->             dependencies: [qemuutil, rt],
->             build_by_default: targetos == 'linux',
-> -           install: false)
-> +           install: true)
-> 
+>
 
-They weren't installed before the conversion, were they?
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Paolo
+---
+>  chardev/meson.build | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/chardev/meson.build b/chardev/meson.build
+> index 27a9a28f4c..54e88d0310 100644
+> --- a/chardev/meson.build
+> +++ b/chardev/meson.build
+> @@ -36,9 +36,9 @@ softmmu_ss.add(when: ['CONFIG_SPICE', spice], if_true:
+> files('spice.c'))
+>
+>  chardev_modules =3D {}
+>
+> -if config_host.has_key('CONFIG_BRLAPI') and sdl.found()
+> +if config_host.has_key('CONFIG_BRLAPI')
+>    module_ss =3D ss.source_set()
+> -  module_ss.add(when: [sdl, brlapi], if_true: [files('baum.c'), pixman])
+> +  module_ss.add(when: [brlapi], if_true: [files('baum.c'), pixman])
+>    chardev_modules +=3D { 'baum': module_ss }
+>  endif
+>
+> --
+> 2.28.0
+>
+>
+>
 
+--=20
+Marc-Andr=C3=A9 Lureau
+
+--000000000000ba0b5305ae6aa349
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
+"><div dir=3D"ltr" class=3D"gmail_attr">On Thu, Sep 3, 2020 at 7:33 PM Bruc=
+e Rogers &lt;<a href=3D"mailto:brogers@suse.com">brogers@suse.com</a>&gt; w=
+rote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0p=
+x 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Ever since=
+ commit 537fe2d63f744e7c96ff45b60d09486a81958e06 there<br>
+has been a &#39;linkage&#39; to sdl for compiling baum.c. Originally it<br>
+had to do with including sdl cflags for any file including sdl<br>
+headers. There is no longer any such need for baum.c, but the<br>
+association has persisted in the make system, and with the switch<br>
+to meson it has now become a hard requirement, which now causes<br>
+chardev-baum.so to not be produced if sdl is not configured.<br>
+Remove this bogus linkage.<br>
+<br>
+Signed-off-by: Bruce Rogers &lt;<a href=3D"mailto:brogers@suse.com" target=
+=3D"_blank">brogers@suse.com</a>&gt;<br></blockquote><div><br></div><div>Re=
+viewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@re=
+dhat.com">marcandre.lureau@redhat.com</a>&gt;</div><div> <br></div><blockqu=
+ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
+ solid rgb(204,204,204);padding-left:1ex">
+---<br>
+=C2=A0chardev/meson.build | 4 ++--<br>
+=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/chardev/meson.build b/chardev/meson.build<br>
+index 27a9a28f4c..54e88d0310 100644<br>
+--- a/chardev/meson.build<br>
++++ b/chardev/meson.build<br>
+@@ -36,9 +36,9 @@ softmmu_ss.add(when: [&#39;CONFIG_SPICE&#39;, spice], if_=
+true: files(&#39;spice.c&#39;))<br>
+<br>
+=C2=A0chardev_modules =3D {}<br>
+<br>
+-if config_host.has_key(&#39;CONFIG_BRLAPI&#39;) and sdl.found()<br>
++if config_host.has_key(&#39;CONFIG_BRLAPI&#39;)<br>
+=C2=A0 =C2=A0module_ss =3D ss.source_set()<br>
+-=C2=A0 module_ss.add(when: [sdl, brlapi], if_true: [files(&#39;baum.c&#39;=
+), pixman])<br>
++=C2=A0 module_ss.add(when: [brlapi], if_true: [files(&#39;baum.c&#39;), pi=
+xman])<br>
+=C2=A0 =C2=A0chardev_modules +=3D { &#39;baum&#39;: module_ss }<br>
+=C2=A0endif<br>
+<br>
+-- <br>
+2.28.0<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
+
+--000000000000ba0b5305ae6aa349--
 
