@@ -8,79 +8,76 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEED8C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A79C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:49:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6620D2072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:48:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 35CCB2072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:49:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ebqdEjdY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6620D2072A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TipNrf5U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35CCB2072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDoff-0001ql-2O
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:48:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57782)
+	id 1kDog1-0002Ls-AE
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:49:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDody-0008EU-Jf
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:47:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25213
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoeS-0000p4-RG
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:47:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35403)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDodw-0001r0-Oe
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:47:10 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoeR-0001sP-1L
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:47:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599137227;
+ s=mimecast20190719; t=1599137257;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=HKOYbSpXqpEFR+xjzMLfCAkn7MGr2ti0r84yWq8CQZA=;
- b=ebqdEjdYHOYHgqTrCBoh+z7+sHeAZE/4c0V6N3F7vTE47Bq2PRFjyfM9j8b9RkoH2t1DTe
- JqYU3BLrEqrKgldJPImN2egb6wWRugyMWhTwTMQLf4hxx4I3i/bHvPaMAKh9kiNqX6VRcu
- TGTYcrsVBiY76LxbLmwa7PRGMvwYCkw=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-440-RJB0VDZwO6qkf6SsL1cvyw-1; Thu, 03 Sep 2020 08:47:06 -0400
-X-MC-Unique: RJB0VDZwO6qkf6SsL1cvyw-1
-Received: by mail-wm1-f69.google.com with SMTP id c72so927089wme.4
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:47:06 -0700 (PDT)
+ bh=U6La/qVi2+fxzxv0OwHJMk5/GOTYwpXBuNbIBbxXxWY=;
+ b=TipNrf5UPlPWE7Im5+ZS+a02PVHzeYH+c89MEiyxo5lNCSQB/4CvvIYklPwu/FGZc26f2Z
+ Bo6d3hsY3DOVetwxqJtSwdIDXwDn5/IQ6vgWwoQTc6EluDHQW2w6vdzqjzR6eD6e3wexVk
+ x4PvhKd2qOtazLbFXmtoHhTWI6kbP1w=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-WrXtnDWuPFusMAUYSVSSnA-1; Thu, 03 Sep 2020 08:47:36 -0400
+X-MC-Unique: WrXtnDWuPFusMAUYSVSSnA-1
+Received: by mail-wm1-f72.google.com with SMTP id k12so2354141wmj.1
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:47:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=HKOYbSpXqpEFR+xjzMLfCAkn7MGr2ti0r84yWq8CQZA=;
- b=d/vAgvBH/cNbaRYLZ2F0wXhhI06O4+tb+6prXBXlXWdRXQiL3R7uwSXFD1csMn0+Se
- cAvz2zqeYXdLPVrk/OTlXKKD7nX+UrhkfJpn8Hcyle2LVS1ciTIY4f6fIN9rKkJL0pcm
- ivfr13hT72AK1J7kUgmQ0JfTRIapPKfhxXHzQVZY6D6x7pVNsYTfXReod/YO1Gqkh71X
- B/+zjqBdKv9EvqLLmBjRATfhfQZzoUmAwK/Myh1dDm7/xPkQKbBoWHmQEdFuBugMC8t6
- QLSSQO3/FiXpZUnTc0dvfQnHzm1mTKVA3q1m7shsbf1IqwCgGl9ZoqGErGLDysHbc8LH
- Tg8A==
-X-Gm-Message-State: AOAM530sbwfJlml546TSjekL9br1iI8gSGe0bHgVY4F+3LNIiRPfvLWw
- RftxFOKcUa3MyCFG8raMTc7bW1zOJ9mIh7err6UvooQiXFb/OaInYZdiOQMry953O71KPP9IRrY
- WzF4Szujk8DCvnxQ=
-X-Received: by 2002:a05:6000:1631:: with SMTP id
- v17mr2245188wrb.411.1599137225071; 
- Thu, 03 Sep 2020 05:47:05 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJynCr2Vo2ZVLhcQt5GFIMTyZLDoqMGpbV5wNDmWkO1rOWNpKJ10MVPxzjeMq64KyJhRp+E3zQ==
-X-Received: by 2002:a05:6000:1631:: with SMTP id
- v17mr2245166wrb.411.1599137224864; 
- Thu, 03 Sep 2020 05:47:04 -0700 (PDT)
+ bh=U6La/qVi2+fxzxv0OwHJMk5/GOTYwpXBuNbIBbxXxWY=;
+ b=qibpuqABBSn4SogGkV+n5sqhlmMBc8uTbBqZiMoOa44Z7H6be07e2v9SkE1II0RWh2
+ VsxoU73p3OEHVvBdX9C8BPKEKIJ1tRzehyQ24pRm+XIHslKAArqonW/coZ7utY+SyaHs
+ TMAXdIF+Acn5iKh2qd57MkScbKkxRrPbgapqMrjJf1WXP2wl23azanKa0PrsRMPdcE8j
+ 27fTwwiUgAMaNlfCbM10KVwa6FOejiQqxxYOXYBsIcOGYzZ4fI9WhIMBG0+i8lRgCq+I
+ VwFVUV/e89XhCVwUggTohk71LvcMEf9rmPaFsF13NR6iAd6D8Q9kNb7TS2IE+fee/UVf
+ vp1Q==
+X-Gm-Message-State: AOAM530zQ3z9QlwiYB/q5a+wE/E4V0er527N+ETFsU7wjeMP6dDObJVZ
+ Hv3ZikY2ZxonbyNliiW8AVfsIsW/S2gZ9yxMwkzkGZ14Y9+VjjsHkPp37eT1MknEe06GapG+i1w
+ J4TrzzvXFwZ2pyjI=
+X-Received: by 2002:a1c:1f42:: with SMTP id f63mr2273646wmf.1.1599137254850;
+ Thu, 03 Sep 2020 05:47:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwN0Du8ikjF4DHgga24K6phzsssa6CiwNbo5t2yc2XbpRYRpO46LOjLIQ/VXV7nUw+MDeYOfQ==
+X-Received: by 2002:a1c:1f42:: with SMTP id f63mr2273635wmf.1.1599137254692;
+ Thu, 03 Sep 2020 05:47:34 -0700 (PDT)
 Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id p9sm4050678wma.42.2020.09.03.05.47.03
+ by smtp.gmail.com with ESMTPSA id 91sm4759925wrq.9.2020.09.03.05.47.33
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 05:47:04 -0700 (PDT)
-Subject: Re: [PATCH 14/63] i8254: Rename TYPE_I8254 to TYPE_PIT
+ Thu, 03 Sep 2020 05:47:34 -0700 (PDT)
+Subject: Re: [PATCH 15/63] i8259: Rename TYPE_I8259 to TYPE_PIC
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-15-ehabkost@redhat.com>
+ <20200902224311.1321159-16-ehabkost@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -105,12 +102,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <9a2be0a5-1d7f-1813-5bdb-2c741f07c593@redhat.com>
-Date: Thu, 3 Sep 2020 14:47:03 +0200
+Message-ID: <bb2d291d-158f-0e79-e384-f6d011b4922e@redhat.com>
+Date: Thu, 3 Sep 2020 14:47:33 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200902224311.1321159-15-ehabkost@redhat.com>
+In-Reply-To: <20200902224311.1321159-16-ehabkost@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -118,17 +115,18 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -44
 X-Spam_score: -4.5
 X-Spam_bar: ----
 X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -157,57 +155,56 @@ On 9/3/20 12:42 AM, Eduardo Habkost wrote:
 > Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Cc: qemu-devel@nongnu.org
 > ---
->  include/hw/timer/i8254.h | 4 ++--
->  hw/timer/i8254.c         | 4 ++--
->  2 files changed, 4 insertions(+), 4 deletions(-)
+>  hw/intc/i8259.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/include/hw/timer/i8254.h b/include/hw/timer/i8254.h
-> index 1a522a2457..ddd925074f 100644
-> --- a/include/hw/timer/i8254.h
-> +++ b/include/hw/timer/i8254.h
-> @@ -45,7 +45,7 @@ typedef struct PITCommonClass PITCommonClass;
->  DECLARE_OBJ_CHECKERS(PITCommonState, PITCommonClass,
->                       PIT_COMMON, TYPE_PIT_COMMON)
+> diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
+> index 344fd04db1..e536cc90be 100644
+> --- a/hw/intc/i8259.c
+> +++ b/hw/intc/i8259.c
+> @@ -37,10 +37,10 @@
 >  
-> -#define TYPE_I8254 "isa-pit"
-> +#define TYPE_PIT "isa-pit"
+>  //#define DEBUG_IRQ_LATENCY
+>  
+> -#define TYPE_I8259 "isa-i8259"
+> +#define TYPE_PIC "isa-i8259"
 
-I disagree with this patch, as we have various PIT and only one I8254.
+I disagree with this patch, as we have various PIC and only one I8259.
 
->  #define TYPE_KVM_I8254 "kvm-pit"
+>  typedef struct PICClass PICClass;
+>  DECLARE_CLASS_CHECKERS(PICClass, PIC,
+> -                       TYPE_I8259)
+> +                       TYPE_PIC)
 >  
->  static inline ISADevice *i8254_pit_init(ISABus *bus, int base, int isa_irq,
-> @@ -54,7 +54,7 @@ static inline ISADevice *i8254_pit_init(ISABus *bus, int base, int isa_irq,
->      DeviceState *dev;
->      ISADevice *d;
+>  /**
+>   * PICClass:
+> @@ -418,7 +418,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
 >  
-> -    d = isa_new(TYPE_I8254);
-> +    d = isa_new(TYPE_PIT);
->      dev = DEVICE(d);
->      qdev_prop_set_uint32(dev, "iobase", base);
->      isa_realize_and_unref(d, bus, &error_fatal);
-> diff --git a/hw/timer/i8254.c b/hw/timer/i8254.c
-> index c01ee2c72a..86f455f67e 100644
-> --- a/hw/timer/i8254.c
-> +++ b/hw/timer/i8254.c
-> @@ -39,7 +39,7 @@
+>      irq_set = g_new0(qemu_irq, ISA_NUM_IRQS);
 >  
->  typedef struct PITClass PITClass;
->  DECLARE_CLASS_CHECKERS(PITClass, PIT,
-> -                       TYPE_I8254)
-> +                       TYPE_PIT)
+> -    isadev = i8259_init_chip(TYPE_I8259, bus, true);
+> +    isadev = i8259_init_chip(TYPE_PIC, bus, true);
+>      dev = DEVICE(isadev);
 >  
->  struct PITClass {
->      PITCommonClass parent_class;
-> @@ -370,7 +370,7 @@ static void pit_class_initfn(ObjectClass *klass, void *data)
+>      qdev_connect_gpio_out(dev, 0, parent_irq);
+> @@ -428,7 +428,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
+>  
+>      isa_pic = dev;
+>  
+> -    isadev = i8259_init_chip(TYPE_I8259, bus, false);
+> +    isadev = i8259_init_chip(TYPE_PIC, bus, false);
+>      dev = DEVICE(isadev);
+>  
+>      qdev_connect_gpio_out(dev, 0, irq_set[2]);
+> @@ -451,7 +451,7 @@ static void i8259_class_init(ObjectClass *klass, void *data)
 >  }
 >  
->  static const TypeInfo pit_info = {
-> -    .name          = TYPE_I8254,
-> +    .name          = TYPE_PIT,
->      .parent        = TYPE_PIT_COMMON,
->      .instance_size = sizeof(PITCommonState),
->      .class_init    = pit_class_initfn,
+>  static const TypeInfo i8259_info = {
+> -    .name       = TYPE_I8259,
+> +    .name       = TYPE_PIC,
+>      .instance_size = sizeof(PICCommonState),
+>      .parent     = TYPE_PIC_COMMON,
+>      .class_init = i8259_class_init,
 > 
 
 
