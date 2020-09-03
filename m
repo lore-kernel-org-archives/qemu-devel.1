@@ -2,132 +2,144 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EA8C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 19:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE98C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 19:47:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54FC920767
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 19:45:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3155D20767
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 19:47:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L8gcVz+3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54FC920767
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="faX/qhry"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3155D20767
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDvAR-0007dY-Fe
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 15:45:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60778)
+	id 1kDvCd-0000bK-DB
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 15:47:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDv9I-0006m5-3v
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 15:43:56 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42429
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDv9F-0003FD-SE
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 15:43:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599162232;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=xSlJnMbTA/2XIvNl4myitKv5MRtFCHdjY8aZlcskhAc=;
- b=L8gcVz+3863iORVp4Cq54RJRr0edm9HKAx3DqzTt9DPhXgVNlji3KX/kt2bbDP1Ir8WZvB
- vetK8sBA90rCqHXYGo9PHFiWqSpg4G5ZfzsYG2M6uDbjYsGaa2hWWm0SkmC7l9s7gJGSpd
- KjCrZzXiHssgbLiXFmYVgzq/+Tt3SJU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-ltBtfzwHO7G7iUL24E3vrg-1; Thu, 03 Sep 2020 15:43:48 -0400
-X-MC-Unique: ltBtfzwHO7G7iUL24E3vrg-1
-Received: by mail-wm1-f69.google.com with SMTP id x6so1325977wmb.6
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 12:43:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=xSlJnMbTA/2XIvNl4myitKv5MRtFCHdjY8aZlcskhAc=;
- b=FnkBYHBPAfXadXHVFcG8Vb9Skwrqb2bbqIKSDyMTnLjpV9ms/8nYA0Qev0Ha/8f7P/
- xVpJx9nwLkXx0o8f+rsg8EIl7SaY+pDhdsdgwDwo0ANeQUeh+Fib/VcTYs1Z33LaDDJP
- DNcHjlY23NuyXY4aOljIk9pKCbHGzetzw9OXZBedP894pZBwUOiWMheOSRvz8glmM8b2
- /Y/OY+0LDh6kJdYJlY5nR+C8G4JnvxesYiYfTbAdMIFJVBhq3pYcr/QJ3eflXTB4agbm
- v4okGKu96U/xSWaIWlu2I4Yr94L0l61dMs/h5DYDKlpoTUVjurTxlFn04VCeY1WS9kth
- 8/3w==
-X-Gm-Message-State: AOAM533wiEKhlF3BJVYgwOhQfXnrVWVub1yCO/FuGDBWqFNtmulB5x9S
- vih4m7N0wjAWVpcQDAr51IK8wOEhIElbhl9ClxI29tHq2MWT+BUIzyyf6pKqNYuF4Db+7NdhN2g
- 66qmWl61bTVHcMD4=
-X-Received: by 2002:adf:ec92:: with SMTP id z18mr4325914wrn.53.1599162227269; 
- Thu, 03 Sep 2020 12:43:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyxOMMOc3Cd0DC2d87+PfGfR0g1AaEoHe/FGmvEYl+Pa8KZWsuUPfjlNjKWPKnLv1/kOHwbAA==
-X-Received: by 2002:adf:ec92:: with SMTP id z18mr4325890wrn.53.1599162227032; 
- Thu, 03 Sep 2020 12:43:47 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id r14sm6636195wrc.41.2020.09.03.12.43.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 12:43:46 -0700 (PDT)
-Subject: Re: [PATCH v1 8/8] migration: use pstrcpy to copy run state
-To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <20200903112107.27367-1-alex.bennee@linaro.org>
- <20200903112107.27367-9-alex.bennee@linaro.org>
- <CABgObfZCiQZ2RhriWj+xmCuYfAXVkXmAAJFKpNA7VS0avo4qUA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <8cddf56b-4115-579d-d4eb-524d2cad1385@redhat.com>
-Date: Thu, 3 Sep 2020 21:43:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
+ id 1kDvC0-0008Qt-Rm; Thu, 03 Sep 2020 15:46:44 -0400
+Received: from mail-bn7nam10on2055.outbound.protection.outlook.com
+ ([40.107.92.55]:57680 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
+ id 1kDvBy-0003db-8E; Thu, 03 Sep 2020 15:46:43 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dVoOObFd3xn7dlUcDQheRTfj+kTby8xXg0jQLbzVBMoxqpoFJblt/qhjeymVaQwmCoc4gFh8tMg5GGkdAInYNIFCRlV2lnALbRDUkVzVAph2HXSa3g/BkxfYXqPs1kYEjcQE5o8AdBFx48KVezs0ODWraUYs03sAPr9l14VpxwceOb0NSq/hcqzAgfKyV5pxJri4L8JMeg9yip5u+VToDqLHW7ba/WC9mTDVLEXP7UbTfU+VsHgAPl0vpyrKfyWSIgxDiIGZ6mEvEbzeprE7UEQAWGYX934rDDV9opukP/B8M1615jk3CPCjVS8jIvzJglp2kDgi21p9gK1FQM/7Sw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nI+4pNLAIOlb9AHbHxv15EWBM4H1fJKDHI9gck2x/CE=;
+ b=m+PxlgP+AOHXCCegJviM6Wa1e8pi9+si2UBwi+ua8hqy8PLIE/X3wP7gPyAjJIkyuL2lbs4GEouhQV42fkmQ0T/b45B+WsQuH2ZOvQ+pQv7SIo2GXoxjLB85ipyXqlvfBiMIEzWljoHF2miCwxm8MX42Ljaze+Q2LPzIb0FgmzAZtF8tTAbTETv9CeT/9XPKnbFEjpxW0IQ/PypfPop4C+iT3zytqdoH9WyvG0gjeX+vIS9RMkWfUDBkdJWcUJ/Uz24gCsQkvcLSoAtYrbQ9aDwXb+fKb7WGO4R8dC3hqdtdxsK4YuNnYf0L9DHBTIlV6+vnWdAVQwC2kdPR76ntdA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=twiddle.net smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=nI+4pNLAIOlb9AHbHxv15EWBM4H1fJKDHI9gck2x/CE=;
+ b=faX/qhryhnOQXns/ifek+4farfGvrIcUpwrOkFpcRmMiPpKNTXJxXNLDxzHzu47U/kkz0vQ0E5huTsX+LWEMowfZKi0i7BhBKvXiuwUh1ubCUXCU7QFjFC/6/FYMEcZx3nLG5CJOU02yr9zysJoNlnhtvkLa5jOXSp94ASIWF9c=
+Received: from MN2PR11CA0005.namprd11.prod.outlook.com (2603:10b6:208:23b::10)
+ by BYAPR02MB5656.namprd02.prod.outlook.com (2603:10b6:a03:96::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Thu, 3 Sep
+ 2020 19:46:37 +0000
+Received: from BL2NAM02FT055.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:208:23b:cafe::5a) by MN2PR11CA0005.outlook.office365.com
+ (2603:10b6:208:23b::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15 via Frontend
+ Transport; Thu, 3 Sep 2020 19:46:36 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; twiddle.net; dkim=none (message not signed)
+ header.d=none;twiddle.net; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ BL2NAM02FT055.mail.protection.outlook.com (10.152.77.126) with Microsoft SMTP
+ Server id 15.20.3326.19 via Frontend Transport; Thu, 3 Sep 2020 19:46:36
+ +0000
+Received: from [149.199.38.66] (port=50797 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kDvBl-0004OS-Hs; Thu, 03 Sep 2020 12:46:29 -0700
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp2.xlnx.xilinx.com)
+ by smtp.xilinx.com with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kDvBr-0005Up-9f; Thu, 03 Sep 2020 12:46:35 -0700
+Received: from xsj-pvapsmtp01 (smtp-fallback.xilinx.com [149.199.38.66] (may
+ be forged))
+ by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 083JkXB5027745; 
+ Thu, 3 Sep 2020 12:46:33 -0700
+Received: from [10.71.116.235] (helo=localhost)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kDvBp-0005Uj-18; Thu, 03 Sep 2020 12:46:33 -0700
+Date: Thu, 3 Sep 2020 21:46:29 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [RFC PATCH 00/12] hw: Forbid DMA write accesses to MMIO regions
+Message-ID: <20200903194629.GH14249@toto>
+References: <20200903110831.353476-1-philmd@redhat.com>
+ <658fdd16-33da-af3a-6d8d-f7ea1253f061@redhat.com>
+ <CAFEAcA8aOzq8UQwKiyuvJokBT9ui6JWxzf=T8=r13Vuu6+_kkQ@mail.gmail.com>
+ <20200903142410.GX2954729@toto>
+ <d030f14b-5b1d-6028-8fdd-5dbc25abdf74@redhat.com>
+ <20200903155023.GC14249@toto>
+ <9105d1fb-8064-076f-9408-ba94c889b765@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CABgObfZCiQZ2RhriWj+xmCuYfAXVkXmAAJFKpNA7VS0avo4qUA@mail.gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9105d1fb-8064-076f-9408-ba94c889b765@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: aafa8737-169e-4c84-945f-08d85042115f
+X-MS-TrafficTypeDiagnostic: BYAPR02MB5656:
+X-Microsoft-Antispam-PRVS: <BYAPR02MB56564E4E66DB14608167AAABC22C0@BYAPR02MB5656.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: aXp8lrAWeaY+evJnQsjxbcM79iR9BDPTFfn9pu219Lf8z/fWUdPkF0ZLobM9MsgeXfPa0ckoG4JPS5fGtXMtwt8n2ifO1zGBjzRO0qRgMeeaxSGGxlX/eDYDLFOlkjRrg3xXOlCMSCux1R4RiWegMF0ftUmEhvlVLeDue3Abl5faaKlza+Ol2OFEXf81Gm8nD/7nG3Zr8s3bFYFnr2EmBXWFuFNSP+8pYxZMFsr0/ZqcHiHiR9fU/joZTRwA5B5ntcvApNmfnxUe2aYs8bwcjCFE8Q2xXhDe5N801kEV1Nv0KuY0QRN57ltfCWI+45CwJNXSDBiX2oGjrCe4qrO3AHb7n3GLNxc7p4VqkO+fFaDnzozb9NLgVrBsgW0Oe112omIfsqzuCVtaU2/9HHMOGnM4j88PoRMPtwDWlvEL1u8=
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(7916004)(39860400002)(136003)(376002)(346002)(396003)(46966005)(426003)(82310400003)(8936002)(7416002)(478600001)(336012)(6666004)(9686003)(7406005)(33656002)(54906003)(5660300002)(186003)(47076004)(53546011)(70586007)(70206006)(83380400001)(1076003)(316002)(81166007)(82740400003)(8676002)(2906002)(9786002)(33716001)(356005)(6916009)(4326008)(26005)(42866002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2020 19:46:36.2015 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: aafa8737-169e-4c84-945f-08d85042115f
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT055.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB5656
+Received-SPF: pass client-ip=40.107.92.55; envelope-from=edgar@xilinx.com;
+ helo=NAM10-BN7-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 15:46:39
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,36 +152,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, Juan Quintela <quintela@redhat.com>,
- stefanb@linux.vnet.ibm.com, richard.henderson@linaro.org,
- qemu-devel <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "Emilio G. Cota" <cota@braap.org>, stefanha@redhat.com,
- marcandre.lureau@redhat.com, aurelien@aurel32.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
+ Li Qiang <liq3ea@163.com>, "Emilio G . Cota" <cota@braap.org>,
+ Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Robert Foley <robert.foley@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Tony Nguyen <tony.nguyen@bt.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Andrew Jeffery <andrew@aj.id.au>, Laszlo Ersek <lersek@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Klaus Jensen <k.jensen@samsung.com>, Peter Chubb <peter.chubb@nicta.com.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/3/20 2:13 PM, Paolo Bonzini wrote:
-> Il gio 3 set 2020, 13:21 Alex Bennée <alex.bennee@linaro.org
-> <mailto:alex.bennee@linaro.org>> ha scritto:
+On Thu, Sep 03, 2020 at 07:53:33PM +0200, Paolo Bonzini wrote:
+> On 03/09/20 17:50, Edgar E. Iglesias wrote:
+> >>> Hmm, I guess it would make sense to have a configurable option in KVM
+> >>> to isolate passthrough devices so they only can DMA to guest RAM...
+> >>
+> >> Passthrough devices are always protected by the IOMMU, anything else
+> >> would be obviously insane^H^H^Hecure. :)
+> > 
+> > Really? To always do that blindly seems wrong.
+> > 
+> > I'm refering to the passthrough device not being able to reach registers
+> > of other passthrough devices within the same guest.
 > 
->     The gcov build triggered:
+> Ah okay; sorry, I misunderstood.  That makes more sense now!
 > 
->       ../../migration/global_state.c:47:5: error: ‘strncpy’ specified
->           bound 100 equals destination size [-Werror=stringop-truncation]
->           strncpy((char *)global_state.runstate
-> 
->     As we shouldn't be using strncpy anyway lets use the suggested
->     pstrcpy.
-> 
-> 
-> This is wrong, we want the all-zeros behavior of strncpy that pstrcpy lacks.
+> Multiple devices are put in the same IOMMU "container" (page table
+> basically), and that takes care of reaching registers of other
+> passthrough devices.
 
-FWIW links to previous discussions:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg584216.html
+Thanks, yes, that's a sane default. What I was trying to say before is that
+it may make sense to allow the user to "harden" the setup by selectivly
+putting certain passthrough devs on a separate group that can *only*
+DMA access guest RAM (not other device regs).
 
-> 
-> Paolo
+Some devs need access to other device's regs but many passthrough devs don't
+need DMA access to anything else but RAM (e.g an Ethernet MAC).
 
+That could mitigate the damage caused by wild DMA pointers...
+
+Cheers,
+Edgar
 
