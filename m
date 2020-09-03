@@ -7,73 +7,74 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC733C43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD7FC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:52:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 65B7D20797
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59F0B20678
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:52:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYnhSvU/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65B7D20797
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D6OtWzvO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59F0B20678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDx7a-000630-Ct
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:50:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59526)
+	id 1kDx9G-0000Vj-Jm
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:52:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwM4-00051A-SZ; Thu, 03 Sep 2020 17:01:13 -0400
-Received: from mail-oo1-xc29.google.com ([2607:f8b0:4864:20::c29]:34350)
+ id 1kDwLw-0004xH-Qx; Thu, 03 Sep 2020 17:01:04 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38621)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwM3-0007sf-5s; Thu, 03 Sep 2020 17:01:12 -0400
-Received: by mail-oo1-xc29.google.com with SMTP id k63so1135286oob.1;
- Thu, 03 Sep 2020 14:01:10 -0700 (PDT)
+ id 1kDwLv-0007qK-2y; Thu, 03 Sep 2020 17:01:04 -0400
+Received: by mail-oi1-x244.google.com with SMTP id y6so4514878oie.5;
+ Thu, 03 Sep 2020 14:01:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=ooJ5JWX44T4rpsVTQbxVK9w+LAQEjZ1790XiAupTrvE=;
- b=cYnhSvU/5APT+omor5i3Awsj9iTcCzyuAF5bA/l9EI4PrN7otvAu3MEhZKF78vkYZ8
- AX2CJ1sAfKGs0/t7UntU0PdCZQaBFTck38wW0a9jNGjSgCxFI8LUkvBRuUv2vkbC+Q1d
- hSD20VxrSIXstJblKSwUpCkNIFqO8HcVnTMrLdlzcflWAVHfeXXV8T/P1OaA6IeUP05P
- HZ2EM15h6jXlEOckjfthQLDIkc9inMcduKqeLcSl3c5uscEutv3Vqxb82Mi0mgh5Yi7v
- Fwgkooh4eZqroxeWnm4rrfVtgAs2Ekn5A28Uonadg8cNJ/Y4oi8GpjbZ0CkQni0xs0FZ
- 2RSA==
+ bh=6sopWa3b6iZGsfPhmep7blcBK54TQmJ/CkRAM88fyYE=;
+ b=D6OtWzvOyBZyNVF95/oyLszPwT+KpsjiXUqf5If8bU/Qh9imETvmnlLZ5HBTscqARJ
+ ib1/jSk1dY74B0l6b9KngunO2f0wpDC2qDGgara55qPNifZlF4K2WCbuHZGd7sQeO62b
+ cZyo11JCQKog4m3OtBT++xIs2JJNfh8LmNIeXZT6LR8Q7lbiB0PizCs3yu7pJa1kOvqM
+ sRAQwfDQPBUhFDVYleGZC4RT6HjiDK4RMyg2Av0jyRXT6UYD3OVrb5aTn/IpXbwAzv9C
+ qtdTB9YpoypGG/G7pzhcsS8AduWxtG6pFjipkTeBosMK9oKfqyDpADDkKZvt37VrjBYD
+ ZKzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=ooJ5JWX44T4rpsVTQbxVK9w+LAQEjZ1790XiAupTrvE=;
- b=kO2fiqurucrOSPUA7mZ+HDorOkEveEAaPf54vpqWSAPlP4cugLFb/OLYbAr5RgaLfv
- knGsiesypq+8HYwEYUfx/Zo/NFYF5Stjl8IYzYPEoTRglcVY6VnPlSv+5VkXTAQNA3Pp
- brWyRICw75QjGwKhAjGBy+eyqm7DULr1vjI4gpX6zrJ3ZFmtu9pdzr75UflB7FRIDB53
- VQYPfvy5mXC+Xq0diV7wbAYNfdDBtLf6v1+dpTithaWoSsu+5vXtEVHudnLSNrAheBxI
- QiumHnUHHTT1EHbZbr3JAoAi/Z5E/OfJrNgGPnhLH+fIkCug4FY1fUJv4izGqf9luy8b
- F4uA==
-X-Gm-Message-State: AOAM531eaYupr9jrV5/44HgXhW7VUdO0sy5arXzQ2w6GmESP+vwn0wed
- AvJZxCW0KAbT0TW5F2eh/JiTa1k/s0jE8g==
-X-Google-Smtp-Source: ABdhPJyrt/U04xIvJZzUVYMcbP/+B4V5yliYVgNS1ZJeIkJYJvEMJ/WKD6rDWMmPYyXbbkRSqGNAPA==
-X-Received: by 2002:a4a:d549:: with SMTP id q9mr3347752oos.74.1599166869225;
- Thu, 03 Sep 2020 14:01:09 -0700 (PDT)
+ bh=6sopWa3b6iZGsfPhmep7blcBK54TQmJ/CkRAM88fyYE=;
+ b=PCGdQW9I2Bs8kc6Is/x0QXF74xEfeem/D+Q76g1xDc0p30RRQqm6ccWRKUPRuBp8Uh
+ 06JcOH6wnIkLTG0uHc1JDkYvbZLZ/o2EEWaC5blFBM75vu/cO1fQdl0eJMNKDVanwFiZ
+ GgouRplkDJnkhOl865PGiCJb8W3FpSS/b0dLpu04UM/w4gS5Inaxnmgbg2vyZAvagYAl
+ TRDqLWUAlp+k3eWr1YkdwoSCNtxkVIKuoob3xG45tYjTH2XCpcMz40bbjUJZTEQfuCdb
+ 7LYpHzRyGRD3j+xEi4k84wnFrf/LTNWrNCyxM4omXT9d0ThIssjqKfsbiIpkERt922Y9
+ iEWw==
+X-Gm-Message-State: AOAM530pzpVsPKQAE/y8azGeLVvxt/4FKEWvfOdtfVqz4mQOoIrqzngU
+ Pg74ebj//4enax3s9h80bweVw1a4KidAKg==
+X-Google-Smtp-Source: ABdhPJwaXRhtMv8BjNSUOl5LHh7UrzWk7yp+3GyL2TEth7DIsNbbgZTJ7QJKGX6/mPSynAQSXDFwzw==
+X-Received: by 2002:aca:4b95:: with SMTP id y143mr3410873oia.121.1599166860982; 
+ Thu, 03 Sep 2020 14:01:00 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id e9sm814941oog.10.2020.09.03.14.01.08
+ by smtp.gmail.com with ESMTPSA id l23sm766436otk.79.2020.09.03.14.01.00
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:01:08 -0700 (PDT)
+ Thu, 03 Sep 2020 14:01:00 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 65/77] virtio: list legacy-capable devices
-Date: Thu,  3 Sep 2020 15:59:23 -0500
-Message-Id: <20200903205935.27832-66-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 60/77] virtio-balloon: Prevent guest from starting a report
+ when we didn't request one
+Date: Thu,  3 Sep 2020 15:59:18 -0500
+Message-Id: <20200903205935.27832-61-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c29;
- envelope-from=flukshun@gmail.com; helo=mail-oo1-xc29.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -96,91 +97,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, qemu-stable@nongnu.org,
+Cc: Alexander Duyck <alexander.h.duyck@linux.intel.com>, qemu-stable@nongnu.org,
  "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cornelia Huck <cohuck@redhat.com>
+From: Alexander Duyck <alexander.h.duyck@linux.intel.com>
 
-Several types of virtio devices had already been around before the
-virtio standard was specified. These devices support virtio in legacy
-(and transitional) mode.
+Based on code review it appears possible for the driver to force the device
+out of a stopped state when hinting by repeating the last ID it was
+provided.
 
-Devices that have been added in the virtio standard are considered
-non-transitional (i.e. with no support for legacy virtio).
+Prevent this by only allowing a transition to the start state when we are
+in the requested state. This way the driver is only allowed to send one
+descriptor that will transition the device into the start state. All others
+will leave it in the stop state once it has finished.
 
-Provide a helper function so virtio transports can figure that out
-easily.
-
-Signed-off-by: Cornelia Huck <cohuck@redhat.com>
-Message-Id: <20200707105446.677966-2-cohuck@redhat.com>
+Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
+Acked-by: David Hildenbrand <david@redhat.com>
+Signed-off-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Message-Id: <20200720175115.21935.99563.stgit@localhost.localdomain>
 Cc: qemu-stable@nongnu.org
-Acked-by: Halil Pasic <pasic@linux.ibm.com>
 Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 7c78bdd7a3d0086179331f10d1f6f8cdac34731a)
+(cherry picked from commit 20a4da0f23078deeff5ea6d1e12f47d968d7c3c9)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio.c         | 25 +++++++++++++++++++++++++
- include/hw/virtio/virtio.h |  2 ++
- 2 files changed, 27 insertions(+)
+ hw/virtio/virtio-balloon.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
-index b6c8ef5bc0..398fd4a305 100644
---- a/hw/virtio/virtio.c
-+++ b/hw/virtio/virtio.c
-@@ -27,6 +27,7 @@
- #include "hw/virtio/virtio-access.h"
- #include "sysemu/dma.h"
- #include "sysemu/runstate.h"
-+#include "standard-headers/linux/virtio_ids.h"
- 
- /*
-  * The alignment to use between consumer and producer parts of vring.
-@@ -3278,6 +3279,30 @@ void virtio_init(VirtIODevice *vdev, const char *name,
-     vdev->use_guest_notifier_mask = true;
- }
- 
-+/*
-+ * Only devices that have already been around prior to defining the virtio
-+ * standard support legacy mode; this includes devices not specified in the
-+ * standard. All newer devices conform to the virtio standard only.
-+ */
-+bool virtio_legacy_allowed(VirtIODevice *vdev)
-+{
-+    switch (vdev->device_id) {
-+    case VIRTIO_ID_NET:
-+    case VIRTIO_ID_BLOCK:
-+    case VIRTIO_ID_CONSOLE:
-+    case VIRTIO_ID_RNG:
-+    case VIRTIO_ID_BALLOON:
-+    case VIRTIO_ID_RPMSG:
-+    case VIRTIO_ID_SCSI:
-+    case VIRTIO_ID_9P:
-+    case VIRTIO_ID_RPROC_SERIAL:
-+    case VIRTIO_ID_CAIF:
-+        return true;
-+    default:
-+        return false;
-+    }
-+}
-+
- hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
- {
-     return vdev->vq[n].vring.desc;
-diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
-index b69d517496..198ffc7626 100644
---- a/include/hw/virtio/virtio.h
-+++ b/include/hw/virtio/virtio.h
-@@ -396,4 +396,6 @@ static inline bool virtio_device_disabled(VirtIODevice *vdev)
-     return unlikely(vdev->disabled || vdev->broken);
- }
- 
-+bool virtio_legacy_allowed(VirtIODevice *vdev);
-+
- #endif
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index e20f90dad4..a30a0c7bfa 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -466,7 +466,8 @@ static bool get_free_page_hints(VirtIOBalloon *dev)
+             ret = false;
+             goto out;
+         }
+-        if (id == dev->free_page_report_cmd_id) {
++        if (dev->free_page_report_status == FREE_PAGE_REPORT_S_REQUESTED &&
++            id == dev->free_page_report_cmd_id) {
+             dev->free_page_report_status = FREE_PAGE_REPORT_S_START;
+         } else {
+             /*
 -- 
 2.17.1
 
