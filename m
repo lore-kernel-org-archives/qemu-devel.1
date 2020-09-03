@@ -2,86 +2,83 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CE4C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53073C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:29:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4E77D2083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:28:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 018872078E
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:29:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ykEB5jKk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4E77D2083B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K31QKriK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 018872078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDnPZ-0004aw-7H
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:28:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37194)
+	id 1kDnQY-0005yc-4L
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:29:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kDnIx-0002hm-Td
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:21:23 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:51276)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDnPu-00055T-IU
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:28:34 -0400
+Received: from mail-ej1-x631.google.com ([2a00:1450:4864:20::631]:37972)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kDnIw-0007aD-2e
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:21:23 -0400
-Received: by mail-wm1-x342.google.com with SMTP id w2so2494747wmi.1
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:21:21 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDnPs-0008Op-SO
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:28:34 -0400
+Received: by mail-ej1-x631.google.com with SMTP id i22so3348039eja.5
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:28:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=3ol6/8ZnV+hKUM+GEucApUlAdOvqwrc7UlycrSSBdXg=;
- b=ykEB5jKkuQonv4sTg8MopB9Qu0oWWXi8OyApbAPA2tENo5DiVVBF6ft591aq7oT8hM
- HkaxtpsH2jGVsbG66BKRNfZJIPiNgVSauliyC5hI+Hx2DdEsQPg//k4AFA7wBFpxsitG
- 1M2/1YLvaEdN5/sCIiYvjrhHoUHyKIBgnfhA29twUImbngfHLm4NxFSfFx3SB6cHRqHd
- jyqJ+2cV3qI/KsWUZqQPflM4Izi2rjUCUAUPcBD48qA7WZlhYlzOi2epg99Ssz9XwRhG
- pHu9RxVHOmy/7tnsX0IYFjGj3D1x69gZCe3CQpz0SvBHk4NXIWrcSADvXC/LmdOL+qlu
- UafQ==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=f2Y/32ubcLIXu+Fx8yG/mdzu/9JOvOGnww1HfRFRsSA=;
+ b=K31QKriKcy/TAktk/Vbh17w+h4AXT/tCR8MUcg60+M0r/ZD4VEu3BdZ5fzjewjAr8Q
+ icXaagNnA6Q1sauog4wbFM9oz76X43H5pbh3asTUPcbPmbj6oxPq5uLiCxSINnwPHb9a
+ H83tiNshVXvCV69VRJZlrE+c4U229YLNBzCNiXyFyhXUv4/dziqPR7mssmMSofivpn82
+ DXg/zhUJIFz07Rls3aXhsjxywhZ0XzLoUs8hPtMvAkwSvScBup2PKZdq07TCnJYY+2ou
+ s13eCO+xUPDCXsBQkK6NNNyB4N0Ys8C8DXOc2bG6R90kim1mOd0MnwGA5NBGiLjXkzey
+ rVvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=3ol6/8ZnV+hKUM+GEucApUlAdOvqwrc7UlycrSSBdXg=;
- b=s2zZXLpuPkFTQFrUJqCJu7hgu2YL8INaVZrPTUASxswTedLZ2J+R9uKaE8Eut/RKU2
- drYwejVOE2sK12ES4r0WtEnPKAxvsNir4Jq8T7u+gMYzuo85JnNJR+1NeV5+c7cjKLaK
- c2WMaH8lxHS5pFt6BklKJh7YsRjCoODmWD19qf9d7YtSwqN/w3mrlN6G0T1jWk/3yLQR
- zexv68PtPy/48GiNoU+3vsgvC1Sr50CIr3VplGOlIBVlYo3pOqVVjhWTYSiUQxEwhdWt
- JEOo8qFHJJ+mKW0KBg6R6/IoJ2kuOz2cSs9M77TrgzOrjygtcdpAI0EOuZcm9LpB2ogM
- w8Xg==
-X-Gm-Message-State: AOAM532xhUzOni0jiMkt7LcaHfoHtbxoTXn62o+ZNo51Czj99jil+Dhm
- IuwVVv4DjgabF1oVlxB0jGkVcQ==
-X-Google-Smtp-Source: ABdhPJy+vfqskttAxRksrG9mUbClhfOiLwCn0V6rE08FXSJWqrt78XL7wOCuhFXNiiSFayln0B++BQ==
-X-Received: by 2002:a1c:4e08:: with SMTP id g8mr1935906wmh.53.1599132080719;
- Thu, 03 Sep 2020 04:21:20 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id g8sm3912454wmd.12.2020.09.03.04.21.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 04:21:12 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 58EC71FF92;
- Thu,  3 Sep 2020 12:21:08 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 6/8] tests/meson.build: fp tests don't need CONFIG_TCG
-Date: Thu,  3 Sep 2020 12:21:05 +0100
-Message-Id: <20200903112107.27367-7-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200903112107.27367-1-alex.bennee@linaro.org>
-References: <20200903112107.27367-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=f2Y/32ubcLIXu+Fx8yG/mdzu/9JOvOGnww1HfRFRsSA=;
+ b=JMJGfDiT5lbpfCug2p0L4QG3TC1wc1Rm5zp/jsVF1byw8a4rS3B5cnHsdOlua55bo5
+ BxlPXpShkhztZaCScOLWtf7/4vEc/3xNux/4A+4410utSQpBynKZD9aGZTlEDku2X9O5
+ BwqjGULojB3VzK4b+pIX3xROzyD1YuJAdMkTbYD2FdEOHfbz34XTXvObw+/2zRtEE9da
+ LLjY/CS4eC0VuShFtV3h/lOlnxoux0eMEZPHV2mnfX3F1eGayHr8OI8LBYlvspR2/jCQ
+ DJ7HHITE6R8asHig3syEM5MHbUhp6NNNdxSwWH1HfcsYZx4tJKpVAeqBmuPk7msEqMu6
+ 88PA==
+X-Gm-Message-State: AOAM5304+VjtAVYuki/PJA6o1Hd0MdGmCVZHjjcAQ6cHqyliz959NCSV
+ 3NGfHd5gCOXlpNxyTxAr1LaZF2gursU8K0WdHEkRQg==
+X-Google-Smtp-Source: ABdhPJz9tMoARJhmCl2kHHLm31mzSpOEJ8lUS85RWIkQQYP2yB4GVDoclIVe2ZzYiYU/nehhLZVi1zWRTFy1c8M28Xk=
+X-Received: by 2002:a17:906:d8ca:: with SMTP id
+ re10mr1578723ejb.382.1599132511255; 
+ Thu, 03 Sep 2020 04:28:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
+References: <20200902162206.101872-1-liq3ea@163.com>
+ <b840aab8-542d-af43-43e5-0a07f442b5d5@redhat.com>
+ <CAFEAcA9mvMaR5MJJ74Vv63TG6frWnMeSZA19Zxv8TUceudPUTQ@mail.gmail.com>
+ <CAKXe6SLYgkiTAYa81nppHUMEzoeGy3988OmrzZyw8-VY8ajE3w@mail.gmail.com>
+ <CAFEAcA9TEpfBmfOOtpfR9JCAFkMF0fy20L=DBVDTFaLp6J3Lfg@mail.gmail.com>
+ <CAKXe6SKgVo5HBL2Uf8AscEn5ohZOJZGLMmT3NZL5cEbcQzgivg@mail.gmail.com>
+In-Reply-To: <CAKXe6SKgVo5HBL2Uf8AscEn5ohZOJZGLMmT3NZL5cEbcQzgivg@mail.gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Sep 2020 12:28:20 +0100
+Message-ID: <CAFEAcA_yTWf2toD_R3ye_cYRZjGOeyrKTV6At2U6vtHn5iiYPg@mail.gmail.com>
+Subject: Re: [RFC 0/3] try to solve the DMA to MMIO issue
+To: Li Qiang <liq3ea@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::631;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x631.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,55 +100,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
- aurelien@aurel32.net
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@163.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alexander Bulekov <alxndr@bu.edu>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As the tests build only softfloat.c no actual TCG machinary is neede
-to test them (as is evidenced by GCC check-softfloat). Might as well
-fix the wording on Travis while at it.
+On Thu, 3 Sep 2020 at 12:24, Li Qiang <liq3ea@gmail.com> wrote:
+> Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B49=E6=9C=88=
+3=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=887:19=E5=86=99=E9=81=93=EF=BC=
+=9A
+> > No. Any device can have an inbound or outbound qemu_irq line.
+> > We use them not just for actual IRQ lines but for any
+> > situation where we need to pass an on-or-off signal from
+> > one device to another.
+>
+> Could you please provide some example, I haven't noticed this before.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- .travis.yml       | 2 +-
- tests/meson.build | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+Look at any device that calls qdev_init_gpio_in() or
+qdev_init_gpio_in_named() for an example of inbound signals.
+Outbound signals might be created via qdev_init_gpio_out(),
+qdev_init_gpio_out_named() or sysbus_init_irq().
 
-diff --git a/.travis.yml b/.travis.yml
-index 1d0ade0a133..65341634d02 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -138,7 +138,7 @@ jobs:
- 
- 
-     # Just build tools and run minimal unit and softfloat checks
--    - name: "GCC check-softfloat (user)"
-+    - name: "GCC check-unit and check-softfloat"
-       env:
-         - BASE_CONFIG="--enable-tools"
-         - CONFIG="--disable-user --disable-system"
-diff --git a/tests/meson.build b/tests/meson.build
-index fe2c6d8e6b6..bdcc5d75293 100644
---- a/tests/meson.build
-+++ b/tests/meson.build
-@@ -7,8 +7,9 @@ test('decodetree', sh,
-      workdir: meson.current_source_dir() / 'decode',
-      suite: 'decodetree')
- 
-+subdir('fp')
-+
- if 'CONFIG_TCG' in config_host
--  subdir('fp')
-   if 'CONFIG_PLUGIN' in config_host
-     subdir('plugin')
-   endif
--- 
-2.20.1
-
+thanks
+-- PMM
 
