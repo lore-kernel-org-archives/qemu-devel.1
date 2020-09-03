@@ -2,90 +2,90 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53073C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:29:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE62C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:29:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 018872078E
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:29:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C59CB2083B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:29:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="K31QKriK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 018872078E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nqWTbV0r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C59CB2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDnQY-0005yc-4L
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:29:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38862)
+	id 1kDnQf-0006CR-TY
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:29:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDnPu-00055T-IU
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:28:34 -0400
-Received: from mail-ej1-x631.google.com ([2a00:1450:4864:20::631]:37972)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDnMF-0008FP-AQ
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:24:47 -0400
+Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:38058)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDnPs-0008Op-SO
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:28:34 -0400
-Received: by mail-ej1-x631.google.com with SMTP id i22so3348039eja.5
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=f2Y/32ubcLIXu+Fx8yG/mdzu/9JOvOGnww1HfRFRsSA=;
- b=K31QKriKcy/TAktk/Vbh17w+h4AXT/tCR8MUcg60+M0r/ZD4VEu3BdZ5fzjewjAr8Q
- icXaagNnA6Q1sauog4wbFM9oz76X43H5pbh3asTUPcbPmbj6oxPq5uLiCxSINnwPHb9a
- H83tiNshVXvCV69VRJZlrE+c4U229YLNBzCNiXyFyhXUv4/dziqPR7mssmMSofivpn82
- DXg/zhUJIFz07Rls3aXhsjxywhZ0XzLoUs8hPtMvAkwSvScBup2PKZdq07TCnJYY+2ou
- s13eCO+xUPDCXsBQkK6NNNyB4N0Ys8C8DXOc2bG6R90kim1mOd0MnwGA5NBGiLjXkzey
- rVvQ==
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDnMD-0007wQ-H0
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:24:46 -0400
+Received: by mail-pf1-x430.google.com with SMTP id d22so2081175pfn.5
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:24:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=0LmdVTwRuqJjBmwvxMnNThS5SGGCNTfka4CWYwgut/k=;
+ b=nqWTbV0rOabku1CVg6hbqxiO00IAhgvb88ih7pIWvrY4XsqGZgag4u7pdCVTMTop3j
+ vH/6DPoy4Pd98MG8/wrZ19BgEyldLpLCCjELYbmstgtHblOOWC+UwbyT7zo/4rS1M7f3
+ ARWSpd5syklBM1XUUQEA3GOEqBLi8C9wvQsq20xo0z7sEaj4RFv4wUS+rjWnRqyX0hCW
+ goWWabDzKt9DB1826bTdZL4ZcFyX5844IM+qugic6i1D/jA2zdHliOHxM1NcZCwdiu7A
+ vCUtl1pc/vl4xMQgtTCyaEkk8bzMD+hirOjqJbvGNmqakK1EvMBytIGeA+qaITRjzm/X
+ Zg5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=f2Y/32ubcLIXu+Fx8yG/mdzu/9JOvOGnww1HfRFRsSA=;
- b=JMJGfDiT5lbpfCug2p0L4QG3TC1wc1Rm5zp/jsVF1byw8a4rS3B5cnHsdOlua55bo5
- BxlPXpShkhztZaCScOLWtf7/4vEc/3xNux/4A+4410utSQpBynKZD9aGZTlEDku2X9O5
- BwqjGULojB3VzK4b+pIX3xROzyD1YuJAdMkTbYD2FdEOHfbz34XTXvObw+/2zRtEE9da
- LLjY/CS4eC0VuShFtV3h/lOlnxoux0eMEZPHV2mnfX3F1eGayHr8OI8LBYlvspR2/jCQ
- DJ7HHITE6R8asHig3syEM5MHbUhp6NNNdxSwWH1HfcsYZx4tJKpVAeqBmuPk7msEqMu6
- 88PA==
-X-Gm-Message-State: AOAM5304+VjtAVYuki/PJA6o1Hd0MdGmCVZHjjcAQ6cHqyliz959NCSV
- 3NGfHd5gCOXlpNxyTxAr1LaZF2gursU8K0WdHEkRQg==
-X-Google-Smtp-Source: ABdhPJz9tMoARJhmCl2kHHLm31mzSpOEJ8lUS85RWIkQQYP2yB4GVDoclIVe2ZzYiYU/nehhLZVi1zWRTFy1c8M28Xk=
-X-Received: by 2002:a17:906:d8ca:: with SMTP id
- re10mr1578723ejb.382.1599132511255; 
- Thu, 03 Sep 2020 04:28:31 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=0LmdVTwRuqJjBmwvxMnNThS5SGGCNTfka4CWYwgut/k=;
+ b=qbz6uykSCAqLs94tKyGjwQXfg0ZyiVGQCrlkFCjjr2e+iNgLCc367Z/29eByf7jmvE
+ Dl5whFjXXU+txGt3xMXAQOBLlCqrAhKB4qYw6BDyp/RaqPcmMc4PaZkPGFnmj8+nIOkD
+ JaBOfRAi1Zb2YDaY9gblQ5wQIYdf2d5AaP1dJVZ4rx4ke3n/wkKUyDDJf3ui0MxHOy/a
+ H0Sde0kZI4jYhpgxNO+UWmHZnek9a2HYrRsI7efxyd+o9O9UHPAPR2ZOEQKLese1BWW4
+ MGMfCUwi7pJbSdydLjXZXVXPuhdlyEyJmV9yOePBJ3qLhE1qjsVn3a98mW2Qxw/EhwD1
+ bJhg==
+X-Gm-Message-State: AOAM532kkAEhj2vAMbYKxC4+ldlYejNZnI7LJlObKTCSua9XzF0ZxOTx
+ aGBKBM6/VwEki0YUEhLKeUJS1LxDRBChTqtr
+X-Google-Smtp-Source: ABdhPJwKpIQ4bbPU+jT6ut0hqjIhDxvs4ahn+If1qhZofm8Bxl8gZp/9tQWnZS+6vEbIBL7FmwNbBg==
+X-Received: by 2002:a63:b202:: with SMTP id x2mr2504429pge.432.1599132283607; 
+ Thu, 03 Sep 2020 04:24:43 -0700 (PDT)
+Received: from localhost.localdomain ([222.95.248.6])
+ by smtp.googlemail.com with ESMTPSA id y3sm2394249pjg.8.2020.09.03.04.24.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 04:24:42 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/2] tests: try to disable make check blocker for msys2
+Date: Thu,  3 Sep 2020 19:24:22 +0800
+Message-Id: <20200903112423.1765-2-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20200903112423.1765-1-luoyonggang@gmail.com>
+References: <20200903112423.1765-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-References: <20200902162206.101872-1-liq3ea@163.com>
- <b840aab8-542d-af43-43e5-0a07f442b5d5@redhat.com>
- <CAFEAcA9mvMaR5MJJ74Vv63TG6frWnMeSZA19Zxv8TUceudPUTQ@mail.gmail.com>
- <CAKXe6SLYgkiTAYa81nppHUMEzoeGy3988OmrzZyw8-VY8ajE3w@mail.gmail.com>
- <CAFEAcA9TEpfBmfOOtpfR9JCAFkMF0fy20L=DBVDTFaLp6J3Lfg@mail.gmail.com>
- <CAKXe6SKgVo5HBL2Uf8AscEn5ohZOJZGLMmT3NZL5cEbcQzgivg@mail.gmail.com>
-In-Reply-To: <CAKXe6SKgVo5HBL2Uf8AscEn5ohZOJZGLMmT3NZL5cEbcQzgivg@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Sep 2020 12:28:20 +0100
-Message-ID: <CAFEAcA_yTWf2toD_R3ye_cYRZjGOeyrKTV6At2U6vtHn5iiYPg@mail.gmail.com>
-Subject: Re: [RFC 0/3] try to solve the DMA to MMIO issue
-To: Li Qiang <liq3ea@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::631;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x631.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::430;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x430.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,31 +100,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Li Qiang <liq3ea@163.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Alexander Bulekov <alxndr@bu.edu>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 3 Sep 2020 at 12:24, Li Qiang <liq3ea@gmail.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B49=E6=9C=88=
-3=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=887:19=E5=86=99=E9=81=93=EF=BC=
-=9A
-> > No. Any device can have an inbound or outbound qemu_irq line.
-> > We use them not just for actual IRQ lines but for any
-> > situation where we need to pass an on-or-off signal from
-> > one device to another.
->
-> Could you please provide some example, I haven't noticed this before.
+tests/test-char are stuck forever on msys2, disable it first
 
-Look at any device that calls qdev_init_gpio_in() or
-qdev_init_gpio_in_named() for an example of inbound signals.
-Outbound signals might be created via qdev_init_gpio_out(),
-qdev_init_gpio_out_named() or sysbus_init_irq().
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ tests/Makefile.include | 2 ++
+ 1 file changed, 2 insertions(+)
 
-thanks
--- PMM
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 497f1f21ff..c645e8972a 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -130,7 +130,9 @@ ifndef CONFIG_TSAN
+ # Some tests: test-char, test-qdev-global-props, and test-qga,
+ # are not runnable under TSan due to a known issue.
+ # https://github.com/google/sanitizers/issues/1116
++ifeq ($(CONFIG_POSIX),y)
+ check-unit-$(CONFIG_SOFTMMU) += tests/test-char$(EXESUF)
++endif
+ check-unit-$(CONFIG_SOFTMMU) += tests/test-qdev-global-props$(EXESUF)
+ ifeq ($(CONFIG_GUEST_AGENT),y)
+ check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) += tests/test-qga$(EXESUF)
+-- 
+2.28.0.windows.1
+
 
