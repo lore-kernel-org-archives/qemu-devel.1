@@ -2,97 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63309C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB446C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:24:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28A49206EB
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:21:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5F4A206EB
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 14:24:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gIhpjMXC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28A49206EB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B0VhFD5r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5F4A206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDq73-00032M-3y
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 10:21:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58598)
+	id 1kDqAY-0004pX-QP
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 10:24:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kDq64-0002NB-25; Thu, 03 Sep 2020 10:20:16 -0400
-Received: from mail-qv1-xf44.google.com ([2607:f8b0:4864:20::f44]:42432)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kDq9x-000493-Km; Thu, 03 Sep 2020 10:24:17 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:42217)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kDq61-0006Xx-U1; Thu, 03 Sep 2020 10:20:15 -0400
-Received: by mail-qv1-xf44.google.com with SMTP id h1so1367971qvo.9;
- Thu, 03 Sep 2020 07:20:12 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kDq9v-0007Dr-MG; Thu, 03 Sep 2020 10:24:17 -0400
+Received: by mail-lj1-x242.google.com with SMTP id k25so3909848ljg.9;
+ Thu, 03 Sep 2020 07:24:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EL387opXsbxjQQWX54Vru1qGfL4aj0+Ej5NNFBYQ5QI=;
- b=gIhpjMXCa1Oytq6IuBP0T0VH3qm05joQhSg5ZLGg72llvVdFUTO3VjzcRuR3H6P/dU
- KnNUoG9YOhJoUj2KQKyRhfYzb0mlOGZw9gJ5VqKFFk5STgNIja8iMzoXbMxaSuF0pYbL
- WSdm3SXTRMyuGle5K2KqASO/mdVjaz7zOGjNzgRonh6njyziaf9o5B4lZbhWrfU2is1Q
- rumU1vBEcG3oCxhBuJqg4ZCBlPQ30mj6BXl0qLXb1uAmORhrrh29rJHImN3Wt8AWGcvj
- EUznEitxM0ScOCynkmku+BuYw+wn/7Gdzqc7Ok7708+Py94GoUWgC4jiYys+Ypfozrh6
- 7irg==
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=1Pxtu2TSawMuPOEKskQiWWu2+rEYKtX4Wt8sb23KmNs=;
+ b=B0VhFD5rvL278QYwv1PAM54Nljg7nwMnD+vW5QETtSJIbvUre//dJHnyZjx7OGUCLH
+ BiltzmNJFnImRHm+jzTje06vr5lthl+LnCjdykhFbQo+YHQeJejsHjZZScizFD7HDwlg
+ sOagTlG+rK/suT33MFljV61Dhe+CoiAf/y65fScnKw4wY45lOzIbQK9Auru9T2vK2JEx
+ coZe5tavqwfaBMguKkcAI084wRMcpFr8BSQ5Xc9i4BRpIZSijXoAX8uaMZn4g1hIB+wp
+ d5dtot6DFGOZ5tXqw4rWh/O/R67PNvimU6VANTFGyOkQzFC18uxc5pPi8YSOeVeRvA9m
+ g2ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EL387opXsbxjQQWX54Vru1qGfL4aj0+Ej5NNFBYQ5QI=;
- b=MqemQ5wJe9UnG516+DEKnqyM9aVC88oSg1B+ZOOUMCZ+fQquxnVMt0w1FZTzNhgZ2P
- o4ycTfFQrlDIasoaWmUGFhhw8W3JnjUWV20Rq3dvTYviwKZuYJc+72CGLl8dRGt1AUfF
- sbIqtiSrG//lNZoaQd9IlMASrG6pBihZVq8X/nNLTGhF1pXOrWw1phj9FwDnTL4MApe9
- /WYrOwBL3HvD7+wDzNcuWXuSMxA3I8JAsBhsARjEKy+YsUZOUfCD3XjTj76soJHik8xh
- 5tmTZE4njU+PFlxF2Vg7dykxmxwWjm+qQpACw7HOwRv3ky1z0VJNSAZH5mMfKj1CajtV
- 4qhw==
-X-Gm-Message-State: AOAM533DcA7e/3teSZyLyipkKHXifhUa0dSENBh+6wC8PxHVdxBVIQUR
- HFSRMELeRpK3wznDxVgXi53a0Z7o208=
-X-Google-Smtp-Source: ABdhPJy0Ju2dnQNU3I1VWPRgRspfVVIPiaI0ZyqV65TqZm80Or7HKeeAuUb7gcGLgJfu6+53pL35CQ==
-X-Received: by 2002:a0c:eac5:: with SMTP id y5mr2149785qvp.2.1599142811706;
- Thu, 03 Sep 2020 07:20:11 -0700 (PDT)
-Received: from ?IPv6:2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca?
- ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
- by smtp.gmail.com with ESMTPSA id e13sm2061717qtr.85.2020.09.03.07.20.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 07:20:10 -0700 (PDT)
-Subject: Re: [PATCH v2 6/7] spapr_numa: move NVLink2 associativity handling to
- spapr_numa.c
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200901125645.118026-1-danielhb413@gmail.com>
- <20200901125645.118026-7-danielhb413@gmail.com>
- <20200903015632.GL1897@yekko.fritz.box>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <606dd354-5c95-9112-1c0f-919e142c9df8@gmail.com>
-Date: Thu, 3 Sep 2020 11:20:08 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=1Pxtu2TSawMuPOEKskQiWWu2+rEYKtX4Wt8sb23KmNs=;
+ b=HML+VaioaXDULFrO6+H/TeMiycFqOQdKs/aFCSFhd/i1fNdIHHsCphYpJAqg4/4wn/
+ By/IKdhtjOTtr2MjxGulLb1e9fVIYpdZ2AByuRsjZjn5U3RfYqc34CSnNA7ZzDoNYUIb
+ r0J+FbsxVbJS090+Ft1XiQAnm91Zjp4LBXiIOdnmuQWKY9E0z7YelvoMIaqt0UwNPzHB
+ +POJqcAbDs9g2UV+oJ9QXIv5suVauHASjtDbji6HEA7TME2pnoJ6UJVnEjYeHPvDCPwl
+ 7iQdN2FGVRYo/39BHVNPObbukXsmb03NiQiE2+zbCuq0eMr+Q3RJiznkQ1iNoN7YKFmo
+ KgIg==
+X-Gm-Message-State: AOAM531BBj0cl2wWBStVY6ZX+ANQ+anBGYgP0QNky2Jdx2KmeLChGebi
+ 3S/+7CqBNeeCvny92RmpWgA=
+X-Google-Smtp-Source: ABdhPJyRLAajHN8MYzt5fOHW79oUEFM546mlXn3bSraQVV5Q0dWwUaJloOB8RpoTGY/QsaKu5TsEpQ==
+X-Received: by 2002:a2e:3a19:: with SMTP id h25mr1379166lja.398.1599143052266; 
+ Thu, 03 Sep 2020 07:24:12 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id 25sm630112lji.130.2020.09.03.07.24.11
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 07:24:11 -0700 (PDT)
+Date: Thu, 3 Sep 2020 16:24:10 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC PATCH 00/12] hw: Forbid DMA write accesses to MMIO regions
+Message-ID: <20200903142410.GX2954729@toto>
+References: <20200903110831.353476-1-philmd@redhat.com>
+ <658fdd16-33da-af3a-6d8d-f7ea1253f061@redhat.com>
+ <CAFEAcA8aOzq8UQwKiyuvJokBT9ui6JWxzf=T8=r13Vuu6+_kkQ@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <20200903015632.GL1897@yekko.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::f44;
- envelope-from=danielhb413@gmail.com; helo=mail-qv1-xf44.google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFEAcA8aOzq8UQwKiyuvJokBT9ui6JWxzf=T8=r13Vuu6+_kkQ@mail.gmail.com>
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, NICE_REPLY_A=-2.403,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -107,159 +99,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Robert Foley <robert.foley@linaro.org>,
+ "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Qemu-block <qemu-block@nongnu.org>, Li Qiang <liq3ea@163.com>,
+ Laszlo Ersek <lersek@redhat.com>, "Emilio G . Cota" <cota@braap.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Joel Stanley <joel@jms.id.au>,
+ Richard Henderson <rth@twiddle.net>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>,
+ =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Tony Nguyen <tony.nguyen@bt.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Andrew Jeffery <andrew@aj.id.au>, Klaus Jensen <k.jensen@samsung.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 9/2/20 10:56 PM, David Gibson wrote:
-> On Tue, Sep 01, 2020 at 09:56:44AM -0300, Daniel Henrique Barboza wrote:
->> This patch adds a new spapr_numa_write_assoc_nvlink2() helper
->> to handle the ibm,associativity for NVLink2 GPUs.
->>
->> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+On Thu, Sep 03, 2020 at 02:58:19PM +0100, Peter Maydell wrote:
+> On Thu, 3 Sep 2020 at 14:37, Laszlo Ersek <lersek@redhat.com> wrote:
+> > Peter mentions an approach at the end of
+> > <https://bugs.launchpad.net/qemu/+bug/1886362/comments/5> that I believe
+> > to understand, but -- according to him -- it seems too much work.
 > 
-> Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+> It also would only be effective for MMIO, not for qemu_irq lines...
 > 
-> It might be nice to "precompute" the assoc arrays for the gpus as you
-> now do for the regular numa nodes.  That can be a later revision, though.
-
-Hmm ... I have the follow-up series with the NUMA calculation ready, and
-one of the steps I had to take there was to initiate all the associativity
-arrays with 'node_id' instead of leaving unintialized (reason: the kernel
-make associativity matches with zeroes). In the end I'm initializing every
-numa node as we do with GPUs.
-
-I'll bring some of this future code to this series and handle GPUs like
-a regular numa node as you suggested. Let's see how it goes.
-
-
-
-Thanks,
-
-DHB
-
+> > I don't think such chains work unto arbitrary depths on physical
+> > hardware either.
 > 
->> ---
->>   hw/ppc/spapr_numa.c         | 23 +++++++++++++++++++++++
->>   hw/ppc/spapr_pci_nvlink2.c  | 19 ++-----------------
->>   include/hw/ppc/spapr_numa.h |  3 +++
->>   3 files changed, 28 insertions(+), 17 deletions(-)
->>
->> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
->> index 9eb4bdbe80..785cc24624 100644
->> --- a/hw/ppc/spapr_numa.c
->> +++ b/hw/ppc/spapr_numa.c
->> @@ -15,6 +15,8 @@
->>   #include "hw/ppc/spapr_numa.h"
->>   #include "hw/ppc/fdt.h"
->>   
->> +/* Moved from hw/ppc/spapr_pci_nvlink2.c */
->> +#define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
->>   
->>   void spapr_numa_associativity_init(MachineState *machine)
->>   {
->> @@ -114,6 +116,27 @@ int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void *fdt,
->>       return ret;
->>   }
->>   
->> +void spapr_numa_write_assoc_nvlink2(void *fdt, int offset, int numa_id,
->> +                                    SpaprPhbState *sphb)
->> +{
->> +    uint32_t associativity[NUMA_ASSOC_SIZE];
->> +    int i;
->> +
->> +    associativity[0] = cpu_to_be32(MAX_DISTANCE_REF_POINTS);
->> +    for (i = 1; i < NUMA_ASSOC_SIZE; i++) {
->> +        associativity[i] = cpu_to_be32(numa_id);
->> +    };
->> +
->> +    if (sphb->pre_5_1_assoc) {
->> +        associativity[1] = SPAPR_GPU_NUMA_ID;
->> +        associativity[2] = SPAPR_GPU_NUMA_ID;
->> +        associativity[3] = SPAPR_GPU_NUMA_ID;
->> +    }
->> +
->> +    _FDT((fdt_setprop(fdt, offset, "ibm,associativity", associativity,
->> +                      sizeof(associativity))));
->> +}
->> +
->>   /*
->>    * Helper that writes ibm,associativity-reference-points and
->>    * max-associativity-domains in the RTAS pointed by @rtas
->> diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
->> index 76ae77ebc8..662a0af990 100644
->> --- a/hw/ppc/spapr_pci_nvlink2.c
->> +++ b/hw/ppc/spapr_pci_nvlink2.c
->> @@ -29,6 +29,7 @@
->>   #include "qemu/error-report.h"
->>   #include "hw/ppc/fdt.h"
->>   #include "hw/pci/pci_bridge.h"
->> +#include "hw/ppc/spapr_numa.h"
->>   
->>   #define PHANDLE_PCIDEV(phb, pdev)    (0x12000000 | \
->>                                        (((phb)->index) << 16) | ((pdev)->devfn))
->> @@ -37,8 +38,6 @@
->>   #define PHANDLE_NVLINK(phb, gn, nn)  (0x00130000 | (((phb)->index) << 8) | \
->>                                        ((gn) << 4) | (nn))
->>   
->> -#define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
->> -
->>   typedef struct SpaprPhbPciNvGpuSlot {
->>           uint64_t tgt;
->>           uint64_t gpa;
->> @@ -360,13 +359,6 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
->>           Object *nv_mrobj = object_property_get_link(OBJECT(nvslot->gpdev),
->>                                                       "nvlink2-mr[0]",
->>                                                       &error_abort);
->> -        uint32_t associativity[] = {
->> -            cpu_to_be32(0x4),
->> -            cpu_to_be32(nvslot->numa_id),
->> -            cpu_to_be32(nvslot->numa_id),
->> -            cpu_to_be32(nvslot->numa_id),
->> -            cpu_to_be32(nvslot->numa_id)
->> -        };
->>           uint64_t size = object_property_get_uint(nv_mrobj, "size", NULL);
->>           uint64_t mem_reg[2] = { cpu_to_be64(nvslot->gpa), cpu_to_be64(size) };
->>           char *mem_name = g_strdup_printf("memory@%"PRIx64, nvslot->gpa);
->> @@ -376,14 +368,7 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
->>           _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")));
->>           _FDT((fdt_setprop(fdt, off, "reg", mem_reg, sizeof(mem_reg))));
->>   
->> -        if (sphb->pre_5_1_assoc) {
->> -            associativity[1] = SPAPR_GPU_NUMA_ID;
->> -            associativity[2] = SPAPR_GPU_NUMA_ID;
->> -            associativity[3] = SPAPR_GPU_NUMA_ID;
->> -        }
->> -
->> -        _FDT((fdt_setprop(fdt, off, "ibm,associativity", associativity,
->> -                          sizeof(associativity))));
->> +        spapr_numa_write_assoc_nvlink2(fdt, off, nvslot->numa_id, sphb);
->>   
->>           _FDT((fdt_setprop_string(fdt, off, "compatible",
->>                                    "ibm,coherent-device-memory")));
->> diff --git a/include/hw/ppc/spapr_numa.h b/include/hw/ppc/spapr_numa.h
->> index f6127501a6..b6e0721b07 100644
->> --- a/include/hw/ppc/spapr_numa.h
->> +++ b/include/hw/ppc/spapr_numa.h
->> @@ -15,6 +15,7 @@
->>   
->>   #include "hw/boards.h"
->>   #include "hw/ppc/spapr.h"
->> +#include "hw/pci-host/spapr.h"
->>   
->>   void spapr_numa_associativity_init(MachineState *machine);
->>   void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas);
->> @@ -24,6 +25,8 @@ int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
->>                               int offset, PowerPCCPU *cpu);
->>   int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void *fdt,
->>                                            int offset);
->> +void spapr_numa_write_assoc_nvlink2(void *fdt, int offset, int numa_id,
->> +                                    SpaprPhbState *sphb);
->>   
->>   
->>   #endif /* HW_SPAPR_NUMA_H */
+> Real hardware by and large doesn't get designed with this kind
+> of DMA-to-self as a consideration either, but unfortunately it's
+> not really very useful as a model to base QEMU's behaviour on:
 > 
+>  (1) real hardware is usually massively parallel, so the logic
+>   that handles incoming MMIO is decoupled anyway from logic
+>   that does outgoing DMA. (Arguably the "do all DMA in a
+>   bottom-half" idea is kind of following the hardware design.)
+>   Similarly simple "raise this outbound signal" logic just
+>   works as an instantaneous action that causes the device on
+>   the other end to change its state/do something parallel,
+>   whereas for QEMU we need to actually call some code in the
+>   device on the other end and so we serialize this stuff,
+>   sandwiching a bit of "device B code" in the middle of a
+>   run of "device A code". So a lot more of this stuff "just
+>   happens to work" on h/w than we get with QEMU.
+>  (2) if software running on real h/w does do something silly with
+>   programming a device to DMA to itself then the worst case is
+>   generally that they manage to wedge that device (or the whole
+>   machine, if you're really unlucky), in which case the response
+>   is "don't do that then". There isn't the same "guest code
+>   can escape the VM" security boundary that QEMU needs to guard
+>   against [*].
+> 
+> [*] I do wonder about hardware-device-passthrough setups; I
+> don't think I would care to pass through an arbitrary device
+> to an untrusted guest...
+
+Hmm, I guess it would make sense to have a configurable option in KVM
+to isolate passthrough devices so they only can DMA to guest RAM...
+
+Cheers,
+Edgar
 
