@@ -2,93 +2,98 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 947BBC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:26:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DEF6C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:26:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2419420775
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:26:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45E1120758
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:26:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Qxs7suyw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2419420775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GrsvskKe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E1120758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDs3w-0004gl-S9
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:26:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35796)
+	id 1kDs46-0005eP-H9
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:26:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmc-0007yg-UL
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:18 -0400
-Received: from mout.gmx.net ([212.227.17.20]:47263)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmb-0007m4-5r
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1599149271;
- bh=jNYZ3H6m2XWVrcJ9B8h4Agdnq/9+ccN+LxZ5qPDMllg=;
- h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=Qxs7suyw09h6ss9YUGIuRqXiFmY99g+M+88s6nUJQxnKnjm86KYOm0wykhnbh2RU8
- NnJwbhQcrnKVZvaU/w8hT18LOi2KtO2LAvTBUA1tndMX1lNRPtu3XoZ7ydX9eB0gOr
- AghgBtKa1pl06u+qs+MxTGs+b1j7ujo5sNnSTvMY=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.fritz.box ([92.116.138.28]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MnJlc-1kx89z2u7Y-00jF4M; Thu, 03
- Sep 2020 18:07:51 +0200
-From: Helge Deller <deller@gmx.de>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL 08/10] hw/display/artist: Verify artist screen resolution
-Date: Thu,  3 Sep 2020 18:07:44 +0200
-Message-Id: <20200903160746.27491-9-deller@gmx.de>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200903160746.27491-1-deller@gmx.de>
-References: <20200903160746.27491-1-deller@gmx.de>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDs3B-0004mc-SU
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:25:25 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:45489)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDs39-0001sZ-5r
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:25:25 -0400
+Received: by mail-pg1-x543.google.com with SMTP id 67so2526474pgd.12
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 09:25:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=d55bjfYXbIsQpM11ZH3ArJgmncniHoUsc9n8g/hvS9w=;
+ b=GrsvskKegSWpkZmawPLF6i9hwKpDysPHBPo50N/Mb6qU5go/tEB6im10njk8YzvFBd
+ BYZYmAXxZydDY1ohw64zNd31eekMxEdim/XbDSUJ0gRYhTx9shdiLspVZuzO+ult3aUa
+ CGq3Lr61hcO85/1WVKj34InXQImqMrSAbmGSiPPcaMC2cY+DjktfR0P4cn7DTBsVylJb
+ QcaHhNJyz69MvVUNvIP7SMJy3znK5trMR3KSN/pkKd/JEwGaaGnJIzv6RbCM3PyLOSCj
+ EpUMyVgkMLUlBxLP+El3iANjmIIVhHbB841VIbcmwRBsOquez7Rs+g1J02MK5tV5PGbz
+ V2oA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=d55bjfYXbIsQpM11ZH3ArJgmncniHoUsc9n8g/hvS9w=;
+ b=RvwGDZIGacuTm13SVxQBMjPU//9ovJK2CzHoxKgZquhf1smQJd3Y8eBDrNoQQuAWk0
+ 6SA2kRSuk8CpL1j52cIfxU+PtklkzU391hVFjZmEDopiPMTwg1sfLKINzQppE2h6MRdl
+ FKNhvfBYulKSy6keVRk8CPWq/3uFG9V3nQtsSnSoeHoJgqYqsj/DqJ4QqoE1nkFpyreN
+ xgZPOPIYx1LgceFBNSFiBwz7n/arM7/6QFIpGlxM6yoeF5u6vc1CBX1QjLqK661drymY
+ zfYsX79cF+tv5ky1AOE9KciS0lGu4BKkFNRMZtJrDMuW+ZCg/UXThXsGlKLNp+ASwmD3
+ PCsw==
+X-Gm-Message-State: AOAM532hDF6OPNvwf6g9BAx/gFOVCWmChWwt2ik4uxchVSD1Qa7oU6sB
+ Vswf1bVi8LuEz7A//MdJdsLXnWCxp5X14A==
+X-Google-Smtp-Source: ABdhPJzg7xlKAX6lcW2i4SCZrN4xzbT9NJBOKpVYiWHLf7FkjWlwIsr3Tqwnumap78U62/FPtJta4Q==
+X-Received: by 2002:a63:3d41:: with SMTP id k62mr3438216pga.87.1599150320475; 
+ Thu, 03 Sep 2020 09:25:20 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id q71sm3132304pja.9.2020.09.03.09.25.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Sep 2020 09:25:19 -0700 (PDT)
+Subject: Re: [PATCH 1/3] target/arm: Convert Neon 3-same-fp size field to MO_*
+ in decode
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200903133209.5141-1-peter.maydell@linaro.org>
+ <20200903133209.5141-2-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <d4329a97-d20b-f47a-ddca-cc42cb190ee7@linaro.org>
+Date: Thu, 3 Sep 2020 09:25:17 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:3P5bc689WyTFuaPWEFdjLSuL3vrHMqrEfh9hNRNY1S9foehOA9e
- qusKmtgdVBPMRGj13ZeyV6ZTOabTzXLk208vvBJxktrKfJkX5yID/NuStl7FOvQ2kTh5U3o
- nwy0yyckE/PJ4XUuSn+hKr/ee1LgZf1D7xJcqn7s+UHtJyf5f0cy7a9d+LAK9kI55VhUEsA
- duXLIRmxISxK8LY6bMF2g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uPdEJB2AaAo=:iO0TWr/sZ3I43/MlNH9hGm
- czhqcs1bTBM4X+XIigr3V2y+8iuQwXKKpemAvL74ZOrApGRlBP6SvZ5xNPH1ZftXo5zcXvv0b
- glyOCcDeACrXBTfq+pB/OY6h1LhYB3L6KRf/Ees9OYHeJQQ0lRUvkNs/cMPldJE3ATIJGKOUd
- xGm2O1EthrBbqaYKKrVLCBBaJF8eVaVJCWlmsHSBHxB8cC1wzauoc4Nt3JYZg/ptnonPOVj1r
- IrBgNFJqjr2rv7PfEg9SmDfcUxsBa5S/oK0rFRbZrOPtNayASDp7z4f5HprDSVweExJgLKTmB
- 0KEFkBqfYhTGZOJHPN5tEgjgVFyAwPxgq4pUe6JOZlRTkCHmIuvktl3G56pf5CGIHXtwbF31R
- jsjXvfEjg66YlgmGNckY35vNUgxqvlBMcEyjNfr2a+8TFyuohpcV1Ao5U0HSfrbQVb7R17jtI
- MKc/638mIsKfZwIjjQrDtrsxF/8d/5m8U12ksl3SWLF5Cr0F/cCRzgs6n1kUH4NO42zM07v83
- vdtYCEMX+OMo4yLtChVwZhBIhyN5q/Q9HniLR0tgrxgQ/opCRz7yybWf4NIevnqrNRWNfQEFc
- tecLDcYQ/ufgmcniS/OR1gddXMfVuHYknQLsb36PhOoQORHZYztNzuysD5ZopJ/AcKkZg9ctD
- fJePOPhOMZRwIXf8Hu5A3mbedoihcyq8G2lbGGpVEU+0sOWXkAxTeV20O3MNsRO02DKJdtuy7
- sF6fO+kIIat12EcUMkd09XYVGX0+u15pl9iU5MqfbJWKQ5qtBHUDmXAXAeny0KWLiCEIcIE+Y
- vvfI9rKI+2A+kawVR5xWAHRnDLKbejnRdGAZn0GuMSi0p1DCFInmn/emRN9qihyxq/bzUmGc1
- CnIqHZ1RI3s880q/t2tLoh+ojiutyLtOBKVk8cbl/xz9XKnnix6KcexJ37wVf1RVwwOprGuqO
- 5af9+ADv8fTJOu9tx0kGHoh/etf6AvlT/teupWYRTYHKPQgkhQhMS7s1TYjer2nTrPfGqMREB
- TZcxVqrEaTd0BQ10tB1ardM/+v+nyD7B8Lb9L73qU0GiOT6hFDstbbtn5EWbIr85V+rF1qLJt
- T6d2U4VA1OezJ0Iyfn9yRUyk1xtNWgNTZg44NgXKtZ9CCPrxJ6em9yRyrTIKDeo5eEPmtpaoc
- By4VSINInE0IywApzT+voaBeC70rsKOX5gVLXPZsYOJ5asYsVQNHGJMF/imobjQVUBPo7a+eG
- Zl3Qpocd3YrtfhNTJ
-Received-SPF: pass client-ip=212.227.17.20; envelope-from=deller@gmx.de;
- helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 12:08:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200903133209.5141-2-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -44
+X-Spam_score: -4.5
+X-Spam_bar: ----
+X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.403,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,53 +106,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>,
- Richard Henderson <richard.henderson@linaro.org>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Artist hardware is limited to 2048 x 2048 pixels.
-STI ROMs allow at minimum 640 x 480 pixels.
+On 9/3/20 6:32 AM, Peter Maydell wrote:
+> In the Neon instructions, some instruction formats have a 2-bit size
+> field which corresponds exactly to QEMU's MO_8/16/32/64.  However the
+> floating-point insns in the 3-same group have a 1-bit size field
+> which is "0 for 32-bit float and 1 for 16-bit float".  Currently we
+> pass these values directly through to trans_ functions, which means
+> that when reading a particular trans_ function you need to know if
+> that insn uses a 2-bit size or a 1-bit size.
+> 
+> Move the handling of the 1-bit size to the decodetree file, so that
+> all these insns consistently pass a size to the trans_ function which
+> is an MO_8/16/32/64 value.
+> 
+> In this commit we switch over the insns using the 3same_fp and
+> 3same_fp_q0 formats.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-Qemu users can adjust the screen size on the command line with:
- -global artist.width=3D800 -global artist.height=3D600
-but we need to ensure that the screen size stays inside the given
-boundaries, otherwise print an error message and adjust.
-
-Signed-off-by: Helge Deller <deller@gmx.de>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-=2D--
- hw/display/artist.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
 
-diff --git a/hw/display/artist.c b/hw/display/artist.c
-index 71982559c6..ff1532fdc1 100644
-=2D-- a/hw/display/artist.c
-+++ b/hw/display/artist.c
-@@ -1374,6 +1374,18 @@ static void artist_realizefn(DeviceState *dev, Erro=
-r **errp)
-     struct vram_buffer *buf;
-     hwaddr offset =3D 0;
 
-+    if (s->width > 2048 || s->height > 2048) {
-+        error_report("artist: screen size can not exceed 2048 x 2048 pixe=
-l.");
-+        s->width =3D MIN(s->width, 2048);
-+        s->height =3D MIN(s->height, 2048);
-+    }
-+
-+    if (s->width < 640 || s->height < 480) {
-+        error_report("artist: minimum screen size is 640 x 480 pixel.");
-+        s->width =3D MAX(s->width, 640);
-+        s->height =3D MAX(s->height, 480);
-+    }
-+
-     memory_region_init(&s->mem_as_root, OBJECT(dev), "artist", ~0ull);
-     address_space_init(&s->as, &s->mem_as_root, "artist");
+> ---
+> I wanted to call the field %3same_fp_size, but decodetree
+> doesn't seem to allow a field starting with a digit, even
+> though it does allow a format that starts with a digit.
+> So it's %fp_3same_size...
 
-=2D-
-2.21.3
+Odd.  All of the names get prefixed, so we don't have a problem of a digit
+beginning a C identifier...  I can look at fixing this if you want.
 
+
+r~
 
