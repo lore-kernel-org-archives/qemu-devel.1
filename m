@@ -2,90 +2,94 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8F08C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:23:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B708C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F018206C0
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:23:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D6FA206C0
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:28:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pw6ju/X3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F018206C0
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lf8dQyo9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D6FA206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDvlk-0001O6-BO
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:23:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41396)
+	id 1kDvqe-0002us-Pf
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:28:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDvj7-0006EF-Tx
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:20:57 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41033)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDvpu-0002JI-Nq
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:27:58 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44578)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDvj6-00085J-4x
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:20:57 -0400
-Received: by mail-wr1-x444.google.com with SMTP id w5so4549786wrp.8
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 13:20:55 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDvps-0002C7-Rp
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:27:58 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 7so3014034pgm.11
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 13:27:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=cAXCKGC6VbvlDmQ7gtrKURJrxX8tvf9unlVaP2aE39c=;
- b=pw6ju/X3lBFbTFamqIZYwJnw6UGjyzawXYbBlpmmrV8aNUHdz9LHdf5N0cvyHIAvOw
- MwTtdkO42RuTV51u0RH3IeCPiMU8ijrOUIpjKXG0LXcf4uHZjpGwvoHgZcf3sQBlX4Jj
- /lUvTm2+lw4OJXeEdO2itLDNLjyQ7dalndm4e4+q5PmqjrIk2BS0kudPm4di/qmxRJEg
- 9kcJpZV68k1sWzX0GFvUK3zT8w5RN+H56R+C1KYORnOtOSmGyRf+N95F6ZXyP7KVJLku
- E4J8F/bk9t235GZcJMwRjx1q88oiTfsj8tY3yH9xm9YJzxrUeNEFb9HktSfU1/S8RzsS
- Ri6w==
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=aNKgomjsVStiCcw1WVtj8fziWdefoSubqFjUduvxK68=;
+ b=Lf8dQyo9oy5PXxFgs2JxQfWfc7mt/ynF4mppqju/6snVSTtqrAtG9atpPufcz1z8YL
+ R63hTtMjD7CVyRk54US7HwA9eZiUVbNYZe23Te6jNCUNXgM8SxzlQ8w9IFeVI+UJ+PXM
+ JjNVG0vc6Ok7xt++kFjFe5zOVc7npkeUa0MlvbExXUtMtAdfymSx2SnLE7oPOtr2gbR8
+ 8+oh+8x3vH4O9nY1UUvmsotAOOD2iMQLuexu2ie5ayCO1hGvALzWqZ7tq0s6wBfK/SLV
+ sIGIk3BCIhtY3cV/YfTc7AEO+e4+NH5Y+syProsp5RD10Fh2ztze3Y5r5MgN+hbseNXf
+ 2JcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=cAXCKGC6VbvlDmQ7gtrKURJrxX8tvf9unlVaP2aE39c=;
- b=iL+HzkKGPs/lA51abvBpMJJirlgNzlDGbTEiBqEUrFESj/b/dEZ5dxR7H45oFq0xJT
- NePKNTw/95TXE/LZiY9YFZx9wrp37YKU1ittFUxEK101MX/dsJSxPcqidiiMXNYilcEk
- Euf14FjpWUi0sDxyh9L5SXNLy1YbrWQ5XuZSgJ7qe2Yy3FOBDpcT5ad4XMlYalyu7Fl9
- +glucbucoWIP5TUB0HoF1MlYjmHEgSVOWslbCsEbe+riFxAVGZzdo4eNj2TrQtRSpFbp
- HWrn+GbTYT2r5mHgODM+s9N2qpbfCrSBiLVrllKNq4ETIRoXkq3hlZJok+0+3yZGIO5e
- ze8w==
-X-Gm-Message-State: AOAM531m1/ZyFWkyMaKN2UY613cbL1KC749v7tjt8yhULvXJhPVJsVq2
- vhoUHkrna7y9VezMyuhp1+nOAQ==
-X-Google-Smtp-Source: ABdhPJxIGAN3pAeVfdbR20vNKGZLdfN9gKVwURb5u3+enOhEq5cahbjBJKQ1ZzPfmAPp6UdIWErlpQ==
-X-Received: by 2002:adf:8187:: with SMTP id 7mr4243412wra.266.1599164454877;
- Thu, 03 Sep 2020 13:20:54 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id p14sm7285023wrg.96.2020.09.03.13.20.53
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 13:20:54 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 3/3] docs/system/arm/mps2.rst: Make board list consistent
-Date: Thu,  3 Sep 2020 21:20:48 +0100
-Message-Id: <20200903202048.15370-4-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200903202048.15370-1-peter.maydell@linaro.org>
-References: <20200903202048.15370-1-peter.maydell@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aNKgomjsVStiCcw1WVtj8fziWdefoSubqFjUduvxK68=;
+ b=PAEac3Wd8eMPqf+JcP2qBwH5ZXGDuWC5RJ1dPiME5wFfLu7+KNX5FUEowlLygraqRC
+ SI6KEMMlDaZkB3BMvXM0M7PgeOAcyOIBoM+Oz+Fq+gnIYGvcu/HYDDp6HQpbbH4X/jyq
+ 20jLrNc1nvFwwAynx8QhkrSPmQL1mhTQERN167/CWh2YIC4mjAjCjfUZAT7ThB6jxFWn
+ Q7UxjVv/4kjzK0e9WuFZLgDLxXieJUC70Hv7MZ5n0RnhLaTvZteisVFvOgKDhCTkU4DD
+ BiqXUWwf16y7N+CdrmCK8BXO4PFFb4njs6ObUvtqA5d9nChoonXye2+73hJPd6eA53R6
+ ljUA==
+X-Gm-Message-State: AOAM533YT7QKZYhr9365kx2qOQs8qK8EBjecMJ6MBcvU4x4VYKOzwwMq
+ 6wtfXeJG4NVzr/e5lKoRM1lhjQ==
+X-Google-Smtp-Source: ABdhPJz+h2QtWb3JdWo7YLw+CKlR/cJA9/7bhOr65TuwYUxLZ6wqdKgpuiNCaH87MpJVVu2ZIAfCrA==
+X-Received: by 2002:a62:f241:: with SMTP id y1mr5357075pfl.206.1599164875069; 
+ Thu, 03 Sep 2020 13:27:55 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id fs24sm3248517pjb.8.2020.09.03.13.27.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Sep 2020 13:27:54 -0700 (PDT)
+Subject: Re: [PATCH v2] linux-user: fix implicit conversion from enumeration
+ type error
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20200902125752.1033524-1-laurent@vivier.eu>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c8ef9a9d-580a-8a72-aed1-b62e92a139fc@linaro.org>
+Date: Thu, 3 Sep 2020 13:27:51 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+In-Reply-To: <20200902125752.1033524-1-laurent@vivier.eu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -44
+X-Spam_score: -4.5
+X-Spam_bar: ----
+X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.403,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,52 +104,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kumar Gala <kumar.gala@linaro.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Filip Bozuta <Filip.Bozuta@syrmia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the list of MPS2 boards consistent in the phrasing of each
-entry, use the correct casing of "Arm", and move the mps2-an511
-entry so the list is in numeric order.
+On 9/2/20 5:57 AM, Laurent Vivier wrote:
+> MK_ARRAY(type,size) is used to fill the field_types buffer, and if the
+> "size" parameter is an enum type, clang [-Werror,-Wenum-conversion] reports
+> an error when it is assigned to field_types which is also an enum, argtypes.
+> 
+> To avoid that, convert "size" to "int" in MK_ARRAY(). "int" is the type
+> used for the size evaluation in thunk_type_size().
+> 
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> ---
 
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- docs/system/arm/mps2.rst | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-diff --git a/docs/system/arm/mps2.rst b/docs/system/arm/mps2.rst
-index 7f2e9c8d52e..8c5b5f1fe07 100644
---- a/docs/system/arm/mps2.rst
-+++ b/docs/system/arm/mps2.rst
-@@ -11,17 +11,17 @@ as seen by the guest depend significantly on the FPGA image.
- QEMU models the following FPGA images:
- 
- ``mps2-an385``
--  Cortex-M3 as documented in ARM Application Note AN385
-+  Cortex-M3 as documented in Arm Application Note AN385
- ``mps2-an386``
--  Cortex-M4 as documented in ARM Application Note AN386
-+  Cortex-M4 as documented in Arm Application Note AN386
- ``mps2-an500``
--  Cortex-M7 as documented in ARM Application Note AN500
--``mps2-an511``
--  Cortex-M3 'DesignStart' as documented in AN511
-+  Cortex-M7 as documented in Arm Application Note AN500
- ``mps2-an505``
--  Cortex-M33 as documented in ARM Application Note AN505
-+  Cortex-M33 as documented in Arm Application Note AN505
-+``mps2-an511``
-+  Cortex-M3 'DesignStart' as documented in Arm Application Note AN511
- ``mps2-an521``
--  Dual Cortex-M33 as documented in Application Note AN521
-+  Dual Cortex-M33 as documented in Arm Application Note AN521
- 
- Differences between QEMU and real hardware:
- 
--- 
-2.20.1
-
+r~
 
