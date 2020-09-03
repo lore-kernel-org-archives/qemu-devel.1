@@ -2,91 +2,86 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6DC5C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:38:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2ECDC43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:54:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B26B20716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:38:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6D10120716
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:54:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m9Ew61LO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B26B20716
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMcPR8Ms"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D10120716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDxsD-0002lM-EA
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 18:38:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52254)
+	id 1kDy7r-0007WB-Ki
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 18:54:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
- id 1kDxrI-00023j-54
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 18:37:32 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40328)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDy76-0006sr-VL
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 18:53:52 -0400
+Received: from mail-lf1-x136.google.com ([2a00:1450:4864:20::136]:35088)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
- id 1kDxrG-0002ms-BH
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 18:37:31 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id gf14so2140355pjb.5
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 15:37:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kDy75-0004Ws-98
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 18:53:52 -0400
+Received: by mail-lf1-x136.google.com with SMTP id w11so2837787lfn.2
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 15:53:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=pav0OrE6Btb36xX/7Tp1ibEuKci58Ujxp0moi+WBeic=;
- b=m9Ew61LO+vzoZN7jt1WatM2Sglcm8loYFraIlluvyFSDA4annPxc1VoWYwkvRTJyww
- JSnMjB0/93UWPcFNFWAQBuL/iCDzfBvbmx8Q4AmE7KcKbfiS0rNJ+dqB1WS9QXIf/S9L
- 0rbxZewbp2dJo4tUu5jXU2a6ppvk7xtDaJ+qxpymj2nWObgl7SmKfPkTZ1QumA+WGm2u
- wA8Xqev4XlsDIYPw3UfBlETBq75FcnooYmr4d6r/Vw7aupKRvDe5ZzdCNOGGVBJUQEh6
- 86VVDt6AbKqsGq11VJh3sMJ/RBHdfK+tqmxeEFbwkTHKLKxVy4PtFSV5IulHWlHjirPW
- ADpA==
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=OHmspF4ygUEbZKBT9iLMTlLqW+uzsy56I3jTBJNzAlw=;
+ b=SMcPR8MsTz8gy5kCMu65MHF9KIznATdpo+8TJVJkqhAtvIsLB5ZOr5/vMaAT06MEoK
+ +Zv7bXOvrLD54On+qN5zx9WWRsyXjYdpCDeTIailz7yMnF64xFm4cGZ/R4jmW6D5SnlW
+ 7iOavFCRuImdcjl5JI0zkqIwHwkyGrkG4sxihCX8cOKR/y6WwKQJfrxacA50/hRSHqkh
+ 281CLEUPrbf3qPYKthC1fRGjic7i8Di2AFS2/jZ0xYfSfzGJZmv0XfXWZXbk8NEpAw7R
+ 3QyV6PBoMfaLXKKVDm156X9046jJWKNjtG+CiNJDxiluXfhP3GSz97zOI79IqL+qwkv/
+ kEHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=pav0OrE6Btb36xX/7Tp1ibEuKci58Ujxp0moi+WBeic=;
- b=rWLtx+rXdQBWgcLn4iLkO88AiINViOnNn8oe9WK53iXXQk4LnP5Bm200B2anJqtFZx
- 7Sbi7YTXKEKv2mFyg38NEeAYy4uw+51tM9Icho1Rr2qZ80EpfQ4Ach2fNDVxXC0LEqSb
- eL65lIFMeHn/qeIflJzokhd/VFFfdyeO0ZWfz9wtkB6pJHVWNKDHLs4aLl4/DgJRNGNR
- yjNu7O3slaQKDh1Wj8WnokkWPoDZNPn7GEpjzSo+5iF+QnTmXwubG99yQRUqpy1SWDlj
- pRJq4ASRrrbz8vOYdEQ4h3dnDvX2Mx84t3Rc7dpktYoSP8K6OZ8YgB/ZXPUWMBDPVilO
- wNxQ==
-X-Gm-Message-State: AOAM533a/EfYzk7vHbgab5AZwWKarmCqJo9e3WveK96hcymV/0zRuorK
- cxWQZlYwHMQ5lHkHKvVn+YUOXbc6OGw=
-X-Google-Smtp-Source: ABdhPJyI48MSA4vciEPNi0IGpz5Wdsm0TSKOfwhd6lG2PzbAYgTl1MhUESmYAlcFbokX53S1JByo0Q==
-X-Received: by 2002:a17:90a:e391:: with SMTP id
- b17mr5310328pjz.127.1599172648049; 
- Thu, 03 Sep 2020 15:37:28 -0700 (PDT)
-Received: from localhost.localdomain ([161.81.62.213])
- by smtp.gmail.com with ESMTPSA id o30sm3893345pgc.45.2020.09.03.15.37.26
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 15:37:27 -0700 (PDT)
-From: Tom Yan <tom.ty89@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] file-posix: split hdev_refresh_limits from raw_refresh_limits
-Date: Fri,  4 Sep 2020 06:37:21 +0800
-Message-Id: <20200903223721.84459-1-tom.ty89@gmail.com>
-X-Mailer: git-send-email 2.28.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=OHmspF4ygUEbZKBT9iLMTlLqW+uzsy56I3jTBJNzAlw=;
+ b=b5ttobEvbhQ9OGeBZ0YsDZZzKmO1lSWfinGqFCW7VKYNai1Dbvgyao3rWqTClHSyz+
+ TDqaLKGGTcL4Dmiy/nqbkZn9IxFmfOq5++j7kRqiSPDvUc6ORdjoZpOhvpyd1YQenAOA
+ 2jkBwPRPYDTiwn2wzT8lBhdvl1AsDH+BgLqFStFktXRSVF/wZfMktbZmgNgFMZHHNyea
+ pv1GgFURNrWECOjn3uqHeOuhvp/umwobDzPOpJEz6exo6MMOwru2jjavd9MGFgEz/Gzy
+ 6L+pQ14uZQ3h4TVXNFAb3iRGAxrF2ivvZUnV38Q6hWrYImX9Be5BZbTHBheiQ6UJ3GWA
+ ruAQ==
+X-Gm-Message-State: AOAM530zSXwMLrFjaifuA6zmWak3OqAGnY5vGyHgmGWxcIBBwKWcAYha
+ GUM73ZuFSlOUvjQlRatDrMln6fG1kNHOjFxJyFE=
+X-Google-Smtp-Source: ABdhPJzkbRH2qToBnVgEObYR7tVskGDm5yae/CxPfkBGJ5OOBuOVSJqIfMoxUxna/ok+d7LXmAvXmAxbg73QsUNEpQY=
+X-Received: by 2002:ac2:5541:: with SMTP id l1mr2391454lfk.89.1599173629440;
+ Thu, 03 Sep 2020 15:53:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=tom.ty89@gmail.com; helo=mail-pj1-x1043.google.com
+References: <CAE2XoE_TJ2T2eN82km0pYqDiqOpsd=waH4EmCe==0k=GYpj3Xg@mail.gmail.com>
+ <3d2db346-2517-f6e3-748d-79a8ae993e06@redhat.com>
+In-Reply-To: <3d2db346-2517-f6e3-748d-79a8ae993e06@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Fri, 4 Sep 2020 06:53:39 +0800
+Message-ID: <CAE2XoE_3Kjjk+tRz1y7rk94+vre2FSfmCGQVWNgjNW14vSNSdw@mail.gmail.com>
+Subject: Re: make -i check resut for msys2
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000001df7be05ae70a01a"
+Received-SPF: pass client-ip=2a00:1450:4864:20::136;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x136.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,106 +95,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tom Yan <tom.ty89@gmail.com>
+Reply-To: luoyonggang@gmail.com
+Cc: Xie Changlong <xiechanglong.d@gmail.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
+ Wen Congyang <wencongyang2@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-sg_get_max_transfer_length() and sg_get_max_segments() have nothing
-to do with the sg driver or SG_IO at all. They can be and should be
-used on all host devices / cdroms (on Linux).
+--0000000000001df7be05ae70a01a
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Also use MIN_NON_ZERO instead when we clamp max_sectors against
-max_segments.
+On Thu, Sep 3, 2020 at 10:33 PM Thomas Huth <thuth@redhat.com> wrote:
 
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
----
- block/file-posix.c | 39 ++++++++++++++++++++++-----------------
- 1 file changed, 22 insertions(+), 17 deletions(-)
+> On 03/09/2020 11.18, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+> [...]
+> >   TEST    check-unit: tests/test-replication.exe
+> > **
+> > ERROR:C:/work/xemu/qemu/tests/test-replication.c:136:make_temp:
+> > assertion failed: (fd >=3D 0)
+> > ERROR test-replication.exe - Bail out!
+> > ERROR:C:/work/xemu/qemu/tests/test-replication.c:136:make_temp:
+> > assertion failed: (fd >=3D 0)
+>
+> At least this one should be easy to fix: The test uses /tmp as
+> hard-coded directory for temporary files. I think it should use
+> g_get_tmp_dir() from glib to get that directory instead.
+>
+>  Thomas
+>
+> After fixes tmp path, how to fixes following error:
+$ tests/test-replication.exe
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 9a00d4190a..a38f43af4f 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1163,7 +1163,7 @@ static void raw_reopen_abort(BDRVReopenState *state)
-     s->reopen_state = NULL;
- }
- 
--static int sg_get_max_transfer_length(int fd)
-+static int get_max_transfer_length(int fd)
- {
- #ifdef BLKSECTGET
-     int max_bytes = 0;
-@@ -1178,7 +1178,7 @@ static int sg_get_max_transfer_length(int fd)
- #endif
- }
- 
--static int sg_get_max_segments(int fd)
-+static int get_max_segments(int fd)
- {
- #ifdef CONFIG_LINUX
-     char buf[32];
-@@ -1233,23 +1233,28 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
- {
-     BDRVRawState *s = bs->opaque;
- 
--    if (bs->sg) {
--        int ret = sg_get_max_transfer_length(s->fd);
-+    raw_probe_alignment(bs, s->fd, errp);
-+    bs->bl.min_mem_alignment = s->buf_align;
-+    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
-+}
- 
--        if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
--            bs->bl.max_transfer = pow2floor(ret);
--        }
-+static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
-+{
-+    BDRVRawState *s = bs->opaque;
- 
--        ret = sg_get_max_segments(s->fd);
--        if (ret > 0) {
--            bs->bl.max_transfer = MIN(bs->bl.max_transfer,
--                                      ret * qemu_real_host_page_size);
--        }
-+    int ret = get_max_transfer_length(s->fd);
-+
-+    if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
-+        bs->bl.max_transfer = pow2floor(ret);
-     }
- 
--    raw_probe_alignment(bs, s->fd, errp);
--    bs->bl.min_mem_alignment = s->buf_align;
--    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
-+    ret = get_max_segments(s->fd);
-+    if (ret > 0) {
-+        bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
-+                                           ret * qemu_real_host_page_size);
-+    }
-+
-+    raw_refresh_limits(bs, errp);
- }
- 
- static int check_for_dasd(int fd)
-@@ -3604,7 +3609,7 @@ static BlockDriver bdrv_host_device = {
-     .bdrv_co_pdiscard       = hdev_co_pdiscard,
-     .bdrv_co_copy_range_from = raw_co_copy_range_from,
-     .bdrv_co_copy_range_to  = raw_co_copy_range_to,
--    .bdrv_refresh_limits = raw_refresh_limits,
-+    .bdrv_refresh_limits = hdev_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-     .bdrv_attach_aio_context = raw_aio_attach_aio_context,
-@@ -3728,7 +3733,7 @@ static BlockDriver bdrv_host_cdrom = {
-     .bdrv_co_preadv         = raw_co_preadv,
-     .bdrv_co_pwritev        = raw_co_pwritev,
-     .bdrv_co_flush_to_disk  = raw_co_flush_to_disk,
--    .bdrv_refresh_limits = raw_refresh_limits,
-+    .bdrv_refresh_limits = hdev_refresh_limits,
-     .bdrv_io_plug = raw_aio_plug,
-     .bdrv_io_unplug = raw_aio_unplug,
-     .bdrv_attach_aio_context = raw_aio_attach_aio_context,
--- 
-2.28.0
 
+# random seed: R02Sdf2e4ffc0e6fbe96624598386b538927
+1..13
+# Start of replication tests
+# Start of primary tests
+Unexpected error in bdrv_open_inherit() at ../block.c:3456:
+Block protocol 'file' doesn't support the option 'locking'
+
+
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--0000000000001df7be05ae70a01a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Sep 3, 2020 at 10:33 PM Thoma=
+s Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wro=
+te:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
+0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 03/09/202=
+0 11.18, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:<br>
+[...]<br>
+&gt; =C2=A0 TEST =C2=A0 =C2=A0check-unit: tests/test-replication.exe<br>
+&gt; **<br>
+&gt; ERROR:C:/work/xemu/qemu/tests/test-replication.c:136:make_temp:<br>
+&gt; assertion failed: (fd &gt;=3D 0)<br>
+&gt; ERROR test-replication.exe - Bail out!<br>
+&gt; ERROR:C:/work/xemu/qemu/tests/test-replication.c:136:make_temp:<br>
+&gt; assertion failed: (fd &gt;=3D 0)<br>
+<br>
+At least this one should be easy to fix: The test uses /tmp as<br>
+hard-coded directory for temporary files. I think it should use<br>
+g_get_tmp_dir() from glib to get that directory instead.<br>
+<br>
+=C2=A0Thomas<br>
+<br></blockquote><div>After fixes tmp path, how to fixes following error:</=
+div>$ tests/test-replication.exe =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0<br># random =
+seed: R02Sdf2e4ffc0e6fbe96624598386b538927<br>1..13<br># Start of replicati=
+on tests<br># Start of primary tests<br>Unexpected error in bdrv_open_inher=
+it() at ../block.c:3456:<br><div>Block protocol &#39;file&#39; doesn&#39;t =
+support the option &#39;locking&#39;=C2=A0<br></div></div><br clear=3D"all"=
+><div><br></div>-- <br><div dir=3D"ltr" class=3D"gmail_signature">=C2=A0 =
+=C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=
+=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<br></d=
+iv></div>
+
+--0000000000001df7be05ae70a01a--
 
