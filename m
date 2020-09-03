@@ -2,103 +2,69 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D5CC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:46:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F70C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:47:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E325E2071B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:46:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D68432071B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:47:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZvjaqcJb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E325E2071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="h3gpRbXX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D68432071B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDpZC-0001C4-1H
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:46:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47588)
+	id 1kDpaM-0003Ft-Ix
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:47:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47666)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDpYE-0008K7-Ps
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:45:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59861)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDpYD-0001BD-8p
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:45:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599140716;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xnJGsFmE0lHc/vacaNXhWmico4HRbt/COcagt38PJC8=;
- b=ZvjaqcJbQ90ZEHy82JiSez2r3a83b1/ay+oq0QvlgYK/FbTbrHg0A3/jTWa2gPNdVT7w/v
- wkcfZsNufPrQxr+e9+cfymxWSQwcAMur1i7n4wPEJu7JjxbxbTopsxMJ7xxuPnquJGDOVA
- 3lFy9p7uCuUDc5j0NvR1e0LiCtohQcw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-qmwgOZ2jM9Gk9znvFWbkQg-1; Thu, 03 Sep 2020 09:45:14 -0400
-X-MC-Unique: qmwgOZ2jM9Gk9znvFWbkQg-1
-Received: by mail-wr1-f70.google.com with SMTP id b8so1110643wrr.2
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 06:45:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=xnJGsFmE0lHc/vacaNXhWmico4HRbt/COcagt38PJC8=;
- b=QXMvktCenDGx5WJt1ooXnmcM39T7hXqt1D0HyimpD/Jji9gq0CUNPlDnpDVu2LP55n
- a8ER4TOQYRRuFCUoRKyemzpHyyR3+37ZeCf72urfJggn/97vwYUwftQ53hJQN3A7RWbk
- ZQy6qQl//XWxMSZ13TJT8EdhrRa1RwDZEruX088NP5BIATD75ilq6rxlbYNf7LM4Ofc6
- Y79Ts0Zl4I3OaeHCIDzzkYPcMZSYiVjvOkfRAClJKm0XEamCjPl4Kl1sulVx8jH94TeD
- 0uLc63RcOQYFlANycX4FLCB+KwhLQhvwc6pkfRAMIgCd/x6PzVu4IvHjOFAeAwDFNgaj
- PtwA==
-X-Gm-Message-State: AOAM5309nbVKiRqXcD2XKcxvsIb7oHsA/MMPgJg/eCnRgspG+DA2MhO1
- wZ73ABIaxTnDcjpVSfJIm6sjtgwfn8474rrCrG2jeZOrj48ONPwejv/tdtZ529WNgKZRIldz48U
- 2SjKb1sdJRXlJaEE=
-X-Received: by 2002:a5d:68d1:: with SMTP id p17mr2498267wrw.378.1599140713414; 
- Thu, 03 Sep 2020 06:45:13 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxkd59juEn6Zi7SDnJ4jjLVol29LXybzqo3sRN18mbzyAzNizyapEc+rY3LZwa19TcFn2OUmA==
-X-Received: by 2002:a5d:68d1:: with SMTP id p17mr2498250wrw.378.1599140713266; 
- Thu, 03 Sep 2020 06:45:13 -0700 (PDT)
-Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id l10sm4408149wru.59.2020.09.03.06.45.12
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 06:45:12 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] hw/timer/hpet: Remove dead code
-Date: Thu,  3 Sep 2020 15:45:05 +0200
-Message-Id: <20200903134506.440082-2-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200903134506.440082-1-philmd@redhat.com>
-References: <20200903134506.440082-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kDpYY-0000Us-Dx; Thu, 03 Sep 2020 09:45:38 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:50401)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kDpYV-0001HF-Rf; Thu, 03 Sep 2020 09:45:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=7pIoZMluEev88/YnPH9xEwhij4qXIqgN02yDm2WS/Mk=; 
+ b=h3gpRbXXN4VZG6coG0I+YI5ZxrloTDxiRG2Nc+KiZNRcevPfLwgcTQJMRC+mdfCibbvDFk79LfV0G3pzmFmtF6rKTzdjq2mwcrvehBOuhn6FMjCxkktn05Cm8C+vtOHkKHRMHG4gn79IaPKJjP5eWW/GOIn29aB7o6xdpVEVelBPsYQp7caH7NOR7pn4nZ6Bk0gtArItlXPbbLxN+h+EcBELLVY1X2ibPBJzLdtBPfnw8NVlAWhIO3N0k+yJIcXx3U6RRKY+gfMVLyOh1+jRV0vUYyDYm/ErcctmCdbi7Bp2e8uEto2icSgDssIHxlyqru5OJnlNgiQbdlA9ZsGCdg==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1kDpYS-0000BS-1c; Thu, 03 Sep 2020 15:45:32 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1kDpYR-0000BR-OV; Thu, 03 Sep 2020 15:45:31 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Max Reitz <mreitz@redhat.com>, qemu-devel@nongnu.org
+Subject: Re: [PATCH] qcow2: Fix removal of list members from
+ BDRVQcow2State.cluster_allocs
+In-Reply-To: <3a45705f-563d-d5f9-bb1c-b94309c07a20@redhat.com>
+References: <20200902174230.12336-1-berto@igalia.com>
+ <3a45705f-563d-d5f9-bb1c-b94309c07a20@redhat.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Thu, 03 Sep 2020 15:45:31 +0200
+Message-ID: <w51pn73km84.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 09:45:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,47 +77,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-trivial@nongnu.org,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This code was never compiled/used, remove it.
+On Thu 03 Sep 2020 03:12:22 PM CEST, Max Reitz wrote:
+> On my search for /(\.|->)nb_clusters/ to verify this, I noticed this
+> comment for qcow2_alloc_cluster_offset():
+>
+>  * If the cluster was already allocated, m->nb_clusters is set to 0 and
+>  * other fields in m are meaningless.
+>
+> Should that be dropped, too?
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- hw/timer/hpet.c | 14 --------------
- 1 file changed, 14 deletions(-)
+Actually the whole comment should be rewritten (the function does not
+allocale just one cluster), I'll send v2 with that and the rest of your
+proposed changes.
 
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index 380acfa7c8a..b683f64f1d3 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -416,20 +416,6 @@ static void hpet_del_timer(HPETTimer *t)
-     update_irq(t, 0);
- }
- 
--#ifdef HPET_DEBUG
--static uint32_t hpet_ram_readb(void *opaque, hwaddr addr)
--{
--    printf("qemu: hpet_read b at %" PRIx64 "\n", addr);
--    return 0;
--}
--
--static uint32_t hpet_ram_readw(void *opaque, hwaddr addr)
--{
--    printf("qemu: hpet_read w at %" PRIx64 "\n", addr);
--    return 0;
--}
--#endif
--
- static uint64_t hpet_ram_read(void *opaque, hwaddr addr,
-                               unsigned size)
- {
--- 
-2.26.2
-
+Berto
 
