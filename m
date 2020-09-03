@@ -2,56 +2,58 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A531C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:57:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C17C2BBD0
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:57:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36A422072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:57:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3F3302072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:57:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CCHF2c2C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36A422072A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="K1kghDxR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F3302072A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDeVc-0001mu-8N
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 21:57:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43060)
+	id 1kDeVe-0001tE-CD
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 21:57:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kDeUm-00005w-1c; Wed, 02 Sep 2020 21:57:00 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:55997 helo=ozlabs.org)
+ id 1kDeUo-00006U-1L; Wed, 02 Sep 2020 21:57:02 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:60837 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kDeUj-0005bt-1H; Wed, 02 Sep 2020 21:56:59 -0400
+ id 1kDeUi-0005bq-Vv; Wed, 02 Sep 2020 21:57:01 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BhkSd2bYBz9sTp; Thu,  3 Sep 2020 11:56:49 +1000 (AEST)
+ id 4BhkSd1Sl0z9sTh; Thu,  3 Sep 2020 11:56:49 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1599098209;
- bh=rBlWEZQ01ggjZW9f7CpBFT7ZjV9RlvLxalPbKl1Tou0=;
+ bh=c5hJwvVzIUhJzr/+IMqqT130AZxkMgZlaDh6HCv3KjA=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=CCHF2c2CEf2AHBcRGq+3FCCxgrvAKtu6NkbBP/yeH/Dox8VBbJGnt+3rp3p4IUI+7
- BRytnDnQYXvvRqy2DSYMQMVBcj5Ld5sfa2B49JCbTZXoPrcklxRFZBefnHs/xs/MOW
- RWiOqIxbxiJ/lZCrJmrgsoLKQZp0DoEhbfWC7Ems=
-Date: Thu, 3 Sep 2020 11:49:04 +1000
+ b=K1kghDxRkZouFDqADI/BlD+PwoGVKeKJkGZcmWekp68RnYcrOqiA8fstzj/grcPyO
+ FFNT0TAZRibhnP+QYuh5Iy5vW+ZsqY19GzrTOLXTRXdTcVhMBbVa3V7vFvXeNgxRd4
+ 33kY7Cw3cTre09bVm9ktCQ/cdwqyWOBtZBD3fvLQ=
+Date: Thu, 3 Sep 2020 11:46:45 +1000
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v2 0/7] pseries NUMA distance rework
-Message-ID: <20200903014904.GJ1897@yekko.fritz.box>
+Subject: Re: [PATCH v2 7/7] spapr_hcall: h_home_node_associativity now reads
+ numa_assoc_array
+Message-ID: <20200903014645.GI1897@yekko.fritz.box>
 References: <20200901125645.118026-1-danielhb413@gmail.com>
- <20200903013539.GH1897@yekko.fritz.box>
+ <20200901125645.118026-8-danielhb413@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="apbmkPN6Hu/1dI3g"
+ protocol="application/pgp-signature"; boundary="Az4VpBrmI9+OyhK/"
 Content-Disposition: inline
-In-Reply-To: <20200903013539.GH1897@yekko.fritz.box>
+In-Reply-To: <20200901125645.118026-8-danielhb413@gmail.com>
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 20:05:08
@@ -80,41 +82,92 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---apbmkPN6Hu/1dI3g
+--Az4VpBrmI9+OyhK/
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Sep 03, 2020 at 11:35:39AM +1000, David Gibson wrote:
-> On Tue, Sep 01, 2020 at 09:56:38AM -0300, Daniel Henrique Barboza wrote:
-> > Hi,
-> >=20
-> > Following the reviews of the first version [1], specially this
-> > reply from David [2], I decided to take a step back and refactor
-> > all the code in hw/ppc/spapr* that operates with ibm,associativity,
-> > ibm,associativity-reference-points and ibm,max-associativity-domains.
-> >=20
-> > A new file named 'spapr_numa.c' was created to gather all the
-> > associativity related code into helpers that write NUMA/associativity
-> > related info to the FDT. These helpers are then used in other
-> > spapr_* files. This allows us to change NUMA related code in a
-> > single location, instead of searching every file to see where is
-> > associativity being written and how, and all the soon to get
-> > more complex logic can be contained in spapr_numa.c. I consider
-> > the end result to be better than what I ended up doing in v1.
-> >=20
-> > Unlike v1, there is no NUMA distance change being done in this series.
-> > Later on, the hub of the new NUMA distance calculation will be
-> > spapr_numa_associativity_init(), where we'll take into consideration
-> > user input from numa_states, handle sizes to what the PAPR kernel
-> > understands and establish assoaciativity domains between the NUMA
-> > nodes.
+On Tue, Sep 01, 2020 at 09:56:45AM -0300, Daniel Henrique Barboza wrote:
+> home_node_associativity reply now uses the associativity
+> values for tcpu->node_id provided by numa_assoc_array.
 >=20
-> Patches 1..4 applied to ppc-for-5.2.  Patch 5 has some nits I've
-> commented on.
+> This will avoid further changes in this code when numa_assoc_array
+> changes values, but it won't be enough to prevent further changes
+> if (falar aqui q se mudar o tamanho do array tem q mexer nessa
+> funcao tambem, falar q a macro associativity() deixa a automacao
+> de tudo mto unreadable)
 
-Ah, sorry, I realised I missed something.  Patches 1..2 are still
-applied, but patch 3 has a nit large enough to call for a respin.
+Uh.. I'm guessing that was a note to yourself you intended to
+translate before publishing?
+
+>=20
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+> ---
+>  hw/ppc/spapr_hcall.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index c1d01228c6..2ec30efdcb 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1878,9 +1878,13 @@ static target_ulong h_home_node_associativity(Powe=
+rPCCPU *cpu,
+>                                                target_ulong opcode,
+>                                                target_ulong *args)
+
+You could move this function to spapr_numa.c as well (the name's a bit
+misleading, but spapr_hcall.c isn't really intended to hold *all*
+hcall implementations, just the ones that don't have somewhere better
+to live).
+
+>  {
+> +    SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(spapr);
+>      target_ulong flags =3D args[0];
+>      target_ulong procno =3D args[1];
+>      PowerPCCPU *tcpu;
+> +    uint32_t assoc_domain1;
+> +    uint32_t assoc_domain2;
+> +    uint32_t assoc_domain3;
+>      int idx;
+> =20
+>      /* only support procno from H_REGISTER_VPA */
+> @@ -1893,13 +1897,21 @@ static target_ulong h_home_node_associativity(Pow=
+erPCCPU *cpu,
+>          return H_P2;
+>      }
+> =20
+> +    /*
+> +     * Index 0 is the ibm,associativity size of the node,
+> +     * which isn't relevant here.
+> +     */
+> +    assoc_domain1 =3D smc->numa_assoc_array[tcpu->node_id][1];
+> +    assoc_domain2 =3D smc->numa_assoc_array[tcpu->node_id][2];
+> +    assoc_domain3 =3D smc->numa_assoc_array[tcpu->node_id][3];
+
+Using all these temporaries is a little ugly.  Maybe do something like:
+	uint32_t *assoc =3D smc->numa_assoc_array[tcpu->node_id];
+
+Then just use assoc[1], assoc[2] etc. below.
+
+> +
+>      /* sequence is the same as in the "ibm,associativity" property */
+> =20
+>      idx =3D 0;
+>  #define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
+>                               ((uint64_t)(b) & 0xffffffff))
+> -    args[idx++] =3D ASSOCIATIVITY(0, 0);
+> -    args[idx++] =3D ASSOCIATIVITY(0, tcpu->node_id);
+> +    args[idx++] =3D ASSOCIATIVITY(assoc_domain1, assoc_domain2);
+> +    args[idx++] =3D ASSOCIATIVITY(assoc_domain3, tcpu->node_id);
+>      args[idx++] =3D ASSOCIATIVITY(procno, -1);
+>      for ( ; idx < 6; idx++) {
+>          args[idx] =3D -1;
+
+Better yet would be to make this handle an arbitrary length of assoc
+array, further isolating this from the specifics of how we construct
+the arrays.  Ideally, you'd call a common path with
+spapr_numa_fixup_cpu_dt() to get the assoc array for a cpu, then here
+just translate it into the in-register format the hcall expects.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -122,25 +175,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---apbmkPN6Hu/1dI3g
+--Az4VpBrmI9+OyhK/
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9QS5AACgkQbDjKyiDZ
-s5JbJhAA5b5EzsKJATY2U4pXrDkPcYPCvcRq9aALF4uG0OGyuCnSb29EZBMC4MSX
-w0Mpx7dkf7LQIb5G1qoSVw54ZcKRXKjKQC6vHXwe+Ax3RAn4R7ABTedP6KhR8rXE
-MxmK9ND9BYMp6n7mo0oewyYGCy8mc+cSBOJ4dzV5SrmaSlqmFyEGuecxPnujA8fh
-r+0CqsSxlTomopZKP+H4XAFlahqIndbLnTZ2cd5nt2Z2CS8iv4aBQz6D/Kom+iAo
-04LigwbRe5YhOym/DPQlWyiQtVIqZ4tm4qLHdR++zHnSe/po/VmDDVFkkLzYrrtB
-eHHtzrZwfi4Fxqs5E1YxK76X5xULK3fFlb3oi9+nvecvZUuk6vR7Qyuv27fQV5KW
-Ol0zWc2hOZgqDon7OqRYeHS8lOvcn052JO0lvTbgsNwBZBdmFtxhHNK2Xj6ld3Uz
-3CnkOafP7nGdmwKb9OmqUQ1MvsWBvQw/Bg3r77+eeR9qTWFuRgEBqIfDjonQGxcw
-DSH5P41UwhqIsV0x+55YFmHHTorNCx/YzGBvNU8m9KqPcB4M0i+zoHNgoJ3fKgo3
-Yts4W+rY4U3fJiehntcRWhBsPH/b8yPmZznIpKfHwlK+Zo5sUptXO9vQOOqwKt2l
-a2F9z3OCow7uxvZBbbnWNlxfMsB/RXuwO7v6SJza69uMBFx1fi0=
-=SIY3
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9QSwMACgkQbDjKyiDZ
+s5JD4A/8Cd1rDmHVS97kTvzzd97zjjXOtLaRp41QyhnR+XrytEpkComS6SoxOWE7
+x5XAjEBdQBS6MY3voCOxeMpSeVVoJ4vCAnI44Xl6F+OTpIXJG2DGyQi1mpJMgQuM
+hpJBiAiDaxFoew4gWIl1SaBHqhdPjGk3ssz5yvJHRQ+y+a+GvXUnKRbBp7LyY1dM
+qsq30YUXmeNvqarHsQgIMjJ213WFpOFcEhDQKbMQnCLBCQZmDTf1aCIIZENTfRqC
+p28j5G5cNdwqHi39vLjKOFYaGwlzz6bG3pBzn4a+c8hKlhQlyKWqVv56N1QB9ajp
+oe3Azchs7aNXWkV7iK31lV0wQ8wTq6+uRQ1uA3LW646U5Wq2nj//+pddUY5C5Iy1
+OfIv5Hvi3V/e7vXTUBqYGRXCOsuWWOzJsEtyvBVVZswI9gmO7RZhPF1s/PrWg6zd
+1Qx9i/5P1IAfxZ/kT4WFMaZVyGXHB56slIjTYe1oapYdNP8M1ebZOVVe4TLGKY1f
+CCLiB4DpEaNJXNayiYgPRQLoj+zfXl9wLT/9j6SdGjU9Ha3u/fgOZUqjxdROtKTR
+BvCU3rn/sBo2UtO2EKiNJFHeHi51G4E0TkmPk6YKVuekhuzYB7L//JQBMRnH0SdJ
+kvbg0nEx66iTxFK06FgTu70KJBbvqH1Kqw9h1Qfi2Q6ynAw0wK4=
+=yudK
 -----END PGP SIGNATURE-----
 
---apbmkPN6Hu/1dI3g--
+--Az4VpBrmI9+OyhK/--
 
