@@ -2,85 +2,91 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A1CC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:11:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB32C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:27:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 91C002071B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:11:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97A0B20737
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:27:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zy9yPg3p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91C002071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eJpn4d9a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A0B20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDjPB-0006WW-PC
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 03:11:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36690)
+	id 1kDjez-0003eg-Lm
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 03:27:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kDjOd-000619-T5
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:10:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37840)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kDjOb-0008Su-8D
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:10:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599117055;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=T5ZfoAzWZJb7OL8G9LB8xC0vvEMd9TxuJopR1WzXeX4=;
- b=Zy9yPg3pmaL9TSUFXFUC1Iws1Vw/W2aU7NOOvO0fFEQxNbZfAPe/2KRxlfvpPX+K73cEMP
- Vm8ZpkhD25W6XOlh6r9ocD5l9jjJ/+WY+SkmULtVR/N7veot7VUrEXibFpOFahEhrGhqVE
- zgKCLI1XPF++hvPWcJoowyxYEjJGDCM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-311-xU47r8Q8NDWkwj0eo8Fx6Q-1; Thu, 03 Sep 2020 03:10:50 -0400
-X-MC-Unique: xU47r8Q8NDWkwj0eo8Fx6Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4ABB5801AE6;
- Thu,  3 Sep 2020 07:10:49 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-113-31.rdu2.redhat.com
- [10.10.113.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FB581002D53;
- Thu,  3 Sep 2020 07:10:46 +0000 (UTC)
-From: P J P <ppandit@redhat.com>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: [PATCH v1] sd: sdhci: assert data_count is within fifo_buffer
-Date: Thu,  3 Sep 2020 12:38:42 +0530
-Message-Id: <20200903070842.2125083-1-ppandit@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDje4-0001m1-9i
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:26:56 -0400
+Received: from mail-pj1-x1035.google.com ([2607:f8b0:4864:20::1035]:54567)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDje2-0001l5-Hv
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:26:55 -0400
+Received: by mail-pj1-x1035.google.com with SMTP id mm21so1076801pjb.4
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 00:26:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=E37UotUtOz5dvnD7S9FR16Zmq6QemgVgH7XlEdh+vAk=;
+ b=eJpn4d9aldD/oKrN+UKJbQXHbY4rZSa3Y4FbNTcnJQAb3jhduKQQfr4TGH3/XodOn3
+ RQRv0Q0Km+an6WCefqoD6oW5RcYPdNpDq0uANoHCd1GQ2h3yTcpsuIB4Ir7LqmP+EGci
+ LlfjkKW4IS1Hb2Ba2kd6NaTSSx0+dp/tUKgya8AVIO6jTYvl2DRP2TUwflX/v5cyYwcI
+ qSBWpBZTZGsqBfECR2PiC1BwzXkO9518VM+YMbren8yj51OOkra1oQA7Xps6AxJTlrT3
+ rRHUUDAeQmTlkkWqjohxDEEfuQ2GKOK2HI8v/Lec0wMAMd2n9S/Drck6OhuCh7RnslPX
+ 0ruw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=E37UotUtOz5dvnD7S9FR16Zmq6QemgVgH7XlEdh+vAk=;
+ b=BlGVXA4tOd9wdA8iQWNTkvEfOzxm6LgwqPO7iB7/E4DADTINOVL3JBw7gLf+neU1s4
+ crC5cMdUtGT3L8cnjr5nfEylbtxfHF0XuQQQCuXPSj/vxNsgD2KSspZ+Zuy4SQJN4AYJ
+ BotrfAmy+PTjrzwvqpTQI7ZY2qEiUAj+myLv0PzzbnRo8CD7fi/ELzu8PIOp/HSTJgW2
+ eRm0UceQwVLzCpZ+ZoXgeiH7rd0iH/oCABSwW1QM29tBresyaouP3gUdfyYMPPFcYwj+
+ UDnOUj4ccidfPTi7gNOidy0B5k0KZ4Yx2opLPTgsHpmuI/oiMJZ1xe4Vk7f3KoGpUVBh
+ 2rIA==
+X-Gm-Message-State: AOAM532sWyD63MTZgl9vWvMrHWuu79q9u9Z0ifCi/i9suGSnqfJwAbJ4
+ ehpXB/wSQ/zAFJa5l2xqsQRsfBUIyW3xpQ==
+X-Google-Smtp-Source: ABdhPJwOWChwQ5TloJvhCRAsnuFbOFCYXESeOjnckGqh4A279A7qWzvzHi6Xlzkml/OwyJSqtPLlaw==
+X-Received: by 2002:a17:90a:3486:: with SMTP id
+ p6mr1956982pjb.44.1599118012537; 
+ Thu, 03 Sep 2020 00:26:52 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id x185sm1930229pfc.188.2020.09.03.00.26.50
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 00:26:51 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/12] target/microblaze improvements
+Date: Thu,  3 Sep 2020 00:26:38 -0700
+Message-Id: <20200903072650.1360454-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1035;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1035.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,68 +99,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ruhr-University <bugs-syssec@rub.de>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
- Prasad J Pandit <pjp@fedoraproject.org>
+Cc: edgar.iglesias@xilinx.com, thuth@redhat.com, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Prasad J Pandit <pjp@fedoraproject.org>
+Version 2 includes fixes for iflags that could cause lockups.
 
-While doing multi block SDMA, transfer block size may exceed
-the 's->fifo_buffer[s->buf_maxsz]' size. It may leave the
-current element pointer 's->data_count' pointing out of bounds.
-Leading the subsequent DMA r/w operation to OOB access issue.
-Assert that 's->data_count' is within fifo_buffer.
+It seems it was easier to do so with icount=7, which is what we do during
+the replay acceptance tests.  This causes TBs to contain no more than 7
+insns, and often less to make up for an incomplete count elsewhere.
+Which stressed the iflags bits around delay slots and imm in ways that
+pure single-step doesn't.
 
- -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Fsdhci_oob_write1
- ==1459837==ERROR: AddressSanitizer: heap-buffer-overflow
- WRITE of size 54722048 at 0x61500001e280 thread T3
- #0  __interceptor_memcpy (/lib64/libasan.so.6+0x3a71d)
- #1  flatview_read_continue ../exec.c:3245
- #2  flatview_read ../exec.c:3278
- #3  address_space_read_full ../exec.c:3291
- #4  address_space_rw ../exec.c:3319
- #5  dma_memory_rw_relaxed ../include/sysemu/dma.h:87
- #6  dma_memory_rw ../include/sysemu/dma.h:110
- #7  dma_memory_read ../include/sysemu/dma.h:116
- #8  sdhci_sdma_transfer_multi_blocks ../hw/sd/sdhci.c:629
- #9  sdhci_write ../hw/sd/sdhci.c:1097
- #10 memory_region_write_accessor ../softmmu/memory.c:483
- ...
+In addition, cpu vmstate is filled in and interrupt logging is tidied.
 
-Reported-by: Ruhr-University <bugs-syssec@rub.de>
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
----
- hw/sd/sdhci.c | 2 ++
- 1 file changed, 2 insertions(+)
 
-Update v1: use assert(3) calls
-  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg00966.html
+r~
 
-diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
-index 1785d7e1f7..023acbed41 100644
---- a/hw/sd/sdhci.c
-+++ b/hw/sd/sdhci.c
-@@ -604,6 +604,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
-                     s->blkcnt--;
-                 }
-             }
-+            assert(s->data_count <= s->buf_maxsz && s->data_count > begin);
-             dma_memory_write(s->dma_as, s->sdmasysad,
-                              &s->fifo_buffer[begin], s->data_count - begin);
-             s->sdmasysad += s->data_count - begin;
-@@ -626,6 +627,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
-                 s->data_count = block_size;
-                 boundary_count -= block_size - begin;
-             }
-+            assert(s->data_count <= s->buf_maxsz && s->data_count > begin);
-             dma_memory_read(s->dma_as, s->sdmasysad,
-                             &s->fifo_buffer[begin], s->data_count - begin);
-             s->sdmasysad += s->data_count - begin;
+
+Richard Henderson (12):
+  target/microblaze: Collected fixes for env->iflags
+  target/microblaze: Renumber D_FLAG
+  target/microblaze: Cleanup mb_cpu_do_interrupt
+  target/microblaze: Rename mmu structs
+  target/microblaze: Fill in VMStateDescription for cpu
+  target/microblaze: Rename DISAS_UPDATE to DISAS_EXIT
+  target/microblaze: Introduce DISAS_EXIT_NEXT, DISAS_EXIT_JUMP
+  target/microblaze: Replace cpustate_changed with DISAS_EXIT_NEXT
+  target/microblaze: Handle DISAS_EXIT_NEXT in delay slot
+  target/microblaze: Force rtid, rted, rtbd to exit
+  target/microblaze: Use tcg_gen_lookup_and_goto_ptr
+  target/microblaze: Diagnose invalid insns in delay slots
+
+ target/microblaze/cpu.h       |  11 +-
+ target/microblaze/mmu.h       |  15 +--
+ target/microblaze/cpu.c       |  19 +--
+ target/microblaze/helper.c    | 216 +++++++++++++++-------------------
+ target/microblaze/machine.c   | 112 ++++++++++++++++++
+ target/microblaze/mmu.c       |  11 +-
+ target/microblaze/translate.c | 166 ++++++++++++++++++--------
+ target/microblaze/meson.build |   5 +-
+ 8 files changed, 362 insertions(+), 193 deletions(-)
+ create mode 100644 target/microblaze/machine.c
+
 -- 
-2.26.2
+2.25.1
 
 
