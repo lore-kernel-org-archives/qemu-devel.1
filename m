@@ -2,97 +2,86 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED245C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:18:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCACFC433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:19:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C8F72078E
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:18:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8B0942078E
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:19:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FgvrmlHm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8F72078E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KE9jOPb9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8B0942078E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46206 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDnGH-00082h-Ly
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:18:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36334)
+	id 1kDnGz-0000lF-MU
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:19:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kDnFV-0006TX-BV; Thu, 03 Sep 2020 07:17:49 -0400
-Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:42381)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kDn9p-0006Nn-8B
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:11:57 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:46228)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kDnFT-00077Y-AN; Thu, 03 Sep 2020 07:17:48 -0400
-Received: by mail-qt1-x842.google.com with SMTP id 60so1538323qtc.9;
- Thu, 03 Sep 2020 04:17:46 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kDn9n-0006Mc-ES
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:11:56 -0400
+Received: by mail-ot1-x341.google.com with SMTP id c10so2277812otm.13
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:11:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=RYvM7/VVud8H9oX0U9lZ+9pQSsp09l2mWS7au7zulzg=;
- b=FgvrmlHmw/8YFE36GY2Tnd4acgewgh3Xk+0nEow4wRjDymhGZQMwuDQBSxf6R+jWnU
- 8Ulsx1Zj1808oUYnQv7H1ID3oOjzOadTWJZWpy8l8ubBhz4zOg9eWYnrG54wV+nag2VF
- i8qklHtWqGdS3kzaSqunEi0/+aEYYT2LA2AB+hsMyGKOAbsGxgSu3y+NsvJWc8ePXR/B
- qDD0TOWlzYfQR+HXYqA36Z5Cf4j4wnN34zGuHKUNQ3D1OlzczdFbpcA4aRiJRUUHwMoO
- 2NX2T/Ai2zRph0FEHM2hJM5qYEqZ2oPL4R27qd6ndBdMY9a78Ez/FMPZdqUVsWSg3UWt
- Fpng==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=25i2bGBt6UrKwE1TXuh8XZu5mFMYpdkhRSNYLgGSyGo=;
+ b=KE9jOPb9x7zyUS9Uen1vDeld0dzitaw62kSn+8kYZ35b5bo6TPQ3m/xeVKdNuLA1h1
+ Vv3+kU0lOPgLi9WFbpD8TBQBtQcxRNMmhbDBvV6XvvpfXWM2Tfi+4JhNjX2S3UnoN3wv
+ TIXKg22qyB1n9sJogEwfDVUObhCK9AKfCr01m6/N0sBADhy5p19Pn1ZXvsiCRGOcTsvS
+ pd1eF0drCeO2kUtB9TaiHNpMvy9F6at6kzJQ/2Q1hb98DlWC0lzOBidZxBkZHcY3NlJM
+ eobSnqacKj//GR6y37CZW8MAgSc9n4/YsB+ybuAZE3+tuPujNKWSEL20ZsfjBduPZsUM
+ FRTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=RYvM7/VVud8H9oX0U9lZ+9pQSsp09l2mWS7au7zulzg=;
- b=VL2+R9e6j9UaFYU80gRn5MLKhPkOnQJhnzx4ymdbcI9P9hxW2o5uI5wBuNMPBoIkX/
- UPfX4acOpSd5BB+OGhXL+tOUhzK/DOqk8qTw6tyGbHeFGHiHpvubUxCXRo/wZASuO+nT
- Tvl2m5pNa9CHsrFP94Z98L6gyudRBBSm+0XJXb0lhaftVgZglBKwgJaUgMtsvoBT5qQW
- 1hiQ1cMvKReM5ZI4D1nY+o8xKzy1E/T89ngaEJIvqOHIyWfoEkUEsIWQsmj9mkAjyjBx
- qpbVAe5XXo80LSNIAjuehj6sia7KoG0LooFZjpx6mQVAkCWagKC2vAT/BODK2yLDeRYn
- 9/Bw==
-X-Gm-Message-State: AOAM531EGDfuGyoiCcLCuVknC2q/UI+qVpecEW25HotbNDusfYV8ezlj
- ZxeFuXZyTaOru13iIx95sEfEaZW1Hps=
-X-Google-Smtp-Source: ABdhPJytSOFeu7iF4g+OpQLPjC6XlfFEMQc/55rWlQFb+wnfREvZoKN5flFxDmld8S2nnWKOw7GjRA==
-X-Received: by 2002:aed:3a27:: with SMTP id n36mr2804129qte.215.1599131865217; 
- Thu, 03 Sep 2020 04:17:45 -0700 (PDT)
-Received: from ?IPv6:2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca?
- ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
- by smtp.gmail.com with ESMTPSA id p68sm1999578qka.78.2020.09.03.04.17.44
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 04:17:44 -0700 (PDT)
-Subject: Re: [PATCH v2 7/7] spapr_hcall: h_home_node_associativity now reads
- numa_assoc_array
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200901125645.118026-1-danielhb413@gmail.com>
- <20200901125645.118026-8-danielhb413@gmail.com>
- <20200903014645.GI1897@yekko.fritz.box>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <4d90d8e3-6787-ecaa-2e19-3178ed4b0d97@gmail.com>
-Date: Thu, 3 Sep 2020 08:17:40 -0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=25i2bGBt6UrKwE1TXuh8XZu5mFMYpdkhRSNYLgGSyGo=;
+ b=RmS7BqLf9IHCFg/FmimCiclmNz3IwJbzUKhSrZgH/OpQLLFV3IL+JLx14yxkpMKxMY
+ ZrFJHmPqlEaye557zRlNjaeYbnhDu8a+QS1jrNwoNlUxuKmHDvtgc+RCJO0Y8gwVi9t0
+ fBWjYjRNH/EuwD2A+5bUQfSK4BcVPEA9xB9hG+6/6L2T9lLHWBRVaMGoLoHynFeKWpCk
+ QXGRC7x4qGiBo7g3EdXvzSpxQjCSjQB1hrd0f9631RklL/Fkx35G5h4mJyfZ0fu6IKrO
+ f1QLTpY2AYlhDCL385eIhsLXu7ILk9VCbclNVolyfIeoI/C3MnAWDTsE+dNM1gNDHVoc
+ pk+A==
+X-Gm-Message-State: AOAM530EMoY8Z5I6ASyNRee2nD3T6moG4WKMwIt62amkJrf+k4Azcuhv
+ 9iekjrTpELblQyPJk5SURxYsHjrS+jALfwoyMsA=
+X-Google-Smtp-Source: ABdhPJzd1JRCtFeoR5WXi/XrGxuHsO+dCkyQGx0JfP2xU9PAiiEHsQYPniP6z1J44wL5EkjsHGuEsZxX+D/aNxs3paU=
+X-Received: by 2002:a05:6830:2302:: with SMTP id
+ u2mr1124916ote.181.1599131513907; 
+ Thu, 03 Sep 2020 04:11:53 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200903014645.GI1897@yekko.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
- envelope-from=danielhb413@gmail.com; helo=mail-qt1-x842.google.com
+References: <20200902162206.101872-1-liq3ea@163.com>
+ <b840aab8-542d-af43-43e5-0a07f442b5d5@redhat.com>
+ <CAFEAcA9mvMaR5MJJ74Vv63TG6frWnMeSZA19Zxv8TUceudPUTQ@mail.gmail.com>
+In-Reply-To: <CAFEAcA9mvMaR5MJJ74Vv63TG6frWnMeSZA19Zxv8TUceudPUTQ@mail.gmail.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 3 Sep 2020 19:11:18 +0800
+Message-ID: <CAKXe6SLYgkiTAYa81nppHUMEzoeGy3988OmrzZyw8-VY8ajE3w@mail.gmail.com>
+Subject: Re: [RFC 0/3] try to solve the DMA to MMIO issue
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, NICE_REPLY_A=-2.403,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -107,111 +96,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Li Qiang <liq3ea@163.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ Alexander Bulekov <alxndr@bu.edu>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B49=E6=9C=883=
+=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=886:53=E5=86=99=E9=81=93=EF=BC=
+=9A
+>
+> On Thu, 3 Sep 2020 at 04:55, Jason Wang <jasowang@redhat.com> wrote:
+> > I think we still need to seek a way to address this issue completely.
+> >
+> > How about adding a flag in MemoryRegionOps and detect the reentrancy
+> > through that flag?
+>
+> This won't catch everything. Consider this situation:
+>   Device A makes DMA access to device B
+>   Device B's write-handling causes it to raise an
+>    outbound qemu_irq signal
+>   The qemu_irq signal is connected to device A
 
+Here mean device A is an interrupt controller?
+This is special case I think.
 
-On 9/2/20 10:46 PM, David Gibson wrote:
-> On Tue, Sep 01, 2020 at 09:56:45AM -0300, Daniel Henrique Barboza wrote:
->> home_node_associativity reply now uses the associativity
->> values for tcpu->node_id provided by numa_assoc_array.
->>
->> This will avoid further changes in this code when numa_assoc_array
->> changes values, but it won't be enough to prevent further changes
->> if (falar aqui q se mudar o tamanho do array tem q mexer nessa
->> funcao tambem, falar q a macro associativity() deixa a automacao
->> de tudo mto unreadable)
-> 
-> Uh.. I'm guessing that was a note to yourself you intended to
-> translate before publishing?
+>   Now we have reentered into device A's code
+>
+> That is to say, the problem is general to "device A does
+> something that affects device B" links of all kinds, which
 
-Ops! Forgot to edit it :|
-
-> 
->>
->> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->> ---
->>   hw/ppc/spapr_hcall.c | 16 ++++++++++++++--
->>   1 file changed, 14 insertions(+), 2 deletions(-)
->>
->> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
->> index c1d01228c6..2ec30efdcb 100644
->> --- a/hw/ppc/spapr_hcall.c
->> +++ b/hw/ppc/spapr_hcall.c
->> @@ -1878,9 +1878,13 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
->>                                                 target_ulong opcode,
->>                                                 target_ulong *args)
-> 
-> You could move this function to spapr_numa.c as well (the name's a bit
-> misleading, but spapr_hcall.c isn't really intended to hold *all*
-> hcall implementations, just the ones that don't have somewhere better
-> to live).
-
-Ok!
-
-
-> 
->>   {
->> +    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
->>       target_ulong flags = args[0];
->>       target_ulong procno = args[1];
->>       PowerPCCPU *tcpu;
->> +    uint32_t assoc_domain1;
->> +    uint32_t assoc_domain2;
->> +    uint32_t assoc_domain3;
->>       int idx;
->>   
->>       /* only support procno from H_REGISTER_VPA */
->> @@ -1893,13 +1897,21 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
->>           return H_P2;
->>       }
->>   
->> +    /*
->> +     * Index 0 is the ibm,associativity size of the node,
->> +     * which isn't relevant here.
->> +     */
->> +    assoc_domain1 = smc->numa_assoc_array[tcpu->node_id][1];
->> +    assoc_domain2 = smc->numa_assoc_array[tcpu->node_id][2];
->> +    assoc_domain3 = smc->numa_assoc_array[tcpu->node_id][3];
-> 
-> Using all these temporaries is a little ugly.  Maybe do something like:
-> 	uint32_t *assoc = smc->numa_assoc_array[tcpu->node_id];
-> 
-> Then just use assoc[1], assoc[2] etc. below.
-> 
->> +
->>       /* sequence is the same as in the "ibm,associativity" property */
->>   
->>       idx = 0;
->>   #define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
->>                                ((uint64_t)(b) & 0xffffffff))
->> -    args[idx++] = ASSOCIATIVITY(0, 0);
->> -    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
->> +    args[idx++] = ASSOCIATIVITY(assoc_domain1, assoc_domain2);
->> +    args[idx++] = ASSOCIATIVITY(assoc_domain3, tcpu->node_id);
->>       args[idx++] = ASSOCIATIVITY(procno, -1);
->>       for ( ; idx < 6; idx++) {
->>           args[idx] = -1;
-> 
-> Better yet would be to make this handle an arbitrary length of assoc
-> array, further isolating this from the specifics of how we construct
-> the arrays.  Ideally, you'd call a common path with
-> spapr_numa_fixup_cpu_dt() to get the assoc array for a cpu, then here
-> just translate it into the in-register format the hcall expects.
-
-
-Since we're moving this to spapr_numa.c then I guess it's ok to add
-more juggling to handle an arbitrary size. I got a bit nervous about
-adding too much stuff here in spapr_hcall.c.
-
+As the P2P is a normal behavior, we can't just prevent this.
 
 Thanks,
-
-
-DHB
-
-> 
+Li Qiang
+> can form loops. Self-DMA is just an easy way to find one
+> category of these with the fuzzer.
+>
+> thanks
+> -- PMM
 
