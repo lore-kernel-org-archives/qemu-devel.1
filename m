@@ -2,132 +2,117 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81A74C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:58:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24100C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:59:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 391FF2072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:58:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0FC42072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:59:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M32cbTwM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391FF2072A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYiJPowL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0FC42072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDooW-0004C8-Ct
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:58:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60542)
+	id 1kDopT-000568-Vq
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:59:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDonj-0003MY-CM
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:57:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53684)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDoo0-0003pJ-GN
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:57:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53983
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDonh-0003HJ-Kp
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:57:15 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDony-0003Im-QW
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:57:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599137832;
+ s=mimecast20190719; t=1599137850;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=w/8bfxvJrL60azUJvVwI707RU5tzNuWHApAA0ggsuko=;
- b=M32cbTwMD0wXH5fxeBkB9DChFCupf+jv0WP+6vDP9nw7UvX/uGxpGcO6OLnbcoTXR+FDul
- 3klt9mGv4TSNWdZ8/xVJspD2VoWYnNTBfBawIF3QGQE/A6Q3Aj4K4InCsu27rPgxJHbGsk
- 7ZrECfbBTcQ//13+RmPxAubn6orv6+I=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-388-64sZirosMOmxhhs9ytddTg-1; Thu, 03 Sep 2020 08:57:11 -0400
-X-MC-Unique: 64sZirosMOmxhhs9ytddTg-1
-Received: by mail-wr1-f70.google.com with SMTP id m7so1035110wrb.20
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:57:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=w/8bfxvJrL60azUJvVwI707RU5tzNuWHApAA0ggsuko=;
- b=WH/kS7MKc3CFpJfMyiZ3Lf1gHAbZF6KwTDR7a/ui6WrE7VbaSlA7SkPL/ouk30vrrQ
- UXDua5YZImHMTanFAsjmiuDNJXNR/1Ww8umGsFgQ0NlmSSDA2KvM1wy4J8D5sBBZvhvS
- 5Sq00nidQd0ZoAMrXwUFceOJo14GdheOejiVM9gu5ZT9vxMsc3ndqxWPdDN/B4FCu6AK
- vnyJSGsWsP94/xAiLK/U+mSooR/Zc2MO/7PCgnmxBUvkt6hqtUjueL4zZN4wbfcBLWKA
- EijsQ3ktgywz/rGZAWaav6Fr8X2eMWhl1GkrYoLxj4JlvK4EL/S8NMgA2UkgGIpibOtC
- XoRw==
-X-Gm-Message-State: AOAM532TOvx1KfBqqxYZmynTl4mCOTua/0P0ppNX8cTHMrzW92eeDwQz
- asIW1kbtVii43/W11sVmb9OKxmqVKeC4dPkbyrlXWqaJ9yNJ/Tc0deIJ8RVB0pQLTrCVPshwac5
- n2FHeM66dwbnheV4=
-X-Received: by 2002:a05:6000:12c3:: with SMTP id
- l3mr2504205wrx.164.1599137829967; 
- Thu, 03 Sep 2020 05:57:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzAd1KMsKjsErsfrLTYr9wpNytoTcMUyxjq+AzjxkRvzvuj2j3M1mWgq+cupZMCYExtw1zxZQ==
-X-Received: by 2002:a05:6000:12c3:: with SMTP id
- l3mr2504193wrx.164.1599137829812; 
- Thu, 03 Sep 2020 05:57:09 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id t16sm4360861wrm.57.2020.09.03.05.57.08
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 05:57:09 -0700 (PDT)
-Subject: Re: [PATCH 32/63] ahci: Rename ICH_AHCI to ICH9_AHCI
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-33-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <f8225852-ec2f-3355-c57e-a29719f286ff@redhat.com>
-Date: Thu, 3 Sep 2020 14:57:08 +0200
+ bh=LAUH/9ryRR5/OksUHUVor7l4I+V37+FxPSiCylrh30U=;
+ b=JYiJPowL0WANvPbinyGTsXlDKoTSsYdavWn/hhEPe3qUwbfiEoKiK248VeJxdUxJt//8cB
+ d6XkKe+1WMLoFOYVxx3/lUXuDNcTNdYL0YrGDDmQehKNnXPt3B66yY1dbOsQxzzSy72RBP
+ KO4ao2aogKYkPbMk+PzzEtkz2dJd8c8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-376-GTmjcbClNcOWPYtxmDTQZA-1; Thu, 03 Sep 2020 08:57:28 -0400
+X-MC-Unique: GTmjcbClNcOWPYtxmDTQZA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E1BFB18BA284;
+ Thu,  3 Sep 2020 12:57:26 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-164.ams2.redhat.com
+ [10.36.112.164])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 35B835C22D;
+ Thu,  3 Sep 2020 12:57:21 +0000 (UTC)
+Subject: Re: [RFC qemu 0/6] mirror: implement incremental and bitmap modes
+To: Kevin Wolf <kwolf@redhat.com>
+References: <20200218100740.2228521-1-f.gruenbichler@proxmox.com>
+ <d35a76de-78d5-af56-0b34-f7bd2bbd3733@redhat.com>
+ <1599127031.9uxdp5h9o2.astroid@nora.none>
+ <ef545f46-7cbb-43f0-2ab8-f3d49643d1e6@redhat.com>
+ <20200903123850.GB8835@linux.fritz.box>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <ec747431-b2fa-2e67-984b-3cf70e0c79e4@redhat.com>
+Date: Thu, 3 Sep 2020 14:57:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200902224311.1321159-33-ehabkost@redhat.com>
+In-Reply-To: <20200903123850.GB8835@linux.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="Cnfr2KdXqybndI8pHCUh9XLlnrqDTlxOl"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -44
 X-Spam_score: -4.5
 X-Spam_bar: ----
 X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -140,103 +125,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/3/20 12:42 AM, Eduardo Habkost wrote:
-> Make the type checking macro name consistent with the TYPE_*
-> constant.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--Cnfr2KdXqybndI8pHCUh9XLlnrqDTlxOl
+Content-Type: multipart/mixed; boundary="0nxcR6BgrpzpJu99dUOaSSV4GFsBymF0m"
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+--0nxcR6BgrpzpJu99dUOaSSV4GFsBymF0m
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> ---
-> Cc: John Snow <jsnow@redhat.com>
-> Cc: qemu-block@nongnu.org
-> Cc: qemu-devel@nongnu.org
-> ---
->  include/hw/ide/ahci.h | 2 +-
->  hw/ide/ahci.c         | 4 ++--
->  hw/ide/ich.c          | 8 ++++----
->  3 files changed, 7 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/hw/ide/ahci.h b/include/hw/ide/ahci.h
-> index 4cf6813d80..da3cddcc65 100644
-> --- a/include/hw/ide/ahci.h
-> +++ b/include/hw/ide/ahci.h
-> @@ -54,7 +54,7 @@ typedef struct AHCIState {
->  typedef struct AHCIPCIState AHCIPCIState;
->  
->  #define TYPE_ICH9_AHCI "ich9-ahci"
-> -DECLARE_INSTANCE_CHECKER(AHCIPCIState, ICH_AHCI,
-> +DECLARE_INSTANCE_CHECKER(AHCIPCIState, ICH9_AHCI,
->                           TYPE_ICH9_AHCI)
->  
->  int32_t ahci_get_num_ports(PCIDevice *dev);
-> diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-> index b696c6291a..ee1d47ff75 100644
-> --- a/hw/ide/ahci.c
-> +++ b/hw/ide/ahci.c
-> @@ -1819,7 +1819,7 @@ type_init(sysbus_ahci_register_types)
->  
->  int32_t ahci_get_num_ports(PCIDevice *dev)
->  {
-> -    AHCIPCIState *d = ICH_AHCI(dev);
-> +    AHCIPCIState *d = ICH9_AHCI(dev);
->      AHCIState *ahci = &d->ahci;
->  
->      return ahci->ports;
-> @@ -1827,7 +1827,7 @@ int32_t ahci_get_num_ports(PCIDevice *dev)
->  
->  void ahci_ide_create_devs(PCIDevice *dev, DriveInfo **hd)
->  {
-> -    AHCIPCIState *d = ICH_AHCI(dev);
-> +    AHCIPCIState *d = ICH9_AHCI(dev);
->      AHCIState *ahci = &d->ahci;
->      int i;
->  
-> diff --git a/hw/ide/ich.c b/hw/ide/ich.c
-> index eff3188fff..51cd2f38b7 100644
-> --- a/hw/ide/ich.c
-> +++ b/hw/ide/ich.c
-> @@ -91,14 +91,14 @@ static const VMStateDescription vmstate_ich9_ahci = {
->  
->  static void pci_ich9_reset(DeviceState *dev)
->  {
-> -    AHCIPCIState *d = ICH_AHCI(dev);
-> +    AHCIPCIState *d = ICH9_AHCI(dev);
->  
->      ahci_reset(&d->ahci);
->  }
->  
->  static void pci_ich9_ahci_init(Object *obj)
->  {
-> -    struct AHCIPCIState *d = ICH_AHCI(obj);
-> +    struct AHCIPCIState *d = ICH9_AHCI(obj);
->  
->      ahci_init(&d->ahci, DEVICE(obj));
->  }
-> @@ -108,7 +108,7 @@ static void pci_ich9_ahci_realize(PCIDevice *dev, Error **errp)
->      struct AHCIPCIState *d;
->      int sata_cap_offset;
->      uint8_t *sata_cap;
-> -    d = ICH_AHCI(dev);
-> +    d = ICH9_AHCI(dev);
->      int ret;
->  
->      ahci_realize(&d->ahci, DEVICE(dev), pci_get_address_space(dev), 6);
-> @@ -154,7 +154,7 @@ static void pci_ich9_ahci_realize(PCIDevice *dev, Error **errp)
->  static void pci_ich9_uninit(PCIDevice *dev)
->  {
->      struct AHCIPCIState *d;
-> -    d = ICH_AHCI(dev);
-> +    d = ICH9_AHCI(dev);
->  
->      msi_uninit(dev);
->      ahci_uninit(&d->ahci);
-> 
+On 03.09.20 14:38, Kevin Wolf wrote:
+> Am 03.09.2020 um 13:04 hat Max Reitz geschrieben:
+>> On 03.09.20 12:13, Fabian Gr=C3=BCnbichler wrote:
+>>> On August 21, 2020 3:03 pm, Max Reitz wrote:
+>>>> On 18.02.20 11:07, Fabian Gr=C3=BCnbichler wrote:
+>>> I am not sure how=20
+>>> the S-O-B by John is supposed to enter the mix - should I just include=
+=20
+>>> it in the squashed patch (which would be partly authored, but=20
+>>> not-yet-signed-off by him otherwise?)?
+>>
+>> I=E2=80=99m not too sure on the proceedings, actually.  I think it shoul=
+d be
+>> fine if you put his S-o-b there, as long as your patch is somehow based
+>> on a patch that he sent earlier with his S-o-b underneath.  But I=E2=80=
+=99m not
+>> sure.
+>=20
+> Signed-off-by means that John certifies the DCO for the patch (at least
+> the original version that you possibly modified), so you cannot just add
+> it without asking him.
+
+But what if you take a patch from someone and heavily modify it =E2=80=93
+wouldn=E2=80=99t you keep the original S-o-b and explain the modifications =
+in
+the commit message?
+
+Max
+
+> John should reply with a Signed-off-by line to the patch in question.
+> Then you (Fabian) can add it in the next version of the series (if I
+> understand correctly, you're going to respin anyway).
+>=20
+> I see that patch 2 doesn't have any S-o-b at all. It should have both
+> John's and Fabian's.
+>=20
+> Kevin
+>=20
+
+
+
+--0nxcR6BgrpzpJu99dUOaSSV4GFsBymF0m--
+
+--Cnfr2KdXqybndI8pHCUh9XLlnrqDTlxOl
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9Q6C8ACgkQ9AfbAGHV
+z0AqzwgAh41GL4613nfjqbZMXj4moXWRKoIiNoMb1ybfzPkakA9ZXKWrJiAklwvk
+DNsJIznPFklDU5CBZ4N6cJkU8XioOUmpjUf+B6Y0T8b9rAzbjXcrVU3zswpL6/te
+aCoWz2x+1El6l1ENyoapNTZFMVNkNESOrOKAF9RpandU2kwOREhMlUy0cK3vCxMP
+5Bq/3dSgUEsFPlHY54Vnua04wQelYanO27o3+UtRRauYJ2j7xC8hgICd+z1MhvQW
+v4eO4sPdwOkORaDVedonVMtbZQnctA3vU/W+OB8PqCkzvU1GV7odw6TVKliycoge
+415zDD7TG1xsk8BsViH4tKvLogwmZw==
+=8b8E
+-----END PGP SIGNATURE-----
+
+--Cnfr2KdXqybndI8pHCUh9XLlnrqDTlxOl--
 
 
