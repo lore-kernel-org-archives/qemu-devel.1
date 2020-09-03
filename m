@@ -7,77 +7,74 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC4FC433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4B4C43461
 	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:31:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4BE9D206D4
+	by mail.kernel.org (Postfix) with ESMTPS id 9C8AD206D4
 	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:31:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Clv9uVjf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BE9D206D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EM1Jf/jO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C8AD206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwpo-0005Wh-Fo
+	id 1kDwpo-0005VR-O8
 	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:31:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59192)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLo-0004fL-IG; Thu, 03 Sep 2020 17:00:56 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:35052)
+ id 1kDwM0-0004zl-Js; Thu, 03 Sep 2020 17:01:10 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:36685)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLm-0007no-La; Thu, 03 Sep 2020 17:00:56 -0400
-Received: by mail-ot1-x342.google.com with SMTP id i4so4038592ota.2;
- Thu, 03 Sep 2020 14:00:53 -0700 (PDT)
+ id 1kDwLy-0007rj-QL; Thu, 03 Sep 2020 17:01:08 -0400
+Received: by mail-oi1-x243.google.com with SMTP id x19so4535893oix.3;
+ Thu, 03 Sep 2020 14:01:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=ZILyJy1nBWpJrZHi1uzFvLmVU4Jp6kAKnyaWcu8nswA=;
- b=Clv9uVjffYFXUVLDfiEodN/TslU59h5Bg0WaWJSGDP198TnWg4/n44x3g5v9q/zw8I
- y1WlFu9igpVmSqrrxY58ZgKqrTscD2IrAt6R8QjhuvaFTajW9C12soRHUGNmcWiY9k3E
- D396CSb6hrIqBMIejNhuArSlpI2sNXGQbFmH2ljCxlk2JxbWTfNjmdzGGqyNR61OMY5Q
- tgujt45eKn7kW5vR+niV4/oqYsL9kEUIe471rx+4AM6DP3UEbYJFlBu4lX2nFVGIFFMp
- Nprm5qXKd1pIN8lawHCxmC9Hzyl0GWeB18g6LIoJ/WlepxNnBVtnUXzmb0ZkcfKwl7Tn
- X/kA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=OBNgeqRx4bpj7whZl9Nqe1uUGZCI5XWKl7ZvXD57/RM=;
+ b=EM1Jf/jOulJZ8qFNufvClh5XlmBbYtMw65yMz85r7W3UbzXG9ba8m6NiQXEBd2W746
+ N7PLgo1L9QJKYTsjTPerD5uSn+tNXpeZ5TIBKsijToaJROvnVK+6UQ65lSjVOhQS8+77
+ mT/jauay0mnzRsW/tdMPzpG8sZRVGa0cfnI8FLOgO96XwlUPj/Jrv0IqxYj5ixy0mkee
+ 3srFEYSGVRcf+kzqP6jyQ+BDcFiXY2z3jSn3s/ELfl+dgxi9ztembWmsvxolBEigR3oJ
+ g9gosWkrCcHwL9F7RcrpFl9BtULFZGERhece6psxXxH1WEwJ1DLSICg1lqZYDgkm0cuU
+ Yuiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ZILyJy1nBWpJrZHi1uzFvLmVU4Jp6kAKnyaWcu8nswA=;
- b=erPDFTM9Ai4o8PTmH4nl5e94k7nRCZ5LLT96ayu5b7bdrjH/UhS3nhb9JPDKrfBzv7
- X9omx41Eav37qqzLaJu3KmqL0kc6H0jNHaxW9tvRFG6FHYJryY8Xr8f8tsNTo6fV4Su3
- dSxTKeOS/f6S3E2Ko1yrX2/4/7o7LdgCmtVnDTqzIrJJSRvAyhCRuB/yP2h7WmLPJt/l
- p4Piq+pp0UsxLho24u0K7SbtkGuPkjm+8gbEioGrdhVHl3qc2E2xEYce4aZyLJZSw2m/
- RhMLVWZTwq4MdACZn5QEEN5DnUlWV69pjZ/299zN8a0ObUN3+SvEUBE7Iuou1WAQlW/J
- 78XQ==
-X-Gm-Message-State: AOAM532yGiRSMzOtxNI1/Oj8TG3bP4xxANvBStndYTXiawCP3zAVXQwF
- QaQQDCFo2DS8WEmMIwyt+RxC+4mR8sM=
-X-Google-Smtp-Source: ABdhPJwM++6LzX4HTR1xyk+ivDuvEvim/0s7nyID5EMvqQE3qxi/bnz+TKqOHMosXyv2bY23ET6bcA==
-X-Received: by 2002:a9d:37b5:: with SMTP id x50mr2906344otb.57.1599166852742; 
- Thu, 03 Sep 2020 14:00:52 -0700 (PDT)
+ :in-reply-to:references;
+ bh=OBNgeqRx4bpj7whZl9Nqe1uUGZCI5XWKl7ZvXD57/RM=;
+ b=M7+M3r25wjaX7Cy7tOOcwlxuvgcydCgD2IcqVhdV1YjmlkLEPJdQxrUk8osMQ2PUxV
+ D1P5TttqmOI+7xW1D1h2s3ZwaJDHpXFDZA62p/1z9fo1YO4uz6VBmr9sJw/thjMTTAZp
+ FruXLD/gyYiRRkvtureBHQDF5WgA4KkeBfyTjn97Iqq76mj/4wkhr3YbdFJVyR8Z/87D
+ 8JS0+QfagdGCIvr+HqhbSULwuZFekMoguD/UQOqtyZ9q8Jm+BmzvESa+13x1HFpbaLLE
+ fCuDsoqmfbt18A9SxxlXm3EUFt5secq7920wks0gYUfHWMDAFjfKhAgeEkaqzs3RkTZP
+ U0FA==
+X-Gm-Message-State: AOAM531WglEwZK2aOnf1cDUSBD5Q3Uy8uOvIO69XmLZyflU0G/2jQeuq
+ Q8OfWciD2YcBb/YckD4+3ClO+nFh/5UKSQ==
+X-Google-Smtp-Source: ABdhPJz75tcfMw+vHfTPyDv3z7hv/nXY8YkMUZJga3pGDzEmq2rdRMrGuop0U3ge1l3P9ahldkImfg==
+X-Received: by 2002:aca:fc85:: with SMTP id a127mr3290379oii.148.1599166864926; 
+ Thu, 03 Sep 2020 14:01:04 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id y10sm849793ooh.9.2020.09.03.14.00.51
+ by smtp.gmail.com with ESMTPSA id l63sm712081oia.56.2020.09.03.14.01.04
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:52 -0700 (PDT)
+ Thu, 03 Sep 2020 14:01:04 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 53/77] hw/sd/sdcard: Do not allow invalid SD card sizes
-Date: Thu,  3 Sep 2020 15:59:11 -0500
-Message-Id: <20200903205935.27832-54-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 62/77] virtio-balloon: always indicate S_DONE when migration
+ fails
+Date: Thu,  3 Sep 2020 15:59:20 -0500
+Message-Id: <20200903205935.27832-63-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=flukshun@gmail.com; helo=mail-ot1-x342.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -100,110 +97,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Wei Wang <wei.w.wang@intel.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ qemu-stable@nongnu.org, Alexander Duyck <alexander.duyck@gmail.com>,
+ David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: David Hildenbrand <david@redhat.com>
 
-QEMU allows to create SD card with unrealistic sizes. This could
-work, but some guests (at least Linux) consider sizes that are not
-a power of 2 as a firmware bug and fix the card size to the next
-power of 2.
+If something goes wrong during precopy, before stopping the VM, we will
+never send a S_DONE indication to the VM, resulting in the hinted pages
+not getting released to be used by the guest OS (e.g., Linux).
 
-While the possibility to use small SD card images has been seen as
-a feature, it became a bug with CVE-2020-13253, where the guest is
-able to do OOB read/write accesses past the image size end.
+Easy to reproduce:
+1. Start migration (e.g., HMP "migrate -d 'exec:gzip -c > STATEFILE.gz'")
+2. Cancel migration (e.g., HMP "migrate_cancel")
+3. Oberve in the guest (e.g., cat /proc/meminfo) that there is basically
+   no free memory left.
 
-In a pair of commits we will fix CVE-2020-13253 as:
+While at it, add similar locking to virtio_balloon_free_page_done() as
+done in virtio_balloon_free_page_stop. Locking is still weird, but that
+has to be sorted out separately.
 
-    Read command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
-    occurred and no data transfer is performed.
+There is nothing to do in the PRECOPY_NOTIFY_COMPLETE case. Add some
+comments regarding S_DONE handling.
 
-    Write command is rejected if BLOCK_LEN_ERROR or ADDRESS_ERROR
-    occurred and no data transfer is performed.
-
-    WP_VIOLATION errors are not modified: the error bit is set, we
-    stay in receive-data state, wait for a stop command. All further
-    data transfer is ignored. See the check on sd->card_status at the
-    beginning of sd_read_data() and sd_write_data().
-
-While this is the correct behavior, in case QEMU create smaller SD
-cards, guests still try to access past the image size end, and QEMU
-considers this is an invalid address, thus "all further data transfer
-is ignored". This is wrong and make the guest looping until
-eventually timeouts.
-
-Fix by not allowing invalid SD card sizes (suggesting the expected
-size as a hint):
-
-  $ qemu-system-arm -M orangepi-pc -drive file=rootfs.ext2,if=sd,format=raw
-  qemu-system-arm: Invalid SD card size: 60 MiB
-  SD card size has to be a power of 2, e.g. 64 MiB.
-  You can resize disk images with 'qemu-img resize <imagefile> <new-size>'
-  (note that this will lose data if you make the image smaller than it currently is).
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20200713183209.26308-8-f4bug@amsat.org>
-(cherry picked from commit a9bcedd15a5834ca9ae6c3a97933e85ac7edbd36)
+Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
+Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
+Cc: Wei Wang <wei.w.wang@intel.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>
+Signed-off-by: David Hildenbrand <david@redhat.com>
+Message-Id: <20200629080615.26022-1-david@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(cherry picked from commit dd8eeb9671fc881e613008bd20035b85fe45383d)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/sd/sd.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ hw/virtio/virtio-balloon.c | 26 ++++++++++++++++++++------
+ 1 file changed, 20 insertions(+), 6 deletions(-)
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 04258f1816..c34435ede4 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -32,6 +32,7 @@
+diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
+index d6e31de1d9..6c75db123e 100644
+--- a/hw/virtio/virtio-balloon.c
++++ b/hw/virtio/virtio-balloon.c
+@@ -572,8 +572,13 @@ static void virtio_balloon_free_page_done(VirtIOBalloon *s)
+ {
+     VirtIODevice *vdev = VIRTIO_DEVICE(s);
  
- #include "qemu/osdep.h"
- #include "qemu/units.h"
-+#include "qemu/cutils.h"
- #include "hw/irq.h"
- #include "hw/registerfields.h"
- #include "sysemu/block-backend.h"
-@@ -2091,11 +2092,35 @@ static void sd_realize(DeviceState *dev, Error **errp)
-     }
+-    s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
+-    virtio_notify_config(vdev);
++    if (s->free_page_report_status != FREE_PAGE_REPORT_S_DONE) {
++        /* See virtio_balloon_free_page_stop() */
++        qemu_mutex_lock(&s->free_page_lock);
++        s->free_page_report_status = FREE_PAGE_REPORT_S_DONE;
++        qemu_mutex_unlock(&s->free_page_lock);
++        virtio_notify_config(vdev);
++    }
+ }
  
-     if (sd->blk) {
-+        int64_t blk_size;
-+
-         if (blk_is_read_only(sd->blk)) {
-             error_setg(errp, "Cannot use read-only drive as SD card");
-             return;
+ static int
+@@ -597,17 +602,26 @@ virtio_balloon_free_page_report_notify(NotifierWithReturn *n, void *data)
+     case PRECOPY_NOTIFY_SETUP:
+         precopy_enable_free_page_optimization();
+         break;
+-    case PRECOPY_NOTIFY_COMPLETE:
+-    case PRECOPY_NOTIFY_CLEANUP:
+     case PRECOPY_NOTIFY_BEFORE_BITMAP_SYNC:
+         virtio_balloon_free_page_stop(dev);
+         break;
+     case PRECOPY_NOTIFY_AFTER_BITMAP_SYNC:
+         if (vdev->vm_running) {
+             virtio_balloon_free_page_start(dev);
+-        } else {
+-            virtio_balloon_free_page_done(dev);
++            break;
          }
- 
-+        blk_size = blk_getlength(sd->blk);
-+        if (blk_size > 0 && !is_power_of_2(blk_size)) {
-+            int64_t blk_size_aligned = pow2ceil(blk_size);
-+            char *blk_size_str;
-+
-+            blk_size_str = size_to_str(blk_size);
-+            error_setg(errp, "Invalid SD card size: %s", blk_size_str);
-+            g_free(blk_size_str);
-+
-+            blk_size_str = size_to_str(blk_size_aligned);
-+            error_append_hint(errp,
-+                              "SD card size has to be a power of 2, e.g. %s.\n"
-+                              "You can resize disk images with"
-+                              " 'qemu-img resize <imagefile> <new-size>'\n"
-+                              "(note that this will lose data if you make the"
-+                              " image smaller than it currently is).\n",
-+                              blk_size_str);
-+            g_free(blk_size_str);
-+
-+            return;
-+        }
-+
-         ret = blk_set_perm(sd->blk, BLK_PERM_CONSISTENT_READ | BLK_PERM_WRITE,
-                            BLK_PERM_ALL, errp);
-         if (ret < 0) {
++        /*
++         * Set S_DONE before migrating the vmstate, so the guest will reuse
++         * all hinted pages once running on the destination. Fall through.
++         */
++    case PRECOPY_NOTIFY_CLEANUP:
++        /*
++         * Especially, if something goes wrong during precopy or if migration
++         * is canceled, we have to properly communicate S_DONE to the VM.
++         */
++        virtio_balloon_free_page_done(dev);
++        break;
++    case PRECOPY_NOTIFY_COMPLETE:
+         break;
+     default:
+         virtio_error(vdev, "%s: %d reason unknown", __func__, pnd->reason);
 -- 
 2.17.1
 
