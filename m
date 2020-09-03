@@ -2,121 +2,86 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0671C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:52:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60281C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:59:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3F2BF208B3
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:52:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1394720C09
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:59:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KeLO3xhW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3F2BF208B3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FxpMQWqe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1394720C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDpfU-0006rN-Uz
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:52:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49196)
+	id 1kDplg-0001XP-35
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:59:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDpee-0005wA-06
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:51:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28759)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kDpec-0002Ah-0M
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:51:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599141112;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=qjfTuVSUMnBMQ1OxXmxodd3enxMxI6BQu9tCRf8lgwc=;
- b=KeLO3xhWk+U00Po4CZqdUqYh0usO3FnufdV/wEVYDwDzlx7fP8nSjajgShKKeHtIKrS8Bz
- rEs465SkSTCL9fypeOPQX4EVHGoMfClFAO5MlxutMszIhTdlsek8h/aRSKffOcfE9habNc
- vx07EVLarrE/7LcgsReo/2Apb3qzgKA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-247-w15k2X7cNk2ZGbqYCvSbCg-1; Thu, 03 Sep 2020 09:51:49 -0400
-X-MC-Unique: w15k2X7cNk2ZGbqYCvSbCg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5993E1019625;
- Thu,  3 Sep 2020 13:51:48 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-164.ams2.redhat.com
- [10.36.112.164])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CAA6A19C78;
- Thu,  3 Sep 2020 13:51:46 +0000 (UTC)
-Subject: Re: [RFC qemu 0/6] mirror: implement incremental and bitmap modes
-To: =?UTF-8?Q?Fabian_Gr=c3=bcnbichler?= <f.gruenbichler@proxmox.com>,
- Kevin Wolf <kwolf@redhat.com>
-References: <20200218100740.2228521-1-f.gruenbichler@proxmox.com>
- <d35a76de-78d5-af56-0b34-f7bd2bbd3733@redhat.com>
- <1599127031.9uxdp5h9o2.astroid@nora.none>
- <ef545f46-7cbb-43f0-2ab8-f3d49643d1e6@redhat.com>
- <20200903123850.GB8835@linux.fritz.box>
- <ec747431-b2fa-2e67-984b-3cf70e0c79e4@redhat.com>
- <20200903132343.GD8835@linux.fritz.box>
- <1599140071.n44h532eeu.astroid@nora.none>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <f061cf19-2633-e8c9-34b8-baa8b6004c47@redhat.com>
-Date: Thu, 3 Sep 2020 15:51:45 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDpl4-0000tU-0D
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:58:34 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:34572)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDpl1-0003Hb-UW
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:58:33 -0400
+Received: by mail-ej1-x641.google.com with SMTP id gr14so2890494ejb.1
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 06:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TVj+wlp4SSk8evA8tvPi1Miohb6m3ZMNiPPqbtxqqNs=;
+ b=FxpMQWqeXLbuho45qTZrscwj5KNo28ve+0ZyoKsOBd3SoEngGNPIyBrQ7njg/BpwIF
+ b53vEDNEMjCwJqzwth/GE8M8gf7Uo8wN/mzZI9nqNRHL/plhcm5vVkSUlmX+2XFa1gpq
+ pbwMpssGzIIC6fMRyP/uzY9d+ted2dod2Q6oSY3jy7hfridaJUQHEwX5yNOPnlLSLMfL
+ GouqkbXeTLNtYcxaMPXGtEyQxOEAfVJnKv5kQSUr4I16cfH3v4SvqvafVqAZTqBYVSpP
+ BjUiwYF8QDZufXEti1k216qI6ot9lOojJLlY6CizFwF6ukGWtVMVp9GgOzDw1Z5SyR6A
+ A9fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TVj+wlp4SSk8evA8tvPi1Miohb6m3ZMNiPPqbtxqqNs=;
+ b=D5/HhP4+WE2noywGzCT14ps+xxpGCC3B7dUamaDxx6LRQZyGWZTS0sG92WEaan71i2
+ 4bROeZEKjjXtdEcb31kJNKv4+yq9GE3yGpa2FpFrci88BccW4UuEWRiSKtPHhn8JsMCP
+ 7+es9J9tU17uGsoc54TTpt2KjmEnpuSD//Gq4TJcKRTCll9KHm5CcwlGlfi7YYdU5mPM
+ 2ZjUHWj4CTOrjPG51e5iRKjbDTP20I3guooiWlEfLC3qLMWN7X/okbNjooKx8Hj7Pfhp
+ 29+TOsICF7L+hTH6gW0mgYXywE0IlFxM517h3kf6O3mPo/iqZu3ItcppHfVsBh2CYsOz
+ CewA==
+X-Gm-Message-State: AOAM5323MHBrA4HQMqgK8duv8MU7Oya10LhSuak9YiooOWYcm+6QrVaz
+ huVqca5kPB88COA7rjcw9LbqIrsgEha+Oxc/DN4EFw==
+X-Google-Smtp-Source: ABdhPJzmRN0XZKro/MnUZ3P4IyenheHc1KBslpLBdUfdpw1ei39la1PwNIWoSy4DlzdkLwY8M9YpSWNo6qQkoXss6iI=
+X-Received: by 2002:a17:906:d8ca:: with SMTP id
+ re10mr2229877ejb.382.1599141510098; 
+ Thu, 03 Sep 2020 06:58:30 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1599140071.n44h532eeu.astroid@nora.none>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="rOkZwV6iD1BjoLYT3W5M9KOejgRPM5pNG"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200903110831.353476-1-philmd@redhat.com>
+ <658fdd16-33da-af3a-6d8d-f7ea1253f061@redhat.com>
+In-Reply-To: <658fdd16-33da-af3a-6d8d-f7ea1253f061@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Sep 2020 14:58:19 +0100
+Message-ID: <CAFEAcA8aOzq8UQwKiyuvJokBT9ui6JWxzf=T8=r13Vuu6+_kkQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/12] hw: Forbid DMA write accesses to MMIO regions
+To: Laszlo Ersek <lersek@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -129,97 +94,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Qemu-block <qemu-block@nongnu.org>, Li Qiang <liq3ea@163.com>,
+ "Emilio G . Cota" <cota@braap.org>, Peter Chubb <peter.chubb@nicta.com.au>,
+ Joel Stanley <joel@jms.id.au>, Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Robert Foley <robert.foley@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Tony Nguyen <tony.nguyen@bt.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Andrew Jeffery <andrew@aj.id.au>, Klaus Jensen <k.jensen@samsung.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rOkZwV6iD1BjoLYT3W5M9KOejgRPM5pNG
-Content-Type: multipart/mixed; boundary="PqllfYE3his0zitYEfDyKnMc81uFR9ZfN"
+On Thu, 3 Sep 2020 at 14:37, Laszlo Ersek <lersek@redhat.com> wrote:
+> Peter mentions an approach at the end of
+> <https://bugs.launchpad.net/qemu/+bug/1886362/comments/5> that I believe
+> to understand, but -- according to him -- it seems too much work.
 
---PqllfYE3his0zitYEfDyKnMc81uFR9ZfN
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+It also would only be effective for MMIO, not for qemu_irq lines...
 
-On 03.09.20 15:36, Fabian Gr=C3=BCnbichler wrote:
-> On September 3, 2020 3:23 pm, Kevin Wolf wrote:
->> Am 03.09.2020 um 14:57 hat Max Reitz geschrieben:
->>> On 03.09.20 14:38, Kevin Wolf wrote:
->>>> Am 03.09.2020 um 13:04 hat Max Reitz geschrieben:
->>>>> On 03.09.20 12:13, Fabian Gr=C3=BCnbichler wrote:
->>>>>> On August 21, 2020 3:03 pm, Max Reitz wrote:
->>>>>>> On 18.02.20 11:07, Fabian Gr=C3=BCnbichler wrote:
->>>>>> I am not sure how=20
->>>>>> the S-O-B by John is supposed to enter the mix - should I just inclu=
-de=20
->>>>>> it in the squashed patch (which would be partly authored, but=20
->>>>>> not-yet-signed-off by him otherwise?)?
->>>>>
->>>>> I=E2=80=99m not too sure on the proceedings, actually.  I think it sh=
-ould be
->>>>> fine if you put his S-o-b there, as long as your patch is somehow bas=
-ed
->>>>> on a patch that he sent earlier with his S-o-b underneath.  But I=E2=
-=80=99m not
->>>>> sure.
->>>>
->>>> Signed-off-by means that John certifies the DCO for the patch (at leas=
-t
->>>> the original version that you possibly modified), so you cannot just a=
-dd
->>>> it without asking him.
->>>
->>> But what if you take a patch from someone and heavily modify it =E2=80=
-=93
->>> wouldn=E2=80=99t you keep the original S-o-b and explain the modificati=
-ons in
->>> the commit message?
->>
->> Ah, if that patch already had a S-o-b, then yes. You keep it not only to
->> show who touched the patch, but also because your own S-o-b depends on
->> the one from the original author (you only have the rights to contribute
->> it because the original author had them and could pass them on to you).
->>
->> I thought it was based on a patch that came without S-o-b.
->=20
-> it is (taken from John's git, with his approval, and implicit admission=
-=20
-> that S-O-B is just missing because it was a WIP branch/tree that I=20
-> started from). that was also the reason why I kept that patch unmodified=
-=20
-> and sent my modifications as patches on-top, to make it easier for John=
-=20
-> to verify that that one patch is his original WIP one and add this=20
-> missing S-O-B ;)
+> I don't think such chains work unto arbitrary depths on physical
+> hardware either.
 
-OK, I see now.  I thought the S-o-b got lost somewhere, but was present
-originally.
+Real hardware by and large doesn't get designed with this kind
+of DMA-to-self as a consideration either, but unfortunately it's
+not really very useful as a model to base QEMU's behaviour on:
 
-Max
+ (1) real hardware is usually massively parallel, so the logic
+  that handles incoming MMIO is decoupled anyway from logic
+  that does outgoing DMA. (Arguably the "do all DMA in a
+  bottom-half" idea is kind of following the hardware design.)
+  Similarly simple "raise this outbound signal" logic just
+  works as an instantaneous action that causes the device on
+  the other end to change its state/do something parallel,
+  whereas for QEMU we need to actually call some code in the
+  device on the other end and so we serialize this stuff,
+  sandwiching a bit of "device B code" in the middle of a
+  run of "device A code". So a lot more of this stuff "just
+  happens to work" on h/w than we get with QEMU.
+ (2) if software running on real h/w does do something silly with
+  programming a device to DMA to itself then the worst case is
+  generally that they manage to wedge that device (or the whole
+  machine, if you're really unlucky), in which case the response
+  is "don't do that then". There isn't the same "guest code
+  can escape the VM" security boundary that QEMU needs to guard
+  against [*].
 
+[*] I do wonder about hardware-device-passthrough setups; I
+don't think I would care to pass through an arbitrary device
+to an untrusted guest...
 
---PqllfYE3his0zitYEfDyKnMc81uFR9ZfN--
-
---rOkZwV6iD1BjoLYT3W5M9KOejgRPM5pNG
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9Q9PEACgkQ9AfbAGHV
-z0CUwgf6AhtNH3hu8N+0wOVvzwnpOpzaHatG6r8DCZ6oY5WEZjA2mSFcTc+Qf/kj
-i6+Xtq3G6RTp44N5dL8esaCuhYZPRdyAzTyuduLBcy/KR8CQtlzaJuTqKhQY1ivT
-crVLn4TAvSJZWsJSmcE6XpTG5JXmBVPYx6qd81SfIAvKCHz4t7D2qAUpi7fHsTcP
-rwuVjM3BeGF5ARUY5Pl4FMlECy7dXPF7684+1xHVKZd3Xqg5KO1HiZhoNwosHmuD
-vsSyVX5uKaav6adUcil3muG8T36qsZm2qtN5j7tRWszeTOqobTy0R936bai2h1AD
-/HlshIKWav0Sn0IKn4boX7TZ2rBCfw==
-=eT3o
------END PGP SIGNATURE-----
-
---rOkZwV6iD1BjoLYT3W5M9KOejgRPM5pNG--
-
+thanks
+-- PMM
 
