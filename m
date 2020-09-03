@@ -2,103 +2,95 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8624C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:45:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CEB4C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:46:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 823092072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:45:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30DF32072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:46:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EHuRz5ld"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 823092072A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZ00OMtr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30DF32072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDocC-0005pA-Jm
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:45:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53680)
+	id 1kDoda-0007RV-4t
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:46:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57432)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoMm-0001L0-L3
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:29:24 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42349
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoMk-0007un-JE
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:29:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599136161;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=NpnignYWyGxwS894GY8oMk/a6JEblSgZ3kZBOAlqf6A=;
- b=EHuRz5ldh7m30rNP6kcSn7OglEJNee23uWnD1qbqDSwGfoAPCJpwQB9o8oLJyAXJc1+tlM
- 0xOgw/2znYP0ZrIGKntH+3yLhQKHk13tP0yGX/grE4vrkyM1Oq5Fx53vWQKcDyYXgOGkt+
- Upgi4BS6XPkdbtYVlJRxbyzEZvuzOpA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-404-vHrFYYKbNAOakWWihsOSQg-1; Thu, 03 Sep 2020 08:29:20 -0400
-X-MC-Unique: vHrFYYKbNAOakWWihsOSQg-1
-Received: by mail-wr1-f71.google.com with SMTP id g6so1032041wrv.3
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:29:20 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kDoc9-0005xL-N5; Thu, 03 Sep 2020 08:45:17 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:37783)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kDoc7-0001aI-V8; Thu, 03 Sep 2020 08:45:17 -0400
+Received: by mail-wm1-x343.google.com with SMTP id a9so2754017wmm.2;
+ Thu, 03 Sep 2020 05:45:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=sPLoQJtAT4WBik7hhQYuT1/Cfi/FzdvLnONFwteKS3s=;
+ b=aZ00OMtrqESRinocvNrK067GvDqSoDJO71dDpkZLcu/JUIjw13X6ca0FX/fzvETGm4
+ koLX688vfdHcPoqHIgZX9rfRKwMfrXp+w8UvRaiV1FHaaFR+Nb04Tq+lwSohK5cZkHZh
+ 95X+dbs/06JP5w5HFywMzduuKqkSwfjChuNecSdJhGL5K/nIqYJLW1lU9QojNoER2Hgw
+ FLdTKTcQcDKHAAesZlMV2tqpgOrfyR6e2PKKdq960Sd7M+98qMYpf5+gVMJkumwGWz38
+ VKuITd28nvT5Uvk96WRYTBETbovNNbGyWAaNXBpKC0iOKSNZ8ugVVBaME41C4AE8da89
+ ojgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NpnignYWyGxwS894GY8oMk/a6JEblSgZ3kZBOAlqf6A=;
- b=MuLIGhFiG8i0nPSkwSuBOov+NWYA/tCTAIbzjeBP5bhjJV+T2fZIQaAbEjpZ24IbSH
- p3BYLUxd16K6K83JiWpI6UjCVnmOXCHrF3aRH02TmojZ8HiGo8cnd4I1PDKNtwYYdMr7
- MJ31DQQKzxmSyaLmMYEg6OMydHJ94y0e74eRNXXnHv9ULpBWEpzeb3SIhwd+C62r/l8+
- 2XCFfKvo7GxuI/gUfMDhN6UQsBhXrTvRxQauXQe6o4mHIIx5Cy0PQBts0r6xy41Z/jDm
- xTxOcoGk8NcJKBkc8mp2seFJG9x9fTuV4fsEMFaJVw2dypC1BBaxsFqpbg9mbmgguVcy
- ik1Q==
-X-Gm-Message-State: AOAM533et1khJu9JWhvqSy9ualbwNl7xWfF0/9lBB0qxlMr+q9UjXRky
- 4jjyQwf8IscOYt5VILYois8wbwhDB2jjo1SqogEdAagVan24hCmNqSZvN/d6MN/D3gbiWrTJOu+
- hNVc6e0HlnL5EUZg=
-X-Received: by 2002:adf:dfc3:: with SMTP id q3mr2143358wrn.238.1599136159152; 
- Thu, 03 Sep 2020 05:29:19 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxR9VEDlF2c2hXScIfRFO6BMVLUh++Phr1HzLZP45Ib7PyZQGziMgfXkk+UlgLLkTuTZ0hqUg==
-X-Received: by 2002:adf:dfc3:: with SMTP id q3mr2143341wrn.238.1599136158915; 
- Thu, 03 Sep 2020 05:29:18 -0700 (PDT)
-Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=sPLoQJtAT4WBik7hhQYuT1/Cfi/FzdvLnONFwteKS3s=;
+ b=tZT2ZLWDaKfOkLbQAymLIGxLuYR/Nu0e0GEbS8YQExszKo7wfiARG9iWNPeo1P1ycQ
+ CZqTyAWOKDVYT7MA//TiWJ6IRc92i1SEKFyUgPMuT90UTZ5NyQWURVWje/W6I0xJ4f+G
+ aFY9D+bZ63yiU2Of8vegthvA4RhQxnh3Jy6SEzSsMQpl5EdXNKWvsI+JZJ92jFHx29cP
+ H63oYDrlBtuY95S43JfOaa19Zt3c08cuhJCz3pufeMv5ag9ZZvdnRHMbvryTe1P1OeyM
+ Zox7Og7LSItEbUggEsjVPGxSvveL0d1ANKzmNKZqVy8vOhTWkJvz/b6NwuHZ9jAuM1sI
+ 3N2Q==
+X-Gm-Message-State: AOAM530Xgrtqa5g9aaz8vatIsFBPjz+2MYeNRoxGsxL8iQ628NW7evsk
+ mECbPWWT+pIGAgavVsyCwxQ=
+X-Google-Smtp-Source: ABdhPJzf1xX/iKQCTf2and0//HxwaoYDzs5CRhEGdeMro8MeVT0EM5BdQYv9+L6sVAY5oy/oOZ7gPg==
+X-Received: by 2002:a7b:cf1a:: with SMTP id l26mr2290315wmg.164.1599137114150; 
+ Thu, 03 Sep 2020 05:45:14 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id f6sm5522520wme.32.2020.09.03.05.29.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 05:29:18 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v7 15/15] block/nvme: Use an array of EventNotifier
-Date: Thu,  3 Sep 2020 14:28:03 +0200
-Message-Id: <20200903122803.405265-16-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200903122803.405265-1-philmd@redhat.com>
-References: <20200903122803.405265-1-philmd@redhat.com>
+ by smtp.gmail.com with ESMTPSA id w21sm4294799wmk.34.2020.09.03.05.45.13
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Sep 2020 05:45:13 -0700 (PDT)
+Subject: Re: [PATCH 20/63] pc87312: Rename TYPE_PC87312_SUPERIO to TYPE_PC87312
+To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
+References: <20200902224311.1321159-1-ehabkost@redhat.com>
+ <20200902224311.1321159-21-ehabkost@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <2863f7ea-6fde-5a2e-b55f-e805f5db35be@amsat.org>
+Date: Thu, 3 Sep 2020 14:45:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8;
-	text/plain; charset="utf-8"
+In-Reply-To: <20200902224311.1321159-21-ehabkost@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.403,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -112,131 +104,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Keith Busch <kbusch@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ qemu-ppc@nongnu.org, berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In preparation of using multiple IRQ (thus multiple eventfds)
-make BDRVNVMeState::irq_notifier an array (for now of a single
-element, the admin queue notifier).
+On 9/3/20 12:42 AM, Eduardo Habkost wrote:
+> This will make the type name constant consistent with the name of
+> the type checking macro.
+> 
+> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Cc: "Hervé Poussineau" <hpoussin@reactos.org>
+> Cc: qemu-ppc@nongnu.org
+> Cc: qemu-devel@nongnu.org
+> ---
+>  include/hw/isa/pc87312.h | 4 ++--
+>  hw/isa/pc87312.c         | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/hw/isa/pc87312.h b/include/hw/isa/pc87312.h
+> index a65168a157..da8dc5ddf5 100644
+> --- a/include/hw/isa/pc87312.h
+> +++ b/include/hw/isa/pc87312.h
+> @@ -29,10 +29,10 @@
+>  #include "qom/object.h"
+>  
+>  
+> -#define TYPE_PC87312_SUPERIO "pc87312"
+> +#define TYPE_PC87312 "pc87312"
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- block/nvme.c | 31 +++++++++++++++++++++----------
- 1 file changed, 21 insertions(+), 10 deletions(-)
+We loose self-documentation. What is a TYPE_PC87312
+when reviewing a board setup code? Should we add a
+comment /* Create the Super I/O */? The current name
+is self-describing...
 
-diff --git a/block/nvme.c b/block/nvme.c
-index e3719d3bd14..24e6e7f0866 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -106,6 +106,12 @@ QEMU_BUILD_BUG_ON(offsetof(NVMeRegs, doorbells) != 0x1000);
- #define INDEX_ADMIN     0
- #define INDEX_IO(n)     (1 + n)
- 
-+/* This driver shares a single MSIX IRQ for the admin and I/O queues */
-+enum {
-+    MSIX_SHARED_IRQ_IDX = 0,
-+    MSIX_IRQ_COUNT = 1
-+};
-+
- struct BDRVNVMeState {
-     AioContext *aio_context;
-     QEMUVFIOState *vfio;
-@@ -120,7 +126,7 @@ struct BDRVNVMeState {
-     /* How many uint32_t elements does each doorbell entry take. */
-     size_t doorbell_scale;
-     bool write_cache_supported;
--    EventNotifier irq_notifier;
-+    EventNotifier irq_notifier[MSIX_IRQ_COUNT];
- 
-     uint64_t nsze; /* Namespace size reported by identify command */
-     int nsid;      /* The namespace id to read/write data. */
-@@ -631,7 +637,8 @@ static bool nvme_poll_queues(BDRVNVMeState *s)
- 
- static void nvme_handle_event(EventNotifier *n)
- {
--    BDRVNVMeState *s = container_of(n, BDRVNVMeState, irq_notifier);
-+    BDRVNVMeState *s = container_of(n, BDRVNVMeState,
-+                                    irq_notifier[MSIX_SHARED_IRQ_IDX]);
- 
-     trace_nvme_handle_event(s);
-     event_notifier_test_and_clear(n);
-@@ -683,7 +690,8 @@ out_error:
- static bool nvme_poll_cb(void *opaque)
- {
-     EventNotifier *e = opaque;
--    BDRVNVMeState *s = container_of(e, BDRVNVMeState, irq_notifier);
-+    BDRVNVMeState *s = container_of(e, BDRVNVMeState,
-+                                    irq_notifier[MSIX_SHARED_IRQ_IDX]);
- 
-     trace_nvme_poll_cb(s);
-     return nvme_poll_queues(s);
-@@ -705,7 +713,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-     s->device = g_strdup(device);
-     s->nsid = namespace;
-     s->aio_context = bdrv_get_aio_context(bs);
--    ret = event_notifier_init(&s->irq_notifier, 0);
-+    ret = event_notifier_init(&s->irq_notifier[MSIX_SHARED_IRQ_IDX], 0);
-     if (ret) {
-         error_setg(errp, "Failed to init event notifier");
-         return ret;
-@@ -784,12 +792,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-         }
-     }
- 
--    ret = qemu_vfio_pci_init_irq(s->vfio, &s->irq_notifier,
-+    ret = qemu_vfio_pci_init_irq(s->vfio, s->irq_notifier,
-                                  VFIO_PCI_MSIX_IRQ_INDEX, errp);
-     if (ret) {
-         goto out;
-     }
--    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-+    aio_set_event_notifier(bdrv_get_aio_context(bs),
-+                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
-                            false, nvme_handle_event, nvme_poll_cb);
- 
-     nvme_identify(bs, namespace, &local_err);
-@@ -872,9 +881,10 @@ static void nvme_close(BlockDriverState *bs)
-         nvme_free_queue_pair(s->queues[i]);
-     }
-     g_free(s->queues);
--    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-+    aio_set_event_notifier(bdrv_get_aio_context(bs),
-+                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
-                            false, NULL, NULL);
--    event_notifier_cleanup(&s->irq_notifier);
-+    event_notifier_cleanup(&s->irq_notifier[MSIX_SHARED_IRQ_IDX]);
-     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
-     qemu_vfio_close(s->vfio);
- 
-@@ -1381,7 +1391,8 @@ static void nvme_detach_aio_context(BlockDriverState *bs)
-         q->completion_bh = NULL;
-     }
- 
--    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
-+    aio_set_event_notifier(bdrv_get_aio_context(bs),
-+                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
-                            false, NULL, NULL);
- }
- 
-@@ -1391,7 +1402,7 @@ static void nvme_attach_aio_context(BlockDriverState *bs,
-     BDRVNVMeState *s = bs->opaque;
- 
-     s->aio_context = new_context;
--    aio_set_event_notifier(new_context, &s->irq_notifier,
-+    aio_set_event_notifier(new_context, &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
-                            false, nvme_handle_event, nvme_poll_cb);
- 
-     for (int i = 0; i < s->nr_queues; i++) {
--- 
-2.26.2
+Is it easier to rename the type as 'pc87312-superio'?
+
+   #define TYPE_PC87312_SUPERIO "pc87312-superio"
+
+>  typedef struct PC87312State PC87312State;
+>  DECLARE_INSTANCE_CHECKER(PC87312State, PC87312,
+> -                         TYPE_PC87312_SUPERIO)
+> +                         TYPE_PC87312)
+>  
+>  struct PC87312State {
+>      /*< private >*/
+> diff --git a/hw/isa/pc87312.c b/hw/isa/pc87312.c
+> index 0cacbbc91b..8d7b8d3db2 100644
+> --- a/hw/isa/pc87312.c
+> +++ b/hw/isa/pc87312.c
+> @@ -371,7 +371,7 @@ static void pc87312_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo pc87312_type_info = {
+> -    .name          = TYPE_PC87312_SUPERIO,
+> +    .name          = TYPE_PC87312,
+>      .parent        = TYPE_ISA_SUPERIO,
+>      .instance_size = sizeof(PC87312State),
+>      .instance_init = pc87312_initfn,
+> 
 
 
