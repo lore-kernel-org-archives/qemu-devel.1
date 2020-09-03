@@ -2,88 +2,85 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0437EC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:09:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3A1CC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:11:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B578220716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:09:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91C002071B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:11:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DsvyV2Gb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B578220716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zy9yPg3p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91C002071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDjMu-0005KV-SI
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 03:09:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36176)
+	id 1kDjPB-0006WW-PC
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 03:11:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDjMG-0004un-Ih
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:08:32 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:40745)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDjME-0007zO-MU
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:08:32 -0400
-Received: by mail-lj1-x243.google.com with SMTP id s205so2317653lja.7
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 00:08:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=+p/MohhaJEAuGgwgS0LbFj7E3XtTQmDAeSRN1EzZHv4=;
- b=DsvyV2GbafQITHIBqewATPXpzHN3GZltgwtNA7PS0hjKF7gqCRZQrJD2uUsfGbEW/+
- ZMl0XYAo4xR7kJxRwILL54Y1tP34VAnD9lS2jBbvpJuKsy4iKQxLgaWla7sI45YJUgtr
- nP5+byK7CvOhUzP/Wb+YWwki9P8FnIL1FrduFubCy+dTH4FWkwHRgqaoBbsa2FEBCToj
- 8uPMDu2xqC6b9rIwZ+oGydIhYExALnsIJIYnXrg1HiVHcdFxe0PvIshT3iniVBTHTw6P
- 9bLmDJoXaYV0IlgK4l1zMhTw5b1BsqTxK1c94pgO0Lmt2EsXqw11Cizp5hYu8FN0yP2F
- lUvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=+p/MohhaJEAuGgwgS0LbFj7E3XtTQmDAeSRN1EzZHv4=;
- b=MOtJrhNHoSJfrC2BoILOwWiLQbjVZXqTcxkcBXWcO5PxsUP4j62rF3jhi87TfEZS8M
- xYrTpwoAmnr8yWndwih/hOQYrLsd5Ct/3VZSIDZ9/wlwlvVGuNrG7diNHFnhif9x2zK9
- gBLXDRPCQWdSHt8xnuJX5T6szuOucwJx7UCSm7z5/OKxeY4SHl+22XxHxORjqqwaqWxX
- cdZd+7xJTxKQnX/v8fTmszHAXJoedO2nKDSAiewG/gdh+deygpJv7RZIvrFTp2Wbo9MB
- wjMOadY1FldBjOUy2h77D3RBQep1isVYGVPrD1tswE9jD16hY14MxdHBuJLBN1qAYPpm
- 7qXw==
-X-Gm-Message-State: AOAM5314+Q/GWR9VdmudzA6GWOjHhxn7KGdYG8vr1GWMBjTBMPzyQKr5
- cUZcOUM0lM1RDXs5IMh9S/xEavBxFUGkdv7LZbAt4/rZ8tolDA==
-X-Google-Smtp-Source: ABdhPJwl8Kisn+k062ot+OX1VkwCYsexW/Ox9UokuHjGLpmK9Rgtaom92Pl9CAl8qoXHY+++DYgAUMxpnt7DJmGWxnc=
-X-Received: by 2002:a05:651c:1119:: with SMTP id
- d25mr464411ljo.300.1599116908795; 
- Thu, 03 Sep 2020 00:08:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kDjOd-000619-T5
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:10:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37840)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kDjOb-0008Su-8D
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:10:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599117055;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=T5ZfoAzWZJb7OL8G9LB8xC0vvEMd9TxuJopR1WzXeX4=;
+ b=Zy9yPg3pmaL9TSUFXFUC1Iws1Vw/W2aU7NOOvO0fFEQxNbZfAPe/2KRxlfvpPX+K73cEMP
+ Vm8ZpkhD25W6XOlh6r9ocD5l9jjJ/+WY+SkmULtVR/N7veot7VUrEXibFpOFahEhrGhqVE
+ zgKCLI1XPF++hvPWcJoowyxYEjJGDCM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-xU47r8Q8NDWkwj0eo8Fx6Q-1; Thu, 03 Sep 2020 03:10:50 -0400
+X-MC-Unique: xU47r8Q8NDWkwj0eo8Fx6Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4ABB5801AE6;
+ Thu,  3 Sep 2020 07:10:49 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-113-31.rdu2.redhat.com
+ [10.10.113.31])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FB581002D53;
+ Thu,  3 Sep 2020 07:10:46 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: [PATCH v1] sd: sdhci: assert data_count is within fifo_buffer
+Date: Thu,  3 Sep 2020 12:38:42 +0530
+Message-Id: <20200903070842.2125083-1-ppandit@redhat.com>
 MIME-Version: 1.0
-References: <20200903054503.425435-1-thuth@redhat.com>
-In-Reply-To: <20200903054503.425435-1-thuth@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Thu, 3 Sep 2020 15:08:17 +0800
-Message-ID: <CAE2XoE85T-BcpDqKSO7Buc8MxSZ-jsQEV+8BsTXoShHz=eOwDw@mail.gmail.com>
-Subject: Re: [PATCH] stubs: Move qemu_fd_register stub to util/main-loop.c
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000004d9cb405ae636bde"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,210 +93,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-level <qemu-devel@nongnu.org>
+Cc: Ruhr-University <bugs-syssec@rub.de>,
+ QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004d9cb405ae636bde
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-I am also facing some problem alike:
+While doing multi block SDMA, transfer block size may exceed
+the 's->fifo_buffer[s->buf_maxsz]' size. It may leave the
+current element pointer 's->data_count' pointing out of bounds.
+Leading the subsequent DMA r/w operation to OOB access issue.
+Assert that 's->data_count' is within fifo_buffer.
 
-  LINK    tests/test-qdev-global-props.exe
-  LINK    tests/test-timed-average.exe
-C:/CI-Tools/msys64/mingw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../.=
-./../x86_64-w64-mingw32/bin/ld.exe:
-libqemuutil.a(util_main-loop.c.obj): in function `qemu_notify_event':
-C:\work\xemu\qemu-build/../qemu/util/main-loop.c:139: multiple definition
-of `qemu_notify_event';
-libqemuutil.a(stubs_notify-event.c.obj):C:\work\xemu\qemu-build/../qemu/stu=
-bs/notify-event.c:6:
-first defined here
-collect2.exe: error: ld returned 1 exit status
-make: *** [C:/work/xemu/qemu/rules.mak:88=EF=BC=9Atests/test-timed-average.=
-exe] =E9=94=99=E8=AF=AF 1
+ -> https://ruhr-uni-bochum.sciebo.de/s/NNWP2GfwzYKeKwE?path=%2Fsdhci_oob_write1
+ ==1459837==ERROR: AddressSanitizer: heap-buffer-overflow
+ WRITE of size 54722048 at 0x61500001e280 thread T3
+ #0  __interceptor_memcpy (/lib64/libasan.so.6+0x3a71d)
+ #1  flatview_read_continue ../exec.c:3245
+ #2  flatview_read ../exec.c:3278
+ #3  address_space_read_full ../exec.c:3291
+ #4  address_space_rw ../exec.c:3319
+ #5  dma_memory_rw_relaxed ../include/sysemu/dma.h:87
+ #6  dma_memory_rw ../include/sysemu/dma.h:110
+ #7  dma_memory_read ../include/sysemu/dma.h:116
+ #8  sdhci_sdma_transfer_multi_blocks ../hw/sd/sdhci.c:629
+ #9  sdhci_write ../hw/sd/sdhci.c:1097
+ #10 memory_region_write_accessor ../softmmu/memory.c:483
+ ...
 
-On Thu, Sep 3, 2020 at 1:46 PM Thomas Huth <thuth@redhat.com> wrote:
+Reported-by: Ruhr-University <bugs-syssec@rub.de>
+Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/sd/sdhci.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-> The linker of MinGW sometimes runs into the following problem:
->
-> libqemuutil.a(util_main-loop.c.obj): In function `qemu_fd_register':
-> /builds/huth/qemu/build/../util/main-loop.c:331: multiple definition of
->  `qemu_fd_register'
->
-> libqemuutil.a(stubs_fd-register.c.obj):/builds/huth/qemu/stubs/fd-registe=
-r.c:5:
->  first defined here
-> collect2: error: ld returned 1 exit status
-> /builds/huth/qemu/rules.mak:88: recipe for target
-> 'tests/test-timed-average.exe'
->  failed
->
-> qemu_fd_register() is defined in util/main-loop.c for WIN32, so let's
-> simply
-> move the stub also there in the #else part of the corresponding #ifndef
-> to fix this problem.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  stubs/fd-register.c | 6 ------
->  stubs/meson.build   | 1 -
->  util/main-loop.c    | 4 ++++
->  3 files changed, 4 insertions(+), 7 deletions(-)
->  delete mode 100644 stubs/fd-register.c
->
-> diff --git a/stubs/fd-register.c b/stubs/fd-register.c
-> deleted file mode 100644
-> index 63a4abdb20..0000000000
-> --- a/stubs/fd-register.c
-> +++ /dev/null
-> @@ -1,6 +0,0 @@
-> -#include "qemu/osdep.h"
-> -#include "qemu/main-loop.h"
-> -
-> -void qemu_fd_register(int fd)
-> -{
-> -}
-> diff --git a/stubs/meson.build b/stubs/meson.build
-> index e2dfedc2a7..e0b322bc28 100644
-> --- a/stubs/meson.build
-> +++ b/stubs/meson.build
-> @@ -9,7 +9,6 @@ stub_ss.add(files('cpu-get-clock.c'))
->  stub_ss.add(files('cpu-get-icount.c'))
->  stub_ss.add(files('dump.c'))
->  stub_ss.add(files('error-printf.c'))
-> -stub_ss.add(files('fd-register.c'))
->  stub_ss.add(files('fdset.c'))
->  stub_ss.add(files('fw_cfg.c'))
->  stub_ss.add(files('gdbstub.c'))
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index f69f055013..217c8d6056 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -179,6 +179,10 @@ static int max_priority;
->  static int glib_pollfds_idx;
->  static int glib_n_poll_fds;
->
-> +void qemu_fd_register(int fd)
-> +{
-> +}
-> +
->  static void glib_pollfds_fill(int64_t *cur_timeout)
->  {
->      GMainContext *context =3D g_main_context_default();
-> --
-> 2.18.2
->
->
->
+Update v1: use assert(3) calls
+  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg00966.html
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 1785d7e1f7..023acbed41 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -604,6 +604,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+                     s->blkcnt--;
+                 }
+             }
++            assert(s->data_count <= s->buf_maxsz && s->data_count > begin);
+             dma_memory_write(s->dma_as, s->sdmasysad,
+                              &s->fifo_buffer[begin], s->data_count - begin);
+             s->sdmasysad += s->data_count - begin;
+@@ -626,6 +627,7 @@ static void sdhci_sdma_transfer_multi_blocks(SDHCIState *s)
+                 s->data_count = block_size;
+                 boundary_count -= block_size - begin;
+             }
++            assert(s->data_count <= s->buf_maxsz && s->data_count > begin);
+             dma_memory_read(s->dma_as, s->sdmasysad,
+                             &s->fifo_buffer[begin], s->data_count - begin);
+             s->sdmasysad += s->data_count - begin;
+-- 
+2.26.2
 
---0000000000004d9cb405ae636bde
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>I am also facing some problem alike:</div><div><br></=
-div><div>=C2=A0 LINK =C2=A0 =C2=A0tests/test-qdev-global-props.exe<br>=C2=
-=A0 LINK =C2=A0 =C2=A0tests/test-timed-average.exe<br>C:/CI-Tools/msys64/mi=
-ngw64/bin/../lib/gcc/x86_64-w64-mingw32/10.2.0/../../../../x86_64-w64-mingw=
-32/bin/ld.exe: libqemuutil.a(util_main-loop.c.obj): in function `qemu_notif=
-y_event&#39;:<br>C:\work\xemu\qemu-build/../qemu/util/main-loop.c:139: mult=
-iple definition of `qemu_notify_event&#39;; libqemuutil.a(stubs_notify-even=
-t.c.obj):C:\work\xemu\qemu-build/../qemu/stubs/notify-event.c:6: first defi=
-ned here<br>collect2.exe: error: ld returned 1 exit status<br>make: *** [C:=
-/work/xemu/qemu/rules.mak:88=EF=BC=9Atests/test-timed-average.exe] =E9=94=
-=99=E8=AF=AF 1<br></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" cla=
-ss=3D"gmail_attr">On Thu, Sep 3, 2020 at 1:46 PM Thomas Huth &lt;<a href=3D=
-"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrote:<br></div><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
- solid rgb(204,204,204);padding-left:1ex">The linker of MinGW sometimes run=
-s into the following problem:<br>
-<br>
-libqemuutil.a(util_main-loop.c.obj): In function `qemu_fd_register&#39;:<br=
->
-/builds/huth/qemu/build/../util/main-loop.c:331: multiple definition of<br>
-=C2=A0`qemu_fd_register&#39;<br>
-libqemuutil.a(stubs_fd-register.c.obj):/builds/huth/qemu/stubs/fd-register.=
-c:5:<br>
-=C2=A0first defined here<br>
-collect2: error: ld returned 1 exit status<br>
-/builds/huth/qemu/rules.mak:88: recipe for target &#39;tests/test-timed-ave=
-rage.exe&#39;<br>
-=C2=A0failed<br>
-<br>
-qemu_fd_register() is defined in util/main-loop.c for WIN32, so let&#39;s s=
-imply<br>
-move the stub also there in the #else part of the corresponding #ifndef<br>
-to fix this problem.<br>
-<br>
-Signed-off-by: Thomas Huth &lt;<a href=3D"mailto:thuth@redhat.com" target=
-=3D"_blank">thuth@redhat.com</a>&gt;<br>
----<br>
-=C2=A0stubs/fd-register.c | 6 ------<br>
-=C2=A0stubs/meson.build=C2=A0 =C2=A0| 1 -<br>
-=C2=A0util/main-loop.c=C2=A0 =C2=A0 | 4 ++++<br>
-=C2=A03 files changed, 4 insertions(+), 7 deletions(-)<br>
-=C2=A0delete mode 100644 stubs/fd-register.c<br>
-<br>
-diff --git a/stubs/fd-register.c b/stubs/fd-register.c<br>
-deleted file mode 100644<br>
-index 63a4abdb20..0000000000<br>
---- a/stubs/fd-register.c<br>
-+++ /dev/null<br>
-@@ -1,6 +0,0 @@<br>
--#include &quot;qemu/osdep.h&quot;<br>
--#include &quot;qemu/main-loop.h&quot;<br>
--<br>
--void qemu_fd_register(int fd)<br>
--{<br>
--}<br>
-diff --git a/stubs/meson.build b/stubs/meson.build<br>
-index e2dfedc2a7..e0b322bc28 100644<br>
---- a/stubs/meson.build<br>
-+++ b/stubs/meson.build<br>
-@@ -9,7 +9,6 @@ stub_ss.add(files(&#39;cpu-get-clock.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;cpu-get-icount.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;dump.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;error-printf.c&#39;))<br>
--stub_ss.add(files(&#39;fd-register.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;fdset.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;fw_cfg.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;gdbstub.c&#39;))<br>
-diff --git a/util/main-loop.c b/util/main-loop.c<br>
-index f69f055013..217c8d6056 100644<br>
---- a/util/main-loop.c<br>
-+++ b/util/main-loop.c<br>
-@@ -179,6 +179,10 @@ static int max_priority;<br>
-=C2=A0static int glib_pollfds_idx;<br>
-=C2=A0static int glib_n_poll_fds;<br>
-<br>
-+void qemu_fd_register(int fd)<br>
-+{<br>
-+}<br>
-+<br>
-=C2=A0static void glib_pollfds_fill(int64_t *cur_timeout)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0GMainContext *context =3D g_main_context_default();<br>
--- <br>
-2.18.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---0000000000004d9cb405ae636bde--
 
