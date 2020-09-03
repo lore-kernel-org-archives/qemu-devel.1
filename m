@@ -4,80 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6E8AC43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:17:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E64C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:17:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 894C4206CA
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:17:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B9E4206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:17:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X8KhjgAb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 894C4206CA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H6HgUhoH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B9E4206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41028 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwbM-0003NE-DM
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:17:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58902)
+	id 1kDwc8-00049s-DZ
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:17:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLa-0004Mz-41; Thu, 03 Sep 2020 17:00:42 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46659)
+ id 1kDwL3-0003X5-2s; Thu, 03 Sep 2020 17:00:09 -0400
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:45784)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLY-0007jb-6c; Thu, 03 Sep 2020 17:00:41 -0400
-Received: by mail-oi1-x242.google.com with SMTP id u126so4474601oif.13;
- Thu, 03 Sep 2020 14:00:39 -0700 (PDT)
+ id 1kDwL1-0007Pl-1Y; Thu, 03 Sep 2020 17:00:08 -0400
+Received: by mail-oi1-x235.google.com with SMTP id d189so4477963oig.12;
+ Thu, 03 Sep 2020 14:00:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=OpNReXfR7oEtNGXMqeGl3rFAqgl3SKXekjVzKbcaap8=;
- b=X8KhjgAbb4mcyWsWM15dzaDEfKZHO8Exg1yGbftCeOLnjppv6RkKEHg3Fq0Ng8GuXw
- HkfVdc0WcYo2DBcJ81JEfqA9Hy5zopID/K1WIoQiT+YcybKTT6UWtI4H8vuS8Pu4utSh
- mwUtd68qWL7dO8U8+lZOED0Nk21KgniqcSbb1PTqOTV3ansddAwortYzzyeiJBhVDtEP
- Grl7/r0fLgf++bY8ZZDSp1kLesJtKdBiawBAzFM+Spb//1qNYxxDX4XkjbLY46Y+VAZB
- 7hnI7rxkhfe55/eX6sI07EMk/IN2zLuLcPYC8PgCSdi2ZAcxi5a/4mK3+o4P0UNYHsX3
- s/wA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=OIsdyV2PRysNfY7ypO8eiajhFecOTZcFODPU4qiwxp8=;
+ b=H6HgUhoHtv7MNe8tt7gWCEWnsJ1mX23d3zM819/uHRaWj0MguMhnTp+FzcwsiZAb6I
+ 3i4F0yjUdkPcsLgb+ahksZd1o2U2OOWVCnpFvOdzsfjhGbhnFv8oe+cs/D3RVD7oM79B
+ NLuAzBVU7nXj9yZQ0QPtCUjaAW7PtQM03+CJd1zoFXd/hTRaZ4a7UDyqA+GiI3t3b7C6
+ JCHXf6AqKsNR9QWIIc4R6xYtJovbHFFC0hhxysFDgGLOP65YGtYes4tE/WcQByN9sOxA
+ auvI4gBkqvxGyActzKeIYh0itCvz3yJDiJn2EQWs5w+odLHyweRL7W2G4UHWOhxm3XYi
+ uTUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=OpNReXfR7oEtNGXMqeGl3rFAqgl3SKXekjVzKbcaap8=;
- b=FkM3uN+dIGYXrZ4Ie1AO8f1vuszOvmFoKtxIpMfm5XKsiuQpRolq6ZsS6hCs6AqIZN
- iIpXY9j4km1sB3cDZ9O8kQgZGHxW+vfc5Uvr1UG6O/vgo7e3WGPgS+EHXLp4a/zwlicY
- XScgxfMbj31QOC1xU4uVGYYkaLwqt+PFY1Kh2koZmGt4k84uOTQsgoBWpZadaIdpiB4+
- FU139nenaqWYaNqjtEmyYX/N38AkKUDNJPMsd+tB3cilarKODq6PuH6kVlq6lIwcM667
- f6U6Bi+F7tYPxq5Jqcc8JpR7vsaJF5yDmvdBkbbZ2Gd3J/vixA2qPWjeHOztcd7Mm7w2
- sTGw==
-X-Gm-Message-State: AOAM53181gkhxwUcu8wazE9DLlvQG5gQsL9S7gsjOhse1MAHsOUGkNQ+
- JcenrhwY95NTCEGiWmnoTVdVFXYMmBs=
-X-Google-Smtp-Source: ABdhPJzk9sJOMiX65whUn5idLaP3rbh3WnjTOymLIAZO6JUDSHEHKQ8xYXyrBz1vN4DDokgF7FEJaA==
-X-Received: by 2002:aca:c4cb:: with SMTP id u194mr3216387oif.106.1599166838308; 
- Thu, 03 Sep 2020 14:00:38 -0700 (PDT)
+ :in-reply-to:references;
+ bh=OIsdyV2PRysNfY7ypO8eiajhFecOTZcFODPU4qiwxp8=;
+ b=qFdt8Fmrl2tYpB4m2oCA0VHbu4KKEwJ3WSBP0AFR6M6T3mr6/jIeJTHYbWmZ4f6Vzv
+ PxiqFPBy0qPrQLk6704uc3I+71fNLPLUQyQzSrjc6NF9npwyQtEHJGn1pWetG6eQwbgk
+ etPJziTqELeTvj9vJtVTpGpt1TZqZdfPyCyoNpPzHyS3IllFKlKZNbzVUm1TtlKWlM3a
+ cTig2d50qF4gPYym4Q2qcxVdA3nmYm/3yPLoJxZ48unN+Z4JhIKunGWYXCv7O/lrAcGC
+ tIKqBBv2RSDiGMMdggHdxmsGgqtbgFfSI3vf0tOr4MeoEZrYzF03azNlxrToVlyahhx+
+ hL6w==
+X-Gm-Message-State: AOAM531xGgJIANXfzeHvkCgteR52JbFWvPvwyh3n4kFXLIpsGO428hQU
+ EkV6O6e1d5EkML0UdIacsk7yTLY30CI=
+X-Google-Smtp-Source: ABdhPJzs7wuKr4APG+r+H6rf/qU3oa+gQO+n5Pc1FoKe7AieBIacr4qorEJZx0imRNUMkvHMjqZ9zA==
+X-Received: by 2002:aca:bc57:: with SMTP id m84mr3224265oif.14.1599166805140; 
+ Thu, 03 Sep 2020 14:00:05 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id g22sm777201ots.35.2020.09.03.14.00.37
+ by smtp.gmail.com with ESMTPSA id l136sm733495oig.7.2020.09.03.14.00.04
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:37 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:04 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 43/77] util: Introduce qemu_get_host_name()
-Date: Thu,  3 Sep 2020 15:59:01 -0500
-Message-Id: <20200903205935.27832-44-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 20/77] virtiofsd: add --rlimit-nofile=NUM option
+Date: Thu,  3 Sep 2020 15:58:38 -0500
+Message-Id: <20200903205935.27832-21-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::235;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x235.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -100,112 +96,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michal Privoznik <mprivozn@redhat.com>, qemu-stable@nongnu.org
+Cc: qemu-stable@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michal Privoznik <mprivozn@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-This function offers operating system agnostic way to fetch host
-name. It is implemented for both POSIX-like and Windows systems.
+Make it possible to specify the RLIMIT_NOFILE on the command-line.
+Users running multiple virtiofsd processes should allocate a certain
+number to each process so that the system-wide limit can never be
+exhausted.
 
-Signed-off-by: Michal Privoznik <mprivozn@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-(cherry picked from commit e47f4765afcab2b78dfa5b0115abf64d1d49a5d3)
+When this option is set to 0 the rlimit is left at its current value.
+This is useful when a management tool wants to configure the rlimit
+itself.
+
+The default behavior remains unchanged: try to set the limit to
+1,000,000 file descriptors if the current rlimit is lower.
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <20200501140644.220940-2-stefanha@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+(cherry picked from commit 6dbb716877728ce4eb51619885ef6ef4ada9565f)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- include/qemu/osdep.h | 10 ++++++++++
- util/oslib-posix.c   | 35 +++++++++++++++++++++++++++++++++++
- util/oslib-win32.c   | 13 +++++++++++++
- 3 files changed, 58 insertions(+)
+ tools/virtiofsd/fuse_lowlevel.h  |  1 +
+ tools/virtiofsd/helper.c         | 23 +++++++++++++++++++++++
+ tools/virtiofsd/passthrough_ll.c | 22 ++++++++--------------
+ 3 files changed, 32 insertions(+), 14 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 20f5c5f197..1866cab3c5 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -607,4 +607,14 @@ static inline void qemu_reset_optind(void)
- #endif
+diff --git a/tools/virtiofsd/fuse_lowlevel.h b/tools/virtiofsd/fuse_lowlevel.h
+index 8f6d705b5c..562fd5241e 100644
+--- a/tools/virtiofsd/fuse_lowlevel.h
++++ b/tools/virtiofsd/fuse_lowlevel.h
+@@ -1777,6 +1777,7 @@ struct fuse_cmdline_opts {
+     int syslog;
+     int log_level;
+     unsigned int max_idle_threads;
++    unsigned long rlimit_nofile;
+ };
+ 
+ /**
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 819c2bc13c..dc59f38af0 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -23,6 +23,8 @@
+ #include <stdlib.h>
+ #include <string.h>
+ #include <sys/param.h>
++#include <sys/time.h>
++#include <sys/resource.h>
+ #include <unistd.h>
+ 
+ #define FUSE_HELPER_OPT(t, p)                       \
+@@ -53,6 +55,7 @@ static const struct fuse_opt fuse_helper_opts[] = {
+     FUSE_HELPER_OPT("subtype=", nodefault_subtype),
+     FUSE_OPT_KEY("subtype=", FUSE_OPT_KEY_KEEP),
+     FUSE_HELPER_OPT("max_idle_threads=%u", max_idle_threads),
++    FUSE_HELPER_OPT("--rlimit-nofile=%lu", rlimit_nofile),
+     FUSE_HELPER_OPT("--syslog", syslog),
+     FUSE_HELPER_OPT_VALUE("log_level=debug", log_level, FUSE_LOG_DEBUG),
+     FUSE_HELPER_OPT_VALUE("log_level=info", log_level, FUSE_LOG_INFO),
+@@ -171,6 +174,9 @@ void fuse_cmdline_help(void)
+            "                               default: no_writeback\n"
+            "    -o xattr|no_xattr          enable/disable xattr\n"
+            "                               default: no_xattr\n"
++           "    --rlimit-nofile=<num>      set maximum number of file descriptors\n"
++           "                               (0 leaves rlimit unchanged)\n"
++           "                               default: 1,000,000 if the current rlimit is lower\n"
+            );
  }
  
-+/**
-+ * qemu_get_host_name:
-+ * @errp: Error object
-+ *
-+ * Operating system agnostic way of querying host name.
-+ *
-+ * Returns allocated hostname (caller should free), NULL on failure.
-+ */
-+char *qemu_get_host_name(Error **errp);
-+
- #endif
-diff --git a/util/oslib-posix.c b/util/oslib-posix.c
-index 062236a1ab..e58fbc8e00 100644
---- a/util/oslib-posix.c
-+++ b/util/oslib-posix.c
-@@ -752,3 +752,38 @@ void sigaction_invoke(struct sigaction *action,
+@@ -191,11 +197,28 @@ static int fuse_helper_opt_proc(void *data, const char *arg, int key,
      }
-     action->sa_sigaction(info->ssi_signo, &si, NULL);
  }
-+
-+#ifndef HOST_NAME_MAX
-+# ifdef _POSIX_HOST_NAME_MAX
-+#  define HOST_NAME_MAX _POSIX_HOST_NAME_MAX
-+# else
-+#  define HOST_NAME_MAX 255
-+# endif
-+#endif
-+
-+char *qemu_get_host_name(Error **errp)
+ 
++static unsigned long get_default_rlimit_nofile(void)
 +{
-+    long len = -1;
-+    g_autofree char *hostname = NULL;
++    rlim_t max_fds = 1000000; /* our default RLIMIT_NOFILE target */
++    struct rlimit rlim;
 +
-+#ifdef _SC_HOST_NAME_MAX
-+    len = sysconf(_SC_HOST_NAME_MAX);
-+#endif /* _SC_HOST_NAME_MAX */
-+
-+    if (len < 0) {
-+        len = HOST_NAME_MAX;
++    if (getrlimit(RLIMIT_NOFILE, &rlim) < 0) {
++        fuse_log(FUSE_LOG_ERR, "getrlimit(RLIMIT_NOFILE): %m\n");
++        exit(1);
 +    }
 +
-+    /* Unfortunately, gethostname() below does not guarantee a
-+     * NULL terminated string. Therefore, allocate one byte more
-+     * to be sure. */
-+    hostname = g_new0(char, len + 1);
-+
-+    if (gethostname(hostname, len) < 0) {
-+        error_setg_errno(errp, errno,
-+                         "cannot get hostname");
-+        return NULL;
++    if (rlim.rlim_cur >= max_fds) {
++        return 0; /* we have more fds available than required! */
 +    }
-+
-+    return g_steal_pointer(&hostname);
++    return max_fds;
 +}
-diff --git a/util/oslib-win32.c b/util/oslib-win32.c
-index e9b14ab178..3b49d27297 100644
---- a/util/oslib-win32.c
-+++ b/util/oslib-win32.c
-@@ -808,3 +808,16 @@ bool qemu_write_pidfile(const char *filename, Error **errp)
++
+ int fuse_parse_cmdline(struct fuse_args *args, struct fuse_cmdline_opts *opts)
+ {
+     memset(opts, 0, sizeof(struct fuse_cmdline_opts));
+ 
+     opts->max_idle_threads = 10;
++    opts->rlimit_nofile = get_default_rlimit_nofile();
+     opts->foreground = 1;
+ 
+     if (fuse_opt_parse(args, opts, fuse_helper_opts, fuse_helper_opt_proc) ==
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index 4c35c95b25..f7b9c1d20c 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -2707,24 +2707,18 @@ static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+     setup_seccomp(enable_syslog);
+ }
+ 
+-/* Raise the maximum number of open file descriptors */
+-static void setup_nofile_rlimit(void)
++/* Set the maximum number of open file descriptors */
++static void setup_nofile_rlimit(unsigned long rlimit_nofile)
+ {
+-    const rlim_t max_fds = 1000000;
+-    struct rlimit rlim;
+-
+-    if (getrlimit(RLIMIT_NOFILE, &rlim) < 0) {
+-        fuse_log(FUSE_LOG_ERR, "getrlimit(RLIMIT_NOFILE): %m\n");
+-        exit(1);
+-    }
++    struct rlimit rlim = {
++        .rlim_cur = rlimit_nofile,
++        .rlim_max = rlimit_nofile,
++    };
+ 
+-    if (rlim.rlim_cur >= max_fds) {
++    if (rlimit_nofile == 0) {
+         return; /* nothing to do */
      }
-     return true;
- }
-+
-+char *qemu_get_host_name(Error **errp)
-+{
-+    wchar_t tmp[MAX_COMPUTERNAME_LENGTH + 1];
-+    DWORD size = G_N_ELEMENTS(tmp);
-+
-+    if (GetComputerNameW(tmp, &size) == 0) {
-+        error_setg_win32(errp, GetLastError(), "failed close handle");
-+        return NULL;
-+    }
-+
-+    return g_utf16_to_utf8(tmp, size, NULL, NULL, NULL);
-+}
+ 
+-    rlim.rlim_cur = max_fds;
+-    rlim.rlim_max = max_fds;
+-
+     if (setrlimit(RLIMIT_NOFILE, &rlim) < 0) {
+         /* Ignore SELinux denials */
+         if (errno == EPERM) {
+@@ -2977,7 +2971,7 @@ int main(int argc, char *argv[])
+ 
+     fuse_daemonize(opts.foreground);
+ 
+-    setup_nofile_rlimit();
++    setup_nofile_rlimit(opts.rlimit_nofile);
+ 
+     /* Must be before sandbox since it wants /proc */
+     setup_capng();
 -- 
 2.17.1
 
