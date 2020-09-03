@@ -2,81 +2,83 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCDBC433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A650C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:22:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 057A6206E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:20:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B21062083B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:22:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IH86kLBe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057A6206E7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KbwXoUSY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B21062083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48676 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDnIO-0001vT-6E
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:20:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36900)
+	id 1kDnJZ-0003cA-Pz
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:22:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDnHU-0001Mf-Le
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:19:52 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:39432)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kDnIm-0002PK-T3
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:21:12 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:38855)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDnHS-0007Iw-TT
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:19:52 -0400
-Received: by mail-ej1-x642.google.com with SMTP id p9so3304212ejf.6
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:19:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kDnIl-0007Yd-45
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:21:12 -0400
+Received: by mail-wm1-x342.google.com with SMTP id l9so2491145wme.3
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:21:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=4Ganswe+9U9d3mD63BLo8JQ6z2589NIHqh5cScxKjHs=;
- b=IH86kLBeHEXrfP8VR4LP+ze5pqHViWWZMQl9IZRBZuoiLPDRtBTqidAi65kBd5xYaD
- 5oJDELKIdZLnJ5LOKzTARpTyrmFHA0Tp+020O8EKjKtDJoUUDnAD1zkftVi1ONgnnhhh
- MWvVF++WeyhFUqpHnoFO+Qw3zaUAz7Z6h2qmXD3nzbTYmOveHgM0hqr/fm2RPUTL5EBk
- 7/A8T3WKnk5xiYWNzzD8gg2vnE200MNCeFWcMcuTVSEtx5ZN/5FfTVNhrVXrt7sEkNre
- ZUqGam8y491k4EsQaplUgJgplsjZJl9q9HSF4S33Km7/DSlGBQS3R/mPxEgs/BO0eDuq
- N4tQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nJOFSwlz75Pbc2Dwox4nGF0ucnikSim5QW753DzsYXo=;
+ b=KbwXoUSYTPeit0P1hDdFZtuiCBWmXAsfdKrAyWDTyXLXHv6RAS5i8fs28buBpEaB0X
+ fQ+P0Vkg5WduiyYT056lIc8fBWRM1zG7qIWaTmbgFqsaM8b02WAUt9f7RsSKDgyyj6aG
+ 2YYsJWa94ghp7JSJtLe5Leb3EcszMqE1ACv/C7hqb/Jj43a2mw7kKKxQkvX8G5tg8xgV
+ QQ8UVDiXttIAxPPvoRI2WwM+H+k15gWIz+03AZh5SGg9knKXFGzzySbr4mQ8tIdgnYUm
+ mIBBVtfWFjuBsxVFqq+xhmpnobSS+u2TGE9VsM356/3vOvykf8UH0uCZJLnreByMPKJK
+ ZktQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=4Ganswe+9U9d3mD63BLo8JQ6z2589NIHqh5cScxKjHs=;
- b=DeRYOZ3t3+kMN5mz/1nHCaLwK2uVLQjPUKJCfEXCEpAWHg08lF3O3m6U7YP+y1SabQ
- hFLwbntrIvztk0US0J2KH2RNlGo/anpyc/9vPmKf1tLXvEewjv8LnFP4+1eYV487Z30d
- zuLDlvNdhcikLhWqVvUdOdOWNuorfjCtkyImrDTdzPbOkCpW8nW6Hdrj2onQsv+H+B9g
- 0D6ewrYf/8lzg+Mtf1n73V1XwxlEu9RfhbZhyw5idH3lR8vco+HoJWhhqLSHuHBDIsJQ
- TB9YBWIaEj6y90g4IKoB/ZrS+KGPntywpdR+o2naM+ZNKdIKjQsTuR4g31QmBZlurSoU
- a/JA==
-X-Gm-Message-State: AOAM530jUXqC/7QeU54/FnILhmBTYIVyjVFP+McAbkNg5MzbjxzAq9k4
- hpC8VDLDgaMIVV+VhY6pEwNJWAcCsI0bpPHSrUwFfg==
-X-Google-Smtp-Source: ABdhPJweiJYZjnF2kxV+UKFl44MQRPF5DqSf69yPG5mc7ZzvH1F3pbuif6HB8ULld+7lgNXRqi9McdA+X/HabFffzgQ=
-X-Received: by 2002:a17:906:2cc2:: with SMTP id
- r2mr1554354ejr.482.1599131989169; 
- Thu, 03 Sep 2020 04:19:49 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nJOFSwlz75Pbc2Dwox4nGF0ucnikSim5QW753DzsYXo=;
+ b=rCI7/XRVzvXBKlD4NXh/RaCP9XqmntEnGEBNlq8hnL84SxtwpGQ3TgQI0meDnWYveS
+ t5mqqieqS6TBytF5J5oK/PLhvNnBx/5RTCfwjZrtKiPRYRCPAQIhSIea9EIVhTAuMaDm
+ RGVRVyKIvOJKNgaAXq810vAiKH1uru7GqMOhtBuLuPxtduEsghbwJRmfhQnCg9i+NwCU
+ RXRhaoaqFPYRhnpYYNEO/LYocks3T5QAe7/0VeTzHzmIi2wjeuonPO4/7v+F45D5UBi6
+ 6e4NEF3otEuRlmv+Xv+LsR7Tt1zjt6mVCOpykQss9SXEEPnPe5U41VBykzUW4XrV6HOX
+ zadQ==
+X-Gm-Message-State: AOAM5326RIQlnKzGHuSkBJZT5GIZ/gEOAMELzHZfD8Gjrm+2UHnZcdW3
+ CewSuKKfw8IdT10clMJ5IDmQ/w==
+X-Google-Smtp-Source: ABdhPJx/+IFA+7MhukpQVwBTCAqWZ0PwtR+SeSQJ3XjFuN8d6gDd+9pGJZ3325wN67NeSJTtrTKhIA==
+X-Received: by 2002:a1c:bdc4:: with SMTP id n187mr1947512wmf.109.1599132069399; 
+ Thu, 03 Sep 2020 04:21:09 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id x16sm3750139wrq.62.2020.09.03.04.21.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 04:21:08 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id AD96E1FF7E;
+ Thu,  3 Sep 2020 12:21:07 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v1 0/8] some testing and CI updates (re-greening)
+Date: Thu,  3 Sep 2020 12:20:59 +0100
+Message-Id: <20200903112107.27367-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20200902162206.101872-1-liq3ea@163.com>
- <b840aab8-542d-af43-43e5-0a07f442b5d5@redhat.com>
- <CAFEAcA9mvMaR5MJJ74Vv63TG6frWnMeSZA19Zxv8TUceudPUTQ@mail.gmail.com>
- <CAKXe6SLYgkiTAYa81nppHUMEzoeGy3988OmrzZyw8-VY8ajE3w@mail.gmail.com>
-In-Reply-To: <CAKXe6SLYgkiTAYa81nppHUMEzoeGy3988OmrzZyw8-VY8ajE3w@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Sep 2020 12:19:37 +0100
-Message-ID: <CAFEAcA9TEpfBmfOOtpfR9JCAFkMF0fy20L=DBVDTFaLp6J3Lfg@mail.gmail.com>
-Subject: Re: [RFC 0/3] try to solve the DMA to MMIO issue
-To: Li Qiang <liq3ea@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,48 +100,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Li Qiang <liq3ea@163.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Alexander Bulekov <alxndr@bu.edu>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ stefanha@redhat.com, marcandre.lureau@redhat.com, pbonzini@redhat.com,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 3 Sep 2020 at 12:11, Li Qiang <liq3ea@gmail.com> wrote:
->
-> Peter Maydell <peter.maydell@linaro.org> =E4=BA=8E2020=E5=B9=B49=E6=9C=88=
-3=E6=97=A5=E5=91=A8=E5=9B=9B =E4=B8=8B=E5=8D=886:53=E5=86=99=E9=81=93=EF=BC=
-=9A
-> >
-> > On Thu, 3 Sep 2020 at 04:55, Jason Wang <jasowang@redhat.com> wrote:
-> > > I think we still need to seek a way to address this issue completely.
-> > >
-> > > How about adding a flag in MemoryRegionOps and detect the reentrancy
-> > > through that flag?
-> >
-> > This won't catch everything. Consider this situation:
-> >   Device A makes DMA access to device B
-> >   Device B's write-handling causes it to raise an
-> >    outbound qemu_irq signal
-> >   The qemu_irq signal is connected to device A
->
-> Here mean device A is an interrupt controller?
+Hi,
 
-No. Any device can have an inbound or outbound qemu_irq line.
-We use them not just for actual IRQ lines but for any
-situation where we need to pass an on-or-off signal from
-one device to another.
+My first series after a holiday is a bunch of clean-ups for testing.
+Currently they all apply on top of Thomas' pull-request-2020-09-02 tag
+which is currently in flight. The fixes to shippable won't become
+apparent until the main registry has been updates with the new images
+but I have tested them locally.
 
-> This is special case I think.
+The migration and mips fixes where just quick band-aids so I would
+appreciate the appropriate maintainers having a closer look.
 
-It's an example of why looking purely at MMIO is not
-sufficient. We should prefer to see if we can come up with
-a design principle that works for all between-device
-coordination before we implement something that is specific
-to MMIO.
+With these we get back to a mostly green state although there seem to
+be some acceptance tests that need updating.
 
-thanks
--- PMM
+Alex Bennée (5):
+  CODING_STYLE.rst: flesh out our naming conventions.
+  tests/docker: add python3-setuptools the docker images
+  tests/meson.build: fp tests don't need CONFIG_TCG
+  target/mips: simplify gen_compute_imm_branch logic
+  migration: use pstrcpy to copy run state
+
+Daniel P. Berrangé (1):
+  crypto: fix build with gcrypt enabled
+
+Gerd Hoffmann (1):
+  usb-host: restrict workaround to new libusb versions
+
+Paolo Bonzini (1):
+  qemu-iotests: move check-block back to Makefiles
+
+ CODING_STYLE.rst                         | 31 +++++++++++++++--
+ configure                                |  2 ++
+ hw/usb/host-libusb.c                     |  2 +-
+ migration/global_state.c                 |  4 +--
+ target/mips/translate.c                  | 12 ++-----
+ .travis.yml                              |  2 +-
+ crypto/meson.build                       | 42 +++++++++++++++++-------
+ meson.build                              |  7 ++--
+ tests/Makefile.include                   | 15 +++++++--
+ tests/docker/dockerfiles/debian10.docker |  1 +
+ tests/docker/dockerfiles/debian9.docker  |  1 +
+ tests/meson.build                        |  3 +-
+ tests/qemu-iotests/meson.build           |  4 ---
+ 13 files changed, 89 insertions(+), 37 deletions(-)
+
+-- 
+2.20.1
+
 
