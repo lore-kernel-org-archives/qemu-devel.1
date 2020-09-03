@@ -4,77 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B607BC43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:32:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4F63C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:32:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73817206D4
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:32:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 866DE206D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:32:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eUBuaUQ4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73817206D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IMg9yE2n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 866DE206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwqN-0006go-Il
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:32:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58494)
+	id 1kDwqn-0007P1-J2
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:32:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLC-0003tt-7f; Thu, 03 Sep 2020 17:00:18 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35795)
+ id 1kDwLG-0003yS-QU; Thu, 03 Sep 2020 17:00:24 -0400
+Received: from mail-oo1-xc43.google.com ([2607:f8b0:4864:20::c43]:42322)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLA-0007X5-JY; Thu, 03 Sep 2020 17:00:17 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w16so4535978oia.2;
- Thu, 03 Sep 2020 14:00:15 -0700 (PDT)
+ id 1kDwLE-0007bB-48; Thu, 03 Sep 2020 17:00:21 -0400
+Received: by mail-oo1-xc43.google.com with SMTP id a6so1118408oog.9;
+ Thu, 03 Sep 2020 14:00:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=LtPU/nN6c9RiqgRTDpf9K4Svqu3AQC8vbJJ7asRl6KM=;
- b=eUBuaUQ4ES92C0W8OsgW0STGVdEb5kXK6SXRNGJywTCk6hM2RcJh6ei1VO52wh49ou
- YmKKnL+AWFhzFy2AeY5VOZxSsM/GF6l/YeBRm8DL4tYcYg/YwdNgZhgTOcsxTDYLh5QG
- 7R0/WJu7xGNUH3a6e6GiszTPL6uFE/66EzGjqeA/as4FDtUCxGFCvlrnTs5pusXOV24V
- 1YUnl0NXNP7FNH+18WLcBtBphK7gNw13y84PH7N4YdVOdcB0VVwGKPX9thewZaxLPgoz
- 5CaN2W7LVgHk/IL4EbTsGb5kc4z9fxVWj/2GaMytL7BakqHxl0Ra9NnD/s7C5Se3169I
- 7t2Q==
+ bh=b3KQN/Kte9yOknsbzt0CDZ4AvatyRKhckS3n3Zf19Fo=;
+ b=IMg9yE2nza1NjXHuqgj8vpy0D5pb/EbUf38oh7UHpghM3PT/FWDzjNoekuQ7w9ky4G
+ vnITpKkUzzzHziDyo3VPs0pu4BMtzKbeUiKFDb9/wdakeaYsrdcyMlYIynEuFMRCE+S1
+ qNsx3a60qks/ilXWS0gTnnrPmhBXO9taWp/3vp7eoQd2kVWp29O8CZhf6ryoKBRtkgCP
+ TW3/vr5MYcbL3QmP4/H7zPIDrRelyoS381HLAlnfJ6iU2QV1cdcQgMXwEgGfTjrLByAu
+ WqftyLlTDTIXyMUXJS3/9Pdd8CfU1S5/b1lAeevwNgyUjLS6r5Hlr7gMFKhg5qT7Z9hl
+ 8BzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=LtPU/nN6c9RiqgRTDpf9K4Svqu3AQC8vbJJ7asRl6KM=;
- b=rGgBHSHE0GWBNwZCXwnW2HkzmOO0YuDKRElN/uMTilsQMkz7Xq2P0J4o3Br3yINLnL
- JPaEpjU/rG/pJHXgcypisgOW2MvNRnloCacY4HG5JmDkz+6nw6wpNK1cNMyE8hdEVOjn
- yvWqPFtRgXIborVnA9MuOAYdovxVW/JAuRWQsgeSv/KwMvJdGlHz1UjvUVDWf1pvizCp
- KPbeRC+a6ISSruG8/rZFbUCEWAMrizOTZu+d+vdg6xJUY6AgXAimi0QpWZ1OUVSJE1uu
- C4yHmJVqqYHmadYvYE2r8KYNgxk+x193yL88jyu9V9tCU6F9f1eTjAb2pn5/bp+w5HWe
- Nwxg==
-X-Gm-Message-State: AOAM530ARn9aGgw3XusZj/49L1PBSFtrtVv58qJ3a30kAYAwqXULs4XZ
- lXNEDykVZRgk/clee59OD70R740kAtw=
-X-Google-Smtp-Source: ABdhPJwtlCZWf9x5sxWZHDVmVDI0++NbnrC3/5hquFSzgWe/SKJ+n3PQLM3wd/5pg06xeqAW466f6g==
-X-Received: by 2002:aca:f103:: with SMTP id p3mr3367677oih.45.1599166814856;
- Thu, 03 Sep 2020 14:00:14 -0700 (PDT)
+ bh=b3KQN/Kte9yOknsbzt0CDZ4AvatyRKhckS3n3Zf19Fo=;
+ b=fMWXMGqCPOXs7MaPwtT434NAHjucAK0tenVT+niZluPKnfXDYUBnW1vZDb3jRsYNlT
+ VMhfU/IDrodGsRhvTF6MfU3SyXlgpjI7zG+VZFzqs2rbgMUkPDbtMwHDdPP1aKoOwiGz
+ cKeI41XtNlIxtwtrms+5U7j7yTb4FjeWeCyiUbQDRsxe1uXLd9/4B2xNLpYN3azJzFj/
+ q+o44Kle+4f12c1DPd57isK0yPawKuwoi7EF645lvEOCQJlHW+TYR+Syg15e+qfLPBjf
+ MPsbjuL60YmVy9+wfVKEvXd/ato+ypqHkHoZdSC/0oPrZwLYnZOCZU2MnsFNK53ijg3j
+ 7NzA==
+X-Gm-Message-State: AOAM530Jp248s9m6xRFJ11Y9fQ8iVXNT7R5CHSOjzxhPGhkkE/w2CW42
+ /k40QSG4cSmGO/gK3Y8SgGn0z9Iizh8=
+X-Google-Smtp-Source: ABdhPJxMIaneA/FtV97r7S/vzL2QCYXzkK5Gu0x6tPm+WGdLfqAqXBBcogQAMJo2J5EUXsF52XS3zw==
+X-Received: by 2002:a4a:a648:: with SMTP id j8mr3362294oom.44.1599166818155;
+ Thu, 03 Sep 2020 14:00:18 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id o204sm719770oib.34.2020.09.03.14.00.14
+ by smtp.gmail.com with ESMTPSA id t84sm294237oif.32.2020.09.03.14.00.17
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:14 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:17 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 27/77] libqos: usb-hcd-ehci: use 32-bit write for config
- register
-Date: Thu,  3 Sep 2020 15:58:45 -0500
-Message-Id: <20200903205935.27832-28-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 30/77] hw/riscv: Allow 64 bit access to SiFive CLINT
+Date: Thu,  3 Sep 2020 15:58:48 -0500
+Message-Id: <20200903205935.27832-31-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c43;
+ envelope-from=flukshun@gmail.com; helo=mail-oo1-xc43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -97,36 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
+Cc: Alistair Francis <alistair.francis@wdc.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Alistair Francis <alistair.francis@wdc.com>
 
-The memory region ops have min_access_size == 4 so obey it.
+Commit 5d971f9e672507210e77d020d89e0e89165c8fc9
+"memory: Revert "memory: accept mismatching sizes in
+memory_region_access_valid"" broke most RISC-V boards as they do 64 bit
+accesses to the CLINT and QEMU would trigger a fault. Fix this failure
+by allowing 8 byte accesses.
 
-Tested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 89ed83d8b23c11d250c290593cad3ca839d5b053)
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: LIU Zhiwei<zhiwei_liu@c-sky.com>
+Message-Id: <122b78825b077e4dfd39b444d3a46fe894a7804c.1593547870.git.alistair.francis@wdc.com>
+(cherry picked from commit 70b78d4e71494c90d2ccb40381336bc9b9a22f79)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qtest/usb-hcd-ehci-test.c | 2 +-
+ hw/riscv/sifive_clint.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tests/qtest/usb-hcd-ehci-test.c b/tests/qtest/usb-hcd-ehci-test.c
-index 5251d539e9..c51e8bb223 100644
---- a/tests/qtest/usb-hcd-ehci-test.c
-+++ b/tests/qtest/usb-hcd-ehci-test.c
-@@ -96,7 +96,7 @@ static void pci_ehci_port_1(void)
- static void pci_ehci_config(void)
- {
-     /* hands over all ports from companion uhci to ehci */
--    qpci_io_writew(ehci1.dev, ehci1.bar, 0x60, 1);
-+    qpci_io_writel(ehci1.dev, ehci1.bar, 0x60, 1);
- }
+diff --git a/hw/riscv/sifive_clint.c b/hw/riscv/sifive_clint.c
+index e933d35092..a2a4b7d752 100644
+--- a/hw/riscv/sifive_clint.c
++++ b/hw/riscv/sifive_clint.c
+@@ -180,7 +180,7 @@ static const MemoryRegionOps sifive_clint_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+     .valid = {
+         .min_access_size = 4,
+-        .max_access_size = 4
++        .max_access_size = 8
+     }
+ };
  
- static void pci_uhci_port_2(void)
 -- 
 2.17.1
 
