@@ -2,110 +2,91 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C7AFC433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:18:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF1BEC43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:22:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05815206C0
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9A69F206C0
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:22:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BfzWzyvm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05815206C0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OZl/kgeh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A69F206C0
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48728 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDvh0-0005AJ-21
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:18:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40716)
+	id 1kDvkL-0007U8-PS
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:22:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDvgG-0004Jz-Cd
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:18:01 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:50047
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDvgD-0007i6-Jp
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:17:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599164275;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=oKvN/3Sxq8A3petd99IC4PMQL9g40UYvQmtSK8chBQk=;
- b=BfzWzyvmA05swkaSJCelAm4M9Pk/Gnfz8UjiQ5vailL6He43rz4FUqvmUqbr/1U6WQ8x8J
- Xd9b7//BJCs3tmCnumcae/m+Q1bMoYnS6/XXsUoIRdDX1+QezEOqXCnZMxki1z9nLJ/szl
- LCYRwLi+soMZI+IRKkkgc/+mJ1pXZW8=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-547-Y_MSsldwMk2uz8ATtpP7KA-1; Thu, 03 Sep 2020 16:17:53 -0400
-X-MC-Unique: Y_MSsldwMk2uz8ATtpP7KA-1
-Received: by mail-ej1-f70.google.com with SMTP id li24so795083ejb.6
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 13:17:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDvj5-00069q-0L
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:20:55 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:51971)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDvj2-00084a-IQ
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:20:54 -0400
+Received: by mail-wm1-x341.google.com with SMTP id w2so4113854wmi.1
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 13:20:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=iMf7PrtIvi+uTaRRjwphBu6nmGC3imxNmq1uK0cxKrA=;
+ b=OZl/kgehL8aVAhLxdcIUVooRvRiqWFsnQWtwOxAxC/ZJcNYL0S/hXps/zWYg3jG78X
+ i2KkS0a4x90Iy5XfKXZnxxonw93bwFbo0KRHINYlefWrySh1rSGCUCtlVySzj4rz+tJO
+ XT7YtFpJKb5alarKSrhBCmGayReJ7InJp2NLF9/ryXOM4hD+rLOIggfQI638LfMEXQHF
+ wQqmU4MsY3CXVmu6htTtzz+2mGoJNO/yWYzmGt7t4zYmduIrrzYVTSYedXmsT2kMjMeK
+ zKbTDyriD2NWcGbiCtzc+plHKK1yd5ji4QbgCa8Pwsn1popIkEV7MBjKcjD8KnbbFaRM
+ THZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=oKvN/3Sxq8A3petd99IC4PMQL9g40UYvQmtSK8chBQk=;
- b=qDvrBTfCVswqW/CQeCH+7HW750uOOx3m899sP1uzTIuMuusiLjEk+xARUJLxxMDYL2
- BKgXCPLwn93CxwEVm9AGvItzUGtqJd0laKCy/am2905czp0xHQgUNNsCir8sNknXJHq5
- 7SouBZ2CTleAT/IG805wKXRYjWXFk3D08DHv+K2+QBhNDIlF26pZbA4+vPCL9EHXWDCF
- yAjfdsao+bSRl10ZS4Quj9jxhwv78Tw2ZY6Ry1ZSFQespQN4sXEGpvI2l/kSCbKT2osu
- oKVfyB0QpMRNev7Xft9f5GmEMb11iaNltgPu7k7qbYwBAeEE80Mpw2IYsCGpEL3weh0L
- NI8g==
-X-Gm-Message-State: AOAM533PYCIxDD2wxugat99PBYdRXKE4ZTEeznj3a/Ugm9ilkVY4T6en
- T9Z1EA3mI4hVpDnZYbbnq+0hsV+f0nocmYX/y8uC5pdlDxj5t+rlQ/0DcKj1wDmgxr9my+jQQQJ
- 8pxXMLITM5leyUFs=
-X-Received: by 2002:a17:906:f2d3:: with SMTP id
- gz19mr3855012ejb.377.1599164272903; 
- Thu, 03 Sep 2020 13:17:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxXR7H4HIbFHsReiTlGellGUs3+lWoK0mlEyWM6biF7V70t3M4rfI3a/vry8XoCntG+1VQUug==
-X-Received: by 2002:a17:906:f2d3:: with SMTP id
- gz19mr3854996ejb.377.1599164272708; 
- Thu, 03 Sep 2020 13:17:52 -0700 (PDT)
-Received: from [192.168.10.150] ([93.56.170.5])
- by smtp.gmail.com with ESMTPSA id b1sm3954156eja.43.2020.09.03.13.17.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 13:17:52 -0700 (PDT)
-Subject: Re: [PATCH 2/2] Makefile: Skip the meson subdir in cscope/TAGS/ctags
-To: Greg Kurz <groug@kaod.org>, qemu-devel@nongnu.org
-References: <159916226258.691541.13056254320330610953.stgit@bahia.lan>
- <159916247553.691541.10480293747685886851.stgit@bahia.lan>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <abd5e0e5-a647-2450-06aa-bd6b9f3cd40e@redhat.com>
-Date: Thu, 3 Sep 2020 22:17:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ bh=iMf7PrtIvi+uTaRRjwphBu6nmGC3imxNmq1uK0cxKrA=;
+ b=D6+z7QODei804mtNoHKIkwZIlrCjaDUyIXUf7bhbxMPStFIF0ed/ha+e34ml64ZK1t
+ rIrqKvY9SDX+OvRnv7OcFVL3juWt3ZKZgcQl9sIQltv/MDNsn86ub03jUlQqHYHsG6Lr
+ Wai5FArfm1mMrGWrOd47iMxwthn5hebliFzXzgDY8jjiGE3f9E9WoxvdXf5Kr+3Nqyv3
+ 1jhKMYorV68EdMO62/Czkqfs2ejvLY/Xqa99ta6o/wGJ3xUyfaGHHxmcmbD3YV6FLrdR
+ RJw+f+wfPKXjm7oJjHcvQ7clClcwS2aCJNvOGZgJdfKEwbzFUsCEmFb0is+3RvkM7OTD
+ Z8YQ==
+X-Gm-Message-State: AOAM533NrlBOC9c5ThwKhIlKU9gD6EJ8YuKwQP2IaoiDq4iK/CzK5Llq
+ eMKwKTKx2SPznIUpqjGNwxRMzg==
+X-Google-Smtp-Source: ABdhPJwGfGR+AOvliDc6Os4eIrAFDvSv2a6hHDttELV+LSN3Oj4jawjG0h/qphW90aqbpjr0Du/k1w==
+X-Received: by 2002:a05:600c:2146:: with SMTP id
+ v6mr4076180wml.159.1599164450958; 
+ Thu, 03 Sep 2020 13:20:50 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id p14sm7285023wrg.96.2020.09.03.13.20.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 13:20:50 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 0/3] target/arm: New boards mps2-an386, mps2-an500
+Date: Thu,  3 Sep 2020 21:20:45 +0100
+Message-Id: <20200903202048.15370-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <159916247553.691541.10480293747685886851.stgit@bahia.lan>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,60 +99,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: Kumar Gala <kumar.gala@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 03/09/20 21:47, Greg Kurz wrote:
-> If the meson submodule is present, we don't really want to index its
-> source code. Consolidate the find command in a single place and use
-> it for cscope, ctags and etags. Note that this now causes ctags and
-> etags to also index assembly files, but this is okay since they both
-> have been supporting assembly since 2001 at least.
-> 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
->  Makefile |    8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index a9d3e2c4d375..34dd9e6c4c4a 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -229,20 +229,22 @@ distclean: clean ninja-distclean
->  	rm -f linux-headers/asm
->  	rm -Rf .sdk
->  
-> +find-src-path = find "$(SRC_PATH)/" -path "$(SRC_PATH)/meson" -prune -o -name "*.[chsS]"
-> +
->  .PHONY: ctags
->  ctags:
->  	rm -f tags
-> -	find "$(SRC_PATH)" -name '*.[hc]' -exec ctags --append {} +
-> +	$(find-src-path) -exec ctags --append {} +
->  
->  .PHONY: TAGS
->  TAGS:
->  	rm -f TAGS
-> -	find "$(SRC_PATH)" -name '*.[hc]' -exec etags --append {} +
-> +	$(find-src-path) -exec etags --append {} +
->  
->  .PHONY: cscope
->  cscope:
->  	rm -f "$(SRC_PATH)"/cscope.*
-> -	find "$(SRC_PATH)/" -name "*.[chsS]" -print | sed -e 's,^\./,,' > "$(SRC_PATH)/cscope.files"
-> +	$(find-src-path) -print | sed -e 's,^\./,,' > "$(SRC_PATH)/cscope.files"
->  	cscope -b -i"$(SRC_PATH)/cscope.files"
->  
->  # Needed by "meson install"
-> 
-> 
+This series adds two new board models in the mps2 family.
+The AN386 is identical to the AN385 but with a Cortex-M4.
+The AN500 is a Cortex-M7 image which is almost the same as
+the AN385 but has a few minor differences, most notably the
+base address of the PSRAM and of the ethernet controller.
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+The AN500 is interesting because we don't currently have any
+boards in-tree which use the Cortex-M7.
 
-so this can go through the trivial tree as well.
+Changes since v1:
+ * patch 1 now also updates the docs to mention the new board
+ * new patch 2 defines the mps2-an500 board
+ * new patch 3 makes some minor cleanup to the docs for these boards
 
-Paolo
+Richard, Philippe: I kept your reviewed-by tags on patch 1
+because the only change was the trivial docs addition and
+there were no code changes.
+
+thanks
+-- PMM
+
+Peter Maydell (3):
+  hw/arm/mps2: New board model mps2-an386
+  hw/arm/mps2: New board model mps2-an500
+  docs/system/arm/mps2.rst: Make board list consistent
+
+ docs/system/arm/mps2.rst | 20 +++++----
+ hw/arm/mps2.c            | 97 ++++++++++++++++++++++++++++++++++------
+ 2 files changed, 95 insertions(+), 22 deletions(-)
+
+-- 
+2.20.1
 
 
