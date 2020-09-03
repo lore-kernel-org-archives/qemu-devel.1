@@ -2,100 +2,71 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3775AC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8108BC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:20:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F320420737
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:10:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MDUust6c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F320420737
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 509BF20578
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 15:20:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 509BF20578
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55310 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDqsq-0002Xd-23
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 11:10:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45318)
+	id 1kDr2j-0007EP-Dk
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 11:20:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDqs7-0001hA-KD
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:09:55 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41526)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDqs5-0005zR-Db
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:09:55 -0400
-Received: by mail-pg1-x542.google.com with SMTP id w186so2368859pgb.8
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 08:09:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=F7Thb7UTALsRhFRnKDC3P2vu20+JHSs+vbqgjS2Op+Y=;
- b=MDUust6cxbNhHkktVy1DnX4Bs6KDHdk3CGvcadV0A1swOYCZby3JXx0ofUlnQHYSoS
- hzyJwFKk+4xefn5udOuWoETeUoVraa9rIcXsKyNikIRw3nZUlNoD/wRyn07+3WP7bL8A
- ODcmiD/Xd1OIeIdF0N+4V5ncDWZ2isaoqJOFJRH14+O4FhY3a0zSLMEFL9aamVPAvSQr
- cQw2yxgEBSwpJkWICVS29U9YZvwE1ppT7lZOSjWabKGv05qdXz+pmTeNXVuPaDj2nCAJ
- Uh5yqsW3t/WowbFnls/3OLwLB44xfxaNLeI73Chl95ICGehnFuV4Ff+imr7db4JrJ9GT
- na/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=F7Thb7UTALsRhFRnKDC3P2vu20+JHSs+vbqgjS2Op+Y=;
- b=W+eM8EmU7Hay9Yz4hJ0y5/ILRGlmkgUQA4NAymr0+PRjSEUM5zcMw6obf6mTk83lqT
- sTyguNatPLM3dGdyonKpHd2kPKChcS9DBI+KcBWhffc5yrSx/S1u83/LsQ0K0Hc7Wvc5
- xZyL3ILjue1Al8JozjoiIL5j6CGURYLwbNXNCntBwnFatN08uGEB0WOpzH1k3ho690zX
- 35LIgNFiIKWQ6S8dm5kAJCya7DFLB5qAFzrI5lFO80xRrDkIz7JCSWFLbSGlm+Q/EDs6
- +/Sz/axb5Hu+iblGP04sGdW/G6czWZwrUTbyKfvIyl6rm0rOklRk34Kc6rWMaS2hy7Ui
- u24A==
-X-Gm-Message-State: AOAM533BOaVBLO1UqOIfmgxEgx05myt7LgS45AdaUg5ePxpM5r6TxppI
- fUvjuWjzY+MeZEVpI0ni4D/XJnr9acNY0w==
-X-Google-Smtp-Source: ABdhPJzu1AM8uLiUt2CaHRB+8k19auxy+SBAqSjkeXwKLAwGH8DKO4ac166JhTvrfnEkTNMxLKxbYw==
-X-Received: by 2002:a63:9d02:: with SMTP id i2mr3238711pgd.378.1599145791155; 
- Thu, 03 Sep 2020 08:09:51 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id u15sm2944336pjx.50.2020.09.03.08.09.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 08:09:50 -0700 (PDT)
-Subject: Re: [PATCH 6/7] hw/display/artist: Fix artist screen resolution
-To: Helge Deller <deller@gmx.de>
-References: <20200901183452.24967-1-deller@gmx.de>
- <20200901183452.24967-7-deller@gmx.de>
- <65284ae3-f0fe-336e-a205-0494abb20f08@linaro.org>
- <20200902214819.GA2424@ls3530.fritz.box>
- <45bf91fd-4e7f-7379-18a2-cdada67a3f6d@linaro.org>
- <20200903060936.GC8548@ls3530.fritz.box>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <53381e05-2116-547c-98d3-4d184a533a9f@linaro.org>
-Date: Thu, 3 Sep 2020 08:09:48 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kDr27-0006gz-GO
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:20:17 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:60147)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kDr24-0007Xw-IL
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 11:20:15 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.252])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 89BB55724584;
+ Thu,  3 Sep 2020 17:19:33 +0200 (CEST)
+Received: from kaod.org (37.59.142.101) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 3 Sep 2020
+ 17:19:33 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-101G0044bba4b4b-9b4e-491f-a895-5c117f28b309,
+ FF22E3E2F99647A0705B7EB067E934078DCBDF97) smtp.auth=groug@kaod.org
+Date: Thu, 3 Sep 2020 17:19:31 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH v2 0/1] 9pfs: log warning if msize <= 8192
+Message-ID: <20200903171931.3bfe611a@bahia.lan>
+In-Reply-To: <cover.1599144062.git.qemu_oss@crudebyte.com>
+References: <cover.1599144062.git.qemu_oss@crudebyte.com>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20200903060936.GC8548@ls3530.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.403,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Originating-IP: [37.59.142.101]
+X-ClientProxiedBy: DAG6EX2.mxp5.local (172.16.2.52) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: f8443b98-e691-4da4-bab8-e18eabd6f2e0
+X-Ovh-Tracer-Id: 685954519315093981
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudeguddgkeelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheeggedvvdethfdttddvhfeiudetvdfgjedtudetgfevheeijeeileevffegkeehnecuffhomhgrihhnpehqvghmuhdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtudenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepsggvrhhrrghnghgvsehrvgguhhgrthdrtghomh
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 11:20:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,40 +79,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: berrange@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/2/20 11:09 PM, Helge Deller wrote:
-> New patch #3/3:
+On Thu, 3 Sep 2020 16:41:02 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+
+> I have updated the QEMU 9P setup wiki page about this 'msize' issue. For
+> some reason the dedicated anchor 'msize' does not work though:
 > 
-> From 476aeb9b832ae172a9d6a28aa9e43300dedd419b Mon Sep 17 00:00:00 2001
-> Subject: [PATCH] hw/display/artist: Allow screen size up to 2048 lines
-> 
-> Adjust the ADDR_TO_Y() macro to extract 11 bits, which allows userspace
-> to address screen sizes up to 2048 lines (instead of 1024 before).
-> 
-> Signed-off-by: Helge Deller <deller@gmx.de>
-> 
-> diff --git a/hw/display/artist.c b/hw/display/artist.c
-> index 16d85c65f8..955296d3d8 100644
-> --- a/hw/display/artist.c
-> +++ b/hw/display/artist.c
-> @@ -193,7 +193,7 @@ static const char *artist_reg_name(uint64_t addr)
->  #undef REG_NAME
-> 
->  /* artist has a fixed line length of 2048 bytes. */
-> -#define ADDR_TO_Y(addr) extract32(addr, 11, 10)
-> +#define ADDR_TO_Y(addr) extract32(addr, 11, 11)
->  #define ADDR_TO_X(addr) extract32(addr, 0, 11)
-> 
->  static int16_t artist_get_x(uint32_t reg)
+> https://wiki.qemu.org/Documentation/9psetup#msize
 > 
 
-Thanks.  All 3 can have a
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+AFAICT the wiki derives the anchor from the section name, ie.
 
+https://wiki.qemu.org/Documentation/9psetup#Performance_Considerations
 
-r~
+It's a bit longer than #msize but it works. I don't know if you can
+add anchors manually in the wiki.
+
+> Not sure whether that's a wiki installation problem? When I view the wiki
+> source, it looks like it is showing some errors there.
+> 
+> v1->v2:
+> 
+>   * Updated commit log message to make it more clear why the client cannot
+>     auto pick a good value for 'msize'.
+> 
+>   * Added a web link to the log message, pointing to the appropriate QEMU
+>     wiki page which explains the 'msize' issue in detail.
+> 
+> Message-ID of previous version (v1):
+>   E1kDR8W-0001s4-Sr@lizzy.crudebyte.com
+> 
+> Christian Schoenebeck (1):
+>   9pfs: log warning if msize <= 8192
+> 
+>  hw/9pfs/9p.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+
 
