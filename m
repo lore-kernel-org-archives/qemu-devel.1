@@ -4,82 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC8EC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:36:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BCBC43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF28120665
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:36:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68396206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:36:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aeQO4TV8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF28120665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ogiOM/vc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68396206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40022 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwuH-0005md-5H
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:36:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58696)
+	id 1kDwuY-0006dI-I9
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:36:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLQ-00041t-9M; Thu, 03 Sep 2020 17:00:32 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:35796)
+ id 1kDwLS-00043y-0L; Thu, 03 Sep 2020 17:00:34 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:45643)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLI-0007e4-IK; Thu, 03 Sep 2020 17:00:28 -0400
-Received: by mail-oi1-x242.google.com with SMTP id w16so4536242oia.2;
- Thu, 03 Sep 2020 14:00:21 -0700 (PDT)
+ id 1kDwLM-0007fN-FL; Thu, 03 Sep 2020 17:00:33 -0400
+Received: by mail-ot1-x341.google.com with SMTP id g96so3975221otb.12;
+ Thu, 03 Sep 2020 14:00:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=RzeduguMkjJ25jQpgkKJueFeI/WMC3SutpUz7EZNeBA=;
- b=aeQO4TV8bN1PkAZJSM9mKjt8QIm1131tI00Up90H0yNKutKUFPYyhR5pZt64+QKVnO
- UqpEdTOJ7oiBPkkDsFitCSeSRMeBKnGst/GFOhQnc9puZo+lxVyaCpKAdGVknhDMQUtU
- nyZdDoFb1Oz4bLk+9pWUw790CKSt3OCFiyZNYFL0hdjWs/SUmIsRgGql0Qype+BNH7KA
- R/r6EhvMSDW+bozssylUuzOiSoSSI/p1xlY1zSUERpTlxuHleYPqRIKo6ot/YDNAAWZU
- s94/jNj7E3e8yveQEmJN1jGGzmulrTWPZDAuqBcxxg5VEamUBPg9WLYOM+Qc+f/8f1V8
- JeCQ==
+ bh=uQPncV/jLImjoch26Nuy7gV8hNnslJV64x5ayj1AopA=;
+ b=ogiOM/vcOw+4h5KxOuXCl3M24eZzMDtvLTnvk240oGhaurTjvHHY0jXrg6Gq1Pj+x9
+ xZhKIpHO4Fq6at1l6n/LUcFijBx+DSFdbzvsv/WRrv4Kt2LO8C6lb4SRXhTpH6qukVoY
+ HZxVOnpSTANhsBZ3My0lqAafSR8GF1IydyhRbBaKbuM4JcCpwA+SUcPBIQFkZIoTdAiM
+ 2xgZCvY+QNSYs3lVxJHGpQsKT5XtKgBsNLXyABVeD4ql2TWnbGsZp0YrdO8Sg1ZaP34b
+ 08tsMDBz/caYx3zed9sKSzi8wIlhHQHNQR9+U5NmfKrjQklA1OsGQW53cLYQej06myfE
+ uIWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=RzeduguMkjJ25jQpgkKJueFeI/WMC3SutpUz7EZNeBA=;
- b=VRhX2HyWB4Kf1jgI3ID+ckw14AyBMPgR3CTUvWt7rKwAbdfb51d9QZ1diF8cMVk2Km
- DymYFZcFmRrgbMTUhLXE3TM/8jhSF09XHhiJjIyFYSMs4RTYC0nS8NcETztpUssEjjMG
- u046Obd0bZKfLjypxEfk3N8T0ElUPK5X0ebpHKo2JDHQ7XUMhWOAVUhEUbMFL3rHXuUl
- wqgwA94NDzzgo+JcFiUZCjPlhIP5WR7W808Nutp5Wpi8NDMErW/yxAPtAhQ047NrEVhp
- m1pPc0Bi+L3oMxWsMVNJZdUVXcn/CD26v3rJoaKjIBCAX2lae6U3eIG4CZ8JnDytDUbA
- TVjA==
-X-Gm-Message-State: AOAM532S5/X9ovZ8EXTHdA17U6MIkWJZCsXf8BGmk6OR29AULoHqeB3g
- EoDgFGs4NqWpAcLWd36AdnPlK/q/B9Q=
-X-Google-Smtp-Source: ABdhPJxE2iGtbT04/YrSqCZV4NB951udik43UfKfeFEIoNqXmz2FAPwMV5hH/A2BkwkQISbIcG0ayA==
-X-Received: by 2002:a05:6808:8e4:: with SMTP id
- d4mr3193629oic.132.1599166820386; 
- Thu, 03 Sep 2020 14:00:20 -0700 (PDT)
+ bh=uQPncV/jLImjoch26Nuy7gV8hNnslJV64x5ayj1AopA=;
+ b=k2X1+JB2ZuIIhjM9AvtwlZpJJVp1o1zW708eN5ZoHMW+ZzxbZEUyz69joLVtTxxkC5
+ UMXVsjbVfXoz1G09IBA8uArchdr9zx1aGvqweKNpCCEz1RrN26WVU0R2I+WJeHpESYO2
+ ixF7KTzDLKY5rMCNCdsOamCeKHEWOCgbuxfXDHW1YYNM8QDNP6StMYjEp0JXGoDjSm2V
+ KK/4netHMzjIaheNsIdQpyhNdTF9er7VbcSJKTBHoghhzuSMqp4UCTw8kqJsLWJMd6gm
+ ODdIU7HLtVOGPf7dBAIQ2iGHRTqIjKPpbEnkkci8+LmAc2xKMQkvcE7WBoZR+R4UDebo
+ L0hQ==
+X-Gm-Message-State: AOAM530utpCO196olzRXfhYRM+URsoSUPtIfEVsEIH/yrDDcwEARUpIp
+ gD7Gp1yqU5aLykHdQ3n/412yM2puwmc=
+X-Google-Smtp-Source: ABdhPJzJlnG9NKW9NqggbCOnxGkTeY2euLyTy91CRCKuT6nVtP1neWk+P/hPjGtSFob1HzF1P+ZtTQ==
+X-Received: by 2002:a9d:6f86:: with SMTP id h6mr3113277otq.285.1599166826509; 
+ Thu, 03 Sep 2020 14:00:26 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id t84sm294254oif.32.2020.09.03.14.00.19
+ by smtp.gmail.com with ESMTPSA id r33sm828425ooi.48.2020.09.03.14.00.25
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:19 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:26 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 31/77] xhci: fix valid.max_access_size to access address
- registers
-Date: Thu,  3 Sep 2020 15:58:49 -0500
-Message-Id: <20200903205935.27832-32-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 36/77] hw/audio/gus: Fix registers 32-bit access
+Date: Thu,  3 Sep 2020 15:58:54 -0500
+Message-Id: <20200903205935.27832-37-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -102,64 +100,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, qemu-stable@nongnu.org,
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Allan Peramaki <aperamak@pp1.inet.fi>, qemu-stable@nongnu.org,
  Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Laurent Vivier <lvivier@redhat.com>
+From: Allan Peramaki <aperamak@pp1.inet.fi>
 
-QEMU XHCI advertises AC64 (64-bit addressing) but doesn't allow
-64-bit mode access in "runtime" and "operational" MemoryRegionOps.
+Fix audio on software that accesses DRAM above 64k via register
+peek/poke and some cases when more than 16 voices are used.
 
-Set the max_access_size based on sizeof(dma_addr_t) as AC64 is set.
-
-XHCI specs:
-"If the xHC supports 64-bit addressing (AC64 = ‘1’), then software
-should write 64-bit registers using only Qword accesses.  If a
-system is incapable of issuing Qword accesses, then writes to the
-64-bit address fields shall be performed using 2 Dword accesses;
-low Dword-first, high-Dword second.  If the xHC supports 32-bit
-addressing (AC64 = ‘0’), then the high Dword of registers containing
-64-bit address fields are unused and software should write addresses
-using only Dword accesses"
-
-The problem has been detected with SLOF, as linux kernel always accesses
-registers using 32-bit access even if AC64 is set and revealed by
-5d971f9e6725 ("memory: Revert "memory: accept mismatching sizes in memory_region_access_valid"")
-
-Suggested-by: Alexey Kardashevskiy <aik@au1.ibm.com>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-Message-id: 20200721083322.90651-1-lvivier@redhat.com
+Cc: qemu-stable@nongnu.org
+Fixes: 135f5ae1974c ("audio: GUSsample is int16_t")
+Signed-off-by: Allan Peramaki <aperamak@pp1.inet.fi>
+Tested-by: Volker Rümelin <vr_qemu@t-online.de>
+Reviewed-by: Volker Rümelin <vr_qemu@t-online.de>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200618103623.6031-1-philmd@redhat.com
+Message-Id: <20200615201757.16868-1-aperamak@pp1.inet.fi>
+[PMD: Removed unrelated style changes]
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-(cherry picked from commit 8e67fda2dd6202ccec093fda561107ba14830a17)
+(cherry picked from commit 586803455b3fa44d949ecd42cd9c87e5a6287aef)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/usb/hcd-xhci.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/audio/gusemu_hal.c   | 2 +-
+ hw/audio/gusemu_mixer.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
-index b330e36fe6..67a18fe2b6 100644
---- a/hw/usb/hcd-xhci.c
-+++ b/hw/usb/hcd-xhci.c
-@@ -3184,7 +3184,7 @@ static const MemoryRegionOps xhci_oper_ops = {
-     .read = xhci_oper_read,
-     .write = xhci_oper_write,
-     .valid.min_access_size = 4,
--    .valid.max_access_size = 4,
-+    .valid.max_access_size = sizeof(dma_addr_t),
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+diff --git a/hw/audio/gusemu_hal.c b/hw/audio/gusemu_hal.c
+index ae40ca341c..5b9a14ee21 100644
+--- a/hw/audio/gusemu_hal.c
++++ b/hw/audio/gusemu_hal.c
+@@ -32,7 +32,7 @@
  
-@@ -3200,7 +3200,7 @@ static const MemoryRegionOps xhci_runtime_ops = {
-     .read = xhci_runtime_read,
-     .write = xhci_runtime_write,
-     .valid.min_access_size = 4,
--    .valid.max_access_size = 4,
-+    .valid.max_access_size = sizeof(dma_addr_t),
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+ #define GUSregb(position) (*            (gusptr+(position)))
+ #define GUSregw(position) (*(uint16_t *) (gusptr+(position)))
+-#define GUSregd(position) (*(uint16_t *)(gusptr+(position)))
++#define GUSregd(position) (*(uint32_t *)(gusptr + (position)))
+ 
+ /* size given in bytes */
+ unsigned int gus_read(GUSEmuState * state, int port, int size)
+diff --git a/hw/audio/gusemu_mixer.c b/hw/audio/gusemu_mixer.c
+index 00b9861b92..56300de77e 100644
+--- a/hw/audio/gusemu_mixer.c
++++ b/hw/audio/gusemu_mixer.c
+@@ -28,7 +28,7 @@
+ 
+ #define GUSregb(position)  (*            (gusptr+(position)))
+ #define GUSregw(position)  (*(uint16_t *) (gusptr+(position)))
+-#define GUSregd(position)  (*(uint16_t *)(gusptr+(position)))
++#define GUSregd(position)  (*(uint32_t *)(gusptr + (position)))
+ 
+ #define GUSvoice(position) (*(uint16_t *)(voiceptr+(position)))
  
 -- 
 2.17.1
