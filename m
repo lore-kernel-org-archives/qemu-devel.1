@@ -7,93 +7,94 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA99C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AB8C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:11:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB82B20709
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:05:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 030B02071B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:11:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Wd/b2StO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB82B20709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="csPGGrpr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 030B02071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDlBg-0000AR-U8
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 05:05:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33018)
+	id 1kDlHV-0004Pv-1f
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 05:11:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kDlAQ-0007dD-4D
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:04:26 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:43772)
+ id 1kDlFW-0001X4-Nn
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:09:42 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:39630)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kDlAM-0005kh-Dj
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:04:25 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08394Jge106065;
- Thu, 3 Sep 2020 09:04:19 GMT
+ id 1kDlFV-0006Pc-0L
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:09:42 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+ by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08394wZh024236;
+ Thu, 3 Sep 2020 09:09:37 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : in-reply-to : references : date : message-id : mime-version :
  content-type; s=corp-2020-01-29;
- bh=c4MpqCDH5DhXVFdNVDQ2UYYGovqeaMdlZ214vLo1Jzk=;
- b=Wd/b2StOi6U0y6Q6ChT3s/m6kIkapxR/fgXNw0WHkNSMvIgJtoB3geGnRWWuJGkSVe8z
- HO4VqU8T3cNMzyM8uG8IVnu39kEqAPMIp4hnR3KLo/oKdWaDlWolLdWkhswLT8gYep7i
- NpQIc7pGcsBVgRdxGF1SZ8j18I2S3sFMrHDQSflFAnEd8f75gYSVLxA83F+3rWVDfmWh
- FcQmkkDm6+hLwuuox4yHwEZc750qpWE5shVNvSYhC8cEQeR0KmcA9JHkyb+4aF4G5+Ua
- B1gNdBzKo5ApthinKnCWhRkmEEl9vUyLM0Ztr2nVWd/ccSxdg8qTgMdkVIF1Ze+q+rnG Vw== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2120.oracle.com with ESMTP id 337eymfg9m-1
+ bh=MK1CHBDqf5eIHDKiCfJipkaD4EzfBdAhHLFJnuQWX/w=;
+ b=csPGGrprmCNlw5GQl5HMmLSx6fcGson8P4DZt+EmAvAqF8v8K9cakjlm8wRl9omoXpjX
+ A+ezPwtGQlseuoELw2+1IoJxZT7wQqaxg7gXTYfT5ncG4ou2NN9FRt0vFzs9p1bAbMQJ
+ eusqsR4j+89EaQ/4Fub96k3XIJjks49dPJ8H40ESQ6zaoTgKP/CRn0VvUrSS/1CdF+d4
+ 21u7mYoFfZ45EWqHEXQ5FfXbfb6jKDVpztENPstj7KkRrjujKGVMyfw0nUAgutwOY5KK
+ JoS5yEqRZG+yD7DeHhPtQkE/w1CM9bJBbgYey5hTC5w2XzhadC8T0iGsAyRq15aSKMXP yA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+ by userp2130.oracle.com with ESMTP id 337eer7mbk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 03 Sep 2020 09:04:19 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 083918Oi074334;
- Thu, 3 Sep 2020 09:04:18 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 3380svqus6-1
+ Thu, 03 Sep 2020 09:09:37 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+ by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08395lQg016922;
+ Thu, 3 Sep 2020 09:07:37 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+ by userp3030.oracle.com with ESMTP id 3380y1hbry-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 03 Sep 2020 09:04:18 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 08394HqL024027;
- Thu, 3 Sep 2020 09:04:17 GMT
+ Thu, 03 Sep 2020 09:07:36 +0000
+Received: from abhmp0005.oracle.com (abhmp0005.oracle.com [141.146.116.11])
+ by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08397ZqO003926;
+ Thu, 3 Sep 2020 09:07:36 GMT
 Received: from starbug-mbp.localdomain (/79.97.215.145)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 03 Sep 2020 02:04:17 -0700
+ with ESMTP ; Thu, 03 Sep 2020 02:07:35 -0700
 Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id C0435134F901; Thu,  3 Sep 2020 10:04:13 +0100 (IST)
+ id E36A4134F9C6; Thu,  3 Sep 2020 10:07:32 +0100 (IST)
 From: Darren Kenny <darren.kenny@oracle.com>
 To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 09/15] fuzz: add a crossover function to generic-fuzzer
-In-Reply-To: <20200819061110.1320568-10-alxndr@bu.edu>
+Subject: Re: [PATCH v2 10/15] scripts/oss-fuzz: Add wrapper program for
+ generic fuzzer
+In-Reply-To: <20200819061110.1320568-11-alxndr@bu.edu>
 References: <20200819061110.1320568-1-alxndr@bu.edu>
- <20200819061110.1320568-10-alxndr@bu.edu>
-Date: Thu, 03 Sep 2020 10:04:13 +0100
-Message-ID: <m2k0xbs036.fsf@oracle.com>
+ <20200819061110.1320568-11-alxndr@bu.edu>
+Date: Thu, 03 Sep 2020 10:07:32 +0100
+Message-ID: <m2h7sfrzxn.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9732
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- adultscore=0
- phishscore=0 malwarescore=0 mlxscore=0 spamscore=0 bulkscore=0
- suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009030083
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ adultscore=0 phishscore=0
+ malwarescore=0 bulkscore=0 mlxscore=0 mlxlogscore=999 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009030084
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9732
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- adultscore=0
- priorityscore=1501 phishscore=0 mlxlogscore=999 mlxscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009030084
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=darren.kenny@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:47:13
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
+ priorityscore=1501
+ lowpriorityscore=0 malwarescore=0 adultscore=0 spamscore=0 mlxscore=0
+ phishscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0 suspectscore=1
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009030084
+Received-SPF: pass client-ip=156.151.31.86;
+ envelope-from=darren.kenny@oracle.com; helo=userp2130.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:48:18
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -114,133 +115,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- f4bug@amsat.org, Alexander Bulekov <alxndr@bu.edu>, bsd@redhat.com,
- stefanha@redhat.com, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, f4bug@amsat.org,
+ Alexander Bulekov <alxndr@bu.edu>, bsd@redhat.com, stefanha@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wednesday, 2020-08-19 at 02:11:04 -04, Alexander Bulekov wrote:
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> ---
->  tests/qtest/fuzz/general_fuzz.c | 81 ++++++++++++++++++++++++++++++++-
->  1 file changed, 80 insertions(+), 1 deletion(-)
+On Wednesday, 2020-08-19 at 02:11:05 -04, Alexander Bulekov wrote:
+> On oss-fuzz we need some sort of wrapper to specify command-line
+> arguments or environment variables. When we had a similar problem with
+> other targets that I fixed with
+> 05509c8e6d ("fuzz: select fuzz target using executable name")
+> by selecting the fuzz target based on the executable's name. In the
+> future should probably commit to one approach (wrapper binary or
+> argv0-based target selection).
 >
-> diff --git a/tests/qtest/fuzz/general_fuzz.c b/tests/qtest/fuzz/general_fuzz.c
-> index 26fcd69e45..2c3716f8cc 100644
-> --- a/tests/qtest/fuzz/general_fuzz.c
-> +++ b/tests/qtest/fuzz/general_fuzz.c
-> @@ -739,6 +739,83 @@ static void general_pre_fuzz(QTestState *s)
->  
->      counter_shm_init();
->  }
-> +
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+
+> ---
+>  scripts/oss-fuzz/target.c | 40 +++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 40 insertions(+)
+>  create mode 100644 scripts/oss-fuzz/target.c
+>
+> diff --git a/scripts/oss-fuzz/target.c b/scripts/oss-fuzz/target.c
+> new file mode 100644
+> index 0000000000..4a7257412a
+> --- /dev/null
+> +++ b/scripts/oss-fuzz/target.c
+> @@ -0,0 +1,40 @@
 > +/*
-> + * When libfuzzer gives us two inputs to combine, return a new input with the
-> + * following structure:
+> + * Copyright Red Hat Inc., 2020
 > + *
-> + * Input 1 (data1)
-> + * SEPARATOR
-> + * Clear out the DMA Patterns
-> + * SEPARATOR
-> + * Disable the pci_read/write instructions
-> + * SEPARATOR
-> + * Input 2 (data2)
+> + * Authors:
+> + *  Alexander Bulekov   <alxndr@bu.edu>
 > + *
-> + * The idea is to collate the core behaviors of the two inputs.
-> + * For example:
-> + * Input 1: maps a device's BARs, sets up three DMA patterns, and triggers
-> + *          device functionality A
-> + * Input 2: maps a device's BARs, sets up one DMA pattern, and triggers device
-> + *          functionality B
-> + *
-> + * This function attempts to produce an input that:
-> + * Ouptut: maps a device's BARs, set up three DMA patterns, triggers
-> + *          functionality A device, replaces the DMA patterns with a single
-> + *          patten, and triggers device functionality B.
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
 > + */
-> +static size_t general_fuzz_crossover(const uint8_t *data1, size_t size1, const
-> +                                     uint8_t *data2, size_t size2, uint8_t *out,
-> +                                     size_t max_out_size, unsigned int seed)
+> +
+> +#include <stdio.h>
+> +#include <stdlib.h>
+> +#include <limits.h>
+> +#include <libgen.h>
+> +#include <string.h>
+> +#include <unistd.h>
+> +
+> +
+> +/* Required for oss-fuzz to consider the binary a target. */
+> +static const char *magic __attribute__((used)) = "LLVMFuzzerTestOneInput";
+> +static const char args[] = {QEMU_FUZZ_ARGS, 0x00};
+> +static const char objects[] = {QEMU_FUZZ_OBJECTS, 0x00};
+> +
+> +int main(int argc, char *argv[])
 > +{
-
-I don't see this function as well documented, but it might be a good
-idea to check up front whether out is not NULL and that the max_out_size
-is capable of holding what you're likely to consume, i.e. approx:
-
-  size1 + size2 + (SEPARATOR * 3) + 2 /* Ops */
-
-If nothing else means you can be sure you won't have to call MIN() all
-the time, but also that you won't end up only partially filling it too.
-
-> +    size_t copy = 0, size = 0;
-
-NIT: Maybe copy should be copy_len or something rather than a verb?
-
+> +    char path[PATH_MAX] = {0};
+> +    char *dir = dirname(argv[0]);
+> +    strncpy(path, dir, PATH_MAX);
+> +    strcat(path, "/deps/qemu-fuzz-i386-target-general-fuzz");
 > +
-> +    // Copy in the first input
-> +    copy = MIN(size1, max_out_size);
-> +    memcpy(out+size, data1, copy);
-> +    size+= copy;
-> +    max_out_size-= copy;
+> +    setenv("QEMU_FUZZ_ARGS", args, 0);
+> +    setenv("QEMU_FUZZ_OBJECTS", objects, 0);
 > +
-> +    // Append a separator
-> +    copy = MIN(strlen(SEPARATOR), max_out_size);
-> +    memcpy(out+size, SEPARATOR, copy);
-> +    size+= copy;
-> +    max_out_size-= copy;
-> +
-> +    // Clear out the
-> +    copy = MIN(1, max_out_size);
-> +    if (copy) {
-> +        out[size] = OP_CLEAR_DMA_PATTERNS;
+> +    argv[0] = path;
+> +    int ret = execvp(path, argv);
+> +    if (ret) {
+> +        perror("execv");
 > +    }
-> +    size+= copy;
-> +    max_out_size-= copy;
-> +
-> +    copy = MIN(strlen(SEPARATOR), max_out_size);
-> +    memcpy(out+size, SEPARATOR, copy);
-> +    size+= copy;
-> +    max_out_size-= copy;
-> +
-> +    copy = MIN(1, max_out_size);
-> +    if (copy) {
-> +        out[size] = OP_DISABLE_PCI;
-> +    }
-> +    size+= copy;
-> +    max_out_size-= copy;
-> +
-> +    copy = MIN(strlen(SEPARATOR), max_out_size);
-> +    memcpy(out+size, SEPARATOR, copy);
-> +    size+= copy;
-> +    max_out_size-= copy;
-> +
-> +    copy = MIN(size2, max_out_size);
-> +    memcpy(out+size, data2, copy);
-> +    size+= copy;
-> +    max_out_size-= copy;
-> +
-> +    return  size;
+> +    return ret;
 > +}
-> +
-> +
->  static GString *general_fuzz_cmdline(FuzzTarget *t)
->  {
->      GString *cmd_line = g_string_new(TARGET_NAME);
-> @@ -758,7 +835,9 @@ static void register_general_fuzz_targets(void)
->              .description = "Fuzz based on any qemu command-line args. ",
->              .get_init_cmdline = general_fuzz_cmdline,
->              .pre_fuzz = general_pre_fuzz,
-> -            .fuzz = general_fuzz});
-> +            .fuzz = general_fuzz,
-> +            .crossover = general_fuzz_crossover
-> +    });
->  }
->  
->  fuzz_target_init(register_general_fuzz_targets);
-
-Thanks,
-
-Darren.
+> -- 
+> 2.27.0
 
