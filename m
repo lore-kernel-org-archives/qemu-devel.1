@@ -2,93 +2,92 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F692C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86377C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:17:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FEA320716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:11:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45CCA20775
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:17:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="f0Ij6uIv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FEA320716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dNSjAL5V"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45CCA20775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDrpt-0001Jt-2j
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:11:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35786)
+	id 1kDrvM-00052K-Da
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:17:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmb-0007xk-Mn
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:17 -0400
-Received: from mout.gmx.net ([212.227.17.20]:47577)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmZ-0007lr-NN
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1599149272;
- bh=nnNlK5lEXtZIws7ZcRwRHZ3YQMN8yoczHrA5VaeDSoM=;
- h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
- b=f0Ij6uIvE2Dsjqk+ukhETOI5LaUq6S2RNWFVSj4eagMp5IObAu/BVm6IamlgWHoAb
- 6TXeZLRXFW1pvqgxF++8nasQwKU9E0wfTaWRCsxtdOAPb4CZkPXoTTVOBWNQMGtNtK
- auIiU/m5w1ORX8kWhQB+dbEZ4VkykJfRryLSnVqg=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from ls3530.fritz.box ([92.116.138.28]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MC30P-1kPjLu3e6n-00CO9z; Thu, 03
- Sep 2020 18:07:51 +0200
-From: Helge Deller <deller@gmx.de>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL 09/10] hw/display/artist: Refactor x/y coordination extraction
-Date: Thu,  3 Sep 2020 18:07:45 +0200
-Message-Id: <20200903160746.27491-10-deller@gmx.de>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20200903160746.27491-1-deller@gmx.de>
-References: <20200903160746.27491-1-deller@gmx.de>
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1kDrto-0003yZ-J8
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:15:44 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:37075
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1kDrtk-0000Zp-Qd
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:15:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599149732;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=nRWfwJF1kic8r7+IRN4Bqmv81Hq3eR0ksOf2YnHD/uc=;
+ b=dNSjAL5VjbrsLRLKgnbIhZCJd/qnr1RbIuRiGcCF1LC38max4iRTqoKDTE1Dq/Ey8mZI6s
+ MSuiy1GpVUB/k7k9hfdKgDpm91/GgfJS+U+mWM6fIyxKvyEWfjrZ+yFmQgj4nNXnXB8Oqp
+ 0nc01XYYVlTmzxKdIw/4ST6FPrLxxXg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-128-JxMj-idwN6GuvpIJDxl-1g-1; Thu, 03 Sep 2020 12:15:28 -0400
+X-MC-Unique: JxMj-idwN6GuvpIJDxl-1g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 421E456BF4;
+ Thu,  3 Sep 2020 16:15:26 +0000 (UTC)
+Received: from eperezma.remote.csb (ovpn-112-236.ams2.redhat.com
+ [10.36.112.236])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6F3E15C3E0;
+ Thu,  3 Sep 2020 16:15:12 +0000 (UTC)
+From: =?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>
+To: Peter Xu <peterx@redhat.com>,
+	qemu-devel@nongnu.org
+Subject: [PATCH 1/5] memory: Rename memory_region_notify_one to
+ memory_region_notify_iommu_one
+Date: Thu,  3 Sep 2020 18:14:42 +0200
+Message-Id: <20200903161446.29615-2-eperezma@redhat.com>
+In-Reply-To: <20200903161446.29615-1-eperezma@redhat.com>
+References: <20200625191651.5817-1-eperezma@redhat.com>
+ <20200903161446.29615-1-eperezma@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:bYMNUoqq2uXBXRY2opA4yyv42Gwoehc/zZeiIgvhvkAuY1hwyRl
- L5/rJEQYO0H0ZDdxkif9+/9Bo2bL3LLATGkZsGY0+yF8hwEUrsiYEFBsafCsM+BgAL4uPjO
- gySRodY5OIZkeM/uI8zpGxioxXN+eOyS9bgtSJRaIhmHPokXRY8KVwerwlbR8B6+kUoyHwL
- omEJJ/cThQZF3O1fGK0aQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8oU2QUbsdJo=:On3kD3+7GnYIsig5nMyeGB
- N7/nurklVd2VGmDmsK/FwOqS6+cPQsEILpHHQ1hSs4T0pV2nw9U1ufPECgy2hDSGf+O2e3hOX
- 0yj9w6cnWnq8rjd3yICbOUhTV1oNh3xCyluwF02JJ2LyiFzW8qAO5d69de5X1kfl9DarcW7P2
- FZYn5fUlJJaCeiayrqNTDlj+9vijNMkG839uQBfQqBqw1Vok5UEZFG1qKThGq9gNwvddhGHqh
- UJI8kqIy1AnmT4OZp+DpY8LOyy4fQRp189czXHdYvF/rN9wflNEohweKsCtSqw8A5OJnTfhHx
- qXiEz8loLdOzjDBHGmMulAtqLJwOksXEUsHzC72tWUv2XULcFzrTGqekpvklkjJYDpUILWNkY
- pnY4gqJvz44q1MH2g8eQY8+tuZM6NUVCmqcEMng2xojna5SmY7kN007Y4xH7FLtbTb/k9yfpF
- EEOLhI2S4c0MRXJBtbb9s4OdVU52cKh3B/GYzIvKl2Zt5E04qnWRVupFBfapHub8niMIUlJ51
- NkfvTFhxZPowp/yIpIIePNM2B+4UJRz5hB35U0i9zrQ2jP1vdHg8lE9pEQMyfvMkrrFYKQX5s
- XfJ1Tzv6SMtv6PMZTDCW03+W+WHeHmzwXNETBUMsegDg0aR9hprJYohl/KG4BVrgwcZd2olVr
- PYc/buEPEd+DoFrAoxYK0R3YBvqCodYOIcnSQIwQJw6S/ev2uH4DnQ3BTfFC0AD0EbR/kRu9h
- ilrAUbchkZlpl3P8nDI7G3bW68LsRFtSqtebQy9z6QnI7lMLzdayXD6f7y25hWwpqghBYF+CW
- 78s2/OPps/NbNavklmUradWZy+KOp6bxSNXqba8meA+7x0gYXfDWz6hctst8NNyYInmhe1lh/
- 8oVuUSw/aDYI4zt2GbJ+hI0kwb3GVN5r4mZCMDeyarIX3byxZMWB9t5nu28n28d9OY5DT4H9W
- rXb9XUf/658zGAMajqZUqDABdMDxsH0fQrlGtVfL3xeqHJz9AkAzaKnNqwIw6V5DfGsGmVbH9
- 9YjX6Nl7OuaYtcJzazMpy9RuFXHQaafFUc7v4gbG2JaLvQZLhT2NQbHbHs3wTtXTUjkWeOIl7
- 50jmIcmEcfNP97Snye+PZJpsBYzzAU7kkH4rE/ETXBW2scsyu00gnObjxgAYbK+4uD/P2MbyL
- 5SIWnPshO8iPFaJxCREVB3a3ae6oqK7DBnNmrcmEBFf7ZXOKrjN25Ez9fqxf1e/iYStrl3kc0
- p4F2GniHpqgaAmgD8
-Received-SPF: pass client-ip=212.227.17.20; envelope-from=deller@gmx.de;
- helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 12:08:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=eperezma@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:28:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,147 +100,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>,
- Richard Henderson <richard.henderson@linaro.org>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
  Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Simplify the code by using new introduced ADDR_TO_Y() and ADDR_TO_X()
-macros. Those macros extract the x/y-coordinate from the given uint32.
+Previous name didn't reflect the iommu operation.
 
-As further simplification the extraction of the x/y coordinates for
-VRAM_WRITE_INCR_Y and VRAM_WRITE_INCR_X can be done centrally in
-vram_bit_write(), so move this code up into the function.
+Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
+---
+ include/exec/memory.h | 6 +++---
+ hw/arm/smmu-common.c  | 2 +-
+ hw/arm/smmuv3.c       | 2 +-
+ hw/i386/intel_iommu.c | 4 ++--
+ softmmu/memory.c      | 6 +++---
+ 5 files changed, 10 insertions(+), 10 deletions(-)
 
-ADDR_TO_Y() is still limited to 10 bits which allow to address up to of
-1024 lines - this will be increased in a follow-up patch.
-
-Signed-off-by: Helge Deller <deller@gmx.de>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-=2D--
- hw/display/artist.c | 31 +++++++++++++++++--------------
- 1 file changed, 17 insertions(+), 14 deletions(-)
-
-diff --git a/hw/display/artist.c b/hw/display/artist.c
-index ff1532fdc1..16d85c65f8 100644
-=2D-- a/hw/display/artist.c
-+++ b/hw/display/artist.c
-@@ -192,6 +192,10 @@ static const char *artist_reg_name(uint64_t addr)
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index 0cfe987ab4..22c5f564d1 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -226,7 +226,7 @@ enum IOMMUMemoryRegionAttr {
+  * The IOMMU implementation must use the IOMMU notifier infrastructure
+  * to report whenever mappings are changed, by calling
+  * memory_region_notify_iommu() (or, if necessary, by calling
+- * memory_region_notify_one() for each registered notifier).
++ * memory_region_notify_iommu_one() for each registered notifier).
+  *
+  * Conceptually an IOMMU provides a mapping from input address
+  * to an output TLB entry. If the IOMMU is aware of memory transaction
+@@ -1274,7 +1274,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+                                 IOMMUTLBEntry entry);
+ 
+ /**
+- * memory_region_notify_one: notify a change in an IOMMU translation
++ * memory_region_notify_iommu_one: notify a change in an IOMMU translation
+  *                           entry to a single notifier
+  *
+  * This works just like memory_region_notify_iommu(), but it only
+@@ -1285,7 +1285,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+  *         replaces all old entries for the same virtual I/O address range.
+  *         Deleted entries have .@perm == 0.
+  */
+-void memory_region_notify_one(IOMMUNotifier *notifier,
++void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
+                               IOMMUTLBEntry *entry);
+ 
+ /**
+diff --git a/hw/arm/smmu-common.c b/hw/arm/smmu-common.c
+index 3838db1395..88d2c454f0 100644
+--- a/hw/arm/smmu-common.c
++++ b/hw/arm/smmu-common.c
+@@ -472,7 +472,7 @@ static void smmu_unmap_notifier_range(IOMMUNotifier *n)
+     entry.perm = IOMMU_NONE;
+     entry.addr_mask = n->end - n->start;
+ 
+-    memory_region_notify_one(n, &entry);
++    memory_region_notify_iommu_one(n, &entry);
  }
- #undef REG_NAME
-
-+/* artist has a fixed line length of 2048 bytes. */
-+#define ADDR_TO_Y(addr) extract32(addr, 11, 10)
-+#define ADDR_TO_X(addr) extract32(addr, 0, 11)
-+
- static int16_t artist_get_x(uint32_t reg)
- {
-     return reg >> 16;
-@@ -348,13 +352,13 @@ static void artist_invalidate_cursor(ARTISTState *s)
-                             y, s->cursor_height);
+ 
+ /* Unmap all notifiers attached to @mr */
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 0122700e72..0a893ae918 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -827,7 +827,7 @@ static void smmuv3_notify_iova(IOMMUMemoryRegion *mr,
+     entry.addr_mask = num_pages * (1 << granule) - 1;
+     entry.perm = IOMMU_NONE;
+ 
+-    memory_region_notify_one(n, &entry);
++    memory_region_notify_iommu_one(n, &entry);
  }
-
--static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_=
-x,
-+static void vram_bit_write(ARTISTState *s, int posy, bool incr_x,
-                            int size, uint32_t data)
+ 
+ /* invalidate an asid/iova range tuple in all mr's */
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 5284bb68b6..2ad6b9d796 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -3498,7 +3498,7 @@ static void vtd_address_space_unmap(VTDAddressSpace *as, IOMMUNotifier *n)
+         /* This field is meaningless for unmap */
+         entry.translated_addr = 0;
+ 
+-        memory_region_notify_one(n, &entry);
++        memory_region_notify_iommu_one(n, &entry);
+ 
+         start += mask;
+         remain -= mask;
+@@ -3536,7 +3536,7 @@ static void vtd_address_space_refresh_all(IntelIOMMUState *s)
+ 
+ static int vtd_replay_hook(IOMMUTLBEntry *entry, void *private)
  {
-     struct vram_buffer *buf;
-     uint32_t vram_bitmask =3D s->vram_bitmask;
-     int mask, i, pix_count, pix_length;
--    unsigned int offset, width;
-+    unsigned int posx, offset, width;
-     uint8_t *data8, *p;
-
-     pix_count =3D vram_write_pix_per_transfer(s);
-@@ -366,6 +370,8 @@ static void vram_bit_write(ARTISTState *s, int posx, i=
-nt posy, bool incr_x,
-     if (s->cmap_bm_access) {
-         offset =3D s->vram_pos;
-     } else {
-+        posx =3D ADDR_TO_X(s->vram_pos >> 2);
-+        posy +=3D ADDR_TO_Y(s->vram_pos >> 2);
-         offset =3D posy * width + posx;
-     }
-
-@@ -858,7 +864,6 @@ static void artist_reg_write(void *opaque, hwaddr addr=
-, uint64_t val,
-                              unsigned size)
+-    memory_region_notify_one((IOMMUNotifier *)private, entry);
++    memory_region_notify_iommu_one((IOMMUNotifier *)private, entry);
+     return 0;
+ }
+ 
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 70b93104e8..961c25b42f 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1890,8 +1890,8 @@ void memory_region_unregister_iommu_notifier(MemoryRegion *mr,
+     memory_region_update_iommu_notify_flags(iommu_mr, NULL);
+ }
+ 
+-void memory_region_notify_one(IOMMUNotifier *notifier,
+-                              IOMMUTLBEntry *entry)
++void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
++                                    IOMMUTLBEntry *entry)
  {
-     ARTISTState *s =3D opaque;
--    int posx, posy;
-     int width, height;
-
-     trace_artist_reg_write(size, addr, artist_reg_name(addr & ~3ULL), val=
-);
-@@ -881,16 +886,12 @@ static void artist_reg_write(void *opaque, hwaddr ad=
-dr, uint64_t val,
-         break;
-
-     case VRAM_WRITE_INCR_Y:
--        posx =3D (s->vram_pos >> 2) & 0x7ff;
--        posy =3D (s->vram_pos >> 13) & 0x3ff;
--        vram_bit_write(s, posx, posy + s->vram_char_y++, false, size, val=
-);
-+        vram_bit_write(s, s->vram_char_y++, false, size, val);
-         break;
-
-     case VRAM_WRITE_INCR_X:
-     case VRAM_WRITE_INCR_X2:
--        posx =3D (s->vram_pos >> 2) & 0x7ff;
--        posy =3D (s->vram_pos >> 13) & 0x3ff;
--        vram_bit_write(s, posx, posy + s->vram_char_y, true, size, val);
-+        vram_bit_write(s, s->vram_char_y, true, size, val);
-         break;
-
-     case VRAM_IDX:
-@@ -1156,8 +1157,7 @@ static void artist_vram_write(void *opaque, hwaddr a=
-ddr, uint64_t val,
- {
-     ARTISTState *s =3D opaque;
-     struct vram_buffer *buf;
--    int posy =3D (addr >> 11) & 0x3ff;
--    int posx =3D addr & 0x7ff;
-+    unsigned int posy, posx;
-     unsigned int offset;
-     trace_artist_vram_write(size, addr, val);
-
-@@ -1170,6 +1170,9 @@ static void artist_vram_write(void *opaque, hwaddr a=
-ddr, uint64_t val,
+     IOMMUNotifierFlag request_flags;
+     hwaddr entry_end = entry->iova + entry->addr_mask;
+@@ -1927,7 +1927,7 @@ void memory_region_notify_iommu(IOMMUMemoryRegion *iommu_mr,
+ 
+     IOMMU_NOTIFIER_FOREACH(iommu_notifier, iommu_mr) {
+         if (iommu_notifier->iommu_idx == iommu_idx) {
+-            memory_region_notify_one(iommu_notifier, &entry);
++            memory_region_notify_iommu_one(iommu_notifier, &entry);
+         }
      }
-
-     buf =3D vram_write_buffer(s);
-+    posy =3D ADDR_TO_Y(addr);
-+    posx =3D ADDR_TO_X(addr);
-+
-     if (!buf->size) {
-         return;
-     }
-@@ -1212,7 +1215,7 @@ static uint64_t artist_vram_read(void *opaque, hwadd=
-r addr, unsigned size)
-     ARTISTState *s =3D opaque;
-     struct vram_buffer *buf;
-     uint64_t val;
--    int posy, posx;
-+    unsigned int posy, posx;
-
-     if (s->cmap_bm_access) {
-         buf =3D &s->vram_buffer[ARTIST_BUFFER_CMAP];
-@@ -1229,8 +1232,8 @@ static uint64_t artist_vram_read(void *opaque, hwadd=
-r addr, unsigned size)
-         return 0;
-     }
-
--    posy =3D (addr >> 13) & 0x3ff;
--    posx =3D (addr >> 2) & 0x7ff;
-+    posy =3D ADDR_TO_Y(addr);
-+    posx =3D ADDR_TO_X(addr);
-
-     if (posy > buf->height || posx > buf->width) {
-         return 0;
-=2D-
-2.21.3
+ }
+-- 
+2.18.1
 
 
