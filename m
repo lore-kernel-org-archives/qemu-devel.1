@@ -2,85 +2,86 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE11EC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:11:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F692C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:11:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8692B20716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:11:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FEA320716
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:11:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="TT6IsSfA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8692B20716
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="f0Ij6uIv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FEA320716
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDrpj-0001DP-Ce
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:11:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35696)
+	id 1kDrpt-0001Jt-2j
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:11:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35786)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmV-0007tl-PG
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:11 -0400
-Received: from mout.gmx.net ([212.227.17.21]:52785)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmb-0007xk-Mn
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:17 -0400
+Received: from mout.gmx.net ([212.227.17.20]:47577)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmT-0007kP-F1
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:11 -0400
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmZ-0007lr-NN
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
- s=badeba3b8450; t=1599149269;
- bh=iT4Q3QIiZyy40ihhg4Ko2Brtk1nIuCu1PMhwJ/hpyOU=;
- h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
- b=TT6IsSfAzVKlYuEgmHSxxO6zQZgHNFYhikm9YMgWaiKUhVGm/5csWcxRcy+fNygfl
- bQ/nkaXZc6vcB4mTn0C9kcp+e1HVHW7Qd7XjodzHPHCFLtH7hklsCLN9tYYRMc3gRZ
- 4Li3LcuTMI9Snv2981gFfu9Xj7dnGVAo7xTwLYxE=
+ s=badeba3b8450; t=1599149272;
+ bh=nnNlK5lEXtZIws7ZcRwRHZ3YQMN8yoczHrA5VaeDSoM=;
+ h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
+ b=f0Ij6uIvE2Dsjqk+ukhETOI5LaUq6S2RNWFVSj4eagMp5IObAu/BVm6IamlgWHoAb
+ 6TXeZLRXFW1pvqgxF++8nasQwKU9E0wfTaWRCsxtdOAPb4CZkPXoTTVOBWNQMGtNtK
+ auIiU/m5w1ORX8kWhQB+dbEZ4VkykJfRryLSnVqg=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from ls3530.fritz.box ([92.116.138.28]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1M5wLT-1kBw6A0ZZL-007U4b; Thu, 03
- Sep 2020 18:07:49 +0200
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MC30P-1kPjLu3e6n-00CO9z; Thu, 03
+ Sep 2020 18:07:51 +0200
 From: Helge Deller <deller@gmx.de>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 00/10] hppa power button support,
- graphics updates and firmware fixes
-Date: Thu,  3 Sep 2020 18:07:36 +0200
-Message-Id: <20200903160746.27491-1-deller@gmx.de>
+Subject: [PULL 09/10] hw/display/artist: Refactor x/y coordination extraction
+Date: Thu,  3 Sep 2020 18:07:45 +0200
+Message-Id: <20200903160746.27491-10-deller@gmx.de>
 X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200903160746.27491-1-deller@gmx.de>
+References: <20200903160746.27491-1-deller@gmx.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:1vwyasTcwHJaG6yDyQ33qv8Mwz8nST/b39sgd0EEt3S3TPI5fYS
- hALshO6nxIA5JBnAaeEwqtE5rOCOi8Y6HTU7xoCss3r8BSGVwbWmL3E5UVG7HAKu/cIMC1K
- iG470WL8dLg3d42AVuEaMSgkPr/5BCB+8xfkTzmF0pU9ItEkPkA/vLHZMPzrkJc9xvcuk5E
- f0n0Yi3VMto7xO0gxwDhQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:DsJscsk/WGo=:DQPW17XXiP+iDEFXPndVBx
- 4AJJ1ihWEB3N2IcDtat9H+Q6TTXx9hPci7Q5OTvMxxx6O6qfJhtJ0HeN1PU4GAzxjblkXZE7r
- iepsFEnI1VvbB4MlSO5TW0ewqDdB3IEUyLjgQOt9kyHXedytffj7/wZdAJXUtQPmngSPkhqWT
- XZyVfI9vbeBjs7a4/40X0Zhh+7vsqpFIQ6zQHGSt8umgk9Cv6u80cxfjytvPB4rgost/0GWP6
- sQNMpltO5+R5fw4nt39oN6I0bYxrcVR2ilugFFD4ZxU+CdyoqcJZvFkI7z6rAstSqIcVsSSTl
- z2cu3imL/CroInRzxWtSRCQHzR7DXYhaixIe2da+AGtqK+OS4wn6F0w6lsj1dcE8Pvaob27gJ
- OTTQ9xgkSx1/YVu+wpVBU7YWAEJjGKFd6C64lrlQNNiOLMwrfhx/GOvhZTcdZOhSY7Zh3tiAM
- 6eARGv3/iUHNu1XTr0nqdlfWbmnQNhJ/iXMVpyNEgO59c2BmmmyX9jvL3jeeQ4zdozKRyOVB7
- /VWYVw8NWa2oYaGN8g6p++KaXSgtK/jNmqBPeBkO099R2MJ59xO5gr9Tbd5tabMn73H5bcLKV
- kE6mKylDJDi1MKBkyTOLpz1j0WDIcZq048IM2a/29XOUkatxOPM4iwze5WpLVcA1ndaHUTvqt
- SDRH5E7H6+91knLuKEadb/K1srnKns/J3bQ3de3V+Ci9EWnCHanD5Q+Wu9vy+XEp3hdBnferS
- u3L61Xt5wxThri3PaeqkN+Tn/y2RVFuS8vjq/YQ0TSkzQQetJWMqD2H6tUvQaies+8UE3OIzX
- PGJdWVnCxnjbFsK6/9qTXUBj4fjRtydbr1QYHvugS/bynEz+Q3Lf+FSfcczn2jYggQnIXBxxu
- ETCJOOJjza7ft8J1ctKQ9bQhxNRuijCsm66hdSAWpGqfFioo135ClUGv1HJoe+VIQM7GxIvFu
- HD/LKoaLR8gURgSTabNeNe4QWHaXgmANgSRcRdl/GHFs1dJJzBIRxBNOxy4nmCxGNwfv67gAi
- /YlDVWgxio+S2TEzy2evuHuvWjLmQTEQEmvmMcoNWRU1UPTtm+fk3LqAt+PzhqrY6JhQBNKos
- hux4SgxWDKdu7D7UkNkv9SUhhGSHjQkk/rQtLPUmLAqgsYhK874ubZVHYClh38XwZxVip40YC
- rdUjP55cLeonUJ+XRb3wynoXKNk8QGqShCV956mGd09W0QP0/5m5La/VIYFkgWsKI0XvSaPKn
- LTzgbM62d6dkJneyz
-Received-SPF: pass client-ip=212.227.17.21; envelope-from=deller@gmx.de;
+X-Provags-ID: V03:K1:bYMNUoqq2uXBXRY2opA4yyv42Gwoehc/zZeiIgvhvkAuY1hwyRl
+ L5/rJEQYO0H0ZDdxkif9+/9Bo2bL3LLATGkZsGY0+yF8hwEUrsiYEFBsafCsM+BgAL4uPjO
+ gySRodY5OIZkeM/uI8zpGxioxXN+eOyS9bgtSJRaIhmHPokXRY8KVwerwlbR8B6+kUoyHwL
+ omEJJ/cThQZF3O1fGK0aQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8oU2QUbsdJo=:On3kD3+7GnYIsig5nMyeGB
+ N7/nurklVd2VGmDmsK/FwOqS6+cPQsEILpHHQ1hSs4T0pV2nw9U1ufPECgy2hDSGf+O2e3hOX
+ 0yj9w6cnWnq8rjd3yICbOUhTV1oNh3xCyluwF02JJ2LyiFzW8qAO5d69de5X1kfl9DarcW7P2
+ FZYn5fUlJJaCeiayrqNTDlj+9vijNMkG839uQBfQqBqw1Vok5UEZFG1qKThGq9gNwvddhGHqh
+ UJI8kqIy1AnmT4OZp+DpY8LOyy4fQRp189czXHdYvF/rN9wflNEohweKsCtSqw8A5OJnTfhHx
+ qXiEz8loLdOzjDBHGmMulAtqLJwOksXEUsHzC72tWUv2XULcFzrTGqekpvklkjJYDpUILWNkY
+ pnY4gqJvz44q1MH2g8eQY8+tuZM6NUVCmqcEMng2xojna5SmY7kN007Y4xH7FLtbTb/k9yfpF
+ EEOLhI2S4c0MRXJBtbb9s4OdVU52cKh3B/GYzIvKl2Zt5E04qnWRVupFBfapHub8niMIUlJ51
+ NkfvTFhxZPowp/yIpIIePNM2B+4UJRz5hB35U0i9zrQ2jP1vdHg8lE9pEQMyfvMkrrFYKQX5s
+ XfJ1Tzv6SMtv6PMZTDCW03+W+WHeHmzwXNETBUMsegDg0aR9hprJYohl/KG4BVrgwcZd2olVr
+ PYc/buEPEd+DoFrAoxYK0R3YBvqCodYOIcnSQIwQJw6S/ev2uH4DnQ3BTfFC0AD0EbR/kRu9h
+ ilrAUbchkZlpl3P8nDI7G3bW68LsRFtSqtebQy9z6QnI7lMLzdayXD6f7y25hWwpqghBYF+CW
+ 78s2/OPps/NbNavklmUradWZy+KOp6bxSNXqba8meA+7x0gYXfDWz6hctst8NNyYInmhe1lh/
+ 8oVuUSw/aDYI4zt2GbJ+hI0kwb3GVN5r4mZCMDeyarIX3byxZMWB9t5nu28n28d9OY5DT4H9W
+ rXb9XUf/658zGAMajqZUqDABdMDxsH0fQrlGtVfL3xeqHJz9AkAzaKnNqwIw6V5DfGsGmVbH9
+ 9YjX6Nl7OuaYtcJzazMpy9RuFXHQaafFUc7v4gbG2JaLvQZLhT2NQbHbHs3wTtXTUjkWeOIl7
+ 50jmIcmEcfNP97Snye+PZJpsBYzzAU7kkH4rE/ETXBW2scsyu00gnObjxgAYbK+4uD/P2MbyL
+ 5SIWnPshO8iPFaJxCREVB3a3ae6oqK7DBnNmrcmEBFf7ZXOKrjN25Ez9fqxf1e/iYStrl3kc0
+ p4F2GniHpqgaAmgD8
+Received-SPF: pass client-ip=212.227.17.20; envelope-from=deller@gmx.de;
  helo=mout.gmx.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 12:08:05
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 12:08:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -25
 X-Spam_score: -2.6
 X-Spam_bar: --
@@ -100,51 +101,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Helge Deller <deller@gmx.de>, Richard Henderson <rth@twiddle.net>
+Cc: Helge Deller <deller@gmx.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-hppa power button support, graphics updates and firmware fixes
+Simplify the code by using new introduced ADDR_TO_Y() and ADDR_TO_X()
+macros. Those macros extract the x/y-coordinate from the given uint32.
 
-The following changes since commit ac8b279f13865d1a4f1958d3bf34240c1c3af90=
-d:
+As further simplification the extraction of the x/y coordinates for
+VRAM_WRITE_INCR_Y and VRAM_WRITE_INCR_X can be done centrally in
+vram_bit_write(), so move this code up into the function.
 
-  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200827' into s=
-taging (2020-08-27 13:48:12 +0100)
+ADDR_TO_Y() is still limited to 10 bits which allow to address up to of
+1024 lines - this will be increased in a follow-up patch.
 
-are available in the Git repository at:
+Signed-off-by: Helge Deller <deller@gmx.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+=2D--
+ hw/display/artist.c | 31 +++++++++++++++++--------------
+ 1 file changed, 17 insertions(+), 14 deletions(-)
 
-   https://github.com/hdeller/qemu-hppa.git tags/target-hppa-pull-request
+diff --git a/hw/display/artist.c b/hw/display/artist.c
+index ff1532fdc1..16d85c65f8 100644
+=2D-- a/hw/display/artist.c
++++ b/hw/display/artist.c
+@@ -192,6 +192,10 @@ static const char *artist_reg_name(uint64_t addr)
+ }
+ #undef REG_NAME
 
-for you to fetch changes up to 32a2b033f0a406c0dd4cc7375367ee63cc36789a:
++/* artist has a fixed line length of 2048 bytes. */
++#define ADDR_TO_Y(addr) extract32(addr, 11, 10)
++#define ADDR_TO_X(addr) extract32(addr, 0, 11)
++
+ static int16_t artist_get_x(uint32_t reg)
+ {
+     return reg >> 16;
+@@ -348,13 +352,13 @@ static void artist_invalidate_cursor(ARTISTState *s)
+                             y, s->cursor_height);
+ }
 
-  hw/display/artist: Allow screen size up to 2048 lines (2020-09-03 17:30:=
-04 +0200)
+-static void vram_bit_write(ARTISTState *s, int posx, int posy, bool incr_=
+x,
++static void vram_bit_write(ARTISTState *s, int posy, bool incr_x,
+                            int size, uint32_t data)
+ {
+     struct vram_buffer *buf;
+     uint32_t vram_bitmask =3D s->vram_bitmask;
+     int mask, i, pix_count, pix_length;
+-    unsigned int offset, width;
++    unsigned int posx, offset, width;
+     uint8_t *data8, *p;
 
-=2D---------------------------------------------------------------
+     pix_count =3D vram_write_pix_per_transfer(s);
+@@ -366,6 +370,8 @@ static void vram_bit_write(ARTISTState *s, int posx, i=
+nt posy, bool incr_x,
+     if (s->cmap_bm_access) {
+         offset =3D s->vram_pos;
+     } else {
++        posx =3D ADDR_TO_X(s->vram_pos >> 2);
++        posy +=3D ADDR_TO_Y(s->vram_pos >> 2);
+         offset =3D posy * width + posx;
+     }
 
-Helge Deller (10):
-  seabios-hppa: Update SeaBIOS to hppa-qemu-5.2-2 tag
-  hw/hppa: Make number of TLB and BTLB entries configurable
-  hw/hppa: Store boot device in fw_cfg section
-  hw/hppa: Change fw_cfg port address
-  hw/hppa: Tell SeaBIOS port address of fw_cfg
-  hw/hppa: Add power button emulation
-  target/hppa: Fix boot with old Linux installation CDs
-  hw/display/artist: Verify artist screen resolution
-  hw/display/artist: Refactor x/y coordination extraction
-  hw/display/artist: Allow screen size up to 2048 lines
+@@ -858,7 +864,6 @@ static void artist_reg_write(void *opaque, hwaddr addr=
+, uint64_t val,
+                              unsigned size)
+ {
+     ARTISTState *s =3D opaque;
+-    int posx, posy;
+     int width, height;
 
- hw/display/artist.c       |  43 +++++++++++++++++++----------
- hw/hppa/hppa_hardware.h   |   3 +-
- hw/hppa/machine.c         |  56 +++++++++++++++++++++++++++++++++++++-
- pc-bios/hppa-firmware.img | Bin 783192 -> 785696 bytes
- roms/seabios-hppa         |   2 +-
- target/hppa/cpu.h         |   5 +++-
- target/hppa/insns.decode  |  10 +++----
- 7 files changed, 95 insertions(+), 24 deletions(-)
+     trace_artist_reg_write(size, addr, artist_reg_name(addr & ~3ULL), val=
+);
+@@ -881,16 +886,12 @@ static void artist_reg_write(void *opaque, hwaddr ad=
+dr, uint64_t val,
+         break;
 
+     case VRAM_WRITE_INCR_Y:
+-        posx =3D (s->vram_pos >> 2) & 0x7ff;
+-        posy =3D (s->vram_pos >> 13) & 0x3ff;
+-        vram_bit_write(s, posx, posy + s->vram_char_y++, false, size, val=
+);
++        vram_bit_write(s, s->vram_char_y++, false, size, val);
+         break;
+
+     case VRAM_WRITE_INCR_X:
+     case VRAM_WRITE_INCR_X2:
+-        posx =3D (s->vram_pos >> 2) & 0x7ff;
+-        posy =3D (s->vram_pos >> 13) & 0x3ff;
+-        vram_bit_write(s, posx, posy + s->vram_char_y, true, size, val);
++        vram_bit_write(s, s->vram_char_y, true, size, val);
+         break;
+
+     case VRAM_IDX:
+@@ -1156,8 +1157,7 @@ static void artist_vram_write(void *opaque, hwaddr a=
+ddr, uint64_t val,
+ {
+     ARTISTState *s =3D opaque;
+     struct vram_buffer *buf;
+-    int posy =3D (addr >> 11) & 0x3ff;
+-    int posx =3D addr & 0x7ff;
++    unsigned int posy, posx;
+     unsigned int offset;
+     trace_artist_vram_write(size, addr, val);
+
+@@ -1170,6 +1170,9 @@ static void artist_vram_write(void *opaque, hwaddr a=
+ddr, uint64_t val,
+     }
+
+     buf =3D vram_write_buffer(s);
++    posy =3D ADDR_TO_Y(addr);
++    posx =3D ADDR_TO_X(addr);
++
+     if (!buf->size) {
+         return;
+     }
+@@ -1212,7 +1215,7 @@ static uint64_t artist_vram_read(void *opaque, hwadd=
+r addr, unsigned size)
+     ARTISTState *s =3D opaque;
+     struct vram_buffer *buf;
+     uint64_t val;
+-    int posy, posx;
++    unsigned int posy, posx;
+
+     if (s->cmap_bm_access) {
+         buf =3D &s->vram_buffer[ARTIST_BUFFER_CMAP];
+@@ -1229,8 +1232,8 @@ static uint64_t artist_vram_read(void *opaque, hwadd=
+r addr, unsigned size)
+         return 0;
+     }
+
+-    posy =3D (addr >> 13) & 0x3ff;
+-    posx =3D (addr >> 2) & 0x7ff;
++    posy =3D ADDR_TO_Y(addr);
++    posx =3D ADDR_TO_X(addr);
+
+     if (posy > buf->height || posx > buf->width) {
+         return 0;
 =2D-
 2.21.3
 
