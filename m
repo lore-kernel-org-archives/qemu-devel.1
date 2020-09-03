@@ -2,89 +2,111 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61FB2C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 17:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55217C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 17:50:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 264C1206C0
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 17:35:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 15F8E2072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 17:50:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I5/TTZm4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 264C1206C0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rq5wY0/6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15F8E2072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDt8d-0000r9-BC
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 13:35:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56888)
+	id 1kDtNd-0006rR-5I
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 13:50:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kDt7Y-0008Jv-0A
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 13:34:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26407
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDtMu-0006S9-VK
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 13:49:52 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37830
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kDt7W-0003I5-Ff
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 13:33:59 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kDtMs-0005oE-Dx
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 13:49:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599154437;
+ s=mimecast20190719; t=1599155388;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=EFi/MZN/E3U+zPWxXnrNfhno7Lkn1hFxHjSFGbLnNm4=;
- b=I5/TTZm44v4Ic6JVdqJopUsm+n1gSnU1k0mL6hCBgr6FrZBpPsoGuokzn886KPQt5zVQIS
- VJa0cEhlGHXXUjG67CkWy8j0fZMwx9+G4v9vcEJjuVA9iokDErrAqUHCGO3v0mZvXHVlO2
- AquM7J5G/uWRhTcTo931vpd8twn0hxk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-cRr77sicNVeN8jqP0dvgVw-1; Thu, 03 Sep 2020 13:33:52 -0400
-X-MC-Unique: cRr77sicNVeN8jqP0dvgVw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6471425DA;
- Thu,  3 Sep 2020 17:33:51 +0000 (UTC)
-Received: from kaapi (ovpn-113-31.rdu2.redhat.com [10.10.113.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8DA0D10027A6;
- Thu,  3 Sep 2020 17:33:49 +0000 (UTC)
-Date: Thu, 3 Sep 2020 23:03:46 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v1] sd: sdhci: assert data_count is within fifo_buffer
-In-Reply-To: <d7af91ab-5874-0619-b7c7-5f475ebf07ca@amsat.org>
-Message-ID: <nycvar.YSQ.7.78.906.2009032302510.2047119@xnncv>
-References: <20200903070842.2125083-1-ppandit@redhat.com>
- <d7af91ab-5874-0619-b7c7-5f475ebf07ca@amsat.org>
+ bh=CuNGxX52f2NjX+jDi86rMYt4A5qZz4shsPjE4v5wul4=;
+ b=Rq5wY0/6n+QhbUbaHNfxNJ4wTT0g5szcSj5zEge8kR+AbnnSWHb6eglqXjy9LoaZTUpxv4
+ KB7zuVl0x+HS0ZPNtpwCK8lUC+jBR8a6S6FjzFaM2WYxRuoUDUda5X1Rw9Hs1VJprrlrhF
+ bsVE60Jo9ZsvAiNAGqPxtgCIbbBaMpg=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-rBRVvDXuMGmxn8TBK75yMQ-1; Thu, 03 Sep 2020 13:49:46 -0400
+X-MC-Unique: rBRVvDXuMGmxn8TBK75yMQ-1
+Received: by mail-wm1-f69.google.com with SMTP id c72so1203367wme.4
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 10:49:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CuNGxX52f2NjX+jDi86rMYt4A5qZz4shsPjE4v5wul4=;
+ b=D+l+D5rALyH7F7l23Fst9Rk3BEAfSOr11xiw2rTWksSmo/zv1u+Bu7e80VHoQeP0+Y
+ GanXB7EKmlBj3ngaUcgXJRTs+0EIu3N2Q4d6tierphKiRgGGaBT5buR+Rw/sOY82ABnG
+ hHFEtxm9p0JKsog3fLKlfqiycA7Wx90P5exFKZzAwYKOzZQqAM/c0eZU7kwmVri/vPVi
+ AXQYyVLHpNXTIBFoSI+4K91iGvkL/kfSQpGlagLlcrzmCq7B0zMd8gACIUa/Osr2ZDAV
+ apNPP09/c8dB33+9AlWN3PjZDK5Mj9z3BpiYFX49RdZJ0X2oHxWvzbd/NRkn8B8GBhZH
+ UvJQ==
+X-Gm-Message-State: AOAM530PtT9ZzNfa5Oqu2imFljR1C3G/pN/GUgrAApXjMVPf8m6HNwNn
+ pC1Nncx+F53ZABorVSo9ZHRAtMehc/NYbBF9GSj9pIhuFUnf2YcSTowu0sT47e8yNgAdzP3d3Ai
+ ACQafQrbqi+sxbq0=
+X-Received: by 2002:a5d:560d:: with SMTP id l13mr3526824wrv.49.1599155385803; 
+ Thu, 03 Sep 2020 10:49:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyRRRS+3KvlmOSMn7bxO+pRnI/OdzYFPwg87wBmm6njWqC60qu55JngOrZj8aDPOv0KOeQmNw==
+X-Received: by 2002:a5d:560d:: with SMTP id l13mr3526814wrv.49.1599155385620; 
+ Thu, 03 Sep 2020 10:49:45 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:197c:daa0:48d1:20b2?
+ ([2001:b07:6468:f312:197c:daa0:48d1:20b2])
+ by smtp.gmail.com with ESMTPSA id s11sm5828285wrt.43.2020.09.03.10.49.44
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Sep 2020 10:49:44 -0700 (PDT)
+Subject: Re: QEMU - Contributing to SCSI Adapter Emulation (BusLogic BT-958
+ SCSI adapter)
+To: Rohit Shinde <rohit.shinde12194@gmail.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, fam@euphon.net,
+ Denis.Dmitriev@ispras.ru, Pavel.Dovgaluk@ispras.ru
+References: <CA+Ai=tAqoCp5mMD3u7wA-CS+mPjksep8N5zw+q4f3Kf2VGhynw@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <c0a592bb-076f-6558-5fa1-bb9ebc8e0d8e@redhat.com>
+Date: Thu, 3 Sep 2020 19:49:44 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <CA+Ai=tAqoCp5mMD3u7wA-CS+mPjksep8N5zw+q4f3Kf2VGhynw@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed;
- boundary="-1463810047-1921646060-1599154431=:2047119"
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=ppandit@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:49
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -44
+X-Spam_score: -4.5
+X-Spam_bar: ----
+X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,29 +119,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ruhr-University <bugs-syssec@rub.de>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
----1463810047-1921646060-1599154431=:2047119
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+On 03/09/20 17:43, Rohit Shinde wrote:
+> I am interested in contributing to the implementation of the BusLogic
+> adapter. I saw on the doc pages of QEMU that it is an incomplete
+> adaptation and I would like to take it further and complete it.
+> 
 
-+-- On Thu, 3 Sep 2020, Philippe Mathieu-Daudé wrote --+
-| If you don't mind I might split the assert in 2 when applying:
-| 
-| -            assert(s->data_count <= s->buf_maxsz && s->data_count > begin);
-| +            assert(s->data_count <= s->buf_maxsz);
-| +            assert(s->data_count > begin);
+Hi, the BT-958 is not available at all in QEMU.  What information were
+you looking at?
 
-Sure, np. Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
----1463810047-1921646060-1599154431=:2047119--
+Paolo
 
 
