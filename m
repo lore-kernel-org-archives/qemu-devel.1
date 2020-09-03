@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 662C8C433E2
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5FEAC433E7
 	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:32:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21D7520897
+	by mail.kernel.org (Postfix) with ESMTPS id 9C146208CA
 	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:32:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vJvoZR4e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21D7520897
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mY7W7h2w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C146208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDjjY-0003rj-9l
+	id 1kDjjY-0003uD-PY
 	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 03:32:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39574)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDjeC-0001yB-6l
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:27:04 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:35821)
+ id 1kDjeI-0002FH-Ec
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:27:10 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38611)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDjeA-0001lz-Bh
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:27:03 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id g6so1046290pjl.0
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 00:27:01 -0700 (PDT)
+ id 1kDjeG-0001mq-NK
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:27:10 -0400
+Received: by mail-pf1-x443.google.com with SMTP id d22so1577911pfn.5
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 00:27:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7qFs4DimqAesKZObvg6cIq0gpU6BQyoRteynVkW2Sws=;
- b=vJvoZR4eyeEq70lEW3rRcB5T7o2w4OUkXM6gqdwPivmCEgc98FbstB1nKnoV2HuhP+
- 5YvA5fdTfPQl875NVktctt0LqaDDRDVxzBnscV5SFXuDdCj7CvOx5Rdtr9ImYwRRLNoz
- emNa3Hkt7rp+KevpCaki92OoG2d79b7fMlnS6BhtxB5FIUkxo/Cl/f/W+0Qegq7d0h3d
- h6OHkvpJdSWjvTjknx1r9JyXOfOM3j9IzhDSGJZgPCiSC/RYBQOsU1IIN9b+DP+aZ2xb
- SEWWF5VKGkTltyfkP2KCxJzAs5bKEohJx62nLsny3bZr0IWBXfBOAcXbhJ84P0+L5UOg
- VezQ==
+ bh=hA0Q3ZvS9ZMt8mExwk35iB2Bwjpw4Nf408fgP9XSgOU=;
+ b=mY7W7h2wq/n51O8Sp20oP6jL7RceK/BxYLfmBYx8BhgKKuFnbjiR+bUQZmvixo+RCr
+ tlUhB9X/oYbCZpfOFMQEB7uyAfW25y0QuOV2j7iLo3D1kpL7wtiwqHpsaaLQ7+XLsPRh
+ RQ3ooAdRx3OahUbLoIvu+esysGFBKRZLWZyEBN0ajMEVOMuRPH0byKeH2uxVbovAEQPN
+ cEnwjK/+sNixCzlOL2bWf2dH+IQbUQpVZ8DN6ItYp9OXBAVlb4/b3M6yrBMgdekXKUS3
+ bFmTmI1AE/5l6KbLAGrnZwTWaIRscjo16EqpTEiP8OKEbc0RZmkH1kRFDIoxA53DJR06
+ qE3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7qFs4DimqAesKZObvg6cIq0gpU6BQyoRteynVkW2Sws=;
- b=dzFBvuzmAJ3rVmrWFVtEfUkmZ/vL2H5lRk6dVLPGZiofKapfH+s8wVOgogkZRToRqR
- WJw/MU9NQyb5+A2NIqOCfWEJjGtlkHGG8hdp+LKh2wFyNj7bCyMfqYw4a67/gteT/c2i
- YdK8ZgmvaW/sXwWJR/XI3AZvzE6L7OgbKVQtLNpu0r3CmVddx0HfIdrT7lfsbGZNRnUE
- 3EPq1NhZQATWcwRmcAZ9sog7zXqnitca7LwhOtwczhuFcgaMI23iVVBGHpF642amsBSW
- d5x5vizJcOd2hY6OHRV1gBRHCVVRhffimVD7l/IHw8ZKpLtAPxlXMDde89dtOloE/BMW
- p9Pw==
-X-Gm-Message-State: AOAM530FQEKfQZxEh20bxbv1F52QFbTo4osKPZSqRxXT19Ma+tNYrm0T
- yoLwB7MTJGt57dHRaTs/LKR5LBPUbETBUA==
-X-Google-Smtp-Source: ABdhPJztpMEYyWUF2EL5o4NtcsGdwvoVApzZKGI4Rz3D9AB/LZAyVCJso2HrfVZEi2N3Q+6D82SFrw==
-X-Received: by 2002:a17:90b:1b4f:: with SMTP id
- nv15mr1910961pjb.95.1599118020618; 
- Thu, 03 Sep 2020 00:27:00 -0700 (PDT)
+ bh=hA0Q3ZvS9ZMt8mExwk35iB2Bwjpw4Nf408fgP9XSgOU=;
+ b=kAaonSp8KH5UcDwprlO7jpi8Drp2K50sqke0wbbR9LFwM+RhagJQ+U2omKyn+eWyJr
+ td2b5hIbvZC1sbtj4thatHBiaRJq50r+rurcDKi59xL2w+6bG1rk5lmOt0INNtz3rdUO
+ eN/FvHdbWifRHGPitqSIy8e5vVW+CWQzj0n0iXCqoX9uK7//PpDffyqBl9j17NzQhapK
+ aq7wILlK5aWIoNV1AzgHolEGVj+bxeGf6rVtsfnKX0vaOMJc4PgAOdTiATL/elWnzvdv
+ vLxN15GI213lSQQRgSaslAG5r26xXUWJu4Mfs6RRxNcLlws5n0NULDnsMfwGjjI7CvgY
+ IEBQ==
+X-Gm-Message-State: AOAM532x9qynuMVUrb02E/VmNLMZUFyTtxth+DihaWWZZhWYtdUX1Py9
+ qKSwMGGR1VDZmprS+/ptaDP4VS41Vj0GLQ==
+X-Google-Smtp-Source: ABdhPJz0K0qsPjhdvOiAKvQ3ZIhi/y8KhOiLhZ7QhQwmM8S4CeQlASG0ZAd59+YjniIpo+3w7ouluQ==
+X-Received: by 2002:a17:902:9a44:: with SMTP id
+ x4mr2542364plv.31.1599118027052; 
+ Thu, 03 Sep 2020 00:27:07 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id x185sm1930229pfc.188.2020.09.03.00.26.59
+ by smtp.gmail.com with ESMTPSA id x185sm1930229pfc.188.2020.09.03.00.27.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 00:27:00 -0700 (PDT)
+ Thu, 03 Sep 2020 00:27:06 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 06/12] target/microblaze: Rename DISAS_UPDATE to DISAS_EXIT
-Date: Thu,  3 Sep 2020 00:26:44 -0700
-Message-Id: <20200903072650.1360454-7-richard.henderson@linaro.org>
+Subject: [PATCH v2 11/12] target/microblaze: Use tcg_gen_lookup_and_goto_ptr
+Date: Thu,  3 Sep 2020 00:26:49 -0700
+Message-Id: <20200903072650.1360454-12-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200903072650.1360454-1-richard.henderson@linaro.org>
 References: <20200903072650.1360454-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,66 +105,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The name "update" suggests that something needs updating, but
-this is not the case.  Use "exit" to emphasize that nothing
-needs doing except to exit.
+Normal indirect jumps, or page-crossing direct jumps, can use
+tcg_gen_lookup_and_goto_ptr to avoid returning to the main loop
+simply to find an existing TB for the next pc.
 
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/translate.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ target/microblaze/translate.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index a8a3249185..8ceb04f4f0 100644
+index da84fdb20b..d98572fab9 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -37,7 +37,7 @@
- 
- /* is_jmp field values */
- #define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
--#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
-+#define DISAS_EXIT    DISAS_TARGET_1 /* all cpu state modified dynamically */
- 
- static TCGv_i32 cpu_R[32];
- static TCGv_i32 cpu_pc;
-@@ -1161,7 +1161,7 @@ static bool trans_brk(DisasContext *dc, arg_typea_br *arg)
-     tcg_gen_ori_i32(cpu_msr, cpu_msr, MSR_BIP);
-     tcg_gen_movi_tl(cpu_res_addr, -1);
- 
--    dc->base.is_jmp = DISAS_UPDATE;
-+    dc->base.is_jmp = DISAS_EXIT;
-     return true;
- }
- 
-@@ -1202,7 +1202,7 @@ static bool trans_brki(DisasContext *dc, arg_typeb_br *arg)
-                          ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM));
+@@ -147,7 +147,7 @@ static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
+         tcg_gen_exit_tb(dc->base.tb, n);
+     } else {
+         tcg_gen_movi_i32(cpu_pc, dest);
+-        tcg_gen_exit_tb(NULL, 0);
++        tcg_gen_lookup_and_goto_ptr();
      }
-     tcg_gen_ori_i32(cpu_msr, cpu_msr, msr_to_set);
--    dc->base.is_jmp = DISAS_UPDATE;
-+    dc->base.is_jmp = DISAS_EXIT;
- #endif
- 
-     return true;
-@@ -1712,7 +1712,7 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
- 
-     /* Force an exit if the per-tb cpu state has changed.  */
-     if (dc->base.is_jmp == DISAS_NEXT && dc->cpustate_changed) {
--        dc->base.is_jmp = DISAS_UPDATE;
-+        dc->base.is_jmp = DISAS_EXIT;
-         tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
-     }
+     dc->base.is_jmp = DISAS_NORETURN;
  }
-@@ -1733,7 +1733,7 @@ static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
-         gen_goto_tb(dc, 0, dc->base.pc_next);
-         return;
- 
--    case DISAS_UPDATE:
-+    case DISAS_EXIT:
+@@ -1803,7 +1803,7 @@ static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
          if (unlikely(cs->singlestep_enabled)) {
              gen_raise_exception(dc, EXCP_DEBUG);
          } else {
+-            tcg_gen_exit_tb(NULL, 0);
++            tcg_gen_lookup_and_goto_ptr();
+         }
+         return;
+ 
 -- 
 2.25.1
 
