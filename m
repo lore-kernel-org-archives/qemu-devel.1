@@ -2,90 +2,90 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7296C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE8BC433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:49:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7443C20775
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:49:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75DF7207EA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 10:49:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u86Kz2ls"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7443C20775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gv1rnV+5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75DF7207EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDmnm-0002h8-Id
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 06:49:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55302)
+	id 1kDmoT-00044l-JL
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 06:49:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kDmfw-00067K-BB; Thu, 03 Sep 2020 06:41:04 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:53984)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kDmft-0002HF-38; Thu, 03 Sep 2020 06:41:03 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id k15so1323431pji.3;
- Thu, 03 Sep 2020 03:41:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=vLhkFcPRPjbFUkxZmeoav+dAcg9EN0kbL/fECyuDRas=;
- b=u86Kz2lsxqQ/2Fe2BOBRNaITiyZFjrkREy/6ThAPKzKVFRDKu4R+SfReEY7Kt3xOdg
- RDzZMFoWsAWi8LNp4hrqHYTDcGzLhhZhNbWZTlTntJBl+kmGUkxwrSMH3VTGAz5JeCxW
- vedtjtkEPttKP/iIgGsPkO4lXhljprZCGYQjHmC0pvQ+WRtgoAsxEN2t2hIq6i7AD0he
- +U+sy4Xkmx9/qPhu8ix94OR6kEAbOMsJkcDrRh4Wirzq3XYH+wGo83cauYK9YtoKFS9k
- 56VPm3ncXY/6qnMwOAnRsKOkn+5newtdOW8TTj1rgNAe4+GYHKBoLhAKlAiu3d4iuX3C
- 9jJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=vLhkFcPRPjbFUkxZmeoav+dAcg9EN0kbL/fECyuDRas=;
- b=NNjP+BmcoyONpZl0lw0iiOC/UCilTtXSf1L3t8ZlHb51kT1aLpMdx9uaSGUCpndQnN
- JFj6/aXMXSQWX0ge8rwq7fcNkyn25nk9zHySEBHr6LLxRRRwy+d1J+KU0J3Tn1PcYVCv
- MOsRsea9JX5eQrAvuT9UX/930ybZMt6FdkI+rL4rwBcuvIDYxkcDuGNGzemdwaNqr3fj
- tX4xpG5qj6RLiQPf7d4hWZ/jdRjwj/GaKduU81XO9CyJl7owkFEI7Yir3VqH/YdR8osb
- N8EF1C2Urx5xQCS+lWJEnDIT4JY/aEYvmtN4SyD0Z9cvQSPXbmt/VAiSS1hSUT0xjL8R
- 4kuw==
-X-Gm-Message-State: AOAM533KvAan5BzPgrJCUZVqz3PNtTemTCM0wAmmY6dicGaUpsfRTeSd
- GC9rZdYwJviyc+vO8VImDMc=
-X-Google-Smtp-Source: ABdhPJx42XnrIqMOwceeXVXYoF6MUeWxHWsztreuUZoeDlmSdMu6BsWkALXhyUi/CO3kiio5J5+H5w==
-X-Received: by 2002:a17:90b:1a89:: with SMTP id
- ng9mr2637439pjb.202.1599129659384; 
- Thu, 03 Sep 2020 03:40:59 -0700 (PDT)
-Received: from pek-vx-bsp2.wrs.com (unknown-146-144.windriver.com.
- [147.11.146.144])
- by smtp.gmail.com with ESMTPSA id b18sm2137098pjq.3.2020.09.03.03.40.57
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Thu, 03 Sep 2020 03:40:58 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-Subject: [PATCH 08/12] hw/riscv: Move sifive_uart model to hw/char
-Date: Thu,  3 Sep 2020 18:40:19 +0800
-Message-Id: <1599129623-68957-9-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1599129623-68957-1-git-send-email-bmeng.cn@gmail.com>
-References: <1599129623-68957-1-git-send-email-bmeng.cn@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=bmeng.cn@gmail.com; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDmnk-0002o1-6p
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:49:08 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:36186
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDmnh-0003HD-HY
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:49:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599130144;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=SfVX2lYDKrQ2VDcxYgB7NyKeqsO8A+m5P/6J6RHwgf0=;
+ b=Gv1rnV+5Lg0c18sHKaFYfLccqC1baBb9lfhkPRG6rLtXzhVHkWUsB28a99UwMysOUVinwF
+ P9RyBiGgMIKJTZpudvgNGKWN8SLoZNctXL1RG9AmQi1utMiH8OSbE/YfUfmqafO6/bRFoh
+ W5fpX7abfYB1p2tgd9DE5Y0m3rc92Lo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-380-Hr5I_xJ5MA2RP8zAf6tmJA-1; Thu, 03 Sep 2020 06:49:02 -0400
+X-MC-Unique: Hr5I_xJ5MA2RP8zAf6tmJA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AEF6718BE16E;
+ Thu,  3 Sep 2020 10:49:01 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7FE0760C0F;
+ Thu,  3 Sep 2020 10:49:01 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 07B11113865F; Thu,  3 Sep 2020 12:49:00 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v6 00/12] monitor: Optionally run handlers in coroutines
+References: <20200528153742.274164-1-kwolf@redhat.com>
+ <87d046d5k1.fsf@dusky.pond.sub.org>
+ <87y2mtpbrf.fsf@dusky.pond.sub.org>
+Date: Thu, 03 Sep 2020 12:49:00 +0200
+In-Reply-To: <87y2mtpbrf.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Wed, 05 Aug 2020 13:34:12 +0200")
+Message-ID: <87ft7zm8yr.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,138 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>
+Cc: marcandre.lureau@gmail.com, qemu-devel@nongnu.org, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+Markus Armbruster <armbru@redhat.com> writes:
 
-This is an effort to clean up the hw/riscv directory. Ideally it
-should only contain the RISC-V SoC / machine codes plus generic
-codes. Let's move sifive_uart model to hw/char directory.
+> Markus Armbruster <armbru@redhat.com> writes:
+>
+>> I let this series slide to get my Error API rework done, along with much
+>> else.  My sincere apologies!
+>>
+>> Unsurprisingly, it needs a rebase now.  I suggest to let me review it as
+>> is first.
+>
+> I'm done with v6.  Summary:
+>
+> * A few trivial things to correct here and there.
+>
+> * A few ideas to improve things in relatively minor ways.
+>
+> * PATCH 03 looks "why bother" to me until PATCH 09 makes me suspect you
+>   did the former to enable the latter.  If you had captured that in your
+>   commit message back then, like you did for the similar PATCH 05, I
+>   wouldn't be scratching my head now :)
+>
+> * I dislike PATCH 06, and would like to explore an alternative idea.
+>
+> * PATCH 08 makes hairy monitor code even hairier, but I don't have
+>   better ideas.
+>
+> * I don't feel comfortable as a sole reviewer of the AIO magic in PATCH
+>   10-12.  Let's ask Stefan for an eye-over.
+>
+> I'd like to proceed as follows.  You rebase, and address "easy" review
+> comments (you decide what's easy).  Post as v7, cc'ing Stefan for the
+> AIO magic and David Gilbert for HMP.  While they review (hopefully), I
+> explore a replacement for PATCH 06.  And then we touch bases and decide
+> how to get this thing wrapped.
 
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
----
+I explored:
 
- include/hw/{riscv => char}/sifive_uart.h | 0
- hw/{riscv => char}/sifive_uart.c         | 2 +-
- hw/riscv/sifive_e.c                      | 2 +-
- hw/riscv/sifive_u.c                      | 2 +-
- hw/char/Kconfig                          | 3 +++
- hw/char/meson.build                      | 1 +
- hw/riscv/Kconfig                         | 2 ++
- hw/riscv/meson.build                     | 1 -
- 8 files changed, 9 insertions(+), 4 deletions(-)
- rename include/hw/{riscv => char}/sifive_uart.h (100%)
- rename hw/{riscv => char}/sifive_uart.c (99%)
+    Subject: Ways to do per-coroutine properties (was: [PATCH v6 06/12] monitor: Make current monitor a per-coroutine property)
+    Date: Fri, 07 Aug 2020 15:09:19 +0200 (3 weeks, 5 days, 21 hours ago)
+    Message-ID: <87a6z6wqkg.fsf_-_@dusky.pond.sub.org>
 
-diff --git a/include/hw/riscv/sifive_uart.h b/include/hw/char/sifive_uart.h
-similarity index 100%
-rename from include/hw/riscv/sifive_uart.h
-rename to include/hw/char/sifive_uart.h
-diff --git a/hw/riscv/sifive_uart.c b/hw/char/sifive_uart.c
-similarity index 99%
-rename from hw/riscv/sifive_uart.c
-rename to hw/char/sifive_uart.c
-index 9350482..3a00ba7 100644
---- a/hw/riscv/sifive_uart.c
-+++ b/hw/char/sifive_uart.c
-@@ -24,7 +24,7 @@
- #include "chardev/char-fe.h"
- #include "hw/hw.h"
- #include "hw/irq.h"
--#include "hw/riscv/sifive_uart.h"
-+#include "hw/char/sifive_uart.h"
- 
- /*
-  * Not yet implemented:
-diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
-index 0ddcf15..40bbf53 100644
---- a/hw/riscv/sifive_e.c
-+++ b/hw/riscv/sifive_e.c
-@@ -39,9 +39,9 @@
- #include "hw/misc/unimp.h"
- #include "target/riscv/cpu.h"
- #include "hw/riscv/riscv_hart.h"
--#include "hw/riscv/sifive_uart.h"
- #include "hw/riscv/sifive_e.h"
- #include "hw/riscv/boot.h"
-+#include "hw/char/sifive_uart.h"
- #include "hw/intc/sifive_clint.h"
- #include "hw/intc/sifive_plic.h"
- #include "hw/misc/sifive_e_prci.h"
-diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
-index faca2e8..4f12a93 100644
---- a/hw/riscv/sifive_u.c
-+++ b/hw/riscv/sifive_u.c
-@@ -46,9 +46,9 @@
- #include "hw/misc/unimp.h"
- #include "target/riscv/cpu.h"
- #include "hw/riscv/riscv_hart.h"
--#include "hw/riscv/sifive_uart.h"
- #include "hw/riscv/sifive_u.h"
- #include "hw/riscv/boot.h"
-+#include "hw/char/sifive_uart.h"
- #include "hw/intc/sifive_clint.h"
- #include "hw/intc/sifive_plic.h"
- #include "chardev/char.h"
-diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-index 91da92f..939bc44 100644
---- a/hw/char/Kconfig
-+++ b/hw/char/Kconfig
-@@ -58,3 +58,6 @@ config AVR_USART
- 
- config MCHP_PFSOC_MMUART
-     bool
-+
-+config SIFIVE_UART
-+    bool
-diff --git a/hw/char/meson.build b/hw/char/meson.build
-index 3db623e..196ac91 100644
---- a/hw/char/meson.build
-+++ b/hw/char/meson.build
-@@ -30,6 +30,7 @@ softmmu_ss.add(when: 'CONFIG_EXYNOS4', if_true: files('exynos4210_uart.c'))
- softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_uart.c'))
- softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_aux.c'))
- softmmu_ss.add(when: 'CONFIG_RENESAS_SCI', if_true: files('renesas_sci.c'))
-+softmmu_ss.add(when: 'CONFIG_SIFIVE_UART', if_true: files('sifive_uart.c'))
- softmmu_ss.add(when: 'CONFIG_SH4', if_true: files('sh_serial.c'))
- softmmu_ss.add(when: 'CONFIG_STM32F2XX_USART', if_true: files('stm32f2xx_usart.c'))
- softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_MMUART', if_true: files('mchp_pfsoc_mmuart.c'))
-diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-index a0e256c..a046157 100644
---- a/hw/riscv/Kconfig
-+++ b/hw/riscv/Kconfig
-@@ -15,6 +15,7 @@ config SIFIVE_E
-     select SIFIVE_CLINT
-     select SIFIVE_GPIO
-     select SIFIVE_PLIC
-+    select SIFIVE_UART
-     select SIFIVE_E_PRCI
-     select UNIMP
- 
-@@ -27,6 +28,7 @@ config SIFIVE_U
-     select SIFIVE_GPIO
-     select SIFIVE_PDMA
-     select SIFIVE_PLIC
-+    select SIFIVE_UART
-     select SIFIVE_U_OTP
-     select SIFIVE_U_PRCI
-     select UNIMP
-diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
-index 619bf80..da32148 100644
---- a/hw/riscv/meson.build
-+++ b/hw/riscv/meson.build
-@@ -5,7 +5,6 @@ riscv_ss.add(when: 'CONFIG_HART', if_true: files('riscv_hart.c'))
- riscv_ss.add(when: 'CONFIG_OPENTITAN', if_true: files('opentitan.c'))
- riscv_ss.add(when: 'CONFIG_RISCV_VIRT', if_true: files('virt.c'))
- riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_test.c'))
--riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_uart.c'))
- riscv_ss.add(when: 'CONFIG_SIFIVE_E', if_true: files('sifive_e.c'))
- riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u.c'))
- riscv_ss.add(when: 'CONFIG_SPIKE', if_true: files('spike.c'))
--- 
-2.7.4
+May I have v7?  Feel free to keep your PATCH 06.  If I decide to replace
+it, I can do it myself, possibly on top.
 
 
