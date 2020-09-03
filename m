@@ -5,81 +5,81 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A170C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C46D6C2BC0E
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:46:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DDBE820716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:46:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B06320716
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 07:46:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HN+AGNaV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDBE820716
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l8wxX/89"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B06320716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDjx3-0004uG-0Q
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 03:46:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43408)
+	id 1kDjxD-0005Gh-EF
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 03:46:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDjuW-0000G2-7E
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:43:56 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:42938)
+ id 1kDjuM-0008Kk-E9
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:43:46 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:54713)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kDjuR-0003t0-QA
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:43:55 -0400
-Received: by mail-pg1-x533.google.com with SMTP id m5so1439681pgj.9
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 00:43:51 -0700 (PDT)
+ id 1kDjuI-0003rW-Ch
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 03:43:46 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id mm21so1098948pjb.4
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 00:43:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=HH+mCBnKGF/uCXFL1Exd9geD9MTauuClce/JbIg2O48=;
- b=HN+AGNaVLH+KmW55Pi2OutSNYueb0Yee9qINdRhgRdQYwsOkBavSe6nrP2F0nG+lYj
- sLDSSjK7ehb/n1Z0V1NbfjKN2KFe2h8o9lFyyxKtS4iAERKiF5Q4Liix1USUyV9MxOum
- CJOQzv7UW5qS5+e8HbnFhLKHPzNd2hgKgqXN/BvpvLzDC8VPr6JuWzpv0zQnLJVb25du
- 1/ABvsgh+af2JgLCXHFuMRKSYWc2/Xw1M9IYgT/9XjDBM5fA+576TQJSR3Yi3XvPRg/o
- 6c1AnuM0XBJbQk6QUulcjXV5EHmwXGIiqTmLtdiU9mPawRbWdKaWXXOaQCso1RpERCj8
- v19w==
+ bh=huTQukiVEQnbnV6oUpHw80TH1WL6GqzC6d5q3yiaZGo=;
+ b=l8wxX/89oWmJ+w+iU3vMiZt+6q+eOpGBjvAPuNr4NRtO3yyQKof9+KPFKP3hG7Z5IY
+ 71aQn7fXvTxZQtisUlj5Rs3ogce/Ha5mtVg+cpUENx83Rv3V5/g1hsQp3d8XwKMbwyM2
+ 32wYu+DQVvgmAPwFuqZqkpFytUjMwbOwp5F0J/xrUllzdgsFRf3HzAKYszUKqExl7Ofx
+ UwSilhsyrzWf8Y2aa921lBFBOOMa44xZA2pieGlBAv0dXZulDbJ5QB3IqfXL0cutx3oO
+ qFHBzyNJCARG+pNgGdNpXbU1szGYkwgrSgRlKod8wNwuugPn4Gi/IOMjAyuz0Tl4Ls0S
+ hrgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=HH+mCBnKGF/uCXFL1Exd9geD9MTauuClce/JbIg2O48=;
- b=dh37IL558Op/SVky65LFVzkKGeBkznn8d1431VeWAcF2mHg/3ZRDuqGLUHnG+kUg4H
- FEtkGge1B+h+EJ7/7Fd4M+qs5hNHe1/lOBXsiLszTf2KqU3KvmGLlH3tdC2GkcnySEQJ
- 5AW2JF0Lek/6x+o5t+tgo60ZmCxkocqeY9FARPlHLgcQTq4IMh+P+9bvINBeQSshozGm
- A3NxsgE7YOBXjMWj5diM9cq+DhC5z+jxFEfUmiLkGF7RKLRb86F/dOA0iexoTsXM6QwV
- U1IQHiJ3SM7sfve3dP/X/x9gaVd2/PLPUnPFDLcXnwKpRkVBzffE/IlaOkWxj4/6Ajdf
- Lb+A==
-X-Gm-Message-State: AOAM533ZDfB550vCIiFBVmOgu9e3PJoI09hu24CGI93Lvaac0RGbukfR
- PSaXYrt3yDa3Q2jlQYdrzOi74pdHfIJuPmnD
-X-Google-Smtp-Source: ABdhPJwumR/4Mo2Lk1rF5FKHijerEoQtcsej4d07i099o87801otZ9JarnsugZAJ2UuJFTlgm2DSlw==
-X-Received: by 2002:aa7:80d3:: with SMTP id a19mr2661743pfn.102.1599119028595; 
- Thu, 03 Sep 2020 00:43:48 -0700 (PDT)
+ bh=huTQukiVEQnbnV6oUpHw80TH1WL6GqzC6d5q3yiaZGo=;
+ b=kyGHCz8Cy4AL7i333ck3TUFGN5OkCtLZ2npG+F94ZIE7uW3G4AZTP70jXCxzuvv5xr
+ h6/tC5Mz7e25XSYjQIg5GQtwxFmXhiol4ffMxTyOZbqINsTkaepCy5X3lRW3FTmt2Fjl
+ GSs0CT7aVq9ujFyGMBI5w8+bCeULAlM76beB3CraAAz+MoiHJYVVIIP63CUQMsY1kbgi
+ HBEKKXp/oVMgDKBjL2V1ZKUlwg+ZTe+fXaIqzNaj6KkNtEP41VrTKNfjyvMGfXpKFbzN
+ vJXUt+8OGdQyegvxsYB3QYAfk/mMU9ZtxhUsBlqv7PVHRb+17SxTzMzSZSJnBSjOJgSD
+ IgAQ==
+X-Gm-Message-State: AOAM531mDQ8usqNHXPeBwz4yvk1lT1/YYfvCgZ+PlcBFqFpppG0UZXtb
+ 7fQ/tkzgHpU4UyGPfiwYFG07dV/M755xhgtE
+X-Google-Smtp-Source: ABdhPJxi5I3vbmjE7EHdfmTr3VoSQFncd3LDkgsP1epfOeOLwOo0iRUdoWa0Kg1ndZY2rO3CXDq3GA==
+X-Received: by 2002:a17:90a:a088:: with SMTP id
+ r8mr1959182pjp.73.1599119019797; 
+ Thu, 03 Sep 2020 00:43:39 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id o6sm1512472pju.25.2020.09.03.00.43.46
+ by smtp.googlemail.com with ESMTPSA id o6sm1512472pju.25.2020.09.03.00.43.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 00:43:47 -0700 (PDT)
+ Thu, 03 Sep 2020 00:43:38 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 07/12] osdep: These function are only available on
- Non-Win32 system.
-Date: Thu,  3 Sep 2020 15:43:08 +0800
-Message-Id: <20200903074313.1498-8-luoyonggang@gmail.com>
+Subject: [PATCH v3 04/12] tests: handling signal on win32 properly
+Date: Thu,  3 Sep 2020 15:43:05 +0800
+Message-Id: <20200903074313.1498-5-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200903074313.1498-1-luoyonggang@gmail.com>
 References: <20200903074313.1498-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::533;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x533.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,1416 +106,1251 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
-int qemu_unlock_fd(int fd, int64_t start, int64_t len);
-int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
-bool qemu_has_ofd_lock(void);
+SIGABRT should use signal(SIGABRT, sigabrt_handler) to handle on win32
+
+The error:
+E:/CI-Cor-Ready/xemu/qemu.org/tests/test-replication.c:559:33: error: inval=
+id use of undefined type 'struct sigaction'
+  559 |     sigact =3D (struct sigaction) {
+      |                                 ^
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- include/qemu/osdep.h | 1372 +++++++++++++++++++++---------------------
- 1 file changed, 686 insertions(+), 686 deletions(-)
+ tests/test-replication.c | 1214 +++++++++++++++++++-------------------
+ 1 file changed, 609 insertions(+), 605 deletions(-)
 
-diff --git a/include/qemu/osdep.h b/include/qemu/osdep.h
-index 412962d91a..e80fddd1e8 100644
---- a/include/qemu/osdep.h
-+++ b/include/qemu/osdep.h
-@@ -1,686 +1,686 @@
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index e0b03dafc2..9ab3666a90 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -1,605 +1,609 @@
 -/*
-- * OS includes and handling of OS dependencies
+- * Block replication tests
 - *
-- * This header exists to pull in some common system headers that
-- * most code in QEMU will want, and to fix up some possible issues with
-- * it (missing defines, Windows weirdness, and so on).
+- * Copyright (c) 2016 FUJITSU LIMITED
+- * Author: Changlong Xie <xiecl.fnst@cn.fujitsu.com>
 - *
-- * To avoid getting into possible circular include dependencies, this
-- * file should not include any other QEMU headers, with the exceptions
-- * of config-host.h, config-target.h, qemu/compiler.h,
-- * sysemu/os-posix.h, sysemu/os-win32.h, glib-compat.h and
-- * qemu/typedefs.h, all of which are doing a similar job to this file
-- * and are under similar constraints.
-- *
-- * This header also contains prototypes for functions defined in
-- * os-*.c and util/oslib-*.c; those would probably be better split
-- * out into separate header files.
-- *
-- * In an ideal world this header would contain only:
-- *  (1) things which everybody needs
-- *  (2) things without which code would work on most platforms but
-- *      fail to compile or misbehave on a minority of host OSes
-- *
-- * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.
-- * See the COPYING file in the top-level directory.
-- */
--#ifndef QEMU_OSDEP_H
--#define QEMU_OSDEP_H
--
--#include "config-host.h"
--#ifdef NEED_CPU_H
--#include CONFIG_TARGET
--#else
--#include "exec/poison.h"
--#endif
--
--#include "qemu/compiler.h"
--
--/* Older versions of C++ don't get definitions of various macros from
-- * stdlib.h unless we define these macros before first inclusion of
-- * that system header.
-- */
--#ifndef __STDC_CONSTANT_MACROS
--#define __STDC_CONSTANT_MACROS
--#endif
--#ifndef __STDC_LIMIT_MACROS
--#define __STDC_LIMIT_MACROS
--#endif
--#ifndef __STDC_FORMAT_MACROS
--#define __STDC_FORMAT_MACROS
--#endif
--
--/* The following block of code temporarily renames the daemon() function s=
-o the
-- * compiler does not see the warning associated with it in stdlib.h on OSX
-- */
--#ifdef __APPLE__
--#define daemon qemu_fake_daemon_function
--#include <stdlib.h>
--#undef daemon
--extern int daemon(int, int);
--#endif
--
--#ifdef _WIN32
--/* as defined in sdkddkver.h */
--#ifndef _WIN32_WINNT
--#define _WIN32_WINNT 0x0600 /* Vista */
--#endif
--/* reduces the number of implicitly included headers */
--#ifndef WIN32_LEAN_AND_MEAN
--#define WIN32_LEAN_AND_MEAN
--#endif
--#endif
--
--/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) */
--#ifdef __MINGW32__
--#define __USE_MINGW_ANSI_STDIO 1
--#endif
--
--#include <stdarg.h>
--#include <stddef.h>
--#include <stdbool.h>
--#include <stdint.h>
--#include <sys/types.h>
--#include <stdlib.h>
--#include <stdio.h>
--
--#include <string.h>
--#include <strings.h>
--#include <inttypes.h>
--#include <limits.h>
--/* Put unistd.h before time.h as that triggers localtime_r/gmtime_r
-- * function availability on recentish Mingw-w64 platforms. */
--#include <unistd.h>
--#include <time.h>
--#include <ctype.h>
--#include <errno.h>
--#include <fcntl.h>
--#include <getopt.h>
--#include <sys/stat.h>
--#include <sys/time.h>
--#include <assert.h>
--/* setjmp must be declared before sysemu/os-win32.h
-- * because it is redefined there. */
--#include <setjmp.h>
--#include <signal.h>
--
--#ifdef HAVE_SYS_SIGNAL_H
--#include <sys/signal.h>
--#endif
--
--#ifndef _WIN32
--#include <sys/wait.h>
--#else
--#define WIFEXITED(x)   1
--#define WEXITSTATUS(x) (x)
--#endif
--
--#ifdef _WIN32
--#include "sysemu/os-win32.h"
--#endif
--
--#ifdef CONFIG_POSIX
--#include "sysemu/os-posix.h"
--#endif
--
--#include "glib-compat.h"
--#include "qemu/typedefs.h"
--
--/*
-- * For mingw, as of v6.0.0, the function implementing the assert macro is
-- * not marked as noreturn, so the compiler cannot delete code following an
-- * assert(false) as unused.  We rely on this within the code base to delete
-- * code that is unreachable when features are disabled.
-- * All supported versions of Glib's g_assert() satisfy this requirement.
-- */
--#ifdef __MINGW32__
--#undef assert
--#define assert(x)  g_assert(x)
--#endif
--
--/*
-- * According to waitpid man page:
-- * WCOREDUMP
-- *  This  macro  is  not  specified  in POSIX.1-2001 and is not
-- *  available on some UNIX implementations (e.g., AIX, SunOS).
-- *  Therefore, enclose its use inside #ifdef WCOREDUMP ... #endif.
-- */
--#ifndef WCOREDUMP
--#define WCOREDUMP(status) 0
--#endif
--/*
-- * We have a lot of unaudited code that may fail in strange ways, or
-- * even be a security risk during migration, if you disable assertions
-- * at compile-time.  You may comment out these safety checks if you
-- * absolutely want to disable assertion overhead, but it is not
-- * supported upstream so the risk is all yours.  Meanwhile, please
-- * submit patches to remove any side-effects inside an assertion, or
-- * fixing error handling that should use Error instead of assert.
-- */
--#ifdef NDEBUG
--#error building with NDEBUG is not supported
--#endif
--#ifdef G_DISABLE_ASSERT
--#error building with G_DISABLE_ASSERT is not supported
--#endif
--
--#ifndef O_LARGEFILE
--#define O_LARGEFILE 0
--#endif
--#ifndef O_BINARY
--#define O_BINARY 0
--#endif
--#ifndef MAP_ANONYMOUS
--#define MAP_ANONYMOUS MAP_ANON
--#endif
--#ifndef MAP_FIXED_NOREPLACE
--#define MAP_FIXED_NOREPLACE 0
--#endif
--#ifndef ENOMEDIUM
--#define ENOMEDIUM ENODEV
--#endif
--#if !defined(ENOTSUP)
--#define ENOTSUP 4096
--#endif
--#if !defined(ECANCELED)
--#define ECANCELED 4097
--#endif
--#if !defined(EMEDIUMTYPE)
--#define EMEDIUMTYPE 4098
--#endif
--#if !defined(ESHUTDOWN)
--#define ESHUTDOWN 4099
--#endif
--
--/* time_t may be either 32 or 64 bits depending on the host OS, and
-- * can be either signed or unsigned, so we can't just hardcode a
-- * specific maximum value. This is not a C preprocessor constant,
-- * so you can't use TIME_MAX in an #ifdef, but for our purposes
-- * this isn't a problem.
+- * This work is licensed under the terms of the GNU GPL, version 2 or
+- * later.  See the COPYING file in the top-level directory.
 - */
 -
--/* The macros TYPE_SIGNED, TYPE_WIDTH, and TYPE_MAXIMUM are from
-- * Gnulib, and are under the LGPL v2.1 or (at your option) any
-- * later version.
-- */
+-#include "qemu/osdep.h"
 -
--/* True if the real type T is signed.  */
--#define TYPE_SIGNED(t) (!((t)0 < (t)-1))
+-#include "qapi/error.h"
+-#include "qapi/qmp/qdict.h"
+-#include "qemu/option.h"
+-#include "qemu/main-loop.h"
+-#include "replication.h"
+-#include "block/block_int.h"
+-#include "block/qdict.h"
+-#include "sysemu/block-backend.h"
 -
--/* The width in bits of the integer type or expression T.
-- * Padding bits are not supported.
-- */
--#define TYPE_WIDTH(t) (sizeof(t) * CHAR_BIT)
+-#define IMG_SIZE (64 * 1024 * 1024)
 -
--/* The maximum and minimum values for the integer type T.  */
--#define TYPE_MAXIMUM(t)                                                \
--  ((t) (!TYPE_SIGNED(t)                                                \
--        ? (t)-1                                                        \
--        : ((((t)1 << (TYPE_WIDTH(t) - 2)) - 1) * 2 + 1)))
+-/* primary */
+-#define P_ID "primary-id"
+-static char p_local_disk[] =3D "/tmp/p_local_disk.XXXXXX";
 -
--#ifndef TIME_MAX
--#define TIME_MAX TYPE_MAXIMUM(time_t)
--#endif
+-/* secondary */
+-#define S_ID "secondary-id"
+-#define S_LOCAL_DISK_ID "secondary-local-disk-id"
+-static char s_local_disk[] =3D "/tmp/s_local_disk.XXXXXX";
+-static char s_active_disk[] =3D "/tmp/s_active_disk.XXXXXX";
+-static char s_hidden_disk[] =3D "/tmp/s_hidden_disk.XXXXXX";
 -
--/* HOST_LONG_BITS is the size of a native pointer in bits. */
--#if UINTPTR_MAX =3D=3D UINT32_MAX
--# define HOST_LONG_BITS 32
--#elif UINTPTR_MAX =3D=3D UINT64_MAX
--# define HOST_LONG_BITS 64
--#else
--# error Unknown pointer size
--#endif
--
--/* Mac OSX has a <stdint.h> bug that incorrectly defines SIZE_MAX with
-- * the wrong type. Our replacement isn't usable in preprocessor
-- * expressions, but it is sufficient for our needs. */
--#if defined(HAVE_BROKEN_SIZE_MAX) && HAVE_BROKEN_SIZE_MAX
--#undef SIZE_MAX
--#define SIZE_MAX ((size_t)-1)
--#endif
--
--/*
-- * Two variations of MIN/MAX macros. The first is for runtime use, and
-- * evaluates arguments only once (so it is safe even with side
-- * effects), but will not work in constant contexts (such as array
-- * size declarations) because of the '{}'.  The second is for constant
-- * expression use, where evaluating arguments twice is safe because
-- * the result is going to be constant anyway, but will not work in a
-- * runtime context because of a void expression where a value is
-- * expected.  Thus, both gcc and clang will fail to compile if you use
-- * the wrong macro (even if the error may seem a bit cryptic).
-- *
-- * Note that neither form is usable as an #if condition; if you truly
-- * need to write conditional code that depends on a minimum or maximum
-- * determined by the pre-processor instead of the compiler, you'll
-- * have to open-code it.  Sadly, Coverity is severely confused by the
-- * constant variants, so we have to dumb things down there.
-- */
--#undef MIN
--#define MIN(a, b)                                       \
--    ({                                                  \
--        typeof(1 ? (a) : (b)) _a =3D (a), _b =3D (b);       \
--        _a < _b ? _a : _b;                              \
--    })
--#undef MAX
--#define MAX(a, b)                                       \
--    ({                                                  \
--        typeof(1 ? (a) : (b)) _a =3D (a), _b =3D (b);       \
--        _a > _b ? _a : _b;                              \
--    })
--
--#ifdef __COVERITY__
--# define MIN_CONST(a, b) ((a) < (b) ? (a) : (b))
--# define MAX_CONST(a, b) ((a) > (b) ? (a) : (b))
--#else
--# define MIN_CONST(a, b)                                        \
--    __builtin_choose_expr(                                      \
--        __builtin_constant_p(a) && __builtin_constant_p(b),     \
--        (a) < (b) ? (a) : (b),                                  \
--        ((void)0))
--# define MAX_CONST(a, b)                                        \
--    __builtin_choose_expr(                                      \
--        __builtin_constant_p(a) && __builtin_constant_p(b),     \
--        (a) > (b) ? (a) : (b),                                  \
--        ((void)0))
--#endif
--
--/*
-- * Minimum function that returns zero only if both values are zero.
-- * Intended for use with unsigned values only.
-- */
--#ifndef MIN_NON_ZERO
--#define MIN_NON_ZERO(a, b)                              \
--    ({                                                  \
--        typeof(1 ? (a) : (b)) _a =3D (a), _b =3D (b);       \
--        _a =3D=3D 0 ? _b : (_b =3D=3D 0 || _b > _a) ? _a : _b;  \
--    })
--#endif
--
--/* Round number down to multiple */
--#define QEMU_ALIGN_DOWN(n, m) ((n) / (m) * (m))
--
--/* Round number up to multiple. Safe when m is not a power of 2 (see
-- * ROUND_UP for a faster version when a power of 2 is guaranteed) */
--#define QEMU_ALIGN_UP(n, m) QEMU_ALIGN_DOWN((n) + (m) - 1, (m))
--
--/* Check if n is a multiple of m */
--#define QEMU_IS_ALIGNED(n, m) (((n) % (m)) =3D=3D 0)
--
--/* n-byte align pointer down */
--#define QEMU_ALIGN_PTR_DOWN(p, n) \
--    ((typeof(p))QEMU_ALIGN_DOWN((uintptr_t)(p), (n)))
--
--/* n-byte align pointer up */
--#define QEMU_ALIGN_PTR_UP(p, n) \
--    ((typeof(p))QEMU_ALIGN_UP((uintptr_t)(p), (n)))
--
--/* Check if pointer p is n-bytes aligned */
--#define QEMU_PTR_IS_ALIGNED(p, n) QEMU_IS_ALIGNED((uintptr_t)(p), (n))
--
--/* Round number up to multiple. Requires that d be a power of 2 (see
-- * QEMU_ALIGN_UP for a safer but slower version on arbitrary
-- * numbers); works even if d is a smaller type than n.  */
--#ifndef ROUND_UP
--#define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))
--#endif
--
--#ifndef DIV_ROUND_UP
--#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))
--#endif
--
--/*
-- * &(x)[0] is always a pointer - if it's same type as x then the argument =
-is a
-- * pointer, not an array.
-- */
--#define QEMU_IS_ARRAY(x) (!__builtin_types_compatible_p(typeof(x), \
--                                                        typeof(&(x)[0])))
--#ifndef ARRAY_SIZE
--#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + \
--                       QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(x)))
--#endif
--
--int qemu_daemon(int nochdir, int noclose);
--void *qemu_try_memalign(size_t alignment, size_t size);
--void *qemu_memalign(size_t alignment, size_t size);
--void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared);
--void qemu_vfree(void *ptr);
--void qemu_anon_ram_free(void *ptr, size_t size);
--
--#define QEMU_MADV_INVALID -1
--
--#if defined(CONFIG_MADVISE)
--
--#define QEMU_MADV_WILLNEED  MADV_WILLNEED
--#define QEMU_MADV_DONTNEED  MADV_DONTNEED
--#ifdef MADV_DONTFORK
--#define QEMU_MADV_DONTFORK  MADV_DONTFORK
--#else
--#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
--#endif
--#ifdef MADV_MERGEABLE
--#define QEMU_MADV_MERGEABLE MADV_MERGEABLE
--#else
--#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
--#endif
--#ifdef MADV_UNMERGEABLE
--#define QEMU_MADV_UNMERGEABLE MADV_UNMERGEABLE
--#else
--#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
--#endif
--#ifdef MADV_DODUMP
--#define QEMU_MADV_DODUMP MADV_DODUMP
--#else
--#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
--#endif
--#ifdef MADV_DONTDUMP
--#define QEMU_MADV_DONTDUMP MADV_DONTDUMP
--#else
--#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
--#endif
--#ifdef MADV_HUGEPAGE
--#define QEMU_MADV_HUGEPAGE MADV_HUGEPAGE
--#else
--#define QEMU_MADV_HUGEPAGE QEMU_MADV_INVALID
--#endif
--#ifdef MADV_NOHUGEPAGE
--#define QEMU_MADV_NOHUGEPAGE MADV_NOHUGEPAGE
--#else
--#define QEMU_MADV_NOHUGEPAGE QEMU_MADV_INVALID
--#endif
--#ifdef MADV_REMOVE
--#define QEMU_MADV_REMOVE MADV_REMOVE
--#else
--#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
--#endif
--
--#elif defined(CONFIG_POSIX_MADVISE)
--
--#define QEMU_MADV_WILLNEED  POSIX_MADV_WILLNEED
--#define QEMU_MADV_DONTNEED  POSIX_MADV_DONTNEED
--#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
--#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
--#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
--#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
--#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
--#define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
--#define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
--#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
--
--#else /* no-op */
--
--#define QEMU_MADV_WILLNEED  QEMU_MADV_INVALID
--#define QEMU_MADV_DONTNEED  QEMU_MADV_INVALID
--#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID
--#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID
--#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID
--#define QEMU_MADV_DODUMP QEMU_MADV_INVALID
--#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID
--#define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID
--#define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID
--#define QEMU_MADV_REMOVE QEMU_MADV_INVALID
--
--#endif
--
--#ifdef _WIN32
--#define HAVE_CHARDEV_SERIAL 1
--#elif defined(__linux__) || defined(__sun__) || defined(__FreeBSD__)    \
--    || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly_=
-_) \
--    || defined(__GLIBC__) || defined(__APPLE__)
--#define HAVE_CHARDEV_SERIAL 1
--#endif
--
--#if defined(__linux__) || defined(__FreeBSD__) ||               \
--    defined(__FreeBSD_kernel__) || defined(__DragonFly__)
--#define HAVE_CHARDEV_PARPORT 1
--#endif
--
--#if defined(__HAIKU__)
--#define SIGIO SIGPOLL
--#endif
--
--#if defined(CONFIG_LINUX)
--#ifndef BUS_MCEERR_AR
--#define BUS_MCEERR_AR 4
--#endif
--#ifndef BUS_MCEERR_AO
--#define BUS_MCEERR_AO 5
--#endif
--#endif
--
--#if defined(__linux__) && \
--    (defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) \
--     || defined(__powerpc64__))
--   /* Use 2 MiB alignment so transparent hugepages can be used by KVM.
--      Valgrind does not support alignments larger than 1 MiB,
--      therefore we need special code which handles running on Valgrind. */
--#  define QEMU_VMALLOC_ALIGN (512 * 4096)
--#elif defined(__linux__) && defined(__s390x__)
--   /* Use 1 MiB (segment size) alignment so gmap can be used by KVM. */
--#  define QEMU_VMALLOC_ALIGN (256 * 4096)
--#elif defined(__linux__) && defined(__sparc__)
--#include <sys/shm.h>
--#  define QEMU_VMALLOC_ALIGN MAX(qemu_real_host_page_size, SHMLBA)
--#else
--#  define QEMU_VMALLOC_ALIGN qemu_real_host_page_size
--#endif
--
--#ifdef CONFIG_POSIX
--struct qemu_signalfd_siginfo {
--    uint32_t ssi_signo;   /* Signal number */
--    int32_t  ssi_errno;   /* Error number (unused) */
--    int32_t  ssi_code;    /* Signal code */
--    uint32_t ssi_pid;     /* PID of sender */
--    uint32_t ssi_uid;     /* Real UID of sender */
--    int32_t  ssi_fd;      /* File descriptor (SIGIO) */
--    uint32_t ssi_tid;     /* Kernel timer ID (POSIX timers) */
--    uint32_t ssi_band;    /* Band event (SIGIO) */
--    uint32_t ssi_overrun; /* POSIX timer overrun count */
--    uint32_t ssi_trapno;  /* Trap number that caused signal */
--    int32_t  ssi_status;  /* Exit status or signal (SIGCHLD) */
--    int32_t  ssi_int;     /* Integer sent by sigqueue(2) */
--    uint64_t ssi_ptr;     /* Pointer sent by sigqueue(2) */
--    uint64_t ssi_utime;   /* User CPU time consumed (SIGCHLD) */
--    uint64_t ssi_stime;   /* System CPU time consumed (SIGCHLD) */
--    uint64_t ssi_addr;    /* Address that generated signal
--                             (for hardware-generated signals) */
--    uint8_t  pad[48];     /* Pad size to 128 bytes (allow for
--                             additional fields in the future) */
+-/* FIXME: steal from blockdev.c */
+-QemuOptsList qemu_drive_opts =3D {
+-    .name =3D "drive",
+-    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_drive_opts.head),
+-    .desc =3D {
+-        { /* end of list */ }
+-    },
 -};
 -
--int qemu_signalfd(const sigset_t *mask);
--void sigaction_invoke(struct sigaction *action,
--                      struct qemu_signalfd_siginfo *info);
--#endif
+-#define NOT_DONE 0x7fffffff
 -
--int qemu_madvise(void *addr, size_t len, int advice);
--int qemu_mprotect_rwx(void *addr, size_t size);
--int qemu_mprotect_none(void *addr, size_t size);
--
--int qemu_open(const char *name, int flags, ...);
--int qemu_close(int fd);
--int qemu_unlink(const char *name);
--#ifndef _WIN32
--int qemu_dup(int fd);
--#endif
--int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);
--int qemu_unlock_fd(int fd, int64_t start, int64_t len);
--int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);
--bool qemu_has_ofd_lock(void);
--
--#if defined(__HAIKU__) && defined(__i386__)
--#define FMT_pid "%ld"
--#elif defined(WIN64)
--#define FMT_pid "%" PRId64
--#else
--#define FMT_pid "%d"
--#endif
--
--bool qemu_write_pidfile(const char *pidfile, Error **errp);
--
--int qemu_get_thread_id(void);
--
--#ifndef CONFIG_IOVEC
--struct iovec {
--    void *iov_base;
--    size_t iov_len;
--};
--/*
-- * Use the same value as Linux for now.
-- */
--#define IOV_MAX 1024
--
--ssize_t readv(int fd, const struct iovec *iov, int iov_cnt);
--ssize_t writev(int fd, const struct iovec *iov, int iov_cnt);
--#else
--#include <sys/uio.h>
--#endif
--
--#ifdef _WIN32
--static inline void qemu_timersub(const struct timeval *val1,
--                                 const struct timeval *val2,
--                                 struct timeval *res)
+-static void blk_rw_done(void *opaque, int ret)
 -{
--    res->tv_sec =3D val1->tv_sec - val2->tv_sec;
--    if (val1->tv_usec < val2->tv_usec) {
--        res->tv_sec--;
--        res->tv_usec =3D val1->tv_usec - val2->tv_usec + 1000 * 1000;
--    } else {
--        res->tv_usec =3D val1->tv_usec - val2->tv_usec;
+-    *(int *)opaque =3D ret;
+-}
+-
+-static void test_blk_read(BlockBackend *blk, long pattern,
+-                          int64_t pattern_offset, int64_t pattern_count,
+-                          int64_t offset, int64_t count,
+-                          bool expect_failed)
+-{
+-    void *pattern_buf =3D NULL;
+-    QEMUIOVector qiov;
+-    void *cmp_buf =3D NULL;
+-    int async_ret =3D NOT_DONE;
+-
+-    if (pattern) {
+-        cmp_buf =3D g_malloc(pattern_count);
+-        memset(cmp_buf, pattern, pattern_count);
 -    }
+-
+-    pattern_buf =3D g_malloc(count);
+-    if (pattern) {
+-        memset(pattern_buf, pattern, count);
+-    } else {
+-        memset(pattern_buf, 0x00, count);
+-    }
+-
+-    qemu_iovec_init(&qiov, 1);
+-    qemu_iovec_add(&qiov, pattern_buf, count);
+-
+-    blk_aio_preadv(blk, offset, &qiov, 0, blk_rw_done, &async_ret);
+-    while (async_ret =3D=3D NOT_DONE) {
+-        main_loop_wait(false);
+-    }
+-
+-    if (expect_failed) {
+-        g_assert(async_ret !=3D 0);
+-    } else {
+-        g_assert(async_ret =3D=3D 0);
+-        if (pattern) {
+-            g_assert(memcmp(pattern_buf + pattern_offset,
+-                            cmp_buf, pattern_count) <=3D 0);
+-        }
+-    }
+-
+-    g_free(pattern_buf);
+-    g_free(cmp_buf);
+-    qemu_iovec_destroy(&qiov);
 -}
--#else
--#define qemu_timersub timersub
--#endif
 -
--void qemu_set_cloexec(int fd);
+-static void test_blk_write(BlockBackend *blk, long pattern, int64_t offset,
+-                           int64_t count, bool expect_failed)
+-{
+-    void *pattern_buf =3D NULL;
+-    QEMUIOVector qiov;
+-    int async_ret =3D NOT_DONE;
 -
--/* Starting on QEMU 2.5, qemu_hw_version() returns "2.5+" by default
-- * instead of QEMU_VERSION, so setting hw_version on MachineClass
-- * is no longer mandatory.
-- *
-- * Do NOT change this string, or it will break compatibility on all
-- * machine classes that don't set hw_version.
-- */
--#define QEMU_HW_VERSION "2.5+"
+-    pattern_buf =3D g_malloc(count);
+-    if (pattern) {
+-        memset(pattern_buf, pattern, count);
+-    } else {
+-        memset(pattern_buf, 0x00, count);
+-    }
 -
--/* QEMU "hardware version" setting. Used to replace code that exposed
-- * QEMU_VERSION to guests in the past and need to keep compatibility.
-- * Do not use qemu_hw_version() in new code.
-- */
--void qemu_set_hw_version(const char *);
--const char *qemu_hw_version(void);
+-    qemu_iovec_init(&qiov, 1);
+-    qemu_iovec_add(&qiov, pattern_buf, count);
 -
--void fips_set_state(bool requested);
--bool fips_get_state(void);
+-    blk_aio_pwritev(blk, offset, &qiov, 0, blk_rw_done, &async_ret);
+-    while (async_ret =3D=3D NOT_DONE) {
+-        main_loop_wait(false);
+-    }
 -
--/* Return a dynamically allocated pathname denoting a file or directory th=
-at is
-- * appropriate for storing local state.
-- *
-- * @relative_pathname need not start with a directory separator; one will =
-be
-- * added automatically.
-- *
-- * The caller is responsible for releasing the value returned with g_free()
-- * after use.
-- */
--char *qemu_get_local_state_pathname(const char *relative_pathname);
+-    if (expect_failed) {
+-        g_assert(async_ret !=3D 0);
+-    } else {
+-        g_assert(async_ret =3D=3D 0);
+-    }
 -
--/* Find program directory, and save it for later usage with
-- * qemu_get_exec_dir().
-- * Try OS specific API first, if not working, parse from argv0. */
--void qemu_init_exec_dir(const char *argv0);
--
--/* Get the saved exec dir.
-- *
-- * The caller is responsible for releasing the value returned with g_free()
-- * after use.
-- */
--char *qemu_get_exec_dir(void);
--
--/**
-- * qemu_getauxval:
-- * @type: the auxiliary vector key to lookup
-- *
-- * Search the auxiliary vector for @type, returning the value
-- * or 0 if @type is not present.
-- */
--unsigned long qemu_getauxval(unsigned long type);
--
--void qemu_set_tty_echo(int fd, bool echo);
--
--void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,
--                     Error **errp);
--
--/**
-- * qemu_get_pid_name:
-- * @pid: pid of a process
-- *
-- * For given @pid fetch its name. Caller is responsible for
-- * freeing the string when no longer needed.
-- * Returns allocated string on success, NULL on failure.
-- */
--char *qemu_get_pid_name(pid_t pid);
--
--/**
-- * qemu_fork:
-- *
-- * A version of fork that avoids signal handler race
-- * conditions that can lead to child process getting
-- * signals that are otherwise only expected by the
-- * parent. It also resets all signal handlers to the
-- * default settings.
-- *
-- * Returns 0 to child process, pid number to parent
-- * or -1 on failure.
-- */
--pid_t qemu_fork(Error **errp);
--
--/* Using intptr_t ensures that qemu_*_page_mask is sign-extended even
-- * when intptr_t is 32-bit and we are aligning a long long.
-- */
--extern uintptr_t qemu_real_host_page_size;
--extern intptr_t qemu_real_host_page_mask;
--
--extern int qemu_icache_linesize;
--extern int qemu_icache_linesize_log;
--extern int qemu_dcache_linesize;
--extern int qemu_dcache_linesize_log;
+-    g_free(pattern_buf);
+-    qemu_iovec_destroy(&qiov);
+-}
 -
 -/*
-- * After using getopt or getopt_long, if you need to parse another set
-- * of options, then you must reset optind.  Unfortunately the way to
-- * do this varies between implementations of getopt.
+- * Create a uniquely-named empty temporary file.
 - */
--static inline void qemu_reset_optind(void)
+-static void make_temp(char *template)
 -{
--#ifdef HAVE_OPTRESET
--    optind =3D 1;
--    optreset =3D 1;
--#else
--    optind =3D 0;
--#endif
+-    int fd;
+-
+-    fd =3D mkstemp(template);
+-    g_assert(fd >=3D 0);
+-    close(fd);
 -}
 -
--/**
-- * qemu_get_host_name:
-- * @errp: Error object
-- *
-- * Operating system agnostic way of querying host name.
-- *
-- * Returns allocated hostname (caller should free), NULL on failure.
-- */
--char *qemu_get_host_name(Error **errp);
+-static void prepare_imgs(void)
+-{
+-    make_temp(p_local_disk);
+-    make_temp(s_local_disk);
+-    make_temp(s_active_disk);
+-    make_temp(s_hidden_disk);
 -
--/**
-- * qemu_get_host_physmem:
-- *
-- * Operating system agnostic way of querying host memory.
-- *
-- * Returns amount of physical memory on the system. This is purely
-- * advisery and may return 0 if we can't work it out. At the other
-- * end we saturate to SIZE_MAX if you are lucky enough to have that
-- * much memory.
-- */
--size_t qemu_get_host_physmem(void);
+-    /* Primary */
+-    bdrv_img_create(p_local_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
+-                    BDRV_O_RDWR, true, &error_abort);
 -
--#endif
+-    /* Secondary */
+-    bdrv_img_create(s_local_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
+-                    BDRV_O_RDWR, true, &error_abort);
+-    bdrv_img_create(s_active_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
+-                    BDRV_O_RDWR, true, &error_abort);
+-    bdrv_img_create(s_hidden_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,
+-                    BDRV_O_RDWR, true, &error_abort);
+-}
+-
+-static void cleanup_imgs(void)
+-{
+-    /* Primary */
+-    unlink(p_local_disk);
+-
+-    /* Secondary */
+-    unlink(s_local_disk);
+-    unlink(s_active_disk);
+-    unlink(s_hidden_disk);
+-}
+-
+-static BlockBackend *start_primary(void)
+-{
+-    BlockBackend *blk;
+-    QemuOpts *opts;
+-    QDict *qdict;
+-    char *cmdline;
+-
+-    cmdline =3D g_strdup_printf("driver=3Dreplication,mode=3Dprimary,node-=
+name=3Dxxx,"
+-                              "file.driver=3Dqcow2,file.file.filename=3D%s=
+,"
+-                              "file.file.locking=3Doff"
+-                              , p_local_disk);
+-    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
+-    g_free(cmdline);
+-
+-    qdict =3D qemu_opts_to_qdict(opts, NULL);
+-    qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
+-    qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
+-
+-    blk =3D blk_new_open(NULL, NULL, qdict, BDRV_O_RDWR, &error_abort);
+-    g_assert(blk);
+-
+-    monitor_add_blk(blk, P_ID, &error_abort);
+-
+-    qemu_opts_del(opts);
+-
+-    return blk;
+-}
+-
+-static void teardown_primary(void)
+-{
+-    BlockBackend *blk;
+-    AioContext *ctx;
+-
+-    /* remove P_ID */
+-    blk =3D blk_by_name(P_ID);
+-    assert(blk);
+-
+-    ctx =3D blk_get_aio_context(blk);
+-    aio_context_acquire(ctx);
+-    monitor_remove_blk(blk);
+-    blk_unref(blk);
+-    aio_context_release(ctx);
+-}
+-
+-static void test_primary_read(void)
+-{
+-    BlockBackend *blk;
+-
+-    blk =3D start_primary();
+-
+-    /* read from 0 to IMG_SIZE */
+-    test_blk_read(blk, 0, 0, IMG_SIZE, 0, IMG_SIZE, true);
+-
+-    teardown_primary();
+-}
+-
+-static void test_primary_write(void)
+-{
+-    BlockBackend *blk;
+-
+-    blk =3D start_primary();
+-
+-    /* write from 0 to IMG_SIZE */
+-    test_blk_write(blk, 0, 0, IMG_SIZE, true);
+-
+-    teardown_primary();
+-}
+-
+-static void test_primary_start(void)
+-{
+-    BlockBackend *blk =3D NULL;
+-
+-    blk =3D start_primary();
+-
+-    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);
+-
+-    /* read from 0 to IMG_SIZE */
+-    test_blk_read(blk, 0, 0, IMG_SIZE, 0, IMG_SIZE, true);
+-
+-    /* write 0x22 from 0 to IMG_SIZE */
+-    test_blk_write(blk, 0x22, 0, IMG_SIZE, false);
+-
+-    teardown_primary();
+-}
+-
+-static void test_primary_stop(void)
+-{
+-    bool failover =3D true;
+-
+-    start_primary();
+-
+-    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);
+-
+-    replication_stop_all(failover, &error_abort);
+-
+-    teardown_primary();
+-}
+-
+-static void test_primary_do_checkpoint(void)
+-{
+-    start_primary();
+-
+-    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);
+-
+-    replication_do_checkpoint_all(&error_abort);
+-
+-    teardown_primary();
+-}
+-
+-static void test_primary_get_error_all(void)
+-{
+-    start_primary();
+-
+-    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);
+-
+-    replication_get_error_all(&error_abort);
+-
+-    teardown_primary();
+-}
+-
+-static BlockBackend *start_secondary(void)
+-{
+-    QemuOpts *opts;
+-    QDict *qdict;
+-    BlockBackend *blk;
+-    char *cmdline;
+-
+-    /* add s_local_disk and forge S_LOCAL_DISK_ID */
+-    cmdline =3D g_strdup_printf("file.filename=3D%s,driver=3Dqcow2,"
+-                              "file.locking=3Doff",
+-                              s_local_disk);
+-    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
+-    g_free(cmdline);
+-
+-    qdict =3D qemu_opts_to_qdict(opts, NULL);
+-    qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
+-    qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
+-
+-    blk =3D blk_new_open(NULL, NULL, qdict, BDRV_O_RDWR, &error_abort);
+-    assert(blk);
+-    monitor_add_blk(blk, S_LOCAL_DISK_ID, &error_abort);
+-
+-    /* format s_local_disk with pattern "0x11" */
+-    test_blk_write(blk, 0x11, 0, IMG_SIZE, false);
+-
+-    qemu_opts_del(opts);
+-
+-    /* add S_(ACTIVE/HIDDEN)_DISK and forge S_ID */
+-    cmdline =3D g_strdup_printf("driver=3Dreplication,mode=3Dsecondary,top=
+-id=3D%s,"
+-                              "file.driver=3Dqcow2,file.file.filename=3D%s=
+,"
+-                              "file.file.locking=3Doff,"
+-                              "file.backing.driver=3Dqcow2,"
+-                              "file.backing.file.filename=3D%s,"
+-                              "file.backing.file.locking=3Doff,"
+-                              "file.backing.backing=3D%s"
+-                              , S_ID, s_active_disk, s_hidden_disk
+-                              , S_LOCAL_DISK_ID);
+-    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);
+-    g_free(cmdline);
+-
+-    qdict =3D qemu_opts_to_qdict(opts, NULL);
+-    qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");
+-    qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");
+-
+-    blk =3D blk_new_open(NULL, NULL, qdict, BDRV_O_RDWR, &error_abort);
+-    assert(blk);
+-    monitor_add_blk(blk, S_ID, &error_abort);
+-
+-    qemu_opts_del(opts);
+-
+-    return blk;
+-}
+-
+-static void teardown_secondary(void)
+-{
+-    /* only need to destroy two BBs */
+-    BlockBackend *blk;
+-    AioContext *ctx;
+-
+-    /* remove S_LOCAL_DISK_ID */
+-    blk =3D blk_by_name(S_LOCAL_DISK_ID);
+-    assert(blk);
+-
+-    ctx =3D blk_get_aio_context(blk);
+-    aio_context_acquire(ctx);
+-    monitor_remove_blk(blk);
+-    blk_unref(blk);
+-    aio_context_release(ctx);
+-
+-    /* remove S_ID */
+-    blk =3D blk_by_name(S_ID);
+-    assert(blk);
+-
+-    ctx =3D blk_get_aio_context(blk);
+-    aio_context_acquire(ctx);
+-    monitor_remove_blk(blk);
+-    blk_unref(blk);
+-    aio_context_release(ctx);
+-}
+-
+-static void test_secondary_read(void)
+-{
+-    BlockBackend *blk;
+-
+-    blk =3D start_secondary();
+-
+-    /* read from 0 to IMG_SIZE */
+-    test_blk_read(blk, 0, 0, IMG_SIZE, 0, IMG_SIZE, true);
+-
+-    teardown_secondary();
+-}
+-
+-static void test_secondary_write(void)
+-{
+-    BlockBackend *blk;
+-
+-    blk =3D start_secondary();
+-
+-    /* write from 0 to IMG_SIZE */
+-    test_blk_write(blk, 0, 0, IMG_SIZE, true);
+-
+-    teardown_secondary();
+-}
+-
+-static void test_secondary_start(void)
+-{
+-    BlockBackend *top_blk, *local_blk;
+-    bool failover =3D true;
+-
+-    top_blk =3D start_secondary();
+-    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);
+-
+-    /* read from s_local_disk (0, IMG_SIZE) */
+-    test_blk_read(top_blk, 0x11, 0, IMG_SIZE, 0, IMG_SIZE, false);
+-
+-    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
+-    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
+-    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
+-
+-    /* replication will backup s_local_disk to s_hidden_disk */
+-    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
+-                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+-
+-    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
+-    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
+-
+-    /* read from s_active_disk (0, IMG_SIZE/2) */
+-    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
+-                  0, IMG_SIZE / 2, false);
+-
+-    /* unblock top_bs */
+-    replication_stop_all(failover, &error_abort);
+-
+-    teardown_secondary();
+-}
+-
+-
+-static void test_secondary_stop(void)
+-{
+-    BlockBackend *top_blk, *local_blk;
+-    bool failover =3D true;
+-
+-    top_blk =3D start_secondary();
+-    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);
+-
+-    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
+-    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
+-    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
+-
+-    /* replication will backup s_local_disk to s_hidden_disk */
+-    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
+-                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+-
+-    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
+-    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
+-
+-    /* do active commit */
+-    replication_stop_all(failover, &error_abort);
+-
+-    /* read from s_local_disk (0, IMG_SIZE / 2) */
+-    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
+-                  0, IMG_SIZE / 2, false);
+-
+-
+-    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
+-    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
+-                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+-
+-    teardown_secondary();
+-}
+-
+-static void test_secondary_continuous_replication(void)
+-{
+-    BlockBackend *top_blk, *local_blk;
+-
+-    top_blk =3D start_secondary();
+-    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);
+-
+-    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
+-    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
+-    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);
+-
+-    /* replication will backup s_local_disk to s_hidden_disk */
+-    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
+-                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+-
+-    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */
+-    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);
+-
+-    /* do failover (active commit) */
+-    replication_stop_all(true, &error_abort);
+-
+-    /* it should ignore all requests from now on */
+-
+-    /* start after failover */
+-    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);
+-
+-    /* checkpoint */
+-    replication_do_checkpoint_all(&error_abort);
+-
+-    /* stop */
+-    replication_stop_all(true, &error_abort);
+-
+-    /* read from s_local_disk (0, IMG_SIZE / 2) */
+-    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,
+-                  0, IMG_SIZE / 2, false);
+-
+-
+-    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
+-    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
+-                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+-
+-    teardown_secondary();
+-}
+-
+-static void test_secondary_do_checkpoint(void)
+-{
+-    BlockBackend *top_blk, *local_blk;
+-    bool failover =3D true;
+-
+-    top_blk =3D start_secondary();
+-    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);
+-
+-    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */
+-    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);
+-    test_blk_write(local_blk, 0x22, IMG_SIZE / 2,
+-                   IMG_SIZE / 2, false);
+-
+-    /* replication will backup s_local_disk to s_hidden_disk */
+-    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,
+-                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+-
+-    replication_do_checkpoint_all(&error_abort);
+-
+-    /* after checkpoint, read pattern 0x22 from s_local_disk */
+-    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,
+-                  IMG_SIZE / 2, 0, IMG_SIZE, false);
+-
+-    /* unblock top_bs */
+-    replication_stop_all(failover, &error_abort);
+-
+-    teardown_secondary();
+-}
+-
+-static void test_secondary_get_error_all(void)
+-{
+-    bool failover =3D true;
+-
+-    start_secondary();
+-    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);
+-
+-    replication_get_error_all(&error_abort);
+-
+-    /* unblock top_bs */
+-    replication_stop_all(failover, &error_abort);
+-
+-    teardown_secondary();
+-}
+-
+-static void sigabrt_handler(int signo)
+-{
+-    cleanup_imgs();
+-}
+-
+-static void setup_sigabrt_handler(void)
+-{
+-    struct sigaction sigact;
+-
+-    sigact =3D (struct sigaction) {
+-        .sa_handler =3D sigabrt_handler,
+-        .sa_flags =3D SA_RESETHAND,
+-    };
+-    sigemptyset(&sigact.sa_mask);
+-    sigaction(SIGABRT, &sigact, NULL);
+-}
+-
+-int main(int argc, char **argv)
+-{
+-    int ret;
+-    qemu_init_main_loop(&error_fatal);
+-    bdrv_init();
+-
+-    g_test_init(&argc, &argv, NULL);
+-    setup_sigabrt_handler();
+-
+-    prepare_imgs();
+-
+-    /* Primary */
+-    g_test_add_func("/replication/primary/read",    test_primary_read);
+-    g_test_add_func("/replication/primary/write",   test_primary_write);
+-    g_test_add_func("/replication/primary/start",   test_primary_start);
+-    g_test_add_func("/replication/primary/stop",    test_primary_stop);
+-    g_test_add_func("/replication/primary/do_checkpoint",
+-                    test_primary_do_checkpoint);
+-    g_test_add_func("/replication/primary/get_error_all",
+-                    test_primary_get_error_all);
+-
+-    /* Secondary */
+-    g_test_add_func("/replication/secondary/read",  test_secondary_read);
+-    g_test_add_func("/replication/secondary/write", test_secondary_write);
+-    g_test_add_func("/replication/secondary/start", test_secondary_start);
+-    g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
+-    g_test_add_func("/replication/secondary/continuous_replication",
+-                    test_secondary_continuous_replication);
+-    g_test_add_func("/replication/secondary/do_checkpoint",
+-                    test_secondary_do_checkpoint);
+-    g_test_add_func("/replication/secondary/get_error_all",
+-                    test_secondary_get_error_all);
+-
+-    ret =3D g_test_run();
+-
+-    cleanup_imgs();
+-
+-    return ret;
+-}
 +/*=0D
-+ * OS includes and handling of OS dependencies=0D
++ * Block replication tests=0D
 + *=0D
-+ * This header exists to pull in some common system headers that=0D
-+ * most code in QEMU will want, and to fix up some possible issues with=0D
-+ * it (missing defines, Windows weirdness, and so on).=0D
++ * Copyright (c) 2016 FUJITSU LIMITED=0D
++ * Author: Changlong Xie <xiecl.fnst@cn.fujitsu.com>=0D
 + *=0D
-+ * To avoid getting into possible circular include dependencies, this=0D
-+ * file should not include any other QEMU headers, with the exceptions=0D
-+ * of config-host.h, config-target.h, qemu/compiler.h,=0D
-+ * sysemu/os-posix.h, sysemu/os-win32.h, glib-compat.h and=0D
-+ * qemu/typedefs.h, all of which are doing a similar job to this file=0D
-+ * and are under similar constraints.=0D
-+ *=0D
-+ * This header also contains prototypes for functions defined in=0D
-+ * os-*.c and util/oslib-*.c; those would probably be better split=0D
-+ * out into separate header files.=0D
-+ *=0D
-+ * In an ideal world this header would contain only:=0D
-+ *  (1) things which everybody needs=0D
-+ *  (2) things without which code would work on most platforms but=0D
-+ *      fail to compile or misbehave on a minority of host OSes=0D
-+ *=0D
-+ * This work is licensed under the terms of the GNU GPL, version 2 or late=
-r.=0D
-+ * See the COPYING file in the top-level directory.=0D
-+ */=0D
-+#ifndef QEMU_OSDEP_H=0D
-+#define QEMU_OSDEP_H=0D
-+=0D
-+#include "config-host.h"=0D
-+#ifdef NEED_CPU_H=0D
-+#include CONFIG_TARGET=0D
-+#else=0D
-+#include "exec/poison.h"=0D
-+#endif=0D
-+=0D
-+#include "qemu/compiler.h"=0D
-+=0D
-+/* Older versions of C++ don't get definitions of various macros from=0D
-+ * stdlib.h unless we define these macros before first inclusion of=0D
-+ * that system header.=0D
-+ */=0D
-+#ifndef __STDC_CONSTANT_MACROS=0D
-+#define __STDC_CONSTANT_MACROS=0D
-+#endif=0D
-+#ifndef __STDC_LIMIT_MACROS=0D
-+#define __STDC_LIMIT_MACROS=0D
-+#endif=0D
-+#ifndef __STDC_FORMAT_MACROS=0D
-+#define __STDC_FORMAT_MACROS=0D
-+#endif=0D
-+=0D
-+/* The following block of code temporarily renames the daemon() function s=
-o the=0D
-+ * compiler does not see the warning associated with it in stdlib.h on OSX=
-=0D
-+ */=0D
-+#ifdef __APPLE__=0D
-+#define daemon qemu_fake_daemon_function=0D
-+#include <stdlib.h>=0D
-+#undef daemon=0D
-+extern int daemon(int, int);=0D
-+#endif=0D
-+=0D
-+#ifdef _WIN32=0D
-+/* as defined in sdkddkver.h */=0D
-+#ifndef _WIN32_WINNT=0D
-+#define _WIN32_WINNT 0x0600 /* Vista */=0D
-+#endif=0D
-+/* reduces the number of implicitly included headers */=0D
-+#ifndef WIN32_LEAN_AND_MEAN=0D
-+#define WIN32_LEAN_AND_MEAN=0D
-+#endif=0D
-+#endif=0D
-+=0D
-+/* enable C99/POSIX format strings (needs mingw32-runtime 3.15 or later) *=
-/=0D
-+#ifdef __MINGW32__=0D
-+#define __USE_MINGW_ANSI_STDIO 1=0D
-+#endif=0D
-+=0D
-+#include <stdarg.h>=0D
-+#include <stddef.h>=0D
-+#include <stdbool.h>=0D
-+#include <stdint.h>=0D
-+#include <sys/types.h>=0D
-+#include <stdlib.h>=0D
-+#include <stdio.h>=0D
-+=0D
-+#include <string.h>=0D
-+#include <strings.h>=0D
-+#include <inttypes.h>=0D
-+#include <limits.h>=0D
-+/* Put unistd.h before time.h as that triggers localtime_r/gmtime_r=0D
-+ * function availability on recentish Mingw-w64 platforms. */=0D
-+#include <unistd.h>=0D
-+#include <time.h>=0D
-+#include <ctype.h>=0D
-+#include <errno.h>=0D
-+#include <fcntl.h>=0D
-+#include <getopt.h>=0D
-+#include <sys/stat.h>=0D
-+#include <sys/time.h>=0D
-+#include <assert.h>=0D
-+/* setjmp must be declared before sysemu/os-win32.h=0D
-+ * because it is redefined there. */=0D
-+#include <setjmp.h>=0D
-+#include <signal.h>=0D
-+=0D
-+#ifdef HAVE_SYS_SIGNAL_H=0D
-+#include <sys/signal.h>=0D
-+#endif=0D
-+=0D
-+#ifndef _WIN32=0D
-+#include <sys/wait.h>=0D
-+#else=0D
-+#define WIFEXITED(x)   1=0D
-+#define WEXITSTATUS(x) (x)=0D
-+#endif=0D
-+=0D
-+#ifdef _WIN32=0D
-+#include "sysemu/os-win32.h"=0D
-+#endif=0D
-+=0D
-+#ifdef CONFIG_POSIX=0D
-+#include "sysemu/os-posix.h"=0D
-+#endif=0D
-+=0D
-+#include "glib-compat.h"=0D
-+#include "qemu/typedefs.h"=0D
-+=0D
-+/*=0D
-+ * For mingw, as of v6.0.0, the function implementing the assert macro is=
-=0D
-+ * not marked as noreturn, so the compiler cannot delete code following an=
-=0D
-+ * assert(false) as unused.  We rely on this within the code base to delet=
-e=0D
-+ * code that is unreachable when features are disabled.=0D
-+ * All supported versions of Glib's g_assert() satisfy this requirement.=0D
-+ */=0D
-+#ifdef __MINGW32__=0D
-+#undef assert=0D
-+#define assert(x)  g_assert(x)=0D
-+#endif=0D
-+=0D
-+/*=0D
-+ * According to waitpid man page:=0D
-+ * WCOREDUMP=0D
-+ *  This  macro  is  not  specified  in POSIX.1-2001 and is not=0D
-+ *  available on some UNIX implementations (e.g., AIX, SunOS).=0D
-+ *  Therefore, enclose its use inside #ifdef WCOREDUMP ... #endif.=0D
-+ */=0D
-+#ifndef WCOREDUMP=0D
-+#define WCOREDUMP(status) 0=0D
-+#endif=0D
-+/*=0D
-+ * We have a lot of unaudited code that may fail in strange ways, or=0D
-+ * even be a security risk during migration, if you disable assertions=0D
-+ * at compile-time.  You may comment out these safety checks if you=0D
-+ * absolutely want to disable assertion overhead, but it is not=0D
-+ * supported upstream so the risk is all yours.  Meanwhile, please=0D
-+ * submit patches to remove any side-effects inside an assertion, or=0D
-+ * fixing error handling that should use Error instead of assert.=0D
-+ */=0D
-+#ifdef NDEBUG=0D
-+#error building with NDEBUG is not supported=0D
-+#endif=0D
-+#ifdef G_DISABLE_ASSERT=0D
-+#error building with G_DISABLE_ASSERT is not supported=0D
-+#endif=0D
-+=0D
-+#ifndef O_LARGEFILE=0D
-+#define O_LARGEFILE 0=0D
-+#endif=0D
-+#ifndef O_BINARY=0D
-+#define O_BINARY 0=0D
-+#endif=0D
-+#ifndef MAP_ANONYMOUS=0D
-+#define MAP_ANONYMOUS MAP_ANON=0D
-+#endif=0D
-+#ifndef MAP_FIXED_NOREPLACE=0D
-+#define MAP_FIXED_NOREPLACE 0=0D
-+#endif=0D
-+#ifndef ENOMEDIUM=0D
-+#define ENOMEDIUM ENODEV=0D
-+#endif=0D
-+#if !defined(ENOTSUP)=0D
-+#define ENOTSUP 4096=0D
-+#endif=0D
-+#if !defined(ECANCELED)=0D
-+#define ECANCELED 4097=0D
-+#endif=0D
-+#if !defined(EMEDIUMTYPE)=0D
-+#define EMEDIUMTYPE 4098=0D
-+#endif=0D
-+#if !defined(ESHUTDOWN)=0D
-+#define ESHUTDOWN 4099=0D
-+#endif=0D
-+=0D
-+/* time_t may be either 32 or 64 bits depending on the host OS, and=0D
-+ * can be either signed or unsigned, so we can't just hardcode a=0D
-+ * specific maximum value. This is not a C preprocessor constant,=0D
-+ * so you can't use TIME_MAX in an #ifdef, but for our purposes=0D
-+ * this isn't a problem.=0D
++ * This work is licensed under the terms of the GNU GPL, version 2 or=0D
++ * later.  See the COPYING file in the top-level directory.=0D
 + */=0D
 +=0D
-+/* The macros TYPE_SIGNED, TYPE_WIDTH, and TYPE_MAXIMUM are from=0D
-+ * Gnulib, and are under the LGPL v2.1 or (at your option) any=0D
-+ * later version.=0D
-+ */=0D
++#include "qemu/osdep.h"=0D
 +=0D
-+/* True if the real type T is signed.  */=0D
-+#define TYPE_SIGNED(t) (!((t)0 < (t)-1))=0D
++#include "qapi/error.h"=0D
++#include "qapi/qmp/qdict.h"=0D
++#include "qemu/option.h"=0D
++#include "qemu/main-loop.h"=0D
++#include "replication.h"=0D
++#include "block/block_int.h"=0D
++#include "block/qdict.h"=0D
++#include "sysemu/block-backend.h"=0D
 +=0D
-+/* The width in bits of the integer type or expression T.=0D
-+ * Padding bits are not supported.=0D
-+ */=0D
-+#define TYPE_WIDTH(t) (sizeof(t) * CHAR_BIT)=0D
++#define IMG_SIZE (64 * 1024 * 1024)=0D
 +=0D
-+/* The maximum and minimum values for the integer type T.  */=0D
-+#define TYPE_MAXIMUM(t)                                                \=0D
-+  ((t) (!TYPE_SIGNED(t)                                                \=0D
-+        ? (t)-1                                                        \=0D
-+        : ((((t)1 << (TYPE_WIDTH(t) - 2)) - 1) * 2 + 1)))=0D
++/* primary */=0D
++#define P_ID "primary-id"=0D
++static char p_local_disk[] =3D "/tmp/p_local_disk.XXXXXX";=0D
 +=0D
-+#ifndef TIME_MAX=0D
-+#define TIME_MAX TYPE_MAXIMUM(time_t)=0D
-+#endif=0D
++/* secondary */=0D
++#define S_ID "secondary-id"=0D
++#define S_LOCAL_DISK_ID "secondary-local-disk-id"=0D
++static char s_local_disk[] =3D "/tmp/s_local_disk.XXXXXX";=0D
++static char s_active_disk[] =3D "/tmp/s_active_disk.XXXXXX";=0D
++static char s_hidden_disk[] =3D "/tmp/s_hidden_disk.XXXXXX";=0D
 +=0D
-+/* HOST_LONG_BITS is the size of a native pointer in bits. */=0D
-+#if UINTPTR_MAX =3D=3D UINT32_MAX=0D
-+# define HOST_LONG_BITS 32=0D
-+#elif UINTPTR_MAX =3D=3D UINT64_MAX=0D
-+# define HOST_LONG_BITS 64=0D
-+#else=0D
-+# error Unknown pointer size=0D
-+#endif=0D
-+=0D
-+/* Mac OSX has a <stdint.h> bug that incorrectly defines SIZE_MAX with=0D
-+ * the wrong type. Our replacement isn't usable in preprocessor=0D
-+ * expressions, but it is sufficient for our needs. */=0D
-+#if defined(HAVE_BROKEN_SIZE_MAX) && HAVE_BROKEN_SIZE_MAX=0D
-+#undef SIZE_MAX=0D
-+#define SIZE_MAX ((size_t)-1)=0D
-+#endif=0D
-+=0D
-+/*=0D
-+ * Two variations of MIN/MAX macros. The first is for runtime use, and=0D
-+ * evaluates arguments only once (so it is safe even with side=0D
-+ * effects), but will not work in constant contexts (such as array=0D
-+ * size declarations) because of the '{}'.  The second is for constant=0D
-+ * expression use, where evaluating arguments twice is safe because=0D
-+ * the result is going to be constant anyway, but will not work in a=0D
-+ * runtime context because of a void expression where a value is=0D
-+ * expected.  Thus, both gcc and clang will fail to compile if you use=0D
-+ * the wrong macro (even if the error may seem a bit cryptic).=0D
-+ *=0D
-+ * Note that neither form is usable as an #if condition; if you truly=0D
-+ * need to write conditional code that depends on a minimum or maximum=0D
-+ * determined by the pre-processor instead of the compiler, you'll=0D
-+ * have to open-code it.  Sadly, Coverity is severely confused by the=0D
-+ * constant variants, so we have to dumb things down there.=0D
-+ */=0D
-+#undef MIN=0D
-+#define MIN(a, b)                                       \=0D
-+    ({                                                  \=0D
-+        typeof(1 ? (a) : (b)) _a =3D (a), _b =3D (b);       \=0D
-+        _a < _b ? _a : _b;                              \=0D
-+    })=0D
-+#undef MAX=0D
-+#define MAX(a, b)                                       \=0D
-+    ({                                                  \=0D
-+        typeof(1 ? (a) : (b)) _a =3D (a), _b =3D (b);       \=0D
-+        _a > _b ? _a : _b;                              \=0D
-+    })=0D
-+=0D
-+#ifdef __COVERITY__=0D
-+# define MIN_CONST(a, b) ((a) < (b) ? (a) : (b))=0D
-+# define MAX_CONST(a, b) ((a) > (b) ? (a) : (b))=0D
-+#else=0D
-+# define MIN_CONST(a, b)                                        \=0D
-+    __builtin_choose_expr(                                      \=0D
-+        __builtin_constant_p(a) && __builtin_constant_p(b),     \=0D
-+        (a) < (b) ? (a) : (b),                                  \=0D
-+        ((void)0))=0D
-+# define MAX_CONST(a, b)                                        \=0D
-+    __builtin_choose_expr(                                      \=0D
-+        __builtin_constant_p(a) && __builtin_constant_p(b),     \=0D
-+        (a) > (b) ? (a) : (b),                                  \=0D
-+        ((void)0))=0D
-+#endif=0D
-+=0D
-+/*=0D
-+ * Minimum function that returns zero only if both values are zero.=0D
-+ * Intended for use with unsigned values only.=0D
-+ */=0D
-+#ifndef MIN_NON_ZERO=0D
-+#define MIN_NON_ZERO(a, b)                              \=0D
-+    ({                                                  \=0D
-+        typeof(1 ? (a) : (b)) _a =3D (a), _b =3D (b);       \=0D
-+        _a =3D=3D 0 ? _b : (_b =3D=3D 0 || _b > _a) ? _a : _b;  \=0D
-+    })=0D
-+#endif=0D
-+=0D
-+/* Round number down to multiple */=0D
-+#define QEMU_ALIGN_DOWN(n, m) ((n) / (m) * (m))=0D
-+=0D
-+/* Round number up to multiple. Safe when m is not a power of 2 (see=0D
-+ * ROUND_UP for a faster version when a power of 2 is guaranteed) */=0D
-+#define QEMU_ALIGN_UP(n, m) QEMU_ALIGN_DOWN((n) + (m) - 1, (m))=0D
-+=0D
-+/* Check if n is a multiple of m */=0D
-+#define QEMU_IS_ALIGNED(n, m) (((n) % (m)) =3D=3D 0)=0D
-+=0D
-+/* n-byte align pointer down */=0D
-+#define QEMU_ALIGN_PTR_DOWN(p, n) \=0D
-+    ((typeof(p))QEMU_ALIGN_DOWN((uintptr_t)(p), (n)))=0D
-+=0D
-+/* n-byte align pointer up */=0D
-+#define QEMU_ALIGN_PTR_UP(p, n) \=0D
-+    ((typeof(p))QEMU_ALIGN_UP((uintptr_t)(p), (n)))=0D
-+=0D
-+/* Check if pointer p is n-bytes aligned */=0D
-+#define QEMU_PTR_IS_ALIGNED(p, n) QEMU_IS_ALIGNED((uintptr_t)(p), (n))=0D
-+=0D
-+/* Round number up to multiple. Requires that d be a power of 2 (see=0D
-+ * QEMU_ALIGN_UP for a safer but slower version on arbitrary=0D
-+ * numbers); works even if d is a smaller type than n.  */=0D
-+#ifndef ROUND_UP=0D
-+#define ROUND_UP(n, d) (((n) + (d) - 1) & -(0 ? (n) : (d)))=0D
-+#endif=0D
-+=0D
-+#ifndef DIV_ROUND_UP=0D
-+#define DIV_ROUND_UP(n, d) (((n) + (d) - 1) / (d))=0D
-+#endif=0D
-+=0D
-+/*=0D
-+ * &(x)[0] is always a pointer - if it's same type as x then the argument =
-is a=0D
-+ * pointer, not an array.=0D
-+ */=0D
-+#define QEMU_IS_ARRAY(x) (!__builtin_types_compatible_p(typeof(x), \=0D
-+                                                        typeof(&(x)[0])))=
-=0D
-+#ifndef ARRAY_SIZE=0D
-+#define ARRAY_SIZE(x) ((sizeof(x) / sizeof((x)[0])) + \=0D
-+                       QEMU_BUILD_BUG_ON_ZERO(!QEMU_IS_ARRAY(x)))=0D
-+#endif=0D
-+=0D
-+int qemu_daemon(int nochdir, int noclose);=0D
-+void *qemu_try_memalign(size_t alignment, size_t size);=0D
-+void *qemu_memalign(size_t alignment, size_t size);=0D
-+void *qemu_anon_ram_alloc(size_t size, uint64_t *align, bool shared);=0D
-+void qemu_vfree(void *ptr);=0D
-+void qemu_anon_ram_free(void *ptr, size_t size);=0D
-+=0D
-+#define QEMU_MADV_INVALID -1=0D
-+=0D
-+#if defined(CONFIG_MADVISE)=0D
-+=0D
-+#define QEMU_MADV_WILLNEED  MADV_WILLNEED=0D
-+#define QEMU_MADV_DONTNEED  MADV_DONTNEED=0D
-+#ifdef MADV_DONTFORK=0D
-+#define QEMU_MADV_DONTFORK  MADV_DONTFORK=0D
-+#else=0D
-+#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID=0D
-+#endif=0D
-+#ifdef MADV_MERGEABLE=0D
-+#define QEMU_MADV_MERGEABLE MADV_MERGEABLE=0D
-+#else=0D
-+#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID=0D
-+#endif=0D
-+#ifdef MADV_UNMERGEABLE=0D
-+#define QEMU_MADV_UNMERGEABLE MADV_UNMERGEABLE=0D
-+#else=0D
-+#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID=0D
-+#endif=0D
-+#ifdef MADV_DODUMP=0D
-+#define QEMU_MADV_DODUMP MADV_DODUMP=0D
-+#else=0D
-+#define QEMU_MADV_DODUMP QEMU_MADV_INVALID=0D
-+#endif=0D
-+#ifdef MADV_DONTDUMP=0D
-+#define QEMU_MADV_DONTDUMP MADV_DONTDUMP=0D
-+#else=0D
-+#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID=0D
-+#endif=0D
-+#ifdef MADV_HUGEPAGE=0D
-+#define QEMU_MADV_HUGEPAGE MADV_HUGEPAGE=0D
-+#else=0D
-+#define QEMU_MADV_HUGEPAGE QEMU_MADV_INVALID=0D
-+#endif=0D
-+#ifdef MADV_NOHUGEPAGE=0D
-+#define QEMU_MADV_NOHUGEPAGE MADV_NOHUGEPAGE=0D
-+#else=0D
-+#define QEMU_MADV_NOHUGEPAGE QEMU_MADV_INVALID=0D
-+#endif=0D
-+#ifdef MADV_REMOVE=0D
-+#define QEMU_MADV_REMOVE MADV_REMOVE=0D
-+#else=0D
-+#define QEMU_MADV_REMOVE QEMU_MADV_INVALID=0D
-+#endif=0D
-+=0D
-+#elif defined(CONFIG_POSIX_MADVISE)=0D
-+=0D
-+#define QEMU_MADV_WILLNEED  POSIX_MADV_WILLNEED=0D
-+#define QEMU_MADV_DONTNEED  POSIX_MADV_DONTNEED=0D
-+#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_DODUMP QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_REMOVE QEMU_MADV_INVALID=0D
-+=0D
-+#else /* no-op */=0D
-+=0D
-+#define QEMU_MADV_WILLNEED  QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_DONTNEED  QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_DONTFORK  QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_MERGEABLE QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_UNMERGEABLE QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_DODUMP QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_DONTDUMP QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_HUGEPAGE  QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_NOHUGEPAGE  QEMU_MADV_INVALID=0D
-+#define QEMU_MADV_REMOVE QEMU_MADV_INVALID=0D
-+=0D
-+#endif=0D
-+=0D
-+#ifdef _WIN32=0D
-+#define HAVE_CHARDEV_SERIAL 1=0D
-+#elif defined(__linux__) || defined(__sun__) || defined(__FreeBSD__)    \=
-=0D
-+    || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly_=
-_) \=0D
-+    || defined(__GLIBC__) || defined(__APPLE__)=0D
-+#define HAVE_CHARDEV_SERIAL 1=0D
-+#endif=0D
-+=0D
-+#if defined(__linux__) || defined(__FreeBSD__) ||               \=0D
-+    defined(__FreeBSD_kernel__) || defined(__DragonFly__)=0D
-+#define HAVE_CHARDEV_PARPORT 1=0D
-+#endif=0D
-+=0D
-+#if defined(__HAIKU__)=0D
-+#define SIGIO SIGPOLL=0D
-+#endif=0D
-+=0D
-+#if defined(CONFIG_LINUX)=0D
-+#ifndef BUS_MCEERR_AR=0D
-+#define BUS_MCEERR_AR 4=0D
-+#endif=0D
-+#ifndef BUS_MCEERR_AO=0D
-+#define BUS_MCEERR_AO 5=0D
-+#endif=0D
-+#endif=0D
-+=0D
-+#if defined(__linux__) && \=0D
-+    (defined(__x86_64__) || defined(__arm__) || defined(__aarch64__) \=0D
-+     || defined(__powerpc64__))=0D
-+   /* Use 2 MiB alignment so transparent hugepages can be used by KVM.=0D
-+      Valgrind does not support alignments larger than 1 MiB,=0D
-+      therefore we need special code which handles running on Valgrind. */=
-=0D
-+#  define QEMU_VMALLOC_ALIGN (512 * 4096)=0D
-+#elif defined(__linux__) && defined(__s390x__)=0D
-+   /* Use 1 MiB (segment size) alignment so gmap can be used by KVM. */=0D
-+#  define QEMU_VMALLOC_ALIGN (256 * 4096)=0D
-+#elif defined(__linux__) && defined(__sparc__)=0D
-+#include <sys/shm.h>=0D
-+#  define QEMU_VMALLOC_ALIGN MAX(qemu_real_host_page_size, SHMLBA)=0D
-+#else=0D
-+#  define QEMU_VMALLOC_ALIGN qemu_real_host_page_size=0D
-+#endif=0D
-+=0D
-+#ifdef CONFIG_POSIX=0D
-+struct qemu_signalfd_siginfo {=0D
-+    uint32_t ssi_signo;   /* Signal number */=0D
-+    int32_t  ssi_errno;   /* Error number (unused) */=0D
-+    int32_t  ssi_code;    /* Signal code */=0D
-+    uint32_t ssi_pid;     /* PID of sender */=0D
-+    uint32_t ssi_uid;     /* Real UID of sender */=0D
-+    int32_t  ssi_fd;      /* File descriptor (SIGIO) */=0D
-+    uint32_t ssi_tid;     /* Kernel timer ID (POSIX timers) */=0D
-+    uint32_t ssi_band;    /* Band event (SIGIO) */=0D
-+    uint32_t ssi_overrun; /* POSIX timer overrun count */=0D
-+    uint32_t ssi_trapno;  /* Trap number that caused signal */=0D
-+    int32_t  ssi_status;  /* Exit status or signal (SIGCHLD) */=0D
-+    int32_t  ssi_int;     /* Integer sent by sigqueue(2) */=0D
-+    uint64_t ssi_ptr;     /* Pointer sent by sigqueue(2) */=0D
-+    uint64_t ssi_utime;   /* User CPU time consumed (SIGCHLD) */=0D
-+    uint64_t ssi_stime;   /* System CPU time consumed (SIGCHLD) */=0D
-+    uint64_t ssi_addr;    /* Address that generated signal=0D
-+                             (for hardware-generated signals) */=0D
-+    uint8_t  pad[48];     /* Pad size to 128 bytes (allow for=0D
-+                             additional fields in the future) */=0D
++/* FIXME: steal from blockdev.c */=0D
++QemuOptsList qemu_drive_opts =3D {=0D
++    .name =3D "drive",=0D
++    .head =3D QTAILQ_HEAD_INITIALIZER(qemu_drive_opts.head),=0D
++    .desc =3D {=0D
++        { /* end of list */ }=0D
++    },=0D
 +};=0D
 +=0D
-+int qemu_signalfd(const sigset_t *mask);=0D
-+void sigaction_invoke(struct sigaction *action,=0D
-+                      struct qemu_signalfd_siginfo *info);=0D
-+#endif=0D
++#define NOT_DONE 0x7fffffff=0D
 +=0D
-+int qemu_madvise(void *addr, size_t len, int advice);=0D
-+int qemu_mprotect_rwx(void *addr, size_t size);=0D
-+int qemu_mprotect_none(void *addr, size_t size);=0D
-+=0D
-+int qemu_open(const char *name, int flags, ...);=0D
-+int qemu_close(int fd);=0D
-+int qemu_unlink(const char *name);=0D
-+#ifndef _WIN32=0D
-+int qemu_dup(int fd);=0D
-+int qemu_lock_fd(int fd, int64_t start, int64_t len, bool exclusive);=0D
-+int qemu_unlock_fd(int fd, int64_t start, int64_t len);=0D
-+int qemu_lock_fd_test(int fd, int64_t start, int64_t len, bool exclusive);=
-=0D
-+bool qemu_has_ofd_lock(void);=0D
-+#endif=0D
-+=0D
-+#if defined(__HAIKU__) && defined(__i386__)=0D
-+#define FMT_pid "%ld"=0D
-+#elif defined(WIN64)=0D
-+#define FMT_pid "%" PRId64=0D
-+#else=0D
-+#define FMT_pid "%d"=0D
-+#endif=0D
-+=0D
-+bool qemu_write_pidfile(const char *pidfile, Error **errp);=0D
-+=0D
-+int qemu_get_thread_id(void);=0D
-+=0D
-+#ifndef CONFIG_IOVEC=0D
-+struct iovec {=0D
-+    void *iov_base;=0D
-+    size_t iov_len;=0D
-+};=0D
-+/*=0D
-+ * Use the same value as Linux for now.=0D
-+ */=0D
-+#define IOV_MAX 1024=0D
-+=0D
-+ssize_t readv(int fd, const struct iovec *iov, int iov_cnt);=0D
-+ssize_t writev(int fd, const struct iovec *iov, int iov_cnt);=0D
-+#else=0D
-+#include <sys/uio.h>=0D
-+#endif=0D
-+=0D
-+#ifdef _WIN32=0D
-+static inline void qemu_timersub(const struct timeval *val1,=0D
-+                                 const struct timeval *val2,=0D
-+                                 struct timeval *res)=0D
++static void blk_rw_done(void *opaque, int ret)=0D
 +{=0D
-+    res->tv_sec =3D val1->tv_sec - val2->tv_sec;=0D
-+    if (val1->tv_usec < val2->tv_usec) {=0D
-+        res->tv_sec--;=0D
-+        res->tv_usec =3D val1->tv_usec - val2->tv_usec + 1000 * 1000;=0D
-+    } else {=0D
-+        res->tv_usec =3D val1->tv_usec - val2->tv_usec;=0D
++    *(int *)opaque =3D ret;=0D
++}=0D
++=0D
++static void test_blk_read(BlockBackend *blk, long pattern,=0D
++                          int64_t pattern_offset, int64_t pattern_count,=0D
++                          int64_t offset, int64_t count,=0D
++                          bool expect_failed)=0D
++{=0D
++    void *pattern_buf =3D NULL;=0D
++    QEMUIOVector qiov;=0D
++    void *cmp_buf =3D NULL;=0D
++    int async_ret =3D NOT_DONE;=0D
++=0D
++    if (pattern) {=0D
++        cmp_buf =3D g_malloc(pattern_count);=0D
++        memset(cmp_buf, pattern, pattern_count);=0D
 +    }=0D
++=0D
++    pattern_buf =3D g_malloc(count);=0D
++    if (pattern) {=0D
++        memset(pattern_buf, pattern, count);=0D
++    } else {=0D
++        memset(pattern_buf, 0x00, count);=0D
++    }=0D
++=0D
++    qemu_iovec_init(&qiov, 1);=0D
++    qemu_iovec_add(&qiov, pattern_buf, count);=0D
++=0D
++    blk_aio_preadv(blk, offset, &qiov, 0, blk_rw_done, &async_ret);=0D
++    while (async_ret =3D=3D NOT_DONE) {=0D
++        main_loop_wait(false);=0D
++    }=0D
++=0D
++    if (expect_failed) {=0D
++        g_assert(async_ret !=3D 0);=0D
++    } else {=0D
++        g_assert(async_ret =3D=3D 0);=0D
++        if (pattern) {=0D
++            g_assert(memcmp(pattern_buf + pattern_offset,=0D
++                            cmp_buf, pattern_count) <=3D 0);=0D
++        }=0D
++    }=0D
++=0D
++    g_free(pattern_buf);=0D
++    g_free(cmp_buf);=0D
++    qemu_iovec_destroy(&qiov);=0D
 +}=0D
-+#else=0D
-+#define qemu_timersub timersub=0D
-+#endif=0D
 +=0D
-+void qemu_set_cloexec(int fd);=0D
++static void test_blk_write(BlockBackend *blk, long pattern, int64_t offset=
+,=0D
++                           int64_t count, bool expect_failed)=0D
++{=0D
++    void *pattern_buf =3D NULL;=0D
++    QEMUIOVector qiov;=0D
++    int async_ret =3D NOT_DONE;=0D
 +=0D
-+/* Starting on QEMU 2.5, qemu_hw_version() returns "2.5+" by default=0D
-+ * instead of QEMU_VERSION, so setting hw_version on MachineClass=0D
-+ * is no longer mandatory.=0D
-+ *=0D
-+ * Do NOT change this string, or it will break compatibility on all=0D
-+ * machine classes that don't set hw_version.=0D
-+ */=0D
-+#define QEMU_HW_VERSION "2.5+"=0D
++    pattern_buf =3D g_malloc(count);=0D
++    if (pattern) {=0D
++        memset(pattern_buf, pattern, count);=0D
++    } else {=0D
++        memset(pattern_buf, 0x00, count);=0D
++    }=0D
 +=0D
-+/* QEMU "hardware version" setting. Used to replace code that exposed=0D
-+ * QEMU_VERSION to guests in the past and need to keep compatibility.=0D
-+ * Do not use qemu_hw_version() in new code.=0D
-+ */=0D
-+void qemu_set_hw_version(const char *);=0D
-+const char *qemu_hw_version(void);=0D
++    qemu_iovec_init(&qiov, 1);=0D
++    qemu_iovec_add(&qiov, pattern_buf, count);=0D
 +=0D
-+void fips_set_state(bool requested);=0D
-+bool fips_get_state(void);=0D
++    blk_aio_pwritev(blk, offset, &qiov, 0, blk_rw_done, &async_ret);=0D
++    while (async_ret =3D=3D NOT_DONE) {=0D
++        main_loop_wait(false);=0D
++    }=0D
 +=0D
-+/* Return a dynamically allocated pathname denoting a file or directory th=
-at is=0D
-+ * appropriate for storing local state.=0D
-+ *=0D
-+ * @relative_pathname need not start with a directory separator; one will =
-be=0D
-+ * added automatically.=0D
-+ *=0D
-+ * The caller is responsible for releasing the value returned with g_free(=
-)=0D
-+ * after use.=0D
-+ */=0D
-+char *qemu_get_local_state_pathname(const char *relative_pathname);=0D
++    if (expect_failed) {=0D
++        g_assert(async_ret !=3D 0);=0D
++    } else {=0D
++        g_assert(async_ret =3D=3D 0);=0D
++    }=0D
 +=0D
-+/* Find program directory, and save it for later usage with=0D
-+ * qemu_get_exec_dir().=0D
-+ * Try OS specific API first, if not working, parse from argv0. */=0D
-+void qemu_init_exec_dir(const char *argv0);=0D
-+=0D
-+/* Get the saved exec dir.=0D
-+ *=0D
-+ * The caller is responsible for releasing the value returned with g_free(=
-)=0D
-+ * after use.=0D
-+ */=0D
-+char *qemu_get_exec_dir(void);=0D
-+=0D
-+/**=0D
-+ * qemu_getauxval:=0D
-+ * @type: the auxiliary vector key to lookup=0D
-+ *=0D
-+ * Search the auxiliary vector for @type, returning the value=0D
-+ * or 0 if @type is not present.=0D
-+ */=0D
-+unsigned long qemu_getauxval(unsigned long type);=0D
-+=0D
-+void qemu_set_tty_echo(int fd, bool echo);=0D
-+=0D
-+void os_mem_prealloc(int fd, char *area, size_t sz, int smp_cpus,=0D
-+                     Error **errp);=0D
-+=0D
-+/**=0D
-+ * qemu_get_pid_name:=0D
-+ * @pid: pid of a process=0D
-+ *=0D
-+ * For given @pid fetch its name. Caller is responsible for=0D
-+ * freeing the string when no longer needed.=0D
-+ * Returns allocated string on success, NULL on failure.=0D
-+ */=0D
-+char *qemu_get_pid_name(pid_t pid);=0D
-+=0D
-+/**=0D
-+ * qemu_fork:=0D
-+ *=0D
-+ * A version of fork that avoids signal handler race=0D
-+ * conditions that can lead to child process getting=0D
-+ * signals that are otherwise only expected by the=0D
-+ * parent. It also resets all signal handlers to the=0D
-+ * default settings.=0D
-+ *=0D
-+ * Returns 0 to child process, pid number to parent=0D
-+ * or -1 on failure.=0D
-+ */=0D
-+pid_t qemu_fork(Error **errp);=0D
-+=0D
-+/* Using intptr_t ensures that qemu_*_page_mask is sign-extended even=0D
-+ * when intptr_t is 32-bit and we are aligning a long long.=0D
-+ */=0D
-+extern uintptr_t qemu_real_host_page_size;=0D
-+extern intptr_t qemu_real_host_page_mask;=0D
-+=0D
-+extern int qemu_icache_linesize;=0D
-+extern int qemu_icache_linesize_log;=0D
-+extern int qemu_dcache_linesize;=0D
-+extern int qemu_dcache_linesize_log;=0D
++    g_free(pattern_buf);=0D
++    qemu_iovec_destroy(&qiov);=0D
++}=0D
 +=0D
 +/*=0D
-+ * After using getopt or getopt_long, if you need to parse another set=0D
-+ * of options, then you must reset optind.  Unfortunately the way to=0D
-+ * do this varies between implementations of getopt.=0D
++ * Create a uniquely-named empty temporary file.=0D
 + */=0D
-+static inline void qemu_reset_optind(void)=0D
++static void make_temp(char *template)=0D
 +{=0D
-+#ifdef HAVE_OPTRESET=0D
-+    optind =3D 1;=0D
-+    optreset =3D 1;=0D
++    int fd;=0D
++=0D
++    fd =3D mkstemp(template);=0D
++    g_assert(fd >=3D 0);=0D
++    close(fd);=0D
++}=0D
++=0D
++static void prepare_imgs(void)=0D
++{=0D
++    make_temp(p_local_disk);=0D
++    make_temp(s_local_disk);=0D
++    make_temp(s_active_disk);=0D
++    make_temp(s_hidden_disk);=0D
++=0D
++    /* Primary */=0D
++    bdrv_img_create(p_local_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,=0D
++                    BDRV_O_RDWR, true, &error_abort);=0D
++=0D
++    /* Secondary */=0D
++    bdrv_img_create(s_local_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,=0D
++                    BDRV_O_RDWR, true, &error_abort);=0D
++    bdrv_img_create(s_active_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,=0D
++                    BDRV_O_RDWR, true, &error_abort);=0D
++    bdrv_img_create(s_hidden_disk, "qcow2", NULL, NULL, NULL, IMG_SIZE,=0D
++                    BDRV_O_RDWR, true, &error_abort);=0D
++}=0D
++=0D
++static void cleanup_imgs(void)=0D
++{=0D
++    /* Primary */=0D
++    unlink(p_local_disk);=0D
++=0D
++    /* Secondary */=0D
++    unlink(s_local_disk);=0D
++    unlink(s_active_disk);=0D
++    unlink(s_hidden_disk);=0D
++}=0D
++=0D
++static BlockBackend *start_primary(void)=0D
++{=0D
++    BlockBackend *blk;=0D
++    QemuOpts *opts;=0D
++    QDict *qdict;=0D
++    char *cmdline;=0D
++=0D
++    cmdline =3D g_strdup_printf("driver=3Dreplication,mode=3Dprimary,node-=
+name=3Dxxx,"=0D
++                              "file.driver=3Dqcow2,file.file.filename=3D%s=
+,"=0D
++                              "file.file.locking=3Doff"=0D
++                              , p_local_disk);=0D
++    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);=0D
++    g_free(cmdline);=0D
++=0D
++    qdict =3D qemu_opts_to_qdict(opts, NULL);=0D
++    qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");=0D
++    qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");=0D
++=0D
++    blk =3D blk_new_open(NULL, NULL, qdict, BDRV_O_RDWR, &error_abort);=0D
++    g_assert(blk);=0D
++=0D
++    monitor_add_blk(blk, P_ID, &error_abort);=0D
++=0D
++    qemu_opts_del(opts);=0D
++=0D
++    return blk;=0D
++}=0D
++=0D
++static void teardown_primary(void)=0D
++{=0D
++    BlockBackend *blk;=0D
++    AioContext *ctx;=0D
++=0D
++    /* remove P_ID */=0D
++    blk =3D blk_by_name(P_ID);=0D
++    assert(blk);=0D
++=0D
++    ctx =3D blk_get_aio_context(blk);=0D
++    aio_context_acquire(ctx);=0D
++    monitor_remove_blk(blk);=0D
++    blk_unref(blk);=0D
++    aio_context_release(ctx);=0D
++}=0D
++=0D
++static void test_primary_read(void)=0D
++{=0D
++    BlockBackend *blk;=0D
++=0D
++    blk =3D start_primary();=0D
++=0D
++    /* read from 0 to IMG_SIZE */=0D
++    test_blk_read(blk, 0, 0, IMG_SIZE, 0, IMG_SIZE, true);=0D
++=0D
++    teardown_primary();=0D
++}=0D
++=0D
++static void test_primary_write(void)=0D
++{=0D
++    BlockBackend *blk;=0D
++=0D
++    blk =3D start_primary();=0D
++=0D
++    /* write from 0 to IMG_SIZE */=0D
++    test_blk_write(blk, 0, 0, IMG_SIZE, true);=0D
++=0D
++    teardown_primary();=0D
++}=0D
++=0D
++static void test_primary_start(void)=0D
++{=0D
++    BlockBackend *blk =3D NULL;=0D
++=0D
++    blk =3D start_primary();=0D
++=0D
++    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);=0D
++=0D
++    /* read from 0 to IMG_SIZE */=0D
++    test_blk_read(blk, 0, 0, IMG_SIZE, 0, IMG_SIZE, true);=0D
++=0D
++    /* write 0x22 from 0 to IMG_SIZE */=0D
++    test_blk_write(blk, 0x22, 0, IMG_SIZE, false);=0D
++=0D
++    teardown_primary();=0D
++}=0D
++=0D
++static void test_primary_stop(void)=0D
++{=0D
++    bool failover =3D true;=0D
++=0D
++    start_primary();=0D
++=0D
++    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);=0D
++=0D
++    replication_stop_all(failover, &error_abort);=0D
++=0D
++    teardown_primary();=0D
++}=0D
++=0D
++static void test_primary_do_checkpoint(void)=0D
++{=0D
++    start_primary();=0D
++=0D
++    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);=0D
++=0D
++    replication_do_checkpoint_all(&error_abort);=0D
++=0D
++    teardown_primary();=0D
++}=0D
++=0D
++static void test_primary_get_error_all(void)=0D
++{=0D
++    start_primary();=0D
++=0D
++    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);=0D
++=0D
++    replication_get_error_all(&error_abort);=0D
++=0D
++    teardown_primary();=0D
++}=0D
++=0D
++static BlockBackend *start_secondary(void)=0D
++{=0D
++    QemuOpts *opts;=0D
++    QDict *qdict;=0D
++    BlockBackend *blk;=0D
++    char *cmdline;=0D
++=0D
++    /* add s_local_disk and forge S_LOCAL_DISK_ID */=0D
++    cmdline =3D g_strdup_printf("file.filename=3D%s,driver=3Dqcow2,"=0D
++                              "file.locking=3Doff",=0D
++                              s_local_disk);=0D
++    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);=0D
++    g_free(cmdline);=0D
++=0D
++    qdict =3D qemu_opts_to_qdict(opts, NULL);=0D
++    qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");=0D
++    qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");=0D
++=0D
++    blk =3D blk_new_open(NULL, NULL, qdict, BDRV_O_RDWR, &error_abort);=0D
++    assert(blk);=0D
++    monitor_add_blk(blk, S_LOCAL_DISK_ID, &error_abort);=0D
++=0D
++    /* format s_local_disk with pattern "0x11" */=0D
++    test_blk_write(blk, 0x11, 0, IMG_SIZE, false);=0D
++=0D
++    qemu_opts_del(opts);=0D
++=0D
++    /* add S_(ACTIVE/HIDDEN)_DISK and forge S_ID */=0D
++    cmdline =3D g_strdup_printf("driver=3Dreplication,mode=3Dsecondary,top=
+-id=3D%s,"=0D
++                              "file.driver=3Dqcow2,file.file.filename=3D%s=
+,"=0D
++                              "file.file.locking=3Doff,"=0D
++                              "file.backing.driver=3Dqcow2,"=0D
++                              "file.backing.file.filename=3D%s,"=0D
++                              "file.backing.file.locking=3Doff,"=0D
++                              "file.backing.backing=3D%s"=0D
++                              , S_ID, s_active_disk, s_hidden_disk=0D
++                              , S_LOCAL_DISK_ID);=0D
++    opts =3D qemu_opts_parse_noisily(&qemu_drive_opts, cmdline, false);=0D
++    g_free(cmdline);=0D
++=0D
++    qdict =3D qemu_opts_to_qdict(opts, NULL);=0D
++    qdict_set_default_str(qdict, BDRV_OPT_CACHE_DIRECT, "off");=0D
++    qdict_set_default_str(qdict, BDRV_OPT_CACHE_NO_FLUSH, "off");=0D
++=0D
++    blk =3D blk_new_open(NULL, NULL, qdict, BDRV_O_RDWR, &error_abort);=0D
++    assert(blk);=0D
++    monitor_add_blk(blk, S_ID, &error_abort);=0D
++=0D
++    qemu_opts_del(opts);=0D
++=0D
++    return blk;=0D
++}=0D
++=0D
++static void teardown_secondary(void)=0D
++{=0D
++    /* only need to destroy two BBs */=0D
++    BlockBackend *blk;=0D
++    AioContext *ctx;=0D
++=0D
++    /* remove S_LOCAL_DISK_ID */=0D
++    blk =3D blk_by_name(S_LOCAL_DISK_ID);=0D
++    assert(blk);=0D
++=0D
++    ctx =3D blk_get_aio_context(blk);=0D
++    aio_context_acquire(ctx);=0D
++    monitor_remove_blk(blk);=0D
++    blk_unref(blk);=0D
++    aio_context_release(ctx);=0D
++=0D
++    /* remove S_ID */=0D
++    blk =3D blk_by_name(S_ID);=0D
++    assert(blk);=0D
++=0D
++    ctx =3D blk_get_aio_context(blk);=0D
++    aio_context_acquire(ctx);=0D
++    monitor_remove_blk(blk);=0D
++    blk_unref(blk);=0D
++    aio_context_release(ctx);=0D
++}=0D
++=0D
++static void test_secondary_read(void)=0D
++{=0D
++    BlockBackend *blk;=0D
++=0D
++    blk =3D start_secondary();=0D
++=0D
++    /* read from 0 to IMG_SIZE */=0D
++    test_blk_read(blk, 0, 0, IMG_SIZE, 0, IMG_SIZE, true);=0D
++=0D
++    teardown_secondary();=0D
++}=0D
++=0D
++static void test_secondary_write(void)=0D
++{=0D
++    BlockBackend *blk;=0D
++=0D
++    blk =3D start_secondary();=0D
++=0D
++    /* write from 0 to IMG_SIZE */=0D
++    test_blk_write(blk, 0, 0, IMG_SIZE, true);=0D
++=0D
++    teardown_secondary();=0D
++}=0D
++=0D
++static void test_secondary_start(void)=0D
++{=0D
++    BlockBackend *top_blk, *local_blk;=0D
++    bool failover =3D true;=0D
++=0D
++    top_blk =3D start_secondary();=0D
++    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);=0D
++=0D
++    /* read from s_local_disk (0, IMG_SIZE) */=0D
++    test_blk_read(top_blk, 0x11, 0, IMG_SIZE, 0, IMG_SIZE, false);=0D
++=0D
++    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */=0D
++    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);=0D
++    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);=0D
++=0D
++    /* replication will backup s_local_disk to s_hidden_disk */=0D
++    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,=0D
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);=0D
++=0D
++    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */=0D
++    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);=0D
++=0D
++    /* read from s_active_disk (0, IMG_SIZE/2) */=0D
++    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,=0D
++                  0, IMG_SIZE / 2, false);=0D
++=0D
++    /* unblock top_bs */=0D
++    replication_stop_all(failover, &error_abort);=0D
++=0D
++    teardown_secondary();=0D
++}=0D
++=0D
++=0D
++static void test_secondary_stop(void)=0D
++{=0D
++    BlockBackend *top_blk, *local_blk;=0D
++    bool failover =3D true;=0D
++=0D
++    top_blk =3D start_secondary();=0D
++    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);=0D
++=0D
++    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */=0D
++    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);=0D
++    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);=0D
++=0D
++    /* replication will backup s_local_disk to s_hidden_disk */=0D
++    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,=0D
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);=0D
++=0D
++    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */=0D
++    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);=0D
++=0D
++    /* do active commit */=0D
++    replication_stop_all(failover, &error_abort);=0D
++=0D
++    /* read from s_local_disk (0, IMG_SIZE / 2) */=0D
++    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,=0D
++                  0, IMG_SIZE / 2, false);=0D
++=0D
++=0D
++    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */=0D
++    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,=0D
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);=0D
++=0D
++    teardown_secondary();=0D
++}=0D
++=0D
++static void test_secondary_continuous_replication(void)=0D
++{=0D
++    BlockBackend *top_blk, *local_blk;=0D
++=0D
++    top_blk =3D start_secondary();=0D
++    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);=0D
++=0D
++    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */=0D
++    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);=0D
++    test_blk_write(local_blk, 0x22, IMG_SIZE / 2, IMG_SIZE / 2, false);=0D
++=0D
++    /* replication will backup s_local_disk to s_hidden_disk */=0D
++    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,=0D
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);=0D
++=0D
++    /* write 0x33 to s_active_disk (0, IMG_SIZE / 2) */=0D
++    test_blk_write(top_blk, 0x33, 0, IMG_SIZE / 2, false);=0D
++=0D
++    /* do failover (active commit) */=0D
++    replication_stop_all(true, &error_abort);=0D
++=0D
++    /* it should ignore all requests from now on */=0D
++=0D
++    /* start after failover */=0D
++    replication_start_all(REPLICATION_MODE_PRIMARY, &error_abort);=0D
++=0D
++    /* checkpoint */=0D
++    replication_do_checkpoint_all(&error_abort);=0D
++=0D
++    /* stop */=0D
++    replication_stop_all(true, &error_abort);=0D
++=0D
++    /* read from s_local_disk (0, IMG_SIZE / 2) */=0D
++    test_blk_read(top_blk, 0x33, 0, IMG_SIZE / 2,=0D
++                  0, IMG_SIZE / 2, false);=0D
++=0D
++=0D
++    /* read from s_local_disk (IMG_SIZE / 2, IMG_SIZE) */=0D
++    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,=0D
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);=0D
++=0D
++    teardown_secondary();=0D
++}=0D
++=0D
++static void test_secondary_do_checkpoint(void)=0D
++{=0D
++    BlockBackend *top_blk, *local_blk;=0D
++    bool failover =3D true;=0D
++=0D
++    top_blk =3D start_secondary();=0D
++    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);=0D
++=0D
++    /* write 0x22 to s_local_disk (IMG_SIZE / 2, IMG_SIZE) */=0D
++    local_blk =3D blk_by_name(S_LOCAL_DISK_ID);=0D
++    test_blk_write(local_blk, 0x22, IMG_SIZE / 2,=0D
++                   IMG_SIZE / 2, false);=0D
++=0D
++    /* replication will backup s_local_disk to s_hidden_disk */=0D
++    test_blk_read(top_blk, 0x11, IMG_SIZE / 2,=0D
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);=0D
++=0D
++    replication_do_checkpoint_all(&error_abort);=0D
++=0D
++    /* after checkpoint, read pattern 0x22 from s_local_disk */=0D
++    test_blk_read(top_blk, 0x22, IMG_SIZE / 2,=0D
++                  IMG_SIZE / 2, 0, IMG_SIZE, false);=0D
++=0D
++    /* unblock top_bs */=0D
++    replication_stop_all(failover, &error_abort);=0D
++=0D
++    teardown_secondary();=0D
++}=0D
++=0D
++static void test_secondary_get_error_all(void)=0D
++{=0D
++    bool failover =3D true;=0D
++=0D
++    start_secondary();=0D
++    replication_start_all(REPLICATION_MODE_SECONDARY, &error_abort);=0D
++=0D
++    replication_get_error_all(&error_abort);=0D
++=0D
++    /* unblock top_bs */=0D
++    replication_stop_all(failover, &error_abort);=0D
++=0D
++    teardown_secondary();=0D
++}=0D
++=0D
++static void sigabrt_handler(int signo)=0D
++{=0D
++    cleanup_imgs();=0D
++}=0D
++=0D
++static void setup_sigabrt_handler(void)=0D
++{=0D
++#ifdef _WIN32=0D
++    signal(SIGABRT, sigabrt_handler);=0D
 +#else=0D
-+    optind =3D 0;=0D
++    struct sigaction sigact;=0D
++=0D
++    sigact =3D (struct sigaction) {=0D
++        .sa_handler =3D sigabrt_handler,=0D
++        .sa_flags =3D SA_RESETHAND,=0D
++    };=0D
++    sigemptyset(&sigact.sa_mask);=0D
++    sigaction(SIGABRT, &sigact, NULL);=0D
 +#endif=0D
 +}=0D
 +=0D
-+/**=0D
-+ * qemu_get_host_name:=0D
-+ * @errp: Error object=0D
-+ *=0D
-+ * Operating system agnostic way of querying host name.=0D
-+ *=0D
-+ * Returns allocated hostname (caller should free), NULL on failure.=0D
-+ */=0D
-+char *qemu_get_host_name(Error **errp);=0D
++int main(int argc, char **argv)=0D
++{=0D
++    int ret;=0D
++    qemu_init_main_loop(&error_fatal);=0D
++    bdrv_init();=0D
 +=0D
-+/**=0D
-+ * qemu_get_host_physmem:=0D
-+ *=0D
-+ * Operating system agnostic way of querying host memory.=0D
-+ *=0D
-+ * Returns amount of physical memory on the system. This is purely=0D
-+ * advisery and may return 0 if we can't work it out. At the other=0D
-+ * end we saturate to SIZE_MAX if you are lucky enough to have that=0D
-+ * much memory.=0D
-+ */=0D
-+size_t qemu_get_host_physmem(void);=0D
++    g_test_init(&argc, &argv, NULL);=0D
++    setup_sigabrt_handler();=0D
 +=0D
-+#endif=0D
++    prepare_imgs();=0D
++=0D
++    /* Primary */=0D
++    g_test_add_func("/replication/primary/read",    test_primary_read);=0D
++    g_test_add_func("/replication/primary/write",   test_primary_write);=0D
++    g_test_add_func("/replication/primary/start",   test_primary_start);=0D
++    g_test_add_func("/replication/primary/stop",    test_primary_stop);=0D
++    g_test_add_func("/replication/primary/do_checkpoint",=0D
++                    test_primary_do_checkpoint);=0D
++    g_test_add_func("/replication/primary/get_error_all",=0D
++                    test_primary_get_error_all);=0D
++=0D
++    /* Secondary */=0D
++    g_test_add_func("/replication/secondary/read",  test_secondary_read);=
+=0D
++    g_test_add_func("/replication/secondary/write", test_secondary_write);=
+=0D
++    g_test_add_func("/replication/secondary/start", test_secondary_start);=
+=0D
++    g_test_add_func("/replication/secondary/stop",  test_secondary_stop);=
+=0D
++    g_test_add_func("/replication/secondary/continuous_replication",=0D
++                    test_secondary_continuous_replication);=0D
++    g_test_add_func("/replication/secondary/do_checkpoint",=0D
++                    test_secondary_do_checkpoint);=0D
++    g_test_add_func("/replication/secondary/get_error_all",=0D
++                    test_secondary_get_error_all);=0D
++=0D
++    ret =3D g_test_run();=0D
++=0D
++    cleanup_imgs();=0D
++=0D
++    return ret;=0D
++}=0D
 --=20
 2.28.0.windows.1
 
