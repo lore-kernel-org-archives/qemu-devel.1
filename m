@@ -2,93 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68408C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:12:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45298C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:12:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3001320709
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:12:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 006D9206E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:12:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKRgVDgj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3001320709
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e//evoK0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 006D9206E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwX6-0004kD-CC
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:12:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58718)
+	id 1kDwXJ-0005Aj-2U
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:12:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLR-00042h-8V; Thu, 03 Sep 2020 17:00:33 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:36666)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLK-0007eq-CQ; Thu, 03 Sep 2020 17:00:29 -0400
-Received: by mail-oi1-x242.google.com with SMTP id x19so4533844oix.3;
- Thu, 03 Sep 2020 14:00:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=OV98AiSKpkunegu+hWzJKS6snwZunhiA7NZUV3WFBUk=;
- b=MKRgVDgj2FZNdNzR+l+hsU/YG+JXwYGnJxNinGOdCu438kHwACj9iqt+VGSUhPPmRn
- tgyOz5scd5zlNxDCVH7ACf/zz+KxwCMdmtjE6YSK5k6SSWbUu3A/JwhmqUBBdzMII+xC
- mKbReXFYWz06tvx1ak3nvs3PVS53QtiTT+e8vOGKAU9GJjJwb+0dleXE52X2fvlmAB/Y
- U6hLfbLQgXIPV++5+xcPHhFhgWkPrVxEQ2EeVYuCVnSQDaRWmvURzI5mGOrWY/rmEkap
- JcCX330WkrRg54ydFStTc1HwuyOeKUdzcU6WiMHBSqF/pyQpkpPex6biakuTVAbloCdF
- y4Lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=OV98AiSKpkunegu+hWzJKS6snwZunhiA7NZUV3WFBUk=;
- b=NVKHOIYhU+GPDe+YO77Mo+aQUuC/UjPQR57uTZ6jtdbgUWayQfjGxIUZNQ9HqfCyF5
- 1kfT7X7n+Fmsn3Z4jlFEz89t+0gTL5UojKhQsJ/1lDGQoG5/ybG+b0HZ9p6fOm7mJM/6
- Df0I9lM/e1SkNsWVv3SDkSaYZU5JREA80vz1eRrLJYOcypxnotNtKsfmfiaO0nmo7+Ci
- fcapP//Hf/aTjVOUjMKoVqRazfSv9Y7haEM0E/PhH/wKZbpERfDwHlz/gg3vZxlM2Htn
- RgPlWGPQPVnaht38OFaFKSA8GGePs+tw8MmJg6UnAbBNk9yCz/GwE/0Ds/gImvkzF2cS
- hx7w==
-X-Gm-Message-State: AOAM530mqYQXp1MMvmNUceE/5Yo97rT/ucifIQxpeHiBsMmjMidxMLhG
- wKoSdPCxYwPSBqm46VtZv9VjjHd7yEQ=
-X-Google-Smtp-Source: ABdhPJzuSw7aM2YMePGtWdBFOfx8GyNKtieQT+gVhgdxaUptLiMmE3z5ELUFaRcSRDkMciZ/JDGfOw==
-X-Received: by 2002:aca:4b12:: with SMTP id y18mr3253674oia.28.1599166823736; 
- Thu, 03 Sep 2020 14:00:23 -0700 (PDT)
-Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
- [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id y83sm714235oiy.35.2020.09.03.14.00.23
- (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:23 -0700 (PDT)
-From: Michael Roth <mdroth@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 34/77] hw/net/e1000e: Do not abort() on invalid PSRCTL
- register value
-Date: Thu,  3 Sep 2020 15:58:52 -0500
-Message-Id: <20200903205935.27832-35-mdroth@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kDwEj-00018w-31
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45335
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kDwEb-0006bz-JH
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599166407;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=F3sKMxahOjYTwSinktMwxAbRSsAgIiqhInGAWsm1MF0=;
+ b=e//evoK0ry8RImKlquUNZwz6AkRL0MqJr76mNg1ViT7JUj3xjR5JEIDBoHx0KQKj6OelS4
+ FnpofOM3A26PPq4Zt99fjD5YpWVkalazA3CjJ6QvJR3CiOTorOKKX28schjJYPunTFkNoS
+ GRAATgw5Wye16NW5g0cbPFPBJQNOd0U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-186-Hj42jdj_OaSM61UhGHXF2g-1; Thu, 03 Sep 2020 16:53:15 -0400
+X-MC-Unique: Hj42jdj_OaSM61UhGHXF2g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB35A18BA282;
+ Thu,  3 Sep 2020 20:53:14 +0000 (UTC)
+Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F6AD81190;
+ Thu,  3 Sep 2020 20:53:14 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 15/27] ap-device: Rename AP_DEVICE_TYPE to TYPE_AP_DEVICE
+Date: Thu,  3 Sep 2020 16:52:35 -0400
+Message-Id: <20200903205247.1667472-16-ehabkost@redhat.com>
+In-Reply-To: <20200903205247.1667472-1-ehabkost@redhat.com>
+References: <20200903205247.1667472-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
-X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,117 +97,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+This will make the type name constant consistent with the name of
+the type checking macro.
 
-libFuzzer found using 'qemu-system-i386 -M q35':
-
-qemu: hardware error: e1000e: PSRCTL.BSIZE0 cannot be zero
-CPU #0:
-EAX=00000000 EBX=00000000 ECX=00000000 EDX=00000663
-ESI=00000000 EDI=00000000 EBP=00000000 ESP=00000000
-EIP=0000fff0 EFL=00000002 [-------] CPL=0 II=0 A20=1 SMM=0 HLT=0
-ES =0000 00000000 0000ffff 00009300
-CS =f000 ffff0000 0000ffff 00009b00
-SS =0000 00000000 0000ffff 00009300
-DS =0000 00000000 0000ffff 00009300
-FS =0000 00000000 0000ffff 00009300
-GS =0000 00000000 0000ffff 00009300
-LDT=0000 00000000 0000ffff 00008200
-TR =0000 00000000 0000ffff 00008b00
-GDT=     00000000 0000ffff
-IDT=     00000000 0000ffff
-CR0=60000010 CR2=00000000 CR3=00000000 CR4=00000000
-DR0=00000000 DR1=00000000 DR2=00000000 DR3=00000000
-DR6=ffff0ff0 DR7=00000400
-EFER=0000000000000000
-FCW=037f FSW=0000 [ST=0] FTW=00 MXCSR=00001f80
-FPR0=0000000000000000 0000 FPR1=0000000000000000 0000
-FPR2=0000000000000000 0000 FPR3=0000000000000000 0000
-FPR4=0000000000000000 0000 FPR5=0000000000000000 0000
-FPR6=0000000000000000 0000 FPR7=0000000000000000 0000
-XMM00=00000000000000000000000000000000 XMM01=00000000000000000000000000000000
-XMM02=00000000000000000000000000000000 XMM03=00000000000000000000000000000000
-XMM04=00000000000000000000000000000000 XMM05=00000000000000000000000000000000
-XMM06=00000000000000000000000000000000 XMM07=00000000000000000000000000000000
-==1988== ERROR: libFuzzer: deadly signal
-    #6 0x7fae4d3ea894 in __GI_abort (/lib64/libc.so.6+0x22894)
-    #7 0x563f4cc59a1d in hw_error (qemu-fuzz-i386+0xe8ca1d)
-    #8 0x563f4d7c93f2 in e1000e_set_psrctl (qemu-fuzz-i386+0x19fc3f2)
-    #9 0x563f4d7b798f in e1000e_core_write (qemu-fuzz-i386+0x19ea98f)
-    #10 0x563f4d7afc46 in e1000e_mmio_write (qemu-fuzz-i386+0x19e2c46)
-    #11 0x563f4cc9a0a7 in memory_region_write_accessor (qemu-fuzz-i386+0xecd0a7)
-    #12 0x563f4cc99c13 in access_with_adjusted_size (qemu-fuzz-i386+0xeccc13)
-    #13 0x563f4cc987b4 in memory_region_dispatch_write (qemu-fuzz-i386+0xecb7b4)
-
-It simply sent the following 2 I/O command to the e1000e
-PCI BAR #2 I/O region:
-
-  writew 0x0100 0x0c00 # RCTL =   E1000_RCTL_DTYP_MASK
-  writeb 0x2170 0x00   # PSRCTL = 0
-
-2813 static void
-2814 e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
-2815 {
-2816     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
-2817
-2818         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
-2819             hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
-2820         }
-
-Instead of calling hw_error() which abort the process (it is
-meant for CPU fatal error condition, not for device logging),
-log the invalid request with qemu_log_mask(LOG_GUEST_ERROR)
-and return, ignoring the request.
-
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-(cherry picked from commit fda43b1204aecd1db158b3255c591d227fbdd629)
-Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Message-Id: <20200902224311.1321159-6-ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/net/e1000e_core.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ include/hw/s390x/ap-device.h | 4 ++--
+ hw/s390x/ap-device.c         | 2 +-
+ hw/vfio/ap.c                 | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index d5676871fa..bcd186cac5 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -34,9 +34,9 @@
- */
+diff --git a/include/hw/s390x/ap-device.h b/include/hw/s390x/ap-device.h
+index fb250a20f3..e502745de5 100644
+--- a/include/hw/s390x/ap-device.h
++++ b/include/hw/s390x/ap-device.h
+@@ -14,7 +14,7 @@
+ #include "hw/qdev-core.h"
+ #include "qom/object.h"
  
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "net/net.h"
- #include "net/tap.h"
--#include "hw/hw.h"
- #include "hw/pci/msi.h"
- #include "hw/pci/msix.h"
- #include "sysemu/runstate.h"
-@@ -2816,11 +2816,15 @@ e1000e_set_psrctl(E1000ECore *core, int index, uint32_t val)
-     if (core->mac[RCTL] & E1000_RCTL_DTYP_MASK) {
+-#define AP_DEVICE_TYPE       "ap-device"
++#define TYPE_AP_DEVICE       "ap-device"
  
-         if ((val & E1000_PSRCTL_BSIZE0_MASK) == 0) {
--            hw_error("e1000e: PSRCTL.BSIZE0 cannot be zero");
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "e1000e: PSRCTL.BSIZE0 cannot be zero");
-+            return;
-         }
+ struct APDevice {
+     DeviceState parent_obj;
+@@ -22,6 +22,6 @@ struct APDevice {
+ typedef struct APDevice APDevice;
  
-         if ((val & E1000_PSRCTL_BSIZE1_MASK) == 0) {
--            hw_error("e1000e: PSRCTL.BSIZE1 cannot be zero");
-+            qemu_log_mask(LOG_GUEST_ERROR,
-+                          "e1000e: PSRCTL.BSIZE1 cannot be zero");
-+            return;
-         }
-     }
+ DECLARE_INSTANCE_CHECKER(APDevice, AP_DEVICE,
+-                         AP_DEVICE_TYPE)
++                         TYPE_AP_DEVICE)
  
+ #endif /* HW_S390X_AP_DEVICE_H */
+diff --git a/hw/s390x/ap-device.c b/hw/s390x/ap-device.c
+index fc0b41e937..237d1f19c5 100644
+--- a/hw/s390x/ap-device.c
++++ b/hw/s390x/ap-device.c
+@@ -21,7 +21,7 @@ static void ap_class_init(ObjectClass *klass, void *data)
+ }
+ 
+ static const TypeInfo ap_device_info = {
+-    .name = AP_DEVICE_TYPE,
++    .name = TYPE_AP_DEVICE,
+     .parent = TYPE_DEVICE,
+     .instance_size = sizeof(APDevice),
+     .class_size = sizeof(DeviceClass),
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index f399ec0a31..68ed059b39 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -177,7 +177,7 @@ static void vfio_ap_class_init(ObjectClass *klass, void *data)
+ 
+ static const TypeInfo vfio_ap_info = {
+     .name = VFIO_AP_DEVICE_TYPE,
+-    .parent = AP_DEVICE_TYPE,
++    .parent = TYPE_AP_DEVICE,
+     .instance_size = sizeof(VFIOAPDevice),
+     .class_init = vfio_ap_class_init,
+ };
 -- 
-2.17.1
+2.26.2
 
 
