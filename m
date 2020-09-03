@@ -2,94 +2,98 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 759F4C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 19:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 221F5C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 19:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36D6220716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 19:53:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E014B206C0
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 19:56:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gZmbzVvg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D6220716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lPifLaxm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E014B206C0
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60142 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDvIC-0005Ij-Co
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 15:53:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34570)
+	id 1kDvL2-0006Ux-4L
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 15:56:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDvHC-0004pe-6U
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 15:52:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42796)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDvH9-0004Jw-J1
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 15:52:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599162721;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0h1UYoNOCCsadZfoKyf00Tk3GiQehD1Ma6/KWMqRnLw=;
- b=gZmbzVvgfLKc+2O9KQvovyGnLvRoXqJI5qQ9RtfJOsV4doq/6vwm1Qi/eSubN2pdSKmzI7
- WGs7Z/8NRq312B58+b8Nylnam1BZz3N69TTJgzrYqF4wW0CcjvhRKsz/T56s4FuGIHClXp
- uUe25eQWw82Qt0mLcv4Lxv2/ewdTdbs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-XowVA9XFOE-cP8ZTwyaAaw-1; Thu, 03 Sep 2020 15:51:59 -0400
-X-MC-Unique: XowVA9XFOE-cP8ZTwyaAaw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F203F1005E67
- for <qemu-devel@nongnu.org>; Thu,  3 Sep 2020 19:51:58 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DC85960C0F;
- Thu,  3 Sep 2020 19:51:55 +0000 (UTC)
-Date: Thu, 3 Sep 2020 15:51:55 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 14/63] i8254: Rename TYPE_I8254 to TYPE_PIT
-Message-ID: <20200903195155.GR4940@habkost.net>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kDvKA-0005xI-GN; Thu, 03 Sep 2020 15:55:10 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54611)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kDvK8-0004bv-Fc; Thu, 03 Sep 2020 15:55:10 -0400
+Received: by mail-wm1-x344.google.com with SMTP id s13so4024439wmh.4;
+ Thu, 03 Sep 2020 12:55:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=5uKaMbLUcclG5Xr3CzuGSuUiVAqefGkhZSf8/LBKfog=;
+ b=lPifLaxmmk8OGJe+DFX8eeB17iYiQkDcGptw9ZdQ3MJRE/gtGNkfbPPWfOvX/K1KYG
+ gph/wDuMORqiUYzn+JWftUOI+quqAlArHjYdVf6OFlu+XRRL98mlfN4glkycx1R27hOd
+ 7iKdeu2CPxD5egy5xBeVukCh6GReA6ULu9q9yPoR/Hu/Rxxc3VQt1ECzA6sxmO6ZYqJF
+ QHdjIjBcm2hPlM1X+Hn7cNhKzId4wgsODXnoI1Q1FNduIp1J3eWBChBcgVmV6oewxvVB
+ q50EBe2CGaR3bk1N8u3wSdZKZme9f5vkw3BM0rg5nJyMPuc2KVtgdJm3RmHaVmhoFOTT
+ C1hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=5uKaMbLUcclG5Xr3CzuGSuUiVAqefGkhZSf8/LBKfog=;
+ b=r9d1WhyBUX4LYKMLH8f/w3OebzjlVyPjoD35sq7GZSgcnl47racApcd1jUHMx/2VMd
+ cHAA+RqKzh6oaw51hNfrdJuYMPrJtZfIkuHtbtIa9tkMLIkRsUn3TrLPu0h4ScfhMtjh
+ 7tD/8G6r08u0Utj6g4XT51mPHAON+G/TTTiTdhKTWp0fZRafkUKheF0G2hvvmKTxtbfG
+ YebJ6tznC2KqU8Qbs8jJuX3xpSQwy9hwDB6MhXDv9AiXR8dvgBswWFVQGgwQcYpxBa7P
+ 56iWT+kQpCm4TwMoEIRr6sJgUSyzdxf6uo+5GxSRxrx2Vm3wo6vO3wlNajByBpqTDxel
+ 8rFA==
+X-Gm-Message-State: AOAM532J9wVFObCwPFsrXfnlzqnIxT9OmI46jgZCZcQvoG/S7D6oECQU
+ hjGTyKRWt4kkkqrPrRddDwP1TjvdDBM=
+X-Google-Smtp-Source: ABdhPJy08xhRANMMcr+tJZ87ngdLWgdgt3nCfrXKKdjXXSiMRCAT/0Rj5bYTKvVyeyqoo/QzWyHVMw==
+X-Received: by 2002:a1c:f605:: with SMTP id w5mr4093026wmc.6.1599162905994;
+ Thu, 03 Sep 2020 12:55:05 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id b8sm6148169wmh.48.2020.09.03.12.55.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 03 Sep 2020 12:55:04 -0700 (PDT)
+Subject: Re: [PATCH 20/63] pc87312: Rename TYPE_PC87312_SUPERIO to TYPE_PC87312
+To: Eduardo Habkost <ehabkost@redhat.com>
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-15-ehabkost@redhat.com>
- <9a2be0a5-1d7f-1813-5bdb-2c741f07c593@redhat.com>
- <20200903161809.GH4940@habkost.net>
- <20200903164429.GD441291@redhat.com>
- <20200903165511.GP4940@habkost.net>
- <47698a43-6b72-1b97-7e6f-da7ba952847f@redhat.com>
+ <20200902224311.1321159-21-ehabkost@redhat.com>
+ <2863f7ea-6fde-5a2e-b55f-e805f5db35be@amsat.org>
+ <20200903161646.GG4940@habkost.net> <20200903172201.GQ4940@habkost.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <9a1fa63c-321f-abf1-736d-f148be89f943@amsat.org>
+Date: Thu, 3 Sep 2020 21:55:03 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <47698a43-6b72-1b97-7e6f-da7ba952847f@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200903172201.GQ4940@habkost.net>
 Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.403,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,68 +106,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-ppc@nongnu.org, berrange@redhat.com,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 03, 2020 at 09:26:16PM +0200, Philippe Mathieu-Daudé wrote:
-> On 9/3/20 6:55 PM, Eduardo Habkost wrote:
-> > On Thu, Sep 03, 2020 at 05:44:29PM +0100, Daniel P. BerrangÃ© wrote:
-> >> On Thu, Sep 03, 2020 at 12:18:09PM -0400, Eduardo Habkost wrote:
-> >>> On Thu, Sep 03, 2020 at 02:47:03PM +0200, Philippe Mathieu-DaudÃƒÆ’Ã‚Â© wrote:
-> >>>> On 9/3/20 12:42 AM, Eduardo Habkost wrote:
-> >>>>> This will make the type name constant consistent with the name of
-> >>>>> the type checking macro.
-> >>>>>
-> >>>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> >>>>> ---
-> >>>>> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> >>>>> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> >>>>> Cc: qemu-devel@nongnu.org
-> >>>>> ---
-> >>>>>  include/hw/timer/i8254.h | 4 ++--
-> >>>>>  hw/timer/i8254.c         | 4 ++--
-> >>>>>  2 files changed, 4 insertions(+), 4 deletions(-)
-> >>>>>
-> >>>>> diff --git a/include/hw/timer/i8254.h b/include/hw/timer/i8254.h
-> >>>>> index 1a522a2457..ddd925074f 100644
-> >>>>> --- a/include/hw/timer/i8254.h
-> >>>>> +++ b/include/hw/timer/i8254.h
-> >>>>> @@ -45,7 +45,7 @@ typedef struct PITCommonClass PITCommonClass;
-> >>>>>  DECLARE_OBJ_CHECKERS(PITCommonState, PITCommonClass,
-> >>>>>                       PIT_COMMON, TYPE_PIT_COMMON)
-> >>>>>  
-> >>>>> -#define TYPE_I8254 "isa-pit"
-> >>>>> +#define TYPE_PIT "isa-pit"
-> >>>>
-> >>>> I disagree with this patch, as we have various PIT and only one I8254.
-> >>>
-> >>> I was unsure about this, and I agree with your point.  I will
-> >>> suggest renaming the PIT macro to I8254 instead.
-> >>
-> >> IMHO the macro name should be directly related to the object name
-> >> string with non-alnum characters replaced by underscore.
-> >>
-> >> ie since the object type is "isa-pit", then the macro should be
-> >> TYPE_ISA_PIT
-> > 
-> > I think that's a good idea in this specific case because it's a
-> > short name (I will do it).  But I don't think we'll be able to
-> > always follow that rule, as the QOM type name is user-visible.
+On 9/3/20 7:22 PM, Eduardo Habkost wrote:
+> On Thu, Sep 03, 2020 at 12:16:47PM -0400, Eduardo Habkost wrote:
+>> On Thu, Sep 03, 2020 at 02:45:12PM +0200, Philippe Mathieu-DaudÃƒÆ’Ã‚Â© wrote:
+>>> On 9/3/20 12:42 AM, Eduardo Habkost wrote:
+>>>> This will make the type name constant consistent with the name of
+>>>> the type checking macro.
+>>>>
+>>>> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+>>>> ---
+>>>> Cc: "HervÃƒÆ’Ã‚Â© Poussineau" <hpoussin@reactos.org>
+>>>> Cc: qemu-ppc@nongnu.org
+>>>> Cc: qemu-devel@nongnu.org
+>>>> ---
+>>>>  include/hw/isa/pc87312.h | 4 ++--
+>>>>  hw/isa/pc87312.c         | 2 +-
+>>>>  2 files changed, 3 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/include/hw/isa/pc87312.h b/include/hw/isa/pc87312.h
+>>>> index a65168a157..da8dc5ddf5 100644
+>>>> --- a/include/hw/isa/pc87312.h
+>>>> +++ b/include/hw/isa/pc87312.h
+>>>> @@ -29,10 +29,10 @@
+>>>>  #include "qom/object.h"
+>>>>  
+>>>>  
+>>>> -#define TYPE_PC87312_SUPERIO "pc87312"
+>>>> +#define TYPE_PC87312 "pc87312"
+>>>
+>>> We loose self-documentation. What is a TYPE_PC87312
+>>> when reviewing a board setup code? Should we add a
+>>> comment /* Create the Super I/O */? The current name
+>>> is self-describing...
 > 
-> Only user-visible if user-creatable, right?
+> I've just realized that TYPE_PC87312_SUPERIO is not used anywhere
+> in the code, so I don't understand where exactly this comment
+> applies.
+> 
+>>>
+>>> Is it easier to rename the type as 'pc87312-superio'?
+>>
+>> This is an option.  In that case, I would like to rename the
+>> PC87312 type checking macro to PC87312_SUPERIO, if that's OK.
+>>
+>> The actual string name doesn't matter for the QOM macros, by the
+>> way.  We can still rename it if you want to, but we don't have
+>> to.
+> 
+> Based on Daniel's suggestion of keeping the macro names
+> consistent with the QOM type name string, I'd like to keep the
+> original color of the bike shed and keep this patch as is.
+> 
+> I will queue this patch on machine-next with HervÃƒÆ’Ã‚Â©'s Reviewed-by
+> line.
+> 
+> If anybody wants to rename the user-visible QOM type name string
+> later, that's OK.  But I don't think this should be done as part
+> of the QOM boilerplate cleanup work.
 
-All of them are user-visible.  All devices have their properties
-configurable using -global, and are visible in the QOM and qdev
-trees.
-
-It doesn't mean we can't change them, but it means that changing
-them is more than just code refactoring.
-
--- 
-Eduardo
-
+Understood, no problem.
 
