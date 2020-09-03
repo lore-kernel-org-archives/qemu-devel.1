@@ -2,72 +2,90 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 573AEC43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:52:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63A0DC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:52:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 22CF520678
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:52:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 22CF520678
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmp.felk.cvut.cz
+	by mail.kernel.org (Postfix) with ESMTPS id 24FFF20678
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:52:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZPl9B5Fz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24FFF20678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDx9j-0000RY-7Z
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:52:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41356)
+	id 1kDx9w-0001P5-Am
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:52:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pisa@cmp.felk.cvut.cz>)
- id 1kDx7B-0005Xa-4b
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:49:53 -0400
-Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:15107)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <pisa@cmp.felk.cvut.cz>) id 1kDx79-0005M4-36
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:49:52 -0400
-Received: from cmp.felk.cvut.cz (haar.felk.cvut.cz [147.32.84.19])
- by relay.felk.cvut.cz (8.15.2/8.15.2) with ESMTP id 083Lmkt9031922;
- Thu, 3 Sep 2020 23:48:46 +0200 (CEST)
- (envelope-from pisa@cmp.felk.cvut.cz)
-Received: from haar.felk.cvut.cz (localhost [127.0.0.1])
- by cmp.felk.cvut.cz (8.14.0/8.12.3/SuSE Linux 0.6) with ESMTP id
- 083LmjDG026130; Thu, 3 Sep 2020 23:48:45 +0200
-Received: (from pisa@localhost)
- by haar.felk.cvut.cz (8.14.0/8.13.7/Submit) id 083Lmj6B026129;
- Thu, 3 Sep 2020 23:48:45 +0200
-From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v2 2/7] hw/net/can: sja1000 ignore CAN FD frames
-Date: Thu,  3 Sep 2020 23:48:18 +0200
-Message-Id: <17e5e09da81539405f9ad3665eabbff0a897a855.1599168753.git.pisa@cmp.felk.cvut.cz>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1599168753.git.pisa@cmp.felk.cvut.cz>
-References: <cover.1599168753.git.pisa@cmp.felk.cvut.cz>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-FELK-MailScanner-Information: 
-X-MailScanner-ID: 083Lmkt9031922
-X-FELK-MailScanner: Found to be clean
-X-FELK-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
- score=-0.098, required 6, BAYES_00 -0.50, KHOP_HELO_FCRDNS 0.40,
- SPF_HELO_NONE 0.00, SPF_NONE 0.00)
-X-FELK-MailScanner-From: pisa@cmp.felk.cvut.cz
-X-FELK-MailScanner-Watermark: 1599774529.85662@Z2aOrjN3Ac3jIRkSVeQgXg
-Received-SPF: none client-ip=2001:718:2:1611:0:1:0:70;
- envelope-from=pisa@cmp.felk.cvut.cz; helo=relay.felk.cvut.cz
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 17:39:24
-X-ACL-Warn: Detected OS   = ???
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwM8-00052Y-9l; Thu, 03 Sep 2020 17:01:17 -0400
+Received: from mail-ot1-x332.google.com ([2607:f8b0:4864:20::332]:33364)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwM6-0007tE-Dh; Thu, 03 Sep 2020 17:01:15 -0400
+Received: by mail-ot1-x332.google.com with SMTP id m12so1037932otr.0;
+ Thu, 03 Sep 2020 14:01:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=Y3yC2SOnzE11vtRpT71Fc4IxJOCN3PFXC+OmZRbaviY=;
+ b=ZPl9B5Fzq1R/hqw20AxD3H4qqtKxTa/lXYm+Tmk3eExvwymvFoyTzut0dC1WfLjIqD
+ K5wDHLxDx81YFqSPJcGveId3LcCEop0Q2w8BjfDLsctbgcF1z6y/dS5klMyPi8zodpsP
+ JlQWhGUDnbnkHZev6g0PHiZMcpOU/qAZoqCIbZ7O7LL7fSEzmdXsgK6KLa7/6g67jSBl
+ 6hAps7dnF1RdSW6wrTNjDiO/L2YnOKC9hW3Srm5xSg9j8w9nSalo+zJe/+iqbZGHeHqQ
+ xWdUbQwNJzp+tfLsX4X0GgshRo8GS0rAIUIFmLVmUtVQ9R7Yebv3S/VrPjqmOZg/S38z
+ QUGg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=Y3yC2SOnzE11vtRpT71Fc4IxJOCN3PFXC+OmZRbaviY=;
+ b=GvXGnC4ZzGS6WGWzI3wIuuJ0/U6/xJYJTPJpLIA6vNGghqLTKQuBzZM2VEReyXttsc
+ vyEPj8ZYeWfM+i1aYNHmvOtU3rfyaYUoBN6stowTWXN6zaOy3Z8tE6XmkeWu6DpryccM
+ /0Xfc2vagBCr049dBVTAnLnrAkPzU6dnAVR5cXpO2l4axfN7xXGJhkYfyfkhBG8mPhNc
+ rnTlE7xp3RZQjZZJkfemog/jpPcOlR5LBxRin9OajJ6vaft0KymFbkdA9lLHJJ3EcgFe
+ 4nPPUuPUDUv1dLsnBgw1NpY54hjgJvBfDZcupvIQf+wlPyB0gZ6d05SKsNfFBKrQnMU8
+ gEfQ==
+X-Gm-Message-State: AOAM531mna+6QwhMRIih45ty0fkZYtWBFnuefs0LA1+5Akrj9CtQ19+p
+ IYGZIb61nS0rZ6SQMsVq0oC4IscqSQVRSQ==
+X-Google-Smtp-Source: ABdhPJxG8u0OcMNMEtQmHDl6WeqW/hTeDfHWLIldHXVV70RparNQ/X3+VWRVJ+ggemRtRuUZ6/IvGA==
+X-Received: by 2002:a05:6830:13d7:: with SMTP id
+ e23mr3098746otq.98.1599166872334; 
+ Thu, 03 Sep 2020 14:01:12 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id t1sm855106ooi.27.2020.09.03.14.01.11
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 03 Sep 2020 14:01:11 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 67/77] intel_iommu: Use correct shift for 256 bits qi
+ descriptor
+Date: Thu,  3 Sep 2020 15:59:25 -0500
+Message-Id: <20200903205935.27832-68-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::332;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x332.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,118 +98,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Vikram Garhwal <fnu.vikram@xilinx.com>,
- Jiri Novak <jnovak@fel.cvut.cz>, Stefan Hajnoczi <stefanha@gmail.com>,
- Deniz Eren <deniz.eren@icloud.com>, Markus Armbruster <armbru@redhat.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Konrad Frederic <frederic.konrad@adacore.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Jan Charvat <charvj10@fel.cvut.cz>,
- Oliver Hartkopp <socketcan@hartkopp.net>, Ondrej Ille <ondrej.ille@gmail.com>,
- Pavel Pisa <pisa@cmp.felk.cvut.cz>
+Cc: Liu Yi L <yi.l.liu@intel.com>, qemu-stable@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jan Charvat <charvj10@fel.cvut.cz>
+From: Liu Yi L <yi.l.liu@intel.com>
 
-Signed-off-by: Jan Charvat <charvj10@fel.cvut.cz>
-Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-Reviewed-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+In chapter 10.4.23 of VT-d spec 3.0, Descriptor Width bit was introduced
+in VTD_IQA_REG. Software could set this bit to tell VT-d the QI descriptor
+from software would be 256 bits. Accordingly, the VTD_IQH_QH_SHIFT should
+be 5 when descriptor size is 256 bits.
+
+This patch adds the DW bit check when deciding the shift used to update
+VTD_IQH_REG.
+
+Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+Message-Id: <1593850035-35483-1-git-send-email-yi.l.liu@intel.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+Cc: qemu-stable@nongnu.org
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(cherry picked from commit a4544c45e109ceee87ee8c19baff28be3890d788)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/net/can/can_sja1000.c | 29 +++++++++++++++++++++++------
- 1 file changed, 23 insertions(+), 6 deletions(-)
+ hw/i386/intel_iommu.c          | 7 ++++++-
+ hw/i386/intel_iommu_internal.h | 3 ++-
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/hw/net/can/can_sja1000.c b/hw/net/can/can_sja1000.c
-index ec66d4232d..0898f54dea 100644
---- a/hw/net/can/can_sja1000.c
-+++ b/hw/net/can/can_sja1000.c
-@@ -323,11 +323,16 @@ static void buff2frame_bas(const uint8_t *buff, qemu_can_frame *frame)
- static int frame2buff_pel(const qemu_can_frame *frame, uint8_t *buff)
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index df7ad254ac..8703a2da42 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -2549,6 +2549,11 @@ static bool vtd_process_inv_desc(IntelIOMMUState *s)
+ /* Try to fetch and process more Invalidation Descriptors */
+ static void vtd_fetch_inv_desc(IntelIOMMUState *s)
  {
-     int i;
-+    int dlen = frame->can_dlc;
- 
-     if (frame->can_id & QEMU_CAN_ERR_FLAG) { /* error frame, NOT support now. */
-         return -1;
-     }
- 
-+    if (dlen > 8) {
-+        return -1;
-+    }
++    int qi_shift;
 +
-     buff[0] = 0x0f & frame->can_dlc; /* DLC */
-     if (frame->can_id & QEMU_CAN_RTR_FLAG) { /* RTR */
-         buff[0] |= (1 << 6);
-@@ -338,18 +343,18 @@ static int frame2buff_pel(const qemu_can_frame *frame, uint8_t *buff)
-         buff[2] = extract32(frame->can_id, 13, 8); /* ID.20~ID.13 */
-         buff[3] = extract32(frame->can_id, 5, 8);  /* ID.12~ID.05 */
-         buff[4] = extract32(frame->can_id, 0, 5) << 3; /* ID.04~ID.00,xxx */
--        for (i = 0; i < frame->can_dlc; i++) {
-+        for (i = 0; i < dlen; i++) {
-             buff[5 + i] = frame->data[i];
-         }
--        return frame->can_dlc + 5;
-+        return dlen + 5;
-     } else { /* SFF */
-         buff[1] = extract32(frame->can_id, 3, 8); /* ID.10~ID.03 */
-         buff[2] = extract32(frame->can_id, 0, 3) << 5; /* ID.02~ID.00,xxxxx */
--        for (i = 0; i < frame->can_dlc; i++) {
-+        for (i = 0; i < dlen; i++) {
-             buff[3 + i] = frame->data[i];
-         }
- 
--        return frame->can_dlc + 3;
-+        return dlen + 3;
-     }
- 
-     return -1;
-@@ -358,6 +363,7 @@ static int frame2buff_pel(const qemu_can_frame *frame, uint8_t *buff)
- static int frame2buff_bas(const qemu_can_frame *frame, uint8_t *buff)
- {
-     int i;
-+    int dlen = frame->can_dlc;
- 
-      /*
-       * EFF, no support for BasicMode
-@@ -369,17 +375,21 @@ static int frame2buff_bas(const qemu_can_frame *frame, uint8_t *buff)
-         return -1;
-     }
- 
-+    if (dlen > 8) {
-+        return -1;
-+    }
++    /* Refer to 10.4.23 of VT-d spec 3.0 */
++    qi_shift = s->iq_dw ? VTD_IQH_QH_SHIFT_5 : VTD_IQH_QH_SHIFT_4;
 +
-     buff[0] = extract32(frame->can_id, 3, 8); /* ID.10~ID.03 */
-     buff[1] = extract32(frame->can_id, 0, 3) << 5; /* ID.02~ID.00,xxxxx */
-     if (frame->can_id & QEMU_CAN_RTR_FLAG) { /* RTR */
-         buff[1] |= (1 << 4);
-     }
-     buff[1] |= frame->can_dlc & 0x0f;
--    for (i = 0; i < frame->can_dlc; i++) {
-+    for (i = 0; i < dlen; i++) {
-         buff[2 + i] = frame->data[i];
-     }
+     trace_vtd_inv_qi_fetch();
  
--    return frame->can_dlc + 2;
-+    return dlen + 2;
+     if (s->iq_tail >= s->iq_size) {
+@@ -2567,7 +2572,7 @@ static void vtd_fetch_inv_desc(IntelIOMMUState *s)
+         }
+         /* Must update the IQH_REG in time */
+         vtd_set_quad_raw(s, DMAR_IQH_REG,
+-                         (((uint64_t)(s->iq_head)) << VTD_IQH_QH_SHIFT) &
++                         (((uint64_t)(s->iq_head)) << qi_shift) &
+                          VTD_IQH_QH_MASK);
+     }
  }
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 862033ebe6..3d5487fe2c 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -230,7 +230,8 @@
+ #define VTD_IQA_DW_MASK             0x800
  
- static void can_sja_update_pel_irq(CanSJA1000State *s)
-@@ -766,6 +776,13 @@ ssize_t can_sja_receive(CanBusClientState *client, const qemu_can_frame *frames,
-     if (frames_cnt <= 0) {
-         return 0;
-     }
-+    if (frame->flags && QEMU_CAN_FRMF_TYPE_FD) {
-+        if (DEBUG_FILTER) {
-+            can_display_msg("[cansja]: ignor fd frame ", frame);
-+        }
-+        return 1;
-+    }
-+
-     if (DEBUG_FILTER) {
-         can_display_msg("[cansja]: receive ", frame);
-     }
+ /* IQH_REG */
+-#define VTD_IQH_QH_SHIFT            4
++#define VTD_IQH_QH_SHIFT_4          4
++#define VTD_IQH_QH_SHIFT_5          5
+ #define VTD_IQH_QH_MASK             0x7fff0ULL
+ 
+ /* ICS_REG */
 -- 
-2.20.1
+2.17.1
 
 
