@@ -2,88 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B100C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03028C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:24:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5250D208C7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:24:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BDE5A20897
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 08:24:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KQDAZrsX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5250D208C7
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C5pAmVo5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE5A20897
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDkY4-0004pF-88
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 04:24:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50290)
+	id 1kDkY6-0004vO-Qn
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 04:24:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDkXB-00036b-42
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:23:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59661)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDkXC-00037O-Dt
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:23:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42605
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDkX8-0008RB-Oj
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:23:52 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kDkXA-0008Sh-IK
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 04:23:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599121429;
+ s=mimecast20190719; t=1599121431;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=N6+u67uMyp/AbE5WPamSR4/ih0VagjfgbRPD2Xx9GOc=;
- b=KQDAZrsXdJn039tqYmeq3VfHnJ6lxv+tmGLMEBy62P1F9qaeBrLimuHFDzX9GnEdVS3yuF
- yzHQrHH/9oDWRUVlN0dj9R3nOKKn53ZxTp5FIa9mbdo9O3JxKrxSLPSCbyBLKPqvewiHM8
- xrDEbLlpoBGlYZ30bg4UEworbRZfvc4=
+ bh=Y++QSgRJlH/gQE4gNXs2Alm/h9hnEyIdu1Oav+EA6RI=;
+ b=C5pAmVo5D7FQUh1mfhwXzJUukxr1DiDrY+nnEc2VlrjqB+8siSbCu0HYEXtnX3Us+DQTOq
+ 1Hhx5Fpf0UoDNFDIoO+keM5tFWfuecA6YzgP3zYlGGtj+un7tn0XgsonMBTpbZoiKCZMw+
+ P2y18M8lyxa3khXVRp1HX5g8V4PvzFw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-191-RpizbRp6NYClytkB-52oOw-1; Thu, 03 Sep 2020 04:23:47 -0400
-X-MC-Unique: RpizbRp6NYClytkB-52oOw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-233-_SdWwz8pPxqVapeyUOC78Q-1; Thu, 03 Sep 2020 04:23:47 -0400
+X-MC-Unique: _SdWwz8pPxqVapeyUOC78Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 91DA880734E;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC86080B702;
  Thu,  3 Sep 2020 08:23:46 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
  [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 385E219C59;
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 564DA78B40;
  Thu,  3 Sep 2020 08:23:46 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id B2A47113861E; Thu,  3 Sep 2020 10:23:44 +0200 (CEST)
+ id BEAC4111CA2A; Thu,  3 Sep 2020 10:23:44 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 1/8] qapi: enable use of g_autoptr with QAPI types
-Date: Thu,  3 Sep 2020 10:23:37 +0200
-Message-Id: <20200903082344.1877175-2-armbru@redhat.com>
+Subject: [PULL 4/8] scripts/qmp/qom-fuse: Port to current Python module fuse
+Date: Thu,  3 Sep 2020 10:23:40 +0200
+Message-Id: <20200903082344.1877175-5-armbru@redhat.com>
 In-Reply-To: <20200903082344.1877175-1-armbru@redhat.com>
 References: <20200903082344.1877175-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 00:24:51
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,238 +97,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: peter.maydell@linaro.org, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel P. Berrangé <berrange@redhat.com>
-
-Currently QAPI generates a type and function for free'ing it:
-
-  typedef struct QCryptoBlockCreateOptions QCryptoBlockCreateOptions;
-  void qapi_free_QCryptoBlockCreateOptions(QCryptoBlockCreateOptions *obj);
-
-This is used in the traditional manner:
-
-  QCryptoBlockCreateOptions *opts = NULL;
-
-  opts = g_new0(QCryptoBlockCreateOptions, 1);
-
-  ....do stuff with opts...
-
-  qapi_free_QCryptoBlockCreateOptions(opts);
-
-Since bumping the min glib to 2.48, QEMU has incrementally adopted the
-use of g_auto/g_autoptr. This allows the compiler to run a function to
-free a variable when it goes out of scope, the benefit being the
-compiler can guarantee it is freed in all possible code ptahs.
-
-This benefit is applicable to QAPI types too, and given the seriously
-long method names for some qapi_free_XXXX() functions, is much less
-typing. This change thus makes the code generator emit:
-
- G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlockCreateOptions,
-                              qapi_free_QCryptoBlockCreateOptions)
-
-The above code example now becomes
-
-  g_autoptr(QCryptoBlockCreateOptions) opts = NULL;
-
-  opts = g_new0(QCryptoBlockCreateOptions, 1);
-
-  ....do stuff with opts...
-
-Note, if the local pointer needs to live beyond the scope holding the
-variable, then g_steal_pointer can be used. This is useful to return the
-pointer to the caller in the success codepath, while letting it be freed
-in all error codepaths.
-
-  return g_steal_pointer(&opts);
-
-The crypto/block.h header needs updating to avoid symbol clash now that
-the g_autoptr support is a standard QAPI feature.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200723153845.2934357-1-berrange@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20200723142738.1868568-3-armbru@redhat.com>
+Reviewed-by: John Snow <jsnow@redhat.com>
 ---
- docs/devel/qapi-code-gen.txt       |  2 ++
- include/crypto/block.h             |  2 --
- tests/test-qobject-input-visitor.c | 23 +++++++----------------
- scripts/qapi/types.py              |  1 +
- 4 files changed, 10 insertions(+), 18 deletions(-)
+ scripts/qmp/qom-fuse | 93 ++++++++++++++++++++++----------------------
+ 1 file changed, 47 insertions(+), 46 deletions(-)
 
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 69eede6c28..f3e7ced212 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -1321,6 +1321,7 @@ Example:
-     };
+diff --git a/scripts/qmp/qom-fuse b/scripts/qmp/qom-fuse
+index b7dabe8d65..405e6ebd67 100755
+--- a/scripts/qmp/qom-fuse
++++ b/scripts/qmp/qom-fuse
+@@ -3,16 +3,18 @@
+ # QEMU Object Model test tools
+ #
+ # Copyright IBM, Corp. 2012
++# Copyright (C) 2020 Red Hat, Inc.
+ #
+ # Authors:
+ #  Anthony Liguori   <aliguori@us.ibm.com>
++#  Markus Armbruster <armbru@redhat.com>
+ #
+ # This work is licensed under the terms of the GNU GPL, version 2 or later.  See
+ # the COPYING file in the top-level directory.
+ ##
  
-     void qapi_free_UserDefOne(UserDefOne *obj);
-+    G_DEFINE_AUTOPTR_CLEANUP_FUNC(UserDefOne, qapi_free_UserDefOne)
+ import fuse, stat
+-from fuse import Fuse
++from fuse import FUSE, FuseOSError, Operations
+ import os, posix, sys
+ from errno import *
  
-     struct UserDefOneList {
-         UserDefOneList *next;
-@@ -1328,6 +1329,7 @@ Example:
-     };
+@@ -21,9 +23,8 @@ from qemu.qmp import QEMUMonitorProtocol
  
-     void qapi_free_UserDefOneList(UserDefOneList *obj);
-+    G_DEFINE_AUTOPTR_CLEANUP_FUNC(UserDefOneList, qapi_free_UserDefOneList)
+ fuse.fuse_python_api = (0, 2)
  
-     struct q_obj_my_command_arg {
-         UserDefOneList *arg1;
-diff --git a/include/crypto/block.h b/include/crypto/block.h
-index d274819791..7a65e8e402 100644
---- a/include/crypto/block.h
-+++ b/include/crypto/block.h
-@@ -311,7 +311,5 @@ uint64_t qcrypto_block_get_sector_size(QCryptoBlock *block);
- void qcrypto_block_free(QCryptoBlock *block);
+-class QOMFS(Fuse):
+-    def __init__(self, qmp, *args, **kwds):
+-        Fuse.__init__(self, *args, **kwds)
++class QOMFS(Operations):
++    def __init__(self, qmp):
+         self.qmp = qmp
+         self.qmp.connect()
+         self.ino_map = {}
+@@ -65,21 +66,21 @@ class QOMFS(Fuse):
+         except:
+             return False
  
- G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlock, qcrypto_block_free)
--G_DEFINE_AUTOPTR_CLEANUP_FUNC(QCryptoBlockCreateOptions,
--                              qapi_free_QCryptoBlockCreateOptions)
+-    def read(self, path, length, offset):
++    def read(self, path, length, offset, fh):
+         if not self.is_property(path):
+             return -ENOENT
  
- #endif /* QCRYPTO_BLOCK_H */
-diff --git a/tests/test-qobject-input-visitor.c b/tests/test-qobject-input-visitor.c
-index 6bacabf063..e41b91a2a6 100644
---- a/tests/test-qobject-input-visitor.c
-+++ b/tests/test-qobject-input-visitor.c
-@@ -417,7 +417,7 @@ static void test_visitor_in_struct(TestInputVisitorData *data,
- static void test_visitor_in_struct_nested(TestInputVisitorData *data,
-                                           const void *unused)
- {
--    UserDefTwo *udp = NULL;
-+    g_autoptr(UserDefTwo) udp = NULL;
-     Visitor *v;
+         path, prop = path.rsplit('/', 1)
+         try:
+-            data = str(self.qmp.command('qom-get', path=path, property=prop))
++            data = self.qmp.command('qom-get', path=path, property=prop)
+             data += '\n' # make values shell friendly
+         except:
+-            return -EPERM
++            raise FuseOSError(EPERM)
  
-     v = visitor_input_test_init(data, "{ 'string0': 'string0', "
-@@ -433,8 +433,6 @@ static void test_visitor_in_struct_nested(TestInputVisitorData *data,
-     g_assert_cmpstr(udp->dict1->dict2->userdef->string, ==, "string");
-     g_assert_cmpstr(udp->dict1->dict2->string, ==, "string2");
-     g_assert(udp->dict1->has_dict3 == false);
--
--    qapi_free_UserDefTwo(udp);
- }
+         if offset > len(data):
+             return ''
  
- static void test_visitor_in_list(TestInputVisitorData *data,
-@@ -546,7 +544,7 @@ static void test_visitor_in_union_flat(TestInputVisitorData *data,
-                                        const void *unused)
- {
-     Visitor *v;
--    UserDefFlatUnion *tmp;
-+    g_autoptr(UserDefFlatUnion) tmp = NULL;
-     UserDefUnionBase *base;
+-        return str(data[offset:][:length])
++        return bytes(data[offset:][:length], encoding='utf-8')
  
-     v = visitor_input_test_init(data,
-@@ -563,8 +561,6 @@ static void test_visitor_in_union_flat(TestInputVisitorData *data,
+     def readlink(self, path):
+         if not self.is_link(path):
+@@ -89,52 +90,52 @@ class QOMFS(Fuse):
+         return prefix + str(self.qmp.command('qom-get', path=path,
+                                              property=prop))
  
-     base = qapi_UserDefFlatUnion_base(tmp);
-     g_assert(&base->enum1 == &tmp->enum1);
--
--    qapi_free_UserDefFlatUnion(tmp);
- }
+-    def getattr(self, path):
++    def getattr(self, path, fh=None):
+         if self.is_link(path):
+-            value = posix.stat_result((0o755 | stat.S_IFLNK,
+-                                       self.get_ino(path),
+-                                       0,
+-                                       2,
+-                                       1000,
+-                                       1000,
+-                                       4096,
+-                                       0,
+-                                       0,
+-                                       0))
++            value = { 'st_mode': 0o755 | stat.S_IFLNK,
++                      'st_ino': self.get_ino(path),
++                      'st_dev': 0,
++                      'st_nlink': 2,
++                      'st_uid': 1000,
++                      'st_gid': 1000,
++                      'st_size': 4096,
++                      'st_atime': 0,
++                      'st_mtime': 0,
++                      'st_ctime': 0 }
+         elif self.is_object(path):
+-            value = posix.stat_result((0o755 | stat.S_IFDIR,
+-                                       self.get_ino(path),
+-                                       0,
+-                                       2,
+-                                       1000,
+-                                       1000,
+-                                       4096,
+-                                       0,
+-                                       0,
+-                                       0))
++            value = { 'st_mode': 0o755 | stat.S_IFDIR,
++                      'st_ino': self.get_ino(path),
++                      'st_dev': 0,
++                      'st_nlink': 2,
++                      'st_uid': 1000,
++                      'st_gid': 1000,
++                      'st_size': 4096,
++                      'st_atime': 0,
++                      'st_mtime': 0,
++                      'st_ctime': 0 }
+         elif self.is_property(path):
+-            value = posix.stat_result((0o644 | stat.S_IFREG,
+-                                       self.get_ino(path),
+-                                       0,
+-                                       1,
+-                                       1000,
+-                                       1000,
+-                                       4096,
+-                                       0,
+-                                       0,
+-                                       0))
++            value = { 'st_mode': 0o644 | stat.S_IFREG,
++                      'st_ino': self.get_ino(path),
++                      'st_dev': 0,
++                      'st_nlink': 1,
++                      'st_uid': 1000,
++                      'st_gid': 1000,
++                      'st_size': 4096,
++                      'st_atime': 0,
++                      'st_mtime': 0,
++                      'st_ctime': 0 }
+         else:
+-            value = -ENOENT
++            raise FuseOSError(ENOENT)
+         return value
  
- static void test_visitor_in_alternate(TestInputVisitorData *data,
-@@ -690,7 +686,7 @@ static void test_list_union_integer_helper(TestInputVisitorData *data,
-                                            const void *unused,
-                                            UserDefListUnionKind kind)
- {
--    UserDefListUnion *cvalue = NULL;
-+    g_autoptr(UserDefListUnion) cvalue = NULL;
-     Visitor *v;
-     GString *gstr_list = g_string_new("");
-     GString *gstr_union = g_string_new("");
-@@ -782,7 +778,6 @@ static void test_list_union_integer_helper(TestInputVisitorData *data,
+-    def readdir(self, path, offset):
+-        yield fuse.Direntry('.')
+-        yield fuse.Direntry('..')
++    def readdir(self, path, fh):
++        yield '.'
++        yield '..'
+         for item in self.qmp.command('qom-list', path=path):
+-            yield fuse.Direntry(str(item['name']))
++            yield str(item['name'])
  
-     g_string_free(gstr_union, true);
-     g_string_free(gstr_list, true);
--    qapi_free_UserDefListUnion(cvalue);
- }
+ if __name__ == '__main__':
+     import os
  
- static void test_visitor_in_list_union_int(TestInputVisitorData *data,
-@@ -851,7 +846,7 @@ static void test_visitor_in_list_union_uint64(TestInputVisitorData *data,
- static void test_visitor_in_list_union_bool(TestInputVisitorData *data,
-                                             const void *unused)
- {
--    UserDefListUnion *cvalue = NULL;
-+    g_autoptr(UserDefListUnion) cvalue = NULL;
-     boolList *elem = NULL;
-     Visitor *v;
-     GString *gstr_list = g_string_new("");
-@@ -879,13 +874,12 @@ static void test_visitor_in_list_union_bool(TestInputVisitorData *data,
- 
-     g_string_free(gstr_union, true);
-     g_string_free(gstr_list, true);
--    qapi_free_UserDefListUnion(cvalue);
- }
- 
- static void test_visitor_in_list_union_string(TestInputVisitorData *data,
-                                               const void *unused)
- {
--    UserDefListUnion *cvalue = NULL;
-+    g_autoptr(UserDefListUnion) cvalue = NULL;
-     strList *elem = NULL;
-     Visitor *v;
-     GString *gstr_list = g_string_new("");
-@@ -914,7 +908,6 @@ static void test_visitor_in_list_union_string(TestInputVisitorData *data,
- 
-     g_string_free(gstr_union, true);
-     g_string_free(gstr_list, true);
--    qapi_free_UserDefListUnion(cvalue);
- }
- 
- #define DOUBLE_STR_MAX 16
-@@ -922,7 +915,7 @@ static void test_visitor_in_list_union_string(TestInputVisitorData *data,
- static void test_visitor_in_list_union_number(TestInputVisitorData *data,
-                                               const void *unused)
- {
--    UserDefListUnion *cvalue = NULL;
-+    g_autoptr(UserDefListUnion) cvalue = NULL;
-     numberList *elem = NULL;
-     Visitor *v;
-     GString *gstr_list = g_string_new("");
-@@ -957,7 +950,6 @@ static void test_visitor_in_list_union_number(TestInputVisitorData *data,
- 
-     g_string_free(gstr_union, true);
-     g_string_free(gstr_list, true);
--    qapi_free_UserDefListUnion(cvalue);
- }
- 
- static void input_visitor_test_add(const char *testpath,
-@@ -1253,7 +1245,7 @@ static void test_visitor_in_fail_alternate(TestInputVisitorData *data,
- static void do_test_visitor_in_qmp_introspect(TestInputVisitorData *data,
-                                               const QLitObject *qlit)
- {
--    SchemaInfoList *schema = NULL;
-+    g_autoptr(SchemaInfoList) schema = NULL;
-     QObject *obj = qobject_from_qlit(qlit);
-     Visitor *v;
- 
-@@ -1262,7 +1254,6 @@ static void do_test_visitor_in_qmp_introspect(TestInputVisitorData *data,
-     visit_type_SchemaInfoList(v, NULL, &schema, &error_abort);
-     g_assert(schema);
- 
--    qapi_free_SchemaInfoList(schema);
-     qobject_unref(obj);
-     visit_free(v);
- }
-diff --git a/scripts/qapi/types.py b/scripts/qapi/types.py
-index 3ad33af4ee..3640f17cd6 100644
---- a/scripts/qapi/types.py
-+++ b/scripts/qapi/types.py
-@@ -213,6 +213,7 @@ def gen_type_cleanup_decl(name):
-     ret = mcgen('''
- 
- void qapi_free_%(c_name)s(%(c_name)s *obj);
-+G_DEFINE_AUTOPTR_CLEANUP_FUNC(%(c_name)s, qapi_free_%(c_name)s)
- ''',
-                 c_name=c_name(name))
-     return ret
+-    fs = QOMFS(QEMUMonitorProtocol(os.environ['QMP_SOCKET']))
+-    fs.main(sys.argv)
++    fuse = FUSE(QOMFS(QEMUMonitorProtocol(os.environ['QMP_SOCKET'])),
++                sys.argv[1], foreground=True)
 -- 
 2.26.2
 
