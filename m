@@ -7,84 +7,84 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7145FC433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:53:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8473BC433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:55:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 290E0206A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:53:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B08B206A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:55:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TulSmbWF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 290E0206A5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R5lwGcXK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B08B206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDsUo-0005Hk-Av
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:53:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46584)
+	id 1kDsVw-0006fv-Hl
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:55:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDsTU-0003gr-Cp
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:52:36 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:38995)
+ id 1kDsUz-0005fl-3F
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:54:09 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:53358)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDsTS-00065R-FK
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:52:36 -0400
-Received: by mail-pf1-x444.google.com with SMTP id u128so2790120pfb.6
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 09:52:34 -0700 (PDT)
+ id 1kDsUw-0006FL-8s
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:54:08 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id k15so1829780pji.3
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 09:54:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=YGaZi7VgeTfvUZOm436eKpOQgjUIU1eNsEdcRl6xGS8=;
- b=TulSmbWFDr66EjIkaxFhZYSDpHGtziPSDsbkbYfz0+1Qt7qdZXrtq1cqecB/hid4oN
- bsdof4I52wTl1ZgGk3sVo3iGL7G6m5VJysD0fMYBB5e/CTjr2cKvHFZC4x+LhPVYEtfo
- g9qegheaRfIPYr1VSnViXJwxRIGHOLqMRGb/PRuD260V6zZ4Yahr00JxNNskOfGbBzbH
- GunekvMQ3zjUkD7hf6BEPTmnk4oYHfPtElVuXsA6Id86YvhZAyHzWcwwhaOwM3RssXcb
- xYi7vskqFWZgjkZyIXRyS2/rXw4FcEzzqoL7Z0ecfkgA//YIbiMImd0GSXzK9t05Fyfx
- JXew==
+ bh=fC0PV6j8015hkE+E7XkRSfLSCaiCAfjaNDXl1ihZU+8=;
+ b=R5lwGcXKZSkM23bWPXqTFbI1/3CvG2bsD/DixS3RKhRfQmkgGgt0N93kxRGQFGhkTb
+ 1MXsxajA6uaa26yTfiS3Fu/qEaPlSeWcKfSASusJhuKHaEwr5J3/Oka0QjUv2GqlQphA
+ VU5DXQoXCp/4uNGHjVbUhoL0BAg6J027Na10CgcrNfygzW2EZ5lnG7iBcgLyM8LmFkMf
+ 8Kh42TN9tdO2gT9dx3Lef+NKaws+SWtGTt8uKSHjwCtGZomNGLkLzsjOlQBAjbhi2AJy
+ Wl0SkhYhoIeTmX7Mn0CsifbYFqqjRPr9VKEiSzvZW1TFJchZVBhtTZdnl6fB89THnx0D
+ eMVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=YGaZi7VgeTfvUZOm436eKpOQgjUIU1eNsEdcRl6xGS8=;
- b=ZEzTRCv5LAXrvtcSLyghyKWu5d5wTruy8daAUMY8r9s2eVpxwz5x/oGmpn2sXZ0Tsz
- 8jBqTy/anhIxZaAMEdG0tuPBPH7EMCbsMyemAssyOZSc4EOEqwwffq6UxfEoSmMDvYil
- SEtxMe2EXeQgi6YebTIDrXfZo/d9kmFCc8oxLTf7ZoGi2xxKnfBwU6NR5KLHSqHgrzAv
- bz2M5doQe/7R/ZPeIDhHd9ubfxPGr0z5K8P5PkeXwvvCAHsDbVkgSH00Wa5EF8GQSAeg
- +ssHu/VtQKaSEJlD29Jo48l9rXq1NXMRMbIJQweUc9vA8WILFqTSVFWGIqrhnl4+FU54
- uYxA==
-X-Gm-Message-State: AOAM532j7iO09Da+EyaVx/FW60al876Ff7WKrcyG1g24Mga2lWpVhWKW
- k53/yJn0n4awXZCZK7auLVMDTA==
-X-Google-Smtp-Source: ABdhPJwAh+iLU2CQS3CeEy3rY8XBQWg1kddH1qN5hYASOnc30LuoqfKM9Z0a9x4IMKPzGn8LjXkfUg==
-X-Received: by 2002:a63:110c:: with SMTP id g12mr3543941pgl.91.1599151953049; 
- Thu, 03 Sep 2020 09:52:33 -0700 (PDT)
+ bh=fC0PV6j8015hkE+E7XkRSfLSCaiCAfjaNDXl1ihZU+8=;
+ b=Ugad03c4eHm5ezo/KcSei8MfXLywN+trtp4LC+Q92a6CjkAg/bv+tjKfjxFKSIpMZN
+ CXWEFF4Y+PZo98gMOHb2SNsdhgp9L5MN80Zu1BR/18M3hceZnJFD266qVpWEoI0AEzUu
+ JG6cvm3ul90bOMuCLb98tTGxgO90pM7P9yLhy6XFiONMwGM3e0Z3dOblkv4BQJC8HrDO
+ aoCIA/M+tsHs/1/3o0B+q0lNDDpT76lt/v+swBLKC2+B1nS6p2NqktDRppp8HuKkfC4G
+ /PytpP9aMoC61ZdrY6XVAvuX2X9NEPtF3eQ4qzeurur0CUAgk8/CdrYlIrviUbCdITEF
+ YuTA==
+X-Gm-Message-State: AOAM532WkbB5lvdGSrsL3O+sgU6TqIY0pjUL+p5SnFwPiPWxwE/eKlVu
+ QeBakX4bQVgCXZiGLgfcTfJZyg==
+X-Google-Smtp-Source: ABdhPJzMvAp7ZrA006Nor+dGPbF8JB0SkysJ8fg5kPyLvxMgL0WG6/O4kalzNAbNc8kO7efeyDDg+Q==
+X-Received: by 2002:a17:90b:183:: with SMTP id t3mr3927946pjs.21.1599152045042; 
+ Thu, 03 Sep 2020 09:54:05 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id k5sm3097600pjq.5.2020.09.03.09.52.31
+ by smtp.gmail.com with ESMTPSA id j19sm1173616pfe.202.2020.09.03.09.54.03
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 09:52:32 -0700 (PDT)
-Subject: Re: [PATCH v6 4/8] util: refactor qemu_open_old to split off variadic
- args handling
+ Thu, 03 Sep 2020 09:54:04 -0700 (PDT)
+Subject: Re: [PATCH v6 6/8] util: introduce qemu_open and qemu_create with
+ error reporting
 To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200903152210.1917355-1-berrange@redhat.com>
- <20200903152210.1917355-5-berrange@redhat.com>
+ <20200903152210.1917355-7-berrange@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <0fd4036b-d3c3-5bac-4ae4-64ce598880c5@linaro.org>
-Date: Thu, 3 Sep 2020 09:52:29 -0700
+Message-ID: <1b3f7dfb-f5fc-9815-08e6-b7de0f2b107e@linaro.org>
+Date: Thu, 3 Sep 2020 09:54:01 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200903152210.1917355-5-berrange@redhat.com>
+In-Reply-To: <20200903152210.1917355-7-berrange@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -44
@@ -115,14 +115,25 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/3/20 8:22 AM, Daniel P. Berrangé wrote:
-> This simple refactoring prepares for future patches. The variadic args
-> handling is split from the main bulk of the open logic.
+> qemu_open_old() works like open(): set errno and return -1 on failure.
+> It has even more failure modes, though.  Reporting the error clearly
+> to users is basically impossible for many of them.
+> 
+> Our standard cure for "errno is too coarse" is the Error object.
+> Introduce two new helper methods:
+> 
+>   int qemu_open(const char *name, int flags, Error **errp);
+>   int qemu_create(const char *name, int flags, mode_t mode, Error **errp);
+> 
+> Note that with this design we no longer require or even accept the
+> O_CREAT flag. Avoiding overloading the two distinct operations
+> means we can avoid variable arguments which would prevent 'errp' from
+> being the last argument. It also gives us a guarantee that the 'mode' is
+> given when creating files, avoiding a latent security bug.
 > 
 > Reviewed-by: Markus Armbruster <armbru@redhat.com>
 > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
 > ---
->  util/osdep.c | 24 +++++++++++++++++-------
->  1 file changed, 17 insertions(+), 7 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
