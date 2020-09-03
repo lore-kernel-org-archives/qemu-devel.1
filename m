@@ -2,80 +2,84 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFB84C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 17:29:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15382C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 17:29:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 99E5720716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 17:29:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D425620716
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 17:29:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A4R1ADeV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99E5720716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LyC+W766"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D425620716
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57244 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDt2i-0002Pc-OD
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 13:29:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55490)
+	id 1kDt2l-0002Vu-09
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 13:29:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kDt1x-0000p2-Gy; Thu, 03 Sep 2020 13:28:13 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42742)
+ id 1kDt20-0000v2-Vh; Thu, 03 Sep 2020 13:28:16 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52779)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kDt1v-0002V5-KF; Thu, 03 Sep 2020 13:28:13 -0400
-Received: by mail-wr1-x444.google.com with SMTP id c18so4068752wrm.9;
- Thu, 03 Sep 2020 10:28:10 -0700 (PDT)
+ id 1kDt1z-0002Vw-Be; Thu, 03 Sep 2020 13:28:16 -0400
+Received: by mail-wm1-x341.google.com with SMTP id q9so3682039wmj.2;
+ Thu, 03 Sep 2020 10:28:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=MaYvDpYA/q1gHW4bD3RmC39zVROC6oAwV/mFF935mOk=;
- b=A4R1ADeVqpDDM6cYNxZfbffyJcUga2yXAfFk0JhtGCPzRjJ22uVpFCfE8zDbQ3ETc9
- NMGjg1P0ZrPRfiYybGTYrdYUTXBvIe+0+9biwOgVJg9nV0lyU+LuqZxBg3BD2sNllryU
- kP6rhep2jcEEajTQfvJcqyKoHzqszqdHLTQBDJuWDazruJX6IubE8Q2CURdfpWbScIol
- 22rFQRJ+VhftqKc1HJMN6YLZv9A/cdldlTrmez4w4Jtx9KoAb3P30srdFww2At8+Gbpz
- 6ks5dSrD3cEGOuFmHgljCsCQh9nQe1VXyNqVaE5aFHYjq9xtPgJxchEs5Or1JQOJvQXS
- uhrQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=91f5lKKcpgYukroYyk+ZgX5AZVtjLWpe85jPZGy47cQ=;
+ b=LyC+W766N/SwxeuWQWdZT0GanuQ0dc5ctaDpI91uj2h7ZqfZa7yANoCBSVdqndSr68
+ S6zx4CtfamtXLOxPkLiMmCxtbcEEvSXqLBTE2fDIpXWXBR/6grDvpUHTLMZuOSo1jBET
+ uYqLawQbCL4xH5ZFvWifVnQqE3d1ZHzqhe2v6WPJOZb0lzpmYb12xucEREg69PFPE9MH
+ SnC4DVAH8pUlkl6Tr1QGKqTib/mj1fwYIuVnMHIlY5uSyQfc9+LfG/VPOM6nczxWGCxa
+ bq1PlXmWZJ3hKzaql7SvzgVrHRgIfO1IbNKLPGXAfMxFW6tB7x4XG174loooTZrKfyo9
+ zXow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=MaYvDpYA/q1gHW4bD3RmC39zVROC6oAwV/mFF935mOk=;
- b=InIjcoCI9OpwlbrqdusRKWlawAiYn2l5gSkMsEjRfQbVr0T1gX2/yLELsd0JnLkTKf
- ZZqhlFQhPDRy95dzf5mJ3FewfK9SJMXf+AC1ZEzO/K7rjalKlAXsujsJzUemI/fmJDrU
- T7Pwp5JblckPsRQ2X7rxv3j9A5/RjH2MmPyyfzgPZ/iYW8CIZuCicAVjl5D1jBEjQlJ0
- qT1I1j6OWfCEcRSDO4IYYUGddGprxeUXFRdPyVZMuIh+huUZp1Im6cLT3l7BZbzBZgdk
- v/oCCVViPY/UIYbJfJwT615ntIgj55b/K0/ePNAFkHlCP3vVJcVtbUUlBlwJG50Onco6
- rfdw==
-X-Gm-Message-State: AOAM530hoXu2jqvgsu0syBlOUjmuJYuNQcoCgaZ9KniHoWnaLck2JMtP
- PN4no/1Q//7HE/bN5eM7uASxd2KNVsI=
-X-Google-Smtp-Source: ABdhPJzUIO97wpLKF8Q5DSWpRv4UTvYhrePm//2Sgj72sU4ZVAJ5n2MhDqxlbX+P7fioJaOATuWIpw==
-X-Received: by 2002:adf:f011:: with SMTP id j17mr3376770wro.335.1599154088909; 
- Thu, 03 Sep 2020 10:28:08 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=91f5lKKcpgYukroYyk+ZgX5AZVtjLWpe85jPZGy47cQ=;
+ b=JBA8TNHtpjFiC6AAu18xghJull1m+1E58bqG3DJqKLnrg275/Aj1UrQRqZLnvQd3CY
+ JHmJVROlWqbjQSFBSx5I9A8cFBESHcjKQLQN1Hl2inwnPyMjSExkt2pjEpwLBwLHyjBa
+ b6Hyyt9yMCWYUsfkFmsH73BJrC38TrAHTx4lilXDReHI6vczFiyz2LKTbAYi3yteK75B
+ VX6/ndav5fm5Ztn7EXY0OanhdaFOTj2NcEXr3DVtibSU8wXWstUQAtoSBPsYJuu4Rvca
+ hNBWlVO50zyo4v01h7qv/HSvBVlkhxZvwbmldT1m4goN5oTpDdL/WcTharmWHCjLageD
+ CC+Q==
+X-Gm-Message-State: AOAM533XKw2tD3ceqJ/Qp9lQShHUJkVSHNYI4QUi9UP3hNCnzt0WKTC/
+ KAPP0V+X9lulA098BAdb8RavuAFaK0w=
+X-Google-Smtp-Source: ABdhPJwfftNG6J6/XNPMEoDaI4gmXsDzgz1Hq9VnvdZ78H87d5DMluA8RToDucGlDNCoK9YKMmaU+A==
+X-Received: by 2002:a1c:6a08:: with SMTP id f8mr1779631wmc.151.1599154092897; 
+ Thu, 03 Sep 2020 10:28:12 -0700 (PDT)
 Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id b2sm5325802wmh.47.2020.09.03.10.28.07
+ by smtp.gmail.com with ESMTPSA id b2sm5325802wmh.47.2020.09.03.10.28.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 10:28:07 -0700 (PDT)
+ Thu, 03 Sep 2020 10:28:12 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/4] hw/sd/sdhci: Strengthen multiple DMA transfers
-Date: Thu,  3 Sep 2020 19:28:02 +0200
-Message-Id: <20200903172806.489710-1-f4bug@amsat.org>
+Subject: [PATCH 3/4] hw/sd/sdhci: Let sdhci_update_irq() return if IRQ was
+ delivered
+Date: Thu,  3 Sep 2020 19:28:05 +0200
+Message-Id: <20200903172806.489710-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200903172806.489710-1-f4bug@amsat.org>
+References: <20200903172806.489710-1-f4bug@amsat.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -106,22 +110,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Still trying to fix the bugs reported by Aleksander...
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/sd/sdhci.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-- Do not send 0 block count
-- Reduce DMA to MMIO re-entrancy by yielding when pending IRQ
-
-Based-on: <20200901140411.112150-1-f4bug@amsat.org>
-
-Philippe Mathieu-Daudé (4):
-  hw/sd/sdhci: Stop multiple transfers when block count is cleared
-  hw/sd/sdhci: Resume pending DMA transfers on MMIO accesses
-  hw/sd/sdhci: Let sdhci_update_irq() return if IRQ was delivered
-  hw/sd/sdhci: Yield if interrupt delivered during multiple transfer
-
- hw/sd/sdhci.c | 35 +++++++++++++++++++++++++++++++----
- 1 file changed, 31 insertions(+), 4 deletions(-)
-
+diff --git a/hw/sd/sdhci.c b/hw/sd/sdhci.c
+index 2b197631870..06cb098036c 100644
+--- a/hw/sd/sdhci.c
++++ b/hw/sd/sdhci.c
+@@ -215,9 +215,14 @@ static uint8_t sdhci_slotint(SDHCIState *s)
+          ((s->norintsts & SDHC_NIS_REMOVE) && (s->wakcon & SDHC_WKUP_ON_RMV));
+ }
+ 
+-static inline void sdhci_update_irq(SDHCIState *s)
++/* Return true if IRQ was pending and delivered */
++static bool sdhci_update_irq(SDHCIState *s)
+ {
+-    qemu_set_irq(s->irq, sdhci_slotint(s));
++    bool pending = sdhci_slotint(s);
++
++    qemu_set_irq(s->irq, pending);
++
++    return pending;
+ }
+ 
+ static void sdhci_raise_insertion_irq(void *opaque)
 -- 
 2.26.2
 
