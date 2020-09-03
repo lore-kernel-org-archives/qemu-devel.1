@@ -4,76 +4,76 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33D38C43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:34:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF30C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:34:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB62B206E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:34:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9FB02206D4
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:34:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SiVmbdyJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB62B206E7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KWXFWA8h"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FB02206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwrw-0001lh-4M
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:34:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58508)
+	id 1kDwsG-0002UQ-QX
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:34:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLE-0003x1-1U; Thu, 03 Sep 2020 17:00:20 -0400
-Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:45655)
+ id 1kDwLM-00040K-Cu; Thu, 03 Sep 2020 17:00:30 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:37566)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLB-0007Yp-QV; Thu, 03 Sep 2020 17:00:18 -0400
-Received: by mail-oo1-xc41.google.com with SMTP id u28so1121631ooe.12;
- Thu, 03 Sep 2020 14:00:16 -0700 (PDT)
+ id 1kDwLI-0007eh-Qc; Thu, 03 Sep 2020 17:00:27 -0400
+Received: by mail-oi1-x244.google.com with SMTP id e6so4528173oii.4;
+ Thu, 03 Sep 2020 14:00:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=D8aV+SuTlrxPWeHJfsFhm4DwE+6NojdwAEJTWEzO0A0=;
- b=SiVmbdyJCkYwEnqKlOkKlofmyUmNpBwRV+8sI/tp1iCMcE1QLrGoUlBSonJMW5kmge
- FUMlWCazFVqHDdnemiN3nzAU4xDI9p/ffSxDEtlq42E+ttUOZ0dWZAV13XjjERkkCF3j
- U8KDeb4AdSYGC93HrpF0UiSsUtEmlt4k2m+Kh/H+SvvgVP4wlhZqQeNPzQQxmCCgsP2h
- LtrbIji8IPUHaymkRxLiajJEXSzjuzCOrRgZl+I1vtyUV9dLuxwy/K1ursyUc0QdlER3
- R2NX4wuac27bLNRm5tNv2okc1824Ebn9pWldVCR/4wBCKCPi1nRH0dtOBmZBlAyvwXIZ
- l75w==
+ bh=6r9u0nklxBNegI6NxrGJn+A8hZD/QGA53VvgRXsDcyg=;
+ b=KWXFWA8hj94/SWqn/xbLuHS1H9UAOa+m7lre17CIgN8saTbSwxAw3Yas7iMEWF26s/
+ 0CZxC5QDw4DZvc1MmeH/o8p6eDm28iJR5Zooz2/G2VBzZy+uCgWtMbKHv1WhLs1ZJs/4
+ uhQIzyrlBStx+jMvZirgwgfxeGQW8wfsrL1J8+z9yvoRyAsnjkYKmeeDOKqzGu7k8EHI
+ KGGwgConXzb9hbaaZJEMX+gjEJlgE9Vz4VrF+1A5BA7w5iuAEYts1vLCyqYKLN19vajX
+ edkQre34dloPQcQBqy4fVnmAZgWY2bg9ZHqPwVv/6cnolONvlqs6tIHPa5OQ5YXwvoJL
+ jFfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=D8aV+SuTlrxPWeHJfsFhm4DwE+6NojdwAEJTWEzO0A0=;
- b=H/pPPhs+6d6mYhhu3Pc1y18BS4lvBkDtG8scBeV4IwKiSyQ2Yx4G3dkGcDLODTJYs4
- x+bd94Ud1/CaaAy5lPda2j63uAwzQ631YqJOTCB41SHB/lbO46hOENAcKzae7ASHgj24
- ARpLSSTZdnvDQsHDIBfOnk2IFPBIaXII84m1xKq1Y9RMiPpM7so+Op8Y37lDZFCiF9/t
- bnyCN5TYYVzcLd5zN6PlDraK/prCHvva84aasLMWSujb0/Nd2RkGkpAcuQe/dynNtU0p
- 0l+qf1tgZvEiWRunDWwBJVLAlVeV1CjrANpWLpMWDfNprFOa1aJ4Hqtqc1yE5qlXjG6x
- ogIQ==
-X-Gm-Message-State: AOAM530vLcbqfRyuyfncQ9oQXXtToc7I6IrTrCkTwLAVmxFeSjAmt64w
- 3TAxIDg5CHgjM+xlREJuYunUihByFGw=
-X-Google-Smtp-Source: ABdhPJwqM43KFDWLqHXcy+anFG9U/WavwYDpAHIJ/emuYFoKHpw0km50yaM2V0T5zOWmvci/y8jFsw==
-X-Received: by 2002:a4a:aa0e:: with SMTP id x14mr3282896oom.27.1599166815905; 
- Thu, 03 Sep 2020 14:00:15 -0700 (PDT)
+ bh=6r9u0nklxBNegI6NxrGJn+A8hZD/QGA53VvgRXsDcyg=;
+ b=majznx8yco2ZDnDkL0TiIoHef9OCp0Zt19ESRMY5HNXY0FmA8h28Sk2BsrkUlb5L2Z
+ 9OokvRyOKZAC5wUNMzmjB2d3lwg6Mz94KMMJSrxYUY+xe/qH9HKeIKzfW5obI5XWTZXC
+ R38IPicZO6NMaKOZZaNp6Weaer+Ydc9YdSnxFVmJ+d6kJ2XozVqQj8YtoSsnOI9GqpY4
+ poRfH4mpRDtQN/e27gcxJclcNsXx0xkt/93ShLjLUGcLQkUDZdD0BzIb+HpQDYGzsd4R
+ WLHwxVgSmbYvQhDqHwxu4foT1m66EJ1u3dQsaX+rdEdfuxELa1htNzaYAZqQ8IEFRNEq
+ cVkg==
+X-Gm-Message-State: AOAM533+nEXmu+8bFewjqEQ8HabNKaxp/JYs6sdIS9YSENVpCuDb2qgC
+ ptytdM+QYkJbxbIgqqQGSiZ3v/kaLyY=
+X-Google-Smtp-Source: ABdhPJykNqvtwFfgk7fq7JGgjho3xrw+T0BCycsxkMlAa5tFID4os47Q4XalaeEpGLqWbi1AQluqSQ==
+X-Received: by 2002:a54:4704:: with SMTP id k4mr2708157oik.78.1599166822706;
+ Thu, 03 Sep 2020 14:00:22 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id l63sm711626oia.56.2020.09.03.14.00.15
+ by smtp.gmail.com with ESMTPSA id p9sm759437oti.22.2020.09.03.14.00.21
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:15 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:22 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 28/77] libqos: pci-pc: use 32-bit write for EJ register
-Date: Thu,  3 Sep 2020 15:58:46 -0500
-Message-Id: <20200903205935.27832-29-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 33/77] hw/display/artist: Unbreak size mismatch memory accesses
+Date: Thu,  3 Sep 2020 15:58:51 -0500
+Message-Id: <20200903205935.27832-34-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
- envelope-from=flukshun@gmail.com; helo=mail-oo1-xc41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -96,36 +96,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-stable@nongnu.org
+Cc: Helge Deller <deller@gmx.de>, Sven Schnelle <svens@stackframe.org>,
+ qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Helge Deller <deller@gmx.de>
 
-The memory region ops have min_access_size == 4 so obey it.
+Commit 5d971f9e6725 ("memory: Revert "memory: accept mismatching sizes
+in memory_region_access_valid") broke the artist driver in a way that
+the dtwm window manager on HP-UX rendered wrong.
 
-Tested-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-(cherry picked from commit 4b7c06837ae0b1ff56473202a42e7e386f53d6db)
+Fixes: 5d971f9e6725 ("memory: Revert "memory: accept mismatching sizes in memory_region_access_valid")
+Signed-off-by: Sven Schnelle <svens@stackframe.org>
+Signed-off-by: Helge Deller <deller@gmx.de>
+(cherry picked from commit e0cf02ce680f11893aca9642e76d6ae68b9375af)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- tests/qtest/libqos/pci-pc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/display/artist.c | 12 ++++--------
+ 1 file changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/tests/qtest/libqos/pci-pc.c b/tests/qtest/libqos/pci-pc.c
-index 0bc591d1da..3bb2eb3ba8 100644
---- a/tests/qtest/libqos/pci-pc.c
-+++ b/tests/qtest/libqos/pci-pc.c
-@@ -186,7 +186,7 @@ void qpci_unplug_acpi_device_test(QTestState *qts, const char *id, uint8_t slot)
-     g_assert(!qdict_haskey(response, "error"));
-     qobject_unref(response);
+diff --git a/hw/display/artist.c b/hw/display/artist.c
+index 753dbb9a77..d7bce918b8 100644
+--- a/hw/display/artist.c
++++ b/hw/display/artist.c
+@@ -1199,20 +1199,16 @@ static const MemoryRegionOps artist_reg_ops = {
+     .read = artist_reg_read,
+     .write = artist_reg_write,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+-    .valid = {
+-        .min_access_size = 1,
+-        .max_access_size = 4,
+-    },
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
+ };
  
--    qtest_outb(qts, ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
-+    qtest_outl(qts, ACPI_PCIHP_ADDR + PCI_EJ_BASE, 1 << slot);
+ static const MemoryRegionOps artist_vram_ops = {
+     .read = artist_vram_read,
+     .write = artist_vram_write,
+     .endianness = DEVICE_NATIVE_ENDIAN,
+-    .valid = {
+-        .min_access_size = 1,
+-        .max_access_size = 4,
+-    },
++    .impl.min_access_size = 1,
++    .impl.max_access_size = 4,
+ };
  
-     qtest_qmp_eventwait(qts, "DEVICE_DELETED");
- }
+ static void artist_draw_cursor(ARTISTState *s)
 -- 
 2.17.1
 
