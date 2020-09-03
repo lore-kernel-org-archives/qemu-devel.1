@@ -7,42 +7,43 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B13BC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:03:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 688E9C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:03:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0EA5720767
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:03:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0EA5720767
+	by mail.kernel.org (Postfix) with ESMTPS id 299F020767
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:03:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 299F020767
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35950 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDn1h-0006KJ-VX
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:03:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59380)
+	id 1kDn1r-0006WO-4n
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:03:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59436)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmuz-0003IN-V0
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:37 -0400
-Received: from mx2.suse.de ([195.135.220.15]:48990)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmv3-0003O2-Og
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:41 -0400
+Received: from mx2.suse.de ([195.135.220.15]:49098)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmuy-0004Yy-3v
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:37 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmv2-0004Zq-1I
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:41 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 50DC4B6A9;
- Thu,  3 Sep 2020 10:56:25 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id 9FCF6B6B3;
+ Thu,  3 Sep 2020 10:56:28 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [PATCH v7 11/16] cpus: remove checks for non-NULL cpus_accel
-Date: Thu,  3 Sep 2020 12:56:09 +0200
-Message-Id: <20200903105614.17772-12-cfontana@suse.de>
+Subject: [PATCH v7 16/16] kvm: remove kvm specific functions from global
+ includes
+Date: Thu,  3 Sep 2020 12:56:14 +0200
+Message-Id: <20200903105614.17772-17-cfontana@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200903105614.17772-1-cfontana@suse.de>
 References: <20200903105614.17772-1-cfontana@suse.de>
@@ -81,105 +82,95 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-now that all accelerators support the CpusAccel interface,
-we can remove most checks for non-NULL cpus_accel,
-we just add a sanity check/assert at vcpu creation.
-
 Signed-off-by: Claudio Fontana <cfontana@suse.de>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- softmmu/cpus.c | 33 +++++++++++++++++++++------------
- 1 file changed, 21 insertions(+), 12 deletions(-)
+ accel/kvm/kvm-cpus.h   |  7 +++++++
+ accel/stubs/kvm-stub.c | 22 ----------------------
+ include/sysemu/kvm.h   |  7 -------
+ 3 files changed, 7 insertions(+), 29 deletions(-)
 
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index 3d8350fba9..f32ecb4bb9 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -166,34 +166,46 @@ void cpu_synchronize_all_pre_loadvm(void)
+diff --git a/accel/kvm/kvm-cpus.h b/accel/kvm/kvm-cpus.h
+index 547fbee111..60c5a554c2 100644
+--- a/accel/kvm/kvm-cpus.h
++++ b/accel/kvm/kvm-cpus.h
+@@ -14,4 +14,11 @@
  
- void cpu_synchronize_state(CPUState *cpu)
+ extern const CpusAccel kvm_cpus;
+ 
++int kvm_init_vcpu(CPUState *cpu);
++int kvm_cpu_exec(CPUState *cpu);
++void kvm_destroy_vcpu(CPUState *cpu);
++void kvm_cpu_synchronize_post_reset(CPUState *cpu);
++void kvm_cpu_synchronize_post_init(CPUState *cpu);
++void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
++
+ #endif /* KVM_CPUS_H */
+diff --git a/accel/stubs/kvm-stub.c b/accel/stubs/kvm-stub.c
+index 69f8a842da..680e099463 100644
+--- a/accel/stubs/kvm-stub.c
++++ b/accel/stubs/kvm-stub.c
+@@ -32,15 +32,6 @@ bool kvm_readonly_mem_allowed;
+ bool kvm_ioeventfd_any_length_allowed;
+ bool kvm_msi_use_devid;
+ 
+-void kvm_destroy_vcpu(CPUState *cpu)
+-{
+-}
+-
+-int kvm_init_vcpu(CPUState *cpu)
+-{
+-    return -ENOSYS;
+-}
+-
+ void kvm_flush_coalesced_mmio_buffer(void)
  {
--    if (cpus_accel && cpus_accel->synchronize_state) {
-+    if (cpus_accel->synchronize_state) {
-         cpus_accel->synchronize_state(cpu);
-     }
+ }
+@@ -49,19 +40,6 @@ void kvm_cpu_synchronize_state(CPUState *cpu)
+ {
  }
  
- void cpu_synchronize_post_reset(CPUState *cpu)
+-void kvm_cpu_synchronize_post_reset(CPUState *cpu)
+-{
+-}
+-
+-void kvm_cpu_synchronize_post_init(CPUState *cpu)
+-{
+-}
+-
+-int kvm_cpu_exec(CPUState *cpu)
+-{
+-    abort();
+-}
+-
+ bool kvm_has_sync_mmu(void)
  {
--    if (cpus_accel && cpus_accel->synchronize_post_reset) {
-+    if (cpus_accel->synchronize_post_reset) {
-         cpus_accel->synchronize_post_reset(cpu);
-     }
- }
+     return false;
+diff --git a/include/sysemu/kvm.h b/include/sysemu/kvm.h
+index f166aa5260..5de1166a64 100644
+--- a/include/sysemu/kvm.h
++++ b/include/sysemu/kvm.h
+@@ -222,10 +222,6 @@ int kvm_has_many_ioeventfds(void);
+ int kvm_has_gsi_routing(void);
+ int kvm_has_intx_set_mask(void);
  
- void cpu_synchronize_post_init(CPUState *cpu)
- {
--    if (cpus_accel && cpus_accel->synchronize_post_init) {
-+    if (cpus_accel->synchronize_post_init) {
-         cpus_accel->synchronize_post_init(cpu);
-     }
- }
+-int kvm_init_vcpu(CPUState *cpu);
+-int kvm_cpu_exec(CPUState *cpu);
+-void kvm_destroy_vcpu(CPUState *cpu);
+-
+ /**
+  * kvm_arm_supports_user_irq
+  *
+@@ -485,9 +481,6 @@ int kvm_physical_memory_addr_from_host(KVMState *s, void *ram_addr,
+ #endif /* NEED_CPU_H */
  
- void cpu_synchronize_pre_loadvm(CPUState *cpu)
- {
--    if (cpus_accel && cpus_accel->synchronize_pre_loadvm) {
-+    if (cpus_accel->synchronize_pre_loadvm) {
-         cpus_accel->synchronize_pre_loadvm(cpu);
-     }
- }
+ void kvm_cpu_synchronize_state(CPUState *cpu);
+-void kvm_cpu_synchronize_post_reset(CPUState *cpu);
+-void kvm_cpu_synchronize_post_init(CPUState *cpu);
+-void kvm_cpu_synchronize_pre_loadvm(CPUState *cpu);
  
- int64_t cpus_get_virtual_clock(void)
- {
-+    /*
-+     * XXX
-+     *
-+     * need to check that cpus_accel is not NULL, because qcow2 calls
-+     * qemu_get_clock_ns(CLOCK_VIRTUAL) without any accel initialized and
-+     * with ticks disabled in some io-tests:
-+     * 030 040 041 060 099 120 127 140 156 161 172 181 191 192 195 203 229 249 256 267
-+     *
-+     * is this expected?
-+     *
-+     * XXX
-+     */
-     if (cpus_accel && cpus_accel->get_virtual_clock) {
-         return cpus_accel->get_virtual_clock();
-     }
-@@ -207,7 +219,7 @@ int64_t cpus_get_virtual_clock(void)
-  */
- int64_t cpus_get_elapsed_ticks(void)
- {
--    if (cpus_accel && cpus_accel->get_elapsed_ticks) {
-+    if (cpus_accel->get_elapsed_ticks) {
-         return cpus_accel->get_elapsed_ticks();
-     }
-     return cpu_get_ticks();
-@@ -399,7 +411,7 @@ void cpus_kick_thread(CPUState *cpu)
- void qemu_cpu_kick(CPUState *cpu)
- {
-     qemu_cond_broadcast(cpu->halt_cond);
--    if (cpus_accel && cpus_accel->kick_vcpu_thread) {
-+    if (cpus_accel->kick_vcpu_thread) {
-         cpus_accel->kick_vcpu_thread(cpu);
-     } else { /* default */
-         cpus_kick_thread(cpu);
-@@ -573,12 +585,9 @@ void qemu_init_vcpu(CPUState *cpu)
-         cpu_address_space_init(cpu, 0, "cpu-memory", cpu->memory);
-     }
+ void kvm_init_cpu_signals(CPUState *cpu);
  
--    if (cpus_accel) {
--        /* accelerator already implements the CpusAccel interface */
--        cpus_accel->create_vcpu_thread(cpu);
--    } else {
--        g_assert_not_reached();
--    }
-+    /* accelerators all implement the CpusAccel interface */
-+    g_assert(cpus_accel != NULL && cpus_accel->create_vcpu_thread != NULL);
-+    cpus_accel->create_vcpu_thread(cpu);
- 
-     while (!cpu->created) {
-         qemu_cond_wait(&qemu_cpu_cond, &qemu_global_mutex);
 -- 
 2.26.2
 
