@@ -7,94 +7,94 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D23C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:21:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF659C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:29:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEB22206C0
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:21:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 898C1206C0
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 09:29:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XFwvP2cY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEB22206C0
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="PhrNJNI7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 898C1206C0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33468 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDlRA-0004t4-3F
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 05:21:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36986)
+	id 1kDlYX-0006ix-LU
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 05:29:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kDlQD-0003tk-4Q
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:20:45 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:48246)
+ id 1kDlXy-0006Id-De
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:28:46 -0400
+Received: from aserp2120.oracle.com ([141.146.126.78]:33934)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kDlQB-00080J-4E
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:20:44 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
- by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0839FBAn044558;
- Thu, 3 Sep 2020 09:20:39 GMT
+ id 1kDlXs-0000Kn-KG
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 05:28:45 -0400
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+ by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0839OOh2135360;
+ Thu, 3 Sep 2020 09:28:36 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : in-reply-to : references : date : message-id : mime-version :
  content-type; s=corp-2020-01-29;
- bh=J3AjharIWio8HH3ZC4GWfZLdP0bg8iidapeVSomeYFs=;
- b=XFwvP2cYLwq/+b2+6mnWEtQxAHSBXzWg9hYZyG41SFdXUpLgw2b+0jipWCrYcIyZGUJy
- fJ5XErNN/womKxtoqbLBneswSRBz06kk5UBgDzsr4GQJIDcc/GFYwxZiHd+DS/Fp5dym
- +D1uNLz9cBWuIWMrH6hk62NkItvWyZsu3TzBGIPX4v2Y4VG9QxmJhCRgJ9v6QXZqNGtm
- vdeEO1ELwAx3P/XhzvGO7GcWmUoSzUmXNmceA+1reXOuELNvF+BY6016upvKoc659B3k
- grlb+oJzKKWaFAQaM3Q5JVAcpYepqgvjwBeqhD70bV107V/6h0DFogDTtZQPKih10oqw SQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by userp2130.oracle.com with ESMTP id 337eer7nyp-1
+ bh=Pfmp9WOY1Dw3f9z7FXh5Vy+/ZjrVDnNaoTKC13v5PHI=;
+ b=PhrNJNI7nZbNCsBdS6QbW2UTvBzS/Jif7AOt7mzGL8Jj1AEq6E+mDOU6OTTvxHhU7ZWO
+ J0ivuusTOiwg6jhZbflbQCMEHN6+oUHH49T96iiGTeB4MF5DCHwgoggZe056cVgVjqM7
+ qoHAVldTn6sWdTuGFqbbRoAty4CnLICroc1izyG34CwPQ31MhApad4kI2f0mL1igIqBT
+ 8lhevGzY8GXQqkgADwCOd0zf1chjNuVjGrpPVtq2YSmDjVtWQdy8mpu55Qvl6DsDmJ7r
+ /E/gem1tR/ZkfJHhQQtrPsGqSmMlHTMva8tBcziJURGaJKqd9/zDuDGY7eoByjmbKsZh Hw== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+ by aserp2120.oracle.com with ESMTP id 337eymfkxf-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 03 Sep 2020 09:20:39 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0839AmOZ153756;
- Thu, 3 Sep 2020 09:20:38 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3020.oracle.com with ESMTP id 3380x9cveb-1
+ Thu, 03 Sep 2020 09:28:36 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+ by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0839PWcc043652;
+ Thu, 3 Sep 2020 09:28:35 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+ by aserp3030.oracle.com with ESMTP id 3380krf619-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 03 Sep 2020 09:20:38 +0000
-Received: from abhmp0011.oracle.com (abhmp0011.oracle.com [141.146.116.17])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 0839KcrN002523;
- Thu, 3 Sep 2020 09:20:38 GMT
+ Thu, 03 Sep 2020 09:28:35 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+ by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0839SXfe003300;
+ Thu, 3 Sep 2020 09:28:33 GMT
 Received: from starbug-mbp.localdomain (/79.97.215.145)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 03 Sep 2020 02:20:37 -0700
+ with ESMTP ; Thu, 03 Sep 2020 02:28:33 -0700
 Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id 337C1134FFB0; Thu,  3 Sep 2020 10:20:35 +0100 (IST)
+ id 0E02513502D6; Thu,  3 Sep 2020 10:28:30 +0100 (IST)
 From: Darren Kenny <darren.kenny@oracle.com>
 To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v2 14/15] scripts/oss-fuzz: Add script to reorder a
- general-fuzzer trace
-In-Reply-To: <20200819061110.1320568-15-alxndr@bu.edu>
+Subject: Re: [PATCH v2 15/15] scripts/oss-fuzz: Add crash trace minimization
+ script
+In-Reply-To: <20200819061110.1320568-16-alxndr@bu.edu>
 References: <20200819061110.1320568-1-alxndr@bu.edu>
- <20200819061110.1320568-15-alxndr@bu.edu>
-Date: Thu, 03 Sep 2020 10:20:35 +0100
-Message-ID: <m21rjjrzbw.fsf@oracle.com>
+ <20200819061110.1320568-16-alxndr@bu.edu>
+Date: Thu, 03 Sep 2020 10:28:29 +0100
+Message-ID: <m2y2lrqkea.fsf@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9732
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0
- spamscore=0 phishscore=0
- mlxlogscore=999 adultscore=0 suspectscore=2 bulkscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ spamscore=0 adultscore=0
+ mlxscore=0 suspectscore=2 malwarescore=0 mlxlogscore=999 bulkscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009030085
+ definitions=main-2009030086
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9732
  signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015
- priorityscore=1501
- lowpriorityscore=0 malwarescore=0 adultscore=0 spamscore=0 mlxscore=0
- phishscore=0 impostorscore=0 mlxlogscore=999 bulkscore=0 suspectscore=2
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009030085
-Received-SPF: pass client-ip=156.151.31.86;
- envelope-from=darren.kenny@oracle.com; helo=userp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:48:18
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
+ adultscore=0
+ priorityscore=1501 phishscore=0 mlxlogscore=999 mlxscore=0
+ lowpriorityscore=0 clxscore=1015 spamscore=0 bulkscore=0 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009030086
+Received-SPF: pass client-ip=141.146.126.78;
+ envelope-from=darren.kenny@oracle.com; helo=aserp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:47:13
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -122,126 +122,159 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wednesday, 2020-08-19 at 02:11:09 -04, Alexander Bulekov wrote:
-> The general-fuzzer uses hooks to fulfill DMA requests just-in-time.
-> This means that if we try to use QTEST_LOG=1 to build a reproducer, the
-> DMA writes will be logged _after_ the in/out/read/write that triggered
-> the DMA read. To work work around this, the general-fuzzer annotates
-> these just-in time DMA fulfilments with a tag that we can use to
-> discern them. This script simply iterates over a raw qtest
-> trace (including log messages, errors, timestamps etc), filters it and
-> re-orders it so that DMA fulfillments are placed directly _before_ the
-> qtest command that will cause the DMA access.
+On Wednesday, 2020-08-19 at 02:11:10 -04, Alexander Bulekov wrote:
+> Once we find a crash, we can convert it into a QTest trace. Usually this
+> trace will contain many operations that are unneeded to reproduce the
+> crash. This script tries to minimize the crashing trace, by removing
+> operations and trimming QTest bufwrite(write addr len data...) commands.
 >
 > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-
 > ---
->  .../oss-fuzz/reorder_fuzzer_qtest_trace.py    | 94 +++++++++++++++++++
->  1 file changed, 94 insertions(+)
->  create mode 100755 scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
+>  scripts/oss-fuzz/minimize_qtest_trace.py | 118 +++++++++++++++++++++++
+>  1 file changed, 118 insertions(+)
+>  create mode 100755 scripts/oss-fuzz/minimize_qtest_trace.py
 >
-> diff --git a/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py b/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
+> diff --git a/scripts/oss-fuzz/minimize_qtest_trace.py b/scripts/oss-fuzz/minimize_qtest_trace.py
 > new file mode 100755
-> index 0000000000..9fb7edb6ee
+> index 0000000000..2f1f4f368e
 > --- /dev/null
-> +++ b/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
-> @@ -0,0 +1,94 @@
+> +++ b/scripts/oss-fuzz/minimize_qtest_trace.py
+> @@ -0,0 +1,118 @@
 > +#!/usr/bin/env python3
 > +# -*- coding: utf-8 -*-
 > +
 > +"""
-> +Use this to convert qtest log info from a generic fuzzer input into a qtest
-> +trace that you can feed into a standard qemu-system process. Example usage:
-> +
-> +QEMU_FUZZ_ARGS="-machine q35,accel=qtest" QEMU_FUZZ_OBJECTS="*" \
-> +        ./i386-softmmu/qemu-fuzz-i386 --fuzz-target=general-pci-fuzz
-> +# .. Finds some crash
-> +QTEST_LOG=1 FUZZ_SERIALIZE_QTEST=1 \
-> +QEMU_FUZZ_ARGS="-machine q35,accel=qtest" QEMU_FUZZ_OBJECTS="*" \
-> +        ./i386-softmmu/qemu-fuzz-i386 --fuzz-target=general-pci-fuzz
-> +        /path/to/crash 2> qtest_log_output
-> +scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py qtest_log_output > qtest_trace
-> +./i386-softmmu/qemu-fuzz-i386 -machine q35,accel=qtest \
-> +        -qtest stdin < qtest_trace
-> +
-> +### Details ###
-> +
-> +Some fuzzer make use of hooks that allow us to populate some memory range, just
-> +before a DMA read from that range. This means that the fuzzer can produce
-> +activity that looks like:
-> +    [start] read from mmio addr
-> +    [end]   read from mmio addr
-> +    [start] write to pio addr
-> +        [start] fill a DMA buffer just in time
-> +        [end]   fill a DMA buffer just in time
-> +        [start] fill a DMA buffer just in time
-> +        [end]   fill a DMA buffer just in time
-> +    [end]   write to pio addr
-> +    [start] read from mmio addr
-> +    [end]   read from mmio addr
-> +
-> +We annotate these "nested" DMA writes, so with QTEST_LOG=1 the QTest trace
-> +might look something like:
-> +[R +0.028431] readw 0x10000
-> +[R +0.028434] outl 0xc000 0xbeef  # Triggers a DMA read from 0xbeef and 0xbf00
-> +[DMA][R +0.034639] write 0xbeef 0x2 0xAAAA
-> +[DMA][R +0.034639] write 0xbf00 0x2 0xBBBB
-> +[R +0.028431] readw 0xfc000
-> +
-> +This script would reorder the above trace so it becomes:
-> +readw 0x10000
-> +write 0xbeef 0x2 0xAAAA
-> +write 0xbf00 0x2 0xBBBB
-> +outl 0xc000 0xbeef
-> +readw 0xfc000
-> +
-> +I.e. by the time, 0xc000 tries to read from DMA, those DMA buffers have already
-> +been set up, removing the need for the DMA hooks. We can simply provide this
-> +reordered trace via -qtest stdio to reproduce the input
-> +
-> +Note: this won't work for traces where the device tries to read from the same
-> +DMA region twice in between MMIO/PIO commands. E.g:
-> +    [R +0.028434] outl 0xc000 0xbeef
-> +    [DMA][R +0.034639] write 0xbeef 0x2 0xAAAA
-> +    [DMA][R +0.034639] write 0xbeef 0x2 0xBBBB
+> +This takes a crashing qtest trace and tries to remove superflous operations
 > +"""
 > +
 > +import sys
+> +import os
+> +import subprocess
+> +import time
 > +
-> +__author__     = "Alexander Bulekov <alxndr@bu.edu>"
-> +__copyright__  = "Copyright (C) 2020, Red Hat, Inc."
-> +__license__    = "GPL version 2 or (at your option) any later version"
-> +
-> +__maintainer__ = "Alexander Bulekov"
-> +__email__      = "alxndr@bu.edu"
+> +QEMU_ARGS = None
+> +QEMU_PATH = None
+> +TIMEOUT = 5
+> +CRASH_TOKEN = None
 > +
 > +
 > +def usage():
-> +    sys.exit("Usage: {} /path/to/qtest_log_output".format((sys.argv[0])))
+> +    sys.exit("""\
+> +Usage: QEMU_PATH="/path/to/qemu" QEMU_ARGS="args" {} input_trace output_trace
+> +By default, will try to use the second-to-last line in the output to identify
+> +whether the crash occred. Optionally, manually set a string that idenitifes the
+> +crash by setting CRASH_TOKEN=
+> +""".format((sys.argv[0])))
 > +
 > +
-> +def main(filename):
-> +    with open(filename, "r") as f:
+> +def check_if_trace_crashes(trace, path):
+> +    global CRASH_TOKEN
+> +    with open(path, "w") as tracefile:
+> +        tracefile.write("".join(trace))
+> +    rc = subprocess.Popen("timeout -s 9 {}s {} {} 2>&1 < {}".format(TIMEOUT,
+> +                          QEMU_PATH, QEMU_ARGS, path),
+> +                          shell=True, stdin=subprocess.PIPE,
+> +                          stdout=subprocess.PIPE)
+
+NIT: Similar comment to before, it is nicer to name the placeholders if
+     there are more than 1 and you can.
+
+> +    stdo = rc.communicate()[0]
+> +    output = stdo.decode('unicode_escape')
+> +    if rc.returncode == 137:    # Timed Out
+> +        return False
+> +    if len(output.splitlines()) < 2:
+> +        return False
+> +
+> +    if CRASH_TOKEN is None:
+> +        CRASH_TOKEN = output.splitlines()[-2]
+> +
+> +    return CRASH_TOKEN in output
+> +
+> +
+> +def minimize_trace(inpath, outpath):
+> +    global TIMEOUT
+> +    with open(inpath) as f:
 > +        trace = f.readlines()
+> +    start = time.time()
+> +    if not check_if_trace_crashes(trace, outpath):
+> +        sys.exit("The input qtest trace didn't cause a crash...")
+> +    end = time.time()
+> +    print("Crashed in {} seconds".format(end-start))
+> +    TIMEOUT = (end-start)*5
+> +    print("Setting the timeout for {} seconds".format(TIMEOUT))
+> +    print("Identifying Crashes by this string: {}".format(CRASH_TOKEN))
 > +
-> +    # Leave only lines that look like logged qtest commands
-> +    trace[:] = [x.strip() for x in trace if "[R +" in x
-> +                or "[S +" in x and "CLOSED" not in x]
-> +
-> +    for i in range(len(trace)):
-> +        if i+1 < len(trace):
-> +            if "[DMA]" in trace[i+1]:
-> +                trace[i], trace[i+1] = trace[i+1], trace[i]
-> +    for line in trace:
-> +        print(line.split("]")[-1].strip())
+> +    i = 0
+> +    newtrace = trace[:]
+> +    while i < len(newtrace):
+> +        prior = newtrace[i]
+> +        print("Trying to remove {}".format(newtrace[i]))
+> +        # Try to remove the line completely
+> +        newtrace[i] = ""
+> +        if check_if_trace_crashes(newtrace, outpath):
+> +            i += 1
+> +            continue
+> +        newtrace[i] = prior
+> +        # Try to split up writes into multiple commands, each of which can be
+> +        # removed.
+> +        if newtrace[i].startswith("write "):
+
+NIT: Would be good to document the assumptions here, just in case things
+     change in future.
+
+> +            addr = int(newtrace[i].split()[1], 16)
+> +            length = int(newtrace[i].split()[2], 16)
+> +            data = newtrace[i].split()[3][2:]
+> +            if length > 1:
+> +                leftlength = int(length/2)
+> +                rightlength = length - leftlength
+> +                newtrace.insert(i+1, "")
+> +                while leftlength > 0:
+> +                    newtrace[i] = "write {} {} 0x{}\n".format(
+> +                            hex(addr),
+> +                            hex(leftlength),
+> +                            data[:leftlength*2])
+> +                    newtrace[i+1] = "write {} {} 0x{}\n".format(
+> +                            hex(addr+leftlength),
+> +                            hex(rightlength),
+> +                            data[leftlength*2:])
+
+NIT: Similar comment w.r.t. naming the placeholders.
+
+> +                    if check_if_trace_crashes(newtrace, outpath):
+> +                        break
+> +                    else:
+> +                        leftlength -= 1
+> +                        rightlength += 1
+> +                if check_if_trace_crashes(newtrace, outpath):
+> +                    i -= 1
+> +                else:
+> +                    newtrace[i] = prior
+> +                    del newtrace[i+1]
+> +        i += 1
+> +    check_if_trace_crashes(newtrace, outpath)
 > +
 > +
 > +if __name__ == '__main__':
-> +    if len(sys.argv) == 1:
+> +    if len(sys.argv) < 3:
 > +        usage()
-> +    main(sys.argv[1])
-> -- 
-> 2.27.0
+> +
+> +    QEMU_PATH = os.getenv("QEMU_PATH")
+> +    QEMU_ARGS = os.getenv("QEMU_ARGS")
+> +    if QEMU_PATH is None or QEMU_ARGS is None:
+> +        usage()
+> +    if "accel" not in QEMU_ARGS:
+> +        QEMU_ARGS += " -accel qtest"
+> +    CRASH_TOKEN = os.getenv("CRASH_TOKEN")
+> +    QEMU_ARGS += " -qtest stdio -monitor none -serial none "
+> +    minimize_trace(sys.argv[1], sys.argv[2])
+
+Since all only nits:
+
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+
+Thanks,
+
+Darren.
 
