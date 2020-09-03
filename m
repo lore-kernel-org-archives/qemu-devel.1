@@ -2,100 +2,101 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54F1AC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:07:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41D23C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:08:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1874C2071B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:07:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 075772071B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:08:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YRleeiyu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1874C2071B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="abZokx+Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 075772071B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDiPc-0006HK-6I
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 02:07:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54086)
+	id 1kDiQb-0007Wo-7Z
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 02:08:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDiOx-0005qb-S4
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:07:15 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:23345
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1kDiPg-0006dy-Hb
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:08:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46834)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kDiOv-00016H-Ko
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:07:15 -0400
+ (Exim 4.90_1) (envelope-from <eperezma@redhat.com>)
+ id 1kDiPe-00019p-Qh
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:08:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599113231;
+ s=mimecast20190719; t=1599113277;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=K7meDXL96i3v+4g65OMta2kw/XdZJGQOw0J/QeISxTc=;
- b=YRleeiyu2gBxqKzaWwboMttNss56wVNf72oIREw3Ll2qwD+08C84K8FM8Ik9maEOtskn9c
- XD2abfvmI44SFGWFqhrsEArbcRG2pA+o3ObMMkP26K/APvfYkLwdpdH50uNICIbTfH32ud
- hb9772ZUXxBb6XmRocYPcsu/yz482og=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-qq-dvcpSNxejNjvEcQgNHA-1; Thu, 03 Sep 2020 02:07:09 -0400
-X-MC-Unique: qq-dvcpSNxejNjvEcQgNHA-1
-Received: by mail-ed1-f69.google.com with SMTP id x23so829915eds.5
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 23:07:08 -0700 (PDT)
+ bh=xG0a7JPdagd7CBfuFiJ6pmrGfAZt41RrXbhI0jSHVSo=;
+ b=abZokx+YnVkQKzlO8tUSzabU1726gFHyhP0d79TP+VBhDmCrnac4j6iHMrhw27PDJ6Efpw
+ pve1qudU/jmdBkTo9Y1GwO+HzmO2y+jBIkC22zoxOT6v4snpV7Nq/pEN7BM5j3Kr3uzDul
+ AehbrNZiXba8d1sLHEAxtDl3kXnNAAs=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-577-eodfLPfOOe-f2QAcjEzT-Q-1; Thu, 03 Sep 2020 02:07:56 -0400
+X-MC-Unique: eodfLPfOOe-f2QAcjEzT-Q-1
+Received: by mail-qt1-f200.google.com with SMTP id a14so1453420qtp.15
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 23:07:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=K7meDXL96i3v+4g65OMta2kw/XdZJGQOw0J/QeISxTc=;
- b=Bu4+T+XWeLA/d7t5CnmkRYvNPXDbxxa6bSVOK446T8VDE3JXKK+8bGqiztKY5gharb
- XyZra8DQ17k4IZa1wsfESJBDWTyGcNj6igVO7J1Q6Mr58MvqYrWQEM5U2vPnRUQDPolw
- xOQ8ZVuT8kLPUO3POlGYVWD9jcnHtKZzXoHXnGuqRl3L8rOt22i9xh3uY0Uor5y+IRpf
- iR+XChW8vH01M+JaDrmlD6vMokxFwvu/4LpUCp+s0rZq6qjE3BxvK8qXKPJ+b0644JGx
- FL+qnkbxKjGE+ZjvjjUPuGbIIfsjcjAlALRHhhZNELP6lown1QvGjWdQyoCQddzzK88/
- RWmg==
-X-Gm-Message-State: AOAM533L8oMNO6G5icecOU6y2jjcpC+Kl+FTjHnCizyQT2NPvCTdssby
- AYRU9RT9JAMB55LpjRtnT+B9dqfhnYOp90/vikaHUTGejJl1Jj+NZXougOmlx6Ckq2CzqsYxFDL
- yCo4saVIAnlu7RT+HnR33ptB4QapZZKQ=
-X-Received: by 2002:a05:6402:10c6:: with SMTP id
- p6mr590228edu.76.1599113227811; 
- Wed, 02 Sep 2020 23:07:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzwpsh5g6+5URig8yxknmAUHvnwbCock0pRxPTKsGatQvX2WMCMvn8i5FrDMrefS2YLfmGAhM4PNbwuDJic844=
-X-Received: by 2002:a05:6402:10c6:: with SMTP id
- p6mr590211edu.76.1599113227575; 
- Wed, 02 Sep 2020 23:07:07 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=xG0a7JPdagd7CBfuFiJ6pmrGfAZt41RrXbhI0jSHVSo=;
+ b=TGiPSqyW0umJEOOttZsWuWVMsbwy+VzlHJn+vBJJEeKJiBL9j46qJ+lP7bCiKLjy6M
+ Qb3R/G5sFQTOgBc86G1iVjgs5qXN7+foM3mEnkphJkTknlXM7DoWxv8sIJU1Soaa5/fy
+ 8FfCtNh2SAu1+zZ61s8gMvETsfHog3CH34EOchUkluW7odIwEZ6M5b0uyAPD0S/wvUZE
+ UI9KwojaVb+bnUhdR9lheZtHjaOzVKQyoHQct+pzXw+LT9+M8GW7QTQeCxl8M9N0EzAi
+ ldgLTajsfrvyW5DiXUInQfrK7xgyny0Xm6jyxhqzY6+qHTQ1YbiJISUfN+bzdsAWkunR
+ i2Ng==
+X-Gm-Message-State: AOAM533Boihc3hnwx+vn7Gf83jqy6vHZ5AiRnjwDoGRvD6DyaqLrN1zV
+ qknvyyKz4e+kH24u9duYnxGdd0whLmKO1ok027B1/ckuI00ea2UfsWxhGds9zvBQyqi0LDkPhX9
+ 1uDtwuOAoTqn4XBDOY5jpr44W5g6Sdbk=
+X-Received: by 2002:a37:2713:: with SMTP id n19mr1650359qkn.497.1599113275587; 
+ Wed, 02 Sep 2020 23:07:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxw2B6VeUYI190LG5kmUvX2831w240Ulzeam6Jt0N51SWaJ9yJJ9L14Z4GfEi3S29PRpFWns+ckIvXsAU7NVbc=
+X-Received: by 2002:a37:2713:: with SMTP id n19mr1650342qkn.497.1599113275368; 
+ Wed, 02 Sep 2020 23:07:55 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200903054503.425435-1-thuth@redhat.com>
-In-Reply-To: <20200903054503.425435-1-thuth@redhat.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 3 Sep 2020 08:06:55 +0200
-Message-ID: <CABgObfZ-Bc84nrFUSY16N-yR1cLu4AdVf+thheyryu3mWoJzJg@mail.gmail.com>
-Subject: Re: [PATCH] stubs: Move qemu_fd_register stub to util/main-loop.c
-To: Thomas Huth <thuth@redhat.com>
+References: <20200901142608.24481-1-eperezma@redhat.com>
+ <20200901142608.24481-5-eperezma@redhat.com>
+ <20200901210424.GF3053@xz-x1>
+In-Reply-To: <20200901210424.GF3053@xz-x1>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 3 Sep 2020 08:07:19 +0200
+Message-ID: <CAJaqyWeNkL3Qc11NZcWgFm5vMfhAREf7m0u0zPi2vpDLwkm9zw@mail.gmail.com>
+Subject: Re: [RFC v8 4/5] intel_iommu: Do not notify regular iotlb to
+ device-iotlb notifiers
+To: Peter Xu <peterx@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eperezma@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000e2ba8e05ae628f81"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:28:33
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eperezma@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,171 +109,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-level <qemu-devel@nongnu.org>,
+ Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Herv=C3=A9_Poussineau?= <hpoussin@reactos.org>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e2ba8e05ae628f81
-Content-Type: text/plain; charset="UTF-8"
+On Tue, Sep 1, 2020 at 11:06 PM Peter Xu <peterx@redhat.com> wrote:
+>
+> On Tue, Sep 01, 2020 at 04:26:07PM +0200, Eugenio P=C3=A9rez wrote:
+> > This improves performance in case of netperf with vhost-net:
+> > * TCP_STREAM: From 1923.6Mbit/s to 2175.13Mbit/s (13%)
+> > * TCP_RR: From 8464.73 trans/s to 8932.703333 trans/s (5.5%)
+> > * UDP_RR: From 8562.08 trans/s to 9005.62/s (5.1%)
+> > * UDP_STREAM: No change observed (insignificant 0.1% improvement)
+>
+> Just to confirm: are these numbers about applying this patch before/after=
+, or
+> applying the whole series before/after?
+>
+> Asked since we actually optimized two parts:
+>
+> Firstly we avoid sending two invalidations for vhost.  That's done by the
+> previous patch, afaict.
+>
+> Secondly, this patch avoids the page walk for vhost since not needed.
+>
+> Am I right?
+>
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Right! The numbers are comparing v5.1.0 tag to this commit. Avoiding
+sending invalidations for vhost did improve performance but in a very
+small number, I thought it would improve more.
 
-Il gio 3 set 2020, 07:45 Thomas Huth <thuth@redhat.com> ha scritto:
+It also depends a lot on using rhel8 (better numbers, less but
+appreciable improvements) or rhel7 guest (worse performance compared
+to rhel8 but patches provide more improvements).
 
-> The linker of MinGW sometimes runs into the following problem:
+
+> >
+> > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > ---
+> >  hw/i386/intel_iommu.c | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+> > index cdddb089e7..fe82391b73 100644
+> > --- a/hw/i386/intel_iommu.c
+> > +++ b/hw/i386/intel_iommu.c
+> > @@ -1964,6 +1964,12 @@ static void vtd_iotlb_domain_invalidate(IntelIOM=
+MUState *s, uint16_t domain_id)
+> >      vtd_iommu_unlock(s);
+> >
+> >      QLIST_FOREACH(vtd_as, &s->vtd_as_with_notifiers, next) {
+> > +        if (vtd_as->iommu.iommu_notify_flags & IOMMU_NOTIFIER_DEVIOTLB=
+) {
+> > +            /* If IOMMU memory region is DEVICE IOTLB type, it does no=
+t make
+> > +             * sense to send regular IOMMU notifications. */
+> > +            continue;
+> > +        }
+> > +
 >
-> libqemuutil.a(util_main-loop.c.obj): In function `qemu_fd_register':
-> /builds/huth/qemu/build/../util/main-loop.c:331: multiple definition of
->  `qemu_fd_register'
+> We want to avoid vtd_sync_shadow_page_table() for vhost, however IMHO a b=
+etter
+> expression would be:
 >
-> libqemuutil.a(stubs_fd-register.c.obj):/builds/huth/qemu/stubs/fd-register.c:5:
->  first defined here
-> collect2: error: ld returned 1 exit status
-> /builds/huth/qemu/rules.mak:88: recipe for target
-> 'tests/test-timed-average.exe'
->  failed
+>     if (!(vtd_as->iommu.iommu_notify_flags &
+>         (IOMMU_NOTIFIER_MAP | IOMMU_NOTIFIER_UNMAP))) {
+>         continue;
+>     }
 >
-> qemu_fd_register() is defined in util/main-loop.c for WIN32, so let's
-> simply
-> move the stub also there in the #else part of the corresponding #ifndef
-> to fix this problem.
+> The thing is we can't avoid the page sync if e.g. we're registered with
+> MAP|UNMAP|DEVIOTLB.  The important thing here, imho, is MAP|UNMAP because=
+ these
+> two messages are used for shadow page synchronizations, so we can skip th=
+at if
+> neither of the message is registered.
 >
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  stubs/fd-register.c | 6 ------
->  stubs/meson.build   | 1 -
->  util/main-loop.c    | 4 ++++
->  3 files changed, 4 insertions(+), 7 deletions(-)
->  delete mode 100644 stubs/fd-register.c
+> Besides, we can add this at the entry of vtd_sync_shadow_page_table() so =
+that
+> all callers of vtd_sync_shadow_page_table() can benefit.
 >
-> diff --git a/stubs/fd-register.c b/stubs/fd-register.c
-> deleted file mode 100644
-> index 63a4abdb20..0000000000
-> --- a/stubs/fd-register.c
-> +++ /dev/null
-> @@ -1,6 +0,0 @@
-> -#include "qemu/osdep.h"
-> -#include "qemu/main-loop.h"
-> -
-> -void qemu_fd_register(int fd)
-> -{
-> -}
-> diff --git a/stubs/meson.build b/stubs/meson.build
-> index e2dfedc2a7..e0b322bc28 100644
-> --- a/stubs/meson.build
-> +++ b/stubs/meson.build
-> @@ -9,7 +9,6 @@ stub_ss.add(files('cpu-get-clock.c'))
->  stub_ss.add(files('cpu-get-icount.c'))
->  stub_ss.add(files('dump.c'))
->  stub_ss.add(files('error-printf.c'))
-> -stub_ss.add(files('fd-register.c'))
->  stub_ss.add(files('fdset.c'))
->  stub_ss.add(files('fw_cfg.c'))
->  stub_ss.add(files('gdbstub.c'))
-> diff --git a/util/main-loop.c b/util/main-loop.c
-> index f69f055013..217c8d6056 100644
-> --- a/util/main-loop.c
-> +++ b/util/main-loop.c
-> @@ -179,6 +179,10 @@ static int max_priority;
->  static int glib_pollfds_idx;
->  static int glib_n_poll_fds;
+
+Agree on both. Testing the new changes.
+
+Thanks!
+
+
+
+> >          if (!vtd_dev_to_context_entry(s, pci_bus_num(vtd_as->bus),
+> >                                        vtd_as->devfn, &ce) &&
+> >              domain_id =3D=3D vtd_get_domain_id(s, &ce)) {
+> > --
+> > 2.18.1
+> >
 >
-> +void qemu_fd_register(int fd)
-> +{
-> +}
-> +
->  static void glib_pollfds_fill(int64_t *cur_timeout)
->  {
->      GMainContext *context = g_main_context_default();
 > --
-> 2.18.2
+> Peter Xu
 >
 >
-
---000000000000e2ba8e05ae628f81
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto">Acked-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@re=
-dhat.com">pbonzini@redhat.com</a>&gt;</div><br><div class=3D"gmail_quote"><=
-div dir=3D"ltr" class=3D"gmail_attr">Il gio 3 set 2020, 07:45 Thomas Huth &=
-lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; ha scritto:=
-<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bord=
-er-left:1px #ccc solid;padding-left:1ex">The linker of MinGW sometimes runs=
- into the following problem:<br>
-<br>
-libqemuutil.a(util_main-loop.c.obj): In function `qemu_fd_register&#39;:<br=
->
-/builds/huth/qemu/build/../util/main-loop.c:331: multiple definition of<br>
-=C2=A0`qemu_fd_register&#39;<br>
-libqemuutil.a(stubs_fd-register.c.obj):/builds/huth/qemu/stubs/fd-register.=
-c:5:<br>
-=C2=A0first defined here<br>
-collect2: error: ld returned 1 exit status<br>
-/builds/huth/qemu/rules.mak:88: recipe for target &#39;tests/test-timed-ave=
-rage.exe&#39;<br>
-=C2=A0failed<br>
-<br>
-qemu_fd_register() is defined in util/main-loop.c for WIN32, so let&#39;s s=
-imply<br>
-move the stub also there in the #else part of the corresponding #ifndef<br>
-to fix this problem.<br>
-<br>
-Signed-off-by: Thomas Huth &lt;<a href=3D"mailto:thuth@redhat.com" target=
-=3D"_blank" rel=3D"noreferrer">thuth@redhat.com</a>&gt;<br>
----<br>
-=C2=A0stubs/fd-register.c | 6 ------<br>
-=C2=A0stubs/meson.build=C2=A0 =C2=A0| 1 -<br>
-=C2=A0util/main-loop.c=C2=A0 =C2=A0 | 4 ++++<br>
-=C2=A03 files changed, 4 insertions(+), 7 deletions(-)<br>
-=C2=A0delete mode 100644 stubs/fd-register.c<br>
-<br>
-diff --git a/stubs/fd-register.c b/stubs/fd-register.c<br>
-deleted file mode 100644<br>
-index 63a4abdb20..0000000000<br>
---- a/stubs/fd-register.c<br>
-+++ /dev/null<br>
-@@ -1,6 +0,0 @@<br>
--#include &quot;qemu/osdep.h&quot;<br>
--#include &quot;qemu/main-loop.h&quot;<br>
--<br>
--void qemu_fd_register(int fd)<br>
--{<br>
--}<br>
-diff --git a/stubs/meson.build b/stubs/meson.build<br>
-index e2dfedc2a7..e0b322bc28 100644<br>
---- a/stubs/meson.build<br>
-+++ b/stubs/meson.build<br>
-@@ -9,7 +9,6 @@ stub_ss.add(files(&#39;cpu-get-clock.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;cpu-get-icount.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;dump.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;error-printf.c&#39;))<br>
--stub_ss.add(files(&#39;fd-register.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;fdset.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;fw_cfg.c&#39;))<br>
-=C2=A0stub_ss.add(files(&#39;gdbstub.c&#39;))<br>
-diff --git a/util/main-loop.c b/util/main-loop.c<br>
-index f69f055013..217c8d6056 100644<br>
---- a/util/main-loop.c<br>
-+++ b/util/main-loop.c<br>
-@@ -179,6 +179,10 @@ static int max_priority;<br>
-=C2=A0static int glib_pollfds_idx;<br>
-=C2=A0static int glib_n_poll_fds;<br>
-<br>
-+void qemu_fd_register(int fd)<br>
-+{<br>
-+}<br>
-+<br>
-=C2=A0static void glib_pollfds_fill(int64_t *cur_timeout)<br>
-=C2=A0{<br>
-=C2=A0 =C2=A0 =C2=A0GMainContext *context =3D g_main_context_default();<br>
--- <br>
-2.18.2<br>
-<br>
-</blockquote></div>
-
---000000000000e2ba8e05ae628f81--
 
 
