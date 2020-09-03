@@ -2,86 +2,122 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,RCVD_ILLEGAL_IP,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A8CC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:47:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66095C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:51:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D4A22071B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:47:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E9AF2071B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 06:51:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tP2sImrk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D4A22071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OuDSFvpu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E9AF2071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34078 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDj28-0003UI-Eu
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 02:47:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60546)
+	id 1kDj5R-0004il-B3
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 02:51:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32800)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kDj1G-00032y-Rk
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:46:50 -0400
-Received: from mail-yb1-xb33.google.com ([2607:f8b0:4864:20::b33]:33133)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kDj1F-0005Zm-63
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 02:46:50 -0400
-Received: by mail-yb1-xb33.google.com with SMTP id c17so1464570ybe.0
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 23:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=FjT5//9JSVN7FtxRKOB/lSDjjGchyoskY8uRxpcFfP4=;
- b=tP2sImrkf8IefPEtEUN6E5ZihiE64BSmVWWGe831cTpDht1MuuoPUUqd1d0qbL0oQt
- 9jI9nmmaIMf/3+huIKpUpZKU8ukj8r55UNn/+ANK1sKAQDV0agxMfoyiGgQaNdYOQtS+
- CCgwl5180XuzSSsiZ8qdlVGGC8tBvD5wstc8hHCGt9tFeu1RNXkmUgR82xsEXeYHJTuM
- GCYzhvO9BLdIlNCbNtVsL019jbfREF+aOMuDr/iEswQJQ/WuxyHCWdrc+CAxmiHiwivS
- D9x7o2iQHouLX2Y1/BH0xtraP6Sh3hdijqUf1SA9PZxuoZOpW7Vup8HZ602jZ47/+Dt2
- lV5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=FjT5//9JSVN7FtxRKOB/lSDjjGchyoskY8uRxpcFfP4=;
- b=qzRMYiZ5c8LX2lzgxmdzpUh14J1j5dC6CC4NkOiddU5nfP8fZI4YdRC83/a9+AVsjd
- cabAoKJFgaxPloyUklgH15dV0KUdmjytzLxRGZncXfDs8K4bS+I3ivfZauR06jaIhZsz
- j33Onnto2ffwENzL7JKGA5CQ+RPsVKf3MEZZpxnJF5eqVwUI8Yj8vYbJzelLpZsM1BYw
- 55H1BAWofPxD9+qc40oZxOIHOXqDOeJOfVqZqJdO6UZ/oRyqiGvRy5wRHzrGM868EIO7
- pcWtr3ARmQBuzUc+IpZcB9JhtlQ780Td3o446A4eV1TmYcbeJPbnE2jMl9aoWJr0jcze
- 7vYw==
-X-Gm-Message-State: AOAM5337bvXdKpgVzS8FT13uVjJsuLr1C8FdK/qssMqjAELCRnClCljT
- E/bBChCX4H1uGmQT1Hp4NxZpcxy8Qf+pdt8sGxU=
-X-Google-Smtp-Source: ABdhPJw1Fn+LxVaSkbU2A8UEMTRQ4Mu6bOUGH/Ybe/FlmsWZy7zpgr0iSDyTkx3MXQZ7/epwZ41XGMGJobBb8Ohmve4=
-X-Received: by 2002:a25:d946:: with SMTP id q67mr633517ybg.517.1599115608110; 
- Wed, 02 Sep 2020 23:46:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kDj4b-00046A-Dl; Thu, 03 Sep 2020 02:50:18 -0400
+Received: from mail-eopbgr40130.outbound.protection.outlook.com
+ ([40.107.4.130]:5305 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kDj4W-0005oF-IL; Thu, 03 Sep 2020 02:50:16 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RLbTM6TsLY7YUlooB4HjttCfAuXi/C3LV+RkCUDbKlEypIMiEOwkZiq+/GTLDQHC7/fnBzYrZeju+2gb2eP4OBDUjdUErmNIa56aAJJNllYI2Gwi8Zw9EepfffRlRHaE3S+vsI/JI8dlaehf0HB8d2xGctWhzqHD5pAgherUP6jfUpPR1ujmtYV3mXqBuT3+oUL8n3AyfvNHyyPQ3n7ePaQW4yyZ7PDtZ5+8N0L/E8y90yTe+Lpmw0Cfb1YoGaGJ5GOO6ERoAqqJHmGV5ISWXkG8Gf7vNKeRu79Z5yYwiKRUNf2APOXwostC9PLE4JMkMYPwoMcFYADAKYn80/PUFw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GnLiclauLqO2Jq/uSuxCYCh5NevB/OEsIUFAdJajWP8=;
+ b=EeZicxkAQ1gh2yzk/xkGa8f4wrf8sgIsQK78xL49dzZgVyHERNT83iNr8Htxz1Dh8+znH+mcvESlVDlxeC7vtVNdhuw8wC8/PRc5UDREtJvN+CTxo04fsfPGeGm9YaPHlbB9skuobtV3RhElrKfIsnWyItkAVb18lHpAQJ/o//nnUezqIsWzhVxO6qqOWfHxwO65B7yafZ/SwckEiPMWl45qMrsZKpuxcLBZmeIJIz1tzQ4NFXjxR1VoBGW1z4IrcNwF26eTosWw4u8bciBCRINc2I/N7b6mhMH8NyapifRb5aE+Wea4K/w9XcZS2zSpXqD/4hwTbgYGYchSS7l80g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GnLiclauLqO2Jq/uSuxCYCh5NevB/OEsIUFAdJajWP8=;
+ b=OuDSFvpu7AYvgDQAeDQDHE/i6NXcYOfvt0M2/HAkoj8dX2tI2PVyV3NfswGozX5zG/TqF0hV0x3ALeB+O6fBY/9OeUivQdVkxKKTOwoR4SOGNywrGRjOyPROxG11BvZHE5OMX+kyUF2OhKMHh4AodViXSK7tfpL2JpPUrnYbS5E=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0802MB2529.eurprd08.prod.outlook.com (2603:10a6:203:9e::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.16; Thu, 3 Sep
+ 2020 06:50:08 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%7]) with mapi id 15.20.3348.015; Thu, 3 Sep 2020
+ 06:50:08 +0000
+Subject: Re: [PATCH v4 0/5] block: add block-dirty-bitmap-populate job
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, armbru@redhat.com, mreitz@redhat.com,
+ pkrempa@redhat.com, qemu-block@nongnu.org
+References: <20200902181831.2570048-1-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b718ea63-76d6-1c9c-0b16-956ca1045735@virtuozzo.com>
+Date: Thu, 3 Sep 2020 09:50:06 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+In-Reply-To: <20200902181831.2570048-1-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FRYP281CA0015.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::25)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-References: <CAEUhbmUOtjEsQzUQZsARBcr9jjpEAu6Br8zozV8f8fQBxznFdg@mail.gmail.com>
- <CABgObfaVC5ts953qaJ5-0wLaF9o4BgXzQbenrY7F_SLFBR+K=A@mail.gmail.com>
-In-Reply-To: <CABgObfaVC5ts953qaJ5-0wLaF9o4BgXzQbenrY7F_SLFBR+K=A@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Thu, 3 Sep 2020 14:46:37 +0800
-Message-ID: <CAEUhbmXR-yqwy=j-gMVHSBZhxa3vP_7R1KnUyb8aGJ66A_dy8g@mail.gmail.com>
-Subject: Re: meson: how to determine which directory applies to the c_args
- during build?
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b33;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb33.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from 255.255.255.255 (255.255.255.255) by
+ FRYP281CA0015.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10::25) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3370.9 via Frontend Transport; Thu, 3 Sep 2020 06:50:07 +0000
+X-Originating-IP: [185.215.60.171]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 0a773868-f486-42c2-7963-08d84fd59866
+X-MS-TrafficTypeDiagnostic: AM5PR0802MB2529:
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB25290B20B2FFA0886A53FA33C12C0@AM5PR0802MB2529.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: ikXl1vNuzwIKFG9IxwOYFWEJal5K4+WfHsfjv6dObYlr++jkppWVxio2LtpHHsfwVpsphvbzMuEkiBrrosoR2H3bi3qLjtGdqxJm5tROnWO/UM0gzAvsyEnyAl03gjGDUqETjr4/ErZZNHDEtAY1NJkaltEakPRV8gqbB8epynudLYlGNGhVe2ezTb62w0sOzZEBxLma5nJD3a7GKcE8yFBwKt+ndW2N3ARqL6mLnf1UdcN6rAcXnDcp7/DkNZX08eL85fxXj7kO41+gg9XOT9MAlHQ/Pzq/FNsbYFKgAeu316Yrror+V4c/lz5PsCBYnu4skj1EuGnU1H7R4dbwFCNos9tpzkMeS6k7zFRVHpBVq0PlPMLuE+mBjzv7rWkyy4CE97B1V5a54x8F/yHIz4CU3KRR1+de4WKcEUYTbqGpKUQq4eko4KitdBlYtiB/gAylN7WCMeP5Ki4zB9xVi4E9CaTOgF36NWv4IINpXWg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(396003)(39840400004)(346002)(366004)(136003)(956004)(36756003)(2616005)(316002)(5660300002)(4326008)(8676002)(8936002)(186003)(26005)(66946007)(66476007)(66556008)(2906002)(52116002)(6486002)(966005)(478600001)(16576012)(83380400001)(31696002)(31686004)(86362001)(14143004)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: gDEMyzr9KILxZIsZ6ocpqDNhmP+gxqSVjefCRtmPUJFl3KMNYewxjruCS3i9BD40aDLTgPqockJkoSGF11PeyUwmOlnO1w2uRUZCy6XQpfYQAQhi8htiR9iFZVeBTze5KMSSjMax++nYUEHthQP1h7ZUeDqySO8iP/GxczrzfUqbC4rn4IHuEl46ioL5YzQ+Lpkmgb0I7iTaWpYZpQ/K1gTXHebQHX5F/7ut+TyKjVSRqChl6gdnWGofc1JqDBOB5cfERTVJyXFF0FUkh3PdEu7dGavMMtx5xCH6qtclvY+5+FD/SdVTGb7I/5r41CXt2uN5B/Ot9FsKsIE6bxTVj9QDJ6mtPiV4qrzoe0Sm3m/YyqL70cpf1yqHEoYfGFBGhu1kzaaPifzzL79irFYdKVJwgERRTfKEfLS845JE+ru1a2DGUpVcF5HJjYSVULq73M3iqOav47nk0pg5PwXtmDsMosFSSCj6n/jbewJ0zpcUirTxB/xrhlZkxQy4rjSrYB2r4TrRrJ+omOQPh+YW4kvyox0EWjmdTZWWJnb5B3bcUlsKY9Zx/AVOeMKh5XX9m4brncTHX2yGuxTlzFn/gktAFaBxjzv9qZfL7Vcu5LmRhDx2i8gnrm9gZ3timjFXr7KJ3bkv6TGnLpMsHvJi+Q==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a773868-f486-42c2-7963-08d84fd59866
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2020 06:50:07.9203 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kkUKJ+lMV8fBKEep07LpgwZCIKJE8+LEF8q0E4TGfID2OfFBqkl/r3n2uGpxF7++3oXwLOWxFd5UPe8VE2fNtl4wNZIwEz2UyN3tak2GI8M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2529
+Received-SPF: pass client-ip=40.107.4.130;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 02:50:08
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.324, RCVD_ILLEGAL_IP=1.3,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,33 +131,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Paolo,
+02.09.2020 21:18, Eric Blake wrote:
+> This is NOT the final version of this patch series, but I'm posting it
+> to revive conversation on the topic while fixing it to compile on top
+> of meson changes.
+> 
+> v3 was: https://lists.gnu.org/archive/html/qemu-devel/2020-06/msg06258.html
+> 
+> 001/5:[0025] [FC] 'block: add bitmap-populate job'
+> 002/5:[----] [--] 'blockdev: combine DriveBackupState and BlockdevBackupState'
+> 003/5:[0004] [FC] 'qmp: expose block-dirty-bitmap-populate'
+> 004/5:[----] [--] 'iotests: move bitmap helpers into their own file'
+> 005/5:[----] [-C] 'iotests: add 298 for block-dirty-bitmap-populate'
+> 
+> I'm still trying to find the right QAPI contract (affects patch 1 and
+> 3 for the qapi, and 5 for invoking the command in iotests), but right
+> now, I'm leaning towards:
+> 
+> { "execute": "block-dirty-bitmap-populate", "arguments": {
+>      "job-id": "job0", "node": "target_node", "name": "target_bitmap",
+>      "sources": [ { "pattern": "allocation", "node": "from_node" } ] } }
+> 
+> which allows expansion into multiple sources, so that we can combine a
+> populate action with a bitmap merge rather than having to do those as
+> separate commands, like:
+> 
+> { "execute": "block-dirty-bitmap-populate", "arguments": {
+>      "job-id": "job0", "node": "target_node", "name": "target_bitmap",
+>      "sources": [ { "pattern": "allocation", "node": "from_node" },
+>                   { "pattern": "bitmap", "node": "from_node",
+> 		     "bitmap": "from_bitmap" } ] } }
 
-On Thu, Sep 3, 2020 at 1:28 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
->
-> Il gio 3 set 2020, 06:43 Bin Meng <bmeng.cn@gmail.com> ha scritto:
->>
->> It seems to me that when building hw/char directory NEED_CPU_H is not
->> defined. However when building hw/riscv and hw/intc NEED_CPU_H is
->> defined. I have no clue where to control c_args to build sub-directories. Any suggestions?
->
->
-> Hi!
->
-> The common_ss sourceset (and most others: block_ss, softmmu_ss, etc.) will not have NEED_CPU_H; only specific_ss will, in addition to the entire directories hw/riscv and target/riscv.
->
-> In other words, specific_ss is equivalent to the old obj-y Makefile variable.
+(I see, this is not realized in v4)
 
-Thank you! It works.
+What about multiple targets as well, as we discussed in v3?
 
-Regards,
-Bin
+> 
+> John Snow (5):
+>    block: add bitmap-populate job
+>    blockdev: combine DriveBackupState and BlockdevBackupState
+>    qmp: expose block-dirty-bitmap-populate
+>    iotests: move bitmap helpers into their own file
+>    iotests: add 298 for block-dirty-bitmap-populate
+> 
+>   qapi/block-core.json          |   66 +
+>   qapi/job.json                 |    6 +-
+>   qapi/transaction.json         |    2 +
+>   include/block/block.h         |    1 +
+>   include/block/block_int.h     |   21 +
+>   block/bitmap-populate.c       |  207 ++
+>   blockdev.c                    |  104 +-
+>   blockjob.c                    |    3 +-
+>   MAINTAINERS                   |    1 +
+>   block/meson.build             |    1 +
+>   tests/qemu-iotests/257        |  110 +-
+>   tests/qemu-iotests/298        |  232 ++
+>   tests/qemu-iotests/298.out    | 4544 +++++++++++++++++++++++++++++++++
+>   tests/qemu-iotests/bitmaps.py |  131 +
+>   tests/qemu-iotests/group      |    1 +
+>   15 files changed, 5301 insertions(+), 129 deletions(-)
+>   create mode 100644 block/bitmap-populate.c
+>   create mode 100755 tests/qemu-iotests/298
+>   create mode 100644 tests/qemu-iotests/298.out
+>   create mode 100644 tests/qemu-iotests/bitmaps.py
+> 
+
+
+-- 
+Best regards,
+Vladimir
 
