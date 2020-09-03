@@ -2,86 +2,90 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B66C2D0A6
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC76CC43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:54:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75C7420639
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:35:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6AE1206EB
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:54:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="stz+Bp01"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75C7420639
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LEwa2yjl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6AE1206EB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDvxQ-0005ND-LB
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:35:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47966)
+	id 1kDwFG-0001rr-Mq
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:54:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDvwj-0004xZ-NK
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:35:01 -0400
-Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:45340)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kDvwi-0002ru-2Q
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:35:01 -0400
-Received: by mail-ej1-x633.google.com with SMTP id i26so5626168ejb.12
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 13:34:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=vT3FWggpMREdYJZIRJUtwlmU/KslYvUKBwRFwxLyFSc=;
- b=stz+Bp01ma8QGfMuwcmDbnUIVrpsRsGrLYEHCK9yvAv9anXsdXa9/9zHZj4+kxpalW
- 7cT/I1Ltfool2gxHbwD09FJxtQ6DYhhu/Qf/KwDDiwlEK59/Hb7PMEuk3UtVvDxnh1Go
- +PY0ry89C7rQbI7CYRkXHal8z5nWmN2pizuIjWs3DXc8watCd15+kAVa7ZtWoCExsWLo
- ZwB5GOm4fWIVozY1aSZ4W5IV256DHl+KK3Lo/LDl4bAkHg3vSXlX8bmh9S64MGUjuWn9
- xNtSvK0tlqrUc5X4dn+oI6umh/P0VbEndFg3BTngm3cH7jft0kC9+zLhFkQexmJFjXFf
- wDMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=vT3FWggpMREdYJZIRJUtwlmU/KslYvUKBwRFwxLyFSc=;
- b=B7jrQrlQBSOjbCRsxq9dgAKFDSzuOhSupJyrXQDafHDnLPI0FDMZVH3PC5IusbMoH6
- 8fQd3jWnXkyddGuBgTJdO4aoiOYrRAo4ViwmjQoWDxJKP1fgVgfN1Bbm+Lc8HaQZPrIE
- 9GaBaZwEzU2F8wbBZahT9XoMDwkIIiqnLr1muobH7I6lG5KFTes0trSZkf1TNuE+gJnr
- NMV83H/qudAiIk72lQZ8d+1Q5LZ0qN4mD8XDrY/Vrdir8SNPX9+GSlvqOzycCJwsT10o
- tRvGvMZVNxCNiakgoDQ2tl5+Y5WCKUXx6OZYQxnHelupyiJxYw1XtuREpPNWLK3CY2Pg
- G2AQ==
-X-Gm-Message-State: AOAM533oQ0wqUdzYj6g4RsEukymlPKo66T3nUbhc4lIzbJxzClAKJwWi
- 31NWoZ9ntgLuMOCOW1xE4Cjhr6E8MzuUPAw7QHM0Bg==
-X-Google-Smtp-Source: ABdhPJyiyFgObPhps93J04dRumrsfderU3ZYtu7l4yMK71MTU4y8HEyZLz4mF6RyAelIIifDDcwo4uASMyHUhr/n1iU=
-X-Received: by 2002:a17:906:59b:: with SMTP id 27mr4298196ejn.56.1599165298581; 
- Thu, 03 Sep 2020 13:34:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kDwE6-0000LD-1O
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:52:58 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54456
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kDwE2-0006WW-Kn
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:52:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599166373;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=7hrteQtPb4fP2DtxnJ0f5kT2tT98m3hNbWJovhD1H8g=;
+ b=LEwa2yjlA19VJp/ROzCojsn6tcWxlf8hdxb0Y0Whst8sCPKhFMdCSGYo6TGVE1K9qXsFFU
+ e3fGRX8hNAXwMJrHeQEG9SDE2dW1cLTPspeSiUjZb80on6AA1et7jsGMaLcbBF4g22Ygpf
+ al7swY4nd9QM86AyadtYxc3HlITh7Ws=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-550-7W868kJQOuWTe8xmm06vSw-1; Thu, 03 Sep 2020 16:52:50 -0400
+X-MC-Unique: 7W868kJQOuWTe8xmm06vSw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DA3FF10BBED8;
+ Thu,  3 Sep 2020 20:52:49 +0000 (UTC)
+Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A75ED7EEAE;
+ Thu,  3 Sep 2020 20:52:49 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 01/27] qom: make object_ref/unref use a void * instead of
+ Object *.
+Date: Thu,  3 Sep 2020 16:52:21 -0400
+Message-Id: <20200903205247.1667472-2-ehabkost@redhat.com>
+In-Reply-To: <20200903205247.1667472-1-ehabkost@redhat.com>
+References: <20200903205247.1667472-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-References: <20200903123130.451577-1-thuth@redhat.com>
-In-Reply-To: <20200903123130.451577-1-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 3 Sep 2020 21:34:47 +0100
-Message-ID: <CAFEAcA-eX5D2iptriNr568PL0nXp3nrr0S621BreT_9pjiYhJA@mail.gmail.com>
-Subject: Re: [PULL v3 00/15] Cirrus-CI improvements, and other CI-related
- fixes, m68k
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::633;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x633.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:28:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,40 +98,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 3 Sep 2020 at 13:31, Thomas Huth <thuth@redhat.com> wrote:
->
->  Hi Peter!
->
-> The following changes since commit ed215cec0fcaeaece064b0fdf37fe3bceb06d76c:
->
->   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2020-09-02 15:26:38 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2020-09-03
->
-> for you to fetch changes up to 0a796d63bcd4e840bb94fbe894ae2ad77b9ee2f7:
->
->   gitlab-ci.yml: Set artifacts expiration time (2020-09-03 12:47:33 +0200)
->
-> ----------------------------------------------------------------
-> * Cirrus-CI improvements and fixes (compile with -Werror & fix for 1h problem)
-> * Two build system fixes to fix some failures the CI
-> * One m68k QOMification patch
-> * Some trivial qtest patches
-> * Some small improvements for the Gitlab CI
-> ----------------------------------------------------------------
+From: Daniel P. Berrangé <berrange@redhat.com>
 
+The object_ref/unref methods are intended for use with any subclass of
+the base Object. Using "Object *" in the signature is not adding any
+meaningful level of type safety, since callers simply use "OBJECT(ptr)"
+and this expands to an unchecked cast "(Object *)".
 
-Applied, thanks.
+By using "void *" we enable the object_unref() method to be used to
+provide support for g_autoptr() with any subclass.
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200723181410.3145233-2-berrange@redhat.com>
+Message-Id: <20200831210740.126168-2-ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/qom/object.h | 4 ++--
+ qom/object.c         | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
--- PMM
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 0f3a60617c..1f8aa2d48e 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -1035,7 +1035,7 @@ GSList *object_class_get_list_sorted(const char *implements_type,
+  * as its reference count is greater than zero.
+  * Returns: @obj
+  */
+-Object *object_ref(Object *obj);
++Object *object_ref(void *obj);
+ 
+ /**
+  * object_unref:
+@@ -1044,7 +1044,7 @@ Object *object_ref(Object *obj);
+  * Decrease the reference count of a object.  A object cannot be freed as long
+  * as its reference count is greater than zero.
+  */
+-void object_unref(Object *obj);
++void object_unref(void *obj);
+ 
+ /**
+  * object_property_try_add:
+diff --git a/qom/object.c b/qom/object.c
+index 00fdf89b3b..b1822a2ef4 100644
+--- a/qom/object.c
++++ b/qom/object.c
+@@ -1124,8 +1124,9 @@ GSList *object_class_get_list_sorted(const char *implements_type,
+                         object_class_cmp);
+ }
+ 
+-Object *object_ref(Object *obj)
++Object *object_ref(void *objptr)
+ {
++    Object *obj = OBJECT(objptr);
+     if (!obj) {
+         return NULL;
+     }
+@@ -1133,8 +1134,9 @@ Object *object_ref(Object *obj)
+     return obj;
+ }
+ 
+-void object_unref(Object *obj)
++void object_unref(void *objptr)
+ {
++    Object *obj = OBJECT(objptr);
+     if (!obj) {
+         return;
+     }
+-- 
+2.26.2
+
 
