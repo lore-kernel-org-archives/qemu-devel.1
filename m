@@ -7,73 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F50C43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:14:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F8CC43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:15:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A6A2206E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:14:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2FE3206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:15:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o2WB0332"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A6A2206E7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U1A+Ihoq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2FE3206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwZ6-0007s8-Fl
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:14:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58820)
+	id 1kDwZw-0000ia-Jk
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:15:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLU-0004Au-Tk; Thu, 03 Sep 2020 17:00:36 -0400
-Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:46892)
+ id 1kDwKy-0003Nn-IL; Thu, 03 Sep 2020 17:00:04 -0400
+Received: from mail-ot1-x32c.google.com ([2607:f8b0:4864:20::32c]:39211)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLS-0007i5-UT; Thu, 03 Sep 2020 17:00:36 -0400
-Received: by mail-oo1-xc41.google.com with SMTP id r6so1115659oon.13;
- Thu, 03 Sep 2020 14:00:33 -0700 (PDT)
+ id 1kDwKw-0007MX-BY; Thu, 03 Sep 2020 17:00:04 -0400
+Received: by mail-ot1-x32c.google.com with SMTP id u25so4008283otq.6;
+ Thu, 03 Sep 2020 14:00:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=0LMgxbFODWFpBaUC7jVrX4CuO2pJP6IZde8nJ19Zvuo=;
- b=o2WB0332e2+ouLNHFWs8qrQ3/t2f+lmDJT2MAdiGBD7ag2Gx8HcDGTtGsyTp1GytlL
- Yupc2EKN+YmlCXgU43eUvh17WmeTU4vyyubcou1Opt9ORzB4N02hFfIytmBq43OXaLQf
- HWV4oTJIaL4HE8G22zxSwjd14vbZCkbyMwcyKLDxREXu+28BuUJrfM85CT+qBM4ZxbFV
- hXlqwcsw8qv6jgslPPlc0t3RM0zufewMaajGecy7psXqswcvZP4u5ivCCYrqls+Daem0
- B/IcS2fxE1eqYQoDVGT6iiiVXoJ6Kqt8olgFGQpByFnTELWhs9WM7tmiXyJqNEfzyJ4T
- idBg==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=rlfytk/HxGcRvQ43QKeVZDlvKaRhllUNtWQbE6mYVCc=;
+ b=U1A+Ihoqs14Ap+tzZ9MDJuzdSwiT12iqB4x2y0I/xN1lTnml1p4BCBFQd0pPbb9isl
+ Rk0yhQKklzGWQkJSUCNiVbAv4tPs6Yr47szSYmeCX5azHT7g4iaRdFcfPSKa6PwASEZ0
+ Oj5aIuJ9NNWef0vc9MLu1lioL8WLNdr5w0fdiI0ZVDGILDovtByHD1f2arJmd47Dabgt
+ Wb8uX9rXtLfIWSsHXT/35BwIVlt37NkMQS36HENFUpAoyg2ZlzbKXM8SJeWxs2UbG68W
+ NhDW4WzDTTd53Vyax1PzGP2tZlyBryMUeCJrqPq1uAF7eZCITv3UqPYt1DyWgaWIPnlA
+ tFnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=0LMgxbFODWFpBaUC7jVrX4CuO2pJP6IZde8nJ19Zvuo=;
- b=KKLVGUueAtByWDGzAte+7xJwmjtOgjsxrfUcIHzSoe+orIae7SotGpuOUoZlByULVh
- b1w0jCnpbmKfo1OpeFgIlv7URWiCGSwKqlyUr7q3sntbGLJb00Zc8x/GJU99KrNok3KR
- /s2ZVxXBhA0tafAWeEeoaF0cmxp+NnkfKxdQW17lBDEu3JjUTRAWNWHcEMr1klyVhP+R
- KdfnstnjuusfPwxPiTn2LQ/jOrpYywjgqmCwsA5rbioazxEKOxZEm262zOoD4Gbffa7I
- LBngmK3/j89tZaaTCZqwwQyu9JYA3r4YhW3EJmwI1JQV6j0iK42EuGQdV+y220U/I4v4
- MmUg==
-X-Gm-Message-State: AOAM533WJTQ30mkVD/+WODib3ReQWeYuTYukwz7mnoSxs6bbo298cMdS
- hgH2eBXti6dP7QGid2ZiNnqqBtRqWLc=
-X-Google-Smtp-Source: ABdhPJyDdn4kiKWjUdAKxHyH9FK8TbJETKGPOTOnGSk/WbWecviuBQvvJ3iQLQkqaLZOcX4rgS/DCw==
-X-Received: by 2002:a4a:7241:: with SMTP id r1mr3344079ooe.48.1599166832885;
- Thu, 03 Sep 2020 14:00:32 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=rlfytk/HxGcRvQ43QKeVZDlvKaRhllUNtWQbE6mYVCc=;
+ b=X8HaUSj6IJHCThV0YZoK8R0P6O6wuZZaOcD2ncsAtvULiPgzB0RISLRjgWXoyQh3Ng
+ kvmAKylSIxclR3iFRsC8xdUYC2AqQa1wuGo9EIOiNWmWGJe13k9HUmrAu+ZiCPqk1B5k
+ cun6vNW20SDOz+lYLqmBraJs4X7sfHPyvpWIHMBD3CjoxEvMyNSXm7xFXDuqPFc7DKGP
+ VBQ9nHu2JoR+8YxRfOZ8b2/WM7GPEzO1H7CyAYS6wCotSHDuqvVwiicXYKmzByM7nnmH
+ YktI6CO91stxGTeCN3hgnJT8fJCYxtrLMWuRJIRdQMW4o5kne4TntAKbl9wEs8GklIPi
+ 00Mw==
+X-Gm-Message-State: AOAM530sAm8yLsA84mTbaXhHifLRFcUsFS2uM5TBh/imOajAXDQ9Mgu/
+ kBvCjjDyhU2IICBxnECTBwSdwlCWZUc=
+X-Google-Smtp-Source: ABdhPJzICnhV8rm0nVYYCpfU/wU6GQn/BMzRcIWxPt8YB0OMN0wG6kI5jsAd5BMBN+0kfd+d5W27eA==
+X-Received: by 2002:a9d:7f84:: with SMTP id t4mr3163361otp.192.1599166800161; 
+ Thu, 03 Sep 2020 14:00:00 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id 40sm757020otj.76.2020.09.03.14.00.32
+ by smtp.gmail.com with ESMTPSA id a75sm709467oii.55.2020.09.03.13.59.59
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:32 -0700 (PDT)
+ Thu, 03 Sep 2020 13:59:59 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 03/77] qemu-nbd: Close inherited stderr
-Date: Thu,  3 Sep 2020 15:58:21 -0500
-Message-Id: <20200903205935.27832-4-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 16/77] ati-vga: check mm_index before recursive call
+ (CVE-2020-13800)
+Date: Thu,  3 Sep 2020 15:58:34 -0500
+Message-Id: <20200903205935.27832-17-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
- envelope-from=flukshun@gmail.com; helo=mail-oo1-xc41.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::32c;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x32c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -96,46 +101,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Raphael Pour <raphael.pour@hetzner.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>, qemu-stable@nongnu.org,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Raphael Pour <raphael.pour@hetzner.com>
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Close inherited stderr of the parent if fork_process is false.
-Otherwise no one will close it. (introduced by e6df58a5)
+While accessing VGA registers via ati_mm_read/write routines,
+a guest may set 's->regs.mm_index' such that it leads to infinite
+recursion. Check mm_index value to avoid such recursion. Log an
+error message for wrong values.
 
-This only affected 'qemu-nbd -c /dev/nbd0'.
-
-Signed-off-by: Raphael Pour <raphael.pour@hetzner.com>
-Message-Id: <d8ddc993-9816-836e-a3de-c6edab9d9c49@hetzner.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-[eblake: Enhance commit message]
-Signed-off-by: Eric Blake <eblake@redhat.com>
-(cherry picked from commit 0eaf453ebf6788885fbb5d40426b154ef8805407)
+Reported-by: Ren Ding <rding@gatech.edu>
+Reported-by: Hanqing Zhao <hanqing@gatech.edu>
+Reported-by: Yi Ren <c4tren@gmail.com>
+Message-id: 20200604090830.33885-1-ppandit@redhat.com
+Suggested-by: BALATON Zoltan <balaton@eik.bme.hu>
+Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+(cherry picked from commit a98610c429d52db0937c1e48659428929835c455)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qemu-nbd.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+ hw/display/ati.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index 4aa005004e..306e44fb0a 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -916,7 +916,11 @@ int main(int argc, char **argv)
-         } else if (pid == 0) {
-             close(stderr_fd[0]);
- 
--            old_stderr = dup(STDERR_FILENO);
-+            /* Remember parent's stderr if we will be restoring it. */
-+            if (fork_process) {
-+                old_stderr = dup(STDERR_FILENO);
-+            }
-+
-             ret = qemu_daemon(1, 0);
- 
-             /* Temporarily redirect stderr to the parent's pipe...  */
+diff --git a/hw/display/ati.c b/hw/display/ati.c
+index 58ec8291d4..9228f1b242 100644
+--- a/hw/display/ati.c
++++ b/hw/display/ati.c
+@@ -285,8 +285,11 @@ static uint64_t ati_mm_read(void *opaque, hwaddr addr, unsigned int size)
+             if (idx <= s->vga.vram_size - size) {
+                 val = ldn_le_p(s->vga.vram_ptr + idx, size);
+             }
+-        } else {
++        } else if (s->regs.mm_index > MM_DATA + 3) {
+             val = ati_mm_read(s, s->regs.mm_index + addr - MM_DATA, size);
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                "ati_mm_read: mm_index too small: %u\n", s->regs.mm_index);
+         }
+         break;
+     case BIOS_0_SCRATCH ... BUS_CNTL - 1:
+@@ -520,8 +523,11 @@ static void ati_mm_write(void *opaque, hwaddr addr,
+             if (idx <= s->vga.vram_size - size) {
+                 stn_le_p(s->vga.vram_ptr + idx, size, data);
+             }
+-        } else {
++        } else if (s->regs.mm_index > MM_DATA + 3) {
+             ati_mm_write(s, s->regs.mm_index + addr - MM_DATA, data, size);
++        } else {
++            qemu_log_mask(LOG_GUEST_ERROR,
++                "ati_mm_write: mm_index too small: %u\n", s->regs.mm_index);
+         }
+         break;
+     case BIOS_0_SCRATCH ... BUS_CNTL - 1:
 -- 
 2.17.1
 
