@@ -2,91 +2,66 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02291C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 00:59:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A531C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:57:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC3A0204EC
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 00:59:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36A422072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:57:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGbTI2ng"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC3A0204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CCHF2c2C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36A422072A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDdb4-0001Ny-Ts
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 20:59:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59194)
+	id 1kDeVc-0001mu-8N
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 21:57:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1kDdaX-0000sO-7F
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 20:58:53 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:40412)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1kDdaV-00079S-DH
- for qemu-devel@nongnu.org; Wed, 02 Sep 2020 20:58:52 -0400
-Received: by mail-il1-x142.google.com with SMTP id y2so941522ilp.7
- for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 17:58:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=hN7aGBq86ycig/3UxHah0Gg2hr9eKDbP0NvSWMHHig8=;
- b=EGbTI2ngA/aC2rozMvsppCNoObESUbzCo2lvui1XjEFzMulLmhPzQBz7W/jCGz17BY
- +44AO4j8cqeOXiH2VJgjWWFm+txkQj6ELt6U+KtZkTMPD774u8qmVmK1TUzRd+HgxeWi
- XOuDFDPw+GjlkL04b96yGU4jL0rT4Gce9h0k212Cc4qungCbO43lRe6PHECT3jh0fZXz
- FAAcXaXcy8+ODFYtN8GsGWL5B/YHA0mTdiPo09cZyqyEBnWKYN0RhpnCCTddhXSwH+8r
- l5HKdOlFY+9kVdN9o7Hfkn3cOywcBC2PJv8sDkwPqkJ8uOR1Efk6Ul8sUu4jWg/RxPUu
- dUOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=hN7aGBq86ycig/3UxHah0Gg2hr9eKDbP0NvSWMHHig8=;
- b=gAksOxy2jef4geDa1F+44FhKVlXCX4dWQ5LORdW6qb62up9NONACEtQa0IUc/r+jLo
- 7qNBlrFKKr4jR2FOpUIrz2ujzY6DGV7ZZoekLuJREOE7tdYcwxsqJEUYNk2VnpdOYg0n
- f8jiGFsR3Y/svcrbYhkwmXqvprZa6B8HfjEBAydH4EyBc+Z+FndACkiVOFJ6HL+5hN0o
- /fRqvcCAYbwUu3O9nx9oGw59LVxNiT0cLpaQQ3ekYWWTyvVjQDunQG8ZgRy03/IjZB5h
- u3msNoVaS9WKuoeaXNKxDLrw3KTaSGK4B9paN5fBR5DarNnz8X1ehzPlZeXKeSZ5U5gs
- EuOg==
-X-Gm-Message-State: AOAM5315UhqCIf1ScyKYtJ+KprTd0dYP8SJh16W952T+sGfUJYJtfhoA
- gPwemnjP3PSFgRis4uMysmqfiV/zQDR4arQLxDs=
-X-Google-Smtp-Source: ABdhPJyxPKswadvrad1LfcZk/0CqcN+AAVIXVYmf6rsVLZtEegWomF1GZd2gNZJp2gJDfik6wdSWV4x0Rg0ee6Mr5HQ=
-X-Received: by 2002:a05:6e02:d8f:: with SMTP id
- i15mr815241ilj.147.1599094729745; 
- Wed, 02 Sep 2020 17:58:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kDeUm-00005w-1c; Wed, 02 Sep 2020 21:57:00 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:55997 helo=ozlabs.org)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kDeUj-0005bt-1H; Wed, 02 Sep 2020 21:56:59 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BhkSd2bYBz9sTp; Thu,  3 Sep 2020 11:56:49 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1599098209;
+ bh=rBlWEZQ01ggjZW9f7CpBFT7ZjV9RlvLxalPbKl1Tou0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=CCHF2c2CEf2AHBcRGq+3FCCxgrvAKtu6NkbBP/yeH/Dox8VBbJGnt+3rp3p4IUI+7
+ BRytnDnQYXvvRqy2DSYMQMVBcj5Ld5sfa2B49JCbTZXoPrcklxRFZBefnHs/xs/MOW
+ RWiOqIxbxiJ/lZCrJmrgsoLKQZp0DoEhbfWC7Ems=
+Date: Thu, 3 Sep 2020 11:49:04 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH v2 0/7] pseries NUMA distance rework
+Message-ID: <20200903014904.GJ1897@yekko.fritz.box>
+References: <20200901125645.118026-1-danielhb413@gmail.com>
+ <20200903013539.GH1897@yekko.fritz.box>
 MIME-Version: 1.0
-References: <1598256668-12131-1-git-send-email-chenhc@lemote.com>
- <d594ed8e-1cb5-f9ac-09d3-7da28f5a95d3@amsat.org>
-In-Reply-To: <d594ed8e-1cb5-f9ac-09d3-7da28f5a95d3@amsat.org>
-From: Huacai Chen <chenhuacai@gmail.com>
-Date: Thu, 3 Sep 2020 08:58:38 +0800
-Message-ID: <CAAhV-H4hRT+7KNCDX7bWwxK_mgYRSkWh+9rh1o6LLfD8zmGdqg@mail.gmail.com>
-Subject: Re: [PATCH V2 for-5.2] hw/null-machine: Add the kvm_type() hook for
- MIPS
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=chenhuacai@gmail.com; helo=mail-il1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="apbmkPN6Hu/1dI3g"
+Content-Disposition: inline
+In-Reply-To: <20200903013539.GH1897@yekko.fritz.box>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 20:05:08
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,93 +74,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Thomas Huth <thuth@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Philippe,
 
-On Wed, Sep 2, 2020 at 9:55 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org=
-> wrote:
->
-> Hi Huacai,
->
-> On 8/24/20 10:11 AM, Huacai Chen wrote:
-> > MIPS has two types of KVM: TE & VZ, and TE is the default type. Now,
-> > libvirt uses a null-machine to detect the kvm capability. In the MIPS
-> > case, it will return "KVM not supported" on a VZ platform by default.
-> > So, add the kvm_type() hook to the null-machine.
-> >
-> > This seems not a very good solution, but I cannot do it better now.
-> >
-> > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > ---
-> >  hw/core/meson.build    | 2 +-
-> >  hw/core/null-machine.c | 6 ++++++
-> >  2 files changed, 7 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/core/meson.build b/hw/core/meson.build
-> > index fc91f98..b6591b9 100644
-> > --- a/hw/core/meson.build
-> > +++ b/hw/core/meson.build
-> > @@ -35,7 +35,6 @@ softmmu_ss.add(files(
-> >    'machine-hmp-cmds.c',
-> >    'machine.c',
-> >    'nmi.c',
-> > -  'null-machine.c',
-> >    'qdev-fw.c',
-> >    'qdev-properties-system.c',
-> >    'sysbus.c',
-> > @@ -45,5 +44,6 @@ softmmu_ss.add(files(
-> >
-> >  specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
-> >    'machine-qmp-cmds.c',
-> > +  'null-machine.c',
-> >    'numa.c',
-> >  ))
-> > diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> > index 7e69352..4b4ab76 100644
-> > --- a/hw/core/null-machine.c
-> > +++ b/hw/core/null-machine.c
-> > @@ -17,6 +17,9 @@
-> >  #include "sysemu/sysemu.h"
-> >  #include "exec/address-spaces.h"
-> >  #include "hw/core/cpu.h"
-> > +#ifdef TARGET_MIPS
-> > +#include "kvm_mips.h"
-> > +#endif
-> >
-> >  static void machine_none_init(MachineState *mch)
-> >  {
-> > @@ -55,6 +58,9 @@ static void machine_none_machine_init(MachineClass *m=
-c)
-> >      mc->no_floppy =3D 1;
-> >      mc->no_cdrom =3D 1;
-> >      mc->no_sdcard =3D 1;
-> > +#ifdef TARGET_MIPS
-> > +    mc->kvm_type =3D mips_kvm_type;
-> > +#endif
->
-> I'm a bit confused here, you are taking the same path from your v4...
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg712550.html
->
-> Did you rebase the correct version?
-The old patch has split to two parts, the first part is used by MIPS
-machine and already merged. This is the second part used by the
-null-machine (and libvirt use null-machine to detect kvm
-capabilities).
+--apbmkPN6Hu/1dI3g
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Huacai
->
-> >  }
-> >
-> >  DEFINE_MACHINE("none", machine_none_machine_init)
-> >
+On Thu, Sep 03, 2020 at 11:35:39AM +1000, David Gibson wrote:
+> On Tue, Sep 01, 2020 at 09:56:38AM -0300, Daniel Henrique Barboza wrote:
+> > Hi,
+> >=20
+> > Following the reviews of the first version [1], specially this
+> > reply from David [2], I decided to take a step back and refactor
+> > all the code in hw/ppc/spapr* that operates with ibm,associativity,
+> > ibm,associativity-reference-points and ibm,max-associativity-domains.
+> >=20
+> > A new file named 'spapr_numa.c' was created to gather all the
+> > associativity related code into helpers that write NUMA/associativity
+> > related info to the FDT. These helpers are then used in other
+> > spapr_* files. This allows us to change NUMA related code in a
+> > single location, instead of searching every file to see where is
+> > associativity being written and how, and all the soon to get
+> > more complex logic can be contained in spapr_numa.c. I consider
+> > the end result to be better than what I ended up doing in v1.
+> >=20
+> > Unlike v1, there is no NUMA distance change being done in this series.
+> > Later on, the hub of the new NUMA distance calculation will be
+> > spapr_numa_associativity_init(), where we'll take into consideration
+> > user input from numa_states, handle sizes to what the PAPR kernel
+> > understands and establish assoaciativity domains between the NUMA
+> > nodes.
+>=20
+> Patches 1..4 applied to ppc-for-5.2.  Patch 5 has some nits I've
+> commented on.
+
+Ah, sorry, I realised I missed something.  Patches 1..2 are still
+applied, but patch 3 has a nit large enough to call for a respin.
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--apbmkPN6Hu/1dI3g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9QS5AACgkQbDjKyiDZ
+s5JbJhAA5b5EzsKJATY2U4pXrDkPcYPCvcRq9aALF4uG0OGyuCnSb29EZBMC4MSX
+w0Mpx7dkf7LQIb5G1qoSVw54ZcKRXKjKQC6vHXwe+Ax3RAn4R7ABTedP6KhR8rXE
+MxmK9ND9BYMp6n7mo0oewyYGCy8mc+cSBOJ4dzV5SrmaSlqmFyEGuecxPnujA8fh
+r+0CqsSxlTomopZKP+H4XAFlahqIndbLnTZ2cd5nt2Z2CS8iv4aBQz6D/Kom+iAo
+04LigwbRe5YhOym/DPQlWyiQtVIqZ4tm4qLHdR++zHnSe/po/VmDDVFkkLzYrrtB
+eHHtzrZwfi4Fxqs5E1YxK76X5xULK3fFlb3oi9+nvecvZUuk6vR7Qyuv27fQV5KW
+Ol0zWc2hOZgqDon7OqRYeHS8lOvcn052JO0lvTbgsNwBZBdmFtxhHNK2Xj6ld3Uz
+3CnkOafP7nGdmwKb9OmqUQ1MvsWBvQw/Bg3r77+eeR9qTWFuRgEBqIfDjonQGxcw
+DSH5P41UwhqIsV0x+55YFmHHTorNCx/YzGBvNU8m9KqPcB4M0i+zoHNgoJ3fKgo3
+Yts4W+rY4U3fJiehntcRWhBsPH/b8yPmZznIpKfHwlK+Zo5sUptXO9vQOOqwKt2l
+a2F9z3OCow7uxvZBbbnWNlxfMsB/RXuwO7v6SJza69uMBFx1fi0=
+=SIY3
+-----END PGP SIGNATURE-----
+
+--apbmkPN6Hu/1dI3g--
 
