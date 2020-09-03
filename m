@@ -2,139 +2,79 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49AF9C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C258C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:46:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1531A2071B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:44:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DD5D320665
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 05:46:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="NZldyKBr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1531A2071B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c8rUORF1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD5D320665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53312 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDi2v-00084D-5k
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 01:44:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50428)
+	id 1kDi4c-0000dC-38
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 01:46:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50586)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1kDi2B-0007f9-C9
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:43:43 -0400
-Received: from mail-bn7nam10on2046.outbound.protection.outlook.com
- ([40.107.92.46]:58762 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1kDi28-0006Vh-Tn
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:43:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mppyGMdNJjI91yDCjW3jQCZ6YoH4eJDA116N1W1xkfTdsBOUFPhz9+7C2wtudqCjkFezmaX2MVYIgOiBXasD36L5+A9u5/B6ndDK21GHfj+ChW/Z4VCw0VVA5Oz4gMzqsWqgLXSznJTqMSiEaJwH4+j1+0gQASgfWptYlfYgBs0Rcu8R7mD4R7L1pAi3wPIHKNCJwHinMBlQfSHY2UBmxhOYVUf3zJ/MXf2xU8KBZMQiwWkTqRRjJBQY2j3NCTEIAMGjKRRdTN/K6yIu5DTRjlR6kyXYljHvV45tGozTN02K/8jSDC9X3b4O2jpKnusHmCltPbMVKGQKDYXWAAMLzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i72qooGvkipQGPsH3HQpUWttODDX0Y62v2t0Xf768zg=;
- b=QPJc4Ydkkk0D8GBiSc9WnK3kDeZk+EEcLd1gVHaons6r26zapsiZ+1KdzHG3k2fXDPm9mdLd8b0js5Icscl6QiYr1THxJGoB55hPDynd0mmtEKiHviyxhsHPW3NVmegy8YDS9aAgtb2qDKHj8TU095iyJRMPX09zIBE185WbKi30VBj1NRPhBZbnfJ9v67oDDL9h17+7nAVROnuMWzpWHFlSef4UuvX6OIY/nZSkzZN2/hOfajUj1kUhC7P7JxoLKkA03bUZ6E6BAGBLEIrVHZfwVS7EGxjc9uSEWjsD8FxIgMUwB6qeJNf1ykFsLGAB3Oeyt8fNI3AirdQ/TR7t7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=fel.cvut.cz smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i72qooGvkipQGPsH3HQpUWttODDX0Y62v2t0Xf768zg=;
- b=NZldyKBrgyeqcdyrQb8J4c6e1N/KiW9YSiqAto0vEKtS3nDDQkoD2VSiysBLGNKzZA10FHOKppOzpEuP3ENtio6+XS4AGscyHMjiX4BeUCwUpCBAmI5wIS/Sb/ZLvVCf4x+bjUYFExYdrMFbWquzccopv0wy+KAcuGRbcQkZWCE=
-Received: from SN2PR01CA0053.prod.exchangelabs.com (2603:10b6:800::21) by
- CY4PR02MB3159.namprd02.prod.outlook.com (2603:10b6:910:79::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3326.19; Thu, 3 Sep 2020 05:43:38 +0000
-Received: from SN1NAM02FT060.eop-nam02.prod.protection.outlook.com
- (2603:10b6:800:0:cafe::e5) by SN2PR01CA0053.outlook.office365.com
- (2603:10b6:800::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.16 via Frontend
- Transport; Thu, 3 Sep 2020 05:43:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; fel.cvut.cz; dkim=none (message not signed)
- header.d=none;fel.cvut.cz; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- SN1NAM02FT060.mail.protection.outlook.com (10.152.72.192) with Microsoft SMTP
- Server id 15.20.3326.21 via Frontend Transport; Thu, 3 Sep 2020 05:43:37
- +0000
-Received: from [149.199.38.66] (port=51769 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <fnu.vikram@xilinx.com>)
- id 1kDi1y-00062G-MX; Wed, 02 Sep 2020 22:43:30 -0700
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
- by smtp.xilinx.com with esmtp (Exim 4.63)
- (envelope-from <fnu.vikram@xilinx.com>)
- id 1kDi24-0000WR-0u; Wed, 02 Sep 2020 22:43:36 -0700
-Received: from xsj-pvapsmtp01 (mailman.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 0835hYMZ032134; 
- Wed, 2 Sep 2020 22:43:35 -0700
-Received: from [172.19.2.115] (helo=xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <fnu.vikram@xilinx.com>)
- id 1kDi22-0000WO-Qr; Wed, 02 Sep 2020 22:43:34 -0700
-Date: Wed, 2 Sep 2020 22:43:34 -0700
-From: Vikram Garhwal <fnu.vikram@xilinx.com>
-To: pisa@cmp.felk.cvut.cz
-Subject: Re: [PATCH v1 3/6] net/can: Add can_dlc2len and can_len2dlc for CAN
- FD.
-Message-ID: <20200903054329.GA405867@xilinx.com>
-References: <cover.1594725647.git.pisa@cmp.felk.cvut.cz>
- <30758547c49f254b3965fc12500735bea8265c97.1594725647.git.pisa@cmp.felk.cvut.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <30758547c49f254b3965fc12500735bea8265c97.1594725647.git.pisa@cmp.felk.cvut.cz>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b2db091a-e714-4aee-4121-08d84fcc4df1
-X-MS-TrafficTypeDiagnostic: CY4PR02MB3159:
-X-Microsoft-Antispam-PRVS: <CY4PR02MB315919764EEF1F82E81C2C1FBC2C0@CY4PR02MB3159.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Q0pBYmlPzKdmYFoED3TRLL9hTP4+bnRjUGRY1iw372+ZApm1pmLia/P/4eKOAKEzTMJsOs/AYEiH+rv3oA6II6JqITxK7VLDRyj9oTugvJW2h1IYwA+8S//dr2UEZjQ3FfJie6t/oN97QHv6cSBX3Hh5oMEsO3MwTmQDfKIP2nOpkmkBKtr37UBIYt49lXmjxGr4RazNM+D3luH1oayFgAAhjdibH4gDP040G5Tuu3pvJa7TPyYKNCq2dDOrpNerAOTePcFtjspousqFlrklnmoJk66SD5apo4tKgJiT+O/cZWmHMj2OAIANA0b3zbtuRwhyow5pYvWsRr2P8shTQov+qNj31MUf931omPBfpMv4CjepIRNXKV7Jlq4Ox8k3VjYFEDl9FW5q+bKJS61JrZMfn0OEHVX1ZB/MP1Z85SM=
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(396003)(376002)(346002)(39860400002)(136003)(46966005)(82310400003)(7416002)(8936002)(8676002)(9786002)(478600001)(356005)(81166007)(6916009)(2906002)(70206006)(70586007)(5660300002)(82740400003)(316002)(36756003)(2616005)(7696005)(26005)(54906003)(426003)(4326008)(336012)(1076003)(186003)(47076004)(33656002)(27376004);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2020 05:43:37.2314 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2db091a-e714-4aee-4121-08d84fcc4df1
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: SN1NAM02FT060.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR02MB3159
-Received-SPF: pass client-ip=40.107.92.46; envelope-from=fnuv@xilinx.com;
- helo=NAM10-BN7-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:43:39
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDi3f-000063-02
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:45:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21592)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDi3b-0006fR-2e
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 01:45:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599111909;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type;
+ bh=5To05iZyCKjCChYbkY8p3ROFswdIR4gTrfcFvLIeb7w=;
+ b=c8rUORF11lndEkvVL16vHe0UmbqYWHRlP5ERSJ9ss8mKLAe/k1iuIMFM1x0Jii/DJYvBC8
+ k91QQddxUafHer+sxghbiP9pMdebYobThrk/PdFRmt2gpy4A47q92m9Zd0SDEQhH3ecTz0
+ uZN40Uazxkhv5bsXH3FB88cHM88mgjo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-98-yDVDMx2YPna7bCDDFYAAVg-1; Thu, 03 Sep 2020 01:45:07 -0400
+X-MC-Unique: yDVDMx2YPna7bCDDFYAAVg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 963BB801AE0
+ for <qemu-devel@nongnu.org>; Thu,  3 Sep 2020 05:45:06 +0000 (UTC)
+Received: from thuth.com (ovpn-112-90.ams2.redhat.com [10.36.112.90])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 74E187E670;
+ Thu,  3 Sep 2020 05:45:05 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] stubs: Move qemu_fd_register stub to util/main-loop.c
+Date: Thu,  3 Sep 2020 07:45:03 +0200
+Message-Id: <20200903054503.425435-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 23:55:14
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -147,94 +87,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marek Vasut <marex@denx.de>, Jiri Novak <jnovak@fel.cvut.cz>,
- Oliver Hartkopp <socketcan@hartkopp.net>, Deniz Eren <deniz.eren@icloud.com>,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- Konrad Frederic <frederic.konrad@adacore.com>,
- Jan Kiszka <jan.kiszka@siemens.com>, Jan Charvat <charvj10@fel.cvut.cz>,
- Stefan Hajnoczi <stefanha@gmail.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Ondrej Ille <ondrej.ille@gmail.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Jul 14, 2020 at 02:20:16PM +0200, pisa@cmp.felk.cvut.cz wrote:
-Hi Pavel,
-> From: Jan Charvat <charvj10@fel.cvut.cz>
->
-> Signed-off-by: Jan Charvat <charvj10@fel.cvut.cz>
-> Signed-off-by: Pavel Pisa <pisa@cmp.felk.cvut.cz>
-> ---
->  include/net/can_emu.h |  4 ++++
->  net/can/can_core.c    | 36 ++++++++++++++++++++++++++++++++++++
->  2 files changed, 40 insertions(+)
->
-> diff --git a/include/net/can_emu.h b/include/net/can_emu.h
-> index c6164dcfb4..7d395fbb9b 100644
-> --- a/include/net/can_emu.h
-> +++ b/include/net/can_emu.h
-> @@ -127,4 +127,8 @@ int can_bus_client_set_filters(CanBusClientState *,
->                                 const struct qemu_can_filter *filters,
->                                 size_t filters_cnt);
->
-> +uint8_t can_dlc2len(uint8_t can_dlc);
-> +
-> +uint8_t can_len2dlc(uint8_t len);
-> +
-These function are aimed for canfd. Perhaps rename these to canfd_dlc2len and
-canfd_len2dlc for better distinction?
-Rest of the patch looks good to me.
->  #endif
-> diff --git a/net/can/can_core.c b/net/can/can_core.c
-> index 90f4d8576a..0115d78794 100644
-> --- a/net/can/can_core.c
-> +++ b/net/can/can_core.c
-> @@ -33,6 +33,42 @@
->  #include "net/can_emu.h"
->  #include "qom/object_interfaces.h"
->
-> +/* CAN DLC to real data length conversion helpers */
-> +
-> +static const uint8_t dlc2len[] = {
-> +    0, 1, 2, 3, 4, 5, 6, 7,
-> +    8, 12, 16, 20, 24, 32, 48, 64
-> +};
-> +
-> +/* get data length from can_dlc with sanitized can_dlc */
-> +uint8_t can_dlc2len(uint8_t can_dlc)
-> +{
-> +    return dlc2len[can_dlc & 0x0F];
-> +}
-> +
-> +static const uint8_t len2dlc[] = {
-> +    0, 1, 2, 3, 4, 5, 6, 7, 8,                              /* 0 - 8 */
-> +    9, 9, 9, 9,                                             /* 9 - 12 */
-> +    10, 10, 10, 10,                                         /* 13 - 16 */
-> +    11, 11, 11, 11,                                         /* 17 - 20 */
-> +    12, 12, 12, 12,                                         /* 21 - 24 */
-> +    13, 13, 13, 13, 13, 13, 13, 13,                         /* 25 - 32 */
-> +    14, 14, 14, 14, 14, 14, 14, 14,                         /* 33 - 40 */
-> +    14, 14, 14, 14, 14, 14, 14, 14,                         /* 41 - 48 */
-> +    15, 15, 15, 15, 15, 15, 15, 15,                         /* 49 - 56 */
-> +    15, 15, 15, 15, 15, 15, 15, 15                          /* 57 - 64 */
-> +};
-> +
-> +/* map the sanitized data length to an appropriate data length code */
-> +uint8_t can_len2dlc(uint8_t len)
-> +{
-> +    if (unlikely(len > 64)) {
-> +        return 0xF;
-> +    }
-> +
-> +    return len2dlc[len];
-> +}
-> +
->  struct CanBusState {
->      Object object;
->
-> --
-> 2.20.1
->
->
+The linker of MinGW sometimes runs into the following problem:
+
+libqemuutil.a(util_main-loop.c.obj): In function `qemu_fd_register':
+/builds/huth/qemu/build/../util/main-loop.c:331: multiple definition of
+ `qemu_fd_register'
+libqemuutil.a(stubs_fd-register.c.obj):/builds/huth/qemu/stubs/fd-register.c:5:
+ first defined here
+collect2: error: ld returned 1 exit status
+/builds/huth/qemu/rules.mak:88: recipe for target 'tests/test-timed-average.exe'
+ failed
+
+qemu_fd_register() is defined in util/main-loop.c for WIN32, so let's simply
+move the stub also there in the #else part of the corresponding #ifndef
+to fix this problem.
+
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ stubs/fd-register.c | 6 ------
+ stubs/meson.build   | 1 -
+ util/main-loop.c    | 4 ++++
+ 3 files changed, 4 insertions(+), 7 deletions(-)
+ delete mode 100644 stubs/fd-register.c
+
+diff --git a/stubs/fd-register.c b/stubs/fd-register.c
+deleted file mode 100644
+index 63a4abdb20..0000000000
+--- a/stubs/fd-register.c
++++ /dev/null
+@@ -1,6 +0,0 @@
+-#include "qemu/osdep.h"
+-#include "qemu/main-loop.h"
+-
+-void qemu_fd_register(int fd)
+-{
+-}
+diff --git a/stubs/meson.build b/stubs/meson.build
+index e2dfedc2a7..e0b322bc28 100644
+--- a/stubs/meson.build
++++ b/stubs/meson.build
+@@ -9,7 +9,6 @@ stub_ss.add(files('cpu-get-clock.c'))
+ stub_ss.add(files('cpu-get-icount.c'))
+ stub_ss.add(files('dump.c'))
+ stub_ss.add(files('error-printf.c'))
+-stub_ss.add(files('fd-register.c'))
+ stub_ss.add(files('fdset.c'))
+ stub_ss.add(files('fw_cfg.c'))
+ stub_ss.add(files('gdbstub.c'))
+diff --git a/util/main-loop.c b/util/main-loop.c
+index f69f055013..217c8d6056 100644
+--- a/util/main-loop.c
++++ b/util/main-loop.c
+@@ -179,6 +179,10 @@ static int max_priority;
+ static int glib_pollfds_idx;
+ static int glib_n_poll_fds;
+ 
++void qemu_fd_register(int fd)
++{
++}
++
+ static void glib_pollfds_fill(int64_t *cur_timeout)
+ {
+     GMainContext *context = g_main_context_default();
+-- 
+2.18.2
+
 
