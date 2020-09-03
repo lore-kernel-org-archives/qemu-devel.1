@@ -2,122 +2,105 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,RCVD_ILLEGAL_IP,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC47C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:17:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA778C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:17:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F0592071B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:17:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 81E052071B
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:17:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="s2Qfc0sI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F0592071B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsySzsPs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81E052071B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37894 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDnFO-0005qj-EK
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:17:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36032)
+	id 1kDnFQ-0005wN-Kg
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:17:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34498)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kDnEM-0004HM-HC; Thu, 03 Sep 2020 07:16:38 -0400
-Received: from mail-eopbgr80103.outbound.protection.outlook.com
- ([40.107.8.103]:34530 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kDnEJ-00070d-Dc; Thu, 03 Sep 2020 07:16:37 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fZtbNkpu0njo+Zor5O8sVOwd+uzwCLvdambB6HBxNVgPDnP1+oiBbGWpU+Rzj5aseP6c4GBo+9ldyU3Q6BpsKyL5x8loq6RAvPxPp7384Xg3NsNkFa/g/5KEycy2PZKtLwvmLuVZaDvpCzavCVw9H5/sxXNODd16fzvV3Km9gngIaILAyV3AZPWLxa5iCTu11jsg1LomSqKt+VWibG/dpTK36Ucv8b1fJ54TvX8cPSR3zzTUArZ466IZCVUNXjfUfYAf1Iku3MD4EMBWs61ShCHfWi8InRVd4qGg2+lnnmK38fbkxXQhAnFtuP7JA/3QiOBQCMoaiHjwc97Q75ckhw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=29BMxhC4ClIQLlMdhiFf8y6nv1MFLc6/KwzbkxxRcNI=;
- b=OfCZpsFICC0nqTnk8r0/qaArS3tqZQjDaZqM/27wkdfDkS5D3u9/vhaV7S3Gc5hUO5xcJmo9y5kZ2pVVVTt4QM86437Ykg5QjEj9URd5+29wyX+HQjGOGol/9D2Em2y7ec302wtP94RwY4dDyrivmT8iURMQZZARC9CND7oOE9qFfZKtrgT48BAVjP4Il6Yzl7/WFB3HtuJWbdVedkjY6xrYeQq+YY4k8WahESlSCSh96eW80bc4QWo8USR9/pbxqIfbahgtSa6mYGiua0uZRyzj3eKKbpKlnTH/nsZbmTNKiuuqZELyXBe28lKwXsQo5yHcA1P/pypmp95BAQegiw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=29BMxhC4ClIQLlMdhiFf8y6nv1MFLc6/KwzbkxxRcNI=;
- b=s2Qfc0sIKcTTwAFRsh4hIXaPWhhoY75BvrRl1GK+qAgbdGKy4qpyfFKilkgU6piDPmtIN/PbP2gZoOyt/sG2xvmU5zzDkxk+wKGQkjo4f/wqj8ZcULaAFxcvQPGdFJU78sQhar2vmrNc0n41Ct5tnTiqkSCGisxo51J0gyyukbY=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB5206.eurprd08.prod.outlook.com (2603:10a6:20b:e9::18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.23; Thu, 3 Sep
- 2020 11:16:31 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::b179:9641:7589:d692%7]) with mapi id 15.20.3348.015; Thu, 3 Sep 2020
- 11:16:31 +0000
-To: qemu-devel <qemu-devel@nongnu.org>
-Cc: qemu block <qemu-block@nongnu.org>, Eric Blake <eblake@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Kevin Wolf <kwolf@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Subject: flatview_write_continue global mutex deadlock
-Message-ID: <3abe8579-3540-72fd-c452-3cc52d7fcf26@virtuozzo.com>
-Date: Thu, 3 Sep 2020 14:16:29 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM0PR03CA0051.eurprd03.prod.outlook.com (2603:10a6:208::28)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDn7q-0001R0-Uj
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:09:54 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51387
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDn7o-00060V-D9
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 07:09:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599131391;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9GnpNx8hKziNiqdzN01AImO2FtSdDZqIBcQzFpkVYA0=;
+ b=RsySzsPsh2kvq7nkD+jX+Er/fgawngwtQlGJTComtHoWAKMxZbTtVoCI+AyPk7sfjn7lk3
+ TiN5KktQpjL5fo7KUxP+aAUaVkInUFKmrC3hmaH8gmmmqUtByrrVZqnvFOD5+5pugiKfgm
+ lE43lwsbzfSuJDCyOfvytjejGSWUQhQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-528-PePNy95GPcqEXhlxmqkwoQ-1; Thu, 03 Sep 2020 07:09:50 -0400
+X-MC-Unique: PePNy95GPcqEXhlxmqkwoQ-1
+Received: by mail-wm1-f71.google.com with SMTP id c186so836259wmd.9
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 04:09:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=9GnpNx8hKziNiqdzN01AImO2FtSdDZqIBcQzFpkVYA0=;
+ b=nkPwc6Dsf5DSeM3y6HU/5NtswfGCZ4SIEc4XqWuWeNfQEbT1fFQ7D0k5RlwKRBmxuU
+ ueUXpJ2qEetWNULvvatsQhkwfA4sS+HQQd9y4k69kC3Vj6ja8Xf74DNoeDsa/asVHMD7
+ V9QUva2tZRMBPwaEPT5vBFXhA8R36lcv+JZr3iuJsdNu1kSniagzL4YuSjS6j8KfdYzc
+ OOPm9KlkdXKH/aq52CIs8FOsXlR2Y/3JRXhygnyBsSseuaWoiSDD1JcShTfXywALPwvI
+ qEfwFmkYfa1ufuoGHjmUkTPBq1//aGalBnAsF0BZqV+Asx5ppSPT9rPkDNXzQJ25vvO+
+ JRBw==
+X-Gm-Message-State: AOAM530Ut2N9V6Ms780kFOrTJyVqArUWvrR9brGfdBdYNdjEL9mqX6Hp
+ H8r/1fVfBEOx7wj/okRMoCPUh8S70mw2SVUI+jpF48xBWsbW0DoAdqTjaxnuXkXNZlw8EX0A3uP
+ TyDSWqCVh8hVNVaM=
+X-Received: by 2002:a1c:f003:: with SMTP id a3mr1951210wmb.170.1599131388986; 
+ Thu, 03 Sep 2020 04:09:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxMrJssg5m9tGdHjZnb9WOYc9LGcKTl/RYUTl+cJMTDL99r9rkDu5mWJzLx75Laz0g6Ll7jVQ==
+X-Received: by 2002:a1c:f003:: with SMTP id a3mr1951153wmb.170.1599131388703; 
+ Thu, 03 Sep 2020 04:09:48 -0700 (PDT)
+Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id q3sm3709070wmq.12.2020.09.03.04.09.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 03 Sep 2020 04:09:48 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 12/12] dma: Assert when device writes to indirect memory
+ (such MMIO regions)
+Date: Thu,  3 Sep 2020 13:08:31 +0200
+Message-Id: <20200903110831.353476-13-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200903110831.353476-1-philmd@redhat.com>
+References: <20200903110831.353476-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from 255.255.255.255 (255.255.255.255) by
- AM0PR03CA0051.eurprd03.prod.outlook.com (2603:10a6:208::28) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3348.15 via Frontend Transport; Thu, 3 Sep 2020 11:16:30 +0000
-X-Originating-IP: [185.215.60.171]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2e40c8ab-65da-45b7-b95a-08d84ffacf39
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5206:
-X-Microsoft-Antispam-PRVS: <AM6PR08MB5206B003E5A979A78FE8D24BC12C0@AM6PR08MB5206.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rgHs1LECkftBH3s27rZrSwu5bpYgk0O+JV1zCF+M08w3lHE0uH5iFPcg2xY8SiZMz0lKQyd+SzNyqby+7D1U5L9JENodrj3i37RB0y5p8WB46m2M77JQGfAym5X8HeuJ1kx+cW6c4NiFwanSXGzve4NIjTwfOSLVsg1U0FrNTy5E8ZzHH80OVrcuA4f/36bmv066+t9VpVKMlbDo34yWathOlKJ4Uy0gCGIQRRWxkht4y9sAWrEQEi+kW0ke2raxYxUtdxUldLhx74BUj7X5pWWShVu9g8IKtUH8AZyk7RMZQBQHjGz57G5DcgNKGbXcSqkA5X1LnQV+HOj5e9+CW48eDDyEsFeLqGQraumRhgL95Wn9A2P0jNn5GfbcYZiVX4yaj1PR8cyPmhMH43yxSA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(396003)(366004)(346002)(376002)(136003)(2906002)(5660300002)(8676002)(4326008)(31686004)(36756003)(83380400001)(478600001)(8936002)(186003)(66556008)(54906003)(66476007)(26005)(31696002)(316002)(956004)(6486002)(6916009)(16576012)(52116002)(86362001)(66946007)(2616005)(21314003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 2OARoucGjQr6N4u0qgaPRNWjKmZDpnFfk6kXT7nh3prCDzq2/NTpeqnrlt0TNj1xd4a+2yEgQrG8g7zlU2fcYnofU3Vwij/rXZufFCBxh+qGU0sj/ZN8aC32AF8JTNrFM+ECPYtoIBxhOFZk/VRxFv+luMAu3JDofhgsIkbraXejIe2GuvIvSZ4hE5dZ7l8INkNSBpa59AgQIoCyNzDvJsHPw3Y2YDBrKS/k4zaQUjajG5ZHoQF468HRuKk2FZHMRrXHwgv0nb4PXkhj/ASzFRK51PpiLcQ8dDMJSMmTVxcuHATbJSikh0iW7XHlOZLQVIrosnUWJnDQVatF21nYO/yW/Iow6MECoiu0v5tnr+pG03XoLt1lPbqTfzfufaiAhL+XKqE2+HjuLbsSEFONkaHiXbdAv0QJ2Qd6zqSMzmI34WwihZ/xchzqBbHGEbt7m0Nb2VY7mwHjPJTBNbfqQSe2PsblLWHZvEdiV8tR3Aqv/8qHJXXZnsHUZLdUlPPphzjMg57DC2yRD4x95Gy5D9za3Lf0lHWTn9vQ4TsVAYNm3AhxJWe0NyFwG0u44CskvFRWIaKVXHaiHPsEVM8Bq22QvzJZqiBYg74joWGQCEiWQGbgGYQmYxc8qAWUfwMvXhSosCsJyEg91hiYwO/7gg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2e40c8ab-65da-45b7-b95a-08d84ffacf39
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Sep 2020 11:16:31.1404 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hj/awYgLFH346+zn2YE5ZHX1uHqvrFy/Ytp9H1F9XjMK7hosXPq80SxHRHVCS2lzp1vtqYc/HzpbY2GjEMw4UnOx8DG1zId3zcHhF4aBUA8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5206
-Received-SPF: pass client-ip=40.107.8.103;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 07:16:32
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -7
-X-Spam_score: -0.8
-X-Spam_bar: /
-X-Spam_report: (-0.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_ILLEGAL_IP=1.3, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,121 +113,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, Peter Xu <peterx@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-block@nongnu.org,
+ Li Qiang <liq3ea@163.com>, "Emilio G . Cota" <cota@braap.org>,
+ Peter Chubb <peter.chubb@nicta.com.au>, Joel Stanley <joel@jms.id.au>,
+ Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>,
+ Robert Foley <robert.foley@linaro.org>,
+ Alistair Francis <alistair@alistair23.me>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Tony Nguyen <tony.nguyen@bt.com>,
+ Prasad J Pandit <pjp@fedoraproject.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all!
+Assert DMA accesses are done on direct memory (in particular
+to catch invalid accesses to MMIO regions).
 
-I can trigger long io request with help of nbd reconnect-delay option, which make the request wait for some time for the connection to establish again and retry (of course, this works if connection is already lost). So, the request itself may be long. And this triggers the deadlock, which seems unrelated to nbd itself.
+Example with the reproducer from LP#1886362 (see previous commit):
 
-So, what I do:
+  qemu-system-i386: include/sysemu/dma.h:111: int dma_memory_rw(AddressSpace *, dma_addr_t, void *, dma_addr_t, DMADirection, MemTxAttrs): Assertion `dir == DMA_DIRECTION_TO_DEVICE || attrs.direct_access' failed.
+  (gdb) bt
+  #0  0x00007ffff51d69e5 in raise () at /lib64/libc.so.6
+  #1  0x00007ffff51bf895 in abort () at /lib64/libc.so.6
+  #2  0x00007ffff51bf769 in _nl_load_domain.cold () at /lib64/libc.so.6
+  #3  0x00007ffff51cee76 in annobin_assert.c_end () at /lib64/libc.so.6
+  #4  0x0000555557b48a94 in dma_memory_rw (as=0x7fffddd3ca28, addr=4064, buf=0x7fffffff7780, len=16, dir=DMA_DIRECTION_FROM_DEVICE, attrs=...) at /home/phil/source/qemu/include/sysemu/dma.h:111
+  #5  0x0000555557b487e0 in pci_dma_rw (dev=0x7fffddd3c800, addr=4064, buf=0x7fffffff7780, len=16, dir=DMA_DIRECTION_FROM_DEVICE) at /home/phil/source/qemu/include/hw/pci/pci.h:791
+  #6  0x0000555557b47373 in pci_dma_write (dev=0x7fffddd3c800, addr=4064, buf=0x7fffffff7780, len=16) at /home/phil/source/qemu/include/hw/pci/pci.h:804
+  #7  0x0000555557b340b4 in e1000e_write_packet_to_guest (core=0x7fffddd3f4e0, pkt=0x61100006c740, rxr=0x7fffffff7cf0, rss_info=0x7fffffff7d10) at hw/net/e1000e_core.c:1609
+  #8  0x0000555557b30739 in e1000e_receive_iov (core=0x7fffddd3f4e0, iov=0x619000060e80, iovcnt=4) at hw/net/e1000e_core.c:1709
+  #9  0x00005555576e2069 in e1000e_nc_receive_iov (nc=0x61400000a060, iov=0x619000060e80, iovcnt=4) at hw/net/e1000e.c:213
+  #10 0x00005555572a3c34 in net_tx_pkt_sendv (pkt=0x631000028800, nc=0x61400000a060, iov=0x619000060e80, iov_cnt=4) at hw/net/net_tx_pkt.c:556
+  #11 0x00005555572a23e2 in net_tx_pkt_send (pkt=0x631000028800, nc=0x61400000a060) at hw/net/net_tx_pkt.c:633
+  #12 0x00005555572a4c67 in net_tx_pkt_send_loopback (pkt=0x631000028800, nc=0x61400000a060) at hw/net/net_tx_pkt.c:646
+  #13 0x0000555557b70b05 in e1000e_tx_pkt_send (core=0x7fffddd3f4e0, tx=0x7fffddd5f748, queue_index=0) at hw/net/e1000e_core.c:664
+  #14 0x0000555557b6eab8 in e1000e_process_tx_desc (core=0x7fffddd3f4e0, tx=0x7fffddd5f748, dp=0x7fffffff8680, queue_index=0) at hw/net/e1000e_core.c:743
+  #15 0x0000555557b6d65d in e1000e_start_xmit (core=0x7fffddd3f4e0, txr=0x7fffffff88a0) at hw/net/e1000e_core.c:934
+  #16 0x0000555557b5ea38 in e1000e_set_tctl (core=0x7fffddd3f4e0, index=256, val=255) at hw/net/e1000e_core.c:2431
+  #17 0x0000555557b369ef in e1000e_core_write (core=0x7fffddd3f4e0, addr=1027, val=255, size=4) at hw/net/e1000e_core.c:3265
+  #18 0x00005555576de3be in e1000e_mmio_write (opaque=0x7fffddd3c800, addr=1027, val=255, size=4) at hw/net/e1000e.c:109
+  #19 0x0000555558e6b789 in memory_region_write_accessor (mr=0x7fffddd3f110, addr=1027, value=0x7fffffff8eb0, size=4, shift=0, mask=4294967295, attrs=...) at softmmu/memory.c:483
+  #20 0x0000555558e6b05b in access_with_adjusted_size (addr=1027, value=0x7fffffff8eb0, size=1, access_size_min=4, access_size_max=4, access_fn= 0x555558e6b120 <memory_region_write_accessor>, mr=0x7fffddd3f110, attrs=...) at softmmu/memory.c:544
+  #21 0x0000555558e69776 in memory_region_dispatch_write (mr=0x7fffddd3f110, addr=1027, data=255, op=MO_8, attrs=...) at softmmu/memory.c:1465
+  #22 0x0000555558f60462 in flatview_write_continue (fv=0x60600003f9e0, addr=3775005699, attrs=..., ptr=0x6020000e3710, len=1, addr1=1027, l=1, mr=0x7fffddd3f110) at exec.c:3176
+  #23 0x0000555558f4e38b in flatview_write (fv=0x60600003f9e0, addr=3775005699, attrs=..., buf=0x6020000e3710, len=1) at exec.c:3220
+  #24 0x0000555558f4dd4f in address_space_write (as=0x60800000baa0, addr=3775005699, attrs=..., buf=0x6020000e3710, len=1) at exec.c:3315
+  #25 0x000055555916b3e0 in qtest_process_command (chr=0x55555c03f300 <qtest_chr>, words=0x604000058150) at softmmu/qtest.c:567
+  #26 0x000055555915f7f2 in qtest_process_inbuf (chr=0x55555c03f300 <qtest_chr>, inbuf=0x6190000200e0) at softmmu/qtest.c:710
 
-1. Create an image:
-    qemu-img create -f qcow2 xx 100M
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ include/sysemu/dma.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-2. Start NBD server:
-    qemu-nbd xx
-
-3. Start vm with second nbd disk on node2, like this:
-
-   ./build/x86_64-softmmu/qemu-system-x86_64 -nodefaults -drive     file=/work/images/cent7.qcow2 -drive driver=nbd,server.type=inet,server.host=192.168.100.5,server.port=10809,reconnect-delay=60     -vnc :0 -m 2G -enable-kvm -vga std
-
-
-4. Access the vm through vnc (or some other way?), and check that NBD
-    drive works:
-
-    dd if=/dev/sdb of=/dev/null bs=1M count=10
-
-    - the command should succeed.
-
-5. Now, kill the nbd server, and run dd in the guest again:
-
-    dd if=/dev/sdb of=/dev/null bs=1M count=10
-
-Now Qemu is trying to reconnect, and dd-generated requests are waiting for the connection (they will wait up to 60 seconds (see reconnect-delay option above) and than fail). But suddenly, vm may totally hang in the deadlock. You may need to increase reconnect-delay period to catch the dead-lock.
-
-Guest os is Centos 7.3.1611, kernel 3.10.0-514.el7.x86_64
-
-The dead lock looks as follows:
-
-(gdb) bt
-#0  0x00007fb9d784f54d in __lll_lock_wait () from /lib64/libpthread.so.0
-#1  0x00007fb9d784ae9b in _L_lock_883 () from /lib64/libpthread.so.0
-#2  0x00007fb9d784ad68 in pthread_mutex_lock () from /lib64/libpthread.so.0
-#3  0x000056069bfb3b06 in qemu_mutex_lock_impl (mutex=0x56069c7a3fe0 <qemu_global_mutex>, file=0x56069c24c79b "../util/main-loop.c", line=238) at ../util/qemu-thread-posix.c:79
-#4  0x000056069bd00056 in qemu_mutex_lock_iothread_impl (file=0x56069c24c79b "../util/main-loop.c", line=238) at ../softmmu/cpus.c:1782
-#5  0x000056069bfcfd6f in os_host_main_loop_wait (timeout=151823947) at ../util/main-loop.c:238
-#6  0x000056069bfcfe7a in main_loop_wait (nonblocking=0) at ../util/main-loop.c:516
-#7  0x000056069bd7777b in qemu_main_loop () at ../softmmu/vl.c:1676
-#8  0x000056069b95fec2 in main (argc=13, argv=0x7fffd42bff08, envp=0x7fffd42bff78) at ../softmmu/main.c:50
-(gdb) p qemu_global_mutex
-$1 = {lock = {__data = {__lock = 2, __count = 0, __owner = 215121, __nusers = 1, __kind = 0, __spins = 0, __elision = 0, __list = {__prev = 0x0, __next = 0x0}},
-     __size = "\002\000\000\000\000\000\000\000QH\003\000\001", '\000' <repeats 26 times>, __align = 2}, file = 0x56069c1d597d "../exec.c", line = 3139, initialized = true}
-
-exec.c:3139 is in prepare_mmio_access(), called from flatview_write_continue(). Let's check qemu_global_mutex owner thread:
-
-(gdb) info thr
-   Id   Target Id                                            Frame
-* 1    Thread 0x7fb9f0f39e00 (LWP 215115) "qemu-system-x86" 0x00007fb9d784f54d in __lll_lock_wait () from /lib64/libpthread.so.0
-   2    Thread 0x7fb9ca20e700 (LWP 215116) "qemu-system-x86" 0x00007fb9d756bbf9 in syscall () from /lib64/libc.so.6
-   3    Thread 0x7fb9481ff700 (LWP 215121) "qemu-system-x86" 0x00007fb9d7566cff in ppoll () from /lib64/libc.so.6
-   4    Thread 0x7fb9461ff700 (LWP 215123) "qemu-system-x86" 0x00007fb9d784ca35 in pthread_cond_wait@@GLIBC_2.3.2 () from /lib64/libpthread.so.0
-(gdb) thr 3
-[Switching to thread 3 (Thread 0x7fb9481ff700 (LWP 215121))]
-#0  0x00007fb9d7566cff in ppoll () from /lib64/libc.so.6
-(gdb) bt
-#0  0x00007fb9d7566cff in ppoll () from /lib64/libc.so.6
-#1  0x000056069bfbd3f1 in qemu_poll_ns (fds=0x7fb9401dcdf0, nfds=1, timeout=542076652475) at ../util/qemu-timer.c:347
-#2  0x000056069bfd949f in fdmon_poll_wait (ctx=0x56069e6864c0, ready_list=0x7fb9481fc200, timeout=542076652475) at ../util/fdmon-poll.c:79
-#3  0x000056069bfcdf4c in aio_poll (ctx=0x56069e6864c0, blocking=true) at ../util/aio-posix.c:601
-#4  0x000056069be80cf3 in bdrv_do_drained_begin (bs=0x56069e6c0950, recursive=false, parent=0x0, ignore_bds_parents=false, poll=true) at ../block/io.c:427
-#5  0x000056069be80ddb in bdrv_drained_begin (bs=0x56069e6c0950) at ../block/io.c:433
-#6  0x000056069bf1e5b4 in blk_drain (blk=0x56069e6adb50) at ../block/block-backend.c:1718
-#7  0x000056069ba40fb5 in ide_cancel_dma_sync (s=0x56069f0d1548) at ../hw/ide/core.c:723
-#8  0x000056069bb90d29 in bmdma_cmd_writeb (bm=0x56069f0d22d0, val=8) at ../hw/ide/pci.c:298
-#9  0x000056069b9fa529 in bmdma_write (opaque=0x56069f0d22d0, addr=0, val=8, size=1) at ../hw/ide/piix.c:75
-#10 0x000056069bd5d9d5 in memory_region_write_accessor (mr=0x56069f0d2420, addr=0, value=0x7fb9481fc4d8, size=1, shift=0, mask=255, attrs=...) at ../softmmu/memory.c:483
-#11 0x000056069bd5dbf3 in access_with_adjusted_size (addr=0, value=0x7fb9481fc4d8, size=1, access_size_min=1, access_size_max=4, access_fn=0x56069bd5d8f6 <memory_region_write_accessor>, mr=0x56069f0d2420,
-     attrs=...) at ../softmmu/memory.c:544
-#12 0x000056069bd60bda in memory_region_dispatch_write (mr=0x56069f0d2420, addr=0, data=8, op=MO_8, attrs=...) at ../softmmu/memory.c:1465
-#13 0x000056069bd965e2 in flatview_write_continue (fv=0x7fb9401ce100, addr=49152, attrs=..., ptr=0x7fb9f0f87000, len=1, addr1=0, l=1, mr=0x56069f0d2420) at ../exec.c:3176
-#14 0x000056069bd9673a in flatview_write (fv=0x7fb9401ce100, addr=49152, attrs=..., buf=0x7fb9f0f87000, len=1) at ../exec.c:3216
-#15 0x000056069bd96aae in address_space_write (as=0x56069c7a5940 <address_space_io>, addr=49152, attrs=..., buf=0x7fb9f0f87000, len=1) at ../exec.c:3307
-#16 0x000056069bd96b20 in address_space_rw (as=0x56069c7a5940 <address_space_io>, addr=49152, attrs=..., buf=0x7fb9f0f87000, len=1, is_write=true) at ../exec.c:3317
-#17 0x000056069bd07f06 in kvm_handle_io (port=49152, attrs=..., data=0x7fb9f0f87000, direction=1, size=1, count=1) at ../accel/kvm/kvm-all.c:2262
-#18 0x000056069bd086db in kvm_cpu_exec (cpu=0x56069e6cdb30) at ../accel/kvm/kvm-all.c:2508
-#19 0x000056069bcfef84 in qemu_kvm_cpu_thread_fn (arg=0x56069e6cdb30) at ../softmmu/cpus.c:1188
-#20 0x000056069bfb4681 in qemu_thread_start (args=0x56069e6f4860) at ../util/qemu-thread-posix.c:521
-#21 0x00007fb9d7848ea5 in start_thread () from /lib64/libpthread.so.0
-#22 0x00007fb9d75718dd in clone () from /lib64/libc.so.6
-
-
-(gdb) fr 13
-#13 0x000056069bd965e2 in flatview_write_continue (fv=0x7fb9401ce100, addr=49152, attrs=..., ptr=0x7fb9f0f87000, len=1, addr1=0, l=1, mr=0x56069f0d2420) at ../exec.c:3176
-3176                result |= memory_region_dispatch_write(mr, addr1, val,
-(gdb) list
-3171                release_lock |= prepare_mmio_access(mr);
-3172                l = memory_access_size(mr, l, addr1);
-3173                /* XXX: could force current_cpu to NULL to avoid
-3174                   potential bugs */
-3175                val = ldn_he_p(buf, l);
-3176                result |= memory_region_dispatch_write(mr, addr1, val,
-3177                                                       size_memop(l), attrs);
-3178            } else {
-3179                /* RAM case */
-3180                ram_ptr = qemu_ram_ptr_length(mr->ram_block, addr1, &l, false);
-(gdb) p release_lock
-$2 = true
-
-
-So, global mutex is locked in flatview_write_continue, and on the path we have blk_drain and wait for some requests (actually nbd requests, waiting for connection, but this shouldn't matter). In the same time main thread waits on global mutex, so it's impossible to proceed with these nbd requests. Deadlock..
-
-Paolo could you please help with it? Or who can? I know nothing about exec.c code :(
-
-Side idea about nbd-reconnect feature: probably we should drop (finish with failure) all the requests waiting for reconnect in .bdrv_co_drain_begin handler of nbd driver. But I'm not sure: it will break reconnect feature if drain() is often event.
-
+diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
+index 8a7dbf0b0f3..a4ba9438a56 100644
+--- a/include/sysemu/dma.h
++++ b/include/sysemu/dma.h
+@@ -108,6 +108,8 @@ static inline int dma_memory_rw(AddressSpace *as, dma_addr_t addr,
+                                 void *buf, dma_addr_t len,
+                                 DMADirection dir, MemTxAttrs attrs)
+ {
++    assert(dir == DMA_DIRECTION_TO_DEVICE || attrs.direct_access);
++
+     dma_barrier(as, dir);
+ 
+     return dma_memory_rw_relaxed(as, addr, buf, len, dir, attrs);
 -- 
-Best regards,
-Vladimir
+2.26.2
+
 
