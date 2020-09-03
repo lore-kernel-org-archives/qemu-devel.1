@@ -2,89 +2,93 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28737C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:40:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2F7C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:42:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D335A206E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2C422072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:42:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGYzU8s7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D335A206E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Uz/OmN9N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2C422072A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDpTw-000518-Vs
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:40:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46024)
+	id 1kDpVH-0005wO-1s
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:42:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kDpT3-0003wS-Ve
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:39:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52311)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kDpT2-0000RT-Jj
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:39:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599140394;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=eX3imYedQvzbjUlbpPhSs9mw/kwOE/aD51WYWhcHWko=;
- b=hGYzU8s7QydImQoENnhv727Tzc2ESWa20Ijs7o0Su4H6bKYgV5G233TsytdNLIXZB6lVdD
- 2VVDe0Vqzjw3bQslvmkVUgSxt1by2moYZll5eRscskTPqb9fKfuPTfXNhCNoK1QPKaiBPh
- y27ioppRwOFUy45PIebd5tWKgE9aZiM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-199-vbMxNEDTPhC4qqg9IJLZPQ-1; Thu, 03 Sep 2020 09:39:51 -0400
-X-MC-Unique: vbMxNEDTPhC4qqg9IJLZPQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1444D1084D61;
- Thu,  3 Sep 2020 13:39:50 +0000 (UTC)
-Received: from kaapi (ovpn-113-31.rdu2.redhat.com [10.10.113.31])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74F375C22B;
- Thu,  3 Sep 2020 13:39:46 +0000 (UTC)
-Date: Thu, 3 Sep 2020 19:09:43 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH] hw/ide: check null block pointer before blk_drain
-In-Reply-To: <a9de0e0e-273e-ece6-7e5a-4ea26c536c33@amsat.org>
-Message-ID: <nycvar.YSQ.7.78.906.2009031908100.2047119@xnncv>
-References: <20200827114428.1850912-1-ppandit@redhat.com>
- <CAAdtpL6o7_Cvnui+dsaobNaY93Noj7fcLWYx37mEGd3kTBv56Q@mail.gmail.com>
- <nycvar.YSQ.7.78.906.2009031631370.2047119@xnncv>
- <a9de0e0e-273e-ece6-7e5a-4ea26c536c33@amsat.org>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDpUj-0005Uw-0K
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:41:41 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:44915)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDpUh-0000l7-6Y
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:41:40 -0400
+Received: by mail-ed1-x544.google.com with SMTP id b12so2680892edz.11
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 06:41:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=fzIP45hW+79F4hUNRI+mrLa7HAgsqApgIY4Pjgt/J58=;
+ b=Uz/OmN9N3Rby/mP3xtdDL1zRBqdE6Kl+2pchZs6NqePrnAklOOv86iQTmWerXJXlDf
+ pIvOEGG4ieCDdRfTQu+HSxfheIMOodH/RwtOV7tE3RxbKbSZnrZTT+i8JMwEhez2Edsb
+ wbhSuv3YJ7sAmslJqOrByvLMhzo2Fyw9758Oh1/Xe178HljzO6DAUFjkj1JAxqLO/p9J
+ ijYWqdytQGbBCf5dNS9tx3wjLO9WMSI/sJ7GLEdo//zFK5HdojUy9NOb34bGIzxM50y6
+ YpyqMghYJsz74MZGwMo/4Xtf6xyrSBgq79sFhk5CiuXy+7aiEr/L8z81rpnlKW4VXJED
+ RubA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fzIP45hW+79F4hUNRI+mrLa7HAgsqApgIY4Pjgt/J58=;
+ b=Gs1L30/bTZ3NjduItbPJt39rtAjafBG5Beb7dKtB4sFrMFnoPgMMDwrT8EaygfZpow
+ TqHochUEiDgJIK/9Xf5l2//cWWbCFJnJbOTtXUf2hgxEG0aL2i8s/eBu6BmIzYzZnewC
+ 5C9QMUYgenUTTYzK3x+J6zvx7KPYjvy4UmSFnnmdzF4I9lSDbgBJMvh05lj6Zex2kfoN
+ kYObkJE3DnnaoMsFAZ5deUSJfsgMeFQwjiwkONE49064gU3ljiIvKuzyKSOO94hk7dgX
+ dz03872dlVPeB4GrHKhOfXxVAXndyrSsBzmmBat7Eb1C/fbB9KKcDcVy/cmpgG0I+1Yr
+ LyZA==
+X-Gm-Message-State: AOAM531oVzsnPcxqHDwg3YdURdIlVh5E5o8TkZ/G+A87yUfeI/5YZZvh
+ D7udJ701+Y4L3qrQejWXOojkCudYlnnsxHFWwNOtYA==
+X-Google-Smtp-Source: ABdhPJxDYxuDTWEAUvS8+0Rl7N2G7imNcqhrAkq06zDvjCSB6l2a6YcSOCiUahgP62hRVqTmMGZdThNmjKhPxG70RKo=
+X-Received: by 2002:a50:8f45:: with SMTP id 63mr3287152edy.52.1599140497577;
+ Thu, 03 Sep 2020 06:41:37 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/mixed;
- boundary="-1463810047-325064299-1599140389=:2047119"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200902162206.101872-1-liq3ea@163.com>
+ <b840aab8-542d-af43-43e5-0a07f442b5d5@redhat.com>
+ <CAFEAcA9mvMaR5MJJ74Vv63TG6frWnMeSZA19Zxv8TUceudPUTQ@mail.gmail.com>
+ <CAKXe6SLYgkiTAYa81nppHUMEzoeGy3988OmrzZyw8-VY8ajE3w@mail.gmail.com>
+ <CAFEAcA9TEpfBmfOOtpfR9JCAFkMF0fy20L=DBVDTFaLp6J3Lfg@mail.gmail.com>
+ <CAKXe6SKgVo5HBL2Uf8AscEn5ohZOJZGLMmT3NZL5cEbcQzgivg@mail.gmail.com>
+ <CAFEAcA_yTWf2toD_R3ye_cYRZjGOeyrKTV6At2U6vtHn5iiYPg@mail.gmail.com>
+ <475a8df6-f54d-9dff-f014-0aedf74ccc88@redhat.com>
+In-Reply-To: <475a8df6-f54d-9dff-f014-0aedf74ccc88@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Sep 2020 14:41:26 +0100
+Message-ID: <CAFEAcA99QOUaJ-wUZQfxmxfx+Mbp1mwWD=cK_vQ8fCE0RwfQuw@mail.gmail.com>
+Subject: Re: [RFC 0/3] try to solve the DMA to MMIO issue
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,31 +101,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, Ruhr-University <bugs-syssec@rub.de>,
- QEMU Developers <qemu-devel@nongnu.org>, qemu-block@nongnu.org
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Li Qiang <liq3ea@gmail.com>,
+ Jason Wang <jasowang@redhat.com>, Li Qiang <liq3ea@163.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
----1463810047-325064299-1599140389=:2047119
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+On Thu, 3 Sep 2020 at 14:36, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com=
+> wrote:
+> Not sure if this is a valid example, but when adding:
+>
+> -- >8 --
+> diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
+> index bca71b5934b..b8b4ba362b1 100644
+> --- a/hw/intc/ioapic.c
+> +++ b/hw/intc/ioapic.c
+> @@ -96,6 +96,8 @@ static void ioapic_service(IOAPICCommonState *s)
+>      uint32_t mask;
+>      uint64_t entry;
+>
+> +    assert(!resettable_is_in_reset(OBJECT(s)));
+> +
+>      for (i =3D 0; i < IOAPIC_NUM_PINS; i++) {
+>          mask =3D 1 << i;
+>          if (s->irr & mask) {
+> ---
+>
+> I get a MMIO write triggered from an IRQ:
 
-+-- On Thu, 3 Sep 2020, Philippe Mathieu-Daudé wrote --+
-| > +            if (s->blk) {
-| > +                ide_cancel_dma_sync(s);
-| > +                bm->status &= ~BM_STATUS_DMAING;
-| 
-| If you don't clear this bit the guest might keep retrying (looping).
+Yeah, IRQs can trigger MMIO writes. In this case one underlying
+problem is that the hpet_reset() code is asserting a qemu_irq
+in a reset phase that it should not, because it's an old-style
+reset function and not a new-style 3-phase one (which would
+do the assertion of the IRQ only in the 3rd phase). I don't
+think this is a case of ending up with a recursive re-entry
+into the code of the original device, though.
 
-Oh, okay will keep it out of the if(s->blk) block.
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
----1463810047-325064299-1599140389=:2047119--
-
+thanks
+-- PMM
 
