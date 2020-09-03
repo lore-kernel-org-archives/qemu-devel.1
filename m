@@ -2,92 +2,93 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2836C43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FF1C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:58:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F83C205CB
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:57:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6BA5E20678
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:58:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UZh++ogd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F83C205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUCGFniQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6BA5E20678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDxEW-000152-OU
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:57:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39720)
+	id 1kDxFb-0003MV-HR
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:58:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDwyl-0007RL-PD
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:41:12 -0400
-Received: from mail-pg1-x532.google.com ([2607:f8b0:4864:20::532]:35856)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwML-0005Ov-2E; Thu, 03 Sep 2020 17:01:29 -0400
+Received: from mail-ot1-x344.google.com ([2607:f8b0:4864:20::344]:46539)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDwyj-0004aN-Ij
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:41:11 -0400
-Received: by mail-pg1-x532.google.com with SMTP id p37so3170417pgl.3
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 14:41:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwMJ-0007vm-CE; Thu, 03 Sep 2020 17:01:28 -0400
+Received: by mail-ot1-x344.google.com with SMTP id c10so3976986otm.13;
+ Thu, 03 Sep 2020 14:01:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=+IpDS3pKsg+orX5M7DofjfKOj/+sV/QvHnOyEKwjMnE=;
- b=UZh++ogd+TpI1ahfhOsvV8lmQ10uIbCS2TlFQAk55jKxEx7gb8+SRVEtfPMkHqFk7L
- i7IFDGrDbBzCM/sukMj6VDhzC7rsPRRfrgYh/OQSWw11Zi08ingehHkI2tDJpHxqPO66
- 74KaRXbC/RgMqOVf3poGEXq5DwWijn6yMuyGn/f2KcVC4DGkHmXZ7QHx8UUTatfcnPLj
- PXognyJCXXE4m9qjKAjw9rsGSf84c40PDkwU9dZa+YiG6q6tRUInMKozqqrMEj3OIS5+
- N8oM2vQfdSd6VY9muJHnZ+dlYiCKUuK8ja/3YqtkUEqqEXdfUltcGyQbv/Rlxsp80EBL
- mcVQ==
+ bh=ukiMnU2Ka9CilWgAW2sSo5sQypISiGu+XOTOgn0j23Q=;
+ b=EUCGFniQXNizA5SYD5PkHcdWgwJn+49NwLtLVyQFwft/kWN11w3Ls7K8tUaFkMw42A
+ 9/wws5PNQVxB3V/4hD8vS+ojTNZq8N++M6EPbR0ETxQ645u16fHRojhD+yrcR4qWzH4z
+ /jUQT+/uSVCRPEzrEuMRxeFNI6C4DpWlofEG5RZKXI5FeXMlqYDr627JSsnrf0xvEb9P
+ 5EyKsI3viZotUyqt+poFpfl9MMCpPEJQJeYAPZnloUNGxW55uzNQYUy+pilj6mNTOJVU
+ IZURk+eRV9ngU3UxWZxPbij5pwxpDmdePVgxQUGfsHvgzUH8Bb+hx1INeYUyhx5ev7Of
+ VM1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=+IpDS3pKsg+orX5M7DofjfKOj/+sV/QvHnOyEKwjMnE=;
- b=jbprJrt+u5vSSU59X9wjJJ5zo4LLhZ4pl+JCJ/dxUe9wwgJ6VSzawGC2dMAidWFotZ
- zxgUB8KU/LB5zXPK90VqF5f+abknWHnT/E0ir0Gqcp0LJlWk/5dJUgszVcjcFOco9F6M
- sqf95YreAX20TMCdjVaKNynRbuW6lR6xvIK8SIgx8yguCf4KQhet+KDIemo0qb94VZoK
- umNd0bvi5B3sMRitGGMWmHWtw4ZIl8zCwwuHt95dbq17PMIVAGYqwPgrPzM0uVK/uFCc
- fwvVEhmUFBi/6ErVLIq+2oRni+nIet2FTXFxvfdtkjmCYRR3yqiY+rdyRozXnLEyAP4E
- Jgtg==
-X-Gm-Message-State: AOAM533jGwKv/djWbprafTlRRISwnl+zej50ddz1H+YtknnX9141JalW
- jEnP3sMZrfGT0j3crDnH9jSs8M2yAmDsUg==
-X-Google-Smtp-Source: ABdhPJx0zu/UJAqI8jxJ8vR6QB+eotQx2U3XX492DvUytR0UT8lm+8PD9YkkAFyLwL1zs8SkqQ57YQ==
-X-Received: by 2002:a63:fa45:: with SMTP id g5mr4510243pgk.448.1599169267417; 
- Thu, 03 Sep 2020 14:41:07 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v17sm4113290pfn.24.2020.09.03.14.41.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 14:41:06 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=ukiMnU2Ka9CilWgAW2sSo5sQypISiGu+XOTOgn0j23Q=;
+ b=h/qz+sM5284+m9mEY0EYuOVJ1T7n4zNmQdECGvkE4r36cB/CIRxlvqMi+1fsnnHuwo
+ kRrnXvEu+RAOv+q0RyZ2UQQzCAZjLsgFFTtfG5PfngLRBtwhGlUxDMCxqFW4N+kVYPYp
+ 0soJ6r1E3cgR4BTF9VA3Qcwcp7oMI+2MoCBSa3AC4I00Fz2XDRaVw5GhtjfknIe2IbTO
+ LBVKoz4PcADaENvnTjrUR/XQBr0gTnwrlnor0WaGzuqMfQtjaSV1e4Qe591JmGbX5pVw
+ 0j2ljnA4TFVAkJcz4nslyA1tTvjAjvW1jpD69OrhM/fUn769YMaMOGZG/8Of7oWL/F7z
+ Ybgw==
+X-Gm-Message-State: AOAM533RKODU/K4G3AU5td0T5mFy6zeB7A3zCRN/ABMJESlB6MKYI0aj
+ uaciZCwCD7ffGNcBf6L6Nt0Y6xnrJP7tYA==
+X-Google-Smtp-Source: ABdhPJz8pRPBwG8xRM1knu8gsqApuT1ZW9/ewO5C+peXCXPcSQb2bt5OVOvxr6bERYp7cFyv/I7JQg==
+X-Received: by 2002:a05:6830:1c61:: with SMTP id
+ s1mr2941421otg.149.1599166885564; 
+ Thu, 03 Sep 2020 14:01:25 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id w13sm740900oiw.50.2020.09.03.14.01.24
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 03 Sep 2020 14:01:25 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/5] softmmu/cpus: Only set parallel_cpus for SMP
-Date: Thu,  3 Sep 2020 14:40:59 -0700
-Message-Id: <20200903214101.1746878-4-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200903214101.1746878-1-richard.henderson@linaro.org>
-References: <20200903214101.1746878-1-richard.henderson@linaro.org>
+Subject: [PATCH 76/77] hw/arm/sbsa-ref: fix typo breaking PCIe IRQs
+Date: Thu,  3 Sep 2020 15:59:34 -0500
+Message-Id: <20200903205935.27832-77-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::532;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x532.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::344;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,51 +101,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Graeme Gregory <graeme@nuviainc.com>,
+ Peter Maydell <peter.maydell@linaro.org>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not set parallel_cpus if there is only one cpu instantiated.
-This will allow tcg to use serial code to implement atomics.
+From: Graeme Gregory <graeme@nuviainc.com>
 
+Fixing a typo in a previous patch that translated an "i" to a 1
+and therefore breaking the allocation of PCIe interrupts. This was
+discovered when virtio-net-pci devices ceased to function correctly.
+
+Cc: qemu-stable@nongnu.org
+Fixes: 48ba18e6d3f3 ("hw/arm/sbsa-ref: Simplify by moving the gic in the machine state")
+Signed-off-by: Graeme Gregory <graeme@nuviainc.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20200821083853.356490-1-graeme@nuviainc.com
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+(cherry picked from commit 870f0051b4ada9a361f7454f833432ae8c06c095)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- softmmu/cpus.c | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+ hw/arm/sbsa-ref.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-index a802e899ab..e3b98065c9 100644
---- a/softmmu/cpus.c
-+++ b/softmmu/cpus.c
-@@ -1895,6 +1895,16 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
-     if (!tcg_region_inited) {
-         tcg_region_inited = 1;
-         tcg_region_init();
-+        /*
-+         * If MTTCG, and we will create multiple cpus,
-+         * then we will have cpus running in parallel.
-+         */
-+        if (qemu_tcg_mttcg_enabled()) {
-+            MachineState *ms = MACHINE(qdev_get_machine());
-+            if (ms->smp.max_cpus > 1) {
-+                parallel_cpus = true;
-+            }
-+        }
+diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
+index 8409ba853d..0b32084dc0 100644
+--- a/hw/arm/sbsa-ref.c
++++ b/hw/arm/sbsa-ref.c
+@@ -555,7 +555,7 @@ static void create_pcie(SBSAMachineState *sms)
+ 
+     for (i = 0; i < GPEX_NUM_IRQS; i++) {
+         sysbus_connect_irq(SYS_BUS_DEVICE(dev), i,
+-                           qdev_get_gpio_in(sms->gic, irq + 1));
++                           qdev_get_gpio_in(sms->gic, irq + i));
+         gpex_set_irq_num(GPEX_HOST(dev), i, irq + i);
      }
  
-     if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
-@@ -1904,7 +1914,6 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
- 
-         if (qemu_tcg_mttcg_enabled()) {
-             /* create a thread per vCPU with TCG (MTTCG) */
--            parallel_cpus = true;
-             snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
-                  cpu->cpu_index);
- 
 -- 
-2.25.1
+2.17.1
 
 
