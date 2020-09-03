@@ -2,88 +2,89 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD939C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 18:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB78C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 18:15:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8DD3020716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 18:07:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74F0F20737
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 18:15:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RHxzhyi7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DD3020716
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HITvIk5E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74F0F20737
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57974 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDtdx-0003io-N8
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 14:07:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36478)
+	id 1kDtla-0006pU-Jp
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 14:15:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDtZK-0004Y6-5z
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 14:02:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23160)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDtZI-0007Ts-KR
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 14:02:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599156159;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8bDwQ1+0PtvkQJU9rqHi5MHZzRgMG86kPPTDKFCaVVU=;
- b=RHxzhyi73p730ZsCf6d099Yyn8mV8fld7EfOafp09S5ff+YSitXnvrbQm6fCyIKjrYcAGS
- Hx2Y4dw7DCuSM+ClCrgYc5P/eLUV77QDX5E3lU7attHpdGUzMZoZMzG9O3hiIHMme93CGT
- HmVCS2rlDUdZLJ8C9m23RGey1FM2uwA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-LwNYACRcMO2ttizD8Lc0ag-1; Thu, 03 Sep 2020 14:02:33 -0400
-X-MC-Unique: LwNYACRcMO2ttizD8Lc0ag-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD2FD1DE0A;
- Thu,  3 Sep 2020 18:02:32 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8E26B19D61;
- Thu,  3 Sep 2020 18:02:26 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	"Daniel P. Berrange" <berrange@redhat.com>
-Subject: [PATCH 8/8] tusb6010: Rename TUSB to TUSB6010
-Date: Thu,  3 Sep 2020 14:01:28 -0400
-Message-Id: <20200903180128.1523959-9-ehabkost@redhat.com>
-In-Reply-To: <20200903180128.1523959-1-ehabkost@redhat.com>
-References: <20200903180128.1523959-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDtl0-0006P9-VK
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 14:14:46 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:44878)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDtkz-0000kA-8F
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 14:14:46 -0400
+Received: by mail-ej1-x643.google.com with SMTP id a15so5099009ejf.11
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 11:14:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=cglZBYp22brb71cVyHQl8NI2C9r/WyDiBlXJEAfiZhk=;
+ b=HITvIk5E1wLto5P0odp9by/nT8sljBXRVu8Ns8IpWs7csYLpVj24F8yhv0zGh9sbPR
+ Hn5jebKZC3eCsk1rMMtsKwzLYZ+4ZD4uyL39m9aV3gaYaW0VQfq9P5Vyd/5I9SSUkUSn
+ mJ5tDLFk+7R45lr+x9t+l1lHvZ9UQkIjOMOWLYzzfxpIGFDRfX7QzqrC2hN7LIYxQ+Nw
+ EyUS+aZYLy0uQqwMBIsrqAvwtv0RZYPebkNqmb4tT38+ExoyYRg9I8C6A2Mbxp7V7kZ/
+ Y4XvMHfYo3Am2++0YzvssYwg0o+IRyyD0yjJuHz3ZhZHJgezHj9ZE5yrPbehZwCLPC+a
+ 14Vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=cglZBYp22brb71cVyHQl8NI2C9r/WyDiBlXJEAfiZhk=;
+ b=jGFVr97cRyDvJWN6MWD3rlWOeh30bkr/pQz7YZFsXKraNRN3iwZNDnvnxNZXfLlqeb
+ L9eVLLV5imcknIySeppQYVcVp2mU9q6RTZIaUqJladM60Zs3+YT6pmhzylHLTaKVjf38
+ 8uQ0wOa+x8E+mSczsGZaXNDP8Tu3lToqCQGYdVC3tq4Jlp9FP/h3LZ56Y2gEi3IBQnV9
+ nyLiFMCRFQxS7GhXXGRww/OhZ1aTs6ctiwh7YIdXW1JbchWA7ziCmtg2fDTgGXgIrUeV
+ TGYV+U7ubKtL62lGFru6QY1cZt7iJ7RWo9syPadC1pTgR7p2s2Ge/JBMiFEW201lIvQ0
+ jvXA==
+X-Gm-Message-State: AOAM5333ixFsLSOrLf+5COH159KVj9oCj5b5jejaAsjEW6hsgWpO0vWL
+ h38PqyCGL1aKRN8x9oEMO1c1eCkpPXwPMwdRLyhcBw==
+X-Google-Smtp-Source: ABdhPJyjM0WyMERGJE/ikzF6M+OYOte6k4yINdr5lUr8vmxIv3LOciOo9kz3snGbbPt7IreMZiKEU3wRrI1TheDx/y8=
+X-Received: by 2002:a17:906:71c9:: with SMTP id
+ i9mr3357986ejk.250.1599156883487; 
+ Thu, 03 Sep 2020 11:14:43 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200903133209.5141-1-peter.maydell@linaro.org>
+ <20200903133209.5141-2-peter.maydell@linaro.org>
+ <d4329a97-d20b-f47a-ddca-cc42cb190ee7@linaro.org>
+In-Reply-To: <d4329a97-d20b-f47a-ddca-cc42cb190ee7@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Sep 2020 19:14:32 +0100
+Message-ID: <CAFEAcA9g-EZpqj2Qg4izL0YhteJB+7MiPcKWtO3QOXjn3a6cpw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] target/arm: Convert Neon 3-same-fp size field to MO_*
+ in decode
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,65 +97,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make type checking function name consistent with the TYPE_TUSB6010
-constant and QOM type name ("tusb6010").
+On Thu, 3 Sep 2020 at 17:25, Richard Henderson
+<richard.henderson@linaro.org> wrote:
+>
+> On 9/3/20 6:32 AM, Peter Maydell wrote:
+> > I wanted to call the field %3same_fp_size, but decodetree
+> > doesn't seem to allow a field starting with a digit, even
+> > though it does allow a format that starts with a digit.
+> > So it's %fp_3same_size...
+>
+> Odd.  All of the names get prefixed, so we don't have a problem of a digit
+> beginning a C identifier...  I can look at fixing this if you want.
 
-Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Suggested-by: "Daniel P. Berrangé" <berrange@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 -> v2:
-* v1 subject was "tusb6010: Rename TYPE_TUSB6010 to TYPE_TUSB"
-* Rename TUSB macro to TUSB6010 instead, to keep it consistent
-  with the QOM type name ("tusb6010")
----
-Cc: Gerd Hoffmann <kraxel@redhat.com>
-Cc: qemu-devel@nongnu.org
----
- hw/usb/tusb6010.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+If it's not too involved a fix it would be nice. The failure
+is that it doesn't manage to parse the file, rather than
+that it produces bad code.
 
-diff --git a/hw/usb/tusb6010.c b/hw/usb/tusb6010.c
-index 2bee3ae59f..dd20996d13 100644
---- a/hw/usb/tusb6010.c
-+++ b/hw/usb/tusb6010.c
-@@ -32,7 +32,7 @@
- 
- #define TYPE_TUSB6010 "tusb6010"
- typedef struct TUSBState TUSBState;
--DECLARE_INSTANCE_CHECKER(TUSBState, TUSB,
-+DECLARE_INSTANCE_CHECKER(TUSBState, TUSB6010,
-                          TYPE_TUSB6010)
- 
- struct TUSBState {
-@@ -779,7 +779,7 @@ static void tusb6010_irq(void *opaque, int source, int level)
- 
- static void tusb6010_reset(DeviceState *dev)
- {
--    TUSBState *s = TUSB(dev);
-+    TUSBState *s = TUSB6010(dev);
-     int i;
- 
-     s->test_reset = TUSB_PROD_TEST_RESET_VAL;
-@@ -815,7 +815,7 @@ static void tusb6010_reset(DeviceState *dev)
- 
- static void tusb6010_realize(DeviceState *dev, Error **errp)
- {
--    TUSBState *s = TUSB(dev);
-+    TUSBState *s = TUSB6010(dev);
-     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
- 
-     s->otg_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, tusb_otg_tick, s);
--- 
-2.26.2
-
+thanks
+-- PMM
 
