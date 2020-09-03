@@ -7,80 +7,77 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A805FC433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A85C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:30:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 648AF20767
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:29:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20B2C206E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:30:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZttGjjjC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 648AF20767
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WSzz1+0N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20B2C206E7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50942 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDoNA-0001Uu-Du
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:29:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53352)
+	id 1kDoO6-0002Yb-0h
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:30:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoM0-0008EA-C7
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:28:36 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:26045
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoMY-0000lr-8l
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:29:10 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:28919
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoLx-0007pH-EG
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:28:36 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoMV-0007ta-S4
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:29:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599136112;
+ s=mimecast20190719; t=1599136147;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HgXwbQUt5qjogYM8iFoeW+GHqjN8VyRP3jjf5JuoDPA=;
- b=ZttGjjjCS3616krHaedR7CdgJC7MYFY6oKjVwhQwCU4y1QLwkhf9il9wSpTIUM38oWncs7
- 7dgEIjCRIQ0dnAo6J93s7PDSmxOjUw8UpJGmBWWPdBWdevC/nL0wby0ctPFHkZaIAZJKcL
- 7jyHUrPV/qJiqt8DnGNTkS1RVIPkAzM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-554-XdMnVcZaOyeE1dtvY2kW_A-1; Thu, 03 Sep 2020 08:28:31 -0400
-X-MC-Unique: XdMnVcZaOyeE1dtvY2kW_A-1
-Received: by mail-wr1-f70.google.com with SMTP id j2so1020585wrr.14
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:28:30 -0700 (PDT)
+ bh=bI0r63FdmYwhNblRvmKN2aGqhdP0Y0JOEVbpUaFc+z8=;
+ b=WSzz1+0NNmFNYh42lWpc14h2tiAPow7HOYbQJIyq29SB4tx8pkkv32ln0AXy1xc4Z2c+9s
+ LXe/vQcrdAMnzA84VIgJgLJJiEtb8/G5kEse/mSk0hUg4Yu+fmC9qZZ5QP48OPejJ9bMH/
+ FD59J5uDGOSqLrqa/0wwvK6NHRwsTrg=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-456-Va5I14IaObabuywpMjG70g-1; Thu, 03 Sep 2020 08:29:05 -0400
+X-MC-Unique: Va5I14IaObabuywpMjG70g-1
+Received: by mail-wm1-f71.google.com with SMTP id d5so915495wmb.2
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:29:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=HgXwbQUt5qjogYM8iFoeW+GHqjN8VyRP3jjf5JuoDPA=;
- b=DVJPmNOQwk76BYZ9ZmjHNtWTvPt6MQ4SrfKHXs4yqLtL4ARDqz8HKiWvuLTX+IDNla
- ixdlkAOMouVrYSMrXRmsb1+j8epjRYUScik/JxCaVLXHjSsRNj2+9KQko8Dl+tkm29Mb
- MAqIlb0e2FQzo4EFwm3tun+soJFaGtbc+Tzh5ZXIUujq7ROOxXKtUGTdzmvMAaX77rQg
- x3xDjKQTekhK/fcCgUev7u/BB5BcVdPVZbZotJrQDVtrDkp5KfXjscZ3fEOGMjBwwtzY
- ODgcuLpaSXTDupEQjRszFI+Dh5Kd66BD4uMgG1sE9ZOmCKvMEW4m4feuCj1amx30ctQy
- ihQw==
-X-Gm-Message-State: AOAM5316Is1AS/xzPlWecBbn24H5fqrxpD7qGXnLXcPI3zfQld8jxeHW
- VLq009RNWuRZVPdZpYQwKeVQl1u7upEoOddRDGB/BSLrqd+Qi/+mW43ZABGUyI0T/4l88w4oQjb
- 3f2R2VvQLZr2F2t0=
-X-Received: by 2002:a05:600c:2f8f:: with SMTP id
- t15mr2339262wmn.41.1599136109718; 
- Thu, 03 Sep 2020 05:28:29 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzmj/53RnlUwP41Kw830eyDzS+S/LEAKExFitdifMhLbzQYjgIiwMnMt/JKVg31cWPCejhtNg==
-X-Received: by 2002:a05:600c:2f8f:: with SMTP id
- t15mr2339246wmn.41.1599136109515; 
- Thu, 03 Sep 2020 05:28:29 -0700 (PDT)
+ bh=bI0r63FdmYwhNblRvmKN2aGqhdP0Y0JOEVbpUaFc+z8=;
+ b=RBR7C9sfytyKfQewXDUb/0rQeKSvINViyJNSb5h1/T3hXODYvNoI8BbUXH0ApiS/uG
+ lsnBF9Zf7D4Eao2vcFcJklO5qNdljPtTRLNlqZiwQLL6vzWigeU2498TrR3zz0uXZil8
+ L0D291fWpxM1rMWsgUykL16IObKGUdgqLAkAFtHk7d8NE5yrmI1fpwyAcZDSqb/nTcWA
+ FsETcCquqB4acnQd3uLoi2XtQ88wDOFAVkhpc7xR3GyjgPM7/J7G1E3+lhHjkWGejAUT
+ 7VUNOJri4hG+2pri6Gwjz70opXKK0rxJC0PCRpvNkMtdl1ahPopbijwf6NYqlAiJdPnE
+ eSpA==
+X-Gm-Message-State: AOAM532HRtAutC9yfPxsRmNgm/VT8cXmJVnrxpqR8SdmaVj8YE9RwFVU
+ +ouhbxAUzPwBoV/nXUi43X2dqaI2ieHDVUVsyDzkJfNuS99yYkSYu6Ju3h6KJntbRjBA3pSeqLX
+ oKO6SjN+cpZsEKc4=
+X-Received: by 2002:adf:db8b:: with SMTP id u11mr2324784wri.143.1599136144279; 
+ Thu, 03 Sep 2020 05:29:04 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw3bP8rcDPxsSDvpTH3+9l4mfbHBSy4lu4/3lw6Lgqy/8W+o/PZz+GYuTalcxE+st4zRRuQdw==
+X-Received: by 2002:adf:db8b:: with SMTP id u11mr2324752wri.143.1599136144061; 
+ Thu, 03 Sep 2020 05:29:04 -0700 (PDT)
 Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id o4sm4079738wrv.86.2020.09.03.05.28.28
+ by smtp.gmail.com with ESMTPSA id g143sm3894220wme.0.2020.09.03.05.29.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 05:28:29 -0700 (PDT)
+ Thu, 03 Sep 2020 05:29:03 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 05/15] block/nvme: Improve error message when IO queue
- creation failed
-Date: Thu,  3 Sep 2020 14:27:53 +0200
-Message-Id: <20200903122803.405265-6-philmd@redhat.com>
+Subject: [PATCH v7 12/15] block/nvme: Replace BDRV_POLL_WHILE by AIO_WAIT_WHILE
+Date: Thu,  3 Sep 2020 14:28:00 +0200
+Message-Id: <20200903122803.405265-13-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200903122803.405265-1-philmd@redhat.com>
 References: <20200903122803.405265-1-philmd@redhat.com>
@@ -125,38 +122,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do not use the same error message for different failures.
-Display a different error whether it is the CQ or the SQ.
+BDRV_POLL_WHILE() is defined as:
+
+  #define BDRV_POLL_WHILE(bs, cond) ({          \
+      BlockDriverState *bs_ = (bs);             \
+      AIO_WAIT_WHILE(bdrv_get_aio_context(bs_), \
+                     cond); })
+
+As we will remove the BlockDriverState use in the next commit,
+start by using the exploded version of BDRV_POLL_WHILE().
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- block/nvme.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/nvme.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/block/nvme.c b/block/nvme.c
-index 488d4ddb3b8..91dba4ec5db 100644
+index e04e1fa4f8f..b03735129d3 100644
 --- a/block/nvme.c
 +++ b/block/nvme.c
-@@ -648,7 +648,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-         .cdw11 = cpu_to_le32(0x3),
-     };
-     if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
--        error_setg(errp, "Failed to create io queue [%d]", n);
-+        error_setg(errp, "Failed to create CQ io queue [%d]", n);
-         nvme_free_queue_pair(q);
-         return false;
+@@ -493,6 +493,7 @@ static void nvme_cmd_sync_cb(void *opaque, int ret)
+ static int nvme_cmd_sync(BlockDriverState *bs, NVMeQueuePair *q,
+                          NvmeCmd *cmd)
+ {
++    AioContext *aio_context = bdrv_get_aio_context(bs);
+     NVMeRequest *req;
+     int ret = -EINPROGRESS;
+     req = nvme_get_free_req(q);
+@@ -501,7 +502,7 @@ static int nvme_cmd_sync(BlockDriverState *bs, NVMeQueuePair *q,
      }
-@@ -659,7 +659,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-         .cdw11 = cpu_to_le32(0x1 | (n << 16)),
-     };
-     if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
--        error_setg(errp, "Failed to create io queue [%d]", n);
-+        error_setg(errp, "Failed to create SQ io queue [%d]", n);
-         nvme_free_queue_pair(q);
-         return false;
-     }
+     nvme_submit_command(q, req, cmd, nvme_cmd_sync_cb, &ret);
+ 
+-    BDRV_POLL_WHILE(bs, ret == -EINPROGRESS);
++    AIO_WAIT_WHILE(aio_context, ret == -EINPROGRESS);
+     return ret;
+ }
+ 
 -- 
 2.26.2
 
