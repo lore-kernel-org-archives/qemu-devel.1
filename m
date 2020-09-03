@@ -2,73 +2,90 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E485FC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C9CC433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5BDE20775
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:27:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5BDE20775
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9278920758
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:28:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y6VBvrac"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9278920758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDs5D-0006r2-UE
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35780)
+	id 1kDs6P-0008Kj-OT
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:28:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kDrmb-0007x6-61
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:17 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:60227)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kDrmY-0007kv-Rr
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:16 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.187])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id E1C0B5DA6AC3;
- Thu,  3 Sep 2020 18:07:43 +0200 (CEST)
-Received: from kaod.org (37.59.142.99) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 3 Sep 2020
- 18:07:42 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-99G0033b24ed8b-eb75-44c7-947d-3b7ea475217a,
- FF22E3E2F99647A0705B7EB067E934078DCBDF97) smtp.auth=groug@kaod.org
-Date: Thu, 3 Sep 2020 18:07:41 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v2 0/1] 9pfs: log warning if msize <= 8192
-Message-ID: <20200903180741.74a8e0c4@bahia.lan>
-In-Reply-To: <2806958.T35s8Q7qhx@silver>
-References: <cover.1599144062.git.qemu_oss@crudebyte.com>
- <20200903171931.3bfe611a@bahia.lan>
- <20200903174123.6b754055@bahia.lan> <2806958.T35s8Q7qhx@silver>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kDs5g-0007cI-5u
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:28:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60529
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kDs5e-0002Hy-2x
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:27:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599150476;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FUSpVNU9wskY8gocipTDH0zGtahy4Kk1NVcmQ//E4i8=;
+ b=Y6VBvract0onJ5lx8tQWFizyw6A9WSJp4pP2vAz0W5/wuttoDxWWbls22CvMw1AbbBkZGx
+ rAPpIOyiQjdRwokrDeCR3P306pQH7BS17zyQN6q6RcBwZde5m0NJRMNWPFkljOeFuD09ej
+ 5VEMzRqViIvQQFAWSKuPRNwzH59aDas=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-395-DAWAcoPFMDCriPTaKy6x2A-1; Thu, 03 Sep 2020 12:27:54 -0400
+X-MC-Unique: DAWAcoPFMDCriPTaKy6x2A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E7A6410162BC;
+ Thu,  3 Sep 2020 16:27:40 +0000 (UTC)
+Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0A3BE756C6;
+ Thu,  3 Sep 2020 16:27:33 +0000 (UTC)
+Date: Thu, 3 Sep 2020 12:27:32 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 16/63] i8259: Rename TYPE_KVM_I8259 to TYPE_KVM_PIC
+Message-ID: <20200903162732.GJ4940@habkost.net>
+References: <20200902224311.1321159-1-ehabkost@redhat.com>
+ <20200902224311.1321159-17-ehabkost@redhat.com>
+ <edcbfa50-c0cd-27f2-f114-2d987715531b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.99]
-X-ClientProxiedBy: DAG2EX1.mxp5.local (172.16.2.11) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 97e8ee39-54cf-4bcb-8da5-438089b5437a
-X-Ovh-Tracer-Id: 1499417205179914717
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudeguddgleelucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepleduudehgfehvefhieekheeghfeguedvtdejheefteehueekvefhieelhfffieetnecuffhomhgrihhnpehqvghmuhdrohhrghdpfihikhhiphgvughirgdrohhrghdpfihikhhimhgvughirgdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegsvghrrhgrnhhgvgesrhgvughhrghtrdgtohhm
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 11:41:43
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <edcbfa50-c0cd-27f2-f114-2d987715531b@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 00:24:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,62 +99,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ berrange@redhat.com, qemu-devel@nongnu.org,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 03 Sep 2020 17:48:33 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-
-> On Donnerstag, 3. September 2020 17:41:23 CEST Greg Kurz wrote:
-> > On Thu, 3 Sep 2020 17:19:31 +0200
+On Thu, Sep 03, 2020 at 02:53:52PM +0200, Philippe Mathieu-Daudé wrote:
+> On 9/3/20 12:42 AM, Eduardo Habkost wrote:
+> > This will make the type name constant consistent with the name of
+> > the type checking macro.
 > > 
-> > Greg Kurz <groug@kaod.org> wrote:
-> > > On Thu, 3 Sep 2020 16:41:02 +0200
-> > > 
-> > > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > > I have updated the QEMU 9P setup wiki page about this 'msize' issue. For
-> > > > some reason the dedicated anchor 'msize' does not work though:
-> > > > 
-> > > > https://wiki.qemu.org/Documentation/9psetup#msize
-> > > 
-> > > AFAICT the wiki derives the anchor from the section name, ie.
-> > > 
-> > > https://wiki.qemu.org/Documentation/9psetup#Performance_Considerations
-> > > 
-> > > It's a bit longer than #msize but it works. I don't know if you can
-> > > add anchors manually in the wiki.
+> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> > ---
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Cc: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Richard Henderson <rth@twiddle.net>
+> > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > Cc: qemu-devel@nongnu.org
+> > ---
+> >  hw/i386/kvm/i8259.c | 10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
 > > 
-> > It seems you could achieve this without the template:
-> > 
-> > == <span id="msize">Performance Considerations</span> ==
+> > diff --git a/hw/i386/kvm/i8259.c b/hw/i386/kvm/i8259.c
+> > index 3f8bf69e9c..687c0cd536 100644
+> > --- a/hw/i386/kvm/i8259.c
+> > +++ b/hw/i386/kvm/i8259.c
+> > @@ -19,10 +19,10 @@
+> >  #include "sysemu/kvm.h"
+> >  #include "qom/object.h"
+> >  
+> > -#define TYPE_KVM_I8259 "kvm-i8259"
+> > +#define TYPE_KVM_PIC "kvm-i8259"
 > 
-> What I tried was this (as wiki source):
+> I disagree with this patch, as we have various KVM INTC and only one
+> KVM_I8259.
 > 
-> <!-- NOTE: anchor 'msize' is linked by a QEMU 9pfs log message in 9p.c  -->
-> {{anchor|msize}}
-> == Performance Considerations ==
+> TYPE_KVM_ARM_GIC and TYPE_KVM_S390_FLIC are kind of TYPE_KVM_INTC ...
 > 
-> Which "should" work according to:
-> https://en.wikipedia.org/wiki/Template:Anchor
-> 
-> However after I did those changes I saw some template errors as comment in the 
-> generated HTML sources, which now are gone at least.
-> 
-> I wait a bit to see if it is maybe just a caching problem. If it still doesn't 
-> work in a while, I will update it with your solution a bit later.
-> 
-> Thanks for the hint!
-> 
+> Can we rename it KVM_I8259_PIC?
 
-Found here:
+I'm inclined to agree, but I'm not completely sure.
 
-https://meta.wikimedia.org/wiki/Help:Link#Manual_anchors
+Why is it OK to have a macro named KVM_PIC, a struct named
+KVMPICClass, a struct named PICCommonState, but not OK to have a
+constant named TYPE_KVM_PIC?  What about the TYPE_PIC_COMMON
+constant?
 
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
+All these symbols are internal to the i8259 code and aren't
+expected to be unique globally.  Are TYPE_* names more special
+and expected to be unique globally?  If yes, why?
+
+-- 
+Eduardo
 
 
