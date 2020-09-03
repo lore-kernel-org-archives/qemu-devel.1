@@ -2,89 +2,88 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F277FC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97840C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:05:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3871206A5
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:05:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5AA57206A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:05:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JOt/0ofh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3871206A5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tEioXK8P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5AA57206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwQ2-0002Kl-QP
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:05:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56388)
+	id 1kDwQ6-0002QO-JA
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:05:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58276)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEe-000180-GL
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:33 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42378
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kDwEb-0006c1-JB
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:53:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599166407;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=42Ag7hd76ygahys0qEi4reckXYsa9ZqB7olqHI6x2pg=;
- b=JOt/0ofhrfwpidLIPP+omB/ALKfEnoe7igvAnGkOmdki/gnoMphuzPubDMDTwsoM1Z6vb2
- yKrOnRsYhf8tlNE1vwtNoiadtktJXO4eR+GPTTaiOgXKzjSDwIgrkyZuoV1XKFZmFBFpB+
- y/SJPjCwQBVbBH4mOFGRmRbZUca9hFg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-564-njQejQJlNWm8HH3ASOMQbA-1; Thu, 03 Sep 2020 16:53:25 -0400
-X-MC-Unique: njQejQJlNWm8HH3ASOMQbA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 898B9CF984;
- Thu,  3 Sep 2020 20:53:24 +0000 (UTC)
-Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 514D28118A;
- Thu,  3 Sep 2020 20:53:24 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 24/27] usb: Rename USB_SERIAL_DEV to USB_SERIAL
-Date: Thu,  3 Sep 2020 16:52:44 -0400
-Message-Id: <20200903205247.1667472-25-ehabkost@redhat.com>
-In-Reply-To: <20200903205247.1667472-1-ehabkost@redhat.com>
-References: <20200903205247.1667472-1-ehabkost@redhat.com>
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:28:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwL1-0003U2-J5; Thu, 03 Sep 2020 17:00:07 -0400
+Received: from mail-oi1-x235.google.com ([2607:f8b0:4864:20::235]:42690)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
+ id 1kDwKz-0007PS-Qf; Thu, 03 Sep 2020 17:00:07 -0400
+Received: by mail-oi1-x235.google.com with SMTP id x14so4501482oic.9;
+ Thu, 03 Sep 2020 14:00:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=D++uhEYw+d3KQcavq6f/g9akX1hQgOj/ppCWcFXbXE0=;
+ b=tEioXK8PcEKWmWlZq6SMEoBFp32xOy7HNKitz9kQZhX9Hl4bHE232eErZc0H9TTyf2
+ k0dDfEF9R6jS6dNraWcZaMoPdMgrSEt57xl8xkzxcYPDd4XEuqcUgAq86cfQCIe2Fsmr
+ KMuvgYvCai3kKkzHvY4tCsB6rqCSOErgj9+Xb6S60fFIMzDLaCLQTGLQNLcZ9M4zBdtR
+ xk7d3k86F+8DvWTydwMmzVQKvT/E6A9au2bME1TTy1D4jotNNVXPBa2ndXKT6BqzSsEE
+ HRuVtwuPcod52+ld+fFIbqQ4euIGa9Xx7WYQFow6CIRmpBxD0orq14/zoVtr9hH0f5JZ
+ 2yYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references;
+ bh=D++uhEYw+d3KQcavq6f/g9akX1hQgOj/ppCWcFXbXE0=;
+ b=jAZGBzjiua1+A057HMStpEtTOUpi/SlC5kaCo3JgHRZiRPtUKy1TLwuvy6tWZog9k7
+ qT3P1Wq2N9t7zUro4CQJpZkDzY8UhxF5CB3q6oVikjbSsADUMTS0iATA+1AwG3TyZnQp
+ +dLOQRSiJW5vKqRZ/QInyfak3K8q2jwleB1i4iSMj2jd/RWMeY1j7uQYnfgSi5S6YJLj
+ BlUcj4+kYQdujEjKmQrXHLYzt0UZcFu18+2cwoPDKTQIE5024JI1CCh12Lt9dYEnDChC
+ 6dteRSNXnQMEk2h2s+yfjKNctHxY8WYsyiXsAOlfEMmaKZM6mX+XBY4r3jx+FOux+Dn4
+ Y95w==
+X-Gm-Message-State: AOAM530vXvtjG/XwdB/uPYqRLzUYa2AeQDQzz/7amiTPAN1zs6kP7FPs
+ zHdLngApypmaxHfLYRjxgG5+N9f7TSY=
+X-Google-Smtp-Source: ABdhPJzHHlvnzQofJnh1MA2OabWvcu6UShqEGNSjCQmpzuMSaPQyKTrxPXbcQv66nXRFjABwRz0nxw==
+X-Received: by 2002:aca:ed0a:: with SMTP id l10mr3403819oih.9.1599166803887;
+ Thu, 03 Sep 2020 14:00:03 -0700 (PDT)
+Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
+ [76.251.165.188])
+ by smtp.gmail.com with ESMTPSA id d83sm703620oib.43.2020.09.03.14.00.03
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 03 Sep 2020 14:00:03 -0700 (PDT)
+From: Michael Roth <mdroth@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 19/77] iotests/283: Use consistent size for source and target
+Date: Thu,  3 Sep 2020 15:58:37 -0500
+Message-Id: <20200903205935.27832-20-mdroth@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::235;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x235.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,47 +96,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the type checking macro name consistent with the TYPE_*
-constant.
+From: Kevin Wolf <kwolf@redhat.com>
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200902224311.1321159-54-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+The test case forgot to specify the null-co size for the target node.
+When adding a check to backup that both sizes match, this would fail
+because of the size mismatch and not the behaviour that the test really
+wanted to test.
+
+Fixes: a541fcc27c98b96da187c7d4573f3270f3ddd283
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Message-Id: <20200430142755.315494-2-kwolf@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+(cherry picked from commit 813cc2545b82409fd504509f0ba2e96fab6edb9e)
+Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/usb/dev-serial.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ tests/qemu-iotests/283     | 6 +++++-
+ tests/qemu-iotests/283.out | 2 +-
+ 2 files changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-index 1a58851d4b..1a038a222e 100644
---- a/hw/usb/dev-serial.c
-+++ b/hw/usb/dev-serial.c
-@@ -113,7 +113,7 @@ struct USBSerialState {
- typedef struct USBSerialState USBSerialState;
+diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
+index 55b7cff953..44de76effe 100644
+--- a/tests/qemu-iotests/283
++++ b/tests/qemu-iotests/283
+@@ -72,7 +72,11 @@ to check that crash is fixed :)
+ vm = iotests.VM()
+ vm.launch()
  
- #define TYPE_USB_SERIAL "usb-serial-dev"
--DECLARE_INSTANCE_CHECKER(USBSerialState, USB_SERIAL_DEV,
-+DECLARE_INSTANCE_CHECKER(USBSerialState, USB_SERIAL,
-                          TYPE_USB_SERIAL)
+-vm.qmp_log('blockdev-add', **{'node-name': 'target', 'driver': 'null-co'})
++vm.qmp_log('blockdev-add', **{
++    'node-name': 'target',
++    'driver': 'null-co',
++    'size': size,
++})
  
- enum {
-@@ -517,7 +517,7 @@ static void usb_serial_event(void *opaque, QEMUChrEvent event)
- 
- static void usb_serial_realize(USBDevice *dev, Error **errp)
- {
--    USBSerialState *s = USB_SERIAL_DEV(dev);
-+    USBSerialState *s = USB_SERIAL(dev);
-     Error *local_err = NULL;
- 
-     usb_desc_create_serial(dev);
+ vm.qmp_log('blockdev-add', **{
+     'node-name': 'source',
+diff --git a/tests/qemu-iotests/283.out b/tests/qemu-iotests/283.out
+index daaf5828c1..d8cff22cc1 100644
+--- a/tests/qemu-iotests/283.out
++++ b/tests/qemu-iotests/283.out
+@@ -1,4 +1,4 @@
+-{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "target"}}
++{"execute": "blockdev-add", "arguments": {"driver": "null-co", "node-name": "target", "size": 1048576}}
+ {"return": {}}
+ {"execute": "blockdev-add", "arguments": {"driver": "blkdebug", "image": {"driver": "null-co", "node-name": "base", "size": 1048576}, "node-name": "source"}}
+ {"return": {}}
 -- 
-2.26.2
+2.17.1
 
 
