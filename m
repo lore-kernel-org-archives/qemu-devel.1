@@ -7,73 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E548C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B972EC43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:22:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 319B2206D4
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:22:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CB99206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:22:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jtR+DsnK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 319B2206D4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q7YXVtjV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CB99206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwgk-0004yn-B2
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:22:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58694)
+	id 1kDwgm-00055Z-Lm
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:22:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLQ-00041s-9A; Thu, 03 Sep 2020 17:00:32 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:40102)
+ id 1kDwLh-0004Zm-Iu; Thu, 03 Sep 2020 17:00:52 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:41877)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLI-0007eN-Q8; Thu, 03 Sep 2020 17:00:28 -0400
-Received: by mail-oi1-x242.google.com with SMTP id t76so4498753oif.7;
- Thu, 03 Sep 2020 14:00:22 -0700 (PDT)
+ id 1kDwLg-0007le-3J; Thu, 03 Sep 2020 17:00:49 -0400
+Received: by mail-ot1-x343.google.com with SMTP id a65so4001887otc.8;
+ Thu, 03 Sep 2020 14:00:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=8SgwdOy9TwvppyJLuavJtnAY1UT8MfcLqFjl3hAfheE=;
- b=jtR+DsnKOXbw7HYmPgw/LCA9u5flrRRuKZI+D3AGFyf6IMJ5EmaHIY2vrnQ1tafp7U
- h122r/JJ7dM2R1DlYEQcWGYxNT7jB63moP5iqXwnxJQCCTI4tPJL/BeLvFOAU/Se/NfC
- 0xeEGYnI6SUkxhn2z9z0fRdMhpU5uqn7wYQmGqk1T45x4QjWasU/4KIqOm+ae8kE3RSF
- tp5ugjsZ2G8IhiwWymQbfC1VD4ZqsDfGtOURXzJDtRcyMhZd1I+TmEG0Hye3xYBeHPBI
- V/2p0JI1SZfjvrhYdyTnfeL/ay9B0pY8Y80fr5BHV4eMMN70ALE3ARoRy3mZVHJ2I+0H
- 8oUA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=nd9Ud5qwe+YYQ0q+uyzFJ7HGCJCNwB347EpetEguZ38=;
+ b=Q7YXVtjV08PkuXoPal29fKq1rGAjHbOQyUSXkOWgVKqLdY339NfDytdc4dfto1Szvc
+ NwUAqvtWdTlfMwsc1Ku6QdDi4ws6gFHqgmECzkYtRxy37/98kEiVOJkJPierJeKJtBrk
+ gxMsNjDauY9xM6Gpfwr+AMN/rkQKplDi40Z+Fl7tzyeweeFVciGrss9x7yh7gUWZUBTg
+ I9UUDvABxoWGdWziGAbP32Y0EzMnQIIQaxcsR33clCdN4F96VLO3sCod9O3Td6MaHaNQ
+ hB12O6UtrH1vlTJL+YKkNkKxsTQBQw7JG4AQlERdto7ZHxnvc2A5P8pW0NG26J9t16iH
+ zgjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=8SgwdOy9TwvppyJLuavJtnAY1UT8MfcLqFjl3hAfheE=;
- b=Sc6hrkRMhdtH1fA8BHOkXbKm9A6P4p2p1fADvDwUk62Ah5kaz4GlMWlKKlDVj5cpBe
- ZxDHXnAFNcUsVBDUDIk4ZfqGcyz8hCOaNEsf6F40W2jKl099mKoHEKWwKkqcHC2gfhFV
- TV0B5/MS9YQFtpZU7ScbZoAdZgcxaq58kbTr6DvtQSDK4Yg6O1u5J+DCW3g1eVdvV6/X
- eunBv62cwVKQ1wHIuPKqNR9Vxe8LzOAvaexoxrdg9JlwykkfdDMFyyVERTwqLY38uYLm
- QsagFUliBdjV537D4AjcqiFoYJ+21XZ/2i8Bmwz3LydErdebSP6lLdbhPzH9BCNyAnDd
- EaOA==
-X-Gm-Message-State: AOAM530ycTQGQEsJj/nLr6GFSgVl8fMIaVnPuzbt1gRf+BbJGCd0lbdk
- +BbiVkSZQFOmTi+zB+KNufc7jwzLA6g=
-X-Google-Smtp-Source: ABdhPJwZ5cIu4iVoHE7fuxkAlz0CmRduev7XP90zHcvdRve34Dv00ENhoeNm7IpRvo5asLwe7YAocQ==
-X-Received: by 2002:aca:db0b:: with SMTP id s11mr3290990oig.161.1599166821506; 
- Thu, 03 Sep 2020 14:00:21 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=nd9Ud5qwe+YYQ0q+uyzFJ7HGCJCNwB347EpetEguZ38=;
+ b=jQ5ElctZ2EY3fOoImmuV0nMyYUb+VKGnSsz0JW9J9B8UWUtu1BVp5sQxUV6frz6HC8
+ XnAcpuh5Q0dtekodW780SjUwevVk1ZbgBNBYw5k0ZPzqCoidy5s/KetREV1it6W5btb1
+ sfNrGKGgMRrFZ58s8dMXVr1t5XByBCMVTX/47Kxblbyoaj4kOO4eUXzrgdZnjNE2ziVo
+ UtLmhDNxb0uIJ3m2mSifQAcY1Ndas33GWysVQ7soBRubp4XJeSDRlC1J3wLN3YhbTmHC
+ Mm3RhsHFD3dUneHMg3U3i/DNvc1312a7+9E07KffWwkyz8Prm7bRgQ2KXtumTGutbVjd
+ jI/A==
+X-Gm-Message-State: AOAM530Y8ZaSOdTjfA5VEMkS0v1xCpjCy4J2Y4CbonIFyii5Lrc6YJLR
+ qMfjoQWEriZUiTeutfnfn67toWXcvQofyw==
+X-Google-Smtp-Source: ABdhPJwNe3F7a0p4wQIZ06EGu2v/ssbcYaWdWIL8AR2YCYHvh5EwBprN0RW0b3XBUzRvYXF+LS5tfg==
+X-Received: by 2002:a9d:eed:: with SMTP id 100mr3004606otj.20.1599166846385;
+ Thu, 03 Sep 2020 14:00:46 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id 91sm792953otn.18.2020.09.03.14.00.20
+ by smtp.gmail.com with ESMTPSA id q15sm761296otl.65.2020.09.03.14.00.45
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:20 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:45 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 32/77] acpi: accept byte and word access to core ACPI registers
-Date: Thu,  3 Sep 2020 15:58:50 -0500
-Message-Id: <20200903205935.27832-33-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 49/77] tests/acceptance: refactor boot_linux_console test to
+ allow code reuse
+Date: Thu,  3 Sep 2020 15:59:07 -0500
+Message-Id: <20200903205935.27832-50-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=flukshun@gmail.com; helo=mail-ot1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -96,72 +101,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Michael Tokarev <mjt@tls.msk.ru>, qemu-stable@nongnu.org,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-stable@nongnu.org, Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Michael Tokarev <mjt@tls.msk.ru>
+From: Pavel Dovgalyuk <Pavel.Dovgaluk@gmail.com>
 
-All ISA registers should be accessible as bytes, words or dwords
-(if wide enough).  Fix the access constraints for acpi-pm-evt,
-acpi-pm-tmr & acpi-cnt registers.
+This patch splits code in BootLinuxConsole class into two different
+classes to allow reusing it by record/replay tests.
 
-Fixes: 5d971f9e67 (memory: Revert "memory: accept mismatching sizes in memory_region_access_valid")
-Fixes: afafe4bbe0 (apci: switch cnt to memory api)
-Fixes: 77d58b1e47 (apci: switch timer to memory api)
-Fixes: b5a7c024d2 (apci: switch evt to memory api)
-Buglink: https://lore.kernel.org/xen-devel/20200630170913.123646-1-anthony.perard@citrix.com/T/
-Buglink: https://bugs.debian.org/964793
-BugLink: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=964247
-BugLink: https://bugs.launchpad.net/bugs/1886318
-Reported-By: Simon John <git@the-jedi.co.uk>
-Signed-off-by: Michael Tokarev <mjt@tls.msk.ru>
-Message-Id: <20200720160627.15491-1-mjt@msgid.tls.msk.ru>
-Cc: qemu-stable@nongnu.org
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit dba04c3488c4699f5afe96f66e448b1d447cf3fb)
+Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <159073588490.20809.13942096070255577558.stgit@pasha-ThinkPad-X280>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+(cherry picked from commit 12121c496fcc609e23033c4a36399b54f98bcd56)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/acpi/core.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ tests/acceptance/boot_linux_console.py | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/hw/acpi/core.c b/hw/acpi/core.c
-index 45cbed49ab..d85052c34a 100644
---- a/hw/acpi/core.c
-+++ b/hw/acpi/core.c
-@@ -461,7 +461,8 @@ static void acpi_pm_evt_write(void *opaque, hwaddr addr, uint64_t val,
- static const MemoryRegionOps acpi_pm_evt_ops = {
-     .read = acpi_pm_evt_read,
-     .write = acpi_pm_evt_write,
--    .valid.min_access_size = 2,
-+    .impl.min_access_size = 2,
-+    .valid.min_access_size = 1,
-     .valid.max_access_size = 2,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
-@@ -530,7 +531,8 @@ static void acpi_pm_tmr_write(void *opaque, hwaddr addr, uint64_t val,
- static const MemoryRegionOps acpi_pm_tmr_ops = {
-     .read = acpi_pm_tmr_read,
-     .write = acpi_pm_tmr_write,
--    .valid.min_access_size = 4,
-+    .impl.min_access_size = 4,
-+    .valid.min_access_size = 1,
-     .valid.max_access_size = 4,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
-@@ -602,7 +604,8 @@ static void acpi_pm_cnt_write(void *opaque, hwaddr addr, uint64_t val,
- static const MemoryRegionOps acpi_pm_cnt_ops = {
-     .read = acpi_pm_cnt_read,
-     .write = acpi_pm_cnt_write,
--    .valid.min_access_size = 2,
-+    .impl.min_access_size = 2,
-+    .valid.min_access_size = 1,
-     .valid.max_access_size = 2,
-     .endianness = DEVICE_LITTLE_ENDIAN,
- };
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index d864d22ca8..e4204d8f09 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -28,19 +28,13 @@ try:
+ except CmdNotFoundError:
+     P7ZIP_AVAILABLE = False
+ 
+-class BootLinuxConsole(Test):
+-    """
+-    Boots a Linux kernel and checks that the console is operational and the
+-    kernel command line is properly passed from QEMU to the kernel
+-    """
+-
+-    timeout = 90
+-
++class LinuxKernelTest(Test):
+     KERNEL_COMMON_COMMAND_LINE = 'printk.time=0 '
+ 
+-    def wait_for_console_pattern(self, success_message):
++    def wait_for_console_pattern(self, success_message, vm=None):
+         wait_for_console_pattern(self, success_message,
+-                                 failure_message='Kernel panic - not syncing')
++                                 failure_message='Kernel panic - not syncing',
++                                 vm=vm)
+ 
+     def extract_from_deb(self, deb, path):
+         """
+@@ -79,6 +73,13 @@ class BootLinuxConsole(Test):
+         os.chdir(cwd)
+         return os.path.normpath(os.path.join(self.workdir, path))
+ 
++class BootLinuxConsole(LinuxKernelTest):
++    """
++    Boots a Linux kernel and checks that the console is operational and the
++    kernel command line is properly passed from QEMU to the kernel
++    """
++    timeout = 90
++
+     def test_x86_64_pc(self):
+         """
+         :avocado: tags=arch:x86_64
 -- 
 2.17.1
 
