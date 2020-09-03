@@ -7,77 +7,73 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD7B7C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:14:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F50C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:14:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F8FA206E7
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:14:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A6A2206E7
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:14:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iddFmDJ7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F8FA206E7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o2WB0332"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A6A2206E7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57672 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwZ0-0007cB-Km
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:14:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58088)
+	id 1kDwZ6-0007s8-Fl
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:14:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwKq-00036s-LR; Thu, 03 Sep 2020 16:59:56 -0400
-Received: from mail-ot1-x342.google.com ([2607:f8b0:4864:20::342]:46518)
+ id 1kDwLU-0004Au-Tk; Thu, 03 Sep 2020 17:00:36 -0400
+Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:46892)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwKo-0007KO-In; Thu, 03 Sep 2020 16:59:56 -0400
-Received: by mail-ot1-x342.google.com with SMTP id c10so3972639otm.13;
- Thu, 03 Sep 2020 13:59:51 -0700 (PDT)
+ id 1kDwLS-0007i5-UT; Thu, 03 Sep 2020 17:00:36 -0400
+Received: by mail-oo1-xc41.google.com with SMTP id r6so1115659oon.13;
+ Thu, 03 Sep 2020 14:00:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=BVrfXN+PksS1+3mj7WHwrA4ngS6G5v4nICiHt9L9Kw0=;
- b=iddFmDJ7CDJcp+Rogo00I29oCuWilvK0P6QrQDBwBudPYwTF+439RQhUg96w2iT+4r
- 8Iygb6wE6XCluWQUGt37xA4XJoPTmAueXoDqxXMd6W5OeuZW7LXiW6056hgFvG/ctqmR
- CkqjJ7ju+zWqAO17iCRv6qHww9hR07GQgajGuC6OkxsjVl0Pxc2xu0j8TS365NaqIXxB
- EjxxovPIvGltgPwPtDfryDEssHES9ujnzleu6hl9srrX7oXgY1miypyA1p7MQ7iqufRz
- yy1EbBzWp8MplWGTwCbWGcAvjtAUvCDah3HG1m9cKiZhR8KEbKUCBBQ2T7R9lknKK/2O
- w7Aw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=0LMgxbFODWFpBaUC7jVrX4CuO2pJP6IZde8nJ19Zvuo=;
+ b=o2WB0332e2+ouLNHFWs8qrQ3/t2f+lmDJT2MAdiGBD7ag2Gx8HcDGTtGsyTp1GytlL
+ Yupc2EKN+YmlCXgU43eUvh17WmeTU4vyyubcou1Opt9ORzB4N02hFfIytmBq43OXaLQf
+ HWV4oTJIaL4HE8G22zxSwjd14vbZCkbyMwcyKLDxREXu+28BuUJrfM85CT+qBM4ZxbFV
+ hXlqwcsw8qv6jgslPPlc0t3RM0zufewMaajGecy7psXqswcvZP4u5ivCCYrqls+Daem0
+ B/IcS2fxE1eqYQoDVGT6iiiVXoJ6Kqt8olgFGQpByFnTELWhs9WM7tmiXyJqNEfzyJ4T
+ idBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=BVrfXN+PksS1+3mj7WHwrA4ngS6G5v4nICiHt9L9Kw0=;
- b=Eg4/O77+7wE+CW4NgchLzGTHD6Rs5qh7OWXrm47PmiAUqGzI8tYiHGfDtMKLqN5o57
- qcs3x5kGsx5Buqp1i1ptT8L3k0qKKaESco6mkJU+VOk+gW4Djd7brp8sCXWrkoLYQsB1
- SRWRode10/Phl9103gl5pUxZWoKfqvVci/6XSNzLnTzUMmRKsTJMqczWQkKQQCS7rGpf
- 0XZVbqfoTbGsNYuVET/MP8ugCGZD2+FalC9xcPV/Fx5qOKAWzL3qtT5luPgx3MKjTUY7
- +gDAehEpA/t2eWfiVJyoYIjO9T0ovVZobNBl4wfSbLBTKvjeZ1vyDC+Obr5UnXn0hCFv
- CrGw==
-X-Gm-Message-State: AOAM532kB6kh3IjTzJc6GyN8NZHfWiT6jMKIxq6B9bx39oyp+by8R8tJ
- CGqQykQZF8/eEh06Ga9v6QVJFOLw6dg=
-X-Google-Smtp-Source: ABdhPJzzCAQrLgn1gBYGKy6Y/ZxgeEvC+GrMTtHJMrnpBCaDRcoQLJTdDeZ+djXZF9CYrSGEf/BoxQ==
-X-Received: by 2002:a9d:23c7:: with SMTP id t65mr2988703otb.275.1599166790542; 
- Thu, 03 Sep 2020 13:59:50 -0700 (PDT)
+ :in-reply-to:references;
+ bh=0LMgxbFODWFpBaUC7jVrX4CuO2pJP6IZde8nJ19Zvuo=;
+ b=KKLVGUueAtByWDGzAte+7xJwmjtOgjsxrfUcIHzSoe+orIae7SotGpuOUoZlByULVh
+ b1w0jCnpbmKfo1OpeFgIlv7URWiCGSwKqlyUr7q3sntbGLJb00Zc8x/GJU99KrNok3KR
+ /s2ZVxXBhA0tafAWeEeoaF0cmxp+NnkfKxdQW17lBDEu3JjUTRAWNWHcEMr1klyVhP+R
+ KdfnstnjuusfPwxPiTn2LQ/jOrpYywjgqmCwsA5rbioazxEKOxZEm262zOoD4Gbffa7I
+ LBngmK3/j89tZaaTCZqwwQyu9JYA3r4YhW3EJmwI1JQV6j0iK42EuGQdV+y220U/I4v4
+ MmUg==
+X-Gm-Message-State: AOAM533WJTQ30mkVD/+WODib3ReQWeYuTYukwz7mnoSxs6bbo298cMdS
+ hgH2eBXti6dP7QGid2ZiNnqqBtRqWLc=
+X-Google-Smtp-Source: ABdhPJyDdn4kiKWjUdAKxHyH9FK8TbJETKGPOTOnGSk/WbWecviuBQvvJ3iQLQkqaLZOcX4rgS/DCw==
+X-Received: by 2002:a4a:7241:: with SMTP id r1mr3344079ooe.48.1599166832885;
+ Thu, 03 Sep 2020 14:00:32 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id l63sm711386oia.56.2020.09.03.13.59.49
+ by smtp.gmail.com with ESMTPSA id 40sm757020otj.76.2020.09.03.14.00.32
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 13:59:49 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:32 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/77] virtio-balloon: unref the iothread when unrealizing
-Date: Thu,  3 Sep 2020 15:58:27 -0500
-Message-Id: <20200903205935.27832-10-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 03/77] qemu-nbd: Close inherited stderr
+Date: Thu,  3 Sep 2020 15:58:21 -0500
+Message-Id: <20200903205935.27832-4-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::342;
- envelope-from=flukshun@gmail.com; helo=mail-ot1-x342.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
+ envelope-from=flukshun@gmail.com; helo=mail-oo1-xc41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -100,49 +96,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S . Tsirkin" <mst@redhat.com>,
- David Hildenbrand <david@redhat.com>, qemu-stable@nongnu.org,
- Alexander Duyck <alexander.duyck@gmail.com>, Wei Wang <wei.w.wang@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-stable@nongnu.org, Raphael Pour <raphael.pour@hetzner.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: David Hildenbrand <david@redhat.com>
+From: Raphael Pour <raphael.pour@hetzner.com>
 
-We took a reference when realizing, so let's drop that reference when
-unrealizing.
+Close inherited stderr of the parent if fork_process is false.
+Otherwise no one will close it. (introduced by e6df58a5)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Alexander Duyck <alexander.h.duyck@linux.intel.com>
-Fixes: c13c4153f76d ("virtio-balloon: VIRTIO_BALLOON_F_FREE_PAGE_HINT")
-Cc: qemu-stable@nongnu.org
-Cc: Wei Wang <wei.w.wang@intel.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: David Hildenbrand <david@redhat.com>
-Message-Id: <20200520100439.19872-4-david@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-(cherry picked from commit 105aef9c9479786d27c1c45c9b0b1fa03dc46be3)
+This only affected 'qemu-nbd -c /dev/nbd0'.
+
+Signed-off-by: Raphael Pour <raphael.pour@hetzner.com>
+Message-Id: <d8ddc993-9816-836e-a3de-c6edab9d9c49@hetzner.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+[eblake: Enhance commit message]
+Signed-off-by: Eric Blake <eblake@redhat.com>
+(cherry picked from commit 0eaf453ebf6788885fbb5d40426b154ef8805407)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/virtio/virtio-balloon.c | 1 +
- 1 file changed, 1 insertion(+)
+ qemu-nbd.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/hw/virtio/virtio-balloon.c b/hw/virtio/virtio-balloon.c
-index 3e3b5ff0f8..e20f90dad4 100644
---- a/hw/virtio/virtio-balloon.c
-+++ b/hw/virtio/virtio-balloon.c
-@@ -820,6 +820,7 @@ static void virtio_balloon_device_unrealize(DeviceState *dev, Error **errp)
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 4aa005004e..306e44fb0a 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -916,7 +916,11 @@ int main(int argc, char **argv)
+         } else if (pid == 0) {
+             close(stderr_fd[0]);
  
-     if (s->free_page_bh) {
-         qemu_bh_delete(s->free_page_bh);
-+        object_unref(OBJECT(s->iothread));
-         virtio_balloon_free_page_stop(s);
-         precopy_remove_notifier(&s->free_page_report_notify);
-     }
+-            old_stderr = dup(STDERR_FILENO);
++            /* Remember parent's stderr if we will be restoring it. */
++            if (fork_process) {
++                old_stderr = dup(STDERR_FILENO);
++            }
++
+             ret = qemu_daemon(1, 0);
+ 
+             /* Temporarily redirect stderr to the parent's pipe...  */
 -- 
 2.17.1
 
