@@ -2,94 +2,84 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B708C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:28:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8B66C2D0A6
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:35:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D6FA206C0
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75C7420639
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 20:35:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lf8dQyo9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D6FA206C0
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="stz+Bp01"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75C7420639
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDvqe-0002us-Pf
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:28:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46436)
+	id 1kDvxQ-0005ND-LB
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 16:35:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDvpu-0002JI-Nq
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:27:58 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:44578)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDvwj-0004xZ-NK
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:35:01 -0400
+Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:45340)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDvps-0002C7-Rp
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:27:58 -0400
-Received: by mail-pg1-x542.google.com with SMTP id 7so3014034pgm.11
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 13:27:56 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kDvwi-0002ru-2Q
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 16:35:01 -0400
+Received: by mail-ej1-x633.google.com with SMTP id i26so5626168ejb.12
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 13:34:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=aNKgomjsVStiCcw1WVtj8fziWdefoSubqFjUduvxK68=;
- b=Lf8dQyo9oy5PXxFgs2JxQfWfc7mt/ynF4mppqju/6snVSTtqrAtG9atpPufcz1z8YL
- R63hTtMjD7CVyRk54US7HwA9eZiUVbNYZe23Te6jNCUNXgM8SxzlQ8w9IFeVI+UJ+PXM
- JjNVG0vc6Ok7xt++kFjFe5zOVc7npkeUa0MlvbExXUtMtAdfymSx2SnLE7oPOtr2gbR8
- 8+oh+8x3vH4O9nY1UUvmsotAOOD2iMQLuexu2ie5ayCO1hGvALzWqZ7tq0s6wBfK/SLV
- sIGIk3BCIhtY3cV/YfTc7AEO+e4+NH5Y+syProsp5RD10Fh2ztze3Y5r5MgN+hbseNXf
- 2JcA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=vT3FWggpMREdYJZIRJUtwlmU/KslYvUKBwRFwxLyFSc=;
+ b=stz+Bp01ma8QGfMuwcmDbnUIVrpsRsGrLYEHCK9yvAv9anXsdXa9/9zHZj4+kxpalW
+ 7cT/I1Ltfool2gxHbwD09FJxtQ6DYhhu/Qf/KwDDiwlEK59/Hb7PMEuk3UtVvDxnh1Go
+ +PY0ry89C7rQbI7CYRkXHal8z5nWmN2pizuIjWs3DXc8watCd15+kAVa7ZtWoCExsWLo
+ ZwB5GOm4fWIVozY1aSZ4W5IV256DHl+KK3Lo/LDl4bAkHg3vSXlX8bmh9S64MGUjuWn9
+ xNtSvK0tlqrUc5X4dn+oI6umh/P0VbEndFg3BTngm3cH7jft0kC9+zLhFkQexmJFjXFf
+ wDMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=aNKgomjsVStiCcw1WVtj8fziWdefoSubqFjUduvxK68=;
- b=PAEac3Wd8eMPqf+JcP2qBwH5ZXGDuWC5RJ1dPiME5wFfLu7+KNX5FUEowlLygraqRC
- SI6KEMMlDaZkB3BMvXM0M7PgeOAcyOIBoM+Oz+Fq+gnIYGvcu/HYDDp6HQpbbH4X/jyq
- 20jLrNc1nvFwwAynx8QhkrSPmQL1mhTQERN167/CWh2YIC4mjAjCjfUZAT7ThB6jxFWn
- Q7UxjVv/4kjzK0e9WuFZLgDLxXieJUC70Hv7MZ5n0RnhLaTvZteisVFvOgKDhCTkU4DD
- BiqXUWwf16y7N+CdrmCK8BXO4PFFb4njs6ObUvtqA5d9nChoonXye2+73hJPd6eA53R6
- ljUA==
-X-Gm-Message-State: AOAM533YT7QKZYhr9365kx2qOQs8qK8EBjecMJ6MBcvU4x4VYKOzwwMq
- 6wtfXeJG4NVzr/e5lKoRM1lhjQ==
-X-Google-Smtp-Source: ABdhPJz+h2QtWb3JdWo7YLw+CKlR/cJA9/7bhOr65TuwYUxLZ6wqdKgpuiNCaH87MpJVVu2ZIAfCrA==
-X-Received: by 2002:a62:f241:: with SMTP id y1mr5357075pfl.206.1599164875069; 
- Thu, 03 Sep 2020 13:27:55 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id fs24sm3248517pjb.8.2020.09.03.13.27.53
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 13:27:54 -0700 (PDT)
-Subject: Re: [PATCH v2] linux-user: fix implicit conversion from enumeration
- type error
-To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
-References: <20200902125752.1033524-1-laurent@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <c8ef9a9d-580a-8a72-aed1-b62e92a139fc@linaro.org>
-Date: Thu, 3 Sep 2020 13:27:51 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=vT3FWggpMREdYJZIRJUtwlmU/KslYvUKBwRFwxLyFSc=;
+ b=B7jrQrlQBSOjbCRsxq9dgAKFDSzuOhSupJyrXQDafHDnLPI0FDMZVH3PC5IusbMoH6
+ 8fQd3jWnXkyddGuBgTJdO4aoiOYrRAo4ViwmjQoWDxJKP1fgVgfN1Bbm+Lc8HaQZPrIE
+ 9GaBaZwEzU2F8wbBZahT9XoMDwkIIiqnLr1muobH7I6lG5KFTes0trSZkf1TNuE+gJnr
+ NMV83H/qudAiIk72lQZ8d+1Q5LZ0qN4mD8XDrY/Vrdir8SNPX9+GSlvqOzycCJwsT10o
+ tRvGvMZVNxCNiakgoDQ2tl5+Y5WCKUXx6OZYQxnHelupyiJxYw1XtuREpPNWLK3CY2Pg
+ G2AQ==
+X-Gm-Message-State: AOAM533oQ0wqUdzYj6g4RsEukymlPKo66T3nUbhc4lIzbJxzClAKJwWi
+ 31NWoZ9ntgLuMOCOW1xE4Cjhr6E8MzuUPAw7QHM0Bg==
+X-Google-Smtp-Source: ABdhPJyiyFgObPhps93J04dRumrsfderU3ZYtu7l4yMK71MTU4y8HEyZLz4mF6RyAelIIifDDcwo4uASMyHUhr/n1iU=
+X-Received: by 2002:a17:906:59b:: with SMTP id 27mr4298196ejn.56.1599165298581; 
+ Thu, 03 Sep 2020 13:34:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200902125752.1033524-1-laurent@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+References: <20200903123130.451577-1-thuth@redhat.com>
+In-Reply-To: <20200903123130.451577-1-thuth@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 3 Sep 2020 21:34:47 +0100
+Message-ID: <CAFEAcA-eX5D2iptriNr568PL0nXp3nrr0S621BreT_9pjiYhJA@mail.gmail.com>
+Subject: Re: [PULL v3 00/15] Cirrus-CI improvements, and other CI-related
+ fixes, m68k
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::633;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x633.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.403,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -104,24 +94,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Filip Bozuta <Filip.Bozuta@syrmia.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/2/20 5:57 AM, Laurent Vivier wrote:
-> MK_ARRAY(type,size) is used to fill the field_types buffer, and if the
-> "size" parameter is an enum type, clang [-Werror,-Wenum-conversion] reports
-> an error when it is assigned to field_types which is also an enum, argtypes.
-> 
-> To avoid that, convert "size" to "int" in MK_ARRAY(). "int" is the type
-> used for the size evaluation in thunk_type_size().
-> 
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
-> ---
+On Thu, 3 Sep 2020 at 13:31, Thomas Huth <thuth@redhat.com> wrote:
+>
+>  Hi Peter!
+>
+> The following changes since commit ed215cec0fcaeaece064b0fdf37fe3bceb06d76c:
+>
+>   Merge remote-tracking branch 'remotes/ehabkost/tags/machine-next-pull-request' into staging (2020-09-02 15:26:38 +0100)
+>
+> are available in the Git repository at:
+>
+>   https://gitlab.com/huth/qemu.git tags/pull-request-2020-09-03
+>
+> for you to fetch changes up to 0a796d63bcd4e840bb94fbe894ae2ad77b9ee2f7:
+>
+>   gitlab-ci.yml: Set artifacts expiration time (2020-09-03 12:47:33 +0200)
+>
+> ----------------------------------------------------------------
+> * Cirrus-CI improvements and fixes (compile with -Werror & fix for 1h problem)
+> * Two build system fixes to fix some failures the CI
+> * One m68k QOMification patch
+> * Some trivial qtest patches
+> * Some small improvements for the Gitlab CI
+> ----------------------------------------------------------------
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-r~
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
