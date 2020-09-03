@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88A79C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CCFC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:50:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35CCB2072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:49:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 86C51206A5
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:50:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TipNrf5U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35CCB2072A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DAN6GLyX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86C51206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDog1-0002Ls-AE
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:49:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57864)
+	id 1kDohO-0004PO-Jy
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:50:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoeS-0000p4-RG
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:47:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35403)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDofM-0001w8-Ub
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:48:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38334)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoeR-0001sP-1L
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:47:40 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDofK-0001xm-JA
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:48:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599137257;
+ s=mimecast20190719; t=1599137313;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=U6La/qVi2+fxzxv0OwHJMk5/GOTYwpXBuNbIBbxXxWY=;
- b=TipNrf5UPlPWE7Im5+ZS+a02PVHzeYH+c89MEiyxo5lNCSQB/4CvvIYklPwu/FGZc26f2Z
- Bo6d3hsY3DOVetwxqJtSwdIDXwDn5/IQ6vgWwoQTc6EluDHQW2w6vdzqjzR6eD6e3wexVk
- x4PvhKd2qOtazLbFXmtoHhTWI6kbP1w=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-258-WrXtnDWuPFusMAUYSVSSnA-1; Thu, 03 Sep 2020 08:47:36 -0400
-X-MC-Unique: WrXtnDWuPFusMAUYSVSSnA-1
-Received: by mail-wm1-f72.google.com with SMTP id k12so2354141wmj.1
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:47:35 -0700 (PDT)
+ bh=0OkkX+HsaMnkRqACeqnDZ3zA7FdUFu1CWUeg73Qzm6Y=;
+ b=DAN6GLyX0gTWXVM4cks7Ji8XDWt1jHLVuWhSIToFKbVcpHRqNeJok1tLveCFkpvWv7AsMm
+ evzYApOH83QtUifkz8UjgnNmI2KyycdGvZ+vowXhPtD5434Ln5oo8HicBBI+VEKbMj+30/
+ 4VK60VJe770K+7K9R3xf8FqoDX+EjNw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-151-kbIu033fPJ2cY8_Jn3m59A-1; Thu, 03 Sep 2020 08:48:30 -0400
+X-MC-Unique: kbIu033fPJ2cY8_Jn3m59A-1
+Received: by mail-wr1-f71.google.com with SMTP id a12so1042478wrg.13
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:48:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=U6La/qVi2+fxzxv0OwHJMk5/GOTYwpXBuNbIBbxXxWY=;
- b=qibpuqABBSn4SogGkV+n5sqhlmMBc8uTbBqZiMoOa44Z7H6be07e2v9SkE1II0RWh2
- VsxoU73p3OEHVvBdX9C8BPKEKIJ1tRzehyQ24pRm+XIHslKAArqonW/coZ7utY+SyaHs
- TMAXdIF+Acn5iKh2qd57MkScbKkxRrPbgapqMrjJf1WXP2wl23azanKa0PrsRMPdcE8j
- 27fTwwiUgAMaNlfCbM10KVwa6FOejiQqxxYOXYBsIcOGYzZ4fI9WhIMBG0+i8lRgCq+I
- VwFVUV/e89XhCVwUggTohk71LvcMEf9rmPaFsF13NR6iAd6D8Q9kNb7TS2IE+fee/UVf
- vp1Q==
-X-Gm-Message-State: AOAM530zQ3z9QlwiYB/q5a+wE/E4V0er527N+ETFsU7wjeMP6dDObJVZ
- Hv3ZikY2ZxonbyNliiW8AVfsIsW/S2gZ9yxMwkzkGZ14Y9+VjjsHkPp37eT1MknEe06GapG+i1w
- J4TrzzvXFwZ2pyjI=
-X-Received: by 2002:a1c:1f42:: with SMTP id f63mr2273646wmf.1.1599137254850;
- Thu, 03 Sep 2020 05:47:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwN0Du8ikjF4DHgga24K6phzsssa6CiwNbo5t2yc2XbpRYRpO46LOjLIQ/VXV7nUw+MDeYOfQ==
-X-Received: by 2002:a1c:1f42:: with SMTP id f63mr2273635wmf.1.1599137254692;
- Thu, 03 Sep 2020 05:47:34 -0700 (PDT)
+ bh=0OkkX+HsaMnkRqACeqnDZ3zA7FdUFu1CWUeg73Qzm6Y=;
+ b=nigAcrQyQ3Sb3P5x7mai/+7R1VdCY6DcxqvdKRwTj2XElF/DsETO1XpEtShfEqFldl
+ rJnexYZRDfYBe9/Pejjkpx6wSllaIOD2gfWzD9Fb2QfJ9fvVR6A6pnMTGu7X/Z88iMrD
+ +CeJtf0sSCCVHeqb22NqD2QdYfTXYPC855Jw4K6282O+rarGgZGiTx3TcphsIwh8jBMB
+ /QzezDprm7nkATNIRr0TesuadnSMrHaMzP5v+ftsoPKvqnGG8gZWwPs/MUQfRhA6QFzj
+ 2sts0dGHrxE5dIK0wLFO1aZbm98U38l0xefiu2ROUUS0jSWTvR612941Pu7sO2naQmNw
+ jTaw==
+X-Gm-Message-State: AOAM531bArQZqYgmuNQigLHCSMd63eNQluaBO1W5xMvDYbr5XrVS790r
+ i3gSa203982P2NKZrch0sLgRafYFOaa8alCCj6EUyD8t1mqMaMSbwifLtP8ZFkNwqzeZcm85ICw
+ ev9jxVLG7g1NMJWQ=
+X-Received: by 2002:adf:fc92:: with SMTP id g18mr2442792wrr.201.1599137309246; 
+ Thu, 03 Sep 2020 05:48:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyMnsBN1qzB3RIw/Yz/rBVFGSoyrupILiial70Lxhuq0Um9uyIM00WOksGNz0ephKIRp8Ay0g==
+X-Received: by 2002:adf:fc92:: with SMTP id g18mr2442770wrr.201.1599137309064; 
+ Thu, 03 Sep 2020 05:48:29 -0700 (PDT)
 Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id 91sm4759925wrq.9.2020.09.03.05.47.33
+ by smtp.gmail.com with ESMTPSA id h5sm6007547wrc.45.2020.09.03.05.48.28
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 05:47:34 -0700 (PDT)
-Subject: Re: [PATCH 15/63] i8259: Rename TYPE_I8259 to TYPE_PIC
+ Thu, 03 Sep 2020 05:48:28 -0700 (PDT)
+Subject: Re: [PATCH 01/63] gpex: Fix type checking function name
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-16-ehabkost@redhat.com>
+ <20200902224311.1321159-2-ehabkost@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -102,22 +102,22 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <bb2d291d-158f-0e79-e384-f6d011b4922e@redhat.com>
-Date: Thu, 3 Sep 2020 14:47:33 +0200
+Message-ID: <290fd4a7-0d89-194a-104c-e2f12d52286d@redhat.com>
+Date: Thu, 3 Sep 2020 14:48:27 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200902224311.1321159-16-ehabkost@redhat.com>
+In-Reply-To: <20200902224311.1321159-2-ehabkost@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:47:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -44
 X-Spam_score: -4.5
@@ -139,72 +139,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, berrange@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>
+Cc: berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/3/20 12:42 AM, Eduardo Habkost wrote:
-> This will make the type name constant consistent with the name of
-> the type checking macro.
+> This looks like a copy/paste mistake: the instance type checking
+> macro for TYPE_GPEX_ROOT_DEVICE was named MCH_PCI_DEVICE.
 > 
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Cc: qemu-devel@nongnu.org
 > ---
->  hw/intc/i8259.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+>  include/hw/pci-host/gpex.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/intc/i8259.c b/hw/intc/i8259.c
-> index 344fd04db1..e536cc90be 100644
-> --- a/hw/intc/i8259.c
-> +++ b/hw/intc/i8259.c
-> @@ -37,10 +37,10 @@
+> diff --git a/include/hw/pci-host/gpex.h b/include/hw/pci-host/gpex.h
+> index e8432eced8..2f4e852eee 100644
+> --- a/include/hw/pci-host/gpex.h
+> +++ b/include/hw/pci-host/gpex.h
+> @@ -32,7 +32,7 @@ DECLARE_INSTANCE_CHECKER(GPEXHost, GPEX_HOST,
 >  
->  //#define DEBUG_IRQ_LATENCY
->  
-> -#define TYPE_I8259 "isa-i8259"
-> +#define TYPE_PIC "isa-i8259"
+>  #define TYPE_GPEX_ROOT_DEVICE "gpex-root"
+>  typedef struct GPEXRootState GPEXRootState;
+> -DECLARE_INSTANCE_CHECKER(GPEXRootState, MCH_PCI_DEVICE,
+> +DECLARE_INSTANCE_CHECKER(GPEXRootState, GPEX_ROOT_DEVICE,
+>                           TYPE_GPEX_ROOT_DEVICE)
 
-I disagree with this patch, as we have various PIC and only one I8259.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
->  typedef struct PICClass PICClass;
->  DECLARE_CLASS_CHECKERS(PICClass, PIC,
-> -                       TYPE_I8259)
-> +                       TYPE_PIC)
 >  
->  /**
->   * PICClass:
-> @@ -418,7 +418,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
->  
->      irq_set = g_new0(qemu_irq, ISA_NUM_IRQS);
->  
-> -    isadev = i8259_init_chip(TYPE_I8259, bus, true);
-> +    isadev = i8259_init_chip(TYPE_PIC, bus, true);
->      dev = DEVICE(isadev);
->  
->      qdev_connect_gpio_out(dev, 0, parent_irq);
-> @@ -428,7 +428,7 @@ qemu_irq *i8259_init(ISABus *bus, qemu_irq parent_irq)
->  
->      isa_pic = dev;
->  
-> -    isadev = i8259_init_chip(TYPE_I8259, bus, false);
-> +    isadev = i8259_init_chip(TYPE_PIC, bus, false);
->      dev = DEVICE(isadev);
->  
->      qdev_connect_gpio_out(dev, 0, irq_set[2]);
-> @@ -451,7 +451,7 @@ static void i8259_class_init(ObjectClass *klass, void *data)
->  }
->  
->  static const TypeInfo i8259_info = {
-> -    .name       = TYPE_I8259,
-> +    .name       = TYPE_PIC,
->      .instance_size = sizeof(PICCommonState),
->      .parent     = TYPE_PIC_COMMON,
->      .class_init = i8259_class_init,
+>  #define GPEX_NUM_IRQS 4
 > 
 
 
