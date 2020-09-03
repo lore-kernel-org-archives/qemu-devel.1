@@ -2,83 +2,87 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F340C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:39:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64172C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:39:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 59B9F206EB
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:39:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A02A206EB
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:39:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I0DazbsO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59B9F206EB
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K3azf1G6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A02A206EB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDoWU-0007l6-7V
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:39:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54240)
+	id 1kDoWy-0000C2-5n
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDoP5-0004jb-2M
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:31:47 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37847
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kDoW6-0007KF-HW
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:39:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37775)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kDoP2-0008HT-1Q
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:31:46 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kDoW4-0000bA-KO
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:39:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599136303;
+ s=mimecast20190719; t=1599136739;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=IGT2ePio+C2hsEldTT04onhkAN0WzzQ5DzluG26/Gv8=;
- b=I0DazbsOh8ZzFsYaUZopUfoRjXSqd3Zo+J0oLBiPxpP/p3a4wJJbY6O0sLUAe0IWaQ95Gl
- rXw+Hloo2vBe1kTBEsv3aMdETAKjJAcFD9dWD5Z2dhQyE6r82D/gjRChVvGNgkYP9uQ9kI
- LEJ3LK1BMdSSXCySSuUzrMpyXXb8yIs=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=lVyloMQgFPo5BSn/nR9ynC1wyQYLozJPFWT5+UF7Xz0=;
+ b=K3azf1G6akBiDP7egd3XzJXXbPjubn+5zT6S51WZiDW5443p7noZe6DlDxPBEWAzypDkSs
+ dHhCrM40PVcOvU2ZveExnKlyN2403gND3pVaNhXpaaugMN0jgc3LrpVF182y1HD3HyO/Rh
+ wdfAog43z11JjtK6JGeZdbHOLrxPu0A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-302-dibmwhefOXOC44RhflhQ8w-1; Thu, 03 Sep 2020 08:31:39 -0400
-X-MC-Unique: dibmwhefOXOC44RhflhQ8w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-38-_S8damOZMtGD2w5kCDsYew-1; Thu, 03 Sep 2020 08:38:54 -0400
+X-MC-Unique: _S8damOZMtGD2w5kCDsYew-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A44110ABDC2;
- Thu,  3 Sep 2020 12:31:38 +0000 (UTC)
-Received: from thuth.com (ovpn-114-10.ams2.redhat.com [10.36.114.10])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 26BCF60250;
- Thu,  3 Sep 2020 12:31:36 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL v3 06/15] meson: fix keymaps without qemu-keymap
-Date: Thu,  3 Sep 2020 14:31:30 +0200
-Message-Id: <20200903123130.451577-2-thuth@redhat.com>
-In-Reply-To: <20200903123130.451577-1-thuth@redhat.com>
-References: <20200903123130.451577-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 79A5F839A48;
+ Thu,  3 Sep 2020 12:38:53 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-114-183.ams2.redhat.com [10.36.114.183])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EC20810013C4;
+ Thu,  3 Sep 2020 12:38:51 +0000 (UTC)
+Date: Thu, 3 Sep 2020 14:38:50 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Max Reitz <mreitz@redhat.com>
+Subject: Re: [RFC qemu 0/6] mirror: implement incremental and bitmap modes
+Message-ID: <20200903123850.GB8835@linux.fritz.box>
+References: <20200218100740.2228521-1-f.gruenbichler@proxmox.com>
+ <d35a76de-78d5-af56-0b34-f7bd2bbd3733@redhat.com>
+ <1599127031.9uxdp5h9o2.astroid@nora.none>
+ <ef545f46-7cbb-43f0-2ab8-f3d49643d1e6@redhat.com>
+MIME-Version: 1.0
+In-Reply-To: <ef545f46-7cbb-43f0-2ab8-f3d49643d1e6@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="nFreZHaLTZJo0R7j"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 04:23:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,114 +95,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kraxel@redhat.com
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ Fabian =?iso-8859-1?Q?Gr=FCnbichler?= <f.gruenbichler@proxmox.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+--nFreZHaLTZJo0R7j
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In case the qemu-keymap tool generating them is neither installed on the
-system nor built from sources (due to xkbcommon not being available)
-qemu will not find the keymaps when started directly from the build
-tree,
+Am 03.09.2020 um 13:04 hat Max Reitz geschrieben:
+> On 03.09.20 12:13, Fabian Gr=C3=BCnbichler wrote:
+> > On August 21, 2020 3:03 pm, Max Reitz wrote:
+> >> On 18.02.20 11:07, Fabian Gr=C3=BCnbichler wrote:
+> > I am not sure how=20
+> > the S-O-B by John is supposed to enter the mix - should I just include=
+=20
+> > it in the squashed patch (which would be partly authored, but=20
+> > not-yet-signed-off by him otherwise?)?
+>=20
+> I=E2=80=99m not too sure on the proceedings, actually.  I think it should=
+ be
+> fine if you put his S-o-b there, as long as your patch is somehow based
+> on a patch that he sent earlier with his S-o-b underneath.  But I=E2=80=
+=99m not
+> sure.
 
-This happens because commit ddcf607fa3d6 ("meson: drop keymaps symlink")
-removed the symlink to the source tree, and the special handling for
-install doesn't help in case we do not install qemu.
+Signed-off-by means that John certifies the DCO for the patch (at least
+the original version that you possibly modified), so you cannot just add
+it without asking him.
 
-Lets fix that by simply copying over the file from the source tree as
-fallback.
+John should reply with a Signed-off-by line to the patch in question.
+Then you (Fabian) can add it in the next version of the series (if I
+understand correctly, you're going to respin anyway).
 
-Reported-by: Thomas Huth <thuth@redhat.com>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-Id: <20200827102617.14448-1-kraxel@redhat.com>
-[thuth: Rebased, changed "config_host['qemu_datadir']" to "qemu_datadir",
-        added Gerd's UNLINK fix to configure script]
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- configure                   |  9 +++++++++
- pc-bios/keymaps/meson.build | 28 +++++++++++++++++++---------
- 2 files changed, 28 insertions(+), 9 deletions(-)
+I see that patch 2 doesn't have any S-o-b at all. It should have both
+John's and Fabian's.
 
-diff --git a/configure b/configure
-index 5645575688..be5434793c 100755
---- a/configure
-+++ b/configure
-@@ -8065,6 +8065,9 @@ fi
- # so the build tree will be missing the link back to the new file, and
- # tests might fail. Prefer to keep the relevant files in their own
- # directory and symlink the directory instead.
-+# UNLINK is used to remove symlinks from older development versions
-+# that might get into the way when doing "git update" without doing
-+# a "make distclean" in between.
- DIRS="tests tests/tcg tests/tcg/lm32 tests/qapi-schema tests/qtest/libqos"
- DIRS="$DIRS tests/qtest tests/qemu-iotests tests/vm tests/fp tests/qgraph"
- DIRS="$DIRS docs docs/interop fsdev scsi"
-@@ -8081,6 +8084,7 @@ LINKS="$LINKS .gdbinit scripts" # scripts needed by relative path in .gdbinit
- LINKS="$LINKS tests/acceptance tests/data"
- LINKS="$LINKS tests/qemu-iotests/check"
- LINKS="$LINKS python"
-+UNLINK="pc-bios/keymaps"
- for bios_file in \
-     $source_path/pc-bios/*.bin \
-     $source_path/pc-bios/*.elf \
-@@ -8101,6 +8105,11 @@ for f in $LINKS ; do
-         symlink "$source_path/$f" "$f"
-     fi
- done
-+for f in $UNLINK ; do
-+    if [ -L "$f" ]; then
-+        rm -f "$f"
-+    fi
-+done
- 
- (for i in $cross_cc_vars; do
-   export $i
-diff --git a/pc-bios/keymaps/meson.build b/pc-bios/keymaps/meson.build
-index bbac83ece3..2e2e0dfa3b 100644
---- a/pc-bios/keymaps/meson.build
-+++ b/pc-bios/keymaps/meson.build
-@@ -38,19 +38,29 @@ if meson.is_cross_build() or 'CONFIG_XKBCOMMON' not in config_host
- else
-   native_qemu_keymap = qemu_keymap
- endif
-+
- t = []
- foreach km, args: keymaps
--  t += custom_target(km,
--                     build_by_default: true,
--                     output: km,
--                     command: [native_qemu_keymap, '-f', '@OUTPUT@', args.split()],
--                     install_dir: qemu_datadir / 'keymaps')
-+  if native_qemu_keymap.found()
-+    # generate with qemu-kvm
-+    t += custom_target(km,
-+                       build_by_default: true,
-+                       output: km,
-+                       command: [native_qemu_keymap, '-f', '@OUTPUT@', args.split()],
-+                       install_dir: qemu_datadir / 'keymaps')
-+  else
-+    # copy from source tree
-+    t += custom_target(km,
-+                       build_by_default: true,
-+                       input: km,
-+                       output: km,
-+                       command: ['cp', '@INPUT@', '@OUTPUT@'],
-+                       install_dir: qemu_datadir / 'keymaps')
-+  endif
- endforeach
--if t.length() > 0
-+
-+if native_qemu_keymap.found()
-   alias_target('update-keymaps', t)
--else
--  # install from the source tree
--  install_data(keymaps.keys(), install_dir: qemu_datadir / 'keymaps')
- endif
- 
- install_data(['sl', 'sv'], install_dir: qemu_datadir / 'keymaps')
--- 
-2.18.2
+Kevin
+
+--nFreZHaLTZJo0R7j
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl9Q49oACgkQfwmycsiP
+L9bcBg/7Bn9rcnmIfwyi/rL25qPe5ZB1dQSwVvy1AMX66+ZSyqY2Oss1+bEPeC41
+oeoPZAxaUie6IUf1BNKncJ1D8cgX4wT/GRMc5k6AW88IojZzNJfn4wXpctYH8p6r
+cC/ZewtmL3KNvxwsIk1D/FHrAclPLI/lIjaMFeLL1VsHHpufy3CepiTL8F0cndYr
+7jHvcKzYSfXsj1dYz9R4Uye1ytZ9Xv4pYzQHE2VHldIGGjScSIeUs9Z39XpP8uVT
+CIiqQ4roQC+XkUyFEob12o0goHJuS3166BTmk2OtcpLju8hk3X8NHFOPPPf1BHLy
+px6zsK/PXzGDsLFKSRHaTFLRac0oXze6PNb/O7o4RygNnBt4rqfIk8Yr9SC2xTPA
+fMTd4SR6vcqV0GsePjSIRGBvRXgGemL/SMfZuY6/Vq3ctTs3wWBM+o18TIY6QBYW
+KenGyepACF8kQDmuN0S7g0XPNBOdj72ErcmKqbC41WPF+ygKtY6tkKdfWWOjGP/U
+pWM5+JoipNWm6XI2UKbGHd3+mresCImQZg813NY5a+k/OLUXdUkKJdHhKPHpcHd8
+AQdvwbXf+qen634c8dARRDSr4Z5bylwX4J6uvWdaBa7ft9jKuvWz/bPd6z5x4hb5
+aN7GlW7qpi9czrZL9XEs0Cx9om79HgAnfvQaYEq129HPrMnit9c=
+=GQzo
+-----END PGP SIGNATURE-----
+
+--nFreZHaLTZJo0R7j--
 
 
