@@ -2,72 +2,91 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 473CDC433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:05:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8348BC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:11:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10F2D20716
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:05:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10F2D20716
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 352A020716
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 16:11:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="WpunyQDg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 352A020716
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gmx.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41922 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDrkB-00071l-7q
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:05:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33716)
+	id 1kDrpg-0001Al-5W
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 12:11:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kDrhQ-0003KW-41
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:02:56 -0400
-Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:52197)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmS-0007t0-LZ
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:08 -0400
+Received: from mout.gmx.net ([212.227.17.21]:49707)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kDrhN-0006ea-U4
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:02:55 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.16.8])
- by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 4A092572881A;
- Thu,  3 Sep 2020 18:02:50 +0200 (CEST)
-Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 3 Sep 2020
- 18:02:49 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-103G0058ebef85b-6f19-405a-a748-ee95702c255e,
- FF22E3E2F99647A0705B7EB067E934078DCBDF97) smtp.auth=groug@kaod.org
-Date: Thu, 3 Sep 2020 18:02:48 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v2 1/1] 9pfs: log warning if msize <= 8192
-Message-ID: <20200903180248.6199bb7b@bahia.lan>
-In-Reply-To: <e6fc84845c95816ad5baecb0abd6bfefdcf7ec9f.1599144062.git.qemu_oss@crudebyte.com>
-References: <cover.1599144062.git.qemu_oss@crudebyte.com>
- <e6fc84845c95816ad5baecb0abd6bfefdcf7ec9f.1599144062.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <deller@gmx.de>) id 1kDrmQ-0007jo-MP
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 12:08:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+ s=badeba3b8450; t=1599149271;
+ bh=BFlROhqLNa/5mWtTViwWl2vX0zdk1DqFz9BeeEdDis8=;
+ h=X-UI-Sender-Class:From:To:Cc:Subject:Date:In-Reply-To:References;
+ b=WpunyQDgri3RYc/4qSKpdQY4bRS3uw68N8xX1tzL+btGUxOk5MmM0Xysm/f5N93dR
+ FoYfSgi6SFa2yIHBgrLRcpuhuDSMGg+oiV79BIuTBC0iE+qAmPq4fZ+dUEtt6acei8
+ mK13MEQQtSp61KB8Okth5A/s4a+BAOIp8t3U8KQo=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from ls3530.fritz.box ([92.116.138.28]) by mail.gmx.com (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MHoRK-1kJvmr00c2-00Es4G; Thu, 03
+ Sep 2020 18:07:51 +0200
+From: Helge Deller <deller@gmx.de>
+To: qemu-devel@nongnu.org,
+	peter.maydell@linaro.org
+Subject: [PULL 04/10] hw/hppa: Change fw_cfg port address
+Date: Thu,  3 Sep 2020 18:07:40 +0200
+Message-Id: <20200903160746.27491-5-deller@gmx.de>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200903160746.27491-1-deller@gmx.de>
+References: <20200903160746.27491-1-deller@gmx.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG5EX1.mxp5.local (172.16.2.41) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: ae6eb1ef-4199-4211-a3e5-6b69bd03cd76
-X-Ovh-Tracer-Id: 1416945036509092317
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudeguddgleekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepheeggedvvdethfdttddvhfeiudetvdfgjedtudetgfevheeijeeileevffegkeehnecuffhomhgrihhnpehqvghmuhdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtfeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepsggvrhhrrghnghgvsehrvgguhhgrthdrtghomh
-Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
- helo=smtpout1.mo529.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 11:20:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:k8RO8z8QxZm8GkBRCPgKP7gXE+t3jKLMPBQgksB11Q4eC3e9dbZ
+ Dysz5NBxrupCqBsMgr5NsXR6P2JxmiHjgm2n+CX/tbJWUggErbcmMbugD3JqcF7ymSyGh+n
+ 25TR9U9ON/DEdzVcCVkSRrd+TOGxtzjJIzjYVE9/UK1CLxQjQ1ZKK15m32KWTCgjaIRdRDy
+ OdN6TeK6zs7kmNNtB3byw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:CU4jH9Gonw4=:C+JFhUx36N2wod0Gbd+7Mh
+ llkv7sB2LfU3SyrTlx+aYOz6RlU9Vi8ZM/kUkNzG8011skyzLy9nmp42EkjwBkTP7x4waDJFq
+ HPVeCZ03ERkv5GGd5o7MfPaxSf9Jv91kXWvS5DN/1QuLjHP8LJYbU3N3uuTucmZCUh7vBqg8v
+ 9thXkzBqwDBCr83SkU95+tgqwqllswoa0tSpGCCc1F7AfU8SsQgjSvuq6VDFhMXSnkYBnrIMw
+ GXzdXLJyzBfpegLF9lkBuYSuah2qCT3Dw56WAx04jjMgOCoLsAdJPK/OULMye0i2C3T2qQnVO
+ oQIZbAHManecCk4MDXy2MxdINJIGtx0xp/Jz5EIHithzQ//yQzMh7NRvOzIQid487N6G5SXGR
+ hmkxoniPO6cZ8dkpUy4kqpp/u7Nmw2nbcZ/sH2UiDtJMH6DLwgYol4LK/AlspwTRMltdsxRNh
+ t5XORr85BScQkKVNuJkm9chLzJP0rpFN9VmcQCW1U+tIEcs+uzHqULoGlrrjUSETdp09yzuSl
+ Cs7/JMDOEaKcZnfMkfwGG6aSEvi6hnOkaqL2hHX5aDBuzvTeWyrF3B4Bwq+W3XXNbYsyUp2Aj
+ 53sp4Run3rD+jyvmfaCxJcyozVnY89sg9KX0fZIHLiSGOheWPNhUzu1E6gXlOgAxpB4aJrzrB
+ RdTjL8a7E3qvZI4RNbaTrc0PBjwBIvKD2go/WJft8qUxKgLbIYfKlP5MMK8QtDp+Lpso3hIGL
+ n6gLkiUWFpzaAUd+SDvkXRQI6gHfmMVmiDKyUYhU3PJ4Qltp0l3x67Y+TWCJln90NgnOZpYOt
+ getAQ8Fth/4ysqLkTEtTCrFirdv93dUxxHmgZMRWc0G9j48q5rapwvc49mKw3FhF2jQwXS9g4
+ TgrTV+kdOLjEaaEK6a/JQM0puSWeDiz1dAKlfsidCoFaZxMO17SE2FfSuyG4M07q02CBQGRHb
+ yiE2lEKVQKAQ0uAcnrzBo5Ey272tv6xR1TPgh74vYey3FGPL3nSLZJ16Wi99nGLi1r9VT6cbo
+ Y+tibV8RNT9yU4Yym+qtRaWvGyZVJyZ0EDzSGot2ysP6/X7s74c6zqANuIbwPrUtwmAKUuLz5
+ riKdlTcdZpwVPA7/NF+WPsTC2kHH8n/lxW9IK65sIYw29lzSHCzlhWVKyBo586VPXpwN3oQdV
+ bnOzCOie5ZrgUvIW7Pwd2xzi7w4XWL40CwcJZTfAtNy48UPipJCQoJIU4rs/E7RYlyHOJc+sS
+ dwFelpiN68xLcm8ao
+Received-SPF: pass client-ip=212.227.17.21; envelope-from=deller@gmx.de;
+ helo=mout.gmx.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 12:08:05
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
+X-Spam_bar: --
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
  RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -82,75 +101,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com, qemu-devel@nongnu.org
+Cc: Helge Deller <deller@gmx.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 3 Sep 2020 16:20:21 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+Devices on hppa occupy at least 4k starting at the HPA, so MEMORY_HPA+4k i=
+s
+blocked (by Linux) for the memory module.  I noticed this when testing the=
+ new
+Linux kernel patch to let the fw_cfg entries show up in Linux under /proc.
+The Linux kernel driver could not allocate the region for fw_cfg.
+This new base address seems to not conflict.
 
-> It is essential to choose a reasonable high value for 'msize' to avoid
-> severely degraded file I/O performance. This parameter can only be
-> chosen on client/guest side, and a Linux client defaults to an 'msize'
-> of only 8192 if the user did not explicitly specify a value for 'msize',
-> which results in very poor file I/O performance.
-> 
-> Unfortunately many users are not aware that they should specify an
-> appropriate value for 'msize' to avoid severe performance issues, so
-> log a performance warning (with a QEMU wiki link explaining this issue
-> in detail) on host side in that case to make it more clear.
-> 
-> Currently a client cannot automatically pick a reasonable value for
-> 'msize', because a good value for 'msize' depends on the file I/O
-> potential of the underlying storage on host side, i.e. a feature
-> invisible to the client, and even then a user would still need to trade
-> off between performance profit and additional RAM costs, i.e. with
-> growing 'msize' (RAM occupation), performance still increases, but
-> performance delta will shrink continuously.
-> 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
->  hw/9pfs/9p.c | 9 +++++++++
->  1 file changed, 9 insertions(+)
-> 
-> diff --git a/hw/9pfs/9p.c b/hw/9pfs/9p.c
-> index 7bb994bbf2..99b6f24fd6 100644
-> --- a/hw/9pfs/9p.c
-> +++ b/hw/9pfs/9p.c
-> @@ -1353,6 +1353,15 @@ static void coroutine_fn v9fs_version(void *opaque)
->          goto out;
->      }
->  
-> +    /* 8192 is the default msize of Linux clients */
-> +    if (s->msize <= 8192) {
+Signed-off-by: Helge Deller <deller@gmx.de>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+=2D--
+ hw/hppa/hppa_hardware.h | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-I agree that an msize of 8192 suck from a performance standpoint but
-I guess many users are msize agnostic, and they use the default value
-without even knowing it. They might not even care for performance at
-all, otherwise they'd likely ask google and they will eventually land
-on:
+diff --git a/hw/hppa/hppa_hardware.h b/hw/hppa/hppa_hardware.h
+index cdb7fa6240..b2fbbc2eec 100644
+=2D-- a/hw/hppa/hppa_hardware.h
++++ b/hw/hppa/hppa_hardware.h
+@@ -38,8 +38,7 @@
+ #define PORT_PCI_CMD    (PCI_HPA + DINO_PCI_ADDR)
+ #define PORT_PCI_DATA   (PCI_HPA + DINO_CONFIG_DATA)
 
-https://wiki.qemu.org/Documentation/9psetup#Performance_Considerations
+-/* QEMU fw_cfg interface port */
+-#define QEMU_FW_CFG_IO_BASE     (MEMORY_HPA + 0x80)
++#define QEMU_FW_CFG_IO_BASE     0xfffa0000
 
-But with this patch, they will now get a warning each time they start
-QEMU, maybe freak out and file reports in launchpad. So I suggest you
-turn <= into < to avoid bothering these placid users with a warning.
-
-Anyway, it's your choice :) so if you manage to get the #msize anchor to
-work as expected:
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-
-> +        warn_report_once(
-> +            "9p: degraded performance: a reasonable high msize should be "
-> +            "chosen on client/guest side (chosen msize is <= 8192). See "
-> +            "https://wiki.qemu.org/Documentation/9psetup#msize for details."
-> +        );
-> +    }
-> +
->  marshal:
->      err = pdu_marshal(pdu, offset, "ds", s->msize, &version);
->      if (err < 0) {
+ #define PORT_SERIAL1    (DINO_UART_HPA + 0x800)
+ #define PORT_SERIAL2    (LASI_UART_HPA + 0x800)
+=2D-
+2.21.3
 
 
