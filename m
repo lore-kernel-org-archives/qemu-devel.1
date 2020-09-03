@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86ACFC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A5CC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:57:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3FBDB20767
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:55:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D8E52072A
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 12:57:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/d7ijan"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FBDB20767
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OWW9SKqw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D8E52072A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDomQ-0001q5-Cs
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:55:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60056)
+	id 1kDonf-00036F-EC
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 08:57:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDolk-0000ut-7A
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:55:12 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:43220
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDomx-0002XZ-2O
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:56:27 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29379
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDoli-0002qG-La
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:55:11 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kDomv-0003EA-ES
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 08:56:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599137709;
+ s=mimecast20190719; t=1599137784;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=nW2YLL6YTqwqrXOqYzrEQueyuerwCqac4JkAVTAjUJQ=;
- b=W/d7ijanMt9uU7AR3WzX92s2s9s6nV3vUXi+5trglJgMl/o1ee5NF3y/fd90n7hvccN6G+
- 9sxLGlSokNy8OPWvwSMSZJOmqA2sEcLbskyn6u4bvOQlsPn8XHnMrO+DvjhEGXrQzvPKaj
- c0YM0tXVxrVHQlpP+RT0kunVaiMDxcY=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-343-MVAocKzHO3WQJlpWMSneMg-1; Thu, 03 Sep 2020 08:55:08 -0400
-X-MC-Unique: MVAocKzHO3WQJlpWMSneMg-1
-Received: by mail-wr1-f69.google.com with SMTP id l15so1048034wro.10
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:55:08 -0700 (PDT)
+ bh=KveyHYVdF04QBjPXFmnHpypNu+GZ/YeWn5rzq5Ic4xw=;
+ b=OWW9SKqw+3kMMSIH+frN7+FCTf2S00Ve1nYw5HIdS4S43qVY/YdB7o3zVTB9hLzMD36bsV
+ LtQyJELfc2PtGEAXsaP2ekgBwpYzOh44c1XSH1gEm/OO+9dO8BW5c/cRHdHjd6opYfAAs5
+ PoEG0pFEHb3A+7gbK/NZqbVHzBNEHgY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-536--vq-UIbiMcipEiV6hjd6vA-1; Thu, 03 Sep 2020 08:56:23 -0400
+X-MC-Unique: -vq-UIbiMcipEiV6hjd6vA-1
+Received: by mail-wm1-f69.google.com with SMTP id u5so690641wme.3
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 05:56:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=nW2YLL6YTqwqrXOqYzrEQueyuerwCqac4JkAVTAjUJQ=;
- b=WwPJuvOG/EjYan+ozfL3VqoaBEYMzSvBArMigjGtaSLcRfruwE/UCUYzJx3FnlpDrx
- 6lqWYhbloVyaVl1P8Tk+6FHH2raWUmJ5n9jwpYq7EoGgYaxA1DKRPpqRxNWkmZoaazdP
- fNSg6r2MiCyGt1Iyd2d7a5lu7XarNEOorqvnNxdKBAdhaCODDmI3E/O3zxSmB7TuixTm
- 3u37HJZMCv8mq0OJO4/qqdQNiJQqe3xBUjiLKDA6dOeO9Tjz4SYN8NCJTw/9rQEDRq+y
- M/OgwUaa8iufTVjv4vDUKZNElwq/RFruSVOl+kzD3wy8p8vfcqUQrDXFvoZilmQYWJMl
- hnNA==
-X-Gm-Message-State: AOAM531hJG0Lvs1f36BSdELszwK/KceE5DOLz/2xd7kyAsD07jXlsHk+
- EsTI7mh7ePCION0Vnmln4mhkPqI/DwZfngqrettS20e8m34MI0xCRNHeq5zconThzt3tCFpEXlX
- Z71dTUgVM8kR9mw8=
-X-Received: by 2002:a5d:4bc6:: with SMTP id l6mr2518882wrt.132.1599137707386; 
- Thu, 03 Sep 2020 05:55:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxOTz1O1U1PHlR9iSJzqDk5pVG6vlpz08+ozbOWNtaGeQoHq93p30PLsRaFVqPHKkbqXuVMeg==
-X-Received: by 2002:a5d:4bc6:: with SMTP id l6mr2518865wrt.132.1599137707233; 
- Thu, 03 Sep 2020 05:55:07 -0700 (PDT)
+ bh=KveyHYVdF04QBjPXFmnHpypNu+GZ/YeWn5rzq5Ic4xw=;
+ b=e5wcVJLojSkVGxb86GjvvgXtIU5QfwM/ghMmCMGUYiMSC0pnbJEmeqZTs3jGTRjmX4
+ 9rvHiixOR9QKa7MhqYB9K/IOS2u5ZO3xesmDdZwwoDnBvfsMURk0xRmOVv5asLpAqKm1
+ 1lAYngJPdoim/EKgN2tvGSKofdMjiN0+7g0wwIbXxZzDvoi6liQcnP3qeAGF+uaCD94I
+ yAOnQd7q0ZDDCwam6muyGbeqZTAT3lS+oEYepUd38d1qHs0hhChwlVB2nTkCtmxQgqbK
+ ssbbx3HE6F/yqVhzTyQuG+ydnHHVE/QSB08JKOTN2/04y3bZ0P0NY2yx9kP3cXBZMdse
+ l4TQ==
+X-Gm-Message-State: AOAM533Qk2zkaPdTzrtESFrCOPwtCWAxtYPy6ZtV9c+wxa5N9EZ2LfXm
+ LieTmTgo2d+nq3sSxxtWrxrck3+qd5vw1tdSSm9XZoX+cZs27uRpKz6pMveMYXpTMUEPcy7BCzo
+ 7txfGxMc6Jg2YBKk=
+X-Received: by 2002:a5d:518b:: with SMTP id k11mr2251079wrv.369.1599137781880; 
+ Thu, 03 Sep 2020 05:56:21 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxATAWTCltXNmcIgnptArUMWsIQm1GJJyRKrzDH7WdYsWqetFqBhizTZXholpXBIWU8vZBsZg==
+X-Received: by 2002:a5d:518b:: with SMTP id k11mr2251064wrv.369.1599137781682; 
+ Thu, 03 Sep 2020 05:56:21 -0700 (PDT)
 Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id h5sm4648395wrt.31.2020.09.03.05.55.06
+ by smtp.gmail.com with ESMTPSA id o4sm4203307wrv.86.2020.09.03.05.56.20
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 05:55:06 -0700 (PDT)
-Subject: Re: [PATCH 24/63] scsi: Rename TYPE_AM53C974_DEVICE to TYPE_PCI_ESP
+ Thu, 03 Sep 2020 05:56:21 -0700 (PDT)
+Subject: Re: [PATCH 28/63] tusb6010: Rename TYPE_TUSB6010 to TYPE_TUSB
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-25-ehabkost@redhat.com>
+ <20200902224311.1321159-29-ehabkost@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -103,12 +103,12 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <cb06c88c-d6e4-c951-5bcd-e0b029bdce81@redhat.com>
-Date: Thu, 3 Sep 2020 14:55:06 +0200
+Message-ID: <fa919593-5c84-a42a-e443-2a957b0426a0@redhat.com>
+Date: Thu, 3 Sep 2020 14:56:20 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200902224311.1321159-25-ehabkost@redhat.com>
+In-Reply-To: <20200902224311.1321159-29-ehabkost@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -116,9 +116,9 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 00:24:51
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 01:58:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -44
 X-Spam_score: -4.5
@@ -139,8 +139,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Paolo Bonzini <pbonzini@redhat.com>,
- berrange@redhat.com
+Cc: berrange@redhat.com, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -151,24 +150,42 @@ On 9/3/20 12:42 AM, Eduardo Habkost wrote:
 > 
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Fam Zheng <fam@euphon.net>
+> Cc: Gerd Hoffmann <kraxel@redhat.com>
 > Cc: qemu-devel@nongnu.org
 > ---
->  hw/scsi/esp-pci.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  hw/usb/tusb6010.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/scsi/esp-pci.c b/hw/scsi/esp-pci.c
-> index 2ce96dc56e..2b1198380b 100644
-> --- a/hw/scsi/esp-pci.c
-> +++ b/hw/scsi/esp-pci.c
-> @@ -35,11 +35,11 @@
->  #include "qemu/module.h"
+> diff --git a/hw/usb/tusb6010.c b/hw/usb/tusb6010.c
+> index 2bee3ae59f..9b35c1d4b8 100644
+> --- a/hw/usb/tusb6010.c
+> +++ b/hw/usb/tusb6010.c
+> @@ -30,10 +30,10 @@
+>  #include "hw/sysbus.h"
 >  #include "qom/object.h"
 >  
-> -#define TYPE_AM53C974_DEVICE "am53c974"
-> +#define TYPE_PCI_ESP "am53c974"
+> -#define TYPE_TUSB6010 "tusb6010"
+> +#define TYPE_TUSB "tusb6010"
 
-We are loosing information helpful to reviewers :(
+We are loosing information helpful to reviewers.
+Can we rename the type macro TUSB6010() instead?
+
+>  typedef struct TUSBState TUSBState;
+>  DECLARE_INSTANCE_CHECKER(TUSBState, TUSB,
+> -                         TYPE_TUSB6010)
+> +                         TYPE_TUSB)
+>  
+>  struct TUSBState {
+>      SysBusDevice parent_obj;
+> @@ -838,7 +838,7 @@ static void tusb6010_class_init(ObjectClass *klass, void *data)
+>  }
+>  
+>  static const TypeInfo tusb6010_info = {
+> -    .name          = TYPE_TUSB6010,
+> +    .name          = TYPE_TUSB,
+>      .parent        = TYPE_SYS_BUS_DEVICE,
+>      .instance_size = sizeof(TUSBState),
+>      .class_init    = tusb6010_class_init,
+> 
 
 
