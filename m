@@ -7,71 +7,76 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F90C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 176F9C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:20:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4590F206CA
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:20:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE2AC206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:20:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvmswsPY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4590F206CA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nm7RClVB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2AC206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDwel-0000yz-Bc
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:20:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58196)
+	id 1kDwf4-0001lU-0W
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:20:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58954)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwKx-0003Kj-5O; Thu, 03 Sep 2020 17:00:03 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35788)
+ id 1kDwLc-0004TB-OL; Thu, 03 Sep 2020 17:00:44 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43289)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwKu-0007ML-UO; Thu, 03 Sep 2020 17:00:02 -0400
-Received: by mail-oi1-x241.google.com with SMTP id w16so4535214oia.2;
- Thu, 03 Sep 2020 14:00:00 -0700 (PDT)
+ id 1kDwLa-0007kB-O3; Thu, 03 Sep 2020 17:00:44 -0400
+Received: by mail-oi1-x241.google.com with SMTP id i17so4497639oig.10;
+ Thu, 03 Sep 2020 14:00:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=WbB6VAhtrBT4SG9Vr6ej0HJWL2xXc11PC/dJaX/FHdI=;
- b=IvmswsPYXOQ5wSszAzBpxdaKmcOafWtZkUB74WnlL4Fa0nuwnoFdyZaPq8NW5lQ7ik
- Z9ib/HyJN2+dB0GsWkEFOW/G6EDyPi85j3pqG+/aYJn8SMCY157Q+X7k/5mrh0FTfoN2
- G02ecmiRMCLnEbLKbsBdVoTzSDJj6/Mmd0t/ietrmXi+SMccieyFiqOl35rghu2Lrb3m
- D6ExOd7aQdfXI04MJ6fLvIVB1pqRRQddDe+N78MMOOdGLRXy3u50SVvk1sTuL1pf4QkY
- mIbnxCnFbtGHQvF4RYxU0bo/GkoX3X762w+QdTECEsfhKN0vOzjuF6WYT8ka7Q1RHwPh
- qCTA==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=aFXlKroXX9PZfDrZJYi+g7t/+H6Gi17j+AWN8w9Ef+w=;
+ b=Nm7RClVBy0aE0za/FeXkR32oswAuJoDh6+tPXlgPu48N13ZGdeixiNLNApnnZZ81VW
+ xZt/RhLysbsjE49kKDNGKrID7thKLFlp5K/qSFQ9tDZXnVWB2/s4X2bdBvPi0jHBURs+
+ 0F1Ci93ZLiyYTPU1KWBlIIKU279d5kmWDjp0JU4v2aeg7LIY0QSm0C38zcikEVrDEsfJ
+ e6BzOtNGH8oUimgvFU+1VHEV9KQUw6I6dMRAA2SmrlT6LqCsT/RtnQ8tMCVvCkWfM2Ct
+ uFq+NRz4qOHipRoOKnkSwuxhAqymrQehIezkH/qJT01/8gDxoX39RBheCN9pqDjVcGrz
+ O7vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references;
- bh=WbB6VAhtrBT4SG9Vr6ej0HJWL2xXc11PC/dJaX/FHdI=;
- b=BlK9Jt68MqTccY1e54l8ABmOUs/CTJmv+TpGO4zWOHaGflwuRZkpupspyLthEEsDQO
- 0UcOFvsNCF/B1ACJW3wb5BzcJjaSghXkgBy71R5sCIZsertHAKT/AMrenGvXPWdXIDEw
- +tnOuqd493lf02I290XHAKpO32jmLduQJSLkODS1WXkNYpDJ9CFSRBRxbJ8sJY2gYXy+
- F1P9PIfySGfV5cOHzzQeaa7tT4alodclRDybUmU5uZ0i5GNk8hJetxXgF4V2aWR7KhwH
- WfwNMNRTKYJktBD1qgYRPHAhWsE+/4ewSChxdAHe22Og5/JjcYVDNb5TVSboczPcIQrV
- 2ByA==
-X-Gm-Message-State: AOAM530nwNmm/XDDjkKfH1k6SDMUJ1y7/q39Xc3EOF118cyCYKV5YQ6Y
- oY0bDUaEMZNOe8u3FRrW2tCZEs/+0dA=
-X-Google-Smtp-Source: ABdhPJxor51/r4+wQK9BhGxTVJ/eSzH8MFU+af+VMR1muKggmi7rEH80t5SiRO8rdssLEYicpL2X5w==
-X-Received: by 2002:aca:bc57:: with SMTP id m84mr3224034oif.14.1599166799088; 
- Thu, 03 Sep 2020 13:59:59 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=aFXlKroXX9PZfDrZJYi+g7t/+H6Gi17j+AWN8w9Ef+w=;
+ b=TIpzGlO+A/iR3TnkMbRkF1drjX/D9RwHMSwJ0o+I9rlhsXqNn9LR2ygxODE5vppbjf
+ m5oVM9YPVHmAnP5+Te4ppjopNBpK6kQ9gBWwwmfGHSL6TVby25BOzBXKOhiUmW2VZNZ/
+ wTB2QqAgkd2Oqbt+mR1KXMALlh8KcItZ8h2M2aSMRYmV85KhgWQ2XxSj6l4ylHPkrd8/
+ dQQcsTHpvMVmjce3O7cVadS1N8QCJkZmXH/2vf1STXCVQHdxWKnyzXR7QEFH634z7Mzz
+ 9T3Us/Xnp000wSqkL4d2W5Y9dwUkCxl3LJzhxKcmVuOa5T/wvQZVjZ0/8KRFtJtpx5V+
+ 0z/g==
+X-Gm-Message-State: AOAM5325ZXCzeMbgZXgeUhrql3QYIj2dPJgV16ZDtwQ7UJbARmPeoqwf
+ BHqw9apYp+BpC5vZFqKqzPeaR/z9Xic=
+X-Google-Smtp-Source: ABdhPJwbNxC9B5yMu5eeSA4PVYpgTPmk2aSAdUOx9z0QLgP9MDB80u/73FtACuwPmrbv6rmzQW8bDw==
+X-Received: by 2002:aca:413:: with SMTP id 19mr3405785oie.149.1599166840933;
+ Thu, 03 Sep 2020 14:00:40 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id x38sm776992ota.72.2020.09.03.13.59.58
+ by smtp.gmail.com with ESMTPSA id r6sm798219otc.0.2020.09.03.14.00.40
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 13:59:58 -0700 (PDT)
+ Thu, 03 Sep 2020 14:00:40 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 15/77] xen/9pfs: yield when there isn't enough room on the ring
-Date: Thu,  3 Sep 2020 15:58:33 -0500
-Message-Id: <20200903205935.27832-16-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 45/77] docs/orangepi: Add instructions for resizing SD image
+ to power of two
+Date: Thu,  3 Sep 2020 15:59:03 -0500
+Message-Id: <20200903205935.27832-46-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
  envelope-from=flukshun@gmail.com; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -96,96 +101,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefano Stabellini <stefano.stabellini@xilinx.com>, qemu-stable@nongnu.org,
- Greg Kurz <groug@kaod.org>
+Cc: Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-stable@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Stefano Stabellini <stefano.stabellini@xilinx.com>
+From: Niek Linnenbank <nieklinnenbank@gmail.com>
 
-Instead of truncating replies, which is problematic, wait until the
-client reads more data and frees bytes on the reply ring.
+SD cards need to have a size of a power of two.
+Update the Orange Pi machine documentation to include
+instructions for resizing downloaded images using the
+qemu-img command.
 
-Do that by calling qemu_coroutine_yield(). The corresponding
-qemu_coroutine_enter_if_inactive() is called from xen_9pfs_bh upon
-receiving the next notification from the client.
-
-We need to be careful to avoid races in case xen_9pfs_bh and the
-coroutine are both active at the same time. In xen_9pfs_bh, wait until
-either the critical section is over (ring->co == NULL) or until the
-coroutine becomes inactive (qemu_coroutine_yield() was called) before
-continuing. Then, simply wake up the coroutine if it is inactive.
-
-Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
-Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-Id: <20200521192627.15259-2-sstabellini@kernel.org>
-Signed-off-by: Greg Kurz <groug@kaod.org>
-(cherry picked from commit a4c4d462729466c4756bac8a0a8d77eb63b21ef7)
+Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200712183708.15450-1-nieklinnenbank@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+(cherry picked from commit 1c2329b5d644bad16e888d095e2021ad682201d9)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- hw/9pfs/xen-9p-backend.c | 31 +++++++++++++++++++++++++------
- 1 file changed, 25 insertions(+), 6 deletions(-)
+ docs/system/arm/orangepi.rst | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
-index fc197f6c8a..3c84c86ab8 100644
---- a/hw/9pfs/xen-9p-backend.c
-+++ b/hw/9pfs/xen-9p-backend.c
-@@ -37,6 +37,7 @@ typedef struct Xen9pfsRing {
+diff --git a/docs/system/arm/orangepi.rst b/docs/system/arm/orangepi.rst
+index c41adad488..6f23907fb6 100644
+--- a/docs/system/arm/orangepi.rst
++++ b/docs/system/arm/orangepi.rst
+@@ -127,6 +127,16 @@ can be downloaded from:
+ Alternatively, you can also choose to build you own image with buildroot
+ using the orangepi_pc_defconfig. Also see https://buildroot.org for more information.
  
-     struct iovec *sg;
-     QEMUBH *bh;
-+    Coroutine *co;
- 
-     /* local copies, so that we can read/write PDU data directly from
-      * the ring */
-@@ -198,16 +199,20 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
-     g_free(ring->sg);
- 
-     ring->sg = g_new0(struct iovec, 2);
--    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
-+    ring->co = qemu_coroutine_self();
-+    /* make sure other threads see ring->co changes before continuing */
-+    smp_wmb();
- 
-+again:
-+    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
-     buf_size = iov_size(ring->sg, num);
-     if (buf_size  < size) {
--        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
--                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
--                buf_size);
--        xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
--        xen_9pfs_disconnect(&xen_9pfs->xendev);
-+        qemu_coroutine_yield();
-+        goto again;
-     }
-+    ring->co = NULL;
-+    /* make sure other threads see ring->co changes before continuing */
-+    smp_wmb();
- 
-     *piov = ring->sg;
-     *pniov = num;
-@@ -292,6 +297,20 @@ static int xen_9pfs_receive(Xen9pfsRing *ring)
- static void xen_9pfs_bh(void *opaque)
- {
-     Xen9pfsRing *ring = opaque;
-+    bool wait;
++When using an image as an SD card, it must be resized to a power of two. This can be
++done with the qemu-img command. It is recommended to only increase the image size
++instead of shrinking it to a power of two, to avoid loss of data. For example,
++to prepare a downloaded Armbian image, first extract it and then increase
++its size to one gigabyte as follows:
 +
-+again:
-+    wait = ring->co != NULL && qemu_coroutine_entered(ring->co);
-+    /* paired with the smb_wmb barriers in xen_9pfs_init_in_iov_from_pdu */
-+    smp_rmb();
-+    if (wait) {
-+        cpu_relax();
-+        goto again;
-+    }
++.. code-block:: bash
 +
-+    if (ring->co != NULL) {
-+        qemu_coroutine_enter_if_inactive(ring->co);
-+    }
-     xen_9pfs_receive(ring);
- }
++  $ qemu-img resize Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img 1G
++
+ You can choose to attach the selected image either as an SD card or as USB mass storage.
+ For example, to boot using the Orange Pi PC Debian image on SD card, simply add the -sd
+ argument and provide the proper root= kernel parameter:
+@@ -213,12 +223,12 @@ Next, unzip the NetBSD image and write the U-Boot binary including SPL using:
+   $ dd if=/path/to/u-boot-sunxi-with-spl.bin of=armv7.img bs=1024 seek=8 conv=notrunc
+ 
+ Finally, before starting the machine the SD image must be extended such
+-that the NetBSD kernel will not conclude the NetBSD partition is larger than
+-the emulated SD card:
++that the size of the SD image is a power of two and that the NetBSD kernel
++will not conclude the NetBSD partition is larger than the emulated SD card:
+ 
+ .. code-block:: bash
+ 
+-  $ dd if=/dev/zero bs=1M count=64 >> armv7.img
++  $ qemu-img resize armv7.img 2G
+ 
+ Start the machine using the following command:
  
 -- 
 2.17.1
