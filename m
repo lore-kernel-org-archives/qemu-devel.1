@@ -7,77 +7,73 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1B9AC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC733C43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:50:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE7620639
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:50:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 65B7D20797
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:50:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nwEX8IKy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE7620639
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cYnhSvU/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65B7D20797
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45390 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDx7V-0005uP-LM
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:50:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59378)
+	id 1kDx7a-000630-Ct
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:50:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLw-0004wu-As; Thu, 03 Sep 2020 17:01:04 -0400
-Received: from mail-oi1-x22a.google.com ([2607:f8b0:4864:20::22a]:38503)
+ id 1kDwM4-00051A-SZ; Thu, 03 Sep 2020 17:01:13 -0400
+Received: from mail-oo1-xc29.google.com ([2607:f8b0:4864:20::c29]:34350)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwLt-0007ph-Gi; Thu, 03 Sep 2020 17:01:03 -0400
-Received: by mail-oi1-x22a.google.com with SMTP id y6so4514799oie.5;
- Thu, 03 Sep 2020 14:01:00 -0700 (PDT)
+ id 1kDwM3-0007sf-5s; Thu, 03 Sep 2020 17:01:12 -0400
+Received: by mail-oo1-xc29.google.com with SMTP id k63so1135286oob.1;
+ Thu, 03 Sep 2020 14:01:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=J5mrcebEEpiZtia/WaO3DA7r7OpI7bIX2tDGLHmyEhs=;
- b=nwEX8IKyKQ6TAIjvlR2cfpkbAihlKBEihOhbC/fOnOiMXJ9pUJxOPnSawUZGUABA2p
- bPTHgS5cTadspvYZHFMP4h9I8YM0L0R+co3E30Z7ph4AjeIR7HB1RvRXxEOkwtRTO2dV
- TGmyOwR1WBRElufNieK0Zpk/YPoDaiAogwtvoPDDh3Eq3JyTzlT87evFM0RZPm7QfVvm
- aeJ2SdNEz1ir2uDIhFX7BiZLqa5whvDc5TpzCZyxvZVb21dirxsves9YELD242gRBTG9
- kndy2NuMBc9jNIrYqETHd+z2/MG5lkHiBIJT7IiTJUZCYzcmUbt2d0WYXSZ0QTCDVlxr
- j9tQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=ooJ5JWX44T4rpsVTQbxVK9w+LAQEjZ1790XiAupTrvE=;
+ b=cYnhSvU/5APT+omor5i3Awsj9iTcCzyuAF5bA/l9EI4PrN7otvAu3MEhZKF78vkYZ8
+ AX2CJ1sAfKGs0/t7UntU0PdCZQaBFTck38wW0a9jNGjSgCxFI8LUkvBRuUv2vkbC+Q1d
+ hSD20VxrSIXstJblKSwUpCkNIFqO8HcVnTMrLdlzcflWAVHfeXXV8T/P1OaA6IeUP05P
+ HZ2EM15h6jXlEOckjfthQLDIkc9inMcduKqeLcSl3c5uscEutv3Vqxb82Mi0mgh5Yi7v
+ Fwgkooh4eZqroxeWnm4rrfVtgAs2Ekn5A28Uonadg8cNJ/Y4oi8GpjbZ0CkQni0xs0FZ
+ 2RSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=J5mrcebEEpiZtia/WaO3DA7r7OpI7bIX2tDGLHmyEhs=;
- b=kF2qCqg5474k4bM/CCht0fIwPCuMh3vmC/HlDXhSdBRtcQ6daj9AXsKhVf2B+3nBrR
- TyKWwW9UryMsfk0LQQviRY3QpgMXryrtyMOhNSfk3Nn0DMjtfG6fVpT3g+CDJqJbTIQS
- Nywm50hYHWh6WOL6LClWiFEGcLQJaAGAQOz3NJYcbMHESu4vJxv4vAkR8UyCryeDUW95
- DFozfJT5uVJ3TL1eiEyr/Img+gWJCgZvsAF4GtbH7fyavghypUcxe7LilFZl0mlVgnOt
- h8QvTzdQmqONgJKg312he84uoLrbsV0Nb6BREHx6uQ/Uxr61IaGG+oFjKsbMmX0TbTBF
- Fpbg==
-X-Gm-Message-State: AOAM532skcsyw6FRJsz8o/fSv6pgoOpa7A8F00jFLY9kxe2LwvEpBwqa
- 5/pl7wxMblVEqSPfkXTVdBHVwLs/6BPr3w==
-X-Google-Smtp-Source: ABdhPJypvYo3b+ibutqMHOkUgaTnTNWJsv5Lh1c4Kuv9x3z0NkReaNS8d62fwIhGRyHCuZ8lQdzvEA==
-X-Received: by 2002:aca:eb82:: with SMTP id j124mr3356100oih.39.1599166859683; 
- Thu, 03 Sep 2020 14:00:59 -0700 (PDT)
+ :in-reply-to:references;
+ bh=ooJ5JWX44T4rpsVTQbxVK9w+LAQEjZ1790XiAupTrvE=;
+ b=kO2fiqurucrOSPUA7mZ+HDorOkEveEAaPf54vpqWSAPlP4cugLFb/OLYbAr5RgaLfv
+ knGsiesypq+8HYwEYUfx/Zo/NFYF5Stjl8IYzYPEoTRglcVY6VnPlSv+5VkXTAQNA3Pp
+ brWyRICw75QjGwKhAjGBy+eyqm7DULr1vjI4gpX6zrJ3ZFmtu9pdzr75UflB7FRIDB53
+ VQYPfvy5mXC+Xq0diV7wbAYNfdDBtLf6v1+dpTithaWoSsu+5vXtEVHudnLSNrAheBxI
+ QiumHnUHHTT1EHbZbr3JAoAi/Z5E/OfJrNgGPnhLH+fIkCug4FY1fUJv4izGqf9luy8b
+ F4uA==
+X-Gm-Message-State: AOAM531eaYupr9jrV5/44HgXhW7VUdO0sy5arXzQ2w6GmESP+vwn0wed
+ AvJZxCW0KAbT0TW5F2eh/JiTa1k/s0jE8g==
+X-Google-Smtp-Source: ABdhPJyrt/U04xIvJZzUVYMcbP/+B4V5yliYVgNS1ZJeIkJYJvEMJ/WKD6rDWMmPYyXbbkRSqGNAPA==
+X-Received: by 2002:a4a:d549:: with SMTP id q9mr3347752oos.74.1599166869225;
+ Thu, 03 Sep 2020 14:01:09 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id l3sm842867oom.18.2020.09.03.14.00.59
+ by smtp.gmail.com with ESMTPSA id e9sm814941oog.10.2020.09.03.14.01.08
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:59 -0700 (PDT)
+ Thu, 03 Sep 2020 14:01:08 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 59/77] qdev: Fix device_add DRIVER,help to print to monitor
-Date: Thu,  3 Sep 2020 15:59:17 -0500
-Message-Id: <20200903205935.27832-60-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 65/77] virtio: list legacy-capable devices
+Date: Thu,  3 Sep 2020 15:59:23 -0500
+Message-Id: <20200903205935.27832-66-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::22a;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x22a.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::c29;
+ envelope-from=flukshun@gmail.com; helo=mail-oo1-xc29.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -100,47 +96,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- qemu-stable@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, qemu-stable@nongnu.org,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Markus Armbruster <armbru@redhat.com>
+From: Cornelia Huck <cohuck@redhat.com>
 
-Help on device properties gets printed to stdout instead of the
-monitor.  If you have the monitor anywhere else, no help for you.
-Broken when commit e1043d674d "qdev: use object_property_help()"
-accidentally switched from qemu_printf() to printf().  Switch right
-back.
+Several types of virtio devices had already been around before the
+virtio standard was specified. These devices support virtio in legacy
+(and transitional) mode.
 
-Fixes: e1043d674d792ff64aebae1a3eafc08b38a8a085
-Cc: Marc-André Lureau <marcandre.lureau@redhat.com>
+Devices that have been added in the virtio standard are considered
+non-transitional (i.e. with no support for legacy virtio).
+
+Provide a helper function so virtio transports can figure that out
+easily.
+
+Signed-off-by: Cornelia Huck <cohuck@redhat.com>
+Message-Id: <20200707105446.677966-2-cohuck@redhat.com>
 Cc: qemu-stable@nongnu.org
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20200714160202.3121879-2-armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Li Qiang <liq3ea@gmail.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-(cherry picked from commit 029afc4e76041e1a320530d97f99122a1b3d5da2)
+Acked-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+(cherry picked from commit 7c78bdd7a3d0086179331f10d1f6f8cdac34731a)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- qdev-monitor.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/virtio/virtio.c         | 25 +++++++++++++++++++++++++
+ include/hw/virtio/virtio.h |  2 ++
+ 2 files changed, 27 insertions(+)
 
-diff --git a/qdev-monitor.c b/qdev-monitor.c
-index 9833b33549..6bf6339ff5 100644
---- a/qdev-monitor.c
-+++ b/qdev-monitor.c
-@@ -299,7 +299,7 @@ int qdev_device_help(QemuOpts *opts)
-     }
-     g_ptr_array_sort(array, (GCompareFunc)qemu_pstrcmp0);
-     for (i = 0; i < array->len; i++) {
--        printf("%s\n", (char *)array->pdata[i]);
-+        qemu_printf("%s\n", (char *)array->pdata[i]);
-     }
-     g_ptr_array_set_free_func(array, g_free);
-     g_ptr_array_free(array, true);
+diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+index b6c8ef5bc0..398fd4a305 100644
+--- a/hw/virtio/virtio.c
++++ b/hw/virtio/virtio.c
+@@ -27,6 +27,7 @@
+ #include "hw/virtio/virtio-access.h"
+ #include "sysemu/dma.h"
+ #include "sysemu/runstate.h"
++#include "standard-headers/linux/virtio_ids.h"
+ 
+ /*
+  * The alignment to use between consumer and producer parts of vring.
+@@ -3278,6 +3279,30 @@ void virtio_init(VirtIODevice *vdev, const char *name,
+     vdev->use_guest_notifier_mask = true;
+ }
+ 
++/*
++ * Only devices that have already been around prior to defining the virtio
++ * standard support legacy mode; this includes devices not specified in the
++ * standard. All newer devices conform to the virtio standard only.
++ */
++bool virtio_legacy_allowed(VirtIODevice *vdev)
++{
++    switch (vdev->device_id) {
++    case VIRTIO_ID_NET:
++    case VIRTIO_ID_BLOCK:
++    case VIRTIO_ID_CONSOLE:
++    case VIRTIO_ID_RNG:
++    case VIRTIO_ID_BALLOON:
++    case VIRTIO_ID_RPMSG:
++    case VIRTIO_ID_SCSI:
++    case VIRTIO_ID_9P:
++    case VIRTIO_ID_RPROC_SERIAL:
++    case VIRTIO_ID_CAIF:
++        return true;
++    default:
++        return false;
++    }
++}
++
+ hwaddr virtio_queue_get_desc_addr(VirtIODevice *vdev, int n)
+ {
+     return vdev->vq[n].vring.desc;
+diff --git a/include/hw/virtio/virtio.h b/include/hw/virtio/virtio.h
+index b69d517496..198ffc7626 100644
+--- a/include/hw/virtio/virtio.h
++++ b/include/hw/virtio/virtio.h
+@@ -396,4 +396,6 @@ static inline bool virtio_device_disabled(VirtIODevice *vdev)
+     return unlikely(vdev->disabled || vdev->broken);
+ }
+ 
++bool virtio_legacy_allowed(VirtIODevice *vdev);
++
+ #endif
 -- 
 2.17.1
 
