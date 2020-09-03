@@ -7,92 +7,94 @@ X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9455DC43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 23:39:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 395CFC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 23:41:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 533E32083B
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 23:39:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ECBAF20786
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 23:41:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IyuSS3xQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 533E32083B
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aO4zi4br"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECBAF20786
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDypW-0005PQ-HL
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 19:39:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38870)
+	id 1kDyqy-0006OT-70
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 19:41:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1kDyoh-0004xB-Nt
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 19:38:55 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54114)
+ id 1kDyq9-0005rr-Gv
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 19:40:25 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8300
+ helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1kDyof-0001KZ-KP
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 19:38:55 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 083NWGoe131378
- for <qemu-devel@nongnu.org>; Thu, 3 Sep 2020 19:38:51 -0400
+ id 1kDyq5-0001YM-NC
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 19:40:25 -0400
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 083NUooD097895
+ for <qemu-devel@nongnu.org>; Thu, 3 Sep 2020 19:40:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=UVgLu1CCoIn4FpQADHF9EPkxhhmDe0ulmIqoK2n8zvU=;
- b=IyuSS3xQOM1oe9/Xx55lRQUTYdJhsxD3D87Ked2uKt11I3d5U+b0s4YlV+1g8xsPl6sU
- xI4cqjwjpBF29QEUSA8wOisvVO9OdCki6R6U41AywJsDzmsIfqkDxuiH0ldunE6L5diX
- 8VU2q7lre3T2obDyl8SAcgqgtfBfZxolp2cxzD4bO3EUz+giPOCuEx2sRu5NrlSaj2Aq
- JC40veGkWNDd+TACyWWtJUEx6ySFvCOeTd/MkmqOOGngpWbI7XMjCgjS87FUI6K/Dcy3
- kGtLTPnHz4ovwv3spCyMjQgdLACIGL7isK1S8j/z/7GJ0Ww0QzJ/hWRULJDnYoOsIEvL Pg== 
+ bh=4tgUEMWFB6w5y3kFbcDVGF5j0H5r8KUHlknPjOls0jc=;
+ b=aO4zi4brFpV7mKh2LytyHh+kdqtJ+13aDY38S+bflhfzX+xq1TfIlku5dSZi3c0Z/h/W
+ cvDi+4GJ2WF5gfM6DLEG3LjXBfTQUnlG+xZELLnvYUfFIcKTeFgrzHHAvIg81uhQIheN
+ qj+AdL/30HtgcprG7fWLlh/d3vYP1LyBvRjSPK+/kf+KPQTEkaquhE1GyPEbR0PqXSlr
+ uFu6ICINDxaiJyS00m5fowowPvYowjFbi/Qr47rjkPxj76Y0srhQiHiWvmTDh/+vQScE
+ PdnTp8Yn+fEqhhz2HJUxCgRtrP3qzRpIaXgMEWsJFudjch6eVEZPvay8LN+aVvnt5PYL BA== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33b9931f69-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33b86aaynu-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 19:38:50 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 083Na5L1145411
- for <qemu-devel@nongnu.org>; Thu, 3 Sep 2020 19:38:50 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33b9931f60-1
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 19:40:20 -0400
+Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 083NUoB0097944
+ for <qemu-devel@nongnu.org>; Thu, 3 Sep 2020 19:40:20 -0400
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.27])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33b86aaynk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 03 Sep 2020 19:38:50 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 083Nc31R000556;
- Thu, 3 Sep 2020 23:38:49 GMT
-Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
- [9.57.198.23]) by ppma03dal.us.ibm.com with ESMTP id 337en9xba9-1
+ Thu, 03 Sep 2020 19:40:20 -0400
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+ by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 083NbEqj016669;
+ Thu, 3 Sep 2020 23:40:20 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma05wdc.us.ibm.com with ESMTP id 337en9uevb-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 03 Sep 2020 23:38:49 +0000
-Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
- [9.57.199.109])
- by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 083NcncG43909474
+ Thu, 03 Sep 2020 23:40:20 +0000
+Received: from b03ledav006.gho.boulder.ibm.com
+ (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 083NeF9h34144800
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 3 Sep 2020 23:38:49 GMT
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2833E112062;
- Thu,  3 Sep 2020 23:38:49 +0000 (GMT)
-Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 140E1112061;
- Thu,  3 Sep 2020 23:38:49 +0000 (GMT)
+ Thu, 3 Sep 2020 23:40:15 GMT
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 220FCC605A;
+ Thu,  3 Sep 2020 23:40:19 +0000 (GMT)
+Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id DA9DCC6055;
+ Thu,  3 Sep 2020 23:40:18 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Thu,  3 Sep 2020 23:38:49 +0000 (GMT)
-Subject: Re: [PATCH 50/63] tpm_crb: Rename CRB to TPM_CRB
+ by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Thu,  3 Sep 2020 23:40:18 +0000 (GMT)
+Subject: Re: [PATCH 51/63] tpm_spapr: Rename VIO_SPAPR_VTPM to TPM_SPAPR
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-51-ehabkost@redhat.com>
+ <20200902224311.1321159-52-ehabkost@redhat.com>
 From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <82df1626-f976-b726-8168-52a05bbeb7ef@linux.ibm.com>
-Date: Thu, 3 Sep 2020 19:38:48 -0400
+Message-ID: <7208b1cb-5811-8111-80c9-4bf23d590ec7@linux.ibm.com>
+Date: Thu, 3 Sep 2020 19:40:18 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <20200902224311.1321159-51-ehabkost@redhat.com>
+In-Reply-To: <20200902224311.1321159-52-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
@@ -101,13 +103,13 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
  definitions=2020-09-03_14:2020-09-03,
  2020-09-03 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 mlxscore=0
- malwarescore=0 priorityscore=1501 mlxlogscore=999 spamscore=0
- clxscore=1015 lowpriorityscore=0 adultscore=0 phishscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ bulkscore=0 spamscore=0
+ impostorscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
+ suspectscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2006250000 definitions=main-2009030205
 Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0b-001b2d01.pphosted.com
+ helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 19:38:51
 X-ACL-Warn: Detected OS   = Linux 3.x [generic]
 X-Spam_score_int: -50
@@ -143,79 +145,77 @@ On 9/2/20 6:42 PM, Eduardo Habkost wrote:
 Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
 
-
-
 > ---
 > Cc: Stefan Berger <stefanb@linux.ibm.com>
 > Cc: qemu-devel@nongnu.org
 > ---
->   hw/tpm/tpm_crb.c | 14 +++++++-------
+>   hw/tpm/tpm_spapr.c | 14 +++++++-------
 >   1 file changed, 7 insertions(+), 7 deletions(-)
 >
-> diff --git a/hw/tpm/tpm_crb.c b/hw/tpm/tpm_crb.c
-> index aa9c00aad3..f4e3f0abbc 100644
-> --- a/hw/tpm/tpm_crb.c
-> +++ b/hw/tpm/tpm_crb.c
-> @@ -47,7 +47,7 @@ struct CRBState {
->   };
->   typedef struct CRBState CRBState;
+> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
+> index e3775adc57..aa86d5f943 100644
+> --- a/hw/tpm/tpm_spapr.c
+> +++ b/hw/tpm/tpm_spapr.c
+> @@ -31,7 +31,7 @@
+>   #define DEBUG_SPAPR 0
 >   
-> -DECLARE_INSTANCE_CHECKER(CRBState, CRB,
-> +DECLARE_INSTANCE_CHECKER(CRBState, TPM_CRB,
->                            TYPE_TPM_CRB)
+>   typedef struct SpaprTpmState SpaprTpmState;
+> -DECLARE_INSTANCE_CHECKER(SpaprTpmState, VIO_SPAPR_VTPM,
+> +DECLARE_INSTANCE_CHECKER(SpaprTpmState, TPM_SPAPR,
+>                            TYPE_TPM_SPAPR)
 >   
->   #define CRB_INTF_TYPE_CRB_ACTIVE 0b1
-> @@ -86,7 +86,7 @@ enum crb_cancel {
->   static uint64_t tpm_crb_mmio_read(void *opaque, hwaddr addr,
->                                     unsigned size)
+>   typedef struct TpmCrq {
+> @@ -132,7 +132,7 @@ static inline int spapr_tpm_send_crq(struct SpaprVioDevice *dev, TpmCrq *crq)
+>   
+>   static int tpm_spapr_do_crq(struct SpaprVioDevice *dev, uint8_t *crq_data)
 >   {
-> -    CRBState *s = CRB(opaque);
-> +    CRBState *s = TPM_CRB(opaque);
->       void *regs = (void *)&s->regs + (addr & ~3);
->       unsigned offset = addr & 3;
->       uint32_t val = *(uint32_t *)regs >> (8 * offset);
-> @@ -113,7 +113,7 @@ static uint8_t tpm_crb_get_active_locty(CRBState *s)
->   static void tpm_crb_mmio_write(void *opaque, hwaddr addr,
->                                  uint64_t val, unsigned size)
+> -    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
+> +    SpaprTpmState *s = TPM_SPAPR(dev);
+>       TpmCrq local_crq;
+>       TpmCrq *crq = &s->crq; /* requests only */
+>       int rc;
+> @@ -235,7 +235,7 @@ static int tpm_spapr_do_crq(struct SpaprVioDevice *dev, uint8_t *crq_data)
+>   
+>   static void tpm_spapr_request_completed(TPMIf *ti, int ret)
 >   {
-> -    CRBState *s = CRB(opaque);
-> +    CRBState *s = TPM_CRB(opaque);
->       uint8_t locty =  addr >> 12;
+> -    SpaprTpmState *s = VIO_SPAPR_VTPM(ti);
+> +    SpaprTpmState *s = TPM_SPAPR(ti);
+>       TpmCrq *crq = &s->crq;
+>       uint32_t len;
+>       int rc;
+> @@ -283,7 +283,7 @@ static int tpm_spapr_do_startup_tpm(SpaprTpmState *s, size_t buffersize)
 >   
->       trace_tpm_crb_mmio_write(addr, size, val);
-> @@ -190,7 +190,7 @@ static const MemoryRegionOps tpm_crb_memory_ops = {
->   
->   static void tpm_crb_request_completed(TPMIf *ti, int ret)
+>   static const char *tpm_spapr_get_dt_compatible(SpaprVioDevice *dev)
 >   {
-> -    CRBState *s = CRB(ti);
-> +    CRBState *s = TPM_CRB(ti);
+> -    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
+> +    SpaprTpmState *s = TPM_SPAPR(dev);
 >   
->       s->regs[R_CRB_CTRL_START] &= ~CRB_START_INVOKE;
->       if (ret != 0) {
-> @@ -201,7 +201,7 @@ static void tpm_crb_request_completed(TPMIf *ti, int ret)
+>       switch (s->be_tpm_version) {
+>       case TPM_VERSION_1_2:
+> @@ -297,7 +297,7 @@ static const char *tpm_spapr_get_dt_compatible(SpaprVioDevice *dev)
 >   
->   static enum TPMVersion tpm_crb_get_version(TPMIf *ti)
+>   static void tpm_spapr_reset(SpaprVioDevice *dev)
 >   {
-> -    CRBState *s = CRB(ti);
-> +    CRBState *s = TPM_CRB(ti);
+> -    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
+> +    SpaprTpmState *s = TPM_SPAPR(dev);
 >   
->       return tpm_backend_get_tpm_version(s->tpmbe);
->   }
-> @@ -232,7 +232,7 @@ static Property tpm_crb_properties[] = {
+>       s->state = SPAPR_VTPM_STATE_NONE;
+>       s->numbytes = 0;
+> @@ -316,7 +316,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
 >   
->   static void tpm_crb_reset(void *dev)
+>   static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
 >   {
-> -    CRBState *s = CRB(dev);
-> +    CRBState *s = TPM_CRB(dev);
+> -    SpaprTpmState *s = VIO_SPAPR_VTPM(ti);
+> +    SpaprTpmState *s = TPM_SPAPR(ti);
 >   
->       if (s->ppi_enabled) {
->           tpm_ppi_reset(&s->ppi);
-> @@ -281,7 +281,7 @@ static void tpm_crb_reset(void *dev)
+>       if (tpm_backend_had_startup_error(s->be_driver)) {
+>           return TPM_VERSION_UNSPEC;
+> @@ -377,7 +377,7 @@ static Property tpm_spapr_properties[] = {
 >   
->   static void tpm_crb_realize(DeviceState *dev, Error **errp)
+>   static void tpm_spapr_realizefn(SpaprVioDevice *dev, Error **errp)
 >   {
-> -    CRBState *s = CRB(dev);
-> +    CRBState *s = TPM_CRB(dev);
+> -    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
+> +    SpaprTpmState *s = TPM_SPAPR(dev);
 >   
 >       if (!tpm_find()) {
 >           error_setg(errp, "at most one TPM device is permitted");
