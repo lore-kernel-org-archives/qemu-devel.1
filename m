@@ -2,68 +2,98 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B02C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CC50C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 02:13:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D18B2072A
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 01:59:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1FC220758
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 02:13:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZyieXCoM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D18B2072A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ITeGvdXj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1FC220758
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDeXL-0005CL-QS
-	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 21:59:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43120)
+	id 1kDekP-0008DL-6N
+	for qemu-devel@archiver.kernel.org; Wed, 02 Sep 2020 22:13:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kDeUq-0000Bj-NV; Wed, 02 Sep 2020 21:57:04 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:36757 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kDeUo-0005dE-HZ; Wed, 02 Sep 2020 21:57:04 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BhkSd3gTGz9sTq; Thu,  3 Sep 2020 11:56:49 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599098209;
- bh=mgU/4xDnjO0LsGIQcsn1ZuhyrwRQxHyvp1EwKAFje+g=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=ZyieXCoM9NGzTaS2EMt+9oZ6iKhhau3WBfeBW+ObHS4POVPgIcc5lfx4p4tmzctar
- DAA+9g1G/mBsmSDhKEoT1AbmIZzkdk9zgQoTjkcV85pghrAJckoXJadD6O3P0Ti4GP
- XgDy5Vcxtz8io0/HHTQAXCIQgkqVTYIjNRZA2USE=
-Date: Thu, 3 Sep 2020 11:56:32 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v2 6/7] spapr_numa: move NVLink2 associativity handling
- to spapr_numa.c
-Message-ID: <20200903015632.GL1897@yekko.fritz.box>
-References: <20200901125645.118026-1-danielhb413@gmail.com>
- <20200901125645.118026-7-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDejo-0007oZ-6s
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 22:12:32 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:39643)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kDejl-0007RI-D5
+ for qemu-devel@nongnu.org; Wed, 02 Sep 2020 22:12:31 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id v15so819824pgh.6
+ for <qemu-devel@nongnu.org>; Wed, 02 Sep 2020 19:12:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=9AxJW4VDtMNfYXk3SPFaN4TQjzI3mPNBIWg5NL5kjKQ=;
+ b=ITeGvdXjqExKBdxMaQRdlN660tJAjmI9FWSyE2d+jMmLUedzZskiZRzvUVWTKH1npw
+ HT+EwxuUUuF/YVhgtd4/ggGhGu0DMCLZ361tffQrvU4ADO3D1THZynqJVfBXRpBgaUZD
+ rPX3qaaYNt0eIqOoGcbZv2faCRmp9pnmvK9CI5OD/B9TGKDkkMUNgyGFT78oivOzA8+3
+ HHR6zQ3BpOCXc9VCbpxybg2b2IMQSxvRotRvvASwAjJyV0GeGJZ0toji1a104I7rhy5t
+ Ai/o+20/tTcNeXgrUC9iHCXAGuiPs+sbvfJkH6GvcXhliD5ZUBUYClMctmDcgq0DWn5j
+ wu0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=9AxJW4VDtMNfYXk3SPFaN4TQjzI3mPNBIWg5NL5kjKQ=;
+ b=REIgtgjzO7TKLQN+EVjgru5RzE+iiEIW9LF82KwSfvTi++m+0VifxRgPmQfzO4Krhr
+ iLWVUEk1/Th09kYqQa360gjHhs9xt2wpc6IPdG/L0s1txo/9XVEmCmr3pYHwB1+FsvtA
+ wK5X5S4jOGrHHBgIr4XFN75VWpC2jyKzm5CHT1cy1vJjjeteBmlfXdCRXZ0ZnXoLxnqd
+ dAm4gXsBacLQuUKiM0hyeF9bodz7Il3PiJ1/QRKnQ6/g/bdOx2ausgg2i8RIqy+ZGhGu
+ 5spaRNqXQztny0TYTJCF2rqjXNgn34IDE4dpPCEZCuX1yOse/bqnRLq27dq+9GL7dDa2
+ 13PQ==
+X-Gm-Message-State: AOAM533p/RvmssbjychzmRPF8DqsjDTyGYwGtO98je+ntM4V+VlB0Oo+
+ 2kPv1I+g88RIpVi/9ggl/54shQ==
+X-Google-Smtp-Source: ABdhPJw/FybIYSwYnyf9NEsijGclvM5JDc+iEWQS3JsL+d0mGBhqisI650tH3jiZ0pQCTYq0q5mnOQ==
+X-Received: by 2002:a17:902:9f82:: with SMTP id
+ g2mr1283651plq.254.1599099147721; 
+ Wed, 02 Sep 2020 19:12:27 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id n67sm623257pgn.14.2020.09.02.19.12.26
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 02 Sep 2020 19:12:26 -0700 (PDT)
+Subject: Re: [PULL v2 00/76] target/microblaze improvements
+From: Richard Henderson <richard.henderson@linaro.org>
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20200901152054.922595-1-richard.henderson@linaro.org>
+ <3eb9a404-b856-6337-680c-462a765e2b42@redhat.com>
+ <ca9d4e58-3545-ca8e-6862-26efe81a0cc7@linaro.org>
+Message-ID: <36e36e04-cc04-163d-58ec-10314ed53999@linaro.org>
+Date: Wed, 2 Sep 2020 19:12:24 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="WkHPBKJ2pKcVUM5H"
-Content-Disposition: inline
-In-Reply-To: <20200901125645.118026-7-danielhb413@gmail.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/02 20:05:08
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+In-Reply-To: <ca9d4e58-3545-ca8e-6862-26efe81a0cc7@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52d;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.324,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,185 +106,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ peter.maydell@linaro.org,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/2/20 4:11 PM, Richard Henderson wrote:
+> On 9/2/20 12:09 PM, Thomas Huth wrote:
+>> On 01/09/2020 17.20, Richard Henderson wrote:
+>>> Version 2.  Serves me right for not testing 32-bit host
+>>> when I knew there was a patch that mattered.
+>>
+>>  Hi Richard,
+>>
+>> I'm afraid, but I think this PR broke the
+>> tests/acceptance/replay_kernel.py:ReplayKernel.test_microblaze_s3adsp1800 acceptance
+>> test:
+>>
+>> https://gitlab.com/qemu-project/qemu/-/jobs/716158589#L176
+>>
+>> Could you please have a look?
+> 
+> That's odd.
+> 
+> Doesn't replay rely on migration (or at least VMStateDescription) to do its
+> job?  Microblaze doesn't implement that, so how could this have worked before?
+> 
+> I admit that I don't often run check-acceptance, because I rarely see a clean
+> bill of health, even for stuff I'm not working on.
+> 
+> Looking into it...
 
---WkHPBKJ2pKcVUM5H
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Ah, in this case it's all about the icount setting.
 
-On Tue, Sep 01, 2020 at 09:56:44AM -0300, Daniel Henrique Barboza wrote:
-> This patch adds a new spapr_numa_write_assoc_nvlink2() helper
-> to handle the ibm,associativity for NVLink2 GPUs.
->=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+So the log recorded by replay=record is indeed useless for input to
+replay=replay, but not relevant.
 
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 
-It might be nice to "precompute" the assoc arrays for the gpus as you
-now do for the regular numa nodes.  That can be a later revision, though.
-
-> ---
->  hw/ppc/spapr_numa.c         | 23 +++++++++++++++++++++++
->  hw/ppc/spapr_pci_nvlink2.c  | 19 ++-----------------
->  include/hw/ppc/spapr_numa.h |  3 +++
->  3 files changed, 28 insertions(+), 17 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-> index 9eb4bdbe80..785cc24624 100644
-> --- a/hw/ppc/spapr_numa.c
-> +++ b/hw/ppc/spapr_numa.c
-> @@ -15,6 +15,8 @@
->  #include "hw/ppc/spapr_numa.h"
->  #include "hw/ppc/fdt.h"
-> =20
-> +/* Moved from hw/ppc/spapr_pci_nvlink2.c */
-> +#define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
-> =20
->  void spapr_numa_associativity_init(MachineState *machine)
->  {
-> @@ -114,6 +116,27 @@ int spapr_numa_write_assoc_lookup_arrays(SpaprMachin=
-eState *spapr, void *fdt,
->      return ret;
->  }
-> =20
-> +void spapr_numa_write_assoc_nvlink2(void *fdt, int offset, int numa_id,
-> +                                    SpaprPhbState *sphb)
-> +{
-> +    uint32_t associativity[NUMA_ASSOC_SIZE];
-> +    int i;
-> +
-> +    associativity[0] =3D cpu_to_be32(MAX_DISTANCE_REF_POINTS);
-> +    for (i =3D 1; i < NUMA_ASSOC_SIZE; i++) {
-> +        associativity[i] =3D cpu_to_be32(numa_id);
-> +    };
-> +
-> +    if (sphb->pre_5_1_assoc) {
-> +        associativity[1] =3D SPAPR_GPU_NUMA_ID;
-> +        associativity[2] =3D SPAPR_GPU_NUMA_ID;
-> +        associativity[3] =3D SPAPR_GPU_NUMA_ID;
-> +    }
-> +
-> +    _FDT((fdt_setprop(fdt, offset, "ibm,associativity", associativity,
-> +                      sizeof(associativity))));
-> +}
-> +
->  /*
->   * Helper that writes ibm,associativity-reference-points and
->   * max-associativity-domains in the RTAS pointed by @rtas
-> diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
-> index 76ae77ebc8..662a0af990 100644
-> --- a/hw/ppc/spapr_pci_nvlink2.c
-> +++ b/hw/ppc/spapr_pci_nvlink2.c
-> @@ -29,6 +29,7 @@
->  #include "qemu/error-report.h"
->  #include "hw/ppc/fdt.h"
->  #include "hw/pci/pci_bridge.h"
-> +#include "hw/ppc/spapr_numa.h"
-> =20
->  #define PHANDLE_PCIDEV(phb, pdev)    (0x12000000 | \
->                                       (((phb)->index) << 16) | ((pdev)->d=
-evfn))
-> @@ -37,8 +38,6 @@
->  #define PHANDLE_NVLINK(phb, gn, nn)  (0x00130000 | (((phb)->index) << 8)=
- | \
->                                       ((gn) << 4) | (nn))
-> =20
-> -#define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
-> -
->  typedef struct SpaprPhbPciNvGpuSlot {
->          uint64_t tgt;
->          uint64_t gpa;
-> @@ -360,13 +359,6 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *=
-sphb, void *fdt)
->          Object *nv_mrobj =3D object_property_get_link(OBJECT(nvslot->gpd=
-ev),
->                                                      "nvlink2-mr[0]",
->                                                      &error_abort);
-> -        uint32_t associativity[] =3D {
-> -            cpu_to_be32(0x4),
-> -            cpu_to_be32(nvslot->numa_id),
-> -            cpu_to_be32(nvslot->numa_id),
-> -            cpu_to_be32(nvslot->numa_id),
-> -            cpu_to_be32(nvslot->numa_id)
-> -        };
->          uint64_t size =3D object_property_get_uint(nv_mrobj, "size", NUL=
-L);
->          uint64_t mem_reg[2] =3D { cpu_to_be64(nvslot->gpa), cpu_to_be64(=
-size) };
->          char *mem_name =3D g_strdup_printf("memory@%"PRIx64, nvslot->gpa=
-);
-> @@ -376,14 +368,7 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *=
-sphb, void *fdt)
->          _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")));
->          _FDT((fdt_setprop(fdt, off, "reg", mem_reg, sizeof(mem_reg))));
-> =20
-> -        if (sphb->pre_5_1_assoc) {
-> -            associativity[1] =3D SPAPR_GPU_NUMA_ID;
-> -            associativity[2] =3D SPAPR_GPU_NUMA_ID;
-> -            associativity[3] =3D SPAPR_GPU_NUMA_ID;
-> -        }
-> -
-> -        _FDT((fdt_setprop(fdt, off, "ibm,associativity", associativity,
-> -                          sizeof(associativity))));
-> +        spapr_numa_write_assoc_nvlink2(fdt, off, nvslot->numa_id, sphb);
-> =20
->          _FDT((fdt_setprop_string(fdt, off, "compatible",
->                                   "ibm,coherent-device-memory")));
-> diff --git a/include/hw/ppc/spapr_numa.h b/include/hw/ppc/spapr_numa.h
-> index f6127501a6..b6e0721b07 100644
-> --- a/include/hw/ppc/spapr_numa.h
-> +++ b/include/hw/ppc/spapr_numa.h
-> @@ -15,6 +15,7 @@
-> =20
->  #include "hw/boards.h"
->  #include "hw/ppc/spapr.h"
-> +#include "hw/pci-host/spapr.h"
-> =20
->  void spapr_numa_associativity_init(MachineState *machine);
->  void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int r=
-tas);
-> @@ -24,6 +25,8 @@ int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, v=
-oid *fdt,
->                              int offset, PowerPCCPU *cpu);
->  int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void =
-*fdt,
->                                           int offset);
-> +void spapr_numa_write_assoc_nvlink2(void *fdt, int offset, int numa_id,
-> +                                    SpaprPhbState *sphb);
-> =20
-> =20
->  #endif /* HW_SPAPR_NUMA_H */
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---WkHPBKJ2pKcVUM5H
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9QTVAACgkQbDjKyiDZ
-s5LngA//V8X1QSrbh/r1qv6RRuG7hrDaUZ9FLSY+2qT11ZlepxS0xevfWgUflYFQ
-raNIhFAPqNNrNYq498v2B7H/2ulr16DL8XvEcszi7KEoKItUxe3hpeHI6rrD+9sT
-v59bGYRJbRPXz5N7lQd71MQCgLMtXYrJ3C4uL3gLtaqhJ79BjaZB923q8neE4oZg
-9nygDllBsGtV/tLbbX5uz/dBi532GYb9EOhMaSYbAz666un9KiaQl/gulGqoxeHM
-SVF/8mI9ZBEOggCUHmRk1PbDQVWtDCeU8/Q494hS36XJk3WHYv51YZZ5gJHmMoPL
-6oKn75XgWy8avnKKgLXHSiuDG9hROThKFkxU+LqMmZ9iK4s9bO8Z8sLPL3BdXeXJ
-V4b2hwecSatYAPFsOR0eTfrAFRJS5IaZ9NjTA46X1ctWLsH9cFfchGnKus5ZGFdg
-IFxm0uUXVGCMc3RneMmkBb9BnvHRdJIEcK1ocJFRszgQ0eGVvNIXpBBhcPmELVxM
-Vrw40eoOxE4KA4UCOMvicBK5ztA257Bicc6drFqK3wMtsg/hVktjwEN1+CA7mJoL
-Mjz9OXzJr1II9WFoIoQF5M/HT1ozqOfgMVyf77ZsZ/4gvHZhAv0ylCOWPC0hcaG5
-QhKr6+OLuA+ui5JI0IC5CdSyfyM0jE4OfkM7BEO2q7R67P/v7i0=
-=16o6
------END PGP SIGNATURE-----
-
---WkHPBKJ2pKcVUM5H--
+r~
 
