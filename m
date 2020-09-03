@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 076FEC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:04:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD24C433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:05:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C2E5720767
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:04:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2E5720767
+	by mail.kernel.org (Postfix) with ESMTPS id 256D720767
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 11:05:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 256D720767
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDn2x-0001H1-QW
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:04:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59434)
+	id 1kDn3B-0001jh-8H
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 07:05:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmv3-0003Nu-Jo
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmv2-0003NF-R0
  for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:41 -0400
-Received: from mx2.suse.de ([195.135.220.15]:49070)
+Received: from mx2.suse.de ([195.135.220.15]:49046)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmv0-0004Zi-7w
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:41 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kDmuz-0004ZW-Lq
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 06:56:40 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id EE0FBB6AC;
+ by mx2.suse.de (Postfix) with ESMTP id 50CF7B6B1;
  Thu,  3 Sep 2020 10:56:27 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
@@ -40,10 +40,10 @@ To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
  Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Roman Bolshakov <r.bolshakov@yadro.com>
-Subject: [PATCH v7 15/16] hax: remove hax specific functions from global
+Subject: [PATCH v7 14/16] whpx: remove whpx specific functions from global
  includes
-Date: Thu,  3 Sep 2020 12:56:13 +0200
-Message-Id: <20200903105614.17772-16-cfontana@suse.de>
+Date: Thu,  3 Sep 2020 12:56:12 +0200
+Message-Id: <20200903105614.17772-15-cfontana@suse.de>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200903105614.17772-1-cfontana@suse.de>
 References: <20200903105614.17772-1-cfontana@suse.de>
@@ -85,172 +85,136 @@ Sender: "Qemu-devel"
 Signed-off-by: Claudio Fontana <cfontana@suse.de>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- accel/stubs/hax-stub.c    | 10 ----------
- include/sysemu/hax.h      | 17 -----------------
- target/i386/hax-all.c     |  1 -
- target/i386/hax-cpus.c    |  1 -
- target/i386/hax-cpus.h    | 16 ++++++++++++++++
- target/i386/hax-mem.c     |  2 +-
- target/i386/hax-posix.c   |  3 +--
- target/i386/hax-windows.c |  2 +-
- target/i386/hax-windows.h |  2 ++
- 9 files changed, 21 insertions(+), 33 deletions(-)
+ accel/stubs/meson.build |  1 -
+ accel/stubs/whpx-stub.c | 47 -----------------------------------------
+ include/sysemu/whpx.h   | 19 -----------------
+ target/i386/whpx-cpus.h | 17 +++++++++++++++
+ 4 files changed, 17 insertions(+), 67 deletions(-)
+ delete mode 100644 accel/stubs/whpx-stub.c
 
-diff --git a/accel/stubs/hax-stub.c b/accel/stubs/hax-stub.c
-index 7ad190cae2..1a9da83185 100644
---- a/accel/stubs/hax-stub.c
-+++ b/accel/stubs/hax-stub.c
-@@ -21,13 +21,3 @@ int hax_sync_vcpus(void)
- {
-     return 0;
- }
+diff --git a/accel/stubs/meson.build b/accel/stubs/meson.build
+index 3fbe34e5bb..12dd1539af 100644
+--- a/accel/stubs/meson.build
++++ b/accel/stubs/meson.build
+@@ -2,4 +2,3 @@ specific_ss.add(when: 'CONFIG_HAX', if_false: files('hax-stub.c'))
+ specific_ss.add(when: 'CONFIG_XEN', if_false: files('xen-stub.c'))
+ specific_ss.add(when: 'CONFIG_KVM', if_false: files('kvm-stub.c'))
+ specific_ss.add(when: 'CONFIG_TCG', if_false: files('tcg-stub.c'))
+-specific_ss.add(when: 'CONFIG_WHPX', if_false: files('whpx-stub.c'))
+diff --git a/accel/stubs/whpx-stub.c b/accel/stubs/whpx-stub.c
+deleted file mode 100644
+index 1efb89f25e..0000000000
+--- a/accel/stubs/whpx-stub.c
++++ /dev/null
+@@ -1,47 +0,0 @@
+-/*
+- * QEMU Windows Hypervisor Platform accelerator (WHPX) stub
+- *
+- * Copyright Microsoft Corp. 2017
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or later.
+- * See the COPYING file in the top-level directory.
+- *
+- */
 -
--int hax_init_vcpu(CPUState *cpu)
+-#include "qemu/osdep.h"
+-#include "cpu.h"
+-#include "sysemu/whpx.h"
+-
+-int whpx_init_vcpu(CPUState *cpu)
 -{
--    return -ENOSYS;
+-    return -1;
 -}
 -
--int hax_smp_cpu_exec(CPUState *cpu)
+-int whpx_vcpu_exec(CPUState *cpu)
 -{
--    return -ENOSYS;
+-    return -1;
 -}
-diff --git a/include/sysemu/hax.h b/include/sysemu/hax.h
-index 9b27e65cc7..12fb54f990 100644
---- a/include/sysemu/hax.h
-+++ b/include/sysemu/hax.h
-@@ -22,29 +22,12 @@
- #ifndef QEMU_HAX_H
- #define QEMU_HAX_H
+-
+-void whpx_destroy_vcpu(CPUState *cpu)
+-{
+-}
+-
+-void whpx_vcpu_kick(CPUState *cpu)
+-{
+-}
+-
+-void whpx_cpu_synchronize_state(CPUState *cpu)
+-{
+-}
+-
+-void whpx_cpu_synchronize_post_reset(CPUState *cpu)
+-{
+-}
+-
+-void whpx_cpu_synchronize_post_init(CPUState *cpu)
+-{
+-}
+-
+-void whpx_cpu_synchronize_pre_loadvm(CPUState *cpu)
+-{
+-}
+diff --git a/include/sysemu/whpx.h b/include/sysemu/whpx.h
+index a84b49e749..59edf13742 100644
+--- a/include/sysemu/whpx.h
++++ b/include/sysemu/whpx.h
+@@ -13,18 +13,6 @@
+ #ifndef QEMU_WHPX_H
+ #define QEMU_WHPX_H
  
 -
- int hax_sync_vcpus(void);
--int hax_init_vcpu(CPUState *cpu);
--int hax_smp_cpu_exec(CPUState *cpu);
--int hax_populate_ram(uint64_t va, uint64_t size);
+-int whpx_init_vcpu(CPUState *cpu);
+-int whpx_vcpu_exec(CPUState *cpu);
+-void whpx_destroy_vcpu(CPUState *cpu);
+-void whpx_vcpu_kick(CPUState *cpu);
 -
--void hax_cpu_synchronize_state(CPUState *cpu);
--void hax_cpu_synchronize_post_reset(CPUState *cpu);
--void hax_cpu_synchronize_post_init(CPUState *cpu);
--void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
- 
- #ifdef CONFIG_HAX
- 
- int hax_enabled(void);
- 
--#include "qemu/bitops.h"
--#include "exec/memory.h"
--int hax_vcpu_destroy(CPUState *cpu);
--void hax_raise_event(CPUState *cpu);
--void hax_reset_vcpu_state(void *opaque);
--#include "target/i386/hax-interface.h"
--#include "target/i386/hax-i386.h"
 -
- #else /* CONFIG_HAX */
- 
- #define hax_enabled() (0)
-diff --git a/target/i386/hax-all.c b/target/i386/hax-all.c
-index fd1ab673d7..fecfe8cd6e 100644
---- a/target/i386/hax-all.c
-+++ b/target/i386/hax-all.c
-@@ -28,7 +28,6 @@
- #include "exec/address-spaces.h"
- 
- #include "qemu-common.h"
--#include "hax-i386.h"
- #include "sysemu/accel.h"
- #include "sysemu/reset.h"
- #include "sysemu/runstate.h"
-diff --git a/target/i386/hax-cpus.c b/target/i386/hax-cpus.c
-index 9aad98bc7a..99770e590c 100644
---- a/target/i386/hax-cpus.c
-+++ b/target/i386/hax-cpus.c
-@@ -22,7 +22,6 @@
- #include "qemu/osdep.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
--#include "hax-i386.h"
- #include "sysemu/runstate.h"
- #include "sysemu/cpus.h"
- #include "qemu/guest-random.h"
-diff --git a/target/i386/hax-cpus.h b/target/i386/hax-cpus.h
-index a64417fe2d..ee8ab7a631 100644
---- a/target/i386/hax-cpus.h
-+++ b/target/i386/hax-cpus.h
-@@ -14,4 +14,20 @@
- 
- extern const CpusAccel hax_cpus;
- 
-+#include "hax-interface.h"
-+#include "hax-i386.h"
-+
-+int hax_init_vcpu(CPUState *cpu);
-+int hax_smp_cpu_exec(CPUState *cpu);
-+int hax_populate_ram(uint64_t va, uint64_t size);
-+
-+void hax_cpu_synchronize_state(CPUState *cpu);
-+void hax_cpu_synchronize_post_reset(CPUState *cpu);
-+void hax_cpu_synchronize_post_init(CPUState *cpu);
-+void hax_cpu_synchronize_pre_loadvm(CPUState *cpu);
-+
-+int hax_vcpu_destroy(CPUState *cpu);
-+void hax_raise_event(CPUState *cpu);
-+void hax_reset_vcpu_state(void *opaque);
-+
- #endif /* HAX_CPUS_H */
-diff --git a/target/i386/hax-mem.c b/target/i386/hax-mem.c
-index 6bb5a24917..71e637cf16 100644
---- a/target/i386/hax-mem.c
-+++ b/target/i386/hax-mem.c
-@@ -13,7 +13,7 @@
- #include "exec/address-spaces.h"
- #include "qemu/error-report.h"
- 
--#include "target/i386/hax-i386.h"
-+#include "hax-cpus.h"
- #include "qemu/queue.h"
- 
- #define DEBUG_HAX_MEM 0
-diff --git a/target/i386/hax-posix.c b/target/i386/hax-posix.c
-index 6fb7867d11..735a749d4b 100644
---- a/target/i386/hax-posix.c
-+++ b/target/i386/hax-posix.c
-@@ -14,9 +14,8 @@
- #include "qemu/osdep.h"
- #include <sys/ioctl.h>
- 
--#include "target/i386/hax-i386.h"
+-void whpx_cpu_synchronize_state(CPUState *cpu);
+-void whpx_cpu_synchronize_post_reset(CPUState *cpu);
+-void whpx_cpu_synchronize_post_init(CPUState *cpu);
+-void whpx_cpu_synchronize_pre_loadvm(CPUState *cpu);
 -
- #include "sysemu/cpus.h"
-+#include "hax-cpus.h"
+ #ifdef CONFIG_WHPX
  
- hax_fd hax_mod_open(void)
- {
-diff --git a/target/i386/hax-windows.c b/target/i386/hax-windows.c
-index 469b48e608..6c82dfb54f 100644
---- a/target/i386/hax-windows.c
-+++ b/target/i386/hax-windows.c
-@@ -12,7 +12,7 @@
+ int whpx_enabled(void);
+@@ -35,11 +23,4 @@ int whpx_enabled(void);
  
- #include "qemu/osdep.h"
- #include "cpu.h"
--#include "hax-i386.h"
-+#include "hax-cpus.h"
+ #endif /* CONFIG_WHPX */
  
- /*
-  * return 0 when success, -1 when driver not loaded,
-diff --git a/target/i386/hax-windows.h b/target/i386/hax-windows.h
-index 12cbd813dc..a5ce12d663 100644
---- a/target/i386/hax-windows.h
-+++ b/target/i386/hax-windows.h
-@@ -23,6 +23,8 @@
- #include <winioctl.h>
- #include <windef.h>
+-/* state subset only touched by the VCPU itself during runtime */
+-#define WHPX_SET_RUNTIME_STATE   1
+-/* state subset modified during VCPU reset */
+-#define WHPX_SET_RESET_STATE     2
+-/* full state set, modified during initialization or on vmload */
+-#define WHPX_SET_FULL_STATE      3
+-
+ #endif /* QEMU_WHPX_H */
+diff --git a/target/i386/whpx-cpus.h b/target/i386/whpx-cpus.h
+index 2393944954..bdb367d1d0 100644
+--- a/target/i386/whpx-cpus.h
++++ b/target/i386/whpx-cpus.h
+@@ -14,4 +14,21 @@
  
-+#include "hax-cpus.h"
+ extern const CpusAccel whpx_cpus;
+ 
++int whpx_init_vcpu(CPUState *cpu);
++int whpx_vcpu_exec(CPUState *cpu);
++void whpx_destroy_vcpu(CPUState *cpu);
++void whpx_vcpu_kick(CPUState *cpu);
 +
- #define HAX_INVALID_FD INVALID_HANDLE_VALUE
- 
- static inline void hax_mod_close(struct hax_state *hax)
++void whpx_cpu_synchronize_state(CPUState *cpu);
++void whpx_cpu_synchronize_post_reset(CPUState *cpu);
++void whpx_cpu_synchronize_post_init(CPUState *cpu);
++void whpx_cpu_synchronize_pre_loadvm(CPUState *cpu);
++
++/* state subset only touched by the VCPU itself during runtime */
++#define WHPX_SET_RUNTIME_STATE   1
++/* state subset modified during VCPU reset */
++#define WHPX_SET_RESET_STATE     2
++/* full state set, modified during initialization or on vmload */
++#define WHPX_SET_FULL_STATE      3
++
+ #endif /* WHPX_CPUS_H */
 -- 
 2.26.2
 
