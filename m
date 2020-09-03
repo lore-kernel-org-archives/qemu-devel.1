@@ -2,92 +2,69 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E856C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D1DCC43461
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:05:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0991520678
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:04:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fbUCyK71"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0991520678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E924D20678
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 22:05:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E924D20678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=cmp.felk.cvut.cz
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDxLb-0003pT-7l
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 18:04:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39752)
+	id 1kDxMd-0004ep-0j
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 18:05:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDwyr-0007TK-Hs
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:41:17 -0400
-Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:38145)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kDwym-0004al-N9
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:41:16 -0400
-Received: by mail-pg1-x52c.google.com with SMTP id l191so3164590pgd.5
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 14:41:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=XhMSwJ2jkxWxuBTzeCmlaoUshyrdzQ2sWDC5rvAjlMw=;
- b=fbUCyK71YOSWuyozk4rmhaR+mgQzn6PTYzicPW2WJwUIlYN0XCHpvUl3c5flK5GtzU
- 3u30FNI5Z5AshCtiqjot4nCgd3tTPAkTX5IdpUWysy2annB0xTtNg+MxCc8J2AfWv/Sn
- va7rd+ocBjm7q+5zyynog+PE0GwqP4YlBHo0PcmlcfPUOXALZoJMrxA33zeJYudab5HY
- ggFA74cdKdlWz5Se+Lp9WTDwzuJh2XtCanRg3rtvB+Mph+tx2rOlp4psptYRexemkBo0
- EtAHIkHqaBZHq9QehCI46fdH60EiDSoWfaHVxKIjrUW+J3n6iqMuh7y3WyV6GopXTMdw
- 3XHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=XhMSwJ2jkxWxuBTzeCmlaoUshyrdzQ2sWDC5rvAjlMw=;
- b=LiMCzOB04keSnzHnC0A4iIdMd7LVmir/bnFI25nbTkP96+MT3M27Yemh5AFdKLLk/k
- KEj/Xb4lFFDdbYb1AJ5h0E9RtD/HSfTY5mT80h5jqHljnXXUWZTYmoGAzgT1FvSyFK0m
- +RVplJT/YGo+PnbaE2WDu3i/Uo0/4jXGXe1YqWU9JTiQgYBXCOV+dLSOCUlYWYOGzfI5
- 9pU6jJ6NfrdaYWuPupORBk+i4Owa/jFvt2NADCH+iQeSxeyLLa0Om8clK5iF3W4EW9Lz
- +ZXvp9OA3HnOYlGs54HrahciNxflqMCiajQ/12T5o2/bHmkiRoiNktn9WYfCSy8Xhfrg
- 0goA==
-X-Gm-Message-State: AOAM5318tQLNxgy9X+dz0I4BW14StmZcIE8uER5bOlcxapvXPrw6DsYg
- 1WL622NYobDN1cOIHofAfetLQ98QiTIxSw==
-X-Google-Smtp-Source: ABdhPJyUyOCLK1s2Ur/M1ErMpX8tT3GnMLFycu0N1b7WGAJUMprdpvI+xLd8Zf3/bWtlWE+VZq6dfw==
-X-Received: by 2002:a62:1d44:: with SMTP id d65mr5725038pfd.150.1599169270638; 
- Thu, 03 Sep 2020 14:41:10 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v17sm4113290pfn.24.2020.09.03.14.41.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 14:41:10 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 5/5] tcg: Implement 256-bit dup for tcg_gen_gvec_dup_mem
-Date: Thu,  3 Sep 2020 14:41:01 -0700
-Message-Id: <20200903214101.1746878-6-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200903214101.1746878-1-richard.henderson@linaro.org>
-References: <20200903214101.1746878-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <pisa@cmp.felk.cvut.cz>)
+ id 1kDwx9-0004PK-P5
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:39:31 -0400
+Received: from relay.felk.cvut.cz ([2001:718:2:1611:0:1:0:70]:35516)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <pisa@cmp.felk.cvut.cz>) id 1kDwx6-00042U-Rn
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 17:39:31 -0400
+Received: from cmp.felk.cvut.cz (haar.felk.cvut.cz [147.32.84.19])
+ by relay.felk.cvut.cz (8.15.2/8.15.2) with ESMTP id 083LcNoI031667;
+ Thu, 3 Sep 2020 23:38:23 +0200 (CEST)
+ (envelope-from pisa@cmp.felk.cvut.cz)
+Received: from haar.felk.cvut.cz (localhost [127.0.0.1])
+ by cmp.felk.cvut.cz (8.14.0/8.12.3/SuSE Linux 0.6) with ESMTP id
+ 083LcMWB025218; Thu, 3 Sep 2020 23:38:22 +0200
+Received: (from pisa@localhost)
+ by haar.felk.cvut.cz (8.14.0/8.13.7/Submit) id 083LcMjb025217;
+ Thu, 3 Sep 2020 23:38:22 +0200
+From: pisa@cmp.felk.cvut.cz
+To: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v2 0/7] CTU CAN FD core support
+Date: Thu,  3 Sep 2020 23:37:17 +0200
+Message-Id: <cover.1599168753.git.pisa@cmp.felk.cvut.cz>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52c;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x52c.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-FELK-MailScanner-Information: 
+X-MailScanner-ID: 083LcNoI031667
+X-FELK-MailScanner: Found to be clean
+X-FELK-MailScanner-SpamCheck: not spam, SpamAssassin (not cached,
+ score=-0.098, required 6, BAYES_00 -0.50, KHOP_HELO_FCRDNS 0.40,
+ SPF_HELO_NONE 0.00, SPF_NONE 0.00)
+X-FELK-MailScanner-From: pisa@cmp.felk.cvut.cz
+X-FELK-MailScanner-Watermark: 1599773906.10116@Bdef7FVpcZDu1YlvxW/4lw
+Received-SPF: none client-ip=2001:718:2:1611:0:1:0:70;
+ envelope-from=pisa@cmp.felk.cvut.cz; helo=relay.felk.cvut.cz
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 17:39:24
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,95 +77,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Marek Vasut <marex@denx.de>, Vikram Garhwal <fnu.vikram@xilinx.com>,
+ Jiri Novak <jnovak@fel.cvut.cz>, Stefan Hajnoczi <stefanha@gmail.com>,
+ Deniz Eren <deniz.eren@icloud.com>, Markus Armbruster <armbru@redhat.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Konrad Frederic <frederic.konrad@adacore.com>,
+ Jan Kiszka <jan.kiszka@siemens.com>, Jan Charvat <charvj10@fel.cvut.cz>,
+ Oliver Hartkopp <socketcan@hartkopp.net>, Ondrej Ille <ondrej.ille@gmail.com>,
+ Pavel Pisa <pisa@cmp.felk.cvut.cz>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We already support duplication of 128-bit blocks.  This extends
-that support to 256-bit blocks.  This will be needed by SVE2.
+From: Pavel Pisa <pisa@cmp.felk.cvut.cz>
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- tcg/tcg-op-gvec.c | 52 ++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 49 insertions(+), 3 deletions(-)
+CTU CAN FD is an open source soft core written in VHDL.
+It originated in 2015 as Ondrej Ille's project at the
+Department of Measurement of FEE at CTU.
 
-diff --git a/tcg/tcg-op-gvec.c b/tcg/tcg-op-gvec.c
-index fcc25b04e6..7ebd9e8298 100644
---- a/tcg/tcg-op-gvec.c
-+++ b/tcg/tcg-op-gvec.c
-@@ -1570,12 +1570,10 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t dofs, uint32_t aofs,
-             do_dup(vece, dofs, oprsz, maxsz, NULL, in, 0);
-             tcg_temp_free_i64(in);
-         }
--    } else {
-+    } else if (vece == 4) {
-         /* 128-bit duplicate.  */
--        /* ??? Dup to 256-bit vector.  */
-         int i;
- 
--        tcg_debug_assert(vece == 4);
-         tcg_debug_assert(oprsz >= 16);
-         if (TCG_TARGET_HAS_v128) {
-             TCGv_vec in = tcg_temp_new_vec(TCG_TYPE_V128);
-@@ -1601,6 +1599,54 @@ void tcg_gen_gvec_dup_mem(unsigned vece, uint32_t dofs, uint32_t aofs,
-         if (oprsz < maxsz) {
-             expand_clr(dofs + oprsz, maxsz - oprsz);
-         }
-+    } else if (vece == 5) {
-+        /* 256-bit duplicate.  */
-+        int i;
-+
-+        tcg_debug_assert(oprsz >= 32);
-+        tcg_debug_assert(oprsz % 32 == 0);
-+        if (TCG_TARGET_HAS_v256) {
-+            TCGv_vec in = tcg_temp_new_vec(TCG_TYPE_V256);
-+
-+            tcg_gen_ld_vec(in, cpu_env, aofs);
-+            for (i = (aofs == dofs) * 32; i < oprsz; i += 32) {
-+                tcg_gen_st_vec(in, cpu_env, dofs + i);
-+            }
-+            tcg_temp_free_vec(in);
-+        } else if (TCG_TARGET_HAS_v128) {
-+            TCGv_vec in0 = tcg_temp_new_vec(TCG_TYPE_V128);
-+            TCGv_vec in1 = tcg_temp_new_vec(TCG_TYPE_V128);
-+
-+            tcg_gen_ld_vec(in0, cpu_env, aofs);
-+            tcg_gen_ld_vec(in1, cpu_env, aofs + 16);
-+            for (i = (aofs == dofs) * 32; i < oprsz; i += 32) {
-+                tcg_gen_st_vec(in0, cpu_env, dofs + i);
-+                tcg_gen_st_vec(in1, cpu_env, dofs + i + 16);
-+            }
-+            tcg_temp_free_vec(in0);
-+            tcg_temp_free_vec(in1);
-+        } else {
-+            TCGv_i64 in[4];
-+            int j;
-+
-+            for (j = 0; j < 4; ++j) {
-+                in[j] = tcg_temp_new_i64();
-+                tcg_gen_ld_i64(in[j], cpu_env, aofs + j * 8);
-+            }
-+            for (i = (aofs == dofs) * 32; i < oprsz; i += 32) {
-+                for (j = 0; j < 4; ++j) {
-+                    tcg_gen_st_i64(in[j], cpu_env, dofs + i + j * 8);
-+                }
-+            }
-+            for (j = 0; j < 4; ++j) {
-+                tcg_temp_free_i64(in[j]);
-+            }
-+        }
-+        if (oprsz < maxsz) {
-+            expand_clr(dofs + oprsz, maxsz - oprsz);
-+        }
-+    } else {
-+        g_assert_not_reached();
-     }
- }
- 
+Integration for Xilinx Zynq and Intel based SoCs is available
+as well as support for PCIe integration of the core.
+
+The core sources
+
+  https://gitlab.fel.cvut.cz/canbus/ctucanfd_ip_core
+
+The controller model and QEMU CAN subsystem extension to CAN FD
+has been implemented in frame of bachelor theses of Jan Charvat.
+The development branch ctu-canfd in CTU local project repository
+
+  https://gitlab.fel.cvut.cz/canbus/qemu-canbus
+
+More CAN bus related project from Czech Technical University
+in Prague, Faculty of Electrical Engineering at
+
+  http://canbus.pages.fel.cvut.cz/
+
+Patches v2 updates:
+
+ - CTU CAN FD IP core emulation tested on x86 host
+   with big-endian MIPS MALTA target as well.
+   This helped t correct Linux driver to support
+   big-endian systems.
+
+ - CTU CAN FD IP core emulation updated to pass CAN frame
+   data correctly on big-endian host systems. Big-endian
+   host not tested, would required whole QEMU build
+   for MIPS MALTA or big-endian POWER and run it nested
+   emulation, because I have no access to Linux based big-endian
+   system capable for QEMU build.
+
+ - Makefile.objs changes applied to meson.build and Kconfig.
+
+ - The common CAN support update for CAN FD tested and reviewed
+   by Vikram Garhwal from Xilinx. They base their CAN FD
+   controllers emulation on our work.
+
+ - Vikram Garhwal agrees to help with common QEMU CAN bus
+   infrastructure reviews. I add him and myself into maintainers.
+
+ - Corrected SJA1000 dependencies in Kconfig after (probably)
+   automated switch to meson build from make build.
+
+Please, let me know if somebody from recipients list does
+no longer have interrest in QEMU CAN bus emulation
+and I would remove you from recipients list to not load
+you by uniteresting content in future.
+
+Jan Charvat (5):
+  net/can: Initial host SocketCan support for CAN FD.
+  hw/net/can: sja1000 ignore CAN FD frames
+  net/can: Add can_dlc2len and can_len2dlc for CAN FD.
+  hw/net/can/ctucafd: Add CTU CAN FD core register definitions.
+  hw/net/can: CTU CAN FD IP open hardware core emulation.
+
+Pavel Pisa (2):
+  hw/net/can: Documentation for CTU CAN FD IP open hardware core
+    emulation.
+  hw/net/can: Correct Kconfig dependencies after switch to meson build.
+
+ MAINTAINERS                   |   9 +
+ docs/can.txt                  | 113 +++-
+ hw/net/Kconfig                |  16 +-
+ hw/net/can/can_sja1000.c      |  31 +-
+ hw/net/can/ctu_can_fd_frame.h | 189 +++++++
+ hw/net/can/ctu_can_fd_regs.h  | 971 ++++++++++++++++++++++++++++++++++
+ hw/net/can/ctucan_core.c      | 696 ++++++++++++++++++++++++
+ hw/net/can/ctucan_core.h      | 127 +++++
+ hw/net/can/ctucan_pci.c       | 280 ++++++++++
+ hw/net/can/meson.build        |   2 +
+ include/net/can_emu.h         |  12 +-
+ net/can/can_core.c            |  36 ++
+ net/can/can_socketcan.c       |  47 +-
+ 13 files changed, 2505 insertions(+), 24 deletions(-)
+ create mode 100644 hw/net/can/ctu_can_fd_frame.h
+ create mode 100644 hw/net/can/ctu_can_fd_regs.h
+ create mode 100644 hw/net/can/ctucan_core.c
+ create mode 100644 hw/net/can/ctucan_core.h
+ create mode 100644 hw/net/can/ctucan_pci.c
+
 -- 
-2.25.1
+2.20.1
 
 
