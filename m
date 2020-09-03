@@ -2,86 +2,88 @@ Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BACE1C433E9
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:04:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1CEEC433E9
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:04:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74BFC206EF
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:04:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5806B206EF
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 13:04:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="juP0Tt1k"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74BFC206EF
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GxSAIS43"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5806B206EF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDouI-0008Oj-IY
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:04:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33972)
+	id 1kDouy-0000ns-E3
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 09:04:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34102)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kDotT-0007pw-UU; Thu, 03 Sep 2020 09:03:11 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:36953)
+ id 1kDotz-0008KT-J1
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:03:43 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54048)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kDotS-0003yu-2W; Thu, 03 Sep 2020 09:03:11 -0400
-Received: by mail-wm1-x344.google.com with SMTP id a9so2815138wmm.2;
- Thu, 03 Sep 2020 06:03:09 -0700 (PDT)
+ id 1kDotx-00040d-72
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 09:03:43 -0400
+Received: by mail-wm1-x343.google.com with SMTP id u18so2800361wmc.3
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 06:03:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6YQlrgPL3xfqmcKmCDzAAhZC0YGrSttpUfADCJ8+pa4=;
- b=juP0Tt1kRImDwhQqhWFmL0AeNvuAbGNNP8Komy0DzzqV/yUavaxXk8jmblOHIYUkaD
- XgLK4ABBA0t0puUzK00e8eVILLN95ALjm+15YW3bjDGmKGeXNzrrFYqHdiSQ9Tg6qqQj
- wQs2g0D/9qEb02tebYPlT6bh/Mxlnjp7UeUYZlXtj+9ILnAwcwK9vJnpgJkyqqFHf9sF
- s3cWlXq6J4H2pTe84cLBnPzy0mqYB/Rkl935dLXWnwHoYfoJIuoJa9v121ANsfy0k4NM
- GJ0+Qed4DMGFZeTx6rcqTJ/Xfyroe22iWsUOqrzaR9HM4PlVTEIFtVeJ5DuG/dIcIt+B
- /MnA==
+ bh=DHFTQwOikxwnvnXXEmWXb0R317Ak4X66NgI6Lf3StRk=;
+ b=GxSAIS43KhWGlxogYq9vCuPJ1NljRiZjlHHQJnCQvqhuyjS091N6AfhA3GfnHlxhDI
+ 0+SYTdggaHzwjVRhC9glzoE8hh1NOl9NDooKlVFbn6hYEpawl4gyGwiWUNm04keHq8Ud
+ VJvsTsmN6fW1aWYMuBU6X7E0vSC9P43iT6uE9056u6hVikPE4WUsYGWs4EagAKkodq2m
+ IE0fwagdetMlvzQ0xPHVmhLIvt62T9nMmOEyfUvCh8q+X0bw6KBc7TAowz/RGIY8l8Ok
+ G1FWEA6U6EMH9m2uK2awkX2DkiQzQQTrXtG7HEz7OO5KNEyhfPib4LwI96tGuDPyFN8N
+ PqTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=6YQlrgPL3xfqmcKmCDzAAhZC0YGrSttpUfADCJ8+pa4=;
- b=YBU719vp7OzBjPkwcfjVxMoPkZXlcXn0QRMHGDtTzHYA0PIhQeGPtv8Rpzm7tYxckN
- SAP63vIQ+bAbOdGBtXkOIqHZfjSiASMFXrgMVDBdOuWUTgBXROVsZwmQBgJtMVqooyg6
- UwKqrqG62LuWVa+z2Md2VQpITclHpWQY3/CfXWxB47/WNdDBpKWJ5nlY9WG/xImXYifq
- jaC11qbkG6hW6swuCzaUm8Bb+uJ96OFQHZotZ+0DYOE/k1zMpHHkBYzp9XM+3t9LQR8B
- IFN3U6POC1rmvP8l1Tcdcc+jmWtF3O/IC6NIE7a8yd5+FJY/xH+HfUEH5q1UDjRLbZDb
- VqEQ==
-X-Gm-Message-State: AOAM5335EkO71BrUHrIlhYvELda7fkfZK5Dhn+/xWjDxfMaXEz3S9FMr
- VTggvm0NSClsYIDPUQEL2SU=
-X-Google-Smtp-Source: ABdhPJxi7dJDQB7fyPBhXpIx69gdIuwoPA8uH+sJX55VlGTWq5OOTnPVgEc1EfA5WSFQjRKVByVMXA==
-X-Received: by 2002:a7b:cb0d:: with SMTP id u13mr2508554wmj.144.1599138188554; 
- Thu, 03 Sep 2020 06:03:08 -0700 (PDT)
+ bh=DHFTQwOikxwnvnXXEmWXb0R317Ak4X66NgI6Lf3StRk=;
+ b=aHg46s/EobWEm9lDcQOnBmrHSrVKZvfsxkDf1bBHrE0LK4iTp4sqlgtdgirX9VYyr2
+ 39zTxzMjVOTp3cHQuwMLkks2aP+KFuUE7INJXoxMsYiP2e2dB/EbLFqe2G2xK+unV9Ky
+ vpeKDyqYLTKWfd/qNIUagCrilL/KdDbUpXK8DhGDfrv5jToN8XYBrjGnI1tQ/tHsyRzl
+ 0bFbaK9sJc7kmq9uUZzO18o51mVUC82rTfM68L8mZSqU0IWtsc39z79OqUEG7+PfPGTd
+ sIbWTqurNCpHrJAS0HJdiHp8GecGZ6qgUrBmjKFlPfiDEZ/DFV09rzQTDDGXjM/CzlVk
+ Ab6A==
+X-Gm-Message-State: AOAM531NLtjNcLhlWgyHji0dQIeNEd7n19nS6hGm7VePHEBXRHAl2qTP
+ uF8alN/ZDhbxl991Tu1HOKA=
+X-Google-Smtp-Source: ABdhPJw1/8fTetqXNn3hqPd0yTj8KZW7Sahxzivp2sgt6XIQEgc8oPXHaW9lENIIh6wxOrNGgBmCqQ==
+X-Received: by 2002:a7b:cb19:: with SMTP id u25mr2296191wmj.113.1599138217338; 
+ Thu, 03 Sep 2020 06:03:37 -0700 (PDT)
 Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id y1sm4498627wru.87.2020.09.03.06.03.07
+ by smtp.gmail.com with ESMTPSA id g8sm4373756wmd.12.2020.09.03.06.03.36
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 03 Sep 2020 06:03:07 -0700 (PDT)
-Subject: Re: [PATCH 47/63] rs6000_mc: Rename RS6000MC_DEVICE to RS6000MC
+ Thu, 03 Sep 2020 06:03:36 -0700 (PDT)
+Subject: Re: [PATCH 48/63] sabre: Rename SABRE_DEVICE to SABRE
 To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
 References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-48-ehabkost@redhat.com>
+ <20200902224311.1321159-49-ehabkost@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <4617c825-2c66-a885-7196-a4078ae67acd@amsat.org>
-Date: Thu, 3 Sep 2020 15:03:06 +0200
+Message-ID: <eda4b708-4279-6605-456f-e4a89722b87a@amsat.org>
+Date: Thu, 3 Sep 2020 15:03:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200902224311.1321159-48-ehabkost@redhat.com>
+In-Reply-To: <20200902224311.1321159-49-ehabkost@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -41
@@ -104,9 +106,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- qemu-ppc@nongnu.org, berrange@redhat.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: berrange@redhat.com, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Artyom Tarasenko <atar4qemu@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -117,38 +118,14 @@ On 9/3/20 12:42 AM, Eduardo Habkost wrote:
 > 
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 > ---
-> Cc: "Hervé Poussineau" <hpoussin@reactos.org>
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> Cc: qemu-ppc@nongnu.org
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
 > Cc: qemu-devel@nongnu.org
 > ---
->  hw/ppc/rs6000_mc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
-> index 56e96010b8..8611ffa96d 100644
-> --- a/hw/ppc/rs6000_mc.c
-> +++ b/hw/ppc/rs6000_mc.c
-> @@ -30,7 +30,7 @@
->  
->  #define TYPE_RS6000MC "rs6000-mc"
->  typedef struct RS6000MCState RS6000MCState;
-> -DECLARE_INSTANCE_CHECKER(RS6000MCState, RS6000MC_DEVICE,
-> +DECLARE_INSTANCE_CHECKER(RS6000MCState, RS6000MC,
->                           TYPE_RS6000MC)
->  
->  struct RS6000MCState {
-> @@ -143,7 +143,7 @@ static const MemoryRegionPortio rs6000mc_port_list[] = {
->  
->  static void rs6000mc_realize(DeviceState *dev, Error **errp)
->  {
-> -    RS6000MCState *s = RS6000MC_DEVICE(dev);
-> +    RS6000MCState *s = RS6000MC(dev);
->      int socket = 0;
->      unsigned int ram_size = s->ram_size / MiB;
->      Error *local_err = NULL;
-> 
+>  include/hw/pci-host/sabre.h | 2 +-
+>  hw/pci-host/sabre.c         | 8 ++++----
+>  hw/sparc64/sun4u.c          | 2 +-
+>  3 files changed, 6 insertions(+), 6 deletions(-)
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
 
