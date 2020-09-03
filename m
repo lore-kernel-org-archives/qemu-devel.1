@@ -7,74 +7,73 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6247BC43461
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F90C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:20:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 243FF206CA
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:19:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4590F206CA
+	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 21:20:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YVmjv4JT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 243FF206CA
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvmswsPY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4590F206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDweE-0007xB-4t
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:19:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58380)
+	id 1kDwel-0000yz-Bc
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 17:20:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58196)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwL6-0003fV-Hi; Thu, 03 Sep 2020 17:00:12 -0400
-Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:33048)
+ id 1kDwKx-0003Kj-5O; Thu, 03 Sep 2020 17:00:03 -0400
+Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:35788)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <flukshun@gmail.com>)
- id 1kDwL4-0007Qq-PH; Thu, 03 Sep 2020 17:00:12 -0400
-Received: by mail-oi1-x242.google.com with SMTP id 3so4556972oih.0;
- Thu, 03 Sep 2020 14:00:09 -0700 (PDT)
+ id 1kDwKu-0007ML-UO; Thu, 03 Sep 2020 17:00:02 -0400
+Received: by mail-oi1-x241.google.com with SMTP id w16so4535214oia.2;
+ Thu, 03 Sep 2020 14:00:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=Ao54A2l3sEDR87eadYmmagGboLEhBAQddrGqeoropng=;
- b=YVmjv4JTEGL/h+upO6IEHC9LgSD2LGBd3A+olh3cyamWjlDE/gYCRbuyeH9dIJE22y
- BwmX18z/mn886P3Zlmx+69kQmLy7DQHSassAx59XW1DJkAnkYRzj/23w2QpOqO9emK0K
- 7DdAX7ZPV/q/OmXDH+on4+fVTqZx0nWsVucEc4RFa4HyAAQQV0XaIzNXAVpFfK11vb3v
- Je/aQkTK1gossZzcNAs34dLnxBrAagjO6wtkSQlfgYbR1sTxXy98OZcdTzOsj1xNeKGL
- IVL+rpxn8vjsoYLG+DO5JiyxUCM4u4f9dBqdtAQQYnANhnb6MI5A2zAwCMajmeRd6JAw
- Nv6g==
+ bh=WbB6VAhtrBT4SG9Vr6ej0HJWL2xXc11PC/dJaX/FHdI=;
+ b=IvmswsPYXOQ5wSszAzBpxdaKmcOafWtZkUB74WnlL4Fa0nuwnoFdyZaPq8NW5lQ7ik
+ Z9ib/HyJN2+dB0GsWkEFOW/G6EDyPi85j3pqG+/aYJn8SMCY157Q+X7k/5mrh0FTfoN2
+ G02ecmiRMCLnEbLKbsBdVoTzSDJj6/Mmd0t/ietrmXi+SMccieyFiqOl35rghu2Lrb3m
+ D6ExOd7aQdfXI04MJ6fLvIVB1pqRRQddDe+N78MMOOdGLRXy3u50SVvk1sTuL1pf4QkY
+ mIbnxCnFbtGHQvF4RYxU0bo/GkoX3X762w+QdTECEsfhKN0vOzjuF6WYT8ka7Q1RHwPh
+ qCTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references;
- bh=Ao54A2l3sEDR87eadYmmagGboLEhBAQddrGqeoropng=;
- b=rnIYxOrUo/HqHbCM/0lArYQzNsDOVfEUnXxKrW53G3bfx5QQfiSGE17RJuVc5HXf5T
- Id3JNpXWOSgg0UFBe2L2S18c7LDS4DfC0xSDu8tj7jUUcQJGQmDCjUN6+3lUwURo2Tzd
- QX92xamv2mH33HvuBTENCbbpUXS3HkP06dxUIaNQ3tUN63x66d6toKMRgEEHff6SFUV+
- fUdQoKWIf7j4d33wH+QX4WRIgTOU1AYcnMo6HKKrrvKThfzm/Xj7sQ1PL1rTXqAsAV3s
- gmOwusmPLyluX3t4tFejQSUx4Hr6ei7hZYp7pX+TqUQVbkP580xnQCK0HMj1ZTjCJ36h
- aFxA==
-X-Gm-Message-State: AOAM530fN2YzK0pviU+fTIfPlCg6a3lKksjsgH4LWJkaM24UnXkGule8
- FkmIw3HFs6tyk9YW0qW1jyztHme/pHY=
-X-Google-Smtp-Source: ABdhPJxERucEeDRW5rSOp26hNeioQKx56W85NQY1JaYp/plQk11AdrrsPd+5n2lpZwdrrdxchp0tEQ==
-X-Received: by 2002:aca:5e82:: with SMTP id s124mr3171775oib.168.1599166809004; 
- Thu, 03 Sep 2020 14:00:09 -0700 (PDT)
+ bh=WbB6VAhtrBT4SG9Vr6ej0HJWL2xXc11PC/dJaX/FHdI=;
+ b=BlK9Jt68MqTccY1e54l8ABmOUs/CTJmv+TpGO4zWOHaGflwuRZkpupspyLthEEsDQO
+ 0UcOFvsNCF/B1ACJW3wb5BzcJjaSghXkgBy71R5sCIZsertHAKT/AMrenGvXPWdXIDEw
+ +tnOuqd493lf02I290XHAKpO32jmLduQJSLkODS1WXkNYpDJ9CFSRBRxbJ8sJY2gYXy+
+ F1P9PIfySGfV5cOHzzQeaa7tT4alodclRDybUmU5uZ0i5GNk8hJetxXgF4V2aWR7KhwH
+ WfwNMNRTKYJktBD1qgYRPHAhWsE+/4ewSChxdAHe22Og5/JjcYVDNb5TVSboczPcIQrV
+ 2ByA==
+X-Gm-Message-State: AOAM530nwNmm/XDDjkKfH1k6SDMUJ1y7/q39Xc3EOF118cyCYKV5YQ6Y
+ oY0bDUaEMZNOe8u3FRrW2tCZEs/+0dA=
+X-Google-Smtp-Source: ABdhPJxor51/r4+wQK9BhGxTVJ/eSzH8MFU+af+VMR1muKggmi7rEH80t5SiRO8rdssLEYicpL2X5w==
+X-Received: by 2002:aca:bc57:: with SMTP id m84mr3224034oif.14.1599166799088; 
+ Thu, 03 Sep 2020 13:59:59 -0700 (PDT)
 Received: from localhost (76-251-165-188.lightspeed.austtx.sbcglobal.net.
  [76.251.165.188])
- by smtp.gmail.com with ESMTPSA id d26sm601073otl.10.2020.09.03.14.00.08
+ by smtp.gmail.com with ESMTPSA id x38sm776992ota.72.2020.09.03.13.59.58
  (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
- Thu, 03 Sep 2020 14:00:08 -0700 (PDT)
+ Thu, 03 Sep 2020 13:59:58 -0700 (PDT)
 From: Michael Roth <mdroth@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 22/77] net: use peer when purging queue in
- qemu_flush_or_purge_queue_packets()
-Date: Thu,  3 Sep 2020 15:58:40 -0500
-Message-Id: <20200903205935.27832-23-mdroth@linux.vnet.ibm.com>
+Subject: [PATCH 15/77] xen/9pfs: yield when there isn't enough room on the ring
+Date: Thu,  3 Sep 2020 15:58:33 -0500
+Message-Id: <20200903205935.27832-16-mdroth@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
 References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
- envelope-from=flukshun@gmail.com; helo=mail-oi1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
+ envelope-from=flukshun@gmail.com; helo=mail-oi1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -97,56 +96,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>, qemu-stable@nongnu.org
+Cc: Stefano Stabellini <stefano.stabellini@xilinx.com>, qemu-stable@nongnu.org,
+ Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jason Wang <jasowang@redhat.com>
+From: Stefano Stabellini <stefano.stabellini@xilinx.com>
 
-The sender of packet will be checked in the qemu_net_queue_purge() but
-we use NetClientState not its peer when trying to purge the incoming
-queue in qemu_flush_or_purge_packets(). This will trigger the assert
-in virtio_net_reset since we can't pass the sender check:
+Instead of truncating replies, which is problematic, wait until the
+client reads more data and frees bytes on the reply ring.
 
-hw/net/virtio-net.c:533: void virtio_net_reset(VirtIODevice *): Assertion
-`!virtio_net_get_subqueue(nc)->async_tx.elem' failed.
-#9 0x55a33fa31b78 in virtio_net_reset hw/net/virtio-net.c:533:13
-#10 0x55a33fc88412 in virtio_reset hw/virtio/virtio.c:1919:9
-#11 0x55a341d82764 in virtio_bus_reset hw/virtio/virtio-bus.c:95:9
-#12 0x55a341dba2de in virtio_pci_reset hw/virtio/virtio-pci.c:1824:5
-#13 0x55a341db3e02 in virtio_pci_common_write hw/virtio/virtio-pci.c:1252:13
-#14 0x55a33f62117b in memory_region_write_accessor memory.c:496:5
-#15 0x55a33f6205e4 in access_with_adjusted_size memory.c:557:18
-#16 0x55a33f61e177 in memory_region_dispatch_write memory.c:1488:16
+Do that by calling qemu_coroutine_yield(). The corresponding
+qemu_coroutine_enter_if_inactive() is called from xen_9pfs_bh upon
+receiving the next notification from the client.
 
-Reproducer:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg701914.html
+We need to be careful to avoid races in case xen_9pfs_bh and the
+coroutine are both active at the same time. In xen_9pfs_bh, wait until
+either the critical section is over (ring->co == NULL) or until the
+coroutine becomes inactive (qemu_coroutine_yield() was called) before
+continuing. Then, simply wake up the coroutine if it is inactive.
 
-Fix by using the peer.
-
-Reported-by: "Alexander Bulekov" <alxndr@bu.edu>
-Acked-by: Alexander Bulekov <alxndr@bu.edu>
-Fixes: ca77d85e1dbf9 ("net: complete all queued packets on VM stop")
-Cc: qemu-stable@nongnu.org
-Signed-off-by: Jason Wang <jasowang@redhat.com>
-(cherry picked from commit 5fe19fb81839ea42b592b409f725349cf3c73551)
+Signed-off-by: Stefano Stabellini <stefano.stabellini@xilinx.com>
+Reviewed-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Message-Id: <20200521192627.15259-2-sstabellini@kernel.org>
+Signed-off-by: Greg Kurz <groug@kaod.org>
+(cherry picked from commit a4c4d462729466c4756bac8a0a8d77eb63b21ef7)
 Signed-off-by: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- net/net.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/9pfs/xen-9p-backend.c | 31 +++++++++++++++++++++++++------
+ 1 file changed, 25 insertions(+), 6 deletions(-)
 
-diff --git a/net/net.c b/net/net.c
-index cbeeeadff8..4c62b10acd 100644
---- a/net/net.c
-+++ b/net/net.c
-@@ -610,7 +610,7 @@ void qemu_flush_or_purge_queued_packets(NetClientState *nc, bool purge)
-         qemu_notify_event();
-     } else if (purge) {
-         /* Unable to empty the queue, purge remaining packets */
--        qemu_net_queue_purge(nc->incoming_queue, nc);
-+        qemu_net_queue_purge(nc->incoming_queue, nc->peer);
+diff --git a/hw/9pfs/xen-9p-backend.c b/hw/9pfs/xen-9p-backend.c
+index fc197f6c8a..3c84c86ab8 100644
+--- a/hw/9pfs/xen-9p-backend.c
++++ b/hw/9pfs/xen-9p-backend.c
+@@ -37,6 +37,7 @@ typedef struct Xen9pfsRing {
+ 
+     struct iovec *sg;
+     QEMUBH *bh;
++    Coroutine *co;
+ 
+     /* local copies, so that we can read/write PDU data directly from
+      * the ring */
+@@ -198,16 +199,20 @@ static void xen_9pfs_init_in_iov_from_pdu(V9fsPDU *pdu,
+     g_free(ring->sg);
+ 
+     ring->sg = g_new0(struct iovec, 2);
+-    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
++    ring->co = qemu_coroutine_self();
++    /* make sure other threads see ring->co changes before continuing */
++    smp_wmb();
+ 
++again:
++    xen_9pfs_in_sg(ring, ring->sg, &num, pdu->idx, size);
+     buf_size = iov_size(ring->sg, num);
+     if (buf_size  < size) {
+-        xen_pv_printf(&xen_9pfs->xendev, 0, "Xen 9pfs request type %d"
+-                "needs %zu bytes, buffer has %zu\n", pdu->id, size,
+-                buf_size);
+-        xen_be_set_state(&xen_9pfs->xendev, XenbusStateClosing);
+-        xen_9pfs_disconnect(&xen_9pfs->xendev);
++        qemu_coroutine_yield();
++        goto again;
      }
++    ring->co = NULL;
++    /* make sure other threads see ring->co changes before continuing */
++    smp_wmb();
+ 
+     *piov = ring->sg;
+     *pniov = num;
+@@ -292,6 +297,20 @@ static int xen_9pfs_receive(Xen9pfsRing *ring)
+ static void xen_9pfs_bh(void *opaque)
+ {
+     Xen9pfsRing *ring = opaque;
++    bool wait;
++
++again:
++    wait = ring->co != NULL && qemu_coroutine_entered(ring->co);
++    /* paired with the smb_wmb barriers in xen_9pfs_init_in_iov_from_pdu */
++    smp_rmb();
++    if (wait) {
++        cpu_relax();
++        goto again;
++    }
++
++    if (ring->co != NULL) {
++        qemu_coroutine_enter_if_inactive(ring->co);
++    }
+     xen_9pfs_receive(ring);
  }
  
 -- 
