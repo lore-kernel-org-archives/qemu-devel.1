@@ -4,71 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1ED9C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:00:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77284C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:01:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C8232084D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:00:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8232084D
+	by mail.kernel.org (Postfix) with ESMTPS id 2DB3B20791
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:01:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DB3B20791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEAO0-0003Bd-Ms
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 08:00:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42956)
+	id 1kEAOv-0004Qt-Aq
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 08:01:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6w-00017h-FE
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:30 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:60284
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kEA6v-00014n-9E
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60233
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6u-0005Iw-KD
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:30 -0400
+ id 1kEA6o-0005I3-PU
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:28 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-246-QiKz7tUoNwSx3FO5Pp-qwA-1; Fri, 04 Sep 2020 07:42:26 -0400
-X-MC-Unique: QiKz7tUoNwSx3FO5Pp-qwA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-511-rr7bPQsmM-WamYusKba1Kw-1; Fri, 04 Sep 2020 07:42:20 -0400
+X-MC-Unique: rr7bPQsmM-WamYusKba1Kw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A4D2496E54D;
- Fri,  4 Sep 2020 11:41:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA29390175C
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:45 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 63FDC1002D4C;
- Fri,  4 Sep 2020 11:41:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id AF0946FDB6
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:45 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 43/46] meson: specify fuzz linker script as a project arg
-Date: Fri,  4 Sep 2020 07:41:19 -0400
-Message-Id: <20200904114122.31307-44-pbonzini@redhat.com>
+Subject: [PULL 39/46] configure: drop dead variables and functions
+Date: Fri,  4 Sep 2020 07:41:15 -0400
+Message-Id: <20200904114122.31307-40-pbonzini@redhat.com>
 In-Reply-To: <20200904114122.31307-1-pbonzini@redhat.com>
 References: <20200904114122.31307-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:11
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,68 +81,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Bulekov <alxndr@bu.edu>
-
-With this change, the fuzzer-linker script should be specified outside
-any --start-group/--end-group pairs. We need this on oss-fuzz, where
-partially applying the linker-script results in a linker failure
-
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-Message-Id: <20200902173652.307222-2-alxndr@bu.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build                  | 9 ++++++++-
- tests/qtest/fuzz/meson.build | 3 ---
- 2 files changed, 8 insertions(+), 4 deletions(-)
+ configure | 15 +--------------
+ 1 file changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/meson.build b/meson.build
-index a10239cfa4..9473b42da3 100644
---- a/meson.build
-+++ b/meson.build
-@@ -56,6 +56,14 @@ add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
- add_project_arguments(config_host['QEMU_INCLUDES'].split(),
-                       language: ['c', 'cpp', 'objc'])
+diff --git a/configure b/configure
+index 0ca0eaf266..8e749ae38a 100755
+--- a/configure
++++ b/configure
+@@ -313,7 +313,6 @@ audio_drv_list=""
+ block_drv_rw_whitelist=""
+ block_drv_ro_whitelist=""
+ host_cc="cc"
+-libs_tools=""
+ audio_win_int=""
+ libs_qga=""
+ debug_info="yes"
+@@ -421,7 +420,6 @@ mingw32="no"
+ gcov="no"
+ EXESUF=""
+ HOST_DSOSUF=".so"
+-LDFLAGS_SHARED="-shared"
+ modules="no"
+ module_upgrades="no"
+ prefix="/usr/local"
+@@ -845,7 +843,6 @@ Darwin)
+   darwin="yes"
+   hax="yes"
+   hvf="yes"
+-  LDFLAGS_SHARED="-bundle -undefined dynamic_lookup"
+   if [ "$cpu" = "x86_64" ] ; then
+     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
+     QEMU_LDFLAGS="-arch x86_64 $QEMU_LDFLAGS"
+@@ -4922,7 +4919,7 @@ elif compile_prog "" "$pthread_lib -lrt" ; then
+   LIBS="$LIBS -lrt"
+ fi
  
-+# Specify linker-script with add_project_link_arguments so that it is not placed
-+# within a linker --start-group/--end-group pair
-+if 'CONFIG_FUZZ' in config_host
-+   add_project_link_arguments(['-Wl,-T,',
-+                               (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
-+                              native: false, language: ['c', 'cpp', 'objc'])
-+endif
-+
- link_language = 'c'
- if add_languages('cpp', required: false, native: false)
-   cxx = meson.get_compiler('cpp')
-@@ -1094,7 +1102,6 @@ foreach target : target_dirs
-         'gui': false,
-         'sources': specific_fuzz.sources(),
-         'dependencies': specific_fuzz.dependencies(),
--        'link_depends': [files('tests/qtest/fuzz/fork_fuzz.ld')],
-       }]
-     endif
-   else
-diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
-index bb0a3f271d..bcc393828e 100644
---- a/tests/qtest/fuzz/meson.build
-+++ b/tests/qtest/fuzz/meson.build
-@@ -6,11 +6,8 @@ specific_fuzz_ss.add(when: 'CONFIG_I440FX', if_true: files('i440fx_fuzz.c'))
- specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio_net_fuzz.c'))
- specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuzz.c'))
+-# Check whether we need to link libutil for openpty()
++# Check whether we have openpty() in either libc or libutil
+ cat > $TMPC << EOF
+ extern int openpty(int *am, int *as, char *name, void *termp, void *winp);
+ int main(void) { return openpty(0, 0, 0, 0, 0); }
+@@ -4933,7 +4930,6 @@ if compile_prog "" "" ; then
+   have_openpty="yes"
+ else
+   if compile_prog "" "-lutil" ; then
+-    libs_tools="-lutil $libs_tools"
+     have_openpty="yes"
+   fi
+ fi
+@@ -6449,12 +6445,6 @@ if test "$cpu" = "s390x" ; then
+   fi
+ fi
  
--# unfortunately declare_dependency does not support link_depends, so
--# this will be duplicated in meson.build
- fork_fuzz = declare_dependency(
-   link_args: ['-fsanitize=fuzzer',
--              '-Wl,-T,' + (meson.current_source_dir() / 'fork_fuzz.ld'),
-               '-Wl,-wrap,qtest_inb',
-               '-Wl,-wrap,qtest_inw',
-               '-Wl,-wrap,qtest_inl',
+-echo_version() {
+-    if test "$1" = "yes" ; then
+-        echo "($2)"
+-    fi
+-}
+-
+ config_host_mak="config-host.mak"
+ 
+ echo "# Automatically generated by configure - do not modify" > $config_host_mak
+@@ -7380,13 +7370,10 @@ if test "$sparse" = "yes" ; then
+ fi
+ echo "QEMU_LDFLAGS=$QEMU_LDFLAGS" >> $config_host_mak
+ echo "LDFLAGS_NOPIE=$LDFLAGS_NOPIE" >> $config_host_mak
+-echo "LD_REL_FLAGS=$LD_REL_FLAGS" >> $config_host_mak
+ echo "LD_I386_EMULATION=$ld_i386_emulation" >> $config_host_mak
+-echo "LIBS_TOOLS+=$libs_tools" >> $config_host_mak
+ echo "PTHREAD_LIB=$PTHREAD_LIB" >> $config_host_mak
+ echo "EXESUF=$EXESUF" >> $config_host_mak
+ echo "HOST_DSOSUF=$HOST_DSOSUF" >> $config_host_mak
+-echo "LDFLAGS_SHARED=$LDFLAGS_SHARED" >> $config_host_mak
+ echo "LIBS_QGA=$libs_qga" >> $config_host_mak
+ echo "TASN1_LIBS=$tasn1_libs" >> $config_host_mak
+ echo "TASN1_CFLAGS=$tasn1_cflags" >> $config_host_mak
 -- 
 2.26.2
 
