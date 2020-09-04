@@ -2,84 +2,81 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C44AC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A19C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:43:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C7C72074D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:36:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 124462074D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:43:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c3k68mKn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C7C72074D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jcAflwNm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 124462074D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53574 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34736 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEDlC-0001va-8n
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 11:36:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51440)
+	id 1kEDro-0006b7-5n
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 11:43:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kEDkb-0001CI-9D
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:35:41 -0400
-Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:37105)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kEDqk-0005I5-CS
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:42:02 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:53615)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kEDkZ-0005hL-3P
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:35:40 -0400
-Received: by mail-wm1-x329.google.com with SMTP id a9so6491896wmm.2
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 08:35:37 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kEDqi-0006vl-MI
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:42:01 -0400
+Received: by mail-wm1-x344.google.com with SMTP id u18so6470689wmc.3
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 08:42:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=user-agent:from:to:cc:subject:date:message-id:mime-version
+ h=from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=vXZqs0dWis6vPj7FMh65e0uFmrw9hMa9w4IIMsG9Gdk=;
- b=c3k68mKnpxsjDDZnTjO9YfFnM6y0gL1RlN/9Y8udwd+eGCwltoXzfQ88CtnEhjN9CS
- ViNsuhERsBwRRAe6Lsqd0AtepWpyYU5zAgvgOJXq8Ersmn3jXKaf4FT+DaPPf/VbAslx
- Iw+ESIqpQ3jJu3vmgDHmfCKHPJnEVduwcB/M5UT1M/q/lp0p/wAZ/R8++PTAnW7Mw1P/
- Ybd2k/gpglUvYosGCocy9tW4FjiF+7izJeyHjjLUNJt21SsTev4zL6CYdRehdf5WkamF
- cahYXzXsTfFohpa70YPjI2lRj/LuFZfqw6ChkWP0iqwqeOBf7OvFtYagkl2Mluv87gwt
- CpcQ==
+ bh=ijN8C9uYRScuOtrUptbu5atVjFcf+AwMoQAbhDGOgh4=;
+ b=jcAflwNmVZ5Z45l/259WzmZ4HAmPVLnoGp3Gh9y06vAkWAkeX37goO6UkyWF6Fz3qk
+ du+ycr++JLmX5UWxi0xwHZALYnGZBXTDFn0F/imhevaRMWijlSV76IJHb/L5Fa3mf6DS
+ 9RHnfYcc4OxBS7OPaTPbeCZs4FV4NFF6BNLFbMRa96v4Hr8e+0xv+/04y6rOWvOLpaSb
+ Alw7QJlixYS3kQt+s8pKbiIuKW6hcu4UOtNPDHinesEg//cjOx2lzYDJ31GX+jzYUTG/
+ uv08Q15+/PeP2QUJMaKBuW987kbT+hN3n/S/AJ7ziVRq7YkhsXwevAUvQkzI4CfH3ffe
+ 6U/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:user-agent:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=vXZqs0dWis6vPj7FMh65e0uFmrw9hMa9w4IIMsG9Gdk=;
- b=JvvXtK3v7faepakD3v6qruJZ0yWdHKCDl0XlhR/jhQaFHLVBbAolwrTLKMJZiy1snf
- +SJEXHcPIAV7hMZ9s8BQ9vGb9QqDlUUBa8Qp+m5UBHqYIdp6uE1GCoyCcp/dNrLmNqZQ
- sbrIe6LIvJiinMZfzABcqpipHFaAONTBjud7IyJd9r/cja85qvqDYhrVf+y9Ej8eYGWL
- qBEDzTAwAedgru3Yg4gz6xUeTGMo6bUinshoqj/sv0huwL591/g/yFCIq8tI9n/UmOau
- 97SOb4lvTur2ICgzXo1JlTqowy9DHaaFuSRXS+v41Di0Beft78JF0RerGj6isz6OwPry
- CCfw==
-X-Gm-Message-State: AOAM530T0fWn+HQvIMyV09wl5fvegC08wK0FoJq8pVTcM8TnGfIv77n1
- gfDX7JofWRb4+/IIiOofPzYgTBtrvdIHYQ==
-X-Google-Smtp-Source: ABdhPJyxQjwN1T/fwGQNrXtg4qef7zkSxKTt+mWZuD0nwS6lpyYFd3r6nlTda70aLMycF42TkNSvHg==
-X-Received: by 2002:a1c:7504:: with SMTP id o4mr8121584wmc.70.1599233735931;
- Fri, 04 Sep 2020 08:35:35 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id y1sm12306406wmi.36.2020.09.04.08.35.34
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=ijN8C9uYRScuOtrUptbu5atVjFcf+AwMoQAbhDGOgh4=;
+ b=jKvTaGO4pzZE8vmQKFHx0G+A6srz0wW2iyVVV3YXkoAAquqNHPk3fDWq4RlnlEiPeh
+ gbeHpkewU+7Yw9IBbDXTMzwmDRXYaN573kWsv1cLLiAdb/G7Ohg7Evoor2hYf8fpBphQ
+ M69sn8VG9IqhXJjTzfKTJQbqJttlYUpiKOKNfykDlEc9vqbnBDjNwkOOjdxD+vtCiGvk
+ nAUh3szNAbTWztrwg7fzTCkIRoYmRys/FUCi4AZJyiezX/fKgt5g4i8J8y9X+/hg0hCu
+ AkTibwfekGICvnWLwTu5cJe8KFM79FCeRXVd3+82LGSMYl+jfRWU0tRfx7b1bdUKzm0D
+ PW/g==
+X-Gm-Message-State: AOAM530p46RVtMEf/baZifqjxVBg5GUouYkqoG2OiWxpUZ/atFeS/L+X
+ 4K3c1RVqMKMhREWFGTaC5SOIpVYca1ymKq8i
+X-Google-Smtp-Source: ABdhPJxeGk1ofLImKOO3yJPNHln5xxWZ+c9M/HPZiH0SkKUCPsfXk1WV5z8YaRZtqisBdA0ik9/8mQ==
+X-Received: by 2002:a1c:105:: with SMTP id 5mr8676359wmb.83.1599234118890;
+ Fri, 04 Sep 2020 08:41:58 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id f14sm12723743wrv.72.2020.09.04.08.41.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 08:35:34 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 5C4FE1FF7E;
- Fri,  4 Sep 2020 16:35:34 +0100 (BST)
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: QEMU Developers <qemu-devel@nongnu.org>
-Subject: Should we apply for GitLab's open source program?
-Date: Fri, 04 Sep 2020 16:35:34 +0100
-Message-ID: <878sdp4ks9.fsf@linaro.org>
+ Fri, 04 Sep 2020 08:41:58 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 0/2] Remove KVM support for 32-bit Arm hosts
+Date: Fri,  4 Sep 2020 16:41:54 +0100
+Message-Id: <20200904154156.31943-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::329;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x329.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,40 +98,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu@sfconservancy.org" <qemu@sfconservancy.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+This patchset drops the support for KVM on 32-bit Arm hosts,
+which we deprecated for the 5.0 release.
 
-Hi,
+To repeat the rationale from the deprecation note: the Linux
+kernel dropped support for 32-bit Arm KVM hosts in 5.7.
+    
+Running 32-bit guests on a 64-bit Arm host remains supported.
 
-Given our growing reliance on GitLab and the recent announcement about
-free tier minutes:
+I split this into two patches, one which does the
+fundamental removal of the kvm32.c code, and one which
+tidies up some now-unreachable bits of code or #ifdeffery.
 
-  https://about.gitlab.com/pricing/faq-consumption-cicd/
+thanks
+-- PMM
 
-is it time we officially apply for GitLab's Open Source Program:
+Peter Maydell (2):
+  target/arm: Remove KVM support for 32-bit Arm hosts
+  target/arm: Remove no-longer-reachable 32-bit KVM code
 
-  https://about.gitlab.com/solutions/open-source/program/
+ docs/system/deprecated.rst |  16 +-
+ configure                  |   2 +-
+ target/arm/kvm-consts.h    |   7 -
+ target/arm/kvm_arm.h       |   6 -
+ target/arm/cpu.c           | 100 +++----
+ target/arm/kvm.c           |   7 -
+ target/arm/kvm32.c         | 595 -------------------------------------
+ target/arm/meson.build     |   5 +-
+ 8 files changed, 56 insertions(+), 682 deletions(-)
+ delete mode 100644 target/arm/kvm32.c
 
-?
+-- 
+2.20.1
 
-From what I can see the QEMU project will easily qualify - the only
-minor inconvenience is needing to reapply every year. So far it seems as
-a public project their are no usage limits anyway. We are currently
-listed as 0 of 50,000 minutes:
-
-  https://gitlab.com/groups/qemu-project/-/usage_quotas#pipelines-quota-tab
-
-So we are in no pressing hurry to do this for the minutes but I suspect
-there may be other things that are made easier by having access to all
-the toys GitLab provides. Daniel has already posted to the forum
-requesting details about how this might affect our workflow so maybe we
-should just wait for feedback until pressing on?
-
-  https://forum.gitlab.com/t/ci-cd-minutes-for-free-tier/40241/33
-
---=20
-Alex Benn=C3=A9e
 
