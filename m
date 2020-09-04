@@ -2,91 +2,66 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A72C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:05:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0F1C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:06:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 057F920758
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:05:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RYD8Yoxa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057F920758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6289220758
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:06:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6289220758
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE0Ao-0003hx-04
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 21:05:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53994)
+	id 1kE0BM-00055G-Ji
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 21:06:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kE09x-0002O7-Nt; Thu, 03 Sep 2020 21:04:57 -0400
-Received: from mail-il1-x141.google.com ([2607:f8b0:4864:20::141]:44507)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kE09w-0002jy-1Z; Thu, 03 Sep 2020 21:04:57 -0400
-Received: by mail-il1-x141.google.com with SMTP id h11so4915442ilj.11;
- Thu, 03 Sep 2020 18:04:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=yaXUGx5Z0/GOHdtMl0ca+JpE0hz+CrwFr6VPmXocPbo=;
- b=RYD8Yoxa8/9UI2F2/n6ZRCKjACDMtiXMtsbwBqMF6DyD4+KBQSKkbDojgQKzXUI7n8
- q71Ko51puobJ9viGEolopvgQbpd4qBAqLb4B4eGfOJKSauk1vV3E+Y9wnkNUmjgeg8ci
- d00aT1+K1KFiwBBRbedgKxvAQQFe7exMIQPHXD3yYq5dLkkNIOxVluDW+sr6kVi6+qLJ
- lz1KGKSq7Psk2rc8FIBLnIbmLppmlqF2pjUeOgDk7RbCr474EeneXN4QZwAD3qu/87cs
- KudUsKOmuvtDcVuJOzUZFbxQOaU4IN3SuRFEl6m+f1TNi7w4M84fJK3ik4tyqVGhN2H/
- 4ixw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=yaXUGx5Z0/GOHdtMl0ca+JpE0hz+CrwFr6VPmXocPbo=;
- b=GlmGO+nwTLLua0kScD6hUfB9bDcVTdyC7Brmv2AE6S/2lqsiC2Q2nAJkZcdhOah1KI
- TLUmF6yCjZ5iR9xMrRXaK5OQTKzfAl+G7Znu6fw1F+b9UQuvCIGfTe/sYRBZSVG6OQBH
- bWBttH6/a7TZ57R2iANmUhFvuF8BHCSyew4CAkirhCvgJyQ7bR7QTevUChpevUn1pbNG
- uITMSoJuyIUOM/juc/wDJZ7CWje0dkDogA2Ac3LN45a8sUN2fmWBiYBAeRDEJE/9oCSK
- IwVdDRECwPulm5JWF9ZcuvWq8s9ZzTTu9+UHBuonoUhpPabOT7yV56LdbxytUx9NBF+/
- zRpg==
-X-Gm-Message-State: AOAM531lalJKXytgp9uYFxSMmE1ERI2ZGVxU+H/+1xVDuvCJE9mtyTex
- w/Sp6l+8y66UAmQOztXEB7arNkn+WHM=
-X-Google-Smtp-Source: ABdhPJzdQToa1ScAuXiim/oa4IxWq5vLhdF+UN758CkxOWJx3s/bU2GUREFXtU5LYlOXvlvC04lZQQ==
-X-Received: by 2002:a92:98c5:: with SMTP id a66mr5900709ill.50.1599181494505; 
- Thu, 03 Sep 2020 18:04:54 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
- by smtp.gmail.com with ESMTPSA id o18sm205907ilj.77.2020.09.03.18.04.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 18:04:54 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 1/3] spapr: move h_home_node_associativity to spapr_numa.c
-Date: Thu,  3 Sep 2020 22:04:37 -0300
-Message-Id: <20200904010439.581957-2-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200904010439.581957-1-danielhb413@gmail.com>
-References: <20200904010439.581957-1-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
+ id 1kE09z-0002RD-GE
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 21:04:59 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4677 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
+ id 1kE09x-0002jR-CS
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 21:04:59 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 07104F7496714BEE0720;
+ Fri,  4 Sep 2020 09:04:46 +0800 (CST)
+Received: from [127.0.0.1] (10.174.187.160) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0;
+ Fri, 4 Sep 2020 09:04:39 +0800
+Message-ID: <5F5192A7.4030805@huawei.com>
+Date: Fri, 4 Sep 2020 09:04:39 +0800
+From: AlexChen <alex.chen@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
+ rv:17.0) Gecko/20130509 Thunderbird/17.0.6
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::141;
- envelope-from=danielhb413@gmail.com; helo=mail-il1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+To: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
+Subject: Re: elf2dmp: Fix memory leak on main() error paths
+References: <5F463659.8080101@huawei.com>
+In-Reply-To: <5F463659.8080101@huawei.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.160]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=alex.chen@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 21:04:46
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.403,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,134 +74,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: zhengchuan@huawei.com, qemu-devel@nongnu.org,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The implementation of this hypercall will be modified to use
-spapr->numa_assoc_arrays input. Moving it to spapr_numa.c makes
-make more sense.
+Kindly ping.
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
- hw/ppc/spapr_hcall.c | 40 ---------------------------------------
- hw/ppc/spapr_numa.c  | 45 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+), 40 deletions(-)
+On 2020/8/26 18:15, AlexChen wrote:
+> From: AlexChen <alex.chen@huawei.com>
+> 
+> The 'kdgb' is allocating memory in get_kdbg(), but it is not freed
+> in both fill_header() and fill_context() failed branches, fix it.
+> 
+> Signed-off-by: AlexChen <alex.chen@huawei.com>
+> ---
+>  contrib/elf2dmp/main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/contrib/elf2dmp/main.c b/contrib/elf2dmp/main.c
+> index 9a2dbc2902..ac746e49e0 100644
+> --- a/contrib/elf2dmp/main.c
+> +++ b/contrib/elf2dmp/main.c
+> @@ -568,12 +568,12 @@ int main(int argc, char *argv[])
+>      if (fill_header(&header, &ps, &vs, KdDebuggerDataBlock, kdbg,
+>              KdVersionBlock, qemu_elf.state_nr)) {
+>          err = 1;
+> -        goto out_pdb;
+> +        goto out_kdbg;
+>      }
+> 
+>      if (fill_context(kdbg, &vs, &qemu_elf)) {
+>          err = 1;
+> -        goto out_pdb;
+> +        goto out_kdbg;
+>      }
+> 
+>      if (write_dump(&ps, &header, argv[2])) {
+> 
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index c1d01228c6..c2776b6a7d 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1873,42 +1873,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     return ret;
- }
- 
--static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
--                                              SpaprMachineState *spapr,
--                                              target_ulong opcode,
--                                              target_ulong *args)
--{
--    target_ulong flags = args[0];
--    target_ulong procno = args[1];
--    PowerPCCPU *tcpu;
--    int idx;
--
--    /* only support procno from H_REGISTER_VPA */
--    if (flags != 0x1) {
--        return H_FUNCTION;
--    }
--
--    tcpu = spapr_find_cpu(procno);
--    if (tcpu == NULL) {
--        return H_P2;
--    }
--
--    /* sequence is the same as in the "ibm,associativity" property */
--
--    idx = 0;
--#define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
--                             ((uint64_t)(b) & 0xffffffff))
--    args[idx++] = ASSOCIATIVITY(0, 0);
--    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
--    args[idx++] = ASSOCIATIVITY(procno, -1);
--    for ( ; idx < 6; idx++) {
--        args[idx] = -1;
--    }
--#undef ASSOCIATIVITY
--
--    return H_SUCCESS;
--}
--
- static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
-                                               SpaprMachineState *spapr,
-                                               target_ulong opcode,
-@@ -2139,10 +2103,6 @@ static void hypercall_register_types(void)
-     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
- 
-     spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
--
--    /* Virtual Processor Home Node */
--    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
--                             h_home_node_associativity);
- }
- 
- type_init(hypercall_register_types)
-diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index 93a000b729..368c1a494d 100644
---- a/hw/ppc/spapr_numa.c
-+++ b/hw/ppc/spapr_numa.c
-@@ -165,3 +165,48 @@ void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas)
-     _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
-                      maxdomains, sizeof(maxdomains)));
- }
-+
-+static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-+                                              SpaprMachineState *spapr,
-+                                              target_ulong opcode,
-+                                              target_ulong *args)
-+{
-+    target_ulong flags = args[0];
-+    target_ulong procno = args[1];
-+    PowerPCCPU *tcpu;
-+    int idx;
-+
-+    /* only support procno from H_REGISTER_VPA */
-+    if (flags != 0x1) {
-+        return H_FUNCTION;
-+    }
-+
-+    tcpu = spapr_find_cpu(procno);
-+    if (tcpu == NULL) {
-+        return H_P2;
-+    }
-+
-+    /* sequence is the same as in the "ibm,associativity" property */
-+
-+    idx = 0;
-+#define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
-+                             ((uint64_t)(b) & 0xffffffff))
-+    args[idx++] = ASSOCIATIVITY(0, 0);
-+    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
-+    args[idx++] = ASSOCIATIVITY(procno, -1);
-+    for ( ; idx < 6; idx++) {
-+        args[idx] = -1;
-+    }
-+#undef ASSOCIATIVITY
-+
-+    return H_SUCCESS;
-+}
-+
-+static void spapr_numa_register_types(void)
-+{
-+    /* Virtual Processor Home Node */
-+    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
-+                             h_home_node_associativity);
-+}
-+
-+type_init(spapr_numa_register_types)
--- 
-2.26.2
 
 
