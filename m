@@ -4,70 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE92C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:56:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A797C28E83
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:56:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 035EA214F1
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:56:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 035EA214F1
+	by mail.kernel.org (Postfix) with ESMTPS id D6563214F1
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:56:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6563214F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEAKc-0003Xf-48
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 07:56:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42834)
+	id 1kEAKd-0003e9-UJ
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 07:56:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6p-0000zS-EL
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46269
- helo=us-smtp-1.mimecast.com)
+ id 1kEA6e-0000jj-1h
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:12 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:25590
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6m-0005Hg-E2
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:22 -0400
+ id 1kEA6b-0005Gl-M4
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:11 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-2QwVqzXSMTmnBOw0AMDlIQ-1; Fri, 04 Sep 2020 07:42:18 -0400
-X-MC-Unique: 2QwVqzXSMTmnBOw0AMDlIQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-428-NdjqO0EINfi5sdugqyqT1Q-1; Fri, 04 Sep 2020 07:42:07 -0400
+X-MC-Unique: NdjqO0EINfi5sdugqyqT1Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 313351933127
- for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 34E468EC16C
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:40 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 49BBF838D2
- for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0433C6024E
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:39 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 33/46] meson: keep all compiler flags detection together
-Date: Fri,  4 Sep 2020 07:41:09 -0400
-Message-Id: <20200904114122.31307-34-pbonzini@redhat.com>
+Subject: [PULL 28/46] meson: compute config_all_devices directly
+Date: Fri,  4 Sep 2020 07:41:04 -0400
+Message-Id: <20200904114122.31307-29-pbonzini@redhat.com>
 In-Reply-To: <20200904114122.31307-1-pbonzini@redhat.com>
 References: <20200904114122.31307-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -85,70 +86,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+There is no need anymore to produce config-all-devices.mak, compute
+the resulting dictionary directly instead of going through grepy.sh.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
+ .gitignore       |  1 -
+ meson.build      | 14 ++------------
+ scripts/grepy.sh |  3 ---
+ 3 files changed, 2 insertions(+), 16 deletions(-)
+ delete mode 100755 scripts/grepy.sh
 
+diff --git a/.gitignore b/.gitignore
+index 4ccb9ed975..f3fbd87ce4 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -2,7 +2,6 @@
+ /build/
+ /.doctrees
+ /config-devices.*
+-/config-all-devices.*
+ /config-all-disas.*
+ /config-host.*
+ /config-target.*
 diff --git a/meson.build b/meson.build
-index a222a50a23..a1705d33af 100644
+index b71f561c96..037ccd3f4c 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -32,6 +32,23 @@ endforeach
- have_tools = 'CONFIG_TOOLS' in config_host
- have_block = have_system or have_tools
+@@ -455,6 +455,7 @@ endforeach
+ genh += configure_file(output: 'config-host.h', configuration: config_host_data)
  
-+python = import('python').find_installation()
-+
-+supported_oses = ['windows', 'freebsd', 'netbsd', 'openbsd', 'darwin', 'sunos', 'linux']
-+supported_cpus = ['ppc', 'ppc64', 's390x', 'sparc64', 'riscv32', 'riscv64', 'x86', 'x86_64',
-+  'arm', 'aarch64', 'mips', 'mips64', 'sparc', 'sparc64']
-+
-+cpu = host_machine.cpu_family()
-+targetos = host_machine.system()
-+
-+configure_file(input: files('scripts/ninjatool.py'),
-+               output: 'ninjatool',
-+               configuration: config_host)
-+
-+##################
-+# Compiler flags #
-+##################
-+
- add_project_arguments(config_host['QEMU_CFLAGS'].split(),
-                       native: false, language: ['c', 'objc'])
- add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
-@@ -39,12 +56,6 @@ add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
- add_project_arguments(config_host['QEMU_INCLUDES'].split(),
-                       language: ['c', 'cpp', 'objc'])
+ minikconf = find_program('scripts/minikconf.py')
++config_all_devices = {}
+ config_devices_mak_list = []
+ config_devices_h = {}
+ config_target_h = {}
+@@ -523,11 +524,11 @@ foreach target : target_dirs
+     config_devices_h += {target: configure_file(output: target + '-config-devices.h',
+                                                 configuration: config_devices_data)}
+     config_target += config_devices
++    config_all_devices += config_devices
+   endif
+   config_target_mak += {target: config_target}
+ endforeach
  
--python = import('python').find_installation()
--
--##################
--# Compiler flags #
--##################
--
- link_language = 'c'
- if add_languages('cpp', required: false, native: false)
-   cxx = meson.get_compiler('cpp')
-@@ -78,17 +89,6 @@ if 'SPARSE_CFLAGS' in config_host
-                        'compile_commands.json'])
- endif
+-grepy = find_program('scripts/grepy.sh')
+ # This configuration is used to build files that are shared by
+ # multiple binaries, and then extracted out of the "common"
+ # static_library target.
+@@ -537,17 +538,6 @@ grepy = find_program('scripts/grepy.sh')
+ # targets that are not built for this compilation.  The CONFIG_ALL
+ # pseudo symbol replaces it.
  
--configure_file(input: files('scripts/ninjatool.py'),
--               output: 'ninjatool',
--               configuration: config_host)
+-if have_system
+-  config_all_devices_mak = configure_file(
+-    output: 'config-all-devices.mak',
+-    input: config_devices_mak_list,
+-    capture: true,
+-    command: [grepy, '@INPUT@'],
+-  )
+-  config_all_devices = keyval.load(config_all_devices_mak)
+-else
+-  config_all_devices = {}
+-endif
+ config_all = config_all_devices
+ config_all += config_host
+ config_all += config_all_disas
+diff --git a/scripts/grepy.sh b/scripts/grepy.sh
+deleted file mode 100755
+index aee46ddc8d..0000000000
+--- a/scripts/grepy.sh
++++ /dev/null
+@@ -1,3 +0,0 @@
+-#!/bin/sh
 -
--supported_oses = ['windows', 'freebsd', 'netbsd', 'openbsd', 'darwin', 'sunos', 'linux']
--supported_cpus = ['ppc', 'ppc64', 's390x', 'sparc64', 'riscv32', 'riscv64', 'x86', 'x86_64',
--  'arm', 'aarch64', 'mips', 'mips64', 'sparc', 'sparc64']
--
--cpu = host_machine.cpu_family()
--targetos = host_machine.system()
--
- m = cc.find_library('m', required: false)
- util = cc.find_library('util', required: false)
- winmm = []
+-grep -h '=y$' "$@" | sort -u
 -- 
 2.26.2
 
