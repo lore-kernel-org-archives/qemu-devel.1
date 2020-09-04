@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66196C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:02:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B8D8C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:03:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26897206CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:02:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DA6D206CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:03:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="QQn3bQCW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26897206CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="IaTwK/2l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DA6D206CA
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2vq-0002qm-Ac
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 00:02:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55010)
+	id 1kE2wG-0003w2-9Y
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 00:03:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2i2-0003et-Sn; Thu, 03 Sep 2020 23:48:18 -0400
-Received: from ozlabs.org ([203.11.71.1]:55909)
+ id 1kE2i2-0003cr-5Q; Thu, 03 Sep 2020 23:48:18 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:37643)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2i0-0004zB-G7; Thu, 03 Sep 2020 23:48:18 -0400
+ id 1kE2hz-0004ys-9G; Thu, 03 Sep 2020 23:48:17 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsv1Ffmz9sWF; Fri,  4 Sep 2020 13:47:30 +1000 (AEST)
+ id 4BjNst3q4bz9sWD; Fri,  4 Sep 2020 13:47:30 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599191251;
- bh=XULsY1KQq35g6GNXDRirXo6GNLLyX2G9qfFOU3fwaQo=;
+ d=gibson.dropbear.id.au; s=201602; t=1599191250;
+ bh=lcJl+18AADR+U6YFsMe0OcdCykc44CX/5zvHrK7DkR0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=QQn3bQCWnm6VUO7+p2gnpza1K2MyqeX42gjUBAG2Sg1PW0h1mJtgjYvLqbMkIAnSe
- Wy1wQ9+Se5ziwg1rKefLy79jwtwrJVyqF2/wSZ9BimdFh/Ydjb5+ugQ/8Hc1d/dpUV
- AuBzXUwIJg5fUhXfLG3SI5Hn4fJ+QEKOCoIOVT/0=
+ b=IaTwK/2lf+K8SbwjkDC7n+PAv5ydgR9R6wKLt06S/cQHFRQWoOVLFGm018f+W5scz
+ Dwx0CFpNZrR9zpxovrORNMjazzivuxJ48cEXo9xeySZN5YAPr9qOatw2QkVTrwdDds
+ MOD6bXwDhOJFrUsGk0N9MH1ZNNfmAIZ7GUrcDy+s=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 28/30] spapr, spapr_numa: handle vcpu ibm,associativity
-Date: Fri,  4 Sep 2020 13:47:17 +1000
-Message-Id: <20200904034719.673626-29-david@gibson.dropbear.id.au>
+Subject: [PULL 26/30] ppc/spapr_nvdimm: turn spapr_dt_nvdimm() static
+Date: Fri,  4 Sep 2020 13:47:15 +1000
+Message-Id: <20200904034719.673626-27-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 23:47:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -19
 X-Spam_score: -2.0
 X-Spam_bar: --
@@ -82,111 +82,75 @@ Sender: "Qemu-devel"
 
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-Vcpus have an additional paramenter to be appended, vcpu_id. This
-also changes the size of the of property itself, which is being
-represented in index 0 of numa_assoc_array[cpu->node_id],
-and defaults to MAX_DISTANCE_REF_POINTS for all cases but
-vcpus.
-
-All this logic makes more sense in spapr_numa.c, where we handle
-everything NUMA and associativity. A new helper spapr_numa_fixup_cpu_dt()
-was added, and spapr.c uses it the same way as it was using the former
-spapr_fixup_cpu_numa_dt().
+This function is only used inside spapr_nvdimm.c.
 
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200903220639.563090-3-danielhb413@gmail.com>
+Message-Id: <20200901125645.118026-3-danielhb413@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c              | 17 +----------------
- hw/ppc/spapr_numa.c         | 27 +++++++++++++++++++++++++++
- include/hw/ppc/spapr_numa.h |  2 ++
- 3 files changed, 30 insertions(+), 16 deletions(-)
+ hw/ppc/spapr_nvdimm.c         | 22 +++++++++++-----------
+ include/hw/ppc/spapr_nvdimm.h |  1 -
+ 2 files changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1ad6f59863..badfa86319 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -202,21 +202,6 @@ static int spapr_fixup_cpu_smt_dt(void *fdt, int offset, PowerPCCPU *cpu,
-     return ret;
+diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+index 95cbc30528..5188e2f503 100644
+--- a/hw/ppc/spapr_nvdimm.c
++++ b/hw/ppc/spapr_nvdimm.c
+@@ -106,16 +106,6 @@ void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp)
+     }
  }
  
--static int spapr_fixup_cpu_numa_dt(void *fdt, int offset, PowerPCCPU *cpu)
+-int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+-                           void *fdt, int *fdt_start_offset, Error **errp)
 -{
--    int index = spapr_get_vcpu_id(cpu);
--    uint32_t associativity[] = {cpu_to_be32(0x5),
--                                cpu_to_be32(0x0),
--                                cpu_to_be32(0x0),
--                                cpu_to_be32(0x0),
--                                cpu_to_be32(cpu->node_id),
--                                cpu_to_be32(index)};
+-    NVDIMMDevice *nvdimm = NVDIMM(drc->dev);
 -
--    /* Advertise NUMA via ibm,associativity */
--    return fdt_setprop(fdt, offset, "ibm,associativity", associativity,
--                          sizeof(associativity));
+-    *fdt_start_offset = spapr_dt_nvdimm(fdt, 0, nvdimm);
+-
+-    return 0;
 -}
 -
- static void spapr_dt_pa_features(SpaprMachineState *spapr,
-                                  PowerPCCPU *cpu,
-                                  void *fdt, int offset)
-@@ -785,7 +770,7 @@ static void spapr_dt_cpu(CPUState *cs, void *fdt, int offset,
-                       pft_size_prop, sizeof(pft_size_prop))));
- 
-     if (ms->numa_state->num_nodes > 1) {
--        _FDT(spapr_fixup_cpu_numa_dt(fdt, offset, cpu));
-+        _FDT(spapr_numa_fixup_cpu_dt(spapr, fdt, offset, cpu));
-     }
- 
-     _FDT(spapr_fixup_cpu_smt_dt(fdt, offset, cpu, compat_smt));
-diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index f6b6fe648f..1a1ec8bcff 100644
---- a/hw/ppc/spapr_numa.c
-+++ b/hw/ppc/spapr_numa.c
-@@ -45,6 +45,33 @@ void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
-                       sizeof(spapr->numa_assoc_array[nodeid]))));
+ void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr)
+ {
+     MachineState *machine = MACHINE(spapr);
+@@ -127,7 +117,7 @@ void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr)
  }
  
-+int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
-+                            int offset, PowerPCCPU *cpu)
+ 
+-int spapr_dt_nvdimm(void *fdt, int parent_offset,
++static int spapr_dt_nvdimm(void *fdt, int parent_offset,
+                            NVDIMMDevice *nvdimm)
+ {
+     int child_offset;
+@@ -184,6 +174,16 @@ int spapr_dt_nvdimm(void *fdt, int parent_offset,
+     return child_offset;
+ }
+ 
++int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
++                           void *fdt, int *fdt_start_offset, Error **errp)
 +{
-+    uint vcpu_assoc_size = NUMA_ASSOC_SIZE + 1;
-+    uint32_t vcpu_assoc[vcpu_assoc_size];
-+    int index = spapr_get_vcpu_id(cpu);
-+    int i;
++    NVDIMMDevice *nvdimm = NVDIMM(drc->dev);
 +
-+    /*
-+     * VCPUs have an extra 'cpu_id' value in ibm,associativity
-+     * compared to other resources. Increment the size at index
-+     * 0, copy all associativity domains already set, then put
-+     * cpu_id last.
-+     */
-+    vcpu_assoc[0] = cpu_to_be32(MAX_DISTANCE_REF_POINTS + 1);
++    *fdt_start_offset = spapr_dt_nvdimm(fdt, 0, nvdimm);
 +
-+    for (i = 1; i <= MAX_DISTANCE_REF_POINTS; i++) {
-+        vcpu_assoc[i] = spapr->numa_assoc_array[cpu->node_id][i];
-+    }
-+
-+    vcpu_assoc[vcpu_assoc_size - 1] = cpu_to_be32(index);
-+
-+    /* Advertise NUMA via ibm,associativity */
-+    return fdt_setprop(fdt, offset, "ibm,associativity",
-+                       vcpu_assoc, sizeof(vcpu_assoc));
++    return 0;
 +}
 +
- /*
-  * Helper that writes ibm,associativity-reference-points and
-  * max-associativity-domains in the RTAS pointed by @rtas
-diff --git a/include/hw/ppc/spapr_numa.h b/include/hw/ppc/spapr_numa.h
-index a2a4df55f7..43c6a16fe3 100644
---- a/include/hw/ppc/spapr_numa.h
-+++ b/include/hw/ppc/spapr_numa.h
-@@ -27,5 +27,7 @@ void spapr_numa_associativity_init(SpaprMachineState *spapr,
- void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas);
- void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
-                                        int offset, int nodeid);
-+int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
-+                            int offset, PowerPCCPU *cpu);
+ void spapr_dt_persistent_memory(void *fdt)
+ {
+     int offset = fdt_subnode_offset(fdt, 0, "persistent-memory");
+diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
+index fd1736634c..10a6d9dbbc 100644
+--- a/include/hw/ppc/spapr_nvdimm.h
++++ b/include/hw/ppc/spapr_nvdimm.h
+@@ -27,7 +27,6 @@ QEMU_BUILD_BUG_ON(SPAPR_MINIMUM_SCM_BLOCK_SIZE % SPAPR_MEMORY_BLOCK_SIZE);
  
- #endif /* HW_SPAPR_NUMA_H */
+ int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+                            void *fdt, int *fdt_start_offset, Error **errp);
+-int spapr_dt_nvdimm(void *fdt, int parent_offset, NVDIMMDevice *nvdimm);
+ void spapr_dt_persistent_memory(void *fdt);
+ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
+                            uint64_t size, Error **errp);
 -- 
 2.26.2
 
