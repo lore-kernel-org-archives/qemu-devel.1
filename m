@@ -2,94 +2,76 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC8BC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD466C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:17:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 111982074D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:15:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KAMmVWiH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 111982074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 98AE72074D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:17:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98AE72074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEBYX-0008EL-8G
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:15:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45220)
+	id 1kEBb6-0001cZ-Qk
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:17:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kEBXf-0006Ti-9H; Fri, 04 Sep 2020 09:14:11 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54195)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kEBXd-0002Z9-MM; Fri, 04 Sep 2020 09:14:10 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u18so6042753wmc.3;
- Fri, 04 Sep 2020 06:14:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=U5Nf/dsZpglT/fNEe0BRVA0EwoDYwFpAKvTQELhkWw4=;
- b=KAMmVWiH0poKB9PnqGwd+tjUHSvmueCm+6am8OJxcwedZtKRAsfzUZMnQbLSoDMD45
- VhsfaSjOzSyf1MbjQgBOnDxMipDNNdxKtoPFwI3moFBR+fMNsIFLtUJbCIRWnTZzisuc
- qx1Awuik+C7kIOFJ7ufhCexGCUHwbVi7thw4xvZREmpCRcuNP2oaZHZoEPVkQWmX7Ui5
- HlORwErw9oiGE6QIv1dymPd+MSu3ptXulCdjB22RD4SdtdGp+3i95t9LZvKHBeRlPzJy
- AHnYKftmfEnvL/WRz6jDp2AOaPJNKr7k2BrSeuoxaR/Kh875oOxm5r+xX01buk88gQHM
- tRQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=U5Nf/dsZpglT/fNEe0BRVA0EwoDYwFpAKvTQELhkWw4=;
- b=RVggC94apX1b5OxhdT0pyQy33+Rju3dA191U0JseaEg2dSrzd32Bw+qMtzLqqg75MI
- yR1BC4AqE7GzsqGU9fT41FYM1w7TTvVgC440NvHm51Nus65hhdlZeWDKV032qvskQsEK
- Gj6+BVsnwZJ8T5TwJ4K4U9XYij8zP994f2l4MxH4lI/Gk5gLcU05tYd4U4jE21YKbZA6
- vxbvZZ1PckpeHMI6DE3uJFVFfHSIsPKOgPzlaSWg/xaqS6u0SmFHCc8cbhAvo0LAfG+l
- B+ctVxXasfE5dOPgK1IcW4gyp/toRs/P05jS4V6rYNZTKBSqC2DKlwmHxTcl3Lq6sJhd
- IKvw==
-X-Gm-Message-State: AOAM5325iNJaoJ2gKQGhD9Ww7tF7pvT2EMPDtuISQwptSY2HhH/NPs7p
- NsEsKIF8o/YB01q33kVPf2jmA0aDF1A=
-X-Google-Smtp-Source: ABdhPJz/7kZSdD5rrx50dbwD7r+e+fFO+u6K2DTvGPgX0raKlN4ET7nL7jY044irKs3XMBfD1DrSkg==
-X-Received: by 2002:a1c:b703:: with SMTP id h3mr7474239wmf.131.1599225247743; 
- Fri, 04 Sep 2020 06:14:07 -0700 (PDT)
-Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id b1sm11923559wru.54.2020.09.04.06.14.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 06:14:07 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] hw/net/e1000e: Remove duplicated write handler for
- FLSWDATA register
-Date: Fri,  4 Sep 2020 15:14:02 +0200
-Message-Id: <20200904131402.590055-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200904131402.590055-1-f4bug@amsat.org>
-References: <20200904131402.590055-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kEBa2-000177-ET
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:16:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37759
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kEBZw-0002wY-VC
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:16:37 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-0DSHmIvHMuWQ6a06fMsBLg-1; Fri, 04 Sep 2020 09:16:30 -0400
+X-MC-Unique: 0DSHmIvHMuWQ6a06fMsBLg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7030D4236C;
+ Fri,  4 Sep 2020 13:16:29 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 409797E41A;
+ Fri,  4 Sep 2020 13:16:29 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id BCCAD1132B59; Fri,  4 Sep 2020 15:16:27 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v5 10/20] docs/interop: Convert qemu-ga-ref to rST
+References: <20200810195019.25427-1-peter.maydell@linaro.org>
+ <20200810195019.25427-11-peter.maydell@linaro.org>
+Date: Fri, 04 Sep 2020 15:16:27 +0200
+In-Reply-To: <20200810195019.25427-11-peter.maydell@linaro.org> (Peter
+ Maydell's message of "Mon, 10 Aug 2020 20:50:09 +0100")
+Message-ID: <875z8t7kd0.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -16
-X-Spam_score: -1.7
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,46 +84,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The FLSWDATA register writeop handler is initialized twice:
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-  3067 #define e1000e_putreg(x)    [x] = e1000e_mac_writereg
-  3068 typedef void (*writeops)(E1000ECore *, int, uint32_t);
-  3069 static const writeops e1000e_macreg_writeops[] = {
-  ....
-  3102     e1000e_putreg(FLSWDATA),
-  ....
-  3145     e1000e_putreg(FLSWDATA),
+> Convert qemu-ga-ref to rST format. This includes dropping
+> the plain-text, pdf and info format outputs for this document;
+> as with all our other Sphinx-based documentation, we provide
+> HTML and manpage only.
+>
+> The qemu-ga-ref.rst is somewhat more stripped down than
+> the .texi was, because we do not (currently) attempt to
+> generate indexes for the commands, events and data types
+> being documented.
 
-To avoid confusion, remove the duplicated initialization.
+I'll miss the plain text output (I may get by with formatting the man
+output, but even if that works, it's still an extra step).  Others may
+miss the index.  Oh well, march of progress.
 
-Fixes: 6f3fbe4ed0 ("net: Introduce e1000e device emulation")
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Noticed after looking for other cases of the previous patch.
----
- hw/net/e1000e_core.c | 1 -
- 1 file changed, 1 deletion(-)
+> As the GA ref is now part of the Sphinx 'interop' manual,
+> we can delete the direct link from index.html.in.
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+[...]
+> diff --git a/docs/interop/qemu-ga-ref.rst b/docs/interop/qemu-ga-ref.rst
+> new file mode 100644
+> index 00000000000..013eac0bb53
+> --- /dev/null
+> +++ b/docs/interop/qemu-ga-ref.rst
+> @@ -0,0 +1,4 @@
+> +QEMU Guest Agent Protocol Reference
+> +===================================
+> +
+> +.. qapi-doc:: qga/qapi-schema.json
+> diff --git a/docs/interop/qemu-ga-ref.texi b/docs/interop/qemu-ga-ref.texi
+> deleted file mode 100644
+> index ddb76ce1c2a..00000000000
+> --- a/docs/interop/qemu-ga-ref.texi
+> +++ /dev/null
+> @@ -1,80 +0,0 @@
+> -\input texinfo
+> -@setfilename qemu-ga-ref.info
+> -
+> -@include version.texi
+> -
+> -@exampleindent 0
+> -@paragraphindent 0
+> -
+> -@settitle QEMU Guest Agent Protocol Reference
+> -
+> -@iftex
+> -@center @image{docs/qemu_logo}
+> -@end iftex
+> -
+> -@copying
+> -This is the QEMU Guest Agent Protocol reference manual.
+> -
+> -Copyright @copyright{} 2016 The QEMU Project developers
+> -
+> -@quotation
+> -This manual is free documentation: you can redistribute it and/or
+> -modify it under the terms of the GNU General Public License as
+> -published by the Free Software Foundation, either version 2 of the
+> -License, or (at your option) any later version.
+> -
+> -This manual is distributed in the hope that it will be useful, but
+> -WITHOUT ANY WARRANTY; without even the implied warranty of
+> -MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+> -General Public License for more details.
+> -
+> -You should have received a copy of the GNU General Public License
+> -along with this manual.  If not, see http://www.gnu.org/licenses/.
+> -@end quotation
+> -@end copying
 
-diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-index 5170e6a4563..bcfd46696ff 100644
---- a/hw/net/e1000e_core.c
-+++ b/hw/net/e1000e_core.c
-@@ -3141,7 +3141,6 @@ static const writeops e1000e_macreg_writeops[] = {
-     e1000e_putreg(RXCFGL),
-     e1000e_putreg(TSYNCRXCTL),
-     e1000e_putreg(TSYNCTXCTL),
--    e1000e_putreg(FLSWDATA),
-     e1000e_putreg(EXTCNF_SIZE),
-     e1000e_putreg(EEMNGCTL),
-     e1000e_putreg(RA),
--- 
-2.26.2
+Does the interop manual carry an equivalent copyright notice?
+
+[...]
+> diff --git a/Makefile b/Makefile
+> index 13dd708c4af..f0cca10b427 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -371,7 +371,7 @@ DOCS+=$(MANUAL_BUILDDIR)/tools/virtiofsd.1
+>  endif
+>  DOCS+=$(MANUAL_BUILDDIR)/system/qemu-block-drivers.7
+>  DOCS+=docs/interop/qemu-qmp-ref.html docs/interop/qemu-qmp-ref.txt docs/interop/qemu-qmp-ref.7
+> -DOCS+=docs/interop/qemu-ga-ref.html docs/interop/qemu-ga-ref.txt docs/interop/qemu-ga-ref.7
+> +DOCS+=$(MANUAL_BUILDDIR)/interop/qemu-ga-ref.7
+>  DOCS+=$(MANUAL_BUILDDIR)/system/qemu-cpu-models.7
+>  DOCS+=$(MANUAL_BUILDDIR)/index.html
+>  ifdef CONFIG_VIRTFS
+> @@ -800,11 +800,11 @@ distclean: clean
+>  	rm -f config.log
+>  	rm -f linux-headers/asm
+>  	rm -f docs/version.texi
+> -	rm -f docs/interop/qemu-ga-qapi.texi docs/interop/qemu-qmp-qapi.texi
+> -	rm -f docs/interop/qemu-qmp-ref.7 docs/interop/qemu-ga-ref.7
+> -	rm -f docs/interop/qemu-qmp-ref.txt docs/interop/qemu-ga-ref.txt
+> -	rm -f docs/interop/qemu-qmp-ref.pdf docs/interop/qemu-ga-ref.pdf
+> -	rm -f docs/interop/qemu-qmp-ref.html docs/interop/qemu-ga-ref.html
+> +	rm -f docs/interop/qemu-qmp-qapi.texi
+> +	rm -f docs/interop/qemu-qmp-ref.7
+> +	rm -f docs/interop/qemu-qmp-ref.txt
+> +	rm -f docs/interop/qemu-qmp-ref.pdf
+> +	rm -f docs/interop/qemu-qmp-ref.html
+>  	rm -rf .doctrees
+>  	$(call clean-manual,devel)
+>  	$(call clean-manual,interop)
+
+Please update .gitignore. as well.
+
+[...]
+
+Comments apply to the next patch, too.
 
 
