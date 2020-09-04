@@ -2,90 +2,97 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 163F2C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF1E4C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:39:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8E8220797
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:38:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F10B2083B
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:39:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HoKKZ0p4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8E8220797
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMaGGa1K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F10B2083B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEBv0-0000Jq-Oc
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:38:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50144)
+	id 1kEBvo-0001tO-O2
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:39:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kEBuO-0008Cb-PQ
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:37:40 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30008
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kEBuM-0005DN-5X
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:37:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599226656;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=z8ijyo9+wVenfwSwyNoFh/rmMtU7RcqAaFooiEOCDv4=;
- b=HoKKZ0p4j1kEg68rT7GbDxsRwfUFiXMtfwts2/yaaeBW92zLW25AtbF2GDTnTK4DUsNlXn
- fwsrsQnBs2MbQ1bN0O4qaNm3YrulYldF15sRn93bAkM5OYznS6/vAPZDZ5uTRC0QM2w2+e
- sP1jfGdJgE4DO4pxs5xBzKyJPq1t694=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-fc5DKkuNN0SvpLoNfbI9rA-1; Fri, 04 Sep 2020 09:37:33 -0400
-X-MC-Unique: fc5DKkuNN0SvpLoNfbI9rA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 364068B1421;
- Fri,  4 Sep 2020 13:37:32 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
- [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D320760C0F;
- Fri,  4 Sep 2020 13:37:31 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 500E31132B59; Fri,  4 Sep 2020 15:37:30 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 14/20] scripts/qapi: Remove texinfo generation support
-References: <20200810195019.25427-1-peter.maydell@linaro.org>
- <20200810195019.25427-15-peter.maydell@linaro.org>
-Date: Fri, 04 Sep 2020 15:37:30 +0200
-In-Reply-To: <20200810195019.25427-15-peter.maydell@linaro.org> (Peter
- Maydell's message of "Mon, 10 Aug 2020 20:50:13 +0100")
-Message-ID: <87y2lp64th.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kEBur-0000NT-Ui; Fri, 04 Sep 2020 09:38:10 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:37228)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kEBup-0005FH-BL; Fri, 04 Sep 2020 09:38:09 -0400
+Received: by mail-wr1-x442.google.com with SMTP id z4so6797218wrr.4;
+ Fri, 04 Sep 2020 06:38:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=wI/gZYNNHO4qNnNvw2+UfOSiVnE0suxgS9Pn5AphWVI=;
+ b=gMaGGa1KTL8c/HeK9We1+eMSwsoYv+6kqtBDNctSOir9mcaTWBBjmrAweoFU0O3ewx
+ QCnB2QjC2rEhm5bIDHwRcKeGA2ZtiNL5NCtpF9/RWkN9pwdZh75iwZuG4E6OLOKHLGKE
+ Th1INrF0lG6+4ykV9o6TgARAGuZaMLPuQBgSqeJZByb2Pz71dE6PmetaT8iO0czJd3NN
+ jUMUqJaEQArfxBQooNEpSlSjbSQenyQUu0szQyzVQmY+eFG8jpOj6fdxCJs4yo9O4d/W
+ imjRzXadVz8hH1E4YjEuDKKr8X6jWUGASxhZM2Wd1g2JZxQOkuyFLrjHBX7dAYfwLGS9
+ ZwgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wI/gZYNNHO4qNnNvw2+UfOSiVnE0suxgS9Pn5AphWVI=;
+ b=CdT4kRsXgochI7i8PxM7yD39PEeI27Vmh9G8czojtcSdquEy0DeglN8bAmh2IOuw9P
+ yJwREk8Y0wL5iQ1IpPzGnc+ND7zA26yTyKxgqjxabQo6INkWPztB4RWjQ7xZDKf2ooNY
+ f5LktLnT1gHg0vpthz4y+d4nv2fQ9TS2NralRjLlR4t6s0d4kGjWCmSPnayH1Gzrnz3d
+ nttms+CcJM5BAY6Vm85tZKgF0pI9w2sPlaAD95Z6emMTS/zNKO3zCt2iLN+mVKy9n5hl
+ GoGjttuogFwqbU9UJ6qqtKzcMAJMs7OwxeCvZwBkzienymqvLl8H+CarEFFaR+04lMeH
+ O4gg==
+X-Gm-Message-State: AOAM530Y8ft1DuTxl4+0yKfoyhXVRw/pRVt0us5xJzQbTNUg/q3Hj3GB
+ oWTCEqsLk0RyvB3Vh6PuAw4=
+X-Google-Smtp-Source: ABdhPJzt8dOBkMT1LBrDHGaAHYBYsG5uj2ZpDt+2cX902UNXscY1LuwYITO9GbBN9aWP3OU4ztfa7Q==
+X-Received: by 2002:adf:c58c:: with SMTP id m12mr7443595wrg.88.1599226685124; 
+ Fri, 04 Sep 2020 06:38:05 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id n16sm12217231wrj.25.2020.09.04.06.38.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 04 Sep 2020 06:38:04 -0700 (PDT)
+Subject: Re: [PATCH v2 2/3] hw/arm/mps2: New board model mps2-an500
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20200903202048.15370-1-peter.maydell@linaro.org>
+ <20200903202048.15370-3-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <29d7a1aa-7289-dabb-db3a-7bc5324d297f@amsat.org>
+Date: Fri, 4 Sep 2020 15:38:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:11
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200903202048.15370-3-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-0.107,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,162 +105,264 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+Cc: Kumar Gala <kumar.gala@linaro.org>,
+ Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
-
-> We no longer use the generated texinfo format documentation,
-> so delete the code that generates it, and the test case for
-> the generation.
->
-> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+On 9/3/20 10:20 PM, Peter Maydell wrote:
+> Implement a model of the MPS2 with the AN500 firmware. This is
+> similar to the AN385, with the following differences:
+>  * Cortex-M7 CPU
+>  * PSRAM is at 0x6000_0000
+>  * Ethernet is at 0xa000_0000
+>  * No zbt_boot_ctrl remapping of the low 16K
+>    (but QEMU doesn't implement this anyway)
+>  * no "block RAM" at 0x01000000
+> 
 > Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 > ---
->  Makefile                        |   1 -
->  scripts/qapi-gen.py             |   2 -
->  scripts/qapi/doc.py             | 302 ------------------------------
->  scripts/qapi/gen.py             |   7 -
->  tests/Makefile.include          |  15 +-
->  tests/qapi-schema/doc-good.texi | 313 --------------------------------
->  6 files changed, 1 insertion(+), 639 deletions(-)
->  delete mode 100644 scripts/qapi/doc.py
->  delete mode 100644 tests/qapi-schema/doc-good.texi
->
-> diff --git a/Makefile b/Makefile
-> index 3df1cf68333..fc3ccc15030 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -626,7 +626,6 @@ qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
->  qapi-py = $(SRC_PATH)/scripts/qapi/__init__.py \
->  $(SRC_PATH)/scripts/qapi/commands.py \
->  $(SRC_PATH)/scripts/qapi/common.py \
-> -$(SRC_PATH)/scripts/qapi/doc.py \
->  $(SRC_PATH)/scripts/qapi/error.py \
->  $(SRC_PATH)/scripts/qapi/events.py \
->  $(SRC_PATH)/scripts/qapi/expr.py \
-> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
-> index 4b03f7d53be..541e8c1f55d 100755
-> --- a/scripts/qapi-gen.py
-> +++ b/scripts/qapi-gen.py
-> @@ -10,7 +10,6 @@ import re
->  import sys
->  
->  from qapi.commands import gen_commands
-> -from qapi.doc import gen_doc
->  from qapi.events import gen_events
->  from qapi.introspect import gen_introspect
->  from qapi.schema import QAPIError, QAPISchema
-> @@ -51,7 +50,6 @@ def main(argv):
->      gen_commands(schema, args.output_dir, args.prefix)
->      gen_events(schema, args.output_dir, args.prefix)
->      gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
-> -    gen_doc(schema, args.output_dir, args.prefix)
->  
->  
->  if __name__ == '__main__':
-> diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
-> deleted file mode 100644
-> index 7764de1e4bc..00000000000
-> --- a/scripts/qapi/doc.py
-> +++ /dev/null
-[...]
-> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
-> index bf5552a4e7f..ca66c82b5b8 100644
-> --- a/scripts/qapi/gen.py
-> +++ b/scripts/qapi/gen.py
-> @@ -178,13 +178,6 @@ def ifcontext(ifcond, *args):
->          arg.end_if()
->  
->  
-> -class QAPIGenDoc(QAPIGen):
-> -
-> -    def _top(self):
-> -        return (super()._top()
-> -                + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
-> -
-> -
->  class QAPISchemaMonolithicCVisitor(QAPISchemaVisitor):
->  
->      def __init__(self, prefix, what, blurb, pydoc):
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index c7e4646ded7..ec83efeaa63 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -38,7 +38,6 @@ export SRC_PATH
->  qapi-py = $(SRC_PATH)/scripts/qapi/__init__.py \
->  $(SRC_PATH)/scripts/qapi/commands.py \
->  $(SRC_PATH)/scripts/qapi/common.py \
-> -$(SRC_PATH)/scripts/qapi/doc.py \
->  $(SRC_PATH)/scripts/qapi/error.py \
->  $(SRC_PATH)/scripts/qapi/events.py \
->  $(SRC_PATH)/scripts/qapi/expr.py \
-> @@ -501,16 +500,8 @@ tests/test-qapi-gen-timestamp: \
->  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
->  		-o tests -p "test-" $<, \
->  		"GEN","$(@:%-timestamp=%)")
-> -	@rm -f tests/test-qapi-doc.texi
->  	@>$@
->  
-> -tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
-> -	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
-> -		-o tests/qapi-schema -p "doc-good-" $<, \
-> -		"GEN","$@")
-> -	@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
-> -	@rm -f tests/qapi-schema/doc-good-qapi-*.[ch] tests/qapi-schema/doc-good-qmp-*.[ch]
-> -
->  tests/qtest/dbus-vmstate1.h tests/qtest/dbus-vmstate1.c: tests/qtest/dbus-vmstate1-gen-timestamp ;
->  tests/qtest/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/qtest/dbus-vmstate1.xml
->  	$(call quiet-command,$(GDBUS_CODEGEN) $< \
-> @@ -891,10 +882,6 @@ check-tests/qapi-schema/frontend: $(addprefix $(SRC_PATH)/, $(check-qapi-schema-
->  	  PYTHONIOENCODING=utf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py $^, \
->  	  TEST, check-qapi-schema)
->  
-> -.PHONY: check-tests/qapi-schema/doc-good.texi
-> -check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
-> -	@diff -u $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
-> -
+> The AN500 also defines some behaviour for CFG_REG[2567] in
+> the SCC (QEMU hw/misc/mps2-scc.c) but none of it is anything
+> QEMU can conveniently support so I have left that code as-is
+> (a guest accessing those registers will hit the LOG_GUEST_ERROR
+> case for "bad offset").
+> 
+> Tested with a buildroot image created using the instructions at:
+>  https://community.arm.com/developer/tools-software/oss-platforms/w/docs/578/running-uclinux-on-the-arm-mps2-platform
+> and the "arm_mps2_CM7fpga" defconfig; QEMU commandline is
+>  qemu-system-arm -M mps2-an500 -serial stdio -display none -kernel boot.axf -device loader,file=linux.axf
 
-We shouldn't just delete this test.
+Maybe worth adding in the commit description.
 
-It is for checking the doc generator does what it should for "good"
-input.  "Bad" input is coverd by the other doc-*.json.
+Ideally we should add an acceptance test...
 
-With the old doc generation system, the testing "good" input is
-straightforward: generate Texinfo, diff to expected Texinfo, which is
-committed to git.
-
-This test has been invaliable when maintaining and extending doc.py.
-
-With the new system, there is no ouput suitable for diffing, as the
-various outputs all depend on the version of Sphinx.
-
-Or is there?  Is there a way to have Sphinx "unparse" its internal
-representation of the input?
-
-If not, we should still run doc-good.json through the doc generator to
-at least catch errors.  We still lose the ability to catch silent bad
-output.
-
->  .PHONY: check-decodetree
->  check-decodetree:
->  	$(call quiet-command, \
-> @@ -956,7 +943,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
->  # Consolidated targets
+> ---
+>  docs/system/arm/mps2.rst |  6 ++--
+>  hw/arm/mps2.c            | 71 ++++++++++++++++++++++++++++++++--------
+>  2 files changed, 62 insertions(+), 15 deletions(-)
+> 
+> diff --git a/docs/system/arm/mps2.rst b/docs/system/arm/mps2.rst
+> index e680a4ceb71..7f2e9c8d52e 100644
+> --- a/docs/system/arm/mps2.rst
+> +++ b/docs/system/arm/mps2.rst
+> @@ -1,5 +1,5 @@
+> -Arm MPS2 boards (``mps2-an385``, ``mps2-an386``, ``mps2-an505``, ``mps2-an511``, ``mps2-an521``)
+> -================================================================================================
+> +Arm MPS2 boards (``mps2-an385``, ``mps2-an386``, ``mps2-an500``, ``mps2-an505``, ``mps2-an511``, ``mps2-an521``)
+> +================================================================================================================
 >  
->  .PHONY: check-block check-qapi-schema check-qtest check-unit check check-clean get-vm-images
-> -check-qapi-schema: check-tests/qapi-schema/frontend check-tests/qapi-schema/doc-good.texi
-> +check-qapi-schema: check-tests/qapi-schema/frontend
->  check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
->  ifeq ($(CONFIG_TOOLS),y)
->  check-block: $(patsubst %,check-%, $(check-block-y))
-> diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
-> deleted file mode 100644
-> index 12808989ffb..00000000000
-> --- a/tests/qapi-schema/doc-good.texi
-> +++ /dev/null
-[...]
+>  These board models all use Arm M-profile CPUs.
+>  
+> @@ -14,6 +14,8 @@ QEMU models the following FPGA images:
+>    Cortex-M3 as documented in ARM Application Note AN385
+>  ``mps2-an386``
+>    Cortex-M4 as documented in ARM Application Note AN386
+> +``mps2-an500``
+> +  Cortex-M7 as documented in ARM Application Note AN500
+>  ``mps2-an511``
+>    Cortex-M3 'DesignStart' as documented in AN511
+>  ``mps2-an505``
+> diff --git a/hw/arm/mps2.c b/hw/arm/mps2.c
+> index 559b297e788..d17fd7a7cb5 100644
+> --- a/hw/arm/mps2.c
+> +++ b/hw/arm/mps2.c
+> @@ -16,6 +16,7 @@
+>   * We model the following FPGA images:
+>   *  "mps2-an385" -- Cortex-M3 as documented in ARM Application Note AN385
+>   *  "mps2-an386" -- Cortex-M4 as documented in ARM Application Note AN386
+> + *  "mps2-an500" -- Cortex-M7 as documented in ARM Application Note AN500
+>   *  "mps2-an511" -- Cortex-M3 'DesignStart' as documented in AN511
+>   *
+>   * Links to the TRM for the board itself and to the various Application
+> @@ -49,6 +50,7 @@
+>  typedef enum MPS2FPGAType {
+>      FPGA_AN385,
+>      FPGA_AN386,
+> +    FPGA_AN500,
+>      FPGA_AN511,
+>  } MPS2FPGAType;
+>  
+> @@ -56,6 +58,9 @@ typedef struct {
+>      MachineClass parent;
+>      MPS2FPGAType fpga_type;
+>      uint32_t scc_id;
+> +    bool has_block_ram;
+> +    hwaddr ethernet_base;
+> +    hwaddr psram_base;
+>  } MPS2MachineClass;
+>  
+>  typedef struct {
+> @@ -82,6 +87,7 @@ typedef struct {
+>  #define TYPE_MPS2_MACHINE "mps2"
+>  #define TYPE_MPS2_AN385_MACHINE MACHINE_TYPE_NAME("mps2-an385")
+>  #define TYPE_MPS2_AN386_MACHINE MACHINE_TYPE_NAME("mps2-an386")
+> +#define TYPE_MPS2_AN500_MACHINE MACHINE_TYPE_NAME("mps2-an500")
+>  #define TYPE_MPS2_AN511_MACHINE MACHINE_TYPE_NAME("mps2-an511")
+>  
+>  #define MPS2_MACHINE(obj)                                       \
+> @@ -143,13 +149,14 @@ static void mps2_common_init(MachineState *machine)
+>       * tradeoffs. For QEMU they're all just RAM, though. We arbitrarily
+>       * call the 16MB our "system memory", as it's the largest lump.
+>       *
+> -     * Common to both boards:
+> -     *  0x21000000..0x21ffffff : PSRAM (16MB)
+> +     * AN385/AN386/AN511:
+> +     *  0x21000000 .. 0x21ffffff : PSRAM (16MB)
 
+^ Actually this belong to the previous patch.
+
+> -     * AN385/AN386 only:
+> +     * AN385/AN386/AN500:
+>       *  0x00000000 .. 0x003fffff : ZBT SSRAM1
+>       *  0x00400000 .. 0x007fffff : mirror of ZBT SSRAM1
+>       *  0x20000000 .. 0x203fffff : ZBT SSRAM 2&3
+>       *  0x20400000 .. 0x207fffff : mirror of ZBT SSRAM 2&3
+> +     * AN385/AN386 only:
+
+Ditto?
+
+Otherwise:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>       *  0x01000000 .. 0x01003fff : block RAM (16K)
+>       *  0x01004000 .. 0x01007fff : mirror of above
+>       *  0x01008000 .. 0x0100bfff : mirror of above
+> @@ -159,22 +166,17 @@ static void mps2_common_init(MachineState *machine)
+>       *  0x00400000 .. 0x007fffff : ZBT SSRAM1
+>       *  0x20000000 .. 0x2001ffff : SRAM
+>       *  0x20400000 .. 0x207fffff : ZBT SSRAM 2&3
+> +     * AN500 only:
+> +     *  0x60000000 .. 0x60ffffff : PSRAM (16MB)
+>       *
+>       * The AN385/AN386 has a feature where the lowest 16K can be mapped
+>       * either to the bottom of the ZBT SSRAM1 or to the block RAM.
+>       * This is of no use for QEMU so we don't implement it (as if
+>       * zbt_boot_ctrl is always zero).
+>       */
+> -    memory_region_add_subregion(system_memory, 0x21000000, machine->ram);
+> +    memory_region_add_subregion(system_memory, mmc->psram_base, machine->ram);
+>  
+> -    switch (mmc->fpga_type) {
+> -    case FPGA_AN385:
+> -    case FPGA_AN386:
+> -        make_ram(&mms->ssram1, "mps.ssram1", 0x0, 0x400000);
+> -        make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", &mms->ssram1, 0x400000);
+> -        make_ram(&mms->ssram23, "mps.ssram23", 0x20000000, 0x400000);
+> -        make_ram_alias(&mms->ssram23_m, "mps.ssram23_m",
+> -                       &mms->ssram23, 0x20400000);
+> +    if (mmc->has_block_ram) {
+>          make_ram(&mms->blockram, "mps.blockram", 0x01000000, 0x4000);
+>          make_ram_alias(&mms->blockram_m1, "mps.blockram_m1",
+>                         &mms->blockram, 0x01004000);
+> @@ -182,6 +184,17 @@ static void mps2_common_init(MachineState *machine)
+>                         &mms->blockram, 0x01008000);
+>          make_ram_alias(&mms->blockram_m3, "mps.blockram_m3",
+>                         &mms->blockram, 0x0100c000);
+> +    }
+> +
+> +    switch (mmc->fpga_type) {
+> +    case FPGA_AN385:
+> +    case FPGA_AN386:
+> +    case FPGA_AN500:
+> +        make_ram(&mms->ssram1, "mps.ssram1", 0x0, 0x400000);
+> +        make_ram_alias(&mms->ssram1_m, "mps.ssram1_m", &mms->ssram1, 0x400000);
+> +        make_ram(&mms->ssram23, "mps.ssram23", 0x20000000, 0x400000);
+> +        make_ram_alias(&mms->ssram23_m, "mps.ssram23_m",
+> +                       &mms->ssram23, 0x20400000);
+>          break;
+>      case FPGA_AN511:
+>          make_ram(&mms->blockram, "mps.blockram", 0x0, 0x40000);
+> @@ -198,6 +211,7 @@ static void mps2_common_init(MachineState *machine)
+>      switch (mmc->fpga_type) {
+>      case FPGA_AN385:
+>      case FPGA_AN386:
+> +    case FPGA_AN500:
+>          qdev_prop_set_uint32(armv7m, "num-irq", 32);
+>          break;
+>      case FPGA_AN511:
+> @@ -235,6 +249,7 @@ static void mps2_common_init(MachineState *machine)
+>      switch (mmc->fpga_type) {
+>      case FPGA_AN385:
+>      case FPGA_AN386:
+> +    case FPGA_AN500:
+>      {
+>          /* The overflow IRQs for UARTs 0, 1 and 2 are ORed together.
+>           * Overflow for UARTs 4 and 5 doesn't trigger any interrupt.
+> @@ -384,7 +399,7 @@ static void mps2_common_init(MachineState *machine)
+>      /* In hardware this is a LAN9220; the LAN9118 is software compatible
+>       * except that it doesn't support the checksum-offload feature.
+>       */
+> -    lan9118_init(&nd_table[0], 0x40200000,
+> +    lan9118_init(&nd_table[0], mmc->ethernet_base,
+>                   qdev_get_gpio_in(armv7m,
+>                                    mmc->fpga_type == FPGA_AN511 ? 47 : 13));
+>  
+> @@ -413,6 +428,9 @@ static void mps2_an385_class_init(ObjectClass *oc, void *data)
+>      mmc->fpga_type = FPGA_AN385;
+>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+>      mmc->scc_id = 0x41043850;
+> +    mmc->psram_base = 0x21000000;
+> +    mmc->ethernet_base = 0x40200000;
+> +    mmc->has_block_ram = true;
+>  }
+>  
+>  static void mps2_an386_class_init(ObjectClass *oc, void *data)
+> @@ -424,6 +442,23 @@ static void mps2_an386_class_init(ObjectClass *oc, void *data)
+>      mmc->fpga_type = FPGA_AN386;
+>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m4");
+>      mmc->scc_id = 0x41043860;
+> +    mmc->psram_base = 0x21000000;
+> +    mmc->ethernet_base = 0x40200000;
+> +    mmc->has_block_ram = true;
+> +}
+> +
+> +static void mps2_an500_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc = MACHINE_CLASS(oc);
+> +    MPS2MachineClass *mmc = MPS2_MACHINE_CLASS(oc);
+> +
+> +    mc->desc = "ARM MPS2 with AN500 FPGA image for Cortex-M7";
+> +    mmc->fpga_type = FPGA_AN500;
+> +    mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m7");
+> +    mmc->scc_id = 0x41045000;
+> +    mmc->psram_base = 0x60000000;
+> +    mmc->ethernet_base = 0xa0000000;
+> +    mmc->has_block_ram = false;
+>  }
+>  
+>  static void mps2_an511_class_init(ObjectClass *oc, void *data)
+> @@ -435,6 +470,9 @@ static void mps2_an511_class_init(ObjectClass *oc, void *data)
+>      mmc->fpga_type = FPGA_AN511;
+>      mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-m3");
+>      mmc->scc_id = 0x41045110;
+> +    mmc->psram_base = 0x21000000;
+> +    mmc->ethernet_base = 0x40200000;
+> +    mmc->has_block_ram = false;
+>  }
+>  
+>  static const TypeInfo mps2_info = {
+> @@ -458,6 +496,12 @@ static const TypeInfo mps2_an386_info = {
+>      .class_init = mps2_an386_class_init,
+>  };
+>  
+> +static const TypeInfo mps2_an500_info = {
+> +    .name = TYPE_MPS2_AN500_MACHINE,
+> +    .parent = TYPE_MPS2_MACHINE,
+> +    .class_init = mps2_an500_class_init,
+> +};
+> +
+>  static const TypeInfo mps2_an511_info = {
+>      .name = TYPE_MPS2_AN511_MACHINE,
+>      .parent = TYPE_MPS2_MACHINE,
+> @@ -469,6 +513,7 @@ static void mps2_machine_init(void)
+>      type_register_static(&mps2_info);
+>      type_register_static(&mps2_an385_info);
+>      type_register_static(&mps2_an386_info);
+> +    type_register_static(&mps2_an500_info);
+>      type_register_static(&mps2_an511_info);
+>  }
+>  
+> 
 
