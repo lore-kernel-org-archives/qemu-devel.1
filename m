@@ -4,64 +4,64 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F7F9C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C920C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:52:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D75920578
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:51:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E29BD20578
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:52:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TrFwB6Nb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D75920578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="UP+Gogc7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E29BD20578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2lD-0001K2-IR
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:51:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54734)
+	id 1kE2lu-0002cH-4Z
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:52:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hY-0002ax-Gf; Thu, 03 Sep 2020 23:47:48 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:41129)
+ id 1kE2hR-0002Kl-Hh; Thu, 03 Sep 2020 23:47:41 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:47491 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hU-0004us-NW; Thu, 03 Sep 2020 23:47:48 -0400
+ id 1kE2hN-0004sN-Hs; Thu, 03 Sep 2020 23:47:41 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsp5s1Pz9sVl; Fri,  4 Sep 2020 13:47:26 +1000 (AEST)
+ id 4BjNsn4MgBz9sVM; Fri,  4 Sep 2020 13:47:25 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599191246;
- bh=oNqINut4m7yPkBkTE4WEvkmXs8Ug4gFGqv9k3XWsOTQ=;
+ d=gibson.dropbear.id.au; s=201602; t=1599191245;
+ bh=PGXTjEP4QoRFOn/jGOws1ISctNffp+geWnV5qJ570xc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=TrFwB6NbgRNQZHoMelmynaUaRKnyQCeLn9s++JQjUEb84ZyS7giFlQYx8P95XzBLH
- 2nDvFoT3yWULyTs5+M2MpWWcym6ylOaIjyA+KmnQ4Y/8kXvPYQChaVKtin2IEUUHpf
- KkjhQ4I7dFHZJNc7Eof5cAhTJ18U2RAgMTpsZxb4=
+ b=UP+Gogc7opNRRmhgXP3/uKpRTOGoeK13yg9005SoppcNiM3y7t23j68JvIskW6b9c
+ 0vqAvDOEz8cdr8WtHkYhVowRtChJRkcbqpE9FqgvUdqvU8VvdJWJ2to9B3dG4OV0Jo
+ cRqtuvCjqlrU3Prcde3gXW0xTy8lc4mqyQ/uQ1Nc=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 11/30] spapr/xive: Allocate vCPU IPIs from the vCPU contexts
-Date: Fri,  4 Sep 2020 13:47:00 +1000
-Message-Id: <20200904034719.673626-12-david@gibson.dropbear.id.au>
+Subject: [PULL 03/30] spapr: Remove unnecessary DRC type-checker macros
+Date: Fri,  4 Sep 2020 13:46:52 +1000
+Message-Id: <20200904034719.673626-4-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 23:47:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -19
 X-Spam_score: -2.0
 X-Spam_bar: --
 X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ UPPERCASE_50_75=0.008 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,94 +75,91 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+ qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+spapr_drc.h includes typechecker macro boilerplate for the many different
+DRC subclasses.  However, most of these types don't actually have different
+data in their class and/or instance, making these unneeded, unused, and in
+fact a bad idea.  Remove them.
 
-When QEMU switches to the XIVE interrupt mode, it creates all the
-guest interrupts at the level of the KVM device. These interrupts are
-backed by real HW interrupts from the IPI interrupt pool of the XIVE
-controller.
-
-Currently, this is done from the QEMU main thread, which results in
-allocating all interrupts from the chip on which QEMU is running. IPIs
-are not distributed across the system and the load is not well
-balanced across the interrupt controllers.
-
-Change the vCPU IPI allocation to run from the vCPU context. The
-associated XIVE IPI interrupt will be allocated on the chip on which
-the vCPU is running and improve distribution of the IPIs in the system.
-When the vCPUs are pinned, this will make the IPI local to the chip of
-the vCPU. It will reduce rerouting between interrupt controllers and
-gives better performance.
-
-Device interrupts are still treated the same. To improve placement, we
-would need some information on the chip owning the virtual source or
-the HW source in case of a passthrough device but this reuires
-changes in PAPR.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-Id: <20200820134547.2355743-5-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
 ---
- hw/intc/spapr_xive_kvm.c | 36 +++++++++++++++++++++++++++++++++---
- 1 file changed, 33 insertions(+), 3 deletions(-)
+ include/hw/ppc/spapr_drc.h | 43 +-------------------------------------
+ 1 file changed, 1 insertion(+), 42 deletions(-)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 507637d51e..66bf4c06fe 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -146,13 +146,43 @@ int kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp)
-     return s.ret;
- }
+diff --git a/include/hw/ppc/spapr_drc.h b/include/hw/ppc/spapr_drc.h
+index 21af8deac1..f270860769 100644
+--- a/include/hw/ppc/spapr_drc.h
++++ b/include/hw/ppc/spapr_drc.h
+@@ -29,62 +29,21 @@
+                                              TYPE_SPAPR_DR_CONNECTOR)
  
--static int kvmppc_xive_reset_ipi(SpaprXive *xive, CPUState *cs, Error **errp)
-+/*
-+ * Allocate the vCPU IPIs from the vCPU context. This will allocate
-+ * the XIVE IPI interrupt on the chip on which the vCPU is running.
-+ * This gives a better distribution of IPIs when the guest has a lot
-+ * of vCPUs. When the vCPUs are pinned, this will make the IPI local
-+ * to the chip of the vCPU. It will reduce rerouting between interrupt
-+ * controllers and gives better performance.
-+ */
-+typedef struct {
-+    SpaprXive *xive;
-+    Error *err;
-+    int rc;
-+} XiveInitIPI;
-+
-+static void kvmppc_xive_reset_ipi_on_cpu(CPUState *cs, run_on_cpu_data arg)
- {
-     unsigned long ipi = kvm_arch_vcpu_id(cs);
-+    XiveInitIPI *s = arg.host_ptr;
-     uint64_t state = 0;
+ #define TYPE_SPAPR_DRC_PHYSICAL "spapr-drc-physical"
+-#define SPAPR_DRC_PHYSICAL_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PHYSICAL)
+-#define SPAPR_DRC_PHYSICAL_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, \
+-                           TYPE_SPAPR_DRC_PHYSICAL)
+ #define SPAPR_DRC_PHYSICAL(obj) OBJECT_CHECK(SpaprDrcPhysical, (obj), \
+                                              TYPE_SPAPR_DRC_PHYSICAL)
  
--    return kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE, ipi,
--                              &state, true, errp);
-+    s->rc = kvm_device_access(s->xive->fd, KVM_DEV_XIVE_GRP_SOURCE, ipi,
-+                              &state, true, &s->err);
-+}
-+
-+static int kvmppc_xive_reset_ipi(SpaprXive *xive, CPUState *cs, Error **errp)
-+{
-+    XiveInitIPI s = {
-+        .xive = xive,
-+        .err  = NULL,
-+        .rc   = 0,
-+    };
-+
-+    run_on_cpu(cs, kvmppc_xive_reset_ipi_on_cpu, RUN_ON_CPU_HOST_PTR(&s));
-+    if (s.err) {
-+        error_propagate(errp, s.err);
-+    }
-+    return s.rc;
- }
+ #define TYPE_SPAPR_DRC_LOGICAL "spapr-drc-logical"
+-#define SPAPR_DRC_LOGICAL_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_LOGICAL)
+-#define SPAPR_DRC_LOGICAL_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, \
+-                           TYPE_SPAPR_DRC_LOGICAL)
+-#define SPAPR_DRC_LOGICAL(obj) OBJECT_CHECK(SpaprDrc, (obj), \
+-                                             TYPE_SPAPR_DRC_LOGICAL)
  
- int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
+ #define TYPE_SPAPR_DRC_CPU "spapr-drc-cpu"
+-#define SPAPR_DRC_CPU_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_CPU)
+-#define SPAPR_DRC_CPU_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_CPU)
+-#define SPAPR_DRC_CPU(obj) OBJECT_CHECK(SpaprDrc, (obj), \
+-                                        TYPE_SPAPR_DRC_CPU)
+ 
+ #define TYPE_SPAPR_DRC_PCI "spapr-drc-pci"
+-#define SPAPR_DRC_PCI_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PCI)
+-#define SPAPR_DRC_PCI_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_PCI)
+-#define SPAPR_DRC_PCI(obj) OBJECT_CHECK(SpaprDrc, (obj), \
+-                                        TYPE_SPAPR_DRC_PCI)
+ 
+ #define TYPE_SPAPR_DRC_LMB "spapr-drc-lmb"
+-#define SPAPR_DRC_LMB_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_LMB)
+-#define SPAPR_DRC_LMB_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_LMB)
+-#define SPAPR_DRC_LMB(obj) OBJECT_CHECK(SpaprDrc, (obj), \
+-                                        TYPE_SPAPR_DRC_LMB)
+ 
+ #define TYPE_SPAPR_DRC_PHB "spapr-drc-phb"
+-#define SPAPR_DRC_PHB_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PHB)
+-#define SPAPR_DRC_PHB_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_PHB)
+-#define SPAPR_DRC_PHB(obj) OBJECT_CHECK(SpaprDrc, (obj), \
+-                                        TYPE_SPAPR_DRC_PHB)
+ 
+ #define TYPE_SPAPR_DRC_PMEM "spapr-drc-pmem"
+-#define SPAPR_DRC_PMEM_GET_CLASS(obj) \
+-        OBJECT_GET_CLASS(SpaprDrcClass, obj, TYPE_SPAPR_DRC_PMEM)
+-#define SPAPR_DRC_PMEM_CLASS(klass) \
+-        OBJECT_CLASS_CHECK(SpaprDrcClass, klass, TYPE_SPAPR_DRC_PMEM)
+-#define SPAPR_DRC_PMEM(obj) OBJECT_CHECK(SpaprDrc, (obj), \
+-                                         TYPE_SPAPR_DRC_PMEM)
++
+ /*
+  * Various hotplug types managed by SpaprDrc
+  *
 -- 
 2.26.2
 
