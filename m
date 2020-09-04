@@ -2,97 +2,114 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA9AC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:16:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62A5DC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:21:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A46AD20748
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:16:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NzCHltBC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A46AD20748
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2FDFA20770
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:21:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FDFA20770
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37954 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE7pR-0004UD-KP
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:16:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59574)
+	id 1kE7uF-0008Sc-DV
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:21:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kE7o0-0003Lq-Hp; Fri, 04 Sep 2020 05:14:48 -0400
-Received: from mail-qt1-x843.google.com ([2607:f8b0:4864:20::843]:38659)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kE7nw-0001cc-Co; Fri, 04 Sep 2020 05:14:47 -0400
-Received: by mail-qt1-x843.google.com with SMTP id e5so4090428qth.5;
- Fri, 04 Sep 2020 02:14:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=LZFnRcJqOhQRsSCxd2s8D9Kmr6nmrFtNb8yncLDWW+s=;
- b=NzCHltBCXQbMDPrBPFwMPU6NRx4MOGHgGv/u5lC8WmMO18Hu9+b0xgeFTY04+ztXKR
- HmjE/Ocvw21AdMChcykdLLf0UypN5NvpU86IeIwJkr+gE2wfDvMvF3eyt0xVYnA4+t8I
- 9XkoNGdFO3CrBFtGsMe2AdZVcf+IbwqgE3iCISHDAlfhVMCcGpzZ8NllsD2Wypuo7fWS
- D+p0zV6L5EtaaUwxsk3mQ/ijyOHv8m2S+VVom5d0oV7bogU0L/3RJcTHv+96vhU/sWiP
- r8AwiDkq8ZKTXY92JIKd6krIHZJQRBC82jlkNboZervnhnFi0NmNSxct3EgdvYbDAqa4
- QO0w==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE7tE-0007k3-5T
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:20:12 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:51487
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE7t8-0003fQ-IV
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:20:11 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-467-iaanW2pgN06c3ibouyixSg-1; Fri, 04 Sep 2020 05:20:03 -0400
+X-MC-Unique: iaanW2pgN06c3ibouyixSg-1
+Received: by mail-wr1-f71.google.com with SMTP id 33so2103954wrk.12
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 02:20:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=LZFnRcJqOhQRsSCxd2s8D9Kmr6nmrFtNb8yncLDWW+s=;
- b=J+8EhJpBGVahjl/wq4Q1cTJ5s1cjcM8ALiHpP4+wFbXP5Rf2MNLwTfhMiFJRuIAZix
- R+4/5fLK6Dv6Tkqxgdzi542oqxu13EU3zbm7r4AHnTESolrTA285KoX3uz/U17S/FDng
- kv2ogl2jzau+DcWw6YokH8gb2s26x8KaB/Vj2F+TBvgfCaZBBy1x03v7GU8NHWThVNZt
- +6ivmXq9GcvMQD1bWPqY7OnWjDAttkFpJhrFHv78COfzwh/MBUu1/OKDIjOa6XNlnzEW
- KyExBUp9li2TmieLKXaSInVn6Pm9wqS9ST9Yp02Nwgs/SCrsOD2EHFBS6fQ7f0JTAWVx
- jCyw==
-X-Gm-Message-State: AOAM530Y5VaU2YrGiaiOjvoPWfWXA3CLJfYLq9p2Omz/qrhasjlaGXbJ
- R381DAG0UzuBKRxAq1Vt4f193tJFhNk=
-X-Google-Smtp-Source: ABdhPJybzLUbx++C03Vs581LsfCOBi5+ruEA3fvqdGUoJJh06SworrPbPy4XVs9D6PGecPPgECy25w==
-X-Received: by 2002:aed:3387:: with SMTP id v7mr7610481qtd.68.1599210881228;
- Fri, 04 Sep 2020 02:14:41 -0700 (PDT)
-Received: from ?IPv6:2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca?
- ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
- by smtp.gmail.com with ESMTPSA id f3sm4008827qth.56.2020.09.04.02.14.39
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=OQKXr4NRe5CAXe30FkKOb7cYcKuHnHotWjK/lXmh21M=;
+ b=uCB9TWEdIsYRAWGUSdwpYwZ69EdenwGphiU9HufvrOXf7q/L2GepBKT7pBwht4lxYP
+ VtnTBybgrQM2QEiXSnFroM/B4hH0vpWrprWruecdWPbHdD2Jzrjy8gOeAM/0Twopl5RL
+ vsP3hlXTQI5V2Ig2J1YL+Qr4UPeds5lJg3FzQDLS5SdIG6u4tbT2eQRftSDJo7l5WqTy
+ bFBTOSYyR5a4PhcZ7c2QuD2A44D3YCJk1ZeDXqIaOq/e5YuKbnltJmoIEl7Wak4PgXWX
+ OqqhOn4cMlhlZYGweyJQO0+dV91mOo47qt6qWxV9d1EIbDFoF6YUIoZjbFYaEQbs/TU0
+ 6e5Q==
+X-Gm-Message-State: AOAM531wNCCbkWgF/3sb6XwYbdmockKKGOvEFGwOlOq+ilYyGPTORgDq
+ mFb14DhhluRMNGynectuHgrHzjNd8yhdcWjD/Wf61jpqAyTTAqskZXjX9074kQzJmgC3WDnZLiz
+ iKGaB9X6w0MBm7XM=
+X-Received: by 2002:adf:d845:: with SMTP id k5mr6180691wrl.285.1599211202773; 
+ Fri, 04 Sep 2020 02:20:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwoXkl5TT6uz86coVyfHU0/tOwHZlR/Y8UJQGtt6i8s42OEWTi5m//xYgjcIk/KRs6SuaBNxQ==
+X-Received: by 2002:adf:d845:: with SMTP id k5mr6180669wrl.285.1599211202526; 
+ Fri, 04 Sep 2020 02:20:02 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id u126sm13152880wmu.9.2020.09.04.02.20.01
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Sep 2020 02:14:40 -0700 (PDT)
-Subject: Re: [PATCH v4 2/3] spapr_numa: create a vcpu associativity helper
-To: David Gibson <david@gibson.dropbear.id.au>
-References: <20200904010439.581957-1-danielhb413@gmail.com>
- <20200904010439.581957-3-danielhb413@gmail.com>
- <20200904041033.GG341806@yekko.fritz.box>
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-ID: <38fb3047-96f1-f5fa-dac3-0876522d4172@gmail.com>
-Date: Fri, 4 Sep 2020 06:14:36 -0300
+ Fri, 04 Sep 2020 02:20:01 -0700 (PDT)
+Subject: Re: [PATCH 00/77] Patch Round-up for stable 5.0.1, freeze on
+ 2020-09-10
+To: Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-devel@nongnu.org
+References: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <70866614-8053-4a87-b3a6-c7448dcff56f@redhat.com>
+Date: Fri, 4 Sep 2020 11:20:00 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200904041033.GG341806@yekko.fritz.box>
-Content-Type: text/plain; charset=windows-1252; format=flowed
+In-Reply-To: <20200903205935.27832-1-mdroth@linux.vnet.ibm.com>
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::843;
- envelope-from=danielhb413@gmail.com; helo=mail-qt1-x843.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -42
 X-Spam_score: -4.3
 X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, NICE_REPLY_A=-2.403,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.403,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -106,97 +123,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 9/4/20 1:10 AM, David Gibson wrote:
-> On Thu, Sep 03, 2020 at 10:04:38PM -0300, Daniel Henrique Barboza wrote:
->> The work to be done in h_home_node_associativity() intersects
->> with what is already done in spapr_numa_fixup_cpu_dt(). This
->> patch creates a new helper, spapr_numa_get_vcpu_assoc(), to
->> be used for both spapr_numa_fixup_cpu_dt() and
->> h_home_node_associativity().
->>
->> While we're at it, use memcpy() instead of loop assignment
->> to created the returned array.
->>
->> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
->> ---
->>   hw/ppc/spapr_numa.c | 30 ++++++++++++++++++++----------
->>   1 file changed, 20 insertions(+), 10 deletions(-)
->>
->> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
->> index 368c1a494d..980a6488bf 100644
->> --- a/hw/ppc/spapr_numa.c
->> +++ b/hw/ppc/spapr_numa.c
->> @@ -71,13 +71,15 @@ void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
->>                         sizeof(spapr->numa_assoc_array[nodeid]))));
->>   }
->>   
->> -int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
->> -                            int offset, PowerPCCPU *cpu)
->> +static uint32_t *spapr_numa_get_vcpu_assoc(SpaprMachineState *spapr,
->> +                                          PowerPCCPU *cpu,
->> +                                          uint *vcpu_assoc_size)
->>   {
->> -    uint vcpu_assoc_size = NUMA_ASSOC_SIZE + 1;
->> -    uint32_t vcpu_assoc[vcpu_assoc_size];
->> +    uint32_t *vcpu_assoc = NULL;
->>       int index = spapr_get_vcpu_id(cpu);
->> -    int i;
->> +
->> +    *vcpu_assoc_size = (NUMA_ASSOC_SIZE + 1) * sizeof(uint32_t);
->> +    vcpu_assoc = g_malloc(*vcpu_assoc_size);
->>   
->>       /*
->>        * VCPUs have an extra 'cpu_id' value in ibm,associativity
->> @@ -86,16 +88,24 @@ int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
->>        * cpu_id last.
->>        */
->>       vcpu_assoc[0] = cpu_to_be32(MAX_DISTANCE_REF_POINTS + 1);
->> +    memcpy(vcpu_assoc + 1, spapr->numa_assoc_array[cpu->node_id],
->> +           MAX_DISTANCE_REF_POINTS);
+On 9/3/20 10:58 PM, Michael Roth wrote:
+> Hi everyone,
 > 
-> That needs to be MAX_DISTANCE_REF_POINTS * sizeof(uint32_t), doesn't it?
+> The following new patches are queued for QEMU stable v5.0.1:
+> 
+>   https://github.com/mdroth/qemu/commits/stable-5.0-staging
+> 
+> Patch freeze is 2020-09-10, and the release is planned for 2020-09-15:
+> 
+>   https://wiki.qemu.org/Planning/5.0
+> 
+> Please respond here or CC qemu-stable@nongnu.org on any additional patches
+> you think should be included in the release.
 
-Hmmmm yeah it does. Even if this didn't break spectacularly in my guest (not
-sure why), we're doing a similar operation in spapr_numa_write_assoc_lookup_arrays()
-using 'sizeof(uint32_t)'. Might as well do the same here.
+Candidates:
 
+b638627c723 ("hw/sd: Fix incorrect populated function switch status data
+structure")
+6d2d4069c47 ("hw/sd: Correct the maximum size of a Standard Capacity SD
+Memory Card")
 
-Thanks,
-
-
-
-DHB
+And maybe "memory: assert and define MemoryRegionOps callbacks"
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg729048.html
 
 > 
->> +    vcpu_assoc[MAX_DISTANCE_REF_POINTS + 1] = cpu_to_be32(index);
->>   
->> -    for (i = 1; i <= MAX_DISTANCE_REF_POINTS; i++) {
->> -        vcpu_assoc[i] = spapr->numa_assoc_array[cpu->node_id][i];
->> -    }
->> +    return vcpu_assoc;
->> +}
->> +
->> +int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
->> +                            int offset, PowerPCCPU *cpu)
->> +{
->> +    g_autofree uint32_t *vcpu_assoc = NULL;
->> +    uint vcpu_assoc_size;
->>   
->> -    vcpu_assoc[vcpu_assoc_size - 1] = cpu_to_be32(index);
->> +    vcpu_assoc = spapr_numa_get_vcpu_assoc(spapr, cpu, &vcpu_assoc_size);
->>   
->>       /* Advertise NUMA via ibm,associativity */
->>       return fdt_setprop(fdt, offset, "ibm,associativity",
->> -                       vcpu_assoc, sizeof(vcpu_assoc));
->> +                       vcpu_assoc, vcpu_assoc_size);>  }
->>   
->>   
-> 
+> Thanks!
+
 
