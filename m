@@ -2,92 +2,68 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F12FBC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 06:04:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C78C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 06:22:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 945CD206E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 06:04:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00063206E7
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 06:22:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AmO1xnRH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 945CD206E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="dBMNFZQS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00063206E7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE4qE-00073A-Jr
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 02:04:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48784)
+	id 1kE570-00034A-4u
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 02:22:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kE4ow-0006Xh-T6
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 02:03:36 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:31023
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kE4ou-0004Jp-9E
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 02:03:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599199410;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=v2RJF5VUCGqQ/4qklZ8eqRwh4QhIzbpsdovBKaqGaH0=;
- b=AmO1xnRH0PyTvW8xXkXDb2hJQERNCf6wVBZZKu06tnGzp23gusTYZYGa1NEXhuhJT4Nug5
- xOeyRQC8OzQRyB5K0vvdeNvxGDsGSDU+jyfueoEKeb60O3jXeexyoe92UsszWwrHGX9LMH
- cwppLotV4P9T0ZM48VtslEsYH1792LE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-6ruqAz0TPJmLpFAllG6BTA-1; Fri, 04 Sep 2020 02:03:25 -0400
-X-MC-Unique: 6ruqAz0TPJmLpFAllG6BTA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5600E800683;
- Fri,  4 Sep 2020 06:03:23 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-159.ams2.redhat.com [10.36.112.159])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B49FF5D9CC;
- Fri,  4 Sep 2020 06:03:18 +0000 (UTC)
-Subject: Re: make -i check resut for msys2
-To: luoyonggang@gmail.com
-References: <CAE2XoE_TJ2T2eN82km0pYqDiqOpsd=waH4EmCe==0k=GYpj3Xg@mail.gmail.com>
- <3d2db346-2517-f6e3-748d-79a8ae993e06@redhat.com>
- <CAE2XoE_3Kjjk+tRz1y7rk94+vre2FSfmCGQVWNgjNW14vSNSdw@mail.gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <48c60a95-c30b-433a-7955-3845074776d8@redhat.com>
-Date: Fri, 4 Sep 2020 08:03:17 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kE55a-0001mF-Fh; Fri, 04 Sep 2020 02:20:47 -0400
+Received: from ozlabs.org ([203.11.71.1]:34085)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kE55W-00062o-TR; Fri, 04 Sep 2020 02:20:46 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BjSGX60NNz9sVL; Fri,  4 Sep 2020 16:20:36 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1599200436;
+ bh=2fjkLzaaVrzTd6IWUUjGSyxMoluSR0Q9UY7POP7WasI=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=dBMNFZQSAyB+8QS1DXiGH5zgJUHX9liTab97B7oVWzvbbnzpDaOaiLrVBcivQ/uTX
+ acfzzJNwWdtAKjy6eW4pLiztVzezFczJa87EZEyi6dGlCUqq/BSMcsGPQcJAfqwDFa
+ MDvQB5hkGRDnwuVN06wrF4l4AmR3rOpM+Ta15cgo=
+Date: Fri, 4 Sep 2020 14:09:42 +1000
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Daniel Henrique Barboza <danielhb413@gmail.com>
+Subject: Re: [PATCH v4 1/3] spapr: move h_home_node_associativity to
+ spapr_numa.c
+Message-ID: <20200904040942.GF341806@yekko.fritz.box>
+References: <20200904010439.581957-1-danielhb413@gmail.com>
+ <20200904010439.581957-2-danielhb413@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <CAE2XoE_3Kjjk+tRz1y7rk94+vre2FSfmCGQVWNgjNW14vSNSdw@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:11
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="aZoGpuMECXJckB41"
+Content-Disposition: inline
+In-Reply-To: <20200904010439.581957-2-danielhb413@gmail.com>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 02:20:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,54 +76,171 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P. Berrange" <berrange@redhat.com>,
- Qemu-block <qemu-block@nongnu.org>, Wen Congyang <wencongyang2@huawei.com>,
- Xie Changlong <xiechanglong.d@gmail.com>, qemu-level <qemu-devel@nongnu.org>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/09/2020 00.53, 罗勇刚(Yonggang Luo) wrote:
-> 
-> 
-> On Thu, Sep 3, 2020 at 10:33 PM Thomas Huth <thuth@redhat.com
-> <mailto:thuth@redhat.com>> wrote:
-> 
->     On 03/09/2020 11.18, 罗勇刚(Yonggang Luo) wrote:
->     [...]
->     >   TEST    check-unit: tests/test-replication.exe
->     > **
->     > ERROR:C:/work/xemu/qemu/tests/test-replication.c:136:make_temp:
->     > assertion failed: (fd >= 0)
->     > ERROR test-replication.exe - Bail out!
->     > ERROR:C:/work/xemu/qemu/tests/test-replication.c:136:make_temp:
->     > assertion failed: (fd >= 0)
-> 
->     At least this one should be easy to fix: The test uses /tmp as
->     hard-coded directory for temporary files. I think it should use
->     g_get_tmp_dir() from glib to get that directory instead.
-> 
->      Thomas
-> 
-> After fixes tmp path, how to fixes following error:
-> $ tests/test-replication.exe                                            
->                                                                        
->                                                                        
->          
-> # random seed: R02Sdf2e4ffc0e6fbe96624598386b538927
-> 1..13
-> # Start of replication tests
-> # Start of primary tests
-> Unexpected error in bdrv_open_inherit() at ../block.c:3456:
-> Block protocol 'file' doesn't support the option 'locking' 
 
-Not sure ... as a temporary test, try to remove the "locking=off"
-strings from the test. If it then works, it might be worth discussing
-with the block layer folks how to handle this test on Windows in the
-best way. If it still does not work, it's maybe simply not worth the
-effort to try to get this test running on Windows - and thus mark it
-with CONFIG_POSIX in the Makefile / meson.build.
+--aZoGpuMECXJckB41
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
- Thomas
+On Thu, Sep 03, 2020 at 10:04:37PM -0300, Daniel Henrique Barboza wrote:
+> The implementation of this hypercall will be modified to use
+> spapr->numa_assoc_arrays input. Moving it to spapr_numa.c makes
+> make more sense.
+>=20
+> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 
+Applied to ppc-for-5.2 (though it missed today's pull request, sorry).
+
+> ---
+>  hw/ppc/spapr_hcall.c | 40 ---------------------------------------
+>  hw/ppc/spapr_numa.c  | 45 ++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 45 insertions(+), 40 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
+> index c1d01228c6..c2776b6a7d 100644
+> --- a/hw/ppc/spapr_hcall.c
+> +++ b/hw/ppc/spapr_hcall.c
+> @@ -1873,42 +1873,6 @@ static target_ulong h_client_architecture_support(=
+PowerPCCPU *cpu,
+>      return ret;
+>  }
+> =20
+> -static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+> -                                              SpaprMachineState *spapr,
+> -                                              target_ulong opcode,
+> -                                              target_ulong *args)
+> -{
+> -    target_ulong flags =3D args[0];
+> -    target_ulong procno =3D args[1];
+> -    PowerPCCPU *tcpu;
+> -    int idx;
+> -
+> -    /* only support procno from H_REGISTER_VPA */
+> -    if (flags !=3D 0x1) {
+> -        return H_FUNCTION;
+> -    }
+> -
+> -    tcpu =3D spapr_find_cpu(procno);
+> -    if (tcpu =3D=3D NULL) {
+> -        return H_P2;
+> -    }
+> -
+> -    /* sequence is the same as in the "ibm,associativity" property */
+> -
+> -    idx =3D 0;
+> -#define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
+> -                             ((uint64_t)(b) & 0xffffffff))
+> -    args[idx++] =3D ASSOCIATIVITY(0, 0);
+> -    args[idx++] =3D ASSOCIATIVITY(0, tcpu->node_id);
+> -    args[idx++] =3D ASSOCIATIVITY(procno, -1);
+> -    for ( ; idx < 6; idx++) {
+> -        args[idx] =3D -1;
+> -    }
+> -#undef ASSOCIATIVITY
+> -
+> -    return H_SUCCESS;
+> -}
+> -
+>  static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
+>                                                SpaprMachineState *spapr,
+>                                                target_ulong opcode,
+> @@ -2139,10 +2103,6 @@ static void hypercall_register_types(void)
+>      spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support=
+);
+> =20
+>      spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
+> -
+> -    /* Virtual Processor Home Node */
+> -    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
+> -                             h_home_node_associativity);
+>  }
+> =20
+>  type_init(hypercall_register_types)
+> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
+> index 93a000b729..368c1a494d 100644
+> --- a/hw/ppc/spapr_numa.c
+> +++ b/hw/ppc/spapr_numa.c
+> @@ -165,3 +165,48 @@ void spapr_numa_write_rtas_dt(SpaprMachineState *spa=
+pr, void *fdt, int rtas)
+>      _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
+>                       maxdomains, sizeof(maxdomains)));
+>  }
+> +
+> +static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+> +                                              SpaprMachineState *spapr,
+> +                                              target_ulong opcode,
+> +                                              target_ulong *args)
+> +{
+> +    target_ulong flags =3D args[0];
+> +    target_ulong procno =3D args[1];
+> +    PowerPCCPU *tcpu;
+> +    int idx;
+> +
+> +    /* only support procno from H_REGISTER_VPA */
+> +    if (flags !=3D 0x1) {
+> +        return H_FUNCTION;
+> +    }
+> +
+> +    tcpu =3D spapr_find_cpu(procno);
+> +    if (tcpu =3D=3D NULL) {
+> +        return H_P2;
+> +    }
+> +
+> +    /* sequence is the same as in the "ibm,associativity" property */
+> +
+> +    idx =3D 0;
+> +#define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
+> +                             ((uint64_t)(b) & 0xffffffff))
+> +    args[idx++] =3D ASSOCIATIVITY(0, 0);
+> +    args[idx++] =3D ASSOCIATIVITY(0, tcpu->node_id);
+> +    args[idx++] =3D ASSOCIATIVITY(procno, -1);
+> +    for ( ; idx < 6; idx++) {
+> +        args[idx] =3D -1;
+> +    }
+> +#undef ASSOCIATIVITY
+> +
+> +    return H_SUCCESS;
+> +}
+> +
+> +static void spapr_numa_register_types(void)
+> +{
+> +    /* Virtual Processor Home Node */
+> +    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
+> +                             h_home_node_associativity);
+> +}
+> +
+> +type_init(spapr_numa_register_types)
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--aZoGpuMECXJckB41
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9RvgQACgkQbDjKyiDZ
+s5Kfvw/+MiRYTndBGvBWbvpWDOdp/7GdCyGfqxXvzidyV3hEN6x+qpguzO0A+RBU
+P+UibhOzxAOjKMsu8Xiw0C9rrTgXG/lZzCpOc7Sm5nbRyQ+WJxEnLLJsvmRohZXR
+J0PyXCWbbKznXkgjAA3CNgOeuzQLuzUZdTNcwmlCbHJUn35zGGlb8TmFHo21zsiT
+DP8waNH9nlsf2/Z1MwFvHB/MGkJGJvmkDXsVGf0oCatjLF9cGFnGnz215ovYL84c
+zu1PWenfxG9+5LY6ct2Mlbnx8xtAGYC0KlxS0SdCB5UOX7nlkNfB9JrMPhzNE74w
+VOLGxkyGgMYtUWmYVbC+hpNDBMtldyHdPc8nMg50yaVuRclMrWJ3ScMcN+a33wHg
+yFJkZ+M3FcnrHSRJ7tlYLQoJYARI2f5or91Q4SLPprjzuY8zPrH8av9+cpu1bJpK
+ttMQveK6E/42XzHAG2Nv1p1lL158w7cViL0hTNzU46ac9swx21+yzHWaGKPls37B
+WBSlOPRcT1W9RD66roSs5KDGJ2UI27RKrRcxnTP9sYqJ/7HIjHtnqq8rrx/Ub4ox
+deNHVdQuGKewKB8HlRqLwuLa+SZVZWdvbDJJKwnZB9EspHXn11DZSfpGjz1ncQ5g
+jB1myCUi6AZZtNUruxYGe7hzkhMB2BVWSETyDDqNKdDDLNA5kfk=
+=+1wu
+-----END PGP SIGNATURE-----
+
+--aZoGpuMECXJckB41--
 
