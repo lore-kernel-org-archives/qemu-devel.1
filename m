@@ -7,54 +7,55 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4067AC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:54:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 973FBC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:54:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2F6820578
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:54:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 58F6720578
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:54:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Qwsajg/q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2F6820578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OTP51pMa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58F6720578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2nZ-0005nS-62
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:54:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54802)
+	id 1kE2nd-00060i-Fx
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:54:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hb-0002jh-QK; Thu, 03 Sep 2020 23:47:51 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:48803)
+ id 1kE2hR-0002Kp-LD; Thu, 03 Sep 2020 23:47:41 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:57385 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hZ-0004wu-Qb; Thu, 03 Sep 2020 23:47:51 -0400
+ id 1kE2hN-0004sI-Ju; Thu, 03 Sep 2020 23:47:41 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsr282wz9sW0; Fri,  4 Sep 2020 13:47:28 +1000 (AEST)
+ id 4BjNsn13y6z9sTR; Fri,  4 Sep 2020 13:47:25 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599191248;
- bh=WHUZRE8xBkBhoLgTp8c17urX6r5gVdkN3abjLoZHMUE=;
+ d=gibson.dropbear.id.au; s=201602; t=1599191245;
+ bh=/JhSp1HFdD3zltLdv6KRNXQgS9TzRkKxf8RYmADUDS8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Qwsajg/q15lklvtp6sxvjoNcyVdI+a0jh1tUVIa3588J2LjOtgJNHvAkm3e/f+Qez
- OlrF1ZcjODs1TFpmQn5ASgU/ZAr4ik5WqhIyW4o6snE3rb4J5xgQs3xca1T7MU7Bag
- AUXlt5PmHUDiPsR6/N1SVqtsIwQWpl2KHXpOmR4Q=
+ b=OTP51pMa4jUnjODutymeXoQg0VZauL2apDZLB3tltHHmLfg9NaTTDLjQ95EC49j4I
+ FuMFwBwBhyXRxzOj+osa6oaZF6eiV1KBE6wMspj5DD8dNNW/1u07WzimrfVWijWc0Q
+ mQdXh5l0AeslXWzkyOHKagRn+H0mg/QTxokgyY10=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 17/30] ppc/spapr: Use start-powered-off CPUState property
-Date: Fri,  4 Sep 2020 13:47:06 +1000
-Message-Id: <20200904034719.673626-18-david@gibson.dropbear.id.au>
+Subject: [PULL 02/30] ppc/pnv: Fix TypeInfo of PnvLpcController abstract class
+Date: Fri,  4 Sep 2020 13:46:51 +1000
+Message-Id: <20200904034719.673626-3-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 23:47:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -19
 X-Spam_score: -2.0
 X-Spam_bar: --
@@ -75,73 +76,54 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, danielhb413@gmail.com,
  qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+From: Cédric Le Goater <clg@kaod.org>
 
-PowerPC sPAPR CPUs start in the halted state, and spapr_reset_vcpu()
-attempts to implement this by setting CPUState::halted to 1. But that's too
-late for the case of hotplugged CPUs in a machine configure with 2 or more
-threads per core.
+It was missing the instance_size field.
 
-By then, other parts of QEMU have already caused the vCPU to run in an
-unitialized state a couple of times. For example, ppc_cpu_reset() calls
-ppc_tlb_invalidate_all(), which ends up calling async_run_on_cpu(). This
-kicks the new vCPU while it has CPUState::halted = 0, causing QEMU to issue
-a KVM_RUN ioctl on the new vCPU before the guest is able to make the
-start-cpu RTAS call to initialize its register state.
-
-This problem doesn't seem to cause visible issues for regular guests, but
-on a secure guest running under the Ultravisor it does. The Ultravisor
-relies on being able to snoop on the start-cpu RTAS call to map vCPUs to
-guests, and this issue causes it to see a stray vCPU that doesn't belong to
-any guest.
-
-Fix by setting the start-powered-off CPUState property in
-spapr_create_vcpu(), which makes cpu_common_reset() initialize
-CPUState::halted to 1 at an earlier moment.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Message-Id: <20200826055535.951207-4-bauerman@linux.ibm.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-Id: <20200822083920.2668930-1-clg@kaod.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/ppc/pnv_lpc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c4f47dcc04..2125fdac34 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -36,11 +36,6 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
+diff --git a/hw/ppc/pnv_lpc.c b/hw/ppc/pnv_lpc.c
+index b5ffa48dac..23f1e09492 100644
+--- a/hw/ppc/pnv_lpc.c
++++ b/hw/ppc/pnv_lpc.c
+@@ -646,7 +646,6 @@ static void pnv_lpc_power8_class_init(ObjectClass *klass, void *data)
+ static const TypeInfo pnv_lpc_power8_info = {
+     .name          = TYPE_PNV8_LPC,
+     .parent        = TYPE_PNV_LPC,
+-    .instance_size = sizeof(PnvLpcController),
+     .class_init    = pnv_lpc_power8_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_PNV_XSCOM_INTERFACE },
+@@ -687,7 +686,6 @@ static void pnv_lpc_power9_class_init(ObjectClass *klass, void *data)
+ static const TypeInfo pnv_lpc_power9_info = {
+     .name          = TYPE_PNV9_LPC,
+     .parent        = TYPE_PNV_LPC,
+-    .instance_size = sizeof(PnvLpcController),
+     .class_init    = pnv_lpc_power9_class_init,
+ };
  
-     cpu_reset(cs);
- 
--    /* All CPUs start halted.  CPU0 is unhalted from the machine level
--     * reset code and the rest are explicitly started up by the guest
--     * using an RTAS call */
--    cs->halted = 1;
--
-     env->spr[SPR_HIOR] = 0;
- 
-     lpcr = env->spr[SPR_LPCR];
-@@ -274,6 +269,11 @@ static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
- 
-     cs = CPU(obj);
-     cpu = POWERPC_CPU(obj);
-+    /*
-+     * All CPUs start halted. CPU0 is unhalted from the machine level reset code
-+     * and the rest are explicitly started up by the guest using an RTAS call.
-+     */
-+    cs->start_powered_off = true;
-     cs->cpu_index = cc->core_id + i;
-     spapr_set_vcpu_id(cpu, cs->cpu_index, &local_err);
-     if (local_err) {
+@@ -768,6 +766,7 @@ static void pnv_lpc_class_init(ObjectClass *klass, void *data)
+ static const TypeInfo pnv_lpc_info = {
+     .name          = TYPE_PNV_LPC,
+     .parent        = TYPE_DEVICE,
++    .instance_size = sizeof(PnvLpcController),
+     .class_init    = pnv_lpc_class_init,
+     .class_size    = sizeof(PnvLpcClass),
+     .abstract      = true,
 -- 
 2.26.2
 
