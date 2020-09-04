@@ -2,87 +2,100 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F2DAC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D94BC28E83
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:32:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4C283206C9
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:27:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="WJgjmqiq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C283206C9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
+	by mail.kernel.org (Postfix) with ESMTPS id 2F339206C9
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:32:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F339206C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47994 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE745-0004di-FE
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 04:27:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48284)
+	id 1kE78g-0006aC-43
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 04:32:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kE72F-0002La-9q
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:25:27 -0400
-Received: from mail-pf1-x434.google.com ([2607:f8b0:4864:20::434]:44571)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kE72A-00041l-TF
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:25:26 -0400
-Received: by mail-pf1-x434.google.com with SMTP id o20so4193484pfp.11
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 01:25:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=l6H9TdFBTaIJQuOiKqxbPbEeHp6Rmtm1RlfMmkyZP3k=;
- b=WJgjmqiq79iO9fh/QC0LEKE5DgkUFnlfejPHbY8gneyD+9fAmSLNI9OitxzOH77522
- IEEHg3c+N5zDwwiAIBgt2FLBTbDhejj6AJpMHX96fMr6fiXf6tD9VB03w0CvtdfdivQ+
- sNXYR9+GKINb1NedHiJ2IpDlbAKAYFC6ji0twnVwUF0nBJVaT2Agfv7deGZP9EODR9wo
- tGsma8E0+IkqWeNQwsMW1r20u/baG/uTqgXnopdtQra+K7eTJCXWN7yFoBa7aytcf5sv
- dVmEMqiFPKcfe2bVP5Ma8XTOeRz41BuGo6ydfBK9lKG3WVdLtDMl5NYu856BwZMzh2hB
- 0B9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=l6H9TdFBTaIJQuOiKqxbPbEeHp6Rmtm1RlfMmkyZP3k=;
- b=buUET6TfZLSOc85a4nubJkHi9U4axEJ3rhmGESu9UZZ3nEzRCAc9N6NbSMKPOBOEoU
- rPV3MSguEGso6xOrMAlxx0gE1We81306fgzgKQLBxFBgcd/hPkL0GUNI7NnRTvKXiRc4
- g91o11cnQq4akRYJXCJQR9N3ySDFkXUZvOzI1Ae7y6/XiHVaYQTr2ZFr5dwbDtOrjxE3
- X45aWaShMFDjyE9K946zH143Qbak2xPLXHAqDwW0jIO6+s0L03RXIYQ9M8N3kAGTeSiq
- zY25w4vRF9442dWd0PAxsi3TFcGP5LDo24cs1saZDeAF52jH3jHcs4C8L3DM6T9kX4Yt
- SgrQ==
-X-Gm-Message-State: AOAM531Wch4XDfXoqsopZxuqwl3kWKuCCtkvEBE4Yq7CbzOVpGvpFRgb
- zz5QYCQggyrwB6Yf+xWCEgL1ei3knZXwyw==
-X-Google-Smtp-Source: ABdhPJwam5Dw2ypF7pPlIkt9TG+MN4L5e9Ug8Qu6ClOxkZd3erY9ViHbcv6wWFR8RrLcRTgXvij3vA==
-X-Received: by 2002:a63:5ec6:: with SMTP id s189mr6383974pgb.40.1599207920760; 
- Fri, 04 Sep 2020 01:25:20 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.135.14])
- by smtp.googlemail.com with ESMTPSA id bj2sm4733098pjb.20.2020.09.04.01.25.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 01:25:20 -0700 (PDT)
-From: Ani Sinha <ani@anisinha.ca>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1] i440fx/acpi: don't hot-unplug cold plugged bridges when
- their hotplug switch is off
-Date: Fri,  4 Sep 2020 13:54:51 +0530
-Message-Id: <20200904082451.1043-2-ani@anisinha.ca>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200904082451.1043-1-ani@anisinha.ca>
-References: <20200904082451.1043-1-ani@anisinha.ca>
-Received-SPF: none client-ip=2607:f8b0:4864:20::434;
- envelope-from=ani@anisinha.ca; helo=mail-pf1-x434.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE77r-00068H-Rp
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:31:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26749
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE77n-0004tg-HF
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:31:15 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-zTIfAmM-OpOLIIb5QWPe_A-1; Fri, 04 Sep 2020 04:31:07 -0400
+X-MC-Unique: zTIfAmM-OpOLIIb5QWPe_A-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A19A1006715;
+ Fri,  4 Sep 2020 08:31:06 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-156.ams2.redhat.com
+ [10.36.114.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E0915811B9;
+ Fri,  4 Sep 2020 08:31:04 +0000 (UTC)
+Subject: Re: [PATCH] iotests: Remove 030 from the auto group
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
+References: <20200904055701.462482-1-thuth@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <c88c3a0a-aaf2-68be-14b8-de7076b214e2@redhat.com>
+Date: Fri, 4 Sep 2020 10:31:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20200904055701.462482-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="ybasuvhfbkblMRq0SyPmPiKIVWquMOa2Z"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.403,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,70 +108,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jusual@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, Ani Sinha <ani@anisinha.ca>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cold plugged bridges should not be hot unpluggable, even when their hotplug property
-(acpi-pci-hotplug-with-bridge-support) is turned off. However, with the current
-implementaton, windows would try to hot-unplug a pci bridge when it's hotplug switch
-is off. This is regardless of whether there are devices attached to the bridge. When
-devices are attached to the bridge, the bridge is ultimately not hot-unpluggable. We
-have a demo video here: https://youtu.be/pME2sjyQweo
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--ybasuvhfbkblMRq0SyPmPiKIVWquMOa2Z
+Content-Type: multipart/mixed; boundary="HIwBy5vOFd7SkdPIpedpTIeDDmS9WN8V5"
 
-In this fix, we identify a cold plugged bridge and for cold plugged bridges, we do not
-add the appropriate amls and acpi methods that are used by the OS to identify a hot-
-unpluggable pci device. After this change, Windows does not show an option to eject the
-PCI bridge. A demo video is here:  https://youtu.be/kbgej5B9Hgs
+--HIwBy5vOFd7SkdPIpedpTIeDDmS9WN8V5
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-While at it, I have also updated a stale comment.
+On 04.09.20 07:57, Thomas Huth wrote:
+> Test 030 is still occasionally failing in the CI ... so for the
+> time being, let's disable it in the "auto" group. We can add it
+> back once it got more stable.
+>=20
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>  I just saw the problem here:
+>   https://cirrus-ci.com/task/5449330930745344?command=3Dmain#L6482
+>  and Peter hit it a couple of weeks ago:
+>   https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg00136.html
+>=20
+>  tests/qemu-iotests/group | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-This change is tested with a Windows 2012R2 guest image running on Ubuntu host. This
-change is based off of upstream qemu master branch tag v5.1.0.
+Thanks, applied to my block branch:
 
-Signed-off-by: Ani Sinha <ani@anisinha.ca>
----
- hw/i386/acpi-build.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index b7bcbbbb2a..90b863f4ec 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -359,6 +359,7 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         int slot = PCI_SLOT(i);
-         bool hotplug_enabled_dev;
-         bool bridge_in_acpi;
-+        bool cold_plugged_bridge;
- 
-         if (!pdev) {
-             if (bsel) { /* add hotplug slots for non present devices */
-@@ -380,15 +381,14 @@ static void build_append_pci_bus_devices(Aml *parent_scope, PCIBus *bus,
-         pc = PCI_DEVICE_GET_CLASS(pdev);
-         dc = DEVICE_GET_CLASS(pdev);
- 
--        /* When hotplug for bridges is enabled, bridges are
--         * described in ACPI separately (see build_pci_bus_end).
--         * In this case they aren't themselves hot-pluggable.
-+        /*
-+         * Cold plugged bridges aren't themselves hot-pluggable.
-          * Hotplugged bridges *are* hot-pluggable.
-          */
--        bridge_in_acpi = pc->is_bridge && pcihp_bridge_en &&
--            !DEVICE(pdev)->hotplugged;
-+        cold_plugged_bridge = pc->is_bridge && !DEVICE(pdev)->hotplugged;
-+        bridge_in_acpi =  cold_plugged_bridge && pcihp_bridge_en;
- 
--        hotplug_enabled_dev = bsel && dc->hotpluggable && !bridge_in_acpi;
-+        hotplug_enabled_dev = bsel && dc->hotpluggable && !cold_plugged_bridge;
- 
-         if (pc->class_id == PCI_CLASS_BRIDGE_ISA) {
-             continue;
--- 
-2.17.1
+
+--HIwBy5vOFd7SkdPIpedpTIeDDmS9WN8V5--
+
+--ybasuvhfbkblMRq0SyPmPiKIVWquMOa2Z
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9R+0YACgkQ9AfbAGHV
+z0DZxAf/cK1PO6qw+gztQvVHtu6K73oZiQAzlLd6PQW3ZByhe3SuHIwzZlc00DCF
+a8tYE39f7BckTXNyWOB2SAZ3YO0xQnMIWwXgNVN1KjnLiLNXLzF7XgXp/UjnsxEN
+yw7+6CCIPX5FYrSlPu/bBzJ67NMIyPqhBZ3XTMCju6iSwFDUuSwUMzKTRiS//HfI
+EpqAiBxu+2rhm1PHGz8GcNaF84u9WKoSzr5OWiJnLrUm76DAqpv/wk9RqlfCbmOl
+VBKKbNMVeHM5Zo9nWvXVIO4FZ2/KPqJpcFrDx2BXqTAUC/QXVpRqD7BaDlJO0eX+
+6TqzUYn/p9WVaTNkQhEq501Qye0CUg==
+=jNdS
+-----END PGP SIGNATURE-----
+
+--ybasuvhfbkblMRq0SyPmPiKIVWquMOa2Z--
 
 
