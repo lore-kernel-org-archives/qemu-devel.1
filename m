@@ -2,54 +2,53 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4232CC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6ECEC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:31:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F41CE20770
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:29:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F41CE20770
+	by mail.kernel.org (Postfix) with ESMTPS id 238C1205CB
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:31:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 238C1205CB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33946 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE828-0005Qb-4T
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:29:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41420)
+	id 1kE83z-0007cD-UW
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:31:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE81I-0004PA-6Z
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:28:32 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58675
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE834-0006ts-1K
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:30:22 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47167
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE81D-0005ET-0w
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:28:31 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE832-0005XE-9L
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:30:21 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393-F_9M6CCiP4uuR5nJoQRMaw-1; Fri, 04 Sep 2020 05:28:24 -0400
-X-MC-Unique: F_9M6CCiP4uuR5nJoQRMaw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-515-iSbtFg8DOr23h6Lx-JsKpg-1; Fri, 04 Sep 2020 05:30:17 -0400
+X-MC-Unique: iSbtFg8DOr23h6Lx-JsKpg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2577C425E0;
- Fri,  4 Sep 2020 09:28:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4512664087;
+ Fri,  4 Sep 2020 09:30:16 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-114-156.ams2.redhat.com
  [10.36.114.156])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AA638196FD;
- Fri,  4 Sep 2020 09:28:20 +0000 (UTC)
-Subject: Re: [PATCH v2 3/3] qcow2: Rewrite the documentation of
- qcow2_alloc_cluster_offset()
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 597E310013C4;
+ Fri,  4 Sep 2020 09:30:15 +0000 (UTC)
+Subject: Re: [PATCH v2 0/3] qcow2: Fix removal of list members from
+ BDRVQcow2State.cluster_allocs
 To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
 References: <cover.1599150873.git.berto@igalia.com>
- <bb5bd06f07c5a05b0818611de0d06ec5b66c8df3.1599150873.git.berto@igalia.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -75,28 +74,28 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <9355b4ef-be80-b8eb-6697-24125caea920@redhat.com>
-Date: Fri, 4 Sep 2020 11:28:18 +0200
+Message-ID: <efd9f01a-27cb-2ff2-4113-5f050df789eb@redhat.com>
+Date: Fri, 4 Sep 2020 11:30:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <bb5bd06f07c5a05b0818611de0d06ec5b66c8df3.1599150873.git.berto@igalia.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <cover.1599150873.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="erdIBTeSupl0BQPnTfOR2GEftMVqoWiEy"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
+ boundary="F9NcNkK3fzGeRM10ZHmsl3zDN2xxPBafb"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:57:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -42
 X-Spam_score: -4.3
 X-Spam_bar: ----
 X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.403,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,86 +114,51 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---erdIBTeSupl0BQPnTfOR2GEftMVqoWiEy
-Content-Type: multipart/mixed; boundary="olaGkDkCr9Tmq4JxDGIRDVCqAt0IFaVYT"
+--F9NcNkK3fzGeRM10ZHmsl3zDN2xxPBafb
+Content-Type: multipart/mixed; boundary="KLkYBQ3ER4vJHCXyqMmNqOWe7gJfMu3wD"
 
---olaGkDkCr9Tmq4JxDGIRDVCqAt0IFaVYT
+--KLkYBQ3ER4vJHCXyqMmNqOWe7gJfMu3wD
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
 On 03.09.20 18:37, Alberto Garcia wrote:
-> The current text corresponds to an earlier, simpler version of this
-> function and it does not explain how it works now.
+> Hi,
 >=20
-> Signed-off-by: Alberto Garcia <berto@igalia.com>
-> ---
->  block/qcow2-cluster.c | 24 ++++++++++++++----------
->  1 file changed, 14 insertions(+), 10 deletions(-)
+> here are the changes from v1:
 >=20
-> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
-> index 25e38daa78..f1ce6afcf5 100644
-> --- a/block/qcow2-cluster.c
-> +++ b/block/qcow2-cluster.c
-> @@ -1713,18 +1713,22 @@ out:
->  }
-> =20
->  /*
-> - * alloc_cluster_offset
-> + * For a given area on the virtual disk defined by @offset and @bytes,
-> + * find the corresponding area on the qcow2 image, allocating new
-> + * clusters (or subclusters) if necessary. The result can span a
-> + * combination of allocated and previously unallocated clusters.
->   *
-> - * For a given offset on the virtual disk, find the cluster offset in qc=
-ow2
-> - * file. If the offset is not found, allocate a new cluster.
-> + * On return, @host_offset is set to the beginning of the requested
-> + * area. This area is guaranteed to be contiguous on the qcow2 file
-> + * but it can be smaller than initially requested. In this case @bytes
-> + * is updated with the actual size.
->   *
-> - * If the cluster was already allocated, m->nb_clusters is set to 0 and
-> - * other fields in m are meaningless.
-> - *
-> - * If the cluster is newly allocated, m->nb_clusters is set to the numbe=
-r of
-> - * contiguous clusters that have been allocated. In this case, the other
-> - * fields of m are valid and contain information about the first allocat=
-ed
-> - * cluster.
-> + * If any clusters or subclusters were allocated then @m contains a
-> + * list with the information of all the affected regions. Note that
-> + * this can happen regardless of whether this function succeeds or
-> + * not. The caller is responsible for updating the L2 metadata of the
-> + * allocated clusters (on success) or freeing them (on failure), and
-> + * for clearing the contents of @m afterwards in both cases.
+> - Split changes into three different patches.
+> - Rewrite the documentation of qcow2_alloc_cluster_offset() [Max]
+> - Use peek_file_be in the test case to read the offset of the refcount
+>   table [Max].
+> - Extend the list of unsupported options for the test case [Max].
+>=20
+> Berto
 
-It=E2=80=99s too bad that preallocate_co() doesn=E2=80=99t do that then, is=
-n=E2=80=99t it...
+Thanks, applied to my block branch:
 
-Max
+https://git.xanclic.moe/XanClic/qemu/commits/branch/block
 
 
---olaGkDkCr9Tmq4JxDGIRDVCqAt0IFaVYT--
+--KLkYBQ3ER4vJHCXyqMmNqOWe7gJfMu3wD--
 
---erdIBTeSupl0BQPnTfOR2GEftMVqoWiEy
+--F9NcNkK3fzGeRM10ZHmsl3zDN2xxPBafb
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9SCLMACgkQ9AfbAGHV
-z0DCrQgAnjFSi9RXyLq4Qofo/zNtBv+fUxoDIAkMlMQxAzg7mVioXEHnFZ0bZBXT
-D6izM3njV+YmZaTcVv3AHiO70tw6AP73aXxGC9eY1eFmlcQrbIRmnplWqPJMEvm/
-eHn60KqcDF+arX7pAb6V9EohVy3KlYmU4sGE5XehQTQMI5u761m7eOh4iCQYdXwK
-+hH0JNDmy6xUhl4PZdrkYQNeO4JBDlELfC3NmXftsjT1/4fz2FbG0YTBSVzy72AA
-gsCW+Qd/CoN3kl3CC5o2fbrKHQ5Z56hk4Zos/06KoGMsBVS1dUDNbGXxRfCROFsE
-xssARK10Zt5Q7njVDxdO7FbB4wL7Cw==
-=sPTu
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9SCSUACgkQ9AfbAGHV
+z0AR9wgAuz3DHB4XrldGoYIkTEgRCT9LUIIJQgl+PVojRD4qzO5Q0VDvDolIpzHe
+bMu62TakF1FDwvO3o3bCglXYzt1MWqirABgjPGDIbPQERhUmR/dbHu7As4ehYnGE
+ausCwv9PTXaVLn12DRFUaTUGm11tpXexvpXuoZA+6VCMwI9oXf45wswVxXe0fvxf
+JCOb0yD/LxfpsYv+fArP9uv7w2xeTV4NTMg6qvAEXx+sMNWnX525ocDBU5Fx0iHY
+/l7heZEdXnJL0M9NA4dX3bBbTxnCPkDV7UCx5x9RuEFtL3ubxyFupsww8AG4fwGn
+inhiVOoAGuRm3DNPQgkWT5/FVMvTsg==
+=Eueq
 -----END PGP SIGNATURE-----
 
---erdIBTeSupl0BQPnTfOR2GEftMVqoWiEy--
+--F9NcNkK3fzGeRM10ZHmsl3zDN2xxPBafb--
 
 
