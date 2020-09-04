@@ -8,71 +8,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73865C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:49:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3484C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:49:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 068F220665
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:49:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2C12820665
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:49:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nW7X75OA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 068F220665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hVmdgPeQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C12820665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41966 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEFzT-0000JT-SF
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:59:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56100)
+	id 1kEFeT-0006RN-2Y
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:37:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kEFyc-00085L-Av; Fri, 04 Sep 2020 13:58:18 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:35969)
+ id 1kEFdo-0005xF-FC; Fri, 04 Sep 2020 13:36:48 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:40529)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kEFya-0000j9-1Q; Fri, 04 Sep 2020 13:58:17 -0400
-Received: by mail-io1-xd43.google.com with SMTP id d190so8040027iof.3;
- Fri, 04 Sep 2020 10:58:15 -0700 (PDT)
+ id 1kEFdm-0006aw-NG; Fri, 04 Sep 2020 13:36:48 -0400
+Received: by mail-qk1-x743.google.com with SMTP id w16so7052572qkj.7;
+ Fri, 04 Sep 2020 10:36:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=G1bM40015bksxd+x19QhiYyqakI9yFwrcxIueYMAw1c=;
- b=nW7X75OAlZoqJ/Vt84dN5h3LUJ6EgxVb9SOvmy27iP7agyWbZPXosnjIYczuv51IXj
- 5VW0oEaPUPq526uYln1QwNyOoENgyP3G27gRaEl/JjziirMn3KPQijMu8hhnOOOJZiqI
- BnzczZIgcSgunIEpuaVXoUjTRKJogdb0IXW+hpQdIpmXD5/de8xMRB7MEaeiGUqcwOSD
- QN5C9YsMBE+jDdInIRsC4O90wxDk8uFvNr6Q21XDXHKGVekM7ThIKThi58EOtCzQ46QC
- 6CcrVbregyvpGJQCwaLbjsYeiPWE7xBi5Nzz/f6E6xEF+tNNqbEOJsVYJkpq4oba8uEe
- fjyQ==
+ :cc; bh=aLFgdwHSKWo6/QJKySfrLCTemjnfCQL03waWC2X/MdE=;
+ b=hVmdgPeQjZQLdpFZD+AVffzsU+AUc7JeLcRYS19/GRCigDuvokTFrDhW6Aym9NMNa6
+ x3L1SFgqA/UZWs+5DjIhS07i2ql0UooBtS9orLrE05cTCbU2Kf7mPfQLW4rml5yMMafz
+ licEasGm1Pcj8n0HJIKDuXe3fbKLcnMG+iIjAfTMzeadxnb9w2+pa0oaCkNJpnKc4iAO
+ AZGNX0OoA7U654azjUoNyhiMuiU82X46C1ljpUF/GDJzGH0DOPjX50yHkOfzVmpsN+MF
+ sKG12+14003aspW7i+ouEhivx1zz97wWXwqbisC3FXBNoSisLGGiTrQYqQyotBGoK5I4
+ 0coA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=G1bM40015bksxd+x19QhiYyqakI9yFwrcxIueYMAw1c=;
- b=NqGBKGGX35wqdk1ugbFALWX0pCKN0xUcCuZa1CO60c7EryTEbsBtUUxZj31E4DHUGc
- cZo6Hh0pZ9iiZgJLSfPb+mK2GExq/AERLh1qAImzqNeCmbCXu4akoQS6EuRhVi1kKRmK
- 3npTC39Y1kx+QJqIuCbyLekbv6qTrkB1tWISzA/VVeJwU/pbtHh1Ey6ZmSrXvV/gTnMP
- 8bfgKrNZkeIxBNgqqAsydlF5H5/5lyMGFctLYpOsGsZcUMiTAcf37I+gI/5hO9///MJe
- qxeQZLmQDnCuF/D0xZTkt6xeJKU48wVwqmO4Kb9PRJS8Y8aamhtaPYjB0cDnB/gBA7qp
- iRVw==
-X-Gm-Message-State: AOAM531u5N8iQY/QjLj5wCAZ2VYmQc16KTCf+qgxRlW5IEnguP5FetWa
- aCMJcNCNBqq/bDjkFfGoh7V5U1OnT0f97We1Sg4=
-X-Google-Smtp-Source: ABdhPJxjTQXbdxFP32NK9WUjpFZmwsCcBBLObdL3OAiMZAj3WOhYnoRRwAn1ucVfhoo0ej4ZW2JZjuLFMgr8VbEfwj4=
-X-Received: by 2002:a02:85e1:: with SMTP id d88mr9369135jai.8.1599242293089;
- Fri, 04 Sep 2020 10:58:13 -0700 (PDT)
+ bh=aLFgdwHSKWo6/QJKySfrLCTemjnfCQL03waWC2X/MdE=;
+ b=ToHrxusPtR46UGKTanGgwq+UIFg96oindK9a1HpgFjzHmxg/qsHEfRzxf3swIKrR16
+ jwQZ50ibLYvVVqqeP0rKUeFIsWs8kEMlTy3kGF9i2VDNv2SpQrlUUo7Aov6LIlCoxylx
+ 9S3dUFZND5q8SZsf9ut7q1VoCBepvfU2oCx97WwQBrh8UOHr/DKub8ygEK7dPCeu2nbe
+ I4hk1IZA4hWK6ZJyVsHXHd6PIkuKqErICUcKr26OHQUfp+nGDIh1aXEJJpwxDPoILl+d
+ B03+qq/IzuVJnnL0j3CZsWuYbe0VQCyr/WHbRNz+DE0Qj2UjgajzG9nKBP2SQ041mp7o
+ no7g==
+X-Gm-Message-State: AOAM531azk1rCxRU0Dtc0YpwlXrMepmRUCGsJet+0Dt/CIdkkCstJqX1
+ nQIxCNrwA9LaSgSCiSw3sG+v/bJ8xOgTQXpwvOI=
+X-Google-Smtp-Source: ABdhPJxR4aQPGrxOQi13qAS8vQqDjTbfX6S6HrzZgpHgg3OmZVDCCwjq+04H/thx53Y+0zmyBvj1++l96WqlvL6TLew=
+X-Received: by 2002:a37:a5ca:: with SMTP id o193mr8998229qke.126.1599241005194; 
+ Fri, 04 Sep 2020 10:36:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <1598924352-89526-1-git-send-email-bmeng.cn@gmail.com>
- <1598924352-89526-6-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1598924352-89526-6-git-send-email-bmeng.cn@gmail.com>
+References: <1599129623-68957-1-git-send-email-bmeng.cn@gmail.com>
+ <1599129623-68957-3-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1599129623-68957-3-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 4 Sep 2020 10:47:18 -0700
-Message-ID: <CAKmqyKPF3YXNiU5V9NO7wQGqwBRdhBW1Rwq5W8A4NkDnQHwy9g@mail.gmail.com>
-Subject: Re: [PATCH v3 05/16] hw/char: Add Microchip PolarFire SoC MMUART
- emulation
+Date: Fri, 4 Sep 2020 10:25:50 -0700
+Message-ID: <CAKmqyKMpX1nEF70i=8aEvwBmPvzcVCGNmu8NLUd99_k+JhGkCQ@mail.gmail.com>
+Subject: Re: [PATCH 02/12] hw/riscv: Move sifive_u_prci model to hw/misc
 To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=alistair23@gmail.com; helo=mail-qk1-x743.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -95,25 +94,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Bin Meng <bin.meng@windriver.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 31, 2020 at 6:44 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Thu, Sep 3, 2020 at 3:41 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
 > From: Bin Meng <bin.meng@windriver.com>
 >
-> Microchip PolarFire SoC MMUART is ns16550 compatible, with some
-> additional registers. Create a simple MMUART model built on top
-> of the existing ns16550 model.
+> This is an effort to clean up the hw/riscv directory. Ideally it
+> should only contain the RISC-V SoC / machine codes plus generic
+> codes. Let's move sifive_u_prci model to hw/misc directory.
 >
 > Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
@@ -121,221 +115,101 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 Alistair
 
->
 > ---
 >
-> (no changes since v2)
+>  include/hw/{riscv => misc}/sifive_u_prci.h | 0
+>  include/hw/riscv/sifive_u.h                | 2 +-
+>  hw/{riscv => misc}/sifive_u_prci.c         | 2 +-
+>  hw/misc/Kconfig                            | 3 +++
+>  hw/misc/meson.build                        | 1 +
+>  hw/riscv/Kconfig                           | 1 +
+>  hw/riscv/meson.build                       | 1 -
+>  7 files changed, 7 insertions(+), 3 deletions(-)
+>  rename include/hw/{riscv => misc}/sifive_u_prci.h (100%)
+>  rename hw/{riscv => misc}/sifive_u_prci.c (99%)
 >
-> Changes in v2:
-> - change to update hw/char/meson.build
-> - add impl.min_access_size and impl.max_access_size as part of
->   MemoryRegionOps and remove the allignment check
+> diff --git a/include/hw/riscv/sifive_u_prci.h b/include/hw/misc/sifive_u_prci.h
+> similarity index 100%
+> rename from include/hw/riscv/sifive_u_prci.h
+> rename to include/hw/misc/sifive_u_prci.h
+> diff --git a/include/hw/riscv/sifive_u.h b/include/hw/riscv/sifive_u.h
+> index 793000a..cbeb228 100644
+> --- a/include/hw/riscv/sifive_u.h
+> +++ b/include/hw/riscv/sifive_u.h
+> @@ -24,8 +24,8 @@
+>  #include "hw/riscv/riscv_hart.h"
+>  #include "hw/riscv/sifive_cpu.h"
+>  #include "hw/riscv/sifive_gpio.h"
+> -#include "hw/riscv/sifive_u_prci.h"
+>  #include "hw/riscv/sifive_u_otp.h"
+> +#include "hw/misc/sifive_u_prci.h"
 >
->  include/hw/char/mchp_pfsoc_mmuart.h | 61 ++++++++++++++++++++++++++
->  hw/char/mchp_pfsoc_mmuart.c         | 86 +++++++++++++++++++++++++++++++++++++
->  MAINTAINERS                         |  2 +
->  hw/char/Kconfig                     |  3 ++
->  hw/char/meson.build                 |  1 +
->  5 files changed, 153 insertions(+)
->  create mode 100644 include/hw/char/mchp_pfsoc_mmuart.h
->  create mode 100644 hw/char/mchp_pfsoc_mmuart.c
+>  #define TYPE_RISCV_U_SOC "riscv.sifive.u.soc"
+>  #define RISCV_U_SOC(obj) \
+> diff --git a/hw/riscv/sifive_u_prci.c b/hw/misc/sifive_u_prci.c
+> similarity index 99%
+> rename from hw/riscv/sifive_u_prci.c
+> rename to hw/misc/sifive_u_prci.c
+> index 4fa590c..5d9d446 100644
+> --- a/hw/riscv/sifive_u_prci.c
+> +++ b/hw/misc/sifive_u_prci.c
+> @@ -22,7 +22,7 @@
+>  #include "hw/sysbus.h"
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+> -#include "hw/riscv/sifive_u_prci.h"
+> +#include "hw/misc/sifive_u_prci.h"
 >
-> diff --git a/include/hw/char/mchp_pfsoc_mmuart.h b/include/hw/char/mchp_pfsoc_mmuart.h
-> new file mode 100644
-> index 0000000..f619902
-> --- /dev/null
-> +++ b/include/hw/char/mchp_pfsoc_mmuart.h
-> @@ -0,0 +1,61 @@
-> +/*
-> + * Microchip PolarFire SoC MMUART emulation
-> + *
-> + * Copyright (c) 2020 Wind River Systems, Inc.
-> + *
-> + * Author:
-> + *   Bin Meng <bin.meng@windriver.com>
-> + *
-> + * Permission is hereby granted, free of charge, to any person obtaining a copy
-> + * of this software and associated documentation files (the "Software"), to deal
-> + * in the Software without restriction, including without limitation the rights
-> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> + * copies of the Software, and to permit persons to whom the Software is
-> + * furnished to do so, subject to the following conditions:
-> + *
-> + * The above copyright notice and this permission notice shall be included in
-> + * all copies or substantial portions of the Software.
-> + *
-> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-> + * THE SOFTWARE.
-> + */
-> +
-> +#ifndef HW_MCHP_PFSOC_MMUART_H
-> +#define HW_MCHP_PFSOC_MMUART_H
-> +
-> +#include "hw/char/serial.h"
-> +
-> +#define MCHP_PFSOC_MMUART_REG_SIZE  52
-> +
-> +typedef struct MchpPfSoCMMUartState {
-> +    MemoryRegion iomem;
-> +    hwaddr base;
-> +    qemu_irq irq;
-> +
-> +    SerialMM *serial;
-> +
-> +    uint32_t reg[MCHP_PFSOC_MMUART_REG_SIZE / sizeof(uint32_t)];
-> +} MchpPfSoCMMUartState;
-> +
-> +/**
-> + * mchp_pfsoc_mmuart_create - Create a Microchip PolarFire SoC MMUART
-> + *
-> + * This is a helper routine for board to create a MMUART device that is
-> + * compatible with Microchip PolarFire SoC.
-> + *
-> + * @sysmem: system memory region to map
-> + * @base: base address of the MMUART registers
-> + * @irq: IRQ number of the MMUART device
-> + * @chr: character device to associate to
-> + *
-> + * @return: a pointer to the device specific control structure
-> + */
-> +MchpPfSoCMMUartState *mchp_pfsoc_mmuart_create(MemoryRegion *sysmem,
-> +    hwaddr base, qemu_irq irq, Chardev *chr);
-> +
-> +#endif /* HW_MCHP_PFSOC_MMUART_H */
-> diff --git a/hw/char/mchp_pfsoc_mmuart.c b/hw/char/mchp_pfsoc_mmuart.c
-> new file mode 100644
-> index 0000000..8a002b0
-> --- /dev/null
-> +++ b/hw/char/mchp_pfsoc_mmuart.c
-> @@ -0,0 +1,86 @@
-> +/*
-> + * Microchip PolarFire SoC MMUART emulation
-> + *
-> + * Copyright (c) 2020 Wind River Systems, Inc.
-> + *
-> + * Author:
-> + *   Bin Meng <bin.meng@windriver.com>
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License as
-> + * published by the Free Software Foundation; either version 2 or
-> + * (at your option) version 3 of the License.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "qemu/log.h"
-> +#include "chardev/char.h"
-> +#include "exec/address-spaces.h"
-> +#include "hw/char/mchp_pfsoc_mmuart.h"
-> +
-> +static uint64_t mchp_pfsoc_mmuart_read(void *opaque, hwaddr addr, unsigned size)
-> +{
-> +    MchpPfSoCMMUartState *s = opaque;
-> +
-> +    if (addr >= MCHP_PFSOC_MMUART_REG_SIZE) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: read: addr=0x%" HWADDR_PRIx "\n",
-> +                      __func__, addr);
-> +        return 0;
-> +    }
-> +
-> +    return s->reg[addr / sizeof(uint32_t)];
-> +}
-> +
-> +static void mchp_pfsoc_mmuart_write(void *opaque, hwaddr addr,
-> +                                    uint64_t value, unsigned size)
-> +{
-> +    MchpPfSoCMMUartState *s = opaque;
-> +    uint32_t val32 = (uint32_t)value;
-> +
-> +    if (addr >= MCHP_PFSOC_MMUART_REG_SIZE) {
-> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%" HWADDR_PRIx
-> +                      " v=0x%x\n", __func__, addr, val32);
-> +        return;
-> +    }
-> +
-> +    s->reg[addr / sizeof(uint32_t)] = val32;
-> +}
-> +
-> +static const MemoryRegionOps mchp_pfsoc_mmuart_ops = {
-> +    .read = mchp_pfsoc_mmuart_read,
-> +    .write = mchp_pfsoc_mmuart_write,
-> +    .endianness = DEVICE_LITTLE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +MchpPfSoCMMUartState *mchp_pfsoc_mmuart_create(MemoryRegion *sysmem,
-> +    hwaddr base, qemu_irq irq, Chardev *chr)
-> +{
-> +    MchpPfSoCMMUartState *s;
-> +
-> +    s = g_new0(MchpPfSoCMMUartState, 1);
-> +
-> +    memory_region_init_io(&s->iomem, NULL, &mchp_pfsoc_mmuart_ops, s,
-> +                          "mchp.pfsoc.mmuart", 0x1000);
-> +
-> +    s->base = base;
-> +    s->irq = irq;
-> +
-> +    s->serial = serial_mm_init(sysmem, base, 2, irq, 399193, chr,
-> +                               DEVICE_LITTLE_ENDIAN);
-> +
-> +    memory_region_add_subregion(sysmem, base + 0x20, &s->iomem);
-> +
-> +    return s;
-> +}
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 5359b39..4002d51 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -1320,7 +1320,9 @@ M: Bin Meng <bin.meng@windriver.com>
->  L: qemu-riscv@nongnu.org
->  S: Supported
->  F: hw/riscv/microchip_pfsoc.c
-> +F: hw/char/mchp_pfsoc_mmuart.c
->  F: include/hw/riscv/microchip_pfsoc.h
-> +F: include/hw/char/mchp_pfsoc_mmuart.h
->
->  RX Machines
->  -----------
-> diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-> index b7e0e4d..1d64555 100644
-> --- a/hw/char/Kconfig
-> +++ b/hw/char/Kconfig
-> @@ -52,3 +52,6 @@ config RENESAS_SCI
->
->  config AVR_USART
+>  static uint64_t sifive_u_prci_read(void *opaque, hwaddr addr, unsigned int size)
+>  {
+> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+> index 5073986..65f3fdd 100644
+> --- a/hw/misc/Kconfig
+> +++ b/hw/misc/Kconfig
+> @@ -137,4 +137,7 @@ config AVR_POWER
+>  config SIFIVE_E_PRCI
 >      bool
-> +
-> +config MCHP_PFSOC_MMUART
-> +    bool
-> diff --git a/hw/char/meson.build b/hw/char/meson.build
-> index e888215..ae27932 100644
-> --- a/hw/char/meson.build
-> +++ b/hw/char/meson.build
-> @@ -32,6 +32,7 @@ softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_aux.c'))
->  softmmu_ss.add(when: 'CONFIG_RENESAS_SCI', if_true: files('renesas_sci.c'))
->  softmmu_ss.add(when: 'CONFIG_SH4', if_true: files('sh_serial.c'))
->  softmmu_ss.add(when: 'CONFIG_STM32F2XX_USART', if_true: files('stm32f2xx_usart.c'))
-> +softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_MMUART', if_true: files('mchp_pfsoc_mmuart.c'))
 >
->  specific_ss.add(when: 'CONFIG_TERMINAL3270', if_true: files('terminal3270.c'))
->  specific_ss.add(when: 'CONFIG_VIRTIO', if_true: files('virtio-serial-bus.c'))
+> +config SIFIVE_U_PRCI
+> +    bool
+> +
+>  source macio/Kconfig
+> diff --git a/hw/misc/meson.build b/hw/misc/meson.build
+> index b6b2e57..9e9550e 100644
+> --- a/hw/misc/meson.build
+> +++ b/hw/misc/meson.build
+> @@ -23,6 +23,7 @@ softmmu_ss.add(when: 'CONFIG_MOS6522', if_true: files('mos6522.c'))
+>
+>  # RISC-V devices
+>  softmmu_ss.add(when: 'CONFIG_SIFIVE_E_PRCI', if_true: files('sifive_e_prci.c'))
+> +softmmu_ss.add(when: 'CONFIG_SIFIVE_U_PRCI', if_true: files('sifive_u_prci.c'))
+>
+>  # PKUnity SoC devices
+>  softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_pm.c'))
+> diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+> index 5855e99..109364b 100644
+> --- a/hw/riscv/Kconfig
+> +++ b/hw/riscv/Kconfig
+> @@ -24,6 +24,7 @@ config SIFIVE_U
+>      select HART
+>      select SIFIVE
+>      select SIFIVE_PDMA
+> +    select SIFIVE_U_PRCI
+>      select UNIMP
+>
+>  config SPIKE
+> diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
+> index d73ea99..e6c8af0 100644
+> --- a/hw/riscv/meson.build
+> +++ b/hw/riscv/meson.build
+> @@ -12,7 +12,6 @@ riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_uart.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_E', if_true: files('sifive_e.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u_otp.c'))
+> -riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u_prci.c'))
+>  riscv_ss.add(when: 'CONFIG_SPIKE', if_true: files('riscv_htif.c'))
+>  riscv_ss.add(when: 'CONFIG_SPIKE', if_true: files('spike.c'))
+>  riscv_ss.add(when: 'CONFIG_MICROCHIP_PFSOC', if_true: files('microchip_pfsoc.c'))
 > --
 > 2.7.4
 >
