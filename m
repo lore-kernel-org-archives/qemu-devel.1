@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 462B0C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 14:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25AF1C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 14:21:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0F5E206B7
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 14:21:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D75C1206B7
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 14:21:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="eh7ZDZbi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0F5E206B7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="oYLBM2hn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D75C1206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kECb0-0004Sk-Vr
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 10:21:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60860)
+	id 1kECb8-0004le-0H
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 10:21:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kECa0-0002RK-LB; Fri, 04 Sep 2020 10:20:40 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:47986)
+ id 1kECZz-0002QI-Cx; Fri, 04 Sep 2020 10:20:39 -0400
+Received: from charlie.dont.surf ([128.199.63.193]:47894)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kECZy-0002ia-UN; Fri, 04 Sep 2020 10:20:40 -0400
+ id 1kECZv-0002hc-BE; Fri, 04 Sep 2020 10:20:39 -0400
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 01C49BFA7A;
+ by charlie.dont.surf (Postfix) with ESMTPSA id 9F63BBF971;
  Fri,  4 Sep 2020 14:20:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
- s=default; t=1599229233;
- bh=x5rI1HWixO9M3U5Sx5ljE1KG3wqn4Or/3ScwW+wMAzc=;
+ s=default; t=1599229232;
+ bh=gogBjjMMi9PEf/7ttP+H9aUwS17DFzWVBvf40kesay4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=eh7ZDZbiwq8glXSnUVwUhnWjtI6V+OjLIMxHs9v0j3en+gDx5kPi1q3VhLsnHpnER
- p3pXEO+aeKQKkijRSq6w0THFuZDRZYynjDyjYahvIKCvrPrrKhplXfvuu9SbdHpb2t
- EJHm/dLdNfyIMRI8lFAZ1HyabGdqL8cD2aGNZ12RowWDOB4eSIFP5+3UpEOKaO0vsP
- WkdTObRy7mv/G7KTrjszHtsXv+b8IQFHxT33eDpyvHvxHyRGJvwr+GWJgJRDWKG4Xh
- jvjS9J4jS9bJvzxOQ77IU8a0obiCRnJeQZAHleljbSRUOWYrj3x28P4ZJaGBH/nkUP
- qt3485TbdM5Rw==
+ b=oYLBM2hnxNyUZM5JV3ZqyjgK3FzxNFqZL8Nf2R9m7AyHBRd4lpn478xACqzRLCYOH
+ 4LlrrSx4Q0gg+va/BEb3O/gUdxXXRyGjQPRtlAAkpYZRLUhkO8Gb3D03uPMWdUf44C
+ B4C9iXTU7F0Q1XHu7LYCkDNoS7AQp9xrgiaSDukBSOfcqq27tZo4i8UoCtUhLBfDrF
+ 94HhbIYVs7lpNaoPGpVjvamBgDygC8iRUcuvMSKd1kug8wtAfTyU+/tpKh1oJdls+1
+ vXiEcH18fIP4joGGOi1TBmVuxsEFB1u9wQgWspDuWkbbQiyvkWfgtlT+4JF4xvyxZg
+ VfvtMKN/XqStw==
 From: Klaus Jensen <its@irrelevant.dk>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/17] hw/block/nvme: add a lba to bytes helper
-Date: Fri,  4 Sep 2020 16:19:44 +0200
-Message-Id: <20200904141956.576630-6-its@irrelevant.dk>
+Subject: [PATCH 04/17] hw/block/nvme: alignment style fixes
+Date: Fri,  4 Sep 2020 16:19:43 +0200
+Message-Id: <20200904141956.576630-5-its@irrelevant.dk>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20200904141956.576630-1-its@irrelevant.dk>
 References: <20200904141956.576630-1-its@irrelevant.dk>
@@ -88,64 +88,120 @@ Sender: "Qemu-devel"
 
 From: Klaus Jensen <k.jensen@samsung.com>
 
-Add the nvme_l2b helper and use it for converting NLB and SLBA to byte
-counts and offsets.
+Style fixes.
 
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
 ---
- hw/block/nvme.c | 12 ++++--------
- hw/block/nvme.h |  6 ++++++
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ hw/block/nvme.c | 25 +++++++++++++------------
+ 1 file changed, 13 insertions(+), 12 deletions(-)
 
 diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 88b4e6288bea..08f824dd807d 100644
+index a94e648a80e4..88b4e6288bea 100644
 --- a/hw/block/nvme.c
 +++ b/hw/block/nvme.c
-@@ -644,12 +644,10 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+@@ -634,7 +634,7 @@ static void nvme_rw_cb(void *opaque, int ret)
+ static uint16_t nvme_flush(NvmeCtrl *n, NvmeRequest *req)
  {
-     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
-     NvmeNamespace *ns = req->ns;
--    const uint8_t lba_index = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
--    const uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
-     uint64_t slba = le64_to_cpu(rw->slba);
-     uint32_t nlb  = le16_to_cpu(rw->nlb) + 1;
--    uint64_t offset = slba << data_shift;
--    uint32_t count = nlb << data_shift;
-+    uint64_t offset = nvme_l2b(ns, slba);
-+    uint32_t count = nvme_l2b(ns, nlb);
-     uint16_t status;
+     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+-         BLOCK_ACCT_FLUSH);
++                     BLOCK_ACCT_FLUSH);
+     req->aiocb = blk_aio_flush(n->conf.blk, nvme_rw_cb, req);
  
-     trace_pci_nvme_write_zeroes(nvme_cid(req), slba, nlb);
-@@ -674,10 +672,8 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
-     uint32_t nlb  = le32_to_cpu(rw->nlb) + 1;
-     uint64_t slba = le64_to_cpu(rw->slba);
- 
--    uint8_t lba_index  = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
--    uint8_t data_shift = ns->id_ns.lbaf[lba_index].ds;
--    uint64_t data_size = (uint64_t)nlb << data_shift;
--    uint64_t data_offset = slba << data_shift;
-+    uint64_t data_size = nvme_l2b(ns, nlb);
-+    uint64_t data_offset = nvme_l2b(ns, slba);
-     int is_write = rw->opcode == NVME_CMD_WRITE ? 1 : 0;
-     enum BlockAcctType acct = is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
-     uint16_t status;
-diff --git a/hw/block/nvme.h b/hw/block/nvme.h
-index 52ba794f2e9a..1675c1e0755c 100644
---- a/hw/block/nvme.h
-+++ b/hw/block/nvme.h
-@@ -77,6 +77,12 @@ static inline uint8_t nvme_ns_lbads(NvmeNamespace *ns)
-     return nvme_ns_lbaf(ns)->ds;
+     return NVME_NO_COMPLETE;
+@@ -663,7 +663,7 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+     block_acct_start(blk_get_stats(n->conf.blk), &req->acct, 0,
+                      BLOCK_ACCT_WRITE);
+     req->aiocb = blk_aio_pwrite_zeroes(n->conf.blk, offset, count,
+-                                        BDRV_REQ_MAY_UNMAP, nvme_rw_cb, req);
++                                       BDRV_REQ_MAY_UNMAP, nvme_rw_cb, req);
+     return NVME_NO_COMPLETE;
  }
  
-+/* convert an LBA to the equivalent in bytes */
-+static inline size_t nvme_l2b(NvmeNamespace *ns, uint64_t lba)
-+{
-+    return lba << nvme_ns_lbads(ns);
-+}
-+
- #define TYPE_NVME "nvme"
- #define NVME(obj) \
-         OBJECT_CHECK(NvmeCtrl, (obj), TYPE_NVME)
+@@ -803,7 +803,7 @@ static uint16_t nvme_del_sq(NvmeCtrl *n, NvmeRequest *req)
+ }
+ 
+ static void nvme_init_sq(NvmeSQueue *sq, NvmeCtrl *n, uint64_t dma_addr,
+-    uint16_t sqid, uint16_t cqid, uint16_t size)
++                         uint16_t sqid, uint16_t cqid, uint16_t size)
+ {
+     int i;
+     NvmeCQueue *cq;
+@@ -1058,7 +1058,8 @@ static uint16_t nvme_del_cq(NvmeCtrl *n, NvmeRequest *req)
+ }
+ 
+ static void nvme_init_cq(NvmeCQueue *cq, NvmeCtrl *n, uint64_t dma_addr,
+-    uint16_t cqid, uint16_t vector, uint16_t size, uint16_t irq_enabled)
++                         uint16_t cqid, uint16_t vector, uint16_t size,
++                         uint16_t irq_enabled)
+ {
+     int ret;
+ 
+@@ -1118,7 +1119,7 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeRequest *req)
+ 
+     cq = g_malloc0(sizeof(*cq));
+     nvme_init_cq(cq, n, prp1, cqid, vector, qsize + 1,
+-        NVME_CQ_FLAGS_IEN(qflags));
++                 NVME_CQ_FLAGS_IEN(qflags));
+ 
+     /*
+      * It is only required to set qs_created when creating a completion queue;
+@@ -1520,7 +1521,7 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeRequest *req)
+         }
+ 
+         if (((n->temperature >= n->features.temp_thresh_hi) ||
+-            (n->temperature <= n->features.temp_thresh_low)) &&
++             (n->temperature <= n->features.temp_thresh_low)) &&
+             NVME_AEC_SMART(n->features.async_config) & NVME_SMART_TEMPERATURE) {
+             nvme_enqueue_event(n, NVME_AER_TYPE_SMART,
+                                NVME_AER_INFO_SMART_TEMP_THRESH,
+@@ -1770,9 +1771,9 @@ static int nvme_start_ctrl(NvmeCtrl *n)
+     n->cqe_size = 1 << NVME_CC_IOCQES(n->bar.cc);
+     n->sqe_size = 1 << NVME_CC_IOSQES(n->bar.cc);
+     nvme_init_cq(&n->admin_cq, n, n->bar.acq, 0, 0,
+-        NVME_AQA_ACQS(n->bar.aqa) + 1, 1);
++                 NVME_AQA_ACQS(n->bar.aqa) + 1, 1);
+     nvme_init_sq(&n->admin_sq, n, n->bar.asq, 0, 0,
+-        NVME_AQA_ASQS(n->bar.aqa) + 1);
++                 NVME_AQA_ASQS(n->bar.aqa) + 1);
+ 
+     nvme_set_timestamp(n, 0ULL);
+ 
+@@ -1782,7 +1783,7 @@ static int nvme_start_ctrl(NvmeCtrl *n)
+ }
+ 
+ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
+-    unsigned size)
++                           unsigned size)
+ {
+     if (unlikely(offset & (sizeof(uint32_t) - 1))) {
+         NVME_GUEST_ERR(pci_nvme_ub_mmiowr_misaligned32,
+@@ -1925,7 +1926,7 @@ static void nvme_write_bar(NvmeCtrl *n, hwaddr offset, uint64_t data,
+                        "invalid write to PMRSWTP register, ignored");
+         return;
+     case 0xE14: /* TODO PMRMSC */
+-         break;
++        break;
+     default:
+         NVME_GUEST_ERR(pci_nvme_ub_mmiowr_invalid,
+                        "invalid MMIO write,"
+@@ -2101,7 +2102,7 @@ static void nvme_process_db(NvmeCtrl *n, hwaddr addr, int val)
+ }
+ 
+ static void nvme_mmio_write(void *opaque, hwaddr addr, uint64_t data,
+-    unsigned size)
++                            unsigned size)
+ {
+     NvmeCtrl *n = (NvmeCtrl *)opaque;
+ 
+@@ -2125,7 +2126,7 @@ static const MemoryRegionOps nvme_mmio_ops = {
+ };
+ 
+ static void nvme_cmb_write(void *opaque, hwaddr addr, uint64_t data,
+-    unsigned size)
++                           unsigned size)
+ {
+     NvmeCtrl *n = (NvmeCtrl *)opaque;
+     stn_le_p(&n->cmbuf[addr], size, data);
 -- 
 2.28.0
 
