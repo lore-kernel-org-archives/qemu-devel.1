@@ -2,83 +2,82 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AEBCC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:07:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3865DC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D83B20758
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:07:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E496A20716
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:33:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="umH80TQA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D83B20758
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="px8QE351"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E496A20716
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE0CP-0006vM-GR
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 21:07:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54030)
+	id 1kE0bv-0004Bs-4n
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 21:33:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kE0A1-0002Wn-MT; Thu, 03 Sep 2020 21:05:01 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:41536)
+ (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
+ id 1kE0bN-0003jX-O9; Thu, 03 Sep 2020 21:33:17 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:38590)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kE09z-0002kP-VH; Thu, 03 Sep 2020 21:05:01 -0400
-Received: by mail-il1-x144.google.com with SMTP id w8so4938267ilj.8;
- Thu, 03 Sep 2020 18:04:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
+ id 1kE0bM-000631-7S; Thu, 03 Sep 2020 21:33:17 -0400
+Received: by mail-pl1-x644.google.com with SMTP id c3so123325plz.5;
+ Thu, 03 Sep 2020 18:33:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=DPxxBWeC4FEvN6MAD2yhRYDcWf1dgWl/eqzDkL21hmc=;
- b=umH80TQA95CeA3tNVazBrDNksqHOGtpELXgK/wqy4lUj2O0aYvVQ+Mqk0dVpzFKWi8
- uEHMRouQdDeLxXsUMpHHY9kQTTCz+3Pr/gCf/M5d5zBt6QNrLwhgKkHdPUkO1CIc7g35
- wzPeRWYULkoAxCVXMhdCDP5G7kV2RqOYeqBcmtbCEOYQwYIRWazZlak4fFu7cOvva8iY
- RBC3ZfH3Uf1GzH298z9iJCtmD6g8hSBdGEFeIYiQS4jqITPQCi7P6JtyIqM34k3idVYz
- iyj3Uu/xGbboTHMYALLdkTbQY59v5Oql/gfZGWgJnHIZ/a1QE45BXpvAVItZV9lZY4/F
- RdGA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LTKQBbgj8r6sHyXKfna5ZlCDFNvh5xC8gEHwgncf6ro=;
+ b=px8QE351uybDWNqxrzrOaxLZyEUp3ebTHz02h7S0JftuZSXVMkethn1PGKBQil/9qA
+ mq2wLHAeekHKZAsop7Bkh+kpaLj2hJmgEiNBACzdlNFaEtK2vV6Fez/otDpPmpJ76O0U
+ 37IfIzT8/AGbYKIykbDzFVDHBURfPKrymJQ3VAx1iO8bHFB8ziQtoYw0b+QSf9+rW8az
+ H/3Fj2LA+NxyAC0F/Im2t0R32yuNLKWVeKw+cXT9tait+Qp6L50Ls8dLhxajBxeSJCal
+ V46c4D91JXiMych6LU2JGkJ55J3S9zX31Y1fe+vK0MwzzQEtT161Z5V4YFjIfJf2pFVh
+ WzRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=DPxxBWeC4FEvN6MAD2yhRYDcWf1dgWl/eqzDkL21hmc=;
- b=m7LNEvT62oL5fI8TpmL+jjtES0c9+TYIQFz+tob7ftTt4YcjxZk1isxMEoyjOF+8P0
- wVBj2r0BiV4pcOajIAFTxkyIlVsMIx9UZDrozJfgqLjMb4K4xg+aD7bI0nk9QDvEchNE
- YZgVLo/plAOks1LUXvIgzW6rdSW91ckQ00zOg4gYCB5KEM9uf0rKWiYFYVoBucW062Qt
- wB6NOkYqLNltjdZ4llb5tz7Rz/chaBPPmiJqWL1OnNJbBz84WKq/S1EAX3agbe4cM4WU
- KeNVtnxjEd5SYAyUAoxTEfEG9223jd6FReykSkMY2JDYw9MX+P5hxpgrgsgWdXqZBAU/
- /7Fg==
-X-Gm-Message-State: AOAM533JywSox96+LisBDEniEexusXaAz73y9YatkxHzle5k+O1e0QVB
- D9FNJ7tjC5rk+tv+T7wa63iTteQL5bY=
-X-Google-Smtp-Source: ABdhPJzn+u3OW8do4dAEjQfcrKWLvZBttD6+KTOjyGpnrpHRtc/AlRhwQ9ssxwDaS/4elNXUs2Hhrw==
-X-Received: by 2002:a05:6e02:1107:: with SMTP id
- u7mr5723047ilk.165.1599181498361; 
- Thu, 03 Sep 2020 18:04:58 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
- by smtp.gmail.com with ESMTPSA id o18sm205907ilj.77.2020.09.03.18.04.56
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=LTKQBbgj8r6sHyXKfna5ZlCDFNvh5xC8gEHwgncf6ro=;
+ b=UpmdqwYrzO5g9uP3krifbE4774hGYHyr6lXzoct0d9/mux/ubUjPHh8og78wD4PEQf
+ oEBRyy8AnEeZF+ryJ1eQujlagnHXkhKR0qRahgQUxQjtMpT27xvK20ZbqmskNKQvn1iB
+ hBYKMbVDDUhxL0jRAJONC6s/g5sl+PjY11zyQBf8E5k8UZXncfFRO7xnkp+krTLc91On
+ HmE9D3LaxDovKnOpEA1DZ2VoHauJQqINu+f9Rd0OAhVlbSBkfc45tPPA7hGdJKxpnT4y
+ P/vAawLnHrB8W+gKXrocIgNsIcijirOK8syQgWuuA5u6joTrFDvAhJoIbxBTBypyO4ze
+ S5tg==
+X-Gm-Message-State: AOAM533bRXhq9YLV0Aj9VXAYTxbb4idVv2MsOKerkzdh0KGajDOAelvw
+ aDwYJ2tDI8xD/DfCy0lf/YKpNC4jlLQ=
+X-Google-Smtp-Source: ABdhPJxcRTKilBZvR5//ok1ltNLwkrVeush/b6XTqwNq1SoYT9iU5F+UTEBAfAIoCvtRbS7W0qBGlA==
+X-Received: by 2002:a17:90a:6903:: with SMTP id
+ r3mr5534917pjj.169.1599183193821; 
+ Thu, 03 Sep 2020 18:33:13 -0700 (PDT)
+Received: from localhost.localdomain ([161.81.62.213])
+ by smtp.gmail.com with ESMTPSA id gj16sm3643158pjb.13.2020.09.03.18.33.12
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 18:04:57 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v4 3/3] spapr_numa: use spapr_numa_get_vcpu_assoc() in
- home_node hcall
-Date: Thu,  3 Sep 2020 22:04:39 -0300
-Message-Id: <20200904010439.581957-4-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200904010439.581957-1-danielhb413@gmail.com>
-References: <20200904010439.581957-1-danielhb413@gmail.com>
+ Thu, 03 Sep 2020 18:33:13 -0700 (PDT)
+From: Tom Yan <tom.ty89@gmail.com>
+To: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
+ qemu-devel@nongnu.org
+Subject: [PATCH RESEND v2 1/2] file-posix: split hdev_refresh_limits from
+ raw_refresh_limits
+Date: Fri,  4 Sep 2020 09:33:03 +0800
+Message-Id: <20200904013304.220336-1-tom.ty89@gmail.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=danielhb413@gmail.com; helo=mail-il1-x144.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=tom.ty89@gmail.com; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -101,86 +100,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au
+Cc: Tom Yan <tom.ty89@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current implementation of h_home_node_associativity hard codes
-the values of associativity domains of the vcpus. Let's make
-it consider the values already initialized in spapr->numa_assoc_array,
-via the spapr_numa_get_vcpu_assoc() helper.
+We can and should get max transfer length and max segments for all host
+devices / cdroms (on Linux).
 
-We want to set it and forget it, and for that we also need to
-assert that we don't overflow the registers of the hypercall.
-From R4 to R9 we can squeeze in 12 associativity domains, so
-let's assert that MAX_DISTANCE_REF_POINTS isn't greater
-than that.
+Also use MIN_NON_ZERO instead when we clamp max transfer length against
+max segments.
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Signed-off-by: Tom Yan <tom.ty89@gmail.com>
 ---
- hw/ppc/spapr_numa.c | 33 +++++++++++++++++++++++++--------
- 1 file changed, 25 insertions(+), 8 deletions(-)
+v2: fix get_max_transfer_length for non-sg devices; also add/fix
+sg_get_max_segments for sg devices
+ block/file-posix.c | 56 +++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 40 insertions(+), 16 deletions(-)
 
-diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index 980a6488bf..0a7e07fe60 100644
---- a/hw/ppc/spapr_numa.c
-+++ b/hw/ppc/spapr_numa.c
-@@ -181,10 +181,12 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-                                               target_ulong opcode,
-                                               target_ulong *args)
+diff --git a/block/file-posix.c b/block/file-posix.c
+index 9a00d4190a..0c9124c8aa 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -1178,7 +1178,23 @@ static int sg_get_max_transfer_length(int fd)
+ #endif
+ }
+ 
+-static int sg_get_max_segments(int fd)
++static int get_max_transfer_length(int fd)
++{
++#if defined(BLKSECTGET) && defined(BLKSSZGET)
++    int sect = 0;
++    int ssz = 0;
++
++    if (ioctl(fd, BLKSECTGET, &sect) == 0 && ioctl(fd, BLKSSZGET, &ssz)) {
++        return sect * ssz;
++    } else {
++        return -errno;
++    }
++#else
++    return -ENOSYS;
++#endif
++}
++
++static int get_max_segments(int fd)
  {
-+    g_autofree uint32_t *vcpu_assoc = NULL;
-     target_ulong flags = args[0];
-     target_ulong procno = args[1];
-     PowerPCCPU *tcpu;
--    int idx;
-+    uint vcpu_assoc_size;
-+    int idx, assoc_idx;
+ #ifdef CONFIG_LINUX
+     char buf[32];
+@@ -1233,23 +1249,31 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
  
-     /* only support procno from H_REGISTER_VPA */
-     if (flags != 0x1) {
-@@ -196,16 +198,31 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-         return H_P2;
+-    if (bs->sg) {
+-        int ret = sg_get_max_transfer_length(s->fd);
++    raw_probe_alignment(bs, s->fd, errp);
++    bs->bl.min_mem_alignment = s->buf_align;
++    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
++}
++
++static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
++{
++    BDRVRawState *s = bs->opaque;
++
++    /* BLKSECTGET has always been implemented wrongly in the sg driver
++       and BLKSSZGET has never been supported by it*/
++    int ret = bs->sg ? sg_get_max_transfer_length(s->fd) :
++                       get_max_transfer_length(s->fd);
+ 
+-        if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+-            bs->bl.max_transfer = pow2floor(ret);
+-        }
++    if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
++        bs->bl.max_transfer = pow2floor(ret);
++    }
+ 
+-        ret = sg_get_max_segments(s->fd);
+-        if (ret > 0) {
+-            bs->bl.max_transfer = MIN(bs->bl.max_transfer,
+-                                      ret * qemu_real_host_page_size);
+-        }
++    ret = get_max_segments(s->fd);
++    if (ret > 0) {
++        bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
++                                           ret * qemu_real_host_page_size);
      }
  
--    /* sequence is the same as in the "ibm,associativity" property */
-+    /*
-+     * Given that we want to be flexible with the sizes and indexes,
-+     * we must consider that there is a hard limit of how many
-+     * associativities domain we can fit in R4 up to R9, which
-+     * would be 12. Assert and bail if that's not the case.
-+     */
-+    G_STATIC_ASSERT(MAX_DISTANCE_REF_POINTS <= 12);
-+
-+    vcpu_assoc = spapr_numa_get_vcpu_assoc(spapr, tcpu, &vcpu_assoc_size);
-+    vcpu_assoc_size /= sizeof(uint32_t);
-+    /* assoc_idx starts at 1 to skip associativity size */
-+    assoc_idx = 1;
+-    raw_probe_alignment(bs, s->fd, errp);
+-    bs->bl.min_mem_alignment = s->buf_align;
+-    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
++    raw_refresh_limits(bs, errp);
+ }
  
--    idx = 0;
- #define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
-                              ((uint64_t)(b) & 0xffffffff))
--    args[idx++] = ASSOCIATIVITY(0, 0);
--    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
--    args[idx++] = ASSOCIATIVITY(procno, -1);
--    for ( ; idx < 6; idx++) {
--        args[idx] = -1;
-+
-+    for (idx = 0; idx < 6; idx++) {
-+        int32_t a, b;
-+
-+        a = assoc_idx < vcpu_assoc_size ?
-+            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
-+        b = assoc_idx < vcpu_assoc_size ?
-+            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
-+
-+        args[idx] = ASSOCIATIVITY(a, b);
-     }
- #undef ASSOCIATIVITY
- 
+ static int check_for_dasd(int fd)
+@@ -3604,7 +3628,7 @@ static BlockDriver bdrv_host_device = {
+     .bdrv_co_pdiscard       = hdev_co_pdiscard,
+     .bdrv_co_copy_range_from = raw_co_copy_range_from,
+     .bdrv_co_copy_range_to  = raw_co_copy_range_to,
+-    .bdrv_refresh_limits = raw_refresh_limits,
++    .bdrv_refresh_limits = hdev_refresh_limits,
+     .bdrv_io_plug = raw_aio_plug,
+     .bdrv_io_unplug = raw_aio_unplug,
+     .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+@@ -3728,7 +3752,7 @@ static BlockDriver bdrv_host_cdrom = {
+     .bdrv_co_preadv         = raw_co_preadv,
+     .bdrv_co_pwritev        = raw_co_pwritev,
+     .bdrv_co_flush_to_disk  = raw_co_flush_to_disk,
+-    .bdrv_refresh_limits = raw_refresh_limits,
++    .bdrv_refresh_limits = hdev_refresh_limits,
+     .bdrv_io_plug = raw_aio_plug,
+     .bdrv_io_unplug = raw_aio_unplug,
+     .bdrv_attach_aio_context = raw_aio_attach_aio_context,
 -- 
-2.26.2
+2.28.0
 
 
