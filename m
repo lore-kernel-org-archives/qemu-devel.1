@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BD8C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:50:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8762DC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:51:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37D1C20773
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:50:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41BA920578
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:51:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GoaRwCq0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37D1C20773
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jEeTZevW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41BA920578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45166 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2ju-0007ho-C8
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:50:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54722)
+	id 1kE2kl-0000ac-AI
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:51:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hX-0002Xx-Do; Thu, 03 Sep 2020 23:47:47 -0400
-Received: from ozlabs.org ([203.11.71.1]:59619)
+ id 1kE2hZ-0002dB-Dq; Thu, 03 Sep 2020 23:47:49 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:51105)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hU-0004uu-AO; Thu, 03 Sep 2020 23:47:47 -0400
+ id 1kE2hU-0004ux-M2; Thu, 03 Sep 2020 23:47:49 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsp3b8dz9sVg; Fri,  4 Sep 2020 13:47:26 +1000 (AEST)
+ id 4BjNsq19Pfz9sVq; Fri,  4 Sep 2020 13:47:27 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599191246;
- bh=+i8c6x+g1I/0BlMD1P5giE77/kh1mmlq1iXBC8Cnpfk=;
+ d=gibson.dropbear.id.au; s=201602; t=1599191247;
+ bh=x72XkQdCKwl+nzDKBcPHb5FwlHCdlLNuP3qoPMFwXdc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=GoaRwCq06m0DSv1loMN+nwJtqt4gRrXkGu97JahZyYxUw6lPg16d6X41BQq4OSOqO
- mTGVB1N+0T5v6RhK6FY6uGZRpUmwFNMKByNwULxeDLzmF2S4d+7iXM+NqdBoTlU5nc
- J77+sa0rnjdcF/xwmS3swkeYp2NApBfPSa7YarVE=
+ b=jEeTZevWfLWBxC2MzJQkPwFtW0OET3L4NvtIKOlOU06QG6pDzJsbL1FaEBe+gmTRL
+ ekamfmoQAh0HWubs73OHX8NTr+qPaHurKPYD3+keH6VUH/HMewhdnZXpFw8MocIfwc
+ eXxo9STyhdb+7+hI8HA33k9eMewyVcawPqgXombU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 09/30] spapr/xive: Use kvmppc_xive_source_reset() in post_load
-Date: Fri,  4 Sep 2020 13:46:58 +1000
-Message-Id: <20200904034719.673626-10-david@gibson.dropbear.id.au>
+Subject: [PULL 12/30] ppc/spapr_nvdimm: use g_autofree in
+ spapr_nvdimm_validate_opts()
+Date: Fri,  4 Sep 2020 13:47:01 +1000
+Message-Id: <20200904034719.673626-13-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 23:47:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -19
 X-Spam_score: -2.0
 X-Spam_bar: --
@@ -75,64 +75,45 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+ qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-This is doing an extra loop but should be equivalent.
+Since we're using the string just once, just use g_autofree and
+avoid leaking it without calling g_free().
 
-It also differentiate the reset of the sources from the restore of the
-sources configuration. This will help in allocating the vCPU IPIs
-independently.
-
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-Id: <20200820134547.2355743-3-clg@kaod.org>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-Id: <20200825215749.213536-2-danielhb413@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive_kvm.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ hw/ppc/spapr_nvdimm.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 0e834b4b71..3e80ea0ce9 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -646,22 +646,22 @@ int kvmppc_xive_post_load(SpaprXive *xive, int version_id)
-         }
-     }
+diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+index 81410aa63f..9a20a65640 100644
+--- a/hw/ppc/spapr_nvdimm.c
++++ b/hw/ppc/spapr_nvdimm.c
+@@ -33,7 +33,7 @@
+ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uint64_t size,
+                                 Error **errp)
+ {
+-    char *uuidstr = NULL;
++    g_autofree char *uuidstr = NULL;
+     QemuUUID uuid;
+     int ret;
  
-+    /*
-+     * We can only restore the source config if the source has been
-+     * previously set in KVM. Since we don't do that at reset time
-+     * when restoring a VM, let's do it now.
-+     */
-+    ret = kvmppc_xive_source_reset(&xive->source, &local_err);
-+    if (ret < 0) {
-+        goto fail;
-+    }
-+
-     /* Restore the EAT */
-     for (i = 0; i < xive->nr_irqs; i++) {
-         if (!xive_eas_is_valid(&xive->eat[i])) {
-             continue;
-         }
+@@ -54,7 +54,6 @@ void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uint64_t size,
+                                       &error_abort);
+     ret = qemu_uuid_parse(uuidstr, &uuid);
+     g_assert(!ret);
+-    g_free(uuidstr);
  
--        /*
--         * We can only restore the source config if the source has been
--         * previously set in KVM. Since we don't do that for all interrupts
--         * at reset time anymore, let's do it now.
--         */
--        ret = kvmppc_xive_source_reset_one(&xive->source, i, &local_err);
--        if (ret < 0) {
--            goto fail;
--        }
--
-         ret = kvmppc_xive_set_source_config(xive, i, &xive->eat[i], &local_err);
-         if (ret < 0) {
-             goto fail;
+     if (qemu_uuid_is_null(&uuid)) {
+         error_setg(errp, "NVDIMM device requires the uuid to be set");
 -- 
 2.26.2
 
