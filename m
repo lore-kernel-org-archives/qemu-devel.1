@@ -2,82 +2,77 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC02C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:53:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09381C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:55:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD48B20665
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:53:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5880D20665
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:55:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CVKhUqVs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD48B20665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LAkYmUU2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5880D20665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEFSl-0006hS-Dy
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:25:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49624)
+	id 1kEFd9-0005Fv-7k
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:36:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51372)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kEFS2-0005TQ-5E; Fri, 04 Sep 2020 13:24:38 -0400
-Received: from mail-qk1-x730.google.com ([2607:f8b0:4864:20::730]:38681)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kEFcN-0004mo-A5; Fri, 04 Sep 2020 13:35:19 -0400
+Received: from mail-qv1-xf42.google.com ([2607:f8b0:4864:20::f42]:38127)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kEFS0-0005CM-3M; Fri, 04 Sep 2020 13:24:37 -0400
-Received: by mail-qk1-x730.google.com with SMTP id d20so7028637qka.5;
- Fri, 04 Sep 2020 10:24:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kEFcL-0006JD-FG; Fri, 04 Sep 2020 13:35:18 -0400
+Received: by mail-qv1-xf42.google.com with SMTP id x7so3398074qvi.5;
+ Fri, 04 Sep 2020 10:35:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Algq3dgij7WJPgSn72cXErD3mDE4VJisbpLxFJRfzcI=;
- b=CVKhUqVseTU0Iqb3NsAwIYF/XySJ8esnLq5WSPJhk97FxBAS8zwp0VZzdNabN20bcy
- zYTeojqpvmokuCJs54Zv3vPxHWcdzz/jXuDvnqY2XyZ9GR8tLR0PGDPKjyAMBvX9SGxG
- 4crosf32JJWqm+YrR29NuAz+CQ1SDIuVvny0lbPcvrGncRVOvLVJ++oN+xyAasmdK/mp
- FScZ+fQYmAyeFzqWPwKt5TbLFKwL+ySu4XQS/PYyKbMA13eX3t7CuEyv1RguunB7cLv4
- VyzDycMnZ+r24F+xYbPyQ4wbJh3wMRTiz9R6orq4n+L3pyzMi9bXkmv4KePdScITr8/n
- ZX4g==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=at1s6EaHojkmloPxxcNCr1MyzhednyNzJ4U7vYLY1+s=;
+ b=LAkYmUU2S2IQyurHQxkpjgd9HhIrQn5MKdsd4cyycJ4pZbnzEZQUhQRz9DWZsC9OEI
+ 7uE6CQTmYZmYZ1bUiKhrz+oSKfCI/mgMv+EJ1akh5lAiN1pK+8vtEBYiLp/mQyDXc88u
+ YGkJszyMndUSdNHnOUG2vMciUMqRUnJnNk51SoA8vnDHCizMl90W2gtWl8V7zjVPYVgG
+ muNU7VtxD3EaHd39Mn+IGtwJneCLUyuGuP/SBhkFVmurAgkKlVKpctEIwuDyU29nAc/9
+ S9koq6GhVkB0/d81PW4Zo7+xdTw+an2JpAUDVUcqbnAwc8KyWTpNgiP0ptbTpfW9pi5h
+ tSbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Algq3dgij7WJPgSn72cXErD3mDE4VJisbpLxFJRfzcI=;
- b=maMkOv01HV+NrjKaWmsdYXGjMvc5KgD5oS1VTZeZqJOICTUHDL9oG99XvRFXIjhwU8
- to/SyRgMKqmQK4MYOsoXvr6KuJPhflDskpbKdDuR9N1R/GznV5ihanTBXrr7dXvm7eKa
- tnspPbCIbejxQ5qMuumDYgWgXZ44QeiErW3TXFl26PrsZ8J6F0WrwPTykD78vBN9QaHP
- 6P1wVmTPOSP0iH9/V78plH+7YZ4IL67vuegtEGLM6wq0frlsbE70sg78S8rjelk0WIOz
- Y0B3rYwujn6z7uW4tVcwWy+JqZZtRW9jyRvdrOIeCznLWoPw5tU7v502Z9Dseqx4ohJ5
- OgbA==
-X-Gm-Message-State: AOAM532OcCfhAKiGEvZ7jy+iangNvfZrmUtwtHwrtBoiFpXDPJ14zod3
- qOX/fjoMAJTlPd/7As54fN56IHXz/mk=
-X-Google-Smtp-Source: ABdhPJz8Ul9qAb/jIRtPtjRi/S4vDLh+Vo//JS3gyK4quxCDgCiLNWdYn7xd4dzjPt4AzGeSnNZHHQ==
-X-Received: by 2002:a05:620a:211b:: with SMTP id
- l27mr8557333qkl.56.1599240274532; 
- Fri, 04 Sep 2020 10:24:34 -0700 (PDT)
-Received: from rekt.ibmuc.com ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
- by smtp.gmail.com with ESMTPSA id s192sm3269245qke.50.2020.09.04.10.24.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 10:24:33 -0700 (PDT)
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 1/3] spapr: move h_home_node_associativity to spapr_numa.c
-Date: Fri,  4 Sep 2020 14:24:20 -0300
-Message-Id: <20200904172422.617460-2-danielhb413@gmail.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200904172422.617460-1-danielhb413@gmail.com>
-References: <20200904172422.617460-1-danielhb413@gmail.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=at1s6EaHojkmloPxxcNCr1MyzhednyNzJ4U7vYLY1+s=;
+ b=uVsZ19VAXRd4ns8Ke9ec89ImXwqy5AzCPS8DqPWyz88gTzirtGgo+Rh/lDP277tbmJ
+ OTl7zluc23fNUwkwJ/DULuPU3FrcsmAPrGDpYvrXoU6TdIUgiit+AbvShM/EkVbVoTRB
+ 16IMqTy61qAqjODkmX7S/1oOKdjrgFIx4xlM/Z+0NeaPGW5KXtTI5KmAMEL979xY6ZAX
+ DBuwnkB1/UGmfHBlix/vjlSqtGx9ya1toW2FNvOAy5/pPz3bf2oy1b6jIE7bwQ/gBuUm
+ woAjvwT7Kh6eA5bnX3cm4EIcudGMmnYNfFy1iX9HHdABdKs4t8XIKiDNpXHEBJZf9Ky6
+ oizw==
+X-Gm-Message-State: AOAM530i7fgetHtZZkkFqMaP/mB81LzI4SIu4uOiam0wF1RL0Ly9/K+g
+ 0DKWypRn77ObQ3EN7hDiFCHWi7cy+wSL6tpojtg=
+X-Google-Smtp-Source: ABdhPJyvvgNz0d3HqR4R1Kak17OQKz7gpjsdZYNe+fWQc9skq1kY8PqSC28BAiWiJ4iagoMdQ7I+7jmTfO181Kc/BFE=
+X-Received: by 2002:a05:6214:1784:: with SMTP id
+ ct4mr8001974qvb.10.1599240915620; 
+ Fri, 04 Sep 2020 10:35:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::730;
- envelope-from=danielhb413@gmail.com; helo=mail-qk1-x730.google.com
+References: <1599129623-68957-1-git-send-email-bmeng.cn@gmail.com>
+ <1599129623-68957-2-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1599129623-68957-2-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 4 Sep 2020 10:24:20 -0700
+Message-ID: <CAKmqyKMFu3dZ0JO9xvwo7BYi6ptyV6r5sZb53r-HAww6u9-H1g@mail.gmail.com>
+Subject: Re: [PATCH 01/12] hw/riscv: Move sifive_e_prci model to hw/misc
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::f42;
+ envelope-from=alistair23@gmail.com; helo=mail-qv1-xf42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -100,135 +95,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>, qemu-ppc@nongnu.org,
- groug@kaod.org, david@gibson.dropbear.id.au
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Bin Meng <bin.meng@windriver.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The implementation of this hypercall will be modified to use
-spapr->numa_assoc_arrays input. Moving it to spapr_numa.c makes
-make more sense.
+On Thu, Sep 3, 2020 at 3:42 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> This is an effort to clean up the hw/riscv directory. Ideally it
+> should only contain the RISC-V SoC / machine codes plus generic
+> codes. Let's move sifive_e_prci model to hw/misc directory.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
----
- hw/ppc/spapr_hcall.c | 40 ---------------------------------------
- hw/ppc/spapr_numa.c  | 45 ++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 45 insertions(+), 40 deletions(-)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-diff --git a/hw/ppc/spapr_hcall.c b/hw/ppc/spapr_hcall.c
-index c1d01228c6..c2776b6a7d 100644
---- a/hw/ppc/spapr_hcall.c
-+++ b/hw/ppc/spapr_hcall.c
-@@ -1873,42 +1873,6 @@ static target_ulong h_client_architecture_support(PowerPCCPU *cpu,
-     return ret;
- }
- 
--static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
--                                              SpaprMachineState *spapr,
--                                              target_ulong opcode,
--                                              target_ulong *args)
--{
--    target_ulong flags = args[0];
--    target_ulong procno = args[1];
--    PowerPCCPU *tcpu;
--    int idx;
--
--    /* only support procno from H_REGISTER_VPA */
--    if (flags != 0x1) {
--        return H_FUNCTION;
--    }
--
--    tcpu = spapr_find_cpu(procno);
--    if (tcpu == NULL) {
--        return H_P2;
--    }
--
--    /* sequence is the same as in the "ibm,associativity" property */
--
--    idx = 0;
--#define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
--                             ((uint64_t)(b) & 0xffffffff))
--    args[idx++] = ASSOCIATIVITY(0, 0);
--    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
--    args[idx++] = ASSOCIATIVITY(procno, -1);
--    for ( ; idx < 6; idx++) {
--        args[idx] = -1;
--    }
--#undef ASSOCIATIVITY
--
--    return H_SUCCESS;
--}
--
- static target_ulong h_get_cpu_characteristics(PowerPCCPU *cpu,
-                                               SpaprMachineState *spapr,
-                                               target_ulong opcode,
-@@ -2139,10 +2103,6 @@ static void hypercall_register_types(void)
-     spapr_register_hypercall(KVMPPC_H_CAS, h_client_architecture_support);
- 
-     spapr_register_hypercall(KVMPPC_H_UPDATE_DT, h_update_dt);
--
--    /* Virtual Processor Home Node */
--    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
--                             h_home_node_associativity);
- }
- 
- type_init(hypercall_register_types)
-diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index 93a000b729..368c1a494d 100644
---- a/hw/ppc/spapr_numa.c
-+++ b/hw/ppc/spapr_numa.c
-@@ -165,3 +165,48 @@ void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas)
-     _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
-                      maxdomains, sizeof(maxdomains)));
- }
-+
-+static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-+                                              SpaprMachineState *spapr,
-+                                              target_ulong opcode,
-+                                              target_ulong *args)
-+{
-+    target_ulong flags = args[0];
-+    target_ulong procno = args[1];
-+    PowerPCCPU *tcpu;
-+    int idx;
-+
-+    /* only support procno from H_REGISTER_VPA */
-+    if (flags != 0x1) {
-+        return H_FUNCTION;
-+    }
-+
-+    tcpu = spapr_find_cpu(procno);
-+    if (tcpu == NULL) {
-+        return H_P2;
-+    }
-+
-+    /* sequence is the same as in the "ibm,associativity" property */
-+
-+    idx = 0;
-+#define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
-+                             ((uint64_t)(b) & 0xffffffff))
-+    args[idx++] = ASSOCIATIVITY(0, 0);
-+    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
-+    args[idx++] = ASSOCIATIVITY(procno, -1);
-+    for ( ; idx < 6; idx++) {
-+        args[idx] = -1;
-+    }
-+#undef ASSOCIATIVITY
-+
-+    return H_SUCCESS;
-+}
-+
-+static void spapr_numa_register_types(void)
-+{
-+    /* Virtual Processor Home Node */
-+    spapr_register_hypercall(H_HOME_NODE_ASSOCIATIVITY,
-+                             h_home_node_associativity);
-+}
-+
-+type_init(spapr_numa_register_types)
--- 
-2.26.2
+Alistair
 
+> ---
+>
+>  include/hw/{riscv => misc}/sifive_e_prci.h | 0
+>  hw/{riscv => misc}/sifive_e_prci.c         | 2 +-
+>  hw/riscv/sifive_e.c                        | 2 +-
+>  hw/misc/Kconfig                            | 3 +++
+>  hw/misc/meson.build                        | 3 +++
+>  hw/riscv/Kconfig                           | 1 +
+>  hw/riscv/meson.build                       | 1 -
+>  7 files changed, 9 insertions(+), 3 deletions(-)
+>  rename include/hw/{riscv => misc}/sifive_e_prci.h (100%)
+>  rename hw/{riscv => misc}/sifive_e_prci.c (99%)
+>
+> diff --git a/include/hw/riscv/sifive_e_prci.h b/include/hw/misc/sifive_e_prci.h
+> similarity index 100%
+> rename from include/hw/riscv/sifive_e_prci.h
+> rename to include/hw/misc/sifive_e_prci.h
+> diff --git a/hw/riscv/sifive_e_prci.c b/hw/misc/sifive_e_prci.c
+> similarity index 99%
+> rename from hw/riscv/sifive_e_prci.c
+> rename to hw/misc/sifive_e_prci.c
+> index 17dfa74..8ec4ee4 100644
+> --- a/hw/riscv/sifive_e_prci.c
+> +++ b/hw/misc/sifive_e_prci.c
+> @@ -24,7 +24,7 @@
+>  #include "qemu/log.h"
+>  #include "qemu/module.h"
+>  #include "hw/hw.h"
+> -#include "hw/riscv/sifive_e_prci.h"
+> +#include "hw/misc/sifive_e_prci.h"
+>
+>  static uint64_t sifive_e_prci_read(void *opaque, hwaddr addr, unsigned int size)
+>  {
+> diff --git a/hw/riscv/sifive_e.c b/hw/riscv/sifive_e.c
+> index 36ccfb2..7f43ed9 100644
+> --- a/hw/riscv/sifive_e.c
+> +++ b/hw/riscv/sifive_e.c
+> @@ -43,8 +43,8 @@
+>  #include "hw/riscv/sifive_clint.h"
+>  #include "hw/riscv/sifive_uart.h"
+>  #include "hw/riscv/sifive_e.h"
+> -#include "hw/riscv/sifive_e_prci.h"
+>  #include "hw/riscv/boot.h"
+> +#include "hw/misc/sifive_e_prci.h"
+>  #include "chardev/char.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/sysemu.h"
+> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+> index 92c397c..5073986 100644
+> --- a/hw/misc/Kconfig
+> +++ b/hw/misc/Kconfig
+> @@ -134,4 +134,7 @@ config MAC_VIA
+>  config AVR_POWER
+>      bool
+>
+> +config SIFIVE_E_PRCI
+> +    bool
+> +
+>  source macio/Kconfig
+> diff --git a/hw/misc/meson.build b/hw/misc/meson.build
+> index e1576b8..b6b2e57 100644
+> --- a/hw/misc/meson.build
+> +++ b/hw/misc/meson.build
+> @@ -21,6 +21,9 @@ softmmu_ss.add(when: 'CONFIG_ARM11SCU', if_true: files('arm11scu.c'))
+>  # Mac devices
+>  softmmu_ss.add(when: 'CONFIG_MOS6522', if_true: files('mos6522.c'))
+>
+> +# RISC-V devices
+> +softmmu_ss.add(when: 'CONFIG_SIFIVE_E_PRCI', if_true: files('sifive_e_prci.c'))
+> +
+>  # PKUnity SoC devices
+>  softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_pm.c'))
+>
+> diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+> index e53ab1e..5855e99 100644
+> --- a/hw/riscv/Kconfig
+> +++ b/hw/riscv/Kconfig
+> @@ -15,6 +15,7 @@ config SIFIVE_E
+>      bool
+>      select HART
+>      select SIFIVE
+> +    select SIFIVE_E_PRCI
+>      select UNIMP
+>
+>  config SIFIVE_U
+> diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
+> index cf1aa99..d73ea99 100644
+> --- a/hw/riscv/meson.build
+> +++ b/hw/riscv/meson.build
+> @@ -10,7 +10,6 @@ riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_plic.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_test.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_uart.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_E', if_true: files('sifive_e.c'))
+> -riscv_ss.add(when: 'CONFIG_SIFIVE_E', if_true: files('sifive_e_prci.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u_otp.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u_prci.c'))
+> --
+> 2.7.4
+>
+>
 
