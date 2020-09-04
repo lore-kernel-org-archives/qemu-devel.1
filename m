@@ -2,67 +2,73 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB57C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 06:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FDD9C28E83
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 07:02:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2AF320748
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 06:22:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="d3JavGW2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2AF320748
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id CED5B206D4
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 07:02:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CED5B206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE577-0003Ez-27
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 02:22:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51622)
+	id 1kE5k3-0003Hu-Tl
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 03:02:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58540)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE55c-0001mU-6P; Fri, 04 Sep 2020 02:20:49 -0400
-Received: from ozlabs.org ([203.11.71.1]:49951)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE55W-00062p-RY; Fri, 04 Sep 2020 02:20:47 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjSGY2FrWz9sVB; Fri,  4 Sep 2020 16:20:36 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599200437;
- bh=9GqHTDLobR0jWc7MzR/l0USSH3hKb109jmAMesbL5LY=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=d3JavGW2xaQ1TBRwwML1MHGTF2cscRtKN4qyTxlp1YEcADF7PUT4XEB7gvIQXa4Y8
- 3wlrf5H456U2H2NFWkFZGFGiefFePmNMZzKPFVecXADPpKY8/mzMBzIcvxYj+I3zdS
- Qf54DKBoKH95dfOssIeFQYvsTusj5fHxBENDT8AY=
-Date: Fri, 4 Sep 2020 14:10:33 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v4 2/3] spapr_numa: create a vcpu associativity helper
-Message-ID: <20200904041033.GG341806@yekko.fritz.box>
-References: <20200904010439.581957-1-danielhb413@gmail.com>
- <20200904010439.581957-3-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kE5iu-00024k-Gg
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 03:01:24 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:47154
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kE5is-0002Jn-2z
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 03:01:23 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-362-ffWXZQ-ONy2CTbyOZ3RI5w-1; Fri, 04 Sep 2020 03:01:18 -0400
+X-MC-Unique: ffWXZQ-ONy2CTbyOZ3RI5w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40D7E802B48;
+ Fri,  4 Sep 2020 07:01:17 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-62.ams2.redhat.com
+ [10.36.112.62])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA1A51A914;
+ Fri,  4 Sep 2020 07:01:13 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 20F3A31E63; Fri,  4 Sep 2020 09:01:13 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 4/4] ui/gtk: Update refresh interval after widget is realized
+Date: Fri,  4 Sep 2020 09:01:12 +0200
+Message-Id: <20200904070112.7315-5-kraxel@redhat.com>
+In-Reply-To: <20200904070112.7315-1-kraxel@redhat.com>
+References: <20200904070112.7315-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="6BvahUXLYAruDZOj"
-Content-Disposition: inline
-In-Reply-To: <20200904010439.581957-3-danielhb413@gmail.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 02:20:37
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,118 +81,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Nikola Pavlica <pavlica.nikola@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
---6BvahUXLYAruDZOj
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Nikola reported on Windows when gd_vc_gfx_init() is called, the
+window is not yet realized, so we run gd_refresh_rate_millihz(NULL)
+which returns 0 milli-Hertz.
+When a Widget is realized, it fires a 'realized' event. We already
+have the gd_draw_event() handler registered for this even, so simply
+move the gd_refresh_rate_millihz() there. When the event fires, the
+window is known to exist.
+This completes commit c4c00922cc original intention.
 
-On Thu, Sep 03, 2020 at 10:04:38PM -0300, Daniel Henrique Barboza wrote:
-> The work to be done in h_home_node_associativity() intersects
-> with what is already done in spapr_numa_fixup_cpu_dt(). This
-> patch creates a new helper, spapr_numa_get_vcpu_assoc(), to
-> be used for both spapr_numa_fixup_cpu_dt() and
-> h_home_node_associativity().
->=20
-> While we're at it, use memcpy() instead of loop assignment
-> to created the returned array.
->=20
-> Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-> ---
->  hw/ppc/spapr_numa.c | 30 ++++++++++++++++++++----------
->  1 file changed, 20 insertions(+), 10 deletions(-)
->=20
-> diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-> index 368c1a494d..980a6488bf 100644
-> --- a/hw/ppc/spapr_numa.c
-> +++ b/hw/ppc/spapr_numa.c
-> @@ -71,13 +71,15 @@ void spapr_numa_write_associativity_dt(SpaprMachineSt=
-ate *spapr, void *fdt,
->                        sizeof(spapr->numa_assoc_array[nodeid]))));
->  }
-> =20
-> -int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
-> -                            int offset, PowerPCCPU *cpu)
-> +static uint32_t *spapr_numa_get_vcpu_assoc(SpaprMachineState *spapr,
-> +                                          PowerPCCPU *cpu,
-> +                                          uint *vcpu_assoc_size)
->  {
-> -    uint vcpu_assoc_size =3D NUMA_ASSOC_SIZE + 1;
-> -    uint32_t vcpu_assoc[vcpu_assoc_size];
-> +    uint32_t *vcpu_assoc =3D NULL;
->      int index =3D spapr_get_vcpu_id(cpu);
-> -    int i;
-> +
-> +    *vcpu_assoc_size =3D (NUMA_ASSOC_SIZE + 1) * sizeof(uint32_t);
-> +    vcpu_assoc =3D g_malloc(*vcpu_assoc_size);
-> =20
->      /*
->       * VCPUs have an extra 'cpu_id' value in ibm,associativity
-> @@ -86,16 +88,24 @@ int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr,=
- void *fdt,
->       * cpu_id last.
->       */
->      vcpu_assoc[0] =3D cpu_to_be32(MAX_DISTANCE_REF_POINTS + 1);
-> +    memcpy(vcpu_assoc + 1, spapr->numa_assoc_array[cpu->node_id],
-> +           MAX_DISTANCE_REF_POINTS);
+Reported-by: Nikola Pavlica <pavlica.nikola@gmail.com>
+Tested-by: Nikola Pavlica <pavlica.nikola@gmail.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-id: 20200817172331.598255-1-philmd@redhat.com
+Suggested-by: Nikola Pavlica <pavlica.nikola@gmail.com>
+Tested-by: Nikola Pavlica <pavlica.nikola@gmail.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/gtk.c | 52 ++++++++++++++++++++++++++--------------------------
+ 1 file changed, 26 insertions(+), 26 deletions(-)
 
-That needs to be MAX_DISTANCE_REF_POINTS * sizeof(uint32_t), doesn't it?
+diff --git a/ui/gtk.c b/ui/gtk.c
+index b0cc08ad6da7..7a717ce8e5e4 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -744,6 +744,25 @@ static void gd_resize_event(GtkGLArea *area,
+ 
+ #endif
+ 
++/*
++ * If available, return the refresh rate of the display in milli-Hertz,
++ * else return 0.
++ */
++static int gd_refresh_rate_millihz(GtkWidget *window)
++{
++#ifdef GDK_VERSION_3_22
++    GdkWindow *win = gtk_widget_get_window(window);
++
++    if (win) {
++        GdkDisplay *dpy = gtk_widget_get_display(window);
++        GdkMonitor *monitor = gdk_display_get_monitor_at_window(dpy, win);
++
++        return gdk_monitor_get_refresh_rate(monitor);
++    }
++#endif
++    return 0;
++}
++
+ static gboolean gd_draw_event(GtkWidget *widget, cairo_t *cr, void *opaque)
+ {
+     VirtualConsole *vc = opaque;
+@@ -751,6 +770,7 @@ static gboolean gd_draw_event(GtkWidget *widget, cairo_t *cr, void *opaque)
+     int mx, my;
+     int ww, wh;
+     int fbw, fbh;
++    int refresh_rate_millihz;
+ 
+ #if defined(CONFIG_OPENGL)
+     if (vc->gfx.gls) {
+@@ -771,6 +791,12 @@ static gboolean gd_draw_event(GtkWidget *widget, cairo_t *cr, void *opaque)
+         return FALSE;
+     }
+ 
++    refresh_rate_millihz = gd_refresh_rate_millihz(vc->window ?
++                                                   vc->window : s->window);
++    if (refresh_rate_millihz) {
++        vc->gfx.dcl.update_interval = MILLISEC_PER_SEC / refresh_rate_millihz;
++    }
++
+     fbw = surface_width(vc->gfx.ds);
+     fbh = surface_height(vc->gfx.ds);
+ 
+@@ -1949,31 +1975,11 @@ static GtkWidget *gd_create_menu_machine(GtkDisplayState *s)
+     return machine_menu;
+ }
+ 
+-/*
+- * If available, return the refresh rate of the display in milli-Hertz,
+- * else return 0.
+- */
+-static int gd_refresh_rate_millihz(GtkWidget *window)
+-{
+-#ifdef GDK_VERSION_3_22
+-    GdkWindow *win = gtk_widget_get_window(window);
+-
+-    if (win) {
+-        GdkDisplay *dpy = gtk_widget_get_display(window);
+-        GdkMonitor *monitor = gdk_display_get_monitor_at_window(dpy, win);
+-
+-        return gdk_monitor_get_refresh_rate(monitor);
+-    }
+-#endif
+-    return 0;
+-}
+-
+ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
+                               QemuConsole *con, int idx,
+                               GSList *group, GtkWidget *view_menu)
+ {
+     bool zoom_to_fit = false;
+-    int refresh_rate_millihz;
+ 
+     vc->label = qemu_console_get_label(con);
+     vc->s = s;
+@@ -2031,12 +2037,6 @@ static GSList *gd_vc_gfx_init(GtkDisplayState *s, VirtualConsole *vc,
+     vc->gfx.kbd = qkbd_state_init(con);
+     vc->gfx.dcl.con = con;
+ 
+-    refresh_rate_millihz = gd_refresh_rate_millihz(vc->window ?
+-                                                   vc->window : s->window);
+-    if (refresh_rate_millihz) {
+-        vc->gfx.dcl.update_interval = MILLISEC_PER_SEC / refresh_rate_millihz;
+-    }
+-
+     register_displaychangelistener(&vc->gfx.dcl);
+ 
+     gd_connect_vc_gfx_signals(vc);
+-- 
+2.27.0
 
-> +    vcpu_assoc[MAX_DISTANCE_REF_POINTS + 1] =3D cpu_to_be32(index);
-> =20
-> -    for (i =3D 1; i <=3D MAX_DISTANCE_REF_POINTS; i++) {
-> -        vcpu_assoc[i] =3D spapr->numa_assoc_array[cpu->node_id][i];
-> -    }
-> +    return vcpu_assoc;
-> +}
-> +
-> +int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
-> +                            int offset, PowerPCCPU *cpu)
-> +{
-> +    g_autofree uint32_t *vcpu_assoc =3D NULL;
-> +    uint vcpu_assoc_size;
-> =20
-> -    vcpu_assoc[vcpu_assoc_size - 1] =3D cpu_to_be32(index);
-> +    vcpu_assoc =3D spapr_numa_get_vcpu_assoc(spapr, cpu, &vcpu_assoc_siz=
-e);
-> =20
->      /* Advertise NUMA via ibm,associativity */
->      return fdt_setprop(fdt, offset, "ibm,associativity",
-> -                       vcpu_assoc, sizeof(vcpu_assoc));
-> +                       vcpu_assoc, vcpu_assoc_size);>  }
-> =20
-> =20
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---6BvahUXLYAruDZOj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9RvjkACgkQbDjKyiDZ
-s5KZvQ/+PjB2SEUexsoNVf9PoB+U6kun3qxlWoj9WjJzQOfrJOvfAN6o5+D2NnNS
-rrbiGsCGShqleuSMexgx6dvQJUy1exddl69Y6N/+Y0ACcjiQSCUFVOp2dbiVe3mo
-FRN7kQADh/vvoqeqs9+5ywfMZsyiWUxDgiyB4qUsiKSJo6yld7mgrlJXyCzjqtbO
-L3jnFUg+gK7p4Fw8lPjAJ19OxFOXmSMH1EiVsE3bEfjQr445M2arm6ZbvZ30Nn/0
-gH2ToJRpYBDppjCANG+YlJU8pGVZo6W0Gxm1nuuWY3p7g6IQ5XSDkRdb5nChCENv
-lK+uoSdEvAVgpIigQSLAlsazNgle3dCBrhswGRm8XKEPLPbm771eex/QY8vV0DTZ
-cwjZXOX0sqmNoFvTCY6ACyAeIb4fE7ilIHCX38ZFSd6EchuKKWFaNZ9OcSEmsYQj
-BilfXM78JNoKkskj7jzPdpH9T5SK9MDNLQliWn8/iYUx/2/v/VQ+suLcdx9HLEZ4
-3fsGIBYjgYBwBYbfngqi+HkWwIcas+BU8QlL6GV8STnmNkonMVSgkJUSs2l8h6pF
-U/v/nd4ayodKnN+EF+rszhvJgVgX5sr4DnJ0qNO4P6FPbpTFxyQz03rqy6l4XB3a
-SPZkYoWDtDAROLeSB79+mD0ylMpSCw52weFCyjzcloq4VFpGFNc=
-=r4Xt
------END PGP SIGNATURE-----
-
---6BvahUXLYAruDZOj--
 
