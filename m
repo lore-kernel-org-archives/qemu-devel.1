@@ -2,93 +2,94 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC67DC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 02:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2830FC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 02:46:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8497F2067C
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 02:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4663206B7
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 02:46:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sxTL1221"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8497F2067C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d+JJ6HvL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4663206B7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE1Bn-0006p5-Mg
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 22:10:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37884)
+	id 1kE1kJ-00009I-Tw
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 22:46:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
- id 1kE1AI-0005Qf-1p; Thu, 03 Sep 2020 22:09:22 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:34226)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
- id 1kE1AG-0002cp-KG; Thu, 03 Sep 2020 22:09:21 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id n3so4513248pjq.1;
- Thu, 03 Sep 2020 19:09:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=wwJlpHbGqD6yuQffmEe6pHXUpY2gNY6RxukEHADyMls=;
- b=sxTL1221iQ0izLkA4qRYFJwMdEgyruNyoxF/WWqwN36w3TxBK4g9GZCb7HoUuZW0H/
- g/p/9m71w5SUvKImfOQfmmAFREWyeuQlP0d3TTfm07SLdNOfbGyB8pxElRDAwTuTpD/S
- IUGhX6F4FqBsVJD+E9+QxNYso2TPCNhXO+9t3NIHlItOQkfZ1hCUdr48SDUoVmf5Z4uL
- kaHcNkYVHPyPxS7xoy3TuXXl6c1wso3DiXocxRsY/VvKWLf93IdIt72TCq6Jm+MAybOd
- 5aRX2HMGmmGZmlwwRpslGTrVyq4B/NwFfIotIYgnM0E0GVAxinvVHjpAqz1NEN/arlQu
- sVxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=wwJlpHbGqD6yuQffmEe6pHXUpY2gNY6RxukEHADyMls=;
- b=PCnar7+Dz3GLlx8s8HYBPVN4LcR93uC+xuVFz8AISItvYn18WsyK3SEWO5RWB+H85n
- ekDgoPv9U3TwKnNp3+tXzLOJo8QFMacaaqehdevncWTiddZYPU+B0siw/IEs32tYdwWx
- K5svRih2vcxvNaBWGJvDxGunR2BfGyvXYxYoCoqcVjbFvNfnIrgmjuLbR+A3iH4BLlNQ
- XNVqbSrOJ+c3g9Gf3b/SpPt+Qoe92FEAIOrItMQ0rAejApzi/97wETVY73+UlKfClUDA
- ME2wffKfXPXZOEc5ZiAb9FYmh4WpWU1AbEVnLgekZpRgS+1D+HDhTv0TUe57wa1rMaj5
- LqMg==
-X-Gm-Message-State: AOAM531M5nNV5nqhDNtFdFHeAT8PVDCiutqvv3foJCOdTB7al/bmZa6K
- Nxvc1c8L3s6aFxq+BbebPoqbHxD8GwU=
-X-Google-Smtp-Source: ABdhPJwu4B+FOu3m8jKtnikiZn4GvH3fE0Tj3jgN7ulW5sVUhPsYdGhptK9LfuTbtiOxDA6j5LijTQ==
-X-Received: by 2002:a17:90b:1256:: with SMTP id
- gx22mr6083420pjb.47.1599185358494; 
- Thu, 03 Sep 2020 19:09:18 -0700 (PDT)
-Received: from localhost.localdomain ([161.81.62.213])
- by smtp.gmail.com with ESMTPSA id n11sm4047178pgd.2.2020.09.03.19.09.16
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 19:09:17 -0700 (PDT)
-From: Tom Yan <tom.ty89@gmail.com>
-To: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
- qemu-devel@nongnu.org
-Subject: [PATCH v4 2/2] file-posix: add sg_get_max_segments that actually
- works with sg
-Date: Fri,  4 Sep 2020 10:09:07 +0800
-Message-Id: <20200904020907.241550-2-tom.ty89@gmail.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200904020907.241550-1-tom.ty89@gmail.com>
-References: <20200904020907.241550-1-tom.ty89@gmail.com>
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kE1jL-00082h-DP
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 22:45:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47495)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kE1jH-0000i6-RQ
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 22:45:34 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599187529;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Y/8HaoGKswsbKahWY+edg6GphdVhXum5MOzh6CpUhds=;
+ b=d+JJ6HvLNRu6cbaDocwt6WJqysUSt97mZzqeBHPcbzZVJdttVO77akpCzuRoTPHPmmP8DA
+ xV2GHzOomomBu4apajWd9TS0Wgg9kSR3uqNBJ3e8YgJzzO6Hoh0GMFvARthJCXT4FtRJO3
+ hheo2+bm4OFahT5y7whBpD73/9GqkTY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-436-dpA9qz0kNnmokx2XgDsCTQ-1; Thu, 03 Sep 2020 22:45:25 -0400
+X-MC-Unique: dpA9qz0kNnmokx2XgDsCTQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7009381F004;
+ Fri,  4 Sep 2020 02:45:24 +0000 (UTC)
+Received: from [10.72.13.157] (ovpn-13-157.pek2.redhat.com [10.72.13.157])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0316881190;
+ Fri,  4 Sep 2020 02:45:14 +0000 (UTC)
+Subject: Re: [RFC 0/3] try to solve the DMA to MMIO issue
+To: Peter Maydell <peter.maydell@linaro.org>, Li Qiang <liq3ea@gmail.com>
+References: <20200902162206.101872-1-liq3ea@163.com>
+ <b840aab8-542d-af43-43e5-0a07f442b5d5@redhat.com>
+ <CAFEAcA9mvMaR5MJJ74Vv63TG6frWnMeSZA19Zxv8TUceudPUTQ@mail.gmail.com>
+ <CAKXe6SLYgkiTAYa81nppHUMEzoeGy3988OmrzZyw8-VY8ajE3w@mail.gmail.com>
+ <CAFEAcA9TEpfBmfOOtpfR9JCAFkMF0fy20L=DBVDTFaLp6J3Lfg@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <fc472e07-42d3-be91-a95c-e0f800ca1855@redhat.com>
+Date: Fri, 4 Sep 2020 10:45:13 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
+In-Reply-To: <CAFEAcA9TEpfBmfOOtpfR9JCAFkMF0fy20L=DBVDTFaLp6J3Lfg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=tom.ty89@gmail.com; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 22:45:29
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -44
+X-Spam_score: -4.5
+X-Spam_bar: ----
+X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,59 +103,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Tom Yan <tom.ty89@gmail.com>
+Cc: Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Li Qiang <liq3ea@163.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-sg devices have different major/minor than their corresponding
-block devices. Using sysfs to get max segments never really worked
-for them.
 
-Fortunately the sg driver provides an ioctl to get sg_tablesize,
-which is apparently equivalent to max segments.
+On 2020/9/3 下午7:19, Peter Maydell wrote:
+> On Thu, 3 Sep 2020 at 12:11, Li Qiang <liq3ea@gmail.com> wrote:
+>> Peter Maydell <peter.maydell@linaro.org> 于2020年9月3日周四 下午6:53写道：
+>>> On Thu, 3 Sep 2020 at 04:55, Jason Wang <jasowang@redhat.com> wrote:
+>>>> I think we still need to seek a way to address this issue completely.
+>>>>
+>>>> How about adding a flag in MemoryRegionOps and detect the reentrancy
+>>>> through that flag?
+>>> This won't catch everything. Consider this situation:
+>>>    Device A makes DMA access to device B
+>>>    Device B's write-handling causes it to raise an
+>>>     outbound qemu_irq signal
+>>>    The qemu_irq signal is connected to device A
+>> Here mean device A is an interrupt controller?
+> No. Any device can have an inbound or outbound qemu_irq line.
+> We use them not just for actual IRQ lines but for any
+> situation where we need to pass an on-or-off signal from
+> one device to another.
+>
+>> This is special case I think.
+> It's an example of why looking purely at MMIO is not
+> sufficient. We should prefer to see if we can come up with
+> a design principle that works for all between-device
+> coordination before we implement something that is specific
+> to MMIO.
 
-Signed-off-by: Tom Yan <tom.ty89@gmail.com>
----
- block/file-posix.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
 
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 411a23cf99..9e37594145 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -1178,6 +1178,21 @@ static int sg_get_max_transfer_length(int fd)
- #endif
- }
- 
-+static int sg_get_max_segments(int fd)
-+{
-+#ifdef SG_GET_SG_TABLESIZE
-+    long max_segments = 0;
-+
-+    if (ioctl(fd, SG_GET_SG_TABLESIZE, &max_segments) == 0) {
-+        return max_segments;
-+    } else {
-+        return -errno;
-+    }
-+#else
-+    return -ENOSYS;
-+#endif
-+}
-+
- static int get_max_transfer_length(int fd)
- {
- #if defined(BLKSECTGET) && defined(BLKSSZGET)
-@@ -1268,7 +1283,7 @@ static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
-         bs->bl.max_transfer = pow2floor(ret);
-     }
- 
--    ret = get_max_segments(s->fd);
-+    ret = bs->sg ? sg_get_max_segments(s->fd) : get_max_segments(s->fd);
-     if (ret > 0) {
-         bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
-                                            ret * qemu_real_host_page_size);
--- 
-2.28.0
+As discussed, maybe we can track the pending operations in device itself 
+and check it in all the possible entry of device codes (irq, MMIO or 
+what ever else). This may be easier for stable backport.
+
+Thanks
+
+
+>
+> thanks
+> -- PMM
+>
 
 
