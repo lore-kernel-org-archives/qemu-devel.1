@@ -7,64 +7,64 @@ X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF63C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64C68C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:47:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1825B206D4
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:47:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1825B206D4
+	by mail.kernel.org (Postfix) with ESMTPS id 2E383206D4
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:47:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E383206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE7NI-0004nz-6w
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 04:47:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52060)
+	id 1kE7NU-0005Gr-9a
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 04:47:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kE7LH-0002CW-8z
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:45:07 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:47176
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kE7Mk-00040c-5r
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:46:38 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60837
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kE7LF-0006Ba-H9
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:45:06 -0400
+ id 1kE7Mi-0006Sv-D2
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:46:37 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-149-CUCXlQ4PMb6T2ejJiUC90g-1; Fri, 04 Sep 2020 04:45:03 -0400
-X-MC-Unique: CUCXlQ4PMb6T2ejJiUC90g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-457-FRSm_jBxMuyvQAj5ENvItA-1; Fri, 04 Sep 2020 04:46:33 -0400
+X-MC-Unique: FRSm_jBxMuyvQAj5ENvItA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A5CDA801FAE;
- Fri,  4 Sep 2020 08:45:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B2EE801FAE;
+ Fri,  4 Sep 2020 08:46:32 +0000 (UTC)
 Received: from redhat.com (ovpn-114-5.ams2.redhat.com [10.36.114.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C7C1F1001B2B;
- Fri,  4 Sep 2020 08:44:54 +0000 (UTC)
-Date: Fri, 4 Sep 2020 09:44:51 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 386515D9D2;
+ Fri,  4 Sep 2020 08:46:27 +0000 (UTC)
+Date: Fri, 4 Sep 2020 09:46:24 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 2/8] i8254: Rename PIT to ISA_PIT
-Message-ID: <20200904084451.GE721059@redhat.com>
+Subject: Re: [PATCH 3/8] i8259: Rename TYPE_I8259 to TYPE_ISA_I8259
+Message-ID: <20200904084624.GF721059@redhat.com>
 References: <20200903180128.1523959-1-ehabkost@redhat.com>
- <20200903180128.1523959-3-ehabkost@redhat.com>
+ <20200903180128.1523959-4-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200903180128.1523959-3-ehabkost@redhat.com>
+In-Reply-To: <20200903180128.1523959-4-ehabkost@redhat.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:57:33
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -94,19 +94,25 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 03, 2020 at 02:01:22PM -0400, Eduardo Habkost wrote:
-> Rename type checking function to be consistent with the type name
-> constant (TYPE_ISA_PIT) and type name string ("isa-pit").
+On Thu, Sep 03, 2020 at 02:01:23PM -0400, Eduardo Habkost wrote:
+> This will make the type name constant consistent with QOM
+> type name string ("isa-i8259").
 > 
+> Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > Suggested-by: "Daniel P. Berrangé" <berrange@redhat.com>
 > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+> ---
+> Changes v1 ->v2:
+> * v1 subject was "i8259: Rename TYPE_I8259 to TYPE_PIC"
+> * Rename it to TYPE_ISA_I8259 instead, to be consistent
+>   with the QOM type name ("isa-i8259")
 > ---
 > Cc: "Michael S. Tsirkin" <mst@redhat.com>
 > Cc: Paolo Bonzini <pbonzini@redhat.com>
 > Cc: qemu-devel@nongnu.org
 > ---
->  hw/timer/i8254.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  hw/intc/i8259.c | 10 +++++-----
+>  1 file changed, 5 insertions(+), 5 deletions(-)
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
