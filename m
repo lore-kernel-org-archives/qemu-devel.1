@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D485AC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BD8C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:50:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92B4D2073B
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:50:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37D1C20773
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:50:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="VSTaUJ9w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92B4D2073B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GoaRwCq0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37D1C20773
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2jq-0007Yz-P7
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:50:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54588)
+	id 1kE2ju-0007ho-C8
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:50:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hR-0002Kk-FA; Thu, 03 Sep 2020 23:47:41 -0400
-Received: from ozlabs.org ([203.11.71.1]:43877)
+ id 1kE2hX-0002Xx-Do; Thu, 03 Sep 2020 23:47:47 -0400
+Received: from ozlabs.org ([203.11.71.1]:59619)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hN-0004sJ-JO; Thu, 03 Sep 2020 23:47:41 -0400
+ id 1kE2hU-0004uu-AO; Thu, 03 Sep 2020 23:47:47 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsn206Pz9sVK; Fri,  4 Sep 2020 13:47:25 +1000 (AEST)
+ id 4BjNsp3b8dz9sVg; Fri,  4 Sep 2020 13:47:26 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599191245;
- bh=qgx6z9rQQE1xqJs/Hitt+hn4TaVazW9OJAaF7qJoeT4=;
+ d=gibson.dropbear.id.au; s=201602; t=1599191246;
+ bh=+i8c6x+g1I/0BlMD1P5giE77/kh1mmlq1iXBC8Cnpfk=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=VSTaUJ9wbCfFzx6O4p5797IKztGmTv3foshyz/xlD2OEX/5voMVmM3gnptCsW46X5
- DVJ+bY4gF6unuofLShuIs3QtOeLjKL7LbijRC2a9dfNlnQr1LYGA2VY22E7x2SpGPX
- EC69/On4Nw15VBNGWDVqtgQq4bizQ+jMWg+uoAaM=
+ b=GoaRwCq06m0DSv1loMN+nwJtqt4gRrXkGu97JahZyYxUw6lPg16d6X41BQq4OSOqO
+ mTGVB1N+0T5v6RhK6FY6uGZRpUmwFNMKByNwULxeDLzmF2S4d+7iXM+NqdBoTlU5nc
+ J77+sa0rnjdcF/xwmS3swkeYp2NApBfPSa7YarVE=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 01/30] adb: Correct class size on TYPE_ADB_DEVICE
-Date: Fri,  4 Sep 2020 13:46:50 +1000
-Message-Id: <20200904034719.673626-2-david@gibson.dropbear.id.au>
+Subject: [PULL 09/30] spapr/xive: Use kvmppc_xive_source_reset() in post_load
+Date: Fri,  4 Sep 2020 13:46:58 +1000
+Message-Id: <20200904034719.673626-10-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
@@ -74,37 +74,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
+Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
  qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
  bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The TypeInfo incorrectly just lets the class size be inherited.  It won't
-actually break things, since the class is abstract, but we should get it
-right.
+From: Cédric Le Goater <clg@kaod.org>
 
+This is doing an extra loop but should be equivalent.
+
+It also differentiate the reset of the sources from the restore of the
+sources configuration. This will help in allocating the vCPU IPIs
+independently.
+
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-Id: <20200820134547.2355743-3-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Cédric Le Goater <clg@kaod.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/input/adb.c | 1 +
- 1 file changed, 1 insertion(+)
+ hw/intc/spapr_xive_kvm.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/hw/input/adb.c b/hw/input/adb.c
-index 013fcc9c54..84331b9fce 100644
---- a/hw/input/adb.c
-+++ b/hw/input/adb.c
-@@ -309,6 +309,7 @@ static void adb_device_class_init(ObjectClass *oc, void *data)
- static const TypeInfo adb_device_type_info = {
-     .name = TYPE_ADB_DEVICE,
-     .parent = TYPE_DEVICE,
-+    .class_size = sizeof(ADBDeviceClass),
-     .instance_size = sizeof(ADBDevice),
-     .abstract = true,
-     .class_init = adb_device_class_init,
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 0e834b4b71..3e80ea0ce9 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -646,22 +646,22 @@ int kvmppc_xive_post_load(SpaprXive *xive, int version_id)
+         }
+     }
+ 
++    /*
++     * We can only restore the source config if the source has been
++     * previously set in KVM. Since we don't do that at reset time
++     * when restoring a VM, let's do it now.
++     */
++    ret = kvmppc_xive_source_reset(&xive->source, &local_err);
++    if (ret < 0) {
++        goto fail;
++    }
++
+     /* Restore the EAT */
+     for (i = 0; i < xive->nr_irqs; i++) {
+         if (!xive_eas_is_valid(&xive->eat[i])) {
+             continue;
+         }
+ 
+-        /*
+-         * We can only restore the source config if the source has been
+-         * previously set in KVM. Since we don't do that for all interrupts
+-         * at reset time anymore, let's do it now.
+-         */
+-        ret = kvmppc_xive_source_reset_one(&xive->source, i, &local_err);
+-        if (ret < 0) {
+-            goto fail;
+-        }
+-
+         ret = kvmppc_xive_set_source_config(xive, i, &xive->eat[i], &local_err);
+         if (ret < 0) {
+             goto fail;
 -- 
 2.26.2
 
