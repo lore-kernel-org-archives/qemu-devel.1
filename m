@@ -2,90 +2,80 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B66C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E750C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83445204EC
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:24:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MKIWNE5X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83445204EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 32252204EC
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:26:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32252204EC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEFoi-0007A2-QQ
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:48:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53676)
+	id 1kEGQL-0002zL-Sa
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 14:26:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kEFni-0006Kr-NJ; Fri, 04 Sep 2020 13:47:02 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:37868)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kEGPL-00027k-AL
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 14:25:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53086)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kEFng-0007pQ-9n; Fri, 04 Sep 2020 13:47:02 -0400
-Received: by mail-qk1-x742.google.com with SMTP id b14so7106009qkn.4;
- Fri, 04 Sep 2020 10:46:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VglmG65lYbuT3KFIPHB7uL7SOW1V6cPg35PHIJJbUIA=;
- b=MKIWNE5XedaVVnGJWM2oNeP/MKDT/o891fGSGnxxD7+jjlOr9ccNeBRPoBhtGJnX6z
- wrnmTYrU1gENxcedceOsUjtAIPk5+YHp038ZeZdq2hxOypptbWWrTqf3x9uxqqm3y+q4
- zNAQ81W0c9RtSNXaIiQtUy+yzUyvcVthlQnJOIU1irvgH6aEXpHxcLNUmHGy5Fd8F/wR
- bzVWUNYhlHAMd4Zn81/ilLEshkECdWlKco9oDQmFGafYlQwdK4cBfGuqw2XmYiaGWG6K
- Ige+qLL9tXCKVuK+rhi8zk35TPKQ4rlSDCEPdWXRB1ycn/vZDCFdcVro+HamaCm+odfm
- 0Bmg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=VglmG65lYbuT3KFIPHB7uL7SOW1V6cPg35PHIJJbUIA=;
- b=badqkllXB8cQ8l6J/uZev/dNGN3Nmyq3VBuJSeP0IX6snZ+nBBeaRCtKqVz/CNk6lT
- f6trh6Z/90SVtcJIjYGqFeLKSjOryRU69QZfObPW5XBMO6ies8Cp8clMNYMdllDXAOk8
- GDeeE4zUkAToHxrw7u9XKzeLjES1NL72O1g9uaVoV6bF4V3Sqct5oVBuVIWv/EzCxlvE
- oMFr2VADSlCtK5xI673FjowBWsZ6XiB6sxg+7r+HVFvxTsrZU9Ppl9skLwrdcHH+aqRc
- mu/Gv7CUFoyjm5+3FWM3fThVA9YkHyM3Mxgtuv6mb94vQOPPfXHw/BSTbTTFkgG8P6eW
- 1XQA==
-X-Gm-Message-State: AOAM530z215wn8gHv4CoDiNDp3kxJCG6ZLzMvnMcj7/eMRn0+x8BtqH5
- 3wRwmN0wfThGJvnbnALJK7TIu+cnexrKiU0taXk=
-X-Google-Smtp-Source: ABdhPJxdCStpJpCKfdcdorSDUpbJXSI2Z9cKn3iuJ/zSgela2QnH+Es5wxAH6ofVwuW8QWvVgdk/OvwmrL9UA8Mq8b0=
-X-Received: by 2002:ae9:f44c:: with SMTP id z12mr9019103qkl.339.1599241618973; 
- Fri, 04 Sep 2020 10:46:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kEGPJ-00044h-2b
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 14:25:54 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kEGPG-0000aC-83
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 18:25:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id F064D2E80EA
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 18:25:49 +0000 (UTC)
 MIME-Version: 1.0
-References: <1599129623-68957-1-git-send-email-bmeng.cn@gmail.com>
- <1599129623-68957-8-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1599129623-68957-8-git-send-email-bmeng.cn@gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 4 Sep 2020 10:36:04 -0700
-Message-ID: <CAKmqyKPzKAfgtLEeCYidQj5wSO8Kc3r=2WWOsW1+hTtSWW9kCw@mail.gmail.com>
-Subject: Re: [PATCH 07/12] hw/riscv: Move riscv_htif model to hw/char
-To: Bin Meng <bmeng.cn@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
- envelope-from=alistair23@gmail.com; helo=mail-qk1-x742.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Sep 2020 18:20:02 -0000
+From: Jordan Williams <1838390@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: hvf macos
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: felipe-1 jimmyj jwillikers smartrejames
+X-Launchpad-Bug-Reporter: James Smart (smartrejames)
+X-Launchpad-Bug-Modifier: Jordan Williams (jwillikers)
+References: <156448241864.18390.18158373201974266058.malonedeb@gac.canonical.com>
+Message-Id: <159924360216.19910.2057178873290053995.malone@gac.canonical.com>
+Subject: [Bug 1838390] Re: vmx_write_mem: mmu_gva_to_gpa failed when using hvf
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: 6d78d44b46ddfd1bb990375aaea236df83d44f8c
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 14:25:51
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,131 +84,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Bin Meng <bin.meng@windriver.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: Bug 1838390 <1838390@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 3, 2020 at 3:48 AM Bin Meng <bmeng.cn@gmail.com> wrote:
->
-> From: Bin Meng <bin.meng@windriver.com>
->
-> This is an effort to clean up the hw/riscv directory. Ideally it
-> should only contain the RISC-V SoC / machine codes plus generic
-> codes. Let's move riscv_htif model to hw/char directory.
->
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+I think I was able to fix this crash by specifying the exact host model
+for the cpu argument.
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+1. Determine the CPU type of the host machine.
 
-Alistair
+$ sysctl -a | grep machdep.cpu.brand_string
+machdep.cpu.brand_string: Intel(R) Core(TM) i5-4690 CPU @ 3.50GHz
 
-> ---
->
->  include/hw/{riscv => char}/riscv_htif.h | 0
->  hw/{riscv => char}/riscv_htif.c         | 2 +-
->  hw/riscv/spike.c                        | 2 +-
->  hw/char/Kconfig                         | 3 +++
->  hw/char/meson.build                     | 1 +
->  hw/riscv/Kconfig                        | 3 ---
->  hw/riscv/meson.build                    | 1 -
->  7 files changed, 6 insertions(+), 6 deletions(-)
->  rename include/hw/{riscv => char}/riscv_htif.h (100%)
->  rename hw/{riscv => char}/riscv_htif.c (99%)
->
-> diff --git a/include/hw/riscv/riscv_htif.h b/include/hw/char/riscv_htif.h
-> similarity index 100%
-> rename from include/hw/riscv/riscv_htif.h
-> rename to include/hw/char/riscv_htif.h
-> diff --git a/hw/riscv/riscv_htif.c b/hw/char/riscv_htif.c
-> similarity index 99%
-> rename from hw/riscv/riscv_htif.c
-> rename to hw/char/riscv_htif.c
-> index ca87a5c..ba1af1c 100644
-> --- a/hw/riscv/riscv_htif.c
-> +++ b/hw/char/riscv_htif.c
-> @@ -24,10 +24,10 @@
->  #include "qapi/error.h"
->  #include "qemu/log.h"
->  #include "hw/sysbus.h"
-> +#include "hw/char/riscv_htif.h"
->  #include "hw/char/serial.h"
->  #include "chardev/char.h"
->  #include "chardev/char-fe.h"
-> -#include "hw/riscv/riscv_htif.h"
->  #include "qemu/timer.h"
->  #include "qemu/error-report.h"
->
-> diff --git a/hw/riscv/spike.c b/hw/riscv/spike.c
-> index 59d9d87..3fd152a 100644
-> --- a/hw/riscv/spike.c
-> +++ b/hw/riscv/spike.c
-> @@ -31,11 +31,11 @@
->  #include "hw/loader.h"
->  #include "hw/sysbus.h"
->  #include "target/riscv/cpu.h"
-> -#include "hw/riscv/riscv_htif.h"
->  #include "hw/riscv/riscv_hart.h"
->  #include "hw/riscv/spike.h"
->  #include "hw/riscv/boot.h"
->  #include "hw/riscv/numa.h"
-> +#include "hw/char/riscv_htif.h"
->  #include "hw/intc/sifive_clint.h"
->  #include "chardev/char.h"
->  #include "sysemu/arch_init.h"
-> diff --git a/hw/char/Kconfig b/hw/char/Kconfig
-> index 1d64555..91da92f 100644
-> --- a/hw/char/Kconfig
-> +++ b/hw/char/Kconfig
-> @@ -1,6 +1,9 @@
->  config ESCC
->      bool
->
-> +config HTIF
-> +    bool
-> +
->  config PARALLEL
->      bool
->      default y
-> diff --git a/hw/char/meson.build b/hw/char/meson.build
-> index ae27932..3db623e 100644
-> --- a/hw/char/meson.build
-> +++ b/hw/char/meson.build
-> @@ -34,6 +34,7 @@ softmmu_ss.add(when: 'CONFIG_SH4', if_true: files('sh_serial.c'))
->  softmmu_ss.add(when: 'CONFIG_STM32F2XX_USART', if_true: files('stm32f2xx_usart.c'))
->  softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_MMUART', if_true: files('mchp_pfsoc_mmuart.c'))
->
-> +specific_ss.add(when: 'CONFIG_HTIF', if_true: files('riscv_htif.c'))
->  specific_ss.add(when: 'CONFIG_TERMINAL3270', if_true: files('terminal3270.c'))
->  specific_ss.add(when: 'CONFIG_VIRTIO', if_true: files('virtio-serial-bus.c'))
->  specific_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr_vty.c'))
-> diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-> index 23b7027..a0e256c 100644
-> --- a/hw/riscv/Kconfig
-> +++ b/hw/riscv/Kconfig
-> @@ -1,6 +1,3 @@
-> -config HTIF
-> -    bool
-> -
->  config HART
->      bool
->
-> diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
-> index 535a142..619bf80 100644
-> --- a/hw/riscv/meson.build
-> +++ b/hw/riscv/meson.build
-> @@ -8,7 +8,6 @@ riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_test.c'))
->  riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_uart.c'))
->  riscv_ss.add(when: 'CONFIG_SIFIVE_E', if_true: files('sifive_e.c'))
->  riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u.c'))
-> -riscv_ss.add(when: 'CONFIG_SPIKE', if_true: files('riscv_htif.c'))
->  riscv_ss.add(when: 'CONFIG_SPIKE', if_true: files('spike.c'))
->  riscv_ss.add(when: 'CONFIG_MICROCHIP_PFSOC', if_true: files('microchip_pfsoc.c'))
->
-> --
-> 2.7.4
->
->
+2. Find the matching CPU model supported by QEMU.
+
+$ qemu-system-x86_64 -cpu help
+
+
+This CPU corresponds to "x86 Haswell-v4" in this instance.
+
+3. Substitute the CPU model in the QEMU command.
+
+$ qemu-system-x86_64 -cpu Haswell-v4 ...
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1838390
+
+Title:
+  vmx_write_mem: mmu_gva_to_gpa failed when using hvf
+
+Status in QEMU:
+  New
+
+Bug description:
+  Installed qemu 4.0.0 by homebrew, used below commands:
+
+  1. qemu-img create -f raw arch-vm.img 100G
+  2. qemu-system-x86_64 -show-cursor -only-migratable -nodefaults -boot ord=
+er=3Dd -cdrom archlinux-2019.07.01-x86_64.iso -cpu host -device virtio-keyb=
+oard -device virtio-mouse -device virtio-tablet -drive file=3Darch-vm.img,f=
+ormat=3Draw,if=3Dvirtio -m 4096 -machine q35,accel=3Dhvf,vmport=3Doff -nic =
+user,ipv6=3Doff,model=3Dvirtio -smp 4,sockets=3D1,cores=3D2,threads=3D2 -so=
+undhw hda -vga virtio
+
+  Displayed bootloader menu successfully, select "Boot Arch Linux" then
+  crashed with message: vmx_write_mem: mmu_gva_to_gpa ffff91953b540000
+  failed.
+
+  Use tcg accelerator has no problem but very slow.
+
+  See attachment for full crash report.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1838390/+subscriptions
 
