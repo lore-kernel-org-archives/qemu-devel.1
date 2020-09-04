@@ -7,56 +7,54 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C6ABC2BC11
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4067AC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:54:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C8AD20FC3
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:53:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2F6820578
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:54:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="EKkeFwJq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C8AD20FC3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Qwsajg/q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2F6820578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53634 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2mu-0003xU-Ca
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:53:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54760)
+	id 1kE2nZ-0005nS-62
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:54:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hZ-0002dl-NT; Thu, 03 Sep 2020 23:47:49 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:40103 helo=ozlabs.org)
+ id 1kE2hb-0002jh-QK; Thu, 03 Sep 2020 23:47:51 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:48803)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hU-0004ut-9Y; Thu, 03 Sep 2020 23:47:49 -0400
+ id 1kE2hZ-0004wu-Qb; Thu, 03 Sep 2020 23:47:51 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsp4qSrz9sVd; Fri,  4 Sep 2020 13:47:26 +1000 (AEST)
+ id 4BjNsr282wz9sW0; Fri,  4 Sep 2020 13:47:28 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599191246;
- bh=jcnikD43TknD0h7PbZyyb0oDHmtpwlFiVMarcY7U0tU=;
+ d=gibson.dropbear.id.au; s=201602; t=1599191248;
+ bh=WHUZRE8xBkBhoLgTp8c17urX6r5gVdkN3abjLoZHMUE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=EKkeFwJqBYXRWehRiY+DgpxbvRFzioFBGpMVB6ZP5ShCb+lM/8tRGrisIp/IIVMaW
- uiEdLmkEoLhpoTwPY+07TKv1hsKpCwsPf0CG8zzBk37JHIKBskVwiivnjmtdsd7pa4
- Ul4QI+ehLIgDiP+fMgLVOPhqKtrytJEKu5Na/9mg=
+ b=Qwsajg/q15lklvtp6sxvjoNcyVdI+a0jh1tUVIa3588J2LjOtgJNHvAkm3e/f+Qez
+ OlrF1ZcjODs1TFpmQn5ASgU/ZAr4ik5WqhIyW4o6snE3rb4J5xgQs3xca1T7MU7Bag
+ AUXlt5PmHUDiPsR6/N1SVqtsIwQWpl2KHXpOmR4Q=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 10/30] spapr/xive: Allocate IPIs independently from the other
- sources
-Date: Fri,  4 Sep 2020 13:46:59 +1000
-Message-Id: <20200904034719.673626-11-david@gibson.dropbear.id.au>
+Subject: [PULL 17/30] ppc/spapr: Use start-powered-off CPUState property
+Date: Fri,  4 Sep 2020 13:47:06 +1000
+Message-Id: <20200904034719.673626-18-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 23:47:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -19
 X-Spam_score: -2.0
 X-Spam_bar: --
@@ -75,140 +73,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+Cc: Eduardo Habkost <ehabkost@redhat.com>, danielhb413@gmail.com,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
  bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cédric Le Goater <clg@kaod.org>
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 
-The vCPU IPIs are now allocated in kvmppc_xive_cpu_connect() when the
-vCPU connects to the KVM device and not when all the sources are reset
-in kvmppc_xive_source_reset()
+PowerPC sPAPR CPUs start in the halted state, and spapr_reset_vcpu()
+attempts to implement this by setting CPUState::halted to 1. But that's too
+late for the case of hotplugged CPUs in a machine configure with 2 or more
+threads per core.
 
-This requires extra care for hotplug vCPUs and VM restore.
+By then, other parts of QEMU have already caused the vCPU to run in an
+unitialized state a couple of times. For example, ppc_cpu_reset() calls
+ppc_tlb_invalidate_all(), which ends up calling async_run_on_cpu(). This
+kicks the new vCPU while it has CPUState::halted = 0, causing QEMU to issue
+a KVM_RUN ioctl on the new vCPU before the guest is able to make the
+start-cpu RTAS call to initialize its register state.
 
-Signed-off-by: Cédric Le Goater <clg@kaod.org>
-Message-Id: <20200820134547.2355743-4-clg@kaod.org>
+This problem doesn't seem to cause visible issues for regular guests, but
+on a secure guest running under the Ultravisor it does. The Ultravisor
+relies on being able to snoop on the start-cpu RTAS call to map vCPUs to
+guests, and this issue causes it to see a stray vCPU that doesn't belong to
+any guest.
+
+Fix by setting the start-powered-off CPUState property in
+spapr_create_vcpu(), which makes cpu_common_reset() initialize
+CPUState::halted to 1 at an earlier moment.
+
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Message-Id: <20200826055535.951207-4-bauerman@linux.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/intc/spapr_xive_kvm.c | 47 +++++++++++++++++++++++++++++++++++-----
- 1 file changed, 42 insertions(+), 5 deletions(-)
+ hw/ppc/spapr_cpu_core.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
-index 3e80ea0ce9..507637d51e 100644
---- a/hw/intc/spapr_xive_kvm.c
-+++ b/hw/intc/spapr_xive_kvm.c
-@@ -146,6 +146,15 @@ int kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp)
-     return s.ret;
- }
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index c4f47dcc04..2125fdac34 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -36,11 +36,6 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
  
-+static int kvmppc_xive_reset_ipi(SpaprXive *xive, CPUState *cs, Error **errp)
-+{
-+    unsigned long ipi = kvm_arch_vcpu_id(cs);
-+    uint64_t state = 0;
-+
-+    return kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE, ipi,
-+                              &state, true, errp);
-+}
-+
- int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
- {
-     ERRP_GUARD();
-@@ -175,6 +184,12 @@ int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
-         return ret;
-     }
+     cpu_reset(cs);
  
-+    /* Create/reset the vCPU IPI */
-+    ret = kvmppc_xive_reset_ipi(xive, tctx->cs, errp);
-+    if (ret < 0) {
-+        return ret;
-+    }
-+
-     kvm_cpu_enable(tctx->cs);
-     return 0;
- }
-@@ -234,6 +249,12 @@ int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **errp)
+-    /* All CPUs start halted.  CPU0 is unhalted from the machine level
+-     * reset code and the rest are explicitly started up by the guest
+-     * using an RTAS call */
+-    cs->halted = 1;
+-
+     env->spr[SPR_HIOR] = 0;
  
-     assert(xive->fd != -1);
+     lpcr = env->spr[SPR_LPCR];
+@@ -274,6 +269,11 @@ static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
  
+     cs = CPU(obj);
+     cpu = POWERPC_CPU(obj);
 +    /*
-+     * The vCPU IPIs are now allocated in kvmppc_xive_cpu_connect()
-+     * and not with all sources in kvmppc_xive_source_reset()
++     * All CPUs start halted. CPU0 is unhalted from the machine level reset code
++     * and the rest are explicitly started up by the guest using an RTAS call.
 +     */
-+    assert(srcno >= SPAPR_XIRQ_BASE);
-+
-     if (xive_source_irq_is_lsi(xsrc, srcno)) {
-         state |= KVM_XIVE_LEVEL_SENSITIVE;
-         if (xsrc->status[srcno] & XIVE_STATUS_ASSERTED) {
-@@ -245,12 +266,28 @@ int kvmppc_xive_source_reset_one(XiveSource *xsrc, int srcno, Error **errp)
-                              true, errp);
- }
- 
-+/*
-+ * To be valid, a source must have been claimed by the machine (valid
-+ * entry in the EAS table) and if it is a vCPU IPI, the vCPU should
-+ * have been enabled, which means the IPI has been allocated in
-+ * kvmppc_xive_cpu_connect().
-+ */
-+static bool xive_source_is_valid(SpaprXive *xive, int i)
-+{
-+    return xive_eas_is_valid(&xive->eat[i]) &&
-+        (i >= SPAPR_XIRQ_BASE || kvm_cpu_is_enabled(i));
-+}
-+
- static int kvmppc_xive_source_reset(XiveSource *xsrc, Error **errp)
- {
-     SpaprXive *xive = SPAPR_XIVE(xsrc->xive);
-     int i;
- 
--    for (i = 0; i < xsrc->nr_irqs; i++) {
-+    /*
-+     * Skip the vCPU IPIs. These are created/reset when the vCPUs are
-+     * connected in kvmppc_xive_cpu_connect()
-+     */
-+    for (i = SPAPR_XIRQ_BASE; i < xsrc->nr_irqs; i++) {
-         int ret;
- 
-         if (!xive_eas_is_valid(&xive->eat[i])) {
-@@ -332,7 +369,7 @@ static void kvmppc_xive_source_get_state(XiveSource *xsrc)
-     for (i = 0; i < xsrc->nr_irqs; i++) {
-         uint8_t pq;
- 
--        if (!xive_eas_is_valid(&xive->eat[i])) {
-+        if (!xive_source_is_valid(xive, i)) {
-             continue;
-         }
- 
-@@ -515,7 +552,7 @@ static void kvmppc_xive_change_state_handler(void *opaque, int running,
-             uint8_t pq;
-             uint8_t old_pq;
- 
--            if (!xive_eas_is_valid(&xive->eat[i])) {
-+            if (!xive_source_is_valid(xive, i)) {
-                 continue;
-             }
- 
-@@ -543,7 +580,7 @@ static void kvmppc_xive_change_state_handler(void *opaque, int running,
-     for (i = 0; i < xsrc->nr_irqs; i++) {
-         uint8_t pq;
- 
--        if (!xive_eas_is_valid(&xive->eat[i])) {
-+        if (!xive_source_is_valid(xive, i)) {
-             continue;
-         }
- 
-@@ -658,7 +695,7 @@ int kvmppc_xive_post_load(SpaprXive *xive, int version_id)
- 
-     /* Restore the EAT */
-     for (i = 0; i < xive->nr_irqs; i++) {
--        if (!xive_eas_is_valid(&xive->eat[i])) {
-+        if (!xive_source_is_valid(xive, i)) {
-             continue;
-         }
- 
++    cs->start_powered_off = true;
+     cs->cpu_index = cc->core_id + i;
+     spapr_set_vcpu_id(cpu, cs->cpu_index, &local_err);
+     if (local_err) {
 -- 
 2.26.2
 
