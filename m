@@ -2,91 +2,73 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E87CC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:51:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D34AC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:51:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A0E720791
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:51:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RsFAanmR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A0E720791
+	by mail.kernel.org (Postfix) with ESMTPS id 1C09920791
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 08:51:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C09920791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47972 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE7Re-00025U-IM
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 04:51:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53224)
+	id 1kE7Rn-0002Ly-3l
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 04:51:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53316)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kE7Qt-0001NG-Uw
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:50:55 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47035
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kE7R3-0001Vx-22
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:51:05 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:46676
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kE7Qs-00072h-6b
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:50:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599209453;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1tq6Nkgo5nJ0XWq4TyeZ4KuU9WxMU7XA95aDtcy1OLU=;
- b=RsFAanmRQdtqnqj9Xxpdfx55aUK6Zw+8JhnxP6kzRHlM88bHx6PK5dlo3RCIruPSuD4JgE
- x34nG+T0/OKx9oR0gSNVS4Tm1TceESBrLJ6IbfdT3K+imGX/RsW2jYVkvqP+PkUwJlT2FC
- 9+iPzosTFwSOnbl6ce54wnOlPDYkVpk=
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kE7R1-00073x-9t
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 04:51:04 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-113-MvSZmDUGOrW942FgQbwKhw-1; Fri, 04 Sep 2020 04:50:51 -0400
-X-MC-Unique: MvSZmDUGOrW942FgQbwKhw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-501-pU6yU0IoPXyjMEMkUwbmSQ-1; Fri, 04 Sep 2020 04:51:01 -0400
+X-MC-Unique: pU6yU0IoPXyjMEMkUwbmSQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7699881CBE1;
- Fri,  4 Sep 2020 08:50:50 +0000 (UTC)
-Received: from redhat.com (ovpn-114-5.ams2.redhat.com [10.36.114.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5886C7E417;
- Fri,  4 Sep 2020 08:50:42 +0000 (UTC)
-Date: Fri, 4 Sep 2020 09:50:34 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Eduardo Habkost <ehabkost@redhat.com>
-Subject: Re: [PATCH 8/8] tusb6010: Rename TUSB to TUSB6010
-Message-ID: <20200904085034.GK721059@redhat.com>
-References: <20200903180128.1523959-1-ehabkost@redhat.com>
- <20200903180128.1523959-9-ehabkost@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 54D1E10BBED7;
+ Fri,  4 Sep 2020 08:51:00 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-112-114.ams2.redhat.com [10.36.112.114])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DA955D9DC;
+ Fri,  4 Sep 2020 08:50:58 +0000 (UTC)
+Date: Fri, 4 Sep 2020 10:50:57 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: make -i check resut for msys2
+Message-ID: <20200904085057.GB6237@linux.fritz.box>
+References: <CAE2XoE_TJ2T2eN82km0pYqDiqOpsd=waH4EmCe==0k=GYpj3Xg@mail.gmail.com>
+ <3d2db346-2517-f6e3-748d-79a8ae993e06@redhat.com>
+ <CAE2XoE_3Kjjk+tRz1y7rk94+vre2FSfmCGQVWNgjNW14vSNSdw@mail.gmail.com>
+ <48c60a95-c30b-433a-7955-3845074776d8@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200903180128.1523959-9-ehabkost@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
+In-Reply-To: <48c60a95-c30b-433a-7955-3845074776d8@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
 Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:57:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,43 +82,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-level <qemu-devel@nongnu.org>,
+ luoyonggang@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 03, 2020 at 02:01:28PM -0400, Eduardo Habkost wrote:
-> Make type checking function name consistent with the TYPE_TUSB6010
-> constant and QOM type name ("tusb6010").
+Am 04.09.2020 um 08:03 hat Thomas Huth geschrieben:
+> On 04/09/2020 00.53, 罗勇刚(Yonggang Luo) wrote:
+> > 
+> > 
+> > On Thu, Sep 3, 2020 at 10:33 PM Thomas Huth <thuth@redhat.com
+> > <mailto:thuth@redhat.com>> wrote:
+> > 
+> >     On 03/09/2020 11.18, 罗勇刚(Yonggang Luo) wrote:
+> >     [...]
+> >     >   TEST    check-unit: tests/test-replication.exe
+> >     > **
+> >     > ERROR:C:/work/xemu/qemu/tests/test-replication.c:136:make_temp:
+> >     > assertion failed: (fd >= 0)
+> >     > ERROR test-replication.exe - Bail out!
+> >     > ERROR:C:/work/xemu/qemu/tests/test-replication.c:136:make_temp:
+> >     > assertion failed: (fd >= 0)
+> > 
+> >     At least this one should be easy to fix: The test uses /tmp as
+> >     hard-coded directory for temporary files. I think it should use
+> >     g_get_tmp_dir() from glib to get that directory instead.
+> > 
+> >      Thomas
+> > 
+> > After fixes tmp path, how to fixes following error:
+> > $ tests/test-replication.exe                                            
+> >                                                                        
+> >                                                                        
+> >          
+> > # random seed: R02Sdf2e4ffc0e6fbe96624598386b538927
+> > 1..13
+> > # Start of replication tests
+> > # Start of primary tests
+> > Unexpected error in bdrv_open_inherit() at ../block.c:3456:
+> > Block protocol 'file' doesn't support the option 'locking' 
 > 
-> Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Suggested-by: "Daniel P. Berrangé" <berrange@redhat.com>
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> ---
-> Changes v1 -> v2:
-> * v1 subject was "tusb6010: Rename TYPE_TUSB6010 to TYPE_TUSB"
-> * Rename TUSB macro to TUSB6010 instead, to keep it consistent
->   with the QOM type name ("tusb6010")
-> ---
-> Cc: Gerd Hoffmann <kraxel@redhat.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->  hw/usb/tusb6010.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+> Not sure ... as a temporary test, try to remove the "locking=off"
+> strings from the test. If it then works, it might be worth discussing
+> with the block layer folks how to handle this test on Windows in the
+> best way. If it still does not work, it's maybe simply not worth the
+> effort to try to get this test running on Windows - and thus mark it
+> with CONFIG_POSIX in the Makefile / meson.build.
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+This is a bug in file-win32. It reads "locking" from the options QDict,
+but doesn't delete it from it.
 
+Does the following help? (Only compile-tested.)
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+If it works for you, I'll send it as a proper patch.
+
+Kevin
+
+diff --git a/block/file-win32.c b/block/file-win32.c
+index ab69bd811a..e2900c3a51 100644
+--- a/block/file-win32.c
++++ b/block/file-win32.c
+@@ -299,6 +299,11 @@ static QemuOptsList raw_runtime_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "host AIO implementation (threads, native)",
+         },
++        {
++            .name = "locking",
++            .type = QEMU_OPT_STRING,
++            .help = "file locking mode (on/off/auto, default: auto)",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -333,6 +338,7 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     Error *local_err = NULL;
+     const char *filename;
+     bool use_aio;
++    OnOffAuto locking;
+     int ret;
+
+     s->type = FTYPE_FILE;
+@@ -343,10 +349,24 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+         goto fail;
+     }
+
+-    if (qdict_get_try_bool(options, "locking", false)) {
++    locking = qapi_enum_parse(&OnOffAuto_lookup,
++                              qemu_opt_get(opts, "locking"),
++                              ON_OFF_AUTO_AUTO, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto fail;
++    }
++    switch (locking) {
++    case ON_OFF_AUTO_ON:
+         error_setg(errp, "locking=on is not supported on Windows");
+         ret = -EINVAL;
+         goto fail;
++    case ON_OFF_AUTO_OFF:
++    case ON_OFF_AUTO_AUTO:
++        break;
++    default:
++        g_assert_not_reached();
+     }
+
+     filename = qemu_opt_get(opts, "filename");
 
 
