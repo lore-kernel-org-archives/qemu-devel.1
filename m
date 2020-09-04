@@ -2,90 +2,85 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 454B1C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 19:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BCDC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 19:21:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFDDD206B8
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 19:19:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8AFED20797
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 19:21:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="p4GtESMY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFDDD206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rfrGbaq/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AFED20797
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEHF1-0001lA-VM
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 15:19:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41850)
+	id 1kEHGr-00049P-Ik
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 15:21:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43880)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kEH5E-00028r-Bl
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 15:09:12 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:37463)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kEHFb-0002sh-Bw; Fri, 04 Sep 2020 15:19:55 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:36227)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kEH5B-0000rH-8f
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 15:09:12 -0400
-Received: by mail-pg1-x543.google.com with SMTP id 5so4807520pgl.4
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 12:09:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=GIYwSbqP2/Q+h6E6JYicJ9jGdOa2Pz7gLWfst3DCrHU=;
- b=p4GtESMYMWerGZwL2UAxtVOLl1xs2bYFU1froYHQUsRZ0zqEhN3g3r6inTHahEfis1
- ehY2Bv3VefoVoaATXSwRI/pq4K/+aZyqdY3C2d8b+yE3l2o/VE7zq65YlIOZRar9056r
- yW1lqGL8hLeDN3hAd6epEdrsEi4eQzdRkWJbKAMGVX7YbCto4P2jcWEfFAY4wXA8UESd
- vhB0DWJsM2EFi+xJ2RWMNi43SNW6Gycct6fLZOrbpKE3SXDgbzQU+XLItv3nVYHp2Ugr
- em3k9UResaqGX3+U1qHyuHskbagSx+T7gS+BE/rQa0MfG++spb8HeA0Z1Zlt2FHzPB73
- pUQQ==
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kEHFZ-0002C4-88; Fri, 04 Sep 2020 15:19:54 -0400
+Received: by mail-io1-xd43.google.com with SMTP id d190so8273859iof.3;
+ Fri, 04 Sep 2020 12:19:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pP7iO7ntIZfxVbioWU2+lnG7XSvtKjf3vslR62sBxmc=;
+ b=rfrGbaq/pJ8jtjqA/4GH1kZIZ5miAJykW3dQepohrLV9VDRS3w9sCjtq5syf2iV5zO
+ gR0pWEiD3SVLGvU95FoXoZMrjQgnPv/B39Sgb3LhioEspp/8mipXfMjhN2NzZvunG7JC
+ QHT8nyXR1IlHNxI3mje3myNZonJwaMeZPNIg8yV1UpWxPAld/+NQyhT40xm+UqIO6p/+
+ MN+UXuSCgQOnIbXx5LbCqne4wqNpcR82qt9SmEPhiUft6fW6hjq/vCLpZmypxWHZAFkY
+ RMotyvtRrJJIcwQbmr8vGUqiXJP8m/85HpNOqy5tFm0wZrnYBmXk/ym7HMo1dZJZaLLP
+ 5keA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=GIYwSbqP2/Q+h6E6JYicJ9jGdOa2Pz7gLWfst3DCrHU=;
- b=TWMhxjEuTTX2jYxZqpGi6r/af2QzM7MoFTGV3b2LrPFQ/jXFP1QMv9kJ3SYwCGffu2
- Z3/h6SGeYv4jBoPSExASJ8Yav2SzyCzKMkU7ygYXUdpKdz3vcZ/3UyIYzSFsVjc5VLgW
- +sglxBWR7wYZxbl8EAp7tyoSEBEVU+RvsFXEvMpX5ewo4F5Q5MHQR4D7tSdpwIHzQcT5
- EtmlMa3EuKWM7X+On9ZT0SfRzYEJUs0eEN63RSNa2ioPcM+ldpdqSGM0K+YUR0gU3wU4
- Dc2TnIXn68NbspsO4xlX16UxCQl9CQvWyUm+MJesw+WsVWgsoK/VoKswaEgjoBvR2Qhh
- GYRA==
-X-Gm-Message-State: AOAM530P3J/erHWdVxGWZ8Gmw6bEowUXmqO3FH4VtIuyIag+e+0bNi0r
- N3arT4AESVFIdopZMq1eVlpGqeBo4OXJdQ==
-X-Google-Smtp-Source: ABdhPJyFDmRysfD4Lf6OBRZkJJb1txyerFF5nv8vGkI9ZBknGlrdYriofspjrNuqQaAx2D1Vp543WA==
-X-Received: by 2002:a63:4c:: with SMTP id 73mr8526187pga.286.1599246547136;
- Fri, 04 Sep 2020 12:09:07 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id x19sm1897941pge.22.2020.09.04.12.09.06
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 12:09:06 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 16/19] target/microblaze: Move mmu parameters to
- MicroBlazeCPUConfig
-Date: Fri,  4 Sep 2020 12:08:39 -0700
-Message-Id: <20200904190842.2282109-17-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200904190842.2282109-1-richard.henderson@linaro.org>
-References: <20200904190842.2282109-1-richard.henderson@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pP7iO7ntIZfxVbioWU2+lnG7XSvtKjf3vslR62sBxmc=;
+ b=VL0I+AKBYTsfOTAHsS7W45cNU3QKDWuCfrXgk15dCe9Pxiwyf0T5oajcgaWx/WIEt/
+ GCZ8rAda/my0eeDL4/ZCBRiBt5bx6NKjVJyEiJ5hNlMr2Wy33Nzc1Z40JN7qcvOs96HQ
+ KPco/8mCboukwim5Ip2r+xdYF/BuJkcq/7uXk/fJqeG9HkWCF2ElFqvrqpb5GV2yR+OD
+ MV1cWFPAWPeBKOtvOHD62/kzZePJj5pL54mkNRJUcKFp35UMHRxsq9Y4Beo/W9GszFAI
+ LL+iWvf+gdPlR1aSn+fgRCiWhyJqt7vgxwXbWvZRYG7aZOOcYu2KGX/B7/McQLVX3hJH
+ 84TA==
+X-Gm-Message-State: AOAM5330exSD7rei3dXdw+DydHfZmZEDFC7zpNIaEJGaho/lDFF4Anso
+ Jm027z2u1XnodbFSc8M0f9VU8LHRz2G051CFcGk=
+X-Google-Smtp-Source: ABdhPJwrLtgMdo4TF8Q8MLiKR7mCa3vhrNmaqY9i8an97zDA9mQzJJlGuQxVAn0+YrILmeIoCAmjDO0qpmxg4QBfX48=
+X-Received: by 2002:a02:85e1:: with SMTP id d88mr9674239jai.8.1599247191754;
+ Fri, 04 Sep 2020 12:19:51 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+References: <1598924352-89526-1-git-send-email-bmeng.cn@gmail.com>
+ <1598924352-89526-9-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1598924352-89526-9-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 4 Sep 2020 12:08:56 -0700
+Message-ID: <CAKmqyKNcDtCsfToVf3tagwH66j6Hd_4-k0=VmS2RWELfOW6Ejg@mail.gmail.com>
+Subject: Re: [PATCH v3 08/16] hw/riscv: microchip_pfsoc: Connect a Cadence
+ SDHCI controller and an SD card
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,248 +95,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com, f4bug@amsat.org
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Palmer Dabbelt <palmerdabbelt@google.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The final 4 fields in MicroBlazeMMU are configuration constants.
-Move them into MicroBlazeCPUConfig where they belong.
+On Mon, Aug 31, 2020 at 6:47 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> Microchip PolarFire SoC integrates one Cadence SDHCI controller.
+> On the Icicle Kit board, one eMMC chip and an external SD card
+> connect to this controller depending on different configuration.
+>
+> As QEMU does not support eMMC yet, we just emulate the SD card
+> configuration. To test this, the Hart Software Services (HSS)
+> should choose the SD card configuration:
+>
+> $ cp boards/icicle-kit-es/def_config.sdcard .config
+> $ make BOARD=icicle-kit-es
+>
+> The SD card image can be built from the Yocto BSP at:
+> https://github.com/polarfire-soc/meta-polarfire-soc-yocto-bsp
+>
+> Note the generated SD card image should be resized before use:
+> $ qemu-img resize /path/to/sdcard.img 4G
+>
+> Launch QEMU with the following command:
+> $ qemu-system-riscv64 -nographic -M microchip-icicle-kit -sd sdcard.img
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
-Remove the leading "c_" from the member names, as that presumably
-implied "config", and that should not be explicit in the location.
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/microblaze/cpu.h    |  5 +++++
- target/microblaze/mmu.h    |  7 +------
- target/microblaze/cpu.c    |  9 +++++----
- target/microblaze/helper.c |  4 ++--
- target/microblaze/mmu.c    | 30 +++++++++++++++++-------------
- 5 files changed, 30 insertions(+), 25 deletions(-)
+Alistair
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index ef96f2fe02..b54f99da61 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -295,6 +295,8 @@ struct CPUMBState {
- typedef struct {
-     char *version;
- 
-+    uint64_t addr_mask;
-+
-     uint32_t base_vectors;
-     uint32_t pvr_user2;
-     uint32_t pvr_regs[13];
-@@ -304,6 +306,9 @@ typedef struct {
-     uint8_t use_hw_mul;
-     uint8_t pvr_user1;
-     uint8_t pvr;
-+    uint8_t mmu;
-+    uint8_t mmu_tlb_access;
-+    uint8_t mmu_zones;
- 
-     bool stackprot;
-     bool use_barrel;
-diff --git a/target/microblaze/mmu.h b/target/microblaze/mmu.h
-index c1feb811b9..7d0fbb8341 100644
---- a/target/microblaze/mmu.h
-+++ b/target/microblaze/mmu.h
-@@ -70,11 +70,6 @@ typedef struct {
-     uint8_t tids[TLB_ENTRIES];
-     /* Control flops.  */
-     uint32_t regs[3];
--
--    int c_mmu;
--    int c_mmu_tlb_access;
--    int c_mmu_zones;
--    uint64_t c_addr_mask; /* Mask to apply to physical addresses.  */
- } MicroBlazeMMU;
- 
- typedef struct {
-@@ -88,7 +83,7 @@ typedef struct {
-     } err;
- } MicroBlazeMMULookup;
- 
--unsigned int mmu_translate(MicroBlazeMMU *mmu, MicroBlazeMMULookup *lu,
-+unsigned int mmu_translate(MicroBlazeCPU *cpu, MicroBlazeMMULookup *lu,
-                            target_ulong vaddr, int rw, int mmu_idx);
- uint32_t mmu_read(CPUMBState *env, bool ea, uint32_t rn);
- void mmu_write(CPUMBState *env, bool ea, uint32_t rn, uint32_t v);
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index b9bb7f0cc7..fde646a7ad 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -135,10 +135,6 @@ static void mb_cpu_reset(DeviceState *dev)
- #else
-     mb_cpu_write_msr(env, 0);
-     mmu_init(&env->mmu);
--    env->mmu.c_mmu = 3;
--    env->mmu.c_mmu_tlb_access = 3;
--    env->mmu.c_mmu_zones = 16;
--    env->mmu.c_addr_mask = MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
- #endif
- }
- 
-@@ -232,6 +228,11 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-     cpu->cfg.pvr_regs[11] = ((cpu->cfg.use_mmu ? PVR11_USE_MMU : 0) |
-                              16 << 17);
- 
-+    cpu->cfg.mmu = 3;
-+    cpu->cfg.mmu_tlb_access = 3;
-+    cpu->cfg.mmu_zones = 16;
-+    cpu->cfg.addr_mask = MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
-+
-     mcc->parent_realize(dev, errp);
- }
- 
-diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
-index c9f236c897..3d6ce1b31b 100644
---- a/target/microblaze/helper.c
-+++ b/target/microblaze/helper.c
-@@ -64,7 +64,7 @@ bool mb_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-         return true;
-     }
- 
--    hit = mmu_translate(&env->mmu, &lu, address, access_type, mmu_idx);
-+    hit = mmu_translate(cpu, &lu, address, access_type, mmu_idx);
-     if (likely(hit)) {
-         uint32_t vaddr = address & TARGET_PAGE_MASK;
-         uint32_t paddr = lu.paddr + vaddr - lu.vaddr;
-@@ -240,7 +240,7 @@ hwaddr mb_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     unsigned int hit;
- 
-     if (mmu_idx != MMU_NOMMU_IDX) {
--        hit = mmu_translate(&env->mmu, &lu, addr, 0, 0);
-+        hit = mmu_translate(cpu, &lu, addr, 0, 0);
-         if (hit) {
-             vaddr = addr & TARGET_PAGE_MASK;
-             paddr = lu.paddr + vaddr - lu.vaddr;
-diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
-index 0546cfd0bc..1dbbb271c4 100644
---- a/target/microblaze/mmu.c
-+++ b/target/microblaze/mmu.c
-@@ -73,9 +73,10 @@ static void mmu_change_pid(CPUMBState *env, unsigned int newpid)
- }
- 
- /* rw - 0 = read, 1 = write, 2 = fetch.  */
--unsigned int mmu_translate(MicroBlazeMMU *mmu, MicroBlazeMMULookup *lu,
-+unsigned int mmu_translate(MicroBlazeCPU *cpu, MicroBlazeMMULookup *lu,
-                            target_ulong vaddr, int rw, int mmu_idx)
- {
-+    MicroBlazeMMU *mmu = &cpu->env.mmu;
-     unsigned int i, hit = 0;
-     unsigned int tlb_ex = 0, tlb_wr = 0, tlb_zsel;
-     uint64_t tlb_tag, tlb_rpn, mask;
-@@ -114,13 +115,13 @@ unsigned int mmu_translate(MicroBlazeMMU *mmu, MicroBlazeMMULookup *lu,
-             t0 = mmu->regs[MMU_R_ZPR] >> (30 - (tlb_zsel * 2));
-             t0 &= 0x3;
- 
--            if (tlb_zsel > mmu->c_mmu_zones) {
-+            if (tlb_zsel > cpu->cfg.mmu_zones) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "tlb zone select out of range! %d\n", tlb_zsel);
-                 t0 = 1; /* Ignore.  */
-             }
- 
--            if (mmu->c_mmu == 1) {
-+            if (cpu->cfg.mmu == 1) {
-                 t0 = 1; /* Zones are disabled.  */
-             }
- 
-@@ -157,7 +158,7 @@ unsigned int mmu_translate(MicroBlazeMMU *mmu, MicroBlazeMMULookup *lu,
-             tlb_rpn = d & TLB_RPN_MASK;
- 
-             lu->vaddr = tlb_tag;
--            lu->paddr = tlb_rpn & mmu->c_addr_mask;
-+            lu->paddr = tlb_rpn & cpu->cfg.addr_mask;
-             lu->size = tlb_size;
-             lu->err = ERR_HIT;
-             lu->idx = i;
-@@ -175,10 +176,11 @@ done:
- /* Writes/reads to the MMU's special regs end up here.  */
- uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
- {
-+    MicroBlazeCPU *cpu = env_archcpu(env);
-     unsigned int i;
-     uint32_t r = 0;
- 
--    if (env->mmu.c_mmu < 2 || !env->mmu.c_mmu_tlb_access) {
-+    if (cpu->cfg.mmu < 2 || !cpu->cfg.mmu_tlb_access) {
-         qemu_log_mask(LOG_GUEST_ERROR, "MMU access on MMU-less system\n");
-         return 0;
-     }
-@@ -191,7 +193,7 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
-         /* Reads to HI/LO trig reads from the mmu rams.  */
-         case MMU_R_TLBLO:
-         case MMU_R_TLBHI:
--            if (!(env->mmu.c_mmu_tlb_access & 1)) {
-+            if (!(cpu->cfg.mmu_tlb_access & 1)) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return 0;
-@@ -204,7 +206,7 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
-             break;
-         case MMU_R_PID:
-         case MMU_R_ZPR:
--            if (!(env->mmu.c_mmu_tlb_access & 1)) {
-+            if (!(cpu->cfg.mmu_tlb_access & 1)) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return 0;
-@@ -227,12 +229,14 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
- 
- void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
- {
-+    MicroBlazeCPU *cpu = env_archcpu(env);
-     uint64_t tmp64;
-     unsigned int i;
-+
-     qemu_log_mask(CPU_LOG_MMU,
-                   "%s rn=%d=%x old=%x\n", __func__, rn, v, env->mmu.regs[rn]);
- 
--    if (env->mmu.c_mmu < 2 || !env->mmu.c_mmu_tlb_access) {
-+    if (cpu->cfg.mmu < 2 || !cpu->cfg.mmu_tlb_access) {
-         qemu_log_mask(LOG_GUEST_ERROR, "MMU access on MMU-less system\n");
-         return;
-     }
-@@ -258,7 +262,7 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
-             env->mmu.rams[rn & 1][i] = deposit64(tmp64, ext * 32, 32, v);
-             break;
-         case MMU_R_ZPR:
--            if (env->mmu.c_mmu_tlb_access <= 1) {
-+            if (cpu->cfg.mmu_tlb_access <= 1) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return;
-@@ -272,7 +276,7 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
-             env->mmu.regs[rn] = v;
-             break;
-         case MMU_R_PID:
--            if (env->mmu.c_mmu_tlb_access <= 1) {
-+            if (cpu->cfg.mmu_tlb_access <= 1) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return;
-@@ -292,14 +296,14 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
-             MicroBlazeMMULookup lu;
-             int hit;
- 
--            if (env->mmu.c_mmu_tlb_access <= 1) {
-+            if (cpu->cfg.mmu_tlb_access <= 1) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return;
-             }
- 
--            hit = mmu_translate(&env->mmu, &lu,
--                                v & TLB_EPN_MASK, 0, cpu_mmu_index(env, false));
-+            hit = mmu_translate(cpu, &lu, v & TLB_EPN_MASK,
-+                                0, cpu_mmu_index(env, false));
-             if (hit) {
-                 env->mmu.regs[MMU_R_TLBX] = lu.idx;
-             } else {
--- 
-2.25.1
-
+>
+> ---
+>
+> (no changes since v2)
+>
+> Changes in v2:
+> - do not initialize TYPE_SYSBUS_SDHCI in the SoC instance_init(),
+>   instead move that to the cadence_sdhci model
+> - do not access generic-sdhci's state directly,
+>   instead move that to the cadence_sdhci model
+>
+>  include/hw/riscv/microchip_pfsoc.h |  4 ++++
+>  hw/riscv/microchip_pfsoc.c         | 23 +++++++++++++++++++++++
+>  hw/riscv/Kconfig                   |  1 +
+>  3 files changed, 28 insertions(+)
+>
+> diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
+> index a5efa1d..d810ee8 100644
+> --- a/include/hw/riscv/microchip_pfsoc.h
+> +++ b/include/hw/riscv/microchip_pfsoc.h
+> @@ -23,6 +23,7 @@
+>  #define HW_MICROCHIP_PFSOC_H
+>
+>  #include "hw/char/mchp_pfsoc_mmuart.h"
+> +#include "hw/sd/cadence_sdhci.h"
+>
+>  typedef struct MicrochipPFSoCState {
+>      /*< private >*/
+> @@ -39,6 +40,7 @@ typedef struct MicrochipPFSoCState {
+>      MchpPfSoCMMUartState *serial2;
+>      MchpPfSoCMMUartState *serial3;
+>      MchpPfSoCMMUartState *serial4;
+> +    CadenceSDHCIState sdhci;
+>  } MicrochipPFSoCState;
+>
+>  #define TYPE_MICROCHIP_PFSOC    "microchip.pfsoc"
+> @@ -74,6 +76,7 @@ enum {
+>      MICROCHIP_PFSOC_MMUART0,
+>      MICROCHIP_PFSOC_SYSREG,
+>      MICROCHIP_PFSOC_MPUCFG,
+> +    MICROCHIP_PFSOC_EMMC_SD,
+>      MICROCHIP_PFSOC_MMUART1,
+>      MICROCHIP_PFSOC_MMUART2,
+>      MICROCHIP_PFSOC_MMUART3,
+> @@ -85,6 +88,7 @@ enum {
+>  };
+>
+>  enum {
+> +    MICROCHIP_PFSOC_EMMC_SD_IRQ = 88,
+>      MICROCHIP_PFSOC_MMUART0_IRQ = 90,
+>      MICROCHIP_PFSOC_MMUART1_IRQ = 91,
+>      MICROCHIP_PFSOC_MMUART2_IRQ = 92,
+> diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
+> index cee959a..0b2e9ca 100644
+> --- a/hw/riscv/microchip_pfsoc.c
+> +++ b/hw/riscv/microchip_pfsoc.c
+> @@ -12,6 +12,7 @@
+>   * 1) PLIC (Platform Level Interrupt Controller)
+>   * 2) eNVM (Embedded Non-Volatile Memory)
+>   * 3) MMUARTs (Multi-Mode UART)
+> + * 4) Cadence eMMC/SDHC controller and an SD card connected to it
+>   *
+>   * This board currently generates devicetree dynamically that indicates at least
+>   * two harts and up to five harts.
+> @@ -75,6 +76,7 @@ static const struct MemmapEntry {
+>      [MICROCHIP_PFSOC_MMUART0] =         { 0x20000000,     0x1000 },
+>      [MICROCHIP_PFSOC_SYSREG] =          { 0x20002000,     0x2000 },
+>      [MICROCHIP_PFSOC_MPUCFG] =          { 0x20005000,     0x1000 },
+> +    [MICROCHIP_PFSOC_EMMC_SD] =         { 0x20008000,     0x1000 },
+>      [MICROCHIP_PFSOC_MMUART1] =         { 0x20100000,     0x1000 },
+>      [MICROCHIP_PFSOC_MMUART2] =         { 0x20102000,     0x1000 },
+>      [MICROCHIP_PFSOC_MMUART3] =         { 0x20104000,     0x1000 },
+> @@ -111,6 +113,9 @@ static void microchip_pfsoc_soc_instance_init(Object *obj)
+>      qdev_prop_set_string(DEVICE(&s->u_cpus), "cpu-type",
+>                           TYPE_RISCV_CPU_SIFIVE_U54);
+>      qdev_prop_set_uint64(DEVICE(&s->u_cpus), "resetvec", RESET_VECTOR);
+> +
+> +    object_initialize_child(obj, "sd-controller", &s->sdhci,
+> +                            TYPE_CADENCE_SDHCI);
+>  }
+>
+>  static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
+> @@ -223,6 +228,13 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
+>          memmap[MICROCHIP_PFSOC_MPUCFG].base,
+>          memmap[MICROCHIP_PFSOC_MPUCFG].size);
+>
+> +    /* SDHCI */
+> +    sysbus_realize(SYS_BUS_DEVICE(&s->sdhci), errp);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sdhci), 0,
+> +                    memmap[MICROCHIP_PFSOC_EMMC_SD].base);
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(&s->sdhci), 0,
+> +        qdev_get_gpio_in(DEVICE(s->plic), MICROCHIP_PFSOC_EMMC_SD_IRQ));
+> +
+>      /* MMUARTs */
+>      s->serial0 = mchp_pfsoc_mmuart_create(system_memory,
+>          memmap[MICROCHIP_PFSOC_MMUART0].base,
+> @@ -290,6 +302,7 @@ static void microchip_icicle_kit_machine_init(MachineState *machine)
+>      MicrochipIcicleKitState *s = MICROCHIP_ICICLE_KIT_MACHINE(machine);
+>      MemoryRegion *system_memory = get_system_memory();
+>      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+> +    DriveInfo *dinfo = drive_get_next(IF_SD);
+>
+>      /* Sanity check on RAM size */
+>      if (machine->ram_size < mc->default_ram_size) {
+> @@ -312,6 +325,16 @@ static void microchip_icicle_kit_machine_init(MachineState *machine)
+>
+>      /* Load the firmware */
+>      riscv_find_and_load_firmware(machine, BIOS_FILENAME, RESET_VECTOR, NULL);
+> +
+> +    /* Attach an SD card */
+> +    if (dinfo) {
+> +        CadenceSDHCIState *sdhci = &(s->soc.sdhci);
+> +        DeviceState *card = qdev_new(TYPE_SD_CARD);
+> +
+> +        qdev_prop_set_drive_err(card, "drive", blk_by_legacy_dinfo(dinfo),
+> +                                &error_fatal);
+> +        qdev_realize_and_unref(card, sdhci->bus, &error_fatal);
+> +    }
+>  }
+>
+>  static void microchip_icicle_kit_machine_class_init(ObjectClass *oc, void *data)
+> diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+> index ceb7c16..7412db9 100644
+> --- a/hw/riscv/Kconfig
+> +++ b/hw/riscv/Kconfig
+> @@ -55,3 +55,4 @@ config MICROCHIP_PFSOC
+>      select SIFIVE
+>      select UNIMP
+>      select MCHP_PFSOC_MMUART
+> +    select CADENCE_SDHCI
+> --
+> 2.7.4
+>
+>
 
