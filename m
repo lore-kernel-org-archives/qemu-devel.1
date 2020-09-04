@@ -4,64 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C9BC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:49:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 033D9C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:50:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 261C3208CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:49:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 261C3208CA
+	by mail.kernel.org (Postfix) with ESMTPS id BDE38208CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:50:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDE38208CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39570 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEAE6-0006u7-Ak
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 07:49:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42568)
+	id 1kEAEC-00078G-SF
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 07:50:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6J-0008Ik-C0
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:41:51 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33107
+ id 1kEA6f-0000mq-39
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42648
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6G-0005EL-Sf
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:41:51 -0400
+ id 1kEA6b-0005Gi-Hr
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:12 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-521-HnyjGU-mMwGooPE4Pj59wA-1; Fri, 04 Sep 2020 07:41:47 -0400
-X-MC-Unique: HnyjGU-mMwGooPE4Pj59wA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-564-coPPJfs4PLmP8JrbdxfuLg-1; Fri, 04 Sep 2020 07:42:07 -0400
+X-MC-Unique: coPPJfs4PLmP8JrbdxfuLg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 076E910299C4
- for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 809F1425ED
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:40 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C75938BA03;
- Fri,  4 Sep 2020 11:41:33 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4FEC660BEC
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:40 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 18/46] meson: move keyutils dependency check
-Date: Fri,  4 Sep 2020 07:40:54 -0400
-Message-Id: <20200904114122.31307-19-pbonzini@redhat.com>
+Subject: [PULL 29/46] Makefile: remove dead variables and includes
+Date: Fri,  4 Sep 2020 07:41:05 -0400
+Message-Id: <20200904114122.31307-30-pbonzini@redhat.com>
 In-Reply-To: <20200904114122.31307-1-pbonzini@redhat.com>
 References: <20200904114122.31307-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0.002
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -81,93 +82,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+Makefile.objs, the .d files and various CONFIG_* symbols are not
+used anymore by the Make side of the build; they are only processed
+by Meson.  We can delete them.
 
-Since there is not minimum version specified, and it's a test-only
-dependency, it's fair to depend on a version that ships with a .pc I
-suppose.
-
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200828110734.1638685-8-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- configure   | 25 -------------------------
- meson.build |  7 +++----
- 2 files changed, 3 insertions(+), 29 deletions(-)
+ Makefile               | 20 --------------------
+ Makefile.objs          | 34 ----------------------------------
+ tests/Makefile.include | 40 ----------------------------------------
+ 3 files changed, 94 deletions(-)
+ delete mode 100644 Makefile.objs
 
-diff --git a/configure b/configure
-index 35dedaf803..3372a43a4f 100755
---- a/configure
-+++ b/configure
-@@ -6305,28 +6305,6 @@ but not implemented on your system"
-     fi
- fi
- 
--##########################################
--# check for usable keyutils.h
--
--if test "$linux" = "yes" ; then
--
--    have_keyutils=no
--    cat > $TMPC << EOF
--#include <errno.h>
--#include <asm/unistd.h>
--#include <unistd.h>
--#include <sys/types.h>
--#include <keyutils.h>
--int main(void) {
--    return request_key("user", NULL, NULL, 0);
--}
--EOF
--    if compile_prog "" "-lkeyutils"; then
--        have_keyutils=yes
--    fi
--fi
--
--
- ##########################################
- # End of CC checks
- # After here, no more $cc or $ld runs
-@@ -7510,9 +7488,6 @@ fi
- 
- if test "$secret_keyring" = "yes" ; then
-   echo "CONFIG_SECRET_KEYRING=y" >> $config_host_mak
--  if test "$have_keyutils" = "yes" ; then
--    echo "CONFIG_KEYUTILS=y" >> $config_host_mak
--  fi
- fi
- 
- if test "$tcg_interpreter" = "yes"; then
-diff --git a/meson.build b/meson.build
-index fc46273491..7c714bb49c 100644
---- a/meson.build
-+++ b/meson.build
-@@ -410,10 +410,8 @@ if 'CONFIG_TASN1' in config_host
-   tasn1 = declare_dependency(compile_args: config_host['TASN1_CFLAGS'].split(),
-                              link_args: config_host['TASN1_LIBS'].split())
+diff --git a/Makefile b/Makefile
+index d4d6a67d96..9bdf5fc072 100644
+--- a/Makefile
++++ b/Makefile
+@@ -80,13 +80,6 @@ seems to have been used for an in-tree build. You can fix this by running \
  endif
--keyutils = not_found
--if 'CONFIG_KEYUTILS' in config_host
--  keyutils = declare_dependency(link_args: '-lkeyutils')
+ endif
+ 
+-CONFIG_SOFTMMU := $(if $(filter %-softmmu,$(TARGET_DIRS)),y)
+-CONFIG_USER_ONLY := $(if $(filter %-user,$(TARGET_DIRS)),y)
+-CONFIG_XEN := $(CONFIG_XEN_BACKEND)
+-CONFIG_ALL=y
+--include config-all-devices.mak
+--include config-all-disas.mak
+-
+ config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VERSION
+ 	@echo $@ is out-of-date, running configure
+ 	@if test -f meson-private/coredata.dat; then \
+@@ -117,9 +110,6 @@ build.ninja: config-host.mak
+ 
+ include $(SRC_PATH)/rules.mak
+ 
+-# lor is defined in rules.mak
+-CONFIG_BLOCK := $(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS))
+-
+ generated-files-y += .git-submodule-status
+ 
+ # Don't try to regenerate Makefile or configure
+@@ -132,14 +122,8 @@ configure: ;
+ 
+ $(call set-vpath, $(SRC_PATH))
+ 
+-LIBS+=-lz $(LIBS_TOOLS)
+-
+ SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet) BUILD_DIR=$(BUILD_DIR)
+ 
+-ifneq ($(wildcard config-host.mak),)
+-include $(SRC_PATH)/Makefile.objs
 -endif
-+keyutils = dependency('libkeyutils', required: false,
-+                      method: 'pkg-config', static: enable_static)
+-
+ include $(SRC_PATH)/tests/Makefile.include
  
- # Create config-host.h
+ all: recurse-all
+@@ -256,10 +240,6 @@ Makefile: $(generated-files-y)
+ endif
+ endif
  
-@@ -424,6 +422,7 @@ config_host_data.set('CONFIG_VNC_JPEG', jpeg.found())
- config_host_data.set('CONFIG_VNC_PNG', png.found())
- config_host_data.set('CONFIG_VNC_SASL', sasl.found())
- config_host_data.set('CONFIG_XKBCOMMON', xkbcommon.found())
-+config_host_data.set('CONFIG_KEYUTILS', keyutils.found())
- config_host_data.set('QEMU_VERSION', '"@0@"'.format(meson.project_version()))
- config_host_data.set('QEMU_VERSION_MAJOR', meson.project_version().split('.')[0])
- config_host_data.set('QEMU_VERSION_MINOR', meson.project_version().split('.')[1])
+-# Include automatically generated dependency files
+-# Dependencies in Makefile.objs files come from our recursive subdir rules
+--include $(wildcard *.d tests/*.d)
+-
+ include $(SRC_PATH)/tests/docker/Makefile.include
+ include $(SRC_PATH)/tests/vm/Makefile.include
+ 
+diff --git a/Makefile.objs b/Makefile.objs
+deleted file mode 100644
+index c351b59641..0000000000
+--- a/Makefile.objs
++++ /dev/null
+@@ -1,34 +0,0 @@
+-#######################################################################
+-# Common libraries for tools and emulators
+-qom-obj-y = qom/libqom.fa
+-
+-#######################################################################
+-# code used by both qemu system emulation and qemu-img
+-
+-ifeq ($(call lor,$(CONFIG_SOFTMMU),$(CONFIG_TOOLS)),y)
+-
+-authz-obj-y = authz/libauthz.fa
+-authz/libauthz.fa-libs = $(if $(CONFIG_AUTH_PAM),-lpam)
+-
+-block-obj-y += libblock.fa
+-
+-libblock.fa-libs = $(ZSTD_LIBS)
+-libblock.fa-libs += $(LIBNFS_LIBS)
+-libblock.fa-libs += $(LIBISCSI_LIBS)
+-libblock.fa-libs += $(CURL_LIBS)
+-libblock.fa-libs += $(RBD_LIBS)
+-libblock.fa-libs += $(GLUSTERFS_LIBS)
+-libblock.fa-libs += $(VXHS_LIBS)
+-libblock.fa-libs += $(LIBSSH_LIBS)
+-libblock.fa-libs += $(BZIP2_LIBS)
+-libblock.fa-libs += $(LZFSE_LIBS)
+-libblock.fa-libs += $(if $(CONFIG_LINUX_AIO),-laio)
+-libblock.fa-libs += $(LIBXML2_LIBS)
+-
+-chardev-obj-y = chardev/libchardev.fa
+-
+-crypto-obj-y = crypto/libcrypto.fa
+-
+-io-obj-y = io/libio.fa
+-
+-endif # CONFIG_SOFTMMU or CONFIG_TOOLS
+diff --git a/tests/Makefile.include b/tests/Makefile.include
+index 1592a647f4..f93e611220 100644
+--- a/tests/Makefile.include
++++ b/tests/Makefile.include
+@@ -40,41 +40,6 @@ SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
+ 
+ SPEED = quick
+ 
+-# gtester tests, possibly with verbose output
+-# do_test_tap runs all tests, even if some of them fail, while do_test_human
+-# stops at the first failure unless -k is given on the command line
+-
+-define do_test_human_k
+-        $(quiet-@)rc=0; $(foreach COMMAND, $1, \
+-          $(call quiet-command-run, \
+-            export MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} $2; \
+-              $(COMMAND) -m=$(SPEED) -k --tap < /dev/null \
+-              | ./scripts/tap-driver.pl --test-name="$(notdir $(COMMAND))" $(if $(V),, --show-failures-only) \
+-              || rc=$$?;, "TEST", "$@: $(COMMAND)")) exit $$rc
+-endef
+-define do_test_human_no_k
+-        $(foreach COMMAND, $1, \
+-          $(call quiet-command, \
+-            MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} $2 \
+-              $(COMMAND) -m=$(SPEED) -k --tap < /dev/null \
+-              | ./scripts/tap-driver.pl --test-name="$(notdir $(COMMAND))" $(if $(V),, --show-failures-only), \
+-              "TEST", "$@: $(COMMAND)")
+-)
+-endef
+-do_test_human = \
+-        $(if $(findstring k, $(MAKEFLAGS)), $(do_test_human_k), $(do_test_human_no_k))
+-
+-define do_test_tap
+-	$(call quiet-command, \
+-          { export MALLOC_PERTURB_=$${MALLOC_PERTURB_:-$$(( $${RANDOM:-0} % 255 + 1))} $2; \
+-            $(foreach COMMAND, $1, \
+-	      $(COMMAND) -m=$(SPEED) -k --tap < /dev/null \
+-	      | sed "s/^\(not \)\?ok [0-9]* /&$(notdir $(COMMAND)) /" || true; ) } \
+-	      | ./scripts/tap-merge.pl | tee "$@" \
+-	      | ./scripts/tap-driver.pl $(if $(V),, --show-failures-only), \
+-	  "TAP","$@")
+-endef
+-
+ # Per guest TCG tests
+ 
+ BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(TARGET_DIRS))
+@@ -182,7 +147,6 @@ endif
+ check-build: $(QEMU_IOTESTS_HELPERS-y)
+ 
+ check-clean:
+-	rm -rf tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
+ 	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
+ 
+ clean: check-clean
+@@ -191,8 +155,4 @@ clean: check-clean
+ 
+ check-speed: bench-speed
+ 
+-# Build the help program automatically
+-
+--include $(wildcard tests/*.d)
+-
+ endif
 -- 
 2.26.2
 
