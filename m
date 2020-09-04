@@ -2,131 +2,85 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A66DEC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6132C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:43:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49DAB206B7
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:43:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29238206B7
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:43:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aqOUHAkw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49DAB206B7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XB9YJGYJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29238206B7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEF6p-0004e9-F4
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:02:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45500)
+	id 1kEFsm-0001s1-Gg
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:52:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kEF6A-00046q-TP
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 13:02:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27117)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kEFs2-0001QR-Jz
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 13:51:30 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58624
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kEF68-0002hu-VW
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 13:02:02 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kEFrz-0008LJ-O2
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 13:51:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599238919;
+ s=mimecast20190719; t=1599241885;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=H/BmVtXqwmiRQle8AnEhf0VuCVo9nDWOQRAO9ksuSp8=;
- b=aqOUHAkwV4KCHpnFdL+a2w0I5C9Tl5EUaYg9blGtzjO4mypDKkdL9QHQ0B0sGBp0pJTktR
- KHIXVl5t9kkNBudaNW7IATBJLgFqVeudo0c89zXHg9oIRDYj63tZc2jQUnGDuhmPUzmMPG
- J5nwZKIDXCynG9OiNV3FhsnuFVrEBv4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-TYxxh3mHNjeI0vsF28ya9w-1; Fri, 04 Sep 2020 13:01:55 -0400
-X-MC-Unique: TYxxh3mHNjeI0vsF28ya9w-1
-Received: by mail-wr1-f71.google.com with SMTP id r16so2494643wrm.18
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 10:01:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=H/BmVtXqwmiRQle8AnEhf0VuCVo9nDWOQRAO9ksuSp8=;
- b=nJBJzEJKGHzGUlM/sZn0QQ6RPwNXnwxAHminwRFQtBiHFtDMNNhj8W11seob/RJTkw
- cBNQGUckM5KDm1CzMFqrdBIAjmD3Uw7Vn7BCRULr5oOzeq0TLmYbwfh+IB60LoW3ZeXV
- xS/ii5LAJiA/qIjDar4bLX5nXhu7ZiVHy5jh57RQadI2Ax4N2HrGXjHRifTH9FjotaSX
- jnz5y8MNI9YVZwzIcmBrNvcqQxGfL4fh4YrdHfYFr4SY1KYik3+g1YsPPSkrLcxylNax
- dLZwmA2B0QXsbNSrbfh9kJSwWes4+mRx6cH6jK6HPPNtqAAURjbSVaSTkfTLuzoj/WyE
- JPdQ==
-X-Gm-Message-State: AOAM531Qfn1r1bOIOf5Rm2RS/GgA4XF7JPZ11GbcPhWgdfjJryJ2ylBC
- /nsjqny+AKQzlJLJ0ZGDeWb/oi4fONyDh9TnEqRaQCwFsPQf23IVhf/s66xp9R+1YkS8vPYY9DH
- YJVQp+PhBAqkjkOI=
-X-Received: by 2002:a1c:9d4b:: with SMTP id g72mr8686052wme.68.1599238912391; 
- Fri, 04 Sep 2020 10:01:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwbrSL9m2sGrF2rPPZ3lCG5AVw+Z1mUoyjcpTpr3haOFxIoybkiEwOY6PNeGxFHMI28tQpJcQ==
-X-Received: by 2002:a1c:9d4b:: with SMTP id g72mr8686031wme.68.1599238912215; 
- Fri, 04 Sep 2020 10:01:52 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id q20sm11795030wmj.5.2020.09.04.10.01.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Sep 2020 10:01:51 -0700 (PDT)
-Subject: Re: [PATCH 1/7] scripts/ci/gitlab-pipeline-status: make branch name
- configurable
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200904164258.240278-1-crosa@redhat.com>
- <20200904164258.240278-2-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <89a0e149-76a1-697e-5895-76e949861ab9@redhat.com>
-Date: Fri, 4 Sep 2020 19:01:50 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ content-transfer-encoding:content-transfer-encoding;
+ bh=FquuQCl3+2MDqTZOPKn2zfHIx42gh/jI9PA5OqnHSsg=;
+ b=XB9YJGYJcxhhcyR1MOXjdbPd5LTKuaSJzNWYIBK+LqRP099OdXXMuhaYduXFXblNqBOBU7
+ NpW2fcKNbQ71EtBuxpjMipsAXCc83xL/avz6rO5oU+BbdC/kq2heaeLAfT3KQGgLS7tUv3
+ 02SNY/CxKVXmxhjtztBq/z/GbAufdZQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-OnJUszeZOo2zjzIoLgT82w-1; Fri, 04 Sep 2020 13:51:22 -0400
+X-MC-Unique: OnJUszeZOo2zjzIoLgT82w-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 14E6957054
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 17:51:22 +0000 (UTC)
+Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C89735D9CC;
+ Fri,  4 Sep 2020 17:51:09 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qom: Remove ParentClassType argument from
+ OBJECT_DECLARE_SIMPLE_TYPE
+Date: Fri,  4 Sep 2020 13:51:09 -0400
+Message-Id: <20200904175109.2436673-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200904164258.240278-2-crosa@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 06:46:59
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:57:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -140,67 +94,355 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Willian Rampazzo <wrampazz@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/4/20 6:42 PM, Cleber Rosa wrote:
-> With the utility function `get_local_staging_branch_commit()`, the
-> name of the branch is hard coded (including in the function name).
-> 
-> For extensibility reasons, let's make that configurable.
-> 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+The requirement to specify the parent class type makes the macro
+harder to use and easy to misuse (by indicating the wrong parent
+class type).
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Simplify the macro by just not declaring any class struct,
+allowing us to remove the class_size field from the TypeInfo
+variables for those types.
 
-> ---
->  scripts/ci/gitlab-pipeline-status | 12 ++++++------
->  1 file changed, 6 insertions(+), 6 deletions(-)
-> 
-> diff --git a/scripts/ci/gitlab-pipeline-status b/scripts/ci/gitlab-pipeline-status
-> index 348a49b6a4..194dd4d0bb 100755
-> --- a/scripts/ci/gitlab-pipeline-status
-> +++ b/scripts/ci/gitlab-pipeline-status
-> @@ -23,20 +23,20 @@ import time
->  import sys
->  
->  
-> -def get_local_staging_branch_commit():
-> +def get_local_branch_commit(branch='staging'):
->      """
->      Returns the commit sha1 for the *local* branch named "staging"
->      """
-> -    result = subprocess.run(['git', 'rev-parse', 'staging'],
-> +    result = subprocess.run(['git', 'rev-parse', branch],
->                              stdin=subprocess.DEVNULL,
->                              stdout=subprocess.PIPE,
->                              stderr=subprocess.DEVNULL,
->                              cwd=os.path.dirname(__file__),
->                              universal_newlines=True).stdout.strip()
-> -    if result == 'staging':
-> -        raise ValueError("There's no local branch named 'staging'")
-> +    if result == branch:
-> +        raise ValueError("There's no local branch named '%s'" % branch)
->      if len(result) != 40:
-> -        raise ValueError("Branch staging HEAD doesn't look like a sha1")
-> +        raise ValueError("Branch '%s' HEAD doesn't look like a sha1" % branch)
->      return result
->  
->  
-> @@ -110,7 +110,7 @@ def main():
->                                'for https://gitlab.com/qemu-project/qemu, that '
->                                'is, "%(default)s"'))
->      try:
-> -        default_commit = get_local_staging_branch_commit()
-> +        default_commit = get_local_branch_commit()
->          commit_required = False
->      except ValueError:
->          default_commit = ''
-> 
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+This patch is based on the machine-next branch, and can be
+fetched from the git branch at:
+  https://github.com/ehabkost/qemu-hacks work/qom-simplify-declare-simple-type
+---
+Cc: "Daniel P. Berrangé" <berrange@redhat.com>
+Cc: "Marc-André Lureau" <marcandre.lureau@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: qemu-devel@nongnu.org
+---
+ include/authz/list.h                |  2 +-
+ include/authz/listfile.h            |  2 +-
+ include/authz/pamacct.h             |  2 +-
+ include/authz/simple.h              |  2 +-
+ include/crypto/secret_keyring.h     |  2 +-
+ include/io/dns-resolver.h           |  2 +-
+ include/io/net-listener.h           |  2 +-
+ include/qom/object.h                | 16 ++++++++--------
+ include/sysemu/vhost-user-backend.h |  2 +-
+ authz/list.c                        |  1 -
+ authz/listfile.c                    |  1 -
+ authz/pamacct.c                     |  1 -
+ authz/simple.c                      |  1 -
+ backends/dbus-vmstate.c             |  3 +--
+ backends/vhost-user.c               |  1 -
+ crypto/secret_keyring.c             |  1 -
+ io/dns-resolver.c                   |  1 -
+ io/net-listener.c                   |  1 -
+ ui/input-barrier.c                  |  3 +--
+ ui/input-linux.c                    |  3 +--
+ 20 files changed, 19 insertions(+), 30 deletions(-)
+
+diff --git a/include/authz/list.h b/include/authz/list.h
+index 5676bb375c..c5eda0f1bf 100644
+--- a/include/authz/list.h
++++ b/include/authz/list.h
+@@ -28,7 +28,7 @@
+ #define TYPE_QAUTHZ_LIST "authz-list"
+ 
+ OBJECT_DECLARE_SIMPLE_TYPE(QAuthZList, qauthz_list,
+-                           QAUTHZ_LIST, QAuthZClass)
++                           QAUTHZ_LIST)
+ 
+ 
+ 
+diff --git a/include/authz/listfile.h b/include/authz/listfile.h
+index b491227bbe..83d78cfa50 100644
+--- a/include/authz/listfile.h
++++ b/include/authz/listfile.h
+@@ -28,7 +28,7 @@
+ #define TYPE_QAUTHZ_LIST_FILE "authz-list-file"
+ 
+ OBJECT_DECLARE_SIMPLE_TYPE(QAuthZListFile, qauthz_list_file,
+-                           QAUTHZ_LIST_FILE, QAuthZClass)
++                           QAUTHZ_LIST_FILE)
+ 
+ 
+ 
+diff --git a/include/authz/pamacct.h b/include/authz/pamacct.h
+index 7804853ddf..18087cee20 100644
+--- a/include/authz/pamacct.h
++++ b/include/authz/pamacct.h
+@@ -28,7 +28,7 @@
+ #define TYPE_QAUTHZ_PAM "authz-pam"
+ 
+ OBJECT_DECLARE_SIMPLE_TYPE(QAuthZPAM, qauthz_pam,
+-                           QAUTHZ_PAM, QAuthZClass)
++                           QAUTHZ_PAM)
+ 
+ 
+ 
+diff --git a/include/authz/simple.h b/include/authz/simple.h
+index 346fcb0c6c..d3ed05b36f 100644
+--- a/include/authz/simple.h
++++ b/include/authz/simple.h
+@@ -27,7 +27,7 @@
+ #define TYPE_QAUTHZ_SIMPLE "authz-simple"
+ 
+ OBJECT_DECLARE_SIMPLE_TYPE(QAuthZSimple, qauthz_simple,
+-                           QAUTHZ_SIMPLE, QAuthZClass)
++                           QAUTHZ_SIMPLE)
+ 
+ 
+ 
+diff --git a/include/crypto/secret_keyring.h b/include/crypto/secret_keyring.h
+index 73d2a8f501..803f3fc28b 100644
+--- a/include/crypto/secret_keyring.h
++++ b/include/crypto/secret_keyring.h
+@@ -27,7 +27,7 @@
+ 
+ #define TYPE_QCRYPTO_SECRET_KEYRING "secret_keyring"
+ OBJECT_DECLARE_SIMPLE_TYPE(QCryptoSecretKeyring, qcrypto_secret_keyring,
+-                           QCRYPTO_SECRET_KEYRING, QCryptoSecretCommonClass)
++                           QCRYPTO_SECRET_KEYRING)
+ 
+ 
+ struct QCryptoSecretKeyring {
+diff --git a/include/io/dns-resolver.h b/include/io/dns-resolver.h
+index e248fba5bd..9d14a8d98f 100644
+--- a/include/io/dns-resolver.h
++++ b/include/io/dns-resolver.h
+@@ -27,7 +27,7 @@
+ 
+ #define TYPE_QIO_DNS_RESOLVER "qio-dns-resolver"
+ OBJECT_DECLARE_SIMPLE_TYPE(QIODNSResolver, qio_dns_resolver,
+-                           QIO_DNS_RESOLVER, ObjectClass)
++                           QIO_DNS_RESOLVER)
+ 
+ 
+ /**
+diff --git a/include/io/net-listener.h b/include/io/net-listener.h
+index 60fad29ff4..8145962fbb 100644
+--- a/include/io/net-listener.h
++++ b/include/io/net-listener.h
+@@ -26,7 +26,7 @@
+ 
+ #define TYPE_QIO_NET_LISTENER "qio-net-listener"
+ OBJECT_DECLARE_SIMPLE_TYPE(QIONetListener, qio_net_listener,
+-                           QIO_NET_LISTENER, ObjectClass)
++                           QIO_NET_LISTENER)
+ 
+ 
+ typedef void (*QIONetListenerClientFunc)(QIONetListener *listener,
+diff --git a/include/qom/object.h b/include/qom/object.h
+index 056f67ab3b..4a23fed586 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -639,19 +639,19 @@ struct Object
+  * @InstanceType: instance struct name
+  * @module_obj_name: the object name in lowercase with underscore separators
+  * @MODULE_OBJ_NAME: the object name in uppercase with underscore separators
+- * @ParentClassType: class struct name of parent type
+  *
+- * This does the same as OBJECT_DECLARE_TYPE(), but also declares
+- * the class struct, thus only the object struct needs to be declare
+- * manually.
++ * This does the same as OBJECT_DECLARE_TYPE(), but with no class struct
++ * declared.
+  *
+  * This macro should be used unless the class struct needs to have
+  * virtual methods declared.
+  */
+-#define OBJECT_DECLARE_SIMPLE_TYPE(InstanceType, module_obj_name, \
+-                                   MODULE_OBJ_NAME, ParentClassType) \
+-    OBJECT_DECLARE_TYPE(InstanceType, InstanceType##Class, module_obj_name, MODULE_OBJ_NAME) \
+-    struct InstanceType##Class { ParentClassType parent_class; };
++#define OBJECT_DECLARE_SIMPLE_TYPE(InstanceType, module_obj_name, MODULE_OBJ_NAME) \
++    typedef struct InstanceType InstanceType; \
++    \
++    G_DEFINE_AUTOPTR_CLEANUP_FUNC(InstanceType, object_unref) \
++    \
++    DECLARE_INSTANCE_CHECKER(InstanceType, MODULE_OBJ_NAME, TYPE_##MODULE_OBJ_NAME)
+ 
+ 
+ /**
+diff --git a/include/sysemu/vhost-user-backend.h b/include/sysemu/vhost-user-backend.h
+index 23205edeb8..41d5ff43bd 100644
+--- a/include/sysemu/vhost-user-backend.h
++++ b/include/sysemu/vhost-user-backend.h
+@@ -23,7 +23,7 @@
+ 
+ #define TYPE_VHOST_USER_BACKEND "vhost-user-backend"
+ OBJECT_DECLARE_SIMPLE_TYPE(VhostUserBackend, vhost_user_backend,
+-                           VHOST_USER_BACKEND, ObjectClass)
++                           VHOST_USER_BACKEND)
+ 
+ 
+ 
+diff --git a/authz/list.c b/authz/list.c
+index 8e904bfc93..28b990931a 100644
+--- a/authz/list.c
++++ b/authz/list.c
+@@ -252,7 +252,6 @@ static const TypeInfo qauthz_list_info = {
+     .name = TYPE_QAUTHZ_LIST,
+     .instance_size = sizeof(QAuthZList),
+     .instance_finalize = qauthz_list_finalize,
+-    .class_size = sizeof(QAuthZListClass),
+     .class_init = qauthz_list_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
+diff --git a/authz/listfile.c b/authz/listfile.c
+index 666df872ad..cd6163aa40 100644
+--- a/authz/listfile.c
++++ b/authz/listfile.c
+@@ -263,7 +263,6 @@ static const TypeInfo qauthz_list_file_info = {
+     .instance_init = qauthz_list_file_init,
+     .instance_size = sizeof(QAuthZListFile),
+     .instance_finalize = qauthz_list_file_finalize,
+-    .class_size = sizeof(QAuthZListFileClass),
+     .class_init = qauthz_list_file_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
+diff --git a/authz/pamacct.c b/authz/pamacct.c
+index 3c6be43916..c91593bbd8 100644
+--- a/authz/pamacct.c
++++ b/authz/pamacct.c
+@@ -129,7 +129,6 @@ static const TypeInfo qauthz_pam_info = {
+     .name = TYPE_QAUTHZ_PAM,
+     .instance_size = sizeof(QAuthZPAM),
+     .instance_finalize = qauthz_pam_finalize,
+-    .class_size = sizeof(QAuthZPAMClass),
+     .class_init = qauthz_pam_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
+diff --git a/authz/simple.c b/authz/simple.c
+index 84954b80a5..ee061e980d 100644
+--- a/authz/simple.c
++++ b/authz/simple.c
+@@ -96,7 +96,6 @@ static const TypeInfo qauthz_simple_info = {
+     .name = TYPE_QAUTHZ_SIMPLE,
+     .instance_size = sizeof(QAuthZSimple),
+     .instance_finalize = qauthz_simple_finalize,
+-    .class_size = sizeof(QAuthZSimpleClass),
+     .class_init = qauthz_simple_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
+diff --git a/backends/dbus-vmstate.c b/backends/dbus-vmstate.c
+index a13461edea..5bffbc4906 100644
+--- a/backends/dbus-vmstate.c
++++ b/backends/dbus-vmstate.c
+@@ -24,7 +24,7 @@
+ 
+ #define TYPE_DBUS_VMSTATE "dbus-vmstate"
+ OBJECT_DECLARE_SIMPLE_TYPE(DBusVMState, dbus_vmstate,
+-                           DBUS_VMSTATE, ObjectClass)
++                           DBUS_VMSTATE)
+ 
+ 
+ struct DBusVMState {
+@@ -483,7 +483,6 @@ static const TypeInfo dbus_vmstate_info = {
+     .parent = TYPE_OBJECT,
+     .instance_size = sizeof(DBusVMState),
+     .instance_finalize = dbus_vmstate_finalize,
+-    .class_size = sizeof(DBusVMStateClass),
+     .class_init = dbus_vmstate_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
+diff --git a/backends/vhost-user.c b/backends/vhost-user.c
+index 9e6e198546..ae8362d721 100644
+--- a/backends/vhost-user.c
++++ b/backends/vhost-user.c
+@@ -197,7 +197,6 @@ static const TypeInfo vhost_user_backend_info = {
+     .instance_size = sizeof(VhostUserBackend),
+     .instance_init = vhost_user_backend_init,
+     .instance_finalize = vhost_user_backend_finalize,
+-    .class_size = sizeof(VhostUserBackendClass),
+ };
+ 
+ static void register_types(void)
+diff --git a/crypto/secret_keyring.c b/crypto/secret_keyring.c
+index 8bfc58ebf4..10d8bc48a0 100644
+--- a/crypto/secret_keyring.c
++++ b/crypto/secret_keyring.c
+@@ -129,7 +129,6 @@ static const TypeInfo qcrypto_secret_info = {
+     .parent = TYPE_QCRYPTO_SECRET_COMMON,
+     .name = TYPE_QCRYPTO_SECRET_KEYRING,
+     .instance_size = sizeof(QCryptoSecretKeyring),
+-    .class_size = sizeof(QCryptoSecretKeyringClass),
+     .class_init = qcrypto_secret_keyring_class_init,
+     .interfaces = (InterfaceInfo[]) {
+         { TYPE_USER_CREATABLE },
+diff --git a/io/dns-resolver.c b/io/dns-resolver.c
+index 6ebe2a5650..b55d8cc3fe 100644
+--- a/io/dns-resolver.c
++++ b/io/dns-resolver.c
+@@ -267,7 +267,6 @@ static const TypeInfo qio_dns_resolver_info = {
+     .parent = TYPE_OBJECT,
+     .name = TYPE_QIO_DNS_RESOLVER,
+     .instance_size = sizeof(QIODNSResolver),
+-    .class_size = sizeof(QIODNSResolverClass),
+ };
+ 
+ 
+diff --git a/io/net-listener.c b/io/net-listener.c
+index 5d8a226872..46c2643d00 100644
+--- a/io/net-listener.c
++++ b/io/net-listener.c
+@@ -307,7 +307,6 @@ static const TypeInfo qio_net_listener_info = {
+     .name = TYPE_QIO_NET_LISTENER,
+     .instance_size = sizeof(QIONetListener),
+     .instance_finalize = qio_net_listener_finalize,
+-    .class_size = sizeof(QIONetListenerClass),
+ };
+ 
+ 
+diff --git a/ui/input-barrier.c b/ui/input-barrier.c
+index 87543a3399..b76697be93 100644
+--- a/ui/input-barrier.c
++++ b/ui/input-barrier.c
+@@ -21,7 +21,7 @@
+ 
+ #define TYPE_INPUT_BARRIER "input-barrier"
+ OBJECT_DECLARE_SIMPLE_TYPE(InputBarrier, input_barrier,
+-                           INPUT_BARRIER, ObjectClass)
++                           INPUT_BARRIER)
+ 
+ 
+ #define MAX_HELLO_LENGTH 1024
+@@ -723,7 +723,6 @@ static void input_barrier_class_init(ObjectClass *oc, void *data)
+ static const TypeInfo input_barrier_info = {
+     .name = TYPE_INPUT_BARRIER,
+     .parent = TYPE_OBJECT,
+-    .class_size = sizeof(InputBarrierClass),
+     .class_init = input_barrier_class_init,
+     .instance_size = sizeof(InputBarrier),
+     .instance_init = input_barrier_instance_init,
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index 5d501c8360..f02557b012 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -32,7 +32,7 @@ static bool linux_is_button(unsigned int lnx)
+ 
+ #define TYPE_INPUT_LINUX "input-linux"
+ OBJECT_DECLARE_SIMPLE_TYPE(InputLinux, input_linux,
+-                           INPUT_LINUX, ObjectClass)
++                           INPUT_LINUX)
+ 
+ 
+ struct InputLinux {
+@@ -514,7 +514,6 @@ static void input_linux_class_init(ObjectClass *oc, void *data)
+ static const TypeInfo input_linux_info = {
+     .name = TYPE_INPUT_LINUX,
+     .parent = TYPE_OBJECT,
+-    .class_size = sizeof(InputLinuxClass),
+     .class_init = input_linux_class_init,
+     .instance_size = sizeof(InputLinux),
+     .instance_init = input_linux_instance_init,
+-- 
+2.26.2
 
 
