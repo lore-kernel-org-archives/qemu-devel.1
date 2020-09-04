@@ -8,78 +8,76 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C9EC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:34:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F165C10DAA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:52:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BC6820716
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E25CE206EF
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:52:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kej30fI+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BC6820716
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+XD0Wo3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E25CE206EF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE0cr-00054t-F7
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 21:34:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57690)
+	id 1kE0ta-0001MO-OY
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 21:52:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
- id 1kE0bQ-0003m6-Ta; Thu, 03 Sep 2020 21:33:20 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:34037)
+ id 1kE0sn-0000VH-O7; Thu, 03 Sep 2020 21:51:17 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:34134)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
- id 1kE0bP-00063O-CU; Thu, 03 Sep 2020 21:33:20 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id n3so4477254pjq.1;
- Thu, 03 Sep 2020 18:33:18 -0700 (PDT)
+ id 1kE0sl-0000Gb-SK; Thu, 03 Sep 2020 21:51:17 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id n3so4494832pjq.1;
+ Thu, 03 Sep 2020 18:51:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=haFiIuZcpa2HR7b3wPU26vJsTkZCNX1fBT9PCrfxrgI=;
- b=kej30fI+TFjB/ZAxcFVAjiZ2pVbW2AkwM2esVyhKxt/wEPeAxpMfcLBS3lss2he04i
- 89mu4m5OaOWX1OkHU3Rju0yZGegaNPvNZSmLe2sklMDYTPU/uWQLSVU3xvAdGNMz+/2w
- hZ9oRFP2xC+RYUoMkY8Fs7KGN3Ikto9YL+Qe5kJnZ8DcuIguLMirac6h4KvhaRyWyWtK
- XdzEGnY4SEnR6Zpfy3o0GKIV8WYlre1RYL69E2SPdeRZJ6fJyQ0jAp05yOwhtt1oKCeD
- Z1oafhlYmVwNeR60VLSCl7qZEXlZdmIGkQWYeZuZMp87AZ2a9bjb8op/eRNzyjnk4Tu8
- +CeA==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=WrIvGIVwkUVVRo0DcZVhgzquP/38Kl7+Ui1XtFslbK4=;
+ b=B+XD0Wo3lFeURHZKy5A7KehFBld8vCFwziu3+6NUkq4/7N6k6ZGMk/YR0ZzJCiWFWx
+ nxCnUohRwuS4E7RR1XG+k82S0B3qrKCd3lyjrSEW8AIZF7pU1sobRqk3BpiKtfLSni40
+ v2fg/suYuAIhU+F4YTIAkQo7yuqen1b0Lfe936l1C3ZoRRWUF+FKT7gK2ZAl47xWvJ6g
+ CCqiO8swCs29Q2aILIcuCE6RrvBLqYxdb+wS0gFC9ywk4QD2CRN8Ig+ziqW0bBx7FrQY
+ JbChCBVIQzE9EW11D6m6csV1yPNdTrmQ7wZhHY/xQgCy7OplUuR6rDJxJVslqJNJW2Ot
+ 8ssA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=haFiIuZcpa2HR7b3wPU26vJsTkZCNX1fBT9PCrfxrgI=;
- b=T07fH/pRk8HtBLyrFlqmANlM9QkOEw8Fzs9pRGkzl19OSqTFkoDngr/3uYD6n4hmDu
- zPLhB0cXSLcLwEKOQMtiAMYN5Ws+OyED9YiRcfaHFa8F+XwQ13mPjsKUe4RPUp/jTb+t
- OuP9xCNRtWeKhtroNdaOjTinHh6q0j5CJpshacjbwu/JLBOOG7Y6veNUcjwi38J720hc
- zCyUTULvP7GoCzdDPyDIHcAAwC9dfrOjR7/oo6Wo3iWsROiru8EV6FsDIvX3Y9BlB/k1
- 62mp+dWYDsW13zqq0hLHH097f8RNstRGFgi9VBVskf0axYtwcJnXE5hsfeO/HU8GdDKr
- 4hIg==
-X-Gm-Message-State: AOAM5303RkmQk8cEpc0CZZX+SIPr3Srjhw1oD2ScqGBQCPn9tSFeyymG
- vcIdWe/46g73/4JCdKIZnYg1WbMUpy8=
-X-Google-Smtp-Source: ABdhPJxJXCXXuYXkl7nY88SAMwHzen6bD9OkvfoYcMgfN4pOQ+FIf2xkCRnRZJIFj5RXBvxEGhw53w==
-X-Received: by 2002:a17:90a:4382:: with SMTP id
- r2mr5636473pjg.144.1599183197261; 
- Thu, 03 Sep 2020 18:33:17 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=WrIvGIVwkUVVRo0DcZVhgzquP/38Kl7+Ui1XtFslbK4=;
+ b=EZS7s6kxTJpPt2BWDS29HvWoIeyEMixPxiZveBL2gG2XkfiJNaXXowlYSX+foZjpjF
+ QNpT7jvlJ42Qbrgma+RcqAlI/i9ZSTP9atQzIF1Hk5mXG5QsOFnz793TY9YRZ36lCVi3
+ 9nE4PVxBxjNY//auSQZztJASRusCvUerEuVHPz7HLRPxOphpJL51FyLxkyD3WuTsKjwF
+ 9MPHWiWzpjPcNed+qiESHin4l69MX3nk9sn0QaMpBXJ1EWpOzzmr6DmI307gIvJngQ0A
+ yEc9z3obv4VeX0OKAkoge02tYW9HolCm0kFZARMO31IUv+8UED9xz1T6UcgrKZ3ogvof
+ VPaQ==
+X-Gm-Message-State: AOAM533mMRwftQz4uU7MIHhLN8cqdEzyVK1QoLe1gXa9Dw6lBWQsbUFj
+ LWFalX2Je3s/ohIhFcSmPAlg2cuD8A0=
+X-Google-Smtp-Source: ABdhPJwilRaw8Jhsyh1ZqK33vMPA2U8giC9h/e/ywI9L/xV9hSRbQmk43dRtgBmlDHZz6ry1SNVlMA==
+X-Received: by 2002:a17:90a:4709:: with SMTP id
+ h9mr5700567pjg.235.1599184273688; 
+ Thu, 03 Sep 2020 18:51:13 -0700 (PDT)
 Received: from localhost.localdomain ([161.81.62.213])
- by smtp.gmail.com with ESMTPSA id gj16sm3643158pjb.13.2020.09.03.18.33.15
+ by smtp.gmail.com with ESMTPSA id j11sm3935559pgh.8.2020.09.03.18.51.11
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 18:33:16 -0700 (PDT)
+ Thu, 03 Sep 2020 18:51:13 -0700 (PDT)
 From: Tom Yan <tom.ty89@gmail.com>
 To: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com,
  qemu-devel@nongnu.org
-Subject: [PATCH RESEND v2 2/2] file-posix: add sg_get_max_segments that
- actually works with sg
-Date: Fri,  4 Sep 2020 09:33:04 +0800
-Message-Id: <20200904013304.220336-2-tom.ty89@gmail.com>
+Subject: [PATCH v3 1/2] file-posix: split hdev_refresh_limits from
+ raw_refresh_limits
+Date: Fri,  4 Sep 2020 09:51:03 +0800
+Message-Id: <20200904015104.234704-1-tom.ty89@gmail.com>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20200904013304.220336-1-tom.ty89@gmail.com>
-References: <20200904013304.220336-1-tom.ty89@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=tom.ty89@gmail.com; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=tom.ty89@gmail.com; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -107,33 +105,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-sg devices have different major/minor than their corresponding
-block devices. Using sysfs to get max segments never really worked
-for them.
+We can and should get max transfer length and max segments for all host
+devices / cdroms (on Linux).
 
-Fortunately the sg driver provides an ioctl to get sg_tablesize,
-which is apparently equivalent to max segments.
+Also use MIN_NON_ZERO instead when we clamp max transfer length against
+max segments.
 
 Signed-off-by: Tom Yan <tom.ty89@gmail.com>
 ---
- block/file-posix.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+v2: fix get_max_transfer_length for non-sg devices; also add/fix
+sg_get_max_segments for sg devices
+v3: fix typo in get_max_transfer_length
+ block/file-posix.c | 57 +++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 41 insertions(+), 16 deletions(-)
 
 diff --git a/block/file-posix.c b/block/file-posix.c
-index 0c9124c8aa..d2cd9a3362 100644
+index 9a00d4190a..411a23cf99 100644
 --- a/block/file-posix.c
 +++ b/block/file-posix.c
-@@ -1178,6 +1178,21 @@ static int sg_get_max_transfer_length(int fd)
+@@ -1178,7 +1178,24 @@ static int sg_get_max_transfer_length(int fd)
  #endif
  }
  
-+static int sg_get_max_segments(int fd)
+-static int sg_get_max_segments(int fd)
++static int get_max_transfer_length(int fd)
 +{
-+#ifdef SG_GET_SG_TABLESIZE
-+    long max_segments = 0;
++#if defined(BLKSECTGET) && defined(BLKSSZGET)
++    int sect = 0;
++    int ssz = 0;
 +
-+    if (ioctl(fd, SG_GET_SG_TABLESIZE, &max_segments) == 0) {
-+        return max_segments;
++    if (ioctl(fd, BLKSECTGET, &sect) == 0 &&
++        ioctl(fd, BLKSSZGET, &ssz) == 0) {
++        return sect * ssz;
 +    } else {
 +        return -errno;
 +    }
@@ -142,18 +145,73 @@ index 0c9124c8aa..d2cd9a3362 100644
 +#endif
 +}
 +
- static int get_max_transfer_length(int fd)
++static int get_max_segments(int fd)
  {
- #if defined(BLKSECTGET) && defined(BLKSSZGET)
-@@ -1267,7 +1282,7 @@ static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
-         bs->bl.max_transfer = pow2floor(ret);
+ #ifdef CONFIG_LINUX
+     char buf[32];
+@@ -1233,23 +1250,31 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+ {
+     BDRVRawState *s = bs->opaque;
+ 
+-    if (bs->sg) {
+-        int ret = sg_get_max_transfer_length(s->fd);
++    raw_probe_alignment(bs, s->fd, errp);
++    bs->bl.min_mem_alignment = s->buf_align;
++    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
++}
++
++static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
++{
++    BDRVRawState *s = bs->opaque;
++
++    /* BLKSECTGET has always been implemented wrongly in the sg driver
++       and BLKSSZGET has never been supported by it*/
++    int ret = bs->sg ? sg_get_max_transfer_length(s->fd) :
++                       get_max_transfer_length(s->fd);
+ 
+-        if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+-            bs->bl.max_transfer = pow2floor(ret);
+-        }
++    if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
++        bs->bl.max_transfer = pow2floor(ret);
++    }
+ 
+-        ret = sg_get_max_segments(s->fd);
+-        if (ret > 0) {
+-            bs->bl.max_transfer = MIN(bs->bl.max_transfer,
+-                                      ret * qemu_real_host_page_size);
+-        }
++    ret = get_max_segments(s->fd);
++    if (ret > 0) {
++        bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
++                                           ret * qemu_real_host_page_size);
      }
  
--    ret = get_max_segments(s->fd);
-+    ret = bs->sg ? sg_get_max_segments(s->fd) : get_max_segments(s->fd);
-     if (ret > 0) {
-         bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
-                                            ret * qemu_real_host_page_size);
+-    raw_probe_alignment(bs, s->fd, errp);
+-    bs->bl.min_mem_alignment = s->buf_align;
+-    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
++    raw_refresh_limits(bs, errp);
+ }
+ 
+ static int check_for_dasd(int fd)
+@@ -3604,7 +3629,7 @@ static BlockDriver bdrv_host_device = {
+     .bdrv_co_pdiscard       = hdev_co_pdiscard,
+     .bdrv_co_copy_range_from = raw_co_copy_range_from,
+     .bdrv_co_copy_range_to  = raw_co_copy_range_to,
+-    .bdrv_refresh_limits = raw_refresh_limits,
++    .bdrv_refresh_limits = hdev_refresh_limits,
+     .bdrv_io_plug = raw_aio_plug,
+     .bdrv_io_unplug = raw_aio_unplug,
+     .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+@@ -3728,7 +3753,7 @@ static BlockDriver bdrv_host_cdrom = {
+     .bdrv_co_preadv         = raw_co_preadv,
+     .bdrv_co_pwritev        = raw_co_pwritev,
+     .bdrv_co_flush_to_disk  = raw_co_flush_to_disk,
+-    .bdrv_refresh_limits = raw_refresh_limits,
++    .bdrv_refresh_limits = hdev_refresh_limits,
+     .bdrv_io_plug = raw_aio_plug,
+     .bdrv_io_unplug = raw_aio_unplug,
+     .bdrv_attach_aio_context = raw_aio_attach_aio_context,
 -- 
 2.28.0
 
