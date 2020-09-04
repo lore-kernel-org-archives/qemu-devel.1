@@ -2,73 +2,70 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23633C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 10:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD20C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0D412084D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 10:43:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0D412084D
+	by mail.kernel.org (Postfix) with ESMTPS id 6902920770
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 10:46:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6902920770
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53496 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE9Bd-0005SV-4d
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 06:43:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58908)
+	id 1kE9EP-0007dV-I8
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 06:46:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59408)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE9At-0004zP-EU
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 06:42:31 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32263
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE9Do-0007BI-Gd
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 06:45:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40821
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE9Ar-00068H-5n
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 06:42:30 -0400
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-523-iq_xAhY7MZqN4xNY97gAnQ-1; Fri, 04 Sep 2020 06:42:26 -0400
-X-MC-Unique: iq_xAhY7MZqN4xNY97gAnQ-1
-Received: by mail-wr1-f72.google.com with SMTP id v12so2185870wrm.9
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 03:42:26 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE9Dm-0006Wq-5Y
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 06:45:32 -0400
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-183-kII3zCfZOb-CiIM-fApI0Q-1; Fri, 04 Sep 2020 06:45:27 -0400
+X-MC-Unique: kII3zCfZOb-CiIM-fApI0Q-1
+Received: by mail-wr1-f71.google.com with SMTP id k13so603341wrw.16
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 03:45:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:autocrypt
  :message-id:date:user-agent:mime-version:in-reply-to
  :content-language:content-transfer-encoding;
- bh=x8Tbw53cYVTfRZiQaYfMnjqWsbGiSiGpzuUjLzYGfro=;
- b=gpR0TdGtM84jWqbKLXqRbFz8SPbX5yxUUj7WCcozGJrn1STcKAx3SJClCFAZ7oTcdB
- 32GNk7EPzjSYA2TuQR3qRBTpJxsti9a/z+JbC0/oxn1Qg/2i60LiLF7zZ77sb/+u9KHH
- 7CnC7uN0bxjec2feXtovgQR4A5mQ6uGY+25kR/vjSuxSb5t8AyDczAKnA8S1aegNmpcQ
- /CisV298yKVdFoyPc+wa8VNKLXGYQBR68GO+107PBWVXmxVQhLl0SZJFmPezVJBCjiAl
- NdbWxS/vtANEpkm4/wz4mLnAwjT6GF7YJahLsd8Uo7W/FrMzehwPy+yhwmf6G9KIhGII
- 8E4Q==
-X-Gm-Message-State: AOAM531UD9m0CeefHOARWwxJ7agzLZYYvOiFVRuth7NZzFa2SfLYviUD
- L0RRiqzNT/ms5MtMjVG1/ACVPHM3T/qYCzRwfRpoHoPSGAbM1ZBRf6lxk4d5af4RmkdpPwIfku7
- +993vd6WpCzyHL/s=
-X-Received: by 2002:a05:600c:2109:: with SMTP id
- u9mr6568219wml.147.1599216145120; 
- Fri, 04 Sep 2020 03:42:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz7brbyb53c8CXS8UYrNdR+00+Iz2fChpehK+fxo2gCZv2GnMMEYak3qTGQSxlCy2PQ3/48zg==
-X-Received: by 2002:a05:600c:2109:: with SMTP id
- u9mr6568177wml.147.1599216144581; 
- Fri, 04 Sep 2020 03:42:24 -0700 (PDT)
+ bh=WWyMqYdlFWzes5l9Z9Fjjy9XY7hqgwPhXoj0bZzl2W8=;
+ b=LprP0XSDfKorQLMGxpd9c6O3+omhVQG4GiILuBLXM/ZwCebW7+GafELLTabkLl1+IL
+ xfzHEwJXx33kZxALH6PyHL1ssjZ6oF5tZMTqgtz8OMG9VpZaTcXmNGglRxCqcAlX94aA
+ 0MQSRg/gxOTNRE08oCCUi2jQ9fsD3bdr+XdEQfA9pw8mMKjKhp5VUojy3ZKEVBM6Y2xv
+ v5wIi4ZYuUsXV9JaKWQrkOea1qYgfTPwdy2nAQVta/AE4NAIHzYOGMw/fJcoWRiOYNki
+ Ca+0zQxB3YY4y6HO1e5YPtMGXPPA+/9jHMYA5VJEdTYo45hL9j5A+YoJxONOrqVtGlEZ
+ 1s7A==
+X-Gm-Message-State: AOAM530P9wbOwNrxVs4Hq74KCCrw92n+S7MIJUCHRTCs7IiGZMoLDCxt
+ iIeHnmRwLwO+PWLzneEskt0AX5dLcS4HvHBuAvU8/SVaErCfsrKVPulmMZulTfvJaH4Ul68RODK
+ 46kAT93+y58EDo3c=
+X-Received: by 2002:adf:ec4f:: with SMTP id w15mr6679605wrn.333.1599216326859; 
+ Fri, 04 Sep 2020 03:45:26 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxG/Nxop5XtmzsCq4/EcSYHVyT9th6vIvYl+TwC9R8PuA4D0eV18b7Oglp1AQye1Y/go2uoXg==
+X-Received: by 2002:adf:ec4f:: with SMTP id w15mr6679583wrn.333.1599216326653; 
+ Fri, 04 Sep 2020 03:45:26 -0700 (PDT)
 Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id h185sm10714596wme.25.2020.09.04.03.42.23
+ by smtp.gmail.com with ESMTPSA id 8sm11446716wrl.7.2020.09.04.03.45.25
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Sep 2020 03:42:23 -0700 (PDT)
-Subject: Re: [PATCH v3 0/7] colo: Introduce resource agent and test suite/CI
-To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+ Fri, 04 Sep 2020 03:45:26 -0700 (PDT)
+Subject: Re: [PATCH v3 6/7] configure,Makefile: Install colo resource-agent
+To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>
 References: <cover.1596536719.git.lukasstraub2@web.de>
- <20200818142701.6d1d82bd@luklap> <20200827104054.45a116fb@luklap>
+ <108a9f4106fcc52f089c9bded571d46f79929235.1596536719.git.lukasstraub2@web.de>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -93,20 +90,20 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <244bdfd0-a780-faca-5f7a-b6e103789341@redhat.com>
-Date: Fri, 4 Sep 2020 12:42:22 +0200
+Message-ID: <35188009-4bc3-63fc-60c5-cb92908c1de5@redhat.com>
+Date: Fri, 4 Sep 2020 12:45:24 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200827104054.45a116fb@luklap>
-X-Mimecast-Spam-Score: 0.002
+In-Reply-To: <108a9f4106fcc52f089c9bded571d46f79929235.1596536719.git.lukasstraub2@web.de>
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=windows-1252
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:57:33
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -42
 X-Spam_score: -4.3
@@ -127,118 +124,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Zhang Chen <chen.zhang@intel.com>, Cleber Rosa <crosa@redhat.com>
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Zhang Chen <chen.zhang@intel.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Wainer,
+On 8/4/20 12:47 PM, Lukas Straub wrote:
+> Optionally install the resouce-agent so it gets picked up by
+> pacemaker.
 
-As Cleber is busy with Gating CI, can you
-review tests/acceptance/colo.py please?
+This patch now needs to be rebased.
 
-On 8/27/20 10:40 AM, Lukas Straub wrote:
-> On Tue, 18 Aug 2020 14:27:01 +0200
-> Lukas Straub <lukasstraub2@web.de> wrote:
 > 
->> On Tue, 4 Aug 2020 12:46:29 +0200
->> Lukas Straub <lukasstraub2@web.de> wrote:
->>
->>> Hello Everyone,
->>> So here is v3. Patch 1 can already be merged independently of the others.
->>> Please review.
->>>
->>> Regards,
->>> Lukas Straub
->>>
->>> Based-on: <cover.1596528468.git.lukasstraub2@web.de>
->>> "Introduce 'yank' oob qmp command to recover from hanging qemu"
->>>
->>> Changes:
->>>
->>> v3:
->>>  -resource-agent: Don't determine local qemu state by remote master-score, query
->>>   directly via qmp instead
->>>  -resource-agent: Add max_queue_size parameter for colo-compare
->>>  -resource-agent: Fix monitor action on secondary returning error during
->>>   clean shutdown
->>>  -resource-agent: Fix stop action setting master-score to 0 on primary on
->>>   clean shutdown
->>>
->>> v2:
->>>  -use new yank api
->>>  -drop disk_size parameter
->>>  -introduce pick_qemu_util function and use it
->>>
->>> Overview:
->>>
->>> Hello Everyone,
->>> These patches introduce a resource agent for fully automatic management of colo
->>> and a test suite building upon the resource agent to extensively test colo.
->>>
->>> Test suite features:
->>> -Tests failover with peer crashing and hanging and failover during checkpoint
->>> -Tests network using ssh and iperf3
->>> -Quick test requires no special configuration
->>> -Network test for testing colo-compare
->>> -Stress test: failover all the time with network load
->>>
->>> Resource agent features:
->>> -Fully automatic management of colo
->>> -Handles many failures: hanging/crashing qemu, replication error, disk error, ...
->>> -Recovers from hanging qemu by using the "yank" oob command
->>> -Tracks which node has up-to-date data
->>> -Works well in clusters with more than 2 nodes
->>>
->>> Run times on my laptop:
->>> Quick test: 200s
->>> Network test: 800s (tagged as slow)
->>> Stress test: 1300s (tagged as slow)
->>>
->>> For the last two tests, the test suite needs access to a network bridge to
->>> properly test the network, so some parameters need to be given to the test
->>> run. See tests/acceptance/colo.py for more information.
->>>
->>> Regards,
->>> Lukas Straub
->>>
->>> Lukas Straub (7):
->>>   block/quorum.c: stable children names
->>>   avocado_qemu: Introduce pick_qemu_util to pick qemu utility binaries
->>>   boot_linux.py: Use pick_qemu_util
->>>   colo: Introduce resource agent
->>>   colo: Introduce high-level test suite
->>>   configure,Makefile: Install colo resource-agent
->>>   MAINTAINERS: Add myself as maintainer for COLO resource agent
->>>
->>>  MAINTAINERS                               |    6 +
->>>  Makefile                                  |    5 +
->>>  block/quorum.c                            |   20 +-
->>>  configure                                 |   10 +
->>>  scripts/colo-resource-agent/colo          | 1501 +++++++++++++++++++++
->>>  scripts/colo-resource-agent/crm_master    |   44 +
->>>  scripts/colo-resource-agent/crm_resource  |   12 +
->>>  tests/acceptance/avocado_qemu/__init__.py |   15 +
->>>  tests/acceptance/boot_linux.py            |   11 +-
->>>  tests/acceptance/colo.py                  |  677 ++++++++++
->>>  10 files changed, 2286 insertions(+), 15 deletions(-)
->>>  create mode 100755 scripts/colo-resource-agent/colo
->>>  create mode 100755 scripts/colo-resource-agent/crm_master
->>>  create mode 100755 scripts/colo-resource-agent/crm_resource
->>>  create mode 100644 tests/acceptance/colo.py
->>>
->>> --
->>> 2.20.1  
->>
->> Ping...
+> Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> ---
+>  Makefile  |  5 +++++
+>  configure | 10 ++++++++++
+>  2 files changed, 15 insertions(+)
 > 
-> Ping 2...
-> 
-> Kevin, can you already apply patch 1 "block/quorum.c: stable children names"? It resolves the following bug: https://bugs.launchpad.net/qemu/+bug/1881231
-> 
-> Regards,
-> Lukas Straub
+> diff --git a/Makefile b/Makefile
+> index c2120d8d48..dccc20b120 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -969,6 +969,11 @@ ifneq ($(DESCS),)
+>  		$(INSTALL_DATA) "$$tmpf" \
+>  			"$(DESTDIR)$(qemu_datadir)/firmware/$$x"; \
+>  	done
+> +endif
+> +ifdef INSTALL_COLO_RA
+> +	mkdir -p "$(DESTDIR)$(libdir)/ocf/resource.d/qemu"
+> +	$(INSTALL_PROG) "scripts/colo-resource-agent/colo" \
+> +		"$(DESTDIR)$(libdir)/ocf/resource.d/qemu/colo"
+>  endif
+>  	for s in $(ICON_SIZES); do \
+>  		mkdir -p "$(DESTDIR)$(qemu_icondir)/hicolor/$${s}/apps"; \
+> diff --git a/configure b/configure
+> index 2acc4d1465..39051d25f8 100755
+> --- a/configure
+> +++ b/configure
+> @@ -438,6 +438,7 @@ softmmu="yes"
+>  linux_user="no"
+>  bsd_user="no"
+>  blobs="yes"
+> +colo_ra="no"
+>  edk2_blobs="no"
+>  pkgversion=""
+>  pie=""
+> @@ -1336,6 +1337,10 @@ for opt do
+>    ;;
+>    --disable-blobs) blobs="no"
+>    ;;
+> +  --disable-colo-ra) colo_ra="no"
+> +  ;;
+> +  --enable-colo-ra) colo_ra="yes"
+> +  ;;
+>    --with-pkgversion=*) pkgversion="$optarg"
+>    ;;
+>    --with-coroutine=*) coroutine="$optarg"
+> @@ -1821,6 +1826,7 @@ Advanced options (experts only):
+>    --enable-gcov            enable test coverage analysis with gcov
+>    --gcov=GCOV              use specified gcov [$gcov_tool]
+>    --disable-blobs          disable installing provided firmware blobs
+> +  --enable-colo-ra         enable installing the COLO resource agent for pacemaker
+>    --with-vss-sdk=SDK-path  enable Windows VSS support in QEMU Guest Agent
+>    --with-win-sdk=SDK-path  path to Windows Platform SDK (to build VSS .tlb)
+>    --tls-priority           default TLS protocol/cipher priority string
+> @@ -6930,6 +6936,7 @@ echo "Linux AIO support $linux_aio"
+>  echo "Linux io_uring support $linux_io_uring"
+>  echo "ATTR/XATTR support $attr"
+>  echo "Install blobs     $blobs"
+> +echo "Install COLO resource agent $colo_ra"
+>  echo "KVM support       $kvm"
+>  echo "HAX support       $hax"
+>  echo "HVF support       $hvf"
+> @@ -7496,6 +7503,9 @@ fi
+>  if test "$blobs" = "yes" ; then
+>    echo "INSTALL_BLOBS=yes" >> $config_host_mak
+>  fi
+> +if test "$colo_ra" = "yes" ; then
+> +  echo "INSTALL_COLO_RA=yes" >> $config_host_mak
+> +fi
+>  if test "$iovec" = "yes" ; then
+>    echo "CONFIG_IOVEC=y" >> $config_host_mak
+>  fi
+> --
+> 2.20.1
 > 
 
 
