@@ -2,94 +2,127 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19A34C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:46:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DE15C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:49:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAE9220658
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:46:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E7EB204FD
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:49:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OSQ2q91V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAE9220658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LufHRgvI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E7EB204FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45252 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEC33-0005VL-Ve
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:46:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51132)
+	id 1kEC5O-0000Bf-9e
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:49:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53222)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kEBwx-00055q-QQ
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:40:19 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:44315)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kEBwv-0005jS-5v
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:40:19 -0400
-Received: by mail-wr1-x429.google.com with SMTP id c15so6756762wrs.11
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 06:40:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=PxtiIAwJ1kjUeew0ERcC6AvTCfyYiyLhyq+ziAl/hGc=;
- b=OSQ2q91Vm33Pjw6Ot3tzHDgsOPn153a8bPUNHhBfkNsS8jL9xKa/rjl4iiGbJ7McaR
- 5eO1tBn8XbM8eTOV/oxgRHWzZRHXjKkGUPPIOO16MmAcvYq5z4ytGjtbP1fA/25rzgZe
- RUTX8S8bUr77swyMU8NpFvV8lze5u5k3kGhVvWx61Ha8uUomIIrSjGPHDM0Vr5IinIoU
- Lbr80FI8dQ9MhrlkIwaoST1G1cyNpooWq7FovbwNDbh6PExLXREz/n8DNuYDSsI7oyZ3
- 7r7xgnV3hdKekzG05XtS+vOvOZCpj6194Dkt+Wpf5/+O+3VyaA20n7vQciaj5LplPsF2
- sgFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=PxtiIAwJ1kjUeew0ERcC6AvTCfyYiyLhyq+ziAl/hGc=;
- b=R4CJGjblyvNjXb4rOWwB0KVGpBhmWNU//Pnyhhk0YIS1Sjk5bFGYaIVok7MdxReGxD
- DYcuBWLr66XtOmLOkNEJ1YpPV/ewR+Bt0EtnuVTorm7w9lktrB56JJFCwKIBsdwQGpRW
- acSXOtmKArH9EBEBLnn9TAAWWhjr+tvdWVH1xsG1lWis0y53AAtn9G0m4f3zZOCHAWax
- i3eGNUDcBwHN8VelgEjsyd5Gt5WLNO7A+ZdmOfNECVKdso6UwU3fEDFLavzDr8EFZgfw
- ZjvuAVw6nJ2k/ckbEiuIdbnQxPAQowaCnrId2SPxunFyy6/cfDoO3U1jnE1wiYxAxwHh
- xxGg==
-X-Gm-Message-State: AOAM530d0Eto31PCO2SmWpbV+6O9VD3Qz4G0va1mtPko5PxqrG93NPOA
- vLdahrFHsivjvLisYtJdtW6lnQ==
-X-Google-Smtp-Source: ABdhPJzEVNcsN1lcNONnBed52WDz/RVuuKoWxG3hJ0ZxO8FSLPgSxLkiiWwFsaRcB0Cb0RqJxIg8ew==
-X-Received: by 2002:adf:9e8d:: with SMTP id a13mr7339768wrf.94.1599226815571; 
- Fri, 04 Sep 2020 06:40:15 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id c14sm11223431wrv.12.2020.09.04.06.40.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 06:40:12 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3BD0D1FF90;
- Fri,  4 Sep 2020 14:40:08 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH  v1 4/4] plugins: new hwprofile plugin
-Date: Fri,  4 Sep 2020 14:40:07 +0100
-Message-Id: <20200904134007.4175-5-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200904134007.4175-1-alex.bennee@linaro.org>
-References: <20200904134007.4175-1-alex.bennee@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kEC4d-0007DK-VY; Fri, 04 Sep 2020 09:48:16 -0400
+Received: from mail-eopbgr40130.outbound.protection.outlook.com
+ ([40.107.4.130]:24332 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kEC4a-0006yc-0i; Fri, 04 Sep 2020 09:48:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S/a19MVjHrtAADhXbS/NZHZbMEVLaWznogusbljv7DbIV5ZGkml3/eGm3ogxN8QqI7n9gb/FjcrKD5e/qJWiDrSks87mNsmGQ0GQkqMqYKk5pNmkw8wCpYgQ9S+jzObyiW0A53EJ7ANXUhrJjpBrHg42td312RSSpWa8EIAztIETd6NO3FgeHA2jkk0UNuFIOsKcBH4yUyAYw5KNFo7JacIQ4d2Bk4iV6eBy0iVrHzq33gDf1qQdY8kkuqPtqTTT+C+9Pmk464AZY/486lYhao6aHX1bLXTkuL3v/vBtEjuMYe8tu3uTS4qEK64jcgYeQlv+f+npHOxXaBsMXkyQAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TR45clhdX7Qc2y5qnm4lszsWmbHYrbctP8QT066rUPk=;
+ b=mmoT8spTMo0QskkAzhISubqCFHryjmSlRcwFXB8+7ZSuOypFCMUpnjFVORYTMR988xGXgLZuRgtQaf53EbFH9cEQy6z+oIUnOxewJgTJXTRDQ/K3BDGSi9kgcrCJfhxXspb2DzSa7IiVvVxPyrMCS9aUnqDzUp6lUpf//BF06P+sYqNxSNhO5oRpsYXFehItWo6xGV2EJR1ojEwwahE0/qRrL1btm3WfmUy0xxUFrPFJYYzWMsZ/kucMe+JXX9vRLcE+k/YbGx97vxNNsCuV2Ijlm6LcXQprR8rVl0a4gQu8UR3HnYbaDwGFdudjU+xJ9OzYSwc/mzBdOTev7t0wZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TR45clhdX7Qc2y5qnm4lszsWmbHYrbctP8QT066rUPk=;
+ b=LufHRgvIF36Q48g4mxOSEro96cZGtjp/V/FZ7NsRlNRbZkCAm20eYV4ZLcuds2gj6uX4fRkXKFxgAUS/YCtmTr4c7kY4wdAv/dCDD39E17YJq2onqTqFp3c0JSVaD4z3sdMobUcdScrtETuG1Y9P+Sn9qMvPMqDChDhw4FaWqs4=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB2984.eurprd08.prod.outlook.com (2603:10a6:209:4e::28)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3326.19; Fri, 4 Sep
+ 2020 13:48:08 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%7]) with mapi id 15.20.3348.017; Fri, 4 Sep 2020
+ 13:48:08 +0000
+Subject: Re: [PATCH v8 6/7] block-stream: freeze link to base node during
+ stream job
+To: Max Reitz <mreitz@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, armbru@redhat.com,
+ jsnow@redhat.com, eblake@redhat.com, den@openvz.org
+References: <1598633579-221780-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1598633579-221780-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <9739719d-0681-d839-cf8d-398b78b6d323@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <3a52e54e-22fe-6eee-439a-dc1db0a1bf63@virtuozzo.com>
+Date: Fri, 4 Sep 2020 16:48:04 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
+In-Reply-To: <9739719d-0681-d839-cf8d-398b78b6d323@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x429.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-ClientProxiedBy: AM0PR07CA0004.eurprd07.prod.outlook.com
+ (2603:10a6:208:ac::17) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.143) by
+ AM0PR07CA0004.eurprd07.prod.outlook.com (2603:10a6:208:ac::17) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3370.9 via Frontend Transport; Fri, 4 Sep 2020 13:48:07 +0000
+X-Originating-IP: [185.215.60.143]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 5036884a-a040-418c-94e2-08d850d9282a
+X-MS-TrafficTypeDiagnostic: AM6PR08MB2984:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB2984272B46012F818CC61F69C12D0@AM6PR08MB2984.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2449;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: /ZR3/RnYm93NQ2jGRJaNXfGUSdkc5f/tPFPa/t9jgrFV/68HAj1LnKSzDqd7ySq3a1sZlTCn36WG0cNgq5g0CbqQ2cf0pHlYZXQUNOvQoC7QFmRC0ucLIGWofBxQNIk+rt4ZRsDDVaQjlA624BzwiVURKRlgJgy6HAEZ9wXRW6Q6Vsmn74OvkMCkHFJsk/5v6Aw9rdsZvDzQw1xPvA2sqCjtnGM5118BESefenxDF4odbF9dT8tMJCAv5FabL9GuM6FqPu/zxg3gP4kR0uX0rWrxZt2qyV2UpNwIpwTSyrMoMK1Wr21xA1HNfK1vyu5Ukikh/kPtSz44TAIbbxC4/IGziV6kQJRxK9LapYawbPx/z+AVRwWWXSApc1oYLyjl
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(136003)(39840400004)(366004)(396003)(346002)(86362001)(26005)(66556008)(478600001)(31686004)(8676002)(83380400001)(36756003)(53546011)(16526019)(66476007)(8936002)(6486002)(186003)(2906002)(31696002)(316002)(16576012)(66946007)(956004)(110136005)(52116002)(6666004)(5660300002)(2616005)(4326008)(107886003)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: w1CBa6paGc5klBlsZi26+jfBK7DnighmMrjBu2NQKVIH1S4lW5LaLjiNOVdoj/QdV7MhmwO0MSaVMdWQUlPIRpRmdbbse60DymsyPrvl+OM2ZmRC9JhgJE0RgLzU0lAcEvaaUC+DZ50sHzyLN4h5U06qbfHuPqANnGf1wkDL+L1/Mu7QdkrQabKPb5565FL9odYRkiUXVtLboXcrdKrKajQoYX2BRmuijGYjOnBsC1AJlJVkOe7AA8A7WVAM0MAJvBrk8NckdTpuiAofHxuTYsNKRzibDjp0Q5kPYvunEyN3MFmSXmFlv1aWHb86h5O9uj1/b1KEtu9byjpYMfvbr4Mn9A+bTqjW3dFWOAbDXr6FpvGpSIwrQFiXruQrDeNkJ/e8QczccJg1KJN46H+Meo9AzhPFgyEt+Jo0kGjpGcels+SOl2ch9uNDR5paRYkaiaDNHRj+1VhCHunV5qZdGNBG12jWUWcFm42VHry6tWWlYEm5HkNz3diT77d969SKYUQ3twYx2IWduOp49yp57nEDGT6cW3uh1p6CTAU00DMN1oFV5ledcfqyw6x0hOQqofojAc7AuTZ3QGQo96zZpGM+ZirPnJ4TPQ6LMjvY0MczRPSgMWfAo51EcPfZvUZzkLseIGwI1CcpyEOy33Ziug==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5036884a-a040-418c-94e2-08d850d9282a
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2020 13:48:08.6492 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7f/7Wogp8ZnBl0mn8xJSpIYOHyrNxU8tQXvnlF9Z4YR/iB8Jlcgc3mEYc84QAf8/1Qa2ItK07bC4yr03fhmWYg2r4dR63+lwAoOc1qo7MvI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB2984
+Received-SPF: pass client-ip=40.107.4.130;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 09:48:09
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -28
+X-Spam_score: -2.9
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,434 +136,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, robhenry@microsoft.com,
- aaron@os.amperecomputing.com, cota@braap.org, kuhn.chenqun@huawei.com,
- peter.puhov@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a plugin intended to help with profiling access to various
-bits of system hardware. It only really makes sense for system
-emulation.
+04.09.2020 16:21, Max Reitz wrote:
+> On 28.08.20 18:52, Andrey Shinkevich wrote:
+>> To keep the base node unchanged during the block-stream operation,
+>> freeze it as the other part of the backing chain with the intermediate
+>> nodes related to the job.
+>> This patch revers the change made with the commit c624b015bf as the
+>> correct base file name and its format have to be written down to the
+>> QCOW2 header on the disk when the backing file is being changed after
+>> the stream job completes.
+>> This reversion incurs changes in the tests 030, 245 and discards the
+>> test 258 where concurrent stream/commit jobs are tested. When the link
+>> to a base node is frozen, the concurrent job cannot change the common
+>> backing chain.
+>>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> ---
+>>   block/stream.c             |  29 ++------
+>>   tests/qemu-iotests/030     |  10 +--
+>>   tests/qemu-iotests/245     |   2 +-
+>>   tests/qemu-iotests/258     | 161 ---------------------------------------------
+>>   tests/qemu-iotests/258.out |  33 ----------
+>>   5 files changed, 14 insertions(+), 221 deletions(-)
+>>   delete mode 100755 tests/qemu-iotests/258
+>>   delete mode 100644 tests/qemu-iotests/258.out
+> 
+> Does this need to be in this series?  (I’m not entirely sure, based on
+> what I can see in patch 7.)
+> 
+> When doing this, should we introduce a @bottom-node option alongside, so
+> that we can make all the tests that are deleted here pass still, just
+> with changes?
+> 
 
-It takes advantage of the recently exposed helper API that allows us
-to see the device name (memory region name) associated with a device.
+That's a question to discuss, and I asked Andrey to make this patch in this
+simple way to see, how much damage we have with this change.
 
-You can specify arg=read or arg=write to limit the tracking to just
-reads or writes (by default it does both).
+Honestly, I doubt that we need the new option. Previously, we decided that
+we can make this change without a deprecation. If we still going to do it,
+we shouldn't care about these use cases. So, if we freeze base again wituhout
+a depreaction and:
 
-The pattern option:
+1. add bottom-node
 
-  -plugin ./tests/plugin/libhwprofile.so,arg=pattern
+  - we keep the iotests
+  - If (unlikely) someone will came and say: hey, you've broken my working scenario, we will say "use bottom-node option, sorry"
+  - Most likely we'll have unused option and corresponding unused logic, making code more complex for nothing (and we'll have to say "sorry" anyway)
 
-will allow you to see the access pattern to devices, eg:
+2. without option
 
-  gic_cpu @ 0xffffffc010040000
-    off:00000000, 8, 1, 8, 1
-    off:00000000, 4, 1, 4, 1
-    off:00000000, 2, 1, 2, 1
-    off:00000000, 1, 1, 1, 1
+  - we loose the iotests. this looks scary, but it is honest: we drop use-cases and corresponding iotests
+  - If (unlikely) someone will came and say: hey, you've broken my working scenario, he will have to wait for next release / package version / or update the downstream himself
+  - Most likely all will be OK.
 
-The source option:
 
-  -plugin ./tests/plugin/libhwprofile.so,arg=source
+Hmm. OK, and the hard-way:
 
-will track the virtual source address of the instruction making the
-access:
+3. Enable all the new logic (filter insertion, freezing base, etc.) only when filter-node-name option specified. And immediately deprecate not-specifying the option.
+  [Note, that in way [3] we don't need bottom-node option]
 
-  pl011 @ 0xffffffc010031000
-    pc:ffffffc0104c785c, 1, 4, 0, 0
-    pc:ffffffc0104c7898, 1, 4, 0, 0
-    pc:ffffffc010512bcc, 2, 1867, 0, 0
 
-You cannot mix source and pattern.
 
-Finally the match option allow you to limit the tracking to just the
-devices you care about.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Robert Foley <robert.foley@linaro.org>
-Tested-by: Robert Foley <robert.foley@linaro.org>
-Message-Id: <20200713200415.26214-12-alex.bennee@linaro.org>
-
----
-vN
-  - add some notes to tcg-plugins.rst
----
- docs/devel/tcg-plugins.rst  |  34 ++++
- contrib/plugins/hwprofile.c | 305 ++++++++++++++++++++++++++++++++++++
- contrib/plugins/Makefile    |   1 +
- 3 files changed, 340 insertions(+)
- create mode 100644 contrib/plugins/hwprofile.c
-
-diff --git a/docs/devel/tcg-plugins.rst b/docs/devel/tcg-plugins.rst
-index e079695caf9..4af6d609c98 100644
---- a/docs/devel/tcg-plugins.rst
-+++ b/docs/devel/tcg-plugins.rst
-@@ -276,3 +276,37 @@ which will eventually report::
-     previously @ 0x000000ffd08098/5 (809900593 insns)
-     previously @ 0x000000ffd080c0/1 (809900588 insns)
- 
-+- contrib/plugins/hwprofile
-+
-+The hwprofile tool can only be used with system emulation and allows
-+the user to see what hardware is accessed how often. It has a number of options:
-+
-+ * arg=read or arg=write
-+
-+ By default the plugin tracks both reads and writes. You can use one
-+ of these options to limit the tracking to just one class of accesses.
-+
-+ * arg=source
-+
-+ Will include a detailed break down of what the guest PC that made the
-+ access was. Not compatible with arg=pattern. Example output::
-+
-+   cirrus-low-memory @ 0xfffffd00000a0000
-+    pc:fffffc0000005cdc, 1, 256
-+    pc:fffffc0000005ce8, 1, 256
-+    pc:fffffc0000005cec, 1, 256
-+
-+ * arg=pattern
-+
-+ Instead break down the accesses based on the offset into the HW
-+ region. This can be useful for seeing the most used registers of a
-+ device. Example output::
-+
-+    pci0-conf @ 0xfffffd01fe000000
-+      off:00000004, 1, 1
-+      off:00000010, 1, 3
-+      off:00000014, 1, 3
-+      off:00000018, 1, 2
-+      off:0000001c, 1, 2
-+      off:00000020, 1, 2
-+      ...
-diff --git a/contrib/plugins/hwprofile.c b/contrib/plugins/hwprofile.c
-new file mode 100644
-index 00000000000..6dac1d5f854
---- /dev/null
-+++ b/contrib/plugins/hwprofile.c
-@@ -0,0 +1,305 @@
-+/*
-+ * Copyright (C) 2020, Alex Bennée <alex.bennee@linaro.org>
-+ *
-+ * HW Profile - breakdown access patterns for IO to devices
-+ *
-+ * License: GNU GPL, version 2 or later.
-+ *   See the COPYING file in the top-level directory.
-+ */
-+
-+#include <inttypes.h>
-+#include <assert.h>
-+#include <stdlib.h>
-+#include <inttypes.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <stdio.h>
-+#include <glib.h>
-+
-+#include <qemu-plugin.h>
-+
-+QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-+
-+#define ARRAY_SIZE(x) (sizeof(x) / sizeof((x)[0]))
-+
-+typedef struct {
-+    uint64_t cpu_read;
-+    uint64_t cpu_write;
-+    uint64_t reads;
-+    uint64_t writes;
-+} IOCounts;
-+
-+typedef struct {
-+    uint64_t off_or_pc;
-+    IOCounts counts;
-+} IOLocationCounts;
-+
-+typedef struct {
-+    const char *name;
-+    uint64_t   base;
-+    IOCounts   totals;
-+    GHashTable *detail;
-+} DeviceCounts;
-+
-+static GMutex lock;
-+static GHashTable *devices;
-+
-+/* track the access pattern to a piece of HW */
-+static bool pattern;
-+/* track the source address of access to HW */
-+static bool source;
-+/* track only matched regions of HW */
-+static bool check_match;
-+static gchar **matches;
-+
-+static enum qemu_plugin_mem_rw rw = QEMU_PLUGIN_MEM_RW;
-+
-+static inline bool track_reads(void)
-+{
-+    return rw == QEMU_PLUGIN_MEM_RW || rw == QEMU_PLUGIN_MEM_R;
-+}
-+
-+static inline bool track_writes(void)
-+{
-+    return rw == QEMU_PLUGIN_MEM_RW || rw == QEMU_PLUGIN_MEM_W;
-+}
-+
-+static void plugin_init(void)
-+{
-+    devices = g_hash_table_new(NULL, NULL);
-+}
-+
-+static gint sort_cmp(gconstpointer a, gconstpointer b)
-+{
-+    DeviceCounts *ea = (DeviceCounts *) a;
-+    DeviceCounts *eb = (DeviceCounts *) b;
-+    return ea->totals.reads + ea->totals.writes >
-+           eb->totals.reads + eb->totals.writes ? -1 : 1;
-+}
-+
-+static gint sort_loc(gconstpointer a, gconstpointer b)
-+{
-+    IOLocationCounts *ea = (IOLocationCounts *) a;
-+    IOLocationCounts *eb = (IOLocationCounts *) b;
-+    return ea->off_or_pc > eb->off_or_pc;
-+}
-+
-+static void fmt_iocount_record(GString *s, IOCounts *rec)
-+{
-+    if (track_reads()) {
-+        g_string_append_printf(s, ", %"PRIx64", %"PRId64,
-+                               rec->cpu_read, rec->reads);
-+    }
-+    if (track_writes()) {
-+        g_string_append_printf(s, ", %"PRIx64", %"PRId64,
-+                               rec->cpu_write, rec->writes);
-+    }
-+}
-+
-+static void fmt_dev_record(GString *s, DeviceCounts *rec)
-+{
-+    g_string_append_printf(s, "%s, 0x%"PRIx64,
-+                           rec->name, rec->base);
-+    fmt_iocount_record(s, &rec->totals);
-+    g_string_append_c(s, '\n');
-+}
-+
-+static void plugin_exit(qemu_plugin_id_t id, void *p)
-+{
-+    g_autoptr(GString) report = g_string_new("");
-+    GList *counts;
-+
-+    if (!(pattern || source)) {
-+        g_string_printf(report, "Device, Address");
-+        if (track_reads()) {
-+            g_string_append_printf(report, ", RCPUs, Reads");
-+        }
-+        if (track_writes()) {
-+            g_string_append_printf(report, ",  WCPUs, Writes");
-+        }
-+        g_string_append_c(report, '\n');
-+    }
-+
-+    counts = g_hash_table_get_values(devices);
-+    if (counts && g_list_next(counts)) {
-+        GList *it;
-+
-+        it = g_list_sort(counts, sort_cmp);
-+
-+        while (it) {
-+            DeviceCounts *rec = (DeviceCounts *) it->data;
-+            if (rec->detail) {
-+                GList *accesses = g_hash_table_get_values(rec->detail);
-+                GList *io_it = g_list_sort(accesses, sort_loc);
-+                const char *prefix = pattern ? "off" : "pc";
-+                g_string_append_printf(report, "%s @ 0x%"PRIx64"\n",
-+                                       rec->name, rec->base);
-+                while (io_it) {
-+                    IOLocationCounts *loc = (IOLocationCounts *) io_it->data;
-+                    g_string_append_printf(report, "  %s:%08"PRIx64,
-+                                           prefix, loc->off_or_pc);
-+                    fmt_iocount_record(report, &loc->counts);
-+                    g_string_append_c(report, '\n');
-+                    io_it = io_it->next;
-+                }
-+            } else {
-+                fmt_dev_record(report, rec);
-+            }
-+            it = it->next;
-+        };
-+        g_list_free(it);
-+    }
-+
-+    qemu_plugin_outs(report->str);
-+}
-+
-+static DeviceCounts *new_count(const char *name, uint64_t base)
-+{
-+    DeviceCounts *count = g_new0(DeviceCounts, 1);
-+    count->name = name;
-+    count->base = base;
-+    if (pattern || source) {
-+        count->detail = g_hash_table_new(NULL, NULL);
-+    }
-+    g_hash_table_insert(devices, (gpointer) name, count);
-+    return count;
-+}
-+
-+static IOLocationCounts *new_location(GHashTable *table, uint64_t off_or_pc)
-+{
-+    IOLocationCounts *loc = g_new0(IOLocationCounts, 1);
-+    loc->off_or_pc = off_or_pc;
-+    g_hash_table_insert(table, (gpointer) off_or_pc, loc);
-+    return loc;
-+}
-+
-+static void hwprofile_match_hit(DeviceCounts *rec, uint64_t off)
-+{
-+    g_autoptr(GString) report = g_string_new("hwprofile: match @ offset");
-+    g_string_append_printf(report, "%"PRIx64", previous hits\n", off);
-+    fmt_dev_record(report, rec);
-+    qemu_plugin_outs(report->str);
-+}
-+
-+static void inc_count(IOCounts *count, bool is_write, unsigned int cpu_index)
-+{
-+    if (is_write) {
-+        count->writes++;
-+        count->cpu_write |= (1 << cpu_index);
-+    } else {
-+        count->reads++;
-+        count->cpu_read |= (1 << cpu_index);
-+    }
-+}
-+
-+static void vcpu_haddr(unsigned int cpu_index, qemu_plugin_meminfo_t meminfo,
-+                       uint64_t vaddr, void *udata)
-+{
-+    struct qemu_plugin_hwaddr *hwaddr = qemu_plugin_get_hwaddr(meminfo, vaddr);
-+
-+    if (!hwaddr || !qemu_plugin_hwaddr_is_io(hwaddr)) {
-+        return;
-+    } else {
-+        const char *name = qemu_plugin_hwaddr_device_name(hwaddr);
-+        uint64_t off = qemu_plugin_hwaddr_device_offset(hwaddr);
-+        bool is_write = qemu_plugin_mem_is_store(meminfo);
-+        DeviceCounts *counts;
-+
-+        g_mutex_lock(&lock);
-+        counts = (DeviceCounts *) g_hash_table_lookup(devices, name);
-+
-+        if (!counts) {
-+            uint64_t base = vaddr - off;
-+            counts = new_count(name, base);
-+        }
-+
-+        if (check_match) {
-+            if (g_strv_contains((const char * const *)matches, counts->name)) {
-+                hwprofile_match_hit(counts, off);
-+                inc_count(&counts->totals, is_write, cpu_index);
-+            }
-+        } else {
-+            inc_count(&counts->totals, is_write, cpu_index);
-+        }
-+
-+        /* either track offsets or source of access */
-+        if (source) {
-+            off = (uint64_t) udata;
-+        }
-+
-+        if (pattern || source) {
-+            IOLocationCounts *io_count = g_hash_table_lookup(counts->detail,
-+                                                             (gpointer) off);
-+            if (!io_count) {
-+                io_count = new_location(counts->detail, off);
-+            }
-+            inc_count(&io_count->counts, is_write, cpu_index);
-+        }
-+
-+        g_mutex_unlock(&lock);
-+    }
-+}
-+
-+static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-+{
-+    size_t n = qemu_plugin_tb_n_insns(tb);
-+    size_t i;
-+
-+    for (i = 0; i < n; i++) {
-+        struct qemu_plugin_insn *insn = qemu_plugin_tb_get_insn(tb, i);
-+        gpointer udata = (gpointer) (source ? qemu_plugin_insn_vaddr(insn) : 0);
-+        qemu_plugin_register_vcpu_mem_cb(insn, vcpu_haddr,
-+                                         QEMU_PLUGIN_CB_NO_REGS,
-+                                         rw, udata);
-+    }
-+}
-+
-+QEMU_PLUGIN_EXPORT
-+int qemu_plugin_install(qemu_plugin_id_t id, const qemu_info_t *info,
-+                        int argc, char **argv)
-+{
-+    int i;
-+
-+    for (i = 0; i < argc; i++) {
-+        char *opt = argv[i];
-+        if (g_strcmp0(opt, "read") == 0) {
-+            rw = QEMU_PLUGIN_MEM_R;
-+        } else if (g_strcmp0(opt, "write") == 0) {
-+            rw = QEMU_PLUGIN_MEM_W;
-+        } else if (g_strcmp0(opt, "pattern") == 0) {
-+            pattern = true;
-+        } else if (g_strcmp0(opt, "source") == 0) {
-+            source = true;
-+        } else if (g_str_has_prefix(opt, "match")) {
-+            gchar **parts = g_strsplit(opt, "=", 2);
-+            check_match = true;
-+            matches = g_strsplit(parts[1], ",", -1);
-+            g_strfreev(parts);
-+        } else {
-+            fprintf(stderr, "option parsing failed: %s\n", opt);
-+            return -1;
-+        }
-+    }
-+
-+    if (source && pattern) {
-+        fprintf(stderr, "can only currently track either source or pattern.\n");
-+        return -1;
-+    }
-+
-+    if (!info->system_emulation) {
-+        fprintf(stderr, "hwprofile: plugin only useful for system emulation\n");
-+        return -1;
-+    }
-+
-+    /* Just warn about overflow */
-+    if (info->system.smp_vcpus > 64 ||
-+        info->system.max_vcpus > 64) {
-+        fprintf(stderr, "hwprofile: can only track up to 64 CPUs\n");
-+    }
-+
-+    plugin_init();
-+
-+    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-+    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-+    return 0;
-+}
-diff --git a/contrib/plugins/Makefile b/contrib/plugins/Makefile
-index 7801b08b0d6..b9d7935e5ef 100644
---- a/contrib/plugins/Makefile
-+++ b/contrib/plugins/Makefile
-@@ -17,6 +17,7 @@ NAMES += hotblocks
- NAMES += hotpages
- NAMES += howvec
- NAMES += lockstep
-+NAMES += hwprofile
- 
- SONAMES := $(addsuffix .so,$(addprefix lib,$(NAMES)))
- 
 -- 
-2.20.1
-
+Best regards,
+Vladimir
 
