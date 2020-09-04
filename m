@@ -7,87 +7,87 @@ X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E64C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18799C2D0A8
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:50:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 34A5D206E7
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:49:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 34A5D206E7
+	by mail.kernel.org (Postfix) with ESMTPS id D7D2120772
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:50:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7D2120772
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEDxU-0008Gh-CT
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 11:49:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55764)
+	id 1kEDyy-0001pg-UD
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 11:50:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kEDu9-0001mj-3B
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:45:34 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47981
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kEDtb-0000nh-SK
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:44:59 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:34835
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kEDu7-0007dO-5e
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:45:32 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-566-oPozlDBnMQ-BHpZupHXqTg-1; Fri, 04 Sep 2020 11:45:29 -0400
-X-MC-Unique: oPozlDBnMQ-BHpZupHXqTg-1
-Received: by mail-wr1-f69.google.com with SMTP id 33so2445182wrk.12
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 08:45:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kEDtZ-0007Q1-BF
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:44:59 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-290-rscFQFtPOS6JQl7WZuvTpg-1; Fri, 04 Sep 2020 11:44:55 -0400
+X-MC-Unique: rscFQFtPOS6JQl7WZuvTpg-1
+Received: by mail-wr1-f70.google.com with SMTP id b7so2458247wrn.6
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 08:44:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=88VzwaD6NZkIeGp94pbPYvLyI6pXPU6GwCC8RqSJAfo=;
- b=LghF+o5tol75AECYEXfQdl1e4MkaI6K2RgwRCL1DSLItxYIfih4WxogC+Ibs0YYEhl
- /7WFXvRepWxhkGAxpNENKQ6F3LNZcONOF9rvRpVfKDgAVuv+XJojNFfPglGJzaraDjsx
- CqXdUyBj/VeYpzfN37xgu9HDqddcMWt8L/i0JQxL6E19d7tFmDyPSl82xNPz9Rkc2GIp
- VFciYpl9uCa4ozxWbZK9PPZRq5epJUrMxbwTwubwDXwk58eoHCq134YscTskxGlVS+CS
- ISMw3GPjimI9XZVG9rwuT21LXE4beuDI6ETlc4gwEbweiyoe+b7ovQtzVBbAW1M4YOda
- /sUg==
-X-Gm-Message-State: AOAM531jYdoLblexlt2qrMB5+EW37L1c9BPbHioIRXqVQFDsJiF9IPon
- H0QL2eqQSLajxruInK7AYG1LVtcqvhOa504Ua8iZ19P8qKZqUZZTYKJf4IAsO2VywV0tYXq1eXv
- eXPXaDQPAc7w943w=
-X-Received: by 2002:a05:600c:ce:: with SMTP id
- u14mr8537727wmm.137.1599234327831; 
- Fri, 04 Sep 2020 08:45:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyilkRW5eMWPpxwBYcqKhgCNwVWDAI895kp0huJC9lWBKdvi74Ba4SYKpGEMSGFUL3gca1tkw==
-X-Received: by 2002:a05:600c:ce:: with SMTP id
- u14mr8537693wmm.137.1599234327664; 
- Fri, 04 Sep 2020 08:45:27 -0700 (PDT)
+ bh=QoQLqcCGXTEq/TAmIUw2m4awB0M5QrT2MRC6GDSSjNM=;
+ b=rb5dVcfZ2HQrg+h2qbiTDhUx0PrgEkS36FFfcY4hdgK+rsPKoK7nDhmwfuWnwJY5J6
+ uFbX0/aMD+ErkULPkugvqSPMRv+QmcLHI0pmMIqBYAPXWPXplIcWHu/lAAP14Hv3rCWk
+ nrlHrYsgxsSxJJBhwt0/dDL+iHD8vJLA3O7cT2GZhMIPNkZOWbHxGmeXO/NlRFD8wlS1
+ mlg+nxYIN6IXi+lwtwAIoIOD/0PgG0fmAJ/VQ0Doa6wsHbaHpa+Qdh6bYgDgAlrOrK7q
+ MV53EEJjN3OhIUKqv0qr1UZhvOUTtAOYA0CNJcFqi6y65SUDHnQg+usqOatNBJ+HMMr9
+ bTPw==
+X-Gm-Message-State: AOAM530AIiVYb1Jaby4m2VkBdCL7U2X7Uu1HWyg1rmsOIWhN2Wto6sBp
+ A9LFfs5hokoSj8giF/9Ui/AD878qvGjEdOh0QgprhC1B+xgGYP/In5v0xM6fOecrBAo8esnimvh
+ L0zIUtC2g5Y0S1T0=
+X-Received: by 2002:a05:600c:2182:: with SMTP id
+ e2mr8345376wme.102.1599234294309; 
+ Fri, 04 Sep 2020 08:44:54 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyYDa0GY7GzDzgRg+yuhtOFf4hxrO2dPMQc4n/kolPVvy5pKPI6BkjHk2dX/8yf8kZX2PvBVg==
+X-Received: by 2002:a05:600c:2182:: with SMTP id
+ e2mr8345340wme.102.1599234294134; 
+ Fri, 04 Sep 2020 08:44:54 -0700 (PDT)
 Received: from localhost.localdomain (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id f1sm12061964wrt.20.2020.09.04.08.45.25
+ by smtp.gmail.com with ESMTPSA id n8sm12759448wra.32.2020.09.04.08.44.52
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 08:45:27 -0700 (PDT)
+ Fri, 04 Sep 2020 08:44:53 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org,
 	Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH 08/13] dma: Let dma_memory_valid() take MemTxAttrs argument
-Date: Fri,  4 Sep 2020 17:44:34 +0200
-Message-Id: <20200904154439.643272-9-philmd@redhat.com>
+Subject: [PATCH 02/13] docs/devel/loads-stores: Add regexp for DMA functions
+Date: Fri,  4 Sep 2020 17:44:28 +0200
+Message-Id: <20200904154439.643272-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904154439.643272-1-philmd@redhat.com>
 References: <20200904154439.643272-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:12
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:11
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,46 +121,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Let devices specify transaction attributes when calling
-dma_memory_valid().
-
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/ppc/spapr_vio.h | 2 +-
- include/sysemu/dma.h       | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ docs/devel/loads-stores.rst | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/hw/ppc/spapr_vio.h b/include/hw/ppc/spapr_vio.h
-index bed7df60e35..f134f6cf574 100644
---- a/include/hw/ppc/spapr_vio.h
-+++ b/include/hw/ppc/spapr_vio.h
-@@ -96,7 +96,7 @@ static inline void spapr_vio_irq_pulse(SpaprVioDevice *dev)
- static inline bool spapr_vio_dma_valid(SpaprVioDevice *dev, uint64_t taddr,
-                                        uint32_t size, DMADirection dir)
- {
--    return dma_memory_valid(&dev->as, taddr, size, dir);
-+    return dma_memory_valid(&dev->as, taddr, size, dir, MEMTXATTRS_UNSPECIFIED);
- }
+diff --git a/docs/devel/loads-stores.rst b/docs/devel/loads-stores.rst
+index 9a944ef1af6..5b20f907e4d 100644
+--- a/docs/devel/loads-stores.rst
++++ b/docs/devel/loads-stores.rst
+@@ -477,6 +477,8 @@ make sure our existing code is doing things correctly.
  
- static inline int spapr_vio_dma_read(SpaprVioDevice *dev, uint64_t taddr,
-diff --git a/include/sysemu/dma.h b/include/sysemu/dma.h
-index f4ade067a46..b322aa5947b 100644
---- a/include/sysemu/dma.h
-+++ b/include/sysemu/dma.h
-@@ -73,11 +73,11 @@ static inline void dma_barrier(AddressSpace *as, DMADirection dir)
-  * dma_memory_{read,write}() and check for errors */
- static inline bool dma_memory_valid(AddressSpace *as,
-                                     dma_addr_t addr, dma_addr_t len,
--                                    DMADirection dir)
-+                                    DMADirection dir, MemTxAttrs attrs)
- {
-     return address_space_access_valid(as, addr, len,
-                                       dir == DMA_DIRECTION_FROM_DEVICE,
--                                      MEMTXATTRS_UNSPECIFIED);
-+                                      attrs);
- }
+ Regexes for git grep
+  - ``\<dma_memory_\(read\|write\|rw\)\>``
++ - ``\<ldu\?[bwlq]\(_[bl]e\)\?_dma\>``
++ - ``\<st[bwlq]\(_[bl]e\)\?_dma\>``
  
- static inline MemTxResult dma_memory_rw_relaxed(AddressSpace *as,
+ ``pci_dma_*`` and ``{ld,st}*_pci_dma``
+ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- 
 2.26.2
 
