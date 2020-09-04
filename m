@@ -2,99 +2,64 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4500FC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 02:52:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 849DCC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:48:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06E7A206CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 02:52:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4421E206F2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:48:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bmhNoPnG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E7A206CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="U2SshrWO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4421E206F2
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48816 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE1pq-00026A-5b
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 22:52:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45154)
+	id 1kE2iP-0004CJ-Db
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:48:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kE1pE-0001Pw-RX
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 22:51:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:42048
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kE1pC-0002ql-Fy
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 22:51:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599187897;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=AySLD2TUcZnoyVLi2KbI606eg0CChKDIVXlT4o/jbZA=;
- b=bmhNoPnGquvyNDI2vban+gUIGNOG/rmIz5NR6Hb2jUp5LWNFVDNgrdyXjEqPmLCp6fI5+J
- qf23KkKWXpWpbWUfQLl0+msZpe16hE5PVjhhLw+EoPWV6Z+sgRGZYwyBS8sFovslSmK1U7
- Bx9kIVEptRn6t5X3CuTQdvUU7O33RA0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-lTWDeDbXOZ6j0hn5EzhvCw-1; Thu, 03 Sep 2020 22:51:33 -0400
-X-MC-Unique: lTWDeDbXOZ6j0hn5EzhvCw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A6CA1084C80;
- Fri,  4 Sep 2020 02:51:28 +0000 (UTC)
-Received: from [10.72.13.157] (ovpn-13-157.pek2.redhat.com [10.72.13.157])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6EF687E405;
- Fri,  4 Sep 2020 02:50:58 +0000 (UTC)
-Subject: Re: [RFC PATCH 00/12] hw: Forbid DMA write accesses to MMIO regions
-To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-References: <20200903110831.353476-1-philmd@redhat.com>
- <658fdd16-33da-af3a-6d8d-f7ea1253f061@redhat.com>
- <CAFEAcA8aOzq8UQwKiyuvJokBT9ui6JWxzf=T8=r13Vuu6+_kkQ@mail.gmail.com>
- <20200903142410.GX2954729@toto>
- <d030f14b-5b1d-6028-8fdd-5dbc25abdf74@redhat.com>
- <20200903155023.GC14249@toto>
- <9105d1fb-8064-076f-9408-ba94c889b765@redhat.com>
- <20200903194629.GH14249@toto>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <0dc3d4a3-489a-7b96-d07d-4b65b86d0782@redhat.com>
-Date: Fri, 4 Sep 2020 10:50:57 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kE2hQ-0002KY-7p; Thu, 03 Sep 2020 23:47:40 -0400
+Received: from ozlabs.org ([203.11.71.1]:46177)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kE2hN-0004sL-Hs; Thu, 03 Sep 2020 23:47:39 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4BjNsn0DYfz9sTv; Fri,  4 Sep 2020 13:47:24 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1599191245;
+ bh=gebdWUkVpMaVkgmdkTIDcNjZehZTWbjiHKrhS+Uaw2M=;
+ h=From:To:Cc:Subject:Date:From;
+ b=U2SshrWONoSK1Vfk12ves/8giCEpBnKzOXvMMTccQOF7vXkDDQ3GQoUyN8cPZfHmU
+ mjAoQ8HJgtyOtVhFQuFXp8XxXMLuDbw5NaidFndoa22TiKn+kLhTH3YZksRh+6R6v2
+ M1ki+b7CMM0qytcNExD6E+xWsRbnruZQqPm50NJk=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 00/30] ppc-for-5.2 queue 20200904
+Date: Fri,  4 Sep 2020 13:46:49 +1000
+Message-Id: <20200904034719.673626-1-david@gibson.dropbear.id.au>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20200903194629.GH14249@toto>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 22:51:37
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 23:47:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
-X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,71 +72,124 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- QEMU Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Qemu-block <qemu-block@nongnu.org>,
- Li Qiang <liq3ea@163.com>, "Emilio G . Cota" <cota@braap.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Robert Foley <robert.foley@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm <qemu-arm@nongnu.org>, Jan Kiszka <jan.kiszka@web.de>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Tony Nguyen <tony.nguyen@bt.com>,
- Prasad J Pandit <pjp@fedoraproject.org>, Alexander Bulekov <alxndr@bu.edu>,
- Andrew Jeffery <andrew@aj.id.au>, Laszlo Ersek <lersek@redhat.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc <qemu-ppc@nongnu.org>,
- Klaus Jensen <k.jensen@samsung.com>, Peter Chubb <peter.chubb@nicta.com.au>
+Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit 67a7bfe560a1bba59efab085cb3430f45176d382:
 
-On 2020/9/4 上午3:46, Edgar E. Iglesias wrote:
-> On Thu, Sep 03, 2020 at 07:53:33PM +0200, Paolo Bonzini wrote:
->> On 03/09/20 17:50, Edgar E. Iglesias wrote:
->>>>> Hmm, I guess it would make sense to have a configurable option in KVM
->>>>> to isolate passthrough devices so they only can DMA to guest RAM...
->>>> Passthrough devices are always protected by the IOMMU, anything else
->>>> would be obviously insane^H^H^Hecure. :)
->>> Really? To always do that blindly seems wrong.
->>>
->>> I'm refering to the passthrough device not being able to reach registers
->>> of other passthrough devices within the same guest.
->> Ah okay; sorry, I misunderstood.  That makes more sense now!
->>
->> Multiple devices are put in the same IOMMU "container" (page table
->> basically), and that takes care of reaching registers of other
->> passthrough devices.
-> Thanks, yes, that's a sane default. What I was trying to say before is that
-> it may make sense to allow the user to "harden" the setup by selectivly
-> putting certain passthrough devs on a separate group that can *only*
-> DMA access guest RAM (not other device regs).
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-09-03' into staging (2020-09-03 16:58:25 +0100)
 
+are available in the Git repository at:
 
-This makes sens but it requires the knowledge from the management layer 
-of whether P2P is needed which is probably not easy.
+  git://github.com/dgibson/qemu.git tags/ppc-for-5.2-20200904
 
-Thanks
+for you to fetch changes up to b172606ecf29a140073f7787251a9d70ecb53b6e:
 
+  spapr_numa: move NVLink2 associativity handling to spapr_numa.c (2020-09-04 13:40:09 +1000)
 
->
-> Some devs need access to other device's regs but many passthrough devs don't
-> need DMA access to anything else but RAM (e.g an Ethernet MAC).
->
-> That could mitigate the damage caused by wild DMA pointers...
->
-> Cheers,
-> Edgar
->
+----------------------------------------------------------------
+ppc patch queue 2020-09-04
 
+Next pull request for qemu-5.2.  The biggest thing here is the
+generalization of ARM's start-powered-off machine property to all
+targets.  This can fix a number of odd little edge cases where KVM
+could run vcpus before they were properly initialized.  This does
+include changes to a number of files that aren't normally in my
+purview.  There are suitable Acked-by lines and Peter requested this
+come in via my tree, since the most pressing requirement for it is in
+pseries machines with the POWER secure virtual machine facility.
+
+In addition we have:
+ * The start of Daniel Barboza's rework and clean up of pseries
+   machine NUMA handling
+ * Correction to behaviour of the nvdimm= generic machine property on
+   pseries
+ * An optimization to the allocation of XIVE interrupts on KVM
+ * Some fixes for confused behaviour with kernel_irqchip when both
+   XICS and XIVE are in play
+ * Add HIOMAP comamnd to pnv flash
+ * Properly advertise the fact that spapr_vscsi doesn't handle
+   hotplugged disks
+ * Some assorted minor enhancements
+
+----------------------------------------------------------------
+Cédric Le Goater (8):
+      ppc/pnv: Fix TypeInfo of PnvLpcController abstract class
+      spapr/xive: Add a 'hv-prio' property to represent the KVM escalation priority
+      ppc/pnv: Add a HIOMAP erase command
+      spapr/xive: Use the xics flag to check for XIVE-only IRQ backends
+      spapr/xive: Modify kvm_cpu_is_enabled() interface
+      spapr/xive: Use kvmppc_xive_source_reset() in post_load
+      spapr/xive: Allocate IPIs independently from the other sources
+      spapr/xive: Allocate vCPU IPIs from the vCPU contexts
+
+Daniel Henrique Barboza (10):
+      spapr_vscsi: do not allow device hotplug
+      ppc/spapr_nvdimm: use g_autofree in spapr_nvdimm_validate_opts()
+      spapr, spapr_nvdimm: fold NVDIMM validation in the same place
+      ppc/spapr_nvdimm: do not enable support with 'nvdimm=off'
+      ppc: introducing spapr_numa.c NUMA code helper
+      ppc/spapr_nvdimm: turn spapr_dt_nvdimm() static
+      spapr: introduce SpaprMachineState::numa_assoc_array
+      spapr, spapr_numa: handle vcpu ibm,associativity
+      spapr, spapr_numa: move lookup-arrays handling to spapr_numa.c
+      spapr_numa: move NVLink2 associativity handling to spapr_numa.c
+
+David Gibson (2):
+      adb: Correct class size on TYPE_ADB_DEVICE
+      spapr: Remove unnecessary DRC type-checker macros
+
+Philippe Mathieu-Daudé (2):
+      hw/ppc/ppc4xx_pci: Use ARRAY_SIZE() instead of magic value
+      hw/ppc/ppc4xx_pci: Replace pointless warning by assert()
+
+Thiago Jung Bauermann (8):
+      target/arm: Move start-powered-off property to generic CPUState
+      target/arm: Move setting of CPU halted state to generic code
+      ppc/spapr: Use start-powered-off CPUState property
+      ppc/e500: Use start-powered-off CPUState property
+      mips/cps: Use start-powered-off CPUState property
+      sparc/sun4m: Don't set cs->halted = 0 in main_cpu_reset()
+      sparc/sun4m: Use start-powered-off CPUState property
+      target/s390x: Use start-powered-off CPUState property
+
+ exec.c                        |   1 +
+ hw/core/cpu.c                 |   2 +-
+ hw/input/adb.c                |   1 +
+ hw/intc/spapr_xive.c          |  33 ++++-----
+ hw/intc/spapr_xive_kvm.c      | 102 +++++++++++++++++++++-----
+ hw/mips/cps.c                 |  15 +++-
+ hw/ppc/e500.c                 |  13 +++-
+ hw/ppc/meson.build            |   3 +-
+ hw/ppc/pnv_bmc.c              |  29 +++++++-
+ hw/ppc/pnv_lpc.c              |   3 +-
+ hw/ppc/ppc4xx_pci.c           |   8 +-
+ hw/ppc/spapr.c                | 109 ++++++---------------------
+ hw/ppc/spapr_cpu_core.c       |  10 +--
+ hw/ppc/spapr_irq.c            |   2 +-
+ hw/ppc/spapr_numa.c           | 167 ++++++++++++++++++++++++++++++++++++++++++
+ hw/ppc/spapr_nvdimm.c         |  68 ++++++++++-------
+ hw/ppc/spapr_pci.c            |   9 +--
+ hw/ppc/spapr_pci_nvlink2.c    |  20 +----
+ hw/scsi/spapr_vscsi.c         |   3 +
+ hw/sparc/sun4m.c              |  26 ++-----
+ include/hw/core/cpu.h         |   4 +
+ include/hw/ipmi/ipmi.h        |   1 +
+ include/hw/ppc/spapr.h        |  12 +++
+ include/hw/ppc/spapr_drc.h    |  43 +----------
+ include/hw/ppc/spapr_numa.h   |  35 +++++++++
+ include/hw/ppc/spapr_nvdimm.h |   7 +-
+ include/hw/ppc/spapr_xive.h   |   2 +
+ target/arm/cpu.c              |   4 +-
+ target/arm/cpu.h              |   3 -
+ target/arm/kvm32.c            |   2 +-
+ target/arm/kvm64.c            |   2 +-
+ target/s390x/cpu.c            |   2 +-
+ 32 files changed, 468 insertions(+), 273 deletions(-)
+ create mode 100644 hw/ppc/spapr_numa.c
+ create mode 100644 include/hw/ppc/spapr_numa.h
 
