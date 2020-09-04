@@ -2,95 +2,114 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78725C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:43:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BE7C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38C922087E
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:43:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aBnWQ0E4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C922087E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4917C20C09
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:44:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4917C20C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33262 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEC0P-000208-DR
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51018)
+	id 1kEC1E-0003ZI-GW
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:44:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kEBws-0004tS-3p
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:40:14 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53411)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kEBwq-0005f2-2N
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:40:13 -0400
-Received: by mail-wm1-x341.google.com with SMTP id u18so6114535wmc.3
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 06:40:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=6ITqVnKRG6efTEDBxxDrqufzGTL9CoWQ38GxyiPoSjU=;
- b=aBnWQ0E4SPdPlq/yVhKDRj/x5MLVIDmQ00yeCIFlqavSSKyKpH2BcutINTzpaYb5is
- EKOpmKAoTWtng6YQFvqdJqDUpOV9UJ6AFPZlSqHxioIrTuyVCxhAIkQe4ibrXdok20Sb
- EvFb9MUzd18JFZKzLj+jelyV3OxqR3usbBkqIELOBRcTN/BxD3uSdRMYDI0N3HWAT5cz
- x3ELI9b8PDwCtCL6xzSU1xBNniJXqlE3Mv6AK94gmyOBORNiUq+xpoOYxrGyekU91Bd0
- awIxezBtVGO0Sf1wFldaGlu/jOsYHYuwwpgQjrn2Z3t03rfrDSi/ekSx98KV69tA9j3i
- sv2Q==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kEByI-0007WM-0e
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:41:42 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41061
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kEByF-00064S-Jz
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:41:41 -0400
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-207-mSWziQuTOU6WtlP8VBuM1w-1; Fri, 04 Sep 2020 09:41:37 -0400
+X-MC-Unique: mSWziQuTOU6WtlP8VBuM1w-1
+Received: by mail-wr1-f70.google.com with SMTP id x15so1501439wrm.7
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 06:41:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=6ITqVnKRG6efTEDBxxDrqufzGTL9CoWQ38GxyiPoSjU=;
- b=SRVa9PqvznNB3LCjTuswzCCpPdq+gCPpFMZAb6Kf6/tVY0702Jp8x20b/rtBJWIymq
- MHJjga1EmUk0bWWqLWXXJkEGjGcZ+C+j82YlrRnjupqCQjxQiowA7awYjen1ASHGPVDo
- Ufi3QWfG24uhj5hkyziM0Z3aTsLDUW/PNyAC2RGJpTynFavrOKQoH8u+pMsJP8hLc40E
- pWUapEt5QykPdW9QAFtEuAZh10XIB9WOas57SkGFUgL4dCD98iKZglRwYetVQJedJTbx
- pa69DpkveglQDikFWXrPABcnlXheES9+oe4G8PebOJbx1SFwlAbptrF5bWSmaCxXTZw8
- +CDg==
-X-Gm-Message-State: AOAM5315GRTF9mQE88VSWMTH10Do9+iQdOC8HzLytBbR8nbGDBDd+Pk9
- eT9Is/BRKCwn5H5PBk2Vgw6GlQ==
-X-Google-Smtp-Source: ABdhPJwKnu/dhtp312SBK7ahiNtM/qp8vf8a+yZtZb0GbkszM2scbX+q9SYK+ySKnudVjavVohFdQw==
-X-Received: by 2002:a1c:2dcc:: with SMTP id t195mr7251321wmt.166.1599226810362; 
- Fri, 04 Sep 2020 06:40:10 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id l19sm11325775wmi.8.2020.09.04.06.40.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 06:40:08 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id D8A151FF87;
- Fri,  4 Sep 2020 14:40:07 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/4] hw/virtio/pci: include vdev name in registered PCI
- sections
-Date: Fri,  4 Sep 2020 14:40:04 +0100
-Message-Id: <20200904134007.4175-2-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200904134007.4175-1-alex.bennee@linaro.org>
-References: <20200904134007.4175-1-alex.bennee@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=EsaUEID8sXWLbDAlgpxx9ibc7q6qTw5nUaimjO39UYs=;
+ b=hit3yaHNAivpTyd6VA1K+yvvl5xVjFB5dxmi+XTQBd3p67356qnzVTU0s99PhPEyS5
+ k7UXnguTCd8S63bDJpp3/p4FZ6MsDo/0jJQqbMkkYCGGcRynzmnSf1ibJnh39cn37cgI
+ 9fY7BnK3rwiloJEvVZGy+cA9zqC9XyKz9DyCJCv5QCKhsdRGgo5wd4IjzcrGrz924TgU
+ KKb8ri6ISpA8snQ8YJqSgAgfQ+LCvRZSpE4WD0zdo/4Seu97D7JUfU6M0+ylZdaLPEZg
+ XumK5070yAQHMwgWXMVqj68sSwFKI/f9u/nDOvziC5o2CDvNjyF0QL1R0/2B0WTxFdot
+ q5iQ==
+X-Gm-Message-State: AOAM531l7XGzxENtfao+T7YDY4/twlUVZ5mPmMFnVcJHiWru3sLBzW0Q
+ KVSYMCziDQabN9QpQqzME3jBj0UOOpN1eLQ8MnnrFjht5htbedfiuGcwy+0Sfic4HZHpjrwbOUI
+ VrxQDeifAnR8fRag=
+X-Received: by 2002:adf:e58b:: with SMTP id l11mr8235070wrm.210.1599226896203; 
+ Fri, 04 Sep 2020 06:41:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4YObwBDJlb5OgoqiIxYRscOdl335xw+/UNWyZBLY2tBeHbClDfwuBAmKkryriUbhls1c5Hg==
+X-Received: by 2002:adf:e58b:: with SMTP id l11mr8235048wrm.210.1599226895937; 
+ Fri, 04 Sep 2020 06:41:35 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id g7sm12753751wrv.82.2020.09.04.06.41.34
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 04 Sep 2020 06:41:35 -0700 (PDT)
+Subject: Re: [PATCH 2/2] vhost-vdpa: improve error reporting
+To: Laurent Vivier <lvivier@redhat.com>, qemu-devel@nongnu.org
+References: <20200903185327.774708-1-lvivier@redhat.com>
+ <20200903185327.774708-3-lvivier@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <8085ec62-737d-6596-bd00-78ebf6ac001f@redhat.com>
+Date: Fri, 4 Sep 2020 15:41:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20200903185327.774708-3-lvivier@redhat.com>
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.107,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,100 +123,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: robert.foley@linaro.org, "Michael S . Tsirkin" <mst@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- robhenry@microsoft.com, aaron@os.amperecomputing.com, cota@braap.org,
- kuhn.chenqun@huawei.com, peter.puhov@linaro.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Jason Wang <jasowang@redhat.com>, Cindy Lu <lulu@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When viewing/debugging memory regions it is sometimes hard to figure
-out which PCI device something belongs to. Make the names unique by
-including the vdev name in the name string.
+On 9/3/20 8:53 PM, Laurent Vivier wrote:
+> Use Error framework to report the id of the device and the details of
+> the error (vhostdev name and errno).
+> 
+> For instance:
+> 
+>  qemu-system-x86_64 ... -netdev vhost-vdpa,id=hostnet1 ...
+>  hostnet1: Cannot open '/dev/vhost-vdpa-0': No such file or directory
+> 
+> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
 
-Message-Id: <20200713200415.26214-10-alex.bennee@linaro.org>
----
- hw/virtio/virtio-pci.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
-
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 5bc769f685c..169d07ba20e 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -1421,7 +1421,8 @@ static void virtio_pci_device_write(void *opaque, hwaddr addr,
-     }
- }
- 
--static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy)
-+static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy,
-+                                           const char *vdev_name)
- {
-     static const MemoryRegionOps common_ops = {
-         .read = virtio_pci_common_read,
-@@ -1468,36 +1469,41 @@ static void virtio_pci_modern_regions_init(VirtIOPCIProxy *proxy)
-         },
-         .endianness = DEVICE_LITTLE_ENDIAN,
-     };
-+    g_autoptr(GString) name = g_string_new(NULL);
- 
--
-+    g_string_printf(name, "virtio-pci-common-%s", vdev_name);
-     memory_region_init_io(&proxy->common.mr, OBJECT(proxy),
-                           &common_ops,
-                           proxy,
--                          "virtio-pci-common",
-+                          name->str,
-                           proxy->common.size);
- 
-+    g_string_printf(name, "virtio-pci-isr-%s", vdev_name);
-     memory_region_init_io(&proxy->isr.mr, OBJECT(proxy),
-                           &isr_ops,
-                           proxy,
--                          "virtio-pci-isr",
-+                          name->str,
-                           proxy->isr.size);
- 
-+    g_string_printf(name, "virtio-pci-device-%s", vdev_name);
-     memory_region_init_io(&proxy->device.mr, OBJECT(proxy),
-                           &device_ops,
-                           proxy,
--                          "virtio-pci-device",
-+                          name->str,
-                           proxy->device.size);
- 
-+    g_string_printf(name, "virtio-pci-notify-%s", vdev_name);
-     memory_region_init_io(&proxy->notify.mr, OBJECT(proxy),
-                           &notify_ops,
-                           proxy,
--                          "virtio-pci-notify",
-+                          name->str,
-                           proxy->notify.size);
- 
-+    g_string_printf(name, "virtio-pci-notify-pio-%s", vdev_name);
-     memory_region_init_io(&proxy->notify_pio.mr, OBJECT(proxy),
-                           &notify_pio_ops,
-                           proxy,
--                          "virtio-pci-notify-pio",
-+                          name->str,
-                           proxy->notify_pio.size);
- }
- 
-@@ -1642,7 +1648,7 @@ static void virtio_pci_device_plugged(DeviceState *d, Error **errp)
- 
-         struct virtio_pci_cfg_cap *cfg_mask;
- 
--        virtio_pci_modern_regions_init(proxy);
-+        virtio_pci_modern_regions_init(proxy, vdev->name);
- 
-         virtio_pci_modern_mem_region_map(proxy, &proxy->common, &cap);
-         virtio_pci_modern_mem_region_map(proxy, &proxy->isr, &cap);
--- 
-2.20.1
+> ---
+>  net/vhost-vdpa.c | 14 ++++++++++----
+>  1 file changed, 10 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+> index 24103ef241e4..8260902334ae 100644
+> --- a/net/vhost-vdpa.c
+> +++ b/net/vhost-vdpa.c
+> @@ -176,7 +176,8 @@ static NetClientInfo net_vhost_vdpa_info = {
+>  };
+>  
+>  static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
+> -                               const char *name, const char *vhostdev)
+> +                               const char *name, const char *vhostdev,
+> +                               Error **errp)
+>  {
+>      NetClientState *nc = NULL;
+>      VhostVDPAState *s;
+> @@ -189,11 +190,15 @@ static int net_vhost_vdpa_init(NetClientState *peer, const char *device,
+>      s = DO_UPCAST(VhostVDPAState, nc, nc);
+>      vdpa_device_fd = qemu_open(vhostdev, O_RDWR);
+>      if (vdpa_device_fd == -1) {
+> -        return -errno;
+> +        error_setg_errno(errp, errno, "%s: Cannot open '%s'", name, vhostdev);
+> +        return -1;
+>      }
+>      s->vhost_vdpa.device_fd = vdpa_device_fd;
+>      ret = vhost_vdpa_add(nc, (void *)&s->vhost_vdpa);
+> -    assert(s->vhost_net);
+> +    if (ret == -1) {
+> +        error_setg(errp, "%s: Cannot add vhost-vdpa '%s'", name, vhostdev);
+> +        return -1;
+> +    }
+>      return ret;
+>  }
+>  
+> @@ -229,5 +234,6 @@ int net_init_vhost_vdpa(const Netdev *netdev, const char *name,
+>      }
+>      return net_vhost_vdpa_init(peer, TYPE_VHOST_VDPA, name,
+>                                 opts->has_vhostdev ?
+> -                               opts->vhostdev : VHOST_VDPA_DEFAULT_VHOSTDEV);
+> +                               opts->vhostdev : VHOST_VDPA_DEFAULT_VHOSTDEV,
+> +                               errp);
+>  }
+> 
 
 
