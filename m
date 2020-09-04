@@ -2,70 +2,85 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CC85C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54EDCC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:55:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 921C220665
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:55:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6EB820665
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:55:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="CsJPh9t5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 921C220665
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S84YiHlm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6EB820665
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEFMI-0001kH-86
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:18:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48672)
+	id 1kEFtj-0002rD-7n
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:53:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kEFLk-0001Ge-6j; Fri, 04 Sep 2020 13:18:08 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48292)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kEFLh-0004VC-5x; Fri, 04 Sep 2020 13:18:07 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id 2732FBF7D3;
- Fri,  4 Sep 2020 17:18:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
- s=default; t=1599239882;
- bh=E579wGZx7XEvccA1emNNVA2p75ag4h0P8tr/8HsnL4U=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=CsJPh9t5FB6JRGuh7q1zhVmrUdEr569h982OUYkum917Sv4DJCxJrSrAZ3IDvdkBa
- /dxltuRIjX1eF/eYzNmiH87ZCnaaKuhJTbnOWgk2Uy5go9kyDPF1cMeKNRr3K9gmqQ
- SwiBYF3krEkrrvQeeDW0nvLf9M3H+03Gc1mfB2aTUfr0kn9vdjV1aZqhpxnvOV9cJp
- 3VsY3pUmdBN6hyC2sHJHMTF4kk0Jz2PgPBYmjjA6Yw3JJ74vqjWVQpterbahhw7Cn3
- I0Nvg2+DQFnZp64PammdpSLT7g10T5Rs/HbpxsLVgCR80G8YjIIlfCBg86QFfmBY+S
- dsD4P525Bh/ZQ==
-Date: Fri, 4 Sep 2020 19:17:59 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 00/17] hw/block/nvme: multiple namespaces support
-Message-ID: <20200904171759.GB584438@apples.localdomain>
-References: <20200904141956.576630-1-its@irrelevant.dk>
- <b44b738e-db6f-e820-11ef-ad9c7615f9a3@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kEFsr-000226-QA; Fri, 04 Sep 2020 13:52:21 -0400
+Received: from mail-qt1-x844.google.com ([2607:f8b0:4864:20::844]:46861)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kEFsp-0008Ob-U1; Fri, 04 Sep 2020 13:52:21 -0400
+Received: by mail-qt1-x844.google.com with SMTP id b3so5219988qtg.13;
+ Fri, 04 Sep 2020 10:52:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=fprJ0PaZ2bAxGvrxX/n7pb6yxC0ZfFJucd+BZpvETr0=;
+ b=S84YiHlmE4pHt5qT9kewwmA0eDiNegfOhC11mPgtbrXPnQCDQJNTndSikHsiDMq46v
+ LfaRWbsYt4LtsrObzpuvNe1IqVrlcnhRJmQkE35AsVcswd2DiA6HL7o4Pu0xLqHYQ1Yt
+ 0I+13FDXBALlbmov/f6H0Xezn41zvpOubzWKERJMvBhmoTjq6GKIdZyq/w43FsABD5eE
+ EAqx1AEpj9ooJYcyMifWUyLRWcItQcp2201Z9z3afjedF2Nc2Gmy+hWnnI1Ob/Ae5N5o
+ M/xaltfXHHIKyZWV1MtOVVimefboebSofHGf9zh2ZZABOtFhwanXAi0MIZfRSh68TORs
+ 2FoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=fprJ0PaZ2bAxGvrxX/n7pb6yxC0ZfFJucd+BZpvETr0=;
+ b=R1TnSRrEwnizjjmFVGqvMexur7s9m0XUPHB+QTt2Njus8aWccBluQXvK2Kbrhoea9w
+ /wpKYrAI0kx1L2sNUU4V0gjce4JQKHQLlXEgYhp/U8YZ8A2F3lGj+EiW0vwMgiwRk0Jv
+ Mx+qOmdM6AW/KBtkfb8LH+MTvxhLNKR+kqh29gjFYchXe/4Q98siDN2IkrWFitiUYMRm
+ j239RE7Il33zcV5X4Zysln0hu6463ideqTczZnlohDIaRvOvddLF1SKrB0cCOwPgsIUf
+ Js6U5MLr1Mn9EwjuJR8mk4Y+iGhB5VT3vERPLeRSFwlAeXUA3bDU/h8YXdF7URiYBTyS
+ b8Ew==
+X-Gm-Message-State: AOAM531AiTmg3cTZQhFidu8C+0BPyynRpvWiOSaP0lMKdjNEWrYrt83q
+ 1X91O1qAB1MoCbJWEtCrJ61Z2h7X7VR5vhJm1sQ=
+X-Google-Smtp-Source: ABdhPJyyk1NrlCZiSgSTjzVTC1/6R72rfXtfmvAVGI4EoAhmHEM7ay2Fikcy0AGiIyv6rcz8uMx5z9RiOjS9ot7m3Lg=
+X-Received: by 2002:ac8:2ab1:: with SMTP id b46mr7064063qta.76.1599241938015; 
+ Fri, 04 Sep 2020 10:52:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="z6Eq5LdranGa6ru8"
-Content-Disposition: inline
-In-Reply-To: <b44b738e-db6f-e820-11ef-ad9c7615f9a3@redhat.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 10:20:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+References: <1599129623-68957-1-git-send-email-bmeng.cn@gmail.com>
+ <1599129623-68957-10-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1599129623-68957-10-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 4 Sep 2020 10:41:23 -0700
+Message-ID: <CAKmqyKMt1MpkJ+GPCHV5dCDwwUfn5AEO6AUhf6oL3qBOZMZk7g@mail.gmail.com>
+Subject: Re: [PATCH 09/12] hw/riscv: Move sifive_test model to hw/misc
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::844;
+ envelope-from=alistair23@gmail.com; helo=mail-qt1-x844.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,108 +94,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Bin Meng <bin.meng@windriver.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, Sep 3, 2020 at 3:46 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> This is an effort to clean up the hw/riscv directory. Ideally it
+> should only contain the RISC-V SoC / machine codes plus generic
+> codes. Let's move sifive_test model to hw/misc directory.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
---z6Eq5LdranGa6ru8
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-On Sep  4 18:12, Philippe Mathieu-Daud=C3=A9 wrote:
-> Hi Klaus,
->=20
-> On 9/4/20 4:19 PM, Klaus Jensen wrote:
-> > From: Klaus Jensen <k.jensen@samsung.com>
-> >=20
-> > This is the next round of my patches for the nvme device.
-> >=20
-> > This includes a bit of cleanup and three new features:
-> >=20
-> >   * refactored aio submission
-> >     This also adds support for multiple parallel AIOs per request which=
- is in
-> >     preparation for DULBE, ZNS and metadata support. If it is found
-> >     controversial, it can easily be dropped from this series.
-> >=20
-> >   * support for scatter/gather lists
-> >=20
-> >   * multiple namespaces support through a new nvme-ns device
-> >=20
-> > Finally, the series ends with changing the PCI vendor and device ID to =
-get rid
-> > of the internal Intel id and as a side-effect get rid of some Linux ker=
-nel
-> > quirks that no longer applies.
-> >=20
-> > "pci: pass along the return value of dma_memory_rw" has already been po=
-sted by
-> > Philippe in another series, but since it is not applied yet, I am inclu=
-ding it
-> > here.
-> >=20
-> > Gollu Appalanaidu (1):
-> >   hw/block/nvme: add support for sgl bit bucket descriptor
-> >=20
-> > Klaus Jensen (16):
-> >   pci: pass along the return value of dma_memory_rw
-> >   hw/block/nvme: handle dma errors
-> >   hw/block/nvme: commonize nvme_rw error handling
-> >   hw/block/nvme: alignment style fixes
-> >   hw/block/nvme: add a lba to bytes helper
-> >   hw/block/nvme: fix endian conversion
-> >   hw/block/nvme: add symbolic command name to trace events
-> >   hw/block/nvme: refactor aio submission
-> >   hw/block/nvme: default request status to success
-> >   hw/block/nvme: support multiple parallel aios per request
-> >   hw/block/nvme: harden cmb access
-> >   hw/block/nvme: add support for scatter gather lists
-> >   hw/block/nvme: refactor identify active namespace id list
-> >   hw/block/nvme: support multiple namespaces
-> >   pci: allocate pci id for nvme
-> >   hw/block/nvme: change controller pci id
-> >=20
-> >  MAINTAINERS            |   1 +
-> >  docs/specs/nvme.txt    |  23 +
-> >  docs/specs/pci-ids.txt |   1 +
-> >  hw/block/meson.build   |   2 +-
-> >  hw/block/nvme-ns.c     | 185 +++++++++
-> >  hw/block/nvme-ns.h     |  74 ++++
-> >  hw/block/nvme.c        | 923 +++++++++++++++++++++++++++++++----------
-> >  hw/block/nvme.h        | 126 +++++-
-> >  hw/block/trace-events  |  21 +-
-> >  hw/core/machine.c      |   1 +
-> >  include/block/nvme.h   |   8 +-
-> >  include/hw/pci/pci.h   |   4 +-
->=20
-> To ease the review, consider setup'ing scripts/git.orderfile,
-> as it avoid reviewers to scroll patches in their email client.
->=20
+Alistair
 
-Oh wow. You learn something new everyday. That's really neat!
-
-Thanks!
-
---z6Eq5LdranGa6ru8
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9SdsQACgkQTeGvMW1P
-DekkKwf/dQT7zgJ1xQauyXzPxSf+NX4yo+7+ZLhVVyk0tqWS8u3Foy5s9ken27V3
-jbph7qiJ4GvS76j9ogQ9V1yoKdPXIbJbTa7ICukMJV2fSYzYcHEGoWmvMrXybeBl
-KRgByUmXu8wv0jnfZ2pWWiFpJjBZC6NWWieZRlQy9d921FDAZ4HCiU4mHdr9avvQ
-GqzjBFvPYvPXOkqcJybr75t/sw/x2qvpCDbKUF0NzVMUBnhL83CFXoKyDv7PZQl/
-zjLAf5SAEpyuRE4W8LjV3Xic7D7yeJDd2eCkwcM3JdTfkhbyHpfETXxfwXHUEzSV
-RPQguR9O/oCTmt0vsFZIWfqL+FJ4Xw==
-=Qv0Q
------END PGP SIGNATURE-----
-
---z6Eq5LdranGa6ru8--
+> ---
+>
+>  include/hw/{riscv => misc}/sifive_test.h | 0
+>  hw/{riscv => misc}/sifive_test.c         | 2 +-
+>  hw/riscv/virt.c                          | 2 +-
+>  hw/misc/Kconfig                          | 3 +++
+>  hw/misc/meson.build                      | 1 +
+>  hw/riscv/Kconfig                         | 1 +
+>  hw/riscv/meson.build                     | 1 -
+>  7 files changed, 7 insertions(+), 3 deletions(-)
+>  rename include/hw/{riscv => misc}/sifive_test.h (100%)
+>  rename hw/{riscv => misc}/sifive_test.c (98%)
+>
+> diff --git a/include/hw/riscv/sifive_test.h b/include/hw/misc/sifive_test.h
+> similarity index 100%
+> rename from include/hw/riscv/sifive_test.h
+> rename to include/hw/misc/sifive_test.h
+> diff --git a/hw/riscv/sifive_test.c b/hw/misc/sifive_test.c
+> similarity index 98%
+> rename from hw/riscv/sifive_test.c
+> rename to hw/misc/sifive_test.c
+> index 0c78fb2..45d9399 100644
+> --- a/hw/riscv/sifive_test.c
+> +++ b/hw/misc/sifive_test.c
+> @@ -25,7 +25,7 @@
+>  #include "qemu/module.h"
+>  #include "sysemu/runstate.h"
+>  #include "hw/hw.h"
+> -#include "hw/riscv/sifive_test.h"
+> +#include "hw/misc/sifive_test.h"
+>
+>  static uint64_t sifive_test_read(void *opaque, hwaddr addr, unsigned int size)
+>  {
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index 0caab8e..41bd2f3 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -30,12 +30,12 @@
+>  #include "hw/char/serial.h"
+>  #include "target/riscv/cpu.h"
+>  #include "hw/riscv/riscv_hart.h"
+> -#include "hw/riscv/sifive_test.h"
+>  #include "hw/riscv/virt.h"
+>  #include "hw/riscv/boot.h"
+>  #include "hw/riscv/numa.h"
+>  #include "hw/intc/sifive_clint.h"
+>  #include "hw/intc/sifive_plic.h"
+> +#include "hw/misc/sifive_test.h"
+>  #include "chardev/char.h"
+>  #include "sysemu/arch_init.h"
+>  #include "sysemu/device_tree.h"
+> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+> index fa3d0f4..3185456 100644
+> --- a/hw/misc/Kconfig
+> +++ b/hw/misc/Kconfig
+> @@ -134,6 +134,9 @@ config MAC_VIA
+>  config AVR_POWER
+>      bool
+>
+> +config SIFIVE_TEST
+> +    bool
+> +
+>  config SIFIVE_E_PRCI
+>      bool
+>
+> diff --git a/hw/misc/meson.build b/hw/misc/meson.build
+> index 018a88c..bd24132 100644
+> --- a/hw/misc/meson.build
+> +++ b/hw/misc/meson.build
+> @@ -22,6 +22,7 @@ softmmu_ss.add(when: 'CONFIG_ARM11SCU', if_true: files('arm11scu.c'))
+>  softmmu_ss.add(when: 'CONFIG_MOS6522', if_true: files('mos6522.c'))
+>
+>  # RISC-V devices
+> +softmmu_ss.add(when: 'CONFIG_SIFIVE_TEST', if_true: files('sifive_test.c'))
+>  softmmu_ss.add(when: 'CONFIG_SIFIVE_E_PRCI', if_true: files('sifive_e_prci.c'))
+>  softmmu_ss.add(when: 'CONFIG_SIFIVE_U_OTP', if_true: files('sifive_u_otp.c'))
+>  softmmu_ss.add(when: 'CONFIG_SIFIVE_U_PRCI', if_true: files('sifive_u_prci.c'))
+> diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
+> index a046157..8e07100 100644
+> --- a/hw/riscv/Kconfig
+> +++ b/hw/riscv/Kconfig
+> @@ -61,6 +61,7 @@ config RISCV_VIRT
+>      select SIFIVE
+>      select SIFIVE_CLINT
+>      select SIFIVE_PLIC
+> +    select SIFIVE_TEST
+>
+>  config MICROCHIP_PFSOC
+>      bool
+> diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
+> index da32148..3cf9380 100644
+> --- a/hw/riscv/meson.build
+> +++ b/hw/riscv/meson.build
+> @@ -4,7 +4,6 @@ riscv_ss.add(files('numa.c'))
+>  riscv_ss.add(when: 'CONFIG_HART', if_true: files('riscv_hart.c'))
+>  riscv_ss.add(when: 'CONFIG_OPENTITAN', if_true: files('opentitan.c'))
+>  riscv_ss.add(when: 'CONFIG_RISCV_VIRT', if_true: files('virt.c'))
+> -riscv_ss.add(when: 'CONFIG_SIFIVE', if_true: files('sifive_test.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_E', if_true: files('sifive_e.c'))
+>  riscv_ss.add(when: 'CONFIG_SIFIVE_U', if_true: files('sifive_u.c'))
+>  riscv_ss.add(when: 'CONFIG_SPIKE', if_true: files('spike.c'))
+> --
+> 2.7.4
+>
+>
 
