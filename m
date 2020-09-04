@@ -2,61 +2,75 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B05C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 537E7C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:10:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88CD12074D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:09:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88CD12074D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1E5822074D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:10:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E5822074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEEHX-0006cf-H7
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 12:09:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60148)
+	id 1kEEHq-00087a-94
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 12:10:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34156)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.price@arm.com>)
- id 1kEE8j-0002fn-FD
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:00:37 -0400
-Received: from foss.arm.com ([217.140.110.172]:45966)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <steven.price@arm.com>) id 1kEE8f-0001gK-Ed
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:00:36 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6D3C313D5;
- Fri,  4 Sep 2020 09:00:32 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0724E3F66F;
- Fri,  4 Sep 2020 09:00:29 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v2 2/2] arm64: kvm: Introduce MTE VCPU feature
-Date: Fri,  4 Sep 2020 17:00:18 +0100
-Message-Id: <20200904160018.29481-3-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200904160018.29481-1-steven.price@arm.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kEEGd-00071T-1g
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:08:47 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47273
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kEEGa-0003Mv-FJ
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:08:46 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-372-svIn_akpM2ixolck4iGXJg-1; Fri, 04 Sep 2020 12:08:41 -0400
+X-MC-Unique: svIn_akpM2ixolck4iGXJg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D5AA801AFD;
+ Fri,  4 Sep 2020 16:08:40 +0000 (UTC)
+Received: from redhat.com (ovpn-114-5.ams2.redhat.com [10.36.114.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 702DD18B59;
+ Fri,  4 Sep 2020 16:08:39 +0000 (UTC)
+Date: Fri, 4 Sep 2020 17:08:36 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: Re: Should we apply for GitLab's open source program?
+Message-ID: <20200904160836.GS721059@redhat.com>
+References: <878sdp4ks9.fsf@linaro.org>
 MIME-Version: 1.0
+In-Reply-To: <878sdp4ks9.fsf@linaro.org>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=217.140.110.172;
- envelope-from=steven.price@arm.com; helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 12:00:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,154 +83,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Peter Maydell <Peter.Maydell@arm.com>, Haibo Xu <Haibo.Xu@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ "qemu@sfconservancy.org" <qemu@sfconservancy.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new VCPU features 'KVM_ARM_VCPU_MTE' which enables memory tagging
-on a VCPU. When enabled on any VCPU in the virtual machine this causes
-all pages that are faulted into the VM to have the PG_mte_tagged flag
-set (and the tag storage cleared if this is the first use).
+On Fri, Sep 04, 2020 at 04:35:34PM +0100, Alex Bennée wrote:
+> 
+> Hi,
+> 
+> Given our growing reliance on GitLab and the recent announcement about
+> free tier minutes:
+> 
+>   https://about.gitlab.com/pricing/faq-consumption-cicd/
+> 
+> is it time we officially apply for GitLab's Open Source Program:
+> 
+>   https://about.gitlab.com/solutions/open-source/program/
+> 
+> ?
+> 
+> From what I can see the QEMU project will easily qualify - the only
+> minor inconvenience is needing to reapply every year. So far it seems as
+> a public project their are no usage limits anyway. We are currently
+> listed as 0 of 50,000 minutes:
+> 
+>   https://gitlab.com/groups/qemu-project/-/usage_quotas#pipelines-quota-tab
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/kvm_emulate.h |  3 +++
- arch/arm64/include/asm/kvm_host.h    |  5 ++++-
- arch/arm64/include/uapi/asm/kvm.h    |  1 +
- arch/arm64/kvm/mmu.c                 | 15 +++++++++++++++
- arch/arm64/kvm/reset.c               |  8 ++++++++
- arch/arm64/kvm/sys_regs.c            |  6 +++++-
- 6 files changed, 36 insertions(+), 2 deletions(-)
+I suspect that ultimately we will end up wanting / needing to do
+this. As you say, there's no significant downside, and it will
+unlock features.
 
-diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
-index 49a55be2b9a2..0042323a4b7f 100644
---- a/arch/arm64/include/asm/kvm_emulate.h
-+++ b/arch/arm64/include/asm/kvm_emulate.h
-@@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
- 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
- 	    vcpu_el1_is_32bit(vcpu))
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
-+
-+	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
-+		vcpu->arch.hcr_el2 |= HCR_ATA;
- }
- 
- static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 4f4360dd149e..b1190366242b 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -37,7 +37,7 @@
- 
- #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
- 
--#define KVM_VCPU_MAX_FEATURES 7
-+#define KVM_VCPU_MAX_FEATURES 8
- 
- #define KVM_REQ_SLEEP \
- 	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
-@@ -110,6 +110,9 @@ struct kvm_arch {
- 	 * supported.
- 	 */
- 	bool return_nisv_io_abort_to_user;
-+
-+	/* If any VCPU has MTE enabled then all memory must be MTE enabled */
-+	bool vcpu_has_mte;
- };
- 
- struct kvm_vcpu_fault_info {
-diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
-index ba85bb23f060..2677e1ab8c16 100644
---- a/arch/arm64/include/uapi/asm/kvm.h
-+++ b/arch/arm64/include/uapi/asm/kvm.h
-@@ -106,6 +106,7 @@ struct kvm_regs {
- #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
- #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
- #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
-+#define KVM_ARM_VCPU_MTE		7 /* VCPU supports Memory Tagging */
- 
- struct kvm_vcpu_init {
- 	__u32 target;
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index ba00bcc0c884..e8891bacd76f 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1949,6 +1949,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	if (vma_pagesize == PAGE_SIZE && !force_pte)
- 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
- 							   &pfn, &fault_ipa);
-+	if (system_supports_mte() && kvm->arch.vcpu_has_mte && pfn_valid(pfn)) {
-+		/*
-+		 * VM will be able to see the page's tags, so we must ensure
-+		 * they have been initialised.
-+		 */
-+		struct page *page = pfn_to_page(pfn);
-+		long i, nr_pages = compound_nr(page);
-+
-+		/* if PG_mte_tagged is set, tags have already been initialised */
-+		for (i = 0; i < nr_pages; i++, page++) {
-+			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
-+				mte_clear_page_tags(page_address(page));
-+		}
-+	}
-+
- 	if (writable)
- 		kvm_set_pfn_dirty(pfn);
- 
-diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
-index ee33875c5c2a..82f3883d717f 100644
---- a/arch/arm64/kvm/reset.c
-+++ b/arch/arm64/kvm/reset.c
-@@ -274,6 +274,14 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
-+	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features)) {
-+		if (!system_supports_mte()) {
-+			ret = -EINVAL;
-+			goto out;
-+		}
-+		vcpu->kvm->arch.vcpu_has_mte = true;
-+	}
-+
- 	switch (vcpu->arch.target) {
- 	default:
- 		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a655f172b5ad..6a971b201e81 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
- 			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
- 		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
- 	} else if (id == SYS_ID_AA64PFR1_EL1) {
--		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
-+		if (!test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
-+			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
- 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
- 		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
- 			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
-@@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
- 				   const struct sys_reg_desc *rd)
- {
-+	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
-+		return 0;
-+
- 	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
- }
- 
+Note there is an issue open about making the application process
+simpler:
+
+https://gitlab.com/groups/gitlab-com/marketing/community-relations/opensource-program/-/epics/18
+
+which could be a reason to not rush into applying immediately
+if we don't have an obvious pressing need.
+
+As you say there's no enforcement of CI minutes at all right now
+anyway as reported at:
+
+  https://gitlab.com/gitlab-org/gitlab/-/issues/243722
+
+
+> So we are in no pressing hurry to do this for the minutes but I suspect
+> there may be other things that are made easier by having access to all
+> the toys GitLab provides. Daniel has already posted to the forum
+> requesting details about how this might affect our workflow so maybe we
+> should just wait for feedback until pressing on?
+> 
+>   https://forum.gitlab.com/t/ci-cd-minutes-for-free-tier/40241/33
+
+Yep, my key observation is that I don't think the open source program
+fully solves the CI minutes problems for projects using a fork'ing
+workflow, as the increased minutes only applies for jobs run in the
+main repo. Each individual contributor is still limited in their
+fork.  Similarly their suggestion that people bring their own
+custom runners doesn't really help projects with a forking workflow
+as custom runners aren't accessible to forks.
+
+It would be crazy if they enforced limited CI time on public repos
+right now, because if any individual contributor runs out of CI
+minutes they will be unable to contribute to a project that mandates
+succesful CI pipeline, even if the project is in the OSS program.
+
+Hopefully they will come up with a more practical answer to the
+forking-workflow problems.
+
+Regards,
+Daniel
 -- 
-2.20.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
