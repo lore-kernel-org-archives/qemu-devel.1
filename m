@@ -2,71 +2,90 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 983EBC2BB84
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:35:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 163F2C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:38:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D25121D20
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:35:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D25121D20
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C8E8220797
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:38:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HoKKZ0p4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8E8220797
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEBsW-0007TN-Dg
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:35:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49682)
+	id 1kEBv0-0000Jq-Oc
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:38:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kEBrl-0006rW-Vi; Fri, 04 Sep 2020 09:34:57 -0400
-Resent-Date: Fri, 04 Sep 2020 09:34:57 -0400
-Resent-Message-Id: <E1kEBrl-0006rW-Vi@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21713)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kEBuO-0008Cb-PQ
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:37:40 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:30008
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kEBrj-0004t6-W5; Fri, 04 Sep 2020 09:34:57 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1599226483; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=BWU6iQvi/iz7ebVAMGpHU4IXHMWkS1xmHng6sR9jbtaYayoulVZcKiPBIPbtE0Gw7+nGTqGX5FKvHNWpBn2i+gRezAgO8+aMXRBPk/xgPWoK07QhRh6AjdkGT5yMfBvrSlKCGf6htv1Gy+nDHPTlm9GwUh6vLsEKOeRK5FY3P9w=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1599226483;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=8lh98ZDcxmkAjKb19Us5zMM5984XONFjf9C6hCfgK04=; 
- b=N2T8vHu714aCgNBJ9iu/0bLcSK5aKTSq2xHd5EZkjLFWppolrByCWAz/rKtfE2mtfES8S1NFGw+q4/q5NuzUSqlzaWo3DQfyLyW2M2D2UhdAhUm9T98bYiJwlslcPR82RlsJm+RnZJMesY4lnPd8TuovmwN3ao8NQzIGJ4XeDMU=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1599226481724178.13168502111216;
- Fri, 4 Sep 2020 06:34:41 -0700 (PDT)
-Subject: Re: [PATCH 0/4] nbd reconnect new fixes
-Message-ID: <159922648029.11986.8450274273047302750@66eaa9a8a123>
-In-Reply-To: <20200903190301.367620-1-vsementsov@virtuozzo.com>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kEBuM-0005DN-5X
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:37:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599226656;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=z8ijyo9+wVenfwSwyNoFh/rmMtU7RcqAaFooiEOCDv4=;
+ b=HoKKZ0p4j1kEg68rT7GbDxsRwfUFiXMtfwts2/yaaeBW92zLW25AtbF2GDTnTK4DUsNlXn
+ fwsrsQnBs2MbQ1bN0O4qaNm3YrulYldF15sRn93bAkM5OYznS6/vAPZDZ5uTRC0QM2w2+e
+ sP1jfGdJgE4DO4pxs5xBzKyJPq1t694=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-56-fc5DKkuNN0SvpLoNfbI9rA-1; Fri, 04 Sep 2020 09:37:33 -0400
+X-MC-Unique: fc5DKkuNN0SvpLoNfbI9rA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 364068B1421;
+ Fri,  4 Sep 2020 13:37:32 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D320760C0F;
+ Fri,  4 Sep 2020 13:37:31 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 500E31132B59; Fri,  4 Sep 2020 15:37:30 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v5 14/20] scripts/qapi: Remove texinfo generation support
+References: <20200810195019.25427-1-peter.maydell@linaro.org>
+ <20200810195019.25427-15-peter.maydell@linaro.org>
+Date: Fri, 04 Sep 2020 15:37:30 +0200
+In-Reply-To: <20200810195019.25427-15-peter.maydell@linaro.org> (Peter
+ Maydell's message of "Mon, 10 Aug 2020 20:50:13 +0100")
+Message-ID: <87y2lp64th.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: vsementsov@virtuozzo.com
-Date: Fri, 4 Sep 2020 06:34:41 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 09:24:22
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -79,21 +98,162 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- qemu-devel@nongnu.org, mreitz@redhat.com, den@openvz.org
+Cc: qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMDkwMzE5MDMwMS4zNjc2
-MjAtMS12c2VtZW50c292QHZpcnR1b3p6by5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgZmFpbGVk
-IHRoZSBkb2NrZXItbWluZ3dAZmVkb3JhIGJ1aWxkIHRlc3QuIFBsZWFzZSBmaW5kIHRoZSB0ZXN0
-aW5nIGNvbW1hbmRzIGFuZAp0aGVpciBvdXRwdXQgYmVsb3cuIElmIHlvdSBoYXZlIERvY2tlciBp
-bnN0YWxsZWQsIHlvdSBjYW4gcHJvYmFibHkgcmVwcm9kdWNlIGl0CmxvY2FsbHkuCgoKCgoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDA5
-MDMxOTAzMDEuMzY3NjIwLTEtdnNlbWVudHNvdkB2aXJ0dW96em8uY29tL3Rlc3RpbmcuZG9ja2Vy
-LW1pbmd3QGZlZG9yYS8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRp
-Y2FsbHkgYnkgUGF0Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3Vy
-IGZlZWRiYWNrIHRvIHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+Peter Maydell <peter.maydell@linaro.org> writes:
+
+> We no longer use the generated texinfo format documentation,
+> so delete the code that generates it, and the test case for
+> the generation.
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>  Makefile                        |   1 -
+>  scripts/qapi-gen.py             |   2 -
+>  scripts/qapi/doc.py             | 302 ------------------------------
+>  scripts/qapi/gen.py             |   7 -
+>  tests/Makefile.include          |  15 +-
+>  tests/qapi-schema/doc-good.texi | 313 --------------------------------
+>  6 files changed, 1 insertion(+), 639 deletions(-)
+>  delete mode 100644 scripts/qapi/doc.py
+>  delete mode 100644 tests/qapi-schema/doc-good.texi
+>
+> diff --git a/Makefile b/Makefile
+> index 3df1cf68333..fc3ccc15030 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -626,7 +626,6 @@ qemu-keymap$(EXESUF): QEMU_CFLAGS += $(XKBCOMMON_CFLAGS)
+>  qapi-py = $(SRC_PATH)/scripts/qapi/__init__.py \
+>  $(SRC_PATH)/scripts/qapi/commands.py \
+>  $(SRC_PATH)/scripts/qapi/common.py \
+> -$(SRC_PATH)/scripts/qapi/doc.py \
+>  $(SRC_PATH)/scripts/qapi/error.py \
+>  $(SRC_PATH)/scripts/qapi/events.py \
+>  $(SRC_PATH)/scripts/qapi/expr.py \
+> diff --git a/scripts/qapi-gen.py b/scripts/qapi-gen.py
+> index 4b03f7d53be..541e8c1f55d 100755
+> --- a/scripts/qapi-gen.py
+> +++ b/scripts/qapi-gen.py
+> @@ -10,7 +10,6 @@ import re
+>  import sys
+>  
+>  from qapi.commands import gen_commands
+> -from qapi.doc import gen_doc
+>  from qapi.events import gen_events
+>  from qapi.introspect import gen_introspect
+>  from qapi.schema import QAPIError, QAPISchema
+> @@ -51,7 +50,6 @@ def main(argv):
+>      gen_commands(schema, args.output_dir, args.prefix)
+>      gen_events(schema, args.output_dir, args.prefix)
+>      gen_introspect(schema, args.output_dir, args.prefix, args.unmask)
+> -    gen_doc(schema, args.output_dir, args.prefix)
+>  
+>  
+>  if __name__ == '__main__':
+> diff --git a/scripts/qapi/doc.py b/scripts/qapi/doc.py
+> deleted file mode 100644
+> index 7764de1e4bc..00000000000
+> --- a/scripts/qapi/doc.py
+> +++ /dev/null
+[...]
+> diff --git a/scripts/qapi/gen.py b/scripts/qapi/gen.py
+> index bf5552a4e7f..ca66c82b5b8 100644
+> --- a/scripts/qapi/gen.py
+> +++ b/scripts/qapi/gen.py
+> @@ -178,13 +178,6 @@ def ifcontext(ifcond, *args):
+>          arg.end_if()
+>  
+>  
+> -class QAPIGenDoc(QAPIGen):
+> -
+> -    def _top(self):
+> -        return (super()._top()
+> -                + '@c AUTOMATICALLY GENERATED, DO NOT MODIFY\n\n')
+> -
+> -
+>  class QAPISchemaMonolithicCVisitor(QAPISchemaVisitor):
+>  
+>      def __init__(self, prefix, what, blurb, pydoc):
+> diff --git a/tests/Makefile.include b/tests/Makefile.include
+> index c7e4646ded7..ec83efeaa63 100644
+> --- a/tests/Makefile.include
+> +++ b/tests/Makefile.include
+> @@ -38,7 +38,6 @@ export SRC_PATH
+>  qapi-py = $(SRC_PATH)/scripts/qapi/__init__.py \
+>  $(SRC_PATH)/scripts/qapi/commands.py \
+>  $(SRC_PATH)/scripts/qapi/common.py \
+> -$(SRC_PATH)/scripts/qapi/doc.py \
+>  $(SRC_PATH)/scripts/qapi/error.py \
+>  $(SRC_PATH)/scripts/qapi/events.py \
+>  $(SRC_PATH)/scripts/qapi/expr.py \
+> @@ -501,16 +500,8 @@ tests/test-qapi-gen-timestamp: \
+>  	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+>  		-o tests -p "test-" $<, \
+>  		"GEN","$(@:%-timestamp=%)")
+> -	@rm -f tests/test-qapi-doc.texi
+>  	@>$@
+>  
+> -tests/qapi-schema/doc-good.test.texi: $(SRC_PATH)/tests/qapi-schema/doc-good.json $(qapi-py)
+> -	$(call quiet-command,$(PYTHON) $(SRC_PATH)/scripts/qapi-gen.py \
+> -		-o tests/qapi-schema -p "doc-good-" $<, \
+> -		"GEN","$@")
+> -	@mv tests/qapi-schema/doc-good-qapi-doc.texi $@
+> -	@rm -f tests/qapi-schema/doc-good-qapi-*.[ch] tests/qapi-schema/doc-good-qmp-*.[ch]
+> -
+>  tests/qtest/dbus-vmstate1.h tests/qtest/dbus-vmstate1.c: tests/qtest/dbus-vmstate1-gen-timestamp ;
+>  tests/qtest/dbus-vmstate1-gen-timestamp: $(SRC_PATH)/tests/qtest/dbus-vmstate1.xml
+>  	$(call quiet-command,$(GDBUS_CODEGEN) $< \
+> @@ -891,10 +882,6 @@ check-tests/qapi-schema/frontend: $(addprefix $(SRC_PATH)/, $(check-qapi-schema-
+>  	  PYTHONIOENCODING=utf-8 $(PYTHON) $(SRC_PATH)/tests/qapi-schema/test-qapi.py $^, \
+>  	  TEST, check-qapi-schema)
+>  
+> -.PHONY: check-tests/qapi-schema/doc-good.texi
+> -check-tests/qapi-schema/doc-good.texi: tests/qapi-schema/doc-good.test.texi
+> -	@diff -u $(SRC_PATH)/tests/qapi-schema/doc-good.texi $<
+> -
+
+We shouldn't just delete this test.
+
+It is for checking the doc generator does what it should for "good"
+input.  "Bad" input is coverd by the other doc-*.json.
+
+With the old doc generation system, the testing "good" input is
+straightforward: generate Texinfo, diff to expected Texinfo, which is
+committed to git.
+
+This test has been invaliable when maintaining and extending doc.py.
+
+With the new system, there is no ouput suitable for diffing, as the
+various outputs all depend on the version of Sphinx.
+
+Or is there?  Is there a way to have Sphinx "unparse" its internal
+representation of the input?
+
+If not, we should still run doc-good.json through the doc generator to
+at least catch errors.  We still lose the ability to catch silent bad
+output.
+
+>  .PHONY: check-decodetree
+>  check-decodetree:
+>  	$(call quiet-command, \
+> @@ -956,7 +943,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
+>  # Consolidated targets
+>  
+>  .PHONY: check-block check-qapi-schema check-qtest check-unit check check-clean get-vm-images
+> -check-qapi-schema: check-tests/qapi-schema/frontend check-tests/qapi-schema/doc-good.texi
+> +check-qapi-schema: check-tests/qapi-schema/frontend
+>  check-qtest: $(patsubst %,check-qtest-%, $(QTEST_TARGETS))
+>  ifeq ($(CONFIG_TOOLS),y)
+>  check-block: $(patsubst %,check-%, $(check-block-y))
+> diff --git a/tests/qapi-schema/doc-good.texi b/tests/qapi-schema/doc-good.texi
+> deleted file mode 100644
+> index 12808989ffb..00000000000
+> --- a/tests/qapi-schema/doc-good.texi
+> +++ /dev/null
+[...]
+
 
