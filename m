@@ -2,55 +2,56 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8BA1C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1CFC2D0E0
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:44:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FA3A2074D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:44:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FA3A2074D
+	by mail.kernel.org (Postfix) with ESMTPS id 5FAC82064E
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:44:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FAC82064E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48036 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEEok-00080w-LL
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 12:44:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41310)
+	id 1kEEol-00081p-Hd
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 12:44:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41302)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kEEnz-0006is-Ml
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:43:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46523
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kEEnz-0006iI-DI
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:43:15 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:22287
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kEEnw-0000An-1W
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kEEnv-0000Ao-VS
  for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:43:15 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-9LTyus_2OFqPuv1_T9XX3Q-1; Fri, 04 Sep 2020 12:43:09 -0400
-X-MC-Unique: 9LTyus_2OFqPuv1_T9XX3Q-1
+ us-mta-482-opbDeT5uOLOd14OCXWwJ_g-1; Fri, 04 Sep 2020 12:43:06 -0400
+X-MC-Unique: opbDeT5uOLOd14OCXWwJ_g-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB361425E1;
- Fri,  4 Sep 2020 16:43:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3B521074660;
+ Fri,  4 Sep 2020 16:43:04 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-120-166.rdu2.redhat.com
  [10.10.120.166])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A23AB19D7D;
- Fri,  4 Sep 2020 16:43:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C952719C59;
+ Fri,  4 Sep 2020 16:43:03 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH 4/7] scripts/ci/gitlab-pipeline-status: refactor parser
- creation
-Date: Fri,  4 Sep 2020 12:42:55 -0400
-Message-Id: <20200904164258.240278-5-crosa@redhat.com>
+Subject: [PATCH 1/7] scripts/ci/gitlab-pipeline-status: make branch name
+ configurable
+Date: Fri,  4 Sep 2020 12:42:52 -0400
+Message-Id: <20200904164258.240278-2-crosa@redhat.com>
 In-Reply-To: <20200904164258.240278-1-crosa@redhat.com>
 References: <20200904164258.240278-1-crosa@redhat.com>
 MIME-Version: 1.0
@@ -59,9 +60,9 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=crosa@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=crosa@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:12
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -90,43 +91,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Out of the main function.
+With the utility function `get_local_staging_branch_commit()`, the
+name of the branch is hard coded (including in the function name).
+
+For extensibility reasons, let's make that configurable.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- scripts/ci/gitlab-pipeline-status | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ scripts/ci/gitlab-pipeline-status | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/scripts/ci/gitlab-pipeline-status b/scripts/ci/gitlab-pipeline-status
-index 18609553be..8355b6a427 100755
+index 348a49b6a4..194dd4d0bb 100755
 --- a/scripts/ci/gitlab-pipeline-status
 +++ b/scripts/ci/gitlab-pipeline-status
-@@ -89,10 +89,7 @@ def wait_on_pipeline_success(timeout, interval,
-         return False
+@@ -23,20 +23,20 @@ import time
+ import sys
  
  
--def main():
--    """
--    Script entry point
--    """
-+def create_parser():
-     parser = argparse.ArgumentParser(
-         prog='pipeline-status',
-         description='check or wait on a pipeline status')
-@@ -127,7 +124,13 @@ def main():
-     parser.add_argument('--verbose', action='store_true', default=False,
-                         help=('A minimal verbosity level that prints the '
-                               'overall result of the check/wait'))
-+    return parser
+-def get_local_staging_branch_commit():
++def get_local_branch_commit(branch='staging'):
+     """
+     Returns the commit sha1 for the *local* branch named "staging"
+     """
+-    result = subprocess.run(['git', 'rev-parse', 'staging'],
++    result = subprocess.run(['git', 'rev-parse', branch],
+                             stdin=subprocess.DEVNULL,
+                             stdout=subprocess.PIPE,
+                             stderr=subprocess.DEVNULL,
+                             cwd=os.path.dirname(__file__),
+                             universal_newlines=True).stdout.strip()
+-    if result == 'staging':
+-        raise ValueError("There's no local branch named 'staging'")
++    if result == branch:
++        raise ValueError("There's no local branch named '%s'" % branch)
+     if len(result) != 40:
+-        raise ValueError("Branch staging HEAD doesn't look like a sha1")
++        raise ValueError("Branch '%s' HEAD doesn't look like a sha1" % branch)
+     return result
  
-+def main():
-+    """
-+    Script entry point
-+    """
-+    parser = create_parser()
-     args = parser.parse_args()
  
+@@ -110,7 +110,7 @@ def main():
+                               'for https://gitlab.com/qemu-project/qemu, that '
+                               'is, "%(default)s"'))
      try:
+-        default_commit = get_local_staging_branch_commit()
++        default_commit = get_local_branch_commit()
+         commit_required = False
+     except ValueError:
+         default_commit = ''
 -- 
 2.25.4
 
