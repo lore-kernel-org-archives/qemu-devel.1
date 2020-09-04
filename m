@@ -2,99 +2,105 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.1 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01433C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 22:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52DFDC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 23:33:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 566D22083B
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 22:39:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XIIW3b0W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 566D22083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	by mail.kernel.org (Postfix) with ESMTPS id 893362078E
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 23:33:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 893362078E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=netbsd.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEKMt-0007oT-5U
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 18:39:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54382)
+	id 1kELDN-0000Pu-5T
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 19:33:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1kEKMB-0007AI-3J
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 18:38:55 -0400
-Received: from mail-vs1-xe41.google.com ([2607:f8b0:4864:20::e41]:39602)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hskinnemoen@google.com>)
- id 1kEKM7-0000u8-Vz
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 18:38:54 -0400
-Received: by mail-vs1-xe41.google.com with SMTP id b16so4479150vsl.6
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 15:38:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=C9EBW7Qk6eIT8P8VIatP89AM80w5sELgLZQ8MqkTGHs=;
- b=XIIW3b0WSmjJEqr/IXZqTryUq5ABZmUC31EkrHihuEihgaHVsvirmxJZAei8TqR/ww
- RQh5UaU7oLfpHCFNe4R1/8Ej3lRFrOJaXdtdN6ajNXLp85bmcRvZfJ0ng5KgKTq/9e7M
- 2P7TX6CJWNbeq9jv1nbFPGshfYyhHzc97e1qY3JBVuTIGekuxBRIUlncxi3CbJRnz6gY
- cE9BNmaW7z6qBsn7iiYBJK0xWV05V+nptjaozy1OQ6/pA8GAAlbsMFUuwL/jd9uQsUrQ
- 53eGUPfv+wy++nxGBbC4IAg+/YZgsUEqx4rs8I3e71Jrz4cOS/DXbJtfVHeSYmRA8Ibu
- whwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=C9EBW7Qk6eIT8P8VIatP89AM80w5sELgLZQ8MqkTGHs=;
- b=Mwpy+dX8KUgLavkHRAfhHeEtIEbvqbshjuY8WIlyb+12oiU7XBQupn5XIZNL5yFwSW
- Bw2D5e1nC2l2pXNX3Un/wX5xIcOgmWVlWH/FgBhRuRKoCVSzIaZCJ0TS7Xj0vvYhk5vV
- SJFklSlx3qdWOoQlqprrWadF8ZDoF+QEvUezIXdwBrYQo8jgp6mSktG6BiaKVbqBEukz
- 0s3JAsudGWHWKkhIvdajUyTqGDSyRfNQuSAld1PF8SSD2KoFV1eofs+YiwJYWXshqpRh
- E92EclD65FhRnz1MC2m8pzh/exZ6VyHUds2Q+VOe/Ei9GMS9puGX+KASbG5Eh7T6bXtg
- pfPw==
-X-Gm-Message-State: AOAM530X7VaNIzV+LfZ7R/0EmZLk8of2kRDDkZGyoNgoiBvg/5i6gZOR
- qyixN8kwth6NBHjOQZpoWOQxRWZx6VSx11cMoJyMtA==
-X-Google-Smtp-Source: ABdhPJzkWobzjIJwWgugqjO2MZIivo+uuHnF90E8/j7J3TMWbGKf03UxH0CZTy4prPhT+mWIKv1fD8xyI1Bm06O+RZk=
-X-Received: by 2002:a05:6102:20da:: with SMTP id
- i26mr7763596vsr.192.1599259130033; 
- Fri, 04 Sep 2020 15:38:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1kELAb-0008GQ-BQ
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 19:31:01 -0400
+Received: from mail.netbsd.org ([2001:470:a085:999::25]:59546)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kamil@netbsd.org>) id 1kELAY-00069F-W8
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 19:31:00 -0400
+Received: from [IPv6:::1] (localhost [127.0.0.1])
+ by mail.netbsd.org (Postfix) with ESMTP id 17C8884D24;
+ Fri,  4 Sep 2020 23:30:51 +0000 (UTC)
+Subject: Re: [PATCH v5 1/4] Add the NVMM vcpu API
+To: rth@twiddle.net, ehabkost@redhat.com, slp@redhat.com,
+ pbonzini@redhat.com, peter.maydell@linaro.org, philmd@redhat.com,
+ max@m00nbsd.net, jmcneill@invisible.ca
+References: <20200206213232.1918-2-n54@gmx.com>
+ <20200811130153.4948-1-n54@gmx.com>
+From: Kamil Rytarowski <kamil@netbsd.org>
+Autocrypt: addr=kamil@netbsd.org; keydata=
+ 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
+Message-ID: <81b20849-20c7-00d6-08fd-6b6cfe3fd190@netbsd.org>
+Date: Sat, 5 Sep 2020 01:28:04 +0200
+User-Agent: Mozilla/5.0 (X11; NetBSD amd64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200825001711.1340443-1-hskinnemoen@google.com>
- <20200825001711.1340443-3-hskinnemoen@google.com>
- <e6187a7b-afc0-425a-de91-ea4818f7f876@amsat.org>
- <CAFQmdRbirDn4ao-B0UHHn-QFKfdeRzBR1dXTmUx_WZikfSB1tg@mail.gmail.com>
-In-Reply-To: <CAFQmdRbirDn4ao-B0UHHn-QFKfdeRzBR1dXTmUx_WZikfSB1tg@mail.gmail.com>
-From: Havard Skinnemoen <hskinnemoen@google.com>
-Date: Fri, 4 Sep 2020 15:38:38 -0700
-Message-ID: <CAFQmdRbSgVTGgN2MV98wfxWSicrtokUCKKBU2knvVrimn2FWxA@mail.gmail.com>
-Subject: Re: [PATCH v8 02/14] hw/misc: Add NPCM7xx Clock Controller device
- model
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm <qemu-arm@nongnu.org>, 
- QEMU Developers <qemu-devel@nongnu.org>,
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>, 
- CS20 KFTing <kfting@nuvoton.com>, Joel Stanley <joel@jms.id.au>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::e41;
- envelope-from=hskinnemoen@google.com; helo=mail-vs1-xe41.google.com
+In-Reply-To: <20200811130153.4948-1-n54@gmx.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2001:470:a085:999::25;
+ envelope-from=kamil@netbsd.org; helo=mail.netbsd.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -180
-X-Spam_score: -18.1
-X-Spam_bar: ------------------
-X-Spam_report: (-18.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.5,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.107,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,468 +113,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 4, 2020 at 3:02 PM Havard Skinnemoen <hskinnemoen@google.com> w=
-rote:
->
-> On Fri, Sep 4, 2020 at 2:32 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
-> >
-> > On 8/25/20 2:16 AM, Havard Skinnemoen via wrote:
-> > > Enough functionality to boot the Linux kernel has been implemented. T=
-his
-> > > includes:
-> > >
-> > >   - Correct power-on reset values so the various clock rates can be
-> > >     accurately calculated.
-> > >   - Clock enables stick around when written.
-> > >
-> > > In addition, a best effort attempt to implement SECCNT and CNTR25M wa=
-s
-> > > made even though I don't think the kernel needs them.
-> > >
-> > > Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-> > > Reviewed-by: Joel Stanley <joel@jms.id.au>
-> > > Reviewed-by: C=C3=A9dric Le Goater <clg@kaod.org>
-> > > Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
-> > > ---
-> > >  include/hw/misc/npcm7xx_clk.h |  48 ++++++
-> > >  hw/misc/npcm7xx_clk.c         | 266 ++++++++++++++++++++++++++++++++=
-++
-> > >  hw/misc/meson.build           |   1 +
-> > >  hw/misc/trace-events          |   4 +
-> > >  4 files changed, 319 insertions(+)
-> > >  create mode 100644 include/hw/misc/npcm7xx_clk.h
-> > >  create mode 100644 hw/misc/npcm7xx_clk.c
-> > >
-> > > diff --git a/include/hw/misc/npcm7xx_clk.h b/include/hw/misc/npcm7xx_=
-clk.h
-> > > new file mode 100644
-> > > index 0000000000..cdcc9e8534
-> > > --- /dev/null
-> > > +++ b/include/hw/misc/npcm7xx_clk.h
-> > > @@ -0,0 +1,48 @@
-> > > +/*
-> > > + * Nuvoton NPCM7xx Clock Control Registers.
-> > > + *
-> > > + * Copyright 2020 Google LLC
-> > > + *
-> > > + * This program is free software; you can redistribute it and/or mod=
-ify it
-> > > + * under the terms of the GNU General Public License as published by=
- the
-> > > + * Free Software Foundation; either version 2 of the License, or
-> > > + * (at your option) any later version.
-> > > + *
-> > > + * This program is distributed in the hope that it will be useful, b=
-ut WITHOUT
-> > > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
-Y or
-> > > + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public Lice=
-nse
-> > > + * for more details.
-> > > + */
-> > > +#ifndef NPCM7XX_CLK_H
-> > > +#define NPCM7XX_CLK_H
-> > > +
-> > > +#include "exec/memory.h"
-> > > +#include "hw/sysbus.h"
-> > > +
-> > > +/*
-> > > + * The reference clock frequency for the timer modules, and the SECC=
-NT and
-> > > + * CNTR25M registers in this module, is always 25 MHz.
-> > > + */
-> > > +#define NPCM7XX_TIMER_REF_HZ            (25000000)
-> > > +
-> > > +/*
-> > > + * Number of registers in our device state structure. Don't change t=
-his without
-> > > + * incrementing the version_id in the vmstate.
-> > > + */
-> > > +#define NPCM7XX_CLK_NR_REGS             (0x70 / sizeof(uint32_t))
-> > > +
-> > > +typedef struct NPCM7xxCLKState {
-> > > +    SysBusDevice parent;
-> > > +
-> > > +    MemoryRegion iomem;
-> > > +
-> > > +    uint32_t regs[NPCM7XX_CLK_NR_REGS];
-> > > +
-> > > +    /* Time reference for SECCNT and CNTR25M, initialized by power o=
-n reset */
-> > > +    int64_t ref_ns;
-> > > +} NPCM7xxCLKState;
-> > > +
-> > > +#define TYPE_NPCM7XX_CLK "npcm7xx-clk"
-> > > +#define NPCM7XX_CLK(obj) OBJECT_CHECK(NPCM7xxCLKState, (obj), TYPE_N=
-PCM7XX_CLK)
-> > > +
-> > > +#endif /* NPCM7XX_CLK_H */
-> > > diff --git a/hw/misc/npcm7xx_clk.c b/hw/misc/npcm7xx_clk.c
-> > > new file mode 100644
-> > > index 0000000000..21ab4200d1
-> > > --- /dev/null
-> > > +++ b/hw/misc/npcm7xx_clk.c
-> > > @@ -0,0 +1,266 @@
-> > > +/*
-> > > + * Nuvoton NPCM7xx Clock Control Registers.
-> > > + *
-> > > + * Copyright 2020 Google LLC
-> > > + *
-> > > + * This program is free software; you can redistribute it and/or mod=
-ify it
-> > > + * under the terms of the GNU General Public License as published by=
- the
-> > > + * Free Software Foundation; either version 2 of the License, or
-> > > + * (at your option) any later version.
-> > > + *
-> > > + * This program is distributed in the hope that it will be useful, b=
-ut WITHOUT
-> > > + * ANY WARRANTY; without even the implied warranty of MERCHANTABILIT=
-Y or
-> > > + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public Lice=
-nse
-> > > + * for more details.
-> > > + */
-> > > +
-> > > +#include "qemu/osdep.h"
-> > > +
-> > > +#include "hw/misc/npcm7xx_clk.h"
-> > > +#include "migration/vmstate.h"
-> > > +#include "qemu/error-report.h"
-> > > +#include "qemu/log.h"
-> > > +#include "qemu/module.h"
-> > > +#include "qemu/timer.h"
-> > > +#include "qemu/units.h"
-> > > +#include "trace.h"
-> > > +
-> > > +#define PLLCON_LOKI     BIT(31)
-> > > +#define PLLCON_LOKS     BIT(30)
-> > > +#define PLLCON_PWDEN    BIT(12)
-> > > +
-> > > +enum NPCM7xxCLKRegisters {
-> > > +    NPCM7XX_CLK_CLKEN1,
-> > > +    NPCM7XX_CLK_CLKSEL,
-> > > +    NPCM7XX_CLK_CLKDIV1,
-> > > +    NPCM7XX_CLK_PLLCON0,
-> > > +    NPCM7XX_CLK_PLLCON1,
-> > > +    NPCM7XX_CLK_SWRSTR,
-> > > +    NPCM7XX_CLK_IPSRST1         =3D 0x20 / sizeof(uint32_t),
-> > > +    NPCM7XX_CLK_IPSRST2,
-> > > +    NPCM7XX_CLK_CLKEN2,
-> > > +    NPCM7XX_CLK_CLKDIV2,
-> > > +    NPCM7XX_CLK_CLKEN3,
-> > > +    NPCM7XX_CLK_IPSRST3,
-> > > +    NPCM7XX_CLK_WD0RCR,
-> > > +    NPCM7XX_CLK_WD1RCR,
-> > > +    NPCM7XX_CLK_WD2RCR,
-> > > +    NPCM7XX_CLK_SWRSTC1,
-> > > +    NPCM7XX_CLK_SWRSTC2,
-> > > +    NPCM7XX_CLK_SWRSTC3,
-> > > +    NPCM7XX_CLK_SWRSTC4,
-> > > +    NPCM7XX_CLK_PLLCON2,
-> > > +    NPCM7XX_CLK_CLKDIV3,
-> > > +    NPCM7XX_CLK_CORSTC,
-> > > +    NPCM7XX_CLK_PLLCONG,
-> > > +    NPCM7XX_CLK_AHBCKFI,
-> > > +    NPCM7XX_CLK_SECCNT,
-> > > +    NPCM7XX_CLK_CNTR25M,
-> > > +    NPCM7XX_CLK_REGS_END,
-> > > +};
-> > > +
-> > > +/*
-> > > + * These reset values were taken from version 0.91 of the NPCM750R d=
-ata sheet.
-> > > + *
-> > > + * All are loaded on power-up reset. CLKENx and SWRSTR should also b=
-e loaded on
-> > > + * core domain reset, but this reset type is not yet supported by QE=
-MU.
-> > > + */
-> > > +static const uint32_t cold_reset_values[NPCM7XX_CLK_NR_REGS] =3D {
-> > > +    [NPCM7XX_CLK_CLKEN1]        =3D 0xffffffff,
-> > > +    [NPCM7XX_CLK_CLKSEL]        =3D 0x004aaaaa,
-> > > +    [NPCM7XX_CLK_CLKDIV1]       =3D 0x5413f855,
-> > > +    [NPCM7XX_CLK_PLLCON0]       =3D 0x00222101 | PLLCON_LOKI,
-> > > +    [NPCM7XX_CLK_PLLCON1]       =3D 0x00202101 | PLLCON_LOKI,
-> > > +    [NPCM7XX_CLK_IPSRST1]       =3D 0x00001000,
-> > > +    [NPCM7XX_CLK_IPSRST2]       =3D 0x80000000,
-> > > +    [NPCM7XX_CLK_CLKEN2]        =3D 0xffffffff,
-> > > +    [NPCM7XX_CLK_CLKDIV2]       =3D 0xaa4f8f9f,
-> > > +    [NPCM7XX_CLK_CLKEN3]        =3D 0xffffffff,
-> > > +    [NPCM7XX_CLK_IPSRST3]       =3D 0x03000000,
-> > > +    [NPCM7XX_CLK_WD0RCR]        =3D 0xffffffff,
-> > > +    [NPCM7XX_CLK_WD1RCR]        =3D 0xffffffff,
-> > > +    [NPCM7XX_CLK_WD2RCR]        =3D 0xffffffff,
-> > > +    [NPCM7XX_CLK_SWRSTC1]       =3D 0x00000003,
-> > > +    [NPCM7XX_CLK_PLLCON2]       =3D 0x00c02105 | PLLCON_LOKI,
-> > > +    [NPCM7XX_CLK_CORSTC]        =3D 0x04000003,
-> > > +    [NPCM7XX_CLK_PLLCONG]       =3D 0x01228606 | PLLCON_LOKI,
-> > > +    [NPCM7XX_CLK_AHBCKFI]       =3D 0x000000c8,
-> > > +};
-> > > +
-> > > +static uint64_t npcm7xx_clk_read(void *opaque, hwaddr offset, unsign=
-ed size)
-> > > +{
-> > > +    uint32_t reg =3D offset / sizeof(uint32_t);
-> > > +    NPCM7xxCLKState *s =3D opaque;
-> > > +    int64_t now_ns;
-> > > +    uint32_t value =3D 0;
-> > > +
-> > > +    if (reg >=3D NPCM7XX_CLK_NR_REGS) {
-> > > +        qemu_log_mask(LOG_GUEST_ERROR,
-> > > +                      "%s: offset 0x%04" HWADDR_PRIx " out of range\=
-n",
-> >
-> > I find "out of range" not clear, but this might be the correct
-> > terminology.
-> >
-> > > +                      __func__, offset);
-> > > +        return 0;
-> > > +    }
-> > > +
-> > > +    switch (reg) {
-> > > +    case NPCM7XX_CLK_SWRSTR:
-> > > +        qemu_log_mask(LOG_GUEST_ERROR,
-> > > +                      "%s: register @ 0x%04" HWADDR_PRIx " is write-=
-only\n",
-> > > +                      __func__, offset);
-> > > +        break;
-> > > +
-> > > +    case NPCM7XX_CLK_SECCNT:
-> > > +        now_ns =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> > > +        value =3D (now_ns - s->ref_ns) / NANOSECONDS_PER_SECOND;
-> > > +        break;
-> > > +
-> > > +    case NPCM7XX_CLK_CNTR25M:
-> > > +        now_ns =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> > > +        /*
-> > > +         * This register counts 25 MHz cycles, updating every 640 ns=
-. It rolls
-> > > +         * over to zero every second.
-> > > +         *
-> > > +         * The 4 LSBs are always zero: (1e9 / 640) << 4 =3D 25000000=
-.
-> > > +         */
-> > > +        value =3D (((now_ns - s->ref_ns) / 640) << 4) % NPCM7XX_TIME=
-R_REF_HZ;
-> > > +        break;
-> > > +
-> > > +    default:
-> > > +        value =3D s->regs[reg];
-> > > +        break;
-> > > +    };
-> > > +
-> > > +    trace_npcm7xx_clk_read(offset, value);
-> > > +
-> > > +    return value;
-> > > +}
-> > > +
-> > > +static void npcm7xx_clk_write(void *opaque, hwaddr offset,
-> > > +                              uint64_t v, unsigned size)
-> > > +{
-> > > +    uint32_t reg =3D offset / sizeof(uint32_t);
-> > > +    NPCM7xxCLKState *s =3D opaque;
-> > > +    uint32_t value =3D v;
-> > > +
-> > > +    trace_npcm7xx_clk_write(offset, value);
-> > > +
-> > > +    if (reg >=3D NPCM7XX_CLK_NR_REGS) {
-> > > +        qemu_log_mask(LOG_GUEST_ERROR,
-> > > +                      "%s: offset 0x%04" HWADDR_PRIx " out of range\=
-n",
-> > > +                      __func__, offset);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    switch (reg) {
-> > > +    case NPCM7XX_CLK_SWRSTR:
-> > > +        qemu_log_mask(LOG_UNIMP, "%s: SW reset not implemented: 0x%0=
-2x\n",
-> > > +                      __func__, value);
-> >
-> > Isn't this sufficient?
-> >
-> >            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
->
-> It's not quite that easy; this register holds 4 bits, each of which
-> maps to a separate register which defines the modules to reset. It's
-> not that hard, but a little more than I'd like to add to the series at
-> this point. I'll send a followup patch once the initial series is in.
+Ping?
 
-Actually, I'm not sure if this would have any effect on being able to
-reboot. Running with -d unimp shows:
+On 11.08.2020 15:01, Kamil Rytarowski wrote:
+> From: Maxime Villard <max@m00nbsd.net>
+> 
+> Adds support for the NetBSD Virtual Machine Monitor (NVMM) stubs and
+> introduces the nvmm.h sysemu API for managing the vcpu scheduling and
+> management.
+> 
+> Signed-off-by: Maxime Villard <max@m00nbsd.net>
+> Signed-off-by: Kamil Rytarowski <n54@gmx.com>
+> Reviewed-by: Sergio Lopez <slp@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Jared McNeill <jmcneill@invisible.ca>
+> ---
+>  accel/stubs/Makefile.objs |  1 +
+>  accel/stubs/nvmm-stub.c   | 43 +++++++++++++++++++++++++++++++++++++++
+>  include/sysemu/nvmm.h     | 35 +++++++++++++++++++++++++++++++
+>  3 files changed, 79 insertions(+)
+>  create mode 100644 accel/stubs/nvmm-stub.c
+>  create mode 100644 include/sysemu/nvmm.h
+> 
+> diff --git a/accel/stubs/Makefile.objs b/accel/stubs/Makefile.objs
+> index bbd14e71fb..38660a0b9b 100644
+> --- a/accel/stubs/Makefile.objs
+> +++ b/accel/stubs/Makefile.objs
+> @@ -1,6 +1,7 @@
+>  obj-$(call lnot,$(CONFIG_HAX))  += hax-stub.o
+>  obj-$(call lnot,$(CONFIG_HVF))  += hvf-stub.o
+>  obj-$(call lnot,$(CONFIG_WHPX)) += whpx-stub.o
+> +obj-$(call lnot,$(CONFIG_NVMM)) += nvmm-stub.o
+>  obj-$(call lnot,$(CONFIG_KVM))  += kvm-stub.o
+>  obj-$(call lnot,$(CONFIG_TCG))  += tcg-stub.o
+>  obj-$(call lnot,$(CONFIG_XEN))  += xen-stub.o
+> diff --git a/accel/stubs/nvmm-stub.c b/accel/stubs/nvmm-stub.c
+> new file mode 100644
+> index 0000000000..c2208b84a3
+> --- /dev/null
+> +++ b/accel/stubs/nvmm-stub.c
+> @@ -0,0 +1,43 @@
+> +/*
+> + * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
+> + *
+> + * NetBSD Virtual Machine Monitor (NVMM) accelerator stub.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include "qemu-common.h"
+> +#include "cpu.h"
+> +#include "sysemu/nvmm.h"
+> +
+> +int nvmm_init_vcpu(CPUState *cpu)
+> +{
+> +    return -1;
+> +}
+> +
+> +int nvmm_vcpu_exec(CPUState *cpu)
+> +{
+> +    return -1;
+> +}
+> +
+> +void nvmm_destroy_vcpu(CPUState *cpu)
+> +{
+> +}
+> +
+> +void nvmm_cpu_synchronize_state(CPUState *cpu)
+> +{
+> +}
+> +
+> +void nvmm_cpu_synchronize_post_reset(CPUState *cpu)
+> +{
+> +}
+> +
+> +void nvmm_cpu_synchronize_post_init(CPUState *cpu)
+> +{
+> +}
+> +
+> +void nvmm_cpu_synchronize_pre_loadvm(CPUState *cpu)
+> +{
+> +}
+> diff --git a/include/sysemu/nvmm.h b/include/sysemu/nvmm.h
+> new file mode 100644
+> index 0000000000..10496f3980
+> --- /dev/null
+> +++ b/include/sysemu/nvmm.h
+> @@ -0,0 +1,35 @@
+> +/*
+> + * Copyright (c) 2018-2019 Maxime Villard, All rights reserved.
+> + *
+> + * NetBSD Virtual Machine Monitor (NVMM) accelerator support.
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_NVMM_H
+> +#define QEMU_NVMM_H
+> +
+> +#include "config-host.h"
+> +#include "qemu-common.h"
+> +
+> +int nvmm_init_vcpu(CPUState *);
+> +int nvmm_vcpu_exec(CPUState *);
+> +void nvmm_destroy_vcpu(CPUState *);
+> +
+> +void nvmm_cpu_synchronize_state(CPUState *);
+> +void nvmm_cpu_synchronize_post_reset(CPUState *);
+> +void nvmm_cpu_synchronize_post_init(CPUState *);
+> +void nvmm_cpu_synchronize_pre_loadvm(CPUState *);
+> +
+> +#ifdef CONFIG_NVMM
+> +
+> +int nvmm_enabled(void);
+> +
+> +#else /* CONFIG_NVMM */
+> +
+> +#define nvmm_enabled() (0)
+> +
+> +#endif /* CONFIG_NVMM */
+> +
+> +#endif /* CONFIG_NVMM */
+> --
+> 2.28.0
+> 
 
-reboot: Restarting system
-npcm7xx_timer_write: WTCR write not implemented: 0x00000083
-Reboot failed -- System halted
-
-So we need to implement watchdog support, which is something we were
-planning to do fairly soon.
-
-> >
-> > > +        value =3D 0;
-> > > +        break;
-> > > +
-> > > +    case NPCM7XX_CLK_PLLCON0:
-> > > +    case NPCM7XX_CLK_PLLCON1:
-> > > +    case NPCM7XX_CLK_PLLCON2:
-> > > +    case NPCM7XX_CLK_PLLCONG:
-> > > +        if (value & PLLCON_PWDEN) {
-> > > +            /* Power down -- clear lock and indicate loss of lock */
-> > > +            value &=3D ~PLLCON_LOKI;
-> > > +            value |=3D PLLCON_LOKS;
-> > > +        } else {
-> > > +            /* Normal mode -- assume always locked */
-> > > +            value |=3D PLLCON_LOKI;
-> > > +            /* Keep LOKS unchanged unless cleared by writing 1 */
-> > > +            if (value & PLLCON_LOKS) {
-> > > +                value &=3D ~PLLCON_LOKS;
-> > > +            } else {
-> > > +                value |=3D (value & PLLCON_LOKS);
-> > > +            }
-> > > +        }
-> > > +        break;
-> > > +
-> > > +    case NPCM7XX_CLK_CNTR25M:
-> > > +        qemu_log_mask(LOG_GUEST_ERROR,
-> > > +                      "%s: register @ 0x%04" HWADDR_PRIx " is read-o=
-nly\n",
-> > > +                      __func__, offset);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    s->regs[reg] =3D value;
-> > > +}
-> > > +
-> > > +static const struct MemoryRegionOps npcm7xx_clk_ops =3D {
-> > > +    .read       =3D npcm7xx_clk_read,
-> > > +    .write      =3D npcm7xx_clk_write,
-> > > +    .endianness =3D DEVICE_LITTLE_ENDIAN,
-> > > +    .valid      =3D {
-> > > +        .min_access_size        =3D 4,
-> > > +        .max_access_size        =3D 4,
-> > > +        .unaligned              =3D false,
-> > > +    },
-> > > +};
-> > > +
-> > > +static void npcm7xx_clk_enter_reset(Object *obj, ResetType type)
-> > > +{
-> > > +    NPCM7xxCLKState *s =3D NPCM7XX_CLK(obj);
-> > > +
-> > > +    QEMU_BUILD_BUG_ON(sizeof(s->regs) !=3D sizeof(cold_reset_values)=
-);
-> > > +
-> > > +    switch (type) {
-> > > +    case RESET_TYPE_COLD:
-> > > +        memcpy(s->regs, cold_reset_values, sizeof(cold_reset_values)=
-);
-> > > +        s->ref_ns =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-> > > +        return;
-> > > +    }
-> > > +
-> > > +    /*
-> > > +     * A small number of registers need to be reset on a core domain=
- reset,
-> > > +     * but no such reset type exists yet.
-> > > +     */
-> > > +    qemu_log_mask(LOG_UNIMP, "%s: reset type %d not implemented.",
-> > > +                  __func__, type);
-> >
-> > Clean :)
-> >
-> > > +}
-> > > +
-> > > +static void npcm7xx_clk_init(Object *obj)
-> > > +{
-> > > +    NPCM7xxCLKState *s =3D NPCM7XX_CLK(obj);
-> > > +
-> > > +    memory_region_init_io(&s->iomem, obj, &npcm7xx_clk_ops, s,
-> > > +                          TYPE_NPCM7XX_CLK, 4 * KiB);
-> > > +    sysbus_init_mmio(&s->parent, &s->iomem);
-> > > +}
-> > > +
-> > > +static const VMStateDescription vmstate_npcm7xx_clk =3D {
-> > > +    .name =3D "npcm7xx-clk",
-> > > +    .version_id =3D 0,
-> > > +    .minimum_version_id =3D 0,
-> > > +    .fields =3D (VMStateField[]) {
-> > > +        VMSTATE_UINT32_ARRAY(regs, NPCM7xxCLKState, NPCM7XX_CLK_NR_R=
-EGS),
-> >
-> > Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> > Tested-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
->
-> Thank you!
->
-> > > +        VMSTATE_INT64(ref_ns, NPCM7xxCLKState),
-> > > +        VMSTATE_END_OF_LIST(),
-> > > +    },
-> > > +};
-> > > +
-> > > +static void npcm7xx_clk_class_init(ObjectClass *klass, void *data)
-> > > +{
-> > > +    ResettableClass *rc =3D RESETTABLE_CLASS(klass);
-> > > +    DeviceClass *dc =3D DEVICE_CLASS(klass);
-> > > +
-> > > +    QEMU_BUILD_BUG_ON(NPCM7XX_CLK_REGS_END > NPCM7XX_CLK_NR_REGS);
-> > > +
-> > > +    dc->desc =3D "NPCM7xx Clock Control Registers";
-> > > +    dc->vmsd =3D &vmstate_npcm7xx_clk;
-> > > +    rc->phases.enter =3D npcm7xx_clk_enter_reset;
-> > > +}
-> > > +
-> > > +static const TypeInfo npcm7xx_clk_info =3D {
-> > > +    .name               =3D TYPE_NPCM7XX_CLK,
-> > > +    .parent             =3D TYPE_SYS_BUS_DEVICE,
-> > > +    .instance_size      =3D sizeof(NPCM7xxCLKState),
-> > > +    .instance_init      =3D npcm7xx_clk_init,
-> > > +    .class_init         =3D npcm7xx_clk_class_init,
-> > > +};
-> > > +
-> > > +static void npcm7xx_clk_register_type(void)
-> > > +{
-> > > +    type_register_static(&npcm7xx_clk_info);
-> > > +}
-> > > +type_init(npcm7xx_clk_register_type);
-> > > diff --git a/hw/misc/meson.build b/hw/misc/meson.build
-> > > index 99ffb9f9e8..531cc31dcc 100644
-> > > --- a/hw/misc/meson.build
-> > > +++ b/hw/misc/meson.build
-> > > @@ -51,6 +51,7 @@ softmmu_ss.add(when: 'CONFIG_IMX', if_true: files(
-> > >  softmmu_ss.add(when: 'CONFIG_MILKYMIST', if_true: files('milkymist-h=
-pdmc.c', 'milkymist-pfpu.c'))
-> > >  softmmu_ss.add(when: 'CONFIG_MAINSTONE', if_true: files('mst_fpga.c'=
-))
-> > >  softmmu_ss.add(when: 'CONFIG_NPCM7XX', if_true: files(
-> > > +  'npcm7xx_clk.c',
-> > >    'npcm7xx_gcr.c',
-> > >  ))
-> > >  softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files(
-> > > diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-> > > index dbf90db8ed..a010699b4f 100644
-> > > --- a/hw/misc/trace-events
-> > > +++ b/hw/misc/trace-events
-> > > @@ -111,6 +111,10 @@ mos6522_set_sr_int(void) "set sr_int"
-> > >  mos6522_write(uint64_t addr, uint64_t val) "reg=3D0x%"PRIx64 " val=
-=3D0x%"PRIx64
-> > >  mos6522_read(uint64_t addr, unsigned val) "reg=3D0x%"PRIx64 " val=3D=
-0x%x"
-> > >
-> > > +# npcm7xx_clk.c
-> > > +npcm7xx_clk_read(uint64_t offset, uint32_t value) " offset: 0x%04" P=
-RIx64 " value: 0x%08" PRIx32
-> > > +npcm7xx_clk_write(uint64_t offset, uint32_t value) "offset: 0x%04" P=
-RIx64 " value: 0x%08" PRIx32
-> > > +
-> > >  # npcm7xx_gcr.c
-> > >  npcm7xx_gcr_read(uint64_t offset, uint32_t value) " offset: 0x%04" P=
-RIx64 " value: 0x%08" PRIx32
-> > >  npcm7xx_gcr_write(uint64_t offset, uint32_t value) "offset: 0x%04" P=
-RIx64 " value: 0x%08" PRIx32
-> > >
 
