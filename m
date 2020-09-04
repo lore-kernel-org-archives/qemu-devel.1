@@ -2,71 +2,79 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6954C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:01:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B26DC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:02:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A854D206CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:01:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Y1JISe4A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A854D206CA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 0481A206CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:02:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0481A206CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60910 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2uf-0000Ze-PB
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 00:01:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54796)
+	id 1kE2vL-0001uB-2f
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 00:02:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hb-0002iS-CE; Thu, 03 Sep 2020 23:47:51 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:40781)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hZ-0004wi-9C; Thu, 03 Sep 2020 23:47:51 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsq6f0Qz9sVy; Fri,  4 Sep 2020 13:47:27 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599191247;
- bh=gMiAtQjsk/Rf8aQpgZPjpS1b6eRF/e1DiGSzGhHBsJ4=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Y1JISe4A0pk3vSHwfvCc5D/S917UE27vRuqXYJkMPiFSBqmM4F1aUfhAleuCP+cBA
- Hq5xGhIxIKPthviG//6dZhBvrTfmdfR62FA6/PdRd66UKtb6YZHlNknEGbX/PQYjdw
- /rSI5wjxde/ZUBhP/UQB/eoOJiXyHjABlEVykTmk=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 15/30] target/arm: Move start-powered-off property to generic
- CPUState
-Date: Fri,  4 Sep 2020 13:47:04 +1000
-Message-Id: <20200904034719.673626-16-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
-References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kE2uH-0000FG-Sz
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 00:00:57 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53424)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kE2uF-0006e2-BW
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 00:00:57 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kE2uC-0005ww-9X
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 04:00:52 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 4255F2E80E9
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 04:00:52 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Sep 2020 03:51:17 -0000
+From: "Tony.LI" <1894071@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bigboy0822 laurent-vivier
+X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
+X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
+References: <159912571834.28358.2492164063235416189.malonedeb@soybean.canonical.com>
+Message-Id: <159919147735.31371.4646694417422436127.malone@wampee.canonical.com>
+Subject: [Bug 1894071] Re: qemu-i386-static ioctl return -14 (Bad Address)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: 73b2ca484ecb58d2ce5fe27eb34696c79f3546aa
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 00:00:52
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -75,132 +83,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, danielhb413@gmail.com,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Reply-To: Bug 1894071 <1894071@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Hi,I found some problems, but I don't know if how to solve it better(I'm
+not really familiar with the source code).
 
-There are other platforms which also have CPUs that start powered off, so
-generalize the start-powered-off property so that it can be used by them.
+When I use ioctl() and use a structure like this:
 
-Note that ARMv7MState also has a property of the same name but this patch
-doesn't change it because that class isn't a subclass of CPUState so it
-wouldn't be a trivial change.
+struct drm_mode_card_res {
+        __u64 fb_id_ptr;
+        __u64 crtc_id_ptr;
+        __u64 connector_id_ptr;
+        __u64 encoder_id_ptr;
+        __u32 count_fbs;
+        ....
+};
 
-This change should not cause any change in behavior.
+Look,"fb_id_ptr" is a pointer,and apply for memory allocation through mallo=
+c.But I use qemu-i386 on 64 bit ARM.As a result, my pointer has no problem =
+in QEMU, but it is wrong when I use ioctl(bad address).This address is actu=
+ally an address in QEMU, but it is not the correct address in a 64 bit mach=
+ine.
+Is there any better way to solve this problem?
 
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Message-Id: <20200826055535.951207-2-bauerman@linux.ibm.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
----
- exec.c                | 1 +
- include/hw/core/cpu.h | 4 ++++
- target/arm/cpu.c      | 5 ++---
- target/arm/cpu.h      | 3 ---
- target/arm/kvm32.c    | 2 +-
- target/arm/kvm64.c    | 2 +-
- 6 files changed, 9 insertions(+), 8 deletions(-)
+-- =
 
-diff --git a/exec.c b/exec.c
-index 7683afb6a8..e34b602bdf 100644
---- a/exec.c
-+++ b/exec.c
-@@ -899,6 +899,7 @@ Property cpu_common_props[] = {
-     DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
-                      MemoryRegion *),
- #endif
-+    DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 8f145733ce..9fc2696db5 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -374,6 +374,10 @@ struct CPUState {
-     bool created;
-     bool stop;
-     bool stopped;
-+
-+    /* Should CPU start in powered-off state? */
-+    bool start_powered_off;
-+
-     bool unplug;
-     bool crash_occurred;
-     bool exit_request;
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index c179e0752d..9f814194fb 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -174,8 +174,8 @@ static void arm_cpu_reset(DeviceState *dev)
-     env->vfp.xregs[ARM_VFP_MVFR1] = cpu->isar.mvfr1;
-     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
- 
--    cpu->power_state = cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
--    s->halted = cpu->start_powered_off;
-+    cpu->power_state = s->start_powered_off ? PSCI_OFF : PSCI_ON;
-+    s->halted = s->start_powered_off;
- 
-     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
-         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
-@@ -2186,7 +2186,6 @@ static const ARMCPUInfo arm_cpus[] = {
- };
- 
- static Property arm_cpu_properties[] = {
--    DEFINE_PROP_BOOL("start-powered-off", ARMCPU, start_powered_off, false),
-     DEFINE_PROP_UINT32("psci-conduit", ARMCPU, psci_conduit, 0),
-     DEFINE_PROP_UINT64("midr", ARMCPU, midr, 0),
-     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a1c7d8ebae..6036f61d60 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -817,9 +817,6 @@ struct ARMCPU {
-      */
-     uint32_t psci_version;
- 
--    /* Should CPU start in PSCI powered-off state? */
--    bool start_powered_off;
--
-     /* Current power state, access guarded by BQL */
-     ARMPSCIState power_state;
- 
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 0af46b41c8..1f2b8f8b7a 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -218,7 +218,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
- 
-     /* Determine init features for this CPU */
-     memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
--    if (cpu->start_powered_off) {
-+    if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
-     }
-     if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index ef1e960285..987b35e33f 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -774,7 +774,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
- 
-     /* Determine init features for this CPU */
-     memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
--    if (cpu->start_powered_off) {
-+    if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
-     }
-     if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
--- 
-2.26.2
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894071
 
+Title:
+  qemu-i386-static ioctl return -14 (Bad Address)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I use qemu-i386-static on 64 bit ARM.But I don't know how to solve some p=
+roblems.
+  First I added some ioctl operations.
+  Then I tried to do some DRM operations like test.c.
+  This is successful when I use qemu-x86_64-static,but it failed when I use=
+ qemu-i386-static.
+  I can get some strace info like this:
+
+  403 openat(AT_FDCWD,"/dev/dri/card0",O_RDWR|O_LARGEFILE|O_CLOEXEC) =3D 4
+  403 ioctl(4,DRM_IOCTL_GET_CAP,{1,0}) =3D 0 ({1,1})
+  403 ioctl(4,DRM_IOCTL_MODE_GETRESOURCES,{0,0,0,0,0,0,0,0,0,0,0,0}) =3D 0 =
+({0,0,0,0,0,2,2,2,0,16384,0,16384})
+  403 brk(NULL) =3D 0x40006000
+  403 brk(0x40027000) =3D 0x40027000
+  403 brk(0x40028000) =3D 0x40028000
+  403 ioctl(4,DRM_IOCTL_MODE_GETRESOURCES,{0,1073766816,1073766832,10737668=
+48,0,2,2,2,0,16384,0,16384}) =3D -1 errno=3D14 (Bad address)
+
+  And there are similar errors in other self driven operations.
+  I want to know if it is QEMU's problem, so I hope to get some help. =
+
+  Thank you!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894071/+subscriptions
 
