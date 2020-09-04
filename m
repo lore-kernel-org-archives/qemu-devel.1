@@ -8,70 +8,70 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1832C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3934BC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:33:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50E8220665
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:33:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C6D2920665
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 18:33:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yuc8MNgX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50E8220665
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VUe3dYOQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6D2920665
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEFun-0004C0-5m
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55034)
+	id 1kEFvn-0005LA-7U
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 13:55:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kEFtT-0002ea-GV; Fri, 04 Sep 2020 13:52:59 -0400
-Received: from mail-qk1-x742.google.com ([2607:f8b0:4864:20::742]:33746)
+ id 1kEFu6-0003IK-HM; Fri, 04 Sep 2020 13:53:38 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:38481)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kEFtS-0008RN-0n; Fri, 04 Sep 2020 13:52:59 -0400
-Received: by mail-qk1-x742.google.com with SMTP id p4so7156003qkf.0;
- Fri, 04 Sep 2020 10:52:57 -0700 (PDT)
+ id 1kEFu4-0008UP-TI; Fri, 04 Sep 2020 13:53:38 -0400
+Received: by mail-qk1-x743.google.com with SMTP id d20so7129422qka.5;
+ Fri, 04 Sep 2020 10:53:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=/MPGgw7TJanQsmptVlMzrhffmoYIVJZtdI1dbW8sSYE=;
- b=Yuc8MNgXK2sCgm32vAfCrFxRxXckymXbVdkuTTWfi0qyBGmavvPZIypBgFR39G6x9P
- 8uFCET54HHYYSc7trSjdj1rfrvpVigzvKeZs8QEhzeT4OXIBCgf7b2hKD8uljw857xW8
- FZnA20SftmgXuRmGUNcB+/uuIib45Ws2Knew34RLGHRW+EtvwwJjFgV0teZH1qYga5GQ
- wjCJueHr9JprimLMp6kb0wlw6LtCl313xS4W5rjtRYhDpME7kjv6ZwrI/ITUuQ1/cSK9
- rOoNOSz5YuMEoSLSewZugjS7hdQPTssdMOmq8/3U14p+30jPF0I8p8o5w5WTHBMOJ2jI
- Se4A==
+ :cc; bh=wBrp3TnUSMyLp9o5msShmUSefqGRodLAR/NbpDDlF7Q=;
+ b=VUe3dYOQensytIuDt0aCPB2PZTGFb4GaJjGXXibq9ZOCpfEOs58BTYI91QUJgoJJlp
+ AGDoPUWOHJIX28uVis9hf8UJDZYk4slKtFzJZhjohlFyxYz+GDHjOBFQpaTmpgDd6vKb
+ 0x8iv/IIVSFz04ycEefyCbNsjBeJHfFKmIKmh9tfv4DVD0jt3edk+WK/8dzubJ35rEoY
+ qrdlY8EdzDzv8PF172dplN/Sb1W0M2ik7J/Ojz+LlY3gV4pcTq8S8PIPxzx60tqSloWN
+ Nq/3YLuj0t+BP+CStr/QMXbpNBv6gpyhHnLdD4bS54kqIFOJ3JVMZX8r/OzV3aj4BRtE
+ 7Z2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=/MPGgw7TJanQsmptVlMzrhffmoYIVJZtdI1dbW8sSYE=;
- b=HKhVYdSGwLCrE7Lgo3hNuLQ8htjInRvYVi6ZZtBlR2H3wE3wXAh/SzQV+XZKKOIC1u
- K4f/pqMkBQdcQ/eWRYhkNhsuw9KfOTuslsjYOk1gbx916YMx0SvaXYSX+33YsEBhoyq5
- rms3nexamxGz94VS3SD8z/6gxT/Tdz3PJ0ENMdbOTlFPICSGkGsTV1pKtAMJJYAhBG9U
- CODxym7ZVddZSr+J8g60ehAgocqlwpMxeFB9DLl0TfC3f9LHXjVc4KjjwCbBkr45MhRv
- 7B8y9nMdoExYfkVS7izQ7NOdKLBBTumHzc6blHHHaB4d19rV1ARrEOZ2ZetNg2XNX1IQ
- M2Iw==
-X-Gm-Message-State: AOAM532wa03P8hb1+yTUXbsMlVqiUoBDWeqebJjdowgWDNnfYy6cFgq7
- tyaHOT/AOE0A8+NS6ASOjj3e9tRuAYyJy4fJFZ0=
-X-Google-Smtp-Source: ABdhPJxVP/uYiJIfo3g/rlsYFzlwSZHMvDzevfdAUEMQkmIe4HU80chzYtpTW/fx3kNwzCiBi0Jfi+ia3IDhBMt9JPU=
-X-Received: by 2002:a37:9304:: with SMTP id v4mr8612137qkd.496.1599241976799; 
- Fri, 04 Sep 2020 10:52:56 -0700 (PDT)
+ bh=wBrp3TnUSMyLp9o5msShmUSefqGRodLAR/NbpDDlF7Q=;
+ b=SoHH7cYVWtFgL0gm58OsIVFyKfB/Q3JIaRDZgk3myQEubx+Fy9k29Jc9hD0bkIKmA9
+ Kf3bffiLigaoDSPl8GrsFfWXNZm+uWaQT+AHCI0FBXibRzKSkNpjt9SUkpTNW3jTdomI
+ UY4ZB+hyoMWOWWW/39vsLx4VixCkSDc7b4trg+v/VFkTeQb1iWlXtkdQxZmvyaz9nXlG
+ faIonT5Lsa9JcGLJ8IxHdnU0VztTzCwYeMoA72QrIUxbsi03sTAifDhfrPPrWIelhFxb
+ nGYy/1b02pd3AnAJnePDOd4Sg4ZBNPn0yP4Lgh7pjq3x5LMAae6AoLQMIjb5mtvsfTqg
+ IM0g==
+X-Gm-Message-State: AOAM533I+gm2RLhj5rWMTD7pwJ4IMYxBGFv6iz1QuEluuE3R9WVlWV1B
+ NBqZUMi/kdVBC+kq5iyJSXIwam1/Ljy5df9DpNw=
+X-Google-Smtp-Source: ABdhPJy3+/ZUv+eRxqdpCZIJnc6ogidl2EJZrt+87ohc9RvTFWLMYDRfSJrvhUyD5vTxbfdsJpxB04rXYrudGV93NGE=
+X-Received: by 2002:a37:a5ca:: with SMTP id o193mr9064865qke.126.1599242015740; 
+ Fri, 04 Sep 2020 10:53:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <1599129623-68957-1-git-send-email-bmeng.cn@gmail.com>
- <1599129623-68957-11-git-send-email-bmeng.cn@gmail.com>
-In-Reply-To: <1599129623-68957-11-git-send-email-bmeng.cn@gmail.com>
+ <1599129623-68957-12-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1599129623-68957-12-git-send-email-bmeng.cn@gmail.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 4 Sep 2020 10:42:02 -0700
-Message-ID: <CAKmqyKPswrSd-fVggWuRt2LHVnAeQKJi_hBC7sP89Dt_24U++Q@mail.gmail.com>
-Subject: Re: [PATCH 10/12] hw/riscv: Always build riscv_hart.c
+Date: Fri, 4 Sep 2020 10:42:40 -0700
+Message-ID: <CAKmqyKOQfB8c5xhCpuNC_8oVjuEsdg55qXDuNA+gcEpPodpXTw@mail.gmail.com>
+Subject: Re: [PATCH 11/12] hw/riscv: Drop CONFIG_SIFIVE
 To: Bin Meng <bmeng.cn@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::742;
- envelope-from=alistair23@gmail.com; helo=mail-qk1-x742.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=alistair23@gmail.com; helo=mail-qk1-x743.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -101,13 +101,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 3, 2020 at 3:42 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Thu, Sep 3, 2020 at 3:49 AM Bin Meng <bmeng.cn@gmail.com> wrote:
 >
 > From: Bin Meng <bin.meng@windriver.com>
 >
-> Every RISC-V machine needs riscv_hart hence there is no need to
-> have a dedicated Kconfig option for it. Drop the Kconfig option
-> and always build riscv_hart.c.
+> The name SIFIVE is too vague to convey the required component of
+> MSI_NONBROKEN. Let's drop the option, and select MSI_NONBROKEN in
+> each machine instead.
 >
 > Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
@@ -117,82 +117,69 @@ Alistair
 
 > ---
 >
->  hw/riscv/Kconfig     | 9 ---------
->  hw/riscv/meson.build | 2 +-
->  2 files changed, 1 insertion(+), 10 deletions(-)
+>  hw/riscv/Kconfig | 14 +++++---------
+>  1 file changed, 5 insertions(+), 9 deletions(-)
 >
 > diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-> index 8e07100..7d017bc 100644
+> index 7d017bc..e152fdc 100644
 > --- a/hw/riscv/Kconfig
 > +++ b/hw/riscv/Kconfig
-> @@ -1,6 +1,3 @@
-> -config HART
-> -    bool
-> -
+> @@ -1,13 +1,9 @@
 >  config IBEX
 >      bool
 >
-> @@ -10,7 +7,6 @@ config SIFIVE
->
+> -config SIFIVE
+> -    bool
+> -    select MSI_NONBROKEN
+> -
 >  config SIFIVE_E
 >      bool
-> -    select HART
->      select SIFIVE
+> -    select SIFIVE
+> +    select MSI_NONBROKEN
 >      select SIFIVE_CLINT
 >      select SIFIVE_GPIO
-> @@ -22,7 +18,6 @@ config SIFIVE_E
+>      select SIFIVE_PLIC
+> @@ -18,7 +14,7 @@ config SIFIVE_E
 >  config SIFIVE_U
 >      bool
 >      select CADENCE
-> -    select HART
->      select SIFIVE
+> -    select SIFIVE
+> +    select MSI_NONBROKEN
 >      select SIFIVE_CLINT
 >      select SIFIVE_GPIO
-> @@ -35,7 +30,6 @@ config SIFIVE_U
->
+>      select SIFIVE_PDMA
+> @@ -31,7 +27,7 @@ config SIFIVE_U
 >  config SPIKE
 >      bool
-> -    select HART
 >      select HTIF
->      select SIFIVE
+> -    select SIFIVE
+> +    select MSI_NONBROKEN
 >      select SIFIVE_CLINT
-> @@ -44,7 +38,6 @@ config SPIKE
->  config OPENTITAN
->      bool
->      select IBEX
-> -    select HART
->      select UNIMP
+>      select SIFIVE_PLIC
 >
->  config RISCV_VIRT
-> @@ -52,7 +45,6 @@ config RISCV_VIRT
+> @@ -44,20 +40,20 @@ config RISCV_VIRT
+>      bool
 >      imply PCI_DEVICES
 >      imply TEST_DEVICES
+> +    select MSI_NONBROKEN
 >      select PCI
-> -    select HART
 >      select SERIAL
 >      select GOLDFISH_RTC
 >      select VIRTIO_MMIO
-> @@ -65,7 +57,6 @@ config RISCV_VIRT
+>      select PCI_EXPRESS_GENERIC_BRIDGE
+>      select PFLASH_CFI01
+> -    select SIFIVE
+>      select SIFIVE_CLINT
+>      select SIFIVE_PLIC
+>      select SIFIVE_TEST
 >
 >  config MICROCHIP_PFSOC
 >      bool
-> -    select HART
->      select SIFIVE
+> -    select SIFIVE
+> +    select MSI_NONBROKEN
 >      select SIFIVE_CLINT
 >      select UNIMP
-> diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
-> index 3cf9380..dbedf9b 100644
-> --- a/hw/riscv/meson.build
-> +++ b/hw/riscv/meson.build
-> @@ -1,7 +1,7 @@
->  riscv_ss = ss.source_set()
->  riscv_ss.add(files('boot.c'))
->  riscv_ss.add(files('numa.c'))
-> -riscv_ss.add(when: 'CONFIG_HART', if_true: files('riscv_hart.c'))
-> +riscv_ss.add(files('riscv_hart.c'))
->  riscv_ss.add(when: 'CONFIG_OPENTITAN', if_true: files('opentitan.c'))
->  riscv_ss.add(when: 'CONFIG_RISCV_VIRT', if_true: files('virt.c'))
->  riscv_ss.add(when: 'CONFIG_SIFIVE_E', if_true: files('sifive_e.c'))
+>      select MCHP_PFSOC_MMUART
 > --
 > 2.7.4
 >
