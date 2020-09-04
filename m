@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A3F2C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:03:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E351C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:04:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 255F820791
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:03:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 255F820791
+	by mail.kernel.org (Postfix) with ESMTPS id 1BAB620791
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:03:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BAB620791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46428 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEAR7-0008K8-3o
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 08:03:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42972)
+	id 1kEARf-0000nA-7Z
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 08:03:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42984)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6x-0001Au-Ju
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:31 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:53365
+ id 1kEA6y-0001DX-Ik
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:51598
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6v-0005JD-GI
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:31 -0400
+ id 1kEA6u-0005J0-O1
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:32 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-526-MlNJN3NfOCmFmBq3WcLg5A-1; Fri, 04 Sep 2020 07:42:27 -0400
-X-MC-Unique: MlNJN3NfOCmFmBq3WcLg5A-1
+ us-mta-382-_AfdZF4fNN2Q5Z1dcW_YNg-1; Fri, 04 Sep 2020 07:42:26 -0400
+X-MC-Unique: _AfdZF4fNN2Q5Z1dcW_YNg-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65CE896E572;
- Fri,  4 Sep 2020 11:41:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 496271084D9F;
+ Fri,  4 Sep 2020 11:41:47 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2535A10013C4;
- Fri,  4 Sep 2020 11:41:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0930310013C4;
+ Fri,  4 Sep 2020 11:41:46 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 45/46] meson: Convert undefsym.sh to undefsym.py
-Date: Fri,  4 Sep 2020 07:41:21 -0400
-Message-Id: <20200904114122.31307-46-pbonzini@redhat.com>
+Subject: [PULL 42/46] oss-fuzz: fix rpath
+Date: Fri,  4 Sep 2020 07:41:18 -0400
+Message-Id: <20200904114122.31307-43-pbonzini@redhat.com>
 In-Reply-To: <20200904114122.31307-1-pbonzini@redhat.com>
 References: <20200904114122.31307-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -82,121 +82,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yonggang Luo <luoyonggang@gmail.com>
+Cc: Alexander Bulekov <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Yonggang Luo <luoyonggang@gmail.com>
+From: Alexander Bulekov <alxndr@bu.edu>
 
-Shell scripts are not easily invoked from the build process
-on MSYS, so convert undefsym.sh to a python script.
+Prior to this change,
+readelf -d build/out/qemu/qemu-fuzz-i386-target-virtio-net-slirp
+...
+0x000000000000000f (RPATH)  Library rpath: ['$$ORIGIN/lib':$ORIGIN/migration:$ORIGIN/]
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Message-Id: <20200902170054.810-3-luoyonggang@gmail.com>
+As of 1a4db552d8 ("ninjatool: quote dollars in variables"), we don't
+need to manually double the dollars. Also, remove the single-quotes as
+they are copied into the rpath.
+
+After this change:
+0x000000000000000f (RPATH)  Library rpath: [$ORIGIN/lib:$ORIGIN/migration:$ORIGIN/]
+
+Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+Message-Id: <20200902142657.112879-3-alxndr@bu.edu>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- meson.build         |  2 +-
- scripts/undefsym.py | 49 +++++++++++++++++++++++++++++++++++++++++++++
- scripts/undefsym.sh | 20 ------------------
- 3 files changed, 50 insertions(+), 21 deletions(-)
- create mode 100644 scripts/undefsym.py
- delete mode 100755 scripts/undefsym.sh
+ scripts/oss-fuzz/build.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 9473b42da3..6ed3c37f46 100644
---- a/meson.build
-+++ b/meson.build
-@@ -942,7 +942,7 @@ foreach d, list : modules
- endforeach
+diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
+index f0b7442c96..d16207eb67 100755
+--- a/scripts/oss-fuzz/build.sh
++++ b/scripts/oss-fuzz/build.sh
+@@ -81,7 +81,7 @@ rm qemu-fuzz-i386
+ # Build a second time to build the final binary with correct rpath
+ ../configure --disable-werror --cc="$CC" --cxx="$CXX" --enable-fuzzing \
+     --prefix="$DEST_DIR" --bindir="$DEST_DIR" --datadir="$DEST_DIR/data/" \
+-    --extra-cflags="$EXTRA_CFLAGS" --extra-ldflags="-Wl,-rpath,'\$\$ORIGIN/lib'" \
++    --extra-cflags="$EXTRA_CFLAGS" --extra-ldflags="-Wl,-rpath,\$ORIGIN/lib" \
+     --target-list="i386-softmmu"
+ make "-j$(nproc)" qemu-fuzz-i386 V=1
  
- nm = find_program('nm')
--undefsym = find_program('scripts/undefsym.sh')
-+undefsym = find_program('scripts/undefsym.py')
- block_syms = custom_target('block.syms', output: 'block.syms',
-                              input: [libqemuutil, block_mods],
-                              capture: true,
-diff --git a/scripts/undefsym.py b/scripts/undefsym.py
-new file mode 100644
-index 0000000000..69a895cd26
---- /dev/null
-+++ b/scripts/undefsym.py
-@@ -0,0 +1,49 @@
-+#!/usr/bin/env python3
-+
-+# Before a shared module's DSO is produced, a static library is built for it
-+# and passed to this script.  The script generates -Wl,-u options to force
-+# the inclusion of symbol from libqemuutil.a if the shared modules need them,
-+# This is necessary because the modules may use functions not needed by the
-+# executable itself, which would cause the function to not be linked in.
-+# Then the DSO loading would fail because of the missing symbol.
-+
-+
-+import sys
-+import subprocess
-+
-+def filter_lines_set(stdout, from_staticlib):
-+    linesSet = set()
-+    for line in stdout.splitlines():
-+        tokens = line.split(b' ')
-+        if len(tokens) >= 1:
-+            if len(tokens) > 1:
-+                if from_staticlib and tokens[1] == b'U':
-+                    continue
-+                if not from_staticlib and tokens[1] != b'U':
-+                    continue
-+            new_line = b'-Wl,-u,' + tokens[0]
-+            if not new_line in linesSet:
-+                linesSet.add(new_line)
-+    return linesSet
-+
-+def main(args):
-+    if len(args) <= 3:
-+        sys.exit(0)
-+
-+    nm = args[1]
-+    staticlib = args[2]
-+    pc = subprocess.run([nm, "-P", "-g", staticlib], stdout=subprocess.PIPE)
-+    if pc.returncode != 0:
-+        sys.exit(1)
-+    staticlib_syms = filter_lines_set(pc.stdout, True)
-+
-+    shared_modules = args[3:]
-+    pc = subprocess.run([nm, "-P", "-g"] + shared_modules, stdout=subprocess.PIPE)
-+    if pc.returncode != 0:
-+        sys.exit(1)
-+    modules_undef_syms = filter_lines_set(pc.stdout, False)
-+    lines = sorted(staticlib_syms.intersection(modules_undef_syms))
-+    sys.stdout.buffer.write(b'\n'.join(lines))
-+
-+if __name__ == "__main__":
-+    main(sys.argv)
-diff --git a/scripts/undefsym.sh b/scripts/undefsym.sh
-deleted file mode 100755
-index b9ec332e95..0000000000
---- a/scripts/undefsym.sh
-+++ /dev/null
-@@ -1,20 +0,0 @@
--#! /usr/bin/env bash
--
--# Before a shared module's DSO is produced, a static library is built for it
--# and passed to this script.  The script generates -Wl,-u options to force
--# the inclusion of symbol from libqemuutil.a if the shared modules need them,
--# This is necessary because the modules may use functions not needed by the
--# executable itself, which would cause the function to not be linked in.
--# Then the DSO loading would fail because of the missing symbol.
--
--if test $# -le 2; then
--  exit 0
--fi
--
--NM=$1
--staticlib=$2
--shift 2
--# Find symbols defined in static libraries and undefined in shared modules
--comm -12 \
--  <( $NM -P -g $staticlib | awk '$2!="U"{print "-Wl,-u," $1}' | sort -u) \
--  <( $NM -P -g "$@" | awk '$2=="U"{print "-Wl,-u," $1}' | sort -u)
 -- 
 2.26.2
 
