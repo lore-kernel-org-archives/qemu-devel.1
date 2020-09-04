@@ -2,96 +2,101 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BDB8C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:26:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4232CC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:29:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 129A320791
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:26:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dIpHP1sT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 129A320791
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id F41CE20770
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:29:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F41CE20770
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51174 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE7z4-0002i3-TQ
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:26:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40416)
+	id 1kE828-0005Qb-4T
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:29:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kE7xl-0001un-0L; Fri, 04 Sep 2020 05:24:53 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:41495)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kE7xj-0004U1-Fu; Fri, 04 Sep 2020 05:24:52 -0400
-Received: by mail-wr1-x443.google.com with SMTP id w5so6010732wrp.8;
- Fri, 04 Sep 2020 02:24:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=L62gDycH2jfiJTmi/B6DChJ2nvGaA1pOjRrC62xMfHM=;
- b=dIpHP1sTezsXOwwHfyvgCzbEcVTv3qzn39lNiufn2wA/sQrYjrNhnNPhyCAWlqHKgu
- Cq5xY/OemNL83qL8p2uxw6CVUfhd+/z1w7hmlbcdz9qZcUDLmpFkvhtiULK+vrkEnxOC
- HpuwNLz2jpQuEtT6IYOcUQV+e6C/t9OOT9ZQ7+C9lwhlpL3YghcmeLZCXKNubek/PJq5
- Wwrg0XRSuS5slxIC7H63MXkGxUhV72rvFjHBO4AsbwsK9xIH/If+M9BW8o7Of29f9u17
- jy1hdW0Z+xXrFswRHDUi0jA8ouielDzz/4Kufj8Xgn5wV7Y6TfE38ZHvpQVNdNFKpJR8
- mAJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=L62gDycH2jfiJTmi/B6DChJ2nvGaA1pOjRrC62xMfHM=;
- b=Q7jUiZ/EkOG+Dp+K3X9N1QhuoPqFnRqGhzdhg3GquIuym5L7btcKi8KtcP+5vTuOOj
- bZC6lTCEYPE1SOGX7IZtxT2MjLiJhQblSVl6IYR3QUdPcC4MOuttXfFxwt5kT/x7aZHd
- JA/a8/eRKjy+0mEg38g+Y0OSS82XkULwltW4BaVuyZwED0SAEB4rzxaahuNimezbxmPb
- S+0N6DdUQB+/G/KMCEAu4Iv/4Boju8hcg5Gr60I1BJRwyQhF7zjSg7KdIiR+4xzelbWZ
- nM81v4IyIPpfjNQHnp7EDcu9KSfUKzvUhcRDa0vhBTwJVNbjvuaNFu9KF8ttRksDSNtE
- cP1A==
-X-Gm-Message-State: AOAM530oaPI7VAEOWbxQcXLuI7PQ+S08JOlHhojRw4Zk7IyAHhqbyqvq
- J/uYq+0HosKTjgmyOzu1E6k=
-X-Google-Smtp-Source: ABdhPJyIlOdMLuM2ALTwAXT8kHQVouv0Qt4Wj70MD2gro8mVBTat5UwUFM2P1aaGwEm7qMd/nIbZcQ==
-X-Received: by 2002:adf:9f10:: with SMTP id l16mr7181604wrf.77.1599211489694; 
- Fri, 04 Sep 2020 02:24:49 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id j10sm10105728wrn.2.2020.09.04.02.24.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Sep 2020 02:24:48 -0700 (PDT)
-Subject: Re: [PATCH v8 06/14] roms: Add virtual Boot ROM for NPCM7xx SoCs
-To: Havard Skinnemoen <hskinnemoen@google.com>, peter.maydell@linaro.org
-References: <20200825001711.1340443-1-hskinnemoen@google.com>
- <20200825001711.1340443-7-hskinnemoen@google.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8a427b01-a02b-df53-9179-ec733b1cfa1d@amsat.org>
-Date: Fri, 4 Sep 2020 11:24:47 +0200
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE81I-0004PA-6Z
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:28:32 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58675
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE81D-0005ET-0w
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:28:31 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-393-F_9M6CCiP4uuR5nJoQRMaw-1; Fri, 04 Sep 2020 05:28:24 -0400
+X-MC-Unique: F_9M6CCiP4uuR5nJoQRMaw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2577C425E0;
+ Fri,  4 Sep 2020 09:28:22 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-114-156.ams2.redhat.com
+ [10.36.114.156])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AA638196FD;
+ Fri,  4 Sep 2020 09:28:20 +0000 (UTC)
+Subject: Re: [PATCH v2 3/3] qcow2: Rewrite the documentation of
+ qcow2_alloc_cluster_offset()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+References: <cover.1599150873.git.berto@igalia.com>
+ <bb5bd06f07c5a05b0818611de0d06ec5b66c8df3.1599150873.git.berto@igalia.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <9355b4ef-be80-b8eb-6697-24125caea920@redhat.com>
+Date: Fri, 4 Sep 2020 11:28:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200825001711.1340443-7-hskinnemoen@google.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -41
-X-Spam_score: -4.2
+In-Reply-To: <bb5bd06f07c5a05b0818611de0d06ec5b66c8df3.1599150873.git.berto@igalia.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="erdIBTeSupl0BQPnTfOR2GEftMVqoWiEy"
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
 X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-2.403,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.403,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,32 +109,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kfting@nuvoton.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
- Avi.Fishman@nuvoton.com
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 8/25/20 2:17 AM, Havard Skinnemoen via wrote:
-> This is a minimalistic boot ROM written specifically for use with QEMU.
-> It supports loading the second-stage loader from SPI flash into RAM, SMP
-> boot, and not much else.
-> 
-> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--erdIBTeSupl0BQPnTfOR2GEftMVqoWiEy
+Content-Type: multipart/mixed; boundary="olaGkDkCr9Tmq4JxDGIRDVCqAt0IFaVYT"
+
+--olaGkDkCr9Tmq4JxDGIRDVCqAt0IFaVYT
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+
+On 03.09.20 18:37, Alberto Garcia wrote:
+> The current text corresponds to an earlier, simpler version of this
+> function and it does not explain how it works now.
+>=20
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 > ---
->  Makefile                    |   1 +
->  .gitmodules                 |   3 +++
->  MAINTAINERS                 |   2 ++
->  pc-bios/README              |   6 ++++++
->  pc-bios/npcm7xx_bootrom.bin | Bin 0 -> 768 bytes
->  roms/Makefile               |   7 +++++++
->  roms/vbootrom               |   1 +
->  7 files changed, 20 insertions(+)
->  create mode 100644 pc-bios/npcm7xx_bootrom.bin
->  create mode 160000 roms/vbootrom
+>  block/qcow2-cluster.c | 24 ++++++++++++++----------
+>  1 file changed, 14 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/block/qcow2-cluster.c b/block/qcow2-cluster.c
+> index 25e38daa78..f1ce6afcf5 100644
+> --- a/block/qcow2-cluster.c
+> +++ b/block/qcow2-cluster.c
+> @@ -1713,18 +1713,22 @@ out:
+>  }
+> =20
+>  /*
+> - * alloc_cluster_offset
+> + * For a given area on the virtual disk defined by @offset and @bytes,
+> + * find the corresponding area on the qcow2 image, allocating new
+> + * clusters (or subclusters) if necessary. The result can span a
+> + * combination of allocated and previously unallocated clusters.
+>   *
+> - * For a given offset on the virtual disk, find the cluster offset in qc=
+ow2
+> - * file. If the offset is not found, allocate a new cluster.
+> + * On return, @host_offset is set to the beginning of the requested
+> + * area. This area is guaranteed to be contiguous on the qcow2 file
+> + * but it can be smaller than initially requested. In this case @bytes
+> + * is updated with the actual size.
+>   *
+> - * If the cluster was already allocated, m->nb_clusters is set to 0 and
+> - * other fields in m are meaningless.
+> - *
+> - * If the cluster is newly allocated, m->nb_clusters is set to the numbe=
+r of
+> - * contiguous clusters that have been allocated. In this case, the other
+> - * fields of m are valid and contain information about the first allocat=
+ed
+> - * cluster.
+> + * If any clusters or subclusters were allocated then @m contains a
+> + * list with the information of all the affected regions. Note that
+> + * this can happen regardless of whether this function succeeds or
+> + * not. The caller is responsible for updating the L2 metadata of the
+> + * allocated clusters (on success) or freeing them (on failure), and
+> + * for clearing the contents of @m afterwards in both cases.
 
-This seems to need yet another rebase...
+It=E2=80=99s too bad that preallocate_co() doesn=E2=80=99t do that then, is=
+n=E2=80=99t it...
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Max
+
+
+--olaGkDkCr9Tmq4JxDGIRDVCqAt0IFaVYT--
+
+--erdIBTeSupl0BQPnTfOR2GEftMVqoWiEy
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9SCLMACgkQ9AfbAGHV
+z0DCrQgAnjFSi9RXyLq4Qofo/zNtBv+fUxoDIAkMlMQxAzg7mVioXEHnFZ0bZBXT
+D6izM3njV+YmZaTcVv3AHiO70tw6AP73aXxGC9eY1eFmlcQrbIRmnplWqPJMEvm/
+eHn60KqcDF+arX7pAb6V9EohVy3KlYmU4sGE5XehQTQMI5u761m7eOh4iCQYdXwK
++hH0JNDmy6xUhl4PZdrkYQNeO4JBDlELfC3NmXftsjT1/4fz2FbG0YTBSVzy72AA
+gsCW+Qd/CoN3kl3CC5o2fbrKHQ5Z56hk4Zos/06KoGMsBVS1dUDNbGXxRfCROFsE
+xssARK10Zt5Q7njVDxdO7FbB4wL7Cw==
+=sPTu
+-----END PGP SIGNATURE-----
+
+--erdIBTeSupl0BQPnTfOR2GEftMVqoWiEy--
+
 
