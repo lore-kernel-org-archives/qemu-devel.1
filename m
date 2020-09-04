@@ -2,61 +2,90 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 939B8C2D0A7
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:07:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83899C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:07:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5CFF82074D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:07:04 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CFF82074D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 439AE2074D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 16:07:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ugvtk8VA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 439AE2074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEEEx-0002ag-B2
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 12:07:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60114)
+	id 1kEEFk-0005Vm-Fj
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 12:07:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.price@arm.com>)
- id 1kEE8g-0002dX-3y
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:00:35 -0400
-Received: from foss.arm.com ([217.140.110.172]:45944)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <steven.price@arm.com>) id 1kEE8c-0001f4-Vr
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:00:33 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C423011D4;
- Fri,  4 Sep 2020 09:00:29 -0700 (PDT)
-Received: from e112269-lin.arm.com (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 60A3C3F66F;
- Fri,  4 Sep 2020 09:00:27 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>
-Subject: [PATCH v2 1/2] arm64: kvm: Save/restore MTE registers
-Date: Fri,  4 Sep 2020 17:00:17 +0100
-Message-Id: <20200904160018.29481-2-steven.price@arm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200904160018.29481-1-steven.price@arm.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kEEDE-0000o2-HK
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:05:16 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:44136)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kEEDC-0002rs-DY
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 12:05:15 -0400
+Received: by mail-ej1-x642.google.com with SMTP id a15so9275975ejf.11
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 09:05:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1mTQlwQyUZEnRTvagM0K10/Nuvnv060MT/Lk904oGY8=;
+ b=Ugvtk8VABWUW4eMfPcA1rf6/9wiFw6KbV7gkrPiFhEtvM2e1K+WOfCkHlue73v8+Ea
+ m6R32Yc1XWBkrlKnAvgFiZVnrZW4Ttq+KGpbsZDTbRFSezNanFg5dAwh1NT9W6UQ6Smc
+ YGSgnNPG3wD3iP/4/Y8kys2CaC/OZD2Vewi7XCQWsV7gcsFQ8g7zd80PRU2mg9hoFgfA
+ hf6MQQ/+wQokVWV8x1z7TGAJP5W+Zd8A1kNkXOgR6s+0IkAH6hT1Neelg65XW5S3wbmq
+ C9+8cwWINqaeOolBUmSz13HM6AgxtT1OKMfW3jemNuMfa3kzybjDwFWD5O/l1qXKadAh
+ ic2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1mTQlwQyUZEnRTvagM0K10/Nuvnv060MT/Lk904oGY8=;
+ b=cIu5xXR1CZ5ib5Wk5MwG27MuIiD7Rh+tKX1zh/rbJ1cSgUIEuP0j2HWl2t3TCPcWSn
+ mE7mzytZk0kyZUqmDYj4hwvfQ9JyCpDNycXgVw/KbDBvUsAnuDyCpGJQWRdTjz6CQPUp
+ mO0PHXJqF123xKMNiL31xHs58bPpq/t37Cq02bJxIQQ8h3YEV5TRs3EUL4uzVlT0Sscx
+ +D/7qMvCN4S4mo2TD4OIkw0YuRelg6L+w7f2i4gD0BEm1BrN62OIjo1OnKoOLyR0jy+z
+ plY7qD7rkTmkSrGW4Kf62uOYo6vnB9GhDaZruQbaykqObd536NAdOKHZaVP80kZY8cQi
+ VCWA==
+X-Gm-Message-State: AOAM533uwu1mDQ7kod0+3Oy+6bJtKqJqzCLW/wiX7hf12Fi8UR2AFYdz
+ sL4XSrKB7K6srHXtp66wMnNsFDIIzBAkDAfKbkGKoA==
+X-Google-Smtp-Source: ABdhPJz3OPvkvLdfscAUJcFk+jQNWlIFON8IPTUrVvGIfyAvLovYT6lCXGyWF7VQp89vnpJP0ul/0Pg7uP2Y/m7i18U=
+X-Received: by 2002:a17:907:20d9:: with SMTP id
+ qq25mr4065715ejb.382.1599235512635; 
+ Fri, 04 Sep 2020 09:05:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=217.140.110.172;
- envelope-from=steven.price@arm.com; helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 12:00:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200810195019.25427-1-peter.maydell@linaro.org>
+ <CAFEAcA9cyKVwONYuzG3oPcQQ9sibpdtetCjcBe3133gd09Aa9w@mail.gmail.com>
+ <87d0314nmp.fsf@dusky.pond.sub.org>
+ <CAFEAcA9ABUwa_TnyczsO+TtSncX0hHwN7_zgyGGWP6nWtEkdDQ@mail.gmail.com>
+ <87eenhzget.fsf@dusky.pond.sub.org>
+In-Reply-To: <87eenhzget.fsf@dusky.pond.sub.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Fri, 4 Sep 2020 17:05:01 +0100
+Message-ID: <CAFEAcA_zWkthoVGr+6NbjqsWvrinJ1R6gVaA2HAVauOy8ENGDA@mail.gmail.com>
+Subject: Re: [PATCH v5 00/20] Convert QAPI doc comments to generate rST
+ instead of texinfo
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,154 +98,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Rutland <mark.rutland@arm.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Peter Maydell <Peter.Maydell@arm.com>, Haibo Xu <Haibo.Xu@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, qemu-devel@nongnu.org,
- Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
- Steven Price <steven.price@arm.com>, James Morse <james.morse@arm.com>,
- Julien Thierry <julien.thierry.kdev@gmail.com>,
- Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Define the new system registers that MTE introduces and context switch
-them. The MTE feature is still hidden from the ID register as it isn't
-supported in a VM yet.
+On Fri, 4 Sep 2020 at 16:54, Markus Armbruster <armbru@redhat.com> wrote:
+> Initially, the include directive was just that: include another file's
+> contents right here.
+>
+> Back in 2018, we switched from generating monolithic code to generating
+> modular code.  What does that mean?
+>
+> Instead of generating the kitchen sink into a single qapi-types.c, we
+> split out the stuff generated for each FOO.json included by
+> qapi-schema.json into qapi-types-FOO.c.
+>
+> Same for qapi-types.h, but with #include stitching that mirrors the
+> schema's include directives.  So, if FOO.json includes SUB.json, then
+> qapi-types-FOO.h will include qapi-types-SUB.h.
+>
+> Same for qapi-{commands,events,visit}.{c,h}.
+>
+> The qapi-schema.json (rather: the file you pass to qapi-gen.py) is the
+> main module.
+>
+> The .json it includes are the sub-modules.
+>
+> visit_module() lets you see the modules.
+>
+> visit_include() lets you see the includes.  The same module can be
+> included multiple times.  Having to filter that out would be annoying.
 
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- arch/arm64/include/asm/kvm_host.h          |  4 ++++
- arch/arm64/include/asm/sysreg.h            |  3 ++-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 14 ++++++++++++++
- arch/arm64/kvm/sys_regs.c                  | 14 ++++++++++----
- 4 files changed, 30 insertions(+), 5 deletions(-)
+I don't think you'd need to filter it out for this use case -- I
+assume Sphinx would just ignore the unnecessary extra dependency
+information. But if visit_module() does what we want and you
+recommend it I'll look at that.
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index e52c927aade5..4f4360dd149e 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -126,6 +126,8 @@ enum vcpu_sysreg {
- 	SCTLR_EL1,	/* System Control Register */
- 	ACTLR_EL1,	/* Auxiliary Control Register */
- 	CPACR_EL1,	/* Coprocessor Access Control */
-+	RGSR_EL1,	/* Random Allocation Tag Seed Register */
-+	GCR_EL1,	/* Tag Control Register */
- 	ZCR_EL1,	/* SVE Control */
- 	TTBR0_EL1,	/* Translation Table Base Register 0 */
- 	TTBR1_EL1,	/* Translation Table Base Register 1 */
-@@ -142,6 +144,8 @@ enum vcpu_sysreg {
- 	TPIDR_EL1,	/* Thread ID, Privileged */
- 	AMAIR_EL1,	/* Aux Memory Attribute Indirection Register */
- 	CNTKCTL_EL1,	/* Timer Control Register (EL1) */
-+	TFSRE0_EL1,	/* Tag Fault Status Register (EL0) */
-+	TFSR_EL1,	/* Tag Fault Stauts Register (EL1) */
- 	PAR_EL1,	/* Physical Address Register */
- 	MDSCR_EL1,	/* Monitor Debug System Control Register */
- 	MDCCINT_EL1,	/* Monitor Debug Comms Channel Interrupt Enable Reg */
-diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
-index 52eefe2f7d95..cd60677551b7 100644
---- a/arch/arm64/include/asm/sysreg.h
-+++ b/arch/arm64/include/asm/sysreg.h
-@@ -563,7 +563,8 @@
- #define SCTLR_ELx_M	(BIT(0))
- 
- #define SCTLR_ELx_FLAGS	(SCTLR_ELx_M  | SCTLR_ELx_A | SCTLR_ELx_C | \
--			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB)
-+			 SCTLR_ELx_SA | SCTLR_ELx_I | SCTLR_ELx_IESB | \
-+			 SCTLR_ELx_ITFSB)
- 
- /* SCTLR_EL2 specific flags. */
- #define SCTLR_EL2_RES1	((BIT(4))  | (BIT(5))  | (BIT(11)) | (BIT(16)) | \
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 7a986030145f..a124ffa49ba3 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -18,6 +18,11 @@
- static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
-+	if (system_supports_mte()) {
-+		ctxt_sys_reg(ctxt, RGSR_EL1)	= read_sysreg_s(SYS_RGSR_EL1);
-+		ctxt_sys_reg(ctxt, GCR_EL1)	= read_sysreg_s(SYS_GCR_EL1);
-+		ctxt_sys_reg(ctxt, TFSRE0_EL1)	= read_sysreg_s(SYS_TFSRE0_EL1);
-+	}
- }
- 
- static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-@@ -45,6 +50,8 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
- 	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg(par_el1);
- 	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
-+	if (system_supports_mte())
-+		ctxt_sys_reg(ctxt, TFSR_EL1) = read_sysreg_el1(SYS_TFSR);
- 
- 	ctxt_sys_reg(ctxt, SP_EL1)	= read_sysreg(sp_el1);
- 	ctxt_sys_reg(ctxt, ELR_EL1)	= read_sysreg_el1(SYS_ELR);
-@@ -63,6 +70,11 @@ static inline void __sysreg_save_el2_return_state(struct kvm_cpu_context *ctxt)
- static inline void __sysreg_restore_common_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt_sys_reg(ctxt, MDSCR_EL1),  mdscr_el1);
-+	if (system_supports_mte()) {
-+		write_sysreg_s(ctxt_sys_reg(ctxt, RGSR_EL1), SYS_RGSR_EL1);
-+		write_sysreg_s(ctxt_sys_reg(ctxt, GCR_EL1), SYS_GCR_EL1);
-+		write_sysreg_s(ctxt_sys_reg(ctxt, TFSRE0_EL1), SYS_TFSRE0_EL1);
-+	}
- }
- 
- static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
-@@ -106,6 +118,8 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, CNTKCTL_EL1), SYS_CNTKCTL);
- 	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
-+	if (system_supports_mte())
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TFSR_EL1), SYS_TFSR);
- 
- 	if (!has_vhe() &&
- 	    cpus_have_final_cap(ARM64_WORKAROUND_SPECULATIVE_AT) &&
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 379f4969d0bd..a655f172b5ad 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1391,6 +1391,12 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	return false;
- }
- 
-+static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
-+				   const struct sys_reg_desc *rd)
-+{
-+	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
-+}
-+
- /* sys_reg_desc initialiser for known cpufeature ID registers */
- #define ID_SANITISED(name) {			\
- 	SYS_DESC(SYS_##name),			\
-@@ -1557,8 +1563,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_ACTLR_EL1), access_actlr, reset_actlr, ACTLR_EL1 },
- 	{ SYS_DESC(SYS_CPACR_EL1), NULL, reset_val, CPACR_EL1, 0 },
- 
--	{ SYS_DESC(SYS_RGSR_EL1), access_mte_regs },
--	{ SYS_DESC(SYS_GCR_EL1), access_mte_regs },
-+	{ SYS_DESC(SYS_RGSR_EL1), access_mte_regs, reset_unknown, RGSR_EL1, .visibility = mte_visibility },
-+	{ SYS_DESC(SYS_GCR_EL1), access_mte_regs, reset_unknown, GCR_EL1, .visibility = mte_visibility },
- 
- 	{ SYS_DESC(SYS_ZCR_EL1), NULL, reset_val, ZCR_EL1, 0, .visibility = sve_visibility },
- 	{ SYS_DESC(SYS_TTBR0_EL1), access_vm_reg, reset_unknown, TTBR0_EL1 },
-@@ -1584,8 +1590,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	{ SYS_DESC(SYS_ERXMISC0_EL1), trap_raz_wi },
- 	{ SYS_DESC(SYS_ERXMISC1_EL1), trap_raz_wi },
- 
--	{ SYS_DESC(SYS_TFSR_EL1), access_mte_regs },
--	{ SYS_DESC(SYS_TFSRE0_EL1), access_mte_regs },
-+	{ SYS_DESC(SYS_TFSR_EL1), access_mte_regs, reset_unknown, TFSR_EL1, .visibility = mte_visibility },
-+	{ SYS_DESC(SYS_TFSRE0_EL1), access_mte_regs, reset_unknown, TFSRE0_EL1, .visibility = mte_visibility },
- 
- 	{ SYS_DESC(SYS_FAR_EL1), access_vm_reg, reset_unknown, FAR_EL1 },
- 	{ SYS_DESC(SYS_PAR_EL1), NULL, reset_unknown, PAR_EL1 },
--- 
-2.20.1
-
+thanks
+-- PMM
 
