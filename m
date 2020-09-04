@@ -2,58 +2,60 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 849DCC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:48:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DE4C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:48:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4421E206F2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:48:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2615C206F2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:48:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="U2SshrWO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4421E206F2
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="R9a1rR8C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2615C206F2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33282 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2iP-0004CJ-Db
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:48:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54554)
+	id 1kE2iT-0004MH-A0
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:48:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hQ-0002KY-7p; Thu, 03 Sep 2020 23:47:40 -0400
-Received: from ozlabs.org ([203.11.71.1]:46177)
+ id 1kE2hW-0002Ue-67; Thu, 03 Sep 2020 23:47:46 -0400
+Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:54823 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hN-0004sL-Hs; Thu, 03 Sep 2020 23:47:39 -0400
+ id 1kE2hT-0004uQ-LA; Thu, 03 Sep 2020 23:47:45 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsn0DYfz9sTv; Fri,  4 Sep 2020 13:47:24 +1000 (AEST)
+ id 4BjNsn5qTfz9sVR; Fri,  4 Sep 2020 13:47:25 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1599191245;
- bh=gebdWUkVpMaVkgmdkTIDcNjZehZTWbjiHKrhS+Uaw2M=;
- h=From:To:Cc:Subject:Date:From;
- b=U2SshrWONoSK1Vfk12ves/8giCEpBnKzOXvMMTccQOF7vXkDDQ3GQoUyN8cPZfHmU
- mjAoQ8HJgtyOtVhFQuFXp8XxXMLuDbw5NaidFndoa22TiKn+kLhTH3YZksRh+6R6v2
- M1ki+b7CMM0qytcNExD6E+xWsRbnruZQqPm50NJk=
+ bh=qRvDkKeGN3ISEoYcHLWQNMPIJ9YGM+/j4ALri4j7g1A=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=R9a1rR8CCxor1A2B4Fm2CYiesC3cS1ZrlPdxdYMNJLVG0t3V7XqmpKIjKqzB+M5d9
+ fXAn5U6G7rLuTlgVQoLsVKg9tEzNIoewr0IkobI8j5/4zgsszrZ26CT241lL3Wjv4C
+ 0/eyZG5KL84OdTxuRMd9EPBbK759Wg4D08qe7SoE=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 00/30] ppc-for-5.2 queue 20200904
-Date: Fri,  4 Sep 2020 13:46:49 +1000
-Message-Id: <20200904034719.673626-1-david@gibson.dropbear.id.au>
+Subject: [PULL 05/30] ppc/pnv: Add a HIOMAP erase command
+Date: Fri,  4 Sep 2020 13:46:54 +1000
+Message-Id: <20200904034719.673626-6-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
+References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 23:47:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -19
 X-Spam_score: -2.0
 X-Spam_bar: --
@@ -72,124 +74,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
+Cc: Corey Minyard <cminyard@mvista.com>, danielhb413@gmail.com,
+ qemu-devel@nongnu.org, groug@kaod.org,
+ Klaus Heinrich Kiwi <klaus@linux.vnet.ibm.com>, qemu-ppc@nongnu.org,
+ =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>, bauerman@linux.ibm.com,
  David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 67a7bfe560a1bba59efab085cb3430f45176d382:
+From: Cédric Le Goater <clg@kaod.org>
 
-  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-09-03' into staging (2020-09-03 16:58:25 +0100)
+The OPAL test suite runs a read-erase-write test on the PNOR :
 
-are available in the Git repository at:
+  https://github.com/open-power/op-test/blob/master/testcases/OpTestPNOR.py
 
-  git://github.com/dgibson/qemu.git tags/ppc-for-5.2-20200904
+which revealed that the IPMI HIOMAP handlers didn't support
+HIOMAP_C_ERASE. Implement the sector erase command by writing 0xFF in
+the PNOR memory region.
 
-for you to fetch changes up to b172606ecf29a140073f7787251a9d70ecb53b6e:
+Cc: Corey Minyard <cminyard@mvista.com>
+Reported-by: Klaus Heinrich Kiwi <klaus@linux.vnet.ibm.com>
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-Id: <20200820164638.2515681-1-clg@kaod.org>
+Acked-by: Corey Minyard <cminyard@mvista.com>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+---
+ hw/ppc/pnv_bmc.c       | 29 ++++++++++++++++++++++++++++-
+ include/hw/ipmi/ipmi.h |  1 +
+ 2 files changed, 29 insertions(+), 1 deletion(-)
 
-  spapr_numa: move NVLink2 associativity handling to spapr_numa.c (2020-09-04 13:40:09 +1000)
+diff --git a/hw/ppc/pnv_bmc.c b/hw/ppc/pnv_bmc.c
+index 2e1a03daa4..67ebb16c4d 100644
+--- a/hw/ppc/pnv_bmc.c
++++ b/hw/ppc/pnv_bmc.c
+@@ -140,6 +140,27 @@ static uint16_t bytes_to_blocks(uint32_t bytes)
+     return bytes >> BLOCK_SHIFT;
+ }
+ 
++static uint32_t blocks_to_bytes(uint16_t blocks)
++{
++    return blocks << BLOCK_SHIFT;
++}
++
++static int hiomap_erase(PnvPnor *pnor, uint32_t offset, uint32_t size)
++{
++    MemTxResult result;
++    int i;
++
++    for (i = 0; i < size / 4; i++) {
++        result = memory_region_dispatch_write(&pnor->mmio, offset + i * 4,
++                                              0xFFFFFFFF, MO_32,
++                                              MEMTXATTRS_UNSPECIFIED);
++        if (result != MEMTX_OK) {
++            return -1;
++        }
++    }
++    return 0;
++}
++
+ static void hiomap_cmd(IPMIBmcSim *ibs, uint8_t *cmd, unsigned int cmd_len,
+                        RspBuffer *rsp)
+ {
+@@ -155,10 +176,16 @@ static void hiomap_cmd(IPMIBmcSim *ibs, uint8_t *cmd, unsigned int cmd_len,
+     switch (cmd[2]) {
+     case HIOMAP_C_MARK_DIRTY:
+     case HIOMAP_C_FLUSH:
+-    case HIOMAP_C_ERASE:
+     case HIOMAP_C_ACK:
+         break;
+ 
++    case HIOMAP_C_ERASE:
++        if (hiomap_erase(pnor, blocks_to_bytes(cmd[5] << 8 | cmd[4]),
++                        blocks_to_bytes(cmd[7] << 8 | cmd[6]))) {
++            rsp_buffer_set_error(rsp, IPMI_CC_UNSPECIFIED);
++        }
++        break;
++
+     case HIOMAP_C_GET_INFO:
+         rsp_buffer_push(rsp, 2);  /* Version 2 */
+         rsp_buffer_push(rsp, BLOCK_SHIFT); /* block size */
+diff --git a/include/hw/ipmi/ipmi.h b/include/hw/ipmi/ipmi.h
+index 8a99d958bb..c1efdaa4cb 100644
+--- a/include/hw/ipmi/ipmi.h
++++ b/include/hw/ipmi/ipmi.h
+@@ -53,6 +53,7 @@ enum ipmi_op {
+ #define IPMI_CC_INVALID_DATA_FIELD                       0xcc
+ #define IPMI_CC_BMC_INIT_IN_PROGRESS                     0xd2
+ #define IPMI_CC_COMMAND_NOT_SUPPORTED                    0xd5
++#define IPMI_CC_UNSPECIFIED                              0xff
+ 
+ #define IPMI_NETFN_APP                0x06
+ #define IPMI_NETFN_OEM                0x3a
+-- 
+2.26.2
 
-----------------------------------------------------------------
-ppc patch queue 2020-09-04
-
-Next pull request for qemu-5.2.  The biggest thing here is the
-generalization of ARM's start-powered-off machine property to all
-targets.  This can fix a number of odd little edge cases where KVM
-could run vcpus before they were properly initialized.  This does
-include changes to a number of files that aren't normally in my
-purview.  There are suitable Acked-by lines and Peter requested this
-come in via my tree, since the most pressing requirement for it is in
-pseries machines with the POWER secure virtual machine facility.
-
-In addition we have:
- * The start of Daniel Barboza's rework and clean up of pseries
-   machine NUMA handling
- * Correction to behaviour of the nvdimm= generic machine property on
-   pseries
- * An optimization to the allocation of XIVE interrupts on KVM
- * Some fixes for confused behaviour with kernel_irqchip when both
-   XICS and XIVE are in play
- * Add HIOMAP comamnd to pnv flash
- * Properly advertise the fact that spapr_vscsi doesn't handle
-   hotplugged disks
- * Some assorted minor enhancements
-
-----------------------------------------------------------------
-Cédric Le Goater (8):
-      ppc/pnv: Fix TypeInfo of PnvLpcController abstract class
-      spapr/xive: Add a 'hv-prio' property to represent the KVM escalation priority
-      ppc/pnv: Add a HIOMAP erase command
-      spapr/xive: Use the xics flag to check for XIVE-only IRQ backends
-      spapr/xive: Modify kvm_cpu_is_enabled() interface
-      spapr/xive: Use kvmppc_xive_source_reset() in post_load
-      spapr/xive: Allocate IPIs independently from the other sources
-      spapr/xive: Allocate vCPU IPIs from the vCPU contexts
-
-Daniel Henrique Barboza (10):
-      spapr_vscsi: do not allow device hotplug
-      ppc/spapr_nvdimm: use g_autofree in spapr_nvdimm_validate_opts()
-      spapr, spapr_nvdimm: fold NVDIMM validation in the same place
-      ppc/spapr_nvdimm: do not enable support with 'nvdimm=off'
-      ppc: introducing spapr_numa.c NUMA code helper
-      ppc/spapr_nvdimm: turn spapr_dt_nvdimm() static
-      spapr: introduce SpaprMachineState::numa_assoc_array
-      spapr, spapr_numa: handle vcpu ibm,associativity
-      spapr, spapr_numa: move lookup-arrays handling to spapr_numa.c
-      spapr_numa: move NVLink2 associativity handling to spapr_numa.c
-
-David Gibson (2):
-      adb: Correct class size on TYPE_ADB_DEVICE
-      spapr: Remove unnecessary DRC type-checker macros
-
-Philippe Mathieu-Daudé (2):
-      hw/ppc/ppc4xx_pci: Use ARRAY_SIZE() instead of magic value
-      hw/ppc/ppc4xx_pci: Replace pointless warning by assert()
-
-Thiago Jung Bauermann (8):
-      target/arm: Move start-powered-off property to generic CPUState
-      target/arm: Move setting of CPU halted state to generic code
-      ppc/spapr: Use start-powered-off CPUState property
-      ppc/e500: Use start-powered-off CPUState property
-      mips/cps: Use start-powered-off CPUState property
-      sparc/sun4m: Don't set cs->halted = 0 in main_cpu_reset()
-      sparc/sun4m: Use start-powered-off CPUState property
-      target/s390x: Use start-powered-off CPUState property
-
- exec.c                        |   1 +
- hw/core/cpu.c                 |   2 +-
- hw/input/adb.c                |   1 +
- hw/intc/spapr_xive.c          |  33 ++++-----
- hw/intc/spapr_xive_kvm.c      | 102 +++++++++++++++++++++-----
- hw/mips/cps.c                 |  15 +++-
- hw/ppc/e500.c                 |  13 +++-
- hw/ppc/meson.build            |   3 +-
- hw/ppc/pnv_bmc.c              |  29 +++++++-
- hw/ppc/pnv_lpc.c              |   3 +-
- hw/ppc/ppc4xx_pci.c           |   8 +-
- hw/ppc/spapr.c                | 109 ++++++---------------------
- hw/ppc/spapr_cpu_core.c       |  10 +--
- hw/ppc/spapr_irq.c            |   2 +-
- hw/ppc/spapr_numa.c           | 167 ++++++++++++++++++++++++++++++++++++++++++
- hw/ppc/spapr_nvdimm.c         |  68 ++++++++++-------
- hw/ppc/spapr_pci.c            |   9 +--
- hw/ppc/spapr_pci_nvlink2.c    |  20 +----
- hw/scsi/spapr_vscsi.c         |   3 +
- hw/sparc/sun4m.c              |  26 ++-----
- include/hw/core/cpu.h         |   4 +
- include/hw/ipmi/ipmi.h        |   1 +
- include/hw/ppc/spapr.h        |  12 +++
- include/hw/ppc/spapr_drc.h    |  43 +----------
- include/hw/ppc/spapr_numa.h   |  35 +++++++++
- include/hw/ppc/spapr_nvdimm.h |   7 +-
- include/hw/ppc/spapr_xive.h   |   2 +
- target/arm/cpu.c              |   4 +-
- target/arm/cpu.h              |   3 -
- target/arm/kvm32.c            |   2 +-
- target/arm/kvm64.c            |   2 +-
- target/s390x/cpu.c            |   2 +-
- 32 files changed, 468 insertions(+), 273 deletions(-)
- create mode 100644 hw/ppc/spapr_numa.c
- create mode 100644 include/hw/ppc/spapr_numa.h
 
