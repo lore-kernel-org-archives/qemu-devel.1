@@ -2,100 +2,86 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SHORTENED_URL_HREF,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E9EC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F80C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:43:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC1C9207EA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:43:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC1C9207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id D1EB4207EA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 13:43:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="S+FTs0uL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1EB4207EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEC00-0001Eg-T6
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:43:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51602)
+	id 1kEC0C-0001PI-1K
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 09:43:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50964)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kEByb-0008ER-A6
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:42:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:24740
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kEByZ-00065V-Hx
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:42:00 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-aT0GoTylPqKQm1Z83M0g1g-1; Fri, 04 Sep 2020 09:41:55 -0400
-X-MC-Unique: aT0GoTylPqKQm1Z83M0g1g-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B00F41074654;
- Fri,  4 Sep 2020 13:41:53 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-156.ams2.redhat.com
- [10.36.114.156])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A366E7E40A;
- Fri,  4 Sep 2020 13:41:51 +0000 (UTC)
-Subject: Re: [PATCH v8 7/7] block: apply COR-filter to block-stream jobs
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-References: <1598633579-221780-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1598633579-221780-8-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8751c312-0f28-9c9e-34cd-b407f767d095@redhat.com>
-Date: Fri, 4 Sep 2020 15:41:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kEBwn-0004jS-QC
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:40:09 -0400
+Received: from mail-wr1-x430.google.com ([2a00:1450:4864:20::430]:39646)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kEBwl-0005dh-Hs
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 09:40:09 -0400
+Received: by mail-wr1-x430.google.com with SMTP id a17so6780322wrn.6
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 06:40:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pAcLXleH3BATZtRYycrQT63Ow9w76K6zXf0hadGR3uw=;
+ b=S+FTs0uLz4RAckKdZeiMGxWNrmC8z1+aWH6erRX5WtXDkVDzmKvVZ8PYJ+7V4N9aHJ
+ L/sQlzopXhWynNT9dZ8O9rbwpdKlZR3T3ihXWf9wqkDaTb7lpYdLeMcHH61mojhzT9Pf
+ CCvbgt9mZ7+2HWBfRGmdmwdtS8RPEWuOi2gfbrZQNpzEFzHGeDc9BDSyCgNWhi+Ut8r0
+ m/gsJHRcDjzMamJnO4iKj2RlovWBwecxQMKYVfudIEh0BzNkIA21C3Z5j7bWZ/Mu8hv2
+ UeWJzCAjmo07Pqfvb0jY/HNBDzypRwIOMi9GO8N5DGYNi0pVwLx11GlC6JOOYAC3fr2j
+ EzzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pAcLXleH3BATZtRYycrQT63Ow9w76K6zXf0hadGR3uw=;
+ b=DgkqNaGUxsZpGmmFtthKrGINdSR8fAj1+XD07UqOIY1S/FPvdzHbOMBhtfNtkv+o8q
+ 22PMvxX7L7YFabyA6ndhlq/ewspcrFNXEuvKAr/89oAfQC3XQfZog0UPUvsnPAzbhYhe
+ eQwnjYn3CJx02uUg80NhAuL+DWcpexDx2xqGtmN7c282QM8P9ltmJ+oq3rJtaWLHqhCb
+ 79UcwPfeL9ESYq/D5g26LYMq48A9vfmncEYy9Zj9/GNPVifwgALmnaN0fjy70x+h9KmP
+ BussOwXhYjq1evoKZLDyUcotEs5C3ooz9nQ5uR5ZdrBl/ymQ4/tY0BYPfDwpOFXxxoBs
+ gHmg==
+X-Gm-Message-State: AOAM530vRPAEsdcGFHN4csCci+tQWQdocaUPlE3WqQ1avjETG9jK8l8q
+ TrHz6QELdqdxC4km/GPC+TtK3lebUx4gZZWjz+QBcK9Qeh4=
+X-Google-Smtp-Source: ABdhPJxsqOZKZagbohgA7yqNkD7uKlwO8W4ANHEZQEAwKc6P168QzphvVCkOZCscu8KoaIZCJv6zOz+TtFSOj90HVYI=
+X-Received: by 2002:adf:bb44:: with SMTP id x4mr7569776wrg.76.1599226805399;
+ Fri, 04 Sep 2020 06:40:05 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <1598633579-221780-8-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="86PVL7GSlrhcIOzYdzTAoNdFVliZVstel"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
-X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.107,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200904124404.9894-1-ani@anisinha.ca>
+ <2ba66be7-d4f2-6994-7794-c07fbb50151f@redhat.com>
+In-Reply-To: <2ba66be7-d4f2-6994-7794-c07fbb50151f@redhat.com>
+From: Ani Sinha <ani@anisinha.ca>
+Date: Fri, 4 Sep 2020 19:09:54 +0530
+Message-ID: <CAARzgwwwbxqwxdni4rANsDF-f5HytcdM9NC9R8X7X0bqJSeVPw@mail.gmail.com>
+Subject: Re: [PATCH v2] i440fx/acpi: disable hotplug of cold plugged bridges
+ regarldless of hotplug switch
+To: QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000a6d0b705ae7d010a"
+Received-SPF: none client-ip=2a00:1450:4864:20::430;
+ envelope-from=ani@anisinha.ca; helo=mail-wr1-x430.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,75 +94,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, jsnow@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, den@openvz.org
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---86PVL7GSlrhcIOzYdzTAoNdFVliZVstel
-Content-Type: multipart/mixed; boundary="9ZXqAwk3h7eUrO38lAZqzPqcSH1qxTYZC"
-
---9ZXqAwk3h7eUrO38lAZqzPqcSH1qxTYZC
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+--000000000000a6d0b705ae7d010a
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 28.08.20 18:52, Andrey Shinkevich wrote:
-> This patch completes the series with the COR-filter insertion for
-> block-stream operations. Adding the filter makes it possible for copied
-> regions to be discarded in backing files during the block-stream job,
-> what will reduce the disk overuse.
-> The COR-filter insertion incurs changes in the iotests case
-> 245:test_block_stream_4 that reopens the backing chain during a
-> block-stream job. There are changes in the iotests #030 as well.
-> The iotests case 030:test_stream_parallel was deleted due to multiple
-> conflicts between the concurrent job operations over the same backing
-> chain. The base backing node for one job is the top node for another
-> job. It may change due to the filter node inserted into the backing
-> chain while both jobs are running. Another issue is that the parts of
-> the backing chain are being frozen by the running job and may not be
-> changed by the concurrent job when needed. The concept of the parallel
-> jobs with common nodes is considered vital no more.
->=20
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->  block/stream.c             | 78 +++++++++++++++++++++++++++-------------=
-------
->  tests/qemu-iotests/030     | 50 +++--------------------------
->  tests/qemu-iotests/030.out |  4 +--
->  tests/qemu-iotests/245     | 19 ++++++++---
->  4 files changed, 67 insertions(+), 84 deletions(-)
+ On Sep 4, 2020, 18:59 +0530, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m>,
+wrote:
 
-I=E2=80=99m not sure I can really review this, when I don=E2=80=99t know wh=
-at the COR
-filter really does.  For example, as it is in this version, it
-unconditionally performs COR, and so on guest reads will copy everything
-from the bottom layers even when they are below the base node.
-
-Max
+Hi Ani,
 
 
---9ZXqAwk3h7eUrO38lAZqzPqcSH1qxTYZC--
+On 9/4/20 2:44 PM, Ani Sinha wrote:
 
---86PVL7GSlrhcIOzYdzTAoNdFVliZVstel
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Cold plugged bridges should not be hot unpluggable, even when their hotplug
 
------BEGIN PGP SIGNATURE-----
+property (acpi-pci-hotplug-with-bridge-support) is turned off. However, wit=
+h
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9SRB0ACgkQ9AfbAGHV
-z0CCKQgAp7R/4zS/XTX23XdRQDMZf6l8Z9fDiwMZaGzzCh3AoBdQ7M3W/irK6Qs6
-sOetawxUFnp6oEGiqYPPKHVoVPae++tW7UwYdfDj/3PsUFN/TukeveX4y4w8NMIK
-/JG84pp0j3EaJiLb0ZEaz1nBpq7EvrMz5Rw3AIqZAV39/ZNoVbVLMiQN1cjIWDjr
-jJQXBqT73lrdAppJCFYASjVm8/rn568UOXYegfweOFvi9mCzCfDKBYOUFj/Qv9TU
-XAfuqpyecJGy4WpMrRmVCcnAExggxWaYJn4AjuHGLYsXp0WO3auIaNpbevhjqQkt
-Fk8AGnVWhcBFKJGzdn54Al8VVN89jA==
-=31uR
------END PGP SIGNATURE-----
+the current implementaton, windows would try to hot-unplug a pci bridge whe=
+n
 
---86PVL7GSlrhcIOzYdzTAoNdFVliZVstel--
+it's hotplug switch is off. This is regardless of whether there are devices
 
+attached to the bridge. When devices are attached to the bridge, the bridge
+
+is ultimately not hot-unpluggable. We have a demo video here:
+
+https://youtu.be/pME2sjyQweo
+
+
+In this fix, we identify a cold plugged bridge and for cold plugged bridges=
+,
+
+we do not add the appropriate amls and acpi methods that are used by the OS
+
+to identify a hot-unpluggable pci device. After this change, Windows does
+not
+
+show an option to eject the PCI bridge. A demo video is here:
+
+https://youtu.be/kbgej5B9Hgs
+
+
+While at it, I have also updated a stale comment.
+
+
+This change is tested with a Windows 2012R2 guest image and Windows 2019
+server
+
+guest image running on Ubuntu 18.04 host. This change is based off of
+upstream
+
+qemu master branch tag v5.1.0.
+
+
+Can you add a test reproducer?
+
+
+Looking at tests/qtest/virtio-rng-test.c it shouldn't be that
+
+hard / time consuming.
+
+
+I can add a unit test. If you look at the disassembled DSDT table, you can
+easily see that it=E2=80=99s adding the EJ0 method for the slot in which th=
+e bridge
+is attached.
+
+--000000000000a6d0b705ae7d010a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">
+
+
+
+<div>
+<div name=3D"messageReplySection">
+<div dir=3D"auto">On Sep 4, 2020, 18:59 +0530, Philippe Mathieu-Daud=C3=A9 =
+&lt;<a href=3D"mailto:philmd@redhat.com" target=3D"_blank">philmd@redhat.co=
+m</a>&gt;, wrote:</div>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">Hi Ani,</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px"><br></blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">On 9/4/20 2:44 PM, Ani Sinha wrote:</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">Cold plugged bridges should not be hot unpluggable, even w=
+hen their hotplug</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">property (acpi-pci-hotplug-with-bridge-support) is turned =
+off. However, with</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">the current implementaton, windows would try to hot-unplug=
+ a pci bridge when</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">it&#39;s hotplug switch is off. This is regardless of whet=
+her there are devices</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">attached to the bridge. When devices are attached to the b=
+ridge, the bridge</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">is ultimately not hot-unpluggable. We have a demo video he=
+re:</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px"><a href=3D"https://youtu.be/pME2sjyQweo" target=3D"_blank"=
+>https://youtu.be/pME2sjyQweo</a></blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px"><br></blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">In this fix, we identify a cold plugged bridge and for col=
+d plugged bridges,</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">we do not add the appropriate amls and acpi methods that a=
+re used by the OS</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">to identify a hot-unpluggable pci device. After this chang=
+e, Windows does not</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">show an option to eject the PCI bridge. A demo video is he=
+re:</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px"><a href=3D"https://youtu.be/kbgej5B9Hgs" target=3D"_blank"=
+>https://youtu.be/kbgej5B9Hgs</a></blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px"><br></blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">While at it, I have also updated a stale comment.</blockqu=
+ote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px"><br></blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">This change is tested with a Windows 2012R2 guest image an=
+d Windows 2019 server</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">guest image running on Ubuntu 18.04 host. This change is b=
+ased off of upstream</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid">
+<blockquote style=3D"border-left-color:rgb(230,126,34);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">qemu master branch tag v5.1.0.</blockquote>
+</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px"><br></blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">Can you add a test reproducer?</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px"><br></blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">Looking at tests/qtest/virtio-rng-test.c it shouldn&#39;t =
+be that</blockquote>
+<blockquote style=3D"border-left-color:rgb(26,188,156);margin:0px;padding-l=
+eft:10px;border-left-width:thin;border-left-style:solid;padding-bottom:5px;=
+padding-top:5px">hard / time consuming.</blockquote>
+<div dir=3D"auto"><br>
+I can add a unit test. If you look at the disassembled DSDT table, you can =
+easily see that it=E2=80=99s adding the EJ0 method for the slot in which th=
+e bridge is attached.<br></div>
+
+</div>
+</div>
+
+</div>
+
+--000000000000a6d0b705ae7d010a--
 
