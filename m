@@ -2,122 +2,79 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91D4FC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD2DCC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:51:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5D078205CB
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:47:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D078205CB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8552020791
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:51:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8552020791
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE8K6-0002xZ-Ew
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:47:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46844)
+	id 1kE8NQ-0005Iq-M8
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:51:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE8JO-00024E-5c
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:47:14 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:21705
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE8JM-0007ly-9X
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:47:13 -0400
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-419-dMCLCcSMOnm407TmTcqoKQ-1; Fri, 04 Sep 2020 05:47:10 -0400
-X-MC-Unique: dMCLCcSMOnm407TmTcqoKQ-1
-Received: by mail-wm1-f72.google.com with SMTP id m25so2018831wmi.0
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 02:47:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=7G7C7A+ggZkEPG+VGKTz/FiDCUH0UIocGyvpBIsBM5M=;
- b=tYfXyprbM/PR6it2qFPX1bgqOwe5VFImywaZvOZbRRzykQsn0PrEfu6MKcC5K7hG+x
- a2U7Tvt78nXaP/6tBME/99AGnc/bUzap33h9i8OfncQOVeZCVZTq+Faoe4I/KOND17uj
- 9X5xF8ku5+SysAbo/PzXG9nJ20710okzm2Nwh3RDBhXpegZMvfRMYR7kTuiZILELkmJ6
- GSuBaAAPp8G9XYkLBQwwHiYajH3vDytVfEjRr4RjGFcew6xN87dxGtqRsetDYAe72AXX
- WSEbPy0C3W178fp22WOSnx6TKj+oLNB2MUqJqNbNg76u8d6hsmhivSWDFD/ROembNI3t
- 0bFg==
-X-Gm-Message-State: AOAM530dfQnjr1NfEby4rBCFzA4bO8zK9xxc7uMMIaGwvb0GWxPyLjsq
- umoU2N2w+OOR8xHKVW2xfZwTA/Ig5v3ETlPOT5o7VwUcJ4db95lgedjTAt9oCe4p0NCUTnSlg9W
- wwiDNYU3iVzbiBxE=
-X-Received: by 2002:adf:c64e:: with SMTP id u14mr1013596wrg.373.1599212829431; 
- Fri, 04 Sep 2020 02:47:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxfXGNqGSUI729EGKRNEkwCJfNSq9TYGnNE5HXEU9Qsrj0HtGsJWaq91ju8vL3n/Ru/vtkD/Q==
-X-Received: by 2002:adf:c64e:: with SMTP id u14mr1013569wrg.373.1599212829211; 
- Fri, 04 Sep 2020 02:47:09 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id y6sm10271497wrt.80.2020.09.04.02.47.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Sep 2020 02:47:08 -0700 (PDT)
-Subject: Re: [PATCH v2 2/2] GitLab Gating CI: initial set of jobs,
- documentation and scripts
-To: Cleber Rosa <crosa@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
-References: <20200709024657.2500558-1-crosa@redhat.com>
- <20200709024657.2500558-3-crosa@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <fb53e38f-98cf-65e0-9592-5ef95d0de71b@redhat.com>
-Date: Fri, 4 Sep 2020 11:47:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kE8Mm-0004Oe-AT
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:50:44 -0400
+Received: from indium.canonical.com ([91.189.90.7]:53768)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kE8Mk-0008Ev-6J
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:50:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kE8Mi-0004VP-2P
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 09:50:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0FC292E8023
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 09:50:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200709024657.2500558-3-crosa@redhat.com>
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:58:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.403,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 04 Sep 2020 09:36:16 -0000
+From: "Tony.LI" <1894071@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bigboy0822 laurent-vivier
+X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
+X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
+References: <159912571834.28358.2492164063235416189.malonedeb@soybean.canonical.com>
+Message-Id: <159921217630.17429.861001040295026847.malone@soybean.canonical.com>
+Subject: [Bug 1894071] Re: qemu-i386-static ioctl return -14 (Bad Address)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: efd4ea6b3f06a98c2c190801ec20e73506a0f307
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 05:50:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -126,67 +83,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Beraldo Leal <bleal@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>
+Reply-To: Bug 1894071 <1894071@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 7/9/20 4:46 AM, Cleber Rosa wrote:
-> This is a mapping of Peter's "remake-merge-builds" and
-> "pull-buildtest" scripts, gone through some updates, adding some build
-> option and removing others.
-> 
-> The jobs currently cover the machines that the QEMU project owns, and that
-> are setup and ready to run jobs:
-> 
->  - Ubuntu 18.04 on S390x
->  - Ubuntu 20.04 on aarch64
-> 
-> During the development of this set of jobs, the GitLab CI was tested
-> with many other architectures, including ppc64, s390x and aarch64,
-> along with the other OSs (not included here):
-> 
->  - Fedora 30
->  - FreeBSD 12.1
-> 
-> More information can be found in the documentation itself.
-[...]
-> diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-> index c1ff24370b..f8dab788ea 100644
-> --- a/docs/devel/testing.rst
-> +++ b/docs/devel/testing.rst
-> @@ -1003,3 +1003,150 @@ exercise as many corner cases as possible. It is a useful test suite
->  to run to exercise QEMU's linux-user code::
->  
->    https://linux-test-project.github.io/
-> +
-> +CI
-> +==
-> +
-> +QEMU has configurations enabled for a number of different CI services.
-> +The most update information about them and their status can be found
-> +at::
-> +
-> +   https://wiki.qemu.org/Testing/CI
-> +
-> +Gating CI
-> +----------
-> +
-> +A Pull Requests will only to be merged if they successfully go through
-> +a different set of CI jobs.  GitLab's CI is the service/framework used
-> +for executing the gating jobs.
-> +
-> +The architecture of GitLab's CI service allows different machines to be
-> +setup with GitLab's "agent", called gitlab-runner, which will take care
-> +of running jobs created by events such as a push to a branch.
+Hi,I found some problems, but I don't know if how to solve it better(I'm
+not really familiar with the source code).
 
-Now that GitLab announced the free tier time limit, it may be worth
-mentioning (if set up) the CI pipeline can be skipped using:
+When I use ioctl() and use a structure like this:
 
-  $ git push --push-option=ci.skip [...]
+struct drm_mode_card_res {
+        __u64 fb_id_ptr;
+        __u64 crtc_id_ptr;
+        __u64 connector_id_ptr;
+        __u64 encoder_id_ptr;
+        __u32 count_fbs;
+        ....
+};
+And in syscall_types.h
+STRUCT(drm_mode_card_res,
+        TYPE_PTRVOID,
+        TYPE_PTRVOID,
+        TYPE_PTRVOID,
+        TYPE_PTRVOID,
+        TYPE_INT,
+        ...
+        )
+Some code:
+        ...
+	if (res.count_fbs) {
+		res.fb_id_ptr =3D VOID2U64(drmMalloc(res.count_fbs*sizeof(uint32_t)));
+		if (!res.fb_id_ptr)
+			goto err_allocs;
+	}
+        ...
 
+This is strace:
+openat(AT_FDCWD,"/dev/dri/card0",O_RDWR|O_LARGEFILE|O_CLOEXEC) =3D 4
+9469 ioctl(4,DRM_IOCTL_GET_CAP,{1,0}) =3D 0 ({1,1})
+9469 ioctl(4,DRM_IOCTL_MODE_GETRESOURCES,{0x0,0x0,0x0,0x0,0,0,0,0,0,0,0,0})=
+ =3D 0 ({0x0,0x0,0x0,0x0,0,2,2,2,0,16384,0,16384})
+9469 brk(NULL) =3D 0x40006000
+9469 brk(0x40027000) =3D 0x40027000
+9469 brk(0x40028000) =3D 0x40028000
+9469 ioctl(4,DRM_IOCTL_MODE_GETRESOURCES,{0x0,0x0,0x400061a0,0x0,0,2,107383=
+2368,0,0,16384,0,16384}) =3D -1 errno=3D14 (Bad address)
+9469 brk(0x40027000) =3D 0x40027000
+
+Look
+9469 ioctl(4,DRM_IOCTL_MODE_GETRESOURCES,{0x0,0x0,0x400061a0,0x0,0,2,107383=
+2368,0,0,16384,0,16384}) =3D -1 errno=3D14 (Bad address)
+
+Why does memory overrun occur here???
+I think this is right:
+{0x0,0x400061a0,1073832368(0x400061a0),0x400061c0,0,2,2,2,0,16384,0,16384}
+
+Who can help me? Thank you!
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894071
+
+Title:
+  qemu-i386-static ioctl return -14 (Bad Address)
+
+Status in QEMU:
+  New
+
+Bug description:
+  I use qemu-i386-static on 64 bit ARM.But I don't know how to solve some p=
+roblems.
+  First I added some ioctl operations.
+  Then I tried to do some DRM operations like test.c.
+  This is successful when I use qemu-x86_64-static,but it failed when I use=
+ qemu-i386-static.
+  I can get some strace info like this:
+
+  403 openat(AT_FDCWD,"/dev/dri/card0",O_RDWR|O_LARGEFILE|O_CLOEXEC) =3D 4
+  403 ioctl(4,DRM_IOCTL_GET_CAP,{1,0}) =3D 0 ({1,1})
+  403 ioctl(4,DRM_IOCTL_MODE_GETRESOURCES,{0,0,0,0,0,0,0,0,0,0,0,0}) =3D 0 =
+({0,0,0,0,0,2,2,2,0,16384,0,16384})
+  403 brk(NULL) =3D 0x40006000
+  403 brk(0x40027000) =3D 0x40027000
+  403 brk(0x40028000) =3D 0x40028000
+  403 ioctl(4,DRM_IOCTL_MODE_GETRESOURCES,{0,1073766816,1073766832,10737668=
+48,0,2,2,2,0,16384,0,16384}) =3D -1 errno=3D14 (Bad address)
+
+  And there are similar errors in other self driven operations.
+  I want to know if it is QEMU's problem, so I hope to get some help. =
+
+  Thank you!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894071/+subscriptions
 
