@@ -2,95 +2,75 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5990DC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7927BC433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:37:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18790206CA
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:35:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EluCZBcy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18790206CA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3E84F206CA
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 04:37:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E84F206CA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE3S8-0006uW-8m
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 00:35:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34614)
+	id 1kE3TX-00084N-FG
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 00:37:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35004)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kE3RG-00068F-EN
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 00:35:02 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47343
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kE3RC-00021g-Ci
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 00:35:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599194097;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4tX42JeuT11tVwYg7ef2XUqO8sjNN+gdBUPZysbX08E=;
- b=EluCZBcyCpq81RrBHJ0esz6MM1VjAUwFOYBDfKuyigVdvNeGaoGfib+o3Q6SO07Nmss242
- siW7WEn+t/4aizYbndOvvQIeI6qAIOZVhceI+ndC4o669a/wdbPPHu1nb3V2Vvd4tCHEpD
- p5sv+IqpveR8JXQwoNkZZ8/Atjp1ahk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-401-E-lusR5jPTSbN6k5sU1Lgg-1; Fri, 04 Sep 2020 00:34:55 -0400
-X-MC-Unique: E-lusR5jPTSbN6k5sU1Lgg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31A5818B9F84;
- Fri,  4 Sep 2020 04:34:53 +0000 (UTC)
-Received: from [10.72.13.157] (ovpn-13-157.pek2.redhat.com [10.72.13.157])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E8F6B1002D57;
- Fri,  4 Sep 2020 04:34:34 +0000 (UTC)
-Subject: Re: [PATCH 5/5] memory: Skip bad range assertion if notifier is
- DEVIOTLB_UNMAP type
-To: =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
- Peter Xu <peterx@redhat.com>, qemu-devel@nongnu.org
-References: <20200625191651.5817-1-eperezma@redhat.com>
- <20200903161446.29615-1-eperezma@redhat.com>
- <20200903161446.29615-6-eperezma@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <d3e2098d-e150-7f99-a1ee-4a997daf4a5c@redhat.com>
-Date: Fri, 4 Sep 2020 12:34:33 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <wangxinxin.wang@huawei.com>)
+ id 1kE3Sl-0007a6-Ds
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 00:36:35 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:2106 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <wangxinxin.wang@huawei.com>)
+ id 1kE3Sj-0002eh-2p
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 00:36:34 -0400
+Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id 2E4ACC983F7A0247B93A;
+ Fri,  4 Sep 2020 12:36:22 +0800 (CST)
+Received: from dggema721-chm.china.huawei.com (10.3.20.85) by
+ DGGEMM404-HUB.china.huawei.com (10.3.20.212) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Fri, 4 Sep 2020 12:36:21 +0800
+Received: from dggema771-chm.china.huawei.com (10.1.198.213) by
+ dggema721-chm.china.huawei.com (10.3.20.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Fri, 4 Sep 2020 12:36:21 +0800
+Received: from dggema771-chm.china.huawei.com ([10.9.128.123]) by
+ dggema771-chm.china.huawei.com ([10.9.128.123]) with mapi id 15.01.1913.007;
+ Fri, 4 Sep 2020 12:36:21 +0800
+From: "Wangxin (Alexander)" <wangxinxin.wang@huawei.com>
+To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: RE: [PATCH 0/2][RFC] exclude ivshmem mr from vhost sections
+Thread-Topic: [PATCH 0/2][RFC] exclude ivshmem mr from vhost sections
+Thread-Index: AQHWfSIAySFupkREukSwljGh+8mH/KlX7qDw
+Date: Fri, 4 Sep 2020 04:36:21 +0000
+Message-ID: <0ecd02b3b6104a7eb8a2f8aa54f6064e@huawei.com>
+References: <20200828095953.2276-1-wangxinxin.wang@huawei.com>
+In-Reply-To: <20200828095953.2276-1-wangxinxin.wang@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.149.106]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20200903161446.29615-6-eperezma@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 22:51:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -44
-X-Spam_score: -4.5
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.189;
+ envelope-from=wangxinxin.wang@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 00:36:23
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.403, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,73 +83,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Juan Quintela <quintela@redhat.com>,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org, qemu-ppc@nongnu.org,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- Richard Henderson <rth@twiddle.net>
+Cc: "Zhoujian \(jay\)" <jianjay.zhou@huawei.com>,
+ "Huangweidong \(C\)" <weidong.huang@huawei.com>,
+ "dgilbert@redhat.com" <dgilbert@redhat.com>, "mst@redhat.com" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Ping.=20
 
-On 2020/9/4 上午12:14, Eugenio Pérez wrote:
-> Device IOTLB invalidations can unmap arbitrary ranges, eiter outside of
-> the memory region or even [0, ~0ULL] for all the space. The assertion
-> could be hit by a guest, and rhel7 guest effectively hit it.
->
-> Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-> Reviewed-by: Peter Xu <peterx@redhat.com>
-> Reviewed-by: Juan Quintela <quintela@redhat.com>
-> ---
->   softmmu/memory.c | 13 +++++++++++--
->   1 file changed, 11 insertions(+), 2 deletions(-)
->
-> diff --git a/softmmu/memory.c b/softmmu/memory.c
-> index 8694fc7cf7..e723fcbaa1 100644
-> --- a/softmmu/memory.c
-> +++ b/softmmu/memory.c
-> @@ -1895,6 +1895,7 @@ void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
->   {
->       IOMMUTLBEntry *entry = &event->entry;
->       hwaddr entry_end = entry->iova + entry->addr_mask;
-> +    IOMMUTLBEntry tmp = *entry;
->   
->       if (event->type == IOMMU_NOTIFIER_UNMAP) {
->           assert(entry->perm == IOMMU_NONE);
-> @@ -1908,10 +1909,18 @@ void memory_region_notify_iommu_one(IOMMUNotifier *notifier,
->           return;
->       }
->   
-> -    assert(entry->iova >= notifier->start && entry_end <= notifier->end);
-> +    if (notifier->notifier_flags & IOMMU_NOTIFIER_DEVIOTLB_UNMAP) {
-> +        /* Crop (iova, addr_mask) to range */
-> +        tmp.iova = MAX(tmp.iova, notifier->start);
-> +        tmp.addr_mask = MIN(entry_end, notifier->end) - tmp.iova;
-> +        /* Confirm no underflow */
-> +        assert(MIN(entry_end, notifier->end) >= tmp.iova);
-
-
-It's still not clear to me why we need such assert. Consider 
-notifier->end is the possible IOVA range but not possible device IOTLB 
-invalidation range (e.g it allows [0, ULLONG_MAX]).
-
-Thanks
-
-
-> +    } else {
-> +        assert(entry->iova >= notifier->start && entry_end <= notifier->end);
-> +    }
->   
->       if (event->type & notifier->notifier_flags) {
-> -        notifier->notify(notifier, entry);
-> +        notifier->notify(notifier, &tmp);
->       }
->   }
->   
+>=20
+> The ivshmem me now mapped to vhost memory regions, and it reduces
+> the number of available memslots of vhost backend, which may
+> causes vhost backend memory slots limit check failure in
+> vhost dev init.
+>=20
+> Since ivshmem_bar2 not normal RAM in Guest, and it shouldn't
+> have vhost DMAing into them, exclude it from the vhost sections.
+>=20
+> The 1st patch re-spin Dave's patch, see link
+>   https://lists.nongnu.org/archive/html/qemu-devel/2020-01/msg02370.html
+>=20
+> However, I'm not sure is there any side effects, or maybe it's
+> better to add a new device property like 'novhost/nodma'?
+>=20
+> Thanks,
+> Xin
+>=20
+> Wang Xin (2):
+>   memory: Allow a MemoryRegion to be marked no_vhost
+>   misc/ivshmem: Mark shared memory regions as no vhost
+>=20
+>  hw/misc/ivshmem.c     |  2 ++
+>  hw/virtio/vhost.c     |  5 ++++-
+>  include/exec/memory.h | 21 +++++++++++++++++++++
+>  softmmu/memory.c      | 15 +++++++++++++++
+>  4 files changed, 42 insertions(+), 1 deletion(-)
+>=20
+> --
+> 2.26.0.windows.1
+>=20
 
 
