@@ -8,75 +8,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1589C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:06:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AEBCC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:07:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E02020758
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:06:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D83B20758
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 01:07:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sWzQjXUY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E02020758
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="umH80TQA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D83B20758
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE0Bo-0005ra-HQ
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 21:06:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54018)
+	id 1kE0CP-0006vM-GR
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 21:07:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kE09z-0002Rk-LI; Thu, 03 Sep 2020 21:04:59 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:42952)
+ id 1kE0A1-0002Wn-MT; Thu, 03 Sep 2020 21:05:01 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:41536)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <danielhb413@gmail.com>)
- id 1kE09y-0002kE-1d; Thu, 03 Sep 2020 21:04:59 -0400
-Received: by mail-il1-x143.google.com with SMTP id t13so4921046ile.9;
- Thu, 03 Sep 2020 18:04:57 -0700 (PDT)
+ id 1kE09z-0002kP-VH; Thu, 03 Sep 2020 21:05:01 -0400
+Received: by mail-il1-x144.google.com with SMTP id w8so4938267ilj.8;
+ Thu, 03 Sep 2020 18:04:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=l8hA6A+tm06gP00jolVs7Fv1lM2u7W2UYOunpzAJwCY=;
- b=sWzQjXUYwtwQOND70k9caF6CZplXeNAxEslfRn2eXESe0Yp5yO5J4rz8/c+rsuWkov
- uSne8FLzswP+QbdrG5TgQeJwh1pbBpkgBVVofsgdJcpVTbRQDoA/qIa9G28B0ezXtTE7
- 8MCVYfC7JsDDYj/N6bxr2BQLBJxbd9EUKL4u0AILKbbciaraa2BQhTAWsSKW3EtG6Hc+
- IeH+IOoxoAChTRMonovBPGB2LjBAOMjMAg/bDt/10+VzP2e5gmQZoUpgLyV5No1/F6k4
- fQ7i9KB0TbacpDKMsTKukCTxLqF6f3Z06p+/9vTFvFY6n1fxbm0icewO4qFFzXnWmBEq
- JfIg==
+ bh=DPxxBWeC4FEvN6MAD2yhRYDcWf1dgWl/eqzDkL21hmc=;
+ b=umH80TQA95CeA3tNVazBrDNksqHOGtpELXgK/wqy4lUj2O0aYvVQ+Mqk0dVpzFKWi8
+ uEHMRouQdDeLxXsUMpHHY9kQTTCz+3Pr/gCf/M5d5zBt6QNrLwhgKkHdPUkO1CIc7g35
+ wzPeRWYULkoAxCVXMhdCDP5G7kV2RqOYeqBcmtbCEOYQwYIRWazZlak4fFu7cOvva8iY
+ RBC3ZfH3Uf1GzH298z9iJCtmD6g8hSBdGEFeIYiQS4jqITPQCi7P6JtyIqM34k3idVYz
+ iyj3Uu/xGbboTHMYALLdkTbQY59v5Oql/gfZGWgJnHIZ/a1QE45BXpvAVItZV9lZY4/F
+ RdGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=l8hA6A+tm06gP00jolVs7Fv1lM2u7W2UYOunpzAJwCY=;
- b=YP+2CAnyVXrXX9vN3VqFojGVdVWeX51xSH+ADLS0ywooAAw1X6gYaZFl/8wr2lmIAI
- YAWNaSxRFjptpN9LtWtblJ27Ad83f82AK/DNnxXtJIQ832hTY2fs01hVMSfj27uwuII4
- ZN3qFJJGyOGr8Ose8eESvibaaNLxdj+m0UAFsKhuHoITT0qVguxi+etJzBS2fYtGHkVh
- r25Dh/W2mPhIz7V+ptCfAU9pFe0im1NQZjthrDNlsmrZpcR6f0zpq6uPQtIvf+J2d68B
- hXhTgv/kuDG/yH003q5IOukQ7ckhvIupq0h9usM9kkjMRFtLORUfwQB+Sn4xf75qrbp7
- Dmmw==
-X-Gm-Message-State: AOAM530PBAaztKkZ2C9I3hGxJKVdaQGVowzFVXT+2udTJVak0e6n+1BJ
- XrH7z0NLV2QPiXXW6Y6ypt999Wz8jsk=
-X-Google-Smtp-Source: ABdhPJxI/GOVULQ9va9WpRu1SFClwhDmVn3hIJy26XtzAWiE6btbMQF9Ds481ff7E0dHLyQR9K6t/w==
-X-Received: by 2002:a92:7754:: with SMTP id s81mr5535730ilc.304.1599181496449; 
- Thu, 03 Sep 2020 18:04:56 -0700 (PDT)
+ bh=DPxxBWeC4FEvN6MAD2yhRYDcWf1dgWl/eqzDkL21hmc=;
+ b=m7LNEvT62oL5fI8TpmL+jjtES0c9+TYIQFz+tob7ftTt4YcjxZk1isxMEoyjOF+8P0
+ wVBj2r0BiV4pcOajIAFTxkyIlVsMIx9UZDrozJfgqLjMb4K4xg+aD7bI0nk9QDvEchNE
+ YZgVLo/plAOks1LUXvIgzW6rdSW91ckQ00zOg4gYCB5KEM9uf0rKWiYFYVoBucW062Qt
+ wB6NOkYqLNltjdZ4llb5tz7Rz/chaBPPmiJqWL1OnNJbBz84WKq/S1EAX3agbe4cM4WU
+ KeNVtnxjEd5SYAyUAoxTEfEG9223jd6FReykSkMY2JDYw9MX+P5hxpgrgsgWdXqZBAU/
+ /7Fg==
+X-Gm-Message-State: AOAM533JywSox96+LisBDEniEexusXaAz73y9YatkxHzle5k+O1e0QVB
+ D9FNJ7tjC5rk+tv+T7wa63iTteQL5bY=
+X-Google-Smtp-Source: ABdhPJzn+u3OW8do4dAEjQfcrKWLvZBttD6+KTOjyGpnrpHRtc/AlRhwQ9ssxwDaS/4elNXUs2Hhrw==
+X-Received: by 2002:a05:6e02:1107:: with SMTP id
+ u7mr5723047ilk.165.1599181498361; 
+ Thu, 03 Sep 2020 18:04:58 -0700 (PDT)
 Received: from rekt.ibmuc.com ([2804:431:c7c6:1dc:ffbd:d3fb:97ff:aaca])
- by smtp.gmail.com with ESMTPSA id o18sm205907ilj.77.2020.09.03.18.04.54
+ by smtp.gmail.com with ESMTPSA id o18sm205907ilj.77.2020.09.03.18.04.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 03 Sep 2020 18:04:55 -0700 (PDT)
+ Thu, 03 Sep 2020 18:04:57 -0700 (PDT)
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 2/3] spapr_numa: create a vcpu associativity helper
-Date: Thu,  3 Sep 2020 22:04:38 -0300
-Message-Id: <20200904010439.581957-3-danielhb413@gmail.com>
+Subject: [PATCH v4 3/3] spapr_numa: use spapr_numa_get_vcpu_assoc() in
+ home_node hcall
+Date: Thu,  3 Sep 2020 22:04:39 -0300
+Message-Id: <20200904010439.581957-4-danielhb413@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904010439.581957-1-danielhb413@gmail.com>
 References: <20200904010439.581957-1-danielhb413@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=danielhb413@gmail.com; helo=mail-il1-x143.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=danielhb413@gmail.com; helo=mail-il1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -105,74 +107,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The work to be done in h_home_node_associativity() intersects
-with what is already done in spapr_numa_fixup_cpu_dt(). This
-patch creates a new helper, spapr_numa_get_vcpu_assoc(), to
-be used for both spapr_numa_fixup_cpu_dt() and
-h_home_node_associativity().
+The current implementation of h_home_node_associativity hard codes
+the values of associativity domains of the vcpus. Let's make
+it consider the values already initialized in spapr->numa_assoc_array,
+via the spapr_numa_get_vcpu_assoc() helper.
 
-While we're at it, use memcpy() instead of loop assignment
-to created the returned array.
+We want to set it and forget it, and for that we also need to
+assert that we don't overflow the registers of the hypercall.
+From R4 to R9 we can squeeze in 12 associativity domains, so
+let's assert that MAX_DISTANCE_REF_POINTS isn't greater
+than that.
 
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
 ---
- hw/ppc/spapr_numa.c | 30 ++++++++++++++++++++----------
- 1 file changed, 20 insertions(+), 10 deletions(-)
+ hw/ppc/spapr_numa.c | 33 +++++++++++++++++++++++++--------
+ 1 file changed, 25 insertions(+), 8 deletions(-)
 
 diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index 368c1a494d..980a6488bf 100644
+index 980a6488bf..0a7e07fe60 100644
 --- a/hw/ppc/spapr_numa.c
 +++ b/hw/ppc/spapr_numa.c
-@@ -71,13 +71,15 @@ void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
-                       sizeof(spapr->numa_assoc_array[nodeid]))));
- }
- 
--int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
--                            int offset, PowerPCCPU *cpu)
-+static uint32_t *spapr_numa_get_vcpu_assoc(SpaprMachineState *spapr,
-+                                          PowerPCCPU *cpu,
-+                                          uint *vcpu_assoc_size)
+@@ -181,10 +181,12 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+                                               target_ulong opcode,
+                                               target_ulong *args)
  {
--    uint vcpu_assoc_size = NUMA_ASSOC_SIZE + 1;
--    uint32_t vcpu_assoc[vcpu_assoc_size];
-+    uint32_t *vcpu_assoc = NULL;
-     int index = spapr_get_vcpu_id(cpu);
--    int i;
-+
-+    *vcpu_assoc_size = (NUMA_ASSOC_SIZE + 1) * sizeof(uint32_t);
-+    vcpu_assoc = g_malloc(*vcpu_assoc_size);
- 
-     /*
-      * VCPUs have an extra 'cpu_id' value in ibm,associativity
-@@ -86,16 +88,24 @@ int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
-      * cpu_id last.
-      */
-     vcpu_assoc[0] = cpu_to_be32(MAX_DISTANCE_REF_POINTS + 1);
-+    memcpy(vcpu_assoc + 1, spapr->numa_assoc_array[cpu->node_id],
-+           MAX_DISTANCE_REF_POINTS);
-+    vcpu_assoc[MAX_DISTANCE_REF_POINTS + 1] = cpu_to_be32(index);
- 
--    for (i = 1; i <= MAX_DISTANCE_REF_POINTS; i++) {
--        vcpu_assoc[i] = spapr->numa_assoc_array[cpu->node_id][i];
--    }
-+    return vcpu_assoc;
-+}
-+
-+int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
-+                            int offset, PowerPCCPU *cpu)
-+{
 +    g_autofree uint32_t *vcpu_assoc = NULL;
+     target_ulong flags = args[0];
+     target_ulong procno = args[1];
+     PowerPCCPU *tcpu;
+-    int idx;
 +    uint vcpu_assoc_size;
++    int idx, assoc_idx;
  
--    vcpu_assoc[vcpu_assoc_size - 1] = cpu_to_be32(index);
-+    vcpu_assoc = spapr_numa_get_vcpu_assoc(spapr, cpu, &vcpu_assoc_size);
+     /* only support procno from H_REGISTER_VPA */
+     if (flags != 0x1) {
+@@ -196,16 +198,31 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+         return H_P2;
+     }
  
-     /* Advertise NUMA via ibm,associativity */
-     return fdt_setprop(fdt, offset, "ibm,associativity",
--                       vcpu_assoc, sizeof(vcpu_assoc));
-+                       vcpu_assoc, vcpu_assoc_size);
- }
+-    /* sequence is the same as in the "ibm,associativity" property */
++    /*
++     * Given that we want to be flexible with the sizes and indexes,
++     * we must consider that there is a hard limit of how many
++     * associativities domain we can fit in R4 up to R9, which
++     * would be 12. Assert and bail if that's not the case.
++     */
++    G_STATIC_ASSERT(MAX_DISTANCE_REF_POINTS <= 12);
++
++    vcpu_assoc = spapr_numa_get_vcpu_assoc(spapr, tcpu, &vcpu_assoc_size);
++    vcpu_assoc_size /= sizeof(uint32_t);
++    /* assoc_idx starts at 1 to skip associativity size */
++    assoc_idx = 1;
  
+-    idx = 0;
+ #define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
+                              ((uint64_t)(b) & 0xffffffff))
+-    args[idx++] = ASSOCIATIVITY(0, 0);
+-    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
+-    args[idx++] = ASSOCIATIVITY(procno, -1);
+-    for ( ; idx < 6; idx++) {
+-        args[idx] = -1;
++
++    for (idx = 0; idx < 6; idx++) {
++        int32_t a, b;
++
++        a = assoc_idx < vcpu_assoc_size ?
++            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
++        b = assoc_idx < vcpu_assoc_size ?
++            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
++
++        args[idx] = ASSOCIATIVITY(a, b);
+     }
+ #undef ASSOCIATIVITY
  
 -- 
 2.26.2
