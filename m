@@ -2,75 +2,93 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAEAC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14396C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:37:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C7C2098B
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:30:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C7C2098B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A1BB12078E
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:37:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="F5LMNEdX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1BB12078E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEArF-0001J0-KV
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 08:30:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54136)
+	id 1kEAyb-0004jS-In
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 08:37:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58928)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kEAqa-0000s0-Aa
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 08:29:40 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:47109
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kEAqW-0003Io-MB
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 08:29:39 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-510-lSqLO82EPOGsIEMzVlYzmQ-1; Fri, 04 Sep 2020 08:29:31 -0400
-X-MC-Unique: lSqLO82EPOGsIEMzVlYzmQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 354FB107464E;
- Fri,  4 Sep 2020 12:29:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
- [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B2B510013C4;
- Fri,  4 Sep 2020 12:29:28 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id EB0E11132B59; Fri,  4 Sep 2020 14:29:26 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v5 09/20] docs/sphinx: Add new qapi-doc Sphinx extension
-References: <20200810195019.25427-1-peter.maydell@linaro.org>
- <20200810195019.25427-10-peter.maydell@linaro.org>
-Date: Fri, 04 Sep 2020 14:29:26 +0200
-In-Reply-To: <20200810195019.25427-10-peter.maydell@linaro.org> (Peter
- Maydell's message of "Mon, 10 Aug 2020 20:50:08 +0100")
-Message-ID: <875z8t913t.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1kEAua-0003Qc-Ht; Fri, 04 Sep 2020 08:33:50 -0400
+Received: from mout.web.de ([212.227.17.11]:50637)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1kEAuW-0004ko-EQ; Fri, 04 Sep 2020 08:33:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1599222812;
+ bh=+RLo/ZVW65kglykyVWrdi0g3aJcp2RgT/A8twL3InLM=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject:In-Reply-To:References;
+ b=F5LMNEdX4JCNRVYUFgoErRnHWHTtVE6h9bXBS1NneVQFtbfmN/ptEra1VKMBI1OPr
+ aVKjCnSb5JERBUyzFZs4Z/Vs6T/e0rBFJOTjXdsyaB3VpH12es35GRZZlqJKqjdWCP
+ 9VCjAWL0Sl6WDws3UjpZW86nxl73xH6BZ4eHWvMI=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([89.247.255.238]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1N0qr9-1kSw492yzl-00wXcd; Fri, 04
+ Sep 2020 14:33:32 +0200
+Date: Fri, 4 Sep 2020 14:33:05 +0200
+From: Lukas Straub <lukasstraub2@web.de>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH v7 1/8] Introduce yank feature
+Message-ID: <20200904141312.185a20d5@luklap>
+In-Reply-To: <871rjs9ser.fsf@dusky.pond.sub.org>
+References: <cover.1596528468.git.lukasstraub2@web.de>
+ <0092d4fe5f64078a18db3790c46c508416dbdb6b.1596528468.git.lukasstraub2@web.de>
+ <871rjs9ser.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+Content-Type: multipart/signed; boundary="Sig_/h.jymMyRN_67nTBYB9keTd/";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:tiZVxRMmN6otur/z2BnjOCaKmPhwLXFcFfJWfw3tN5EO0tSqeDZ
+ vuHZWSTzABFoFo65fI132aV3EcQ9CnkVXMAGyyZDizAL4VooMXW13bgtftL62J2BbHrCtJU
+ IO6G4RL2CM7RVAbe5z78OPCpCP2evoa8z+/7WPKLrdQswo+mrh5Jcn4x1f08DYSvNIWQhTb
+ iR0a8Z2VgxoBVwXoThahA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:mYEq7XdSXYU=:DP42ZD1gICa6tvs7OUMiwV
+ mcylTyoc/nHNeIut0m6405h7u5ycMHHM8y8+C+s21LtyPbfDRgvFkiVUSojl81wdUN6eNaFqo
+ 94Vai1BF7aMYW1Czj9NRtlAXvhYqmBSv0UWkT2s+7Nn62W/W0VP5+Z4nYIaBx17m1BNhGHJLv
+ Uf0lMKp4ixx2f2uL7r13oCgg7RtYgqGdqs5nANh77E6SOJsTcDixS3SG8OhCLk01uc2s1FaZz
+ Sh7hkaBLgfpq24gQJk9+Vf1UQJ9bB9jTSJdeUjVNRgfKqfupmqA71LYxOzhZR3YPJRLiiXhEb
+ 6cf/Pp9yZ2a2NZgzwCId2dlCRGjxV2RJYxXQ2iYRy1RZBWEv+dq9fKxO2undNdfnSkMmMvedQ
+ OW6AotNVsMTX6EHrAsQDtVauKxuXzCnpc7A/968ypXxIgPb3moYdey+KxpUVebXoyEUxXRd+E
+ 1wlx/07OX1NQ5iI1UFlr0P0kfECphPmNYJV5GHQogPF69X7TWFTL6W36fy4KKLGKkiXZ/G+ry
+ QYaUE/zSDdgsUxUk/hdm8v0DqeNiQvVIq6Rpbx5GkCRAbJc7sxX9qU2vskUp4FlDjP8E9bhen
+ 8JpWoLDEQRKcB3lacANYTYcUWF2TBhlZMvIvZ+CNs8T8zaHXZtB4IHT5TCT+3naII/Szj8VwI
+ Tm5r8987ukPoLZhFL5vBJdSgYq0XKzE0zAejGNRbefjdm4CNtrfYHLqGbNisww366I8+oGOX5
+ xu0D01G7w3zdHFprhTrlMa94wB1grQzsUuqp2GWo6cw5RWDFHSdk5lGvDr2hxduyFTXb5Ll94
+ fqBfNe2B6c0Nf7V9mpWSsuKAeju8kbKWP/sV0Agu9mPXlpEqtLibo314ximLYXdW2kP0H51v9
+ kRH6T/altDe/h8qx7nXsHzo0zNVc99DDBXlND2mF7bQ1zkS6kzkMVL42j4cv7NnGLyPgIH6SA
+ +nDC6feEP8SfwMoK970E3FnmWC6LPHJ51mdpScolxt3au/pnOOqthkR9KdiljPDZBBVKpmCJv
+ DBiUTTygNSeqmXGyns7vDeBDqJ6qBLL8OBjKIi6AvAmQQ5FSNKimSHEWrNAl4iy19Dyw+g5IX
+ xikKpmeGmHUvLtPcOlzZVM8fip+gdRswDGHgr+ylsQVswxSJwBYqWfMDab69yrSKCunDPGWKY
+ BRh3zost6ZGuOx+tcvJEXCubA4+cCGbNI9WJs4NHqkmdHm3aQ4gDxip9JUFj0nNmZOObCLvXn
+ ckxZ36jjQN4FAU68wWwvwkfADFVf00RponkgoHA==
+Received-SPF: pass client-ip=212.227.17.11; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 08:33:36
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -24
+X-Spam_score: -2.5
+X-Spam_bar: --
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -84,678 +102,175 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ "Dr. David
+ Alan Gilbert" <dgilbert@redhat.com>, qemu-devel <qemu-devel@nongnu.org>,
+ =?UTF-8?B?TWFyYy1BbmRyw6k=?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Peter Maydell <peter.maydell@linaro.org> writes:
+--Sig_/h.jymMyRN_67nTBYB9keTd/
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> Some of our documentation is auto-generated from documentation
-> comments in the JSON schema.
->
-> For Sphinx, rather than creating a file to include, the most natural
-> way to handle this is to have a small custom Sphinx extension which
-> processes the JSON file and inserts documentation into the rST
-> file being processed.
->
-> This is the same approach that kerneldoc and hxtool use.
->
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+On Thu, 27 Aug 2020 14:37:00 +0200
+Markus Armbruster <armbru@redhat.com> wrote:
 
-Got a pointer to "Writing Sphinx Extensions for Dummies" or similar?
+> I apologize for not reviewing this much earlier.
+>=20
+> Lukas Straub <lukasstraub2@web.de> writes:
+>=20
+> > The yank feature allows to recover from hanging qemu by "yanking"
+> > at various parts. Other qemu systems can register themselves and
+> > multiple yank functions. Then all yank functions for selected
+> > instances can be called by the 'yank' out-of-band qmp command.
+> > Available instances can be queried by a 'query-yank' oob command.
+> >
+> > Signed-off-by: Lukas Straub <lukasstraub2@web.de>
+> > Acked-by: Stefan Hajnoczi <stefanha@redhat.com>
+> > ---
+> ...
+> > diff --git a/qapi/misc.json b/qapi/misc.json
+> > index 9d32820dc1..0d6a8f20b7 100644
+> > --- a/qapi/misc.json
+> > +++ b/qapi/misc.json
+> > @@ -1615,3 +1615,48 @@
+> >  ##
+> >  { 'command': 'query-vm-generation-id', 'returns': 'GuidInfo' }
+> >
+> > +##
+> > +# @YankInstances:
+> > +#
+> > +# @instances: List of yank instances.
+> > +#
+> > +# Yank instances are named after the following schema:
+> > +# "blockdev:<node-name>", "chardev:<chardev-name>" and "migration"
+> > +#
+> > +# Since: 5.1
+> > +##
+> > +{ 'struct': 'YankInstances', 'data': {'instances': ['str'] } } =20
+>=20
+> I'm afraid this is a problematic QMP interface.
+>=20
+> By making YankInstances a struct, you keep the door open to adding more
+> members, which is good.
+>=20
+> But by making its 'instances' member a ['str'], you close the door to
+> using anything but a single string for the individual instances.  Not so
+> good.
+>=20
+> The single string encodes information which QMP client will need to
+> parse from the string.  We frown on that in QMP.  Use QAPI complex types
+> capabilities for structured data.
+>=20
+> Could you use something like this instead?
+>=20
+> { 'enum': 'YankInstanceType',
+>   'data': { 'block-node', 'chardev', 'migration' } }
+>=20
+> { 'struct': 'YankInstanceBlockNode',
+>   'data': { 'node-name': 'str' } }
+>=20
+> { 'struct': 'YankInstanceChardev',
+>   'data' { 'label': 'str' } }
+>=20
+> { 'union': 'YankInstance',
+>   'base': { 'type': 'YankInstanceType' },
+>   'discriminator': 'type',
+>   'data': {
+>       'block-node': 'YankInstanceBlockNode',
+>       'chardev': 'YankInstanceChardev' } }
+>=20
+> { 'command': 'yank',
+>   'data': { 'instances': ['YankInstance'] },
+>   'allow-oob': true }
 
-Since I know nothing about Sphinx extensions, my review will be more or
-less limited to the part facing QAPI.  Perhaps "generated docs look
-sane" suffices for the rest.
+This proposal looks good to me. Does everyone agree?
 
-> ---
-> Changes v4->v5: match the changes in parameters to the
-> various visit_* methods from commit 7b3bc9e28f366
-> ---
->  docs/conf.py           |   6 +-
->  docs/sphinx/qapidoc.py | 504 +++++++++++++++++++++++++++++++++++++++++
->  MAINTAINERS            |   1 +
->  3 files changed, 510 insertions(+), 1 deletion(-)
->  create mode 100644 docs/sphinx/qapidoc.py
->
-> diff --git a/docs/conf.py b/docs/conf.py
-> index d6e173ef77b..44ec5050717 100644
-> --- a/docs/conf.py
-> +++ b/docs/conf.py
-> @@ -52,7 +52,10 @@ except NameError:
->  # add these directories to sys.path here. If the directory is relative to the
->  # documentation root, use an absolute path starting from qemu_docdir.
->  #
-> +# Our extensions are in docs/sphinx; the qapidoc extension requires
-> +# the QAPI modules from scripts/.
->  sys.path.insert(0, os.path.join(qemu_docdir, "sphinx"))
-> +sys.path.insert(0, os.path.join(qemu_docdir, "../scripts"))
->  
->  
->  # -- General configuration ------------------------------------------------
-> @@ -67,7 +70,7 @@ needs_sphinx = '1.6'
->  # Add any Sphinx extension module names here, as strings. They can be
->  # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
->  # ones.
-> -extensions = ['kerneldoc', 'qmp_lexer', 'hxtool']
-> +extensions = ['kerneldoc', 'qmp_lexer', 'hxtool', 'qapidoc']
->  
->  # Add any paths that contain templates here, relative to this directory.
->  templates_path = ['_templates']
-> @@ -241,3 +244,4 @@ texinfo_documents = [
->  kerneldoc_bin = os.path.join(qemu_docdir, '../scripts/kernel-doc')
->  kerneldoc_srctree = os.path.join(qemu_docdir, '..')
->  hxtool_srctree = os.path.join(qemu_docdir, '..')
-> +qapidoc_srctree = os.path.join(qemu_docdir, '..')
-> diff --git a/docs/sphinx/qapidoc.py b/docs/sphinx/qapidoc.py
-> new file mode 100644
-> index 00000000000..4f571b2f45a
-> --- /dev/null
-> +++ b/docs/sphinx/qapidoc.py
-> @@ -0,0 +1,504 @@
-> +# coding=utf-8
-> +#
-> +# QEMU qapidoc QAPI file parsing extension
-> +#
-> +# Copyright (c) 2020 Linaro
-> +#
-> +# This work is licensed under the terms of the GNU GPLv2 or later.
-> +# See the COPYING file in the top-level directory.
-> +"""qapidoc is a Sphinx extension that implements the qapi-doc directive"""
-> +
-> +# The purpose of this extension is to read the documentation comments
-> +# in QAPI JSON schema files, and insert them all into the current document.
+Regards,
+Lukas Straub
 
-Let's drop "JSON", it's not really true.
+> If you're confident nothing will ever be added to YankInstanceBlockNode
+> and YankInstanceChardev, you could use str instead.
+>=20
+> > +
+> > +##
+> > +# @yank:
+> > +#
+> > +# Recover from hanging qemu by yanking the specified instances. =20
+>=20
+> What's an "instance", and what does it mean to "yank" it?
+>=20
+> The documentation of YankInstances above gives a clue on what an
+> "instance" is: presumably a block node, a character device or the
+> migration job.
+>=20
+> I guess a YankInstance is whatever the code chooses to make one, and the
+> current code makes these three kinds.
+>=20
+> Does it make every block node a YankInstance?  If not, which ones?
+>=20
+> Does it make every character device a YankInstance?  If not, which ones?
+>=20
+> Does it make migration always a YankInstance?  If not, when?
+>=20
+> > +#
+> > +# Takes @YankInstances as argument.
+> > +#
+> > +# Returns: nothing.
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "yank", "arguments": { "instances": ["blockdev:nbd0"=
+] } }
+> > +# <- { "return": {} }
+> > +#
+> > +# Since: 5.1
+> > +##
+> > +{ 'command': 'yank', 'data': 'YankInstances', 'allow-oob': true }
+> > +
+> > +##
+> > +# @query-yank:
+> > +#
+> > +# Query yank instances.
+> > +#
+> > +# Returns: @YankInstances
+> > +#
+> > +# Example:
+> > +#
+> > +# -> { "execute": "query-yank" }
+> > +# <- { "return": { "instances": ["blockdev:nbd0"] } }
+> > +#
+> > +# Since: 5.1
+> > +##
+> > +{ 'command': 'query-yank', 'returns': 'YankInstances', 'allow-oob': tr=
+ue }
+> ...
 
-> +# The conf.py file must set the qapidoc_srctree config value to
-> +# the root of the QEMU source tree.
-> +# Each qapi-doc:: directive takes one argument which is the
-> +# path of the .json file to process, relative to the source tree.
+--Sig_/h.jymMyRN_67nTBYB9keTd/
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-Beg your pardon?  Oh, you're talking about .rst files now.  The next two
-patches will add such files.  Perhaps something like "The qapi-doc::
-reST directive provided by this extension takes ..."
+-----BEGIN PGP SIGNATURE-----
 
-> +
-> +import os
-> +import re
-> +
-> +from docutils import nodes
-> +from docutils.statemachine import ViewList
-> +from docutils.parsers.rst import directives, Directive
-> +from sphinx.errors import ExtensionError
-> +from sphinx.util.nodes import nested_parse_with_titles
-> +import sphinx
-> +from qapi.gen import QAPISchemaVisitor
-> +from qapi.schema import QAPIError, QAPISchema
-> +
-> +# Sphinx up to 1.6 uses AutodocReporter; 1.7 and later
-> +# use switch_source_input. Check borrowed from kerneldoc.py.
-> +Use_SSI = sphinx.__version__[:3] >= '1.7'
-> +if Use_SSI:
-> +    from sphinx.util.docutils import switch_source_input
-> +else:
-> +    from sphinx.ext.autodoc import AutodocReporter
-> +
-> +
-> +__version__ = '1.0'
-> +
-> +# Function borrowed from pydash, which is under the MIT license
-> +def intersperse(iterable, separator):
-> +    """Like join, but for arbitrary iterables, notably arrays"""
-> +    iterable = iter(iterable)
-> +    yield next(iterable)
-> +    for item in iterable:
-> +        yield separator
-> +        yield item
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl9SNAEACgkQNasLKJxd
+sliQog/9E9snwdjFZqRTxGyvoaujLfpoNA0Q3Wr5F4l4ZS6y/ecXlnFRInD/GxvY
+fxvv/d0V+quxIMfQlk6mK7tYNEdBjRQlaqO1wn9zuoji/gmtzWNqtZz5jWRg0bcC
+y67IKAYRHmjIUIxrVgJUm9XYiiDk5M3khX7DW/C3MiT27FIb4XndnEyqfhFkqhz1
+Ez5qEU/XIU5Ml9mc7zlHEHBwntvZkxPhUE3nGw6ashztQH8MHD0FWXmgfeHeINof
+3gE6rgbYzsnwHSqYUxTUGDFo+ebGO3xNNobRMBpVOcDc9Gt35TXp/p9mfMHE/zp7
+w+zx8EPXkul2b57py3ISoMKa17fjLzCoYVb3Q+o4CTSPvibcV9ACR8kYtAxJzH7i
+ShtjR6Et193FBTVFCLpy0VuqT8bZ136hUZBQBYrAMA5vD504nQJ3Us4kLN1+lQZO
+6+ONrhqL47S01eUNXR7K2SCYNiq2F3BGR9p6jadNRAG1N/77x7pViStABHUclYe8
+nCvB6c9Mhowp08HAF8dBtAp5MUDRMPDEGx7XYhdpEeMy4/5CWP2toDScRI9nZk32
+KoUwkN3I2GRSQvThtYPFh930Ky+FTNRLHkvagPHVe29485/igaja1uBxqRLa/RFm
+zT+dv9DrWbCA597bFcqgcPG2YelCx/36fzsQ4B5ZsF2E40UruuU=
+=ftgr
+-----END PGP SIGNATURE-----
 
-What's wrong with separator.join(iterable)?
-
-> +
-> +class QAPISchemaGenRSTVisitor(QAPISchemaVisitor):
-> +    """A QAPI schema visitor which generates docutils/Sphinx nodes
-> +
-> +    This class builds up a tree of docutils/Sphinx nodes corresponding
-> +    to documentation for the various QAPI objects. To use it, first create
-> +    a QAPISchemaGenRSTVisitor object, and call its visit_begin() method.
-> +    Then you can call one of the two methods 'freeform' (to add documentation
-> +    for a freeform documentation chunk) or 'symbol' (to add documentation
-> +    for a QAPI symbol). These will cause the visitor to build up the
-> +    tree of document nodes. Once you've added all the documentation
-> +    via 'freeform' and 'symbol' method calls, you can call 'get_document_nodes'
-> +    to get the final list of document nodes (in a form suitable for returning
-> +    from a Sphinx directive's 'run' method).
-> +    """
-> +    def __init__(self, sphinx_directive):
-> +        self._cur_doc = None
-> +        self._sphinx_directive = sphinx_directive
-> +        self._top_node = nodes.section()
-> +        self._active_headings = [self._top_node]
-> +
-> +    def _serror(self, msg):
-> +        """Raise an exception giving a user-friendly syntax error message"""
-> +        file = self._cur_doc.info.fname
-> +        line = self._cur_doc.info.line
-> +        raise ExtensionError('%s line %d: syntax error: %s' % (file, line, msg))
-
-Note for later: ornate error message format, no use of QAPISourceInfo.
-
-> +
-> +    def _make_dlitem(self, term, defn):
-> +        """Return a dlitem node with the specified term and definition.
-> +
-> +        term should be a list of Text and literal nodes.
-> +        defn should be one of:
-> +        - a string, which will be handed to _parse_text_into_node
-> +        - a list of Text and literal nodes, which will be put into
-> +          a paragraph node
-> +        """
-> +        dlitem = nodes.definition_list_item()
-> +        dlterm = nodes.term('', '', *term)
-> +        dlitem += dlterm
-> +        if defn:
-> +            dldef = nodes.definition()
-> +            if isinstance(defn, list):
-> +                dldef += nodes.paragraph('', '', *defn)
-> +            else:
-> +                self._parse_text_into_node(defn, dldef)
-> +            dlitem += dldef
-> +        return dlitem
-> +
-> +    def _make_section(self, title):
-> +        """Return a section node with optional title"""
-> +        section = nodes.section(ids=[self._sphinx_directive.new_serialno()])
-> +        if title:
-> +            section += nodes.title(title, title)
-> +        return section
-> +
-> +    def _nodes_for_ifcond(self, ifcond, with_if=True):
-> +        """Return list of Text, literal nodes for the ifcond
-> +
-> +        Return a list which gives text like ' (If: cond1, cond2, cond3)', where
-> +        the conditions are in literal-text and the commas are not.
-> +        If with_if is False, we don't return the "(If: " and ")".
-> +        """
-> +        condlist = intersperse([nodes.literal('', c) for c in ifcond],
-> +                               nodes.Text(', '))
-> +        if not with_if:
-> +            return condlist
-> +
-> +        nodelist = [nodes.Text(' ('), nodes.strong('', 'If: ')]
-> +        nodelist.extend(condlist)
-> +        nodelist.append(nodes.Text(')'))
-> +        return nodelist
-> +
-> +    def _nodes_for_one_member(self, member):
-> +        """Return list of Text, literal nodes for this member
-> +
-> +        Return a list of doctree nodes which give text like
-> +        'name: type (optional) (If: ...)' suitable for use as the
-> +        'term' part of a definition list item.
-> +        """
-> +        term = [nodes.literal('', member.name)]
-> +        if member.type.doc_type():
-> +            term.append(nodes.Text(': '))
-> +            term.append(nodes.literal('', member.type.doc_type()))
-> +        if member.optional:
-> +            term.append(nodes.Text(' (optional)'))
-> +        if member.ifcond:
-> +            term.extend(self._nodes_for_ifcond(member.ifcond))
-> +        return term
-> +
-> +    def _nodes_for_variant_when(self, variants, variant):
-> +        """Return list of Text, literal nodes for variant 'when' clause
-> +
-> +        Return a list of doctree nodes which give text like
-> +        'when tagname is variant (If: ...)' suitable for use in
-> +        the 'variants' part of a definition list.
-> +        """
-> +        term = [nodes.Text(' when '),
-> +                nodes.literal('', variants.tag_member.name),
-> +                nodes.Text(' is '),
-> +                nodes.literal('', '"%s"' % variant.name)]
-> +        if variant.ifcond:
-> +            term.extend(self._nodes_for_ifcond(variant.ifcond))
-> +        return term
-> +
-> +    def _nodes_for_members(self, doc, what, base=None, variants=None):
-> +        """Return doctree nodes for the table of members"""
-> +        dlnode = nodes.definition_list()
-> +        for section in doc.args.values():
-> +            term = self._nodes_for_one_member(section.member)
-> +            # TODO drop fallbacks when undocumented members are outlawed
-> +            if section.text:
-> +                defn = section.text
-> +            elif (variants and variants.tag_member == section.member
-> +                  and not section.member.type.doc_type()):
-> +                values = section.member.type.member_names()
-> +                defn = [nodes.Text('One of ')]
-> +                defn.extend(intersperse([nodes.literal('', v) for v in values],
-> +                                        nodes.Text(', ')))
-> +            else:
-> +                defn = [nodes.Text('Not documented')]
-> +
-> +            dlnode += self._make_dlitem(term, defn)
-> +
-> +        if base:
-> +            dlnode += self._make_dlitem([nodes.Text('The members of '),
-> +                                         nodes.literal('', base.doc_type())],
-> +                                        None)
-> +
-> +        if variants:
-> +            for v in variants.variants:
-> +                if v.type.is_implicit():
-> +                    assert not v.type.base and not v.type.variants
-> +                    for m in v.type.local_members:
-> +                        term = self._nodes_for_one_member(m)
-> +                        term.extend(self._nodes_for_variant_when(variants, v))
-> +                        dlnode += self._make_dlitem(term, None)
-> +                else:
-> +                    term = [nodes.Text('The members of '),
-> +                            nodes.literal('', v.type.doc_type())]
-> +                    term.extend(self._nodes_for_variant_when(variants, v))
-> +                    dlnode += self._make_dlitem(term, None)
-> +
-> +        if not dlnode.children:
-> +            return None
-> +
-> +        section = self._make_section(what)
-> +        section += dlnode
-> +        return section
-> +
-> +    def _nodes_for_enum_values(self, doc, what):
-
-@what is only ever 'Values', isn't it?
-
-> +        """Return doctree nodes for the table of enum values"""
-> +        seen_item = False
-> +        dlnode = nodes.definition_list()
-> +        for section in doc.args.values():
-> +            termtext = [nodes.literal('', section.member.name)]
-> +            if section.member.ifcond:
-> +                termtext.extend(self._nodes_for_ifcond(section.member.ifcond))
-> +            # TODO drop fallbacks when undocumented members are outlawed
-> +            if section.text:
-> +                defn = section.text
-> +            else:
-> +                defn = [nodes.Text('Not documented')]
-> +
-> +            dlnode += self._make_dlitem(termtext, defn)
-> +            seen_item = True
-> +
-> +        if not seen_item:
-> +            return None
-> +
-> +        section = self._make_section(what)
-> +        section += dlnode
-> +        return section
-> +
-> +    def _nodes_for_arguments(self, doc, boxed_arg_type):
-> +        """Return doctree nodes for the arguments section"""
-> +        if boxed_arg_type:
-> +            assert not doc.args
-> +            section = self._make_section('Arguments')
-> +            dlnode = nodes.definition_list()
-> +            dlnode += self._make_dlitem(
-> +                [nodes.Text('The members of '),
-> +                 nodes.literal('', boxed_arg_type.name)],
-> +                None)
-> +            section += dlnode
-> +            return section
-> +
-> +        return self._nodes_for_members(doc, 'Arguments')
-> +
-> +    def _nodes_for_features(self, doc):
-> +        """Return doctree nodes for the table of features"""
-> +        seen_item = False
-> +        dlnode = nodes.definition_list()
-> +        for section in doc.features.values():
-> +            dlnode += self._make_dlitem([nodes.literal('', section.name)],
-> +                                        section.text)
-> +            seen_item = True
-> +
-> +        if not seen_item:
-> +            return None
-> +
-> +        section = self._make_section('Features')
-> +        section += dlnode
-> +        return section
-> +
-> +    def _nodes_for_example(self, exampletext):
-> +        """Return doctree nodes for a code example snippet"""
-> +        return nodes.literal_block(exampletext, exampletext)
-> +
-> +    def _nodes_for_sections(self, doc, ifcond):
-> +        """Return doctree nodes for additional sections following arguments"""
-> +        nodelist = []
-> +        for section in doc.sections:
-> +            snode = self._make_section(section.name)
-> +            if section.name and section.name.startswith('Example'):
-> +                snode += self._nodes_for_example(section.text)
-> +            else:
-> +                self._parse_text_into_node(section.text, snode)
-> +            nodelist.append(snode)
-> +        if ifcond:
-> +            snode = self._make_section('If')
-> +            snode += self._nodes_for_ifcond(ifcond, with_if=False)
-> +            nodelist.append(snode)
-
-I think I'd rather have a separate _node_for_ifcond().  Not a demand.
-
-> +        if not nodelist:
-> +            return None
-
-Any particular reason for mapping [] to None?
-
-> +        return nodelist
-> +
-> +    def _add_doc(self, typ, sections):
-> +        """Add documentation for a command/object/enum...
-> +
-> +        We assume we're documenting the thing defined in self._cur_doc.
-> +        typ is the type of thing being added ("Command", "Object", etc)
-> +
-> +        sections is a list of nodes for sections to add to the definition.
-> +        """
-> +
-> +        doc = self._cur_doc
-> +        snode = nodes.section(ids=[self._sphinx_directive.new_serialno()])
-> +        snode += nodes.title('', '', *[nodes.literal(doc.symbol, doc.symbol),
-> +                                       nodes.Text(' (' + typ + ')')])
-> +        self._parse_text_into_node(doc.body.text, snode)
-> +        for s in sections:
-> +            if s is not None:
-> +                snode += s
-
-Looks like you're flattening the two-level list the callers create,
-e.g. ...
-
-> +        self._add_node_to_current_heading(snode)
-> +
-> +    def visit_enum_type(self, name, info, ifcond, features, members, prefix):
-> +        doc = self._cur_doc
-> +        self._add_doc('Enum',
-> +                      [self._nodes_for_enum_values(doc, 'Values'),
-> +                       self._nodes_for_features(doc),
-> +                       self._nodes_for_sections(doc, ifcond)])
-
-... this one: [[nodes for enum values...]
-               [nodes for features...]
-               [nodes for sections]]
-
-Makes me wonder why you build two levels in the first place.
-
-> +
-> +    def visit_object_type(self, name, info, ifcond, features,
-> +                          base, members, variants):
-> +        doc = self._cur_doc
-> +        if base and base.is_implicit():
-> +            base = None
-> +        self._add_doc('Object',
-> +                      [self._nodes_for_members(doc, 'Members', base, variants),
-> +                       self._nodes_for_features(doc),
-> +                       self._nodes_for_sections(doc, ifcond)])
-> +
-> +    def visit_alternate_type(self, name, info, ifcond, features, variants):
-> +        doc = self._cur_doc
-> +        self._add_doc('Alternate',
-> +                      [self._nodes_for_members(doc, 'Members'),
-> +                       self._nodes_for_features(doc),
-> +                       self._nodes_for_sections(doc, ifcond)])
-> +
-> +    def visit_command(self, name, info, ifcond, features, arg_type,
-> +                      ret_type, gen, success_response, boxed, allow_oob,
-> +                      allow_preconfig):
-> +        doc = self._cur_doc
-> +        self._add_doc('Command',
-> +                      [self._nodes_for_arguments(doc,
-> +                                                 arg_type if boxed else None),
-> +                       self._nodes_for_features(doc),
-> +                       self._nodes_for_sections(doc, ifcond)])
-> +
-> +    def visit_event(self, name, info, ifcond, features, arg_type, boxed):
-> +        doc = self._cur_doc
-> +        self._add_doc('Event',
-> +                      [self._nodes_for_arguments(doc,
-> +                                                 arg_type if boxed else None),
-> +                       self._nodes_for_features(doc),
-> +                       self._nodes_for_sections(doc, ifcond)])
-> +
-> +    def symbol(self, doc, entity):
-> +        """Add documentation for one symbol to the document tree
-> +
-> +        This is the main entry point which causes us to add documentation
-> +        nodes for a symbol (which could be a 'command', 'object', 'event',
-> +        etc). We do this by calling 'visit' on the schema entity, which
-> +        will then call back into one of our visit_* methods, depending
-> +        on what kind of thing this symbol is.
-> +        """
-> +        self._cur_doc = doc
-> +        entity.visit(self)
-> +        self._cur_doc = None
-
-Matches doc.py's QAPISchemaGenDocVisitor.symbol().  entity.visit() calls
-one of the five functions preceding this one.  The function called
-processes self._cur_doc.  They all boil down to a variation of
-self._add_doc().  Okay.
-
-> +
-> +    def _start_new_heading(self, heading, level):
-> +        """Start a new heading at the specified heading level
-> +
-> +        Create a new section whose title is 'heading' and which is placed
-> +        in the docutils node tree as a child of the most recent level-1
-> +        heading. Subsequent document sections (commands, freeform doc chunks,
-> +        etc) will be placed as children of this new heading section.
-> +        """
-> +        if len(self._active_headings) < level:
-> +            self._serror('Level %d subheading found outside a level %d heading'
-> +                         % (level, level - 1))
-> +        snode = self._make_section(heading)
-> +        self._active_headings[level - 1] += snode
-> +        self._active_headings = self._active_headings[:level]
-> +        self._active_headings.append(snode)
-> +
-> +    def _add_node_to_current_heading(self, node):
-> +        """Add the node to whatever the current active heading is"""
-> +        self._active_headings[-1] += node
-> +
-> +    def freeform(self, doc):
-> +        """Add a piece of 'freeform' documentation to the document tree
-> +
-> +        A 'freeform' document chunk doesn't relate to any particular
-> +        symbol (for instance, it could be an introduction).
-> +
-> +        As a special case, if the freeform document is a single line
-> +        of the form '= Heading text' it is treated as a section or subsection
-> +        heading, with the heading level indicated by the number of '=' signs.
-> +        """
-> +
-> +        # QAPIDoc documentation says free-form documentation blocks
-> +        # must have only a body section, nothing else.
-> +        assert not doc.sections
-> +        assert not doc.args
-> +        assert not doc.features
-> +        self._cur_doc = doc
-> +
-> +        if re.match(r'=+ ', doc.body.text):
-> +            # Section or subsection heading: must be the only thing in the block
-> +            (heading, _, rest) = doc.body.text.partition('\n')
-> +            if rest != '':
-> +                raise ExtensionError('%s line %s: section or subsection heading'
-> +                                     ' must be in its own doc comment block'
-> +                                     % (doc.info.fname, doc.info.line))
-
-Same ornate error message format as above, less 'syntax error: '.
-
-> +            (leader, _, heading) = heading.partition(' ')
-> +            self._start_new_heading(heading, len(leader))
-> +            return
-> +
-> +        node = self._make_section(None)
-> +        self._parse_text_into_node(doc.body.text, node)
-> +        self._add_node_to_current_heading(node)
-> +        self._cur_doc = None
-> +
-> +    def _parse_text_into_node(self, doctext, node):
-> +        """Parse a chunk of QAPI-doc-format text into the node
-> +
-> +        The doc comment can contain most inline rST markup, including
-> +        bulleted and enumerated lists.
-> +        As an extra permitted piece of markup, @var will be turned
-> +        into ``var``.
-> +        """
-> +
-> +        # Handle the "@var means ``var`` case
-> +        doctext = re.sub(r'@([\w-]+)', r'``\1``', doctext)
-> +
-> +        rstlist = ViewList()
-> +        for line in doctext.splitlines():
-> +            # The reported line number will always be that of the start line
-> +            # of the doc comment, rather than the actual location of the error.
-> +            # Being more precise would require overhaul of the QAPIDoc class
-> +            # to track lines more exactly within all the sub-parts of the doc
-> +            # comment, as well as counting lines here.
-> +            rstlist.append(line, self._cur_doc.info.fname,
-> +                           self._cur_doc.info.line)
-> +        self._sphinx_directive.do_parse(rstlist, node)
-> +
-> +    def get_document_nodes(self):
-> +        """Return the list of docutils nodes which make up the document"""
-> +        return self._top_node.children
-> +
-> +class QAPIDocDirective(Directive):
-> +    """Extract documentation from the specified QAPI .json file"""
-> +    required_argument = 1
-> +    optional_arguments = 1
-> +    option_spec = {
-> +        'qapifile': directives.unchanged_required
-> +    }
-> +    has_content = False
-> +
-> +    def new_serialno(self):
-> +        """Return a unique new ID string suitable for use as a node's ID"""
-> +        env = self.state.document.settings.env
-> +        return 'qapidoc-%d' % env.new_serialno('qapidoc')
-> +
-> +    def run(self):
-> +        env = self.state.document.settings.env
-> +        qapifile = env.config.qapidoc_srctree + '/' + self.arguments[0]
-> +
-> +        # Tell sphinx of the dependency
-> +        env.note_dependency(os.path.abspath(qapifile))
-> +
-> +        try:
-> +            schema = QAPISchema(qapifile)
-> +        except QAPIError as err:
-> +            # Launder QAPI parse errors into Sphinx extension errors
-> +            # so they are displayed nicely to the user
-> +            raise ExtensionError(str(err))
-
-I expected plumbing the error location through Sphinx to the user to
-take a bit more effort.  I'm not complaining.
-
-A QAPIError looks like this when converted to str:
-
-    In file included from ...:
-    ...
-    In file included from ...:
-    FILE: In ENTITY-TYPE 'NAME':
-    FILE:LINE: MESSAGE
-
-"In file" lines appear when the error is in a sub-module.
-
-An "In ENTITY-TYPE" line appears when the error is in an entity
-definition.
-
-The other two ExtensionError() look like
-
-    FILE line LINE: syntax error: MESSAGE
-
-and
-
-    FILE line LINE: MESSAGE
-
-More ornate, less information.
-
-I figure more errors can get thrown by nested_parse_with_titles() (see
-below).  How do they look like?
-
-Can we avoid the information loss?
-
-Can we make the error message format more consistent?
-
-> +
-> +        vis = QAPISchemaGenRSTVisitor(self)
-> +        vis.visit_begin(schema)
-> +        for doc in schema.docs:
-> +            if doc.symbol:
-> +                vis.symbol(doc, schema.lookup_entity(doc.symbol))
-> +            else:
-> +                vis.freeform(doc)
-
-Matches doc.py.  Visits the documentation doc comment blocks and the
-entities they document.  The other backends use
-
-           schema.visit(vis)
-
-which visits the modules and their entities.  Okay.
-
-> +
-> +        return vis.get_document_nodes()
-> +
-> +    def do_parse(self, rstlist, node):
-> +        """Parse rST source lines and add them to the specified node
-> +
-> +        Take the list of rST source lines rstlist, parse them as
-> +        rST, and add the resulting docutils nodes as children of node.
-> +        The nodes are parsed in a way that allows them to include
-> +        subheadings (titles) without confusing the rendering of
-> +        anything else.
-> +        """
-> +        # This is from kerneldoc.py -- it works around an API change in
-> +        # Sphinx between 1.6 and 1.7. Unlike kerneldoc.py, we use
-> +        # sphinx.util.nodes.nested_parse_with_titles() rather than the
-> +        # plain self.state.nested_parse(), and so we can drop the saving
-> +        # of title_styles and section_level that kerneldoc.py does,
-> +        # because nested_parse_with_titles() does that for us.
-> +        if Use_SSI:
-> +            with switch_source_input(self.state, rstlist):
-> +                nested_parse_with_titles(self.state, rstlist, node)
-> +        else:
-> +            save = self.state.memo.reporter
-> +            self.state.memo.reporter = AutodocReporter(rstlist,
-> +                                                       self.state.memo.reporter)
-> +            try:
-> +                nested_parse_with_titles(self.state, rstlist, node)
-> +            finally:
-> +                self.state.memo.reporter = save
-> +
-> +def setup(app):
-> +    """ Register qapi-doc directive with Sphinx"""
-> +    app.add_config_value('qapidoc_srctree', None, 'env')
-> +    app.add_directive('qapi-doc', QAPIDocDirective)
-> +
-> +    return dict(
-> +        version=__version__,
-> +        parallel_read_safe=True,
-> +        parallel_write_safe=True
-> +    )
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 0886eb3d2b5..fdd38f412d7 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -3116,6 +3116,7 @@ M: Peter Maydell <peter.maydell@linaro.org>
->  S: Maintained
->  F: docs/conf.py
->  F: docs/*/conf.py
-> +F: docs/sphinx/
->  
->  Miscellaneous
->  -------------
-
-I had to read mostly backwards to understand the code.
-
+--Sig_/h.jymMyRN_67nTBYB9keTd/--
 
