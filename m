@@ -2,70 +2,94 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32770C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:29:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19ADEC43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:31:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6BC72074D
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:29:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=irrelevant.dk header.i=@irrelevant.dk header.b="FSAv9Bo1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6BC72074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id DA1132074D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 15:31:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA1132074D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEDeH-0006xS-5S
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 11:29:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49474)
+	id 1kEDgv-0008Dm-4D
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 11:31:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50198)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kEDdR-0006Bx-UG; Fri, 04 Sep 2020 11:28:18 -0400
-Received: from charlie.dont.surf ([128.199.63.193]:48130)
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1kEDft-0007h3-2V
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:30:49 -0400
+Received: from mga05.intel.com ([192.55.52.43]:18030)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kEDdN-0004g4-QU; Fri, 04 Sep 2020 11:28:17 -0400
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by charlie.dont.surf (Postfix) with ESMTPSA id DD8FEBF7D3;
- Fri,  4 Sep 2020 15:28:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=irrelevant.dk;
- s=default; t=1599233291;
- bh=IvQifLIBpg1LyDw9ZTIanqh9tJ9F09sVxi6p9CgdAxA=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=FSAv9Bo1zZXqnAns444mqO6eRxxnWCgC55ytfWEv7w/o7afIQ3ZpNPUdYSodK0G2c
- Hk3fpSN6LuCKGQwNrlsRPjfpxv8vrjDOI1Uvvn+Hvo4zwMcqx6/h1nqDeyJ7dlRcE9
- tR4V/uEUEYCgUbWbSzPchlbB34Xo6jjHSMiHSNOqezlRQbf80rYm2E3YpvrB21SZh/
- wRzDyvIwQ1tA234yVcCrEjeIs6UIipBloKe/Lhl3UQ/hDViAOXAD4ygi633QJf50yD
- 61Xhe3kuFKXkWZVpYcz3apI13QXq0n9O7xnP0ixLYxfC/QDszycKPqwt0DoHVrJi99
- x1A6/mHdD0Xvw==
-Date: Fri, 4 Sep 2020 17:28:07 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 0/3] block/nvme: Use NvmeBar structure from "block/nvme.h"
-Message-ID: <20200904152807.GA584438@apples.localdomain>
-References: <20200904124130.583838-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
+ id 1kEDfp-000569-UA
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 11:30:48 -0400
+IronPort-SDR: ZIkzqkOnFWWtBvf1R+EM+PfCvMsxy6em3VYLwGbOFawLGdkXQV0Pm18Z1XNwVca3bVG5nEumAf
+ +LQ8QxRbVgSg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9734"; a="242580431"
+X-IronPort-AV: E=Sophos;i="5.76,389,1592895600"; d="scan'208";a="242580431"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+ by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 04 Sep 2020 08:30:38 -0700
+IronPort-SDR: bBqpVpIQTYNuZj/YBoHaHEDlOKpXGayXf7zUfM4sOAG1XrRmxod61NTFNImmOaQL1pAdl53rGv
+ WNU3dQXPT0Sg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.76,389,1592895600"; d="scan'208";a="405867876"
+Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
+ by fmsmga001.fm.intel.com with ESMTP; 04 Sep 2020 08:30:38 -0700
+Received: from shsmsx602.ccr.corp.intel.com (10.109.6.142) by
+ fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 4 Sep 2020 08:30:38 -0700
+Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
+ SHSMSX602.ccr.corp.intel.com (10.109.6.142) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 4 Sep 2020 23:30:21 +0800
+Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
+ SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
+ Fri, 4 Sep 2020 23:30:21 +0800
+From: "Zhang, Chen" <chen.zhang@intel.com>
+To: Pan Nengyuan <pannengyuan@huawei.com>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>
+Subject: RE: [PATCH] net/filter-rewriter: destroy g_hash_table in
+ colo_rewriter_cleanup
+Thread-Topic: [PATCH] net/filter-rewriter: destroy g_hash_table in
+ colo_rewriter_cleanup
+Thread-Index: AQHWgoxAN7Z5W4Oo6kad3S1TmqXujalYmseg
+Date: Fri, 4 Sep 2020 15:30:21 +0000
+Message-ID: <cbc8bf62c2d14f78ad21020d50597740@intel.com>
+References: <20200904134908.1396-1-pannengyuan@huawei.com>
+In-Reply-To: <20200904134908.1396-1-pannengyuan@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-product: dlpe-windows
+dlp-version: 11.5.1.3
+dlp-reaction: no-action
+x-originating-ip: [10.239.127.36]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="9amGYk9869ThD9tj"
-Content-Disposition: inline
-In-Reply-To: <20200904124130.583838-1-philmd@redhat.com>
-Received-SPF: pass client-ip=128.199.63.193; envelope-from=its@irrelevant.dk;
- helo=charlie.dont.surf
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 10:20:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=192.55.52.43; envelope-from=chen.zhang@intel.com;
+ helo=mga05.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 11:30:38
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,51 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Keith Busch <kbusch@kernel.org>
+Cc: "kuhn.chenqun@huawei.com" <kuhn.chenqun@huawei.com>,
+ "jasowang@redhat.com" <jasowang@redhat.com>,
+ "zhang.zhanghailiang@huawei.com" <zhang.zhanghailiang@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---9amGYk9869ThD9tj
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Sep  4 14:41, Philippe Mathieu-Daud=C3=A9 wrote:
-> Cleanups in the NVMeRegs structure:
-> - Use the already existing NvmeBar structure from "block/nvme.h"
-> - Pair doorbell registers
+> -----Original Message-----
+> From: Pan Nengyuan <pannengyuan@huawei.com>
+> Sent: Friday, September 4, 2020 9:49 PM
+> To: qemu-devel@nongnu.org
+> Cc: Zhang, Chen <chen.zhang@intel.com>; jasowang@redhat.com;
+> zhang.zhanghailiang@huawei.com; kuhn.chenqun@huawei.com; Pan
+> Nengyuan <pannengyuan@huawei.com>
+> Subject: [PATCH] net/filter-rewriter: destroy g_hash_table in
+> colo_rewriter_cleanup
 >=20
-> Based-on: <20200903122803.405265-1-philmd@redhat.com>
+> s->connection_track_table forgot to destroy in colo_rewriter_cleanup. Fix=
+ it.
 >=20
-> Philippe Mathieu-Daud=C3=A9 (3):
->   block/nvme: Group controller registers in NVMeRegs structure
->   block/nvme: Use generic NvmeBar structure
->   block/nvme: Pair doorbell registers
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+
+Oh, Thanks Euler Robot~~
+Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+
+Thanks
+Zhang Chen
+
+> ---
+>  net/filter-rewriter.c | 2 ++
+>  1 file changed, 2 insertions(+)
 >=20
->  block/nvme.c | 43 +++++++++++++++----------------------------
->  1 file changed, 15 insertions(+), 28 deletions(-)
+> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c index
+> 1aaad101b6..9ff366d44f 100644
+> --- a/net/filter-rewriter.c
+> +++ b/net/filter-rewriter.c
+> @@ -376,6 +376,8 @@ static void colo_rewriter_cleanup(NetFilterState *nf)
+>          filter_rewriter_flush(nf);
+>          g_free(s->incoming_queue);
+>      }
+> +
+> +    g_hash_table_destroy(s->connection_track_table);
+>  }
 >=20
+>  static void colo_rewriter_setup(NetFilterState *nf, Error **errp)
+> --
+> 2.18.2
 
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
-
---9amGYk9869ThD9tj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9SXQAACgkQTeGvMW1P
-DenioAf/X7uBDwlJOXY9lPgpjhQVB4KIjNEP2WpBoYsPXgtCLkT7ezA7ZRlgBcy2
-JgrdUEREuWgJu2K/n2sA9Be3/7NRDpWq1VBrO+aLNSF+F2Nps4JyrfjIxOxmN2cI
-VeYGKPr5oITurdiWYTNL148ZIQhsJDMShOTHQMPm+o7NKedzXs+loI20KPbOWLeS
-n9bqk5zPOn02KOJ5OhNP7qTbezqISnPaK6+A/4YZQ5IOGs4E64FrRSU88A5/dHCu
-UAsQz3mKu35vi+oeWBsR+iQNG0Sz/YFKm4AH9BBfcs4X7n4XcD781QdZGLN/rSSu
-T6yPhaokVJb3C+Ma63vpmHPSem5CyA==
-=pqim
------END PGP SIGNATURE-----
-
---9amGYk9869ThD9tj--
 
