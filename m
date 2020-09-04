@@ -2,88 +2,73 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01614C433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83685C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:57:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B66F9214F1
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:57:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RCPAZjrl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B66F9214F1
+	by mail.kernel.org (Postfix) with ESMTPS id 44949214F1
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 11:57:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44949214F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEAL4-0004s3-RX
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 07:57:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42726)
+	id 1kEALD-0005LR-C6
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 07:57:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6c-0000gO-Pc
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35027)
+ id 1kEA6u-00011V-2j
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:28 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:21793
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEA6a-0005GR-2b
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599219727;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RsnTcssORBAfLgaqnBJYc2s5Hs447I4ulQrE+UsAJhQ=;
- b=RCPAZjrlwIjw5Oji8ZuiFCkdtsOzYQ/q1ALB9TmlI9sKzEUfniGN8OclHL4VcQBs27FSLf
- vY5pnCyvvvBzKU4K1HyQBWynQG9A3wPWXKgd2exwy89OUsPYxJMCQf+B7bMZN9OVtoeeEY
- eHzz7t2QvIb46GBNxtWEMAqAUYgMx1M=
+ id 1kEA6o-0005Hl-GY
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 07:42:27 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-59-YH4tmcmWNde2nA-sx37iIw-1; Fri, 04 Sep 2020 07:42:04 -0400
-X-MC-Unique: YH4tmcmWNde2nA-sx37iIw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-450-Sl7zWWnVORy_0W_jlp-oFA-1; Fri, 04 Sep 2020 07:42:18 -0400
+X-MC-Unique: Sl7zWWnVORy_0W_jlp-oFA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 85F6C8DE44B
- for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 92274909EF9
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:44 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2BC697B9C8;
- Fri,  4 Sep 2020 11:41:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 204D682165
+ for <qemu-devel@nongnu.org>; Fri,  4 Sep 2020 11:41:44 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/46] meson: convert migration/initrd-stress
-Date: Fri,  4 Sep 2020 07:41:02 -0400
-Message-Id: <20200904114122.31307-27-pbonzini@redhat.com>
+Subject: [PULL 35/46] configure: remove unnecessary libm test
+Date: Fri,  4 Sep 2020 07:41:11 -0400
+Message-Id: <20200904114122.31307-36-pbonzini@redhat.com>
 In-Reply-To: <20200904114122.31307-1-pbonzini@redhat.com>
 References: <20200904114122.31307-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 07:42:07
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,95 +81,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Marc-André Lureau <marcandre.lureau@redhat.com>
+The same test is already performed by meson.build.
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200828110734.1638685-17-marcandre.lureau@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/Makefile.include           | 14 --------------
- tests/meson.build                |  1 +
- tests/migration/initrd-stress.sh | 10 ++++++++++
- tests/migration/meson.build      | 14 ++++++++++++++
- 4 files changed, 25 insertions(+), 14 deletions(-)
- create mode 100755 tests/migration/initrd-stress.sh
- create mode 100644 tests/migration/meson.build
+ configure | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index fe22ccfcc6..1592a647f4 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -38,20 +38,6 @@ export SRC_PATH
- SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
-    $(wildcard $(SRC_PATH)/default-configs/*-softmmu.mak)))
+diff --git a/configure b/configure
+index d9e11a04ab..59453ade2f 100755
+--- a/configure
++++ b/configure
+@@ -4968,20 +4968,6 @@ if test "$libiscsi" != "no" ; then
+   fi
+ fi
  
--QEMU_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
+-##########################################
+-# Do we need libm
+-cat > $TMPC << EOF
+-#include <math.h>
+-int main(int argc, char **argv) { return isnan(sin((double)argc)); }
+-EOF
+-if compile_prog "" "" ; then
+-  :
+-elif compile_prog "" "-lm" ; then
+-  LIBS="-lm $LIBS"
+-else
+-  error_exit "libm check failed"
+-fi
 -
--tests/migration/stress$(EXESUF): tests/migration/stress.o
--	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
--
--INITRD_WORK_DIR=tests/migration/initrd
--
--tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
--	mkdir -p $(INITRD_WORK_DIR)
--	cp $< $(INITRD_WORK_DIR)/init
--	(cd $(INITRD_WORK_DIR) && (find | cpio --quiet -o -H newc | gzip -9)) > $@
--	rm $(INITRD_WORK_DIR)/init
--	rmdir $(INITRD_WORK_DIR)
--
- SPEED = quick
- 
- # gtester tests, possibly with verbose output
-diff --git a/tests/meson.build b/tests/meson.build
-index 17536de589..a1cea7adb2 100644
---- a/tests/meson.build
-+++ b/tests/meson.build
-@@ -272,3 +272,4 @@ endif
- 
- subdir('qapi-schema')
- subdir('qtest')
-+subdir('migration')
-diff --git a/tests/migration/initrd-stress.sh b/tests/migration/initrd-stress.sh
-new file mode 100755
-index 0000000000..0f20ac29a6
---- /dev/null
-+++ b/tests/migration/initrd-stress.sh
-@@ -0,0 +1,10 @@
-+#!/bin/sh
-+
-+INITRD="$1"
-+STRESS="$2"
-+
-+INITRD_DIR=$(mktemp -d -p '' "initrd-stress.XXXXXX")
-+trap 'rm -rf $INITRD_DIR' EXIT
-+
-+cp "$STRESS" "$INITRD_DIR/init"
-+(cd "$INITRD_DIR" && (find | cpio --quiet -o -H newc | gzip -9)) > "$INITRD"
-diff --git a/tests/migration/meson.build b/tests/migration/meson.build
-new file mode 100644
-index 0000000000..f215ee7d3a
---- /dev/null
-+++ b/tests/migration/meson.build
-@@ -0,0 +1,14 @@
-+stress = executable(
-+  'stress',
-+  files('stress.c'),
-+  dependencies: [glib],
-+  link_args: ['-static'],
-+  build_by_default: false,
-+)
-+
-+custom_target(
-+  'initrd-stress.img',
-+  output: 'initrd-stress.img',
-+  input: stress,
-+  command: [find_program('initrd-stress.sh'), '@OUTPUT@', '@INPUT@']
-+)
+ ##########################################
+ # Do we need librt
+ # uClibc provides 2 versions of clock_gettime(), one with realtime
 -- 
 2.26.2
 
