@@ -7,54 +7,55 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 371DCC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:55:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 888D0C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:55:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFB6B20578
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:55:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A2F020578
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 03:55:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="MgXT8Ip8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFB6B20578
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Oa+Fh3pE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A2F020578
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE2p7-0000pd-4P
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:55:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54654)
+	id 1kE2pC-0000zI-GK
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 23:55:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hV-0002T2-El; Thu, 03 Sep 2020 23:47:45 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:42773 helo=ozlabs.org)
+ id 1kE2hd-0002pS-QU; Thu, 03 Sep 2020 23:47:55 -0400
+Received: from ozlabs.org ([203.11.71.1]:34617)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kE2hT-0004uP-9N; Thu, 03 Sep 2020 23:47:45 -0400
+ id 1kE2hb-0004xe-V6; Thu, 03 Sep 2020 23:47:53 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BjNsp0VV5z9sVb; Fri,  4 Sep 2020 13:47:25 +1000 (AEST)
+ id 4BjNsr6Mrwz9sW3; Fri,  4 Sep 2020 13:47:28 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599191246;
- bh=ugr0WxY1CRWShk3/UQfX+l/l8XSozOlyduL+5OhU5iA=;
+ d=gibson.dropbear.id.au; s=201602; t=1599191248;
+ bh=nJoBs/BV0XUu7Aj0kMHw1zqSmXlXG1x5Ion9wGnErAY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=MgXT8Ip8E4/cQUgLRsWWMm3Fl4c16h3xB9yafwj/uZ7rNePBi/9MsemqpZY5socG1
- uZrvURPR3UH/8+pFSQo0GtfuLMmciTqlZfnrYfiWVsFpBaYC05UUmTw7h+nP6xfWl2
- 0l64BgXObT9d7h8kXX1A7JoKYQwe6RxJA8StJRUU=
+ b=Oa+Fh3pExtd8QzuGsMh/KVDGk3AliNe+2pP3aTdGLZtTLMW3kFxlFHcuxZ3wBL3BG
+ TJGd0gHt6Rq/QfVtyamRjuE17w/cFGhOF/ad75Izk+8G7lhN5wW6k/OeirLBuXZONf
+ wkolxKxF90vdU/SL1bDRlT76XMu4D0FJ8R3F6clk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 06/30] spapr_vscsi: do not allow device hotplug
-Date: Fri,  4 Sep 2020 13:46:55 +1000
-Message-Id: <20200904034719.673626-7-david@gibson.dropbear.id.au>
+Subject: [PULL 19/30] mips/cps: Use start-powered-off CPUState property
+Date: Fri,  4 Sep 2020 13:47:08 +1000
+Message-Id: <20200904034719.673626-20-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 23:47:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -19
 X-Spam_score: -2.0
 X-Spam_bar: --
@@ -74,46 +75,64 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
- David Gibson <david@gibson.dropbear.id.au>
+ qemu-ppc@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 
-We do not implement hotplug in the vscsi bus, but we forgot to
-tell qdev about it. The result is that users are able to hotplug
-devices in the vscsi bus, the devices appear in qdev, but they
-aren't usable by the guest OS unless the user reboots it first.
+Instead of setting CPUState::halted to 1 in main_cpu_reset(), use the
+start-powered-off property which makes cpu_common_reset() initialize it
+to 1 in common code.
 
-Setting qbus hotplug_handler to NULL will tell qdev-monitor, via
-qbus_is_hotpluggable(), that we do not support hotplug operations
-in spapr_vscsi.
+Also change creation of CPU object from cpu_create() to object_new() and
+qdev_realize_and_unref() because cpu_create() realizes the CPU and it's not
+possible to set a property after the object is realized.
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1862059
-
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200820190635.379657-1-danielhb413@gmail.com>
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Message-Id: <20200826055535.951207-6-bauerman@linux.ibm.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/scsi/spapr_vscsi.c | 3 +++
- 1 file changed, 3 insertions(+)
+ hw/mips/cps.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/hw/scsi/spapr_vscsi.c b/hw/scsi/spapr_vscsi.c
-index d17dc03c73..57f0a1336f 100644
---- a/hw/scsi/spapr_vscsi.c
-+++ b/hw/scsi/spapr_vscsi.c
-@@ -1219,6 +1219,9 @@ static void spapr_vscsi_realize(SpaprVioDevice *dev, Error **errp)
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index 615e1a1ad2..23c0f87e41 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -52,9 +52,6 @@ static void main_cpu_reset(void *opaque)
+     CPUState *cs = CPU(cpu);
  
-     scsi_bus_new(&s->bus, sizeof(s->bus), DEVICE(dev),
-                  &vscsi_scsi_info, NULL);
-+
-+    /* ibmvscsi SCSI bus does not allow hotplug. */
-+    qbus_set_hotplug_handler(BUS(&s->bus), NULL);
+     cpu_reset(cs);
+-
+-    /* All VPs are halted on reset. Leave powering up to CPC. */
+-    cs->halted = 1;
  }
  
- void spapr_vscsi_create(SpaprVioBus *bus)
+ static bool cpu_mips_itu_supported(CPUMIPSState *env)
+@@ -76,7 +73,17 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+     bool saar_present = false;
+ 
+     for (i = 0; i < s->num_vp; i++) {
+-        cpu = MIPS_CPU(cpu_create(s->cpu_type));
++        cpu = MIPS_CPU(object_new(s->cpu_type));
++
++        /* All VPs are halted on reset. Leave powering up to CPC. */
++        if (!object_property_set_bool(OBJECT(cpu), "start-powered-off", true,
++                                      errp)) {
++            return;
++        }
++
++        if (!qdev_realize_and_unref(DEVICE(cpu), NULL, errp)) {
++            return;
++        }
+ 
+         /* Init internal devices */
+         cpu_mips_irq_init_cpu(cpu);
 -- 
 2.26.2
 
