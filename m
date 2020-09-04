@@ -2,92 +2,109 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46D78C43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 10:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23633C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 10:43:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1295D206D4
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 10:40:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1295D206D4
+	by mail.kernel.org (Postfix) with ESMTPS id E0D412084D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 10:43:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0D412084D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE98c-0004Bz-8I
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 06:40:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58264)
+	id 1kE9Bd-0005SV-4d
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 06:43:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE97S-0002vP-Sv
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 06:38:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:59043
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE9At-0004zP-EU
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 06:42:31 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:32263
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kE97R-0005Zt-9K
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 06:38:58 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-445-YefqngVsPu-IGgUG__9NTg-1; Fri, 04 Sep 2020 06:38:54 -0400
-X-MC-Unique: YefqngVsPu-IGgUG__9NTg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 457FD81F014;
- Fri,  4 Sep 2020 10:38:53 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-114-156.ams2.redhat.com
- [10.36.114.156])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F8F65D9CC;
- Fri,  4 Sep 2020 10:38:52 +0000 (UTC)
-Subject: Re: [PATCH] iotests: Remove 030 from the auto group
-To: Thomas Huth <thuth@redhat.com>, Kevin Wolf <kwolf@redhat.com>
-References: <20200904055701.462482-1-thuth@redhat.com>
- <20200904082513.GA6237@linux.fritz.box>
- <51e03521-f0b7-bf29-1ab8-9025f2f4ce94@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0c90a606-c697-332d-a3b7-12aec7c67f85@redhat.com>
-Date: Fri, 4 Sep 2020 12:38:50 +0200
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kE9Ar-00068H-5n
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 06:42:30 -0400
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-523-iq_xAhY7MZqN4xNY97gAnQ-1; Fri, 04 Sep 2020 06:42:26 -0400
+X-MC-Unique: iq_xAhY7MZqN4xNY97gAnQ-1
+Received: by mail-wr1-f72.google.com with SMTP id v12so2185870wrm.9
+ for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 03:42:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=x8Tbw53cYVTfRZiQaYfMnjqWsbGiSiGpzuUjLzYGfro=;
+ b=gpR0TdGtM84jWqbKLXqRbFz8SPbX5yxUUj7WCcozGJrn1STcKAx3SJClCFAZ7oTcdB
+ 32GNk7EPzjSYA2TuQR3qRBTpJxsti9a/z+JbC0/oxn1Qg/2i60LiLF7zZ77sb/+u9KHH
+ 7CnC7uN0bxjec2feXtovgQR4A5mQ6uGY+25kR/vjSuxSb5t8AyDczAKnA8S1aegNmpcQ
+ /CisV298yKVdFoyPc+wa8VNKLXGYQBR68GO+107PBWVXmxVQhLl0SZJFmPezVJBCjiAl
+ NdbWxS/vtANEpkm4/wz4mLnAwjT6GF7YJahLsd8Uo7W/FrMzehwPy+yhwmf6G9KIhGII
+ 8E4Q==
+X-Gm-Message-State: AOAM531UD9m0CeefHOARWwxJ7agzLZYYvOiFVRuth7NZzFa2SfLYviUD
+ L0RRiqzNT/ms5MtMjVG1/ACVPHM3T/qYCzRwfRpoHoPSGAbM1ZBRf6lxk4d5af4RmkdpPwIfku7
+ +993vd6WpCzyHL/s=
+X-Received: by 2002:a05:600c:2109:: with SMTP id
+ u9mr6568219wml.147.1599216145120; 
+ Fri, 04 Sep 2020 03:42:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz7brbyb53c8CXS8UYrNdR+00+Iz2fChpehK+fxo2gCZv2GnMMEYak3qTGQSxlCy2PQ3/48zg==
+X-Received: by 2002:a05:600c:2109:: with SMTP id
+ u9mr6568177wml.147.1599216144581; 
+ Fri, 04 Sep 2020 03:42:24 -0700 (PDT)
+Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
+ [83.52.54.50])
+ by smtp.gmail.com with ESMTPSA id h185sm10714596wme.25.2020.09.04.03.42.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 04 Sep 2020 03:42:23 -0700 (PDT)
+Subject: Re: [PATCH v3 0/7] colo: Introduce resource agent and test suite/CI
+To: Lukas Straub <lukasstraub2@web.de>, qemu-devel <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>
+References: <cover.1596536719.git.lukasstraub2@web.de>
+ <20200818142701.6d1d82bd@luklap> <20200827104054.45a116fb@luklap>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <244bdfd0-a780-faca-5f7a-b6e103789341@redhat.com>
+Date: Fri, 4 Sep 2020 12:42:22 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <51e03521-f0b7-bf29-1ab8-9025f2f4ce94@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-X-Mimecast-Spam-Score: 0.0
+In-Reply-To: <20200827104054.45a116fb@luklap>
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="DkW3NTUGSh5sTArCcEnh5ZF2o5ucFBzUz"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=windows-1252
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:57:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,7 +113,7 @@ X-Spam_score: -4.3
 X-Spam_bar: ----
 X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.403,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,61 +126,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Zhang Chen <chen.zhang@intel.com>, Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---DkW3NTUGSh5sTArCcEnh5ZF2o5ucFBzUz
-Content-Type: multipart/mixed; boundary="hFmlD54SaJ4DTkFSFlXH2uXb4Ke0PMp4e"
+Hi Wainer,
 
---hFmlD54SaJ4DTkFSFlXH2uXb4Ke0PMp4e
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+As Cleber is busy with Gating CI, can you
+review tests/acceptance/colo.py please?
 
-On 04.09.20 12:14, Thomas Huth wrote:
-> On 04/09/2020 10.25, Kevin Wolf wrote:
->> Am 04.09.2020 um 07:57 hat Thomas Huth geschrieben:
->>> Test 030 is still occasionally failing in the CI ... so for the
->>> time being, let's disable it in the "auto" group. We can add it
->>> back once it got more stable.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
+On 8/27/20 10:40 AM, Lukas Straub wrote:
+> On Tue, 18 Aug 2020 14:27:01 +0200
+> Lukas Straub <lukasstraub2@web.de> wrote:
+> 
+>> On Tue, 4 Aug 2020 12:46:29 +0200
+>> Lukas Straub <lukasstraub2@web.de> wrote:
 >>
->> I would rather just disable this one test function as 030 is a pretty
->> important one that tends to catch bugs.
->=20
-> Ok, ... should it always get disabled, or shall we try to come up with
-> some magic checks so that it only gets disabled in the CI pipelines (...
-> though I don't have a clue how to check for Peter's merge test
-> environment...)?
-
-I suppose we could let check-block.sh set some environment variable.
-
-Max
-
-
---hFmlD54SaJ4DTkFSFlXH2uXb4Ke0PMp4e--
-
---DkW3NTUGSh5sTArCcEnh5ZF2o5ucFBzUz
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9SGToACgkQ9AfbAGHV
-z0CriQgAsD+42eJy/ustg1E9iNTV8Vl3lSFA753BrOs6SygZAQxpewGEqZNxa5Jl
-SWrtjF7dO89i3EbzUXSKnvdFIMvfG9QpeAzJb/ZpA6b6/8Wob6OkMjuZ4DQA9lU9
-3CcGV1YkdrdFoBopw7bPiteDHOBkK8KVE6JS6Ga3+cSxlKtkfMUZuE+2UB7Pm9zL
-xAFW63gF4rau7eByJXdBpEZIMXyLCDH9B9vYyWdVA61dxa74r+EHL5rwWK1L7RYs
-88p605zZwhvRPCqkzFfbMY4t3zipzx0OXMRjXKu8+YUvGu+pQYXmvc6PiXlTERGU
-rikyNH+yx/A7xGD8pI5HGR7MuyhufQ==
-=lx3E
------END PGP SIGNATURE-----
-
---DkW3NTUGSh5sTArCcEnh5ZF2o5ucFBzUz--
+>>> Hello Everyone,
+>>> So here is v3. Patch 1 can already be merged independently of the others.
+>>> Please review.
+>>>
+>>> Regards,
+>>> Lukas Straub
+>>>
+>>> Based-on: <cover.1596528468.git.lukasstraub2@web.de>
+>>> "Introduce 'yank' oob qmp command to recover from hanging qemu"
+>>>
+>>> Changes:
+>>>
+>>> v3:
+>>>  -resource-agent: Don't determine local qemu state by remote master-score, query
+>>>   directly via qmp instead
+>>>  -resource-agent: Add max_queue_size parameter for colo-compare
+>>>  -resource-agent: Fix monitor action on secondary returning error during
+>>>   clean shutdown
+>>>  -resource-agent: Fix stop action setting master-score to 0 on primary on
+>>>   clean shutdown
+>>>
+>>> v2:
+>>>  -use new yank api
+>>>  -drop disk_size parameter
+>>>  -introduce pick_qemu_util function and use it
+>>>
+>>> Overview:
+>>>
+>>> Hello Everyone,
+>>> These patches introduce a resource agent for fully automatic management of colo
+>>> and a test suite building upon the resource agent to extensively test colo.
+>>>
+>>> Test suite features:
+>>> -Tests failover with peer crashing and hanging and failover during checkpoint
+>>> -Tests network using ssh and iperf3
+>>> -Quick test requires no special configuration
+>>> -Network test for testing colo-compare
+>>> -Stress test: failover all the time with network load
+>>>
+>>> Resource agent features:
+>>> -Fully automatic management of colo
+>>> -Handles many failures: hanging/crashing qemu, replication error, disk error, ...
+>>> -Recovers from hanging qemu by using the "yank" oob command
+>>> -Tracks which node has up-to-date data
+>>> -Works well in clusters with more than 2 nodes
+>>>
+>>> Run times on my laptop:
+>>> Quick test: 200s
+>>> Network test: 800s (tagged as slow)
+>>> Stress test: 1300s (tagged as slow)
+>>>
+>>> For the last two tests, the test suite needs access to a network bridge to
+>>> properly test the network, so some parameters need to be given to the test
+>>> run. See tests/acceptance/colo.py for more information.
+>>>
+>>> Regards,
+>>> Lukas Straub
+>>>
+>>> Lukas Straub (7):
+>>>   block/quorum.c: stable children names
+>>>   avocado_qemu: Introduce pick_qemu_util to pick qemu utility binaries
+>>>   boot_linux.py: Use pick_qemu_util
+>>>   colo: Introduce resource agent
+>>>   colo: Introduce high-level test suite
+>>>   configure,Makefile: Install colo resource-agent
+>>>   MAINTAINERS: Add myself as maintainer for COLO resource agent
+>>>
+>>>  MAINTAINERS                               |    6 +
+>>>  Makefile                                  |    5 +
+>>>  block/quorum.c                            |   20 +-
+>>>  configure                                 |   10 +
+>>>  scripts/colo-resource-agent/colo          | 1501 +++++++++++++++++++++
+>>>  scripts/colo-resource-agent/crm_master    |   44 +
+>>>  scripts/colo-resource-agent/crm_resource  |   12 +
+>>>  tests/acceptance/avocado_qemu/__init__.py |   15 +
+>>>  tests/acceptance/boot_linux.py            |   11 +-
+>>>  tests/acceptance/colo.py                  |  677 ++++++++++
+>>>  10 files changed, 2286 insertions(+), 15 deletions(-)
+>>>  create mode 100755 scripts/colo-resource-agent/colo
+>>>  create mode 100755 scripts/colo-resource-agent/crm_master
+>>>  create mode 100755 scripts/colo-resource-agent/crm_resource
+>>>  create mode 100644 tests/acceptance/colo.py
+>>>
+>>> --
+>>> 2.20.1  
+>>
+>> Ping...
+> 
+> Ping 2...
+> 
+> Kevin, can you already apply patch 1 "block/quorum.c: stable children names"? It resolves the following bug: https://bugs.launchpad.net/qemu/+bug/1881231
+> 
+> Regards,
+> Lukas Straub
+> 
 
 
