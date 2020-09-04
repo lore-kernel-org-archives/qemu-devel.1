@@ -2,95 +2,76 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8DBDC433E2
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:04:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65A76C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:04:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6CB420748
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:04:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6CB420748
+	by mail.kernel.org (Postfix) with ESMTPS id 134AD20748
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 09:04:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 134AD20748
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59648 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kE7de-0007fn-Ni
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:04:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56022)
+	id 1kE7eE-0000Ce-7y
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 05:04:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kE7cg-0006h2-Jl
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:03:06 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:30105
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kE7dQ-0007Yn-Gg
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:03:52 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:42130
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kE7ce-0008W6-6j
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:03:05 -0400
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-519-wYaLBoU4PP6wQ6dgOJCuGg-1; Fri, 04 Sep 2020 05:03:00 -0400
-X-MC-Unique: wYaLBoU4PP6wQ6dgOJCuGg-1
-Received: by mail-ed1-f71.google.com with SMTP id r19so2419652edq.12
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 02:03:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=/owlrH05oLcdb27l+gUDO0iDqQnbh+KlGKD+g+WkV1U=;
- b=eIDjCUAAOZkNBdHxVsNJDpNPqnjimOYqRVAO9JzMN2OK2ytZXW2xFVw+SVcyyPYqWD
- Mha32JUZKg7aLDHGDlHwJSzzSFpSilPTBlm1LCFHQDN5yTzBY25qtg8ZSzJgNK9t1dUp
- mnDjKt6BL1RzSc0seUCaYbC2NV+NYPXm9dTt+gs/V8U8zijxd8ekq0koDdwBa2boB9lN
- 3C2TE33WXMs1mv8xHve84y0koXsLq2yl5JjjYFx/7kkHAC3bJBYPjC7u6Lv1A5INqeDv
- OhkHxML72HAXoaxoqychuJ4UPivtblrjuqL9vV2I/e44KNL97TvFhT4RPDUi3cojSisg
- 9a/g==
-X-Gm-Message-State: AOAM533oXEHTFt/Pca5WsOcyqc0yHLvT6rlaGxxwkvK8ZXydY2F43UaE
- CeGZ/KAYF20rpN61dQYqYUdGs82q9C00XxJAatCzp29YlszvQJ0QeB8RAx+W8kzH3sJ2Vy6R/Tw
- YaFD5cpqtLSiBCWE=
-X-Received: by 2002:a17:906:faec:: with SMTP id
- lu44mr6174490ejb.527.1599210179457; 
- Fri, 04 Sep 2020 02:02:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzPcU4l2TjgBmwcagt36DXtQxuYEqe6ilFPncCAeiyANALsKY4/mXm+7SC6Au/FYVijsvsg3w==
-X-Received: by 2002:a17:906:faec:: with SMTP id
- lu44mr6174461ejb.527.1599210179151; 
- Fri, 04 Sep 2020 02:02:59 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:6276:52ed:96d5:c094?
- ([2001:b07:6468:f312:6276:52ed:96d5:c094])
- by smtp.gmail.com with ESMTPSA id b6sm5436265eds.46.2020.09.04.02.02.58
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Sep 2020 02:02:58 -0700 (PDT)
-Subject: Re: [PATCH] meson: fix qxl module build
-To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
-References: <20200827064629.23080-1-kraxel@redhat.com>
- <20200904081240.afvjaek5o2owlyeh@sirius.home.kraxel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <2706f51d-381f-929e-7c8c-7df83f8491ff@redhat.com>
-Date: Fri, 4 Sep 2020 11:02:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kE7dL-0000AA-V3
+ for qemu-devel@nongnu.org; Fri, 04 Sep 2020 05:03:52 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-218-3rIhK3wTN7uQrsNTMxgZqA-1; Fri, 04 Sep 2020 05:03:39 -0400
+X-MC-Unique: 3rIhK3wTN7uQrsNTMxgZqA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ABC978712FE;
+ Fri,  4 Sep 2020 09:03:38 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 341BC2D07D;
+ Fri,  4 Sep 2020 09:03:38 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A7F4B1132B59; Fri,  4 Sep 2020 11:03:36 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH v5 08/20] scripts/qapi/parser.py: improve doc comment
+ indent handling
+References: <20200810195019.25427-1-peter.maydell@linaro.org>
+ <20200810195019.25427-9-peter.maydell@linaro.org>
+Date: Fri, 04 Sep 2020 11:03:36 +0200
+In-Reply-To: <20200810195019.25427-9-peter.maydell@linaro.org> (Peter
+ Maydell's message of "Mon, 10 Aug 2020 20:50:07 +0100")
+Message-ID: <87wo19c3rr.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20200904081240.afvjaek5o2owlyeh@sirius.home.kraxel.org>
-X-Mimecast-Spam-Score: 0.001
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 03:57:33
+Content-Type: text/plain
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=armbru@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 01:57:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.403,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,65 +85,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/09/20 10:12, Gerd Hoffmann wrote:
->   Hi,
-> 
->>  if config_all_devices.has_key('CONFIG_QXL')
->>    qxl_ss = ss.source_set()
->> -  qxl_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
->> +  qxl_ss.add(files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
->>    hw_display_modules += {'qxl': qxl_ss}
->>  endif
->>  
->> -softmmu_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
-> 
-> Damn.  Turned out to not be that easy.  Modular builds work fine, but
-> with non-modular builds I have the problem that qxl_ss is merged into
-> softmmu_ss *unconditionally*.  So when building two targets, one with
-> qxl enabled (i386 for example) and one without pci support (avr for
-> example) I get missing symbols for pci+vga due to the attempt to link
-> qxl into avr-softmmu.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-You have found why it's got that "when:". :)
+> Make the handling of indentation in doc comments more sophisticated,
+> so that when we see a section like:
+>
+> Notes: some text
+>        some more text
+>           indented line 3
+>
+> we save it for the doc-comment processing code as:
+>
+> some text
+> some more text
+>    indented line 3
+>
+> and when we see a section with the heading on its own line:
+>
+> Notes:
+>
+> some text
+> some more text
+>    indented text
+>
+> we also accept that and save it in the same form.
+>
+> The exception is that we always retain indentation as-is for Examples
+> sections, because these are literal text.
 
-> Any hints how to solve that one?
+Does docs/devel/qapi-code-gen.txt need an update?  Hmm, looks like you
+leave it to [PATCH 15] docs/devel/qapi-code-gen.txt: Update to new rST
+backend conventions.  Acceptable.  Mentioning it in the commit message
+now may make sense.
 
-I think this should be enough---fixing it in the common code, not with a
-qxl-specific change:
+> If we detect that the comment document text is not indented as much
+> as we expect it to be, we throw a parse error.  (We don't complain
+> about over-indented sections, because for rST this can be legitimate
+> markup.)
+>
+> The golden reference for the doc comment text is updated to remove
+> the two 'wrong' indents; these now form a test case that we correctly
+> stripped leading whitespace from an indented multi-line argument
+> definition.
+>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> v1->v2: Update doc-good.out as per final para.
+> ---
+>  scripts/qapi/parser.py         | 81 +++++++++++++++++++++++++++-------
+>  tests/qapi-schema/doc-good.out |  4 +-
+>  2 files changed, 67 insertions(+), 18 deletions(-)
+>
+> diff --git a/scripts/qapi/parser.py b/scripts/qapi/parser.py
+> index 7fae4478d34..d9f11eadd96 100644
+> --- a/scripts/qapi/parser.py
+> +++ b/scripts/qapi/parser.py
+> @@ -308,18 +308,32 @@ class QAPIDoc:
+>      """
+>  
+>      class Section:
+> -        def __init__(self, name=None):
+> +        def __init__(self, parser, name=None, indent=0):
+> +            # parser, for error messages about indentation
+> +            self._parser = parser
+>              # optional section name (argument/member or section name)
+>              self.name = name
+>              # the list of lines for this section
+>              self.text = ''
+> +            # the expected indent level of the text of this section
+> +            self._indent = indent
+>  
+>          def append(self, line):
+> +            # Strip leading spaces corresponding to the expected indent level
+> +            # Blank lines are always OK.
+> +            if line:
+> +                spacecount = len(line) - len(line.lstrip(" "))
 
-diff --git a/meson.build b/meson.build
-index 6ed3c37f46..88f2254f3b 100644
---- a/meson.build
-+++ b/meson.build
-@@ -923,7 +923,7 @@ softmmu_mods = []
- foreach d, list : modules
-   foreach m, module_ss : list
-     if enable_modules and targetos != 'windows'
--      module_ss = module_ss.apply(config_host, strict: false)
-+      module_ss = module_ss.apply(config_all, strict: false)
-       sl = static_library(d + '-' + m, [genh, module_ss.sources()],
-                           dependencies: [modulecommon, module_ss.dependencies()], pic: true)
-       if d == 'block'
+Works, but I'd prefer
 
-:-O
+                   indent = re.match(r'\s*', line).end()
 
-If you want to get rid of the "if config_all_devices.has_key(...)", you perhaps
-could try doing something like
+> +                if spacecount > self._indent:
+> +                    spacecount = self._indent
+> +                if spacecount < self._indent:
+> +                    raise QAPIParseError(self._parser, "unexpected de-indent")
 
-  module_srcs = module_ss.sources()
-  if module_srcs.length() == 0
-    continue
-  endif
-  sl = static_library(d + '-' + m, [genh, module_srcs],
-                      dependencies: [modulecommon, module_ss.dependencies()], pic: true)
+New error needs test coverage.  I append a possible test.
 
-etc.  This would work also for the CONFIG_VIRTIO_GPU changes.
+Reporting the expected indentation might be helpful.
 
-Paolo
+> +                line = line[spacecount:]
+
+If you use self._indent instead of spacecount here (which I find
+clearer), you don't need to cap spacecount at self._indent above.
+
+> +
+>              self.text += line.rstrip() + '\n'
+>  
+>      class ArgSection(Section):
+> -        def __init__(self, name):
+> -            super().__init__(name)
+> +        def __init__(self, parser, name, indent=0):
+> +            super().__init__(parser, name, indent)
+>              self.member = None
+>  
+>          def connect(self, member):
+> @@ -333,7 +347,7 @@ class QAPIDoc:
+>          self._parser = parser
+>          self.info = info
+>          self.symbol = None
+> -        self.body = QAPIDoc.Section()
+> +        self.body = QAPIDoc.Section(parser)
+>          # dict mapping parameter name to ArgSection
+>          self.args = OrderedDict()
+>          self.features = OrderedDict()
+> @@ -438,7 +452,18 @@ class QAPIDoc:
+>  
+>          if name.startswith('@') and name.endswith(':'):
+>              line = line[len(name)+1:]
+> -            self._start_args_section(name[1:-1])
+> +            if not line or line.isspace():
+> +                # Line was just the "@arg:" header; following lines
+> +                # are not indented
+> +                indent = 0
+> +                line = ''
+> +            else:
+> +                # Line is "@arg: first line of description"; following
+> +                # lines should be indented by len(name) + 1, and we
+> +                # pad out this first line so it is handled the same way
+> +                indent = len(name) + 1
+> +                line = ' ' * indent + line
+> +            self._start_args_section(name[1:-1], indent)
+>          elif self._is_section_tag(name):
+>              self._append_line = self._append_various_line
+>              self._append_various_line(line)
+> @@ -460,7 +485,17 @@ class QAPIDoc:
+>  
+>          if name.startswith('@') and name.endswith(':'):
+>              line = line[len(name)+1:]
+> -            self._start_features_section(name[1:-1])
+> +            if not line or line.isspace():
+> +                # Line is just the "@name:" header, no ident for following lines
+
+pycodestyle complains:
+scripts/qapi/parser.py:489:80: E501 line too long (80 > 79 characters)
+
+> +                indent = 0
+> +                line = ''
+> +            else:
+> +                # Line is "@arg: first line of description"; following
+> +                # lines should be indented by len(name) + 3, and we
+> +                # pad out this first line so it is handled the same way
+> +                indent = len(name) + 1
+
+Comment claims + 3, code uses + 1.
+
+Does this do the right thing when @arg: is followed by multiple
+whitespace characters?
+
+> +                line = ' ' * indent + line
+> +            self._start_features_section(name[1:-1], indent)
+>          elif self._is_section_tag(name):
+>              self._append_line = self._append_various_line
+>              self._append_various_line(line)
+> @@ -493,11 +528,23 @@ class QAPIDoc:
+>                                   % (name, self.sections[0].name))
+>          if self._is_section_tag(name):
+>              line = line[len(name)+1:]
+> -            self._start_section(name[:-1])
+> +            if not line or line.isspace():
+> +                # Line is just "SectionName:", no indent for following lines
+> +                indent = 0
+> +                line = ''
+> +            elif name.startswith("Example"):
+> +                # The "Examples" section is literal-text, so preserve
+> +                # all the indentation as-is
+> +                indent = 0
+
+Section "Example" is an exception.  Needs to be documented.  Do we
+really need the exception?  As far as I can see, it's only ever used in
+documentation of block-latency-histogram-set.
+
+> +            else:
+> +                # Line is "SectionName: some text", indent required
+
+Same situation as above, much terser comment.
+
+> +                indent = len(name) + 1
+> +                line = ' ' * indent + line
+> +            self._start_section(name[:-1], indent)
+>  
+>          self._append_freeform(line)
+>  
+> -    def _start_symbol_section(self, symbols_dict, name):
+> +    def _start_symbol_section(self, symbols_dict, name, indent):
+>          # FIXME invalid names other than the empty string aren't flagged
+>          if not name:
+>              raise QAPIParseError(self._parser, "invalid parameter name")
+> @@ -506,21 +553,21 @@ class QAPIDoc:
+>                                   "'%s' parameter name duplicated" % name)
+>          assert not self.sections
+>          self._end_section()
+> -        self._section = QAPIDoc.ArgSection(name)
+> +        self._section = QAPIDoc.ArgSection(self._parser, name, indent)
+>          symbols_dict[name] = self._section
+>  
+> -    def _start_args_section(self, name):
+> -        self._start_symbol_section(self.args, name)
+> +    def _start_args_section(self, name, indent):
+> +        self._start_symbol_section(self.args, name, indent)
+>  
+> -    def _start_features_section(self, name):
+> -        self._start_symbol_section(self.features, name)
+> +    def _start_features_section(self, name, indent):
+> +        self._start_symbol_section(self.features, name, indent)
+>  
+> -    def _start_section(self, name=None):
+> +    def _start_section(self, name=None, indent=0):
+>          if name in ('Returns', 'Since') and self.has_section(name):
+>              raise QAPIParseError(self._parser,
+>                                   "duplicated '%s' section" % name)
+>          self._end_section()
+> -        self._section = QAPIDoc.Section(name)
+> +        self._section = QAPIDoc.Section(self._parser, name, indent)
+>          self.sections.append(self._section)
+>  
+>      def _end_section(self):
+> @@ -543,7 +590,7 @@ class QAPIDoc:
+>      def connect_member(self, member):
+>          if member.name not in self.args:
+>              # Undocumented TODO outlaw
+> -            self.args[member.name] = QAPIDoc.ArgSection(member.name)
+> +            self.args[member.name] = QAPIDoc.ArgSection(self._parser, member.name)
+
+pycodestyle complains:
+scripts/qapi/parser.py:593:80: E501 line too long (82 > 79 characters)
+
+
+>          self.args[member.name].connect(member)
+>  
+>      def connect_feature(self, feature):
+> @@ -551,6 +598,8 @@ class QAPIDoc:
+>              raise QAPISemError(feature.info,
+>                                 "feature '%s' lacks documentation"
+>                                 % feature.name)
+> +            self.features[feature.name] = QAPIDoc.ArgSection(self._parser,
+> +                                                             feature.name)
+
+pylint points out:
+scripts/qapi/parser.py:601:12: W0101: Unreachable code (unreachable)
+
+>          self.features[feature.name].connect(feature)
+>  
+>      def check_expr(self, expr):
+> diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+> index 0ef85d959ac..bbf77b08dc3 100644
+> --- a/tests/qapi-schema/doc-good.out
+> +++ b/tests/qapi-schema/doc-good.out
+> @@ -158,7 +158,7 @@ doc symbol=Alternate
+>  
+>      arg=i
+>  an integer
+> -    @b is undocumented
+> +@b is undocumented
+>      arg=b
+>  
+>      feature=alt-feat
+> @@ -173,7 +173,7 @@ doc symbol=cmd
+>  the first argument
+>      arg=arg2
+>  the second
+> -       argument
+> +argument
+>      arg=arg3
+>  
+>      feature=cmd-feat1
+
+
+Suggested new test doc-bad-deintent.json, cribbed from your PATCH 06 of
+doc-good.json:
+
+##
+# @Alternate:
+# @i: an integer
+# @b is undocumented
+##
+{ 'alternate': 'Alternate',
+  'data': { 'i': 'int', 'b': 'bool' } }
 
 
