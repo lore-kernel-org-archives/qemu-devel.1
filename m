@@ -2,112 +2,128 @@ Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAECC43461
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:25:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8042C433E2
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:28:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 307ED20658
-	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:25:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9ECD92084D
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 12:28:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hALrWg9v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307ED20658
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="usfs3EjT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9ECD92084D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEAml-0005fB-Bu
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 08:25:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52814)
+	id 1kEAp8-0007sA-AL
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 08:28:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEAly-00058a-BS
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 08:24:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56758)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kEAlv-0002g4-Dl
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 08:24:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599222288;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0P+1BBhRg8wznt3NT6U0B23heHcJauvTqNmCPJlp1Gc=;
- b=hALrWg9vmKA6kz6rhtwqOEn/seueQ3JNJQmeFZ6iZIYSMiNhoCOQR2HCoy+ApKRlVB1R8+
- PopIY1Oj29/p5B6nP5OE2Q+SMztzgT6U1JZ39fl1SUTm1TJ4CbzSTY20fkcQlUeuIx4mW3
- XuOhVJjlXcwHZZfRx4uG9U9/klzHd8o=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-NU_V0iTfNai2ESiErpgXLA-1; Fri, 04 Sep 2020 08:24:47 -0400
-X-MC-Unique: NU_V0iTfNai2ESiErpgXLA-1
-Received: by mail-ed1-f71.google.com with SMTP id r9so2258492edi.9
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 05:24:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=0P+1BBhRg8wznt3NT6U0B23heHcJauvTqNmCPJlp1Gc=;
- b=s6yW6Ur4fTzTjHZZjDSv9Gc5ED2b0upnUTEHaFuULXKJpDuF4CT8wU41QlYQ0GEhn0
- 78kEXHRInQy1gbGBMuqyXmdS0cfX46TelaRFK3NJMLdI+At0Y4LOCAFEMaMtL9GwPuhv
- 3oMtoNICLKTwEkc/d4mpO+sPS7KcnyO+iRsRPn/VxKXWfbqFNqDjC0yp/DBcrDO0BlCN
- sxMvMzurXxCmMz9TmdhGtlrZS7AitMkkSfgDls8+1+xRTtSYhe3ZdxTNoG42XJX8660e
- aBF20cn7aRAveoKS5o7yiIyyRRUwEFbsv3BThy+6OptI8zdI5h32bE3ooj7l/veiBojC
- z7NQ==
-X-Gm-Message-State: AOAM533ijRdIjRpphfG6jVeKHYfepfu2uR/KLfj1uIUJSIzeu1sRC3P1
- e5/ts33MuknbRoIY45bzOKXgxeFNshRV6PPQ+jiub14Bja0qqNBcjjaB1FIF4JHOGvqwEbQCOua
- vAvWxGVK7ozCJDi0=
-X-Received: by 2002:a17:907:72c5:: with SMTP id
- du5mr7414005ejc.469.1599222286328; 
- Fri, 04 Sep 2020 05:24:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxCz/L+a2Tx56RhPG+9SjhBVZebH1LwkA5uyiZAs2OAqxLMQKQDnBgQiZKPPx4nT82udceAdw==
-X-Received: by 2002:a17:907:72c5:: with SMTP id
- du5mr7413990ejc.469.1599222286099; 
- Fri, 04 Sep 2020 05:24:46 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:6276:52ed:96d5:c094?
- ([2001:b07:6468:f312:6276:52ed:96d5:c094])
- by smtp.gmail.com with ESMTPSA id bn14sm5921555ejb.115.2020.09.04.05.24.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 04 Sep 2020 05:24:45 -0700 (PDT)
-Subject: Re: [PATCH] meson: fix qxl module build
-To: Gerd Hoffmann <kraxel@redhat.com>
-References: <20200827064629.23080-1-kraxel@redhat.com>
- <20200904081240.afvjaek5o2owlyeh@sirius.home.kraxel.org>
- <2706f51d-381f-929e-7c8c-7df83f8491ff@redhat.com>
- <20200904121412.lgrm7mlri664jz4n@sirius.home.kraxel.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9de758ed-ae9d-40e6-8ad5-aaf102bc5013@redhat.com>
-Date: Fri, 4 Sep 2020 14:24:45 +0200
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kEAnt-0006fx-IQ; Fri, 04 Sep 2020 08:26:53 -0400
+Received: from mail-eopbgr30135.outbound.protection.outlook.com
+ ([40.107.3.135]:17646 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kEAnq-00033u-By; Fri, 04 Sep 2020 08:26:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SusiyCLUbtU/1bcrq1ULToMVS9vqckpu6TFUIB+MEocYn0DHpvW6KUNzQhZvFTZxp4VK+WDPAV+1Xh9Zk/mHHBvXeI7PBBpVFDPhteCSzy59vVymM+fqhPSzJuvuqEHh1qdHEgE4QGWoHanFOiEUW7W2o3Iay6/8U11enH4FMRAeoQlebBqOukGYPcd9i1nUxRnd84xhV6LIT0yevgnsVjcgW6OJtyCJKlm7LeeGCuTHdSAh+kkkIwBtplHOo1ia2SKsk/fDsIInr9t4tzUFrEt3fwI/z9XNbX+mg0vNFKGdHZvqoRo5itxgJ0NJ9VpPKBRsP53satcLx0NUoqL31w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cyE52T9DnqN1Wa/hkndSH4vmicqoawW/wieBa9tEcpg=;
+ b=BohYh5Ny0SbhsUq5VLmwzrWEOej09QoEJnIEmiLYAh63d2fRyp+6zz1buBsW5B6GOa034ZK0yRGHbLSWQZXEdPiAlLlGmRCys8z7PW8aWFYTnG8pYPcSZKcdmqFmBizF7kelnxfHkzR+Ko+oel5mn7pM/nr/auAms3oOHTkymD4DVmvKUbVcFALCfY3XxeDO/olnf8ld7ZS9LFCLGYMN5q9nTA17PNQCkA4nPWibHxAAI4L3xx1UazUApUq/zx1oQ17AUvI8E2rGxmXXwdanDi9i0OLsGSv5cV8HFXdEgVL1IiPW1R5s0BkllMqwSdT9AC1V7gCeKQ1Y7Fe7C8HYXA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=cyE52T9DnqN1Wa/hkndSH4vmicqoawW/wieBa9tEcpg=;
+ b=usfs3EjTQGlqeC2jSPAaJev1YbQYV+TYUMezUG5Mi+8v4LqvExXOuHrT6tK8oOSRwObAiOqVXbQPKQrtIjXx+ey9/+29E5a/+/mpyooEhTkbFvQBHK4+hJy+Xep6vsC3CAne6/W4omEP7JSTKxCvI6S1lnST471NO5PLn2IuWzw=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4785.eurprd08.prod.outlook.com (2603:10a6:20b:d2::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Fri, 4 Sep
+ 2020 12:26:45 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%7]) with mapi id 15.20.3348.017; Fri, 4 Sep 2020
+ 12:26:45 +0000
+Subject: Re: [PATCH v8 4/7] copy-on-read: pass base file name to COR driver
+To: Max Reitz <mreitz@redhat.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, armbru@redhat.com,
+ jsnow@redhat.com, eblake@redhat.com, den@openvz.org
+References: <1598633579-221780-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1598633579-221780-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <15dbdc16-8d4d-3830-01af-8cc149ffd79d@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <94df17fe-545f-3e08-1189-fbbf311c8326@virtuozzo.com>
+Date: Fri, 4 Sep 2020 15:26:43 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20200904121412.lgrm7mlri664jz4n@sirius.home.kraxel.org>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+ Thunderbird/68.12.0
+In-Reply-To: <15dbdc16-8d4d-3830-01af-8cc149ffd79d@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 06:46:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AM0PR01CA0083.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::24) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.143) by
+ AM0PR01CA0083.eurprd01.prod.exchangelabs.com (2603:10a6:208:10e::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15 via Frontend
+ Transport; Fri, 4 Sep 2020 12:26:44 +0000
+X-Originating-IP: [185.215.60.143]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d67e7dcf-ad31-47d2-2dc1-08d850cdc984
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4785:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB47851431EA169D3A25F296FEC12D0@AM6PR08MB4785.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vv5ysq4agiNV99mg38cLAKBEGFu7ZbHc20tbN+gnIEi6Kl1+h2uRYQwNkVn5y1o7ZkXD+XJHRcK2f4zUUApcU3ppMpoEkQBMInlTAZ/NYf/7btT0f36jiBJSON/5opIgta/s8tXPvYzA1sAIasrFSEEm3ulDdWbGDOFoKYCovku3Ea28hDlW05RxkOHliJ/WD+ra850hH6zjYLea5YCTEIC9ZorcqTbE/ooArSKIk6QkLHPck4bnM43JnBdqAMyEeavCY9XZfUezfHn54zWl+kc4nUC9Yi86IijxohuU9VDeLF2wCopWP6RcUfiru4K00mZECQa3kBqfoo2yqYu7imo+dtfMt7enmAyYe3SwFZjpsggJfEibjHym44vsODzf
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(346002)(136003)(366004)(396003)(39840400004)(8936002)(107886003)(36756003)(2616005)(956004)(4326008)(8676002)(66556008)(66946007)(66476007)(478600001)(2906002)(16526019)(26005)(52116002)(86362001)(31686004)(53546011)(186003)(316002)(5660300002)(16576012)(6486002)(31696002)(83380400001)(110136005)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: rXhzE5IPSxVqG9K4xPWHH37C8uGeDTX5ih4gK47xpCT2sobM3lcfnliqU17Gre16jA6SCY/mtb7K8p9r6hIX1mZ5MFt7vxjUYgbe4NuK6NAN2NecZK+0mp5zESy4MUPWwX+YnaKzT0D0LqP7K9cfdExIqn1ovoPYwgLAB/jTPLJ//UWSwGLkgeSqQ2RJh1h3QjpykFrOBsYHghChVshV3Bl6TNY4Y2oAZBYfnvO+ZRpUrUgKLPlQoIdi3S1af5SbzS8A/x/tS4AFtdUzvm8FH2dY3N7UICb3S2B8fzANmUR2a0KkVUFg2twC4nAJkh/rTeOniGCcqQolnOI4IRJUtRsSqb8T/TfLKB0GKyc6ozqUjPrFNZSQHHfRCwNCZKg7fQns0k8qi5vaJ3cgF2MqhBQDxPjM2bYBCu3Z8AEGWGaZydarCg6LakI3S6pr5Wjp9WjN/gAY7YE/7kbHr9Du7+iyCrMoQyRdeV+9v/zCvj+y83+R1CnAVg655daz5S2TqVjRR1GfIqu5PckFdpQpUvSemEiMYDdLu2b/JXosJHWdHUP6F3cnqf5RlwDQ4O7lm4bumuVwF3bS2d7SWkmBYUFKc3Dkruwy77BAsK8P5glX3LvKATHMbXu0ltLqZiIRxvtpTqCKnP75ClzUpXUNgA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d67e7dcf-ad31-47d2-2dc1-08d850cdc984
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Sep 2020 12:26:45.3789 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aa1V5hdNu2TjT8IH7h+X7PuFYo/HcMxj9CZdttjLAHsmmDovZMlSjHVbKpdDbqDT1W8U3N8eexmGu9tezmnc0hKfeEUitRMwiHPaIKKsrUQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4785
+Received-SPF: pass client-ip=40.107.3.135;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/04 08:26:46
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -121,32 +137,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@gmail.com>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 04/09/20 14:14, Gerd Hoffmann wrote:
->   Hi,
+04.09.2020 15:17, Max Reitz wrote:
+> On 28.08.20 18:52, Andrey Shinkevich wrote:
+>> To limit the guest's COR operations by the base node in the backing
+>> chain during stream job, pass the base file name to the copy-on-read
 > 
->>>> -  qxl_ss.add(when: 'CONFIG_QXL', if_true: files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
->>>> +  qxl_ss.add(files('qxl.c', 'qxl-logger.c', 'qxl-render.c'))
-> 
->> You have found why it's got that "when:". :)
-> 
->> -      module_ss = module_ss.apply(config_host, strict: false)
->> +      module_ss = module_ss.apply(config_all, strict: false)
-> 
-> Ah.  That nicely explains why the "when:" didn't work in the
-> first place.
-> 
->> etc.  This would work also for the CONFIG_VIRTIO_GPU changes.
-> 
-> Yes, virtio-gpu modules are next on the list ;)
+> Does it have to be a filename?  That sounds really bad to me.
 
-Great, feel free to pick the patch up, no need for attribution or anything.
+Agree, it should be node-name. Filename-based interfaces is a headache.
 
-Paolo
+> 
+>> driver. The rest of the functionality will be implemented in the patch
+>> that follows.
+>>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> ---
+>>   block/copy-on-read.c | 41 ++++++++++++++++++++++++++++++++++++++++-
+>>   block/copy-on-read.h |  1 +
+>>   2 files changed, 41 insertions(+), 1 deletion(-)
+> 
+> Furthermore, I believe that this option should become an externally
+> visible option for the copy-on-read filter (i.e., part of its
+> BlockdevOptions) – but that definitely won’t be viable if @base contains
+> a filename.
+> 
+> Can’t we let the stream job invoke bdrv_find_backing_image() to
+> translate a filename into a node name that’s then passed to the COR filter?
+> 
+>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+>> index 0ede7aa..1f858bb 100644
+>> --- a/block/copy-on-read.c
+>> +++ b/block/copy-on-read.c
+>> @@ -24,19 +24,45 @@
+>>   #include "block/block_int.h"
+>>   #include "qemu/module.h"
+>>   #include "qapi/error.h"
+>> +#include "qapi/qmp/qerror.h"
+>>   #include "qapi/qmp/qdict.h"
+>>   #include "block/copy-on-read.h"
+>>   
+>>   
+>>   typedef struct BDRVStateCOR {
+>>       bool active;
+>> +    BlockDriverState *base_bs;
+>>   } BDRVStateCOR;
+>>   
+>> +/*
+>> + * Non-zero pointers are the caller's responsibility.
+>> + */
+>> +static BlockDriverState *get_base_by_name(BlockDriverState *bs,
+>> +                                          const char *base_name, Error **errp)
+>> +{
+>> +    BlockDriverState *base_bs = NULL;
+>> +    AioContext *aio_context;
+>> +
+>> +    base_bs = bdrv_find_backing_image(bs, base_name);
+>> +    if (base_bs == NULL) {
+>> +        error_setg(errp, QERR_BASE_NOT_FOUND, base_name);
+>> +        return NULL;
+>> +    }
+>> +
+>> +    aio_context = bdrv_get_aio_context(bs);
+>> +    aio_context_acquire(aio_context);
+>> +    assert(bdrv_get_aio_context(base_bs) == aio_context);
+>> +    aio_context_release(aio_context);
+> 
+> Er.  OK.  But why?  Isn’t this just guaranteed by the block layer?  I
+> don’t think we need an explicit assertion for this, especially if it
+> means having to acquire an AioContext.
+> 
+> Furthermore, I don’t even know why we’d need the AioContext.  On one
+> hand, we don’t need to acquire a context just to get it or compare it;
+> on the other, this I would have thought that .bdrv_open() runs in the
+> BDS’s AioContext anyway (or the caller already has it acquired at least).
+> 
+> Max
+> 
 
+
+-- 
+Best regards,
+Vladimir
 
