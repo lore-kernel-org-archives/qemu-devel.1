@@ -1,123 +1,88 @@
-Return-Path: <SRS0=d88l=CM=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=8bV5=CN=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 395CFC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 23:41:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB392C43461
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 00:02:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECBAF20786
-	for <qemu-devel@archiver.kernel.org>; Thu,  3 Sep 2020 23:41:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A1B420716
+	for <qemu-devel@archiver.kernel.org>; Fri,  4 Sep 2020 00:02:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aO4zi4br"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECBAF20786
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mLZiBHtb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1B420716
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kDyqy-0006OT-70
-	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 19:41:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39172)
+	id 1kDzBT-0002OL-Fd
+	for qemu-devel@archiver.kernel.org; Thu, 03 Sep 2020 20:02:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1kDyq9-0005rr-Gv
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 19:40:25 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8300
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1kDyq5-0001YM-NC
- for qemu-devel@nongnu.org; Thu, 03 Sep 2020 19:40:25 -0400
-Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 083NUooD097895
- for <qemu-devel@nongnu.org>; Thu, 3 Sep 2020 19:40:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=4tgUEMWFB6w5y3kFbcDVGF5j0H5r8KUHlknPjOls0jc=;
- b=aO4zi4brFpV7mKh2LytyHh+kdqtJ+13aDY38S+bflhfzX+xq1TfIlku5dSZi3c0Z/h/W
- cvDi+4GJ2WF5gfM6DLEG3LjXBfTQUnlG+xZELLnvYUfFIcKTeFgrzHHAvIg81uhQIheN
- qj+AdL/30HtgcprG7fWLlh/d3vYP1LyBvRjSPK+/kf+KPQTEkaquhE1GyPEbR0PqXSlr
- uFu6ICINDxaiJyS00m5fowowPvYowjFbi/Qr47rjkPxj76Y0srhQiHiWvmTDh/+vQScE
- PdnTp8Yn+fEqhhz2HJUxCgRtrP3qzRpIaXgMEWsJFudjch6eVEZPvay8LN+aVvnt5PYL BA== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 33b86aaynu-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 19:40:20 -0400
-Received: from m0098416.ppops.net (m0098416.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 083NUoB0097944
- for <qemu-devel@nongnu.org>; Thu, 3 Sep 2020 19:40:20 -0400
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com
- [169.47.144.27])
- by mx0b-001b2d01.pphosted.com with ESMTP id 33b86aaynk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 03 Sep 2020 19:40:20 -0400
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
- by ppma05wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 083NbEqj016669;
- Thu, 3 Sep 2020 23:40:20 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma05wdc.us.ibm.com with ESMTP id 337en9uevb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 03 Sep 2020 23:40:20 +0000
-Received: from b03ledav006.gho.boulder.ibm.com
- (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 083NeF9h34144800
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 3 Sep 2020 23:40:15 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 220FCC605A;
- Thu,  3 Sep 2020 23:40:19 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id DA9DCC6055;
- Thu,  3 Sep 2020 23:40:18 +0000 (GMT)
-Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
- by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu,  3 Sep 2020 23:40:18 +0000 (GMT)
-Subject: Re: [PATCH 51/63] tpm_spapr: Rename VIO_SPAPR_VTPM to TPM_SPAPR
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20200902224311.1321159-1-ehabkost@redhat.com>
- <20200902224311.1321159-52-ehabkost@redhat.com>
-From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <7208b1cb-5811-8111-80c9-4bf23d590ec7@linux.ibm.com>
-Date: Thu, 3 Sep 2020 19:40:18 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
+ id 1kDzAj-0001xS-Li
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 20:01:41 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:42568)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
+ id 1kDzAh-000495-Sw
+ for qemu-devel@nongnu.org; Thu, 03 Sep 2020 20:01:41 -0400
+Received: by mail-ej1-x642.google.com with SMTP id q13so6195052ejo.9
+ for <qemu-devel@nongnu.org>; Thu, 03 Sep 2020 17:01:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=xJFtwhn0thd/oBMr9T6W4mv9yooiQSle35CCdPGIoRo=;
+ b=mLZiBHtbF19KhYlfjxaDbkjYqxQ98OvWyx16mL0L0AvFvLdxTD0yvqAp79NZ0i5JYh
+ j20PCwb6nP5k+P059a5c5SpmA1lk48ym99Nw1Qx2lU9bD98hyzLekt6aD2BiSbsxaBzS
+ SsHauF5S0PG/vVGI2PCrVjgnBY6u2Bn24mxEA33GEU2G7dK1LFFuil4AT5V8nRX5fqdi
+ gwXqdtzQt5g4AsRzqspg5J7/utSrGKPpydjzWmC6dlUYw+rx+dt4RW/buBJMavxVHpt+
+ gBRNGrlPF/wQeoNczw8u5cPjWuSSzMl1D7cEOdohMHg/KZU5I34COoKq38N4QWrW81ln
+ iG4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=xJFtwhn0thd/oBMr9T6W4mv9yooiQSle35CCdPGIoRo=;
+ b=KfpgBOgELPV8tPShtk/kAnKpejGf9XEXGRJylHF3u0xKZFkBPqJmSxt+vGNkgG5dZZ
+ 9oy6kzvu7TP7nTf9TG7y9IMt8b5wTu/ZsEe1BzXncRehm2FuuQLWXa2Qk6tHFjojLRiE
+ v65f83+ePeBSjCYyfAOcmSSAX2p37stb/axfYSkieH/HQJrRQ9pzPEBEyXiO09+VTzd5
+ Mx3ANTRXV6/QtDbMh85neoBaSE3z/e/FWDeaW5+M786CHY8f+TZbFcYq3g0WWUGFjUS9
+ xf1Sjut+Txfk/lXP+UBQK6Qiuto1ZZRjZLuTi0DUMfZf6c1dKf05QscqvZXvGASBHRYL
+ Jv5Q==
+X-Gm-Message-State: AOAM533qr/pQ0zEbW+fHVBq2GIFEpVIvSQykeevvmYAqNdx9kpuvWh0c
+ +/42vmyjiUGozy/mGIK60WtmTMEecDl/4s3VgVodNa2c
+X-Google-Smtp-Source: ABdhPJzPCn3d5d7MvBUmoesNj4UBecnICHMEZMLtY8c2b9ZWr1dRKXQa/zqKlASqatEYrAUpfli6aC4omiafRYD9da8=
+X-Received: by 2002:a17:906:72d2:: with SMTP id
+ m18mr4617152ejl.220.1599177697648; 
+ Thu, 03 Sep 2020 17:01:37 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200902224311.1321159-52-ehabkost@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-03_14:2020-09-03,
- 2020-09-03 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- bulkscore=0 spamscore=0
- impostorscore=0 clxscore=1015 priorityscore=1501 mlxlogscore=999
- suspectscore=0 phishscore=0 malwarescore=0 lowpriorityscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009030205
-Received-SPF: pass client-ip=148.163.158.5; envelope-from=stefanb@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/03 19:38:51
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.403,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+References: <20200903223721.84459-1-tom.ty89@gmail.com>
+In-Reply-To: <20200903223721.84459-1-tom.ty89@gmail.com>
+From: Tom Yan <tom.ty89@gmail.com>
+Date: Fri, 4 Sep 2020 08:01:26 +0800
+Message-ID: <CAGnHSEnK_xPv_=kUBcLcPDw-UMh9XST_c=TLAo=NV2cMk9sHJw@mail.gmail.com>
+Subject: Re: [PATCH] file-posix: split hdev_refresh_limits from
+ raw_refresh_limits
+To: qemu-devel@nongnu.org
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=tom.ty89@gmail.com; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -131,94 +96,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/2/20 6:42 PM, Eduardo Habkost wrote:
-> Make the type checking macro name consistent with the TYPE_*
-> constant.
+Oops I forgot max_transfer needs to be in bytes (and BLKSECTGET in sg
+has always been implemented wrongly). Will send a new version.
+
+On Fri, 4 Sep 2020 at 06:37, Tom Yan <tom.ty89@gmail.com> wrote:
 >
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-
-Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
-
-
-> ---
-> Cc: Stefan Berger <stefanb@linux.ibm.com>
-> Cc: qemu-devel@nongnu.org
-> ---
->   hw/tpm/tpm_spapr.c | 14 +++++++-------
->   1 file changed, 7 insertions(+), 7 deletions(-)
+> sg_get_max_transfer_length() and sg_get_max_segments() have nothing
+> to do with the sg driver or SG_IO at all. They can be and should be
+> used on all host devices / cdroms (on Linux).
 >
-> diff --git a/hw/tpm/tpm_spapr.c b/hw/tpm/tpm_spapr.c
-> index e3775adc57..aa86d5f943 100644
-> --- a/hw/tpm/tpm_spapr.c
-> +++ b/hw/tpm/tpm_spapr.c
-> @@ -31,7 +31,7 @@
->   #define DEBUG_SPAPR 0
->   
->   typedef struct SpaprTpmState SpaprTpmState;
-> -DECLARE_INSTANCE_CHECKER(SpaprTpmState, VIO_SPAPR_VTPM,
-> +DECLARE_INSTANCE_CHECKER(SpaprTpmState, TPM_SPAPR,
->                            TYPE_TPM_SPAPR)
->   
->   typedef struct TpmCrq {
-> @@ -132,7 +132,7 @@ static inline int spapr_tpm_send_crq(struct SpaprVioDevice *dev, TpmCrq *crq)
->   
->   static int tpm_spapr_do_crq(struct SpaprVioDevice *dev, uint8_t *crq_data)
->   {
-> -    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-> +    SpaprTpmState *s = TPM_SPAPR(dev);
->       TpmCrq local_crq;
->       TpmCrq *crq = &s->crq; /* requests only */
->       int rc;
-> @@ -235,7 +235,7 @@ static int tpm_spapr_do_crq(struct SpaprVioDevice *dev, uint8_t *crq_data)
->   
->   static void tpm_spapr_request_completed(TPMIf *ti, int ret)
->   {
-> -    SpaprTpmState *s = VIO_SPAPR_VTPM(ti);
-> +    SpaprTpmState *s = TPM_SPAPR(ti);
->       TpmCrq *crq = &s->crq;
->       uint32_t len;
->       int rc;
-> @@ -283,7 +283,7 @@ static int tpm_spapr_do_startup_tpm(SpaprTpmState *s, size_t buffersize)
->   
->   static const char *tpm_spapr_get_dt_compatible(SpaprVioDevice *dev)
->   {
-> -    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-> +    SpaprTpmState *s = TPM_SPAPR(dev);
->   
->       switch (s->be_tpm_version) {
->       case TPM_VERSION_1_2:
-> @@ -297,7 +297,7 @@ static const char *tpm_spapr_get_dt_compatible(SpaprVioDevice *dev)
->   
->   static void tpm_spapr_reset(SpaprVioDevice *dev)
->   {
-> -    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-> +    SpaprTpmState *s = TPM_SPAPR(dev);
->   
->       s->state = SPAPR_VTPM_STATE_NONE;
->       s->numbytes = 0;
-> @@ -316,7 +316,7 @@ static void tpm_spapr_reset(SpaprVioDevice *dev)
->   
->   static enum TPMVersion tpm_spapr_get_version(TPMIf *ti)
->   {
-> -    SpaprTpmState *s = VIO_SPAPR_VTPM(ti);
-> +    SpaprTpmState *s = TPM_SPAPR(ti);
->   
->       if (tpm_backend_had_startup_error(s->be_driver)) {
->           return TPM_VERSION_UNSPEC;
-> @@ -377,7 +377,7 @@ static Property tpm_spapr_properties[] = {
->   
->   static void tpm_spapr_realizefn(SpaprVioDevice *dev, Error **errp)
->   {
-> -    SpaprTpmState *s = VIO_SPAPR_VTPM(dev);
-> +    SpaprTpmState *s = TPM_SPAPR(dev);
->   
->       if (!tpm_find()) {
->           error_setg(errp, "at most one TPM device is permitted");
-
-
+> Also use MIN_NON_ZERO instead when we clamp max_sectors against
+> max_segments.
+>
+> Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+> ---
+>  block/file-posix.c | 39 ++++++++++++++++++++++-----------------
+>  1 file changed, 22 insertions(+), 17 deletions(-)
+>
+> diff --git a/block/file-posix.c b/block/file-posix.c
+> index 9a00d4190a..a38f43af4f 100644
+> --- a/block/file-posix.c
+> +++ b/block/file-posix.c
+> @@ -1163,7 +1163,7 @@ static void raw_reopen_abort(BDRVReopenState *state)
+>      s->reopen_state = NULL;
+>  }
+>
+> -static int sg_get_max_transfer_length(int fd)
+> +static int get_max_transfer_length(int fd)
+>  {
+>  #ifdef BLKSECTGET
+>      int max_bytes = 0;
+> @@ -1178,7 +1178,7 @@ static int sg_get_max_transfer_length(int fd)
+>  #endif
+>  }
+>
+> -static int sg_get_max_segments(int fd)
+> +static int get_max_segments(int fd)
+>  {
+>  #ifdef CONFIG_LINUX
+>      char buf[32];
+> @@ -1233,23 +1233,28 @@ static void raw_refresh_limits(BlockDriverState *bs, Error **errp)
+>  {
+>      BDRVRawState *s = bs->opaque;
+>
+> -    if (bs->sg) {
+> -        int ret = sg_get_max_transfer_length(s->fd);
+> +    raw_probe_alignment(bs, s->fd, errp);
+> +    bs->bl.min_mem_alignment = s->buf_align;
+> +    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
+> +}
+>
+> -        if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+> -            bs->bl.max_transfer = pow2floor(ret);
+> -        }
+> +static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
+> +{
+> +    BDRVRawState *s = bs->opaque;
+>
+> -        ret = sg_get_max_segments(s->fd);
+> -        if (ret > 0) {
+> -            bs->bl.max_transfer = MIN(bs->bl.max_transfer,
+> -                                      ret * qemu_real_host_page_size);
+> -        }
+> +    int ret = get_max_transfer_length(s->fd);
+> +
+> +    if (ret > 0 && ret <= BDRV_REQUEST_MAX_BYTES) {
+> +        bs->bl.max_transfer = pow2floor(ret);
+>      }
+>
+> -    raw_probe_alignment(bs, s->fd, errp);
+> -    bs->bl.min_mem_alignment = s->buf_align;
+> -    bs->bl.opt_mem_alignment = MAX(s->buf_align, qemu_real_host_page_size);
+> +    ret = get_max_segments(s->fd);
+> +    if (ret > 0) {
+> +        bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
+> +                                           ret * qemu_real_host_page_size);
+> +    }
+> +
+> +    raw_refresh_limits(bs, errp);
+>  }
+>
+>  static int check_for_dasd(int fd)
+> @@ -3604,7 +3609,7 @@ static BlockDriver bdrv_host_device = {
+>      .bdrv_co_pdiscard       = hdev_co_pdiscard,
+>      .bdrv_co_copy_range_from = raw_co_copy_range_from,
+>      .bdrv_co_copy_range_to  = raw_co_copy_range_to,
+> -    .bdrv_refresh_limits = raw_refresh_limits,
+> +    .bdrv_refresh_limits = hdev_refresh_limits,
+>      .bdrv_io_plug = raw_aio_plug,
+>      .bdrv_io_unplug = raw_aio_unplug,
+>      .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+> @@ -3728,7 +3733,7 @@ static BlockDriver bdrv_host_cdrom = {
+>      .bdrv_co_preadv         = raw_co_preadv,
+>      .bdrv_co_pwritev        = raw_co_pwritev,
+>      .bdrv_co_flush_to_disk  = raw_co_flush_to_disk,
+> -    .bdrv_refresh_limits = raw_refresh_limits,
+> +    .bdrv_refresh_limits = hdev_refresh_limits,
+>      .bdrv_io_plug = raw_aio_plug,
+>      .bdrv_io_unplug = raw_aio_unplug,
+>      .bdrv_attach_aio_context = raw_aio_attach_aio_context,
+> --
+> 2.28.0
+>
 
