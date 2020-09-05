@@ -5,78 +5,79 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2208C43461
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 06:27:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47362C43461
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 06:27:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F341208DB
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 06:27:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C414B208DB
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 06:27:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aY0RsVob"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F341208DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AGY3srBk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C414B208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37644 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kERff-0003jJ-6W
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 02:27:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49434)
+	id 1kERfl-00042n-Tp
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 02:27:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kERcF-0006d8-RZ; Sat, 05 Sep 2020 02:23:59 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42294)
+ id 1kERcR-00076D-Ft; Sat, 05 Sep 2020 02:24:12 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:40465)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kERcE-0003VU-1a; Sat, 05 Sep 2020 02:23:59 -0400
-Received: by mail-pg1-x543.google.com with SMTP id m5so5410071pgj.9;
- Fri, 04 Sep 2020 23:23:57 -0700 (PDT)
+ id 1kERcP-0003Xd-AA; Sat, 05 Sep 2020 02:24:11 -0400
+Received: by mail-pl1-x644.google.com with SMTP id z15so2124982plo.7;
+ Fri, 04 Sep 2020 23:24:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bscWSrwzBlA91ho91MKRFqbKOrFCfnhQG9RPGa7f72A=;
- b=aY0RsVob/SJYu2MYTAzRf9jyHOAFu1wfwV9SpQMXVQd6kgWAmG841k2AjQ90Vv3wSC
- 7Yv2EMxKTQbL3TrAzPIUcYSTtf3K7VhXiIrqYnH2XKtPrrdRxEoj/v4h1UprVpiPX1Em
- JT52XQYvZkfujQAjbbRbwwV8pTP6eMbZDK4O979RXKReWDV1uqKF0ozROZWwHmwEq+0n
- XjlWefV/dE+kT8f1iGnhIeJk6tNRoO8UTGvUJEfuaN/06bqEFZxGCJx1jg0skP8Xu/TY
- epu7u8e1fl1yekmA4UP86dr3hNJobyQwxJ3gA253TosnyhtVBYSd4el4uXaTpjHUlLaz
- sL3g==
+ bh=S0CdT7EJuAl1EvDXm+oKp2XSA+jKypIYBOFAUPRceZg=;
+ b=AGY3srBkrJ8hAMq30GuKDomzi7MVozMGpAejXJis8rx7KAU2uM6a7XJklnKp21lZfY
+ BnCRsGuGQqdjNZ2ESpJAdjsBYSwWiN3SbrbbhgmAM+ZntfEwHRWSqr7wqO6GFbUsFZKk
+ S9mUqLjvP3/PfVfOYlUTVz/yGOOHBr/FWp2Dp7znmNys3ukt6bjnIk39SheXrrKsDN7e
+ VoYsj98hgx4JzbtG70fqezXqQcH3+PF5MKH5JUNAfHuA1xG676OkMBTbMB+P6/xWdPIq
+ /bJ0feoqOa1aQc5ZGkAjY1GokJ2OllQtIMJgLB7Kv+81h15KUqH3E40oXP5UkOWiB/Qt
+ C+vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=bscWSrwzBlA91ho91MKRFqbKOrFCfnhQG9RPGa7f72A=;
- b=QdbKIeeBxfhCDKYQ0eT4EiUcu2gfTQ+Yt+ofXtoo6kN+vMiDyor8C7ow8DUTUEjfE1
- Z38AvL3j+Szp3pQo73eLjBcVT+O30rgnFvET4g7U7yeOhkI0AmOLsl8sMAVAze+cqEju
- lLk032wBUBJfKbzs+86AubiUbpl3fe2RtuY+/IYz/HsAnAbHaNjwuF9Nx0P4B+Tzbcoc
- w1nKMCCfpYQZcyr+Gj4mBF5BobDeh/nNWDnQLQLo+mpA8/k1TeOtxv+xeR4fQ2/AcgR8
- NBfe8NWAU4ksX9dXTAskytriR0BCvWdeORKOjpaJXiV6cDV3LxLccgwd/3j2OjC4xcs4
- jf5w==
-X-Gm-Message-State: AOAM532BG2agKpNslSR8pF0PgXruLhbZ6DKBrAv83j6/XZdX0DtsRGPt
- ooq/4xK7JgENxJeHprYxq/k8HcSs8pOoYLAZ
-X-Google-Smtp-Source: ABdhPJysbaa/8tzmzVw7fLth/Vhz8OeJF41mhOCi9dtBbd419rSY9piDKanXzRp7KvxAiGsLL5LXOg==
-X-Received: by 2002:a63:780a:: with SMTP id t10mr10170735pgc.184.1599287034925; 
- Fri, 04 Sep 2020 23:23:54 -0700 (PDT)
+ bh=S0CdT7EJuAl1EvDXm+oKp2XSA+jKypIYBOFAUPRceZg=;
+ b=lbiW//b7Q3TyDBrVPt7N1vuX7y0m/9r0oZgYR7qCIon3RoQ/JLa6Vf32QdBqZ8Vkuh
+ KTOs7eEKXNOW4InEcAqBThAmzD8E369G9PDKaABIzSwxBhCjL5/DaZOoX5bDo+tQjQww
+ cX4hc4rimf5wuaBvmMfq5+C6YHzLl4iL2EEIkyz84XEsQN/W+pDYftEI6+oxFgyVlPNr
+ Ud3ys54MNK53KUB2dbA/6DE5r177DgXT5ug9SLZtGnWPjyhWgvnbN2L2rFI4kphOcBl2
+ +xCDPHAV2fhKY0aCiDeEwFQ/Hi8o+Z5C+dBnMZGEG4dx8Zyb3B1MdkHadnt9+QEDjxqs
+ OPnA==
+X-Gm-Message-State: AOAM533W5Ki6+pmp/eGIRKY6EctlWJA176gq53LiOlp4U5R1bOIuyLLU
+ kbbsSNo6Hq9yJ92JIUD7AANpxH+vkBBqq7IC
+X-Google-Smtp-Source: ABdhPJzj2rJz8oO4+aR3EzrqGR6k8EHpEZI4E/1qOHEKkVWkuQCbG4mxBOTOBHotdvmhQuvzQq1y6A==
+X-Received: by 2002:a17:90b:4acd:: with SMTP id
+ mh13mr11709545pjb.147.1599287047099; 
+ Fri, 04 Sep 2020 23:24:07 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id v8sm21436381pju.1.2020.09.04.23.23.52
+ by smtp.googlemail.com with ESMTPSA id v8sm21436381pju.1.2020.09.04.23.24.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 23:23:54 -0700 (PDT)
+ Fri, 04 Sep 2020 23:24:06 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 02/11] block: Fixes nfs on msys2/mingw
-Date: Sat,  5 Sep 2020 14:23:24 +0800
-Message-Id: <20200905062333.1087-3-luoyonggang@gmail.com>
+Subject: [PATCH v5 06/11] tests: Trying fixes test-replication.c on msys2.
+Date: Sat,  5 Sep 2020 14:23:28 +0800
+Message-Id: <20200905062333.1087-7-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200905062333.1087-1-luoyonggang@gmail.com>
 References: <20200905062333.1087-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,113 +109,49 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- block/nfs.c | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+ tests/test-replication.c | 17 +++++++++++++----
+ 1 file changed, 13 insertions(+), 4 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index 61a249a9fc..34b2cd5708 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -24,7 +24,9 @@
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index 9ab3666a90..d0e06f8d77 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -23,14 +23,18 @@
  
- #include "qemu/osdep.h"
+ /* primary */
+ #define P_ID "primary-id"
+-static char p_local_disk[] = "/tmp/p_local_disk.XXXXXX";
++#define P_LOCAL_DISK "%s/p_local_disk.XXXXXX"
++static char p_local_disk[PATH_MAX];
  
-+#if !defined(_WIN32)
- #include <poll.h>
-+#endif
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-@@ -51,6 +53,12 @@
- #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
- #define QEMU_NFS_MAX_DEBUG_LEVEL 2
+ /* secondary */
+ #define S_ID "secondary-id"
+ #define S_LOCAL_DISK_ID "secondary-local-disk-id"
+-static char s_local_disk[] = "/tmp/s_local_disk.XXXXXX";
+-static char s_active_disk[] = "/tmp/s_active_disk.XXXXXX";
+-static char s_hidden_disk[] = "/tmp/s_hidden_disk.XXXXXX";
++#define S_LOCAL_DISK "%s/s_local_disk.XXXXXX"
++static char s_local_disk[PATH_MAX];
++#define S_ACTIVE_DISK "%s/s_active_disk.XXXXXX"
++static char s_active_disk[PATH_MAX];
++#define S_HIDDEN_DISK "%s/s_hidden_disk.XXXXXX"
++static char s_hidden_disk[PATH_MAX];
  
-+#if defined (_WIN32)
-+#define nfs_stat __stat64
-+#else
-+#define nfs_stat stat
-+#endif
-+
- typedef struct NFSClient {
-     struct nfs_context *context;
-     struct nfsfh *fh;
-@@ -58,7 +66,7 @@ typedef struct NFSClient {
-     bool has_zero_init;
-     AioContext *aio_context;
-     QemuMutex mutex;
--    blkcnt_t st_blocks;
-+    int64_t st_size;
-     bool cache_used;
-     NFSServer *server;
-     char *path;
-@@ -70,7 +78,7 @@ typedef struct NFSRPC {
+ /* FIXME: steal from blockdev.c */
+ QemuOptsList qemu_drive_opts = {
+@@ -571,7 +575,12 @@ static void setup_sigabrt_handler(void)
+ int main(int argc, char **argv)
+ {
      int ret;
-     int complete;
-     QEMUIOVector *iov;
--    struct stat *st;
-+    struct nfs_stat *st;
-     Coroutine *co;
-     NFSClient *client;
- } NFSRPC;
-@@ -419,7 +427,7 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
-                                int flags, int open_flags, Error **errp)
- {
-     int64_t ret = -EINVAL;
--    struct stat st;
-+    struct nfs_stat st;
-     char *file = NULL, *strp = NULL;
++    const char *tmpdir = g_get_tmp_dir();
+     qemu_init_main_loop(&error_fatal);
++    sprintf(p_local_disk, P_LOCAL_DISK, tmpdir);
++    sprintf(s_local_disk, S_LOCAL_DISK, tmpdir);
++    sprintf(s_active_disk, S_ACTIVE_DISK, tmpdir);
++    sprintf(s_hidden_disk, S_HIDDEN_DISK, tmpdir);
+     bdrv_init();
  
-     qemu_mutex_init(&client->mutex);
-@@ -545,7 +553,7 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
-     }
- 
-     ret = DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
--    client->st_blocks = st.st_blocks;
-+    client->st_size = st.st_size;
-     client->has_zero_init = S_ISREG(st.st_mode);
-     *strp = '/';
-     goto out;
-@@ -729,11 +737,11 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
- {
-     NFSClient *client = bs->opaque;
-     NFSRPC task = {0};
--    struct stat st;
-+    struct nfs_stat st;
- 
-     if (bdrv_is_read_only(bs) &&
-         !(bs->open_flags & BDRV_O_NOCACHE)) {
--        return client->st_blocks * 512;
-+        return client->st_size;
-     }
- 
-     task.bs = bs;
-@@ -746,7 +754,7 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
-     nfs_set_events(client);
-     BDRV_POLL_WHILE(bs, !task.complete);
- 
--    return (task.ret < 0 ? task.ret : st.st_blocks * 512);
-+    return (task.ret < 0 ? task.ret : st.st_size);
- }
- 
- static int coroutine_fn
-@@ -778,7 +786,7 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
-                               BlockReopenQueue *queue, Error **errp)
- {
-     NFSClient *client = state->bs->opaque;
--    struct stat st;
-+    struct nfs_stat st;
-     int ret = 0;
- 
-     if (state->flags & BDRV_O_RDWR && bdrv_is_read_only(state->bs)) {
-@@ -800,7 +808,7 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
-                        nfs_get_error(client->context));
-             return ret;
-         }
--        client->st_blocks = st.st_blocks;
-+        client->st_size = st.st_size;
-     }
- 
-     return 0;
+     g_test_init(&argc, &argv, NULL);
 -- 
 2.28.0.windows.1
 
