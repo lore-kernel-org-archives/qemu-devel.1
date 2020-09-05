@@ -2,100 +2,114 @@ Return-Path: <SRS0=twQi=CO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3BFC433E2
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78547C43461
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:50:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DE39D2073B
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:42:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1A7HR0+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE39D2073B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 3DD6F20760
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:50:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DD6F20760
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEfxb-0004I2-4G
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:42:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36586)
+	id 1kEg4P-00062B-7A
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:50:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37558)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kEfx1-0003lF-Mr
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:42:23 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33233)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kEfx0-0001XU-7L
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:42:23 -0400
-Received: by mail-wr1-x444.google.com with SMTP id m6so10882941wrn.0
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 14:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=sYrL9yO7gV87qUMsgaLyavewF2w86opY4D7SYA8kSkU=;
- b=K1A7HR0+n/QSMn6nMjTbDnSk2fXsyMyqEEUWB0IX7LIRMg9vtOItv+ec4+VD4Alu8x
- +8UHDuWVBct6JRRuGmeG5CMpIdXL+V1/zYMKLgT3XAcdx/Qi+QH0KEZGcBkBY/RWOhQj
- NlNbLRW38xiDpTfUZabkXUKSeJt413gRwBBmIRL5+gREM4KJqPLYWtQRqB+E7WAegzMN
- NQ1TsCEHC2oXOLuKChwmlIUWBSyDmvut95SLu+Aq+5JgNaR+ZwIcRzGlbdWcgApHazqo
- /Fc4aKT+wKTXLAD7OWRAJowvalUaD9mZRoTB+0PcLbGFx7TRJ+okwRr51Fe/HKQB2VrA
- R3EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=sYrL9yO7gV87qUMsgaLyavewF2w86opY4D7SYA8kSkU=;
- b=itPt2972VrW4m7XRfPT2toP1phBzY1nbAuDBPyYbeqRM9lkXoJZ7fSmQrpKEsj/jyD
- EU4S0DTHQU6ERosRwpOxzTt4TCEMIb3jc0a2DIxRBObB/H+WlC7w6Ae3TxPC3mMwhfOA
- aAxVLv2sKCfcrxfIoHeTSHi93aNWHQhoMS+w6uUFe7DN5n5az4vpLPu3MXAXZ40iGzTQ
- GP9NegkWXGRCV4oG0+S7bo10lLUbeEogCTl/7XC+SAKrrpP/XRG+PJNr0INxVWNZcd1t
- 42OZp6pFcDwHTpK+uR4xXW9DieVOGeGIgcv8ky5oxTYAzzKjjnkh/HBMsJk01sgY1eLW
- 6sBQ==
-X-Gm-Message-State: AOAM532cdUO0UMYeaQlEktYi+IxsVfo7WwJDzVsRzH1ODYO98R0tZZV9
- 8t9NGSTNPoObXRUUBJITNy0=
-X-Google-Smtp-Source: ABdhPJzyRwJ+svB5iFcgQZGvNbuVlWlZdpx1LHHH5mOHxoCsbNr/79hpSLo3h8rdrOPQMvHJDhpEeg==
-X-Received: by 2002:a05:6000:1184:: with SMTP id
- g4mr13748598wrx.20.1599342140725; 
- Sat, 05 Sep 2020 14:42:20 -0700 (PDT)
-Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
- [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id t1sm17563671wmi.16.2020.09.05.14.42.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 05 Sep 2020 14:42:20 -0700 (PDT)
-Subject: Re: [PATCH v3 18/19] target/microblaze: Put MicroBlazeCPUConfig into
- DisasContext
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200904190842.2282109-1-richard.henderson@linaro.org>
- <20200904190842.2282109-19-richard.henderson@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bfaa38f2-6f6e-387a-b27b-e32a7cb5a8fe@amsat.org>
-Date: Sat, 5 Sep 2020 23:42:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>)
+ id 1kEg3o-0005YK-NS; Sat, 05 Sep 2020 17:49:24 -0400
+Received: from mail.weilnetz.de ([37.120.169.71]:59708
+ helo=v2201612906741603.powersrv.de)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <sw@weilnetz.de>)
+ id 1kEg3m-00028k-7p; Sat, 05 Sep 2020 17:49:24 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by v2201612906741603.powersrv.de (Postfix) with ESMTP id BC306DA322B;
+ Sat,  5 Sep 2020 23:49:18 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
+Received: from v2201612906741603.powersrv.de ([127.0.0.1])
+ by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
+ port 10024)
+ with ESMTP id KjHMVsgnL-5P; Sat,  5 Sep 2020 23:49:18 +0200 (CEST)
+Received: from macbook02.fritz.box (pd9ec31d2.dip0.t-ipconnect.de
+ [217.236.49.210])
+ (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+ key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+ (No client certificate requested)
+ by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 95668DA322A;
+ Sat,  5 Sep 2020 23:49:17 +0200 (CEST)
+Subject: Re: [PATCH 1/2] tests: Trying fixes test-replication.c on msys2/mingw.
+To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
+References: <20200905211038.904-1-luoyonggang@gmail.com>
+ <20200905211038.904-2-luoyonggang@gmail.com>
+From: Stefan Weil <sw@weilnetz.de>
+Autocrypt: addr=sw@weilnetz.de; keydata=
+ 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
+Message-ID: <5a0e9248-d2eb-a88e-4043-7104498cd804@weilnetz.de>
+Date: Sat, 5 Sep 2020 23:49:16 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200904190842.2282109-19-richard.henderson@linaro.org>
+In-Reply-To: <20200905211038.904-2-luoyonggang@gmail.com>
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.001, NICE_REPLY_A=-0.107,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
+ helo=v2201612906741603.powersrv.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 17:49:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.107,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,25 +122,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: edgar.iglesias@xilinx.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, QEMU Block <qemu-block@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/4/20 9:08 PM, Richard Henderson wrote:
-> The bulk of the translator should not have access to the
-> complete cpu state, to avoid the temptation to examine bits
-> that are in run time, but not translation time context.
-> 
-> We do need access to the constant cpu configuration, and
-> that is sufficient, so put that into DisasContext.
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Am 05.09.20 um 23:10 schrieb Yonggang Luo:
+
+> On Windows there is no path like /tmp/s_local_disk.XXXXXX
+>
+> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 > ---
->  target/microblaze/translate.c | 24 ++++++++++++------------
->  1 file changed, 12 insertions(+), 12 deletions(-)
+>  tests/test-replication.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+>
+> diff --git a/tests/test-replication.c b/tests/test-replication.c
+> index 9ab3666a90..3cf544a133 100644
+> --- a/tests/test-replication.c
+> +++ b/tests/test-replication.c
+> @@ -23,14 +23,14 @@
+> =20
+>  /* primary */
+>  #define P_ID "primary-id"
+> -static char p_local_disk[] =3D "/tmp/p_local_disk.XXXXXX";
+> +static char p_local_disk[PATH_MAX];
+> =20
+>  /* secondary */
+>  #define S_ID "secondary-id"
+>  #define S_LOCAL_DISK_ID "secondary-local-disk-id"
+> -static char s_local_disk[] =3D "/tmp/s_local_disk.XXXXXX";
+> -static char s_active_disk[] =3D "/tmp/s_active_disk.XXXXXX";
+> -static char s_hidden_disk[] =3D "/tmp/s_hidden_disk.XXXXXX";
+> +static char s_local_disk[PATH_MAX];
+> +static char s_active_disk[PATH_MAX];
+> +static char s_hidden_disk[PATH_MAX];
+> =20
+>  /* FIXME: steal from blockdev.c */
+>  QemuOptsList qemu_drive_opts =3D {
+> @@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)
+>  int main(int argc, char **argv)
+>  {
+>      int ret;
+> +    const char *tmpdir =3D g_get_tmp_dir();
+> +    sprintf(p_local_disk, "%s/p_local_disk.XXXXXX", tmpdir);
+> +    sprintf(s_local_disk, "%s/s_local_disk.XXXXXX", tmpdir);
+> +    sprintf(s_active_disk, "%s/s_active_disk.XXXXXX", tmpdir);
+> +    sprintf(s_hidden_disk, "%s/s_hidden_disk.XXXXXX", tmpdir);
+>      qemu_init_main_loop(&error_fatal);
+>      bdrv_init();
+> =20
 
-Nice.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Maybe it is possible to use get_tmp_filename() (which could be
+simplified by using g_get_tmp_dir).
+
+And please use snprintf instead of sprintf. I am afraid that a path can
+be longer than PATH_MAX, even if the tmpdir path is normally rather short=
+=2E
+
+You could also allocate the different filenames dynamically instead of
+limiting them to PATH_MAX characters.
+
+Regards
+
+Stefan Weil
+
+
 
