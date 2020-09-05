@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FEDBC43461
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AA8C43461
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:09:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B2F9820738
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:07:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F9820738
+	by mail.kernel.org (Postfix) with ESMTPS id C3F3F20738
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:09:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3F3F20738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEfPR-0002r0-RG
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:07:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60824)
+	id 1kEfQx-0003mL-TZ
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:09:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfOh-0002Pm-AD
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:06:55 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:51769)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfQI-0003Ky-IH
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:08:34 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:47337)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfOf-0006Dl-NM
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:06:55 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfQD-0006Hv-03
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:08:34 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MF3U0-1kLCpm36oS-00FWhT; Sat, 05 Sep 2020 23:06:50 +0200
-Subject: Re: [PATCH] linux-user: fix ppc/termbits.h
-To: qemu-devel@nongnu.org
-References: <20200830181620.422036-1-laurent@vivier.eu>
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1Mgek8-1kmb8I2UkG-00h4kZ; Sat, 05 Sep 2020 23:08:26 +0200
+Subject: Re: [PATCH] linux-user: Protect btrfs ioctl target definitions
+To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
+References: <20200905163802.2666-1-Filip.Bozuta@syrmia.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,32 +79,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <fd58993b-511e-5b05-1aae-16177bd034cc@vivier.eu>
-Date: Sat, 5 Sep 2020 23:06:49 +0200
+Message-ID: <c513bf3e-0540-6d77-997f-820f87063d83@vivier.eu>
+Date: Sat, 5 Sep 2020 23:08:25 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200830181620.422036-1-laurent@vivier.eu>
+In-Reply-To: <20200905163802.2666-1-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:5IuaP+TMCFF92xogSIThBzGcOScinIRprD3goXMy1enQLO53/p0
- cUu7fPyjQKaCLDo7ja3lIu8U52Uyiag/x9dJLovHZRHiOSSRP7sXvkR+OZGbZdb+5nCr0ue
- ThdO3KiNnXU6pCKMH5ROxG9VGr7SAwvAMDJ44Dm5C8vJcW8+9xZd6EMzTwxEAlWQin7imzz
- gez/sBA5e66V2yhKoiqMg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:uPmCUsK4Q3o=:ClKn3bvC7ax77NsLQd1HH6
- rNVOzmBF7wPe637mMK333bTBgY/Y7d9IWtMEwNslRPxNrMdTf2gm33CI0MGMAncIZvHNwZg47
- B0OwxBgj0rrXhRorj0TxvegiI8c/WPxAF0iUvYKF2Lf3YCEePNQFUZSP4d6ZRKcoX+1bVfRY3
- Aq45LibxqmpDueyjCwcYP11QgXhaOnM/tIrU2R+YYGt4buedtIHWi7q5PSfma8oiBgL/ltCf9
- BqlROJXkcq5XBInAz3ZqCY/zCqEuKwXxR4LFeZUg64gfWcM1DO0nojnmOXaEgx8hF+72e2Sqr
- eGD2FFmcrbzkay85NL90ANlraljunecyxGTTIAyLS2Bg8bauYBec8f4rxb0egWoZhVnjPGxSE
- e+mN8GXIpyalyRGvYXJKBYXl2yb10GPvobb+LPqCllK3enNHQpaE8iZssu3ubiczWS6Qdj9N+
- D3uhqh0aLMwa3QbEqqtg+d+lmbDs6JE4wZkzXTgkX08ZmLFIU8M4ebALAUiNKcLcs/VgYcjte
- RO2f+xJ+8ynRZpSjHgDZiEiIYxD2QcomAlZnkosl5DdSAENZeuqmKmrkOsBMiz+pBs+J+uKEB
- zgO37vMq4GuTyb/Tx2ARdmctN1cvwr5sLEoXNfaDvHgj2WdJ83ywk64co5dBNZk8jeI+ioOIl
- 3GljsWkXYAUbHMiwRT85EUo8sy3WgFIJu4bCK9itOhjGO3naP44Kj0WHoG9C/rHE79OMgPtLE
- ID+ndRnxJ1vXydLT2AymmQH2YTVOPCvd2C/xAXS7zwBqZIoP4aiESjBrietCsq2NRO4vzcQbk
- 7kuy7RbkZD6y9nctdDK87TDD4hqvwFUiV7XATCuJOIwwQbtiGTrb2dVwd42dBrFswrbr3sO
+X-Provags-ID: V03:K1:5KGcKJPzq8g3R09k4r2qnVukkZuaq/geWwQsiCtc1gCr69nuFDr
+ 5xwxzWvEcUNXv3E1vpEsvyY0mluQfluy8xQiGrCJWdvM7nuKoAheexmCkO2unRKwuZVbI5F
+ Ejtk+kdy3hZHAIYDJ9oOydy/sZVE0pL/e+/OzuKlFC/fG9j6vZrARdVSh3wPFJ3skzFuEM9
+ +C/AtqamaGhKuVaCkNSCw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:R1yF/HtQ15o=:8ZNVEvoClU5zi4BogO1P8W
+ 2Km+m1RC6aiKfGXhTaTNZjU5/4PoNlLDv3JF2vy8aQo2cXSp7kZDaneQAwWhRWh6ltRQ7lzxH
+ JvQ1Iq138taJu0JGdO8PUFQ16YzlZLtjqWoyQqPg64F1/KjpUEtPWt/LWm6nMHq0WT9oEIjg+
+ io6a/IhcrRQHYdYS9rSukazvRU72zxnFQLICCt92W3ykJQsPCDQ8i7ecZEo5Bf8VgzWdl1Qhc
+ Mz6Uf55YC0+XVXuTyw2D4zUHnfKBQUCAOmNAPslaB9v05Zcxxo+h3ydVpnrgPOVtWSE0glsgs
+ /9Tc3XgrKOaz5+pN5EhEnvzmxXkuRYotKOnlZEaSrZHyeCqnlDw67hp0Lodv11qOm7waZN8a0
+ kBdPw0ahgdOOGQ9Sdai+EGML0B8HVFsI3YrNYDuMv6kGQQz9l/KyZ22v2xJXM+v4zNO8b2qMe
+ hpvOG0HbDO7Afh/6nOtNCmdje6eeguS0kLyoqoUDe7JFdlJGhrq+NZoTB6LOl8cMAKKAwUfAL
+ CGTqJJXCU0NzyKTR4ZOYP3oVuHXQ9QJFtyKoLbwCPPdqH1pf5555AlQuk174QDNsZhIWsQDMv
+ hHmMrFPujEOwmhAAkNkXaSqF3M6A2G+N001xsXp5ILQqcHN3az3bpCs0LvMpiCIJphi2XbKt/
+ PRs5IDJUrZRGxVrThU+5nWjGa/jjCOrgkP63oN+G2R9lx69lOuMIWwEReSHh6E/HYP/vDAM5Q
+ t1erP04MrA41eN5FgLK8bux65M9CNG2aZdT/dCOPxtnBtLWTVYoJULUMVCyilLEpbPh9hRPFO
+ aWQloxjaCOzslITEX4W30+rPAdA/G5P8wPUSjHyWtrD/EQUCOTiVUQs0hkrz1Ny8pjCpd/5
 Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 16:41:54
@@ -127,40 +127,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Filip.Bozuta@syrmia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 30/08/2020 à 20:16, Laurent Vivier a écrit :
-> On ppc, in termios, c_line is after c_cc, not before .
+Le 05/09/2020 à 18:38, Filip Bozuta a écrit :
+> Target definitions of btrfs ioctls in 'syscall_defs.h' use
+> the value BTRFS_IOCTL_MAGIC that is defined header 'btrfs.h'.
+> This header is not available in kernel versions before 3.9.
+> For that reason, these target ioctl definitions should be
+> enwrapped in an #ifdef directive to check whether the 'btrfs.h'
+> header is available as to not cause build errors on older
+> Linux systems.
 > 
-> Fixes: c218b4ede4f9 ("linux-user: Add missing termbits types and values definitions")
-> Cc: Filip.Bozuta@syrmia.com
-> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+> Signed-off-by: Filip Bozuta <Filip.Bozuta@syrmia.com>
 > ---
->  linux-user/ppc/termbits.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  linux-user/syscall_defs.h | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> diff --git a/linux-user/ppc/termbits.h b/linux-user/ppc/termbits.h
-> index 7066d1e5523d..eb226e099980 100644
-> --- a/linux-user/ppc/termbits.h
-> +++ b/linux-user/ppc/termbits.h
-> @@ -14,8 +14,8 @@ struct target_termios {
->      target_tcflag_t c_oflag;               /* output mode flags */
->      target_tcflag_t c_cflag;               /* control mode flags */
->      target_tcflag_t c_lflag;               /* local mode flags */
-> -    target_cc_t c_line;                    /* line discipline */
->      target_cc_t c_cc[TARGET_NCCS];         /* control characters */
-> +    target_cc_t c_line;                    /* line discipline */
->      target_speed_t c_ispeed;               /* input speed */
->      target_speed_t c_ospeed;               /* output speed */
->  };
+> diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+> index 33a414c50f..731c3d5341 100644
+> --- a/linux-user/syscall_defs.h
+> +++ b/linux-user/syscall_defs.h
+> @@ -1006,6 +1006,7 @@ struct target_rtc_pll_info {
+>  #define TARGET_FS_IOC32_SETVERSION TARGET_IOW('v', 2, int)
+>  
+>  /* btrfs ioctls */
+> +#ifdef CONFIG_BTRFS
+>  #define TARGET_BTRFS_IOC_SNAP_CREATE            TARGET_IOWU(BTRFS_IOCTL_MAGIC, 1)
+>  #define TARGET_BTRFS_IOC_SCAN_DEV               TARGET_IOWU(BTRFS_IOCTL_MAGIC, 4)
+>  #define TARGET_BTRFS_IOC_FORGET_DEV             TARGET_IOWU(BTRFS_IOCTL_MAGIC, 5)
+> @@ -1041,6 +1042,7 @@ struct target_rtc_pll_info {
+>  #define TARGET_BTRFS_IOC_GET_SUBVOL_INFO        TARGET_IORU(BTRFS_IOCTL_MAGIC, 60)
+>  #define TARGET_BTRFS_IOC_GET_SUBVOL_ROOTREF     TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 61)
+>  #define TARGET_BTRFS_IOC_INO_LOOKUP_USER        TARGET_IOWRU(BTRFS_IOCTL_MAGIC, 62)
+> +#endif
+>  
+>  /* usb ioctls */
+>  #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
 > 
 
-
-Applied to my linux-user-for-5.2 branch.
-
-Thanks,
-Laurent
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
 
