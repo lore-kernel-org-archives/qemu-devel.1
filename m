@@ -2,80 +2,82 @@ Return-Path: <SRS0=twQi=CO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B781C43461
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 06:25:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E92AC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 06:25:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5A36208DB
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 06:25:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3F32208DB
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 06:25:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q9yUCdfi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5A36208DB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WhStefGg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3F32208DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kERdS-000859-0T
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 02:25:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49384)
+	id 1kERdW-0008GC-Qp
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 02:25:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kERc9-0006Pr-EN; Sat, 05 Sep 2020 02:23:53 -0400
-Received: from mail-pl1-x634.google.com ([2607:f8b0:4864:20::634]:42795)
+ id 1kERcB-0006Su-OJ; Sat, 05 Sep 2020 02:23:55 -0400
+Received: from mail-pj1-x102b.google.com ([2607:f8b0:4864:20::102b]:40784)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kERc7-0003UL-Pk; Sat, 05 Sep 2020 02:23:53 -0400
-Received: by mail-pl1-x634.google.com with SMTP id j11so2116941plk.9;
- Fri, 04 Sep 2020 23:23:50 -0700 (PDT)
+ id 1kERcA-0003UZ-6F; Sat, 05 Sep 2020 02:23:55 -0400
+Received: by mail-pj1-x102b.google.com with SMTP id gf14so3998485pjb.5;
+ Fri, 04 Sep 2020 23:23:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=q/gexmTa/YH7hhTv7O7ttDMEBUVZAx5Bi9pjOkkesPI=;
- b=Q9yUCdfiLMdWB24qmJxvLJHDufKp5nPxRiIm7xIu9lNf2UPmPgkBdgi492zC2wuoSJ
- 9r+oGX+vro7UHNeqN3BV6itGIZhbtVgB9xrvl/wCKJf6qbxxVonxofB3E8E2Xajh8LaJ
- ptOly+bdn0i1d74p9b1Ll6HTHdsGMggMJqm9WisvYIVX8PL5HMjKu5EEmv6eiTUBw2R+
- 372R86QlXQVYMpe/QzXXFeBKTsGwv4XkyVxc/0UyrL0cfk4YgQ+kfTz/bshm+y4PZdvO
- kkwI2+vY0sgQiHzFla0nQv3jYd2knI5UM2Wbl2+eYYxLf+aHwLaH7QMp64K+80Pg4obI
- HaZQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=bM8au98PWoeNJSV4TV/fhw7ws62pAWVvuMLjtZdOgq4=;
+ b=WhStefGg3ym29O/azclYOzuYCMZ0N6D6h1xo9lyj/yjz9m2PS5/J/N63htH61/2lLe
+ 7Q5pQFQfZEEQxw/V36MPQHr3Q4eFbuiXjNXvAVr4LifZ82Dns8IogVtYySpQgrQnjq9a
+ rdbJa37LLCQkMNX2+2C5s2dDMTKYJo2TZI9HYXGLKp9k1jhfJDSqac40mDEZWltwpq3d
+ iCDgyiUKS9F0pQHYGuAUHSGBgmUT+LfcVHplosK9+jV8KZAfXWSExs66PhDhRHC/kCEd
+ dpZWzZuBsffOtqzJlPC1qFBYDU3ecBCQJjopRAUmA5rWiUTArIMToaa7LHHf6B+gTTXb
+ RduQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=q/gexmTa/YH7hhTv7O7ttDMEBUVZAx5Bi9pjOkkesPI=;
- b=rqgXKeJfhDpTOqNVKgFDRA8izBvZdG8jMLlb+0aZ5htddaJKdHk7D/0ymNSRbmMijY
- NrXjEiB0GZpCOMqTAO9SLjm0unGQG1OL+3vct1FPcG3pk/Lz2WM8WJPhG3/N3xlt/gyp
- +58ah+vecfP0UvctgMi9Jfnv46dBWepVSX1QTMqBTsTllIK05KU8n0/KDcA1Eo7g76Ny
- VArp/elIBCqJi8CoZZCVBT2Gb7TX24dGc+efNVmlefNJpniLJprLHv0QIHks3vOjcES8
- k+ny1LJWwRWxNISt9zA5dFK5nCSEicmVdGDhtkWXvYs+oAzFgWDl4nn6yXjMMNsGN0Qv
- 0f+w==
-X-Gm-Message-State: AOAM531seNPwYKQal7ifFjVudnXOCiOEedu4Ho1s40XCxWcRVZQO7XK9
- 98jQEoNktnhHR/rdTTiv5eXDPVvrLc26rA==
-X-Google-Smtp-Source: ABdhPJxA9RdohKCULkCxgJDCM5lC5fnKnWihjO8tcadnNOENYu8L4EFwJQNQikU1R+cqRAFmcjskRA==
-X-Received: by 2002:a17:90a:c24a:: with SMTP id
- d10mr11650904pjx.31.1599287029077; 
- Fri, 04 Sep 2020 23:23:49 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=bM8au98PWoeNJSV4TV/fhw7ws62pAWVvuMLjtZdOgq4=;
+ b=Ph+sB5a4jLcnRNzxpjwFbKFGea0oU8QgGcVwgdqQp7gEnpgp76KMP+/Ib3OmT/4CsI
+ Rlr3D+Ohg6o9veqzRFoW3MadkpYzJfwEBc7/8dWOZqkBvKju1ZTXEqMWdzD23CbHubmC
+ NKX1IIN+4QYOmNx0aVbNV0O8W85wAKmoTtWg/tpTC2lU4rg6P3mc3S+X3EGG8SjqVLWB
+ zhZYrLAuagzRpIkzvpaNn6WMn9iN7sU/xIYnn0Vv4+J6yExCPF4/CeriLDaGxbCZI2Xf
+ hQG6HBb/LV5igkH8GxaK/i2HyGp1DTRV1FE+uYQEbh5I3lc+1O4WFj+PKWsXySHf93E7
+ nsTA==
+X-Gm-Message-State: AOAM531myjB38Kr9sYxjypnIAxe5IH103GTqsl9sk4xjyv8BcYTZPavE
+ we/0f6sIBpTtEvd8Odr4axdiLVPb8xWvtg==
+X-Google-Smtp-Source: ABdhPJwcAwwpvAE7Bhdq/x4vcM2OU4LCzkgaePdpLrtb54QjYzxKj3l7RsGsdyw8jrPhUoy7d/oI3g==
+X-Received: by 2002:a17:90a:7f8a:: with SMTP id
+ m10mr11739392pjl.47.1599287031969; 
+ Fri, 04 Sep 2020 23:23:51 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id v8sm21436381pju.1.2020.09.04.23.23.46
+ by smtp.googlemail.com with ESMTPSA id v8sm21436381pju.1.2020.09.04.23.23.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 04 Sep 2020 23:23:48 -0700 (PDT)
+ Fri, 04 Sep 2020 23:23:51 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 00/11] Green the msys2 CI make
-Date: Sat,  5 Sep 2020 14:23:22 +0800
-Message-Id: <20200905062333.1087-1-luoyonggang@gmail.com>
+Subject: [PATCH v5 01/11] Revert "configure: add --ninja option"
+Date: Sat,  5 Sep 2020 14:23:23 +0800
+Message-Id: <20200905062333.1087-2-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20200905062333.1087-1-luoyonggang@gmail.com>
+References: <20200905062333.1087-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::634;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x634.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102b;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x102b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,44 +107,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Also it's fixes issues about make check=0D
-=0D
-Yonggang Luo (11):=0D
-  Revert "configure: add --ninja option"=0D
-  block: Fixes nfs on msys2/mingw=0D
-  ci: fixes msys2 build by upgrading capstone to 4.0.2=0D
-  meson: upgrade meson for execute custom ninjatool under msys2 properly=0D
-  ci: Enable msys2 ci in cirrus=0D
-  tests: Trying fixes test-replication.c on msys2.=0D
-  block: get file-win32.c handle locking option consistence with=0D
-    file-posix.c=0D
-  osdep: These function are only available on Non-Win32 system.=0D
-  meson: Fixes qapi tests.=0D
-  docker: Add win32/msys2/mingw64 docker=0D
-  ci: Enable Github actions.=0D
-=0D
- .cirrus.yml                           | 24 +++++++++++++++++++=0D
- .github/workflows/main.yml            | 31 +++++++++++++++++++++++++=0D
- block/file-win32.c                    | 23 +++++++++++++++++--=0D
- block/nfs.c                           | 26 +++++++++++++--------=0D
- capstone                              |  2 +-=0D
- configure                             | 18 ++-------------=0D
- include/qemu/osdep.h                  |  2 +-=0D
- meson                                 |  2 +-=0D
- scripts/ci/windows/msys2-build.sh     | 27 ++++++++++++++++++++++=0D
- scripts/ci/windows/msys2-download.bat |  4 ++++=0D
- scripts/ci/windows/msys2-install.sh   | 33 +++++++++++++++++++++++++++=0D
- tests/docker/dockerfiles/msys2.docker | 11 +++++++++=0D
- tests/qapi-schema/meson.build         |  3 ++-=0D
- tests/test-replication.c              | 17 ++++++++++----=0D
- 14 files changed, 188 insertions(+), 35 deletions(-)=0D
- create mode 100644 .github/workflows/main.yml=0D
- create mode 100644 scripts/ci/windows/msys2-build.sh=0D
- create mode 100644 scripts/ci/windows/msys2-download.bat=0D
- create mode 100644 scripts/ci/windows/msys2-install.sh=0D
- create mode 100644 tests/docker/dockerfiles/msys2.docker=0D
-=0D
--- =0D
-2.28.0.windows.1=0D
-=0D
+This reverts commit 48328880fddf0145bdccc499160fb24dfabfbd41.
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ configure | 16 +---------------
+ 1 file changed, 1 insertion(+), 15 deletions(-)
+
+diff --git a/configure b/configure
+index d3495e107f..5d8bf4d8bb 100755
+--- a/configure
++++ b/configure
+@@ -517,7 +517,6 @@ rng_none="no"
+ secret_keyring=""
+ libdaxctl=""
+ meson=""
+-ninja=""
+ skip_meson=no
+ gettext=""
+ 
+@@ -984,8 +983,6 @@ for opt do
+   ;;
+   --meson=*) meson="$optarg"
+   ;;
+-  --ninja=*) ninja="$optarg"
+-  ;;
+   --smbd=*) smbd="$optarg"
+   ;;
+   --extra-cflags=*)
+@@ -1758,7 +1755,6 @@ Advanced options (experts only):
+   --python=PYTHON          use specified python [$python]
+   --sphinx-build=SPHINX    use specified sphinx-build [$sphinx_build]
+   --meson=MESON            use specified meson [$meson]
+-  --ninja=NINJA            use specified ninja [$ninja]
+   --smbd=SMBD              use specified smbd [$smbd]
+   --with-git=GIT           use specified git [$git]
+   --static                 enable static build [$static]
+@@ -1995,16 +1991,6 @@ case "$meson" in
+     *) meson=$(command -v meson) ;;
+ esac
+ 
+-# Probe for ninja (used for compdb)
+-
+-if test -z "$ninja"; then
+-    for c in ninja ninja-build samu; do
+-        if has $c; then
+-            ninja=$(command -v "$c")
+-            break
+-        fi
+-    done
+-fi
+ 
+ # Check that the C compiler works. Doing this here before testing
+ # the host CPU ensures that we had a valid CC to autodetect the
+@@ -7917,7 +7903,7 @@ fi
+ mv $cross config-meson.cross
+ 
+ rm -rf meson-private meson-info meson-logs
+-NINJA=${ninja:-$PWD/ninjatool} $meson setup \
++NINJA=$PWD/ninjatool $meson setup \
+         --prefix "${pre_prefix}$prefix" \
+         --libdir "${pre_prefix}$libdir" \
+         --libexecdir "${pre_prefix}$libexecdir" \
+-- 
+2.28.0.windows.1
+
 
