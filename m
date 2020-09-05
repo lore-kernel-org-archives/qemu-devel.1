@@ -8,76 +8,77 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F29ADC433E2
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91548C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:14:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 529EE20709
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:13:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 021D220709
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:14:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2pfd2z6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 529EE20709
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kg/yrIHT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 021D220709
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEfUf-000701-CN
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:13:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33218)
+	id 1kEfVw-0008Ix-V3
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:14:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33232)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kEfSg-0005Fj-9d; Sat, 05 Sep 2020 17:11:02 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:38491)
+ id 1kEfSi-0005GB-7p; Sat, 05 Sep 2020 17:11:04 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:44294)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kEfSd-0006dd-4R; Sat, 05 Sep 2020 17:11:00 -0400
-Received: by mail-pl1-x642.google.com with SMTP id c3so2452296plz.5;
- Sat, 05 Sep 2020 14:10:58 -0700 (PDT)
+ id 1kEfSg-0006ds-Bf; Sat, 05 Sep 2020 17:11:03 -0400
+Received: by mail-pf1-x443.google.com with SMTP id o20so6517745pfp.11;
+ Sat, 05 Sep 2020 14:11:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=RYTSwUG4Szrk3/bEJFR9FTm/dK9H9YQKE9Ykyfw7eKM=;
- b=e2pfd2z620LYxvunSr0XzhlsQuKep439VY5cl7KQ9w88eInCUDM2g42HHf7WxB/6f6
- BaJS75/cfnU06sHNJHKNQVgyApeLFIiutAnswR+W1iU+uS1S6ltNK5Tbb249/z12OnR3
- hUjRzV7BArr2iQ4TwgSULpdgwNCEpH+CmoT3gLleIdqQebXBU5kYgWSTOvMtb0wr3ABZ
- U8T6+l2KkymgahnrdjFbKC2uNP6RP4mGq+PxUbZUAL/dq0vXmcJWMhbi+aDOXKmqccZh
- BX2gapLTml5rEiMrR32J2mkS9UPnv1ZVhAFmGW+5dx5DqK4t1NUMRF3oxM6VBSjAfq0y
- isRA==
+ bh=ptTGH2qI85N+szgczRA8YGLjVKH01noRoeLoG/lJ5SE=;
+ b=kg/yrIHTiFToquAiDBch0QwBWI26YxASfDpEbKFWWc2UIBvut6CtutwzzqO74r1pye
+ 83OMqWfo0CXYn3b0qmc2rH54iwboGbv8+CEa1MAQDdOFvB2uuJ+2NIFVEcHM+FbVMog6
+ llio9f7efRNcRO1dWxIb9ouy0pTKjU0nSdOcdEirQvjQgRLmg5XcUXyKIcEfbUL28zTl
+ 10T+a+Bcd0N2glwXElTvbOYpbvMLfVEq7OoJ5+A5gQn0JJhlGD2keStqGhxSTkGPF/Pp
+ 0W+uPIpVNzlyaNG2QmVDSoYoy3cbDA/stELngDv9JohX2iwTQg0g08diEBwZbfkEORJY
+ RnUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=RYTSwUG4Szrk3/bEJFR9FTm/dK9H9YQKE9Ykyfw7eKM=;
- b=po3jm3JrzotqJPfsloc6d5oY5Qb8ve7tZ8Q3EwFTBpgp6iU/UwKbRPC3B8+BCtETlu
- +ids+exH8ouH/b9ndt0AuoXipAwvhOpxr7pfqEYISNehaTozK4dl1n4NyxNfKTFT92j1
- 9hzYh09GjJrxo0RAAAN8jJf6kovgIytx8/v0D5oS7pQMDADu+K+61t1MZMtka8E+jjbo
- olpf+7Z+KJ40PQlQQ1/U9uNDfqjSCfdD6xGDpqVUOjJLiQANa1nI4rseA5UnlEL570cf
- e0OgP9sCmE8z690k+hsuWT7pyfre0PtafA1zlHAUrVh7Maznlkb7cG/c5qVHuI3jNiju
- ZM1g==
-X-Gm-Message-State: AOAM530EGrq6Z7rswLQMKEhHTwLqQ7bQ7/hcQ2BRQYU24K26u5fuPVqq
- pcH9uxk7YOCK5Bq6y1DfZai9QZXgLm2FM2Kq
-X-Google-Smtp-Source: ABdhPJyV12iqHkme4UCSfdR/Nwh24V4zZIF7D/R8U/qY6ptViKE2gKRnU6ED77pCZAwTfUVZsbsqiA==
-X-Received: by 2002:a17:90a:4687:: with SMTP id
- z7mr6881443pjf.144.1599340256797; 
- Sat, 05 Sep 2020 14:10:56 -0700 (PDT)
+ bh=ptTGH2qI85N+szgczRA8YGLjVKH01noRoeLoG/lJ5SE=;
+ b=BXe6OVTxYMgpppz2PVSaJ1jHd52i+c78jvywFSgyhZSFSdbBEpS03IrJdStWdoDit9
+ uH37Nmh9ewr3P5bWpWMiJJBRhJJtuzr2FE9oJw1O3OsW1ZPeS+aXamb0uD/4KshhLozG
+ h2rc2nXagTu5eEvpesHAaDmrm19ZVaLXG9lQD9WRp9SFFPM/4OlMWsotBQ3tavdT6rvM
+ gZme6J6ODYQgPrwtfmODZDtrF3Bcwub3T0pNi08wH/yQxLUUgQsUMgSEyqDuij/iy8Hj
+ OekO2vnnvJnF0xq4ssuNuFEDI2DMLQeZGKY8qJBCae4O//n98QHB+yjHPVKNmbuiuLnk
+ TJzg==
+X-Gm-Message-State: AOAM531+V7kI2tQYSEpqmuI5PPTYEBSRvDpy9o1gnmuoJrklhIWMaE0Y
+ uCk9WshsaChT0Vh/UoLETgXkr+rguNT6ISnU
+X-Google-Smtp-Source: ABdhPJxXVtpJAXIWKrV9qpNrCj+JG8vHFr6/bPILqbweNT0/Its1BuXXWjLZRqxRP04+OSAQzAREAQ==
+X-Received: by 2002:a62:8806:0:b029:13c:d37c:5e47 with SMTP id
+ l6-20020a6288060000b029013cd37c5e47mr12366910pfd.13.1599340259779; 
+ Sat, 05 Sep 2020 14:10:59 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id k88sm8576010pjk.19.2020.09.05.14.10.54
+ by smtp.googlemail.com with ESMTPSA id k88sm8576010pjk.19.2020.09.05.14.10.57
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 05 Sep 2020 14:10:56 -0700 (PDT)
+ Sat, 05 Sep 2020 14:10:58 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/2] tests: Trying fixes test-replication.c on msys2/mingw.
-Date: Sun,  6 Sep 2020 05:10:37 +0800
-Message-Id: <20200905211038.904-2-luoyonggang@gmail.com>
+Subject: [PATCH 2/2] block: get file-win32.c handle locking option consistence
+ with file-posix.c
+Date: Sun,  6 Sep 2020 05:10:38 +0800
+Message-Id: <20200905211038.904-3-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200905211038.904-1-luoyonggang@gmail.com>
 References: <20200905211038.904-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x642.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,48 +108,62 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Windows there is no path like /tmp/s_local_disk.XXXXXX
-
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- tests/test-replication.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ block/file-win32.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index 9ab3666a90..3cf544a133 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -23,14 +23,14 @@
- 
- /* primary */
- #define P_ID "primary-id"
--static char p_local_disk[] = "/tmp/p_local_disk.XXXXXX";
-+static char p_local_disk[PATH_MAX];
- 
- /* secondary */
- #define S_ID "secondary-id"
- #define S_LOCAL_DISK_ID "secondary-local-disk-id"
--static char s_local_disk[] = "/tmp/s_local_disk.XXXXXX";
--static char s_active_disk[] = "/tmp/s_active_disk.XXXXXX";
--static char s_hidden_disk[] = "/tmp/s_hidden_disk.XXXXXX";
-+static char s_local_disk[PATH_MAX];
-+static char s_active_disk[PATH_MAX];
-+static char s_hidden_disk[PATH_MAX];
- 
- /* FIXME: steal from blockdev.c */
- QemuOptsList qemu_drive_opts = {
-@@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)
- int main(int argc, char **argv)
- {
+diff --git a/block/file-win32.c b/block/file-win32.c
+index ab69bd811a..14e5f5c3b5 100644
+--- a/block/file-win32.c
++++ b/block/file-win32.c
+@@ -299,6 +299,11 @@ static QemuOptsList raw_runtime_opts = {
+             .type = QEMU_OPT_STRING,
+             .help = "host AIO implementation (threads, native)",
+         },
++        {
++            .name = "locking",
++            .type = QEMU_OPT_STRING,
++            .help = "file locking mode (on/off/auto, default: auto)",
++        },
+         { /* end of list */ }
+     },
+ };
+@@ -334,6 +339,7 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+     const char *filename;
+     bool use_aio;
      int ret;
-+    const char *tmpdir = g_get_tmp_dir();
-+    sprintf(p_local_disk, "%s/p_local_disk.XXXXXX", tmpdir);
-+    sprintf(s_local_disk, "%s/s_local_disk.XXXXXX", tmpdir);
-+    sprintf(s_active_disk, "%s/s_active_disk.XXXXXX", tmpdir);
-+    sprintf(s_hidden_disk, "%s/s_hidden_disk.XXXXXX", tmpdir);
-     qemu_init_main_loop(&error_fatal);
-     bdrv_init();
++    OnOffAuto locking;
  
+     s->type = FTYPE_FILE;
+ 
+@@ -342,11 +348,24 @@ static int raw_open(BlockDriverState *bs, QDict *options, int flags,
+         ret = -EINVAL;
+         goto fail;
+     }
+-
+-    if (qdict_get_try_bool(options, "locking", false)) {
++    locking = qapi_enum_parse(&OnOffAuto_lookup,
++                              qemu_opt_get(opts, "locking"),
++                              ON_OFF_AUTO_AUTO, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        ret = -EINVAL;
++        goto fail;
++    }
++    switch (locking) {
++    case ON_OFF_AUTO_ON:
+         error_setg(errp, "locking=on is not supported on Windows");
+         ret = -EINVAL;
+         goto fail;
++    case ON_OFF_AUTO_OFF:
++    case ON_OFF_AUTO_AUTO:
++        break;
++    default:
++        g_assert_not_reached();
+     }
+ 
+     filename = qemu_opt_get(opts, "filename");
 -- 
 2.28.0.windows.1
 
