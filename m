@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E138C43461
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 09:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D57ACC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 09:56:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D31DE206E7
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 09:56:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D31DE206E7
+	by mail.kernel.org (Postfix) with ESMTPS id E0028206E7
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 09:56:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0028206E7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEUw7-0001Ta-UI
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 05:56:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48160)
+	id 1kEUw8-0001WM-Qk
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 05:56:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kEUvO-0000DI-7O
+ id 1kEUvO-0000DP-Ii
  for qemu-devel@nongnu.org; Sat, 05 Sep 2020 05:55:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59074)
+Received: from indium.canonical.com ([91.189.90.7]:59078)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kEUvM-00007W-GC
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 05:55:57 -0400
+ id 1kEUvM-00007Z-Mq
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 05:55:58 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kEUvL-0002LG-0P
+ id 1kEUvL-0002Lg-D4
  for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 09:55:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id EE8292E80EA
- for <qemu-devel@nongnu.org>; Sat,  5 Sep 2020 09:55:54 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id 61F042E804E
+ for <qemu-devel@nongnu.org>; Sat,  5 Sep 2020 09:55:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Sat, 05 Sep 2020 09:49:19 -0000
-From: Thomas Huth <1717414@bugs.launchpad.net>
+Date: Sat, 05 Sep 2020 09:47:56 -0000
+From: Thomas Huth <1715715@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
@@ -50,19 +50,19 @@ X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: iiordanov th-huth
-X-Launchpad-Bug-Reporter: Iordan Iordanov (iiordanov)
+X-Launchpad-Bug-Commenters: cbparker mark-cave-ayland th-huth
+X-Launchpad-Bug-Reporter: Brad Parker (cbparker)
 X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <150544685826.29673.14944456813287969209.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159929935944.19700.15934794035277589088.malone@gac.canonical.com>
-Subject: [Bug 1717414] Re: Sending certain keysyms results in wrong symbol
- input
+References: <150480734842.32058.3488330551186130563.malonedeb@soybean.canonical.com>
+Message-Id: <159929927705.17975.13860193808135241223.malone@soybean.canonical.com>
+Subject: [Bug 1715715] Re: [qemu-ppc] Segfault when booting from HD after
+ MacOS9 install
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: 49a19f90c2d9a9f3449e65f90ca642122d3216c6
+X-Launchpad-Hash: 8eb2ab07fd52e6d4c0b377a42eae7fd5674848d3
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 03:50:36
@@ -85,14 +85,13 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1717414 <1717414@bugs.launchpad.net>
+Reply-To: Bug 1715715 <1715715@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There have been quite a bunch of improvements in the keysyms handling
-during the past years ... can you still reproduce your issue with the
-latest version of QEMU?
+Looking through old bug tickets ... can you still reproduce the segfault
+with the latest version of QEMU?
 
 ** Changed in: qemu
        Status: New =3D> Incomplete
@@ -101,48 +100,106 @@ latest version of QEMU?
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1717414
+https://bugs.launchpad.net/bugs/1715715
 
 Title:
-  Sending certain keysyms results in wrong symbol input
+  [qemu-ppc] Segfault when booting from HD after MacOS9 install
 
 Status in QEMU:
   Incomplete
 
 Bug description:
-  I develop bVNC, an Android VNC client. I noticed that when I connect
-  to qemu VMs that have a VNC console, Keysyms that are usually sent
-  over with SHIFT modifier when connecting from a PC have wrong symbols
-  typed within the VM. A very short list of examples:
+  I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
+  Install CD, in which I was able to install the OS successfully to the
+  hard drive. Upon reboot, this time from the hard drive directly, qemu-
+  system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
+  commit.
 
-  exclam                              33     0x0021
+  qemu --version reports "2.10.50 (v2.10.0-244-gb07d1c2-dirty)", but I
+  used git commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built
+  with "./configure --target-list=3Dppc-softmmu --enable-debug --disable-
+  strip".
 
-  results in "1" typed in the VM.
+  Here is the command-line arguments:
 
-  at                                  64     0x0040
+  qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env
+  'auto-boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtru=
+e'
+  -drive file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
+  file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice
+  port=3D5901,password=3DXXX -net nic,model=3Drtl8139 -net user -monitor st=
+dio
 
-  results in "2"
+  And the GDB backtrace:
 
-  plus                                43     0x002b
+  Program terminated with signal SIGSEGV, Segmentation fault.
+  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
+) at util/qemu-timer.c:462
+  462         timer_mod_ns(ts, expire_time * ts->scale);
+  [Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
+  (gdb) bt
+  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
+) at util/qemu-timer.c:462
+  #1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=
+=3D96, enabled=3Dtrue) at hw/intc/openpic.c:861
+  #2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, add=
+r=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
+  #3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f77=
+10, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D42949672=
+95, attrs=3D...) at /home/bp/qemu/memory.c:529
+  #4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0=
+x7f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=
+=3D0x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attr=
+s=3D...) at /home/bp/qemu/memory.c:595
+  #5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f77=
+10, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:=
+1337
+  #6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d=
+90, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", le=
+n=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
+  #7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=
+=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) a=
+t /home/bp/qemu/exec.c:2987
+  #8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D=
+272, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
+  #9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0=
+x7f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mas=
+k=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
+  #10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D=
+0x7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=
+=3D0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c82=
+75fc0, attrs=3D...) at /home/bp/qemu/memory.c:590
+  #11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275f=
+c0, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c=
+:1344
+  #12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0=
+x7f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D14005415=
+8295744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
+  #13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, i=
+ndex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /=
+home/bp/qemu/softmmu_template.h:265
+  #14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=
+=3D2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp=
+/qemu/softmmu_template.h:300
+  #15 0x00007f60e65ac2c0 in code_gen_buffer ()
+  #16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60=
+e65ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
+  #17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x=
+7f60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D=
+0x7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
+  #18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qem=
+u/accel/tcg/cpu-exec.c:676
+  #19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp=
+/qemu/cpus.c:1270
+  #20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010=
+) at /home/bp/qemu/cpus.c:1365
+  #21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_=
+create.c:333
+  #22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
+lone.S:109
 
-  results in "=3D"
-
-  asterisk                            42     0x002a
-
-  results in "8"
-
-  On Android, KEYCODEs that correspond to the above keysyms do not come
-  with SHIFT metastate. Therefore, the keysyms that they correspond to
-  are not sent over with any modifiers and must just work.
-
-  The issue was reproduced with bVNC and RealVNC viewers connecting to
-  many versions of qemu (Ubuntu 14.04, oVirt 3.4, oVirt 4.1, etc.). The
-  qemu version that comes with oVirt 4.1 is 2.6.0, commit hash
-  bfc766d38e1fae5767d43845c15c79ac8fa6d6af.
-
-  Sincerely,
-  iordan
+  Any idea what is going on?
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1717414/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1715715/+subscriptions
 
