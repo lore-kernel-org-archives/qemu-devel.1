@@ -2,90 +2,95 @@ Return-Path: <SRS0=twQi=CO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D4FBC43461
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 08:43:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 307B3C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 08:46:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93F5D2074D
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 08:43:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CpHeUDwG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93F5D2074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 265372074D
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 08:46:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 265372074D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55742 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60436 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kETmw-0007fA-If
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 04:43:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39142)
+	id 1kETqO-0001Is-63
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 04:46:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kETmN-00077X-Lh
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 04:42:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45701)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kETmM-00014f-2Y
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 04:42:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599295353;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Uy4CThzEeLYDy4jHDeKDsbkANckp+E3w5ZX8y2NT3iY=;
- b=CpHeUDwGKh+Jc3AfVMi88QkcMfGdl3vR03Zzk1RGu45lW45m0ye9qPaZ5kLZ9OrhDX0nvv
- DCCf1YmtDeKIlt2uFfBeJ4q7C/wz+AhvJqQHig9/uMWwoPxc9w2A2ndKySTmef/4/Ak6AR
- KQCGfr+SwWn2MMj6npMOqLN9fSRtlbk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-JEfr9pMYMuKfHwtzIaj13w-1; Sat, 05 Sep 2020 04:42:29 -0400
-X-MC-Unique: JEfr9pMYMuKfHwtzIaj13w-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA9D08712D3;
- Sat,  5 Sep 2020 08:42:27 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-27.ams2.redhat.com [10.36.112.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9F38F60C05;
- Sat,  5 Sep 2020 08:42:23 +0000 (UTC)
-Subject: Re: [PATCH v5 09/11] meson: Fixes qapi tests.
-To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kETpT-0000ix-Sj; Sat, 05 Sep 2020 04:45:47 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:57794
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kETpR-0001HN-TY; Sat, 05 Sep 2020 04:45:47 -0400
+Received: from host86-148-246-76.range86-148.btcentralplus.com
+ ([86.148.246.76] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kETpu-0001nN-NM; Sat, 05 Sep 2020 09:46:14 +0100
+To: Thomas Huth <thuth@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ qemu-devel@nongnu.org
 References: <20200905062333.1087-1-luoyonggang@gmail.com>
- <20200905062333.1087-10-luoyonggang@gmail.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <cdbe94fa-01a3-52b2-c2bc-6f92d2fda154@redhat.com>
-Date: Sat, 5 Sep 2020 10:42:22 +0200
+ <20200905062333.1087-2-luoyonggang@gmail.com>
+ <e0746ca9-87a3-4873-6b83-075a6ee90ff6@redhat.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Autocrypt: addr=mark.cave-ayland@ilande.co.uk; keydata=
+ mQENBFQJuzwBCADAYvxrwUh1p/PvUlNFwKosVtVHHplgWi5p29t58QlOUkceZG0DBYSNqk93
+ 3JzBTbtd4JfFcSupo6MNNOrCzdCbCjZ64ik8ycaUOSzK2tKbeQLEXzXoaDL1Y7vuVO7nL9bG
+ E5Ru3wkhCFc7SkoypIoAUqz8EtiB6T89/D9TDEyjdXUacc53R5gu8wEWiMg5MQQuGwzbQy9n
+ PFI+mXC7AaEUqBVc2lBQVpAYXkN0EyqNNT12UfDLdxaxaFpUAE2pCa2LTyo5vn5hEW+i3VdN
+ PkmjyPvL6DdY03fvC01PyY8zaw+UI94QqjlrDisHpUH40IUPpC/NB0LwzL2aQOMkzT2NABEB
+ AAG0ME1hcmsgQ2F2ZS1BeWxhbmQgPG1hcmsuY2F2ZS1heWxhbmRAaWxhbmRlLmNvLnVrPokB
+ OAQTAQIAIgUCVAm7PAIbAwYLCQgHAwIGFQgCCQoLBBYCAwECHgECF4AACgkQW8LFb64PMh9f
+ NAgAuc3ObOEY8NbZko72AGrg2tWKdybcMVITxmcor4hb9155o/OWcA4IDbeATR6cfiDL/oxU
+ mcmtXVgPqOwtW3NYAKr5g/FrZZ3uluQ2mtNYAyTFeALy8YF7N3yhs7LOcpbFP7tEbkSzoXNG
+ z8iYMiYtKwttt40WaheWuRs0ZOLbs6yoczZBDhna3Nj0LA3GpeJKlaV03O4umjKJgACP1c/q
+ T2Pkg+FCBHHFP454+waqojHp4OCBo6HyK+8I4wJRa9Z0EFqXIu8lTDYoggeX0Xd6bWeCFHK3
+ DhD0/Xi/kegSW33unsp8oVcM4kcFxTkpBgj39dB4KwAUznhTJR0zUHf63LkBDQRUCbs8AQgA
+ y7kyevA4bpetM/EjtuqQX4U05MBhEz/2SFkX6IaGtTG2NNw5wbcAfhOIuNNBYbw6ExuaJ3um
+ 2uLseHnudmvN4VSJ5Hfbd8rhqoMmmO71szgT/ZD9MEe2KHzBdmhmhxJdp+zQNivy215j6H27
+ 14mbC2dia7ktwP1rxPIX1OOfQwPuqlkmYPuVwZP19S4EYnCELOrnJ0m56tZLn5Zj+1jZX9Co
+ YbNLMa28qsktYJ4oU4jtn6V79H+/zpERZAHmH40IRXdR3hA+Ye7iC/ZpWzT2VSDlPbGY9Yja
+ Sp7w2347L5G+LLbAfaVoejHlfy/msPeehUcuKjAdBLoEhSPYzzdvEQARAQABiQEfBBgBAgAJ
+ BQJUCbs8AhsMAAoJEFvCxW+uDzIfabYIAJXmBepHJpvCPiMNEQJNJ2ZSzSjhic84LTMWMbJ+
+ opQgr5cb8SPQyyb508fc8b4uD8ejlF/cdbbBNktp3BXsHlO5BrmcABgxSP8HYYNsX0n9kERv
+ NMToU0oiBuAaX7O/0K9+BW+3+PGMwiu5ml0cwDqljxfVN0dUBZnQ8kZpLsY+WDrIHmQWjtH+
+ Ir6VauZs5Gp25XLrL6bh/SL8aK0BX6y79m5nhfKI1/6qtzHAjtMAjqy8ChPvOqVVVqmGUzFg
+ KPsrrIoklWcYHXPyMLj9afispPVR8e0tMKvxzFBWzrWX1mzljbBlnV2n8BIwVXWNbgwpHSsj
+ imgcU9TTGC5qd9g=
+Message-ID: <7bf3ce41-145e-0eaf-2900-e43b647bbb2a@ilande.co.uk>
+Date: Sat, 5 Sep 2020 09:45:36 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20200905062333.1087-10-luoyonggang@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <e0746ca9-87a3-4873-6b83-075a6ee90ff6@redhat.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 04:29:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.148.246.76
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH v5 01/11] Revert "configure: add --ninja option"
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.107,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,42 +105,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Block <qemu-block@nongnu.org>,
  Stefan Weil <sw@weilnetz.de>, Peter Lieven <pl@kamp.de>,
- Markus Armbruster <armbru@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/09/2020 08.23, Yonggang Luo wrote:
-> The error are:
-> +@end table
-> +
-> +@end deftypefn
-> +
-> make: *** [Makefile.mtest:63: check-qapi-schema] Error 1
+On 05/09/2020 09:29, Thomas Huth wrote:
+
+> On 05/09/2020 08.23, Yonggang Luo wrote:
+>> This reverts commit 48328880fddf0145bdccc499160fb24dfabfbd41.
+>>
+>> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+>> ---
+>>  configure | 16 +---------------
+>>  1 file changed, 1 insertion(+), 15 deletions(-)
 > 
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> ---
->  tests/qapi-schema/meson.build | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build
-> index c87d141417..67ba0a5ebd 100644
-> --- a/tests/qapi-schema/meson.build
-> +++ b/tests/qapi-schema/meson.build
-> @@ -220,6 +220,7 @@ qapi_doc = custom_target('QAPI doc',
->  
->  # "full_path()" needed here to work around
->  # https://github.com/mesonbuild/meson/issues/7585
-> -test('QAPI doc', diff, args: ['-u', files('doc-good.texi'), qapi_doc[0].full_path()],
-> +test('QAPI doc', diff, args: ['--strip-trailing-cr',
-> +                              '-u', files('doc-good.texi'), qapi_doc[0].full_path()],
+> Please be a little bit more descriptive in the patch description: Why do
+> you have to revert this patch?
 
-I just had a look at the POSIX man page of "diff", and it seems like
-"'--strip-trailing-cr" is not a portable option :-( Thus this will
-likely fail on the BSDs and Solaris-based systems.
-I think it's maybe best if you replace it with "-b" instead.
+Indeed - I certainly still need this, although I will do another test once Paolo's
+latest changes have been merged.
 
- Thomas
 
+ATB,
+
+Mark.
 
