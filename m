@@ -8,73 +8,73 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F15F2C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 00:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CCF0C43461
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 00:58:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AE8F2087C
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 00:45:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 720582087C
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 00:58:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BjcdFuon"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AE8F2087C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m0dDKT2y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 720582087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEML4-0002jv-3l
-	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 20:45:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41524)
+	id 1kEMX7-0005YZ-8q
+	for qemu-devel@archiver.kernel.org; Fri, 04 Sep 2020 20:58:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42604)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kEMK4-0001tZ-UL
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 20:44:52 -0400
-Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:37689)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kEMWY-0004z7-6O; Fri, 04 Sep 2020 20:57:46 -0400
+Received: from mail-oi1-x244.google.com ([2607:f8b0:4864:20::244]:38199)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kEMK3-0005cT-7v
- for qemu-devel@nongnu.org; Fri, 04 Sep 2020 20:44:52 -0400
-Received: by mail-ot1-x341.google.com with SMTP id 37so7513446oto.4
- for <qemu-devel@nongnu.org>; Fri, 04 Sep 2020 17:44:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kEMWW-00077L-PX; Fri, 04 Sep 2020 20:57:45 -0400
+Received: by mail-oi1-x244.google.com with SMTP id y6so8209871oie.5;
+ Fri, 04 Sep 2020 17:57:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=8KuhqHgtkRVWvOKolrbTGviPXza6sCvr3zYEivYnqhU=;
- b=BjcdFuon1XAKB/0e/ufbMngMr2jpsHtUpAOkspTSzd5+usj3ttQhcaE0jFJxEQd+ZC
- s9PmDM7/JMWWcmzJGto650nETQ3C1kchtrTqz9IHMofNkh23n6YL0AoXCY0CLw1NCh59
- cT7J9Ga4W3pl2Lk9DIy7T1pSnCo0N00/MeA2oGUJT4OwUGPtjPCSS1RIcFvr48uGjfsG
- Uzaq1GKz0CxBANqBtNm7C6ISxOFFLDyA+tcNJ3rzGEFTLR6JMpWXwb3Xq0R3tcKEOMyY
- WnclOdVvNNO17n2Qh89N958CoNtXAswlx01d8Tb8lLA1hjIe4/CzXjCu7wZ2ObJCJPiD
- He8Q==
+ bh=pq3IydyVl7elgApy6N8WV2urw9Pb7iv2Q/GZzZ4Wprk=;
+ b=m0dDKT2y0i1v1ap8gzg9Nr/irji2zScGYs+dIuOa9f0f6sxBmPiQ3epjAjKRs78A2o
+ cL5i1DYsFhFjXZMffZgTo0n6tH9gxXg38BwxiLCUrGO53mX9Qi7n0AeHLvjsTB9dwwwA
+ IkOhqp6wBV2zJ9lFWtJg0FkLB6y6WHlzGWeVoHlzGhtpGQVe+C/hgfu9UnzsogGjz32B
+ RQaZpY9rx3byMofwZEFSiWRZaj0wGNdR8ZXvnM2fKsIxsgNESPWDCjSaw4OTJw9055zB
+ jGBKu9LUBXGsiAIz/r3jRzgQXl7Ixy4mm6yeX2e+K8LkzBhOI0Et9KkU+nXl98A2ZSmx
+ asyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=8KuhqHgtkRVWvOKolrbTGviPXza6sCvr3zYEivYnqhU=;
- b=jPsQ2GPtwwern0RTr0dwG9d2MIMefZy023spqy4OX3LIdvY3IHUjcTsWOmnYwL7Ize
- QZRPHo98tiefXXbykW7QVsTMw+Zuw3HYyaLrYelNfeew5v0ZBmRpSaw593DmooGGwHqN
- CGC5Em80E+lLqAXWZdk4EsJhKfqac0oqpC/rFpQcHWj9gI8vk8Mt6nrT/DdQx3vd1Jvx
- Q/TY1XUPbZs5a/KUpxIHw87lwHSznVumHRIy21AZ4TTdyE/9Aj9RjKpowMCZ+7Hm4pjL
- ioQa99bdIA2xzH6o5892iGnMP2IFWnHqeO0erkLKYfR0Aw3CIs0EHOT1JLzrnItjiNgB
- uu2w==
-X-Gm-Message-State: AOAM5318iBkyH6ao1AO31l6TeSyn7hoR4LCTFw/xRK1GvoIPZqEN75aW
- cxW6bLXkzPJS7DOQeUS+yz7es/8BDGffSd5vJck=
-X-Google-Smtp-Source: ABdhPJxPfbWKv1c/KmJ2yAF1AbH3q+5CquZgVA8dsd4nYPnHr7STdU+AAzvTfQK6mW2IwWwznzjwEDz/rVW9ISALkbs=
-X-Received: by 2002:a05:6830:10c8:: with SMTP id
- z8mr7177565oto.333.1599266689325; 
- Fri, 04 Sep 2020 17:44:49 -0700 (PDT)
+ bh=pq3IydyVl7elgApy6N8WV2urw9Pb7iv2Q/GZzZ4Wprk=;
+ b=CvKRdi76MlZgjwjkaYTlwp1NPQaEveXwSfA2RVZ994cKcEeQj6anRbMyf9nOfTYbCs
+ T3bHdb2ekb63bA0rsa6YD5rChXz1FBi2rvZPwCG6bt91LjFB+cQwqSKQshD6dWF0tYNK
+ RHQ4Z4IE0LMrWWXo6UMBfHXyEk9lIl1LwBy+/pL4dDgwy8WtR06Ipz73a9K8Rhl3JYlm
+ bMFjqJbr5Yqke2T6X5KU5iNg/eFO7Ejw+mGL6BJfO6qKwy8lnIIvCu3zJoWRC4Tqbgkg
+ XXJz3e4Kirlif9sueHb2RZMzVthkHnGiKjekGAcZmIoWJDXuLc5xt2PN/HjldClSCvCB
+ IHgA==
+X-Gm-Message-State: AOAM530FFXt8QDM7ivfwRSGo1yptPx+5K1ZOXNV6hGJ/bl5koBJuCyml
+ 2vUS4kUlibukDopNNmQmhNPHbXgi+EKv9Qtv7Us=
+X-Google-Smtp-Source: ABdhPJzH+I3FcaveCU4mH3MC9K+bkvxPmST6AkIUZlGFJ/MbPkqA5b0ql53hKEfpSZihfijgimoXt8b80L9kKg5IM/I=
+X-Received: by 2002:aca:1117:: with SMTP id 23mr6980636oir.97.1599267463252;
+ Fri, 04 Sep 2020 17:57:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200904134908.1396-1-pannengyuan@huawei.com>
-In-Reply-To: <20200904134908.1396-1-pannengyuan@huawei.com>
+References: <20200904131402.590055-1-f4bug@amsat.org>
+ <20200904131402.590055-2-f4bug@amsat.org>
+In-Reply-To: <20200904131402.590055-2-f4bug@amsat.org>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Sat, 5 Sep 2020 08:44:13 +0800
-Message-ID: <CAKXe6SJL8Y2frr1-d06=Ovoo=45+kJSGM2vhDGFeJf4YuUfN4A@mail.gmail.com>
-Subject: Re: [PATCH] net/filter-rewriter: destroy g_hash_table in
- colo_rewriter_cleanup
-To: Pan Nengyuan <pannengyuan@huawei.com>
+Date: Sat, 5 Sep 2020 08:57:07 +0800
+Message-ID: <CAKXe6SKbRVsgi8DRd-NzuAnPbFFF130-mcN=+zxRqaZgDB2zJg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] hw/net/e1000e: Remove overwritten read handler for
+ STATUS register
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::244;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x244.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,43 +96,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, Chen Qun <kuhn.chenqun@huawei.com>,
- zhanghailiang <zhang.zhanghailiang@huawei.com>
+Cc: qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
+ Dmitry Fleytman <dmitry.fleytman@gmail.com>,
+ Qemu Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Pan Nengyuan <pannengyuan@huawei.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=884=E6=
-=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=883:23=E5=86=99=E9=81=93=EF=BC=9A
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> =E4=BA=8E2020=E5=B9=B49=E6=9C=
+=884=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=889:14=E5=86=99=E9=81=93=EF=
+=BC=9A
 >
-> s->connection_track_table forgot to destroy in colo_rewriter_cleanup. Fix=
- it.
+> The STATUS register readop handler is initialized first with
+> the generic e1000e_mac_readreg() handler:
 >
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
+>   2861 #define e1000e_getreg(x)    [x] =3D e1000e_mac_readreg
+>   2862 typedef uint32_t (*readops)(E1000ECore *, int);
+>   2863 static const readops e1000e_macreg_readops[] =3D {
+>   ....
+>   2919     e1000e_getreg(STATUS),
+>
+> Then overwritten with the specific e1000e_get_status handler:
+>
+>   3018     [STATUS]  =3D e1000e_get_status,
+>
+> To avoid confusion, remove the overwritten initialization.
+>
+> 6f3fbe4ed0 ("net: Introduce e1000e device emulation")
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
 > ---
->  net/filter-rewriter.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  hw/net/e1000e_core.c | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-> index 1aaad101b6..9ff366d44f 100644
-> --- a/net/filter-rewriter.c
-> +++ b/net/filter-rewriter.c
-> @@ -376,6 +376,8 @@ static void colo_rewriter_cleanup(NetFilterState *nf)
->          filter_rewriter_flush(nf);
->          g_free(s->incoming_queue);
->      }
-> +
-> +    g_hash_table_destroy(s->connection_track_table);
->  }
->
->  static void colo_rewriter_setup(NetFilterState *nf, Error **errp)
+> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
+> index bcd186cac52..5170e6a4563 100644
+> --- a/hw/net/e1000e_core.c
+> +++ b/hw/net/e1000e_core.c
+> @@ -2916,7 +2916,6 @@ static const readops e1000e_macreg_readops[] =3D {
+>      e1000e_getreg(TSYNCRXCTL),
+>      e1000e_getreg(TDH),
+>      e1000e_getreg(LEDCTL),
+> -    e1000e_getreg(STATUS),
+>      e1000e_getreg(TCTL),
+>      e1000e_getreg(TDBAL),
+>      e1000e_getreg(TDLEN),
 > --
-> 2.18.2
+> 2.26.2
 >
 >
 
