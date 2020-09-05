@@ -7,84 +7,85 @@ X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E75C43461
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D3BFC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:43:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A6FF2073B
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:42:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE39D2073B
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:42:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c86P5FTO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A6FF2073B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K1A7HR0+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE39D2073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEfwn-0003Cy-Jx
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:42:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36456)
+	id 1kEfxb-0004I2-4G
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:42:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36586)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kEfwD-0002kB-Dg
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:41:33 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:53177)
+ id 1kEfx1-0003lF-Mr
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:42:23 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:33233)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kEfwB-0001Pn-Qb
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:41:33 -0400
-Received: by mail-wm1-x341.google.com with SMTP id q9so9812070wmj.2
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 14:41:31 -0700 (PDT)
+ id 1kEfx0-0001XU-7L
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:42:23 -0400
+Received: by mail-wr1-x444.google.com with SMTP id m6so10882941wrn.0
+ for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 14:42:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=ebcUtTn4PehBcB6V0CciawNM0piRDMerv10NHneDLqQ=;
- b=c86P5FTO1hvOS1dD/jTLdIUk+ja4xWazemazG9IdMhNntpCZzDOxaeKP6GJSUN5Tbw
- 8OUqkNWTnvfnhGgnNxbWjkr4j/AYd80KgFu8Zo9cW9FugARnQPE15aYPZJxLiUln82oQ
- YztbME1FKXuryGvwA90gWD5uh9lOrGugAZq2o9h9BFk/LEtQZJS3Z0s4mW2wBbF68/0m
- ZlwAnXr429PWn453lXLUbptmrK2T4HI6VrKi21u/Aerr900wABOcgmYeMJMkUAVJ/lKN
- nHt2BygAJ77LnC1ShZu1OmalqiVllofDfwwBm6l7KHUPUmKNTFn2UaA5D/my6PqDpG8p
- P0UQ==
+ bh=sYrL9yO7gV87qUMsgaLyavewF2w86opY4D7SYA8kSkU=;
+ b=K1A7HR0+n/QSMn6nMjTbDnSk2fXsyMyqEEUWB0IX7LIRMg9vtOItv+ec4+VD4Alu8x
+ +8UHDuWVBct6JRRuGmeG5CMpIdXL+V1/zYMKLgT3XAcdx/Qi+QH0KEZGcBkBY/RWOhQj
+ NlNbLRW38xiDpTfUZabkXUKSeJt413gRwBBmIRL5+gREM4KJqPLYWtQRqB+E7WAegzMN
+ NQ1TsCEHC2oXOLuKChwmlIUWBSyDmvut95SLu+Aq+5JgNaR+ZwIcRzGlbdWcgApHazqo
+ /Fc4aKT+wKTXLAD7OWRAJowvalUaD9mZRoTB+0PcLbGFx7TRJ+okwRr51Fe/HKQB2VrA
+ R3EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ebcUtTn4PehBcB6V0CciawNM0piRDMerv10NHneDLqQ=;
- b=DgwqyNMzuJv1OtUlXSBYteSerPZzKKL77d2WrHU0nGqVgPOTlGO6pZ8LJuE8JfMOXk
- xPc/PB/GMmoKJ3cn9OvKnQBdb3xbQRF+x8mQ71Z0unmjLkxp2PIvDRaX9mQy0IgxXMjV
- sp4H3ZZZdrDaXq2bNBD9s+hpGHkF6m3YTKBgE5Vly5xKrGslCuDLF3d1frGf+8x1i077
- G6nO/qVYoNs5vVA+DEPAN1xJVmj1xT6+JLIINalbQ6GsAqWlKG/zDsJQLUB0ELlYvYLs
- As9/fffKtFJSgQJMHR9CNesVo85Q7SAVuldJc8ewmeLgbuOHVwOgWzk17zlTCYgJ4qB9
- RWTQ==
-X-Gm-Message-State: AOAM530nwHMH2GpnB/IQwFwahsKmn6LZx1frxct+go4yIr+9B5K8YZ+U
- IgIsyV+4NsoBT7CyzkTI5k38a/gTFr0=
-X-Google-Smtp-Source: ABdhPJwPK2I7AJpcnbrqo0ndIBkC56GB7BX0MUjXxPWuA676g/kH61qFywZD+iVV+kM+o/Yv44xqHQ==
-X-Received: by 2002:a1c:7911:: with SMTP id l17mr13402149wme.179.1599342090355; 
- Sat, 05 Sep 2020 14:41:30 -0700 (PDT)
+ bh=sYrL9yO7gV87qUMsgaLyavewF2w86opY4D7SYA8kSkU=;
+ b=itPt2972VrW4m7XRfPT2toP1phBzY1nbAuDBPyYbeqRM9lkXoJZ7fSmQrpKEsj/jyD
+ EU4S0DTHQU6ERosRwpOxzTt4TCEMIb3jc0a2DIxRBObB/H+WlC7w6Ae3TxPC3mMwhfOA
+ aAxVLv2sKCfcrxfIoHeTSHi93aNWHQhoMS+w6uUFe7DN5n5az4vpLPu3MXAXZ40iGzTQ
+ GP9NegkWXGRCV4oG0+S7bo10lLUbeEogCTl/7XC+SAKrrpP/XRG+PJNr0INxVWNZcd1t
+ 42OZp6pFcDwHTpK+uR4xXW9DieVOGeGIgcv8ky5oxTYAzzKjjnkh/HBMsJk01sgY1eLW
+ 6sBQ==
+X-Gm-Message-State: AOAM532cdUO0UMYeaQlEktYi+IxsVfo7WwJDzVsRzH1ODYO98R0tZZV9
+ 8t9NGSTNPoObXRUUBJITNy0=
+X-Google-Smtp-Source: ABdhPJzyRwJ+svB5iFcgQZGvNbuVlWlZdpx1LHHH5mOHxoCsbNr/79hpSLo3h8rdrOPQMvHJDhpEeg==
+X-Received: by 2002:a05:6000:1184:: with SMTP id
+ g4mr13748598wrx.20.1599342140725; 
+ Sat, 05 Sep 2020 14:42:20 -0700 (PDT)
 Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id c6sm19148621wrr.15.2020.09.05.14.41.29
+ by smtp.gmail.com with ESMTPSA id t1sm17563671wmi.16.2020.09.05.14.42.19
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 05 Sep 2020 14:41:29 -0700 (PDT)
-Subject: Re: [PATCH v3 16/19] target/microblaze: Move mmu parameters to
- MicroBlazeCPUConfig
+ Sat, 05 Sep 2020 14:42:20 -0700 (PDT)
+Subject: Re: [PATCH v3 18/19] target/microblaze: Put MicroBlazeCPUConfig into
+ DisasContext
 To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 References: <20200904190842.2282109-1-richard.henderson@linaro.org>
- <20200904190842.2282109-17-richard.henderson@linaro.org>
+ <20200904190842.2282109-19-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8d8453ae-0020-ab47-ffa5-feb56afb6143@amsat.org>
-Date: Sat, 5 Sep 2020 23:41:29 +0200
+Message-ID: <bfaa38f2-6f6e-387a-b27b-e32a7cb5a8fe@amsat.org>
+Date: Sat, 5 Sep 2020 23:42:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200904190842.2282109-17-richard.henderson@linaro.org>
+In-Reply-To: <20200904190842.2282109-19-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -113,20 +114,19 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/4/20 9:08 PM, Richard Henderson wrote:
-> The final 4 fields in MicroBlazeMMU are configuration constants.
-> Move them into MicroBlazeCPUConfig where they belong.
+> The bulk of the translator should not have access to the
+> complete cpu state, to avoid the temptation to examine bits
+> that are in run time, but not translation time context.
 > 
-> Remove the leading "c_" from the member names, as that presumably
-> implied "config", and that should not be explicit in the location.
+> We do need access to the constant cpu configuration, and
+> that is sufficient, so put that into DisasContext.
 > 
 > Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
->  target/microblaze/cpu.h    |  5 +++++
->  target/microblaze/mmu.h    |  7 +------
->  target/microblaze/cpu.c    |  9 +++++----
->  target/microblaze/helper.c |  4 ++--
->  target/microblaze/mmu.c    | 30 +++++++++++++++++-------------
->  5 files changed, 30 insertions(+), 25 deletions(-)
+>  target/microblaze/translate.c | 24 ++++++++++++------------
+>  1 file changed, 12 insertions(+), 12 deletions(-)
+
+Nice.
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
