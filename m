@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20553C433E2
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:06:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FEDBC43461
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:07:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7A52320738
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:06:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A52320738
+	by mail.kernel.org (Postfix) with ESMTPS id B2F9820738
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:07:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2F9820738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEfOB-0001vb-L8
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:06:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60654)
+	id 1kEfPR-0002r0-RG
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:07:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfNQ-0001Tq-Vl
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:05:37 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:45889)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfOh-0002Pm-AD
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:06:55 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:51769)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfNN-00062j-6j
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:05:36 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfOf-0006Dl-NM
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:06:55 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mn2eN-1kwlMz1cnv-00k5h6; Sat, 05 Sep 2020 23:05:30 +0200
-Subject: Re: [PATCH] linux-user: Map signal numbers in fcntl
-To: Timothy Baldwin <T.E.Baldwin99@members.leeds.ac.uk>, qemu-devel@nongnu.org
-References: <72cc725c-f344-b7f1-d559-401867067d80@members.leeds.ac.uk>
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MF3U0-1kLCpm36oS-00FWhT; Sat, 05 Sep 2020 23:06:50 +0200
+Subject: Re: [PATCH] linux-user: fix ppc/termbits.h
+To: qemu-devel@nongnu.org
+References: <20200830181620.422036-1-laurent@vivier.eu>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -79,35 +79,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <78fc7c17-4323-9cfa-bd1f-f9276fc7d498@vivier.eu>
-Date: Sat, 5 Sep 2020 23:05:29 +0200
+Message-ID: <fd58993b-511e-5b05-1aae-16177bd034cc@vivier.eu>
+Date: Sat, 5 Sep 2020 23:06:49 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <72cc725c-f344-b7f1-d559-401867067d80@members.leeds.ac.uk>
+In-Reply-To: <20200830181620.422036-1-laurent@vivier.eu>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:UpMvAo5/gKEJJCT1kNzYLwkjczjoJ7LDbVpU6yMxuXJOf55iZG8
- DeexHWGbcjUWKnOFgQrIbqo2FbF2FGglGGMwJ/EESWa839dUtKraLdTZ1zno/1XANCkrWM1
- WsrIx6jmPAaWmFhwFTua136JGEgLIoEaD2wOR6izLkeZZSfpGeTORP8EnuoWguXHNJBJoHK
- B52UvHj9ZF58M7eQZgJ+g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:F1TKHhvZX1w=:hswJePbMyGR9TrCkYERkO+
- dsZrKhFEskK+Pynxl72mgjL+bE32mK6gQ+LhJkbj4rif0vpOBInIJJ97EwaqpIrRvlefQNMGG
- v+9gTUv/3NsQH2WaVLop8kCXmJyFQxBw6LwbbVlWgYky2wJnTSMOjYAiy5FXGYSzTxRToOSab
- rL6H5W8JusCwrHppVklOGtENvD/5CISp6mgB7+mbn1y2V5FniEE4UddCiLU7nX9NTeXwqrZRi
- b4pOlPhGRqsgnrnRnxbd27gNQ8s8B7USHfpXHf8IbG99VByNtQIj2r+kfnxpLoWSzl6jaCl2M
- CH6qroUu+0lZWYoYr0AAi8k9T5gn21wuuOQO8h9kpIT94hAPn2Ucru548GUir1/lhbuZsgdkL
- kUDj8EH9bXUtL+5x22vCQ7d9B/tCOUvPlVEa6HJNGnMwuYFB9WwykstKHwmjd0dpoEoKoCigW
- JuUOnRL/SY9l5Al0mk/7gbBVOTGhof8OpH8cXjKoDsLj/BdnOve43eDR31IOiwHge81h6QMe7
- FsAicsH+aoXFE5Qk3gqZGiruMay38Wrz+3eeJxIkfy3IV7vskVphtYoESUci/Cuo/nLmZhTfh
- mus8Ye511C9Mji5onu2TqfySaeTxZeGhxLNXcnBbJOukrnMyC78gUXvv6X87o5yb6sfY8wvoN
- oF5VmyTt5au7aDHoDGV9eWNMYTbW/0zW3Jnmu1KXDGA884S5HuD6FQIpwdNQgq7rbNxHVwRPC
- wvcSk7VQdWX0x6Bz+sUY4nC3YKi04BKa83P+LeQVJPB+eI/IxGLr6kALdvcIrWlJ2TXRPNvC3
- jbqAGeT9n0d2cjfdsruSvfOX96uZFnbJ7ScaZujYk4gIOdOW3inT/EObJRsRvSGIOXO0vtL
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:5IuaP+TMCFF92xogSIThBzGcOScinIRprD3goXMy1enQLO53/p0
+ cUu7fPyjQKaCLDo7ja3lIu8U52Uyiag/x9dJLovHZRHiOSSRP7sXvkR+OZGbZdb+5nCr0ue
+ ThdO3KiNnXU6pCKMH5ROxG9VGr7SAwvAMDJ44Dm5C8vJcW8+9xZd6EMzTwxEAlWQin7imzz
+ gez/sBA5e66V2yhKoiqMg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:uPmCUsK4Q3o=:ClKn3bvC7ax77NsLQd1HH6
+ rNVOzmBF7wPe637mMK333bTBgY/Y7d9IWtMEwNslRPxNrMdTf2gm33CI0MGMAncIZvHNwZg47
+ B0OwxBgj0rrXhRorj0TxvegiI8c/WPxAF0iUvYKF2Lf3YCEePNQFUZSP4d6ZRKcoX+1bVfRY3
+ Aq45LibxqmpDueyjCwcYP11QgXhaOnM/tIrU2R+YYGt4buedtIHWi7q5PSfma8oiBgL/ltCf9
+ BqlROJXkcq5XBInAz3ZqCY/zCqEuKwXxR4LFeZUg64gfWcM1DO0nojnmOXaEgx8hF+72e2Sqr
+ eGD2FFmcrbzkay85NL90ANlraljunecyxGTTIAyLS2Bg8bauYBec8f4rxb0egWoZhVnjPGxSE
+ e+mN8GXIpyalyRGvYXJKBYXl2yb10GPvobb+LPqCllK3enNHQpaE8iZssu3ubiczWS6Qdj9N+
+ D3uhqh0aLMwa3QbEqqtg+d+lmbDs6JE4wZkzXTgkX08ZmLFIU8M4ebALAUiNKcLcs/VgYcjte
+ RO2f+xJ+8ynRZpSjHgDZiEiIYxD2QcomAlZnkosl5DdSAENZeuqmKmrkOsBMiz+pBs+J+uKEB
+ zgO37vMq4GuTyb/Tx2ARdmctN1cvwr5sLEoXNfaDvHgj2WdJ83ywk64co5dBNZk8jeI+ioOIl
+ 3GljsWkXYAUbHMiwRT85EUo8sy3WgFIJu4bCK9itOhjGO3naP44Kj0WHoG9C/rHE79OMgPtLE
+ ID+ndRnxJ1vXydLT2AymmQH2YTVOPCvd2C/xAXS7zwBqZIoP4aiESjBrietCsq2NRO4vzcQbk
+ 7kuy7RbkZD6y9nctdDK87TDD4hqvwFUiV7XATCuJOIwwQbtiGTrb2dVwd42dBrFswrbr3sO
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 16:51:56
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 16:41:54
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -19
 X-Spam_score: -2.0
@@ -127,44 +127,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Filip.Bozuta@syrmia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 29/07/2020 à 22:06, Timothy Baldwin a écrit :
-> Map signal numbers in fcntl F_SETSIG and F_GETSIG.
+Le 30/08/2020 à 20:16, Laurent Vivier a écrit :
+> On ppc, in termios, c_line is after c_cc, not before .
 > 
-> Signed-off-by: Timothy E Baldwin <T.E.Baldwin99@members.leeds.ac.uk>
+> Fixes: c218b4ede4f9 ("linux-user: Add missing termbits types and values definitions")
+> Cc: Filip.Bozuta@syrmia.com
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  linux-user/syscall.c | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
+>  linux-user/ppc/termbits.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-> index 945fc25279..8456bad109 100644
-> --- a/linux-user/syscall.c
-> +++ b/linux-user/syscall.c
-> @@ -6583,10 +6583,16 @@ static abi_long do_fcntl(int fd, int cmd,
-> abi_ulong arg)
->          break;
->  #endif
+> diff --git a/linux-user/ppc/termbits.h b/linux-user/ppc/termbits.h
+> index 7066d1e5523d..eb226e099980 100644
+> --- a/linux-user/ppc/termbits.h
+> +++ b/linux-user/ppc/termbits.h
+> @@ -14,8 +14,8 @@ struct target_termios {
+>      target_tcflag_t c_oflag;               /* output mode flags */
+>      target_tcflag_t c_cflag;               /* control mode flags */
+>      target_tcflag_t c_lflag;               /* local mode flags */
+> -    target_cc_t c_line;                    /* line discipline */
+>      target_cc_t c_cc[TARGET_NCCS];         /* control characters */
+> +    target_cc_t c_line;                    /* line discipline */
+>      target_speed_t c_ispeed;               /* input speed */
+>      target_speed_t c_ospeed;               /* output speed */
+>  };
 > 
-> -    case TARGET_F_SETOWN:
-> -    case TARGET_F_GETOWN:
->      case TARGET_F_SETSIG:
-> +        ret = get_errno(safe_fcntl(fd, host_cmd,
-> target_to_host_signal(arg)));
-> +        break;
-> +
->      case TARGET_F_GETSIG:
-> +        ret = host_to_target_signal(get_errno(safe_fcntl(fd, host_cmd,
-> arg)));
-> +        break;
-> +
-> +    case TARGET_F_SETOWN:
-> +    case TARGET_F_GETOWN:
->      case TARGET_F_SETLEASE:
->      case TARGET_F_GETLEASE:
->      case TARGET_F_SETPIPE_SZ:
+
 
 Applied to my linux-user-for-5.2 branch.
 
