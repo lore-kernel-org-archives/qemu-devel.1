@@ -2,81 +2,87 @@ Return-Path: <SRS0=twQi=CO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D57ACC433E2
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 09:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1241C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 10:36:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0028206E7
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 09:56:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0028206E7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BFDA920757
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 10:36:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=anisinha-ca.20150623.gappssmtp.com header.i=@anisinha-ca.20150623.gappssmtp.com header.b="17gqgFsF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFDA920757
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=anisinha.ca
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53222 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEUw8-0001WM-Qk
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 05:56:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48162)
+	id 1kEVYY-0005YN-NK
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 06:36:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kEUvO-0000DP-Ii
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 05:55:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:59078)
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kEVXo-0004ze-L6
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 06:35:40 -0400
+Received: from mail-pf1-x432.google.com ([2607:f8b0:4864:20::432]:36344)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kEUvM-00007Z-Mq
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 05:55:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kEUvL-0002Lg-D4
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 09:55:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 61F042E804E
- for <qemu-devel@nongnu.org>; Sat,  5 Sep 2020 09:55:55 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Sat, 05 Sep 2020 09:47:56 -0000
-From: Thomas Huth <1715715@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <ani@anisinha.ca>) id 1kEVXm-00040T-1j
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 06:35:40 -0400
+Received: by mail-pf1-x432.google.com with SMTP id m8so6007724pfh.3
+ for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 03:35:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=anisinha-ca.20150623.gappssmtp.com; s=20150623;
+ h=from:to:cc:subject:date:message-id;
+ bh=z7BX5XuG5iEZqoDahY/O/X9PCHt6zYvr3byrSIWrzSk=;
+ b=17gqgFsFP3xG7LbveD9aux1HDud1gAvlETuvHeYA2hkezWbRIP2Vd1mBHzbmhGBjNo
+ JB5vtIQMekXGZNPlNQfgS0e/w3xn+a4yMylaa6t4Gy/ldlKkX/evKxHXO0PSZRVl9I63
+ K+vqdiolweTx7FTK7h3MXl74oqeqh3obnxvjU6M69NosSwkTrFH18y5hUlqQYdcIDp9L
+ Ds/whu79QiZnupKfH8mkWNSoRG5qyRxa5B3HwgelaIU6Gov9cXOoVyRhuo5TPaQjlRLB
+ Vm/C8oi9iFjJnbJVUkXfL1ZSdKt2KAWzkB9aswJSmlCge28NcEuotNcxUUYjB81TG34y
+ Zt2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=z7BX5XuG5iEZqoDahY/O/X9PCHt6zYvr3byrSIWrzSk=;
+ b=PzAriM4aN6OyCQirQXq312D1unv4Ti0Dr1/t9t2qYOVtS6t4IavWM1TZ9lGc83nFSg
+ DuMhsrZqWJ+5pvFHDLLz4nNvZaSS01XtH4TaT9+VZqW9UdWo0l+ZK7Twag1gAa61K618
+ MM9zlhilyr9fEs2eZGk4Q16KlKYChgwUFZsXPt2aHFcanBXK/0ZYCo6EG7FGKNqs72+R
+ ljrW5SvJfmIbNBezzPV/GNsZgNLKV9YF8Dn5v6sEr8XZrgWeDhTogSsdOx79xPy+n+jJ
+ OEs560CLkr3TU9xC9EjPUReokW+ygsRQpThc64WqhPnF+5zGfaRISJr5CYpXZ4P8NgWE
+ uaBA==
+X-Gm-Message-State: AOAM531HUQBXxzkCYn2Mt5y9i13ypSB/YuCzw0+hrId/X+diMS11bNxx
+ /+UhQOrUYjoAB6hLSbCoq0W16b8Evj0J3w==
+X-Google-Smtp-Source: ABdhPJzSkCeHUgFRmi11yjJiQJMc3RTfslSwiGf7hwZDP5udMHcbCw023wA7YG0K0lPSf0iwI+HGSg==
+X-Received: by 2002:a63:cd4f:: with SMTP id a15mr8334028pgj.416.1599302135137; 
+ Sat, 05 Sep 2020 03:35:35 -0700 (PDT)
+Received: from localhost.localdomain ([115.96.135.214])
+ by smtp.googlemail.com with ESMTPSA id k24sm9200643pfg.148.2020.09.05.03.35.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 05 Sep 2020 03:35:33 -0700 (PDT)
+From: Ani Sinha <ani@anisinha.ca>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: cbparker mark-cave-ayland th-huth
-X-Launchpad-Bug-Reporter: Brad Parker (cbparker)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <150480734842.32058.3488330551186130563.malonedeb@soybean.canonical.com>
-Message-Id: <159929927705.17975.13860193808135241223.malone@soybean.canonical.com>
-Subject: [Bug 1715715] Re: [qemu-ppc] Segfault when booting from HD after
- MacOS9 install
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: 8eb2ab07fd52e6d4c0b377a42eae7fd5674848d3
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 03:50:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Subject: [PATCH v1 0/3] unit tests for change 'do not add hotplug related amls
+ for cold plugged bridges'
+Date: Sat,  5 Sep 2020 16:05:17 +0530
+Message-Id: <20200905103520.12626-1-ani@anisinha.ca>
+X-Mailer: git-send-email 2.17.1
+Received-SPF: none client-ip=2607:f8b0:4864:20::432;
+ envelope-from=ani@anisinha.ca; helo=mail-pf1-x432.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,121 +91,673 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1715715 <1715715@bugs.launchpad.net>
+Cc: Ani Sinha <ani@anisinha.ca>, Igor Mammedov <imammedo@redhat.com>,
+ jusual@redhat.com, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Looking through old bug tickets ... can you still reproduce the segfault
-with the latest version of QEMU?
+The following patchset adds the unit test for the change:
+f80ba9e599 ("tests/acpi: unit test for 'acpi-pci-hotplug-with-bridge-support' bridge flag")
 
-** Changed in: qemu
-       Status: New =3D> Incomplete
+Please compare the diff of the DSDT table attached with the commit log with the following diff which
+was generated before appplying the above change. The major difference between the diffs are the absence
+of the following lines in the diff corresponding to this change:
 
--- =
++                Name (_SUN, 0x03)  // _SUN: Slot User Number
++                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+                 {
++                    PCEJ (BSEL, _SUN)
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1715715
++                If ((Arg0 & 0x08))
++                {
++                    Notify (S18, Arg1)
++                }
++
 
-Title:
-  [qemu-ppc] Segfault when booting from HD after MacOS9 install
+These are hotplug related amls which were present for slot 3 in the root pci bus before this change was applied.
+With the change, these amls have been removed. Hence, slot 3 where the bridge is attached is no longer hotplug
+capable.
 
-Status in QEMU:
-  Incomplete
+--Ani
 
-Bug description:
-  I created an empty 128G qcow2 image and booted from a Mac OS 9.2.1
-  Install CD, in which I was able to install the OS successfully to the
-  hard drive. Upon reboot, this time from the hard drive directly, qemu-
-  system-ppc segfaults. Host system is Ubuntu 16.04.2 with latest qemu
-  commit.
+@@ -1,30 +1,30 @@
+ /*
+  * Intel ACPI Component Architecture
+  * AML/ASL+ Disassembler version 20180105 (64-bit version)
+  * Copyright (c) 2000 - 2018 Intel Corporation
+  * 
+  * Disassembling to symbolic ASL+ operators
+  *
+- * Disassembly of tests/data/acpi/pc/DSDT.bridge, Fri Sep  4 11:08:58 2020
++ * Disassembly of /tmp/aml-IEQEQ0, Fri Sep  4 11:08:58 2020
+  *
+  * Original Table Header:
+  *     Signature        "DSDT"
+- *     Length           0x00001A89 (6793)
++ *     Length           0x00001346 (4934)
+  *     Revision         0x01 **** 32-bit table (V1), no 64-bit math support
+- *     Checksum         0x08
++ *     Checksum         0xBF
+  *     OEM ID           "BOCHS "
+  *     OEM Table ID     "BXPCDSDT"
+  *     OEM Revision     0x00000001 (1)
+  *     Compiler ID      "BXPC"
+  *     Compiler Version 0x00000001 (1)
+  */
+ DefinitionBlock ("", "DSDT", 1, "BOCHS ", "BXPCDSDT", 0x00000001)
+ {
+     Scope (\)
+     {
+         OperationRegion (DBG, SystemIO, 0x0402, One)
+         Field (DBG, ByteAcc, NoLock, Preserve)
+         {
+             DBGB,   8
+         }
+ 
+@@ -859,521 +859,36 @@
+                 }
+ 
+                 Method (_S2D, 0, NotSerialized)  // _S2D: S2 Device State
+                 {
+                     Return (Zero)
+                 }
+ 
+                 Method (_S3D, 0, NotSerialized)  // _S3D: S3 Device State
+                 {
+                     Return (Zero)
+                 }
+             }
+ 
+             Device (S18)
+             {
+                 Name (_ADR, 0x00030000)  // _ADR: Address
+-                Name (BSEL, One)
+-                Device (S00)
+-                {
+-                    Name (_SUN, Zero)  // _SUN: Slot User Number
+-                    Name (_ADR, Zero)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S08)
+-                {
+-                    Name (_SUN, One)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00010000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S10)
+-                {
+-                    Name (_SUN, 0x02)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00020000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S18)
+-                {
+-                    Name (_SUN, 0x03)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00030000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S20)
+-                {
+-                    Name (_SUN, 0x04)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00040000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S28)
+-                {
+-                    Name (_SUN, 0x05)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00050000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S30)
+-                {
+-                    Name (_SUN, 0x06)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00060000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S38)
+-                {
+-                    Name (_SUN, 0x07)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00070000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S40)
+-                {
+-                    Name (_SUN, 0x08)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00080000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S48)
+-                {
+-                    Name (_SUN, 0x09)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00090000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S50)
+-                {
+-                    Name (_SUN, 0x0A)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x000A0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S58)
+-                {
+-                    Name (_SUN, 0x0B)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x000B0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S60)
+-                {
+-                    Name (_SUN, 0x0C)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x000C0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S68)
+-                {
+-                    Name (_SUN, 0x0D)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x000D0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S70)
+-                {
+-                    Name (_SUN, 0x0E)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x000E0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S78)
+-                {
+-                    Name (_SUN, 0x0F)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x000F0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S80)
+-                {
+-                    Name (_SUN, 0x10)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00100000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S88)
+-                {
+-                    Name (_SUN, 0x11)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00110000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S90)
+-                {
+-                    Name (_SUN, 0x12)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00120000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (S98)
+-                {
+-                    Name (_SUN, 0x13)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00130000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SA0)
+-                {
+-                    Name (_SUN, 0x14)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00140000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SA8)
+-                {
+-                    Name (_SUN, 0x15)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00150000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SB0)
+-                {
+-                    Name (_SUN, 0x16)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00160000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SB8)
+-                {
+-                    Name (_SUN, 0x17)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00170000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SC0)
+-                {
+-                    Name (_SUN, 0x18)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00180000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SC8)
+-                {
+-                    Name (_SUN, 0x19)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x00190000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SD0)
+-                {
+-                    Name (_SUN, 0x1A)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x001A0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SD8)
+-                {
+-                    Name (_SUN, 0x1B)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x001B0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SE0)
+-                {
+-                    Name (_SUN, 0x1C)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x001C0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SE8)
+-                {
+-                    Name (_SUN, 0x1D)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x001D0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SF0)
+-                {
+-                    Name (_SUN, 0x1E)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x001E0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Device (SF8)
+-                {
+-                    Name (_SUN, 0x1F)  // _SUN: Slot User Number
+-                    Name (_ADR, 0x001F0000)  // _ADR: Address
+-                    Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+-                    {
+-                        PCEJ (BSEL, _SUN)
+-                    }
+-                }
+-
+-                Method (DVNT, 2, NotSerialized)
+-                {
+-                    If ((Arg0 & One))
+-                    {
+-                        Notify (S00, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x02))
+-                    {
+-                        Notify (S08, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x04))
+-                    {
+-                        Notify (S10, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x08))
+-                    {
+-                        Notify (S18, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x10))
+-                    {
+-                        Notify (S20, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x20))
+-                    {
+-                        Notify (S28, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x40))
+-                    {
+-                        Notify (S30, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x80))
+-                    {
+-                        Notify (S38, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x0100))
+-                    {
+-                        Notify (S40, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x0200))
+-                    {
+-                        Notify (S48, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x0400))
+-                    {
+-                        Notify (S50, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x0800))
+-                    {
+-                        Notify (S58, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x1000))
+-                    {
+-                        Notify (S60, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x2000))
+-                    {
+-                        Notify (S68, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x4000))
+-                    {
+-                        Notify (S70, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x8000))
+-                    {
+-                        Notify (S78, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x00010000))
+-                    {
+-                        Notify (S80, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x00020000))
+-                    {
+-                        Notify (S88, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x00040000))
+-                    {
+-                        Notify (S90, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x00080000))
+-                    {
+-                        Notify (S98, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x00100000))
+-                    {
+-                        Notify (SA0, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x00200000))
+-                    {
+-                        Notify (SA8, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x00400000))
+-                    {
+-                        Notify (SB0, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x00800000))
+-                    {
+-                        Notify (SB8, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x01000000))
+-                    {
+-                        Notify (SC0, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x02000000))
+-                    {
+-                        Notify (SC8, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x04000000))
+-                    {
+-                        Notify (SD0, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x08000000))
+-                    {
+-                        Notify (SD8, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x10000000))
+-                    {
+-                        Notify (SE0, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x20000000))
+-                    {
+-                        Notify (SE8, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x40000000))
+-                    {
+-                        Notify (SF0, Arg1)
+-                    }
+-
+-                    If ((Arg0 & 0x80000000))
+-                    {
+-                        Notify (SF8, Arg1)
+-                    }
+-                }
+-
+-                Method (PCNT, 0, NotSerialized)
++                Name (_SUN, 0x03)  // _SUN: Slot User Number
++                Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+                 {
+-                    BNUM = One
+-                    DVNT (PCIU, One)
+-                    DVNT (PCID, 0x03)
++                    PCEJ (BSEL, _SUN)
+                 }
+             }
+ 
+             Device (S20)
+             {
+                 Name (_SUN, 0x04)  // _SUN: Slot User Number
+                 Name (_ADR, 0x00040000)  // _ADR: Address
+                 Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+                 {
+                     PCEJ (BSEL, _SUN)
+                 }
+             }
+ 
+             Device (S28)
+             {
+                 Name (_SUN, 0x05)  // _SUN: Slot User Number
+@@ -1633,32 +1148,37 @@
+                     PCEJ (BSEL, _SUN)
+                 }
+             }
+ 
+             Device (SF8)
+             {
+                 Name (_SUN, 0x1F)  // _SUN: Slot User Number
+                 Name (_ADR, 0x001F0000)  // _ADR: Address
+                 Method (_EJ0, 1, NotSerialized)  // _EJx: Eject Device
+                 {
+                     PCEJ (BSEL, _SUN)
+                 }
+             }
+ 
+             Method (DVNT, 2, NotSerialized)
+             {
++                If ((Arg0 & 0x08))
++                {
++                    Notify (S18, Arg1)
++                }
++
+                 If ((Arg0 & 0x10))
+                 {
+                     Notify (S20, Arg1)
+                 }
+ 
+                 If ((Arg0 & 0x20))
+                 {
+                     Notify (S28, Arg1)
+                 }
+ 
+                 If ((Arg0 & 0x40))
+                 {
+                     Notify (S30, Arg1)
+                 }
+ 
+                 If ((Arg0 & 0x80))
+@@ -1779,22 +1299,21 @@
+                 If ((Arg0 & 0x40000000))
+                 {
+                     Notify (SF0, Arg1)
+                 }
+ 
+                 If ((Arg0 & 0x80000000))
+                 {
+                     Notify (SF8, Arg1)
+                 }
+             }
+ 
+             Method (PCNT, 0, NotSerialized)
+             {
+                 BNUM = Zero
+                 DVNT (PCIU, One)
+                 DVNT (PCID, 0x03)
+-                ^S18.PCNT ()
+             }
+         }
+     }
+ }
+ 
 
-  qemu --version reports "2.10.50 (v2.10.0-244-gb07d1c2-dirty)", but I
-  used git commit b07d1c2f5607489d4d4a6a65ce36a3e896ac065e and built
-  with "./configure --target-list=3Dppc-softmmu --enable-debug --disable-
-  strip".
+***
 
-  Here is the command-line arguments:
+Ani Sinha (3):
+  tests/acpi: list added acpi table binary file for pci bridge hotplug
+    test
+  tests/acpi: unit test for 'acpi-pci-hotplug-with-bridge-support'
+    bridge flag
+  tests/acpi: add newly added acpi DSDT table blob for pci bridge
+    hotplug flag
 
-  qemu-system-ppc -boot c -g 1024x768x32 -M mac99 -m 256 -prom-env
-  'auto-boot?=3Dtrue' -prom-env 'boot-args=3D-v' -prom-env 'vga-ndrv?=3Dtru=
-e'
-  -drive file=3D../os9.img,format=3Draw,media=3Dcdrom -drive
-  file=3DMacOS9.qcow2,format=3Dqcow2,media=3Ddisk -spice
-  port=3D5901,password=3DXXX -net nic,model=3Drtl8139 -net user -monitor st=
-dio
+ tests/data/acpi/pc/DSDT.hpbridge | Bin 0 -> 4895 bytes
+ tests/qtest/bios-tables-test.c   |  15 +++++++++++++++
+ 2 files changed, 15 insertions(+)
+ create mode 100644 tests/data/acpi/pc/DSDT.hpbridge
 
-  And the GDB backtrace:
+-- 
+2.17.1
 
-  Program terminated with signal SIGSEGV, Segmentation fault.
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  462         timer_mod_ns(ts, expire_time * ts->scale);
-  [Current thread is 1 (Thread 0x7f60e43cb700 (LWP 9853))]
-  (gdb) bt
-  #0  0x0000559065fe7d3a in timer_mod (ts=3D0x0, expire_time=3D888960717010=
-) at util/qemu-timer.c:462
-  #1  0x0000559065d63769 in openpic_tmr_set_tmr (tmr=3D0x5590676fa7e0, val=
-=3D96, enabled=3Dtrue) at hw/intc/openpic.c:861
-  #2  0x0000559065d63995 in openpic_tmr_write (opaque=3D0x5590676f71f0, add=
-r=3D16, val=3D96, len=3D4) at hw/intc/openpic.c:912
-  #3  0x0000559065b02811 in memory_region_write_accessor (mr=3D0x5590676f77=
-10, addr=3D32, value=3D0x7f60e43c7da8, size=3D4, shift=3D0, mask=3D42949672=
-95, attrs=3D...) at /home/bp/qemu/memory.c:529
-  #4  0x0000559065b02a29 in access_with_adjusted_size (addr=3D32, value=3D0=
-x7f60e43c7da8, size=3D1, access_size_min=3D4, access_size_max=3D4, access=
-=3D0x559065b02727 <memory_region_write_accessor>, mr=3D0x5590676f7710, attr=
-s=3D...) at /home/bp/qemu/memory.c:595
-  #5  0x0000559065b051eb in memory_region_dispatch_write (mr=3D0x5590676f77=
-10, addr=3D32, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c:=
-1337
-  #6  0x0000559065aa3a36 in address_space_write_continue (as=3D0x559067614d=
-90, addr=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", le=
-n=3D1, addr1=3D32, l=3D1, mr=3D0x5590676f7710) at /home/bp/qemu/exec.c:2942
-  #7  0x0000559065aa3b84 in address_space_write (as=3D0x559067614d90, addr=
-=3D2147750160, attrs=3D..., buf=3D0x7f60e43c7ed0 "`_'\310`\177", len=3D1) a=
-t /home/bp/qemu/exec.c:2987
-  #8  0x0000559065aa2ec0 in subpage_write (opaque=3D0x7f60c8275fc0, addr=3D=
-272, value=3D96, len=3D1, attrs=3D...) at /home/bp/qemu/exec.c:2565
-  #9  0x0000559065b02906 in memory_region_write_with_attrs_accessor (mr=3D0=
-x7f60c8275fc0, addr=3D272, value=3D0x7f60e43c7fc8, size=3D1, shift=3D0, mas=
-k=3D255, attrs=3D...) at /home/bp/qemu/memory.c:555
-  #10 0x0000559065b029d3 in access_with_adjusted_size (addr=3D272, value=3D=
-0x7f60e43c7fc8, size=3D1, access_size_min=3D1, access_size_max=3D8, access=
-=3D0x559065b02818 <memory_region_write_with_attrs_accessor>, mr=3D0x7f60c82=
-75fc0, attrs=3D...) at /home/bp/qemu/memory.c:590
-  #11 0x0000559065b0523a in memory_region_dispatch_write (mr=3D0x7f60c8275f=
-c0, addr=3D272, data=3D96, size=3D1, attrs=3D...) at /home/bp/qemu/memory.c=
-:1344
-  #12 0x0000559065b175db in io_writex (env=3D0x7f60e43d42a0, iotlbentry=3D0=
-x7f60e43e8130, mmu_idx=3D3, val=3D96, addr=3D2147750160, retaddr=3D14005415=
-8295744, size=3D1) at /home/bp/qemu/accel/tcg/cputlb.c:807
-  #13 0x0000559065b18055 in io_writeb (env=3D0x7f60e43d42a0, mmu_idx=3D3, i=
-ndex=3D65, val=3D96 '`', addr=3D2147750160, retaddr=3D140054158295744) at /=
-home/bp/qemu/softmmu_template.h:265
-  #14 0x0000559065b181ea in helper_ret_stb_mmu (env=3D0x7f60e43d42a0, addr=
-=3D2147750160, val=3D96 '`', oi=3D3, retaddr=3D140054158295744) at /home/bp=
-/qemu/softmmu_template.h:300
-  #15 0x00007f60e65ac2c0 in code_gen_buffer ()
-  #16 0x0000559065b1ff26 in cpu_tb_exec (cpu=3D0x7f60e43cc010, itb=3D0x7f60=
-e65ac5c0 <code_gen_buffer+935318>) at /home/bp/qemu/accel/tcg/cpu-exec.c:166
-  #17 0x0000559065b20bfd in cpu_loop_exec_tb (cpu=3D0x7f60e43cc010, tb=3D0x=
-7f60e65ac5c0 <code_gen_buffer+935318>, last_tb=3D0x7f60e43c8678, tb_exit=3D=
-0x7f60e43c8674) at /home/bp/qemu/accel/tcg/cpu-exec.c:578
-  #18 0x0000559065b20eed in cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp/qem=
-u/accel/tcg/cpu-exec.c:676
-  #19 0x0000559065aebc3d in tcg_cpu_exec (cpu=3D0x7f60e43cc010) at /home/bp=
-/qemu/cpus.c:1270
-  #20 0x0000559065aebe64 in qemu_tcg_rr_cpu_thread_fn (arg=3D0x7f60e43cc010=
-) at /home/bp/qemu/cpus.c:1365
-  #21 0x00007f60f56f06ba in start_thread (arg=3D0x7f60e43cb700) at pthread_=
-create.c:333
-  #22 0x00007f60f542682d in clone () at ../sysdeps/unix/sysv/linux/x86_64/c=
-lone.S:109
-
-  Any idea what is going on?
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1715715/+subscriptions
 
