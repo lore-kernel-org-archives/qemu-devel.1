@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F4AEC43461
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:34:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E75BC433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:36:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C9D02074B
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:34:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3CF32073B
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:36:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PFP5ciWK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C9D02074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BkBI8Bmi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3CF32073B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39322 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEfpC-0006LA-O9
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:34:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35818)
+	id 1kEfrB-0007LB-Uf
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:36:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kEfoT-0005ul-T3
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:33:33 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43366)
+ id 1kEfqQ-0006tC-KP
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:35:34 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36833)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kEfoS-0000Ga-Ef
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:33:33 -0400
-Received: by mail-wr1-x444.google.com with SMTP id k15so10803844wrn.10
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 14:33:32 -0700 (PDT)
+ id 1kEfqO-0000XU-GD
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:35:34 -0400
+Received: by mail-wm1-x341.google.com with SMTP id z9so9842179wmk.1
+ for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 14:35:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Yzh8Y+S8EaE6sLjYA7IgZtmWRBf5mrrHYpN3uy3Mqcs=;
- b=PFP5ciWKohdxWQULO1iV8+Bn+9+NX2aLhLv+PBGo1PiOEZcOfA4Tb5Kxyg3UD/W54l
- ICYT4nLcPpmVZ05GzYKTwPvcaTEPFO4zRvBcid9L0MbNW68EIPZL8pEiPz5pvQ8crAkQ
- nSNxdLrq7Ch0PuIkCVoSLR2Zv/zw0dDD/ApwmTgocTtBqxy4Sh7Yg5LiDMJunNOwRCx3
- 1r0NKseoQPK61MEYIA+kDJbvnQpbfXWL5mxiEIKKxCupSoE7VC5I1BqQxOawPCFKFHIb
- hg7ibDF4zCoKqoOk0ZUoH+/K4uVPoVvcyg3mC8qbfMGtMDwaGz9CrcOBvjP2BI3M3ZlP
- JjRQ==
+ bh=OpQvted7S7+4FPai6rTn/puQwuIiv2h0VxhnP7TslMc=;
+ b=BkBI8BmiLomRgw3w0QfC3ZEM4qd8tqPcl3nvPAe50DwdHfK91lGD8IMmke8nNegRaM
+ qyMLDDxrIl7hoWuIhnjd/q4pKHGFKoMCQucSUiT/qp7jbvhQueEGBPl32gblRsF6z5PW
+ ADpqjTthOuO5jEOqhitvrIo5Kf9/An6Slofz84DcREju/Vozs20Tm5nroYQ3eiWZT7sS
+ ZuTaTiVEJZG+lhTz3+//KuIzJMcDvMgErIq5Mj5uDT9kqIZD1hC9ChgLtSKEn22XLZVD
+ ym4kFOK2pm8HQggmWwjLZ9rZFQ/lRHf/jNUYJcKNTjJpF0UOyb3EELDwCA7kt29pDKNl
+ tTig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Yzh8Y+S8EaE6sLjYA7IgZtmWRBf5mrrHYpN3uy3Mqcs=;
- b=cTwN1fZZ/5c2sRj8hj15fVOv6OI24wuDQAhFiE86DicAguWOxhcMoFnYziVdDQYcvG
- 1mq9VTjdKr7tbz2YPeWooBOm8PMA8JjVdur9jlo7LVu3KhMhanoMONffB1gid3yUTXum
- /qc9PZCB+ttMkW4vuBE09HO3XUgAMipfgAZkd1sgxU507ZAF0lzCAk0FYuuOuUt/PO0J
- YAY0lMGRS/g4j1m0IDi4NnBCD+HjU/oOnd8/sL0OPBB1sIesey3MKpkKPoeg4dMPXIYy
- DV2tt4spRUhBwmJcFYg+No/Wpfav8qC6M3/dsTRkexU5J21wAQs6PFs2R58R1js4HX5z
- cEeQ==
-X-Gm-Message-State: AOAM533EW1eVwSY8Q36HbNAIz66GliCKJm2PpRReBn0BmGmI1Hgg6PTQ
- +i8fr6pgzy7AiT0ITj8v2Wo=
-X-Google-Smtp-Source: ABdhPJz3DrOXRD5hVQN41yNdh4hgVFUyCtroLARM8hNxH5fc+hfVcZQIJ3eADyqNixg4K1p0FM3m9w==
-X-Received: by 2002:adf:f88b:: with SMTP id u11mr13365017wrp.376.1599341611174; 
- Sat, 05 Sep 2020 14:33:31 -0700 (PDT)
+ bh=OpQvted7S7+4FPai6rTn/puQwuIiv2h0VxhnP7TslMc=;
+ b=sovAOdPvpd3itWNM3uhB61Y4IXXNhqyYLe3I6DEgBMUuFzi1p2Hv78q5L5JyPTKKne
+ LeQGAqKc9d+9FHE6LP13WLwRbGOQOofDQviDMuDKnvXmmu1mhrmJruXolu6PUzfAOMhQ
+ bPMa2C9DP2whrF99D7bu/K1J0F5xIEuCdHtirUzDZwdDuEOE6yEt0mu+3khaD5r8BROe
+ ehx0iHp5fnqv66KJqn26opjajmCdDEyXQR3FBEX0sw/2Cf3PNiBSCqQ5uygPZroAlEMC
+ 1jggPdwv2afu6fuPvL0zfUL4oyEujQVbCme7x8uHFpvKV8WmukoE94m1IHgzf9qBe9fM
+ bHiQ==
+X-Gm-Message-State: AOAM531Yd77sYBZIUCsWZXJXEofr/ggRJkc2wBzBfIcOrXuJOBBij7El
+ oT+xplpQ8aCZU2OwkOcXCUM=
+X-Google-Smtp-Source: ABdhPJyhrRqFzYFCAtn7wRSIdVXgt49wfOqTOsocn9lSSKsGDWUUOyu9u4ngIOy+zHW8lBJVNQgr5A==
+X-Received: by 2002:a1c:5906:: with SMTP id n6mr11988958wmb.160.1599341731310; 
+ Sat, 05 Sep 2020 14:35:31 -0700 (PDT)
 Received: from [192.168.1.36] (50.red-83-52-54.dynamicip.rima-tde.net.
  [83.52.54.50])
- by smtp.gmail.com with ESMTPSA id o5sm18446695wmc.33.2020.09.05.14.33.30
+ by smtp.gmail.com with ESMTPSA id c14sm19204965wrv.12.2020.09.05.14.35.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 05 Sep 2020 14:33:30 -0700 (PDT)
-Subject: Re: [PATCH] tests: fixes test-vmstate.c compile error on msys2
-To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
-References: <20200905063813.1875-1-luoyonggang@gmail.com>
+ Sat, 05 Sep 2020 14:35:30 -0700 (PDT)
+Subject: Re: [PATCH v3 12/19] target/microblaze: Split out MicroBlazeCPUConfig
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200904190842.2282109-1-richard.henderson@linaro.org>
+ <20200904190842.2282109-13-richard.henderson@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <a68e6325-693a-2bc5-b18a-0d38d789fec4@amsat.org>
-Date: Sat, 5 Sep 2020 23:33:29 +0200
+Message-ID: <78a05885-0456-76d4-18e7-397675f641f8@amsat.org>
+Date: Sat, 5 Sep 2020 23:35:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200905063813.1875-1-luoyonggang@gmail.com>
+In-Reply-To: <20200904190842.2282109-13-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -105,48 +106,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: edgar.iglesias@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/5/20 8:38 AM, Yonggang Luo wrote:
-> ../tests/test-vmstate.c: In function 'int_cmp':
-> ../tests/test-vmstate.c:884:5: error: unknown type name 'uint'; did you mean 'uInt'?
->   884 |     uint ua = GPOINTER_TO_UINT(a);
->       |     ^~~~
->       |     uInt
-> ../tests/test-vmstate.c:885:5: error: unknown type name 'uint'; did you mean 'uInt'?
->   885 |     uint ub = GPOINTER_TO_UINT(b);
->       |     ^~~~
->       |     uInt
-> make: *** [Makefile.ninja:5461：tests/test-vmstate.exe.p/test-vmstate.c.obj] 错误 1
+On 9/4/20 9:08 PM, Richard Henderson wrote:
+> This struct was previously unnamed, and defined in MicroBlazeCPU.
+> Pull it out to its own typedef so that we can reuse it.
 > 
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 > ---
->  tests/test-vmstate.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  target/microblaze/cpu.h | 55 ++++++++++++++++++++++-------------------
+>  1 file changed, 29 insertions(+), 26 deletions(-)
 > 
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index f7b3868881..f8de709a0b 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -881,8 +881,8 @@ static gint interval_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
->  /* ID comparison function */
->  static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data)
->  {
-> -    uint ua = GPOINTER_TO_UINT(a);
-> -    uint ub = GPOINTER_TO_UINT(b);
-> +    guint ua = GPOINTER_TO_UINT(a);
-> +    guint ub = GPOINTER_TO_UINT(b);
->      return (ua > ub) - (ua < ub);
->  }
+> diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+> index 20c2979396..59d2a079c4 100644
+> --- a/target/microblaze/cpu.h
+> +++ b/target/microblaze/cpu.h
+> @@ -291,6 +291,34 @@ struct CPUMBState {
+>      } pvr;
+>  };
+>  
+> +/*
+> + * Microblaze Configuration Settings
+> + */
+> +typedef struct {
+> +    bool stackprot;
+> +    uint32_t base_vectors;
+> +    uint8_t addr_size;
+> +    uint8_t use_fpu;
+> +    uint8_t use_hw_mul;
+> +    bool use_barrel;
+> +    bool use_div;
+> +    bool use_msr_instr;
+> +    bool use_pcmp_instr;
+> +    bool use_mmu;
+> +    bool dcache_writeback;
+> +    bool endi;
+> +    bool dopb_bus_exception;
+> +    bool iopb_bus_exception;
+> +    bool illegal_opcode_exception;
+> +    bool opcode_0_illegal;
+> +    bool div_zero_exception;
+> +    bool unaligned_exceptions;
+> +    uint8_t pvr_user1;
+> +    uint32_t pvr_user2;
+> +    char *version;
+> +    uint8_t pvr;
+> +} MicroBlazeCPUConfig;
+> +
+>  /**
+>   * MicroBlazeCPU:
+>   * @env: #CPUMBState
+> @@ -305,32 +333,7 @@ struct MicroBlazeCPU {
+>  
+>      CPUNegativeOffsetState neg;
+>      CPUMBState env;
+> -
+> -    /* Microblaze Configuration Settings */
+> -    struct {
+> -        bool stackprot;
+> -        uint32_t base_vectors;
+> -        uint8_t addr_size;
+> -        uint8_t use_fpu;
+> -        uint8_t use_hw_mul;
+> -        bool use_barrel;
+> -        bool use_div;
+> -        bool use_msr_instr;
+> -        bool use_pcmp_instr;
+> -        bool use_mmu;
+> -        bool dcache_writeback;
+> -        bool endi;
+> -        bool dopb_bus_exception;
+> -        bool iopb_bus_exception;
+> -        bool illegal_opcode_exception;
+> -        bool opcode_0_illegal;
+> -        bool div_zero_exception;
+> -        bool unaligned_exceptions;
+> -        uint8_t pvr_user1;
+> -        uint32_t pvr_user2;
+> -        char *version;
+> -        uint8_t pvr;
+> -    } cfg;
+> +    MicroBlazeCPUConfig cfg;
+>  };
+>  
 >  
 > 
-
 
