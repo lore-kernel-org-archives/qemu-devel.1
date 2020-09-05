@@ -2,94 +2,81 @@ Return-Path: <SRS0=twQi=CO=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49D6EC433E2
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 12:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9606C43461
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 12:27:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7AB2020757
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 12:17:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RgDC1C9e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AB2020757
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 493962074B
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 12:27:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 493962074B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43442 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEX89-0001gn-9B
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 08:17:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38006)
+	id 1kEXHi-0004Ap-A8
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 08:27:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kEX6s-0000rv-V2
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 08:15:58 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29374
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kEX6m-0006HG-Fo
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 08:15:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599308151;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=n0uEUA85X+MCWMWu2Nvn8t7hQWmnqZMSGsU+rkFYFvE=;
- b=RgDC1C9epnkz8C2FenhvZVKIBhzbBXWx8J5z4xDlOGy7KlFblQRhwb7385HoGCq596lG+e
- I4yYQ7Tcq/8yHhrVHpWxNEEOu4nFaFatpRZWNgCWwYb8eLRhbHcD6HOIDX2tX2QPPS5YVX
- Ad4VgBt9jtrhA3UNNJnMZ2jSLGoTkO0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-3Nnv8yYIM26scF1jpBv_Ow-1; Sat, 05 Sep 2020 08:15:47 -0400
-X-MC-Unique: 3Nnv8yYIM26scF1jpBv_Ow-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 978EF1005E72;
- Sat,  5 Sep 2020 12:15:46 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-27.ams2.redhat.com [10.36.112.27])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8BCD260C05;
- Sat,  5 Sep 2020 12:15:45 +0000 (UTC)
-Subject: Re: [RFC PATCH] travis.yml: Drop the default softmmu builds
-From: Thomas Huth <thuth@redhat.com>
-To: qemu-devel@nongnu.org, =?UTF-8?Q?Alex_Benn=c3=a9e?=
- <alex.bennee@linaro.org>
-References: <20200805185403.15227-1-thuth@redhat.com>
-Message-ID: <c1927c74-da26-a17d-e92e-1e052540733f@redhat.com>
-Date: Sat, 5 Sep 2020 14:15:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kEXGL-0003FV-Am
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 08:25:45 -0400
+Received: from indium.canonical.com ([91.189.90.7]:50262)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kEXGH-0007FH-Ln
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 08:25:45 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kEXGD-0001WE-FT
+ for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 12:25:37 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 6EA1A2E804E
+ for <qemu-devel@nongnu.org>; Sat,  5 Sep 2020 12:25:37 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200805185403.15227-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 07:24:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
-X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 05 Sep 2020 12:19:29 -0000
+From: Thomas Huth <1712818@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: eblake meeho schu-schu th-huth
+X-Launchpad-Bug-Reporter: meeho yuen (meeho)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <150357954932.16920.8202218494274187188.malonedeb@gac.canonical.com>
+Message-Id: <159930836947.18139.6297887047126491705.malone@soybean.canonical.com>
+Subject: [Bug 1712818] Re: live migration with storage encounter
+ assert(!(bs->open_flags & BDRV_O_INACTIVE)) crashes
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: 7490a40596897c9ad4d2b727e25082468f2c5a6f
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 03:50:36
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -68
+X-Spam_score: -6.9
+X-Spam_bar: ------
+X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.001, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -98,57 +85,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Reply-To: Bug 1712818 <1712818@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 05/08/2020 20.54, Thomas Huth wrote:
-> The total runtime of all Travis jobs is very long and we are testing
-> all softmmu targets in the gitlab-CI already - so we can speed up the
-> Travis testing a little bit by not testing the softmmu targets here
-> anymore.
-> 
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  Well, ok, we do not test all the softmmu targets on gitlab-CI with
->  that same ancient version of Ubuntu ... but do we still care about
->  testing all softmmut targets on Ubuntu Xenial at all? ... at least
->  according to our support policy, we do not care about Xenial anymore.
-> 
->  .travis.yml | 14 --------------
->  1 file changed, 14 deletions(-)
-> 
-> diff --git a/.travis.yml b/.travis.yml
-> index 6695c0620f..18290bc51d 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -123,20 +123,6 @@ jobs:
->          - CONFIG="--disable-system --static"
->          - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
->  
-> -
-> -    # we split the system builds as it takes a while to build them all
-> -    - name: "GCC (main-softmmu)"
-> -      env:
-> -        - CONFIG="--disable-user --target-list=${MAIN_SOFTMMU_TARGETS}"
-> -        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-> -
-> -
-> -    - name: "GCC (other-softmmu)"
-> -      env:
-> -       - CONFIG="--disable-user --target-list-exclude=${MAIN_SOFTMMU_TARGETS}"
-> -        - CACHE_NAME="${TRAVIS_BRANCH}-linux-gcc-default"
-> -
-> -
->      # Just build tools and run minimal unit and softfloat checks
->      - name: "GCC check-softfloat (user)"
->        env:
-> 
+Looking through old bug tickets... is this still an issue with the
+latest version of QEMU? Or could we close this ticket nowadays?
 
-Ping?
+** Changed in: qemu
+       Status: New =3D> Incomplete
 
- Thomas
+-- =
 
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1712818
+
+Title:
+  live migration with storage encounter assert(!(bs->open_flags &
+  BDRV_O_INACTIVE)) crashes
+
+Status in QEMU:
+  Incomplete
+
+Bug description:
+  The vm guest runs a iotest program, and i migrate it with virsh
+  --copy-storage-all,then the qemu process on the source host happens to
+  crash with the following message:
+
+  kvm: block/io.c:1543: bdrv_co_pwritev: Assertion `!(bs->open_flags & 0x08=
+00)' failed.
+  2017-08-24 11:43:45.919+0000: shutting down, reason=3Dcrashed
+
+  here is the release:
+  qemu 2.7 & 2.10.rc3 were tested.
+  libvirt 3.0.0 & 3.2.0 were tested.
+
+  command line:
+  src_host:virsh migrate --verbose --live --persistent --copy-storage-all v=
+m-core qemu+ssh://dst_host/system
+
+  Possible Reason: After bdrv_inactivate_all() was called, mirror_run
+  coroutine still writes the left dirty disk data to remote nbd server,
+  which triggers the assertion. But I don't known how to avoid the
+  problem, help is needed!  Thanks.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1712818/+subscriptions
 
