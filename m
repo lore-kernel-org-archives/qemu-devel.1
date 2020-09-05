@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AA8C43461
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15685C433E2
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:10:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3F3F20738
-	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:09:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3F3F20738
+	by mail.kernel.org (Postfix) with ESMTPS id AA1232074B
+	for <qemu-devel@archiver.kernel.org>; Sat,  5 Sep 2020 21:10:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA1232074B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEfQx-0003mL-TZ
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:09:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32784)
+	id 1kEfRy-0004gn-Kr
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 17:10:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfQI-0003Ky-IH
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:08:34 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:47337)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfRK-0004AP-5p
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:09:38 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:54071)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfQD-0006Hv-03
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:08:34 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kEfRI-0006Mn-4r
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 17:09:37 -0400
 Received: from [192.168.100.1] ([82.252.135.186]) by mrelayeu.kundenserver.de
- (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1Mgek8-1kmb8I2UkG-00h4kZ; Sat, 05 Sep 2020 23:08:26 +0200
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MIyiY-1jydgl2ulO-00KOhk; Sat, 05 Sep 2020 23:09:33 +0200
 Subject: Re: [PATCH] linux-user: Protect btrfs ioctl target definitions
 To: Filip Bozuta <Filip.Bozuta@syrmia.com>, qemu-devel@nongnu.org
 References: <20200905163802.2666-1-Filip.Bozuta@syrmia.com>
@@ -79,8 +79,8 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <c513bf3e-0540-6d77-997f-820f87063d83@vivier.eu>
-Date: Sat, 5 Sep 2020 23:08:25 +0200
+Message-ID: <40fd48e9-58f4-ff4a-6af8-1151df7fc7d8@vivier.eu>
+Date: Sat, 5 Sep 2020 23:09:32 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
@@ -88,23 +88,23 @@ In-Reply-To: <20200905163802.2666-1-Filip.Bozuta@syrmia.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:5KGcKJPzq8g3R09k4r2qnVukkZuaq/geWwQsiCtc1gCr69nuFDr
- 5xwxzWvEcUNXv3E1vpEsvyY0mluQfluy8xQiGrCJWdvM7nuKoAheexmCkO2unRKwuZVbI5F
- Ejtk+kdy3hZHAIYDJ9oOydy/sZVE0pL/e+/OzuKlFC/fG9j6vZrARdVSh3wPFJ3skzFuEM9
- +C/AtqamaGhKuVaCkNSCw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:R1yF/HtQ15o=:8ZNVEvoClU5zi4BogO1P8W
- 2Km+m1RC6aiKfGXhTaTNZjU5/4PoNlLDv3JF2vy8aQo2cXSp7kZDaneQAwWhRWh6ltRQ7lzxH
- JvQ1Iq138taJu0JGdO8PUFQ16YzlZLtjqWoyQqPg64F1/KjpUEtPWt/LWm6nMHq0WT9oEIjg+
- io6a/IhcrRQHYdYS9rSukazvRU72zxnFQLICCt92W3ykJQsPCDQ8i7ecZEo5Bf8VgzWdl1Qhc
- Mz6Uf55YC0+XVXuTyw2D4zUHnfKBQUCAOmNAPslaB9v05Zcxxo+h3ydVpnrgPOVtWSE0glsgs
- /9Tc3XgrKOaz5+pN5EhEnvzmxXkuRYotKOnlZEaSrZHyeCqnlDw67hp0Lodv11qOm7waZN8a0
- kBdPw0ahgdOOGQ9Sdai+EGML0B8HVFsI3YrNYDuMv6kGQQz9l/KyZ22v2xJXM+v4zNO8b2qMe
- hpvOG0HbDO7Afh/6nOtNCmdje6eeguS0kLyoqoUDe7JFdlJGhrq+NZoTB6LOl8cMAKKAwUfAL
- CGTqJJXCU0NzyKTR4ZOYP3oVuHXQ9QJFtyKoLbwCPPdqH1pf5555AlQuk174QDNsZhIWsQDMv
- hHmMrFPujEOwmhAAkNkXaSqF3M6A2G+N001xsXp5ILQqcHN3az3bpCs0LvMpiCIJphi2XbKt/
- PRs5IDJUrZRGxVrThU+5nWjGa/jjCOrgkP63oN+G2R9lx69lOuMIWwEReSHh6E/HYP/vDAM5Q
- t1erP04MrA41eN5FgLK8bux65M9CNG2aZdT/dCOPxtnBtLWTVYoJULUMVCyilLEpbPh9hRPFO
- aWQloxjaCOzslITEX4W30+rPAdA/G5P8wPUSjHyWtrD/EQUCOTiVUQs0hkrz1Ny8pjCpd/5
+X-Provags-ID: V03:K1:EPf94t7ArwDWg7/GkNbgQty31aa6Z1EShcRQ/EwJFSOHiUjKAPE
+ yMJqgt+lxSzy3Fx4fNxwGfi/rJo5xtbeQJHJ2BDglXyrnN26X9K23ObWt5SW/tJ1PLhxjz4
+ VNwCpZo6P95dRSV2NE0KOLqUZ9EOKvW54LNaF5QbGJmADZfQiHQmzoF5sPBcaskoz92HBFy
+ nQYZHuFr54RJxb2L2/M4w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:NCHgm5FktmM=:8MWfWh1KT3AAmNVJcgrrdy
+ oT3vRAZZR3ZumpuB+H7DPju4EbTB8fp8YJh54zzmi46u60RxUr/ipa+28Ni1xkjpOdyXEwjyV
+ SvkA4KSfJrSumkeH6z3NtIi+D7fCS8wj1tzF/AttvM6R4zjCRyq0L2cda9SzDDb99l5DcuMRN
+ +s1ugJykpoKwuN40vnNvL98hAdexEIqsyGFLlgSeHIJ1Ie3eorxldSzIFSLk91KkkszZM5CUq
+ tTACaqAwF2ZhPypw0+t21/q9Si6Duq/7U/mOu3czDB+/+Lc+CAMmBJpeu6dgcdF4iZZ+0Juk/
+ MFzAX1DbPdvNINBIE+54C+QGeW2FvKtepmUZM9SlDmJp14vkYe5DPiQJNLJv7uQ49ctLbHhlg
+ CNLpv8cigbMYpPW3/qk/3BNFXZ7kZTW5rFQe5I3TZoqRmk/zFS7me0mJFnYcNOY9C8uYQx/Cd
+ Eqk+YeamrGpvE+UMxViLZY5yAtJ6V2ExlkywINELwZvb2ODvVMNgc/0a26rZgKrxLN2lAb1uS
+ nQQECyGzjjfRHTAEe/sSPDnLwYBgkGVMva35qB/A/h5Zt51o8ecaZJfBRW4iXCjd4B2XO+uMT
+ DWQutkS7a9DWJboOzDrTYxuRhhengeQvd3o9CXqzA+NLDOs7g+zkIo2cC+UH3r/XvpnxYzLQ8
+ MJVH1wELajjheJclnIbJiATvyQxo3+bChsLtyR1ON6YPO3ev5R0rVsj17UuRIxJboawWiEJwh
+ IDDZwg6IVqmTX1x3FMf2xEcunruu3OLKqcS1/d2xKQ85tiWkzgMA14iX9yDPWiTMAygMxStAa
+ JxPHOYjaHOmvaWx76T3OOJb+riLSbSA0L2YP4w7c0GdO6/Mj8+SVpyNTkwMU2rxTWBMXWn8
 Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/05 16:41:54
@@ -167,5 +167,9 @@ Le 05/09/2020 à 18:38, Filip Bozuta a écrit :
 >  #define TARGET_USBDEVFS_CONTROL TARGET_IOWRU('U', 0)
 > 
 
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Applied to my linux-user-for-5.2 branch.
+
+Thanks,
+Laurent
+
 
