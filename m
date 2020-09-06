@@ -4,88 +4,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 365D2C43461
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 04:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30D65C43461
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 04:03:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E09420757
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 04:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7BB220757
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 04:03:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pTO2s3B7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E09420757
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l2dkmEpZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7BB220757
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEltz-0003es-NY
-	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 00:03:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48856)
+	id 1kEluE-0003yX-Uz
+	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 00:03:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kElsT-000242-1n
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 00:02:06 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:39749)
+ id 1kEltK-0002r5-TT
+ for qemu-devel@nongnu.org; Sun, 06 Sep 2020 00:02:58 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41111)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kElsK-0005Rg-Nr
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 00:02:04 -0400
-Received: by mail-pl1-x644.google.com with SMTP id x18so2935937pll.6
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 21:01:55 -0700 (PDT)
+ id 1kEltI-0005VE-K3
+ for qemu-devel@nongnu.org; Sun, 06 Sep 2020 00:02:58 -0400
+Received: by mail-pl1-x641.google.com with SMTP id m15so1827691pls.8
+ for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 21:02:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=+FK3z7SEtHHMAHcUbWz3yY5WEnySEdB15eOW6FkW6Pk=;
- b=pTO2s3B740aWaEYgsDYQjq6N2JpqRdS7uvxP/5LRTU2vnjGq4qfHiTRI7QNeQM2DgX
- Ks6iJYPzZ9QRTB2/nw+SznP4R/NNxuAZQGtvEqHgMANlCQogMryrXHeoHXB4aApyxtSI
- SU4CmgAeOtdFkJPk1I2s5qDQt7ABtrNxtK6YxwV1RO5370E1mDayVKwBAg5j6m39Hnbx
- hfuaNctH1SadDOjG0bMy4C23R3xK/M2ZOUwG+q+dQ8531kgKrOSNK91dyD4Ktc+qtFMd
- kKL4o1qH9qfe/T6H4qNT0wkL5lcCSd3b3leSlw1QneyFVdx7L6l+abK2eD6GxvZyDbxT
- eRVA==
+ bh=F/yrApjoieedPs4WcscGvUC363fGK8G23iY++bTYdgE=;
+ b=l2dkmEpZsjqcHGt4C0xrTxC7E3zLVKk8+LXfF6lxIqn2fv6dUFn/JIGDYKsRt0MxKC
+ 6LfxZFppnJthDaJbX3wHp19Cth5/VwK64RruP0nnLIuEuEDlj5w31V8FTtl8t+FOmp7t
+ +V1CIIlQN4iKz414Ux0SuZ1yv5uEm6ehOKksIegQ3mDTXCGgimPtQ08pZaHNMAjViVNf
+ yUTelo0E6uNzjMXaHR3a0rvMYiIYf/IZ7jzkzIZo/YUHUAk0R1MgnU99QcbioqBkhhua
+ tCv0o6stg0rGKZsFhgXWW2Q/S3UpZU3FlvqJkzSvyXY+MrN2eDeD/CO8A4fe+CjOesh3
+ NjQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=+FK3z7SEtHHMAHcUbWz3yY5WEnySEdB15eOW6FkW6Pk=;
- b=eK+bMpt0dbG+RoQYPyR10hdiWa0JYyBwSvwYxphRoIwGVulytjHZ94BFnETb5dpMNv
- 7NnyYhOok7rEGnLP/ULCbgRzNl6H9l/DEeq8ZsdiOaMFGgv5cD/dGzJhrd3FwWUHMCWf
- fYKv7lO4TTdoPigV+UbsCqZWJvZbKOPi45NSecHxNsLtyNUWH0ZLJKLhyKOJybiX5mR9
- A6jE2AUhSALO8Sxkp6zxAfdlEoXyjx/QCC+SXmiLKgi/ZcFKNKzeCNnMCtQUfycClOtb
- JYZ3p2IHhM03So6mHns/WquGcXlB1fImbxIGGMhhaMCXhlGiJjSGGKDt4PWv/TB1LkVA
- vH/w==
-X-Gm-Message-State: AOAM5336EsJB9gSvZzRM5n29giV8+NsOctlZHKJaplTdZSSL76lOT6z/
- TeNlosW64PveOL8QmU96NYaMzQ==
-X-Google-Smtp-Source: ABdhPJxvFya3IBbOR9LxF0EMe4DI38mKuccgDA+zzYacp3/e6hVxE4On4hdopOM1g7WbIKl3wDJ5AA==
-X-Received: by 2002:a17:90a:de09:: with SMTP id
- m9mr14617064pjv.231.1599364915228; 
- Sat, 05 Sep 2020 21:01:55 -0700 (PDT)
+ bh=F/yrApjoieedPs4WcscGvUC363fGK8G23iY++bTYdgE=;
+ b=kKl7J7JWOuSaMvFH+ANUPetqANEwSKRF79aPy9hnr3Ad5B2RzOgdYVWGIESrPgu9Fg
+ S16gw1t2+nVXygKbQ8bSa+7SBtfyhAc2uZu0iIUF4uHCkaek0KrWjDFeU8FWNuQi9mvo
+ JdWffxleC0K/cVv0IrT5m7zBp6XEzPbcblTVut3BK40dMk/ral1aTEq1vMW8FVyL38CA
+ 3IWXQDvFM6XSVUbzfkXrd0yhwTgcKFt1ETXOfXr9bTXUHYxINppk9EZ19MHNZqwwlx9f
+ y/OiL6FIlEBpUhRRKCwuWc5WSDf3AERgegp2wgc1XBQl7UYpU97u4W57dZ+CmqdhkiWY
+ +HTQ==
+X-Gm-Message-State: AOAM531DfkvNLQIaOOxWNQrnANnLanrKxxmADO4au6QF42mBpVUe9EVb
+ NrX0KZvvBtuh7q3AiXDV7fVYDg==
+X-Google-Smtp-Source: ABdhPJzuEFBEVy0kE1sLzq9aOh1AskEocutFAogDOwN+f8aJgigAxV0u4Vo0qEzvPI5F8VYQmUX7/A==
+X-Received: by 2002:a17:90b:f09:: with SMTP id
+ br9mr14610755pjb.102.1599364975234; 
+ Sat, 05 Sep 2020 21:02:55 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id d12sm10924564pfn.146.2020.09.05.21.01.53
+ by smtp.gmail.com with ESMTPSA id e1sm10906425pfn.78.2020.09.05.21.02.53
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 05 Sep 2020 21:01:54 -0700 (PDT)
-Subject: Re: [PATCH 10/13] dma: Let dma_memory_rw_relaxed() take MemTxAttrs
- argument
+ Sat, 05 Sep 2020 21:02:54 -0700 (PDT)
+Subject: Re: [PATCH 11/13] dma: Let dma_memory_rw() take MemTxAttrs argument
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 References: <20200904154439.643272-1-philmd@redhat.com>
- <20200904154439.643272-11-philmd@redhat.com>
+ <20200904154439.643272-12-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7a73f8e2-85d9-e6e8-255b-3644406352e5@linaro.org>
-Date: Sat, 5 Sep 2020 21:01:52 -0700
+Message-ID: <ce74259a-b1f8-8f28-b496-5b422e502f17@linaro.org>
+Date: Sat, 5 Sep 2020 21:02:52 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200904154439.643272-11-philmd@redhat.com>
+In-Reply-To: <20200904154439.643272-12-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -21
@@ -127,15 +126,17 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 9/4/20 8:44 AM, Philippe Mathieu-Daudé wrote:
-> We will add the MemTxAttrs argument to dma_memory_rw() in
-> the next commit. Since dma_memory_rw_relaxed() is only used
-> by dma_memory_rw(), modify it first in a separate commit to
-> keep the next commit easier to review.
+> Let devices specify transaction attributes when calling
+> dma_memory_rw().
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  include/sysemu/dma.h | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
+>  include/hw/pci/pci.h |  3 ++-
+>  include/sysemu/dma.h | 11 ++++++-----
+>  dma-helpers.c        |  3 ++-
+>  hw/intc/spapr_xive.c |  3 ++-
+>  hw/usb/hcd-ohci.c    | 10 ++++++----
+>  5 files changed, 18 insertions(+), 12 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
