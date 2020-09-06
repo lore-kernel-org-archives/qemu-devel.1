@@ -2,84 +2,74 @@ Return-Path: <SRS0=M8gQ=CP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47207C433E2
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 06:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A172C43461
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 07:36:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F01620714
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 06:31:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LeWJjOJK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F01620714
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6FCCA20759
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 07:36:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FCCA20759
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEoCk-0007H3-JQ
-	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 02:31:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37260)
+	id 1kEpDY-0003ZM-Gw
+	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 03:36:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1kEoBr-0006ln-23
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 02:30:15 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:40799)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <arilou@gmail.com>) id 1kEoBn-00031W-Tx
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 02:30:14 -0400
-Received: by mail-ej1-x642.google.com with SMTP id z22so13706331ejl.7
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 23:30:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=NFIfJffLfsqYbC3d/3/9ToQuk9mE/JEnDYR3Ic3+ySo=;
- b=LeWJjOJKwjuNNRndgJzGfMgawfvAysUuFipxv3sSErUe5QPLsQXwCHnDBuN7kq+Jcu
- swGfEh5XLfzjKlRCIlubqua5qcgv8UVjwdryPppR/nNrQB6JCmuumo+vbv1vB4N9AVSB
- mX1udSoQzygA5qUBWbID5YBPhhCuKa7StIrEp//1ud7Wk6jOFI/r7RnQWVeDxtnN7Yig
- ObvBfGvWZKsmfI/sgoWf+t+Hk0R68GdXGRUmOZmKxdACH+mpXZQorIYoWp06Mt1T9XVz
- wTkwLufKc5k+BredCXevCFYY/YlLfqSD5iH5E1xhvcbPG26D/fYZovBVzGXPjE1XUrgz
- Eegg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=NFIfJffLfsqYbC3d/3/9ToQuk9mE/JEnDYR3Ic3+ySo=;
- b=D7OrQAVX/6uiEB4VY6EhUgaT0e4rhyiDQ1LrMXjYnsUFyXX5Hq+8bTk8Zn00DfD+YH
- +GBRXlXArSjziFEIA3qt2U27dk0RlXAUuTUrITeVX7U1vZMTytNC2H5rIVBs67XBdCOP
- m8XLecvj1j/MHzQgixvsdQKF1ryPlWswW8Uz/afwwpWzWmNmFakpSC5TshPblPw9/ayo
- dwFXUDZdHuU/F+2OelFV3i2kgLjjCo8DY0OLaW8lvYE9w0ZFYrtLxhZ16RxgORdhAJ8J
- 45D4Q6D/EuE1q2Yd353sMMxPgmeaP90ZNI5GQZMPJog0LWAHmr4DvqS1CjPBfrNeDoLf
- iJMw==
-X-Gm-Message-State: AOAM532ynxZ544AVH4nvbcy+t2AE3XWN376hKX7x6QtXjteLCHpCNrJd
- zrp4i0MCzjxX3KEXG5Q5LoWcH+WbobQh42cyu4s=
-X-Google-Smtp-Source: ABdhPJzz4sLDnWEg1Kiqto24WvGWME/tw5P7hddmUQHZu2ZA+k5OmDuDn0BZqTI1tp6I7895BoszR6X2fSb9J1vxFzk=
-X-Received: by 2002:a17:906:375a:: with SMTP id
- e26mr15095502ejc.552.1599373809824; 
- Sat, 05 Sep 2020 23:30:09 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kEpCu-0002x9-Pj; Sun, 06 Sep 2020 03:35:24 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:51845)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <clg@kaod.org>)
+ id 1kEpCs-0001ER-Sm; Sun, 06 Sep 2020 03:35:24 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.143.167])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id A40665E6C1C1;
+ Sun,  6 Sep 2020 09:35:10 +0200 (CEST)
+Received: from kaod.org (37.59.142.97) by DAG4EX1.mxp5.local (172.16.2.31)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Sun, 6 Sep 2020
+ 09:35:09 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-97G002a7556670-9a2c-40a1-b5d5-b52daa0b74eb,
+ F0DF53881C1DD6DF86E1DD74DB2F83E9981A8108) smtp.auth=clg@kaod.org
+Subject: Re: [PATCH] hw/arm/aspeed: Map the UART5 device unconditionally
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ <qemu-devel@nongnu.org>
+References: <20200905212415.760452-1-f4bug@amsat.org>
+From: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
+Message-ID: <728e4345-123a-ba17-2c07-e3c8dc847dd9@kaod.org>
+Date: Sun, 6 Sep 2020 09:35:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200906050113.2783642-1-richard.henderson@linaro.org>
-In-Reply-To: <20200906050113.2783642-1-richard.henderson@linaro.org>
-From: Jon Doron <arilou@gmail.com>
-Date: Sun, 6 Sep 2020 09:29:58 +0300
-Message-ID: <CAP7QCogkn6mT1JEGsA5tt+jM-t1qOrK_7k1owXgi_zTdeTY0UA@mail.gmail.com>
-Subject: Re: [PATCH] hw/hyperv: Fix 32-bit build error for vmbus.
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=arilou@gmail.com; helo=mail-ej1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <20200905212415.760452-1-f4bug@amsat.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [37.59.142.97]
+X-ClientProxiedBy: DAG2EX1.mxp5.local (172.16.2.11) To DAG4EX1.mxp5.local
+ (172.16.2.31)
+X-Ovh-Tracer-GUID: 262a8904-e070-41da-8cd0-7cb8076143fa
+X-Ovh-Tracer-Id: 10461298984657324838
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudegiedguddujecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefuvfhfhffkffgfgggjtgfgihesthekredttdefjeenucfhrhhomhepveorughrihgtpgfnvggpifhorghtvghruceotghlgheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeejkeduueduveelgeduueegkeelffevledujeetffeivdelvdfgkeeufeduheehfeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpegtlhhgsehkrghougdrohhrghdprhgtphhtthhopehfgegsuhhgsegrmhhsrghtrdhorhhg
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=clg@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 03:35:11
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.107,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -94,54 +84,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- ehabkost@redhat.com
+Cc: Andrew Jeffery <andrew@aj.id.au>, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Richard,
+On 9/5/20 11:24 PM, Philippe Mathieu-Daudé wrote:
+> The UART5 is present on the machine regardless there is a
+> character device connected to it. Map it unconditionally.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-I have already submitted this 7 weeks ago
-https://patchew.org/QEMU/20200715084326.678715-1-arilou@gmail.com/202007150=
-84326.678715-3-arilou@gmail.com/
+Reviewed-by: Cédric Le Goater <clg@kaod.org>
 
-On Sun, Sep 6, 2020 at 8:01 AM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> ../qemu/hw/hyperv/vmbus.c: In function =E2=80=98gpadl_iter_io=E2=80=99:
-> ../qemu/hw/hyperv/vmbus.c:383:13: error: cast to pointer from integer of =
-different size [-Werror=3Dint-to-pointer-cast]
->   383 |         p =3D (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) =
-| off_in_page);
->       |             ^
-> cc1: all warnings being treated as errors
->
-> Fixes: 0d71f7082d7 ("vmbus: vmbus implementation")
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 > ---
-> Cc: Jon Doron <arilou@gmail.com>
-> ---
->  hw/hyperv/vmbus.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
-> index 75af6b83dd..3482e9c6cb 100644
-> --- a/hw/hyperv/vmbus.c
-> +++ b/hw/hyperv/vmbus.c
-> @@ -380,7 +380,8 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void *b=
-uf, uint32_t len)
->              }
->          }
->
-> -        p =3D (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_i=
-n_page);
-> +        p =3D (void *)(uintptr_t)
-> +            (((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
->          if (iter->dir =3D=3D DMA_DIRECTION_FROM_DEVICE) {
->              memcpy(p, buf, cplen);
->          } else {
-> --
-> 2.25.1
->
+>  hw/arm/aspeed_ast2600.c | 8 +++-----
+>  hw/arm/aspeed_soc.c     | 8 +++-----
+>  2 files changed, 6 insertions(+), 10 deletions(-)
+> 
+> diff --git a/hw/arm/aspeed_ast2600.c b/hw/arm/aspeed_ast2600.c
+> index 9d95e421435..1450bde7cf2 100644
+> --- a/hw/arm/aspeed_ast2600.c
+> +++ b/hw/arm/aspeed_ast2600.c
+> @@ -325,11 +325,9 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      /* UART - attach an 8250 to the IO space as our UART5 */
+> -    if (serial_hd(0)) {
+> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
+> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+> -    }
+> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5),
+> +                   38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>  
+>      /* I2C */
+>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
+> diff --git a/hw/arm/aspeed_soc.c b/hw/arm/aspeed_soc.c
+> index 35be126db6f..7eefd54ac07 100644
+> --- a/hw/arm/aspeed_soc.c
+> +++ b/hw/arm/aspeed_soc.c
+> @@ -283,11 +283,9 @@ static void aspeed_soc_realize(DeviceState *dev, Error **errp)
+>      }
+>  
+>      /* UART - attach an 8250 to the IO space as our UART5 */
+> -    if (serial_hd(0)) {
+> -        qemu_irq uart5 = aspeed_soc_get_irq(s, ASPEED_DEV_UART5);
+> -        serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+> -                       uart5, 38400, serial_hd(0), DEVICE_LITTLE_ENDIAN);
+> -    }
+> +    serial_mm_init(get_system_memory(), sc->memmap[ASPEED_DEV_UART5], 2,
+> +                   aspeed_soc_get_irq(s, ASPEED_DEV_UART5), 38400,
+> +                   serial_hd(0), DEVICE_LITTLE_ENDIAN);
+>  
+>      /* I2C */
+>      object_property_set_link(OBJECT(&s->i2c), "dram", OBJECT(s->dram_mr),
+> 
+
 
