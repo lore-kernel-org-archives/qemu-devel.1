@@ -2,90 +2,88 @@ Return-Path: <SRS0=M8gQ=CP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C22EC433E2
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 02:03:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12CCCC433E2
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 02:15:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DB35420738
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 02:03:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AC072086A
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 02:15:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b1cEDTQj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB35420738
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WvhnfVrA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AC072086A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49356 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEk1o-0008DH-Lz
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 22:03:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35214)
+	id 1kEkDH-0001nn-FV
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 22:15:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36154)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kEk1G-0007n5-Uh
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 22:03:02 -0400
-Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:55700)
+ id 1kEkCh-0001Eo-Uz
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 22:14:51 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:45616)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kEk1E-0001xU-Vb
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 22:03:02 -0400
-Received: by mail-pj1-x1041.google.com with SMTP id 2so4953283pjx.5
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 19:02:59 -0700 (PDT)
+ id 1kEkCg-00032L-81
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 22:14:51 -0400
+Received: by mail-pl1-x643.google.com with SMTP id bh1so2860447plb.12
+ for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 19:14:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=HhTWQZ3pU6KdfKoPTW5sOF1zWhexwCqkuxGKLoGbVDk=;
- b=b1cEDTQjGW0qVWnMdILMzF/yL6RMUaX88yTY+P8pasm9aXER2D7YTZQEqFSN2i4l0C
- /to6mTG/VqpWzmByxPocF/D672ozDGENe4xp67k3dIqPU2DoOAuTA4s/cmydqadcx+c6
- pbiiePgqZXi5fcGja2mXQj2hgQm3BXv5p0rAVLEF6++UHS2I6ioMjzNc4oeyjJgDy61J
- Uf6Z2JQaETHmVntnDWE7uSQx464uw3Qsk5MwQnwvmaeeXiytsgMnhZt3UPoFTu1Xon9/
- On41zEe/OOpO+h9yQVnh6jLdwfWNCguF1w/wtEHBqiQwRvM8pNJgqYw3NW6xUJtVywL+
- s9kw==
+ bh=rnqKeYjT1gCh07zTwKxNFwiWzunpvcDckfNSKQmPOY4=;
+ b=WvhnfVrAWGpO5YTZa8vTdwwo3vDGFUJ4Bz/6ejCfuascmI5lugPsAd2KdCEdK+rZpc
+ W2d3k8GZaUAJMHpfvJBzagl5LGAiAoBWaKerVOo3WVz2sCp/K8o+X9liJQWgJu347JYC
+ ypnCADbshTYxd5KaG/DIrfN7WQj5+7Vne+yapgICQemn+kQewOfQ4kpK+ewKfLgQpF2a
+ w+432JJKx5ZCQcJsk4ievLkaiwzYQoKdqfQ/FsNJBSU98r7AI3DK811m7TMzmfezMR+S
+ U41trQEVX/JQXl4O+wAJo8FYdT+zauuLxfh83HWg/INvu7VXQ3Mn+2IldRYGhOGh9YHD
+ cK1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=HhTWQZ3pU6KdfKoPTW5sOF1zWhexwCqkuxGKLoGbVDk=;
- b=PQpfd0jmSlAVUPfqdNecnchbasCtYjj37PYzjQkPFxD+XPOTO5+kEtwmjixbGs9ZsX
- ZV7dbhJwy230lRp3qjMjAsgJ6TJqUKg1+q7KTyxOzMglcUTjEhvjzmi3g4YlLLYV0QcE
- 3KjNQc2mGmXYeFVxrcjbHjm8c1ZvCFWjqglc86Vo21Afkkweg8M2qJA0cGKD9ihYLk2C
- lEb7WbT3PKI55XNKk+uWbn+ZSm2vSA+ss0RhLPD0iCQfyJDQTeHZh/2lh0/RgKRTeBUM
- tS5rjFjH86JvnQJUrsbOnqYVhhcbvC52YbMrxR+bEIt2U1sVwNAfJ7c/EyXUGBzoYBTO
- Am/g==
-X-Gm-Message-State: AOAM531CAuckNteMJlAt5d6Sb4e2ZIs1WjYx3Yo66Mr6Dk0HudWgdZFx
- f1ZnecO1Uhfpl87eO9bb6DIoVQ==
-X-Google-Smtp-Source: ABdhPJwSGyHiAi3o+rzwAU/h3t1BnyyMQGXtnXD/O5++3jOuUrD7SZHG8FV1+VDXyoeypcNDAisA2A==
-X-Received: by 2002:a17:90a:fa8b:: with SMTP id
- cu11mr13029850pjb.10.1599357778657; 
- Sat, 05 Sep 2020 19:02:58 -0700 (PDT)
+ bh=rnqKeYjT1gCh07zTwKxNFwiWzunpvcDckfNSKQmPOY4=;
+ b=MSo+ZKPQAlMLUkCKTCjSCvx2GIdd4yuqZHit2wgJN8VfHM8z22UbGUQlsx4JagBgIZ
+ zDrCEB0WhX5ZTyBAQ5G7+PrtG3NPtczNzKZLOhtY2ej9/P+BLwPCUguBB5yufVe9/GRr
+ l2dHRF0GlYW5Ew5oXMbosM5skb0l4KdobdFKD71BPN3zFbzq8p8Ouu3F5236hojGdIc7
+ oud0/CBWhYnT+CzPloPTmt8tgAkXn6AiB55vOd/zPRCrOweWooJBEMdQ074sXg3LuOI7
+ DIK+Sc1+4VsVDUIhNk2HESsqUx5ChLtCblBHfwHirUNjw2419z/VUHfaewZ+omienUoU
+ 9kQg==
+X-Gm-Message-State: AOAM53169yNncn4+5IuNl+B7pMcIc0Dh1W73qNdfOJy99qKyuzPK7TaQ
+ drxTguZQOJ99y3IMLmqCxsgWhQ==
+X-Google-Smtp-Source: ABdhPJxnQicC9/9sXGfEWdOzMd5HfEWMxdxOrLXEN4TGKOo8fioo1QFh2SfcKoGimyiepEvtbQqKAA==
+X-Received: by 2002:a17:902:56a:: with SMTP id
+ 97mr14845116plf.130.1599358488564; 
+ Sat, 05 Sep 2020 19:14:48 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v10sm10334219pff.192.2020.09.05.19.02.57
+ by smtp.gmail.com with ESMTPSA id 64sm3846510pfz.204.2020.09.05.19.14.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 05 Sep 2020 19:02:57 -0700 (PDT)
-Subject: Re: [RFC PATCH] docs/system/deprecated: mark ppc64abi32-linux-user
- for deprecation
-To: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200904165140.10962-1-alex.bennee@linaro.org>
- <CAFEAcA9+hoPrkDNg21b03CT=YmTXuOLwKrornYn6J12bZ=B+OQ@mail.gmail.com>
+ Sat, 05 Sep 2020 19:14:47 -0700 (PDT)
+Subject: Re: [PATCH] tests: Fixes building test-util-filemonitor.c on
+ msys2/mingw
+To: Yonggang Luo <luoyonggang@gmail.com>, qemu-devel@nongnu.org
+References: <20200905203425.1470-1-luoyonggang@gmail.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b6743c82-4129-5b43-af75-11ade37df303@linaro.org>
-Date: Sat, 5 Sep 2020 19:02:55 -0700
+Message-ID: <f0a88f9e-b4a9-9ef1-ee47-6054a1cbbc5e@linaro.org>
+Date: Sat, 5 Sep 2020 19:14:45 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9+hoPrkDNg21b03CT=YmTXuOLwKrornYn6J12bZ=B+OQ@mail.gmail.com>
+In-Reply-To: <20200905203425.1470-1-luoyonggang@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -21
@@ -107,38 +105,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "reviewer:Incompatible changes" <libvir-list@redhat.com>,
- Richard Henderson <rth@twiddle.net>, QEMU Developers <qemu-devel@nongnu.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ "Daniel P . Berrange" <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/4/20 10:21 AM, Peter Maydell wrote:
-> On Fri, 4 Sep 2020 at 17:52, Alex Bennée <alex.bennee@linaro.org> wrote:
->>
->> It's buggy and we are not sure anyone uses it.
+On 9/5/20 1:34 PM, Yonggang Luo wrote:
+> Fixes the following compiling error:
+> ../tests/test-util-filemonitor.c: In function 'test_file_monitor_events':
+> ../tests/test-util-filemonitor.c:620:17: error: too many arguments to function 'mkdir'
+>   620 |             if (mkdir(pathsrc, 0700) < 0) {
+>       |                 ^~~~~
+> In file included from C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/unistd.h:10,
+>                  from C:/work/xemu/qemu/include/qemu/osdep.h:93,
+>                  from ../tests/test-util-filemonitor.c:21:
+> C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/io.h:282:15: note: declared here
+>   282 |   int __cdecl mkdir (const char *) __MINGW_ATTRIB_DEPRECATED_MSVC2005;
+>       |               ^~~~~
 > 
->> +``ppc64abi32`` CPUs (since 5.2.0)
->> +'''''''''''''''''''''''''''''''''
->> +
->> +The ``ppc64abi32`` architecture has a number of issues which regularly
->> +trip up our CI testing and is suspected to be quite broken.
->> +Furthermore the maintainers are unsure what the correct behaviour
->> +should be and strongly suspect no one actually uses it.
-> 
-> IRC discussion suggests we do know what the correct behaviour
-> is -- it should be "what the compat32 interface of a 64-bit
-> PPC kernel gives you", it's just that the code doesn't do that
-> (and never has?). It's like the mipsn32, mipsn32el, sparc32plus
-> ABIs which we also implement (hopefully correctly...)
-> 
-> But "this has always been broken and nobody complained" is
-> a good reason to deprecate anyway.
-
-Indeed.  With the last sentence changed to
-
-"For that reason the maintainers strongly suspect no one actually uses it."
+> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> ---
+>  tests/test-util-filemonitor.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
