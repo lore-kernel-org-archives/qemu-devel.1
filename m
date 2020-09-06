@@ -4,87 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83BE2C433E2
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 03:58:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 886BCC433E2
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 03:59:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A2AC20759
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 03:58:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2220420708
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 03:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a0TCaUF/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A2AC20759
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zk3iZdvB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2220420708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58022 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kElpO-0006lB-6Q
-	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 23:58:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48080)
+	id 1kElq1-0007xf-8i
+	for qemu-devel@archiver.kernel.org; Sat, 05 Sep 2020 23:59:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kEloq-000681-GW
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 23:58:20 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40742)
+ id 1kElpP-0006um-8M
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 23:58:55 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42173)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kEloo-0004tx-Vi
- for qemu-devel@nongnu.org; Sat, 05 Sep 2020 23:58:20 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id gf14so4835200pjb.5
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 20:58:18 -0700 (PDT)
+ id 1kElpN-0004wi-Ob
+ for qemu-devel@nongnu.org; Sat, 05 Sep 2020 23:58:54 -0400
+Received: by mail-pf1-x442.google.com with SMTP id 17so6788608pfw.9
+ for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 20:58:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=x/K9DfBaCDVRy2Q1yPT5gqpEh6i01VW8hIjOC6nepkc=;
- b=a0TCaUF/eQ4JdzFJz7r+gYBP1303bQkxWTBNvfEI2osx3xFWMxXjqMej5hWRm1JJJ5
- nCwB71F9dycCGhv3Ir9uJGkUCVBcdTMeJ1WeC4q87YpRozA7Kk8NxGH70g2Sf1tdLW/z
- c0RFZZyP1atoS39U1hfB4DXspghoaBeE1NG9pkzn2O5G9ljmGZYhWJmVUPyK00IlIOHC
- Of8oY+b8kg9LmdRYNCQggO9EhyF7cECsZ87+CIf475eAa/nKNzb/Nx0+C3mA4NwCCqYo
- OLvtTzDK5Z0VxCI9hzntIor8B1NpA0rd3pSGtNmszBazgZTgF3EiXKhOyv13buo/ejhW
- 5oxA==
+ bh=m2bYMEGomk8hFaxqfnpouoTbsg/xQOjjaCJvBHSA7k0=;
+ b=Zk3iZdvBP/jhMTZhyOl8NROR0TjohTsPb7ZUme9041tL1oZbCi9N+9KpL3EjSe61yn
+ z7/ZQZEDySrZjWQ0/MC0GJ16vrAUWJufpJmRbd4SRNNX7/mKi5rbqVuzmTGofz9azexA
+ K0v4Xv6HjA8OVNlB57hvqsYHA1Dikbo4W3vNIiByVPrmvcymPU9jEoF1gzh1HvYWaK3H
+ nnlaOBnFK5zdkx3Hn1SQcfv0j1CdfDFfyLaoqEWmutx+GDl55GR6nH2EiAzv80ZJnSO2
+ uyQzepBPviTWK/ZPEnnT6QpGhHcyDEcOxbqw+2jwZkeqLuVgWE2YdTeW5EY4r2auNC2s
+ QGcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=x/K9DfBaCDVRy2Q1yPT5gqpEh6i01VW8hIjOC6nepkc=;
- b=iDPw/pZ1AyKbfAJLj/nFEqfuUxsK2gQ5GFkVocPU2uRKlej+QftLL1lMuBqK45tTSm
- Rh8mgOWM+qag5LIbq5meeu59k1e1fkNuCETMJ5ysc2KlLi1FzIyXN2WaI4Km1wcEBcLA
- Eu23q/CJcGuDHeE9Lxsdp2+awSwWwYUb9hdQm+4CUDe3NsF3VEpIQGSchF1UYw5f0hZu
- kde4Rcahh/J0ttARTDnQZi41hzYlIk+1VuhCVe4XxDXOiPj650vTaICLdKA6MH7xgWd1
- 6SE5i58HQyy9TBRtm+cd+4dv7PH2htuXWyp2K+E2YByfaKzvppsU8WtBI0pcw6fmjynv
- BILw==
-X-Gm-Message-State: AOAM530SWs0QX+qGWIfQ5HPYoBAVzXDz4HOXJcN4qBKeXrO1wC0JE5rJ
- FbJZasRKGVZSzIMiwu4UNITokA==
-X-Google-Smtp-Source: ABdhPJxp1t5Onid+4GiR8t+ZwXqqdkJrf0sgbHtL0Ooq5DoFrNiZYLX3NsrgH5pRUihuuSXJHhfItw==
-X-Received: by 2002:a17:90a:bf8d:: with SMTP id
- d13mr15219470pjs.100.1599364697731; 
- Sat, 05 Sep 2020 20:58:17 -0700 (PDT)
+ bh=m2bYMEGomk8hFaxqfnpouoTbsg/xQOjjaCJvBHSA7k0=;
+ b=GM/T79CMksac8JlYVMqtS/Zjo88h3ikqZ14zEp1zUF5DpBnWc5Dk3HtTD6BF7Oc890
+ /kZUc46SMcf1ziap5Ll2UrlCpEVHklPqKLYZQsfj/rh4mA5M70RFWEGT5f/0h0dEBMKH
+ BHWKkhX8tsZx6jnC4kulc5C0yL2OGaQVZP/Jn7mVaKTYLVXKzjZFa84JTksYwB/C3pln
+ L4U+9LGK0IiMH5zaJU2+R6LO3iaj2xmg+lhd3RXvtJ0FOMJhMg8Li8vwS5/7MHuKlDL2
+ zhfeuV3pCaKZCrx0ATpFLqxwRboPRbhjP5KqSiX+ihtMkFSMQ+3XexMK3eykMDELFrVH
+ XzAQ==
+X-Gm-Message-State: AOAM530mFTbA9j7CZ8CsWeBbfjsAHyfHHOylNq41oDGheNaE6SrcjU3U
+ w9E/z6sX7aiIr38dNFbR509ghg==
+X-Google-Smtp-Source: ABdhPJw8TsyWgf/eJXu58/vIHNUv4OF87SrEJxupqB9QKv6vScQFeqaato3gTno0BaJlEh3rKbKSZQ==
+X-Received: by 2002:a63:6d0d:: with SMTP id i13mr12798785pgc.372.1599364732557; 
+ Sat, 05 Sep 2020 20:58:52 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id u22sm8792077pgi.85.2020.09.05.20.58.16
+ by smtp.gmail.com with ESMTPSA id g192sm3490029pfb.168.2020.09.05.20.58.51
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 05 Sep 2020 20:58:17 -0700 (PDT)
-Subject: Re: [PATCH 06/13] dma: Let dma_memory_read() propagate MemTxResult
+ Sat, 05 Sep 2020 20:58:51 -0700 (PDT)
+Subject: Re: [PATCH 07/13] dma: Let dma_memory_write() propagate MemTxResult
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 References: <20200904154439.643272-1-philmd@redhat.com>
- <20200904154439.643272-7-philmd@redhat.com>
+ <20200904154439.643272-8-philmd@redhat.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f013f669-d7a7-ae06-a192-0878451dd18d@linaro.org>
-Date: Sat, 5 Sep 2020 20:58:14 -0700
+Message-ID: <5ccd69c0-79b0-d6ec-9dcb-a0df245fa9d9@linaro.org>
+Date: Sat, 5 Sep 2020 20:58:49 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200904154439.643272-7-philmd@redhat.com>
+In-Reply-To: <20200904154439.643272-8-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -21
@@ -131,8 +130,8 @@ On 9/4/20 8:44 AM, Philippe Mathieu-Daudé wrote:
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  include/sysemu/dma.h | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
+>  include/sysemu/dma.h | 22 ++++++++++++++++++----
+>  1 file changed, 18 insertions(+), 4 deletions(-)
 
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
