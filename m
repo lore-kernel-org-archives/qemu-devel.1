@@ -2,88 +2,86 @@ Return-Path: <SRS0=M8gQ=CP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03AB0C43461
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 11:05:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4724EC433E2
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 12:14:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3639920760
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 11:05:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95F35208B3
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 12:14:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LDuJyOE5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3639920760
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jSfNoq3i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95F35208B3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kEsUO-0002BI-AA
-	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 07:05:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44232)
+	id 1kEtYr-0006O1-LK
+	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 08:14:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
- id 1kEsTq-0001bA-FW; Sun, 06 Sep 2020 07:05:06 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:46948)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kEtY6-0005fM-WF; Sun, 06 Sep 2020 08:13:35 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:35149)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <tom.ty89@gmail.com>)
- id 1kEsTo-0005RV-EG; Sun, 06 Sep 2020 07:05:06 -0400
-Received: by mail-ed1-x544.google.com with SMTP id a12so9887448eds.13;
- Sun, 06 Sep 2020 04:05:03 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kEtY5-0003mN-3t; Sun, 06 Sep 2020 08:13:34 -0400
+Received: by mail-lf1-x141.google.com with SMTP id w11so6132606lfn.2;
+ Sun, 06 Sep 2020 05:13:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
- bh=eNdHFRLdIzEeaRR2eJnvIW3tUh+p6PK+0B02/d8rd5M=;
- b=LDuJyOE5uNsR2by4e+EVvYSPtqsSf7hjeg0sbMctX1bKhnQnocq0WN+Iuatb789vid
- Nqs1Gzy1LOa84ad0QWJXtEQMrxZhtd76qa4UL1sJTh+IhCoBBoP2zR4+s0O6ly+JPX1D
- wGfZjG5AvFcarzakp+kikEzuvvKIppSfE+dtrzoOQgIXKwr6gSG2zsUQU4fU6iediTi1
- vDmDZBmaWwht9a4ltu6db5lc500WV5xM5y9PEzks+IZl1UIxLTySzzlwre0ySgjov10V
- 91CcoEWIBSxJR27lbnqZRl+isddrHFeRn6/iGGNu5tniKCtIKI+x+AD9ewR+1LXbvDw9
- r9wQ==
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=QmE07HEnFEaUCmfLTkTXOqhOMiLKNDOq45u3ckcXxhE=;
+ b=jSfNoq3i7EePQd3yTutqjCDUW9rKoc8GbW6UnVVGjdF/C0LHZJFK13hPeC2rUBI5pH
+ RPvNGRk84wPsz5K1XGyCVejaJOXLLaC1xivCI7t1BAAYoewbRrSslSQyIRZZ/bCU3p7z
+ auwQpQ0bnNpli936v0sYljzvHncL79WlAPQ+HKTlF4VG+Wofl3UMh0Z7JOqgOkjiAgeQ
+ e/eBXl6+6LDb9t2NrF85CXxlhltkWaJjVRvutekgB1kg5Jo4IUcyTApE6/8ulsiV39yu
+ MB3dLZgAuX1+Kc1QFsVdhIVqFmYjrwcSUIgf0K1jtqMpjtHf8HTNIAjed8LEUTQytR5b
+ Hf9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to;
- bh=eNdHFRLdIzEeaRR2eJnvIW3tUh+p6PK+0B02/d8rd5M=;
- b=lUZ0DIzNx81q9dUK8aEQ50DhwLmrUzxSvrHrfMH0WCXpW9k2L/v7XarJQi42UI929l
- cenUwOh5U4z6mFVscJZ6KzCnrfuOIu8vr8ne3717wJopVEjL3cCFT1eXCPUWVZPd/z9T
- ykgphoZeaeEzv4GbfHx8PfQLoYQ+kydGmAr75eNKh/2EVHFHqMM9NPGWUvRXJz1vGrV1
- //XEv6ajDQvhT2Ka2JZ3WXhrZ6GYtJSntbOyW4fa6ArgqIUbUYQoe81dgl9yhr61DYhw
- xV+jGxYhJNYPRR/nsJ47XrweT8ufF1LV4fOuDBEOHsTUFuBH/SJUxWHe8/lV7de9CJZ4
- tqUA==
-X-Gm-Message-State: AOAM53026S06hQORLoPRQYq/nUQx4cdUb+OWYIfmevAmX+jKbQeR0hrf
- sXzdNyW5moxtzeH/C05jL/NwvCm1riD7awCj0zb+oj9ESBg=
-X-Google-Smtp-Source: ABdhPJwQIA+swN4xrkZX1N2OUdkeY7i+OkislKOCjh0FLWIlebdSqeBarihRzctNeUnvlQAmIiS7eF2pFGHN7sJk3QU=
-X-Received: by 2002:a50:fb15:: with SMTP id d21mr17605814edq.150.1599390302305; 
- Sun, 06 Sep 2020 04:05:02 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=QmE07HEnFEaUCmfLTkTXOqhOMiLKNDOq45u3ckcXxhE=;
+ b=DeXk/CAtk3CnrMvL230xymr1pAi6ZyijVQ0Dq3HYLnKxA7yaKEDiuZSywfucDjNNLX
+ Qh7FF0skgEkMoGpdpARaYIo+TutAMiqIjAyG8nECjexmmJSiNXFUgQZX/eT1UBIYbrnR
+ L7pvz/uh6aXdvIiBl5P8tt2GyhtRkGG4D9m7FWwDc1lOZBpltyHvaQx3dZ7l1XVjc8xy
+ Y3TCqDiM8EXJzWDlA9KAy9jlV1073VSQh1lwla8hCTgPlOZxHyPIgMlGjKjJj7t74u3u
+ 7xS4dV/oeLq+7kl0iq3O+6gR19kCp4v7MoSKoazNOCLz8Ex2nI6BnFjNkPjDLXApZxSS
+ 1g2A==
+X-Gm-Message-State: AOAM533UFgZLpxPHED8hB5aquSocO59LYllhsoo06H/nj+zoJk52tZIT
+ n33HUhJmf+iXbpRfmyuFm6Rb3uZ3Dq82OnDxVKA=
+X-Google-Smtp-Source: ABdhPJzYofDZmJCu8zrVt7ZrKcnu7nEc+YHp1Muw0qP5lJ8TM4MM5FgR9Kv5ZVxnv5gyYnJkN0yasZCLH1mG6tJNhcQ=
+X-Received: by 2002:a19:41c8:: with SMTP id o191mr8228099lfa.176.1599394410391; 
+ Sun, 06 Sep 2020 05:13:30 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200904020907.241550-1-tom.ty89@gmail.com>
- <20200904020907.241550-2-tom.ty89@gmail.com>
- <CAGnHSEnF--OJ9biTx_ZxgqizVtr+0rBL8o-b9wY9+XNsnLPV=A@mail.gmail.com>
-In-Reply-To: <CAGnHSEnF--OJ9biTx_ZxgqizVtr+0rBL8o-b9wY9+XNsnLPV=A@mail.gmail.com>
-From: Tom Yan <tom.ty89@gmail.com>
-Date: Sun, 6 Sep 2020 19:04:51 +0800
-Message-ID: <CAGnHSE=qnj8a8qaS6eiFdevp6ya0GjqXHuDgAV12B0tEAajddg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] file-posix: add sg_get_max_segments that actually
- works with sg
-To: qemu-block@nongnu.org, kwolf@redhat.com, mreitz@redhat.com, 
- qemu-devel@nongnu.org, mlevitsk@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=tom.ty89@gmail.com; helo=mail-ed1-x544.google.com
+References: <20200905211038.904-1-luoyonggang@gmail.com>
+ <20200905211038.904-2-luoyonggang@gmail.com>
+ <5a0e9248-d2eb-a88e-4043-7104498cd804@weilnetz.de>
+In-Reply-To: <5a0e9248-d2eb-a88e-4043-7104498cd804@weilnetz.de>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Sun, 6 Sep 2020 20:13:19 +0800
+Message-ID: <CAE2XoE-MuBNOGU5T_H_vgWYA5sU+HBjrk3tBa-=zJzpekWQcqw@mail.gmail.com>
+Subject: Re: [PATCH 1/2] tests: Trying fixes test-replication.c on msys2/mingw.
+To: Stefan Weil <sw@weilnetz.de>
+Content-Type: multipart/alternative; boundary="000000000000aff34005aea4078d"
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x141.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,85 +95,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, QEMU Block <qemu-block@nongnu.org>,
+ Wen Congyang <wencongyang2@huawei.com>,
+ Xie Changlong <xiechanglong.d@gmail.com>, qemu-level <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Maybe you want to add some condition for this:
-https://github.com/qemu/qemu/blob/v5.1.0/nbd/server.c#L659
-Or not clamp it at all.
+--000000000000aff34005aea4078d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 6 Sep 2020 at 18:58, Tom Yan <tom.ty89@gmail.com> wrote:
+On Sun, Sep 6, 2020 at 5:49 AM Stefan Weil <sw@weilnetz.de> wrote:
+
+> Am 05.09.20 um 23:10 schrieb Yonggang Luo:
 >
-> In commit 867eccfed84f96b54f4a432c510a02c2ce03b430, Levitsky appears
-> to have assumed that the only "SCSI Passthrough" is `-device
-> scsi-generic`, while the fact is there's also `-device scsi-block`
-> (passthrough without the sg driver). Unlike `-device scsi-hd`, getting
-> max_sectors is necessary to it (more precisely, hw_max_sectors might
-> what matters, but BLKSECTGET reports max_sectors, so).
->
-> I'm unsure about how qemu-nbd works, but the commit clearly wasn't the
-> right approach to fix the original issue it addresses. (It should for
-> example ignore the max_transfer if it will never matter in to it, or
-> overrides it in certain cases; when I glimpsed over
-> https://bugzilla.redhat.com/show_bug.cgi?id=1647104, I don't see how
-> it could be file-posix problem when it is reporting the right thing,
-> regardless of whether "removing" the code helps.)
->
-> I don't think we want to "mark" `-device scsi-block` as sg either. It
-> will probably bring even more unexpected problems, because they are
-> literally different sets of things behind the scene / in the kernel.
->
-> On Fri, 4 Sep 2020 at 10:09, Tom Yan <tom.ty89@gmail.com> wrote:
+> > On Windows there is no path like /tmp/s_local_disk.XXXXXX
 > >
-> > sg devices have different major/minor than their corresponding
-> > block devices. Using sysfs to get max segments never really worked
-> > for them.
-> >
-> > Fortunately the sg driver provides an ioctl to get sg_tablesize,
-> > which is apparently equivalent to max segments.
-> >
-> > Signed-off-by: Tom Yan <tom.ty89@gmail.com>
+> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 > > ---
-> >  block/file-posix.c | 17 ++++++++++++++++-
-> >  1 file changed, 16 insertions(+), 1 deletion(-)
+> >  tests/test-replication.c | 13 +++++++++----
+> >  1 file changed, 9 insertions(+), 4 deletions(-)
 > >
-> > diff --git a/block/file-posix.c b/block/file-posix.c
-> > index 411a23cf99..9e37594145 100644
-> > --- a/block/file-posix.c
-> > +++ b/block/file-posix.c
-> > @@ -1178,6 +1178,21 @@ static int sg_get_max_transfer_length(int fd)
-> >  #endif
-> >  }
+> > diff --git a/tests/test-replication.c b/tests/test-replication.c
+> > index 9ab3666a90..3cf544a133 100644
+> > --- a/tests/test-replication.c
+> > +++ b/tests/test-replication.c
+> > @@ -23,14 +23,14 @@
 > >
-> > +static int sg_get_max_segments(int fd)
-> > +{
-> > +#ifdef SG_GET_SG_TABLESIZE
-> > +    long max_segments = 0;
-> > +
-> > +    if (ioctl(fd, SG_GET_SG_TABLESIZE, &max_segments) == 0) {
-> > +        return max_segments;
-> > +    } else {
-> > +        return -errno;
-> > +    }
-> > +#else
-> > +    return -ENOSYS;
-> > +#endif
-> > +}
-> > +
-> >  static int get_max_transfer_length(int fd)
+> >  /* primary */
+> >  #define P_ID "primary-id"
+> > -static char p_local_disk[] =3D "/tmp/p_local_disk.XXXXXX";
+> > +static char p_local_disk[PATH_MAX];
+> >
+> >  /* secondary */
+> >  #define S_ID "secondary-id"
+> >  #define S_LOCAL_DISK_ID "secondary-local-disk-id"
+> > -static char s_local_disk[] =3D "/tmp/s_local_disk.XXXXXX";
+> > -static char s_active_disk[] =3D "/tmp/s_active_disk.XXXXXX";
+> > -static char s_hidden_disk[] =3D "/tmp/s_hidden_disk.XXXXXX";
+> > +static char s_local_disk[PATH_MAX];
+> > +static char s_active_disk[PATH_MAX];
+> > +static char s_hidden_disk[PATH_MAX];
+> >
+> >  /* FIXME: steal from blockdev.c */
+> >  QemuOptsList qemu_drive_opts =3D {
+> > @@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)
+> >  int main(int argc, char **argv)
 > >  {
-> >  #if defined(BLKSECTGET) && defined(BLKSSZGET)
-> > @@ -1268,7 +1283,7 @@ static void hdev_refresh_limits(BlockDriverState *bs, Error **errp)
-> >          bs->bl.max_transfer = pow2floor(ret);
-> >      }
+> >      int ret;
+> > +    const char *tmpdir =3D g_get_tmp_dir();
+> > +    sprintf(p_local_disk, "%s/p_local_disk.XXXXXX", tmpdir);
+> > +    sprintf(s_local_disk, "%s/s_local_disk.XXXXXX", tmpdir);
+> > +    sprintf(s_active_disk, "%s/s_active_disk.XXXXXX", tmpdir);
+> > +    sprintf(s_hidden_disk, "%s/s_hidden_disk.XXXXXX", tmpdir);
+> >      qemu_init_main_loop(&error_fatal);
+> >      bdrv_init();
 > >
-> > -    ret = get_max_segments(s->fd);
-> > +    ret = bs->sg ? sg_get_max_segments(s->fd) : get_max_segments(s->fd);
-> >      if (ret > 0) {
-> >          bs->bl.max_transfer = MIN_NON_ZERO(bs->bl.max_transfer,
-> >                                             ret * qemu_real_host_page_size);
-> > --
-> > 2.28.0
-> >
+>
+>
+> Maybe it is possible to use get_tmp_filename() (which could be
+> simplified by using g_get_tmp_dir).
+>
+What  does get_tmp_filename mean? I didn't understand
+
+>
+> And please use snprintf instead of sprintf. I am afraid that a path can
+> be longer than PATH_MAX, even if the tmpdir path is normally rather short=
+.
+>
+ OK, I'll use  snprintf
+
+>
+> You could also allocate the different filenames dynamically instead of
+> limiting them to PATH_MAX characters.
+>
+as a test, it's too complicated,
+
+>
+> Regards
+>
+> Stefan Weil
+>
+>
+>
+
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--000000000000aff34005aea4078d
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Sep 6, 2020 at 5:49 AM Stefan=
+ Weil &lt;<a href=3D"mailto:sw@weilnetz.de">sw@weilnetz.de</a>&gt; wrote:<b=
+r></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex=
+;border-left:1px solid rgb(204,204,204);padding-left:1ex">Am 05.09.20 um 23=
+:10 schrieb Yonggang Luo:<br>
+<br>
+&gt; On Windows there is no path like /tmp/s_local_disk.XXXXXX<br>
+&gt;<br>
+&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
+m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 tests/test-replication.c | 13 +++++++++----<br>
+&gt;=C2=A0 1 file changed, 9 insertions(+), 4 deletions(-)<br>
+&gt;<br>
+&gt; diff --git a/tests/test-replication.c b/tests/test-replication.c<br>
+&gt; index 9ab3666a90..3cf544a133 100644<br>
+&gt; --- a/tests/test-replication.c<br>
+&gt; +++ b/tests/test-replication.c<br>
+&gt; @@ -23,14 +23,14 @@<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 /* primary */<br>
+&gt;=C2=A0 #define P_ID &quot;primary-id&quot;<br>
+&gt; -static char p_local_disk[] =3D &quot;/tmp/p_local_disk.XXXXXX&quot;;<=
+br>
+&gt; +static char p_local_disk[PATH_MAX];<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 /* secondary */<br>
+&gt;=C2=A0 #define S_ID &quot;secondary-id&quot;<br>
+&gt;=C2=A0 #define S_LOCAL_DISK_ID &quot;secondary-local-disk-id&quot;<br>
+&gt; -static char s_local_disk[] =3D &quot;/tmp/s_local_disk.XXXXXX&quot;;<=
+br>
+&gt; -static char s_active_disk[] =3D &quot;/tmp/s_active_disk.XXXXXX&quot;=
+;<br>
+&gt; -static char s_hidden_disk[] =3D &quot;/tmp/s_hidden_disk.XXXXXX&quot;=
+;<br>
+&gt; +static char s_local_disk[PATH_MAX];<br>
+&gt; +static char s_active_disk[PATH_MAX];<br>
+&gt; +static char s_hidden_disk[PATH_MAX];<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 /* FIXME: steal from blockdev.c */<br>
+&gt;=C2=A0 QemuOptsList qemu_drive_opts =3D {<br>
+&gt; @@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)<br>
+&gt;=C2=A0 int main(int argc, char **argv)<br>
+&gt;=C2=A0 {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 int ret;<br>
+&gt; +=C2=A0 =C2=A0 const char *tmpdir =3D g_get_tmp_dir();<br>
+&gt; +=C2=A0 =C2=A0 sprintf(p_local_disk, &quot;%s/p_local_disk.XXXXXX&quot=
+;, tmpdir);<br>
+&gt; +=C2=A0 =C2=A0 sprintf(s_local_disk, &quot;%s/s_local_disk.XXXXXX&quot=
+;, tmpdir);<br>
+&gt; +=C2=A0 =C2=A0 sprintf(s_active_disk, &quot;%s/s_active_disk.XXXXXX&qu=
+ot;, tmpdir);<br>
+&gt; +=C2=A0 =C2=A0 sprintf(s_hidden_disk, &quot;%s/s_hidden_disk.XXXXXX&qu=
+ot;, tmpdir);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qemu_init_main_loop(&amp;error_fatal);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 bdrv_init();<br>
+&gt;=C2=A0 <br>
+<br>
+<br>
+Maybe it is possible to use get_tmp_filename() (which could be<br>
+simplified by using g_get_tmp_dir).<br></blockquote><div>What=C2=A0 does ge=
+t_tmp_filename mean? I didn&#39;t understand</div><blockquote class=3D"gmai=
+l_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,20=
+4,204);padding-left:1ex">
+<br>
+And please use snprintf instead of sprintf. I am afraid that a path can<br>
+be longer than PATH_MAX, even if the tmpdir path is normally rather short.<=
+br></blockquote><div>=C2=A0OK, I&#39;ll use=C2=A0
+
+snprintf=20
+
+</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;b=
+order-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+You could also allocate the different filenames dynamically instead of<br>
+limiting them to PATH_MAX characters.<br></blockquote><div>as a test, it&#3=
+9;s too complicated,=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"=
+margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
+t:1ex">
+<br>
+Regards<br>
+<br>
+Stefan Weil<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
+
+--000000000000aff34005aea4078d--
 
