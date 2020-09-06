@@ -2,96 +2,89 @@ Return-Path: <SRS0=M8gQ=CP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D62DC433E2
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 04:09:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 338ADC43461
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 05:02:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A4E420757
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 04:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62CE22075A
+	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 05:02:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="MW4O3iNp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A4E420757
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lBokwxko"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62CE22075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kElzm-0002FD-QP
-	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 00:09:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49586)
+	id 1kEmp4-0001z6-3b
+	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 01:02:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54572)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kElxl-000804-Q7
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 00:07:33 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:39992)
+ id 1kEmnn-00012X-Nb
+ for qemu-devel@nongnu.org; Sun, 06 Sep 2020 01:01:19 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:36608)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kElxk-0005tW-5y
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 00:07:33 -0400
-Received: by mail-pl1-x643.google.com with SMTP id z15so2938902plo.7
- for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 21:07:31 -0700 (PDT)
+ id 1kEmnl-0002aD-S1
+ for qemu-devel@nongnu.org; Sun, 06 Sep 2020 01:01:19 -0400
+Received: by mail-pf1-x443.google.com with SMTP id d9so559151pfd.3
+ for <qemu-devel@nongnu.org>; Sat, 05 Sep 2020 22:01:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=PCSxRIYL5MvsEumYLS+k8NBn0TzZSDj9/oWkGoo/eyo=;
- b=MW4O3iNpzUSXmWL/bEKH17pAnLFVu67/JglkGcNekKj5XOhNU7PQLj4ZGJSqva5M45
- yq1jqiDstkBGinQf54x+mANV7eUkqosrXIaCN29SVrmMGtjB0VZ/7Jij9aHObQJ9WoUx
- 0lpDqUzuXj99NccoOOtVlvZ+NCMBcwI25ndAlXE8x3xiRMj4cTzXxOdPw5jwAF67rGan
- JoqgRrY59e4ei84mrt5CVfurEHMji2snVonGduHmDlCz4s26kPUb7uCgXyHQ5bDC2YRR
- fmhfYsPBLQdkS15WL+9CJxKTKMXG9/988pVjRFFpkxWpaz3GIsk1ySh+WK3NoF6PO8K/
- LjnQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=/iCHgyxkq9v43nhcSQtgg4n7M9LvoD8NgErTOXuCnmg=;
+ b=lBokwxkoUOBX+KHWO9mQL7EsuhI7rdElWmBPog0pRdUkbWBkR5A88gLl9Z1Fcm2Lor
+ UI3FCKNd9VgzxpZsK7a4bsRBdiHlcuMjFBmTV8R++V9lgZKhE7H9MSEFjl8AifDQDclo
+ cIp6TsfVr7/hCOJ6+8tFA9pRIDQFIBt1jt4S/MJI/BdtBfb45Z+VmwxbV5EQt1rI3v0M
+ X7Nb9+gxGbSLInWz1UXbiqE+Mzah9RC3BHz+YWZN57KgbMOGxh8D8pnbAOZ8/VH5K6li
+ dX0ty1kzu10X8yby1gq4NK0t3bn8ptkGLS/5gTwWZl2Oso4AOGCG5HScIzgN1jwvvjNy
+ sLPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=PCSxRIYL5MvsEumYLS+k8NBn0TzZSDj9/oWkGoo/eyo=;
- b=oXfEcOeCIOZmJDnmBaJ2xhuTZQF00NUiaz9QpTVngbVJDyq9VGKfK1IGi+Lz8j2qXV
- GYb1zPlakZ8kwnZR6MA5pxlGH/4VqvMBlnEt4gRW9M4NW7o5FuAdgqulctoQiL0zILBN
- Iuv82gkB/tSHUq9xeSSnlzZoCc5T8G8OoVHwd6n0EOKbNMqAJvTYN800cSha37BapIRm
- J8p6S8+ymDKsWO1vF1tFQAsIkqS4JoQtydi86wuxlc7hcM50kDewmiB1hUxCJRjzS9iX
- SdIHnbH7aXy6Qw+U8O2JNzoeVjqqCNPF/p/de58pueFDOQsDCyrjiJEFRmskeGX3ejtE
- 1Vfg==
-X-Gm-Message-State: AOAM533/ejeRyS7sxoSEC7v4YQThy8ZVY6F6w5lB3zvT8EsOVggKM8VJ
- oZskmjq1xBAtullDSM5cGtq0t8TAqigXvw==
-X-Google-Smtp-Source: ABdhPJxHpZf3/g2t1g07ZDhHLIMsBdPXcFrxxzEic+MLrix0kLDs4s+rt5IzxvPu17zS4DWMp9w04w==
-X-Received: by 2002:a17:90a:55c8:: with SMTP id
- o8mr14589561pjm.215.1599365250908; 
- Sat, 05 Sep 2020 21:07:30 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 19sm7475879pgz.42.2020.09.05.21.07.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 05 Sep 2020 21:07:30 -0700 (PDT)
-Subject: Re: [PATCH 2/3] pci: Let pci_dma_read() propagate MemTxResult
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200904162620.657726-1-philmd@redhat.com>
- <20200904162620.657726-3-philmd@redhat.com>
+ bh=/iCHgyxkq9v43nhcSQtgg4n7M9LvoD8NgErTOXuCnmg=;
+ b=YdzerCWw58V0t3M/G3/asJ32ty3jY76DFEHTZZUcN58MBpSEpISqIizabnE3squuOa
+ xEt76WAccXl9kTa/fSFEQF7EXAhiHiMfqW/NOvjiQDbZ9uID1EggDuGxwu4xY+i0TIpm
+ ubRFnSCeO5r8yijtnK0vCiKGIgsY0mX7dTfpqlgrodvDWpjiA05/PCSMVbcqXc8KCmYv
+ Io2AIQVUOBnxps2ZsFTUzt4ZjwTRzVzIFIJ2CyY9Wq02CPHbLhQ2bBlfCwpRRlDR22co
+ nwIUScMPU9swuv08YNvyDG98xapwfl//cs5r+FMD5JMc5J7GIZV8cZStPOjnWAKN7Ymi
+ jN9w==
+X-Gm-Message-State: AOAM533neugTbWP2wyTHDpKCRJYej34DAYr7JRSIUvGz/K+JYHfyVBpE
+ DUXUvIipM/+/CKOYbghTZg8Ft2j/wATA6Q==
+X-Google-Smtp-Source: ABdhPJzu5rpVYsPTrMj5kUIW3xmKQm3WUdU3JYkUOFK7xB2KOYVybD4KaWZf/xAjFozElB06kv9tcA==
+X-Received: by 2002:aa7:9084:0:b029:13c:1611:658c with SMTP id
+ i4-20020aa790840000b029013c1611658cmr13844960pfa.9.1599368475720; 
+ Sat, 05 Sep 2020 22:01:15 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id p9sm9289361pjm.1.2020.09.05.22.01.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 05 Sep 2020 22:01:15 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <7bd4e8e1-a04f-2715-c27b-1ba3c3835d91@linaro.org>
-Date: Sat, 5 Sep 2020 21:07:28 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/hyperv: Fix 32-bit build error for vmbus.
+Date: Sat,  5 Sep 2020 22:01:13 -0700
+Message-Id: <20200906050113.2783642-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20200904162620.657726-3-philmd@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x643.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.107,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -106,22 +99,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: pbonzini@redhat.com, ehabkost@redhat.com, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/4/20 9:26 AM, Philippe Mathieu-Daudé wrote:
-> pci_dma_rw() returns a MemTxResult type.
-> Do not discard it, return it to the caller.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  include/hw/pci/pci.h | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
+../qemu/hw/hyperv/vmbus.c: In function ‘gpadl_iter_io’:
+../qemu/hw/hyperv/vmbus.c:383:13: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+  383 |         p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
+      |             ^
+cc1: all warnings being treated as errors
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Fixes: 0d71f7082d7 ("vmbus: vmbus implementation")
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+Cc: Jon Doron <arilou@gmail.com>
+---
+ hw/hyperv/vmbus.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-r~
+diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
+index 75af6b83dd..3482e9c6cb 100644
+--- a/hw/hyperv/vmbus.c
++++ b/hw/hyperv/vmbus.c
+@@ -380,7 +380,8 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void *buf, uint32_t len)
+             }
+         }
+ 
+-        p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
++        p = (void *)(uintptr_t)
++            (((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
+         if (iter->dir == DMA_DIRECTION_FROM_DEVICE) {
+             memcpy(p, buf, cplen);
+         } else {
+-- 
+2.25.1
 
 
