@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF7DC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:15:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 836BEC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:15:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E126221919
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:15:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2433F206E6
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:15:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RCNBiAzl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E126221919
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PQi8YWhc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2433F206E6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFF7D-0002t9-SM
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:15:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58624)
+	id 1kFF7U-0003YH-7S
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:15:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF24-0001xg-Gh
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37116
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2L-0002Tv-9q
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:13 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:26737
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF22-0007sT-Np
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:56 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2H-0007vi-PX
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599476993;
+ s=mimecast20190719; t=1599477009;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=i0uKVqpxa7wGGtsTL+0P6si5G+VY/3o6ZWlaDQJN9cA=;
- b=RCNBiAzlB9iH96ioVRFTQLC6dmAKOX3pu+VNmZ0LF6Xu5ttrboQkkaWuHZJsX710ihfWJN
- 6y50+/AV3CGxve2y3dql687aCkX8ZzPSLtVUALPhoxwtBzJ4Hcjkp6CunqdW/7g3LS6ruC
- H0LGKoLKfnIeW94wV7urqmYYYMQi6OQ=
+ bh=QlJlHyReNS4qbBo0jUsSvwq9VssIi7A7mtUCK6QSbtc=;
+ b=PQi8YWhcFbmfFcVWEPnH1xdRwsLesDoREqxTNw514peoEW1ps4C3GUA2IFjhak8qmBqwMM
+ 1ZXCvGqS0/LkWRIxUL7Wol6bKWilwR6LRcb99zf57xes++SzmSvC7oBWof8AJmaBDrIZwn
+ Nq6KTe0Tz4FGwfCAvZ5l2YbR/VZwBNo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-298-Mt9T1ifJM02nXa16bJyjzA-1; Mon, 07 Sep 2020 07:09:51 -0400
-X-MC-Unique: Mt9T1ifJM02nXa16bJyjzA-1
+ us-mta-580-oPdJqvGOO52WfcNJOXtpsw-1; Mon, 07 Sep 2020 07:10:01 -0400
+X-MC-Unique: oPdJqvGOO52WfcNJOXtpsw-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3A2A1007469;
- Mon,  7 Sep 2020 11:09:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF70D1084C88;
+ Mon,  7 Sep 2020 11:10:00 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C32C99CBA;
- Mon,  7 Sep 2020 11:09:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8B849CBA;
+ Mon,  7 Sep 2020 11:09:59 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 07/64] block/nvme: Use common error path in nvme_add_io_queue()
-Date: Mon,  7 Sep 2020 13:08:39 +0200
-Message-Id: <20200907110936.261684-8-kwolf@redhat.com>
+Subject: [PULL 15/64] block/nvme: Extract nvme_poll_queue()
+Date: Mon,  7 Sep 2020 13:08:47 +0200
+Message-Id: <20200907110936.261684-16-kwolf@redhat.com>
 In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
 References: <20200907110936.261684-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -72,17 +72,17 @@ X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:05:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
 X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,51 +102,81 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Rearrange nvme_add_io_queue() by using a common error path.
-This will be proven useful in few commits where we add IRQ
-notification to the IO queues.
+As we want to do per-queue polling, extract the nvme_poll_queue()
+method which operates on a single queue.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200821195359.1285345-7-philmd@redhat.com>
+Message-Id: <20200821195359.1285345-15-philmd@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/nvme.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ block/nvme.c | 44 +++++++++++++++++++++++++++-----------------
+ 1 file changed, 27 insertions(+), 17 deletions(-)
 
 diff --git a/block/nvme.c b/block/nvme.c
-index 91dba4ec5d..909a565184 100644
+index 914a3c4ab3..e3719d3bd1 100644
 --- a/block/nvme.c
 +++ b/block/nvme.c
-@@ -649,8 +649,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-     };
-     if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to create CQ io queue [%d]", n);
--        nvme_free_queue_pair(q);
--        return false;
-+        goto out_error;
-     }
-     cmd = (NvmeCmd) {
-         .opcode = NVME_ADM_CMD_CREATE_SQ,
-@@ -660,13 +659,15 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-     };
-     if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to create SQ io queue [%d]", n);
--        nvme_free_queue_pair(q);
--        return false;
-+        goto out_error;
-     }
-     s->queues = g_renew(NVMeQueuePair *, s->queues, n + 1);
-     s->queues[n] = q;
-     s->nr_queues++;
-     return true;
-+out_error:
-+    nvme_free_queue_pair(q);
-+    return false;
+@@ -590,31 +590,41 @@ out:
+     qemu_vfree(id);
  }
  
- static bool nvme_poll_cb(void *opaque)
++static bool nvme_poll_queue(NVMeQueuePair *q)
++{
++    bool progress = false;
++
++    const size_t cqe_offset = q->cq.head * NVME_CQ_ENTRY_BYTES;
++    NvmeCqe *cqe = (NvmeCqe *)&q->cq.queue[cqe_offset];
++
++    /*
++     * Do an early check for completions. q->lock isn't needed because
++     * nvme_process_completion() only runs in the event loop thread and
++     * cannot race with itself.
++     */
++    if ((le16_to_cpu(cqe->status) & 0x1) == q->cq_phase) {
++        return false;
++    }
++
++    qemu_mutex_lock(&q->lock);
++    while (nvme_process_completion(q)) {
++        /* Keep polling */
++        progress = true;
++    }
++    qemu_mutex_unlock(&q->lock);
++
++    return progress;
++}
++
+ static bool nvme_poll_queues(BDRVNVMeState *s)
+ {
+     bool progress = false;
+     int i;
+ 
+     for (i = 0; i < s->nr_queues; i++) {
+-        NVMeQueuePair *q = s->queues[i];
+-        const size_t cqe_offset = q->cq.head * NVME_CQ_ENTRY_BYTES;
+-        NvmeCqe *cqe = (NvmeCqe *)&q->cq.queue[cqe_offset];
+-
+-        /*
+-         * Do an early check for completions. q->lock isn't needed because
+-         * nvme_process_completion() only runs in the event loop thread and
+-         * cannot race with itself.
+-         */
+-        if ((le16_to_cpu(cqe->status) & 0x1) == q->cq_phase) {
+-            continue;
+-        }
+-
+-        qemu_mutex_lock(&q->lock);
+-        while (nvme_process_completion(q)) {
+-            /* Keep polling */
++        if (nvme_poll_queue(s->queues[i])) {
+             progress = true;
+         }
+-        qemu_mutex_unlock(&q->lock);
+     }
+     return progress;
+ }
 -- 
 2.25.4
 
