@@ -2,95 +2,87 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 607FDC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 20:24:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E586C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 20:25:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1E7321556
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 20:24:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBA3A2080A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 20:25:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rjhCuaJ0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1E7321556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OO6UInV6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBA3A2080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFNgv-0007nl-MA
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 16:24:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37530)
+	id 1kFNhv-0000Pb-VP
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 16:25:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFNgO-0007CH-7v; Mon, 07 Sep 2020 16:24:08 -0400
-Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35876)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFNh5-00087M-GS
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 16:24:51 -0400
+Received: from mail-ej1-x62d.google.com ([2a00:1450:4864:20::62d]:43720)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFNgM-0002GP-BR; Mon, 07 Sep 2020 16:24:07 -0400
-Received: by mail-wm1-x344.google.com with SMTP id z9so15188860wmk.1;
- Mon, 07 Sep 2020 13:24:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=qJ0HzX9L9PdOn/tmbJa+FDM6ybFev8Io6r70iYfxrOc=;
- b=rjhCuaJ0UdMXkqNRTKgLM9RrKnmH2KeF/xGxA2RXvJMrLxD+bDTWiu2gQ7D58wakEy
- EwF2UxXHC8nssnHlUDxnKMdgE/fyjDZPt8RIgKCzFkoq+toYHnMMOAk7+/CQD6lzdTo5
- xnS0kBmXnkqrkqwHXldr2eqngGlCDEnBVjXJk1jXCGQJvmBafqrvmhPxs2siBAJRIojO
- /6kJMskh9znZALRbeTZRq+0yGKu84NsngI5crliherohNOgZq9wkLK82Ex74tsNAbVEm
- Z2+sgkuv1SbV2jtTiQRTMglcbKIgYsGVbk1lFGB5kPba/sV0UXR73LIOxPTdH6UbtUtx
- 2mlQ==
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFNh3-0002Kj-Qu
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 16:24:51 -0400
+Received: by mail-ej1-x62d.google.com with SMTP id o8so6400105ejb.10
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 13:24:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=21fQHiNFtOo6sbqJCTuae+9V5Wy/XSRdOOW8gWIJZS4=;
+ b=OO6UInV6BdLlik3cQlf0q0ZjXaJaScUttdIXZLRhRDGl2yOUdzrGAF4o4QGynFyWz8
+ 89xzFTQoKFLKg1QKYvmwNaC1zgdtjAc1bQ+1uhdk6FgrLSRM3j+GxA2evt5p7jpdYehH
+ js9RMBTAU6/aef55oGSG3UHySgWHfTLR4s0Y/yWRLb6egNonFpLGf3tiCzGR5g7o1r5z
+ 9q3JCRsr7GSzhWAsnqFVYxRNpka/sqgGSntVH2jBMLoXSCVDCWXMylgPE6uLtJJnyuSF
+ 9QO1gVH6D4XqaxexP9Xn7I8JpH4bgDmShdqWuNhiw7X5RBK4+iggw4yuORMWPqA421mJ
+ gACQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qJ0HzX9L9PdOn/tmbJa+FDM6ybFev8Io6r70iYfxrOc=;
- b=YXqxrg+SDLjyviHVxIW2YTjai+MutbBPjb+LzlxOr6RZVwjoCU75YzDhADXu2Yurcj
- 2akjvZtBRMUPzo5tePQS+wN/xmXb6PqYlBVqt06V3iodxQ28xf22X1EsdmWV0coMG5Ce
- Hqg1jM7G63IqIUiVP8WXAAKgrY7YohCvux9dmyP//Ta0HmQvGYwjTDPRwE9ub9MLzkdf
- 72caQKGRaWzmNi85c+xNmidWiJ3/fdTpHc3iYKL0blyepJIo7EC4QuCKnv3jmYhDk8Wh
- UAfttbSd5rx0f/qY4t5ajdw+bNvUWg+kmH0cR2Rp1/BwMkq2OCZrbrFpaehTErb6zvUg
- OgxA==
-X-Gm-Message-State: AOAM530qwnYVnkK189smfgs9diNqda1u3OzW3Z6q+LCELU3JYSRhh+FS
- fp/t/ogBRIjSFOb3Ynq+m+w=
-X-Google-Smtp-Source: ABdhPJwBqR8yKoQ+7Z7JVv9GpSdEspg21ufZiCVrNtcyK20bdgHbOPZzp87JDkv5sXOjfvWSnUCFqw==
-X-Received: by 2002:a1c:a557:: with SMTP id o84mr939494wme.96.1599510244482;
- Mon, 07 Sep 2020 13:24:04 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id f1sm29392440wrt.20.2020.09.07.13.24.03
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Sep 2020 13:24:03 -0700 (PDT)
-Subject: Re: [PATCH v4 1/8] hw/misc/led: Add a LED device
-To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
-References: <20200907163257.46527-1-f4bug@amsat.org>
- <20200907163257.46527-2-f4bug@amsat.org>
- <451e8d25-ecb5-c3e2-64aa-8582f2f47a25@greensocs.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ad0701b2-e772-2b4a-283a-ec4bb02c6a6b@amsat.org>
-Date: Mon, 7 Sep 2020 22:24:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=21fQHiNFtOo6sbqJCTuae+9V5Wy/XSRdOOW8gWIJZS4=;
+ b=ju3AZdP+yWXibd/ak/l808UkE6BYiX7pR8j846XBk0b7oKwDNi8h5jPgabh4ir9LuG
+ LM8A6pDsgIQCcj2mbR/LucHRfpFX+LupQOAD4Q2bNx57rafNQvKAroOWNyHHT7idVK2D
+ 1U2Qkh9TsxyCVoBVcmpifeMCKQYyc7rNBNRaip+Whu7fkf8c5xejGu2kFYwg3TMCyctr
+ 7Ol8awRLqyCjXKgx//OKf+HgebD4Ge/Dthrg2RogaKatp6jMLW1uB4ooM59ZgDSgsfC2
+ R/QiNToZ5qlF0LAt5EzTM9HfJJPBxPOvk0QTnLi4iv/pXO1qbDptLjGqfSI+X9qW0tc9
+ DnMQ==
+X-Gm-Message-State: AOAM531Ofo56cWnFN0QFFzkWfKArBchYe+Qay0X0aV7y09XvSxTnaFa/
+ ZQaoBYOKo6Pqfbm9mrLdhRUgttppY6Kiw92JSvUCsQ==
+X-Google-Smtp-Source: ABdhPJyj2jwbA14Br5CNnkk2ZKU8YSbPi+jwLMBT7CQO8xaY3gIqZpxRZf49yQgMlwXWleSnu6XUqeV5Y2pOiR2RSSk=
+X-Received: by 2002:a17:906:24d6:: with SMTP id
+ f22mr22043457ejb.85.1599510288088; 
+ Mon, 07 Sep 2020 13:24:48 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <451e8d25-ecb5-c3e2-64aa-8582f2f47a25@greensocs.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::344;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+References: <20200903160746.27491-1-deller@gmx.de>
+ <CAFEAcA_9Dkj8dJAxLdhtN_6Xw+ThX0J-s0LkG1J2mnJdd+NLWA@mail.gmail.com>
+ <c27d1e75-49cf-37a1-b46b-60a35909dc4b@gmx.de>
+In-Reply-To: <c27d1e75-49cf-37a1-b46b-60a35909dc4b@gmx.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 7 Sep 2020 21:24:37 +0100
+Message-ID: <CAFEAcA9Q_areoERnyZCWEm5Xj90E77z+cYQ+Qu73UpxknYzW1A@mail.gmail.com>
+Subject: Re: [PULL 00/10] hppa power button support, graphics updates and
+ firmware fixes
+To: Helge Deller <deller@gmx.de>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::62d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-1.825,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -105,131 +97,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Joaquin de Andres <me@xcancerberox.com.ar>, qemu-arm@nongnu.org,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- Joel Stanley <joel@jms.id.au>
+Cc: QEMU Developers <qemu-devel@nongnu.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/7/20 10:03 PM, Luc Michel wrote:
-> Hi Philippe,
-> 
-> On 9/7/20 6:32 PM, Philippe Mathieu-Daudé wrote:
->> Add a LED device which can be connected to a GPIO output.
->> They can also be dimmed with PWM devices. For now we do
->> not implement the dimmed mode, but in preparation of a
->> future implementation, we start using the LED intensity.
->>
->> LEDs are limited to a fixed set of colors.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   include/hw/misc/led.h |  84 +++++++++++++++++++++++++
->>   hw/misc/led.c         | 142 ++++++++++++++++++++++++++++++++++++++++++
->>   MAINTAINERS           |   6 ++
->>   hw/misc/Kconfig       |   3 +
->>   hw/misc/meson.build   |   1 +
->>   hw/misc/trace-events  |   3 +
->>   6 files changed, 239 insertions(+)
->>   create mode 100644 include/hw/misc/led.h
->>   create mode 100644 hw/misc/led.c
-...
->> +/**
->> + * led_set_intensity: set the intensity of a LED device
->> + * @s: the LED object
->> + * @intensity: intensity as percentage in range 0 to 100.
-> @intensity_percent
-> 
->> + */
->> +void led_set_intensity(LEDState *s, unsigned intensity_percent);
->> +
->> +/**
->> + * led_get_intensity:
->> + * @s: the LED object
->> + *
->> + * Returns: The LED intensity as percentage in range 0 to 100.
->> + */
->> +unsigned led_get_intensity(LEDState *s);
->> +
->> +/**
->> + * led_set_intensity: set the state of a LED device
-> led_set_state
-> 
->> + * @s: the LED object
->> + * @is_on: boolean indicating whether the LED is emitting
-> @is_emitting
-> 
->> + *
->> + * This utility is meant for LED connected to GPIO.
->> + */
->> +void led_set_state(LEDState *s, bool is_emitting);
->> +
->> +/**
->> + * led_create_simple: Create and realize a LED device
->> + * @parent: the parent object
-> @parentobj
-> 
->> + * @color: color of the LED
->> + * @description: description of the LED (optional)
->> + *
->> + * Create the device state structure, initialize it, and
->> + * drop the reference to it (the device is realized).
->> + */
->> +LEDState *led_create_simple(Object *parentobj,
->> +                            LEDColor color,
->> +                            const char *description);
->> +
->> +#endif /* HW_MISC_LED_H */
->> diff --git a/hw/misc/led.c b/hw/misc/led.c
->> new file mode 100644
->> index 00000000000..f2140739b68
->> --- /dev/null
->> +++ b/hw/misc/led.c
->> @@ -0,0 +1,142 @@
->> +/*
->> + * QEMU single LED device
->> + *
->> + * Copyright (C) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
->> + *
->> + * SPDX-License-Identifier: GPL-2.0-or-later
->> + */
->> +#include "qemu/osdep.h"
->> +#include "qapi/error.h"
->> +#include "migration/vmstate.h"
->> +#include "hw/qdev-properties.h"
->> +#include "hw/misc/led.h"
->> +#include "trace.h"
->> +
->> +#define LED_INTENSITY_PERCENT_MAX   100
->> +
->> +static const char *led_color_name[] = {
->> +    [LED_COLOR_VIOLET]  = "violet",
->> +    [LED_COLOR_BLUE]    = "blue",
->> +    [LED_COLOR_CYAN]    = "cyan",
->> +    [LED_COLOR_GREEN]   = "green",
->> +    [LED_COLOR_AMBER]   = "amber",
->> +    [LED_COLOR_ORANGE]  = "orange",
->> +    [LED_COLOR_RED]     = "red",
->> +};
->> +
->> +static bool led_color_name_is_valid(const char *color_name)
->> +{
->> +    for (size_t i = 0; i < ARRAY_SIZE(led_color_name); i++) {
->> +        if (led_color_name[i] && strcmp(color_name,
->> led_color_name[i]) == 0) {
-> 
-> Why are you checking led_color_name[i] here?
+On Mon, 7 Sep 2020 at 20:12, Helge Deller <deller@gmx.de> wrote:
+>
+> On 07.09.20 20:29, Peter Maydell wrote:
+> > On Thu, 3 Sep 2020 at 17:07, Helge Deller <deller@gmx.de> wrote:
+> >>
+> >> hppa power button support, graphics updates and firmware fixes
+> >>
+> >> The following changes since commit ac8b279f13865d1a4f1958d3bf34240c1c3af90d:
+> >>
+> >>   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200827' into staging (2020-08-27 13:48:12 +0100)
+> >>
+> >> are available in the Git repository at:
+> >>
+> >>    https://github.com/hdeller/qemu-hppa.git tags/target-hppa-pull-request
+> >
+> > Hi; this is a git tag, but it is not a signed tag; we only
+> > take merges with signed tags.
+>
+> Sorry, I missed that.
+> Fixed it up and signed it now.
+> Can you retry?
 
-It could happen in v3 but not now, thanks for catching this :)
+OK. (In general to ask for a retry you should just resend the
+git request-pull cover letter, because that will be caught
+by my mail filters, whereas an informal request for a retry
+is more dependent on my happening to notice your email. But
+I saw this one, so it's OK.)
 
-I'll address your comment and respin after few days.
-
-> 
-> Otherwise, seems good to me.
-> 
-> Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-
-Thanks!
+thanks
+-- PMM
 
