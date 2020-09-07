@@ -2,101 +2,89 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86FD2C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 13:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A9F0C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 13:55:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5A1C216C4
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 13:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7388C2078E
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 13:55:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jGYu9R86"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5A1C216C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y8WfUarh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7388C2078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38888 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFHOq-00059W-Qh
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 09:41:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37516)
+	id 1kFHcH-00006k-He
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 09:55:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFHO1-0004cF-HU; Mon, 07 Sep 2020 09:40:45 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:43565)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFHNz-0001V1-Lg; Mon, 07 Sep 2020 09:40:45 -0400
-Received: by mail-ej1-x643.google.com with SMTP id o8so5077238ejb.10;
- Mon, 07 Sep 2020 06:40:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=mQz7J+ZjXCYnfaZAO7LPzDyU8dwXICb9lwINT022HTQ=;
- b=jGYu9R861cbjwppNeub8GtlIk7hr7h61DKDgYPAk+UF9IL5CoFoR4c08GoAYH3FA+/
- cuBJR1QHthcVhoGVPwoUTS7xzQqT38DwONsIqgIttebRRF07cd5LaKcawcixebzOu2hu
- E81iE5eXaMJsBv5s490pBwjh2RXvgoj2uOLRz1pvWVJfjsE8Hj6YnZggqZywJOAwp+Tn
- hGMFREH02Ujhv6ZFQzegBGVLc8/wS9KQTRsDU/hymSdFYRSEauGKYZCA77gEsYJXHat+
- FyB/m/rqxTqZhPnUxQogISooubWY0zY3NuGgGjzHwsImh1/ChbN5jkdpnBngbffdKlB/
- r9zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=mQz7J+ZjXCYnfaZAO7LPzDyU8dwXICb9lwINT022HTQ=;
- b=hGa8Bfrc96DmtqfUGDn5Wj2b2hacMdA2PRfhaml8AnPYrXrpNXnmI2nvx9YM5Cb5bz
- HaJ0Wqe16ZFtOZ69zPwoUJ2aD9Sd6E/Awh4j48GU0YvLyBFzlamIJtwgQ2TUMH0MdfLE
- J3lpY5VzDvgaqZaZqOQmdaXo1opIL7eWytkP4JWTZ3+swtar/rMGDdtkX/TVNbPJF8x1
- 2v4nJF1G9Ki9hCfxvpfEI9bhJSRaYY4WBI4FEQTfj4Ulfyy40DD7HDlQRbJ8IyTRIQbX
- LMZZSCGreXXlTEwWHt1QLIrJhkItBanT3a3wa+pLNAx8JhoC9W12Fk7okkzJ29wbGMCH
- emoA==
-X-Gm-Message-State: AOAM5301QM802yG2jQzaD+8K7zqHPiET7qfEswqc4roI+TNV4L3fpZEE
- 6I//0mhT3/PFIogd9FvsYTM=
-X-Google-Smtp-Source: ABdhPJz5Z1RAGPZxPMSsXMJt9VfUnx54t6CBeH1kN2Eaex4vkfOcdn4tK1v9DUMKWTxDI3CYq44yWA==
-X-Received: by 2002:a17:906:2c44:: with SMTP id
- f4mr21355732ejh.52.1599486041953; 
- Mon, 07 Sep 2020 06:40:41 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id k8sm12875827ejz.60.2020.09.07.06.40.40
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Sep 2020 06:40:40 -0700 (PDT)
-Subject: Re: [PATCH v8 02/14] hw/misc: Add NPCM7xx Clock Controller device
- model
-To: Havard Skinnemoen <hskinnemoen@google.com>
-References: <20200825001711.1340443-1-hskinnemoen@google.com>
- <20200825001711.1340443-3-hskinnemoen@google.com>
- <e6187a7b-afc0-425a-de91-ea4818f7f876@amsat.org>
- <CAFQmdRbirDn4ao-B0UHHn-QFKfdeRzBR1dXTmUx_WZikfSB1tg@mail.gmail.com>
- <CAFQmdRbSgVTGgN2MV98wfxWSicrtokUCKKBU2knvVrimn2FWxA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <8bd0d21c-d511-d814-da27-92114c47cfcc@amsat.org>
-Date: Mon, 7 Sep 2020 15:40:39 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kFHbi-00083s-TX
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 09:54:54 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:47462
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kFHbh-00034t-39
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 09:54:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599486891;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=DEn+MAr3F5qGsJoMedT0iiAfliz0qLcQNHItZIqD00U=;
+ b=Y8WfUarhg9KuRz4pN+acwjprdTygdRtB7sfOq/iy27uM6qFKF6qac3r72cfM13DSqdnsyG
+ JN7DNhFMRMbmVhe7fFZ/owSIRxsfV8+EtGQS40h7ERUs+IGj/5lW8N97EcmSuaTxe7MLuY
+ jFfqKISruG9fxXSsCYz9wjCkPFl+rws=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-89-7n4gUnoZPP-plHymxUfaDw-1; Mon, 07 Sep 2020 09:54:49 -0400
+X-MC-Unique: 7n4gUnoZPP-plHymxUfaDw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD3771DDF3;
+ Mon,  7 Sep 2020 13:54:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6B4ED747C6;
+ Mon,  7 Sep 2020 13:54:39 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E70A01132B59; Mon,  7 Sep 2020 15:54:37 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH] schemas: Add vim modeline
+References: <20200729185024.121766-1-abologna@redhat.com>
+ <87ime52wxd.fsf@dusky.pond.sub.org>
+Date: Mon, 07 Sep 2020 15:54:37 +0200
+In-Reply-To: <87ime52wxd.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Thu, 30 Jul 2020 11:07:26 +0200")
+Message-ID: <877dt5ofoi.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <CAFQmdRbSgVTGgN2MV98wfxWSicrtokUCKKBU2knvVrimn2FWxA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -32
-X-Spam_score: -3.3
-X-Spam_bar: ---
-X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-1.825,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 22:29:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,85 +97,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, CS20 KFTing <kfting@nuvoton.com>,
- =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- qemu-arm <qemu-arm@nongnu.org>, Joel Stanley <joel@jms.id.au>,
- IS20 Avi Fishman <Avi.Fishman@nuvoton.com>
+Cc: "Daniel P. =?utf-8?Q?Berrang?= =?utf-8?Q?=C3=A9?=" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Yuval Shaia <yuval.shaia.ml@gmail.com>,
+ Andrea Bolognani <abologna@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?utf-8?Q?Mar?= =?utf-8?Q?c-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Stefan Berger <stefanb@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/5/20 12:38 AM, Havard Skinnemoen wrote:
-> On Fri, Sep 4, 2020 at 3:02 PM Havard Skinnemoen <hskinnemoen@google.com> wrote:
+Markus Armbruster <armbru@redhat.com> writes:
+
+> Andrea Bolognani <abologna@redhat.com> writes:
+>
+>> The various schemas included in QEMU use a JSON-based format which
+>> is, however, strictly speaking not valid JSON.
 >>
->> On Fri, Sep 4, 2020 at 2:32 AM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>
->>> On 8/25/20 2:16 AM, Havard Skinnemoen via wrote:
->>>> Enough functionality to boot the Linux kernel has been implemented. This
->>>> includes:
->>>>
->>>>   - Correct power-on reset values so the various clock rates can be
->>>>     accurately calculated.
->>>>   - Clock enables stick around when written.
->>>>
->>>> In addition, a best effort attempt to implement SECCNT and CNTR25M was
->>>> made even though I don't think the kernel needs them.
->>>>
->>>> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
->>>> Reviewed-by: Joel Stanley <joel@jms.id.au>
->>>> Reviewed-by: Cédric Le Goater <clg@kaod.org>
->>>> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
->>>> ---
-[...]
->>>> +static void npcm7xx_clk_write(void *opaque, hwaddr offset,
->>>> +                              uint64_t v, unsigned size)
->>>> +{
->>>> +    uint32_t reg = offset / sizeof(uint32_t);
->>>> +    NPCM7xxCLKState *s = opaque;
->>>> +    uint32_t value = v;
->>>> +
->>>> +    trace_npcm7xx_clk_write(offset, value);
->>>> +
->>>> +    if (reg >= NPCM7XX_CLK_NR_REGS) {
->>>> +        qemu_log_mask(LOG_GUEST_ERROR,
->>>> +                      "%s: offset 0x%04" HWADDR_PRIx " out of range\n",
->>>> +                      __func__, offset);
->>>> +        return;
->>>> +    }
->>>> +
->>>> +    switch (reg) {
->>>> +    case NPCM7XX_CLK_SWRSTR:
->>>> +        qemu_log_mask(LOG_UNIMP, "%s: SW reset not implemented: 0x%02x\n",
->>>> +                      __func__, value);
->>>
->>> Isn't this sufficient?
->>>
->>>            qemu_system_reset_request(SHUTDOWN_CAUSE_GUEST_RESET);
+>> As a consequence, when vim tries to apply syntax highlight rules
+>> for JSON (as guessed from the file name), the result is an unreadable
+>> mess which mostly consist of red markers pointing out supposed errors
+>> in, well, pretty much everything.
 >>
->> It's not quite that easy; this register holds 4 bits, each of which
->> maps to a separate register which defines the modules to reset. It's
->> not that hard, but a little more than I'd like to add to the series at
->> this point. I'll send a followup patch once the initial series is in.
-> 
-> Actually, I'm not sure if this would have any effect on being able to
-> reboot. Running with -d unimp shows:
-> 
-> reboot: Restarting system
-> npcm7xx_timer_write: WTCR write not implemented: 0x00000083
-> Reboot failed -- System halted
-> 
-> So we need to implement watchdog support, which is something we were
-> planning to do fairly soon.
+>> Using Python syntax highlighting produces much better results, and
+>> in fact these files already start with specially-formatted comments
+>> that instruct Emacs to process them as if they were Python files.
+>>
+>> This commit adds the equivalent special comments for vim.
+>>
+>> Signed-off-by: Andrea Bolognani <abologna@redhat.com>
+>
+> Naming QAPI schema files .json even though their contents isn't was a
+> mistake.  Correcting it would be a pain.  If we correct it, then the
+> sooner the better.
+>
+> Renaming them to .py gives decent editor support out of the box.  Their
+> contents isn't quite Python, though: true vs. True, false vs. False.  Do
+> we care?  Only a few dozen occurences; they could be adjusted.
+>
+> Renaming them to .qapi would perhaps be less confusing, for the price of
+> "out of the box".
+>
+> Thoughts?
 
-Well this seems a guest implementation decision to prefer
-wait the watchdog to kick (hard reset?) rather than doing
-a soft reset.
+Let me try to summarize the discussion from my point of view.
 
-Two different issues IMO. Anyway this is certainly not
-blocking your series to get merged.
+Basing a DSL on some existing syntax has its advantages: the learning
+curve is slightly more gentle, and we get some tooling for free, notably
+editor support.
 
-Regards,
+Basing on JSON was a mistake: JSON is designed for data interchange, not
+for programming.
 
-Phil.
+To make it fit for programming, we extended it, losing much of what we
+gained by basing on existing syntax.
+
+Use of .json file names for the resulting bastard is confusing.
+
+Among the confused are editors.  We unconfuse them one by one by telling
+them to treat the files as Python.  Works, because the syntax happens to
+be a strict subset of Python's.
+
+We discussed swapping out the base syntax layer for one that is actually
+fit for purpose (and doesn't need extending), e.g. YAML.  Radical
+change, benefits need to justify the cost.  Possible benefits:
+
+* Better ergonomics for developers
+
+  Depends on what we pick for a base, and how we use it.
+
+  We discussed YAML at some length.  It's complex, and the way it
+  assigns types is at odds with the QAPI schema's needs.  I doubt YAML
+  could improve ergonomics all that much.
+
+* Not having to maintain our own code for the lower layer
+
+  Replacing the (trivial) JSON parser by glue for an off-the-shelf
+  parser is quite unlikely to pay off.
+
+  Replacing the (non-trivial) doc comment parser could be a win, but no
+  credible replacements have been suggested so far.
+
+* Make the schema more easily consumable by other programs
+
+  Parsing is the easy part of this problem.  Making the easy part easier
+  won't make the total problem appreciably easier.
+
+Right now, I doubt the benefits are worth the cost.  To make me
+reconsider, write a concise memo stating the goals, their benefits, the
+possible ways to get there, and their cost.
+
+More modest ways to stop our confusing misuse of .json:
+
+* Rename QAPI schema files to .qapi, keep unconfusing tools one by one
+  by telling them to treat the files as Python.
+
+* Rename QAPI schema files to .py.  Optionally rename false, true to
+  False, True in the schema language, so the schema expressions are
+  semantically valid Python.  Humans might still find .py confusing.
+
+* Rename QAPI schema files to .js, change comments from # to //.
+
+* Keep .json, change comments from # to // and strings from ' to ".
+
+  This is still not JSON, but should be close enough to make common
+  tooling work.
+
+The last two are too much churn for too little benefit, in my opinion.
+
+I'm willing to do either of the first two.  If you have a preference,
+let me know.
+
 
