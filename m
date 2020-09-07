@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D6BC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:35:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBD54C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:36:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B68B421927
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:35:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 42DA321D7D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:36:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CbNlWh0S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B68B421927
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lsra9HzP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42DA321D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60170 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFK7X-0003vt-N7
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:35:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47806)
+	id 1kFK89-0004so-BT
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:36:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFK4q-00088C-4j; Mon, 07 Sep 2020 12:33:08 -0400
-Received: from mail-ed1-x52d.google.com ([2a00:1450:4864:20::52d]:45189)
+ id 1kFK4o-00084c-JU; Mon, 07 Sep 2020 12:33:06 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:46338)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFK4o-0007c4-Gw; Mon, 07 Sep 2020 12:33:07 -0400
-Received: by mail-ed1-x52d.google.com with SMTP id l17so13270655edq.12;
- Mon, 07 Sep 2020 09:33:05 -0700 (PDT)
+ id 1kFK4m-0007bv-Ti; Mon, 07 Sep 2020 12:33:06 -0400
+Received: by mail-ej1-x642.google.com with SMTP id z23so18871174ejr.13;
+ Mon, 07 Sep 2020 09:33:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=sOTWIKCT6VDFv2Z2z68Ud6vgTWqu6BKF5mHpas4qUIU=;
- b=CbNlWh0SZ+7iSW1+FYz4wkXR13QN3P64ZIb9mGTZ45QuJKP8BzwzHJWcUZ4opDAS+U
- NPwfnLRggsDeRGkYoETvHFcOISfCCoZEBl+m+F2F4mhClWL1W/PD5k5C1JukQNptuduA
- tQYQrZiO1+J2GdIJssDIepQ8IXYIGxQp/bQ/kOcAVQj7UzI7873cVIxKWzS6H6JJMr3A
- EIGAyzN7jkWU3F93RLTnvnKHR4JYudYeEVDsMDW+esIf/UaVOF8/qwDCf6g0x5jA086X
- KDLkQl6FTCHaGXnVaaqSBu6CGskE+VSvlpwu2B6tB0ppiVXB+JvGr12EHMXcectt4ETm
- SBGQ==
+ bh=VNbcpVtna5bpU7n81cix+fetWM20QpCF3F6nhCiudhQ=;
+ b=Lsra9HzP9MY8fC6amVNSnK9RIttSVRIDNAo7ZVenbXPeC+d7FLhru2Larq7F0cwxH9
+ 7A+1x5dtEHr7d7X8o+moA6ydLEfoLQqdWvDjl9Kfr2Jf0WEA08VsQbSXsul5VP4f4WBz
+ 5wO80IO5hMpD7iGTf+HkodI05Ua3cKKD5Ta3eG+HyCX7ZPo+sb7xQjR/lGRUsyP1sgCn
+ RaA+8spjY4Xc1aE1pY6zEFS+6NZZP76V8o4bOMdzvnXgltI7KtodTz4wJxEDAg0oxqUp
+ UzH0WDeBNBtX7N3HRP7NJTPa7H6EKVF2rMQGib4ZiGq0PUA7CyKtjr8HIMXhjymB6io2
+ 9UWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=sOTWIKCT6VDFv2Z2z68Ud6vgTWqu6BKF5mHpas4qUIU=;
- b=rB7ahS0G9JlxY3QXewcESNSsRkeWoFlGKpNjHawHP/dEnFJb97X9FLcu837CbMkZIg
- JKN1ONuKycBOxRvUcEKLcQQoH/GdiJIoy5LJpGqk21IRhmKG9uibJd+M6yDQAmClcme4
- Di6Sz4ZE331MeZhJAkAt1LI6aaL1NQNgK/b7V1r4h+jr+B1mHKro1owfuCN2kyJGWnI7
- inHZPrrjtLM/XxL6d2cVMl6Xhu6pMuohm7La3aTutI2clsWLgEAY23THrH5kcxXv4XQR
- lnMnZ0SKLmve5sQ6RGY2XZHQh670pwkApPlwrykEdvGGY1n1hxnUZYpvqORk8QZXMdP2
- 0Wzg==
-X-Gm-Message-State: AOAM531FuvZIlbPA2cuIPqWLC5x39+HsMUpYsRwiQm/Imzg2Pi3D09HQ
- RKMTAuwV1omZIxtM+Eysg1K3lR1g9Ng=
-X-Google-Smtp-Source: ABdhPJz4mZwYDnh5f9SkSMuj18wRVfof8pdYAQR5sxNMR440kQguG89aeMXab6/H9yyTddV3KMHFew==
-X-Received: by 2002:aa7:dbd9:: with SMTP id v25mr23489525edt.78.1599496384529; 
- Mon, 07 Sep 2020 09:33:04 -0700 (PDT)
+ bh=VNbcpVtna5bpU7n81cix+fetWM20QpCF3F6nhCiudhQ=;
+ b=Exz9wrwQ/sUDE5j6fx9U48qSQ4TkGo4MU9tYMdGtVUS/jbwd9K+9Q3ZCHjK1chwPZ/
+ xHmKtbzJCCAEr5zxchvqi1qC+lLE41XNHHI4PjORtfjnPz7qckKtFjVQtQdF8eNXqJLL
+ eKhzPUrzYJ+fe7cAKMLxJHGZI+/OgURnOfvr0UX3Q/3/aQd6pZXBWgAnk2GcMLg2vkwi
+ 7W2uoaFUvDk7w6UFasfSNkC4/bRYFPh6G5sWXi721wkKej+3arz8iTsxHD8+fJSjNj9S
+ m5/63KgsfFmyIF6XHd1jn9NkHavC77m7d4h8JBhBNsI5H3Oh8ouF+3EJzBICu07/EnX/
+ 7rdA==
+X-Gm-Message-State: AOAM533MP81iNd6lXHcawIX4pokqlhjr8sB4tmnz7MQa0LIQXKxDqXvi
+ o00p65ssl3BF2/N6mtYE76j6tqCx6dE=
+X-Google-Smtp-Source: ABdhPJxGLaRMjJjguE+3rJHPw8QpT0NRuDthkCZFOR88+Gn0lmfnBM2KpBc+w/J/zRInktHy4AP+GA==
+X-Received: by 2002:a17:906:2552:: with SMTP id
+ j18mr21262657ejb.476.1599496382901; 
+ Mon, 07 Sep 2020 09:33:02 -0700 (PDT)
 Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id u13sm15700199ejn.82.2020.09.07.09.33.03
+ by smtp.gmail.com with ESMTPSA id u13sm15700199ejn.82.2020.09.07.09.33.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 09:33:03 -0700 (PDT)
+ Mon, 07 Sep 2020 09:33:02 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 3/8] hw/misc/led: Emit a trace event when LED intensity has
- changed
-Date: Mon,  7 Sep 2020 18:32:52 +0200
-Message-Id: <20200907163257.46527-4-f4bug@amsat.org>
+Subject: [PATCH v4 2/8] hw/misc/led: Allow connecting from GPIO output
+Date: Mon,  7 Sep 2020 18:32:51 +0200
+Message-Id: <20200907163257.46527-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200907163257.46527-1-f4bug@amsat.org>
 References: <20200907163257.46527-1-f4bug@amsat.org>
@@ -78,8 +78,8 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::52d;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x52d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -102,52 +102,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
  Joaquin de Andres <me@xcancerberox.com.ar>,
- Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Luc Michel <luc.michel@greensocs.com>, Joel Stanley <joel@jms.id.au>
+ Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc.michel@greensocs.com>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Track the LED intensity, and emit a trace event when it changes.
+Some devices expose GPIO lines.
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Add a GPIO qdev input to our LED device, so we can
+connect a GPIO output using qdev_connect_gpio_out().
+
+When used with GPIOs, the intensity can only be either
+minium or maximum. This depends of the polarity of the
+GPIO (which can be inverted).
+Declare the GpioPolarity type to model the polarity.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/misc/led.c        | 4 ++++
- hw/misc/trace-events | 1 +
- 2 files changed, 5 insertions(+)
+ include/hw/misc/led.h  |  8 ++++++++
+ include/hw/qdev-core.h |  8 ++++++++
+ hw/misc/led.c          | 17 ++++++++++++++++-
+ 3 files changed, 32 insertions(+), 1 deletion(-)
 
+diff --git a/include/hw/misc/led.h b/include/hw/misc/led.h
+index 1aaabbebafc..c8dd6da74d5 100644
+--- a/include/hw/misc/led.h
++++ b/include/hw/misc/led.h
+@@ -38,10 +38,16 @@ typedef struct LEDState {
+     /* Public */
+ 
+     uint8_t intensity_percent;
++    qemu_irq irq;
+ 
+     /* Properties */
+     char *description;
+     char *color;
++    /*
++     * When used with GPIO, the intensity at reset is related
++     * to the GPIO polarity.
++     */
++    bool inverted_polarity;
+ } LEDState;
+ 
+ /**
+@@ -71,6 +77,7 @@ void led_set_state(LEDState *s, bool is_emitting);
+ /**
+  * led_create_simple: Create and realize a LED device
+  * @parent: the parent object
++ * @gpio_polarity: GPIO polarity
+  * @color: color of the LED
+  * @description: description of the LED (optional)
+  *
+@@ -78,6 +85,7 @@ void led_set_state(LEDState *s, bool is_emitting);
+  * drop the reference to it (the device is realized).
+  */
+ LEDState *led_create_simple(Object *parentobj,
++                            GpioPolarity gpio_polarity,
+                             LEDColor color,
+                             const char *description);
+ 
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index ea3f73a282d..846354736a5 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -424,6 +424,14 @@ void qdev_simple_device_unplug_cb(HotplugHandler *hotplug_dev,
+ void qdev_machine_creation_done(void);
+ bool qdev_machine_modified(void);
+ 
++/**
++ * GpioPolarity: Polarity of a GPIO line
++ */
++typedef enum {
++    GPIO_POLARITY_ACTIVE_LOW,
++    GPIO_POLARITY_ACTIVE_HIGH
++} GpioPolarity;
++
+ /**
+  * qdev_get_gpio_in: Get one of a device's anonymous input GPIO lines
+  * @dev: Device whose GPIO we want
 diff --git a/hw/misc/led.c b/hw/misc/led.c
-index 1acade1d592..b7e9b1465bb 100644
+index f2140739b68..1acade1d592 100644
 --- a/hw/misc/led.c
 +++ b/hw/misc/led.c
-@@ -41,6 +41,10 @@ void led_set_intensity(LEDState *s, unsigned intensity_percent)
-         intensity_percent = LED_INTENSITY_PERCENT_MAX;
-     }
-     trace_led_set_intensity(s->description, s->color, intensity_percent);
-+    if (intensity_percent != s->intensity_percent) {
-+        trace_led_change_intensity(s->description, s->color,
-+                                   s->intensity_percent, intensity_percent);
-+    }
-     s->intensity_percent = intensity_percent;
+@@ -10,6 +10,7 @@
+ #include "migration/vmstate.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/misc/led.h"
++#include "hw/irq.h"
+ #include "trace.h"
+ 
+ #define LED_INTENSITY_PERCENT_MAX   100
+@@ -53,11 +54,19 @@ void led_set_state(LEDState *s, bool is_emitting)
+     led_set_intensity(s, is_emitting ? LED_INTENSITY_PERCENT_MAX : 0);
  }
  
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 76c9ddb54fe..89d15f05f9a 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -216,6 +216,7 @@ grlib_apb_pnp_read(uint64_t addr, uint32_t value) "APB PnP read addr:0x%03"PRIx6
++static void led_set_state_gpio_handler(void *opaque, int line, int new_state)
++{
++    LEDState *s = LED(opaque);
++
++    assert(line == 0);
++    led_set_state(s, !!new_state != s->inverted_polarity);
++}
++
+ static void led_reset(DeviceState *dev)
+ {
+     LEDState *s = LED(dev);
  
- # led.c
- led_set_intensity(const char *color, const char *desc, uint8_t intensity_percent) "LED desc:'%s' color:%s intensity: %u%%"
-+led_change_intensity(const char *color, const char *desc, uint8_t old_intensity_percent, uint8_t new_intensity_percent) "LED desc:'%s' color:%s intensity %u%% -> %u%%"
+-    led_set_state(s, false);
++    led_set_state(s, s->inverted_polarity);
+ }
  
- # pca9552.c
- pca955x_gpio_status(const char *description, const char *buf) "%s GPIOs 0-15 [%s]"
+ static const VMStateDescription vmstate_led = {
+@@ -84,11 +93,14 @@ static void led_realize(DeviceState *dev, Error **errp)
+     if (s->description == NULL) {
+         s->description = g_strdup("n/a");
+     }
++
++    qdev_init_gpio_in(DEVICE(s), led_set_state_gpio_handler, 1);
+ }
+ 
+ static Property led_properties[] = {
+     DEFINE_PROP_STRING("color", LEDState, color),
+     DEFINE_PROP_STRING("description", LEDState, description),
++    DEFINE_PROP_BOOL("polarity-inverted", LEDState, inverted_polarity, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+@@ -119,6 +131,7 @@ static void led_register_types(void)
+ type_init(led_register_types)
+ 
+ LEDState *led_create_simple(Object *parentobj,
++                            GpioPolarity gpio_polarity,
+                             LEDColor color,
+                             const char *description)
+ {
+@@ -126,6 +139,8 @@ LEDState *led_create_simple(Object *parentobj,
+     DeviceState *dev;
+ 
+     dev = qdev_new(TYPE_LED);
++    qdev_prop_set_bit(dev, "polarity-inverted",
++                      gpio_polarity == GPIO_POLARITY_ACTIVE_LOW);
+     qdev_prop_set_string(dev, "color", led_color_name[color]);
+     if (!description) {
+         static unsigned undescribed_led_id;
 -- 
 2.26.2
 
