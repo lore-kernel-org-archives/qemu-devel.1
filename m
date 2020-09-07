@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A8DC2BB84
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:08:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B9EC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:09:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9F08206B5
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:08:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 078B5206B5
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:09:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sXN95DMJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9F08206B5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mq27g1oD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 078B5206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLYe-0008IU-Rq
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:08:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38764)
+	id 1kFLZm-0001mq-1W
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:09:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLVu-0003kr-Bn
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:10 -0400
-Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:36271)
+ id 1kFLVy-0003sU-85
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:14 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:37283)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLVp-0002NP-O5
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:10 -0400
-Received: by mail-pl1-x62d.google.com with SMTP id k13so2794087plk.3
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 11:05:05 -0700 (PDT)
+ id 1kFLVw-0002ON-7K
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:13 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id kk9so4409914pjb.2
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 11:05:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BV7UzgSMM3A3H8QtCGnB/gl3FBbCJtYPNUPwgrX+UHQ=;
- b=sXN95DMJNz/SuqFVAmT0QvAY8b1QhUoEQyTSScvyvZOrbOg2BxiM8cyHrDtiwezM9O
- /aiVDDcHsjNzIBjHo7h4lcOCMYk2r03aZk+oTYLEZtjeesItby7qdtOwsP+XuHi5tYc2
- OUlhEno8mpkKLvBmZ1/bSnS20SLw65QYyJMUzJ/KsIXJ/DpKEr5JJmskJKtqLDkkmwvx
- dDrVUY9xzx+aaFyyulCGcdckTzXB1JtG3oZwLxLBa9w+dLR8ltsBMoIKdqdzq3GofDQW
- XF2VKEnboJVX11HBXDuPyAjYk3F7qANsyBrKgQPuB1XSFWtBnq8RWEwzasEvQZXEe2BJ
- npBw==
+ bh=dWk0u18HrFWEmO0Ek4pDOwsIb2E0YHnrPgMxsDRW+cA=;
+ b=mq27g1oDg7Fa7RsvStGUPmszuAwud6AtXZVjqdWaEceJH7zleAqfadJIuF/GfJgZf1
+ umQCuni7SmZrs27cIIBSaeQWpU3GmuvlI0s37d/QAKvgZl3UIT9Lm0EWq90tm++HgVXN
+ aw5SUAa1WEX/36mN+EbYFreWua8MxDTyT9cIbgJtJVLWo0Lm7vBo6kuydj6qFXN0AOxa
+ eYlaIoG07KxbOgyuO7EE7fFSPNkQLOWFEd50HgxFvUoGxDyu0xloyLCQTQ/Nt26kb09L
+ TmZrMVXDtr9+/pP9mA6BgWakplVCqFeoo2j/6nVqmoMD+xBIVr4ZlAlH/AMkmb+aoOYs
+ F8Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BV7UzgSMM3A3H8QtCGnB/gl3FBbCJtYPNUPwgrX+UHQ=;
- b=NqylOlHTZoGiLnaxZ3KZV8IbhK/q1a9X53bcjSEWb2NGMSZcJyMFFgaVfK+1qJtSwf
- FHeQXACSPXuvgqYfkNm+r0HEr2uN01uFGgCplMo7SujIDFryP+fXJMkSw5PDFwwSi/4B
- JFJojXqJBFg4337SVoCdI+gVgE5AEuToCVQFcIk1hopikZc2J7mTpHt/Ev7EHRDC3LMr
- 7woJHM2YTy0TbV4aWYMoFXkQSlk/kflawoUgK8zgUvz92qDH9m3W+qlFtbkmnfPFex7r
- OAaNultAfjKenMnMoqEVsv0+Q/EFkCkKulyr5QPIg66jY9WByfe68idS3/ajTMnkHPwn
- 7MSA==
-X-Gm-Message-State: AOAM533yMRxTmtdQqpv3Ea+Y3qpZPAvU9CHpabHuhIsU4m+2JlqQkvLq
- 2LbCoESlJgRoI36UzHB0tKPlD9xN7J7zxQ==
-X-Google-Smtp-Source: ABdhPJwavj8eNmRDTI44lGjzX74kssBWPrdxH9jGbO2ZS5B/phOGsd7Eyn81hzkpsEM7m69a71nMKA==
-X-Received: by 2002:a17:90a:930e:: with SMTP id
- p14mr421362pjo.49.1599501903898; 
- Mon, 07 Sep 2020 11:05:03 -0700 (PDT)
+ bh=dWk0u18HrFWEmO0Ek4pDOwsIb2E0YHnrPgMxsDRW+cA=;
+ b=sylZcjOuKZ84h9YdXgV2K5bfeUuosPB7Nu6TFOf3C6qG90o+0uGrp1l6qDLk1FRmUu
+ 3WzNWlggpSbiRmIMY7/CDLRtDoB27ekyiaO9ZxN4idC9Rth33IMkxIJZbT49TgfbwW5W
+ ssOOfT7QtweayJY8uwdOaUa6sP7fjtftuT14wZSItEg+zSNoTIiwFM1iWdPRfBZ8xwIO
+ dW6c1ibHZGkpLm4z8omxo1LhdAgKIwaQkoLkqI9IlwCS0tN9CrGQ8PkXpl0b2/aFqWd6
+ 9aPljS78MZ8LXVVdjlT8967Y9WcjmXDRaRr1gAZuHyMgE9e3IpArLyJdG2gK2sEun7OP
+ kdCQ==
+X-Gm-Message-State: AOAM5335rVJa4qVI76QEFmTZ1Z5TlaiRfjwz0l2VOHWp7B34iFd/LXfp
+ zgmJd2uo6VyYaxrwqrTFyRE8eaiwCgXYZw==
+X-Google-Smtp-Source: ABdhPJwVYX5Czt1wXjZuX9eJwKDG5jVZ+wcm83BZD1w9ptTEclLG1NpfkXkhVloBnzksa9e2620MWQ==
+X-Received: by 2002:a17:902:7895:b029:d0:89f4:621c with SMTP id
+ q21-20020a1709027895b02900d089f4621cmr19090697pll.4.1599501910454; 
+ Mon, 07 Sep 2020 11:05:10 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v6sm11367768pfi.38.2020.09.07.11.05.02
+ by smtp.gmail.com with ESMTPSA id v6sm11367768pfi.38.2020.09.07.11.05.09
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 11:05:03 -0700 (PDT)
+ Mon, 07 Sep 2020 11:05:09 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/19] target/microblaze: Split out MicroBlazeCPUConfig
-Date: Mon,  7 Sep 2020 11:04:52 -0700
-Message-Id: <20200907180459.29025-3-richard.henderson@linaro.org>
+Subject: [PULL 17/19] target/microblaze: Fill in VMStateDescription for cpu
+Date: Mon,  7 Sep 2020 11:04:57 -0700
+Message-Id: <20200907180459.29025-8-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200907180459.29025-1-richard.henderson@linaro.org>
 References: <20200907175102.28027-1-richard.henderson@linaro.org>
  <20200907180459.29025-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62d;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62d.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,89 +106,192 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This struct was previously unnamed, and defined in MicroBlazeCPU.
-Pull it out to its own typedef so that we can reuse it.
-
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/cpu.h | 55 ++++++++++++++++++++++-------------------
- 1 file changed, 29 insertions(+), 26 deletions(-)
+ target/microblaze/cpu.h       |   4 ++
+ target/microblaze/cpu.c       |   8 +--
+ target/microblaze/machine.c   | 106 ++++++++++++++++++++++++++++++++++
+ target/microblaze/meson.build |   5 +-
+ 4 files changed, 115 insertions(+), 8 deletions(-)
+ create mode 100644 target/microblaze/machine.c
 
 diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index 20c2979396..59d2a079c4 100644
+index b54f99da61..297b36879a 100644
 --- a/target/microblaze/cpu.h
 +++ b/target/microblaze/cpu.h
-@@ -291,6 +291,34 @@ struct CPUMBState {
-     } pvr;
- };
+@@ -429,4 +429,8 @@ static inline int cpu_mmu_index(CPUMBState *env, bool ifetch)
+     return MMU_KERNEL_IDX;
+ }
  
-+/*
-+ * Microblaze Configuration Settings
-+ */
-+typedef struct {
-+    bool stackprot;
-+    uint32_t base_vectors;
-+    uint8_t addr_size;
-+    uint8_t use_fpu;
-+    uint8_t use_hw_mul;
-+    bool use_barrel;
-+    bool use_div;
-+    bool use_msr_instr;
-+    bool use_pcmp_instr;
-+    bool use_mmu;
-+    bool dcache_writeback;
-+    bool endi;
-+    bool dopb_bus_exception;
-+    bool iopb_bus_exception;
-+    bool illegal_opcode_exception;
-+    bool opcode_0_illegal;
-+    bool div_zero_exception;
-+    bool unaligned_exceptions;
-+    uint8_t pvr_user1;
-+    uint32_t pvr_user2;
-+    char *version;
-+    uint8_t pvr;
-+} MicroBlazeCPUConfig;
++#ifndef CONFIG_USER_ONLY
++extern const VMStateDescription vmstate_mb_cpu;
++#endif
 +
- /**
-  * MicroBlazeCPU:
-  * @env: #CPUMBState
-@@ -305,32 +333,7 @@ struct MicroBlazeCPU {
+ #endif
+diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
+index fde646a7ad..9b2482159d 100644
+--- a/target/microblaze/cpu.c
++++ b/target/microblaze/cpu.c
+@@ -26,7 +26,6 @@
+ #include "cpu.h"
+ #include "qemu/module.h"
+ #include "hw/qdev-properties.h"
+-#include "migration/vmstate.h"
+ #include "exec/exec-all.h"
+ #include "fpu/softfloat-helpers.h"
  
-     CPUNegativeOffsetState neg;
-     CPUMBState env;
+@@ -251,11 +250,6 @@ static void mb_cpu_initfn(Object *obj)
+ #endif
+ }
+ 
+-static const VMStateDescription vmstate_mb_cpu = {
+-    .name = "cpu",
+-    .unmigratable = 1,
+-};
 -
--    /* Microblaze Configuration Settings */
--    struct {
--        bool stackprot;
--        uint32_t base_vectors;
--        uint8_t addr_size;
--        uint8_t use_fpu;
--        uint8_t use_hw_mul;
--        bool use_barrel;
--        bool use_div;
--        bool use_msr_instr;
--        bool use_pcmp_instr;
--        bool use_mmu;
--        bool dcache_writeback;
--        bool endi;
--        bool dopb_bus_exception;
--        bool iopb_bus_exception;
--        bool illegal_opcode_exception;
--        bool opcode_0_illegal;
--        bool div_zero_exception;
--        bool unaligned_exceptions;
--        uint8_t pvr_user1;
--        uint32_t pvr_user2;
--        char *version;
--        uint8_t pvr;
--    } cfg;
-+    MicroBlazeCPUConfig cfg;
- };
+ static Property mb_properties[] = {
+     DEFINE_PROP_UINT32("base-vectors", MicroBlazeCPU, cfg.base_vectors, 0),
+     DEFINE_PROP_BOOL("use-stack-protection", MicroBlazeCPU, cfg.stackprot,
+@@ -335,8 +329,8 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
+ #ifndef CONFIG_USER_ONLY
+     cc->do_transaction_failed = mb_cpu_transaction_failed;
+     cc->get_phys_page_debug = mb_cpu_get_phys_page_debug;
+-#endif
+     dc->vmsd = &vmstate_mb_cpu;
++#endif
+     device_class_set_props(dc, mb_properties);
+     cc->gdb_num_core_regs = 32 + 27;
  
+diff --git a/target/microblaze/machine.c b/target/microblaze/machine.c
+new file mode 100644
+index 0000000000..acdb8d0474
+--- /dev/null
++++ b/target/microblaze/machine.c
+@@ -0,0 +1,106 @@
++/*
++ *  Microblaze VMState for qemu.
++ *
++ *  Copyright (c) 2020 Linaro, Ltd.
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#include "qemu/osdep.h"
++#include "cpu.h"
++#include "migration/cpu.h"
++
++
++static VMStateField vmstate_mmu_fields[] = {
++    VMSTATE_UINT64_2DARRAY(rams, MicroBlazeMMU, 2, TLB_ENTRIES),
++    VMSTATE_UINT8_ARRAY(tids, MicroBlazeMMU, TLB_ENTRIES),
++    VMSTATE_UINT32_ARRAY(regs, MicroBlazeMMU, 3),
++    VMSTATE_END_OF_LIST()
++};
++
++static const VMStateDescription vmstate_mmu = {
++    .name = "mmu",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .fields = vmstate_mmu_fields,
++};
++
++static int get_msr(QEMUFile *f, void *opaque, size_t size,
++                   const VMStateField *field)
++{
++    CPUMBState *env = container_of(opaque, CPUMBState, msr);
++
++    mb_cpu_write_msr(env, qemu_get_be32(f));
++    return 0;
++}
++
++static int put_msr(QEMUFile *f, void *opaque, size_t size,
++                   const VMStateField *field, QJSON *vmdesc)
++{
++    CPUMBState *env = container_of(opaque, CPUMBState, msr);
++
++    qemu_put_be32(f, mb_cpu_read_msr(env));
++    return 0;
++}
++
++static const VMStateInfo vmstate_msr = {
++    .name = "msr",
++    .get = get_msr,
++    .put = put_msr,
++};
++
++static VMStateField vmstate_env_fields[] = {
++    VMSTATE_UINT32_ARRAY(regs, CPUMBState, 32),
++
++    VMSTATE_UINT32(pc, CPUMBState),
++    VMSTATE_SINGLE(msr, CPUMBState, 0, vmstate_msr, uint32_t),
++    VMSTATE_UINT32(esr, CPUMBState),
++    VMSTATE_UINT32(fsr, CPUMBState),
++    VMSTATE_UINT32(btr, CPUMBState),
++    VMSTATE_UINT32(edr, CPUMBState),
++    VMSTATE_UINT32(slr, CPUMBState),
++    VMSTATE_UINT32(shr, CPUMBState),
++    VMSTATE_UINT64(ear, CPUMBState),
++
++    VMSTATE_UINT32(btarget, CPUMBState),
++    VMSTATE_UINT32(imm, CPUMBState),
++    VMSTATE_UINT32(iflags, CPUMBState),
++
++    VMSTATE_UINT32(res_val, CPUMBState),
++    VMSTATE_UINTTL(res_addr, CPUMBState),
++
++    VMSTATE_STRUCT(mmu, CPUMBState, 0, vmstate_mmu, MicroBlazeMMU),
++
++    VMSTATE_END_OF_LIST()
++};
++
++static const VMStateDescription vmstate_env = {
++    .name = "env",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .fields = vmstate_env_fields,
++};
++
++static VMStateField vmstate_cpu_fields[] = {
++    VMSTATE_CPU(),
++    VMSTATE_STRUCT(env, MicroBlazeCPU, 1, vmstate_env, CPUMBState),
++    VMSTATE_END_OF_LIST()
++};
++
++const VMStateDescription vmstate_mb_cpu = {
++    .name = "cpu",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .fields = vmstate_cpu_fields,
++};
+diff --git a/target/microblaze/meson.build b/target/microblaze/meson.build
+index 639c3f73a8..05ee0ec163 100644
+--- a/target/microblaze/meson.build
++++ b/target/microblaze/meson.build
+@@ -11,7 +11,10 @@ microblaze_ss.add(files(
+ ))
  
+ microblaze_softmmu_ss = ss.source_set()
+-microblaze_softmmu_ss.add(files('mmu.c'))
++microblaze_softmmu_ss.add(files(
++  'mmu.c',
++  'machine.c',
++))
+ 
+ target_arch += {'microblaze': microblaze_ss}
+ target_softmmu_arch += {'microblaze': microblaze_softmmu_ss}
 -- 
 2.25.1
 
