@@ -7,62 +7,60 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3F4C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77122C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:30:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73EE42075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:29:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F25C4206B8
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:30:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AnYDAHZ4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73EE42075A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KJASm3iu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F25C4206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLtB-0004aB-Im
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:29:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42572)
+	id 1kFLul-0007dB-1A
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:30:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42726)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlA-0005Qf-LZ
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:20:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:56752
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlF-0005fA-W9
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42564)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLl2-0004Xm-5o
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:20:56 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlA-0004eM-NW
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599502847;
+ s=mimecast20190719; t=1599502855;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZFHoapVQkqGSRxNn4cvX8ieZX/367BLHhu1Z1co4Hj4=;
- b=AnYDAHZ4XZRH6zUEx99fqlTzI6S2q/5md+OM24q5vJZQOzApFcRkPYsLxcAFBIrquJCoBz
- LANVxCsFAR5Nn/A9cPbU2T27Nwtnte7hftC+4Wd7cmEJfPp5V5xbfUC0w+wxC5RocmwjRE
- 8BoBHDKQv1QbO6sbObwMsDdIXh5eOFg=
+ bh=TyTESgIRwVT/16t/ZAX+fErpReN/1+JHC0EHdQpAWSI=;
+ b=KJASm3iun8BE+lQ7dwmQcxriNjQ5Tn7pbppM6oFFek6VCh6lDocRhLploW7vUaEizJKk4z
+ K+S1IoMiDQUEW7MkrCxHVlXMYTRHJCCt6srA47v55C9LiNLVUdMFDBFVZf/TCJki6tRuw4
+ WvDVVt/xNehpBUaij9LNe3mMLpHpkwY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-U1xJbCg3MxKkdew2OswqiQ-1; Mon, 07 Sep 2020 14:20:45 -0400
-X-MC-Unique: U1xJbCg3MxKkdew2OswqiQ-1
+ us-mta-579-RTlN9ZvkMC2-rq9P5Qmudw-1; Mon, 07 Sep 2020 14:20:54 -0400
+X-MC-Unique: RTlN9ZvkMC2-rq9P5Qmudw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F8FD807350;
- Mon,  7 Sep 2020 18:20:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F12818B9EC1;
+ Mon,  7 Sep 2020 18:20:53 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 632BA60BF3;
- Mon,  7 Sep 2020 18:20:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E9A1860BF3;
+ Mon,  7 Sep 2020 18:20:51 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 14/29] block/export: Move AioContext from NBDExport to
- BlockExport
-Date: Mon,  7 Sep 2020 20:19:56 +0200
-Message-Id: <20200907182011.521007-15-kwolf@redhat.com>
+Subject: [PATCH 20/29] block/export: Add block-export-del
+Date: Mon,  7 Sep 2020 20:20:02 +0200
+Message-Id: <20200907182011.521007-21-kwolf@redhat.com>
 In-Reply-To: <20200907182011.521007-1-kwolf@redhat.com>
 References: <20200907182011.521007-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -73,17 +71,17 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 14:12:50
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
 X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,162 +99,267 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- include/block/export.h |  3 +++
- block/export/export.c  |  2 ++
- nbd/server.c           | 26 +++++++++++++-------------
- 3 files changed, 18 insertions(+), 13 deletions(-)
+Implement a new QMP command block-export-del and make nbd-server-remove
+a wrapper around it.
 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ qapi/block-export.json         | 32 ++++++++++++++++++++-----
+ include/block/export.h         |  1 +
+ include/block/nbd.h            |  1 -
+ block/export/export.c          | 43 +++++++++++++++++++++++++++++++++-
+ block/monitor/block-hmp-cmds.c |  4 ++--
+ blockdev-nbd.c                 | 25 +++++---------------
+ nbd/server.c                   | 14 -----------
+ 7 files changed, 77 insertions(+), 43 deletions(-)
+
+diff --git a/qapi/block-export.json b/qapi/block-export.json
+index 9e05265b06..77a6b595e8 100644
+--- a/qapi/block-export.json
++++ b/qapi/block-export.json
+@@ -116,9 +116,9 @@
+   'data': 'NbdServerAddOptions', 'boxed': true }
+ 
+ ##
+-# @NbdServerRemoveMode:
++# @BlockExportRemoveMode:
+ #
+-# Mode for removing an NBD export.
++# Mode for removing a block export.
+ #
+ # @safe: Remove export if there are no existing connections, fail otherwise.
+ #
+@@ -134,16 +134,16 @@
+ #
+ # Since: 2.12
+ ##
+-{'enum': 'NbdServerRemoveMode', 'data': ['safe', 'hard']}
++{'enum': 'BlockExportRemoveMode', 'data': ['safe', 'hard']}
+ 
+ ##
+ # @nbd-server-remove:
+ #
+ # Remove NBD export by name.
+ #
+-# @name: Export name.
++# @name: Block export id.
+ #
+-# @mode: Mode of command operation. See @NbdServerRemoveMode description.
++# @mode: Mode of command operation. See @BlockExportRemoveMode description.
+ #        Default is 'safe'.
+ #
+ # Returns: error if
+@@ -154,7 +154,7 @@
+ # Since: 2.12
+ ##
+ { 'command': 'nbd-server-remove',
+-  'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
++  'data': {'name': 'str', '*mode': 'BlockExportRemoveMode'} }
+ 
+ ##
+ # @nbd-server-stop:
+@@ -213,3 +213,23 @@
+ ##
+ { 'command': 'block-export-add',
+   'data': 'BlockExportOptions', 'boxed': true }
++
++##
++# @block-export-del:
++#
++# Request to remove a block export. This drops the user's reference to the
++# export, but the export may still stay around after this command returns until
++# the shutdown of the export has completed.
++#
++# @id: Block export id.
++#
++# @mode: Mode of command operation. See @BlockExportRemoveMode description.
++#        Default is 'safe'.
++#
++# Returns: Error if the export is not found or @mode is 'safe' and the export
++#          is still in use (e.g. by existing client connections)
++#
++# Since: 5.2
++##
++{ 'command': 'block-export-del',
++  'data': { 'id': 'str', '*mode': 'BlockExportRemoveMode' } }
 diff --git a/include/block/export.h b/include/block/export.h
-index 5236a35e12..e6f96f4e1e 100644
+index 4833947e89..ff54d35872 100644
 --- a/include/block/export.h
 +++ b/include/block/export.h
-@@ -41,6 +41,9 @@ struct BlockExport {
-      * the export.
-      */
-     int refcount;
-+
-+    /* The AioContext whose lock protects this BlockExport object. */
-+    AioContext *ctx;
+@@ -76,6 +76,7 @@ struct BlockExport {
  };
  
  BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp);
++BlockExport *blk_exp_find(const char *id);
+ void blk_exp_ref(BlockExport *exp);
+ void blk_exp_unref(BlockExport *exp);
+ void blk_exp_request_shutdown(BlockExport *exp);
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 0b9f3e5d4e..a4dc1f9e54 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -337,7 +337,6 @@ int nbd_export_new(BlockExport *blk_exp, BlockDriverState *bs,
+                    const char *bitmap, bool readonly, bool shared,
+                    bool writethrough, Error **errp);
+ void nbd_export_set_on_eject_blk(BlockExport *exp, BlockBackend *blk);
+-void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp);
+ 
+ AioContext *nbd_export_aio_context(NBDExport *exp);
+ NBDExport *nbd_export_find(const char *name);
 diff --git a/block/export/export.c b/block/export/export.c
-index baba4e94ff..8635318ef1 100644
+index 42aac867e9..4af3b69186 100644
 --- a/block/export/export.c
 +++ b/block/export/export.c
-@@ -49,12 +49,14 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
-     return drv->create(export, errp);
+@@ -29,7 +29,7 @@ static const BlockExportDriver *blk_exp_drivers[] = {
+ static QLIST_HEAD(, BlockExport) block_exports =
+     QLIST_HEAD_INITIALIZER(block_exports);
+ 
+-static BlockExport *blk_exp_find(const char *id)
++BlockExport *blk_exp_find(const char *id)
+ {
+     BlockExport *exp;
+ 
+@@ -136,12 +136,23 @@ void blk_exp_request_shutdown(BlockExport *exp)
+     AioContext *aio_context = exp->ctx;
+ 
+     aio_context_acquire(aio_context);
++
++    /*
++     * If the user doesn't own the export any more, it is already shutting
++     * down. We must not call .request_shutdown and decrease the refcount a
++     * second time.
++     */
++    if (!exp->user_owned) {
++        goto out;
++    }
++
+     exp->drv->request_shutdown(exp);
+ 
+     assert(exp->user_owned);
+     exp->user_owned = false;
+     blk_exp_unref(exp);
+ 
++out:
+     aio_context_release(aio_context);
  }
  
-+/* Callers must hold exp->ctx lock */
- void blk_exp_ref(BlockExport *exp)
+@@ -192,3 +203,33 @@ void qmp_block_export_add(BlockExportOptions *export, Error **errp)
  {
-     assert(exp->refcount > 0);
-     exp->refcount++;
+     blk_exp_add(export, errp);
+ }
++
++void qmp_block_export_del(const char *id,
++                          bool has_mode, BlockExportRemoveMode mode,
++                          Error **errp)
++{
++    ERRP_GUARD();
++    BlockExport *exp;
++
++    exp = blk_exp_find(id);
++    if (exp == NULL) {
++        error_setg(errp, "Export '%s' is not found", id);
++        return;
++    }
++    if (!exp->user_owned) {
++        error_setg(errp, "Export '%s' is already shutting down", id);
++        return;
++    }
++
++    if (!has_mode) {
++        mode = BLOCK_EXPORT_REMOVE_MODE_SAFE;
++    }
++    if (mode == BLOCK_EXPORT_REMOVE_MODE_SAFE && exp->refcount > 1) {
++        error_setg(errp, "export '%s' still in use", exp->id);
++        error_append_hint(errp, "Use mode='hard' to force client "
++                          "disconnect\n");
++        return;
++    }
++
++    blk_exp_request_shutdown(exp);
++}
+diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
+index db357cafcb..d15a2be827 100644
+--- a/block/monitor/block-hmp-cmds.c
++++ b/block/monitor/block-hmp-cmds.c
+@@ -476,8 +476,8 @@ void hmp_nbd_server_remove(Monitor *mon, const QDict *qdict)
+     bool force = qdict_get_try_bool(qdict, "force", false);
+     Error *err = NULL;
+ 
+-    /* Rely on NBD_SERVER_REMOVE_MODE_SAFE being the default */
+-    qmp_nbd_server_remove(name, force, NBD_SERVER_REMOVE_MODE_HARD, &err);
++    /* Rely on BLOCK_EXPORT_REMOVE_MODE_SAFE being the default */
++    qmp_nbd_server_remove(name, force, BLOCK_EXPORT_REMOVE_MODE_HARD, &err);
+     hmp_handle_error(mon, err);
  }
  
-+/* Callers must hold exp->ctx lock */
- void blk_exp_unref(BlockExport *exp)
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 9efbaef8f7..4a9a1be571 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -307,31 +307,18 @@ fail:
+ }
+ 
+ void qmp_nbd_server_remove(const char *name,
+-                           bool has_mode, NbdServerRemoveMode mode,
++                           bool has_mode, BlockExportRemoveMode mode,
+                            Error **errp)
  {
-     assert(exp->refcount > 0);
+-    NBDExport *exp;
+-    AioContext *aio_context;
+-
+-    if (!nbd_server) {
+-        error_setg(errp, "NBD server not running");
+-        return;
+-    }
++    BlockExport *exp;
+ 
+-    exp = nbd_export_find(name);
+-    if (exp == NULL) {
+-        error_setg(errp, "Export '%s' is not found", name);
++    exp = blk_exp_find(name);
++    if (exp && exp->drv->type != BLOCK_EXPORT_TYPE_NBD) {
++        error_setg(errp, "Block export '%s' is not an NBD export", name);
+         return;
+     }
+ 
+-    if (!has_mode) {
+-        mode = NBD_SERVER_REMOVE_MODE_SAFE;
+-    }
+-
+-    aio_context = nbd_export_aio_context(exp);
+-    aio_context_acquire(aio_context);
+-    nbd_export_remove(exp, mode, errp);
+-    aio_context_release(aio_context);
++    qmp_block_export_del(name, has_mode, mode, errp);
+ }
+ 
+ void qmp_nbd_server_stop(Error **errp)
 diff --git a/nbd/server.c b/nbd/server.c
-index 7be81c7bda..7cf81646fc 100644
+index 22a1d66168..1a0e1db401 100644
 --- a/nbd/server.c
 +++ b/nbd/server.c
-@@ -92,8 +92,6 @@ struct NBDExport {
-     QTAILQ_HEAD(, NBDClient) clients;
-     QTAILQ_ENTRY(NBDExport) next;
+@@ -1669,20 +1669,6 @@ static void nbd_export_request_shutdown(BlockExport *blk_exp)
+     blk_exp_unref(&exp->common);
+ }
  
--    AioContext *ctx;
+-void nbd_export_remove(NBDExport *exp, NbdServerRemoveMode mode, Error **errp)
+-{
+-    ERRP_GUARD();
+-    if (mode == NBD_SERVER_REMOVE_MODE_HARD || QTAILQ_EMPTY(&exp->clients)) {
+-        nbd_export_request_shutdown(&exp->common);
+-        return;
+-    }
 -
-     BlockBackend *eject_notifier_blk;
-     Notifier eject_notifier;
- 
-@@ -1333,8 +1331,8 @@ static coroutine_fn int nbd_negotiate(NBDClient *client, Error **errp)
-     }
- 
-     /* Attach the channel to the same AioContext as the export */
--    if (client->exp && client->exp->ctx) {
--        qio_channel_attach_aio_context(client->ioc, client->exp->ctx);
-+    if (client->exp && client->exp->common.ctx) {
-+        qio_channel_attach_aio_context(client->ioc, client->exp->common.ctx);
-     }
- 
-     assert(!client->optlen);
-@@ -1466,7 +1464,7 @@ static void blk_aio_attached(AioContext *ctx, void *opaque)
- 
-     trace_nbd_blk_aio_attached(exp->name, ctx);
- 
--    exp->ctx = ctx;
-+    exp->common.ctx = ctx;
- 
-     QTAILQ_FOREACH(client, &exp->clients, next) {
-         qio_channel_attach_aio_context(client->ioc, ctx);
-@@ -1484,13 +1482,13 @@ static void blk_aio_detach(void *opaque)
-     NBDExport *exp = opaque;
-     NBDClient *client;
- 
--    trace_nbd_blk_aio_detach(exp->name, exp->ctx);
-+    trace_nbd_blk_aio_detach(exp->name, exp->common.ctx);
- 
-     QTAILQ_FOREACH(client, &exp->clients, next) {
-         qio_channel_detach_aio_context(client->ioc);
-     }
- 
--    exp->ctx = NULL;
-+    exp->common.ctx = NULL;
- }
- 
- static void nbd_eject_notifier(Notifier *n, void *data)
-@@ -1498,7 +1496,7 @@ static void nbd_eject_notifier(Notifier *n, void *data)
-     NBDExport *exp = container_of(n, NBDExport, eject_notifier);
-     AioContext *aio_context;
- 
--    aio_context = exp->ctx;
-+    aio_context = exp->common.ctx;
-     aio_context_acquire(aio_context);
-     nbd_export_close(exp);
-     aio_context_release(aio_context);
-@@ -1535,10 +1533,13 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
-         return NULL;
-     }
- 
-+    ctx = bdrv_get_aio_context(bs);
-+
-     exp = g_new0(NBDExport, 1);
-     exp->common = (BlockExport) {
-         .drv        = &blk_exp_nbd,
-         .refcount   = 1,
-+        .ctx        = ctx,
-     };
- 
-     /*
-@@ -1548,7 +1549,7 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
-      * ctx was acquired in the caller.
-      */
-     assert(name && strlen(name) <= NBD_MAX_STRING_SIZE);
--    ctx = bdrv_get_aio_context(bs);
-+
-     bdrv_invalidate_cache(bs, NULL);
- 
-     /* Don't allow resize while the NBD server is running, otherwise we don't
-@@ -1622,7 +1623,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs,
-         assert(strlen(exp->export_bitmap_context) < NBD_MAX_STRING_SIZE);
-     }
- 
--    exp->ctx = ctx;
-     blk_add_aio_context_notifier(blk, blk_aio_attached, blk_aio_detach, exp);
- 
-     blk_exp_ref(&exp->common);
-@@ -1653,7 +1653,7 @@ NBDExport *nbd_export_find(const char *name)
- AioContext *
- nbd_export_aio_context(NBDExport *exp)
+-    assert(mode == NBD_SERVER_REMOVE_MODE_SAFE);
+-
+-    error_setg(errp, "export '%s' still in use", exp->name);
+-    error_append_hint(errp, "Use mode='hard' to force client disconnect\n");
+-}
+-
+ static void nbd_export_delete(BlockExport *blk_exp)
  {
--    return exp->ctx;
-+    return exp->common.ctx;
- }
- 
- void nbd_export_close(NBDExport *exp)
-@@ -1738,7 +1738,7 @@ void nbd_export_close_all(void)
-     AioContext *aio_context;
- 
-     QTAILQ_FOREACH_SAFE(exp, &exports, next, next) {
--        aio_context = exp->ctx;
-+        aio_context = exp->common.ctx;
-         aio_context_acquire(aio_context);
-         nbd_export_close(exp);
-         aio_context_release(aio_context);
-@@ -2537,7 +2537,7 @@ static void nbd_client_receive_next_request(NBDClient *client)
-     if (!client->recv_coroutine && client->nb_requests < MAX_NBD_REQUESTS) {
-         nbd_client_get(client);
-         client->recv_coroutine = qemu_coroutine_create(nbd_trip, client);
--        aio_co_schedule(client->exp->ctx, client->recv_coroutine);
-+        aio_co_schedule(client->exp->common.ctx, client->recv_coroutine);
-     }
- }
- 
+     NBDExport *exp = container_of(blk_exp, NBDExport, common);
 -- 
 2.25.4
 
