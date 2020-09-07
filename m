@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C02C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:47:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0EECC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:47:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F27E207C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:47:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 726E1207C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:47:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z5kR1RWt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F27E207C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KNOcIjB7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 726E1207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFFby-00088J-6W
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:47:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34706)
+	id 1kFFcW-0000cN-Ii
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:47:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34678)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kFFFo-0005U9-7g
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:24:08 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:54503
+ id 1kFFFm-0005Q6-Tx
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:24:06 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35252
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kFFFl-0001PD-J9
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:24:07 -0400
+ id 1kFFFk-0001P3-EM
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:24:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599477844;
+ s=mimecast20190719; t=1599477843;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4TLJo7nynTabhq9F+M6OLF62vf/KQEZsxsmu63BFIWs=;
- b=Z5kR1RWtl0Wq2vcNCGFnqlZzkLii3lFQyf8HVVswlsRubaB/EaSabLi/9cAqY/3usgRLqv
- Nryyp3xSLORxnwhHhbY7jLgfjMjRMAZMhFcbsSjkynTBeFXUcwfR7tgXRIKW7eUeEH06OG
- i+grWay7HtjLrqULpWqO5/c+pNp0+Y8=
+ bh=UnwwvfPaikZ28zwBpKXMT23mZgx2KoIxoIkNqTysrJg=;
+ b=KNOcIjB7RwNH+pEpK4WkCc6YBoPgCW/1GEJ6iaQfmIqHcflUIdyonMdDg2C7CGhAzXm5/s
+ i15AesC462mdaPzUvBpC1zQEH2uZock7PODywNMpNS5mSEk7dQ/CnGZESl4oYXNMSPLIlE
+ bEAyB5794N/EQv6hLseyDYmXJSWymZI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-e4qyfSXfPfGuXgFYnurOng-1; Mon, 07 Sep 2020 07:24:03 -0400
-X-MC-Unique: e4qyfSXfPfGuXgFYnurOng-1
+ us-mta-422-frM_yBk7NNyEIpRNJMUrhQ-1; Mon, 07 Sep 2020 07:23:59 -0400
+X-MC-Unique: frM_yBk7NNyEIpRNJMUrhQ-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B05A100854F;
- Mon,  7 Sep 2020 11:24:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E29338015B0;
+ Mon,  7 Sep 2020 11:23:58 +0000 (UTC)
 Received: from dell-r430-03.lab.eng.brq.redhat.com
  (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 38B815D9D2;
- Mon,  7 Sep 2020 11:23:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA1775D9D2;
+ Mon,  7 Sep 2020 11:23:57 +0000 (UTC)
 From: Igor Mammedov <imammedo@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 07/10] x86: acpi: introduce AcpiPmInfo::smi_on_cpuhp
-Date: Mon,  7 Sep 2020 07:23:45 -0400
-Message-Id: <20200907112348.530921-8-imammedo@redhat.com>
+Subject: [PATCH v5 06/10] x86: ich9: expose "smi_negotiated_features" as a QOM
+ property
+Date: Mon,  7 Sep 2020 07:23:44 -0400
+Message-Id: <20200907112348.530921-7-imammedo@redhat.com>
 In-Reply-To: <20200907112348.530921-1-imammedo@redhat.com>
 References: <20200907112348.530921-1-imammedo@redhat.com>
 MIME-Version: 1.0
@@ -74,9 +75,9 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=imammedo@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=imammedo@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
@@ -102,52 +103,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Translate the "CPU hotplug with SMI" feature bit, from the property
-added in the last patch, to a dedicated boolean in AcpiPmInfo.
+Expose the "smi_negotiated_features" field of ICH9LPCState as
+a QOM property.
 
 Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 Reviewed-by: Laszlo Ersek <lersek@redhat.com>
 ---
- hw/i386/acpi-build.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ include/hw/i386/ich9.h | 2 ++
+ hw/isa/lpc_ich9.c      | 3 +++
+ 2 files changed, 5 insertions(+)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index 7a5a8b3521..e61c17a484 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -95,6 +95,7 @@ typedef struct AcpiPmInfo {
-     bool s3_disabled;
-     bool s4_disabled;
-     bool pcihp_bridge_en;
-+    bool smi_on_cpuhp;
-     uint8_t s4_val;
-     AcpiFadtData fadt;
-     uint16_t cpu_hp_io_base;
-@@ -194,6 +195,7 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-     pm->cpu_hp_io_base = 0;
-     pm->pcihp_io_base = 0;
-     pm->pcihp_io_len = 0;
-+    pm->smi_on_cpuhp = false;
+diff --git a/include/hw/i386/ich9.h b/include/hw/i386/ich9.h
+index d1bb3f7bf0..0f43ef2481 100644
+--- a/include/hw/i386/ich9.h
++++ b/include/hw/i386/ich9.h
+@@ -245,6 +245,8 @@ typedef struct ICH9LPCState {
+ #define ICH9_SMB_HST_D1                         0x06
+ #define ICH9_SMB_HOST_BLOCK_DB                  0x07
  
-     assert(obj);
-     init_common_fadt_data(machine, obj, &pm->fadt);
-@@ -207,12 +209,16 @@ static void acpi_get_pm_info(MachineState *machine, AcpiPmInfo *pm)
-             object_property_get_uint(obj, ACPI_PCIHP_IO_LEN_PROP, NULL);
-     }
-     if (lpc) {
-+        uint64_t smi_features = object_property_get_uint(lpc,
-+            ICH9_LPC_SMI_NEGOTIATED_FEAT_PROP, NULL);
-         struct AcpiGenericAddress r = { .space_id = AML_AS_SYSTEM_IO,
-             .bit_width = 8, .address = ICH9_RST_CNT_IOPORT };
-         pm->fadt.reset_reg = r;
-         pm->fadt.reset_val = 0xf;
-         pm->fadt.flags |= 1 << ACPI_FADT_F_RESET_REG_SUP;
-         pm->cpu_hp_io_base = ICH9_CPU_HOTPLUG_IO_BASE;
-+        pm->smi_on_cpuhp =
-+            !!(smi_features & BIT_ULL(ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT));
-     }
++#define ICH9_LPC_SMI_NEGOTIATED_FEAT_PROP "x-smi-negotiated-features"
++
+ /* bit positions used in fw_cfg SMI feature negotiation */
+ #define ICH9_LPC_SMI_F_BROADCAST_BIT            0
+ #define ICH9_LPC_SMI_F_CPU_HOTPLUG_BIT          1
+diff --git a/hw/isa/lpc_ich9.c b/hw/isa/lpc_ich9.c
+index 19f32bed3e..8124d20338 100644
+--- a/hw/isa/lpc_ich9.c
++++ b/hw/isa/lpc_ich9.c
+@@ -647,6 +647,9 @@ static void ich9_lpc_initfn(Object *obj)
+                                   &acpi_enable_cmd, OBJ_PROP_FLAG_READ);
+     object_property_add_uint8_ptr(OBJECT(lpc), ACPI_PM_PROP_ACPI_DISABLE_CMD,
+                                   &acpi_disable_cmd, OBJ_PROP_FLAG_READ);
++    object_property_add_uint64_ptr(obj, ICH9_LPC_SMI_NEGOTIATED_FEAT_PROP,
++                                   &lpc->smi_negotiated_features,
++                                   OBJ_PROP_FLAG_READ);
  
-     /* The above need not be conditional on machine type because the reset port
+     ich9_pm_add_properties(obj, &lpc->pm);
+ }
 -- 
 2.27.0
 
