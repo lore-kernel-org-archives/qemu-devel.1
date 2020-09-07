@@ -2,84 +2,95 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C922C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 20:23:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 607FDC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 20:24:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36C5D21556
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 20:23:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C1E7321556
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 20:24:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NvXAZDq2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36C5D21556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rjhCuaJ0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1E7321556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFNfr-0006Zb-4h
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 16:23:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37176)
+	id 1kFNgv-0007nl-MA
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 16:24:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37530)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kFNfC-00063Z-3I
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 16:22:54 -0400
-Received: from mail-ej1-x62a.google.com ([2a00:1450:4864:20::62a]:35975)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kFNgO-0007CH-7v; Mon, 07 Sep 2020 16:24:08 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:35876)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kFNf9-00028s-NM
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 16:22:53 -0400
-Received: by mail-ej1-x62a.google.com with SMTP id e23so19597383eja.3
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 13:22:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=567r3FBVF6W9mK7iue0v8vLjrsBIMfPdDhdxER/ESQs=;
- b=NvXAZDq2K8Prso876b+vm7LaemuWn5ajJySJgBwpBMA+cltEI2ovhmUDr+kmy6ImXX
- /ZKRDB7DPW2WvFbQTLk9Nq0L+OVOJqorZp19/KI16Koir2AUL5MzZY8pnMPrtyYAtsDc
- 1+Ma1jhn5H4onGyp6NP2PcaZnOPMkgRVxH+cyJZgKqZPh0hcNnAcnAmxc2kfsy7ZQfDI
- Iohpjh4g1BMyuEGOnpcnp+O6E1Ek5WsL+BRDqGWzK+ct/uS5uOakjhcS4mAMkPfYYFfa
- LtgeL2P4++wTp8Gwr6dj5QpS+XM+e0lQz7idVglR+Qq5IZNNoM3BKo1pk8odsRrILqF/
- bAFw==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kFNgM-0002GP-BR; Mon, 07 Sep 2020 16:24:07 -0400
+Received: by mail-wm1-x344.google.com with SMTP id z9so15188860wmk.1;
+ Mon, 07 Sep 2020 13:24:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=qJ0HzX9L9PdOn/tmbJa+FDM6ybFev8Io6r70iYfxrOc=;
+ b=rjhCuaJ0UdMXkqNRTKgLM9RrKnmH2KeF/xGxA2RXvJMrLxD+bDTWiu2gQ7D58wakEy
+ EwF2UxXHC8nssnHlUDxnKMdgE/fyjDZPt8RIgKCzFkoq+toYHnMMOAk7+/CQD6lzdTo5
+ xnS0kBmXnkqrkqwHXldr2eqngGlCDEnBVjXJk1jXCGQJvmBafqrvmhPxs2siBAJRIojO
+ /6kJMskh9znZALRbeTZRq+0yGKu84NsngI5crliherohNOgZq9wkLK82Ex74tsNAbVEm
+ Z2+sgkuv1SbV2jtTiQRTMglcbKIgYsGVbk1lFGB5kPba/sV0UXR73LIOxPTdH6UbtUtx
+ 2mlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=567r3FBVF6W9mK7iue0v8vLjrsBIMfPdDhdxER/ESQs=;
- b=R/nAT5N6OJkL7uc66+s6ERBbZmN2My4xXbqcRUCJjX1gaxR/uzr+VciA7pwLg5a5y8
- ItrssiMpESmr//vm0K/U+MG//3SpmJVqbgMQGU70BZVuIKk9H/i7wzcdWEMTL9Wjw3bX
- GR+sS1t6zBneRq8xUyn3I8CDTAuPxVO/g1JPYboOZrs9mlCKY+3GknVBAL8pzWZehVkg
- +tmrP8g0QE0G7kHpMGI4hQWzGUTjfHX5ez6AH/jJw2lpLTMLbnWL+Ek1HjOKYcFYLT/l
- VlUR+7RtmQgmvMUp1ot065RxqgIdBzur1DLUY7NR/3Xa1snRg89pjsbB5RilEB75l3NQ
- gfyQ==
-X-Gm-Message-State: AOAM531W5R/dY9Q+WjVGcjM5hX3rQe5i/7/DEIjwxUFVtzXgJyX8yKCz
- pqafO4i31w8B3IUAY9gor5+wqsubGHKqLXcWceclCQ==
-X-Google-Smtp-Source: ABdhPJxJ4Oz5SNyZUL8QNgWPTKpcc5fHyOKAey0eSRckfgFVxItqQ86dEfJbxMKgFImh015j9M/WicbrTjkXmc7wc3I=
-X-Received: by 2002:a17:906:4a53:: with SMTP id
- a19mr5153124ejv.56.1599510169869; 
- Mon, 07 Sep 2020 13:22:49 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=qJ0HzX9L9PdOn/tmbJa+FDM6ybFev8Io6r70iYfxrOc=;
+ b=YXqxrg+SDLjyviHVxIW2YTjai+MutbBPjb+LzlxOr6RZVwjoCU75YzDhADXu2Yurcj
+ 2akjvZtBRMUPzo5tePQS+wN/xmXb6PqYlBVqt06V3iodxQ28xf22X1EsdmWV0coMG5Ce
+ Hqg1jM7G63IqIUiVP8WXAAKgrY7YohCvux9dmyP//Ta0HmQvGYwjTDPRwE9ub9MLzkdf
+ 72caQKGRaWzmNi85c+xNmidWiJ3/fdTpHc3iYKL0blyepJIo7EC4QuCKnv3jmYhDk8Wh
+ UAfttbSd5rx0f/qY4t5ajdw+bNvUWg+kmH0cR2Rp1/BwMkq2OCZrbrFpaehTErb6zvUg
+ OgxA==
+X-Gm-Message-State: AOAM530qwnYVnkK189smfgs9diNqda1u3OzW3Z6q+LCELU3JYSRhh+FS
+ fp/t/ogBRIjSFOb3Ynq+m+w=
+X-Google-Smtp-Source: ABdhPJwBqR8yKoQ+7Z7JVv9GpSdEspg21ufZiCVrNtcyK20bdgHbOPZzp87JDkv5sXOjfvWSnUCFqw==
+X-Received: by 2002:a1c:a557:: with SMTP id o84mr939494wme.96.1599510244482;
+ Mon, 07 Sep 2020 13:24:04 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id f1sm29392440wrt.20.2020.09.07.13.24.03
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 07 Sep 2020 13:24:03 -0700 (PDT)
+Subject: Re: [PATCH v4 1/8] hw/misc/led: Add a LED device
+To: Luc Michel <luc.michel@greensocs.com>, qemu-devel@nongnu.org
+References: <20200907163257.46527-1-f4bug@amsat.org>
+ <20200907163257.46527-2-f4bug@amsat.org>
+ <451e8d25-ecb5-c3e2-64aa-8582f2f47a25@greensocs.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <ad0701b2-e772-2b4a-283a-ec4bb02c6a6b@amsat.org>
+Date: Mon, 7 Sep 2020 22:24:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200907110936.261684-1-kwolf@redhat.com>
-In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Sep 2020 21:22:38 +0100
-Message-ID: <CAFEAcA_woBi7gMG9vK7heTwc-uCee8q3O44Mq3icHvCk2bYNNg@mail.gmail.com>
-Subject: Re: [PULL 00/64] Block layer patches
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::62a;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x62a.google.com
+In-Reply-To: <451e8d25-ecb5-c3e2-64aa-8582f2f47a25@greensocs.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-1.825,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -94,278 +105,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Qemu-block <qemu-block@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
+ Joaquin de Andres <me@xcancerberox.com.ar>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
+ Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 7 Sep 2020 at 12:09, Kevin Wolf <kwolf@redhat.com> wrote:
->
-> The following changes since commit 7c37270b3fbe3d034ba80e488761461676e21eb4:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20200904-pull-request' into staging (2020-09-06 16:23:55 +0100)
->
-> are available in the Git repository at:
->
->   git://repo.or.cz/qemu/kevin.git tags/for-upstream
->
-> for you to fetch changes up to 4cc0ec9b1b8830f7d1fcf5dfded19ef070f98eaa:
->
->   block/nvme: Pair doorbell registers (2020-09-07 12:47:57 +0200)
->
-> ----------------------------------------------------------------
-> Block layer patches:
->
-> - qemu-img create: Fail gracefully when backing file is an empty string
-> - Fixes related to filter block nodes ("Deal with filters" series)
-> - block/nvme: Various cleanups required to use multiple queues
-> - block/nvme: Use NvmeBar structure from "block/nvme.h"
-> - file-win32: Fix "locking" option
-> - iotests: Allow running from different directory
+On 9/7/20 10:03 PM, Luc Michel wrote:
+> Hi Philippe,
+> 
+> On 9/7/20 6:32 PM, Philippe Mathieu-Daudé wrote:
+>> Add a LED device which can be connected to a GPIO output.
+>> They can also be dimmed with PWM devices. For now we do
+>> not implement the dimmed mode, but in preparation of a
+>> future implementation, we start using the LED intensity.
+>>
+>> LEDs are limited to a fixed set of colors.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   include/hw/misc/led.h |  84 +++++++++++++++++++++++++
+>>   hw/misc/led.c         | 142 ++++++++++++++++++++++++++++++++++++++++++
+>>   MAINTAINERS           |   6 ++
+>>   hw/misc/Kconfig       |   3 +
+>>   hw/misc/meson.build   |   1 +
+>>   hw/misc/trace-events  |   3 +
+>>   6 files changed, 239 insertions(+)
+>>   create mode 100644 include/hw/misc/led.h
+>>   create mode 100644 hw/misc/led.c
+...
+>> +/**
+>> + * led_set_intensity: set the intensity of a LED device
+>> + * @s: the LED object
+>> + * @intensity: intensity as percentage in range 0 to 100.
+> @intensity_percent
+> 
+>> + */
+>> +void led_set_intensity(LEDState *s, unsigned intensity_percent);
+>> +
+>> +/**
+>> + * led_get_intensity:
+>> + * @s: the LED object
+>> + *
+>> + * Returns: The LED intensity as percentage in range 0 to 100.
+>> + */
+>> +unsigned led_get_intensity(LEDState *s);
+>> +
+>> +/**
+>> + * led_set_intensity: set the state of a LED device
+> led_set_state
+> 
+>> + * @s: the LED object
+>> + * @is_on: boolean indicating whether the LED is emitting
+> @is_emitting
+> 
+>> + *
+>> + * This utility is meant for LED connected to GPIO.
+>> + */
+>> +void led_set_state(LEDState *s, bool is_emitting);
+>> +
+>> +/**
+>> + * led_create_simple: Create and realize a LED device
+>> + * @parent: the parent object
+> @parentobj
+> 
+>> + * @color: color of the LED
+>> + * @description: description of the LED (optional)
+>> + *
+>> + * Create the device state structure, initialize it, and
+>> + * drop the reference to it (the device is realized).
+>> + */
+>> +LEDState *led_create_simple(Object *parentobj,
+>> +                            LEDColor color,
+>> +                            const char *description);
+>> +
+>> +#endif /* HW_MISC_LED_H */
+>> diff --git a/hw/misc/led.c b/hw/misc/led.c
+>> new file mode 100644
+>> index 00000000000..f2140739b68
+>> --- /dev/null
+>> +++ b/hw/misc/led.c
+>> @@ -0,0 +1,142 @@
+>> +/*
+>> + * QEMU single LED device
+>> + *
+>> + * Copyright (C) 2020 Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> + *
+>> + * SPDX-License-Identifier: GPL-2.0-or-later
+>> + */
+>> +#include "qemu/osdep.h"
+>> +#include "qapi/error.h"
+>> +#include "migration/vmstate.h"
+>> +#include "hw/qdev-properties.h"
+>> +#include "hw/misc/led.h"
+>> +#include "trace.h"
+>> +
+>> +#define LED_INTENSITY_PERCENT_MAX   100
+>> +
+>> +static const char *led_color_name[] = {
+>> +    [LED_COLOR_VIOLET]  = "violet",
+>> +    [LED_COLOR_BLUE]    = "blue",
+>> +    [LED_COLOR_CYAN]    = "cyan",
+>> +    [LED_COLOR_GREEN]   = "green",
+>> +    [LED_COLOR_AMBER]   = "amber",
+>> +    [LED_COLOR_ORANGE]  = "orange",
+>> +    [LED_COLOR_RED]     = "red",
+>> +};
+>> +
+>> +static bool led_color_name_is_valid(const char *color_name)
+>> +{
+>> +    for (size_t i = 0; i < ARRAY_SIZE(led_color_name); i++) {
+>> +        if (led_color_name[i] && strcmp(color_name,
+>> led_color_name[i]) == 0) {
+> 
+> Why are you checking led_color_name[i] here?
 
-Fails in make check on iotests 040 and/or 041, various hosts:
+It could happen in v3 but not now, thanks for catching this :)
 
-s390x linux:
+I'll address your comment and respin after few days.
 
-  TEST    iotest-qcow2: 041 [fail]
-QEMU          --
-"/home/ubuntu/qemu/build/all/tests/qemu-iotests/../../qemu-system-s390x"
--nodefaults -display none -accel qtest
-QEMU_IMG      -- "/home/ubuntu/qemu/build/all/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/ubuntu/qemu/build/all/tests/qemu-iotests/../../qemu-io"
---cache writeback --aio threads -f qcow2
-QEMU_NBD      -- "/home/ubuntu/qemu/build/all/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/s390x qemu01 4.15.0-72-generic
-TEST_DIR      -- /home/ubuntu/qemu/build/all/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.5Tpl6u2SCo
-SOCKET_SCM_HELPER --
-/home/ubuntu/qemu/build/all/tests/qemu-iotests/socket_scm_helper
+> 
+> Otherwise, seems good to me.
+> 
+> Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 
---- /home/ubuntu/qemu/tests/qemu-iotests/041.out        2020-09-07
-14:29:45.468466636 -0400
-+++ /home/ubuntu/qemu/build/all/tests/qemu-iotests/041.out.bad
-2020-09-07 14:43:41.494989911 -0400
-@@ -1,5 +1,29 @@
--...........................................................................................................
-+.FF........................................................................................................
-+======================================================================
-+FAIL: test_explicit_mirror_filter (__main__.TestFilters)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "041", line 1415, in test_explicit_mirror_filter
-+    self.assert_qmp(result, 'return', {})
-+  File "/home/ubuntu/qemu/tests/qemu-iotests/iotests.py", line 888,
-in assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/home/ubuntu/qemu/tests/qemu-iotests/iotests.py", line 862, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'GenericError', 'desc': "Device 'virtio-blk-ccw' can't go on
-PCI bus"}}"
-+
-+======================================================================
-+FAIL: test_implicit_mirror_filter (__main__.TestFilters)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "041", line 1381, in test_implicit_mirror_filter
-+    self.assert_qmp(result, 'return', {})
-+  File "/home/ubuntu/qemu/tests/qemu-iotests/iotests.py", line 888,
-in assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/home/ubuntu/qemu/tests/qemu-iotests/iotests.py", line 862, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'GenericError', 'desc': "Device 'virtio-blk-ccw' can't go on
-PCI bus"}}"
-+
- ----------------------------------------------------------------------
- Ran 107 tests
-
--OK
-+FAILED (failures=2)
-
-
-freebsd:
-
-  TEST    iotest-qcow2: 040 [fail]
-QEMU          --
-"/usr/home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/../../qemu-system-aarch64"
--nodefaults -display none -accel qtest -machine virt
-QEMU_IMG      --
-"/usr/home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/usr/home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/../../qemu-io"
- --cache writeback --aio threads -f qcow2
-QEMU_NBD      --
-"/usr/home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- FreeBSD/amd64 freebsd 12.1-RELEASE
-TEST_DIR      -- /home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.gaJ11NA1
-SOCKET_SCM_HELPER --
-
---- /home/qemu/qemu-test.6pxNB5/src/tests/qemu-iotests/040.out
-2020-09-07 18:29:28.000000000 +0000
-+++ /home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/040.out.bad
- 2020-09-07 18:37:26.783967000 +0000
-@@ -1,5 +1,17 @@
--.................................................................
-+....................F............................................
-+======================================================================
-+FAIL: test_filtered_active_commit_with_filter (__main__.TestCommitWithFilters)
- ----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "040", line 867, in test_filtered_active_commit_with_filter
-+    self.assert_qmp(result, 'return', {})
-+  File "/usr/home/qemu/qemu-test.6pxNB5/src/tests/qemu-iotests/iotests.py",
-line 888, in assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/usr/home/qemu/qemu-test.6pxNB5/src/tests/qemu-iotests/iotests.py",
-line 862, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'GenericError', 'desc': "Bus 'pcie.0' does not support
-hotplugging"}}"
-+
-+----------------------------------------------------------------------
- Ran 65 tests
-
--OK
-+FAILED (failures=1)
-  TEST    iotest-qcow2: 041 [fail]
-QEMU          --
-"/usr/home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/../../qemu-system-aarch64"
--nodefaults -display none -accel qtest -machine virt
-QEMU_IMG      --
-"/usr/home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/usr/home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/../../qemu-io"
- --cache writeback --aio threads -f qcow2
-QEMU_NBD      --
-"/usr/home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- FreeBSD/amd64 freebsd 12.1-RELEASE
-TEST_DIR      -- /home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.gaJ11NA1
-SOCKET_SCM_HELPER --
-
---- /home/qemu/qemu-test.6pxNB5/src/tests/qemu-iotests/041.out
-2020-09-07 18:29:28.000000000 +0000
-+++ /home/qemu/qemu-test.6pxNB5/build/tests/qemu-iotests/041.out.bad
- 2020-09-07 18:38:32.186227000 +0000
-@@ -1,5 +1,29 @@
--...........................................................................................................
-+.FF........................................................................................................
-+======================================================================
-+FAIL: test_explicit_mirror_filter (__main__.TestFilters)
- ----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "041", line 1415, in test_explicit_mirror_filter
-+    self.assert_qmp(result, 'return', {})
-+  File "/usr/home/qemu/qemu-test.6pxNB5/src/tests/qemu-iotests/iotests.py",
-line 888, in assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/usr/home/qemu/qemu-test.6pxNB5/src/tests/qemu-iotests/iotests.py",
-line 862, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'GenericError', 'desc': "Bus 'pci.0' not found"}}"
-+
-+======================================================================
-+FAIL: test_implicit_mirror_filter (__main__.TestFilters)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "041", line 1381, in test_implicit_mirror_filter
-+    self.assert_qmp(result, 'return', {})
-+  File "/usr/home/qemu/qemu-test.6pxNB5/src/tests/qemu-iotests/iotests.py",
-line 888, in assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/usr/home/qemu/qemu-test.6pxNB5/src/tests/qemu-iotests/iotests.py",
-line 862, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'GenericError', 'desc': "Bus 'pci.0' not found"}}"
-+
-+----------------------------------------------------------------------
- Ran 107 tests
-
--OK
-+FAILED (failures=2)
-
-AArch32 and AArch64 Linux:
-
-  TEST    iotest-qcow2: 041 [fail]
-QEMU          --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-system-aarch64"
--nodefaults -disp
-lay none -accel qtest -machine virt
-QEMU_IMG      --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-img"
-QEMU_IO       --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-io"
- --cache writeback --aio thre
-ads -f qcow2
-QEMU_NBD      --
-"/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/../../qemu-nbd"
-IMGFMT        -- qcow2 (compat=1.1)
-IMGPROTO      -- file
-PLATFORM      -- Linux/aarch64 mustang-maydell 4.15.0-101-generic
-TEST_DIR      --
-/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/scratch
-SOCK_DIR      -- /tmp/tmp.L8FBRpgYvF
-SOCKET_SCM_HELPER --
-/home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/socket_scm_helper
-
---- /home/peter.maydell/qemu/tests/qemu-iotests/041.out 2020-09-07
-18:29:45.583104907 +0000
-+++ /home/peter.maydell/qemu/build/all-a32/tests/qemu-iotests/041.out.bad
-      2020-09-07 18:45:19.385149062 +0000
-@@ -1,5 +1,29 @@
--...........................................................................................................
-+.FF........................................................................................................
-+======================================================================
-+FAIL: test_explicit_mirror_filter (__main__.TestFilters)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "041", line 1415, in test_explicit_mirror_filter
-+    self.assert_qmp(result, 'return', {})
-+  File "/home/peter.maydell/qemu/tests/qemu-iotests/iotests.py", line
-888, in assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/home/peter.maydell/qemu/tests/qemu-iotests/iotests.py", line
-862, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'GenericError', 'desc': "Bus 'pci.0' not fou
-nd"}}"
-+
-+======================================================================
-+FAIL: test_implicit_mirror_filter (__main__.TestFilters)
-+----------------------------------------------------------------------
-+Traceback (most recent call last):
-+  File "041", line 1381, in test_implicit_mirror_filter
-+    self.assert_qmp(result, 'return', {})
-+  File "/home/peter.maydell/qemu/tests/qemu-iotests/iotests.py", line
-888, in assert_qmp
-+    result = self.dictpath(d, path)
-+  File "/home/peter.maydell/qemu/tests/qemu-iotests/iotests.py", line
-862, in dictpath
-+    self.fail(f'failed path traversal for "{path}" in "{d}"')
-+AssertionError: failed path traversal for "return" in "{'error':
-{'class': 'GenericError', 'desc': "Bus 'pci.0' not found"}}"
-+
- ----------------------------------------------------------------------
- Ran 107 tests
-
--OK
-+FAILED (failures=2)
-
-
-thanks
--- PMM
+Thanks!
 
