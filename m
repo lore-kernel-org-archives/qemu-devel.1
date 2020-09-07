@@ -2,78 +2,80 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CB64C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 02:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB85CC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 03:32:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EC1E620796
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 02:58:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2DAA9207BC
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 03:32:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vhsBhkKn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC1E620796
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="et8TH88K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DAA9207BC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kF7MM-0007GM-Pg
-	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 22:58:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39350)
+	id 1kF7tq-0005IR-1x
+	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 23:32:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kF7Lm-0006rA-PL
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 22:57:46 -0400
-Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:43891)
+ id 1kF7tF-0004lu-3Q; Sun, 06 Sep 2020 23:32:21 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37341)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kF7Ll-0006pY-3M
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 22:57:46 -0400
-Received: by mail-lj1-x244.google.com with SMTP id u4so13404680ljd.10
- for <qemu-devel@nongnu.org>; Sun, 06 Sep 2020 19:57:44 -0700 (PDT)
+ id 1kF7tD-0001w3-A0; Sun, 06 Sep 2020 23:32:20 -0400
+Received: by mail-pf1-x443.google.com with SMTP id w7so7908044pfi.4;
+ Sun, 06 Sep 2020 20:32:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=2hq8jpUb7PmymYi0kT3PicbE43njMLPKY2dZFng6nu0=;
- b=vhsBhkKnJgsbkJGNAmvwLUpZtkTOAG0GgUo0LrgoucRKJcyj5zcdHpUPay2JZDNpVV
- nnQ72aJb8FRNtU3jPKCn7o3r0iRvlxeSGxicI+OlSxFoSM7KRlsiK5UF+AAVFU+V+aJK
- 5xPTxswpEeSnnkdvzqUn+J9V9kDEe0ScWz/kY+CW7BKwLMLHr1t44da3+hauBhlExopP
- QuEnSbS5EQqzAJQ0tE/X9p//Tw8HTd3VPQsIk63RcstKDkaXs2G6nEGh1Uo12e0yJW2E
- AFVrdoUX3/DFjJXWPYpfx009Ep+xQubeH5AtdhY1dyOg9N4Mu9Zb/DO5cCEAS1pFkLzY
- yWvg==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nAx6s0n7EquPuKtbRfQCQcpP1wZJocedy6K5u8E7EDo=;
+ b=et8TH88KAEvaQt4beYyr20+X4EvGDTuta0UPlHeG33J0BEG/JRZVxNFuSUJpvSol3I
+ MUM/5OTL/pRfn18RJ6doWKoXz3w6lSaf3iB+eiFFyoUq/yYeq9bATBH5k4W2Z3oBCITd
+ 8flU5B3KEVeOSjxGRIk/xWAd8YnAoueP8JWAWGPua3VFPSmKvDf3ATduhsChbBKyQgya
+ DHA1MsTC0ur4zM6n7GSJU6cXF3OzKkVhZGlEAiMFeak4eFZgrS8QBDYlgSBW2P6n5dkc
+ LhuVFl2hN9nHFvRJNCzzmk4eXqShHCRJekC5EMLST/kmsHvieFswwn/H+lxxZGx/ztqm
+ E0YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=2hq8jpUb7PmymYi0kT3PicbE43njMLPKY2dZFng6nu0=;
- b=i2kpBTFN/jZOhUSG5I+cdPV6GO4HAuI4qx98emquVcXUug2u5CB7DpP7OKmo9xTvwW
- jBbHYLtmy9yIkD0gK4rwDdScgr68a6oNvMfdPdMcKo1A866k3fHBipT7m5Snn2+fdqnR
- EpO7CjZ5aH7oV6qvXriegIIUXp/kTRnONQWke/H8jhvZxIMUEogxscuZZc+cH7qoY6Ly
- nGShYnbUx6f81XdQjlqmnkLBAQThXXD5A/4Q3Z2Q9xVv7MGRmsLoaUYq1IHggBnY7iva
- tiyR+JsZ3krVdwFcZlI2yB93ibJNuNWOWvfO5G9mHSE9wM0b525qtpk3wyZkctEzdp2r
- +nGA==
-X-Gm-Message-State: AOAM531Lb0+xHfp3/QJIfe+V45Hyq1GlEOi6+Z+Gt5sUnjt/RCwvLkQv
- YHtRVpLEFTjCMDK9dFBfIf/nTyEc0UU1Kq6zeOLmUAyU6mTkOw==
-X-Google-Smtp-Source: ABdhPJz4GlsD9idiPg3Djz5e3XUkRY3+ALXFNHGRRDrxH8ZAho/mjuCDH+s3sdxt+WdkesxwfumSSfBO4uWcEux9viI=
-X-Received: by 2002:a2e:87d9:: with SMTP id v25mr9401972ljj.171.1599447462423; 
- Sun, 06 Sep 2020 19:57:42 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=nAx6s0n7EquPuKtbRfQCQcpP1wZJocedy6K5u8E7EDo=;
+ b=fs/Fpn05Tjfp3Y07mpRULRsx5Munt9DWYMqGwFLrH9zW6py50axKj9yZMRFZReII7m
+ kwJ3dMGKZ57tl6AlOkgBwjuWPhRrdI/MpZl6dZSY6tdyc6BjlfCbA+jCZGfOdrSAXt73
+ W5baWmqPqdXN08FN5//6lgm28ddFn/13CjsiO0rCU70m+ifZekeJHFP2jwTQ9VwC406C
+ O+tNddayLF+lSeM/EA9pKh+NnWsTkO7uo35JnJnq+fEcbQJzaWV2R+d1CVSGwdqxD55E
+ O5lzglZIXITN7A58URHwDG7obbB/YmogD6vL56B5alzLfKOlqwfWuIFsj3RsUXtEtk6k
+ n16A==
+X-Gm-Message-State: AOAM531wStiAUt1FdSlZxZULBMoWoj4zpSuF5XlXKSPla4kODBY4NdsG
+ 42NrXc8ZNurvwrzLyxyPuxAaHD/eOm4edAeh
+X-Google-Smtp-Source: ABdhPJzuFIypYQbGNaq+jH8XeaaNXD6FKPuGRL7tzl34f18XZUcNZbgJHHkjHVGqkmHBotBbWOiGZQ==
+X-Received: by 2002:a63:6d0d:: with SMTP id i13mr15673017pgc.372.1599449536980; 
+ Sun, 06 Sep 2020 20:32:16 -0700 (PDT)
+Received: from localhost.localdomain ([222.95.248.6])
+ by smtp.googlemail.com with ESMTPSA id j18sm10973291pgm.30.2020.09.06.20.32.14
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 06 Sep 2020 20:32:16 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] configure: Fixes ncursesw detection under msys2/mingw and
+ enable curses
+Date: Mon,  7 Sep 2020 11:32:01 +0800
+Message-Id: <20200907033201.1453-1-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
 MIME-Version: 1.0
-References: <20200905063813.1875-1-luoyonggang@gmail.com>
-In-Reply-To: <20200905063813.1875-1-luoyonggang@gmail.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 7 Sep 2020 10:57:31 +0800
-Message-ID: <CAE2XoE-pwp_wC0t+utEqKX65jBKjxMDOzydgJmge1__ojn1Yrw@mail.gmail.com>
-Subject: Re: [PATCH] tests: fixes test-vmstate.c compile error on msys2
-To: qemu-level <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000d5b05705aeb061e2"
-Received-SPF: pass client-ip=2a00:1450:4864:20::244;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x244.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -81,7 +83,7 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,125 +97,130 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
+ Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d5b05705aeb061e2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The mingw pkg-config are showing following absolute path and contains : as the separator,
+so we must handling : properly.
 
-Bonzini, you need have a look at this
+-D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC:/CI-Tools/msys64/mingw64/include/ncursesw:-I/usr/include/ncursesw:
+-DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+-DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -lncursesw
+-DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -lcursesw
+-DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+-DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -lncursesw
+-DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -lcursesw
+-DNCURSES_WIDECHAR -I/usr/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+-DNCURSES_WIDECHAR -I/usr/include/ncursesw -lncursesw
+-DNCURSES_WIDECHAR -I/usr/include/ncursesw -lcursesw
 
-On Sat, Sep 5, 2020 at 2:38 PM Yonggang Luo <luoyonggang@gmail.com> wrote:
+MINGW doesn't have langinfo.h, only exist in glic and musl
 
-> ../tests/test-vmstate.c: In function 'int_cmp':
-> ../tests/test-vmstate.c:884:5: error: unknown type name 'uint'; did you
-> mean 'uInt'?
->   884 |     uint ua =3D GPOINTER_TO_UINT(a);
->       |     ^~~~
->       |     uInt
-> ../tests/test-vmstate.c:885:5: error: unknown type name 'uint'; did you
-> mean 'uInt'?
->   885 |     uint ub =3D GPOINTER_TO_UINT(b);
->       |     ^~~~
->       |     uInt
-> make: ***
-> [Makefile.ninja:5461=EF=BC=9Atests/test-vmstate.exe.p/test-vmstate.c.obj]=
- =E9=94=99=E8=AF=AF 1
->
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> ---
->  tests/test-vmstate.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
-> index f7b3868881..f8de709a0b 100644
-> --- a/tests/test-vmstate.c
-> +++ b/tests/test-vmstate.c
-> @@ -881,8 +881,8 @@ static gint interval_cmp(gconstpointer a,
-> gconstpointer b, gpointer user_data)
->  /* ID comparison function */
->  static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_data=
-)
->  {
-> -    uint ua =3D GPOINTER_TO_UINT(a);
-> -    uint ub =3D GPOINTER_TO_UINT(b);
-> +    guint ua =3D GPOINTER_TO_UINT(a);
-> +    guint ub =3D GPOINTER_TO_UINT(b);
->      return (ua > ub) - (ua < ub);
->  }
->
-> --
-> 2.28.0.windows.1
->
->
+gcc test.c -DNCURSES_WIDECHAR -I/mingw64/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+test.c:4:10: fatal error: langinfo.h: No such file or directory
+    4 | #include <langinfo.h>
+      |          ^~~~~~~~~~~~
+compilation terminated.
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ configure   |  9 +++------
+ ui/curses.c | 10 +++++-----
+ 2 files changed, 8 insertions(+), 11 deletions(-)
 
---000000000000d5b05705aeb061e2
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+diff --git a/configure b/configure
+index f8cbd2898c..2dc25bda69 100755
+--- a/configure
++++ b/configure
+@@ -3620,8 +3620,8 @@ if test "$iconv" = "no" ; then
+ fi
+ if test "$curses" != "no" ; then
+   if test "$mingw32" = "yes" ; then
+-    curses_inc_list="$($pkg_config --cflags ncurses 2>/dev/null):"
+-    curses_lib_list="$($pkg_config --libs ncurses 2>/dev/null):-lpdcurses"
++    curses_inc_list="$($pkg_config --cflags ncursesw 2>/dev/null):-I/${MSYSTEM,,}/include/ncursesw:"
++    curses_lib_list="$($pkg_config --libs ncursesw 2>/dev/null):-lncursesw"
+   else
+     curses_inc_list="$($pkg_config --cflags ncursesw 2>/dev/null):-I/usr/include/ncursesw:"
+     curses_lib_list="$($pkg_config --libs ncursesw 2>/dev/null):-lncursesw:-lcursesw"
+@@ -3631,17 +3631,14 @@ if test "$curses" != "no" ; then
+ #include <locale.h>
+ #include <curses.h>
+ #include <wchar.h>
+-#include <langinfo.h>
+ int main(void) {
+-  const char *codeset;
+   wchar_t wch = L'w';
+   setlocale(LC_ALL, "");
+   resize_term(0, 0);
+   addwstr(L"wide chars\n");
+   addnwstr(&wch, 1);
+   add_wch(WACS_DEGREE);
+-  codeset = nl_langinfo(CODESET);
+-  return codeset != 0;
++  return 0;
+ }
+ EOF
+   IFS=:
+diff --git a/ui/curses.c b/ui/curses.c
+index a59b23a9cf..f13804e942 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -30,7 +30,6 @@
+ #endif
+ #include <locale.h>
+ #include <wchar.h>
+-#include <langinfo.h>
+ #include <iconv.h>
+ 
+ #include "qapi/error.h"
+@@ -526,6 +525,7 @@ static void font_setup(void)
+     iconv_t nativecharset_to_ucs2;
+     iconv_t font_conv;
+     int i;
++    g_autoptr(gchar) local_codeset = g_get_codeset();
+ 
+     /*
+      * Control characters are normally non-printable, but VGA does have
+@@ -566,14 +566,14 @@ static void font_setup(void)
+       0x25bc
+     };
+ 
+-    ucs2_to_nativecharset = iconv_open(nl_langinfo(CODESET), "UCS-2");
++    ucs2_to_nativecharset = iconv_open(local_codeset, "UCS-2");
+     if (ucs2_to_nativecharset == (iconv_t) -1) {
+         fprintf(stderr, "Could not convert font glyphs from UCS-2: '%s'\n",
+                         strerror(errno));
+         exit(1);
+     }
+ 
+-    nativecharset_to_ucs2 = iconv_open("UCS-2", nl_langinfo(CODESET));
++    nativecharset_to_ucs2 = iconv_open("UCS-2", local_codeset);
+     if (nativecharset_to_ucs2 == (iconv_t) -1) {
+         iconv_close(ucs2_to_nativecharset);
+         fprintf(stderr, "Could not convert font glyphs to UCS-2: '%s'\n",
+@@ -581,7 +581,7 @@ static void font_setup(void)
+         exit(1);
+     }
+ 
+-    font_conv = iconv_open(nl_langinfo(CODESET), font_charset);
++    font_conv = iconv_open(local_codeset, font_charset);
+     if (font_conv == (iconv_t) -1) {
+         iconv_close(ucs2_to_nativecharset);
+         iconv_close(nativecharset_to_ucs2);
+@@ -602,7 +602,7 @@ static void font_setup(void)
+     /* DEL */
+     convert_ucs(0x7F, 0x2302, ucs2_to_nativecharset);
+ 
+-    if (strcmp(nl_langinfo(CODESET), "UTF-8")) {
++    if (strcmp(local_codeset, "UTF-8")) {
+         /* Non-Unicode capable, use termcap equivalents for those available */
+         for (i = 0; i <= 0xFF; i++) {
+             wchar_t wch[CCHARW_MAX];
+-- 
+2.28.0.windows.1
 
-<div dir=3D"ltr"><div>Bonzini, you need have a look at this<br></div><br><d=
-iv class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Sat, Sep =
-5, 2020 at 2:38 PM Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com=
-">luoyonggang@gmail.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_=
-quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,=
-204);padding-left:1ex">../tests/test-vmstate.c: In function &#39;int_cmp&#3=
-9;:<br>
-../tests/test-vmstate.c:884:5: error: unknown type name &#39;uint&#39;; did=
- you mean &#39;uInt&#39;?<br>
-=C2=A0 884 |=C2=A0 =C2=A0 =C2=A0uint ua =3D GPOINTER_TO_UINT(a);<br>
-=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0^~~~<br>
-=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0uInt<br>
-../tests/test-vmstate.c:885:5: error: unknown type name &#39;uint&#39;; did=
- you mean &#39;uInt&#39;?<br>
-=C2=A0 885 |=C2=A0 =C2=A0 =C2=A0uint ub =3D GPOINTER_TO_UINT(b);<br>
-=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0^~~~<br>
-=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0uInt<br>
-make: *** [Makefile.ninja:5461=EF=BC=9Atests/test-vmstate.exe.p/test-vmstat=
-e.c.obj] =E9=94=99=E8=AF=AF 1<br>
-<br>
-Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com" ta=
-rget=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
----<br>
-=C2=A0tests/test-vmstate.c | 4 ++--<br>
-=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
-<br>
-diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c<br>
-index f7b3868881..f8de709a0b 100644<br>
---- a/tests/test-vmstate.c<br>
-+++ b/tests/test-vmstate.c<br>
-@@ -881,8 +881,8 @@ static gint interval_cmp(gconstpointer a, gconstpointer=
- b, gpointer user_data)<br>
-=C2=A0/* ID comparison function */<br>
-=C2=A0static gint int_cmp(gconstpointer a, gconstpointer b, gpointer user_d=
-ata)<br>
-=C2=A0{<br>
--=C2=A0 =C2=A0 uint ua =3D GPOINTER_TO_UINT(a);<br>
--=C2=A0 =C2=A0 uint ub =3D GPOINTER_TO_UINT(b);<br>
-+=C2=A0 =C2=A0 guint ua =3D GPOINTER_TO_UINT(a);<br>
-+=C2=A0 =C2=A0 guint ub =3D GPOINTER_TO_UINT(b);<br>
-=C2=A0 =C2=A0 =C2=A0return (ua &gt; ub) - (ua &lt; ub);<br>
-=C2=A0}<br>
-<br>
--- <br>
-2.28.0.windows.1<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---000000000000d5b05705aeb061e2--
 
