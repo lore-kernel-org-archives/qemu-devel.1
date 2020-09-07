@@ -2,78 +2,76 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C7BC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:55:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92896C2BB84
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:55:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8C5C12080A
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:55:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 120F02080A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:55:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CnJuuOQO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C5C12080A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FCbsQTlT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 120F02080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLME-0004p3-LI
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 13:55:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35990)
+	id 1kFLMF-0004nn-3l
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 13:55:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFLJo-00087m-Kj
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:52:40 -0400
-Received: from mail-lf1-x132.google.com ([2a00:1450:4864:20::132]:34989)
+ id 1kFLKh-0001Yl-4B; Mon, 07 Sep 2020 13:53:35 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:40951)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFLJm-0000r8-Dm
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:52:40 -0400
-Received: by mail-lf1-x132.google.com with SMTP id w11so7882988lfn.2
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 10:52:38 -0700 (PDT)
+ id 1kFLKc-0000vB-Oz; Mon, 07 Sep 2020 13:53:34 -0400
+Received: by mail-lj1-x241.google.com with SMTP id s205so17019845lja.7;
+ Mon, 07 Sep 2020 10:53:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:reply-to:from:date:message-id
  :subject:to:cc;
- bh=uVCOUmVn5yFZWifRDuSrqGvFKaFGSvPXKSHiMJfANL4=;
- b=CnJuuOQOY/ELxAWe94z8OUyVa/SJ35CXjL0Nx7HyeLVnqpR9KaOLHXNgljZvCUySyS
- y5TIdOaq332rJmXGUSHQUIQ8C/pgvlJDRDFTP5tWIe6CrGWvUk1seTwnbu7SxGGkf90A
- q3a32ynylb5CnqLv6Gk92JZoyAUBB0zmYUe9aQ39Sy1kw3ekPvHPfrvEJsse6GnKzt7q
- fmO+ysw38/NEOOio0OqNC3CJ88dLyCyWNjwTpISl2RJYwyZXOvArac1nlX4ArYtOwoqe
- vpMmN5++0S56rzeOMwMyWJb3OzPx0scEgMltvdV8GdyE+2CJQf0zFTC+ktcsWfhne6yn
- meUw==
+ bh=Rl9ibgrlv/offHmvZeZnsqOhlxzv4cLLe6pFW55PIsU=;
+ b=FCbsQTlTTdakvgNkGg+HpvOPD5KMTjkZNNwovHWGiId5vuxgRUoZ63SHoYlfBXR0oa
+ MJE7ik0mfQWyL+dvi2ggquMeJyGuI//r+s2OyFm4NrXr1uzN+4CcW4oa4aMFAOs2SlWW
+ K14HvV19n+TQOLv2aP/g8y3zIxLBQng0DfGRlbH7X86sUq1N92WMqgHoDXTR+dkg5J6v
+ yVgJ0dseUom40lH4byJBBTn5AggFtfSTC8QLAs7hjIyowpDeJ6y1vXUWbaFpHa/FHhe0
+ Uz2UbB3Qcdpv6sZa4xpe//vCmaYVRVO9DPgEHSoof/3mc60pf0JrcMfu0UlkwTICbG3r
+ TStQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
  :from:date:message-id:subject:to:cc;
- bh=uVCOUmVn5yFZWifRDuSrqGvFKaFGSvPXKSHiMJfANL4=;
- b=ofuJTYR6kiPUMfYwNcdR33AzVN1WejwUGqj6Qj5MmeExgOucXgKJhoNNDwzXPC0hIW
- WTyDT6bR2sdY4kGYW1J0xIyvgnPlJxTLBHWK1aX7hQfwYyDMeKsF+pY8p0ibtdlw26ZE
- VCmU3MkTcDucBd+c9Y79UOs9CZA9Y0/qVRSYAk6Qba1f7T0eCgA/mHyl5oDgJpaEU4WU
- 8zNt/98UAJi+vqhM9TRf0azvkDtkdLvH1GiJYbFhvVv+Ixl6SKqI/wl2OSaTtJYvVU69
- b7kDJTdUnpBp6T9rZ7JFmQITS7sFuVJPBufg3nXBIS4/bFo9egMw/rk8ksWF8UdmNO7B
- gwew==
-X-Gm-Message-State: AOAM533jFk3j/I/P5NxoxKP9Ujx/EZptSdvMcIs1BAFC9qMEAnK1u9oF
- 307HZEacf5iZtCVPSW/6XeZq6J49kWnftXEGJns=
-X-Google-Smtp-Source: ABdhPJww69Yv+iqjSZi6fAFQXi4I+pVb8Yccs+wSMCUNfYy+ZzKlKNI8ZlKEBFFvOnsqL7tbU87b2Og/92akaE3T8qg=
-X-Received: by 2002:ac2:42c2:: with SMTP id n2mr10651203lfl.117.1599501156234; 
- Mon, 07 Sep 2020 10:52:36 -0700 (PDT)
+ bh=Rl9ibgrlv/offHmvZeZnsqOhlxzv4cLLe6pFW55PIsU=;
+ b=e/qPhnsDo8C62yOKeBxJNbWXegK5tFJNkov3nwlMVIPBy1IY1JwaYA43Ev9hSXsj35
+ ++lc1i+vOiQPfjPZ5LjfrQsvagiZMNM+tWil7W96MrXLA6jdAForr95J0UkHZgqByHdM
+ rnXizKkdVYWE5EPd5qttVAJ+8P6O9tqSNESdRtNpH4No3M2ycS5H30YqNXJq1gml+Efj
+ YVbUS3IuQXct4nyw3TASenA3EGXkuDPXjyQoYZDwuukvWe8muBP7XjEQQVhIDQ1Xa/uL
+ 4oe0mIGtRkZaKbDhfJrhJMz23KHMlBWIXx8COLMaF5OI+eV27mxrs0UN3OW8VHy3KdZO
+ 10ig==
+X-Gm-Message-State: AOAM532gyjs2aDn3XtlNaHic2Q1wRdwQR5Bfv6WlMMZCmTIV2BquPny0
+ A6/d9j+88VATXgdbtJMNTB0pG/xBJkFpa2JYrbpukORlRcHJzg==
+X-Google-Smtp-Source: ABdhPJxqu1TiegwXvH+H+y7mwArniew/Z4mTFLBc7JGeYChD9PLWp5e/vYsTnaDlz0poMNJqGVm/IMv80cOPYQbrzJA=
+X-Received: by 2002:a2e:87d9:: with SMTP id v25mr11082807ljj.171.1599501208270; 
+ Mon, 07 Sep 2020 10:53:28 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200907121127.136243-1-thuth@redhat.com>
-In-Reply-To: <20200907121127.136243-1-thuth@redhat.com>
+References: <20200907174828.1768-1-luoyonggang@gmail.com>
+In-Reply-To: <20200907174828.1768-1-luoyonggang@gmail.com>
 From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Tue, 8 Sep 2020 01:52:24 +0800
-Message-ID: <CAE2XoE_99nATg7+3uz5rOqW08ZouiOaMzgo94CKrqVZ9CPtXNQ@mail.gmail.com>
-Subject: Re: [PULL 00/14] Gitlab-CI improvements and related fixes
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000003c3c3405aebce252"
-Received-SPF: pass client-ip=2a00:1450:4864:20::132;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x132.google.com
+Date: Tue, 8 Sep 2020 01:53:16 +0800
+Message-ID: <CAE2XoE8ePZUKNOMcQu5yZtP8NHsru+xsAuwrD1AGh72NPbqnvA@mail.gmail.com>
+Subject: Re: [PATCH v2] meson: Use -b to ignore CR vs. CR-LF issues on Windows
+To: qemu-level <qemu-devel@nongnu.org>
+Content-Type: multipart/alternative; boundary="000000000000563a4605aebce5b3"
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,112 +94,1352 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Reply-To: luoyonggang@gmail.com
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Thomas Huth <thuth@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000003c3c3405aebce252
+--000000000000563a4605aebce5b3
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Sep 7, 2020 at 8:11 PM Thomas Huth <thuth@redhat.com> wrote:
+Forgot your
 
->  Hi Peter,
->
-> the following changes since commit
-> 7c37270b3fbe3d034ba80e488761461676e21eb4:
->
->   Merge remote-tracking branch
-> 'remotes/kraxel/tags/ui-20200904-pull-request' into staging (2020-09-06
-> 16:23:55 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2020-09-07
->
-> for you to fetch changes up to 88e74b6122bb40852b1c98befd47a572f0c06930:
->
->   target/microblaze: Collected fixes for env->iflags (2020-09-07 12:34:17
-> +0200)
->
-> ----------------------------------------------------------------
-> * Fixes for cross-compiling with MinGW / compiling with MSYS2
-> * Enable cross-compiler builds in the Gitlab CI
-> * Improvements / fixes for the crypto tests in the Gitlab CI
-> * Fix for the "make check-acceptance" microblaze failure
->   (required to get the Gitlab CI green again)
-> ----------------------------------------------------------------
->
-> Alex Benn=C3=A9e (1):
->       tests/docker: add python3-setuptools the docker images
->
-> Daniel P. Berrang=C3=A9 (2):
->       crypto: fix build with gcrypt enabled
->       gitlab: expand test coverage for crypto builds
->
-> Paolo Bonzini (1):
->       tests/qtest: do not list ahci-test twice
->
-> Richard Henderson (1):
->       target/microblaze: Collected fixes for env->iflags
->
-> Thomas Huth (6):
->       tests/Makefile: test-image-locking needs CONFIG_POSIX
->       dockerfiles/debian-win64-cross: Download WHPX MinGW headers
->       configure: Allow automatic WHPX detection
->       stubs: Move qemu_timer_notify_cb() and remove qemu_notify_event()
-> stub
->       stubs: Move qemu_fd_register stub to util/main-loop.c
->       gitlab-ci: Add cross-compiling build tests
->
-> Yonggang Luo (3):
->       tests: handling signal on win32 properly
->
-Hi thomas, this have already been queued by Bonzini, you have to skip this.
+On Tue, Sep 8, 2020 at 1:48 AM Yonggang Luo <luoyonggang@gmail.com> wrote:
 
->       tests: fixes test-vmstate.c compile error on msys2
+> Or the tests result would cause following test failure:
+> Running test QAPI doc
+>   LINK    tests/check-qdict.exe
+> ---
+> C:/Users/ContainerAdministrator/AppData/Local/Temp/qemu-build/../cirrus-c=
+i-build/tests/qapi-schema/doc-good.texi
+>   2020-09-02 10:26:02.396028200 -0700
+> +++
+> C:/Users/ContainerAdministrator/AppData/Local/Temp/qemu-build/tests/qapi-=
+schema/doc-good-qapi-doc.texi
+>     2020-09-02 10:43:09.849568200 -0700
+> @@ -1,319 +1,319 @@
+> -@c AUTOMATICALLY GENERATED, DO NOT MODIFY
+> -
+> -@section Section
+> -
+> -@subsection Subsection
+> -
+> -@strong{strong} @emph{with emphasis}
+> -@code{var} @{in braces@}
+> -@itemize @bullet
+> -@item
+> -List item one
+> -@item
+> -Two, multiple
+> -lines
+> -
+> -@item
+> -Three
+> -Still in list
+> -
+> -@end itemize
+> -
+> -Not in list
+> -@itemize @minus
+> -@item
+> -Second list
+> -Note: still in list
+> -
+> -@end itemize
+> -
+> -Note: not in list
+> -@enumerate
+> -@item
+> -Third list
+> -is numbered
+> -
+> -@item
+> -another item
+> -
+> -@example
+> -example
+> -@end example
+> -
+> -@example
+> -multiple lines
+> -@end example
+> -
+> -
+> -@end enumerate
+> -
+> -Returns: the King
+> -Since: the first age
+> -Notes:
+> -
+> -@enumerate
+> -@item
+> -Lorem ipsum dolor sit amet
+> -
+> -@item
+> -Ut enim ad minim veniam
+> -
+> -@end enumerate
+> -
+> -Duis aute irure dolor
+> -
+> -Example:
+> -
+> --> in
+> -<- out
+> -Examples:
+> -@itemize @minus
+> -@item
+> -@strong{verbatim}
+> -@item
+> -@{braces@}
+> -@end itemize
+> -
+> -
+> -
+> -@deftp {Enum} Enum
+> -
+> -
+> -
+> -@b{Values:}
+> -@table @asis
+> -@item @code{one}
+> -The @emph{one} @{and only@}
+> -@*@b{If:} @code{defined(IFONE)}
+> -@item @code{two}
+> -Not documented
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{enum-feat}
+> -Also @emph{one} @{and only@}
+> -@end table
+> -@code{two} is undocumented
+> -
+> -@b{If:} @code{defined(IFCOND)}
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} Base
+> -
+> -
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item @code{base1: Enum}
+> -the first member
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} Variant1
+> -
+> -A paragraph
+> -
+> -Another paragraph (but no @code{var}: line)
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item @code{var1: string}
+> -Not documented
+> -@*@b{If:} @code{defined(IFSTR)}
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{variant1-feat}
+> -a feature
+> -@item @code{member-feat}
+> -a member feature
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} Variant2
+> -
+> -
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} Object
+> -
+> -
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item The members of @code{Base}
+> -@item The members of @code{Variant1} when @code{base1} is @t{"one"}
+> -@item The members of @code{Variant2} when @code{base1} is @t{"two"}
+> (@b{If:} @code{IFTWO})
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{union-feat1}
+> -a feature
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} SugaredUnion
+> -
+> -
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item @code{type}
+> -One of @t{"one"}, @t{"two"}
+> -@item @code{data: Variant1} when @code{type} is @t{"one"}
+> -@item @code{data: Variant2} when @code{type} is @t{"two"} (@b{If:}
+> @code{IFTWO})
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{union-feat2}
+> -a feature
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Alternate} Alternate
+> -
+> -
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item @code{i: int}
+> -an integer
+> -@code{b} is undocumented
+> -@item @code{b: boolean}
+> -Not documented
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{alt-feat}
+> -a feature
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -@subsection Another subsection
+> -
+> -
+> -@deftypefn Command {} cmd
+> -
+> -
+> -
+> -@b{Arguments:}
+> -@table @asis
+> -@item @code{arg1: int}
+> -the first argument
+> -@item @code{arg2: string} (optional)
+> -the second
+> -argument
+> -@item @code{arg3: boolean}
+> -Not documented
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{cmd-feat1}
+> -a feature
+> -@item @code{cmd-feat2}
+> -another feature
+> -@end table
+> -
+> -@b{Note:}
+> -@code{arg3} is undocumented
+> -
+> -@b{Returns:}
+> -@code{Object}
+> -
+> -@b{TODO:}
+> -frobnicate
+> -
+> -@b{Notes:}
+> -@itemize @minus
+> -@item
+> -Lorem ipsum dolor sit amet
+> -@item
+> -Ut enim ad minim veniam
+> -
+> -@end itemize
+> -
+> -Duis aute irure dolor
+> -
+> -@b{Example:}
+> -@example
+> --> in
+> -<- out
+> -@end example
+> -
+> -@b{Examples:}
+> -@example
+> -- *verbatim*
+> -- @{braces@}
+> -@end example
+> -
+> -@b{Since:}
+> -2.10
+> -
+> -@end deftypefn
+> -
+> -
+> -
+> -@deftypefn Command {} cmd-boxed
+> -
+> -If you're bored enough to read this, go see a video of boxed cats
+> -
+> -@b{Arguments:} the members of @code{Object}
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{cmd-feat1}
+> -a feature
+> -@item @code{cmd-feat2}
+> -another feature
+> -@end table
+> -
+> -@b{Example:}
+> -@example
+> --> in
+> -
+> -<- out
+> -@end example
+> -
+> -@end deftypefn
+> -
+> -
+> -
+> -@deftypefn Event {} EVT-BOXED
+> -
+> -
+> -
+> -@b{Arguments:} the members of @code{Object}
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{feat3}
+> -a feature
+> -@end table
+> -
+> -@end deftypefn
+> -
+> +@c AUTOMATICALLY GENERATED, DO NOT MODIFY
+> +
+> +@section Section
+> +
+> +@subsection Subsection
+> +
+> +@strong{strong} @emph{with emphasis}
+> +@code{var} @{in braces@}
+> +@itemize @bullet
+> +@item
+> +List item one
+> +@item
+> +Two, multiple
+> +lines
+> +
+> +@item
+> +Three
+> +Still in list
+> +
+> +@end itemize
+> +
+> +Not in list
+> +@itemize @minus
+> +@item
+> +Second list
+> +Note: still in list
+> +
+> +@end itemize
+> +
+> +Note: not in list
+> +@enumerate
+> +@item
+> +Third list
+> +is numbered
+> +
+> +@item
+> +another item
+> +
+> +@example
+> +example
+> +@end example
+> +
+> +@example
+> +multiple lines
+> +@end example
+> +
+> +
+> +@end enumerate
+> +
+> +Returns: the King
+> +Since: the first age
+> +Notes:
+> +
+> +@enumerate
+> +@item
+> +Lorem ipsum dolor sit amet
+> +
+> +@item
+> +Ut enim ad minim veniam
+> +
+> +@end enumerate
+> +
+> +Duis aute irure dolor
+> +
+> +Example:
+> +
+> +-> in
+> +<- out
+> +Examples:
+> +@itemize @minus
+> +@item
+> +@strong{verbatim}
+> +@item
+> +@{braces@}
+> +@end itemize
+> +
+> +
+> +
+> +@deftp {Enum} Enum
+> +
+> +
+> +
+> +@b{Values:}
+> +@table @asis
+> +@item @code{one}
+> +The @emph{one} @{and only@}
+> +@*@b{If:} @code{defined(IFONE)}
+> +@item @code{two}
+> +Not documented
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{enum-feat}
+> +Also @emph{one} @{and only@}
+> +@end table
+> +@code{two} is undocumented
+> +
+> +@b{If:} @code{defined(IFCOND)}
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} Base
+> +
+> +
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item @code{base1: Enum}
+> +the first member
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} Variant1
+> +
+> +A paragraph
+> +
+> +Another paragraph (but no @code{var}: line)
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item @code{var1: string}
+> +Not documented
+> +@*@b{If:} @code{defined(IFSTR)}
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{variant1-feat}
+> +a feature
+> +@item @code{member-feat}
+> +a member feature
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} Variant2
+> +
+> +
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} Object
+> +
+> +
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item The members of @code{Base}
+> +@item The members of @code{Variant1} when @code{base1} is @t{"one"}
+> +@item The members of @code{Variant2} when @code{base1} is @t{"two"}
+> (@b{If:} @code{IFTWO})
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{union-feat1}
+> +a feature
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} SugaredUnion
+> +
+> +
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item @code{type}
+> +One of @t{"one"}, @t{"two"}
+> +@item @code{data: Variant1} when @code{type} is @t{"one"}
+> +@item @code{data: Variant2} when @code{type} is @t{"two"} (@b{If:}
+> @code{IFTWO})
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{union-feat2}
+> +a feature
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Alternate} Alternate
+> +
+> +
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item @code{i: int}
+> +an integer
+> +@code{b} is undocumented
+> +@item @code{b: boolean}
+> +Not documented
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{alt-feat}
+> +a feature
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +@subsection Another subsection
+> +
+> +
+> +@deftypefn Command {} cmd
+> +
+> +
+> +
+> +@b{Arguments:}
+> +@table @asis
+> +@item @code{arg1: int}
+> +the first argument
+> +@item @code{arg2: string} (optional)
+> +the second
+> +argument
+> +@item @code{arg3: boolean}
+> +Not documented
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{cmd-feat1}
+> +a feature
+> +@item @code{cmd-feat2}
+> +another feature
+> +@end table
+> +
+> +@b{Note:}
+> +@code{arg3} is undocumented
+> +
+> +@b{Returns:}
+> +@code{Object}
+> +
+> +@b{TODO:}
+> +frobnicate
+> +
+> +@b{Notes:}
+> +@itemize @minus
+> +@item
+> +Lorem ipsum dolor sit amet
+> +@item
+> +Ut enim ad minim veniam
+> +
+> +@end itemize
+> +
+> +Duis aute irure dolor
+> +
+> +@b{Example:}
+> +@example
+> +-> in
+> +<- out
+> +@end example
+> +
+> +@b{Examples:}
+> +@example
+> +- *verbatim*
+> +- @{braces@}
+> +@end example
+> +
+> +@b{Since:}
+> +2.10
+> +
+> +@end deftypefn
+> +
+> +
+> +
+> +@deftypefn Command {} cmd-boxed
+> +
+> +If you're bored enough to read this, go see a video of boxed cats
+> +
+> +@b{Arguments:} the members of @code{Object}
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{cmd-feat1}
+> +a feature
+> +@item @code{cmd-feat2}
+> +another feature
+> +@end table
+> +
+> +@b{Example:}
+> +@example
+> +-> in
+> +
+> +<- out
+> +@end example
+> +
+> +@end deftypefn
+> +
+> +
+> +
+> +@deftypefn Event {} EVT-BOXED
+> +
+> +
+> +
+> +@b{Arguments:} the members of @code{Object}
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{feat3}
+> +a feature
+> +@end table
+> +
+> +@end deftypefn
+> +
+> make: *** [Makefile.mtest:85: check-qapi-doc] Error 1
+> make: *** Waiting for unfinished jobs....
+> Running test QAPI doc
+> ---
+> C:/Users/ContainerAdministrator/AppData/Local/Temp/qemu-build/../cirrus-c=
+i-build/tests/qapi-schema/doc-good.texi
+>   2020-09-02 10:26:02.396028200 -0700
+> +++
+> C:/Users/ContainerAdministrator/AppData/Local/Temp/qemu-build/tests/qapi-=
+schema/doc-good-qapi-doc.texi
+>     2020-09-02 10:43:09.849568200 -0700
+> @@ -1,319 +1,319 @@
+> -@c AUTOMATICALLY GENERATED, DO NOT MODIFY
+> -
+> -@section Section
+> -
+> -@subsection Subsection
+> -
+> -@strong{strong} @emph{with emphasis}
+> -@code{var} @{in braces@}
+> -@itemize @bullet
+> -@item
+> -List item one
+> -@item
+> -Two, multiple
+> -lines
+> -
+> -@item
+> -Three
+> -Still in list
+> -
+> -@end itemize
+> -
+> -Not in list
+> -@itemize @minus
+> -@item
+> -Second list
+> -Note: still in list
+> -
+> -@end itemize
+> -
+> -Note: not in list
+> -@enumerate
+> -@item
+> -Third list
+> -is numbered
+> -
+> -@item
+> -another item
+> -
+> -@example
+> -example
+> -@end example
+> -
+> -@example
+> -multiple lines
+> -@end example
+> -
+> -
+> -@end enumerate
+> -
+> -Returns: the King
+> -Since: the first age
+> -Notes:
+> -
+> -@enumerate
+> -@item
+> -Lorem ipsum dolor sit amet
+> -
+> -@item
+> -Ut enim ad minim veniam
+> -
+> -@end enumerate
+> -
+> -Duis aute irure dolor
+> -
+> -Example:
+> -
+> --> in
+> -<- out
+> -Examples:
+> -@itemize @minus
+> -@item
+> -@strong{verbatim}
+> -@item
+> -@{braces@}
+> -@end itemize
+> -
+> -
+> -
+> -@deftp {Enum} Enum
+> -
+> -
+> -
+> -@b{Values:}
+> -@table @asis
+> -@item @code{one}
+> -The @emph{one} @{and only@}
+> -@*@b{If:} @code{defined(IFONE)}
+> -@item @code{two}
+> -Not documented
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{enum-feat}
+> -Also @emph{one} @{and only@}
+> -@end table
+> -@code{two} is undocumented
+> -
+> -@b{If:} @code{defined(IFCOND)}
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} Base
+> -
+> -
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item @code{base1: Enum}
+> -the first member
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} Variant1
+> -
+> -A paragraph
+> -
+> -Another paragraph (but no @code{var}: line)
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item @code{var1: string}
+> -Not documented
+> -@*@b{If:} @code{defined(IFSTR)}
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{variant1-feat}
+> -a feature
+> -@item @code{member-feat}
+> -a member feature
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} Variant2
+> -
+> -
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} Object
+> -
+> -
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item The members of @code{Base}
+> -@item The members of @code{Variant1} when @code{base1} is @t{"one"}
+> -@item The members of @code{Variant2} when @code{base1} is @t{"two"}
+> (@b{If:} @code{IFTWO})
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{union-feat1}
+> -a feature
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Object} SugaredUnion
+> -
+> -
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item @code{type}
+> -One of @t{"one"}, @t{"two"}
+> -@item @code{data: Variant1} when @code{type} is @t{"one"}
+> -@item @code{data: Variant2} when @code{type} is @t{"two"} (@b{If:}
+> @code{IFTWO})
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{union-feat2}
+> -a feature
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -
+> -@deftp {Alternate} Alternate
+> -
+> -
+> -
+> -@b{Members:}
+> -@table @asis
+> -@item @code{i: int}
+> -an integer
+> -@code{b} is undocumented
+> -@item @code{b: boolean}
+> -Not documented
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{alt-feat}
+> -a feature
+> -@end table
+> -
+> -@end deftp
+> -
+> -
+> -@subsection Another subsection
+> -
+> -
+> -@deftypefn Command {} cmd
+> -
+> -
+> -
+> -@b{Arguments:}
+> -@table @asis
+> -@item @code{arg1: int}
+> -the first argument
+> -@item @code{arg2: string} (optional)
+> -the second
+> -argument
+> -@item @code{arg3: boolean}
+> -Not documented
+> -@end table
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{cmd-feat1}
+> -a feature
+> -@item @code{cmd-feat2}
+> -another feature
+> -@end table
+> -
+> -@b{Note:}
+> -@code{arg3} is undocumented
+> -
+> -@b{Returns:}
+> -@code{Object}
+> -
+> -@b{TODO:}
+> -frobnicate
+> -
+> -@b{Notes:}
+> -@itemize @minus
+> -@item
+> -Lorem ipsum dolor sit amet
+> -@item
+> -Ut enim ad minim veniam
+> -
+> -@end itemize
+> -
+> -Duis aute irure dolor
+> -
+> -@b{Example:}
+> -@example
+> --> in
+> -<- out
+> -@end example
+> -
+> -@b{Examples:}
+> -@example
+> -- *verbatim*
+> -- @{braces@}
+> -@end example
+> -
+> -@b{Since:}
+> -2.10
+> -
+> -@end deftypefn
+> -
+> -
+> -
+> -@deftypefn Command {} cmd-boxed
+> -
+> -If you're bored enough to read this, go see a video of boxed cats
+> -
+> -@b{Arguments:} the members of @code{Object}
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{cmd-feat1}
+> -a feature
+> -@item @code{cmd-feat2}
+> -another feature
+> -@end table
+> -
+> -@b{Example:}
+> -@example
+> --> in
+> -
+> -<- out
+> -@end example
+> -
+> -@end deftypefn
+> -
+> -
+> -
+> -@deftypefn Event {} EVT-BOXED
+> -
+> -
+> -
+> -@b{Arguments:} the members of @code{Object}
+> -
+> -@b{Features:}
+> -@table @asis
+> -@item @code{feat3}
+> -a feature
+> -@end table
+> -
+> -@end deftypefn
+> -
+> +@c AUTOMATICALLY GENERATED, DO NOT MODIFY
+> +
+> +@section Section
+> +
+> +@subsection Subsection
+> +
+> +@strong{strong} @emph{with emphasis}
+> +@code{var} @{in braces@}
+> +@itemize @bullet
+> +@item
+> +List item one
+> +@item
+> +Two, multiple
+> +lines
+> +
+> +@item
+> +Three
+> +Still in list
+> +
+> +@end itemize
+> +
+> +Not in list
+> +@itemize @minus
+> +@item
+> +Second list
+> +Note: still in list
+> +
+> +@end itemize
+> +
+> +Note: not in list
+> +@enumerate
+> +@item
+> +Third list
+> +is numbered
+> +
+> +@item
+> +another item
+> +
+> +@example
+> +example
+> +@end example
+> +
+> +@example
+> +multiple lines
+> +@end example
+> +
+> +
+> +@end enumerate
+> +
+> +Returns: the King
+> +Since: the first age
+> +Notes:
+> +
+> +@enumerate
+> +@item
+> +Lorem ipsum dolor sit amet
+> +
+> +@item
+> +Ut enim ad minim veniam
+> +
+> +@end enumerate
+> +
+> +Duis aute irure dolor
+> +
+> +Example:
+> +
+> +-> in
+> +<- out
+> +Examples:
+> +@itemize @minus
+> +@item
+> +@strong{verbatim}
+> +@item
+> +@{braces@}
+> +@end itemize
+> +
+> +
+> +
+> +@deftp {Enum} Enum
+> +
+> +
+> +
+> +@b{Values:}
+> +@table @asis
+> +@item @code{one}
+> +The @emph{one} @{and only@}
+> +@*@b{If:} @code{defined(IFONE)}
+> +@item @code{two}
+> +Not documented
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{enum-feat}
+> +Also @emph{one} @{and only@}
+> +@end table
+> +@code{two} is undocumented
+> +
+> +@b{If:} @code{defined(IFCOND)}
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} Base
+> +
+> +
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item @code{base1: Enum}
+> +the first member
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} Variant1
+> +
+> +A paragraph
+> +
+> +Another paragraph (but no @code{var}: line)
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item @code{var1: string}
+> +Not documented
+> +@*@b{If:} @code{defined(IFSTR)}
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{variant1-feat}
+> +a feature
+> +@item @code{member-feat}
+> +a member feature
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} Variant2
+> +
+> +
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} Object
+> +
+> +
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item The members of @code{Base}
+> +@item The members of @code{Variant1} when @code{base1} is @t{"one"}
+> +@item The members of @code{Variant2} when @code{base1} is @t{"two"}
+> (@b{If:} @code{IFTWO})
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{union-feat1}
+> +a feature
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Object} SugaredUnion
+> +
+> +
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item @code{type}
+> +One of @t{"one"}, @t{"two"}
+> +@item @code{data: Variant1} when @code{type} is @t{"one"}
+> +@item @code{data: Variant2} when @code{type} is @t{"two"} (@b{If:}
+> @code{IFTWO})
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{union-feat2}
+> +a feature
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +
+> +@deftp {Alternate} Alternate
+> +
+> +
+> +
+> +@b{Members:}
+> +@table @asis
+> +@item @code{i: int}
+> +an integer
+> +@code{b} is undocumented
+> +@item @code{b: boolean}
+> +Not documented
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{alt-feat}
+> +a feature
+> +@end table
+> +
+> +@end deftp
+> +
+> +
+> +@subsection Another subsection
+> +
+> +
+> +@deftypefn Command {} cmd
+> +
+> +
+> +
+> +@b{Arguments:}
+> +@table @asis
+> +@item @code{arg1: int}
+> +the first argument
+> +@item @code{arg2: string} (optional)
+> +the second
+> +argument
+> +@item @code{arg3: boolean}
+> +Not documented
+> +@end table
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{cmd-feat1}
+> +a feature
+> +@item @code{cmd-feat2}
+> +another feature
+> +@end table
+> +
+> +@b{Note:}
+> +@code{arg3} is undocumented
+> +
+> +@b{Returns:}
+> +@code{Object}
+> +
+> +@b{TODO:}
+> +frobnicate
+> +
+> +@b{Notes:}
+> +@itemize @minus
+> +@item
+> +Lorem ipsum dolor sit amet
+> +@item
+> +Ut enim ad minim veniam
+> +
+> +@end itemize
+> +
+> +Duis aute irure dolor
+> +
+> +@b{Example:}
+> +@example
+> +-> in
+> +<- out
+> +@end example
+> +
+> +@b{Examples:}
+> +@example
+> +- *verbatim*
+> +- @{braces@}
+> +@end example
+> +
+> +@b{Since:}
+> +2.10
+> +
+> +@end deftypefn
+> +
+> +
+> +
+> +@deftypefn Command {} cmd-boxed
+> +
+> +If you're bored enough to read this, go see a video of boxed cats
+> +
+> +@b{Arguments:} the members of @code{Object}
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{cmd-feat1}
+> +a feature
+> +@item @code{cmd-feat2}
+> +another feature
+> +@end table
+> +
+> +@b{Example:}
+> +@example
+> +-> in
+> +
+> +<- out
+> +@end example
+> +
+> +@end deftypefn
+> +
+> +
+> +
+> +@deftypefn Event {} EVT-BOXED
+> +
+> +
+> +
+> +@b{Arguments:} the members of @code{Object}
+> +
+> +@b{Features:}
+> +@table @asis
+> +@item @code{feat3}
+> +a feature
+> +@end table
+> +
+> +@end deftypefn
+> +
+> make: *** [Makefile.mtest:63: check-qapi-schema] Error 1
 >
-Hi Bonzini, the int compiling error are fixed by this commit
-
->       tests: Fixes building test-util-filemonitor.c on msys2/mingw
+> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> ---
+>  tests/qapi-schema/meson.build | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-Hi Bonzini, the mkdir error are fixed by this commit
-
+> diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.buil=
+d
+> index c87d141417..f1449298b0 100644
+> --- a/tests/qapi-schema/meson.build
+> +++ b/tests/qapi-schema/meson.build
+> @@ -220,6 +220,6 @@ qapi_doc =3D custom_target('QAPI doc',
 >
->  .gitlab-ci.d/crossbuilds.yml                       | 113
-> +++++++++++++++++++++
->  .gitlab-ci.yml                                     |  69 +++++++++++++
->  MAINTAINERS                                        |   1 +
->  configure                                          |   3 +
->  crypto/meson.build                                 |  42 ++++++--
->  meson.build                                        |   5 +
->  stubs/cpu-get-icount.c                             |   5 -
->  stubs/fd-register.c                                |   6 --
->  stubs/meson.build                                  |   3 +-
->  stubs/notify-event.c                               |   6 --
->  stubs/qemu-timer-notify-cb.c                       |   8 ++
->  target/microblaze/cpu.c                            |  11 ++
->  target/microblaze/cpu.h                            |   3 +-
->  target/microblaze/helper.c                         |  17 ++--
->  target/microblaze/translate.c                      |   4 +-
->  tests/Makefile.include                             |   2 +
->  tests/docker/dockerfiles/centos7.docker            |   2 +
->  tests/docker/dockerfiles/centos8.docker            |   1 +
->  tests/docker/dockerfiles/debian-win64-cross.docker |   9 +-
->  tests/docker/dockerfiles/debian10.docker           |   1 +
->  tests/docker/dockerfiles/debian9.docker            |   1 +
->  tests/qtest/meson.build                            |   1 -
->  tests/test-replication.c                           |   4 +
->  tests/test-util-filemonitor.c                      |   4 +-
->  tests/test-vmstate.c                               |   4 +-
->  util/main-loop.c                                   |   4 +
->  26 files changed, 285 insertions(+), 44 deletions(-)
->  create mode 100644 .gitlab-ci.d/crossbuilds.yml
->  delete mode 100644 stubs/fd-register.c
->  delete mode 100644 stubs/notify-event.c
->  create mode 100644 stubs/qemu-timer-notify-cb.c
+>  # "full_path()" needed here to work around
+>  # https://github.com/mesonbuild/meson/issues/7585
+> -test('QAPI doc', diff, args: ['-u', files('doc-good.texi'),
+> qapi_doc[0].full_path()],
+> +test('QAPI doc', diff, args: ['-b', '-u', files('doc-good.texi'),
+> qapi_doc[0].full_path()],
+>       depends: qapi_doc,
+>       suite: ['qapi-schema', 'qapi-doc'])
+> --
+> 2.28.0.windows.1
 >
 >
 
@@ -213,160 +1451,1356 @@ Yours
     sincerely,
 Yonggang Luo
 
---0000000000003c3c3405aebce252
+--000000000000563a4605aebce5b3
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Mon, Sep 7, 2020 at 8:11 PM Thomas=
- Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wrot=
-e:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0=
-.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">=C2=A0Hi Pete=
-r,<br>
-<br>
-the following changes since commit 7c37270b3fbe3d034ba80e488761461676e21eb4=
-:<br>
-<br>
-=C2=A0 Merge remote-tracking branch &#39;remotes/kraxel/tags/ui-20200904-pu=
-ll-request&#39; into staging (2020-09-06 16:23:55 +0100)<br>
-<br>
-are available in the Git repository at:<br>
-<br>
-=C2=A0 <a href=3D"https://gitlab.com/huth/qemu.git" rel=3D"noreferrer" targ=
-et=3D"_blank">https://gitlab.com/huth/qemu.git</a> tags/pull-request-2020-0=
-9-07<br>
-<br>
-for you to fetch changes up to 88e74b6122bb40852b1c98befd47a572f0c06930:<br=
->
-<br>
-=C2=A0 target/microblaze: Collected fixes for env-&gt;iflags (2020-09-07 12=
-:34:17 +0200)<br>
-<br>
-----------------------------------------------------------------<br>
-* Fixes for cross-compiling with MinGW / compiling with MSYS2<br>
-* Enable cross-compiler builds in the Gitlab CI<br>
-* Improvements / fixes for the crypto tests in the Gitlab CI<br>
-* Fix for the &quot;make check-acceptance&quot; microblaze failure<br>
-=C2=A0 (required to get the Gitlab CI green again)<br>
-----------------------------------------------------------------<br>
-<br>
-Alex Benn=C3=A9e (1):<br>
-=C2=A0 =C2=A0 =C2=A0 tests/docker: add python3-setuptools the docker images=
-<br>
-<br>
-Daniel P. Berrang=C3=A9 (2):<br>
-=C2=A0 =C2=A0 =C2=A0 crypto: fix build with gcrypt enabled<br>
-=C2=A0 =C2=A0 =C2=A0 gitlab: expand test coverage for crypto builds<br>
-<br>
-Paolo Bonzini (1):<br>
-=C2=A0 =C2=A0 =C2=A0 tests/qtest: do not list ahci-test twice<br>
-<br>
-Richard Henderson (1):<br>
-=C2=A0 =C2=A0 =C2=A0 target/microblaze: Collected fixes for env-&gt;iflags<=
-br>
-<br>
-Thomas Huth (6):<br>
-=C2=A0 =C2=A0 =C2=A0 tests/Makefile: test-image-locking needs CONFIG_POSIX<=
-br>
-=C2=A0 =C2=A0 =C2=A0 dockerfiles/debian-win64-cross: Download WHPX MinGW he=
-aders<br>
-=C2=A0 =C2=A0 =C2=A0 configure: Allow automatic WHPX detection<br>
-=C2=A0 =C2=A0 =C2=A0 stubs: Move qemu_timer_notify_cb() and remove qemu_not=
-ify_event() stub<br>
-=C2=A0 =C2=A0 =C2=A0 stubs: Move qemu_fd_register stub to util/main-loop.c<=
-br>
-=C2=A0 =C2=A0 =C2=A0 gitlab-ci: Add cross-compiling build tests<br>
-<br>
-Yonggang Luo (3):<br>
-=C2=A0 =C2=A0 =C2=A0 tests: handling signal on win32 properly<br></blockquo=
-te><div>Hi thomas, this have already been queued by Bonzini, you have to sk=
-ip this.=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-=C2=A0 =C2=A0 =C2=A0 tests: fixes test-vmstate.c compile error on msys2<br>=
-</blockquote><div>Hi=C2=A0Bonzini, the int compiling error are fixed by thi=
-s commit=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-=C2=A0 =C2=A0 =C2=A0 tests: Fixes building test-util-filemonitor.c on msys2=
-/mingw<br></blockquote><div>Hi=C2=A0Bonzini, the mkdir error are fixed by t=
-his commit</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0=
-px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex"></blockqu=
-ote><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;bor=
-der-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-=C2=A0.gitlab-ci.d/crossbuilds.yml=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 113 +++++++++++++++++++++<br>
-=C2=A0.gitlab-ci.yml=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0|=C2=A0 69 +++++++++++++<br>
-=C2=A0MAINTAINERS=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
-=C2=A0configure=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A03 +<br>
-=C2=A0crypto/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=
-=A0 42 ++++++--<br>
-=C2=A0meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 |=C2=A0 =C2=A05 +<br>
-=C2=A0stubs/cpu-get-icount.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A05 =
+<div dir=3D"ltr"><div>Forgot your=C2=A0</div><br><div class=3D"gmail_quote"=
+><div dir=3D"ltr" class=3D"gmail_attr">On Tue, Sep 8, 2020 at 1:48 AM Yongg=
+ang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.com<=
+/a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0=
+px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">O=
+r the tests result would cause following test failure:<br>
+Running test QAPI doc<br>
+=C2=A0 LINK=C2=A0 =C2=A0 tests/check-qdict.exe<br>
+--- C:/Users/ContainerAdministrator/AppData/Local/Temp/qemu-build/../cirrus=
+-ci-build/tests/qapi-schema/doc-good.texi=C2=A0 =C2=A0 2020-09-02 10:26:02.=
+396028200 -0700<br>
++++ C:/Users/ContainerAdministrator/AppData/Local/Temp/qemu-build/tests/qap=
+i-schema/doc-good-qapi-doc.texi=C2=A0 =C2=A0 =C2=A0 2020-09-02 10:43:09.849=
+568200 -0700<br>
+@@ -1,319 +1,319 @@<br>
+-@c AUTOMATICALLY GENERATED, DO NOT MODIFY<br>
 -<br>
-=C2=A0stubs/fd-register.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=
-=A06 --<br>
-=C2=A0stubs/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =
-=C2=A03 +-<br>
-=C2=A0stubs/notify-event.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=
-=A06 --<br>
-=C2=A0stubs/qemu-timer-notify-cb.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A08 ++<br>
-=C2=A0target/microblaze/cpu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 11 ++<br>
-=C2=A0target/microblaze/cpu.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A03 +-<br>
-=C2=A0target/microblaze/helper.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 17 ++--<br>
-=C2=A0target/microblaze/translate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A04 +-<br>
-=C2=A0tests/Makefile.include=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A02 =
+-@section Section<br>
+-<br>
+-@subsection Subsection<br>
+-<br>
+-@strong{strong} @emph{with emphasis}<br>
+-@code{var} @{in braces@}<br>
+-@itemize @bullet<br>
+-@item<br>
+-List item one<br>
+-@item<br>
+-Two, multiple<br>
+-lines<br>
+-<br>
+-@item<br>
+-Three<br>
+-Still in list<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Not in list<br>
+-@itemize @minus<br>
+-@item<br>
+-Second list<br>
+-Note: still in list<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Note: not in list<br>
+-@enumerate<br>
+-@item<br>
+-Third list<br>
+-is numbered<br>
+-<br>
+-@item<br>
+-another item<br>
+-<br>
+-@example<br>
+-example<br>
+-@end example<br>
+-<br>
+-@example<br>
+-multiple lines<br>
+-@end example<br>
+-<br>
+-<br>
+-@end enumerate<br>
+-<br>
+-Returns: the King<br>
+-Since: the first age<br>
+-Notes:<br>
+-<br>
+-@enumerate<br>
+-@item<br>
+-Lorem ipsum dolor sit amet<br>
+-<br>
+-@item<br>
+-Ut enim ad minim veniam<br>
+-<br>
+-@end enumerate<br>
+-<br>
+-Duis aute irure dolor<br>
+-<br>
+-Example:<br>
+-<br>
+--&gt; in<br>
+-&lt;- out<br>
+-Examples:<br>
+-@itemize @minus<br>
+-@item<br>
+-@strong{verbatim}<br>
+-@item<br>
+-@{braces@}<br>
+-@end itemize<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Enum} Enum<br>
+-<br>
+-<br>
+-<br>
+-@b{Values:}<br>
+-@table @asis<br>
+-@item @code{one}<br>
+-The @emph{one} @{and only@}<br>
+-@*@b{If:} @code{defined(IFONE)}<br>
+-@item @code{two}<br>
+-Not documented<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{enum-feat}<br>
+-Also @emph{one} @{and only@}<br>
+-@end table<br>
+-@code{two} is undocumented<br>
+-<br>
+-@b{If:} @code{defined(IFCOND)}<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} Base<br>
+-<br>
+-<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item @code{base1: Enum}<br>
+-the first member<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} Variant1<br>
+-<br>
+-A paragraph<br>
+-<br>
+-Another paragraph (but no @code{var}: line)<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item @code{var1: string}<br>
+-Not documented<br>
+-@*@b{If:} @code{defined(IFSTR)}<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{variant1-feat}<br>
+-a feature<br>
+-@item @code{member-feat}<br>
+-a member feature<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} Variant2<br>
+-<br>
+-<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} Object<br>
+-<br>
+-<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item The members of @code{Base}<br>
+-@item The members of @code{Variant1} when @code{base1} is @t{&quot;one&quo=
+t;}<br>
+-@item The members of @code{Variant2} when @code{base1} is @t{&quot;two&quo=
+t;} (@b{If:} @code{IFTWO})<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{union-feat1}<br>
+-a feature<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} SugaredUnion<br>
+-<br>
+-<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item @code{type}<br>
+-One of @t{&quot;one&quot;}, @t{&quot;two&quot;}<br>
+-@item @code{data: Variant1} when @code{type} is @t{&quot;one&quot;}<br>
+-@item @code{data: Variant2} when @code{type} is @t{&quot;two&quot;} (@b{If=
+:} @code{IFTWO})<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{union-feat2}<br>
+-a feature<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Alternate} Alternate<br>
+-<br>
+-<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item @code{i: int}<br>
+-an integer<br>
+-@code{b} is undocumented<br>
+-@item @code{b: boolean}<br>
+-Not documented<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{alt-feat}<br>
+-a feature<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-@subsection Another subsection<br>
+-<br>
+-<br>
+-@deftypefn Command {} cmd<br>
+-<br>
+-<br>
+-<br>
+-@b{Arguments:}<br>
+-@table @asis<br>
+-@item @code{arg1: int}<br>
+-the first argument<br>
+-@item @code{arg2: string} (optional)<br>
+-the second<br>
+-argument<br>
+-@item @code{arg3: boolean}<br>
+-Not documented<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{cmd-feat1}<br>
+-a feature<br>
+-@item @code{cmd-feat2}<br>
+-another feature<br>
+-@end table<br>
+-<br>
+-@b{Note:}<br>
+-@code{arg3} is undocumented<br>
+-<br>
+-@b{Returns:}<br>
+-@code{Object}<br>
+-<br>
+-@b{TODO:}<br>
+-frobnicate<br>
+-<br>
+-@b{Notes:}<br>
+-@itemize @minus<br>
+-@item<br>
+-Lorem ipsum dolor sit amet<br>
+-@item<br>
+-Ut enim ad minim veniam<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Duis aute irure dolor<br>
+-<br>
+-@b{Example:}<br>
+-@example<br>
+--&gt; in<br>
+-&lt;- out<br>
+-@end example<br>
+-<br>
+-@b{Examples:}<br>
+-@example<br>
+-- *verbatim*<br>
+-- @{braces@}<br>
+-@end example<br>
+-<br>
+-@b{Since:}<br>
+-2.10<br>
+-<br>
+-@end deftypefn<br>
+-<br>
+-<br>
+-<br>
+-@deftypefn Command {} cmd-boxed<br>
+-<br>
+-If you&#39;re bored enough to read this, go see a video of boxed cats<br>
+-<br>
+-@b{Arguments:} the members of @code{Object}<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{cmd-feat1}<br>
+-a feature<br>
+-@item @code{cmd-feat2}<br>
+-another feature<br>
+-@end table<br>
+-<br>
+-@b{Example:}<br>
+-@example<br>
+--&gt; in<br>
+-<br>
+-&lt;- out<br>
+-@end example<br>
+-<br>
+-@end deftypefn<br>
+-<br>
+-<br>
+-<br>
+-@deftypefn Event {} EVT-BOXED<br>
+-<br>
+-<br>
+-<br>
+-@b{Arguments:} the members of @code{Object}<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{feat3}<br>
+-a feature<br>
+-@end table<br>
+-<br>
+-@end deftypefn<br>
+-<br>
++@c AUTOMATICALLY GENERATED, DO NOT MODIFY<br>
 +<br>
-=C2=A0tests/docker/dockerfiles/centos7.docker=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A02 +<br>
-=C2=A0tests/docker/dockerfiles/centos8.docker=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
-=C2=A0tests/docker/dockerfiles/debian-win64-cross.docker |=C2=A0 =C2=A09 +-=
++@section Section<br>
++<br>
++@subsection Subsection<br>
++<br>
++@strong{strong} @emph{with emphasis}<br>
++@code{var} @{in braces@}<br>
++@itemize @bullet<br>
++@item<br>
++List item one<br>
++@item<br>
++Two, multiple<br>
++lines<br>
++<br>
++@item<br>
++Three<br>
++Still in list<br>
++<br>
++@end itemize<br>
++<br>
++Not in list<br>
++@itemize @minus<br>
++@item<br>
++Second list<br>
++Note: still in list<br>
++<br>
++@end itemize<br>
++<br>
++Note: not in list<br>
++@enumerate<br>
++@item<br>
++Third list<br>
++is numbered<br>
++<br>
++@item<br>
++another item<br>
++<br>
++@example<br>
++example<br>
++@end example<br>
++<br>
++@example<br>
++multiple lines<br>
++@end example<br>
++<br>
++<br>
++@end enumerate<br>
++<br>
++Returns: the King<br>
++Since: the first age<br>
++Notes:<br>
++<br>
++@enumerate<br>
++@item<br>
++Lorem ipsum dolor sit amet<br>
++<br>
++@item<br>
++Ut enim ad minim veniam<br>
++<br>
++@end enumerate<br>
++<br>
++Duis aute irure dolor<br>
++<br>
++Example:<br>
++<br>
++-&gt; in<br>
++&lt;- out<br>
++Examples:<br>
++@itemize @minus<br>
++@item<br>
++@strong{verbatim}<br>
++@item<br>
++@{braces@}<br>
++@end itemize<br>
++<br>
++<br>
++<br>
++@deftp {Enum} Enum<br>
++<br>
++<br>
++<br>
++@b{Values:}<br>
++@table @asis<br>
++@item @code{one}<br>
++The @emph{one} @{and only@}<br>
++@*@b{If:} @code{defined(IFONE)}<br>
++@item @code{two}<br>
++Not documented<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{enum-feat}<br>
++Also @emph{one} @{and only@}<br>
++@end table<br>
++@code{two} is undocumented<br>
++<br>
++@b{If:} @code{defined(IFCOND)}<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} Base<br>
++<br>
++<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item @code{base1: Enum}<br>
++the first member<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} Variant1<br>
++<br>
++A paragraph<br>
++<br>
++Another paragraph (but no @code{var}: line)<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item @code{var1: string}<br>
++Not documented<br>
++@*@b{If:} @code{defined(IFSTR)}<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{variant1-feat}<br>
++a feature<br>
++@item @code{member-feat}<br>
++a member feature<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} Variant2<br>
++<br>
++<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} Object<br>
++<br>
++<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item The members of @code{Base}<br>
++@item The members of @code{Variant1} when @code{base1} is @t{&quot;one&quo=
+t;}<br>
++@item The members of @code{Variant2} when @code{base1} is @t{&quot;two&quo=
+t;} (@b{If:} @code{IFTWO})<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{union-feat1}<br>
++a feature<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} SugaredUnion<br>
++<br>
++<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item @code{type}<br>
++One of @t{&quot;one&quot;}, @t{&quot;two&quot;}<br>
++@item @code{data: Variant1} when @code{type} is @t{&quot;one&quot;}<br>
++@item @code{data: Variant2} when @code{type} is @t{&quot;two&quot;} (@b{If=
+:} @code{IFTWO})<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{union-feat2}<br>
++a feature<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Alternate} Alternate<br>
++<br>
++<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item @code{i: int}<br>
++an integer<br>
++@code{b} is undocumented<br>
++@item @code{b: boolean}<br>
++Not documented<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{alt-feat}<br>
++a feature<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++@subsection Another subsection<br>
++<br>
++<br>
++@deftypefn Command {} cmd<br>
++<br>
++<br>
++<br>
++@b{Arguments:}<br>
++@table @asis<br>
++@item @code{arg1: int}<br>
++the first argument<br>
++@item @code{arg2: string} (optional)<br>
++the second<br>
++argument<br>
++@item @code{arg3: boolean}<br>
++Not documented<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{cmd-feat1}<br>
++a feature<br>
++@item @code{cmd-feat2}<br>
++another feature<br>
++@end table<br>
++<br>
++@b{Note:}<br>
++@code{arg3} is undocumented<br>
++<br>
++@b{Returns:}<br>
++@code{Object}<br>
++<br>
++@b{TODO:}<br>
++frobnicate<br>
++<br>
++@b{Notes:}<br>
++@itemize @minus<br>
++@item<br>
++Lorem ipsum dolor sit amet<br>
++@item<br>
++Ut enim ad minim veniam<br>
++<br>
++@end itemize<br>
++<br>
++Duis aute irure dolor<br>
++<br>
++@b{Example:}<br>
++@example<br>
++-&gt; in<br>
++&lt;- out<br>
++@end example<br>
++<br>
++@b{Examples:}<br>
++@example<br>
++- *verbatim*<br>
++- @{braces@}<br>
++@end example<br>
++<br>
++@b{Since:}<br>
++2.10<br>
++<br>
++@end deftypefn<br>
++<br>
++<br>
++<br>
++@deftypefn Command {} cmd-boxed<br>
++<br>
++If you&#39;re bored enough to read this, go see a video of boxed cats<br>
++<br>
++@b{Arguments:} the members of @code{Object}<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{cmd-feat1}<br>
++a feature<br>
++@item @code{cmd-feat2}<br>
++another feature<br>
++@end table<br>
++<br>
++@b{Example:}<br>
++@example<br>
++-&gt; in<br>
++<br>
++&lt;- out<br>
++@end example<br>
++<br>
++@end deftypefn<br>
++<br>
++<br>
++<br>
++@deftypefn Event {} EVT-BOXED<br>
++<br>
++<br>
++<br>
++@b{Arguments:} the members of @code{Object}<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{feat3}<br>
++a feature<br>
++@end table<br>
++<br>
++@end deftypefn<br>
++<br>
+make: *** [Makefile.mtest:85: check-qapi-doc] Error 1<br>
+make: *** Waiting for unfinished jobs....<br>
+Running test QAPI doc<br>
+--- C:/Users/ContainerAdministrator/AppData/Local/Temp/qemu-build/../cirrus=
+-ci-build/tests/qapi-schema/doc-good.texi=C2=A0 =C2=A0 2020-09-02 10:26:02.=
+396028200 -0700<br>
++++ C:/Users/ContainerAdministrator/AppData/Local/Temp/qemu-build/tests/qap=
+i-schema/doc-good-qapi-doc.texi=C2=A0 =C2=A0 =C2=A0 2020-09-02 10:43:09.849=
+568200 -0700<br>
+@@ -1,319 +1,319 @@<br>
+-@c AUTOMATICALLY GENERATED, DO NOT MODIFY<br>
+-<br>
+-@section Section<br>
+-<br>
+-@subsection Subsection<br>
+-<br>
+-@strong{strong} @emph{with emphasis}<br>
+-@code{var} @{in braces@}<br>
+-@itemize @bullet<br>
+-@item<br>
+-List item one<br>
+-@item<br>
+-Two, multiple<br>
+-lines<br>
+-<br>
+-@item<br>
+-Three<br>
+-Still in list<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Not in list<br>
+-@itemize @minus<br>
+-@item<br>
+-Second list<br>
+-Note: still in list<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Note: not in list<br>
+-@enumerate<br>
+-@item<br>
+-Third list<br>
+-is numbered<br>
+-<br>
+-@item<br>
+-another item<br>
+-<br>
+-@example<br>
+-example<br>
+-@end example<br>
+-<br>
+-@example<br>
+-multiple lines<br>
+-@end example<br>
+-<br>
+-<br>
+-@end enumerate<br>
+-<br>
+-Returns: the King<br>
+-Since: the first age<br>
+-Notes:<br>
+-<br>
+-@enumerate<br>
+-@item<br>
+-Lorem ipsum dolor sit amet<br>
+-<br>
+-@item<br>
+-Ut enim ad minim veniam<br>
+-<br>
+-@end enumerate<br>
+-<br>
+-Duis aute irure dolor<br>
+-<br>
+-Example:<br>
+-<br>
+--&gt; in<br>
+-&lt;- out<br>
+-Examples:<br>
+-@itemize @minus<br>
+-@item<br>
+-@strong{verbatim}<br>
+-@item<br>
+-@{braces@}<br>
+-@end itemize<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Enum} Enum<br>
+-<br>
+-<br>
+-<br>
+-@b{Values:}<br>
+-@table @asis<br>
+-@item @code{one}<br>
+-The @emph{one} @{and only@}<br>
+-@*@b{If:} @code{defined(IFONE)}<br>
+-@item @code{two}<br>
+-Not documented<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{enum-feat}<br>
+-Also @emph{one} @{and only@}<br>
+-@end table<br>
+-@code{two} is undocumented<br>
+-<br>
+-@b{If:} @code{defined(IFCOND)}<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} Base<br>
+-<br>
+-<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item @code{base1: Enum}<br>
+-the first member<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} Variant1<br>
+-<br>
+-A paragraph<br>
+-<br>
+-Another paragraph (but no @code{var}: line)<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item @code{var1: string}<br>
+-Not documented<br>
+-@*@b{If:} @code{defined(IFSTR)}<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{variant1-feat}<br>
+-a feature<br>
+-@item @code{member-feat}<br>
+-a member feature<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} Variant2<br>
+-<br>
+-<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} Object<br>
+-<br>
+-<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item The members of @code{Base}<br>
+-@item The members of @code{Variant1} when @code{base1} is @t{&quot;one&quo=
+t;}<br>
+-@item The members of @code{Variant2} when @code{base1} is @t{&quot;two&quo=
+t;} (@b{If:} @code{IFTWO})<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{union-feat1}<br>
+-a feature<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Object} SugaredUnion<br>
+-<br>
+-<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item @code{type}<br>
+-One of @t{&quot;one&quot;}, @t{&quot;two&quot;}<br>
+-@item @code{data: Variant1} when @code{type} is @t{&quot;one&quot;}<br>
+-@item @code{data: Variant2} when @code{type} is @t{&quot;two&quot;} (@b{If=
+:} @code{IFTWO})<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{union-feat2}<br>
+-a feature<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-<br>
+-@deftp {Alternate} Alternate<br>
+-<br>
+-<br>
+-<br>
+-@b{Members:}<br>
+-@table @asis<br>
+-@item @code{i: int}<br>
+-an integer<br>
+-@code{b} is undocumented<br>
+-@item @code{b: boolean}<br>
+-Not documented<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{alt-feat}<br>
+-a feature<br>
+-@end table<br>
+-<br>
+-@end deftp<br>
+-<br>
+-<br>
+-@subsection Another subsection<br>
+-<br>
+-<br>
+-@deftypefn Command {} cmd<br>
+-<br>
+-<br>
+-<br>
+-@b{Arguments:}<br>
+-@table @asis<br>
+-@item @code{arg1: int}<br>
+-the first argument<br>
+-@item @code{arg2: string} (optional)<br>
+-the second<br>
+-argument<br>
+-@item @code{arg3: boolean}<br>
+-Not documented<br>
+-@end table<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{cmd-feat1}<br>
+-a feature<br>
+-@item @code{cmd-feat2}<br>
+-another feature<br>
+-@end table<br>
+-<br>
+-@b{Note:}<br>
+-@code{arg3} is undocumented<br>
+-<br>
+-@b{Returns:}<br>
+-@code{Object}<br>
+-<br>
+-@b{TODO:}<br>
+-frobnicate<br>
+-<br>
+-@b{Notes:}<br>
+-@itemize @minus<br>
+-@item<br>
+-Lorem ipsum dolor sit amet<br>
+-@item<br>
+-Ut enim ad minim veniam<br>
+-<br>
+-@end itemize<br>
+-<br>
+-Duis aute irure dolor<br>
+-<br>
+-@b{Example:}<br>
+-@example<br>
+--&gt; in<br>
+-&lt;- out<br>
+-@end example<br>
+-<br>
+-@b{Examples:}<br>
+-@example<br>
+-- *verbatim*<br>
+-- @{braces@}<br>
+-@end example<br>
+-<br>
+-@b{Since:}<br>
+-2.10<br>
+-<br>
+-@end deftypefn<br>
+-<br>
+-<br>
+-<br>
+-@deftypefn Command {} cmd-boxed<br>
+-<br>
+-If you&#39;re bored enough to read this, go see a video of boxed cats<br>
+-<br>
+-@b{Arguments:} the members of @code{Object}<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{cmd-feat1}<br>
+-a feature<br>
+-@item @code{cmd-feat2}<br>
+-another feature<br>
+-@end table<br>
+-<br>
+-@b{Example:}<br>
+-@example<br>
+--&gt; in<br>
+-<br>
+-&lt;- out<br>
+-@end example<br>
+-<br>
+-@end deftypefn<br>
+-<br>
+-<br>
+-<br>
+-@deftypefn Event {} EVT-BOXED<br>
+-<br>
+-<br>
+-<br>
+-@b{Arguments:} the members of @code{Object}<br>
+-<br>
+-@b{Features:}<br>
+-@table @asis<br>
+-@item @code{feat3}<br>
+-a feature<br>
+-@end table<br>
+-<br>
+-@end deftypefn<br>
+-<br>
++@c AUTOMATICALLY GENERATED, DO NOT MODIFY<br>
++<br>
++@section Section<br>
++<br>
++@subsection Subsection<br>
++<br>
++@strong{strong} @emph{with emphasis}<br>
++@code{var} @{in braces@}<br>
++@itemize @bullet<br>
++@item<br>
++List item one<br>
++@item<br>
++Two, multiple<br>
++lines<br>
++<br>
++@item<br>
++Three<br>
++Still in list<br>
++<br>
++@end itemize<br>
++<br>
++Not in list<br>
++@itemize @minus<br>
++@item<br>
++Second list<br>
++Note: still in list<br>
++<br>
++@end itemize<br>
++<br>
++Note: not in list<br>
++@enumerate<br>
++@item<br>
++Third list<br>
++is numbered<br>
++<br>
++@item<br>
++another item<br>
++<br>
++@example<br>
++example<br>
++@end example<br>
++<br>
++@example<br>
++multiple lines<br>
++@end example<br>
++<br>
++<br>
++@end enumerate<br>
++<br>
++Returns: the King<br>
++Since: the first age<br>
++Notes:<br>
++<br>
++@enumerate<br>
++@item<br>
++Lorem ipsum dolor sit amet<br>
++<br>
++@item<br>
++Ut enim ad minim veniam<br>
++<br>
++@end enumerate<br>
++<br>
++Duis aute irure dolor<br>
++<br>
++Example:<br>
++<br>
++-&gt; in<br>
++&lt;- out<br>
++Examples:<br>
++@itemize @minus<br>
++@item<br>
++@strong{verbatim}<br>
++@item<br>
++@{braces@}<br>
++@end itemize<br>
++<br>
++<br>
++<br>
++@deftp {Enum} Enum<br>
++<br>
++<br>
++<br>
++@b{Values:}<br>
++@table @asis<br>
++@item @code{one}<br>
++The @emph{one} @{and only@}<br>
++@*@b{If:} @code{defined(IFONE)}<br>
++@item @code{two}<br>
++Not documented<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{enum-feat}<br>
++Also @emph{one} @{and only@}<br>
++@end table<br>
++@code{two} is undocumented<br>
++<br>
++@b{If:} @code{defined(IFCOND)}<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} Base<br>
++<br>
++<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item @code{base1: Enum}<br>
++the first member<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} Variant1<br>
++<br>
++A paragraph<br>
++<br>
++Another paragraph (but no @code{var}: line)<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item @code{var1: string}<br>
++Not documented<br>
++@*@b{If:} @code{defined(IFSTR)}<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{variant1-feat}<br>
++a feature<br>
++@item @code{member-feat}<br>
++a member feature<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} Variant2<br>
++<br>
++<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} Object<br>
++<br>
++<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item The members of @code{Base}<br>
++@item The members of @code{Variant1} when @code{base1} is @t{&quot;one&quo=
+t;}<br>
++@item The members of @code{Variant2} when @code{base1} is @t{&quot;two&quo=
+t;} (@b{If:} @code{IFTWO})<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{union-feat1}<br>
++a feature<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Object} SugaredUnion<br>
++<br>
++<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item @code{type}<br>
++One of @t{&quot;one&quot;}, @t{&quot;two&quot;}<br>
++@item @code{data: Variant1} when @code{type} is @t{&quot;one&quot;}<br>
++@item @code{data: Variant2} when @code{type} is @t{&quot;two&quot;} (@b{If=
+:} @code{IFTWO})<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{union-feat2}<br>
++a feature<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++<br>
++@deftp {Alternate} Alternate<br>
++<br>
++<br>
++<br>
++@b{Members:}<br>
++@table @asis<br>
++@item @code{i: int}<br>
++an integer<br>
++@code{b} is undocumented<br>
++@item @code{b: boolean}<br>
++Not documented<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{alt-feat}<br>
++a feature<br>
++@end table<br>
++<br>
++@end deftp<br>
++<br>
++<br>
++@subsection Another subsection<br>
++<br>
++<br>
++@deftypefn Command {} cmd<br>
++<br>
++<br>
++<br>
++@b{Arguments:}<br>
++@table @asis<br>
++@item @code{arg1: int}<br>
++the first argument<br>
++@item @code{arg2: string} (optional)<br>
++the second<br>
++argument<br>
++@item @code{arg3: boolean}<br>
++Not documented<br>
++@end table<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{cmd-feat1}<br>
++a feature<br>
++@item @code{cmd-feat2}<br>
++another feature<br>
++@end table<br>
++<br>
++@b{Note:}<br>
++@code{arg3} is undocumented<br>
++<br>
++@b{Returns:}<br>
++@code{Object}<br>
++<br>
++@b{TODO:}<br>
++frobnicate<br>
++<br>
++@b{Notes:}<br>
++@itemize @minus<br>
++@item<br>
++Lorem ipsum dolor sit amet<br>
++@item<br>
++Ut enim ad minim veniam<br>
++<br>
++@end itemize<br>
++<br>
++Duis aute irure dolor<br>
++<br>
++@b{Example:}<br>
++@example<br>
++-&gt; in<br>
++&lt;- out<br>
++@end example<br>
++<br>
++@b{Examples:}<br>
++@example<br>
++- *verbatim*<br>
++- @{braces@}<br>
++@end example<br>
++<br>
++@b{Since:}<br>
++2.10<br>
++<br>
++@end deftypefn<br>
++<br>
++<br>
++<br>
++@deftypefn Command {} cmd-boxed<br>
++<br>
++If you&#39;re bored enough to read this, go see a video of boxed cats<br>
++<br>
++@b{Arguments:} the members of @code{Object}<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{cmd-feat1}<br>
++a feature<br>
++@item @code{cmd-feat2}<br>
++another feature<br>
++@end table<br>
++<br>
++@b{Example:}<br>
++@example<br>
++-&gt; in<br>
++<br>
++&lt;- out<br>
++@end example<br>
++<br>
++@end deftypefn<br>
++<br>
++<br>
++<br>
++@deftypefn Event {} EVT-BOXED<br>
++<br>
++<br>
++<br>
++@b{Arguments:} the members of @code{Object}<br>
++<br>
++@b{Features:}<br>
++@table @asis<br>
++@item @code{feat3}<br>
++a feature<br>
++@end table<br>
++<br>
++@end deftypefn<br>
++<br>
+make: *** [Makefile.mtest:63: check-qapi-schema] Error 1<br>
 <br>
-=C2=A0tests/docker/dockerfiles/debian10.docker=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0|=C2=A0 =C2=A01 +<br>
-=C2=A0tests/docker/dockerfiles/debian9.docker=C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 |=C2=A0 =C2=A01 +<br>
-=C2=A0tests/qtest/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A01 -<br>
-=C2=A0tests/test-replication.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A04 +<br>
-=C2=A0tests/test-util-filemonitor.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A04 +-<br>
-=C2=A0tests/test-vmstate.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=
-=A04 +-<br>
-=C2=A0util/main-loop.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
-=C2=A0 =C2=A04 +<br>
-=C2=A026 files changed, 285 insertions(+), 44 deletions(-)<br>
-=C2=A0create mode 100644 .gitlab-ci.d/crossbuilds.yml<br>
-=C2=A0delete mode 100644 stubs/fd-register.c<br>
-=C2=A0delete mode 100644 stubs/notify-event.c<br>
-=C2=A0create mode 100644 stubs/qemu-timer-notify-cb.c<br>
+Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com" ta=
+rget=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+---<br>
+=C2=A0tests/qapi-schema/meson.build | 2 +-<br>
+=C2=A01 file changed, 1 insertion(+), 1 deletion(-)<br>
+<br>
+diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build<=
+br>
+index c87d141417..f1449298b0 100644<br>
+--- a/tests/qapi-schema/meson.build<br>
++++ b/tests/qapi-schema/meson.build<br>
+@@ -220,6 +220,6 @@ qapi_doc =3D custom_target(&#39;QAPI doc&#39;,<br>
+<br>
+=C2=A0# &quot;full_path()&quot; needed here to work around<br>
+=C2=A0# <a href=3D"https://github.com/mesonbuild/meson/issues/7585" rel=3D"=
+noreferrer" target=3D"_blank">https://github.com/mesonbuild/meson/issues/75=
+85</a><br>
+-test(&#39;QAPI doc&#39;, diff, args: [&#39;-u&#39;, files(&#39;doc-good.te=
+xi&#39;), qapi_doc[0].full_path()],<br>
++test(&#39;QAPI doc&#39;, diff, args: [&#39;-b&#39;, &#39;-u&#39;, files(&#=
+39;doc-good.texi&#39;), qapi_doc[0].full_path()],<br>
+=C2=A0 =C2=A0 =C2=A0 depends: qapi_doc,<br>
+=C2=A0 =C2=A0 =C2=A0 suite: [&#39;qapi-schema&#39;, &#39;qapi-doc&#39;])<br=
+>
+-- <br>
+2.28.0.windows.1<br>
 <br>
 </blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
  class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
 =87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
 =A0 sincerely,<br>Yonggang Luo<br></div></div>
 
---0000000000003c3c3405aebce252--
+--000000000000563a4605aebce5b3--
 
