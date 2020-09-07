@@ -2,94 +2,98 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 883A2C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:18:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A4ABC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:20:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E70E1207C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:18:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8329F2064B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:20:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mJcos/r2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E70E1207C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nYG/SqRH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8329F2064B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFEE2-0001MU-OO
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 06:18:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48150)
+	id 1kFEGV-0002Z0-Eb
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 06:20:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48554)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFEDS-0000xn-M7
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:17:38 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42959)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kFEFv-00023y-Mv
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:20:11 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42989)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFEDQ-0001dw-2u
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:17:38 -0400
-Received: by mail-wr1-x443.google.com with SMTP id c18so15179374wrm.9
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 03:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=W9a/LfMQc1HV7u5hEPDc3bEmXKHLSUhwVWJqWUvocsA=;
- b=mJcos/r2LFujs7pWObvMfTl5EGSlqmr+byja6IdJ8PuOhYVkLyvpycqGlMPzPLQgqI
- wtIAFPz0m9bTh8471df7T4oixzecoUjvQb5R1GDVHkZ+b1TJfndN98kiOFmKw5JYEdHN
- zfeqSJZrY3qeQSTDMLgyadF94gxV5p4HiEuaWn5uOKNHt8/Gdizcxb3rR7mvcMaPn0AI
- bmea2q56ampmgiWoSkC4wZimuwvgxrg9xyqDURcMFNAvx4IGyMGhtNlLTDuyq2pimZSI
- UBN1es5fYe4ZxCJty2JdQjq5uRPPCxEX0AXJX/FyyXgW3eqtQJnTmGiXpPe6y1fo1KD6
- brBw==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kFEFt-0001oE-Sg
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:20:11 -0400
+Received: by mail-wr1-x441.google.com with SMTP id c18so15187741wrm.9
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 03:20:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=vnpyYhZaeRqlBBMcs6XOlMjuNEcGFrdZOAleCSugNY0=;
+ b=nYG/SqRHcFIe8xbyHIzv3Dll7BnEVCkx7jlw4Drd43g0nKFvXjRpLz/aIqGUMQ4Zhs
+ 0Y/8u8MWvBF34m7px3bqQvLufAt7alzaaL1JHF+t6WsvDraciVy0ox6mqBbtlhcan5VW
+ syowHjOETs4JWHdBxkS1u/pEbYLJZ7ydWKm4jqjf6sVmAN8Fxcj5vHqSyvoy2xnVS5a3
+ ovvsx2lNouiaLy2Or0GbPajLetQI3Y4lKFTakHabe7ZJklVrDDqBiIZCajDTSkDyZr/r
+ KjR66Md9Up1L6qglAbem94PuP8Vvgf9ukkhGIdehw+b3tGqwTFuGpcg2hgsT8wZLHZWx
+ HTBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=W9a/LfMQc1HV7u5hEPDc3bEmXKHLSUhwVWJqWUvocsA=;
- b=CdSrHyMsRwSLOStnLDf/ggVGduyMeW/Dn0UAoZs6SxCCKZMFxHDnATLP8gJMZirDQA
- GUgBjtJzRFcYXUvCQwJY2VlbPhIgyshsjsswOkH5PRnIldgwXHzx3hbaPQ1pph7TDrsi
- OjCac9Tv0X2A21BelUl4eIMZW6UftftYvUhctJlqfwhQN/WBdZuPLY4uaQc6BzkabD2o
- +bxreldgP/o8MzqD/J+GdeTHrGL6ZBZL/7w+KNCUYVcLnjw9Zhjv02IO4P3/6aoJWXMD
- b2XFQGevsCoRtSJTkQGxbENtH+u5Gzdh2PZ1wP7BSTYtMSlq3rg1N8zgnZmzCjtaOm5E
- cR8A==
-X-Gm-Message-State: AOAM533AVtdi+czdC+HyZHHa0BivQUGI53cjWiHz3R5lFBvOj83vm3QE
- LYMWDVXUHQAXlNfOCAcJWl/HGg==
-X-Google-Smtp-Source: ABdhPJx1E68dg2vxr0+tBMhueEUsD4WrBswfAeNOYT+keVH+Fj2jGHj2DNVwS7EYqIutUsI/Y0NftQ==
-X-Received: by 2002:adf:f80a:: with SMTP id s10mr22009369wrp.351.1599473853515; 
- Mon, 07 Sep 2020 03:17:33 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id o4sm24115007wru.55.2020.09.07.03.17.32
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 03:17:32 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E36B51FF7E;
- Mon,  7 Sep 2020 11:17:31 +0100 (BST)
-References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
- <159903455305.28509.6834799024577960185.stgit@pasha-ThinkPad-X280>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Subject: Re: [PATCH v3 01/15] replay: don't record interrupt poll
-In-reply-to: <159903455305.28509.6834799024577960185.stgit@pasha-ThinkPad-X280>
-Date: Mon, 07 Sep 2020 11:17:31 +0100
-Message-ID: <874ko9sxfo.fsf@linaro.org>
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=vnpyYhZaeRqlBBMcs6XOlMjuNEcGFrdZOAleCSugNY0=;
+ b=ieBc2gI05kQr7ou08CLcVYVEa/IRRO4WNJNz42FaGSJSAw9XH5Boqxy0VfdArx+J4R
+ b52zQr2kqwxgWfKbJNqupySCbfPgXhO05wfiDmhV7C1w51qxiNviO/YBFAP2n0OSC/bk
+ YGD2VVVlh5BRUgaBG+mAcaYiCfVTOJhxDxgE1PxeWACgHe+EXeJjqV0N+CjqMcy4I7K+
+ osaiPLd8vmoMcrJYRZlQqPdki+DlD3DMZOXqCDsT3AQ3Edh8RfdskZkiA30aEugc21z5
+ luCZS4xVld/F7WtMAZaGS3VqU39icwLDfh3mvSWtTpkN2486CJQ2F9KVYUOtv9EtK1xT
+ MqkA==
+X-Gm-Message-State: AOAM530fuKI1XedJmH9pE92cH86a2u2c4eoD0YAH2dAcFAw0A1Gjx32w
+ BiKAcQWXtMSvM6sseQxZ9pQ=
+X-Google-Smtp-Source: ABdhPJxxGqkAemMfHjv3dKgZsbk9W64CxrHQPZWtiYaVnUAwRlyUIMplHj0tRUTxEEWt4Y3m986aIA==
+X-Received: by 2002:adf:dcd1:: with SMTP id x17mr22274660wrm.150.1599474007985; 
+ Mon, 07 Sep 2020 03:20:07 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id w15sm27839165wro.46.2020.09.07.03.20.06
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 07 Sep 2020 03:20:06 -0700 (PDT)
+Subject: Re: [PULL 3/5] softmmu/cpus: Only set parallel_cpus for SMP
+To: Claudio Fontana <cfontana@suse.de>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+References: <20200903214101.1746878-1-richard.henderson@linaro.org>
+ <20200903214101.1746878-4-richard.henderson@linaro.org>
+ <1f573d2d-b3bb-21ab-bbcd-b759fc14ad2b@suse.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3dfae924-34c9-e36a-77bf-f3abcdeaf268@amsat.org>
+Date: Mon, 7 Sep 2020 12:20:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <1f573d2d-b3bb-21ab-bbcd-b759fc14ad2b@suse.de>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-2.69,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -104,83 +108,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, crosa@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
- philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/7/20 12:05 PM, Claudio Fontana wrote:
+> Hi Richard,
+> 
+> currently rebasing on top of this one,
+> just a question, why is the patch not directly using "current_machine"?
 
-Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
+For user mode?
 
-> Interrupt poll is not a real interrupt event. It is needed only for
-> thread safety. This interrupt is used for i386 and converted
-> to hardware interrupt by cpu_handle_interrupt function.
-> Therefore it is not needed to be recorded, because hardware
-> interrupt will be recorded after converting.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-> ---
->  accel/tcg/cpu-exec.c |   11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
->
-> diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-> index 66d38f9d85..28aff1bb1e 100644
-> --- a/accel/tcg/cpu-exec.c
-> +++ b/accel/tcg/cpu-exec.c
-> @@ -429,8 +429,7 @@ static inline bool cpu_handle_halt(CPUState *cpu)
->  {
->      if (cpu->halted) {
->  #if defined(TARGET_I386) && !defined(CONFIG_USER_ONLY)
-> -        if ((cpu->interrupt_request & CPU_INTERRUPT_POLL)
-> -            && replay_interrupt()) {
-> +        if (cpu->interrupt_request & CPU_INTERRUPT_POLL) {
->              X86CPU *x86_cpu =3D X86_CPU(cpu);
->              qemu_mutex_lock_iothread();
->              apic_poll_irq(x86_cpu->apic_state);
-> @@ -587,7 +586,13 @@ static inline bool cpu_handle_interrupt(CPUState *cp=
-u,
->             and via longjmp via cpu_loop_exit.  */
->          else {
->              if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
-> -                replay_interrupt();
-> +                if (true
-> +#if defined(TARGET_I386)
-> +                    && !(interrupt_request & CPU_INTERRUPT_POLL)
-> +#endif
-> +                ) {
-> +                    replay_interrupt();
-> +                }
-
-The cpu-exec code has enough special casing in it without adding more
-ugly ifdefs. You could hoist the check into:
-
-  /*
-   * CPU_INTERRUPT_POLL is a virtual event which gets converted into a
-   * "real" interrupt event later. It does not need to be recorded for
-   * replay purposes.
-   */
-  static inline bool replay_valid_interrupt(int interrupt) {
-  #ifdef TARGET_I386
-      return !(interrupt_request & CPU_INTERRUPT_POLL);
-  #else
-      return true;
-  #endif
-  }
-
-and then the logic is a cleaner in the function:
-
-  if (cc->cpu_exec_interrupt(cpu, interrupt_request)) {
-      if (replay_valid_interrupt(interrupt_request)) {
-          replay_interrupt();
-      }
-
-Otherwise:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
+> 
+> Is using MACHINE(qdev_get_machine()) preferrable here?
+> 
+> Thanks,
+> 
+> Claudio
+> 
+> On 9/3/20 11:40 PM, Richard Henderson wrote:
+>> Do not set parallel_cpus if there is only one cpu instantiated.
+>> This will allow tcg to use serial code to implement atomics.
+>>
+>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>> ---
+>>  softmmu/cpus.c | 11 ++++++++++-
+>>  1 file changed, 10 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+>> index a802e899ab..e3b98065c9 100644
+>> --- a/softmmu/cpus.c
+>> +++ b/softmmu/cpus.c
+>> @@ -1895,6 +1895,16 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>>      if (!tcg_region_inited) {
+>>          tcg_region_inited = 1;
+>>          tcg_region_init();
+>> +        /*
+>> +         * If MTTCG, and we will create multiple cpus,
+>> +         * then we will have cpus running in parallel.
+>> +         */
+>> +        if (qemu_tcg_mttcg_enabled()) {
+>> +            MachineState *ms = MACHINE(qdev_get_machine());
+> 
+> MachineState *ms = current_machine;
+> ?
+> 
+> 
+>> +            if (ms->smp.max_cpus > 1) {
+>> +                parallel_cpus = true;
+>> +            }
+>> +        }
+>>      }
+>>  
+>>      if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
+>> @@ -1904,7 +1914,6 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>>  
+>>          if (qemu_tcg_mttcg_enabled()) {
+>>              /* create a thread per vCPU with TCG (MTTCG) */
+>> -            parallel_cpus = true;
+>>              snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+>>                   cpu->cpu_index);
+>>  
+>>
+> 
+> 
 
