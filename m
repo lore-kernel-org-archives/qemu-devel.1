@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76138C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:14:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF7DC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:15:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01CB3218AC
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:14:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E126221919
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:15:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MkHdalPa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01CB3218AC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RCNBiAzl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E126221919
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFF6r-0002e0-3z
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:14:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58984)
+	id 1kFF7D-0002t9-SM
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:15:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2N-0002Yp-QI
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:15 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:34080
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF24-0001xg-Gh
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:56 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:37116
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2K-0007w8-JT
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:15 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF22-0007sT-Np
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599477011;
+ s=mimecast20190719; t=1599476993;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=uYKL4EUIg+tiDvl0ohfIl6kYYHmyzDlUQkHeFO5keDU=;
- b=MkHdalPaGWXpBn/eWrYc1xTE+I+NIr7ZfOQNodncrqQZsUFMuMMeSpwEMDN5TPgO3Dhk+0
- NQ53tLqS2k4tobHBgVVNAttb0tMSBwlS02a6p/u4VM1GgUJY9IHArmZg7qkdSXdFDMi52E
- vrC03cbx+ltJejmAbEBzP0KzBsCsmAQ=
+ bh=i0uKVqpxa7wGGtsTL+0P6si5G+VY/3o6ZWlaDQJN9cA=;
+ b=RCNBiAzlB9iH96ioVRFTQLC6dmAKOX3pu+VNmZ0LF6Xu5ttrboQkkaWuHZJsX710ihfWJN
+ 6y50+/AV3CGxve2y3dql687aCkX8ZzPSLtVUALPhoxwtBzJ4Hcjkp6CunqdW/7g3LS6ruC
+ H0LGKoLKfnIeW94wV7urqmYYYMQi6OQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-jydXnBrrMziKdtX0nY-Ztg-1; Mon, 07 Sep 2020 07:10:09 -0400
-X-MC-Unique: jydXnBrrMziKdtX0nY-Ztg-1
+ us-mta-298-Mt9T1ifJM02nXa16bJyjzA-1; Mon, 07 Sep 2020 07:09:51 -0400
+X-MC-Unique: Mt9T1ifJM02nXa16bJyjzA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 04A481084C8A;
- Mon,  7 Sep 2020 11:10:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D3A2A1007469;
+ Mon,  7 Sep 2020 11:09:50 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 10AA77E435;
- Mon,  7 Sep 2020 11:10:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C32C99CBA;
+ Mon,  7 Sep 2020 11:09:49 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 18/64] block: Add chain helper functions
-Date: Mon,  7 Sep 2020 13:08:50 +0200
-Message-Id: <20200907110936.261684-19-kwolf@redhat.com>
+Subject: [PULL 07/64] block/nvme: Use common error path in nvme_add_io_queue()
+Date: Mon,  7 Sep 2020 13:08:39 +0200
+Message-Id: <20200907110936.261684-8-kwolf@redhat.com>
 In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
 References: <20200907110936.261684-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 22:29:02
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
@@ -100,101 +100,53 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Add some helper functions for skipping filters in a chain of block
-nodes.
+Rearrange nvme_add_io_queue() by using a common error path.
+This will be proven useful in few commits where we add IRQ
+notification to the IO queues.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200821195359.1285345-7-philmd@redhat.com>
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/block/block_int.h |  3 ++
- block.c                   | 62 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
+ block/nvme.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index f280a95b26..8205ccaa62 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1394,6 +1394,9 @@ BdrvChild *bdrv_cow_child(BlockDriverState *bs);
- BdrvChild *bdrv_filter_child(BlockDriverState *bs);
- BdrvChild *bdrv_filter_or_cow_child(BlockDriverState *bs);
- BdrvChild *bdrv_primary_child(BlockDriverState *bs);
-+BlockDriverState *bdrv_skip_implicit_filters(BlockDriverState *bs);
-+BlockDriverState *bdrv_skip_filters(BlockDriverState *bs);
-+BlockDriverState *bdrv_backing_chain_next(BlockDriverState *bs);
- 
- static inline BlockDriverState *child_bs(BdrvChild *child)
- {
-diff --git a/block.c b/block.c
-index 9f866e8676..b162142609 100644
---- a/block.c
-+++ b/block.c
-@@ -7034,3 +7034,65 @@ BdrvChild *bdrv_primary_child(BlockDriverState *bs)
- 
-     return found;
+diff --git a/block/nvme.c b/block/nvme.c
+index 91dba4ec5d..909a565184 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -649,8 +649,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
+     };
+     if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
+         error_setg(errp, "Failed to create CQ io queue [%d]", n);
+-        nvme_free_queue_pair(q);
+-        return false;
++        goto out_error;
+     }
+     cmd = (NvmeCmd) {
+         .opcode = NVME_ADM_CMD_CREATE_SQ,
+@@ -660,13 +659,15 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
+     };
+     if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
+         error_setg(errp, "Failed to create SQ io queue [%d]", n);
+-        nvme_free_queue_pair(q);
+-        return false;
++        goto out_error;
+     }
+     s->queues = g_renew(NVMeQueuePair *, s->queues, n + 1);
+     s->queues[n] = q;
+     s->nr_queues++;
+     return true;
++out_error:
++    nvme_free_queue_pair(q);
++    return false;
  }
-+
-+static BlockDriverState *bdrv_do_skip_filters(BlockDriverState *bs,
-+                                              bool stop_on_explicit_filter)
-+{
-+    BdrvChild *c;
-+
-+    if (!bs) {
-+        return NULL;
-+    }
-+
-+    while (!(stop_on_explicit_filter && !bs->implicit)) {
-+        c = bdrv_filter_child(bs);
-+        if (!c) {
-+            /*
-+             * A filter that is embedded in a working block graph must
-+             * have a child.  Assert this here so this function does
-+             * not return a filter node that is not expected by the
-+             * caller.
-+             */
-+            assert(!bs->drv || !bs->drv->is_filter);
-+            break;
-+        }
-+        bs = c->bs;
-+    }
-+    /*
-+     * Note that this treats nodes with bs->drv == NULL as not being
-+     * filters (bs->drv == NULL should be replaced by something else
-+     * anyway).
-+     * The advantage of this behavior is that this function will thus
-+     * always return a non-NULL value (given a non-NULL @bs).
-+     */
-+
-+    return bs;
-+}
-+
-+/*
-+ * Return the first BDS that has not been added implicitly or that
-+ * does not have a filtered child down the chain starting from @bs
-+ * (including @bs itself).
-+ */
-+BlockDriverState *bdrv_skip_implicit_filters(BlockDriverState *bs)
-+{
-+    return bdrv_do_skip_filters(bs, true);
-+}
-+
-+/*
-+ * Return the first BDS that does not have a filtered child down the
-+ * chain starting from @bs (including @bs itself).
-+ */
-+BlockDriverState *bdrv_skip_filters(BlockDriverState *bs)
-+{
-+    return bdrv_do_skip_filters(bs, false);
-+}
-+
-+/*
-+ * For a backing chain, return the first non-filter backing image of
-+ * the first non-filter image.
-+ */
-+BlockDriverState *bdrv_backing_chain_next(BlockDriverState *bs)
-+{
-+    return bdrv_skip_filters(bdrv_cow_bs(bdrv_skip_filters(bs)));
-+}
+ 
+ static bool nvme_poll_cb(void *opaque)
 -- 
 2.25.4
 
