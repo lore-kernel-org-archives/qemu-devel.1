@@ -2,120 +2,74 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5960DC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 15:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 709EEC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 15:15:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 69A6920678
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 15:12:07 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="d8RnsC3G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 69A6920678
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 84D6820678
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 15:15:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84D6820678
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFIoQ-0001q0-8S
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 11:12:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56658)
+	id 1kFIrY-000407-MW
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 11:15:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1kFInV-0001BC-Lc; Mon, 07 Sep 2020 11:11:09 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:32902)
+ (Exim 4.90_1) (envelope-from <ligang6@huawei.com>)
+ id 1kFHlA-0003Cs-4G
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 10:04:40 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:43572 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
- id 1kFInS-0004pJ-PC; Mon, 07 Sep 2020 11:11:08 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 087F3iDa065914; Mon, 7 Sep 2020 11:10:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=date : from : to : cc :
- subject : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=pp1;
- bh=0uT1Wh3NsrCyhry/BDzdibfaWs2fQbiYxDW51MVpoaI=;
- b=d8RnsC3GWpqKB8EVHSVfUXP4kWt6nvv+tKT+MOXciV5luzqfH5tySxcB979+PetploWV
- 6PCnByP7NaQJrpQb5giUYlo+8ggkZGjK5iz7YegXCrpBpEcd76thYGkRf4JHmIRzt26A
- emvqWGDFhUXmG7ZgAAQcxPQeKvMxNFoUwbB6If5gPqAjZJWG3diiFkWsfwJQCDvjAdRb
- VQtYVf2GoAVmbXS8yg2CEug4y8iCNy5UOuFMWcA70hEJjq769Htt0gkbOx25ncDGAHe6
- yGTzYf5PyGIrmdKUYZfWlErvxRc/EikV9NxVsP83Du3yCytztAmeNb7jWsQ825uplDIv 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33dq2d8apn-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 07 Sep 2020 11:10:56 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 087F4HAB067012;
- Mon, 7 Sep 2020 11:10:55 -0400
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.98])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33dq2d8ans-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 07 Sep 2020 11:10:55 -0400
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
- by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 087F28JI014122;
- Mon, 7 Sep 2020 15:10:52 GMT
-Received: from b06cxnps4075.portsmouth.uk.ibm.com
- (d06relay12.portsmouth.uk.ibm.com [9.149.109.197])
- by ppma03ams.nl.ibm.com with ESMTP id 33c2a82h2p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 07 Sep 2020 15:10:52 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com
- [9.149.105.60])
- by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 087FAnZb36307338
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 7 Sep 2020 15:10:49 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CC76F42041;
- Mon,  7 Sep 2020 15:10:49 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D370542042;
- Mon,  7 Sep 2020 15:10:48 +0000 (GMT)
-Received: from oc2783563651 (unknown [9.145.173.93])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Mon,  7 Sep 2020 15:10:48 +0000 (GMT)
-Date: Mon, 7 Sep 2020 17:10:46 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [for-5.2 v4 09/10] host trust limitation: Alter virtio default
- properties for protected guests
-Message-ID: <20200907171046.18211111.pasic@linux.ibm.com>
-In-Reply-To: <20200724025744.69644-10-david@gibson.dropbear.id.au>
-References: <20200724025744.69644-1-david@gibson.dropbear.id.au>
- <20200724025744.69644-10-david@gibson.dropbear.id.au>
-Organization: IBM
-X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <ligang6@huawei.com>)
+ id 1kFHl6-00047A-Ku
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 10:04:39 -0400
+Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.54])
+ by Forcepoint Email with ESMTP id E2C1A918B914A4AD88C4;
+ Mon,  7 Sep 2020 22:04:20 +0800 (CST)
+Received: from dggeme758-chm.china.huawei.com (10.3.19.104) by
+ dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1913.5; Mon, 7 Sep 2020 22:04:20 +0800
+Received: from dggeme758-chm.china.huawei.com ([10.6.80.69]) by
+ dggeme758-chm.china.huawei.com ([10.6.80.69]) with mapi id 15.01.1913.007;
+ Mon, 7 Sep 2020 22:04:20 +0800
+From: "ligang (P)" <ligang6@huawei.com>
+To: "kvm@veger.kernel.org" <kvm@veger.kernel.org>, "libvir-list@redhat.com"
+ <libvir-list@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Subject: watchdog fed successfully event of 6300esb
+Thread-Topic: watchdog fed successfully event of 6300esb
+Thread-Index: AdaFH7BNpUzBhBuURViHR9x8GKhq/w==
+Date: Mon, 7 Sep 2020 14:04:20 +0000
+Message-ID: <624825e298f94650a7b69f483c9de84d@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.182.123.125]
+Content-Type: multipart/alternative;
+ boundary="_000_624825e298f94650a7b69f483c9de84dhuaweicom_"
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-07_10:2020-09-07,
- 2020-09-07 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 adultscore=0
- mlxlogscore=999 phishscore=0 impostorscore=0 priorityscore=1501 mlxscore=0
- suspectscore=0 clxscore=1011 bulkscore=0 spamscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009070149
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 11:11:03
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.255; envelope-from=ligang6@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 10:04:21
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Mon, 07 Sep 2020 11:14:03 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -127,126 +81,176 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pair@us.ibm.com, Cornelia Huck <cohuck@redhat.com>, brijesh.singh@amd.com,
- frankja@linux.ibm.com, kvm@vger.kernel.org,
- "Michael S. Tsirkin" <mst@redhat.com>, David Hildenbrand <david@redhat.com>,
- qemu-devel@nongnu.org, dgilbert@redhat.com,
- Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
- Boris Fiuczynski <fiuczy@linux.ibm.com>, qemu-ppc@nongnu.org,
- "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
- Bjoern Walk <bwalk@linux.ibm.com>, Thomas Huth <thuth@redhat.com>,
- pbonzini@redhat.com, Richard Henderson <rth@twiddle.net>,
- mdroth@linux.vnet.ibm.com, ehabkost@redhat.com
+Cc: "openstack-discuss@lists.openstack.org"
+ <openstack-discuss@lists.openstack.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 24 Jul 2020 12:57:43 +1000
-David Gibson <david@gibson.dropbear.id.au> wrote:
+--_000_624825e298f94650a7b69f483c9de84dhuaweicom_
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-> The default behaviour for virtio devices is not to use the platforms normal
-> DMA paths, but instead to use the fact that it's running in a hypervisor
-> to directly access guest memory.  That doesn't work if the guest's memory
-> is protected from hypervisor access, such as with AMD's SEV or POWER's PEF.
-> 
-> So, if a host trust limitation mechanism is enabled, then apply the
-> iommu_platform=on option so it will go through normal DMA mechanisms.
-> Those will presumably have some way of marking memory as shared with the
-> hypervisor or hardware so that DMA will work.
+Hi folks,
 
-Sorry for being this late. I had to do some high priority debugging,
-which made me drop everything else, and after that I had some vacation.
+I have an question to discuss about the 6300esb watchdog.
 
-I have some questions about the bigger picture. The promised benefit of
-this patch for users that invoke QEMU manually is relatively clear: it
-alters the default value of some virtio properties, so that using the
-defaults does not result in a bugous configuration.
+I think is it possible that qemu can send an event while the watchdog succe=
+ssfully fed by the vm at the first time.
 
-This comes at a price. I used to think of device property default values
-like this. If I don't specify it and I use the default machine, I will
-effectively get the the default value of of the property (as reported by
-qemu -device dev-name,?). If I use a compat machine, then I will get the
-compatibility default value: i.e. the what is reported as the default
-value, if I invoke the binary whose default machine is my compat machine.
+Here is the situation:
 
-With this patch, that reasoning is not valid any more. Did we do
-something like this before, or is this the first time we introduce this
-complication?
+Qemu will send an VIR_DOMAIN_EVENT_ID_WATCHDOG event while watch dog timeou=
+t, and if the action of the watchdog in xml of the vm was set to "reset", t=
+he vm will be rebooted while timeout.
 
-In any case, I suppose, this change needs a documentation update, which I
-could not find in the series.
+I have an monitor process that register callback function of the VIR_DOMAIN=
+_EVENT_ID_WATCHDOG event, the callback function will send an alarm to my up=
+per layer monitor platform indicate that the vm is fault, and the cluster d=
+eployed business on the vm will isolate the vm by the alarm.
 
-How are things supposed to pan out when QEMU is used with management
-software?
+And after the vm rebooted , the monitor process will receive an reboot even=
+t and send it to the platform, the upper layer monitor platform will clear =
+the alarm, and business continue to run on the vm.
 
-I was told that libvirt's policy is to be explicit and not let QEMU use
-defaults. But this policy does not seem to apply to iommu_platform -- at
-least not on s390x. Why is this? Is this likely to change in the future?
+In most cases ,the watch dog process in vm will feed the watchdog after vm =
+rebooted and all things go back on track.
 
-Furthermore, the libvirt documentation is IMHO not that great when it
-comes to iommu_platform. All I've found is 
+In some other cases,the guestos may failed to start (in my environment vm s=
+tart failed by io error), but the reboot event will still be received and t=
+he alarm will be cleared and the vm is still fault. So the this may not a g=
+ood idea to clear the alarm by the reboot event.
 
-"""
-Virtio-related options
+So, I think it will be helpful that the qemu can send an event while the wa=
+tchdog successfully fed by the vm at the first time. So I can exactly know =
+that the guest os go back on running and the watch dog initialized successf=
+ully.
+
+Or any other opintion about this situation.
+
+Thanks.
 
 
-QEMU's virtio devices have some attributes related to the virtio transport under the driver element: The iommu attribute enables the use of emulated IOMMU by the device. 
-"""
+--_000_624825e298f94650a7b69f483c9de84dhuaweicom_
+Content-Type: text/html; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 
-which:
-* Is not explicit about the default, but suggests that default is off
-  (because it needs to be enabled), which would reflect the current state
-  of affairs (without this patch).
-* Makes me wonder, to what extent does the libvirt concept correspond
-  to the virtio semantics of _F_ACCESS_PLATFORM. I.e. we don't really
-  do any IOMMU emulation with virtio-ccw.
+<html xmlns:v=3D"urn:schemas-microsoft-com:vml" xmlns:o=3D"urn:schemas-micr=
+osoft-com:office:office" xmlns:w=3D"urn:schemas-microsoft-com:office:word" =
+xmlns:m=3D"http://schemas.microsoft.com/office/2004/12/omml" xmlns=3D"http:=
+//www.w3.org/TR/REC-html40">
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dus-ascii"=
+>
+<meta name=3D"Generator" content=3D"Microsoft Word 15 (filtered medium)">
+<style><!--
+/* Font Definitions */
+@font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:2 4 5 3 5 4 6 3 2 4;}
+@font-face
+	{font-family:Calibri;
+	panose-1:2 15 5 2 2 2 4 3 2 4;}
+@font-face
+	{font-family:SimSun;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+/* Style Definitions */
+p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	font-size:10.5pt;
+	font-family:"Calibri",sans-serif;}
+a:link, span.MsoHyperlink
+	{mso-style-priority:99;
+	color:#0563C1;
+	text-decoration:underline;}
+a:visited, span.MsoHyperlinkFollowed
+	{mso-style-priority:99;
+	color:#954F72;
+	text-decoration:underline;}
+span.EmailStyle17
+	{mso-style-type:personal-compose;
+	font-family:"Calibri",sans-serif;
+	color:windowtext;}
+.MsoChpDefault
+	{mso-style-type:export-only;
+	font-family:"Calibri",sans-serif;}
+/* Page Definitions */
+@page WordSection1
+	{size:612.0pt 792.0pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;}
+div.WordSection1
+	{page:WordSection1;}
+--></style><!--[if gte mso 9]><xml>
+<o:shapedefaults v:ext=3D"edit" spidmax=3D"1026" />
+</xml><![endif]--><!--[if gte mso 9]><xml>
+<o:shapelayout v:ext=3D"edit">
+<o:idmap v:ext=3D"edit" data=3D"1" />
+</o:shapelayout></xml><![endif]-->
+</head>
+<body lang=3D"ZH-CN" link=3D"#0563C1" vlink=3D"#954F72" style=3D"text-justi=
+fy-trim:punctuation">
+<div class=3D"WordSection1">
+<p class=3D"MsoNormal"><span lang=3D"EN-US">Hi folks,<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">I have an question to discuss a=
+bout the 6300esb watchdog.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">I think is it possible that qem=
+u can send an event while the watchdog successfully fed by the vm at the fi=
+rst time.
+<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">Here is the situation:<o:p></o:=
+p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">Qemu will send an VIR_DOMAIN_EV=
+ENT_ID_WATCHDOG event while watch dog timeout, and if the action of the wat=
+chdog in xml of the vm was set to &#8220;reset&#8221;, the vm will be reboo=
+ted while timeout.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">I have an monitor process that =
+register callback function of the VIR_DOMAIN_EVENT_ID_WATCHDOG event, the c=
+allback function will send an alarm to my upper layer monitor platform indi=
+cate that the vm is fault, and the cluster
+ deployed business on the vm will isolate the vm by the alarm. <o:p></o:p><=
+/span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">And after the vm rebooted , the=
+ monitor process will receive an reboot event and send it to the platform, =
+the upper layer monitor platform will clear the alarm, and business continu=
+e to run on the vm.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">In most cases ,the watch dog pr=
+ocess in vm will feed the watchdog after vm rebooted and all things go back=
+ on track.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">In some other cases,the guestos=
+ may failed to start (in my environment vm start failed by io error), but t=
+he reboot event will still be received and the alarm will be cleared and th=
+e vm is still fault. So the this may
+ not a good idea to clear the alarm by the reboot event.<o:p></o:p></span><=
+/p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">So, I think it will be helpful =
+that the qemu can send an event while the watchdog successfully fed by the =
+vm at the first time. So I can exactly know that the guest os go back on ru=
+nning and the watch dog initialized
+ successfully.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">Or any other opintion about thi=
+s situation.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US">Thanks.<o:p></o:p></span></p>
+<p class=3D"MsoNormal"><span lang=3D"EN-US"><o:p>&nbsp;</o:p></span></p>
+</div>
+</body>
+</html>
 
-I guess host trust limitation is something that is to be expressed in
-libvirt, or? Do we have a design for that?
-
-I was also reflecting on how does this patch compare to on/off/auto, but
-this email is already too long, so decided keep my thoughts for myself
--- for now.
-
-Regards,
-Halil
-
-> 
-> Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/core/machine.c | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/hw/core/machine.c b/hw/core/machine.c
-> index b599b0ba65..2a723bf07b 100644
-> --- a/hw/core/machine.c
-> +++ b/hw/core/machine.c
-> @@ -28,6 +28,8 @@
->  #include "hw/mem/nvdimm.h"
->  #include "migration/vmstate.h"
->  #include "exec/host-trust-limitation.h"
-> +#include "hw/virtio/virtio.h"
-> +#include "hw/virtio/virtio-pci.h"
->  
->  GlobalProperty hw_compat_5_0[] = {
->      { "virtio-balloon-device", "page-poison", "false" },
-> @@ -1161,6 +1163,15 @@ void machine_run_board_init(MachineState *machine)
->           * areas.
->           */
->          machine_set_mem_merge(OBJECT(machine), false, &error_abort);
-> +
-> +        /*
-> +         * Virtio devices can't count on directly accessing guest
-> +         * memory, so they need iommu_platform=on to use normal DMA
-> +         * mechanisms.  That requires disabling legacy virtio support
-> +         * for virtio pci devices
-> +         */
-> +        object_register_sugar_prop(TYPE_VIRTIO_PCI, "disable-legacy", "on");
-> +        object_register_sugar_prop(TYPE_VIRTIO_DEVICE, "iommu_platform", "on");
->      }
->  
->      machine_class->init(machine);
-
-
-
+--_000_624825e298f94650a7b69f483c9de84dhuaweicom_--
 
