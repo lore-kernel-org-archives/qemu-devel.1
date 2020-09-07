@@ -2,65 +2,68 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A15F6C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:50:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E49B3C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:51:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29B50207C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:50:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74428207C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:51:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ToDm089M"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29B50207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QrujSPVf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74428207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51924 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFFfH-0004xY-8m
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:50:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39434)
+	id 1kFFfo-0005qi-Km
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:51:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kFFeU-00041G-Vt
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:49:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:49575
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kFFa9-0005iJ-Em
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:45:09 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:49825
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kFFeT-0004Ew-Cn
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:49:38 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kFFa7-0003lE-9u
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:45:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599479376;
+ s=mimecast20190719; t=1599479106;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=YigVYd9HHjUTHOnVxm5Z1OFwlTDzfV9E1ceviX4q3bI=;
- b=ToDm089M5w6VtRuWTyjmOnsZJfmA6sRg8VxMPHBOwAxHOZhfdzXSAF0xdU8iXIbkLDZf2K
- xJr8KU8EQ0OZ6ndGykCdjnPhXJgHuzuvoW07b6pS1Ql73ldaShdGTv/trSy8hUm//5BEm0
- +ZWHWPbas4mYNH6hN7k3cy064pAk2YA=
+ bh=3PY+iHzCzYNaFJDP+3GmaN02aP257qQCnWM68c4YePo=;
+ b=QrujSPVfH44L1gqVn1T87TFghD+tZXEn3OX6/K6D07yT566HIQZDw97UgHXxftU7yYpPWW
+ KToTfhAEKCRzFcqVNXtOnTuDb4S1DiYYvUCwgDGkcTs5SNS1q1QM0+kpiAgomGVxTbXyJR
+ xuIt3hZQZXxNy/p2LYcrs3Itj5encRg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-427-Q4jgqFacOBWB6EhrOVMUcA-1; Mon, 07 Sep 2020 07:49:31 -0400
-X-MC-Unique: Q4jgqFacOBWB6EhrOVMUcA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-273-nwYzBXWINxyczQomNJssMA-1; Mon, 07 Sep 2020 07:45:03 -0400
+X-MC-Unique: nwYzBXWINxyczQomNJssMA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 10BE41084C85;
- Mon,  7 Sep 2020 11:49:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9691A1007461;
+ Mon,  7 Sep 2020 11:45:02 +0000 (UTC)
 Received: from dresden.str.redhat.com (ovpn-113-5.ams2.redhat.com
  [10.36.113.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B51E60C0F;
- Mon,  7 Sep 2020 11:49:29 +0000 (UTC)
-Subject: Re: [PATCH v2] iotests: Skip test_stream_parallel in test 030 when
- doing "make check"
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
- Kevin Wolf <kwolf@redhat.com>
-References: <20200907113824.134788-1-thuth@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 637575D9D2;
+ Mon,  7 Sep 2020 11:45:00 +0000 (UTC)
+Subject: Re: [PATCH v8 6/7] block-stream: freeze link to base node during
+ stream job
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1598633579-221780-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1598633579-221780-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <9739719d-0681-d839-cf8d-398b78b6d323@redhat.com>
+ <3a52e54e-22fe-6eee-439a-dc1db0a1bf63@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -86,23 +89,23 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <db917b80-3817-a92b-b0bc-5b00b0b2e533@redhat.com>
-Date: Mon, 7 Sep 2020 13:49:28 +0200
+Message-ID: <a6bc0dc7-12d8-6a63-6885-2cbff7da580a@redhat.com>
+Date: Mon, 7 Sep 2020 13:44:58 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200907113824.134788-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <3a52e54e-22fe-6eee-439a-dc1db0a1bf63@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="O3OoW5mGdxzacnsnnedZ1hNSPMsGLwuWD"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
+ boundary="xMAuV21ekUqKb38sa4PeEQRGAbCbLhh66"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 22:29:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -39
 X-Spam_score: -4.0
@@ -123,62 +126,140 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org
+Cc: kwolf@redhat.com, jsnow@redhat.com, qemu-devel@nongnu.org,
+ armbru@redhat.com, den@openvz.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---O3OoW5mGdxzacnsnnedZ1hNSPMsGLwuWD
-Content-Type: multipart/mixed; boundary="EAKStK6iUTESXo3bx5IZd2mIR7GOWS7Pu"
+--xMAuV21ekUqKb38sa4PeEQRGAbCbLhh66
+Content-Type: multipart/mixed; boundary="jUhDgyB1e8dyxnVBUfmv7HWW0EI9cSBLf"
 
---EAKStK6iUTESXo3bx5IZd2mIR7GOWS7Pu
+--jUhDgyB1e8dyxnVBUfmv7HWW0EI9cSBLf
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 07.09.20 13:38, Thomas Huth wrote:
-> The test_stream_parallel test still occasionally fails in the CI.
-> Thus let's disable it during "make check" for now so that it does
-> not cause trouble during merge tests. We can enable it again once
-> the problem has been resolved.
+On 04.09.20 15:48, Vladimir Sementsov-Ogievskiy wrote:
+> 04.09.2020 16:21, Max Reitz wrote:
+>> On 28.08.20 18:52, Andrey Shinkevich wrote:
+>>> To keep the base node unchanged during the block-stream operation,
+>>> freeze it as the other part of the backing chain with the intermediate
+>>> nodes related to the job.
+>>> This patch revers the change made with the commit c624b015bf as the
+>>> correct base file name and its format have to be written down to the
+>>> QCOW2 header on the disk when the backing file is being changed after
+>>> the stream job completes.
+>>> This reversion incurs changes in the tests 030, 245 and discards the
+>>> test 258 where concurrent stream/commit jobs are tested. When the link
+>>> to a base node is frozen, the concurrent job cannot change the common
+>>> backing chain.
+>>>
+>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>> ---
+>>> =C2=A0 block/stream.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 29 ++------
+>>> =C2=A0 tests/qemu-iotests/030=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 10 +--
+>>> =C2=A0 tests/qemu-iotests/245=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 2 +=
+-
+>>> =C2=A0 tests/qemu-iotests/258=C2=A0=C2=A0=C2=A0=C2=A0 | 161
+>>> ---------------------------------------------
+>>> =C2=A0 tests/qemu-iotests/258.out |=C2=A0 33 ----------
+>>> =C2=A0 5 files changed, 14 insertions(+), 221 deletions(-)
+>>> =C2=A0 delete mode 100755 tests/qemu-iotests/258
+>>> =C2=A0 delete mode 100644 tests/qemu-iotests/258.out
+>>
+>> Does this need to be in this series?=C2=A0 (I=E2=80=99m not entirely sur=
+e, based on
+>> what I can see in patch 7.)
+>>
+>> When doing this, should we introduce a @bottom-node option alongside, so
+>> that we can make all the tests that are deleted here pass still, just
+>> with changes?
+>>
 >=20
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  v2: Use @unittest.skipIf() decorator
+> That's a question to discuss, and I asked Andrey to make this patch in th=
+is
+> simple way to see, how much damage we have with this change.
 >=20
->  tests/check-block.sh   | 3 +++
->  tests/qemu-iotests/030 | 2 ++
->  2 files changed, 5 insertions(+)
+> Honestly, I doubt that we need the new option. Previously, we decided tha=
+t
+> we can make this change without a deprecation. If we still going to do it=
+,
+> we shouldn't care about these use cases. So, if we freeze base again
+> wituhout
+> a depreaction and:
+>=20
+> 1. add bottom-node
+>=20
+> =C2=A0- we keep the iotests
+> =C2=A0- If (unlikely) someone will came and say: hey, you've broken my
+> working scenario, we will say "use bottom-node option, sorry"
+> =C2=A0- Most likely we'll have unused option and corresponding unused log=
+ic,
+> making code more complex for nothing (and we'll have to say "sorry" anywa=
+y)
+>=20
+> 2. without option
+>=20
+> =C2=A0- we loose the iotests. this looks scary, but it is honest: we drop
+> use-cases and corresponding iotests
+> =C2=A0- If (unlikely) someone will came and say: hey, you've broken my
+> working scenario, he will have to wait for next release / package
+> version / or update the downstream himself
+> =C2=A0- Most likely all will be OK.
 
-Thanks :)
+Well, yes, we=E2=80=99ll disrupt either way, but it is a difference whether=
+ we
+can tell people immediately that there=E2=80=99s an alternative now, or whe=
+ther
+we=E2=80=99ll have to make them wait for the next release.
 
-Applied to my block branch:
+Basically, the whole argument hinges on the question of whether anyone
+uses this right now or not, and we just don=E2=80=99t know.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+The question remains whether this patch is necessary for this series.
+We also have the option of introducing @bottom-node, leaving @base=E2=80=99=
+s
+behavior as-is and explaining it as a legacy option from which
+@bottom-node is inferred.  Then specifying @base just becomes weird and
+problem-prone when the graph is reconfigured while the job is active,
+but you can get around that by simply using the non-legacy option.
 
 Max
 
+> Hmm. OK, and the hard-way:
+>=20
+> 3. Enable all the new logic (filter insertion, freezing base, etc.) only
+> when filter-node-name option specified. And immediately deprecate
+> not-specifying the option.
+> =C2=A0[Note, that in way [3] we don't need bottom-node option]
+>=20
+>=20
+>=20
 
---EAKStK6iUTESXo3bx5IZd2mIR7GOWS7Pu--
 
---O3OoW5mGdxzacnsnnedZ1hNSPMsGLwuWD
+
+--jUhDgyB1e8dyxnVBUfmv7HWW0EI9cSBLf--
+
+--xMAuV21ekUqKb38sa4PeEQRGAbCbLhh66
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9WHkgACgkQ9AfbAGHV
-z0A4MQf/RURmKSgtPEAyPQJcNSsqNwoALIm7fLsJ4UH8X4mWkAf5FvQITISndmxB
-coPnUNDWjkf2tZGzqrynCNa17F3rLnhoxreftdS6V+mPXRmOMTneBrpbJQ+UrpKg
-QnCv6E8bUY4sFX+cjRHnZqu99BJ22RGhRRi8vyNZ4jl2HH3avQqFTbDgreQHxAw3
-qrBWkH2EyIHyVipafCtkf+LuYgu+kZJyT4VlwIZH0XtawA8+kSQBhx9VZj0jDar/
-OqQCCDE5v1r/6KqO7sLOots7WKdaZT36AvquPMussfo6GlJ5zzxPoZJQApJMBPIS
-3IhV3J8hVvLfoQ5ynfC3xus+HHqxVw==
-=pRCS
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9WHToACgkQ9AfbAGHV
+z0Bu4Af/SuSSTeXis+WcKl9o6upI50IjkSbs3hT7DzNmtJUACxZsQ2NUEWjQ+gWB
++t0NX166M3Sb5rAWakVq850sxMAjTtVbeFddNsvQUHj4yh84CxeF0k0pXw5uVtI/
+Acv2URA2HzQAxinmMLnJZD1XM23aM2ONGPyF2m0LYjydAHP5iDz7JgS6EKq+lwL3
+tQZ1NISgld+dH+WatDDyzVsxmIG2Kt/DoEDc4mLcJhb/tVqGwf2JKxvASAGg6B4N
+hGoq35MfLAEKa+dcojsRQBWUH9B7usZ9dUxx+MATCMXDE2vc4KCPg59PbQF3Wmwt
+VT+29osg9q4dF31h7RNeq0yYAZl81A==
+=WLVy
 -----END PGP SIGNATURE-----
 
---O3OoW5mGdxzacnsnnedZ1hNSPMsGLwuWD--
+--xMAuV21ekUqKb38sa4PeEQRGAbCbLhh66--
 
 
