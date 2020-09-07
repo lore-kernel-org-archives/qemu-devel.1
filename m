@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14081C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47EF0C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:31:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A53BF2087D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:31:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D12ED2087D
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:31:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="avAueBR/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A53BF2087D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nbu/giRs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D12ED2087D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLuv-0007vL-Kp
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:31:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42674)
+	id 1kFLve-0000WE-Sx
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:31:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlE-0005ai-AC
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:00 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:28122
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlH-0005jY-HM
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:03 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37782
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLl7-0004c0-Jx
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:20:59 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlC-0004ek-B8
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599502852;
+ s=mimecast20190719; t=1599502857;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zaKftACigPU9mTvNXCsMgTIYRzKVBhasG+mIZjW4mjQ=;
- b=avAueBR/6DoW4RF5oD3l7zIyiBcRRp6NN/kZSdbj+ZtPLiKj5FtvqzDgsMZIa6YeV5yUCu
- AlUwYpFbWViO9Ck6KCSPm7lHRNGggK2kdpRAXlPjSYrxTIN5edMmbTi0EmhsSkpDUoAtLc
- 56gtGUEIjwbDqh9d41qYdyxAyo9NHj0=
+ bh=ZH96r63WA6QU5Vypyz+MbcvZqXIiFQx84/t8vwSycOI=;
+ b=Nbu/giRsTLSkv5hW9KB8hYtWxVJhBqjyIi6UDamUHxg0xeDSACB1AESbVS6qEfWGEmit4B
+ lT+siSmgESBY/M8f8VaBpEq25Qd2UQoAkrdb46FHNiuqKP0oDiM+YfVsPx6cUQ24GIwWhh
+ 5Jq8+JNvNPf+bScGQnYzTMcbgNDj3+k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-557-MmXT7fNLMGyF8WJ_uHMP3w-1; Mon, 07 Sep 2020 14:20:51 -0400
-X-MC-Unique: MmXT7fNLMGyF8WJ_uHMP3w-1
+ us-mta-187-NpIChmDWMlmNhoBlCiPcNQ-1; Mon, 07 Sep 2020 14:20:55 -0400
+X-MC-Unique: NpIChmDWMlmNhoBlCiPcNQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F93518B9EC1;
- Mon,  7 Sep 2020 18:20:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 757AF807335;
+ Mon,  7 Sep 2020 18:20:54 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 187AA60BF3;
- Mon,  7 Sep 2020 18:20:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5A64F60BF3;
+ Mon,  7 Sep 2020 18:20:53 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 18/29] block/export: Add 'id' option to block-export-add
-Date: Mon,  7 Sep 2020 20:20:00 +0200
-Message-Id: <20200907182011.521007-19-kwolf@redhat.com>
+Subject: [PATCH 21/29] block/export: Add BLOCK_EXPORT_DELETED event
+Date: Mon,  7 Sep 2020 20:20:03 +0200
+Message-Id: <20200907182011.521007-22-kwolf@redhat.com>
 In-Reply-To: <20200907182011.521007-1-kwolf@redhat.com>
 References: <20200907182011.521007-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -72,9 +72,9 @@ X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 22:29:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
@@ -100,199 +100,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We'll need an id to identify block exports in monitor commands. This
-adds one.
-
-Note that this is different from the 'name' option in the NBD server,
-which is the externally visible export name. While block export ids need
-to be unique in the whole process, export names must be unique only for
-the same server. Different export types or (potentially in the future)
-multiple NBD servers can have the same export name externally, but still
-need different block export ids internally.
+Clients may want to know when an export has finally disappeard
+(block-export-del returns earlier than that in the general case), so add
+a QAPI event for it.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-export.json               |  5 +++++
- include/block/export.h               |  3 +++
- block/export/export.c                | 26 ++++++++++++++++++++++++++
- blockdev-nbd.c                       |  1 +
- qemu-nbd.c                           |  1 +
- storage-daemon/qemu-storage-daemon.c |  2 +-
- tests/qemu-iotests/223.out           |  4 ++--
- 7 files changed, 39 insertions(+), 3 deletions(-)
+ qapi/block-export.json     | 12 ++++++++++++
+ block/export/export.c      |  2 ++
+ tests/qemu-iotests/140.out |  1 +
+ tests/qemu-iotests/223.out |  4 ++++
+ 4 files changed, 19 insertions(+)
 
 diff --git a/qapi/block-export.json b/qapi/block-export.json
-index 4d22f46c94..9e05265b06 100644
+index 77a6b595e8..dac3250f08 100644
 --- a/qapi/block-export.json
 +++ b/qapi/block-export.json
-@@ -105,6 +105,8 @@
- #
- # Export a block node to QEMU's embedded NBD server.
- #
-+# The export name will be used as the id for the resulting block export.
-+#
- # Returns: error if the server is not running, or export with the same name
- #          already exists.
- #
-@@ -182,6 +184,8 @@
- # Describes a block export, i.e. how single node should be exported on an
- # external interface.
- #
-+# @id: A unique identifier for the block export (across all export types)
-+#
- # @node-name: The node name of the block node to be exported (since: 5.2)
- #
- # @writethrough: If true, caches are flushed after every write request to the
-@@ -192,6 +196,7 @@
+@@ -233,3 +233,15 @@
  ##
- { 'union': 'BlockExportOptions',
-   'base': { 'type': 'BlockExportType',
-+            'id': 'str',
-             'node-name': 'str',
-             '*writethrough': 'bool' },
-   'discriminator': 'type',
-diff --git a/include/block/export.h b/include/block/export.h
-index 6fffcb5651..cdc6e161ea 100644
---- a/include/block/export.h
-+++ b/include/block/export.h
-@@ -50,6 +50,9 @@ typedef struct BlockExportDriver {
- struct BlockExport {
-     const BlockExportDriver *drv;
- 
-+    /* Unique identifier for the export */
-+    char *id;
+ { 'command': 'block-export-del',
+   'data': { 'id': 'str', '*mode': 'BlockExportRemoveMode' } }
 +
-     /*
-      * Reference count for this block export. This includes strong references
-      * both from the owner (qemu-nbd or the monitor) and clients connected to
++##
++# @BLOCK_EXPORT_DELETED:
++#
++# Emitted when a block export is removed and it's id can be reused.
++#
++# @id: Block export id.
++#
++# Since: 5.2
++##
++{ 'event': 'BLOCK_EXPORT_DELETED',
++  'data': { 'id': 'str' } }
 diff --git a/block/export/export.c b/block/export/export.c
-index 1b36286010..21e9013fb6 100644
+index 4af3b69186..ae7879e6a9 100644
 --- a/block/export/export.c
 +++ b/block/export/export.c
 @@ -19,6 +19,7 @@
  #include "block/nbd.h"
  #include "qapi/error.h"
  #include "qapi/qapi-commands-block-export.h"
-+#include "qemu/id.h"
++#include "qapi/qapi-events-block-export.h"
+ #include "qemu/id.h"
  
  static const BlockExportDriver *blk_exp_drivers[] = {
-     &blk_exp_nbd,
-@@ -28,6 +29,19 @@ static const BlockExportDriver *blk_exp_drivers[] = {
- static QLIST_HEAD(, BlockExport) block_exports =
-     QLIST_HEAD_INITIALIZER(block_exports);
- 
-+static BlockExport *blk_exp_find(const char *id)
-+{
-+    BlockExport *exp;
-+
-+    QLIST_FOREACH(exp, &block_exports, next) {
-+        if (strcmp(id, exp->id) == 0) {
-+            return exp;
-+        }
-+    }
-+
-+    return NULL;
-+}
-+
- static const BlockExportDriver *blk_exp_find_driver(BlockExportType type)
- {
-     int i;
-@@ -46,6 +60,15 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
-     BlockExport *exp;
-     int ret;
- 
-+    if (!id_wellformed(export->id)) {
-+        error_setg(errp, "Invalid block export id");
-+        return NULL;
-+    }
-+    if (blk_exp_find(export->id)) {
-+        error_setg(errp, "Block export id '%s' is already in use", export->id);
-+        return NULL;
-+    }
-+
-     drv = blk_exp_find_driver(export->type);
-     if (!drv) {
-         error_setg(errp, "No driver found for the requested export type");
-@@ -57,10 +80,12 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
-     *exp = (BlockExport) {
-         .drv        = &blk_exp_nbd,
-         .refcount   = 1,
-+        .id         = g_strdup(export->id),
-     };
- 
-     ret = drv->create(exp, export, errp);
-     if (ret < 0) {
-+        g_free(exp->id);
-         g_free(exp);
-         return NULL;
-     }
-@@ -87,6 +112,7 @@ static void blk_exp_delete_bh(void *opaque)
+@@ -113,6 +114,7 @@ static void blk_exp_delete_bh(void *opaque)
      assert(exp->refcount == 0);
      QLIST_REMOVE(exp, next);
      exp->drv->delete(exp);
-+    g_free(exp->id);
++    qapi_event_send_block_export_deleted(exp->id);
+     g_free(exp->id);
      g_free(exp);
  
-     aio_context_release(aio_context);
-diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index f927264777..814554dd90 100644
---- a/blockdev-nbd.c
-+++ b/blockdev-nbd.c
-@@ -269,6 +269,7 @@ void qmp_nbd_server_add(NbdServerAddOptions *arg, Error **errp)
-     export_opts = g_new(BlockExportOptions, 1);
-     *export_opts = (BlockExportOptions) {
-         .type                   = BLOCK_EXPORT_TYPE_NBD,
-+        .id                     = g_strdup(arg->name),
-         .node_name              = g_strdup(bdrv_get_node_name(bs)),
-         .u.nbd = {
-             .has_name           = true,
-diff --git a/qemu-nbd.c b/qemu-nbd.c
-index c64f83618b..ac82acb4ac 100644
---- a/qemu-nbd.c
-+++ b/qemu-nbd.c
-@@ -1064,6 +1064,7 @@ int main(int argc, char **argv)
-     export_opts = g_new(BlockExportOptions, 1);
-     *export_opts = (BlockExportOptions) {
-         .type               = BLOCK_EXPORT_TYPE_NBD,
-+        .id                 = g_strdup("qemu-nbd-export"),
-         .node_name          = g_strdup(bdrv_get_node_name(bs)),
-         .has_writethrough   = true,
-         .writethrough       = writethrough,
-diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
-index 0fcab6ed2d..e6157ff518 100644
---- a/storage-daemon/qemu-storage-daemon.c
-+++ b/storage-daemon/qemu-storage-daemon.c
-@@ -92,7 +92,7 @@ static void help(void)
- "  --chardev <options>    configure a character device backend\n"
- "                         (see the qemu(1) man page for possible options)\n"
- "\n"
--"  --export [type=]nbd,device=<node-name>[,name=<export-name>]\n"
-+"  --export [type=]nbd,device=<node-name>,id=<id>,[,name=<export-name>]\n"
- "           [,writable=on|off][,bitmap=<name>]\n"
- "                         export the specified block node over NBD\n"
- "                         (requires --nbd-server)\n"
+diff --git a/tests/qemu-iotests/140.out b/tests/qemu-iotests/140.out
+index 86b985da75..f1db409b26 100644
+--- a/tests/qemu-iotests/140.out
++++ b/tests/qemu-iotests/140.out
+@@ -15,6 +15,7 @@ read 65536/65536 bytes at offset 0
+ qemu-io: can't open device nbd+unix:///drv?socket=SOCK_DIR/nbd: Requested export not available
+ server reported: export 'drv' not present
+ { 'execute': 'quit' }
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "drv"}}
+ {"return": {}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "SHUTDOWN", "data": {"guest": false, "reason": "host-qmp-quit"}}
+ *** done
 diff --git a/tests/qemu-iotests/223.out b/tests/qemu-iotests/223.out
-index e1eaaedb55..31ce9e6fe0 100644
+index 31ce9e6fe0..f6eac23f04 100644
 --- a/tests/qemu-iotests/223.out
 +++ b/tests/qemu-iotests/223.out
-@@ -45,7 +45,7 @@ exports available: 0
- {"execute":"nbd-server-add", "arguments":{"device":"nosuch"}}
- {"error": {"class": "GenericError", "desc": "Cannot find device=nosuch nor node_name=nosuch"}}
- {"execute":"nbd-server-add", "arguments":{"device":"n"}}
--{"error": {"class": "GenericError", "desc": "NBD server already has export named 'n'"}}
-+{"error": {"class": "GenericError", "desc": "Block export id 'n' is already in use"}}
- {"execute":"nbd-server-add", "arguments":{"device":"n", "name":"n2", "bitmap":"b2"}}
- {"error": {"class": "GenericError", "desc": "Enabled bitmap 'b2' incompatible with readonly export"}}
- {"execute":"nbd-server-add", "arguments":{"device":"n", "name":"n2", "bitmap":"b3"}}
-@@ -126,7 +126,7 @@ exports available: 0
- {"execute":"nbd-server-add", "arguments":{"device":"nosuch"}}
- {"error": {"class": "GenericError", "desc": "Cannot find device=nosuch nor node_name=nosuch"}}
- {"execute":"nbd-server-add", "arguments":{"device":"n"}}
--{"error": {"class": "GenericError", "desc": "NBD server already has export named 'n'"}}
-+{"error": {"class": "GenericError", "desc": "Block export id 'n' is already in use"}}
- {"execute":"nbd-server-add", "arguments":{"device":"n", "name":"n2", "bitmap":"b2"}}
- {"error": {"class": "GenericError", "desc": "Enabled bitmap 'b2' incompatible with readonly export"}}
- {"execute":"nbd-server-add", "arguments":{"device":"n", "name":"n2", "bitmap":"b3"}}
+@@ -102,8 +102,10 @@ read 2097152/2097152 bytes at offset 2097152
+ {"execute":"nbd-server-remove", "arguments":{"name":"n"}}
+ {"return": {}}
+ {"execute":"nbd-server-remove", "arguments":{"name":"n2"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "n"}}
+ {"return": {}}
+ {"execute":"nbd-server-remove", "arguments":{"name":"n2"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "n2"}}
+ {"error": {"class": "GenericError", "desc": "Export 'n2' is not found"}}
+ {"execute":"nbd-server-stop"}
+ {"return": {}}
+@@ -183,8 +185,10 @@ read 2097152/2097152 bytes at offset 2097152
+ {"execute":"nbd-server-remove", "arguments":{"name":"n"}}
+ {"return": {}}
+ {"execute":"nbd-server-remove", "arguments":{"name":"n2"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "n"}}
+ {"return": {}}
+ {"execute":"nbd-server-remove", "arguments":{"name":"n2"}}
++{"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "BLOCK_EXPORT_DELETED", "data": {"id": "n2"}}
+ {"error": {"class": "GenericError", "desc": "Export 'n2' is not found"}}
+ {"execute":"nbd-server-stop"}
+ {"return": {}}
 -- 
 2.25.4
 
