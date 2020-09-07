@@ -2,86 +2,87 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CDE2C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 04:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B4AC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 04:23:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF8D921775
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 04:22:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01E0421775
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 04:23:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V+tVYzat"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF8D921775
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hXBQxoGR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01E0421775
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kF8fp-0001nq-U3
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 00:22:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50694)
+	id 1kF8gP-0002zg-5l
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 00:23:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kF8ea-0007KC-Hq; Mon, 07 Sep 2020 00:21:16 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:46230)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kF8eT-00073S-QA; Mon, 07 Sep 2020 00:21:16 -0400
-Received: by mail-lf1-x142.google.com with SMTP id u27so6744193lfm.13;
- Sun, 06 Sep 2020 21:20:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=uAWCekkydZn1lOHe45YNp0uVn0gd0Kd5AXukfWwTbNU=;
- b=V+tVYzatmSgNhcaxQb2axzvLPl9BuO2NLq1eowymap6H4N5XRd54KYeLprTczx/wCe
- wkGQyJYTL8wFi0Jxx8L1ZxOI3qV5DmSv8HFu2sUhO5AqB1+TJv5y13cHEKa6AFrEiDTr
- 1Y9zetTUrK+zpPZ0vFRtge8rhfvUg447WBAZkVJ1Z8r0TK/yverD4o4Ek6ZSwiH58DZ5
- /ocvqXua51pEcxl/RegnbWw/palSDBBoAb7Sjx8dRrOzuaBClHdjL2KJjRhCDNyXq/0t
- 000qcqVC04MzIC5pd3eu6fjiEQ5QDrGg6nG+XPBHq3hD3u6BAE1c+U9vtcuqTsJdlNFf
- dNFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=uAWCekkydZn1lOHe45YNp0uVn0gd0Kd5AXukfWwTbNU=;
- b=d1OwWz9CRzbiiTi5fjsZCA/GaoJ9DLu9TSIGgt3RqUa1dhQ2jiE4vU5Wp6JZPwIZWG
- aq3zgxGM7ENTc/Ce/nh/3VJn27646+DFAxEEruDKiVH+PQEcphodxGTNVJba0QF8LqaA
- 7XDrU+q6Sej5riH2pz7d9rGunKGg9/Fvg2iILI9aQsFyhjciIFrbIRG45+p/PbuqyCls
- G5Lhfw9/JyVkQlPOtdsaHx5/wOhih1B2/O6SSrkam0RdIIgg8nBSYO/TqFiwGzbKUzwU
- pVgy2dXxHL3Adl+fOIt0GR21iimtoyxyPMwdzBCOyDX917nwII534w6mhrB0e6LvvL64
- rKsA==
-X-Gm-Message-State: AOAM533VHlAj6/Sx+B6HC5E+ifitCp7gVGsI1cJ/pc6Uckn1nJKL0WB6
- vI9Qh28HhP92BitgkydSPXqt43e2xhoYUG7fcMU=
-X-Google-Smtp-Source: ABdhPJxhcyunMsMtBHpPQqWD9+SiWuUF7KNz9vvE1ROZuMUHvqHZ0U2sEI/6FlrSW4q4wOiuktf9/VqJcD44OuMQuqc=
-X-Received: by 2002:a19:b83:: with SMTP id 125mr5057367lfl.126.1599452435806; 
- Sun, 06 Sep 2020 21:20:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kF8dq-0006ta-As
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 00:20:33 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54319
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kF8do-0006yb-Mv
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 00:20:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599452427;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=IJ4slLay8b89rpTy43SAQf3zve8jR9BeHUD3qmKqNaw=;
+ b=hXBQxoGR968zZsiGaGrcB9DGukHEPLxZIHL19J38dvYP8Si9UJ3z8aeTB32/cdZpVuECut
+ H1uVOMO5DrIwPplNg4lASUiEs3xDwrsV6lYFAPRMoOtW34NPNqWJJcscC/zTBjT0UgnwTJ
+ 1BdbxPP0pS/NfsT7ZytiOcRCGI/Mfww=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-145-Bcf1S9CSN8CC9SzS1QLozw-1; Mon, 07 Sep 2020 00:20:19 -0400
+X-MC-Unique: Bcf1S9CSN8CC9SzS1QLozw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0823180F040;
+ Mon,  7 Sep 2020 04:20:17 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-120-166.rdu2.redhat.com
+ [10.10.120.166])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2A8621002D57;
+ Mon,  7 Sep 2020 04:20:14 +0000 (UTC)
+From: Cleber Rosa <crosa@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/4] boot linux test: update arm bionic URL
+Date: Mon,  7 Sep 2020 00:19:58 -0400
+Message-Id: <20200907042000.415931-3-crosa@redhat.com>
+In-Reply-To: <20200907042000.415931-1-crosa@redhat.com>
+References: <20200907042000.415931-1-crosa@redhat.com>
 MIME-Version: 1.0
-References: <20200905204236.1508-1-luoyonggang@gmail.com>
- <b40c03d0-99bc-eb94-200f-7cf9a7734797@linaro.org>
-In-Reply-To: <b40c03d0-99bc-eb94-200f-7cf9a7734797@linaro.org>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Mon, 7 Sep 2020 12:20:24 +0800
-Message-ID: <CAE2XoE9qajeCRoVBZYBSYycdB-+j0fL2atfUjP-vkhXHhjp9tg@mail.gmail.com>
-Subject: Re: [PATCH] configure: Fixes ncursesw detection under msys2/mingw and
- enable curses
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="000000000000457c8405aeb18af3"
-Received-SPF: pass client-ip=2a00:1450:4864:20::142;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=crosa@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 22:29:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.099,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,82 +95,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, qemu-level <qemu-devel@nongnu.org>,
- Gerd Hoffmann <kraxel@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Sarah Harris <S.E.Harris@kent.ac.uk>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Thomas Huth <thuth@redhat.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ KONRAD Frederic <frederic.konrad@adacore.com>,
+ Willian Rampazzo <wrampazz@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Antony Pavlov <antonynpavlov@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>,
+ qemu-arm@nongnu.org, Michael Rolnik <mrolnik@gmail.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000457c8405aeb18af3
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Which uses an xz compressed file, which has builtin support for
+decompression on avocado.utils.archive.  So the check for P7ZIP can be
+dropped, and extraction logic simplified.
 
-On Sun, Sep 6, 2020 at 11:28 AM Richard Henderson <
-richard.henderson@linaro.org> wrote:
+Signed-off-by: Cleber Rosa <crosa@redhat.com>
+---
+ tests/acceptance/boot_linux_console.py | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
-> On 9/5/20 1:42 PM, Yonggang Luo wrote:
-> > +    nativecharset_to_ucs2 =3D iconv_open("UCS-2", g_get_codeset());
->
-> g_get_codeset():
-> "a newly allocated string containing the name of the character set. This
-> string
-> must be freed with g_free()."
->
-> You need to plug the memory leak.
->
-> It's probably worth fixing the mistake in which we call this function fou=
-r
-> times from the same function.
->
-Done with autofree
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 751b47b8fd..c75c512c8b 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -22,12 +22,6 @@ from avocado.utils import process
+ from avocado.utils import archive
+ from avocado.utils.path import find_command, CmdNotFoundError
+ 
+-P7ZIP_AVAILABLE = True
+-try:
+-    find_command('7z')
+-except CmdNotFoundError:
+-    P7ZIP_AVAILABLE = False
+-
+ """
+ Round up to next power of 2
+ """
+@@ -687,7 +681,6 @@ class BootLinuxConsole(LinuxKernelTest):
+         self.vm.wait()
+ 
+     @skipUnless(os.getenv('AVOCADO_ALLOW_LARGE_STORAGE'), 'storage limited')
+-    @skipUnless(P7ZIP_AVAILABLE, '7z not installed')
+     def test_arm_orangepi_bionic(self):
+         """
+         :avocado: tags=arch:arm
+@@ -695,14 +688,13 @@ class BootLinuxConsole(LinuxKernelTest):
+         :avocado: tags=device:sd
+         """
+ 
+-        # This test download a 196MB compressed image and expand it to 1GB
++        # This test download a 275MB compressed image and expand it to 1.1GB
+         image_url = ('https://dl.armbian.com/orangepipc/archive/'
+-                     'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.7z')
+-        image_hash = '196a8ffb72b0123d92cea4a070894813d305c71e'
+-        image_path_7z = self.fetch_asset(image_url, asset_hash=image_hash)
+-        image_name = 'Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img'
+-        image_path = os.path.join(self.workdir, image_name)
+-        process.run("7z e -o%s %s" % (self.workdir, image_path_7z))
++                     'Armbian_20.08.1_Orangepipc_bionic_current_5.8.5.img.xz')
++        image_hash = 'b4d6775f5673486329e45a0586bf06b6dbe792199fd182ac6b9c7bb6c7d3e6dd'
++        image_path_xz = self.fetch_asset(image_url, asset_hash=image_hash,
++                                         algorithm='sha256')
++        image_path = archive.extract(image_path_xz, self.workdir)
+         image_pow2ceil_expand(image_path)
+ 
+         self.vm.set_console()
+-- 
+2.25.4
 
->
->
-> r~
->
-
-
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000457c8405aeb18af3
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Sun, Sep 6, 2020 at 11:28 AM Richa=
-rd Henderson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.he=
-nderson@linaro.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote=
-" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
-padding-left:1ex">On 9/5/20 1:42 PM, Yonggang Luo wrote:<br>
-&gt; +=C2=A0 =C2=A0 nativecharset_to_ucs2 =3D iconv_open(&quot;UCS-2&quot;,=
- g_get_codeset());<br>
-<br>
-g_get_codeset():<br>
-&quot;a newly allocated string containing the name of the character set. Th=
-is string<br>
-must be freed with g_free().&quot;<br>
-<br>
-You need to plug the memory leak.<br>
-<br>
-It&#39;s probably worth fixing the mistake in which we call this function f=
-our<br>
-times from the same function.<br></blockquote><div>Done with autofree=C2=A0=
-</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;b=
-order-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-<br>
-r~<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---000000000000457c8405aeb18af3--
 
