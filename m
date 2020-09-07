@@ -2,85 +2,87 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A717C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:33:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17163C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:34:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2905B2151B
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:33:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A5BA82151B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:34:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tk/dP7FT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2905B2151B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bf5IXua/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5BA82151B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLxZ-0003oP-3F
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:33:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43780)
+	id 1kFLyE-0005cO-Rf
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:34:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kFLqw-0000cc-Ek
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:26:54 -0400
-Received: from mail-ed1-x52a.google.com ([2a00:1450:4864:20::52a]:45912)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kFLqu-0005PK-Hl
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:26:53 -0400
-Received: by mail-ed1-x52a.google.com with SMTP id l17so13533084edq.12
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 11:26:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WJGTwQzg7xcEYrTKZxOyuk/9RXIjii1Wfyrmy6K0z1E=;
- b=tk/dP7FT17zav13ca27SOFW1z2D7q7RFYmtF0mgh2PUZoxG4yPnEoL99w9Hbp80Ntn
- fM77LH1vCPi/ZWii5ga6jlSvKsK17KLa+1TVdER3kGlFv+ORnT847jcz0JOEh6jdclLn
- YWL1cmLoK+jHCKhYBYCJM6x0/LEWzBhzfm9WFU/KSPUJNPpT9L/QcsxmCnqhMCQkei26
- N8f8LN440U/KP8RQyemgd81hTx44gGS66ARsh0P8l8WIHMcjHk5crjtz//NM7w6SEDc7
- jNB2TYGH16qDEdKMiaK5li+26t9JNcDOxKs4ryJSnGScau2IgQx1xnLUoVrZxbmDhhFN
- U6HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WJGTwQzg7xcEYrTKZxOyuk/9RXIjii1Wfyrmy6K0z1E=;
- b=tBlbNJG4vRqqC56Vt/tFan8ZR99DTLUf1shvjyr5f0eUNxT/AKVVYgUYOzM2hMveN8
- 0cv6SNZyHiNveNvg6QlveTJxCJ9xpMkZSDNiECOyb3jDdPT/TBUT1q+BeGee1pG6XhFw
- ndUBEnaU3TPoDUSplkZbulYd+LjmKxkeRRGI0CxpAd5kn15hhYVPdSn6O/MEk6oSjZih
- 5FHD5/Tt5BSetrvi+2XqPhvHmNj9h/osgXwCGhHiiOxXsv7uiElq4gzJ7qNazYyuTEVa
- 6gxrjWFPUM9kEOAPnyEwpKN9N0mFwFgo2r0pCJuDICxS8mfO3G8YoOdkSSViDv4w3oPR
- IibA==
-X-Gm-Message-State: AOAM532f5CGMP/KrpdGfNrbkkxASQ3bkurdupxAmpzw0mXSueX42PAFS
- pbYS2YavMkmcmIHUMkCoJwMBU30tzDkCeE64mbOjag==
-X-Google-Smtp-Source: ABdhPJyfC71fy+3EDQZT3Y27W7IjZY2hfNZByWW1Iv3hPxphJdFCIx7KYbdixdrpK3mXhuVD1QacDvd1BpDKboNVABc=
-X-Received: by 2002:a50:f28b:: with SMTP id f11mr22455748edm.44.1599503210474; 
- Mon, 07 Sep 2020 11:26:50 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlI-0005nI-Pb
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:04 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:44724
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlF-0004ff-IV
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599502860;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Yk64AMLLHe7WJDpUa4dVKSdOPGFkuRbVGqup9pfHIEA=;
+ b=Bf5IXua/KWD3mXjA3Qu/04f3Vbh4tqwqIRppeMD3Y2kSZkEATl/c4QqxE7Mp+ufGDxT3nZ
+ ZIc1oJAwy6WzQRPpFisQnZbct3qC0wrHIUZZidgfY3pMDLpzdGO1ZlRunDqghn1FqCEnpA
+ A1JUpQfZniHTKoH32edpEEEaRuRHjUs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-e5v0pJ-zO2eeBEVIRS8XyA-1; Mon, 07 Sep 2020 14:20:56 -0400
+X-MC-Unique: e5v0pJ-zO2eeBEVIRS8XyA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD8191084C85;
+ Mon,  7 Sep 2020 18:20:55 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
+ [10.36.114.154])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C152B60BF3;
+ Mon,  7 Sep 2020 18:20:54 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH 22/29] block/export: Move blk to BlockExport
+Date: Mon,  7 Sep 2020 20:20:04 +0200
+Message-Id: <20200907182011.521007-23-kwolf@redhat.com>
+In-Reply-To: <20200907182011.521007-1-kwolf@redhat.com>
+References: <20200907182011.521007-1-kwolf@redhat.com>
 MIME-Version: 1.0
-References: <20200907121127.136243-1-thuth@redhat.com>
-In-Reply-To: <20200907121127.136243-1-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Sep 2020 19:26:39 +0100
-Message-ID: <CAFEAcA9qdsFdyzRwU0=D=SA+Vt-dd30PfEcNhbDhPRMYvDvukA@mail.gmail.com>
-Subject: Re: [PULL 00/14] Gitlab-CI improvements and related fixes
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::52a;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 22:29:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,41 +95,233 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yonggang Luo <luoyonggang@gmail.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 7 Sep 2020 at 13:11, Thomas Huth <thuth@redhat.com> wrote:
->
->  Hi Peter,
->
-> the following changes since commit 7c37270b3fbe3d034ba80e488761461676e21eb4:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/ui-20200904-pull-request' into staging (2020-09-06 16:23:55 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/huth/qemu.git tags/pull-request-2020-09-07
->
-> for you to fetch changes up to 88e74b6122bb40852b1c98befd47a572f0c06930:
->
->   target/microblaze: Collected fixes for env->iflags (2020-09-07 12:34:17 +0200)
->
-> ----------------------------------------------------------------
-> * Fixes for cross-compiling with MinGW / compiling with MSYS2
-> * Enable cross-compiler builds in the Gitlab CI
-> * Improvements / fixes for the crypto tests in the Gitlab CI
-> * Fix for the "make check-acceptance" microblaze failure
->   (required to get the Gitlab CI green again)
-> ----------------------------------------------------------------
+Every block export has a BlockBackend representing the disk that is
+exported. It should live in BlockExport therefore.
 
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
+---
+ include/block/export.h |  3 +++
+ block/export/export.c  |  3 +++
+ nbd/server.c           | 43 +++++++++++++++++++++---------------------
+ 3 files changed, 28 insertions(+), 21 deletions(-)
 
-Applied, thanks.
+diff --git a/include/block/export.h b/include/block/export.h
+index ff54d35872..7feb02e10d 100644
+--- a/include/block/export.h
++++ b/include/block/export.h
+@@ -71,6 +71,9 @@ struct BlockExport {
+     /* The AioContext whose lock protects this BlockExport object. */
+     AioContext *ctx;
+ 
++    /* The block device to export */
++    BlockBackend *blk;
++
+     /* List entry for block_exports */
+     QLIST_ENTRY(BlockExport) next;
+ };
+diff --git a/block/export/export.c b/block/export/export.c
+index ae7879e6a9..40fc9d505f 100644
+--- a/block/export/export.c
++++ b/block/export/export.c
+@@ -92,6 +92,8 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
+         return NULL;
+     }
+ 
++    assert(exp->blk != NULL);
++
+     QLIST_INSERT_HEAD(&block_exports, exp, next);
+     return exp;
+ }
+@@ -114,6 +116,7 @@ static void blk_exp_delete_bh(void *opaque)
+     assert(exp->refcount == 0);
+     QLIST_REMOVE(exp, next);
+     exp->drv->delete(exp);
++    blk_unref(exp->blk);
+     qapi_event_send_block_export_deleted(exp->id);
+     g_free(exp->id);
+     g_free(exp);
+diff --git a/nbd/server.c b/nbd/server.c
+index 1a0e1db401..f9af45c480 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -84,7 +84,6 @@ struct NBDRequestData {
+ struct NBDExport {
+     BlockExport common;
+ 
+-    BlockBackend *blk;
+     char *name;
+     char *description;
+     uint64_t size;
+@@ -643,7 +642,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
+      * whether this is OPT_INFO or OPT_GO. */
+     /* minimum - 1 for back-compat, or actual if client will obey it. */
+     if (client->opt == NBD_OPT_INFO || blocksize) {
+-        check_align = sizes[0] = blk_get_request_alignment(exp->blk);
++        check_align = sizes[0] = blk_get_request_alignment(exp->common.blk);
+     } else {
+         sizes[0] = 1;
+     }
+@@ -652,7 +651,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
+      * TODO: is blk_bs(blk)->bl.opt_transfer appropriate? */
+     sizes[1] = MAX(4096, sizes[0]);
+     /* maximum - At most 32M, but smaller as appropriate. */
+-    sizes[2] = MIN(blk_get_max_transfer(exp->blk), NBD_MAX_BUFFER_SIZE);
++    sizes[2] = MIN(blk_get_max_transfer(exp->common.blk), NBD_MAX_BUFFER_SIZE);
+     trace_nbd_negotiate_handle_info_block_size(sizes[0], sizes[1], sizes[2]);
+     sizes[0] = cpu_to_be32(sizes[0]);
+     sizes[1] = cpu_to_be32(sizes[1]);
+@@ -684,7 +683,7 @@ static int nbd_negotiate_handle_info(NBDClient *client, Error **errp)
+      * tolerate all clients, regardless of alignments.
+      */
+     if (client->opt == NBD_OPT_INFO && !blocksize &&
+-        blk_get_request_alignment(exp->blk) > 1) {
++        blk_get_request_alignment(exp->common.blk) > 1) {
+         return nbd_negotiate_send_rep_err(client,
+                                           NBD_REP_ERR_BLOCK_SIZE_REQD,
+                                           errp,
+@@ -1557,7 +1556,7 @@ int nbd_export_new(BlockExport *blk_exp, BlockDriverState *bs,
+     blk_set_allow_aio_context_change(blk, true);
+ 
+     QTAILQ_INIT(&exp->clients);
+-    exp->blk = blk;
++    exp->common.blk = blk;
+     exp->name = g_strdup(name);
+     assert(!desc || strlen(desc) <= NBD_MAX_STRING_SIZE);
+     exp->description = g_strdup(desc);
+@@ -1679,15 +1678,13 @@ static void nbd_export_delete(BlockExport *blk_exp)
+     g_free(exp->description);
+     exp->description = NULL;
+ 
+-    if (exp->blk) {
++    if (exp->common.blk) {
+         if (exp->eject_notifier_blk) {
+             notifier_remove(&exp->eject_notifier);
+             blk_unref(exp->eject_notifier_blk);
+         }
+-        blk_remove_aio_context_notifier(exp->blk, blk_aio_attached,
++        blk_remove_aio_context_notifier(exp->common.blk, blk_aio_attached,
+                                         blk_aio_detach, exp);
+-        blk_unref(exp->blk);
+-        exp->blk = NULL;
+     }
+ 
+     if (exp->export_bitmap) {
+@@ -1840,7 +1837,7 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+ 
+     while (progress < size) {
+         int64_t pnum;
+-        int status = bdrv_block_status_above(blk_bs(exp->blk), NULL,
++        int status = bdrv_block_status_above(blk_bs(exp->common.blk), NULL,
+                                              offset + progress,
+                                              size - progress, &pnum, NULL,
+                                              NULL);
+@@ -1872,7 +1869,8 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+             stl_be_p(&chunk.length, pnum);
+             ret = nbd_co_send_iov(client, iov, 1, errp);
+         } else {
+-            ret = blk_pread(exp->blk, offset + progress, data + progress, pnum);
++            ret = blk_pread(exp->common.blk, offset + progress,
++                            data + progress, pnum);
+             if (ret < 0) {
+                 error_setg_errno(errp, -ret, "reading from file failed");
+                 break;
+@@ -2136,7 +2134,8 @@ static int nbd_co_receive_request(NBDRequestData *req, NBDRequest *request,
+         }
+ 
+         if (request->type != NBD_CMD_CACHE) {
+-            req->data = blk_try_blockalign(client->exp->blk, request->len);
++            req->data = blk_try_blockalign(client->exp->common.blk,
++                                           request->len);
+             if (req->data == NULL) {
+                 error_setg(errp, "No memory");
+                 return -ENOMEM;
+@@ -2232,7 +2231,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
+ 
+     /* XXX: NBD Protocol only documents use of FUA with WRITE */
+     if (request->flags & NBD_CMD_FLAG_FUA) {
+-        ret = blk_co_flush(exp->blk);
++        ret = blk_co_flush(exp->common.blk);
+         if (ret < 0) {
+             return nbd_send_generic_reply(client, request->handle, ret,
+                                           "flush failed", errp);
+@@ -2246,7 +2245,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
+                                        data, request->len, errp);
+     }
+ 
+-    ret = blk_pread(exp->blk, request->from, data, request->len);
++    ret = blk_pread(exp->common.blk, request->from, data, request->len);
+     if (ret < 0) {
+         return nbd_send_generic_reply(client, request->handle, ret,
+                                       "reading from file failed", errp);
+@@ -2281,7 +2280,7 @@ static coroutine_fn int nbd_do_cmd_cache(NBDClient *client, NBDRequest *request,
+ 
+     assert(request->type == NBD_CMD_CACHE);
+ 
+-    ret = blk_co_preadv(exp->blk, request->from, request->len,
++    ret = blk_co_preadv(exp->common.blk, request->from, request->len,
+                         NULL, BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH);
+ 
+     return nbd_send_generic_reply(client, request->handle, ret,
+@@ -2312,7 +2311,8 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+         if (request->flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
+         }
+-        ret = blk_pwrite(exp->blk, request->from, data, request->len, flags);
++        ret = blk_pwrite(exp->common.blk, request->from, data, request->len,
++                         flags);
+         return nbd_send_generic_reply(client, request->handle, ret,
+                                       "writing to file failed", errp);
+ 
+@@ -2333,7 +2333,7 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+             int align = client->check_align ?: 1;
+             int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
+                                                         align));
+-            ret = blk_pwrite_zeroes(exp->blk, request->from, len, flags);
++            ret = blk_pwrite_zeroes(exp->common.blk, request->from, len, flags);
+             request->len -= len;
+             request->from += len;
+         }
+@@ -2345,7 +2345,7 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+         abort();
+ 
+     case NBD_CMD_FLUSH:
+-        ret = blk_co_flush(exp->blk);
++        ret = blk_co_flush(exp->common.blk);
+         return nbd_send_generic_reply(client, request->handle, ret,
+                                       "flush failed", errp);
+ 
+@@ -2356,12 +2356,12 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+             int align = client->check_align ?: 1;
+             int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
+                                                         align));
+-            ret = blk_co_pdiscard(exp->blk, request->from, len);
++            ret = blk_co_pdiscard(exp->common.blk, request->from, len);
+             request->len -= len;
+             request->from += len;
+         }
+         if (ret >= 0 && request->flags & NBD_CMD_FLAG_FUA) {
+-            ret = blk_co_flush(exp->blk);
++            ret = blk_co_flush(exp->common.blk);
+         }
+         return nbd_send_generic_reply(client, request->handle, ret,
+                                       "discard failed", errp);
+@@ -2379,7 +2379,8 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+ 
+             if (client->export_meta.base_allocation) {
+                 ret = nbd_co_send_block_status(client, request->handle,
+-                                               blk_bs(exp->blk), request->from,
++                                               blk_bs(exp->common.blk),
++                                               request->from,
+                                                request->len, dont_fragment,
+                                                !client->export_meta.bitmap,
+                                                NBD_META_ID_BASE_ALLOCATION,
+-- 
+2.25.4
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
