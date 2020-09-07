@@ -2,105 +2,84 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCB75C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:04:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42480C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:11:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4FB321481
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:04:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4FB321481
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 8ABA72177B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:11:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WBHwxv0q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8ABA72177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFEwm-0000aE-Hd
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:04:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56778)
+	id 1kFF3K-0003kD-C3
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:11:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kFEuo-0008Se-KG; Mon, 07 Sep 2020 07:02:26 -0400
-Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:47637)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kFEum-0007Bk-Ej; Mon, 07 Sep 2020 07:02:26 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.west.internal (Postfix) with ESMTP id 82589839;
- Mon,  7 Sep 2020 07:02:21 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Mon, 07 Sep 2020 07:02:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=7U/ZlxOgzp5CMcm+5t3hZ1+xKQc
- F34UxOR+oUIYKdyk=; b=l3uvvodW0OMfBwJ7lugQhJYVeT3bbc0RfH77dm+c86U
- 7w79NCBI6mpH9n+nChA3DKvzQi7EV1yU9quaaw1ws1L9QRbt1/X9yH/lAFxryINK
- 0rQ0daqcumnbpNzR2QKGJFBhsnYUF29uEKEUSGmd9wD0TKTc6vS2V8Gx8L3snsf8
- hGt3ALO0rSgNg0tXtQNYUlE++W6+nBo+I8CsySfwUR8a5D/9OMmCRqdy216s4Pq5
- 0hIhG+oda/8p9BMv6L74EOs5+7BQu2sQCq35Qe+OFMtz1MCRE3mX6mrwv2ecswFt
- HWED6qz6jxWihvlmnwnyHTTNy9sxw706dlz1wproOEQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=7U/Zlx
- Ogzp5CMcm+5t3hZ1+xKQcF34UxOR+oUIYKdyk=; b=odTkLSOk2b6JvBmJ1caIIm
- +/yc89CLP1o5BPDPW3OpgbDxQ+VuzqIdSIcNlvwxI4cAN+pl4SvXl1xZqV/g8Jep
- o6DJVj8NXKidFiLs3QykQjOTcNjATuiDtd7sfSVKqy2oIvq7n38QuswP6bMj3mYe
- SNEYf7R2+3RctmCtU9vbcA7Nc0My5XyFWHnByXVUtPPucBNG5jKgTn7JUaD33YWm
- hyNf/fNXHejoBIYTMWbhxLYa8dq0b8SK/hJx/+ipUPaOW6xJQATTWiSXuelwXYmw
- AAv0x31NZNq8k1/FnlSpgs8Quc3D1FwUDnbEVdfc/PQFEDMDobOeD4R3h0he6EEg
- ==
-X-ME-Sender: <xms:OxNWX6p8pZ_8RY8yxmeBx8J2VmDG48rU_TxzQST4yi7Rur2Vlh1g4w>
- <xme:OxNWX4rsJEjRiEh6UEDxpFS9FwbkBs_Z2Tu7H3LnV6ESSpvci7l5geesQs0220r_4
- g9W-lCBDA3Dl5FhOos>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrudehtddgfeeiucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:OxNWX_MK1ZY63n6BQNd2IGrlgru_LvNqIJiRMT6CKlZoQTuRrsGElA>
- <xmx:OxNWX55nc7dD3heYY1ncbEOcFHVQmYHIaaA9YnQv5AmSIxDups807g>
- <xmx:OxNWX57WJpFuVP7xPiC_Rykpg5u3_QEN8kpGdP1Qki4okgROOHpcaA>
- <xmx:PBNWX-GryctLo7fdjt9vq6O9T1e_wRztDjCLQtR5t-S4u6eXL59J1p__cdKj4lIIrIaekA>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id C26063064674;
- Mon,  7 Sep 2020 07:02:17 -0400 (EDT)
-Date: Mon, 7 Sep 2020 13:02:16 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 17/17] hw/block/nvme: change controller pci id
-Message-ID: <20200907110216.GB732668@apples.localdomain>
-References: <20200904141956.576630-1-its@irrelevant.dk>
- <20200904141956.576630-18-its@irrelevant.dk>
- <894711e0-7823-5cf0-5b5a-a84f15b458ce@redhat.com>
- <20200907103708.GG2682@work-vm>
- <20200907105024.GA732668@apples.localdomain>
- <20200907105257.GH2682@work-vm>
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF1y-0001i0-Cc
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:50 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:49822
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF1v-0007qi-K6
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599476986;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ivOMTX/5BEYzRjRij14ka9b8UzkCtyUXx45fVTX8myw=;
+ b=WBHwxv0qqxMMW40D7qEwrHTlbIJuEB5XDnFjmfR2YNXAYaVXyYl6DnMLD8BV3u8L59YZQb
+ sfTxVXeYQyHF9Mx25OI50kYXQoK0Kk6IPGMer7jjOpR+MAoFKlpXofCHfLa0fLhOeo8rCC
+ lcSt0RgMNoG0SkMSTjcsfZQ5+csYX2U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-568-auujLZ3tMRKB_LO2GqlDnQ-1; Mon, 07 Sep 2020 07:09:42 -0400
+X-MC-Unique: auujLZ3tMRKB_LO2GqlDnQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EC0E6802B49;
+ Mon,  7 Sep 2020 11:09:41 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
+ [10.36.114.154])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F10667ED60;
+ Mon,  7 Sep 2020 11:09:40 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 00/64] Block layer patches
+Date: Mon,  7 Sep 2020 13:08:32 +0200
+Message-Id: <20200907110936.261684-1-kwolf@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FkmkrVfFsRoUs1wW"
-Content-Disposition: inline
-In-Reply-To: <20200907105257.GH2682@work-vm>
-Received-SPF: pass client-ip=64.147.123.18; envelope-from=its@irrelevant.dk;
- helo=wnew4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 06:50:30
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:05:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,118 +92,154 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Maxim Levitsky <mlevitsk@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The following changes since commit 7c37270b3fbe3d034ba80e488761461676e21eb4:
 
---FkmkrVfFsRoUs1wW
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20200904-pull-request' into staging (2020-09-06 16:23:55 +0100)
 
-On Sep  7 11:52, Dr. David Alan Gilbert wrote:
-> * Klaus Jensen (its@irrelevant.dk) wrote:
-> > On Sep  7 11:37, Dr. David Alan Gilbert wrote:
-> > > * Philippe Mathieu-Daud=C3=83=C2=83=C3=82=C2=A9 (philmd@redhat.com) w=
-rote:
-> > > > +David in case
-> > > >=20
-> > > > On 9/4/20 4:19 PM, Klaus Jensen wrote:
-> > > > > From: Klaus Jensen <k.jensen@samsung.com>
-> > > > >=20
-> > > > > There are two reasons for changing this:
-> > > > >=20
-> > > > >   1. The nvme device currently uses an internal Intel device id.
-> > > > >=20
-> > > > >   2. Since commits "nvme: fix write zeroes offset and count" and =
-"nvme:
-> > > > >      support multiple namespaces" the controller device no longer=
- has
-> > > > >      the quirks that the Linux kernel think it has.
-> > > > >=20
-> > > > >      As the quirks are applied based on pci vendor and device id,=
- change
-> > > > >      them to get rid of the quirks.
-> > > > >=20
-> > > > > To keep backward compatibility, add a new 'x-use-intel-id' parame=
-ter to
-> > > > > the nvme device to force use of the Intel vendor and device id. T=
-his is
-> > > > > off by default but add a compat property to set this for 5.1 mach=
-ines
-> > > > > and older.
-> > > >=20
-> > > > So now what happens if you start a 5.1 machine with a recent kernel?
-> > > > Simply the kernel will use unnecessary quirks, or are there more
-> > > > changes in behavior?
-> > >=20
-> > > Seems reasonable to me...but...
-> > >=20
-> > > > >=20
-> > > > > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-> > > > > Reviewed-by: Keith Busch <kbusch@kernel.org>
-> > > > > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-> > > > > ---
-> > > > >  hw/block/nvme.c   | 12 ++++++++++--
-> > > > >  hw/block/nvme.h   |  1 +
-> > > > >  hw/core/machine.c |  1 +
-> > > > >  3 files changed, 12 insertions(+), 2 deletions(-)
-> > > > >=20
-> > > > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-> > > > > index 453d3a89d475..8018f8679366 100644
-> > > > > --- a/hw/block/nvme.c
-> > > > > +++ b/hw/block/nvme.c
-> > > > > @@ -2749,6 +2749,15 @@ static void nvme_init_pci(NvmeCtrl *n, PCI=
-Device *pci_dev, Error **errp)
-> > > > > =20
-> > > > >      pci_conf[PCI_INTERRUPT_PIN] =3D 1;
-> > > > >      pci_config_set_prog_interface(pci_conf, 0x2);
-> > > > > +
-> > > > > +    if (n->params.use_intel_id) {
-> > > > > +        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
-> > > > > +        pci_config_set_device_id(pci_conf, 0x5846);
-> > >=20
-> > > Wasn't that magic number 5845 down there ?
-> > >=20
-> >=20
-> > Argh! My first version of this just bumbed the intel device id and it
-> > got left there.
-> >=20
-> > Good find! Thank you!
->=20
-> It may be best to turn it into a constant in include/hw/pci/pci_ids.h if
-> it corresponds to some real Intel device.
->=20
+are available in the Git repository at:
 
-Yes, but that is just the thing - it does not correspond to an
-officially allocated device; which is why I think we should leave it out
-of pci_ids.h.
+  git://repo.or.cz/qemu/kevin.git tags/for-upstream
 
-The end goal is to get rid of its use in the code by deprecating the
-use-intel-id parameter in the future. I guess the parameter should just
-be deprecated immediately? Then we can get rid of it in, what, 5.4?
+for you to fetch changes up to 4cc0ec9b1b8830f7d1fcf5dfded19ef070f98eaa:
 
---FkmkrVfFsRoUs1wW
-Content-Type: application/pgp-signature; name="signature.asc"
+  block/nvme: Pair doorbell registers (2020-09-07 12:47:57 +0200)
 
------BEGIN PGP SIGNATURE-----
+----------------------------------------------------------------
+Block layer patches:
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9WEzMACgkQTeGvMW1P
-Delxlwf/U9C6mJ4n06tdlEetoiHfhgBhV4MuJzb1GIU2CS86dopak7uCpQWOguZ5
-3OSw/p0pNvFOi+LJoEapQw09xj6Xv+5AYvUiHurN8D9Tk3gEME0E19JH+meczS3p
-WwQzEUQjzc/FD1iJn2FZZrP0vY8nuwoOI1LmVClKy124a+ulKHeeK5z7Ck+q+lNo
-jTLwd3pGWMjvL8SSqCuPfmIRbfYiErvBHvwajgxurha/4SPAvimYpLog7u1J+P94
-b9UFUkyGDPnvS3FZ5huAhYi7Vca+oyAgwq8jx2T6UAcZ4BHZPEf/8Yp9IqbBHXDH
-h1M+dJYOruTrY78LYXIGPkgiXRp4Vg==
-=HHp7
------END PGP SIGNATURE-----
+- qemu-img create: Fail gracefully when backing file is an empty string
+- Fixes related to filter block nodes ("Deal with filters" series)
+- block/nvme: Various cleanups required to use multiple queues
+- block/nvme: Use NvmeBar structure from "block/nvme.h"
+- file-win32: Fix "locking" option
+- iotests: Allow running from different directory
 
---FkmkrVfFsRoUs1wW--
+----------------------------------------------------------------
+Connor Kuehl (1):
+      block: Raise an error when backing file parameter is an empty string
+
+Kevin Wolf (2):
+      iotests: Allow running from different directory
+      file-win32: Fix "locking" option
+
+Max Reitz (43):
+      block: Add child access functions
+      block: Add chain helper functions
+      block: bdrv_cow_child() for bdrv_has_zero_init()
+      block: bdrv_set_backing_hd() is about bs->backing
+      block: Include filters when freezing backing chain
+      block: Drop bdrv_is_encrypted()
+      block: Add bdrv_supports_compressed_writes()
+      throttle: Support compressed writes
+      copy-on-read: Support compressed writes
+      block: Use bdrv_filter_(bs|child) where obvious
+      block: Use CAFs in block status functions
+      stream: Deal with filters
+      block: Use CAFs when working with backing chains
+      block: Use bdrv_cow_child() in bdrv_co_truncate()
+      block: Re-evaluate backing file handling in reopen
+      block: Flush all children in generic code
+      vmdk: Drop vmdk_co_flush()
+      block: Iterate over children in refresh_limits
+      block: Use CAFs in bdrv_refresh_filename()
+      block: Use CAF in bdrv_co_rw_vmstate()
+      block/snapshot: Fix fallback
+      block: Use CAFs for debug breakpoints
+      block: Improve get_allocated_file_size's default
+      block/null: Implement bdrv_get_allocated_file_size
+      blockdev: Use CAF in external_snapshot_prepare()
+      block: Report data child for query-blockstats
+      block: Use child access functions for QAPI queries
+      block-copy: Use CAF to find sync=top base
+      mirror: Deal with filters
+      backup: Deal with filters
+      commit: Deal with filters
+      nbd: Use CAF when looking for dirty bitmap
+      qemu-img: Use child access functions
+      block: Drop backing_bs()
+      blockdev: Fix active commit choice
+      block: Inline bdrv_co_block_status_from_*()
+      block: Leave BDS.backing_{file,format} constant
+      iotests: Test that qcow2's data-file is flushed
+      iotests: Let complete_and_wait() work with commit
+      iotests: Add filter commit test cases
+      iotests: Add filter mirror test cases
+      iotests: Add test for commit in sub directory
+      iotests: Test committing to overridden backing
+
+Philippe Mathieu-Daudé (18):
+      block/nvme: Replace magic value by SCALE_MS definition
+      block/nvme: Avoid further processing if trace event not enabled
+      block/nvme: Let nvme_create_queue_pair() fail gracefully
+      block/nvme: Define INDEX macros to ease code review
+      block/nvme: Improve error message when IO queue creation failed
+      block/nvme: Use common error path in nvme_add_io_queue()
+      block/nvme: Rename local variable
+      block/nvme: Use union of NvmeIdCtrl / NvmeIdNs structures
+      block/nvme: Replace qemu_try_blockalign0 by qemu_try_blockalign/memset
+      block/nvme: Replace qemu_try_blockalign(bs) by qemu_try_memalign(pg_sz)
+      block/nvme: Simplify nvme_init_queue() arguments
+      block/nvme: Replace BDRV_POLL_WHILE by AIO_WAIT_WHILE
+      block/nvme: Simplify nvme_create_queue_pair() arguments
+      block/nvme: Extract nvme_poll_queue()
+      block/nvme: Use an array of EventNotifier
+      block/nvme: Group controller registers in NVMeRegs structure
+      block/nvme: Use generic NvmeBar structure
+      block/nvme: Pair doorbell registers
+
+ qapi/block-core.json           |  58 +++--
+ include/block/block.h          |   2 +-
+ include/block/block_int.h      |  95 +++++---
+ block.c                        | 492 +++++++++++++++++++++++++++++++++--------
+ block/backup-top.c             |   4 +-
+ block/backup.c                 |   9 +-
+ block/blkdebug.c               |   7 +-
+ block/blklogwrites.c           |   1 -
+ block/block-backend.c          |   7 +-
+ block/block-copy.c             |   4 +-
+ block/commit.c                 |  95 +++++---
+ block/copy-on-read.c           |  13 +-
+ block/file-win32.c             |  22 +-
+ block/filter-compress.c        |   2 -
+ block/io.c                     | 142 ++++++------
+ block/mirror.c                 | 119 +++++++---
+ block/monitor/block-hmp-cmds.c |   2 +-
+ block/null.c                   |   7 +
+ block/nvme.c                   | 248 +++++++++++----------
+ block/qapi.c                   |  74 +++++--
+ block/snapshot.c               | 104 +++++++--
+ block/stream.c                 |  63 ++++--
+ block/throttle.c               |  11 +-
+ block/vmdk.c                   |  16 --
+ blockdev.c                     | 101 +++++++--
+ migration/block-dirty-bitmap.c |   8 +-
+ nbd/server.c                   |   6 +-
+ qemu-img.c                     |  43 ++--
+ tests/qemu-iotests/iotests.py  |  10 +-
+ tests/qemu-iotests/020         |  44 ++++
+ tests/qemu-iotests/020.out     |  10 +
+ tests/qemu-iotests/040         | 238 ++++++++++++++++++++
+ tests/qemu-iotests/040.out     |   4 +-
+ tests/qemu-iotests/041         | 146 +++++++++++-
+ tests/qemu-iotests/041.out     |   4 +-
+ tests/qemu-iotests/049         |   4 +
+ tests/qemu-iotests/049.out     |   5 +
+ tests/qemu-iotests/153.out     |   2 +-
+ tests/qemu-iotests/184         |   3 +-
+ tests/qemu-iotests/184.out     |  14 +-
+ tests/qemu-iotests/204.out     |   1 +
+ tests/qemu-iotests/228         |   6 +-
+ tests/qemu-iotests/228.out     |   6 +-
+ tests/qemu-iotests/244         |  49 ++++
+ tests/qemu-iotests/244.out     |   7 +
+ tests/qemu-iotests/245         |   4 +-
+ tests/qemu-iotests/273.out     |   4 +-
+ tests/qemu-iotests/check       |   2 +-
+ 48 files changed, 1763 insertions(+), 555 deletions(-)
+
 
