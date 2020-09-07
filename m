@@ -2,83 +2,85 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A33FDC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E689C2BB84
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:46:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08389207DE
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:45:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DBD202080A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:46:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bDM8rM0J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08389207DE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nXgrufAJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBD202080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFKGR-0005lF-2n
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:45:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50288)
+	id 1kFKHl-0007UU-0q
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:46:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50328)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kFKFk-0004vb-Da
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:44:24 -0400
-Received: from mail-ej1-x634.google.com ([2a00:1450:4864:20::634]:37656)
+ id 1kFKFm-0004xx-8T
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:44:26 -0400
+Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:41906)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kFKFi-0000Z3-I9
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:44:24 -0400
-Received: by mail-ej1-x634.google.com with SMTP id nw23so18962210ejb.4
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 09:44:22 -0700 (PDT)
+ id 1kFKFk-0000ZP-6u
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:44:25 -0400
+Received: by mail-ej1-x633.google.com with SMTP id lo4so18965727ejb.8
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 09:44:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=UaDGbL3i7ikwtLIsat0e9nCTw2lQMjWiBe+goatyRsQ=;
- b=bDM8rM0JoBITdBaCT4tSqW7r7sywHSRn0hjnUa9pjzEGaL0WJIj2ejtRRI0n1RUZf6
- zZMZkmfnVip3tibFS46YO50nHaGvx8iT/TrlIMPAq5aIoOkB2u2qyXTF/gXrOHMO9LJ0
- yysR0yn3YWtemPgQBKU+NI5ccnr4HhRS52ziug7ahYLoahLSALuMGM2oH6nTdhA5ePGi
- JqmUcnFKj7VqUlud6S5tb72+M01zse8qNAb71h3pOxzerHF3biQmoWg10+3rpcE2a4Sx
- 3AmUQ6vsdG/llj+OLs+4xnOW1w1+WK7AHWQo6U8COFlPDqSzQyRPOPBF4yhYrz5OBaEq
- 0/Bw==
+ h=sender:from:to:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=NJCG291sP5k6rqzSSOSg1NyDHQEnkAmTSor1WlXw0DU=;
+ b=nXgrufAJbvLCPRmvq13zIrV8mDHSnNAdQR5SDsq0PjCjzEvuU2t+ZmBtOWJTZBYIR0
+ AqAYD+rWu3w82zLQoH3G80VgVgR0/ZPvefmOBnokyzzVcAjt9+mJxOmsgRtL4pKNXFKm
+ rEmb3XNqxVC5eyGYuILuQm6BYjtRbjYjVOhNVCcHcIjNIZNeFDGZI3X0dTi7cxYsO2bJ
+ xIOAsc78F4NRo2vGK4msVZZi8TaPXd6r/U7Z/0Yc27zKCkdDE6qSSvcjXQutxHn/g8hl
+ vBxzqu3kMIGV/3MTkI0xTh4e2Y4V3qGVbF6Z5aZNVFtnkPo7pQXbiFG1/gT4AEXoZjR6
+ cOOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=UaDGbL3i7ikwtLIsat0e9nCTw2lQMjWiBe+goatyRsQ=;
- b=fdviwzqpJ8+Eeueb4yvnVZ34SeuSCtMQKzVdaVj/cTTzIgJ3lh8aEk2SbJ3Z41qqgJ
- 0/xiUzUbyY66OeLIsjDFqsqEIS+ipqjkfnIiZwdJlV0xsjuo+rNys9nZv+LyUJx52n3S
- S4YSY0BmQFUAvkKjSyiUZrXE+OAdfsjFeWmTbpfbwi2VmYfKUA43c9dbAeUTt4PFgcxO
- m7klz+c8QxG9IWWTAXnA7xhaVM1W62IFYjjHHSJQaPWpRwGkaGVGGF0+1xDTLGmzlUsS
- /WlXMjo8PWepfVdWQBBs+lhX9zdq7GWzZ687K17z9h8ubUNNxD24bZqRT5h7p+pMBX7b
- 8JFA==
-X-Gm-Message-State: AOAM530/CBbmAurKQmHayKzmi01nbgASpLcBhphd6GbLt8z3I471EiRx
- uLtUYPM++TD+biQlACCqGseSS8u7db8=
-X-Google-Smtp-Source: ABdhPJz3hnYPURFzK6QvMlZwt6EkmF0nR+Lkm528uEfQ+qpfz7RmdIBYLMrKOhv0t4ynQWsY4R+NqQ==
-X-Received: by 2002:a17:906:1542:: with SMTP id
- c2mr23114425ejd.533.1599497060579; 
- Mon, 07 Sep 2020 09:44:20 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=NJCG291sP5k6rqzSSOSg1NyDHQEnkAmTSor1WlXw0DU=;
+ b=fSLhK4kc5EGUUd69t3BVqE+JOhG6ChnNLTgbv4TgOtr3nyOjwm/H4z66GFxflavq2g
+ v8sNxrzhIhDrbOlfJk5J6E+QoGLSX5OUYPbGltJcgibsLHsgBTO4MW1mYdvYLLqt68/0
+ iYrTVKlIvw004MX1RrgwH2UUrp8Aiv5sfianJUMmAIGdlPbyFFJnhL/zex0pXulKsVDo
+ Ts/5Ag8Iu9TlTDc95z5tDKUkw/3SIf7PIm0avgt4HJqVNaOcDGJvhjWhFaz3k3u+ZC9m
+ 5UupD8HOXJpxII2jooJnZag6soKQcb2JUU4ZRnzSzF3qwQOqzG6E1CbFVzpIY7HjAqIL
+ nyug==
+X-Gm-Message-State: AOAM5324/13JdSqGkLEOxEtRg+L37yUZXpG4MHt/vi2iJnGDOIWdE8g3
+ siSyl9zIWrYg9oRi+tupqb5RUOVk3X8=
+X-Google-Smtp-Source: ABdhPJxqSI1Kafahr+mYf258sK1ApX4ulrplmXfj3oNj/THNKN84wSQnEIB/f0f0M2vt8gbIPiSwng==
+X-Received: by 2002:a17:906:715b:: with SMTP id
+ z27mr23224920ejj.166.1599497062347; 
+ Mon, 07 Sep 2020 09:44:22 -0700 (PDT)
 Received: from donizetti.lan ([2001:b07:6468:f312:6891:d6db:f6ec:d1df])
- by smtp.gmail.com with ESMTPSA id n20sm15760391ejg.65.2020.09.07.09.44.19
+ by smtp.gmail.com with ESMTPSA id n20sm15760391ejg.65.2020.09.07.09.44.21
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 09:44:19 -0700 (PDT)
+ Mon, 07 Sep 2020 09:44:21 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL v2 00/46] Next round of Meson bugfixes and cleanups
-Date: Mon,  7 Sep 2020 18:44:19 +0200
-Message-Id: <20200907164421.19886-1-pbonzini@redhat.com>
+Subject: [PULL 38/46] configure: do not include dependency flags in
+ QEMU_CFLAGS and LIBS
+Date: Mon,  7 Sep 2020 18:44:21 +0200
+Message-Id: <20200907164421.19886-3-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200907164421.19886-1-pbonzini@redhat.com>
+References: <20200907164421.19886-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::634;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-ej1-x634.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::633;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-ej1-x633.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -105,136 +107,291 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 62f9256052df85194faa33137bbe0afb1c95b6e6:
+All Meson executables should specify their dependencies explicitly, either
+directly or indirectly via declare_dependency.  Makefiles instead did
+not propagate dependencies correctly from static libraries, for example.
+Therefore, flags for dependencies need not be included in QEMU_CFLAGS.
+LIBS is not used at all, so drop that one as well.
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/vga-20200904-pull-request' into staging (2020-09-07 13:27:20 +0100)
+In a few cases the dependencies were not yet specified, so add them.
 
-are available in the Git repository at:
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ Makefile             |  2 +-
+ configure            | 40 ----------------------------------------
+ hw/arm/meson.build   |  2 +-
+ hw/mips/meson.build  |  2 +-
+ hw/riscv/meson.build |  2 +-
+ monitor/meson.build  |  2 +-
+ ui/meson.build       |  3 ++-
+ 7 files changed, 7 insertions(+), 46 deletions(-)
 
-  https://gitlab.com/bonzini/qemu.git tags/for-upstream
-
-for you to fetch changes up to cfdedc114244adf488242f547af899bc2fe9f3c0:
-
-  meson: remove linkage of sdl to baum (2020-09-07 18:43:20 +0200)
-
-----------------------------------------------------------------
-meson related:
-* convert unit tests
-* bugfixes for mtest2make
-* miscellaneous bugfixes
-* dead code removal and configure cleanups
-* oss-fuzz fixes
-* msys fixes
-
-----------------------------------------------------------------
-Alexander Bulekov (3):
-      oss-fuzz: fix rpath
-      meson: specify fuzz linker script as a project arg
-      fuzz: Add support for custom fuzzing library
-
-Bruce Rogers (1):
-      meson: remove linkage of sdl to baum
-
-Marc-André Lureau (12):
-      meson: build qapi tests library
-      meson: declare tasn1 dependency
-      meson: declare keyutils dependency
-      meson: convert qht-bench
-      meson: move keyutils dependency check
-      meson: remove old socket_scm_helper rule
-      meson: convert vhost-user-bridge
-      meson: convert atomic*-bench
-      tests: do not print benchmark output to stdout
-      tests/migration/stress: remove unused exit_success
-      meson: fix migration/stress compilation with glibc>=2.30
-      meson: convert migration/initrd-stress
-
-Paolo Bonzini (25):
-      qemu-iotests: move check-block back to Makefiles
-      mtest2make: split environment from test command
-      mtest2make: split working directory from test command
-      mtest2make: hide output of successful tests
-      mtest2make: unify tests that appear in multiple suites
-      meson: remove b_lundef option
-      configure: do not include absolute paths in -I and -L paths
-      configure: include cross sdl2-config in meson cross file
-      ninjatool: use constant names for stamp files
-      meson: fix libqos linking
-      meson: convert the speed tests
-      configure: remove dead code for in-tree builds
-      meson: compute config_all_devices directly
-      Makefile: remove dead variables and includes
-      Makefile: inline the relevant parts of rules.mak
-      configure: move disassembler configuration to meson
-      meson: keep all compiler flags detection together
-      configure: move -ldl test to meson
-      configure: remove unnecessary libm test
-      configure: do not look for install(1)
-      meson: get glib compilation flags from GLIB_CFLAGS
-      meson: get opengl compilation flags from OPENGL_CFLAGS
-      configure: do not include dependency flags in QEMU_CFLAGS and LIBS
-      configure: drop dead variables and functions
-      docs: suggest Meson replacements for various configure functions
-
-Thomas Huth (2):
-      tests/Makefile: test-image-locking needs CONFIG_POSIX
-      meson: convert the unit tests
-
-Yonggang Luo (3):
-      tests: handling signal on win32 properly
-      configure: update dtc submodule
-      meson: Convert undefsym.sh to undefsym.py
-
- .gitignore                       |   2 -
- Makefile                         |  63 +++---
- Makefile.objs                    |  34 ----
- accel/tcg/meson.build            |   2 +-
- chardev/meson.build              |   4 +-
- configure                        | 304 ++++------------------------
- disas/meson.build                |   4 +-
- docs/devel/build-system.rst      |  18 +-
- hw/arm/meson.build               |   2 +-
- hw/mips/meson.build              |   2 +-
- hw/riscv/meson.build             |   2 +-
- meson.build                      | 127 ++++++++----
- monitor/meson.build              |   2 +-
- rules.mak                        | 158 ---------------
- scripts/grepy.sh                 |   3 -
- scripts/mtest2make.py            | 100 +++++-----
- scripts/ninjatool.py             |   8 +-
- scripts/oss-fuzz/build.sh        |   2 +-
- scripts/test-driver.py           |  35 ++++
- scripts/undefsym.py              |  49 +++++
- scripts/undefsym.sh              |  20 --
- tests/Makefile.include           | 414 ++-------------------------------------
- tests/benchmark-crypto-cipher.c  |   8 +-
- tests/benchmark-crypto-hash.c    |   2 +-
- tests/benchmark-crypto-hmac.c    |   8 +-
- tests/docker/Makefile.include    |   4 +
- tests/include/meson.build        |  16 ++
- tests/meson.build                | 255 ++++++++++++++++++++++++
- tests/migration/initrd-stress.sh |  10 +
- tests/migration/meson.build      |  14 ++
- tests/migration/stress.c         |  15 +-
- tests/qemu-iotests/meson.build   |   4 -
- tests/qtest/fuzz/meson.build     |   7 +-
- tests/qtest/libqos/meson.build   |   9 +-
- tests/tcg/Makefile.qemu          |   2 -
- tests/test-crypto-secret.c       |  10 +-
- tests/test-qga.c                 |   2 +-
- tests/test-replication.c         |   4 +
- ui/meson.build                   |   3 +-
- 39 files changed, 662 insertions(+), 1066 deletions(-)
- delete mode 100644 Makefile.objs
- delete mode 100644 rules.mak
- delete mode 100755 scripts/grepy.sh
- create mode 100644 scripts/test-driver.py
- create mode 100644 scripts/undefsym.py
- delete mode 100755 scripts/undefsym.sh
- create mode 100644 tests/include/meson.build
- create mode 100755 tests/migration/initrd-stress.sh
- create mode 100644 tests/migration/meson.build
+diff --git a/Makefile b/Makefile
+index 678e76d6f2..d6c5c9fdef 100644
+--- a/Makefile
++++ b/Makefile
+@@ -155,7 +155,7 @@ dtc/%: .git-submodule-status
+ # Therefore we replicate some of the logic in the sub-makefile.
+ # Remove all the extra -Warning flags that QEMU uses that Capstone doesn't;
+ # no need to annoy QEMU developers with such things.
+-CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS))
++CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS)) $(CAPSTONE_CFLAGS)
+ CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
+ CAP_CFLAGS += -DCAPSTONE_HAS_ARM
+ CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
+diff --git a/configure b/configure
+index e18f3e2156..b94ba9b239 100755
+--- a/configure
++++ b/configure
+@@ -832,7 +832,6 @@ FreeBSD)
+   audio_drv_list="oss try-sdl"
+   audio_possible_drivers="oss sdl pa"
+   # needed for kinfo_getvmmap(3) in libutil.h
+-  LIBS="-lutil $LIBS"
+   netmap=""  # enable netmap autodetect
+   HOST_VARIANT_DIR="freebsd"
+ ;;
+@@ -890,13 +889,10 @@ SunOS)
+   QEMU_CFLAGS="-D_XOPEN_SOURCE=600 $QEMU_CFLAGS"
+ # needed for TIOCWIN* defines in termios.h
+   QEMU_CFLAGS="-D__EXTENSIONS__ $QEMU_CFLAGS"
+-  solarisnetlibs="-lsocket -lnsl -lresolv"
+-  LIBS="$solarisnetlibs $LIBS"
+ ;;
+ Haiku)
+   haiku="yes"
+   QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS -DBSD_SOURCE $QEMU_CFLAGS"
+-  LIBS="-lposix_error_mapper -lnetwork -lbsd $LIBS"
+ ;;
+ Linux)
+   audio_drv_list="try-pa oss"
+@@ -966,11 +962,7 @@ if test "$mingw32" = "yes" ; then
+   HOST_DSOSUF=".dll"
+   # MinGW needs -mthreads for TLS and macro _MT.
+   CFLAGS="-mthreads $CFLAGS"
+-  LIBS="-lwinmm -lws2_32 $LIBS"
+   write_c_skeleton;
+-  if compile_prog "" "-liberty" ; then
+-    LIBS="-liberty $LIBS"
+-  fi
+   prefix="c:/Program Files/QEMU"
+   qemu_suffix=""
+   libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpapi -lnetapi32 $libs_qga"
+@@ -2691,7 +2683,6 @@ if test "$xen" != "no" ; then
+     if $pkg_config --exists xentoolcore; then
+       xen_pc="$xen_pc xentoolcore"
+     fi
+-    QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
+     xen_cflags="$($pkg_config --cflags $xen_pc)"
+     xen_libs="$($pkg_config --libs $xen_pc)"
+   else
+@@ -3076,8 +3067,6 @@ if test "$gnutls" != "no"; then
+         # At least ubuntu 18.04 ships only shared libraries.
+         write_c_skeleton
+         if compile_prog "" "$gnutls_libs" ; then
+-            LIBS="$gnutls_libs $LIBS"
+-            QEMU_CFLAGS="$QEMU_CFLAGS $gnutls_cflags"
+             pass="yes"
+         fi
+     fi
+@@ -3147,8 +3136,6 @@ if test "$nettle" != "no"; then
+         # Link test to make sure the given libraries work (e.g for static).
+         write_c_skeleton
+         if compile_prog "" "$nettle_libs" ; then
+-            LIBS="$nettle_libs $LIBS"
+-            QEMU_CFLAGS="$QEMU_CFLAGS $nettle_cflags"
+             if test -z "$gcrypt"; then
+                gcrypt="no"
+             fi
+@@ -3191,8 +3178,6 @@ if test "$gcrypt" != "no"; then
+         # Link test to make sure the given libraries work (e.g for static).
+         write_c_skeleton
+         if compile_prog "" "$gcrypt_libs" ; then
+-            LIBS="$gcrypt_libs $LIBS"
+-            QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
+             pass="yes"
+         fi
+     fi
+@@ -3764,7 +3749,6 @@ for i in $glib_modules; do
+     if $pkg_config --atleast-version=$glib_req_ver $i; then
+         glib_cflags=$($pkg_config --cflags $i)
+         glib_libs=$($pkg_config --libs $i)
+-        LIBS="$glib_libs $LIBS"
+     else
+         error_exit "glib-$glib_req_ver $i is required to compile QEMU"
+     fi
+@@ -4074,11 +4058,6 @@ if test "$linux_io_uring" != "no" ; then
+     linux_io_uring_cflags=$($pkg_config --cflags liburing)
+     linux_io_uring_libs=$($pkg_config --libs liburing)
+     linux_io_uring=yes
+-
+-    # io_uring is used in libqemuutil.a where per-file -libs variables are not
+-    # seen by programs linking the archive.  It's not ideal, but just add the
+-    # library dependency globally.
+-    LIBS="$linux_io_uring_libs $LIBS"
+   else
+     if test "$linux_io_uring" = "yes" ; then
+       feature_not_found "linux io_uring" "Install liburing devel"
+@@ -4123,7 +4102,6 @@ EOF
+   elif compile_prog "-DCONFIG_LIBATTR" "-lattr" ; then
+     attr=yes
+     libattr_libs="-lattr"
+-    LIBS="$libattr_libs $LIBS"
+     libattr=yes
+   else
+     if test "$attr" = "yes" ; then
+@@ -4243,7 +4221,6 @@ if test "$opengl" != "no" ; then
+     if test "$gtk" = "yes" && $pkg_config --exists "$gtkpackage >= 3.16"; then
+         gtk_gl="yes"
+     fi
+-    QEMU_CFLAGS="$QEMU_CFLAGS $opengl_cflags"
+   else
+     if test "$opengl" = "yes" ; then
+       feature_not_found "opengl" "Please install opengl (mesa) devel pkgs: $opengl_pkgs"
+@@ -4998,7 +4975,6 @@ EOF
+      $pkg_config --atleast-version=0.12.3 spice-protocol && \
+      compile_prog "$spice_cflags" "$spice_libs" ; then
+     spice="yes"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $spice_cflags"
+   else
+     if test "$spice" = "yes" ; then
+       feature_not_found "spice" \
+@@ -5181,7 +5157,6 @@ case "$capstone" in
+       git_submodules="${git_submodules} capstone"
+     fi
+     mkdir -p capstone
+-    QEMU_CFLAGS="$QEMU_CFLAGS -I${source_path}/capstone/include"
+     if test "$mingw32" = "yes"; then
+       LIBCAPSTONE=capstone.lib
+     else
+@@ -5194,7 +5169,6 @@ case "$capstone" in
+   system)
+     capstone_libs="$($pkg_config --libs capstone)"
+     capstone_cflags="$($pkg_config --cflags capstone)"
+-    QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
+     ;;
+ 
+   no)
+@@ -5343,8 +5317,6 @@ EOF
+     else
+       urcu_bp_libs="-lurcu-bp"
+     fi
+-
+-    LIBS="$lttng_ust_libs $urcu_bp_libs $LIBS"
+   else
+     error_exit "Trace backend 'ust' missing lttng-ust header files"
+   fi
+@@ -6125,7 +6097,6 @@ if test "$libpmem" != "no"; then
+ 		libpmem="yes"
+ 		libpmem_libs=$($pkg_config --libs libpmem)
+ 		libpmem_cflags=$($pkg_config --cflags libpmem)
+-		QEMU_CFLAGS="$QEMU_CFLAGS $libpmem_cflags"
+ 	else
+ 		if test "$libpmem" = "yes" ; then
+ 			feature_not_found "libpmem" "Install nvml or pmdk"
+@@ -6142,7 +6113,6 @@ if test "$libdaxctl" != "no"; then
+ 		libdaxctl="yes"
+ 		libdaxctl_libs=$($pkg_config --libs libdaxctl)
+ 		libdaxctl_cflags=$($pkg_config --cflags libdaxctl)
+-		QEMU_CFLAGS="$QEMU_CFLAGS $libdaxctl_cflags"
+ 	else
+ 		if test "$libdaxctl" = "yes" ; then
+ 			feature_not_found "libdaxctl" "Install libdaxctl"
+@@ -6325,11 +6295,6 @@ if test "$libudev" != "no" ; then
+   fi
+ fi
+ 
+-# Now we've finished running tests it's OK to add -Werror to the compiler flags
+-if test "$werror" = "yes"; then
+-    QEMU_CFLAGS="-Werror $QEMU_CFLAGS"
+-fi
+-
+ # Exclude --warn-common with TSan to suppress warnings from the TSan libraries.
+ if test "$solaris" = "no" && test "$tsan" = "no"; then
+     if $ld --version 2>/dev/null | grep "GNU ld" >/dev/null 2>/dev/null ; then
+@@ -6546,10 +6511,6 @@ echo_version() {
+     fi
+ }
+ 
+-# prepend ftd flags after all config tests are done
+-QEMU_CFLAGS="$fdt_cflags $QEMU_CFLAGS"
+-QEMU_LDFLAGS="$fdt_ldflags $QEMU_LDFLAGS"
+-
+ config_host_mak="config-host.mak"
+ 
+ echo "# Automatically generated by configure - do not modify" > $config_host_mak
+@@ -7482,7 +7443,6 @@ echo "QEMU_LDFLAGS=$QEMU_LDFLAGS" >> $config_host_mak
+ echo "LDFLAGS_NOPIE=$LDFLAGS_NOPIE" >> $config_host_mak
+ echo "LD_REL_FLAGS=$LD_REL_FLAGS" >> $config_host_mak
+ echo "LD_I386_EMULATION=$ld_i386_emulation" >> $config_host_mak
+-echo "LIBS+=$LIBS" >> $config_host_mak
+ echo "LIBS_TOOLS+=$libs_tools" >> $config_host_mak
+ echo "PTHREAD_LIB=$PTHREAD_LIB" >> $config_host_mak
+ echo "EXESUF=$EXESUF" >> $config_host_mak
+diff --git a/hw/arm/meson.build b/hw/arm/meson.build
+index 1ae5e17eeb..8480b7f37d 100644
+--- a/hw/arm/meson.build
++++ b/hw/arm/meson.build
+@@ -1,5 +1,5 @@
+ arm_ss = ss.source_set()
+-arm_ss.add(files('boot.c'))
++arm_ss.add(files('boot.c'), fdt)
+ arm_ss.add(when: 'CONFIG_PLATFORM_BUS', if_true: files('sysbus-fdt.c'))
+ arm_ss.add(when: 'CONFIG_ARM_VIRT', if_true: files('virt.c'))
+ arm_ss.add(when: 'CONFIG_ACPI', if_true: files('virt-acpi-build.c'))
+diff --git a/hw/mips/meson.build b/hw/mips/meson.build
+index 6ac9dc4cff..46294b7382 100644
+--- a/hw/mips/meson.build
++++ b/hw/mips/meson.build
+@@ -4,7 +4,7 @@ mips_ss.add(when: 'CONFIG_FULOONG', if_true: files('fuloong2e.c'))
+ mips_ss.add(when: 'CONFIG_JAZZ', if_true: files('jazz.c'))
+ mips_ss.add(when: 'CONFIG_MALTA', if_true: files('gt64xxx_pci.c', 'malta.c'))
+ mips_ss.add(when: 'CONFIG_MIPSSIM', if_true: files('mipssim.c'))
+-mips_ss.add(when: 'CONFIG_MIPS_BOSTON', if_true: files('boston.c'))
++mips_ss.add(when: 'CONFIG_MIPS_BOSTON', if_true: [files('boston.c'), fdt])
+ mips_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('cps.c'))
+ mips_ss.add(when: 'CONFIG_R4K', if_true: files('r4k.c'))
+ 
+diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
+index 25af9db75e..fe2ea75f65 100644
+--- a/hw/riscv/meson.build
++++ b/hw/riscv/meson.build
+@@ -1,5 +1,5 @@
+ riscv_ss = ss.source_set()
+-riscv_ss.add(files('boot.c'))
++riscv_ss.add(files('boot.c'), fdt)
+ riscv_ss.add(files('numa.c'))
+ riscv_ss.add(when: 'CONFIG_HART', if_true: files('riscv_hart.c'))
+ riscv_ss.add(when: 'CONFIG_OPENTITAN', if_true: files('opentitan.c'))
+diff --git a/monitor/meson.build b/monitor/meson.build
+index 0484a64341..eb2a534fdc 100644
+--- a/monitor/meson.build
++++ b/monitor/meson.build
+@@ -6,4 +6,4 @@ softmmu_ss.add(files(
+   'qmp-cmds.c',
+ ))
+ 
+-specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files('misc.c'))
++specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files('misc.c'), spice])
+diff --git a/ui/meson.build b/ui/meson.build
+index 82f60756d9..dd6c110136 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -1,5 +1,5 @@
+ softmmu_ss.add(pixman)
+-specific_ss.add(pixman)   # for the include path
++specific_ss.add(when: ['CONFIG_SOFTMMU'], if_true: pixman)   # for the include path
+ 
+ softmmu_ss.add(files(
+   'console.c',
+@@ -35,6 +35,7 @@ softmmu_ss.add_all(when: vnc, if_true: vnc_ss)
+ softmmu_ss.add(when: vnc, if_false: files('vnc-stubs.c'))
+ softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
+ softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL_DMABUF'], if_true: files('egl-headless.c'))
++specific_ss.add(when: ['CONFIG_SOFTMMU'], if_true: opengl)
+ 
+ ui_modules = {}
+ 
 -- 
 2.26.2
-
 
