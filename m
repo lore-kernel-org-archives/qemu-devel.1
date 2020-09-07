@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2023C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B59ABC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:17:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74436206E6
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:15:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E7A02166E
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:17:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K8a0EWPa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74436206E6
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TVcB9Uom"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E7A02166E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFF7n-0003qP-I7
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:15:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58614)
+	id 1kFF91-0006N9-5x
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:17:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF23-0001uy-LB
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59551
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2P-0002cd-7k
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:17 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59138
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF21-0007sH-QT
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:55 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2H-0007ve-2U
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:16 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599476993;
+ s=mimecast20190719; t=1599477008;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lRuhktsTR3pRXfEZU+LhEedgEn/X4rqYqpI6TCkcoOQ=;
- b=K8a0EWPaWuZ9LJz/Np/dRRMJPeckz5Z08adVFp5gWRFB5+cyQ6OCJmfUkr6jLy2WDl0QHe
- aatS1Q1zN7TklZPb+qmwiyLfZw+lzcT50v5UBBxSJMiv4B9vvkTrYtGN1ROf5moJMt3KPa
- blyGyZ9ZHYuSntjqy5OQA0RDJtm6WoY=
+ bh=XqeQAtrwuLeSFVRWmN1UxBAMnY/zUvyI12xGACYFF0w=;
+ b=TVcB9UomVL3kKTBLL76arTX1gptu3UqQKlpEAUqJPqov0jemB+DeastuLqJGpGQSemgsWt
+ f1T6F2BTaun5nt+IJcLpW7jMeEVOmXWcyqyEI7ywGXW9u7ZMTPL4jg4OiaY/x652tPRjTw
+ GkEaq7YRCn6bTUPz+58XMmv4bLI0xjc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-301-WiZ8oIitM4m0TToLaKW2Og-1; Mon, 07 Sep 2020 07:09:49 -0400
-X-MC-Unique: WiZ8oIitM4m0TToLaKW2Og-1
+ us-mta-382-Tnlc1GYrNjGceGYHgh4KWQ-1; Mon, 07 Sep 2020 07:10:06 -0400
+X-MC-Unique: Tnlc1GYrNjGceGYHgh4KWQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3756E1DDEC;
- Mon,  7 Sep 2020 11:09:48 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5B54F1007466;
+ Mon,  7 Sep 2020 11:10:05 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4226D7E43B;
- Mon,  7 Sep 2020 11:09:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 557439CBA;
+ Mon,  7 Sep 2020 11:10:01 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 05/64] block/nvme: Define INDEX macros to ease code review
-Date: Mon,  7 Sep 2020 13:08:37 +0200
-Message-Id: <20200907110936.261684-6-kwolf@redhat.com>
+Subject: [PULL 16/64] block/nvme: Use an array of EventNotifier
+Date: Mon,  7 Sep 2020 13:08:48 +0200
+Message-Id: <20200907110936.261684-17-kwolf@redhat.com>
 In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
 References: <20200907110936.261684-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -72,9 +72,9 @@ X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
@@ -102,145 +102,122 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Use definitions instead of '0' or '1' indexes. Also this will
-be useful when using multi-queues later.
+In preparation of using multiple IRQ (thus multiple eventfds)
+make BDRVNVMeState::irq_notifier an array (for now of a single
+element, the admin queue notifier).
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200821195359.1285345-5-philmd@redhat.com>
+Message-Id: <20200821195359.1285345-16-philmd@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/nvme.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
+ block/nvme.c | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
 
 diff --git a/block/nvme.c b/block/nvme.c
-index ca8b039f4f..488d4ddb3b 100644
+index e3719d3bd1..24e6e7f086 100644
 --- a/block/nvme.c
 +++ b/block/nvme.c
-@@ -103,6 +103,9 @@ typedef volatile struct {
+@@ -106,6 +106,12 @@ QEMU_BUILD_BUG_ON(offsetof(NVMeRegs, doorbells) != 0x1000);
+ #define INDEX_ADMIN     0
+ #define INDEX_IO(n)     (1 + n)
  
- QEMU_BUILD_BUG_ON(offsetof(NVMeRegs, doorbells) != 0x1000);
- 
-+#define INDEX_ADMIN     0
-+#define INDEX_IO(n)     (1 + n)
++/* This driver shares a single MSIX IRQ for the admin and I/O queues */
++enum {
++    MSIX_SHARED_IRQ_IDX = 0,
++    MSIX_IRQ_COUNT = 1
++};
 +
  struct BDRVNVMeState {
      AioContext *aio_context;
      QEMUVFIOState *vfio;
-@@ -531,7 +534,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-     }
-     cmd.dptr.prp1 = cpu_to_le64(iova);
+@@ -120,7 +126,7 @@ struct BDRVNVMeState {
+     /* How many uint32_t elements does each doorbell entry take. */
+     size_t doorbell_scale;
+     bool write_cache_supported;
+-    EventNotifier irq_notifier;
++    EventNotifier irq_notifier[MSIX_IRQ_COUNT];
  
--    if (nvme_cmd_sync(bs, s->queues[0], &cmd)) {
-+    if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to identify controller");
-         goto out;
-     }
-@@ -555,7 +558,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+     uint64_t nsze; /* Namespace size reported by identify command */
+     int nsid;      /* The namespace id to read/write data. */
+@@ -631,7 +637,8 @@ static bool nvme_poll_queues(BDRVNVMeState *s)
  
-     cmd.cdw10 = 0;
-     cmd.nsid = cpu_to_le32(namespace);
--    if (nvme_cmd_sync(bs, s->queues[0], &cmd)) {
-+    if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to identify namespace");
-         goto out;
-     }
-@@ -644,7 +647,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-         .cdw10 = cpu_to_le32(((queue_size - 1) << 16) | (n & 0xFFFF)),
-         .cdw11 = cpu_to_le32(0x3),
-     };
--    if (nvme_cmd_sync(bs, s->queues[0], &cmd)) {
-+    if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to create io queue [%d]", n);
-         nvme_free_queue_pair(q);
-         return false;
-@@ -655,7 +658,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
-         .cdw10 = cpu_to_le32(((queue_size - 1) << 16) | (n & 0xFFFF)),
-         .cdw11 = cpu_to_le32(0x1 | (n << 16)),
-     };
--    if (nvme_cmd_sync(bs, s->queues[0], &cmd)) {
-+    if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
-         error_setg(errp, "Failed to create io queue [%d]", n);
-         nvme_free_queue_pair(q);
-         return false;
-@@ -739,16 +742,18 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+ static void nvme_handle_event(EventNotifier *n)
+ {
+-    BDRVNVMeState *s = container_of(n, BDRVNVMeState, irq_notifier);
++    BDRVNVMeState *s = container_of(n, BDRVNVMeState,
++                                    irq_notifier[MSIX_SHARED_IRQ_IDX]);
  
-     /* Set up admin queue. */
-     s->queues = g_new(NVMeQueuePair *, 1);
--    s->queues[0] = nvme_create_queue_pair(bs, 0, NVME_QUEUE_SIZE, errp);
--    if (!s->queues[0]) {
-+    s->queues[INDEX_ADMIN] = nvme_create_queue_pair(bs, 0,
-+                                                          NVME_QUEUE_SIZE,
-+                                                          errp);
-+    if (!s->queues[INDEX_ADMIN]) {
-         ret = -EINVAL;
-         goto out;
-     }
-     s->nr_queues = 1;
-     QEMU_BUILD_BUG_ON(NVME_QUEUE_SIZE & 0xF000);
-     s->regs->aqa = cpu_to_le32((NVME_QUEUE_SIZE << 16) | NVME_QUEUE_SIZE);
--    s->regs->asq = cpu_to_le64(s->queues[0]->sq.iova);
--    s->regs->acq = cpu_to_le64(s->queues[0]->cq.iova);
-+    s->regs->asq = cpu_to_le64(s->queues[INDEX_ADMIN]->sq.iova);
-+    s->regs->acq = cpu_to_le64(s->queues[INDEX_ADMIN]->cq.iova);
+     trace_nvme_handle_event(s);
+     event_notifier_test_and_clear(n);
+@@ -683,7 +690,8 @@ out_error:
+ static bool nvme_poll_cb(void *opaque)
+ {
+     EventNotifier *e = opaque;
+-    BDRVNVMeState *s = container_of(e, BDRVNVMeState, irq_notifier);
++    BDRVNVMeState *s = container_of(e, BDRVNVMeState,
++                                    irq_notifier[MSIX_SHARED_IRQ_IDX]);
  
-     /* After setting up all control registers we can enable device now. */
-     s->regs->cc = cpu_to_le32((ctz32(NVME_CQ_ENTRY_BYTES) << 20) |
-@@ -839,7 +844,7 @@ static int nvme_enable_disable_write_cache(BlockDriverState *bs, bool enable,
-         .cdw11 = cpu_to_le32(enable ? 0x01 : 0x00),
-     };
- 
--    ret = nvme_cmd_sync(bs, s->queues[0], &cmd);
-+    ret = nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd);
+     trace_nvme_poll_cb(s);
+     return nvme_poll_queues(s);
+@@ -705,7 +713,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+     s->device = g_strdup(device);
+     s->nsid = namespace;
+     s->aio_context = bdrv_get_aio_context(bs);
+-    ret = event_notifier_init(&s->irq_notifier, 0);
++    ret = event_notifier_init(&s->irq_notifier[MSIX_SHARED_IRQ_IDX], 0);
      if (ret) {
-         error_setg(errp, "Failed to configure NVMe write cache");
+         error_setg(errp, "Failed to init event notifier");
+         return ret;
+@@ -784,12 +792,13 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+         }
      }
-@@ -1056,7 +1061,7 @@ static coroutine_fn int nvme_co_prw_aligned(BlockDriverState *bs,
- {
-     int r;
-     BDRVNVMeState *s = bs->opaque;
--    NVMeQueuePair *ioq = s->queues[1];
-+    NVMeQueuePair *ioq = s->queues[INDEX_IO(0)];
-     NVMeRequest *req;
  
-     uint32_t cdw12 = (((bytes >> s->blkshift) - 1) & 0xFFFF) |
-@@ -1171,7 +1176,7 @@ static coroutine_fn int nvme_co_pwritev(BlockDriverState *bs,
- static coroutine_fn int nvme_co_flush(BlockDriverState *bs)
- {
-     BDRVNVMeState *s = bs->opaque;
--    NVMeQueuePair *ioq = s->queues[1];
-+    NVMeQueuePair *ioq = s->queues[INDEX_IO(0)];
-     NVMeRequest *req;
-     NvmeCmd cmd = {
-         .opcode = NVME_CMD_FLUSH,
-@@ -1202,7 +1207,7 @@ static coroutine_fn int nvme_co_pwrite_zeroes(BlockDriverState *bs,
-                                               BdrvRequestFlags flags)
- {
-     BDRVNVMeState *s = bs->opaque;
--    NVMeQueuePair *ioq = s->queues[1];
-+    NVMeQueuePair *ioq = s->queues[INDEX_IO(0)];
-     NVMeRequest *req;
+-    ret = qemu_vfio_pci_init_irq(s->vfio, &s->irq_notifier,
++    ret = qemu_vfio_pci_init_irq(s->vfio, s->irq_notifier,
+                                  VFIO_PCI_MSIX_IRQ_INDEX, errp);
+     if (ret) {
+         goto out;
+     }
+-    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
++    aio_set_event_notifier(bdrv_get_aio_context(bs),
++                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
+                            false, nvme_handle_event, nvme_poll_cb);
  
-     uint32_t cdw12 = ((bytes >> s->blkshift) - 1) & 0xFFFF;
-@@ -1255,7 +1260,7 @@ static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
-                                          int bytes)
- {
+     nvme_identify(bs, namespace, &local_err);
+@@ -872,9 +881,10 @@ static void nvme_close(BlockDriverState *bs)
+         nvme_free_queue_pair(s->queues[i]);
+     }
+     g_free(s->queues);
+-    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
++    aio_set_event_notifier(bdrv_get_aio_context(bs),
++                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
+                            false, NULL, NULL);
+-    event_notifier_cleanup(&s->irq_notifier);
++    event_notifier_cleanup(&s->irq_notifier[MSIX_SHARED_IRQ_IDX]);
+     qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->regs, 0, NVME_BAR_SIZE);
+     qemu_vfio_close(s->vfio);
+ 
+@@ -1381,7 +1391,8 @@ static void nvme_detach_aio_context(BlockDriverState *bs)
+         q->completion_bh = NULL;
+     }
+ 
+-    aio_set_event_notifier(bdrv_get_aio_context(bs), &s->irq_notifier,
++    aio_set_event_notifier(bdrv_get_aio_context(bs),
++                           &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
+                            false, NULL, NULL);
+ }
+ 
+@@ -1391,7 +1402,7 @@ static void nvme_attach_aio_context(BlockDriverState *bs,
      BDRVNVMeState *s = bs->opaque;
--    NVMeQueuePair *ioq = s->queues[1];
-+    NVMeQueuePair *ioq = s->queues[INDEX_IO(0)];
-     NVMeRequest *req;
-     NvmeDsmRange *buf;
-     QEMUIOVector local_qiov;
-@@ -1398,7 +1403,7 @@ static void nvme_aio_unplug(BlockDriverState *bs)
-     BDRVNVMeState *s = bs->opaque;
-     assert(s->plugged);
-     s->plugged = false;
--    for (i = 1; i < s->nr_queues; i++) {
-+    for (i = INDEX_IO(0); i < s->nr_queues; i++) {
-         NVMeQueuePair *q = s->queues[i];
-         qemu_mutex_lock(&q->lock);
-         nvme_kick(q);
+ 
+     s->aio_context = new_context;
+-    aio_set_event_notifier(new_context, &s->irq_notifier,
++    aio_set_event_notifier(new_context, &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
+                            false, nvme_handle_event, nvme_poll_cb);
+ 
+     for (int i = 0; i < s->nr_queues; i++) {
 -- 
 2.25.4
 
