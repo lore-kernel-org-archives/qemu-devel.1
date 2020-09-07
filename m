@@ -7,74 +7,74 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0941C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98842C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:23:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 242BF20732
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 226A220732
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:23:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gkDIdmVT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 242BF20732
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ur+Rcv2O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 226A220732
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLni-0001tO-0w
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:23:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42276)
+	id 1kFLns-0002I2-8O
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:23:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42240)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLl0-0004yc-20
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:20:46 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:25448
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLky-0004xT-2y
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:20:44 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54222
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLkr-0004Rz-T3
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:20:45 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLkr-0004SX-TI
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:20:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599502833;
+ s=mimecast20190719; t=1599502835;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SVNpvfWyufjUxDfLNdiOZAp9NC+ld2t9E1cXUnO2rqc=;
- b=gkDIdmVT5JtQCH8u2ip4jzF5hkoLagZn7NK+07D9jMnn5H6zq1wTxJP0+M3yZlRfXKIWcR
- sbSBwcgZMyudisiM/C3I5hyUIAuiPJnAp+KPR4kXmPmWC8ArYf5YU6bs/fc268LeFHhHeW
- ERRjq2GKTIHiRGPvHiBe9ApJ0Xn0AGs=
+ bh=iHxPf4E6nv7ka0kIDLdkyKT+jqwegwlf8eihiZP8g1Q=;
+ b=Ur+Rcv2OakffbI4jwfO11lJqtBwqr1goLa7mmb20GXHCLCq6wuzT2Wxgu4Jm1xq820wTrn
+ npW03AM71OfAFLBOm5j05h/rsBnwxTVnFm6jxEDTl8XNhMwL3vO7leVxO9XMKj2fYdFYrB
+ yf15oAX8T9vimDbNjUQP9vF7gj0Q30Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-355-eccZfd95OCquOHTGEPUhiA-1; Mon, 07 Sep 2020 14:20:28 -0400
-X-MC-Unique: eccZfd95OCquOHTGEPUhiA-1
+ us-mta-290-G7lL6fLzOTGqRP_Av18Wvw-1; Mon, 07 Sep 2020 14:20:34 -0400
+X-MC-Unique: G7lL6fLzOTGqRP_Av18Wvw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 37FD18015A8;
- Mon,  7 Sep 2020 18:20:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 39A83393B1;
+ Mon,  7 Sep 2020 18:20:33 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ED2DD60BF3;
- Mon,  7 Sep 2020 18:20:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 187E360BF3;
+ Mon,  7 Sep 2020 18:20:31 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 02/29] qapi: Create block-export module
-Date: Mon,  7 Sep 2020 20:19:44 +0200
-Message-Id: <20200907182011.521007-3-kwolf@redhat.com>
+Subject: [PATCH 06/29] qemu-nbd: Use raw block driver for --offset
+Date: Mon,  7 Sep 2020 20:19:48 +0200
+Message-Id: <20200907182011.521007-7-kwolf@redhat.com>
 In-Reply-To: <20200907182011.521007-1-kwolf@redhat.com>
 References: <20200907182011.521007-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 22:29:02
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
@@ -100,482 +100,245 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move all block export related types and commands from block-core to the
-new QAPI module block-export.
+Instead of implementing qemu-nbd --offset in the NBD code, just put a
+raw block node with the requested offset on top of the user image and
+rely on that doing the job.
+
+This does not only simplify the nbd_export_new() interface and bring it
+closer to the set of options that the nbd-server-add QMP command offers,
+but in fact it also eliminates a potential source for bugs in the NBD
+code which previously had to add the offset manually in all relevant
+places.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 Reviewed-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- qapi/block-core.json                 | 166 -------------------------
- qapi/block-export.json               | 175 +++++++++++++++++++++++++++
- qapi/qapi-schema.json                |   1 +
- include/block/nbd.h                  |   2 +-
- block/monitor/block-hmp-cmds.c       |   1 +
- blockdev-nbd.c                       |   2 +-
- storage-daemon/qemu-storage-daemon.c |   2 +-
- qapi/meson.build                     |   4 +-
- storage-daemon/qapi/qapi-schema.json |   1 +
- 9 files changed, 184 insertions(+), 170 deletions(-)
- create mode 100644 qapi/block-export.json
+ include/block/nbd.h |  4 ++--
+ blockdev-nbd.c      |  9 +--------
+ nbd/server.c        | 33 ++++++++++++++++-----------------
+ qemu-nbd.c          | 27 ++++++++++++---------------
+ 4 files changed, 31 insertions(+), 42 deletions(-)
 
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index 0345f6f2d2..41afd89a43 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -5192,172 +5192,6 @@
-              'iothread': 'StrOrNull',
-              '*force': 'bool' } }
- 
--##
--# @NbdServerOptions:
--#
--# @addr: Address on which to listen.
--# @tls-creds: ID of the TLS credentials object (since 2.6).
--# @tls-authz: ID of the QAuthZ authorization object used to validate
--#             the client's x509 distinguished name. This object is
--#             is only resolved at time of use, so can be deleted and
--#             recreated on the fly while the NBD server is active.
--#             If missing, it will default to denying access (since 4.0).
--#
--# Keep this type consistent with the nbd-server-start arguments. The only
--# intended difference is using SocketAddress instead of SocketAddressLegacy.
--#
--# Since: 4.2
--##
--{ 'struct': 'NbdServerOptions',
--  'data': { 'addr': 'SocketAddress',
--            '*tls-creds': 'str',
--            '*tls-authz': 'str'} }
--
--##
--# @nbd-server-start:
--#
--# Start an NBD server listening on the given host and port.  Block
--# devices can then be exported using @nbd-server-add.  The NBD
--# server will present them as named exports; for example, another
--# QEMU instance could refer to them as "nbd:HOST:PORT:exportname=NAME".
--#
--# @addr: Address on which to listen.
--# @tls-creds: ID of the TLS credentials object (since 2.6).
--# @tls-authz: ID of the QAuthZ authorization object used to validate
--#             the client's x509 distinguished name. This object is
--#             is only resolved at time of use, so can be deleted and
--#             recreated on the fly while the NBD server is active.
--#             If missing, it will default to denying access (since 4.0).
--#
--# Returns: error if the server is already running.
--#
--# Keep this type consistent with the NbdServerOptions type. The only intended
--# difference is using SocketAddressLegacy instead of SocketAddress.
--#
--# Since: 1.3.0
--##
--{ 'command': 'nbd-server-start',
--  'data': { 'addr': 'SocketAddressLegacy',
--            '*tls-creds': 'str',
--            '*tls-authz': 'str'} }
--
--##
--# @BlockExportNbd:
--#
--# An NBD block export.
--#
--# @device: The device name or node name of the node to be exported
--#
--# @name: Export name. If unspecified, the @device parameter is used as the
--#        export name. (Since 2.12)
--#
--# @description: Free-form description of the export, up to 4096 bytes.
--#               (Since 5.0)
--#
--# @writable: Whether clients should be able to write to the device via the
--#            NBD connection (default false).
--#
--# @bitmap: Also export the dirty bitmap reachable from @device, so the
--#          NBD client can use NBD_OPT_SET_META_CONTEXT with
--#          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (since 4.0)
--#
--# Since: 5.0
--##
--{ 'struct': 'BlockExportNbd',
--  'data': {'device': 'str', '*name': 'str', '*description': 'str',
--           '*writable': 'bool', '*bitmap': 'str' } }
--
--##
--# @nbd-server-add:
--#
--# Export a block node to QEMU's embedded NBD server.
--#
--# Returns: error if the server is not running, or export with the same name
--#          already exists.
--#
--# Since: 1.3.0
--##
--{ 'command': 'nbd-server-add',
--  'data': 'BlockExportNbd', 'boxed': true }
--
--##
--# @NbdServerRemoveMode:
--#
--# Mode for removing an NBD export.
--#
--# @safe: Remove export if there are no existing connections, fail otherwise.
--#
--# @hard: Drop all connections immediately and remove export.
--#
--# Potential additional modes to be added in the future:
--#
--# hide: Just hide export from new clients, leave existing connections as is.
--# Remove export after all clients are disconnected.
--#
--# soft: Hide export from new clients, answer with ESHUTDOWN for all further
--# requests from existing clients.
--#
--# Since: 2.12
--##
--{'enum': 'NbdServerRemoveMode', 'data': ['safe', 'hard']}
--
--##
--# @nbd-server-remove:
--#
--# Remove NBD export by name.
--#
--# @name: Export name.
--#
--# @mode: Mode of command operation. See @NbdServerRemoveMode description.
--#        Default is 'safe'.
--#
--# Returns: error if
--#            - the server is not running
--#            - export is not found
--#            - mode is 'safe' and there are existing connections
--#
--# Since: 2.12
--##
--{ 'command': 'nbd-server-remove',
--  'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
--
--##
--# @nbd-server-stop:
--#
--# Stop QEMU's embedded NBD server, and unregister all devices previously
--# added via @nbd-server-add.
--#
--# Since: 1.3.0
--##
--{ 'command': 'nbd-server-stop' }
--
--##
--# @BlockExportType:
--#
--# An enumeration of block export types
--#
--# @nbd: NBD export
--#
--# Since: 4.2
--##
--{ 'enum': 'BlockExportType',
--  'data': [ 'nbd' ] }
--
--##
--# @BlockExport:
--#
--# Describes a block export, i.e. how single node should be exported on an
--# external interface.
--#
--# Since: 4.2
--##
--{ 'union': 'BlockExport',
--  'base': { 'type': 'BlockExportType' },
--  'discriminator': 'type',
--  'data': {
--      'nbd': 'BlockExportNbd'
--   } }
--
- ##
- # @QuorumOpType:
- #
-diff --git a/qapi/block-export.json b/qapi/block-export.json
-new file mode 100644
-index 0000000000..f038eb47aa
---- /dev/null
-+++ b/qapi/block-export.json
-@@ -0,0 +1,175 @@
-+# -*- Mode: Python -*-
-+# vim: filetype=python
-+
-+##
-+# == Block device exports
-+##
-+
-+{ 'include': 'sockets.json' }
-+
-+##
-+# @NbdServerOptions:
-+#
-+# @addr: Address on which to listen.
-+# @tls-creds: ID of the TLS credentials object (since 2.6).
-+# @tls-authz: ID of the QAuthZ authorization object used to validate
-+#             the client's x509 distinguished name. This object is
-+#             is only resolved at time of use, so can be deleted and
-+#             recreated on the fly while the NBD server is active.
-+#             If missing, it will default to denying access (since 4.0).
-+#
-+# Keep this type consistent with the nbd-server-start arguments. The only
-+# intended difference is using SocketAddress instead of SocketAddressLegacy.
-+#
-+# Since: 4.2
-+##
-+{ 'struct': 'NbdServerOptions',
-+  'data': { 'addr': 'SocketAddress',
-+            '*tls-creds': 'str',
-+            '*tls-authz': 'str'} }
-+
-+##
-+# @nbd-server-start:
-+#
-+# Start an NBD server listening on the given host and port.  Block
-+# devices can then be exported using @nbd-server-add.  The NBD
-+# server will present them as named exports; for example, another
-+# QEMU instance could refer to them as "nbd:HOST:PORT:exportname=NAME".
-+#
-+# @addr: Address on which to listen.
-+# @tls-creds: ID of the TLS credentials object (since 2.6).
-+# @tls-authz: ID of the QAuthZ authorization object used to validate
-+#             the client's x509 distinguished name. This object is
-+#             is only resolved at time of use, so can be deleted and
-+#             recreated on the fly while the NBD server is active.
-+#             If missing, it will default to denying access (since 4.0).
-+#
-+# Returns: error if the server is already running.
-+#
-+# Keep this type consistent with the NbdServerOptions type. The only intended
-+# difference is using SocketAddressLegacy instead of SocketAddress.
-+#
-+# Since: 1.3.0
-+##
-+{ 'command': 'nbd-server-start',
-+  'data': { 'addr': 'SocketAddressLegacy',
-+            '*tls-creds': 'str',
-+            '*tls-authz': 'str'} }
-+
-+##
-+# @BlockExportNbd:
-+#
-+# An NBD block export.
-+#
-+# @device: The device name or node name of the node to be exported
-+#
-+# @name: Export name. If unspecified, the @device parameter is used as the
-+#        export name. (Since 2.12)
-+#
-+# @description: Free-form description of the export, up to 4096 bytes.
-+#               (Since 5.0)
-+#
-+# @writable: Whether clients should be able to write to the device via the
-+#            NBD connection (default false).
-+#
-+# @bitmap: Also export the dirty bitmap reachable from @device, so the
-+#          NBD client can use NBD_OPT_SET_META_CONTEXT with
-+#          "qemu:dirty-bitmap:NAME" to inspect the bitmap. (since 4.0)
-+#
-+# Since: 5.0
-+##
-+{ 'struct': 'BlockExportNbd',
-+  'data': {'device': 'str', '*name': 'str', '*description': 'str',
-+           '*writable': 'bool', '*bitmap': 'str' } }
-+
-+##
-+# @nbd-server-add:
-+#
-+# Export a block node to QEMU's embedded NBD server.
-+#
-+# Returns: error if the server is not running, or export with the same name
-+#          already exists.
-+#
-+# Since: 1.3.0
-+##
-+{ 'command': 'nbd-server-add',
-+  'data': 'BlockExportNbd', 'boxed': true }
-+
-+##
-+# @NbdServerRemoveMode:
-+#
-+# Mode for removing an NBD export.
-+#
-+# @safe: Remove export if there are no existing connections, fail otherwise.
-+#
-+# @hard: Drop all connections immediately and remove export.
-+#
-+# Potential additional modes to be added in the future:
-+#
-+# hide: Just hide export from new clients, leave existing connections as is.
-+# Remove export after all clients are disconnected.
-+#
-+# soft: Hide export from new clients, answer with ESHUTDOWN for all further
-+# requests from existing clients.
-+#
-+# Since: 2.12
-+##
-+{'enum': 'NbdServerRemoveMode', 'data': ['safe', 'hard']}
-+
-+##
-+# @nbd-server-remove:
-+#
-+# Remove NBD export by name.
-+#
-+# @name: Export name.
-+#
-+# @mode: Mode of command operation. See @NbdServerRemoveMode description.
-+#        Default is 'safe'.
-+#
-+# Returns: error if
-+#            - the server is not running
-+#            - export is not found
-+#            - mode is 'safe' and there are existing connections
-+#
-+# Since: 2.12
-+##
-+{ 'command': 'nbd-server-remove',
-+  'data': {'name': 'str', '*mode': 'NbdServerRemoveMode'} }
-+
-+##
-+# @nbd-server-stop:
-+#
-+# Stop QEMU's embedded NBD server, and unregister all devices previously
-+# added via @nbd-server-add.
-+#
-+# Since: 1.3.0
-+##
-+{ 'command': 'nbd-server-stop' }
-+
-+##
-+# @BlockExportType:
-+#
-+# An enumeration of block export types
-+#
-+# @nbd: NBD export
-+#
-+# Since: 4.2
-+##
-+{ 'enum': 'BlockExportType',
-+  'data': [ 'nbd' ] }
-+
-+##
-+# @BlockExport:
-+#
-+# Describes a block export, i.e. how single node should be exported on an
-+# external interface.
-+#
-+# Since: 4.2
-+##
-+{ 'union': 'BlockExport',
-+  'base': { 'type': 'BlockExportType' },
-+  'discriminator': 'type',
-+  'data': {
-+      'nbd': 'BlockExportNbd'
-+   } }
-+
-diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
-index f03ff91ceb..b78fc399a4 100644
---- a/qapi/qapi-schema.json
-+++ b/qapi/qapi-schema.json
-@@ -64,6 +64,7 @@
- { 'include': 'run-state.json' }
- { 'include': 'crypto.json' }
- { 'include': 'block.json' }
-+{ 'include': 'block-export.json' }
- { 'include': 'char.json' }
- { 'include': 'dump.json' }
- { 'include': 'job.json' }
 diff --git a/include/block/nbd.h b/include/block/nbd.h
-index 0451683d03..262f6da2ce 100644
+index 7698453fb2..451f399b0a 100644
 --- a/include/block/nbd.h
 +++ b/include/block/nbd.h
-@@ -20,7 +20,7 @@
- #ifndef NBD_H
- #define NBD_H
+@@ -331,8 +331,8 @@ typedef struct NBDExport NBDExport;
+ typedef struct NBDClient NBDClient;
  
--#include "qapi/qapi-types-block.h"
-+#include "qapi/qapi-types-block-export.h"
- #include "io/channel-socket.h"
- #include "crypto/tlscreds.h"
- #include "qapi/error.h"
-diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
-index 4d3db5ed3c..6ce0f8f87c 100644
---- a/block/monitor/block-hmp-cmds.c
-+++ b/block/monitor/block-hmp-cmds.c
-@@ -40,6 +40,7 @@
- #include "sysemu/block-backend.h"
- #include "sysemu/blockdev.h"
- #include "qapi/qapi-commands-block.h"
-+#include "qapi/qapi-commands-block-export.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/error.h"
- #include "qapi/qmp/qerror.h"
+ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp);
+-NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+-                          uint64_t size, const char *name, const char *desc,
++NBDExport *nbd_export_new(BlockDriverState *bs,
++                          const char *name, const char *desc,
+                           const char *bitmap, bool readonly, bool shared,
+                           void (*close)(NBDExport *), bool writethrough,
+                           BlockBackend *on_eject_blk, Error **errp);
 diff --git a/blockdev-nbd.c b/blockdev-nbd.c
-index 1a95d89f00..0f6b80c58f 100644
+index 47b04f166a..96cb0100e9 100644
 --- a/blockdev-nbd.c
 +++ b/blockdev-nbd.c
-@@ -14,7 +14,7 @@
- #include "sysemu/block-backend.h"
- #include "hw/block/block.h"
- #include "qapi/error.h"
--#include "qapi/qapi-commands-block.h"
-+#include "qapi/qapi-commands-block-export.h"
- #include "block/nbd.h"
- #include "io/channel-socket.h"
- #include "io/net-listener.h"
-diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
-index 7e9b0e0d3f..ed9d2afcf3 100644
---- a/storage-daemon/qemu-storage-daemon.c
-+++ b/storage-daemon/qemu-storage-daemon.c
-@@ -35,8 +35,8 @@
- #include "monitor/monitor-internal.h"
+@@ -154,7 +154,6 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
+     BlockDriverState *bs = NULL;
+     BlockBackend *on_eject_blk;
+     NBDExport *exp = NULL;
+-    int64_t len;
+     AioContext *aio_context;
  
- #include "qapi/error.h"
--#include "qapi/qapi-visit-block.h"
- #include "qapi/qapi-visit-block-core.h"
-+#include "qapi/qapi-visit-block-export.h"
- #include "qapi/qapi-visit-control.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
-diff --git a/qapi/meson.build b/qapi/meson.build
-index 2b2872a41d..1ee19a07de 100644
---- a/qapi/meson.build
-+++ b/qapi/meson.build
-@@ -16,8 +16,9 @@ util_ss.add(files(
- qapi_all_modules = [
-   'audio',
-   'authz',
--  'block-core',
-   'block',
-+  'block-core',
-+  'block-export',
-   'char',
-   'common',
-   'control',
-@@ -47,6 +48,7 @@ qapi_all_modules = [
+     assert(exp_args->type == BLOCK_EXPORT_TYPE_NBD);
+@@ -192,12 +191,6 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
  
- qapi_storage_daemon_modules = [
-   'block-core',
-+  'block-export',
-   'char',
-   'common',
-   'control',
-diff --git a/storage-daemon/qapi/qapi-schema.json b/storage-daemon/qapi/qapi-schema.json
-index 6100d1f0c9..c6ad5ae1e3 100644
---- a/storage-daemon/qapi/qapi-schema.json
-+++ b/storage-daemon/qapi/qapi-schema.json
-@@ -16,6 +16,7 @@
- { 'include': '../../qapi/pragma.json' }
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+-    len = bdrv_getlength(bs);
+-    if (len < 0) {
+-        error_setg_errno(errp, -len,
+-                         "Failed to determine the NBD export's length");
+-        goto out;
+-    }
  
- { 'include': '../../qapi/block-core.json' }
-+{ 'include': '../../qapi/block-export.json' }
- { 'include': '../../qapi/char.json' }
- { 'include': '../../qapi/common.json' }
- { 'include': '../../qapi/control.json' }
+     if (!arg->has_writable) {
+         arg->writable = false;
+@@ -206,7 +199,7 @@ BlockExport *nbd_export_create(BlockExportOptions *exp_args, Error **errp)
+         arg->writable = false;
+     }
+ 
+-    exp = nbd_export_new(bs, 0, len, arg->name, arg->description, arg->bitmap,
++    exp = nbd_export_new(bs, arg->name, arg->description, arg->bitmap,
+                          !arg->writable, !arg->writable,
+                          NULL, false, on_eject_blk, errp);
+     if (!exp) {
+diff --git a/nbd/server.c b/nbd/server.c
+index f5af93c253..33aaca918c 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -89,7 +89,6 @@ struct NBDExport {
+     BlockBackend *blk;
+     char *name;
+     char *description;
+-    uint64_t dev_offset;
+     uint64_t size;
+     uint16_t nbdflags;
+     QTAILQ_HEAD(, NBDClient) clients;
+@@ -1507,8 +1506,8 @@ static void nbd_eject_notifier(Notifier *n, void *data)
+     aio_context_release(aio_context);
+ }
+ 
+-NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+-                          uint64_t size, const char *name, const char *desc,
++NBDExport *nbd_export_new(BlockDriverState *bs,
++                          const char *name, const char *desc,
+                           const char *bitmap, bool readonly, bool shared,
+                           void (*close)(NBDExport *), bool writethrough,
+                           BlockBackend *on_eject_blk, Error **errp)
+@@ -1516,9 +1515,17 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+     AioContext *ctx;
+     BlockBackend *blk;
+     NBDExport *exp;
++    int64_t size;
+     uint64_t perm;
+     int ret;
+ 
++    size = bdrv_getlength(bs);
++    if (size < 0) {
++        error_setg_errno(errp, -size,
++                         "Failed to determine the NBD export's length");
++        return NULL;
++    }
++
+     exp = g_new0(NBDExport, 1);
+     exp->common = (BlockExport) {
+         .drv = &blk_exp_nbd,
+@@ -1553,8 +1560,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+     exp->refcount = 1;
+     QTAILQ_INIT(&exp->clients);
+     exp->blk = blk;
+-    assert(dev_offset <= INT64_MAX);
+-    exp->dev_offset = dev_offset;
+     exp->name = g_strdup(name);
+     assert(!desc || strlen(desc) <= NBD_MAX_STRING_SIZE);
+     exp->description = g_strdup(desc);
+@@ -1569,7 +1574,6 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
+         exp->nbdflags |= (NBD_FLAG_SEND_TRIM | NBD_FLAG_SEND_WRITE_ZEROES |
+                           NBD_FLAG_SEND_FAST_ZERO);
+     }
+-    assert(size <= INT64_MAX - dev_offset);
+     exp->size = QEMU_ALIGN_DOWN(size, BDRV_SECTOR_SIZE);
+ 
+     if (bitmap) {
+@@ -1928,8 +1932,7 @@ static int coroutine_fn nbd_co_send_sparse_read(NBDClient *client,
+             stl_be_p(&chunk.length, pnum);
+             ret = nbd_co_send_iov(client, iov, 1, errp);
+         } else {
+-            ret = blk_pread(exp->blk, offset + progress + exp->dev_offset,
+-                            data + progress, pnum);
++            ret = blk_pread(exp->blk, offset + progress, data + progress, pnum);
+             if (ret < 0) {
+                 error_setg_errno(errp, -ret, "reading from file failed");
+                 break;
+@@ -2303,8 +2306,7 @@ static coroutine_fn int nbd_do_cmd_read(NBDClient *client, NBDRequest *request,
+                                        data, request->len, errp);
+     }
+ 
+-    ret = blk_pread(exp->blk, request->from + exp->dev_offset, data,
+-                    request->len);
++    ret = blk_pread(exp->blk, request->from, data, request->len);
+     if (ret < 0) {
+         return nbd_send_generic_reply(client, request->handle, ret,
+                                       "reading from file failed", errp);
+@@ -2339,7 +2341,7 @@ static coroutine_fn int nbd_do_cmd_cache(NBDClient *client, NBDRequest *request,
+ 
+     assert(request->type == NBD_CMD_CACHE);
+ 
+-    ret = blk_co_preadv(exp->blk, request->from + exp->dev_offset, request->len,
++    ret = blk_co_preadv(exp->blk, request->from, request->len,
+                         NULL, BDRV_REQ_COPY_ON_READ | BDRV_REQ_PREFETCH);
+ 
+     return nbd_send_generic_reply(client, request->handle, ret,
+@@ -2370,8 +2372,7 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+         if (request->flags & NBD_CMD_FLAG_FUA) {
+             flags |= BDRV_REQ_FUA;
+         }
+-        ret = blk_pwrite(exp->blk, request->from + exp->dev_offset,
+-                         data, request->len, flags);
++        ret = blk_pwrite(exp->blk, request->from, data, request->len, flags);
+         return nbd_send_generic_reply(client, request->handle, ret,
+                                       "writing to file failed", errp);
+ 
+@@ -2392,8 +2393,7 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+             int align = client->check_align ?: 1;
+             int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
+                                                         align));
+-            ret = blk_pwrite_zeroes(exp->blk, request->from + exp->dev_offset,
+-                                    len, flags);
++            ret = blk_pwrite_zeroes(exp->blk, request->from, len, flags);
+             request->len -= len;
+             request->from += len;
+         }
+@@ -2416,8 +2416,7 @@ static coroutine_fn int nbd_handle_request(NBDClient *client,
+             int align = client->check_align ?: 1;
+             int len = MIN(request->len, QEMU_ALIGN_DOWN(BDRV_REQUEST_MAX_BYTES,
+                                                         align));
+-            ret = blk_co_pdiscard(exp->blk, request->from + exp->dev_offset,
+-                                  len);
++            ret = blk_co_pdiscard(exp->blk, request->from, len);
+             request->len -= len;
+             request->from += len;
+         }
+diff --git a/qemu-nbd.c b/qemu-nbd.c
+index 33476a1000..1752daa4c4 100644
+--- a/qemu-nbd.c
++++ b/qemu-nbd.c
+@@ -524,7 +524,6 @@ int main(int argc, char **argv)
+     const char *port = NULL;
+     char *sockpath = NULL;
+     char *device = NULL;
+-    int64_t fd_size;
+     QemuOpts *sn_opts = NULL;
+     const char *sn_id_or_name = NULL;
+     const char *sopt = "hVb:o:p:rsnc:dvk:e:f:tl:x:T:D:B:L";
+@@ -1037,6 +1036,17 @@ int main(int argc, char **argv)
+     }
+     bs = blk_bs(blk);
+ 
++    if (dev_offset) {
++        QDict *raw_opts = qdict_new();
++        qdict_put_str(raw_opts, "driver", "raw");
++        qdict_put_str(raw_opts, "file", bs->node_name);
++        qdict_put_int(raw_opts, "offset", dev_offset);
++        bs = bdrv_open(NULL, NULL, raw_opts, flags, &error_fatal);
++        blk_remove_bs(blk);
++        blk_insert_bs(blk, bs, &error_fatal);
++        bdrv_unref(bs);
++    }
++
+     blk_set_enable_write_cache(blk, !writethrough);
+ 
+     if (sn_opts) {
+@@ -1054,21 +1064,8 @@ int main(int argc, char **argv)
+     }
+ 
+     bs->detect_zeroes = detect_zeroes;
+-    fd_size = blk_getlength(blk);
+-    if (fd_size < 0) {
+-        error_report("Failed to determine the image length: %s",
+-                     strerror(-fd_size));
+-        exit(EXIT_FAILURE);
+-    }
+-
+-    if (dev_offset >= fd_size) {
+-        error_report("Offset (%" PRIu64 ") has to be smaller than the image "
+-                     "size (%" PRId64 ")", dev_offset, fd_size);
+-        exit(EXIT_FAILURE);
+-    }
+-    fd_size -= dev_offset;
+ 
+-    export = nbd_export_new(bs, dev_offset, fd_size, export_name,
++    export = nbd_export_new(bs, export_name,
+                             export_description, bitmap, readonly, shared > 1,
+                             nbd_export_closed, writethrough, NULL,
+                             &error_fatal);
 -- 
 2.25.4
 
