@@ -2,86 +2,89 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D14B7C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E76C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:49:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5361120768
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:38:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 95A1920738
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:49:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="VNHjOMzB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5361120768
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VbkCjnXD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95A1920738
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60380 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFEXk-0007Nr-BQ
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 06:38:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52468)
+	id 1kFEid-0001Y3-H7
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 06:49:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kFEWy-00063E-Jw
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:37:48 -0400
-Received: from forwardcorp1j.mail.yandex.net ([5.45.199.163]:50098)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kFEWu-0004EA-Cg
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:37:46 -0400
-Received: from sas1-ec30c78b6c5b.qloud-c.yandex.net
- (sas1-ec30c78b6c5b.qloud-c.yandex.net
- [IPv6:2a02:6b8:c14:2704:0:640:ec30:c78b])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id 5A5FC2E1516;
- Mon,  7 Sep 2020 13:37:38 +0300 (MSK)
-Received: from localhost (localhost [::1])
- by sas1-ec30c78b6c5b.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- GfDwWv2BTn-bbwaIiKV; Mon, 07 Sep 2020 13:37:38 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1599475058; bh=cwcsiQlrmauxS/kvXdy+OJF6Jf56aoZ0/BafKIkkCoE=;
- h=Message-Id:Cc:Subject:In-Reply-To:Date:References:To:From;
- b=VNHjOMzBjmsnFBEPs4/Pbac3EWe89QQlO4tZnwYjlTZu/yPQqqsbIWmslEUrsLefB
- v6S2WM/u/7OCFTUDam6si7JjmMapJ9fQpVPP5Ywfo6zxpMli3v0mOdyJ34W44mspe+
- eLuRM140MJ6iXd+w29dwfj65JDIqY/celOH7xydk=
-Authentication-Results: sas1-ec30c78b6c5b.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000161690
-Received: by sas1-1199a7868807.qloud-c.yandex.net with HTTP;
- Mon, 07 Sep 2020 13:37:37 +0300
-From: Alexey Kirillov <lekiravi@yandex-team.ru>
-To: Markus Armbruster <armbru@redhat.com>
-In-Reply-To: <87lfhsjubv.fsf@dusky.pond.sub.org>
-References: <20200901182326.59633-1-lekiravi@yandex-team.ru>
- <20200901182326.59633-2-lekiravi@yandex-team.ru>
- <87lfhsjubv.fsf@dusky.pond.sub.org>
-Subject: Re: [PATCH v3 1/4] qapi: net: Add query-netdevs command
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kFEi4-0000tb-Kp
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:49:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55522)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kFEi2-0005Z3-SD
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:49:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599475753;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=Ae7f6irsUFFWK5PL1/2523vA7Al9YZKubyW3h/Rgyg4=;
+ b=VbkCjnXDlB4RkTPlFy3Hr1RbBSjaWYzDxS3j5X98Y26JKjuOrCez0GS7SpA3wXZyVdkzNa
+ p62QsAVzaBxc/UC0L/lHxW0rbnK5TTX0ysL7ajoaAoHdpsgqALsa0j6++TDsLuyXvQGusV
+ w1DNHEWnDjxROH8kOkhN+hrdJGl1z9o=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-197-Bni8OlWyNf-l21AyQvp2_w-1; Mon, 07 Sep 2020 06:49:11 -0400
+X-MC-Unique: Bni8OlWyNf-l21AyQvp2_w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 636AC1074660;
+ Mon,  7 Sep 2020 10:49:10 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
+ (ovpn-12-108.pek2.redhat.com [10.72.12.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3C3A010013C4;
+ Mon,  7 Sep 2020 10:49:05 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [PATCH 0/3] Vhost-vDPA: batch IOTLB updating
+Date: Mon,  7 Sep 2020 18:49:00 +0800
+Message-Id: <20200907104903.31551-1-jasowang@redhat.com>
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Mon, 07 Sep 2020 13:37:37 +0300
-Message-Id: <37711599469320@mail.yandex-team.ru>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset=utf-8
-Received-SPF: pass client-ip=5.45.199.163;
- envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 06:37:39
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 05:27:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -90,141 +93,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>, Luigi Rizzo <rizzo@iet.unipi.it>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>
+Cc: elic@nvidia.com, Jason Wang <jasowang@redhat.com>, lulu@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi!
+Hi all:
 
-02.09.2020, 14:23, "Markus Armbruster" <armbru@redhat.com>:
-> Alexey Kirillov <lekiravi@yandex-team.ru> writes:
->
->>  Add a qmp command that provides information about currently attached
->>  backend network devices and their configuration.
->>
->>  Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
->
-> [...]
->>  diff --git a/qapi/net.json b/qapi/net.json
->>  index ddb113e5e5..c09322bb42 100644
->>  --- a/qapi/net.json
->>  +++ b/qapi/net.json
->>  @@ -714,3 +714,71 @@
->>   ##
->>   { 'event': 'FAILOVER_NEGOTIATED',
->>     'data': {'device-id': 'str'} }
->>  +
->>  +##
->>  +# @NetdevInfo:
->>  +#
->>  +# Configuration of a network backend device (netdev).
->>  +#
->>  +# @id: Device identifier.
->>  +#
->>  +# @type: Specify the driver used for interpreting remaining arguments.
->>  +#
->>  +# @peer-id: Connected frontend network device identifier.
->>  +#
->>  +# Since: 5.2
->>  +##
->>  +{ 'union': 'NetdevInfo',
->>  + 'base': { 'id': 'str',
->>  + 'type': 'NetClientDriver',
->>  + '*peer-id': 'str' },
->>  + 'discriminator': 'type',
->>  + 'data': {
->>  + 'user': 'NetdevUserOptions',
->>  + 'tap': 'NetdevTapOptions',
->>  + 'l2tpv3': 'NetdevL2TPv3Options',
->>  + 'socket': 'NetdevSocketOptions',
->>  + 'vde': 'NetdevVdeOptions',
->>  + 'bridge': 'NetdevBridgeOptions',
->>  + 'netmap': 'NetdevNetmapOptions',
->>  + 'vhost-user': 'NetdevVhostUserOptions',
->>  + 'vhost-vdpa': 'NetdevVhostVDPAOptions' } }
->
-> This is union Netdev plus a common member @peer-id, less the variant
-> members for NetClientDriver values 'nic' and 'hubport'.
->
-> Can 'type: 'nic' and 'type': 'hubport' occur?
+This series introduces batch IOTLB updating support for vhost-vDPA.
 
-No, it can't. We don't support NIC/hubport in query-netdevs, so we neither create this
-structure for them, nor store config.
+Smoking test was done through vDPA simulator. Please reivew.
 
-> What's the use case for @peer-id?
+Thanks
 
-Main reason is to provide information "is this backend connected to frontend device".
-User also may want to know which backend used for frontend device.
+Jason Wang (3):
+  linux headers: sync to 5.9-rc4
+  vhost: switch to use IOTLB v2 format
+  vhost-vdpa: batch updating IOTLB mappings
 
-> Assuming we want @peer-id: its documentation is too vague. Cases:
->
-> * Not connected to a frontend: I guess @peer-id is absent then.
+ hw/virtio/vhost-backend.c                     |  86 +++++++++--
+ hw/virtio/vhost-vdpa.c                        |  66 +++++++++
+ hw/virtio/vhost.c                             |  10 ++
+ include/hw/virtio/vhost-backend.h             |   2 +
+ include/hw/virtio/vhost-vdpa.h                |   1 +
+ include/hw/virtio/vhost.h                     |   1 +
+ include/standard-headers/drm/drm_fourcc.h     | 140 ++++++++++++++++++
+ include/standard-headers/linux/ethtool.h      |  87 +++++++++++
+ .../linux/input-event-codes.h                 |   3 +-
+ include/standard-headers/linux/vhost_types.h  |  11 ++
+ include/standard-headers/linux/virtio_9p.h    |   4 +-
+ include/standard-headers/linux/virtio_blk.h   |  26 ++--
+ .../standard-headers/linux/virtio_config.h    |   8 +-
+ .../standard-headers/linux/virtio_console.h   |   8 +-
+ include/standard-headers/linux/virtio_net.h   |   6 +-
+ include/standard-headers/linux/virtio_scsi.h  |  20 +--
+ linux-headers/asm-generic/unistd.h            |   6 +-
+ linux-headers/asm-mips/unistd_n32.h           |   1 +
+ linux-headers/asm-mips/unistd_n64.h           |   1 +
+ linux-headers/asm-mips/unistd_o32.h           |   1 +
+ linux-headers/asm-powerpc/kvm.h               |   5 +
+ linux-headers/asm-powerpc/unistd_32.h         |   1 +
+ linux-headers/asm-powerpc/unistd_64.h         |   1 +
+ linux-headers/asm-s390/kvm.h                  |   7 +-
+ linux-headers/asm-s390/unistd_32.h            |   1 +
+ linux-headers/asm-s390/unistd_64.h            |   1 +
+ linux-headers/asm-x86/unistd_32.h             |   1 +
+ linux-headers/asm-x86/unistd_64.h             |   1 +
+ linux-headers/asm-x86/unistd_x32.h            |   1 +
+ linux-headers/linux/kvm.h                     |   4 +
+ linux-headers/linux/vfio.h                    |   2 +-
+ linux-headers/linux/vhost.h                   |   2 +
+ 32 files changed, 458 insertions(+), 57 deletions(-)
 
-Absolutely correct.
+-- 
+2.20.1
 
-> * Connected to a frontend
->
->   - that has a qdev ID (the thing you set with -device id=...): I guess
->     it's the qdev ID then.
-
-Correct.
-
->   - that doesn't have a qdev ID: anyone's guess.
-
-We use field "name" of structure NetClientState, so if there is no direct ID setting,
-there must be generated name (in format "model.id").
-
->>  +
->>  +##
->>  +# @query-netdevs:
->>  +#
->>  +# Get a list of @NetdevInfo for all virtual network backend devices (netdevs).
->>  +#
->>  +# Returns: a list of @NetdevInfo describing each netdev.
->>  +#
->>  +# Since: 5.2
->>  +#
->>  +# Example:
->>  +#
->>  +# -> { "execute": "query-netdevs" }
->>  +# <- { "return": [
->>  +# {
->>  +# "ipv6": true,
->>  +# "ipv4": true,
->>  +# "host": "10.0.2.2",
->>  +# "ipv6-dns": "fec0::3",
->>  +# "ipv6-prefix": "fec0::",
->>  +# "net": "10.0.2.0/255.255.255.0",
->>  +# "ipv6-host": "fec0::2",
->>  +# "type": "user",
->>  +# "peer-id": "net0",
->>  +# "dns": "10.0.2.3",
->>  +# "hostfwd": [
->>  +# {
->>  +# "str": "tcp::20004-:22"
->>  +# }
->>  +# ],
->>  +# "ipv6-prefixlen": 64,
->>  +# "id": "netdev0",
->>  +# "restrict": false
->>  +# }
->>  +# ]
->>  +# }
->>  +#
->>  +##
->>  +{ 'command': 'query-netdevs', 'returns': ['NetdevInfo'] }
-
-
--- 
-Alexey Kirillov
-Yandex.Cloud
 
