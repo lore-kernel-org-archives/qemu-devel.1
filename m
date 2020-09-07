@@ -2,66 +2,66 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E775C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:17:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EE5C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:18:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 043172137B
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:17:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E73392075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:18:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQ5t+hRc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 043172137B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F/568LfO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E73392075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFG5K-0005C8-Tp
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 08:17:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45404)
+	id 1kFG67-0006DZ-Sl
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 08:18:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFFzz-0004Fa-2C
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:11:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24391)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFG00-0004Iw-6Y
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:11:52 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:58468
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFFzx-0007wh-6A
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:11:50 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFFzy-0007wl-5B
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:11:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599480708;
+ s=mimecast20190719; t=1599480709;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Bnhwpf91NWQ8MuyXnWB5gwviH1NlbUQ0asbytZTSU/8=;
- b=jQ5t+hRcdvEIQPfpffPXhBmGqSU8Z65dNJVbyQxvfCu9xb+BUgdrbKD6+Ie3i9vjhdZ5c9
- pzWT859S2c3sPI7dTJr1UJM9uVowcppqmfzLUlGyp3Oljk902AO8jJOHxNazxtz3mMSXmU
- g4c4tXilvmMenKGZUGep6Uk/Uq3ydRY=
+ bh=oVs3jEQVMpxHjQaVcw0d5wtkBSNPsFa3uu5iv4I8tHM=;
+ b=F/568LfOM8ernVxSUVMkO9L0oom9VuY2WYaFntLQu5YteTgLT/TH5zJBmQ/OUJYuaA0nN/
+ S/06bxfVo3R4v93w9pN6j7PuYOUTEaOAvXA/qB3F0CfmhtWEJT+wY0MAcv+8QRUN1e3iMo
+ shqV7Yki2lAzH4NrUHZzq6fqE56MPGs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-471-ToP490ODMzSogrix1je23Q-1; Mon, 07 Sep 2020 08:11:46 -0400
-X-MC-Unique: ToP490ODMzSogrix1je23Q-1
+ us-mta-18-iRjFqzZ-MH2P6JNnFGLhpw-1; Mon, 07 Sep 2020 08:11:47 -0400
+X-MC-Unique: iRjFqzZ-MH2P6JNnFGLhpw-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E567318B9F91;
- Mon,  7 Sep 2020 12:11:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AC0F640C3;
+ Mon,  7 Sep 2020 12:11:46 +0000 (UTC)
 Received: from thuth.com (ovpn-112-193.ams2.redhat.com [10.36.112.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D81EB5C1BB;
- Mon,  7 Sep 2020 12:11:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4A3C95C1BB;
+ Mon,  7 Sep 2020 12:11:45 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 10/14] gitlab-ci: Add cross-compiling build tests
-Date: Mon,  7 Sep 2020 14:11:23 +0200
-Message-Id: <20200907121127.136243-11-thuth@redhat.com>
+Subject: [PULL 11/14] crypto: fix build with gcrypt enabled
+Date: Mon,  7 Sep 2020 14:11:24 +0200
+Message-Id: <20200907121127.136243-12-thuth@redhat.com>
 In-Reply-To: <20200907121127.136243-1-thuth@redhat.com>
 References: <20200907121127.136243-1-thuth@redhat.com>
 MIME-Version: 1.0
@@ -72,16 +72,16 @@ X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 05:27:53
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=thuth@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:05:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
 X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,166 +100,134 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that we can use all our QEMU test containers in the gitlab-CI, we can
-easily add some jobs that test cross-compilation for various architectures.
-There is just only small ugliness: Since the shared runners on gitlab.com
-are single-threaded, we have to split each compilation job into two parts
-(--disable-user and --disable-system), and exclude some additional targets,
-to avoid that the jobs are running too long and hitting the timeout of 1 h.
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Message-Id: <20200823111757.72002-8-thuth@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+If nettle is disabled and gcrypt enabled, the compiler and linker flags
+needed for gcrypt are not passed.
+
+Gnutls was also not added as a dependancy when gcrypt is enabled.
+
+Attempting to add the library dependencies at the same time as the
+source dependencies is error prone, as there are alot of different
+rules for picking which sources to use, and some of the source files
+use code level conditionals intead. It is thus clearer to add the
+library dependencies separately.
+
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20200901133050.381844-2-berrange@redhat.com>
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Alex Bennée <alex.bennee@linaro.org>
+Tested-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- .gitlab-ci.d/crossbuilds.yml | 113 +++++++++++++++++++++++++++++++++++
- .gitlab-ci.yml               |   1 +
- MAINTAINERS                  |   1 +
- 3 files changed, 115 insertions(+)
- create mode 100644 .gitlab-ci.d/crossbuilds.yml
+ configure          |  2 ++
+ crypto/meson.build | 42 +++++++++++++++++++++++++++++++-----------
+ meson.build        |  5 +++++
+ 3 files changed, 38 insertions(+), 11 deletions(-)
 
-diff --git a/.gitlab-ci.d/crossbuilds.yml b/.gitlab-ci.d/crossbuilds.yml
-new file mode 100644
-index 0000000000..4ec7226b5c
---- /dev/null
-+++ b/.gitlab-ci.d/crossbuilds.yml
-@@ -0,0 +1,113 @@
-+
-+.cross_system_build_job_template: &cross_system_build_job_definition
-+  stage: build
-+  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
-+  script:
-+    - mkdir build
-+    - cd build
-+    - PKG_CONFIG_PATH=$PKG_CONFIG_PATH
-+      ../configure --enable-werror $QEMU_CONFIGURE_OPTS --disable-user
-+        --target-list-exclude="aarch64-softmmu i386-softmmu microblaze-softmmu
-+          mips-softmmu mipsel-softmmu mips64-softmmu ppc64-softmmu sh4-softmmu
-+          xtensa-softmmu"
-+    - make -j$(expr $(nproc) + 1) all check-build
-+
-+.cross_user_build_job_template: &cross_user_build_job_definition
-+  stage: build
-+  image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
-+  script:
-+    - mkdir build
-+    - cd build
-+    - PKG_CONFIG_PATH=$PKG_CONFIG_PATH
-+      ../configure --enable-werror $QEMU_CONFIGURE_OPTS --disable-system
-+    - make -j$(expr $(nproc) + 1) all check-build
-+
-+cross-armel-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-armel-cross
-+
-+cross-armel-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-armel-cross
-+
-+cross-armhf-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-armhf-cross
-+
-+cross-armhf-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-armhf-cross
-+
-+cross-arm64-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-arm64-cross
-+
-+cross-arm64-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-arm64-cross
-+
-+cross-mips-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-mips-cross
-+
-+cross-mips-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-mips-cross
-+
-+cross-mipsel-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-mipsel-cross
-+
-+cross-mipsel-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-mipsel-cross
-+
-+cross-mips64el-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-mips64el-cross
-+
-+cross-mips64el-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-mips64el-cross
-+
-+cross-ppc64el-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-ppc64el-cross
-+
-+cross-ppc64el-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-ppc64el-cross
-+
-+cross-s390x-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-s390x-cross
-+
-+cross-s390x-user:
-+  <<: *cross_user_build_job_definition
-+  variables:
-+    IMAGE: debian-s390x-cross
-+
-+cross-win32-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-win32-cross
-+
-+cross-win64-system:
-+  <<: *cross_system_build_job_definition
-+  variables:
-+    IMAGE: debian-win64-cross
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index ff959e4e03..d677e00933 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -18,6 +18,7 @@ include:
-   - local: '/.gitlab-ci.d/edk2.yml'
-   - local: '/.gitlab-ci.d/opensbi.yml'
-   - local: '/.gitlab-ci.d/containers.yml'
-+  - local: '/.gitlab-ci.d/crossbuilds.yml'
+diff --git a/configure b/configure
+index 086c6d3197..166193cef9 100755
+--- a/configure
++++ b/configure
+@@ -6963,6 +6963,8 @@ if test "$gcrypt" = "yes" ; then
+   if test "$gcrypt_hmac" = "yes" ; then
+     echo "CONFIG_GCRYPT_HMAC=y" >> $config_host_mak
+   fi
++  echo "GCRYPT_CFLAGS=$gcrypt_cflags" >> $config_host_mak
++  echo "GCRYPT_LIBS=$gcrypt_libs" >> $config_host_mak
+ fi
+ if test "$nettle" = "yes" ; then
+   echo "CONFIG_NETTLE=y" >> $config_host_mak
+diff --git a/crypto/meson.build b/crypto/meson.build
+index 18da7c8541..f6f5ce1ecd 100644
+--- a/crypto/meson.build
++++ b/crypto/meson.build
+@@ -23,24 +23,35 @@ crypto_ss.add(files(
+   'tlssession.c',
+ ))
  
- .native_build_job_template: &native_build_job_definition
-   stage: build
-diff --git a/MAINTAINERS b/MAINTAINERS
-index b233da2a73..7d0a5e91e4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3071,6 +3071,7 @@ M: Alex Bennée <alex.bennee@linaro.org>
- R: Wainer dos Santos Moschetta <wainersm@redhat.com>
- S: Maintained
- F: .gitlab-ci.yml
-+F: .gitlab-ci.d/crossbuilds.yml
+-if 'CONFIG_GCRYPT' in config_host
+-  wo_nettle = files('hash-gcrypt.c', 'pbkdf-gcrypt.c')
++if 'CONFIG_NETTLE' in config_host
++  crypto_ss.add(files('hash-nettle.c', 'hmac-nettle.c', 'pbkdf-nettle.c'))
++elif 'CONFIG_GCRYPT' in config_host
++  crypto_ss.add(files('hash-gcrypt.c', 'pbkdf-gcrypt.c'))
++  if 'CONFIG_GCRYPT_HMAC' in config_host
++    crypto_ss.add(files('hmac-gcrypt.c'))
++  else
++    crypto_ss.add(files('hmac-glib.c'))
++  endif
+ else
+-  wo_nettle = files('hash-glib.c', 'pbkdf-stub.c')
+-endif
+-if 'CONFIG_GCRYPT_HMAC' not in config_host
+-  wo_nettle += files('hmac-glib.c')
++  crypto_ss.add(files('hash-glib.c', 'hmac-glib.c', 'pbkdf-stub.c'))
+ endif
+-crypto_ss.add(when: [nettle, 'CONFIG_NETTLE'],
+-             if_true: files('hash-nettle.c', 'hmac-nettle.c', 'pbkdf-nettle.c'),
+-             if_false: wo_nettle)
  
- Guest Test Compilation Support
- M: Alex Bennée <alex.bennee@linaro.org>
+ crypto_ss.add(when: 'CONFIG_SECRET_KEYRING', if_true: files('secret_keyring.c'))
+ crypto_ss.add(when: 'CONFIG_QEMU_PRIVATE_XTS', if_true: files('xts.c'))
+-crypto_ss.add(when: 'CONFIG_GCRYPT_HMAC', if_true: files('hmac-gcrypt.c'))
+ crypto_ss.add(when: 'CONFIG_AF_ALG', if_true: files('afalg.c', 'cipher-afalg.c', 'hash-afalg.c'))
+ crypto_ss.add(when: 'CONFIG_GNUTLS', if_true: files('tls-cipher-suites.c'))
+ 
++if 'CONFIG_NETTLE' in config_host
++  crypto_ss.add(nettle)
++elif 'CONFIG_GCRYPT' in config_host
++  crypto_ss.add(gcrypt)
++endif
++
++if 'CONFIG_GNUTLS' in config_host
++  crypto_ss.add(gnutls)
++endif
++
++
+ crypto_ss = crypto_ss.apply(config_host, strict: false)
+ libcrypto = static_library('crypto', crypto_ss.sources() + genh,
+                            dependencies: [crypto_ss.dependencies()],
+@@ -52,12 +63,21 @@ crypto = declare_dependency(link_whole: libcrypto,
+ 
+ util_ss.add(files('aes.c'))
+ util_ss.add(files('init.c'))
++
+ if 'CONFIG_GCRYPT' in config_host
+   util_ss.add(files('random-gcrypt.c'))
+ elif 'CONFIG_GNUTLS' in config_host
+-  util_ss.add(files('random-gnutls.c'), gnutls)
++  util_ss.add(files('random-gnutls.c'))
+ elif 'CONFIG_RNG_NONE' in config_host
+   util_ss.add(files('random-none.c'))
+ else
+   util_ss.add(files('random-platform.c'))
+ endif
++
++if 'CONFIG_GCRYPT' in config_host
++  util_ss.add(gcrypt)
++endif
++
++if 'CONFIG_GNUTLS' in config_host
++  util_ss.add(gnutls)
++endif
+diff --git a/meson.build b/meson.build
+index 5aaa364730..04e070bb3b 100644
+--- a/meson.build
++++ b/meson.build
+@@ -116,6 +116,11 @@ urcubp = not_found
+ if 'CONFIG_TRACE_UST' in config_host
+   urcubp = declare_dependency(link_args: config_host['URCU_BP_LIBS'].split())
+ endif
++gcrypt = not_found
++if 'CONFIG_GCRYPT' in config_host
++  gcrypt = declare_dependency(compile_args: config_host['GCRYPT_CFLAGS'].split(),
++                              link_args: config_host['GCRYPT_LIBS'].split())
++endif
+ nettle = not_found
+ if 'CONFIG_NETTLE' in config_host
+   nettle = declare_dependency(compile_args: config_host['NETTLE_CFLAGS'].split(),
 -- 
 2.18.2
 
