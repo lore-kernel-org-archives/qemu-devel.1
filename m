@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27BCBC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 01:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 718DAC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 01:38:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DF5D20708
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 01:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D90420708
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 01:38:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Onx1Inbr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DF5D20708
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s8vN1r3s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D90420708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56000 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kF66b-0001ra-AB
-	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 21:38:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57508)
+	id 1kF671-0002dQ-8S
+	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 21:38:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kF65v-00018L-5w
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 21:37:19 -0400
-Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:33116)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kF66P-0001nh-KB
+ for qemu-devel@nongnu.org; Sun, 06 Sep 2020 21:37:49 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:46943)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kF65t-0005UU-L1
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 21:37:18 -0400
-Received: by mail-ot1-x343.google.com with SMTP id m12so8077073otr.0
- for <qemu-devel@nongnu.org>; Sun, 06 Sep 2020 18:37:17 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kF66O-0005Xk-4A
+ for qemu-devel@nongnu.org; Sun, 06 Sep 2020 21:37:49 -0400
+Received: by mail-oi1-x243.google.com with SMTP id u126so12227399oif.13
+ for <qemu-devel@nongnu.org>; Sun, 06 Sep 2020 18:37:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=Ol8E0wQZvCEK3KqdN7lKvOrhE+yZkFZ/oQIJ9nbRIIQ=;
- b=Onx1InbrJX14bIzDq/itDaMOa8ZffK6Lmk55sCbmgB81zxiCNngpg/KjHEhkcsBgUM
- 8pRtjPPG7cqQ0m31KUuev77a82KWV/WiB82UfwsfSI9T97oVrbDtKjKlY8UHgrFu/x3y
- hjUQIC/+34UVRLOMaJuk8f5pUvp3uxuwqzNTl7CgpyeckqpGbV4vg1XqRzSacLqXHJAC
- t01cL/uhkJg5kaBNV9eOR2MapJjzojsPW2pce8WJy2va5QjU0h+dHQ3mlfHr5Oty7sv7
- 7VOajWYbfUHClga3kjSHk5cWp3iKnN/IRf49mlVQGaNKqUG/pXttprsXELtAp8NZpY6L
- IhOA==
+ bh=KMqFlgvLIYEjgTpdNvETa0bzYJVsFSDhNYnkFR8oZcs=;
+ b=s8vN1r3s079qSSNVf2UOeEoZCXtNpXGVlmlYeoczxIkWJtdyfXDJV0ra5us2a5fiiU
+ ejQewCLxRaDUQKQWuOCiAuVf/5BDZ6q00CDGf5Gkm6/hHsEdyOwg1PgPfmNsLyBF6J/d
+ b5uWe/hS7r5irTXv4ZsW4FZJLeMniejxlc9p6mQ39wPZEr041FmwI4ZhmMbsjq6i6bFx
+ GMkTRtgSJWC9mbACfJ2uoSmdsZSLGoxJwzh+6eCsTyz++8UWl9Fr5yFvGkf57+1uRuLy
+ k+4eRMh4Ibv6rJSaP4vNiHQZHwH58VuMf4MefsxFKWGD+z7CSL+40OzlqBPVacQWQR+n
+ 3jOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=Ol8E0wQZvCEK3KqdN7lKvOrhE+yZkFZ/oQIJ9nbRIIQ=;
- b=aNRElTorrn7KlWi0Kt1dXSMVvFuhV5aJsWNmzRS9kDrdF3ZHJPR7gmkJWW4pcgnGwF
- tc9Hg7rebaczSU3xNw3z3cHFxYZHOT75CS2cCXW8sMBxBCUA/tP+aiAPTSQWWBBjaYfr
- yAxOvuArYv5k9ny7tnZZGVxsfs2S2aORvqEIWL8Z2gKu85whlqqTCkuSI6qIB8ND5t94
- 77W/YLN5L0PBZSTXWrYWfGUx3Q5lu6D0L/pQRP9+Rc0KBUDQ7SDWkzPQHwFGo44MWRLO
- TtHc5vFxFyqHqdf052Nln7MfH2aHSR3ZbGbESXcScDhhJhELnU/ZoqkcHQA66Epbvf3A
- s4aw==
-X-Gm-Message-State: AOAM532OrVu28RMhovzoYIbf7/Jz5jvloye3BSm+mkhclbm3JF915/e/
- gJsOcV/jJeZFyc31sdORHYvulSGq7zWus/gQqbk=
-X-Google-Smtp-Source: ABdhPJwqXXLZLS586fXeBo9v4BkWLvemPqDU0gJdnecPedFrrK5EKcVETZJ/z/80ok9fre71bjGsPmMM8Q2tq+lpqPA=
-X-Received: by 2002:a9d:5e11:: with SMTP id d17mr879462oti.333.1599442636553; 
- Sun, 06 Sep 2020 18:37:16 -0700 (PDT)
+ bh=KMqFlgvLIYEjgTpdNvETa0bzYJVsFSDhNYnkFR8oZcs=;
+ b=cCv6L+VX0ViN7Q3hu9H5vwWzROvbKblqQhOLgvvZxl32PfWsE3L8UobLIqdJ1RKUU7
+ 1cTFI9hBlCJ+FCYObIGDwJlw7VlezAHqGf6XOVULDX1pH/lBrko50JzJ1j/wk3NHY1YJ
+ m2Ugecviw/zjM219WogzSrujNdl5cny07PpP+0kVW0zzroBu44mM3ea4tNQb14ox3DiL
+ cFulDBGLxaYq6ZhgofM4urNMj1nZZw9fdA4bonekPAT/Qh6VoDxakzSwESDBjXPkIzNW
+ o0ceIh2vkYvalH+Erxs2uUw67QtQsAvOhDauyAcaL6h1xbTC7cXKG0fBOWF33lmssTVJ
+ 06pA==
+X-Gm-Message-State: AOAM532utPYI08OoSEhQXwtrpcGAz87nUTJBUaZzd9Myf+hJ5mvqvDLv
+ 0Qk6+ANOG102hDHaq8wP8tX34KO591MIILD6haw=
+X-Google-Smtp-Source: ABdhPJz5k6Pi4JZXeR+Lob/EGUAjdlhPUwR9JZfVvLtdzi4gnOdg6thGzDyu2xrBwIXIl4K57rx34M9JIcN1qnmx+/A=
+X-Received: by 2002:aca:904:: with SMTP id 4mr2941434oij.97.1599442667230;
+ Sun, 06 Sep 2020 18:37:47 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200816142245.17556-1-liq3ea@163.com>
- <CAKXe6SJjrTZ5cW3h227MUpPt8jsPimcrjiN8-WXSbVCZvdkCFg@mail.gmail.com>
-In-Reply-To: <CAKXe6SJjrTZ5cW3h227MUpPt8jsPimcrjiN8-WXSbVCZvdkCFg@mail.gmail.com>
+References: <20200813165125.59928-1-liq3ea@163.com>
+ <CAKXe6SL3myrx1XcoOVxkD6RxpDMRiOOVorXQrfPnShC0+Y6WUg@mail.gmail.com>
+In-Reply-To: <CAKXe6SL3myrx1XcoOVxkD6RxpDMRiOOVorXQrfPnShC0+Y6WUg@mail.gmail.com>
 From: Li Qiang <liq3ea@gmail.com>
-Date: Mon, 7 Sep 2020 09:36:40 +0800
-Message-ID: <CAKXe6SLt8r3bm0bGiGQ5sPoz-8xWrZkpnRFa1GEaT5_iRO1+Rg@mail.gmail.com>
-Subject: Re: [PATCH v2] virtio-mem: detach the element from the virtqueue when
- error occurs
+Date: Mon, 7 Sep 2020 09:37:11 +0800
+Message-ID: <CAKXe6S+r1SNCBm_daBRqX-m50rNPwRHR_ZmuxdBoU_Mum-oesQ@mail.gmail.com>
+Subject: Re: [PATCH] hw: virtio-pmem: detach the element fromt the virtqueue
+ when error occurs
 To: Li Qiang <liq3ea@163.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
- envelope-from=liq3ea@gmail.com; helo=mail-ot1-x343.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,21 +95,21 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Hildenbrand <david@redhat.com>,
- Qemu Developers <qemu-devel@nongnu.org>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Qemu Developers <qemu-devel@nongnu.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping!
+ping!
 
 Li Qiang <liq3ea@gmail.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8828=E6=97=A5=E5=
 =91=A8=E4=BA=94 =E4=B8=8A=E5=8D=889:21=E5=86=99=E9=81=93=EF=BC=9A
 >
 > Kindly ping.
 >
-> Li Qiang <liq3ea@163.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8816=E6=97=A5=E5=
-=91=A8=E6=97=A5 =E4=B8=8B=E5=8D=8810:23=E5=86=99=E9=81=93=EF=BC=9A
+> Li Qiang <liq3ea@163.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8814=E6=97=A5=E5=
+=91=A8=E4=BA=94 =E4=B8=8A=E5=8D=8812:52=E5=86=99=E9=81=93=EF=BC=9A
 > >
 > > If error occurs while processing the virtio request we should call
 > > 'virtqueue_detach_element' to detach the element from the virtqueue
@@ -117,48 +117,22 @@ Li Qiang <liq3ea@gmail.com> =E4=BA=8E2020=E5=B9=B48=E6=9C=8828=E6=97=A5=E5=
 > >
 > > Signed-off-by: Li Qiang <liq3ea@163.com>
 > > ---
-> > Change since v1:
-> > Change the subject
-> > Avoid using the goto label
+> >  hw/virtio/virtio-pmem.c | 1 +
+> >  1 file changed, 1 insertion(+)
 > >
-> >  hw/virtio/virtio-mem.c | 3 +++
-> >  1 file changed, 3 insertions(+)
+> > diff --git a/hw/virtio/virtio-pmem.c b/hw/virtio/virtio-pmem.c
+> > index 1e0c137497..ddb0125901 100644
+> > --- a/hw/virtio/virtio-pmem.c
+> > +++ b/hw/virtio/virtio-pmem.c
+> > @@ -77,6 +77,7 @@ static void virtio_pmem_flush(VirtIODevice *vdev, Vir=
+tQueue *vq)
 > >
-> > diff --git a/hw/virtio/virtio-mem.c b/hw/virtio/virtio-mem.c
-> > index 7740fc613f..e6ffc781b3 100644
-> > --- a/hw/virtio/virtio-mem.c
-> > +++ b/hw/virtio/virtio-mem.c
-> > @@ -318,6 +318,7 @@ static void virtio_mem_handle_request(VirtIODevice =
-*vdev, VirtQueue *vq)
-> >          if (iov_to_buf(elem->out_sg, elem->out_num, 0, &req, len) < le=
-n) {
-> >              virtio_error(vdev, "virtio-mem protocol violation: invalid=
- request"
-> >                           " size: %d", len);
-> > +            virtqueue_detach_element(vq, elem, 0);
-> >              g_free(elem);
-> >              return;
-> >          }
-> > @@ -327,6 +328,7 @@ static void virtio_mem_handle_request(VirtIODevice =
-*vdev, VirtQueue *vq)
-> >              virtio_error(vdev, "virtio-mem protocol violation: not eno=
-ugh space"
-> >                           " for response: %zu",
-> >                           iov_size(elem->in_sg, elem->in_num));
-> > +            virtqueue_detach_element(vq, elem, 0);
-> >              g_free(elem);
-> >              return;
-> >          }
-> > @@ -348,6 +350,7 @@ static void virtio_mem_handle_request(VirtIODevice =
-*vdev, VirtQueue *vq)
-> >          default:
-> >              virtio_error(vdev, "virtio-mem protocol violation: unknown=
- request"
-> >                           " type: %d", type);
-> > +            virtqueue_detach_element(vq, elem, 0);
-> >              g_free(elem);
-> >              return;
-> >          }
+> >      if (req_data->elem.out_num < 1 || req_data->elem.in_num < 1) {
+> >          virtio_error(vdev, "virtio-pmem request not proper");
+> > +        virtqueue_detach_element(vq, (VirtQueueElement *)req_data, 0);
+> >          g_free(req_data);
+> >          return;
+> >      }
 > > --
 > > 2.17.1
 > >
