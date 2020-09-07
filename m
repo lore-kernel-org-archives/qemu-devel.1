@@ -2,78 +2,81 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D29EC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:32:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC8B0C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:33:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 270DA207C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:32:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 923DB207C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:33:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T9vhsDlJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 270DA207C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="df6YCDVy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 923DB207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59530 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFFOA-0007ac-6g
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:32:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59714)
+	id 1kFFOu-0000i4-Ng
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:33:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34652)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2y-0003ic-Uw
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54159)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kFFFi-0005Ee-Nh
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:24:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20726)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2w-0008Ds-Ch
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:52 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kFFFh-0001OF-08
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:24:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599477049;
+ s=mimecast20190719; t=1599477840;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SwjJO9OgfnthpPqGG05+FhxfwAdB4zNWb1Lsv+ZNGHg=;
- b=T9vhsDlJEHAVMjwmdwI6aCvB4F7RDhsSskeK9+B4/r13JbsuzDGooSKNpMyHK/dK1g4Wvx
- 2zbf8TDh9/+9g4eigfUlzYTqnqA00uCvQLf2W8iU4g/aEtFTnnxugCIaqyR/0G8Y+I9zXU
- 0Svbb7AG9ID/V1jjVozfxre08DKiW44=
+ bh=aabSme6Lagu3M0YsB1G2o8hHynbhoukArXgvCa/doaU=;
+ b=df6YCDVyLLIliN5sH3/hX3zJFYBwFAZrgXqdimSLpC0wotjS7td6iM+pHkIeescZSSSkwG
+ 7lwnoeC1wD/WPCE5QS8oVk8zBZKvfJAbVG6O3QRYxEl0L0YCai7LLPAJbh5g1+VpvGhIPQ
+ eT5sZo4S1NZdtWvilqMczx8gANV9+Mo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-540-QIa6hwo6MrGgDjsOEEqXFA-1; Mon, 07 Sep 2020 07:10:47 -0400
-X-MC-Unique: QIa6hwo6MrGgDjsOEEqXFA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-243-g-HmPtCnMHun8uvzKIlJMA-1; Mon, 07 Sep 2020 07:23:58 -0400
+X-MC-Unique: g-HmPtCnMHun8uvzKIlJMA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9A2F81084C88;
- Mon,  7 Sep 2020 11:10:46 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
- [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A6E3D9CBA;
- Mon,  7 Sep 2020 11:10:45 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL 48/64] nbd: Use CAF when looking for dirty bitmap
-Date: Mon,  7 Sep 2020 13:09:20 +0200
-Message-Id: <20200907110936.261684-49-kwolf@redhat.com>
-In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
-References: <20200907110936.261684-1-kwolf@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F87E805EE5;
+ Mon,  7 Sep 2020 11:23:57 +0000 (UTC)
+Received: from dell-r430-03.lab.eng.brq.redhat.com
+ (dell-r430-03.lab.eng.brq.redhat.com [10.37.153.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A6E015D9D2;
+ Mon,  7 Sep 2020 11:23:56 +0000 (UTC)
+From: Igor Mammedov <imammedo@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 05/10] tests: acpi: mark to be changed tables in
+ bios-tables-test-allowed-diff
+Date: Mon,  7 Sep 2020 07:23:43 -0400
+Message-Id: <20200907112348.530921-6-imammedo@redhat.com>
+In-Reply-To: <20200907112348.530921-1-imammedo@redhat.com>
+References: <20200907112348.530921-1-imammedo@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:52:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 05:27:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
@@ -81,7 +84,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,45 +97,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: boris.ostrovsky@oracle.com, lersek@redhat.com, aaron.young@oracle.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+... to let tests pass until binary blobs are updated with new AML
 
-When looking for a dirty bitmap to share, we should handle filters by
-just including them in the search (so they do not break backing chains).
-
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Reviewed-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Igor Mammedov <imammedo@redhat.com>
 ---
- nbd/server.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tests/qtest/bios-tables-test-allowed-diff.h | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
-diff --git a/nbd/server.c b/nbd/server.c
-index c5d71cff10..982de67816 100644
---- a/nbd/server.c
-+++ b/nbd/server.c
-@@ -1567,13 +1567,13 @@ NBDExport *nbd_export_new(BlockDriverState *bs, uint64_t dev_offset,
-     if (bitmap) {
-         BdrvDirtyBitmap *bm = NULL;
- 
--        while (true) {
-+        while (bs) {
-             bm = bdrv_find_dirty_bitmap(bs, bitmap);
--            if (bm != NULL || bs->backing == NULL) {
-+            if (bm != NULL) {
-                 break;
-             }
- 
--            bs = bs->backing->bs;
-+            bs = bdrv_filter_or_cow_bs(bs);
-         }
- 
-         if (bm == NULL) {
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index dfb8523c8b..dba32d5613 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1 +1,20 @@
+ /* List of comma-separated changed AML files to ignore */
++"tests/data/acpi/pc/DSDT",
++"tests/data/acpi/q35/DSDT",
++"tests/data/acpi/q35/DSDT.tis",
++"tests/data/acpi/q35/DSDT.bridge",
++"tests/data/acpi/q35/DSDT.mmio64",
++"tests/data/acpi/q35/DSDT.ipmibt",
++"tests/data/acpi/q35/DSDT.cphp",
++"tests/data/acpi/q35/DSDT.memhp",
++"tests/data/acpi/q35/DSDT.numamem",
++"tests/data/acpi/q35/DSDT.dimmpxm",
++"tests/data/acpi/q35/DSDT.acpihmat",
++"tests/data/acpi/pc/DSDT.bridge",
++"tests/data/acpi/pc/DSDT.ipmikcs",
++"tests/data/acpi/pc/DSDT.cphp",
++"tests/data/acpi/pc/DSDT.memhp",
++"tests/data/acpi/pc/DSDT.numamem",
++"tests/data/acpi/pc/DSDT.dimmpxm",
++"tests/data/acpi/pc/DSDT.acpihmat",
++"tests/data/acpi/pc/DSDT.acpihmat",
 -- 
-2.25.4
+2.27.0
 
 
