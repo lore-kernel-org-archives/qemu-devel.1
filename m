@@ -2,78 +2,103 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D08EC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:51:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DF8C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:56:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 853CA2078E
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:51:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 853CA2078E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9FA4A20C09
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:56:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sPUfEnIx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9FA4A20C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFDnx-0006Mj-JY
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:51:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40938)
+	id 1kFDsW-0008FA-GD
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:56:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFDnQ-0005xO-VE
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:50:44 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42532)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFDrl-0007RE-5t
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:55:13 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:32829)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFDnO-0006R4-K3
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:50:44 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kFDnM-0003lj-DJ
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 09:50:40 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 637492E8053
- for <qemu-devel@nongnu.org>; Mon,  7 Sep 2020 09:50:40 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFDrh-00073N-En
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:55:12 -0400
+Received: by mail-wr1-x442.google.com with SMTP id m6so15161742wrn.0
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 02:55:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=C6do+SDtH388WeKdevTyowpBUxx3AyaDfVjWDJ38+wE=;
+ b=sPUfEnIxQQmD5q1KDYd2SPX8HVwfatyg5UEd8bMWK5mtsFhK1HrcsSMrByLdWLZrHt
+ 9edSE0Ok9SrYb2CzlpplwHq5JddhtgXlYyxuBcJrUb25flkWCOu4lZp/ml7O4IaK/k4R
+ nF0Ddr0xJpWGZCCTrveioPtPOb3efBSi8U3n8ze8H7k62uXg968TwBn3qJiG5i8sPO3O
+ XDQY5RZysnOu90F4ZrU3IraWNJEE4rvCU1IQl89Su1lY6xOe1tKqXLlFebvIGVITxkIu
+ uYwRb9SFVsSJisQDETz5KQ2C5Iq1Gh6cqaI6NiF1AZvOdU5/XtaIfBKHxH6EnIjjEwhZ
+ wDLw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=C6do+SDtH388WeKdevTyowpBUxx3AyaDfVjWDJ38+wE=;
+ b=ngbMhc8F2hwFOh5Gkee+AMtKDy20w7AW5hwpz18ukYLQNWrD4QD3FUnbjU+SV4PpDA
+ Div0dDLcW3eYLo00ra/8EM44zS5ZFgprmj/ggdVfn0K2hhrW5DFEFraSKR7pJgWrVXth
+ HTtNYBBjCeUjvaoHq3x8XnZiK85eo6QA/d1N3gQKZr9ODGKTwQhJMxUf3mckOXkQEItW
+ yNIVDLSGbRB0bcbzXDP3VB7Mz3gwxiSRAHaUsCE84cd+Eop5Y3oCfYk11co4XG5M6x/R
+ JFRX1x7uZyQjRxSKScXa/J4MH03q+LGzg5RJugyfdqjqdHcyO1QUmztD50aMyllzURUt
+ 9DtA==
+X-Gm-Message-State: AOAM532Egme43/DVys2chjXPl3BvYgzIONJRPp4Lf7JAoWv19F41AiIs
+ LTCwyTd8t4AR+0r/SRwkTB165A==
+X-Google-Smtp-Source: ABdhPJxBUFmpI2zm7JGgLOQeDjlQzT8dY8kpkFVd0r/f4P0wPd5fGgbKL4piEp529lKfi1Fy8hQlIA==
+X-Received: by 2002:a05:6000:12cf:: with SMTP id
+ l15mr20213838wrx.312.1599472507688; 
+ Mon, 07 Sep 2020 02:55:07 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id d18sm27497867wrm.10.2020.09.07.02.55.06
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 07 Sep 2020 02:55:06 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id BF2D81FF7E;
+ Mon,  7 Sep 2020 10:55:05 +0100 (BST)
+References: <20200903112107.27367-1-alex.bennee@linaro.org>
+ <20200903112107.27367-7-alex.bennee@linaro.org>
+ <CABgObfZ_Xdd-pnRjpWO=8NjEznZhz84DTq95OzCdjL_rxnw=XQ@mail.gmail.com>
+ <87a6y2rlwq.fsf@linaro.org>
+ <6c8531d2-a695-e964-bacf-a4322d4c9f40@redhat.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v1 6/8] tests/meson.build: fp tests don't need CONFIG_TCG
+In-reply-to: <6c8531d2-a695-e964-bacf-a4322d4c9f40@redhat.com>
+Date: Mon, 07 Sep 2020 10:55:05 +0100
+Message-ID: <877dt5syh2.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Date: Mon, 07 Sep 2020 09:42:42 -0000
-From: "Tony.LI" <1894617@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: bigboy0822
-X-Launchpad-Bug-Reporter: Tony.LI (bigboy0822)
-X-Launchpad-Bug-Modifier: Tony.LI (bigboy0822)
-Message-Id: <159947176304.11179.15547014994707599381.malonedeb@chaenomeles.canonical.com>
-Subject: [Bug 1894617] [NEW] qemu-i386 mmap but offset greater than 32 bits
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: f557d9c23c0dff9b5d20ce2b5b0960529aa8fc3e
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 05:50:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -66
-X-Spam_score: -6.7
-X-Spam_bar: ------
-X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -82,89 +107,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1894617 <1894617@bugs.launchpad.net>
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ richard.henderson@linaro.org, qemu-devel <qemu-devel@nongnu.org>,
+ "Emilio G. Cota" <cota@braap.org>, stefanha@redhat.com,
+ marcandre.lureau@redhat.com, Paolo Bonzini <pbonzini@redhat.com>,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
 
-I don't know if it's a problem, but I did, and it bothered me for a long ti=
-me.
-When I use qemu-i386 and interact with the video card device,an error has o=
-ccurred:
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
 
-18534 ioctl(4,DRM_IOCTL_MODE_GETENCODER,{39,0,0,0,0}) =3D 0 ({39,4,34,3,0})
-18534 ioctl(4,DRM_IOCTL_MODE_CREATE_DUMB,{1080,1920,32,0,0,0,0}) =3D 0 ({10=
-80,1920,32,0,1,7680,8294400})
-18534 ioctl(4,DRM_IOCTL_MODE_ADDFB,{0,1920,1080,7680,32,24,1}) =3D 0 ({66,1=
-920,1080,7680,32,24,1})
-18534 ioctl(4,DRM_IOCTL_MODE_MAP_DUMB,{1,0,0}) =3D 0 ({1,0,5543018496})
-18534 mmap2(NULL,8294400,PROT_READ|PROT_WRITE,MAP_SHARED,4,0x14a63c) =3D -1=
- errno=3D22 (Invalid argument)
+> On 9/7/20 11:11 AM, Alex Benn=C3=A9e wrote:
+>>=20
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>=20
+>>> Il gio 3 set 2020, 13:21 Alex Benn=C3=A9e <alex.bennee@linaro.org> ha s=
+critto:
+>>>
+>>>> As the tests build only softfloat.c no actual TCG machinary is neede
+>>>> to test them (as is evidenced by GCC check-softfloat). Might as well
+>>>> fix the wording on Travis while at it.
+>>>>
+>>>
+>>> The reason is that softfloat is not built at all into QEMU if !CONFIG_T=
+CG.
+>>> We similarly skip block layer tests if !CONFIG_SOFTMMU &&
+>>> !CONFIG_TOOLS.
+>>=20
+>> It's not built anyway if you don't call the test. Are you saying a
+>> --disable-system and --disable-user build is invalid for running unit
+>> tests? That is what check-softfloat is doing as it doesn't involve
+>> softfloat built into any qemu binary.
+>
+> FYI my tools build dir is configured as:
+>
+> '--enable-trace-backends=3Dlog' '--disable-docs' '--enable-debug'
+> '--disable-system' '--disable-user' '--enable-tools'
+>
+> and it still works after the Meson conversion.
 
-"5543018496" is the offset through ioctl() and it is "0x14a63c000".
-In qemu=EF=BC=9A
-ret =3D target_mmap(arg1, arg2, arg3,
-      target_to_host_bitmask(arg4, mmap_flags_tbl),
-      arg5, arg6 << MMAP_SHIFT);
+But check-softfloat doesn't work with that right?
 
-The type of "arg6" is ulong.When use qemu-i386, arg6 can't be set to
-"0x14a63c000".So it's wrong for my program.
-
-I want to find a good way to deal with this kind of problem, but I'm not ve=
-ry familiar with QEMU=EF=BC=8C
-so I came to ask how to deal with this problem.
-
-Thank you=EF=BC=81
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1894617
-
-Title:
-  qemu-i386 mmap but offset greater than 32 bits
-
-Status in QEMU:
-  New
-
-Bug description:
-  I don't know if it's a problem, but I did, and it bothered me for a long =
-time.
-  When I use qemu-i386 and interact with the video card device,an error has=
- occurred:
-
-  18534 ioctl(4,DRM_IOCTL_MODE_GETENCODER,{39,0,0,0,0}) =3D 0 ({39,4,34,3,0=
-})
-  18534 ioctl(4,DRM_IOCTL_MODE_CREATE_DUMB,{1080,1920,32,0,0,0,0}) =3D 0 ({=
-1080,1920,32,0,1,7680,8294400})
-  18534 ioctl(4,DRM_IOCTL_MODE_ADDFB,{0,1920,1080,7680,32,24,1}) =3D 0 ({66=
-,1920,1080,7680,32,24,1})
-  18534 ioctl(4,DRM_IOCTL_MODE_MAP_DUMB,{1,0,0}) =3D 0 ({1,0,5543018496})
-  18534 mmap2(NULL,8294400,PROT_READ|PROT_WRITE,MAP_SHARED,4,0x14a63c) =3D =
--1 errno=3D22 (Invalid argument)
-
-  "5543018496" is the offset through ioctl() and it is "0x14a63c000".
-  In qemu=EF=BC=9A
-  ret =3D target_mmap(arg1, arg2, arg3,
-        target_to_host_bitmask(arg4, mmap_flags_tbl),
-        arg5, arg6 << MMAP_SHIFT);
-
-  The type of "arg6" is ulong.When use qemu-i386, arg6 can't be set to
-  "0x14a63c000".So it's wrong for my program.
-
-  I want to find a good way to deal with this kind of problem, but I'm not =
-very familiar with QEMU=EF=BC=8C
-  so I came to ask how to deal with this problem.
-
-  Thank you=EF=BC=81
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1894617/+subscriptions
+--=20
+Alex Benn=C3=A9e
 
