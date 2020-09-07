@@ -2,67 +2,101 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87BEFC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 02:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 279ACC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 02:41:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BDBF20C09
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 02:39:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51DD520796
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 02:41:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="U+EWG1Eb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BDBF20C09
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M37zuSRT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51DD520796
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kF73i-00013w-Gu
-	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 22:39:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37462)
+	id 1kF75d-0002Bo-AO
+	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 22:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37664)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kF731-0000Yg-H2; Sun, 06 Sep 2020 22:38:23 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:51969)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kF72y-0003mG-7a; Sun, 06 Sep 2020 22:38:22 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BlCBT6VJWz9sTR; Mon,  7 Sep 2020 12:38:09 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599446289;
- bh=cA2/UB0t6rSIszXDdFDknMATd5phSVWhQz3GGCrw5Wg=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=U+EWG1EbinmSPEZu0cXu0jkj8yBDJwemX4iBqvntUbA+Va/dpxU2b3IPY+ODNhpwh
- cW9lE8nKYmi1mhLFOfxC4gLabUT1QCVogdgtQp0ivJwzcPOmZtfo2ax9b3DxpG3cbQ
- ThdfgL3LHWYa87YQfVpvb6Ws0vP5ZENXz0d0328Q=
-Date: Mon, 7 Sep 2020 12:38:00 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 00/30] ppc-for-5.2 queue 20200904
-Message-ID: <20200907023800.GJ341806@yekko.fritz.box>
-References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
- <CAFEAcA8xCpRBcsCaozEXnCuM5SqWr5ZEDrwLjs+8va=316_70Q@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kF753-0001ZS-Hg
+ for qemu-devel@nongnu.org; Sun, 06 Sep 2020 22:40:29 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26137
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kF751-0004X5-1S
+ for qemu-devel@nongnu.org; Sun, 06 Sep 2020 22:40:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599446426;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=4OIj4jz8LXHEWJ5feeAlUTIZDKQ5O5S7lX7AHvNA6oc=;
+ b=M37zuSRToklewB/6AjPsan9sFQXndeiy44xkOJpCmoa3aIGe/E4fhyOqoArFsB3Su7iWdA
+ +WW6tmQqhctDr9C8Uadj+pYuJtO+ARkYD2JuM3S3vgAckgLfxywFnqb0dLAFdmD80L/K9R
+ ev4X43Ip8/8oh7sPpflZMCJ4HP3QewU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-QJ6ftDz1No-R3vebK5ftQQ-1; Sun, 06 Sep 2020 22:40:24 -0400
+X-MC-Unique: QJ6ftDz1No-R3vebK5ftQQ-1
+Received: by mail-wr1-f69.google.com with SMTP id r15so5141775wrt.8
+ for <qemu-devel@nongnu.org>; Sun, 06 Sep 2020 19:40:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=4OIj4jz8LXHEWJ5feeAlUTIZDKQ5O5S7lX7AHvNA6oc=;
+ b=XIUDdsT4oqrxlPbRqGcx49ZayOiEYgPZ7u6qBOnB02o99cHzokK5s0qZiOL1A13HHi
+ pe+nY9pTOfl3XQ+RQrb2QF5yv6GEOjAzavA9ShxwvhGdKX8Cfe0W/FB50xD/Y9h09kWB
+ kqkNFnzWk5b5EwDbF60i6tqRa/VAvuAPeRNro0wmnNCJVH6PWY+wrrAn34tVuBFXHMkW
+ b2KNBRwDiW0bJIjoEwZw3oeZ8bN0Ca5W1zqE1ELRbVwudbHcpcZWF01LM15TebV1qDTX
+ dNFvetcBAvhv38kSGQQqDJy0cmbgAB+qjsc14ERG3Y3EPiCCOs3OcoiSsXbZubXKzITJ
+ R/9g==
+X-Gm-Message-State: AOAM531v8okZ+6yfzVwSYWOdGij/TgJOZixtatrXWUFtHc6Du800xDtO
+ qiJVFVXFaZ8OG8txp/P7njk0Pb/N4xKibvkLn+e3EedP8AmkcPysWuT4J4ouTbtuXGONa6rMdSN
+ r3YEDzuQZixpkSio=
+X-Received: by 2002:adf:c404:: with SMTP id v4mr18782084wrf.17.1599446423414; 
+ Sun, 06 Sep 2020 19:40:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwdhbmfejOQRnTYHq/FvUULXHKw2HSDGUiqQAlr9sUy9fovlhOU/lgA5l0QN8+7XEjg08lWRg==
+X-Received: by 2002:adf:c404:: with SMTP id v4mr18782062wrf.17.1599446423182; 
+ Sun, 06 Sep 2020 19:40:23 -0700 (PDT)
+Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id g2sm25686140wmg.32.2020.09.06.19.40.21
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 06 Sep 2020 19:40:22 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/s390x/css: Remove double initialization
+Date: Mon,  7 Sep 2020 04:40:20 +0200
+Message-Id: <20200907024020.854465-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="huG+SbfbdD6eblZQ"
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8xCpRBcsCaozEXnCuM5SqWr5ZEDrwLjs+8va=316_70Q@mail.gmail.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 21:15:45
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.099,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,127 +109,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Daniel Henrique Barboza <danielhb413@gmail.com>,
- qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
- Thiago Jung Bauermann <bauerman@linux.ibm.com>, Greg Kurz <groug@kaod.org>
+Cc: Thomas Huth <thuth@redhat.com>, David Hildenbrand <david@redhat.com>,
+ qemu-trivial@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Fix eventual copy/paste mistake introduced in commit bc994b74ea
+("s390x/css: Use static initialization for channel_subsys fields").
 
---huG+SbfbdD6eblZQ
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ hw/s390x/css.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-On Sun, Sep 06, 2020 at 04:20:10PM +0100, Peter Maydell wrote:
-> On Fri, 4 Sep 2020 at 04:47, David Gibson <david@gibson.dropbear.id.au> w=
-rote:
-> >
-> > The following changes since commit 67a7bfe560a1bba59efab085cb3430f45176=
-d382:
-> >
-> >   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2=
-020-09-03' into staging (2020-09-03 16:58:25 +0100)
-> >
-> > are available in the Git repository at:
-> >
-> >   git://github.com/dgibson/qemu.git tags/ppc-for-5.2-20200904
-> >
-> > for you to fetch changes up to b172606ecf29a140073f7787251a9d70ecb53b6e:
-> >
-> >   spapr_numa: move NVLink2 associativity handling to spapr_numa.c (2020=
--09-04 13:40:09 +1000)
-> >
-> > ----------------------------------------------------------------
-> > ppc patch queue 2020-09-04
-> >
-> > Next pull request for qemu-5.2.  The biggest thing here is the
-> > generalization of ARM's start-powered-off machine property to all
-> > targets.  This can fix a number of odd little edge cases where KVM
-> > could run vcpus before they were properly initialized.  This does
-> > include changes to a number of files that aren't normally in my
-> > purview.  There are suitable Acked-by lines and Peter requested this
-> > come in via my tree, since the most pressing requirement for it is in
-> > pseries machines with the POWER secure virtual machine facility.
-> >
-> > In addition we have:
-> >  * The start of Daniel Barboza's rework and clean up of pseries
-> >    machine NUMA handling
-> >  * Correction to behaviour of the nvdimm=3D generic machine property on
-> >    pseries
-> >  * An optimization to the allocation of XIVE interrupts on KVM
-> >  * Some fixes for confused behaviour with kernel_irqchip when both
-> >    XICS and XIVE are in play
-> >  * Add HIOMAP comamnd to pnv flash
-> >  * Properly advertise the fact that spapr_vscsi doesn't handle
-> >    hotplugged disks
-> >  * Some assorted minor enhancements
->=20
-> Hi -- this fails to build for Windows:
->=20
-> ../../hw/ppc/spapr_numa.c: In function 'spapr_numa_fixup_cpu_dt':
-> ../../hw/ppc/spapr_numa.c:77:5: error: unknown type name 'uint'
->      uint vcpu_assoc_size =3D NUMA_ASSOC_SIZE + 1;
->      ^
+diff --git a/hw/s390x/css.c b/hw/s390x/css.c
+index 519dc91316d..9961cfe7bf6 100644
+--- a/hw/s390x/css.c
++++ b/hw/s390x/css.c
+@@ -353,7 +353,6 @@ static ChannelSubSys channel_subsys = {
+     .pending_crws = QTAILQ_HEAD_INITIALIZER(channel_subsys.pending_crws),
+     .do_crw_mchk = true,
+     .sei_pending = false,
+-    .do_crw_mchk = true,
+     .crws_lost = false,
+     .chnmon_active = false,
+     .indicator_addresses =
+-- 
+2.26.2
 
-Huh, that's weird.  My testing run was less thorough than I'd usually
-do, because so many tests were broken on the master branch, but I was
-pretty sure I did do successful mingw builds.
-
-> That should probably be using one of the standard C types.
-
-Done.
-
-> The 'check-tcg' tests for the linux-user static build also
-> failed on an s390x test:
->=20
->   CHECK   debian-s390x-cross
->   BUILD   s390x-linux-user guest-tests with docker qemu/debian-s390x-cross
->   RUN     tests for s390x
->   TEST    threadcount on s390x
-> Unhandled trap: 0x10003
-> PSW=3Dmask 0000000180000000 addr 00000000010004f0 cc 00
-> R00=3D0000000000000000 R01=3D0000000000000000 R02=3D0000000000000000
-> R03=3D0000000000000000
-> R04=3D0000000000000000 R05=3D0000000000000000 R06=3D0000000000000000
-> R07=3D0000000000000000
-> R08=3D0000000000000000 R09=3D0000000000000000 R10=3D0000000000000000
-> R11=3D0000000000000000
-> R12=3D0000000000000000 R13=3D0000000000000000 R14=3D0000000000000000
-> R15=3D00000040008006c0
->=20
-> ../Makefile.target:153: recipe for target 'run-threadcount' failed
-> make[2]: *** [run-threadcount] Error 1
-
-Bother.  I did see that failure on Travis, but assumed it was a false
-positive because there were so many failures on master there.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---huG+SbfbdD6eblZQ
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9VnQYACgkQbDjKyiDZ
-s5JPRg//VpQ+ak6B0AgVNXakq/HGiYrN+1sZ8lOBE5/ZDiTKtkRblB//wM6Fnk0u
-YEncfxeDlYDDYNtGugvE4/Td7s7atTDoHmFVgkhrjC5U3AgRDG2IEHULd3zyAfiP
-+RjuKM6up7iwm2hFevDhptku7WA7JuRQEqWrobidSFY+3c7CggSb4vHczrOC7YDA
-o09KQT4eBRxTWVlnh2FKejcDqMpEJ3FS2In4V6b7eWjdxC4TCW5AZOT3RTUFY3k0
-98NuGtf6FxBbVT8XVd4EvjSA2xVjJN2DHptdqzMEZ9KjTRqGllIyO7YkuTZutoJ7
-81APvUXBbhZqYjZFBgASjJ/6dAZcOteF5rJCOa9DzestVAECpDdrMj/aw28x7h9G
-qY6B4bqjYIEN8n+B19NFE9YINRJcMwpxBSt0FMKMSoBfKwys/B5QXRJwFyjATtjJ
-zIGyWhGQ9ROrCnSBKS3rgQk89j9OEzkqYYETD9FqVzxBXRP1BMzkjUbF93zebecd
-3UDjhU7ZuJbhrv0wbc8+1/vikqDEBDfGD/sNFTVkJtGmgxWP7EdnlPMOQmgjf729
-rtsgRT4ED0TrVBCUpgdmgK8bzvd8QkJkDnbVeA3mNlB6Tx4E1iOBh95peT2BcjyF
-o0/2nlhJi6zzchvkTENH+rVHrgyslcnpr0fOKXHP1eIOkhLNdUA=
-=3Z87
------END PGP SIGNATURE-----
-
---huG+SbfbdD6eblZQ--
 
