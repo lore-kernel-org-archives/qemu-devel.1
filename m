@@ -2,82 +2,83 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E0DFC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 466E0C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:52:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9030215A4
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CECFE2080A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:52:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ly2Q+Fo5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9030215A4
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g8zk1RdB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CECFE2080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40120 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLJB-0006Ac-PK
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 13:52:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35608)
+	id 1kFLJE-0006Gj-MV
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 13:52:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLIK-0004fV-Bp
+ id 1kFLIK-0004fc-Ky
  for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:51:08 -0400
-Received: from mail-pj1-x102e.google.com ([2607:f8b0:4864:20::102e]:50383)
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:33236)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLII-0000kQ-Bo
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:51:07 -0400
-Received: by mail-pj1-x102e.google.com with SMTP id b16so7020379pjp.0
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 10:51:05 -0700 (PDT)
+ id 1kFLIJ-0000kX-81
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:51:08 -0400
+Received: by mail-pg1-x543.google.com with SMTP id e33so8338987pgm.0
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 10:51:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=RjqVFOTeqg9LVlbApNcAWSAyva2vOJwRXeL4ngm1lCU=;
- b=Ly2Q+Fo5t8L1+9DHoUAZav5s/8jW6d0oQkAYZ1lsM5iuMG85jKeBgYBocuT4z+Tuo2
- ixh5HWJ6HYXIyG511mx2xyXdbnWq2IM92u5OkNFTp3JT3MIbGtl/CgqQudP/vDC1x2X8
- nnAVUVR64EhiB4p5bEF4ACaSzfu12AO/gQqWtL6Wtwe7HG0J4xphGw/uE3nf44gQBNPc
- +TaIZiiKCkkmPx/MWUOVi2PD+2QRcgGoEhFocmKxEUUuZzfvYxCyMVO6gWUPMMixVSJm
- CZtyqOowavL8W6d4Yz/gc94zPCHKooACH6WIiTZ7JHDI++O7aLiysxtYPxQ3P1Uv20r2
- Se1w==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=/iCHgyxkq9v43nhcSQtgg4n7M9LvoD8NgErTOXuCnmg=;
+ b=g8zk1RdBa61GBirf1Ej5ISFHYe+2Av+drjkjjfZTS2Fmx/UZDFiW04dRML+UG2TYDq
+ ImRVsmtiSKVOTy+ZFUCgAahY81NmQMYB40NDoumgpR+kOL/jwICjngvM8LZVgvwMa/IV
+ bdV8uTJO6aDfvmNtHqDZp/Jx1Dkqhv+jz76ogrlNchGNgIBUfRjpv4pOyBBOfKmR16um
+ 2XO/CL3/b2MnufGhk6HqutEv7KcMCchDaVK+9xChNAbiJxYbAoV7AjthGexPPE9MKOSb
+ YPkvSwiSVOxmZasoGc4RXabm4CfMptgUtJAWmrA3b+w3Kgl30NpOmLmjuwHL6DgPkh9S
+ ZP/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=RjqVFOTeqg9LVlbApNcAWSAyva2vOJwRXeL4ngm1lCU=;
- b=CjFjpktjH/GP44XER/l0VGsPXZ0yhqUv8c6u/mUya+qqeER0KEGtmIbjcFaF8VTnKX
- klnC9nN6qGQ6TI9lPQTBNnAExMiAT0w4FRZcabHdXX990cr3jDQSGaoyykjYl6T8x9SU
- Vc0fgndA6j1az8Nh+M4KSU9PATBux6sF9rEqRpZBR2mUvLy17aIj3dOGzp3tprsOuRCi
- SXlK9xcPFxI7GldPIupp6k6W4zMmOzISBGZu5DmNRUXjQDCJaz0mDtiyNaJ/+j8EWtgk
- u/TH4a7Un4kbS6NXtCpJm331cYANzUG6pjMWkThmnBbkmfQQzSNlw02lFzbJM1VhjnQa
- kF8Q==
-X-Gm-Message-State: AOAM530YHuf7kcRGw8MqTHVHPHGpxRV4nzgUGuRgVEJEAW6CvSLfjp/C
- wO5qiHe6n3KxWfZ5SejceQv0fCWhxYKLfQ==
-X-Google-Smtp-Source: ABdhPJz1cOMa49rmUu93xOepRgBrz2KtnjCSeCWctVsAr98FbfHetccUJ5+IRcPEi0roQXoHxzh4xQ==
-X-Received: by 2002:a17:90a:dd45:: with SMTP id
- u5mr380363pjv.198.1599501064334; 
- Mon, 07 Sep 2020 10:51:04 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=/iCHgyxkq9v43nhcSQtgg4n7M9LvoD8NgErTOXuCnmg=;
+ b=FKdhyOxDbgCa92GTUh4m/7s4QJJREvh7uyHGfR0Vg72S2yLqx53Y1b5AhXeiiN6tF4
+ Sft61nAQ2GmGwPu+uQJBMR9jUmIy9u0DFbNrzgoQSXFGtqG3hH5dUbVnUvDI3jfVbJCh
+ cHpyn+L8ayna2EexzN85jVKP8V9IHiDZdBjoDW5u0x8JA37/6/rAl42F0gZqGmtfOxe/
+ ZqFKEKaps5eiXVgCDIebridsMDqpns4xZGiCCjV5qR+v+G6vg93Al1w6XEupxrxULx1l
+ dOaPwMILFj6hIHma+MAcWbTvMqvycdBRq5ugetfsIXR/qSzU2to5MWqxcvZoVJcG2aVm
+ UUlg==
+X-Gm-Message-State: AOAM530G028Z2BUYxRm7zDEs8hX0TrDsVCB4gNhXr9X9L21ekBryjvcy
+ JyyMKX1x5xuolzZj3rp4xr710uqbseVjug==
+X-Google-Smtp-Source: ABdhPJwSfI9O25Kgu0siLoVszF6IBvHMaQNEWs53laJLJe6m+1FQmeAfcX/8kXCoDRTQuxh20lVY5w==
+X-Received: by 2002:a63:ff01:: with SMTP id k1mr6885043pgi.141.1599501065563; 
+ Mon, 07 Sep 2020 10:51:05 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id ga3sm1651496pjb.18.2020.09.07.10.51.03
+ by smtp.gmail.com with ESMTPSA id ga3sm1651496pjb.18.2020.09.07.10.51.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 10:51:03 -0700 (PDT)
+ Mon, 07 Sep 2020 10:51:04 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/19] target/microblaze patch queue
-Date: Mon,  7 Sep 2020 10:50:42 -0700
-Message-Id: <20200907175102.28027-1-richard.henderson@linaro.org>
+Subject: [PATCH] hw/hyperv: Fix 32-bit build error for vmbus.
+Date: Mon,  7 Sep 2020 10:50:43 -0700
+Message-Id: <20200907175102.28027-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200907175102.28027-1-richard.henderson@linaro.org>
+References: <20200907175102.28027-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::102e;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102e.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,68 +100,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: peter.maydell@linaro.org, Jon Doron <arilou@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Doing the PR on request from Edgar.
+../qemu/hw/hyperv/vmbus.c: In function ‘gpadl_iter_io’:
+../qemu/hw/hyperv/vmbus.c:383:13: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+  383 |         p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
+      |             ^
+cc1: all warnings being treated as errors
 
+Fixes: 0d71f7082d7 ("vmbus: vmbus implementation")
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+Cc: Jon Doron <arilou@gmail.com>
+---
+ hw/hyperv/vmbus.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-r~
+diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
+index 75af6b83dd..3482e9c6cb 100644
+--- a/hw/hyperv/vmbus.c
++++ b/hw/hyperv/vmbus.c
+@@ -380,7 +380,8 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void *buf, uint32_t len)
+             }
+         }
+ 
+-        p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
++        p = (void *)(uintptr_t)
++            (((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
+         if (iter->dir == DMA_DIRECTION_FROM_DEVICE) {
+             memcpy(p, buf, cplen);
+         } else {
+-- 
+2.25.1
 
-
-The following changes since commit 9d5589bb3feed442ae7ee24d2d882aa0312349a6:
-
-  Merge remote-tracking branch 'remotes/vivier2/tags/linux-user-for-5.2-pull-request' into staging (2020-09-07 15:31:04 +0100)
-
-are available in the Git repository at:
-
-  https://github.com/rth7680/qemu.git tags/pull-mb-20200907
-
-for you to fetch changes up to 971338d7906b89359c75bd657e4275fdb12cf38d:
-
-  configure: Do not set TARGET_ABI32 for microblaze (2020-09-07 10:42:04 -0700)
-
-----------------------------------------------------------------
-Fix icount regresion.
-Use lookup_and_goto_tb.
-Cleanup and fill in VMStateDescription.
-
-----------------------------------------------------------------
-Richard Henderson (19):
-      target/microblaze: Collected fixes for env->iflags
-      target/microblaze: Renumber D_FLAG
-      target/microblaze: Cleanup mb_cpu_do_interrupt
-      target/microblaze: Rename mmu structs
-      target/microblaze: Rename DISAS_UPDATE to DISAS_EXIT
-      target/microblaze: Introduce DISAS_EXIT_NEXT, DISAS_EXIT_JUMP
-      target/microblaze: Replace cpustate_changed with DISAS_EXIT_NEXT
-      target/microblaze: Handle DISAS_EXIT_NEXT in delay slot
-      target/microblaze: Force rtid, rted, rtbd to exit
-      target/microblaze: Use tcg_gen_lookup_and_goto_ptr
-      target/microblaze: Diagnose invalid insns in delay slots
-      target/microblaze: Split out MicroBlazeCPUConfig
-      target/microblaze: Reorg MicroBlazeCPUConfig to minimize holes
-      target/microblaze: Move pvr regs to MicroBlazeCPUConfig
-      target/microblaze: Treat pvr_regs as constant
-      target/microblaze: Move mmu parameters to MicroBlazeCPUConfig
-      target/microblaze: Fill in VMStateDescription for cpu
-      target/microblaze: Put MicroBlazeCPUConfig into DisasContext
-      configure: Do not set TARGET_ABI32 for microblaze
-
- configure                           |   1 -
- target/microblaze/cpu.h             |  81 +++++++------
- target/microblaze/mmu.h             |  20 +---
- hw/microblaze/petalogix_ml605_mmu.c |   6 +-
- target/microblaze/cpu.c             | 120 ++++++++++----------
- target/microblaze/gdbstub.c         |   6 +-
- target/microblaze/helper.c          | 220 ++++++++++++++++--------------------
- target/microblaze/machine.c         | 106 +++++++++++++++++
- target/microblaze/mmu.c             |  39 ++++---
- target/microblaze/op_helper.c       |   2 +-
- target/microblaze/translate.c       | 198 +++++++++++++++++++++-----------
- target/microblaze/meson.build       |   5 +-
- 12 files changed, 482 insertions(+), 322 deletions(-)
- create mode 100644 target/microblaze/machine.c
 
