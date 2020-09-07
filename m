@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B1CAC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:07:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24A8DC2BB84
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:08:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CFC09206B5
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:07:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A9F08206B5
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:08:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oP7O60eT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFC09206B5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="sXN95DMJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9F08206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56304 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLXo-0006tY-Vd
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:07:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38744)
+	id 1kFLYe-0008IU-Rq
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLVq-0003jy-Bt
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:09 -0400
-Received: from mail-pf1-x42a.google.com ([2607:f8b0:4864:20::42a]:36070)
+ id 1kFLVu-0003kr-Bn
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:10 -0400
+Received: from mail-pl1-x62d.google.com ([2607:f8b0:4864:20::62d]:36271)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLVo-0002NK-GL
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:06 -0400
-Received: by mail-pf1-x42a.google.com with SMTP id d9so2672326pfd.3
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 11:05:04 -0700 (PDT)
+ id 1kFLVp-0002NP-O5
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:10 -0400
+Received: by mail-pl1-x62d.google.com with SMTP id k13so2794087plk.3
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 11:05:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BKnI6SGaGA2YOpJ/qxM62G0O4ltDNID2ekxG+CDt900=;
- b=oP7O60eTFecqwO/U2jrLEVybQHk4yY9ru8kiCROjWzekf9V/ZYZYAWLzkObH3/a5Md
- ImndxqnBzVZ96voEPjkppMBFopn9Hqyf6B52z6gfQ4Q/FUTFwxpr8BzuW6bAf94qxAVs
- 0smPvuU/4sZNJ0yk7zohbOZdeyShzLM8Ub2e/ACtCtFQzkERiQ0DmmpJsfg8cgNq2uJy
- s2vmolbpPXniZFZe8OAr9GV7xxV+y2THWDLZQVtbBH0WdpR4060/Eas9bI+qaZFdRl0x
- C+ssQcWpiPY9nvFughEhb7vth5inUGMo16ZoszSnBG6sZWIlWjvEHStlks5gfW7tprjt
- Lc+Q==
+ bh=BV7UzgSMM3A3H8QtCGnB/gl3FBbCJtYPNUPwgrX+UHQ=;
+ b=sXN95DMJNz/SuqFVAmT0QvAY8b1QhUoEQyTSScvyvZOrbOg2BxiM8cyHrDtiwezM9O
+ /aiVDDcHsjNzIBjHo7h4lcOCMYk2r03aZk+oTYLEZtjeesItby7qdtOwsP+XuHi5tYc2
+ OUlhEno8mpkKLvBmZ1/bSnS20SLw65QYyJMUzJ/KsIXJ/DpKEr5JJmskJKtqLDkkmwvx
+ dDrVUY9xzx+aaFyyulCGcdckTzXB1JtG3oZwLxLBa9w+dLR8ltsBMoIKdqdzq3GofDQW
+ XF2VKEnboJVX11HBXDuPyAjYk3F7qANsyBrKgQPuB1XSFWtBnq8RWEwzasEvQZXEe2BJ
+ npBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BKnI6SGaGA2YOpJ/qxM62G0O4ltDNID2ekxG+CDt900=;
- b=H+sgQhefEBFJuyXW0HzASOrOdq4+m7mTEpxJjzOXsHto0Va4x5SkWxqiWHgBH03ngu
- ZBrOSoxnXKwORo0GvuV4TwyFqT2Rx4o3D1N2v8IT7rsGpjYzeTDBYpWTwesayi6FxZ2P
- OyHOhCfjm3PswOsLEm2pWXGmiK9aWv+kIXAavhmq7Jz4mWj1PzD4wWtSraDhszEXci04
- VIsMQ+6CKsEMVszJUc46+cepYqOC0hyAOClewu8aLuyEfifpanullwFot5OeBaXRXDz3
- 4PPFK3p4y3xRUSM4GSfcaX0TIvd2hsfEwH0IX9e+Rx8jryHohN80hXhQqdH07bL/W0V+
- IQRw==
-X-Gm-Message-State: AOAM532+b2NIjn2ZyO06oB3lLokKSpD5Xx9VhZ1jyC0PgsD/YqWR+zOk
- 5LPsCPtuMY1zFtEQTw+mhHK4tFRNNtCsDw==
-X-Google-Smtp-Source: ABdhPJzg6KsWvSQibxeajhO9Lm2Sw76mbHEvieiH2CU26e38NCGAau3G2jpebdg1GYWEvirrt5EuTA==
-X-Received: by 2002:a62:f904:: with SMTP id o4mr20599356pfh.14.1599501902694; 
- Mon, 07 Sep 2020 11:05:02 -0700 (PDT)
+ bh=BV7UzgSMM3A3H8QtCGnB/gl3FBbCJtYPNUPwgrX+UHQ=;
+ b=NqylOlHTZoGiLnaxZ3KZV8IbhK/q1a9X53bcjSEWb2NGMSZcJyMFFgaVfK+1qJtSwf
+ FHeQXACSPXuvgqYfkNm+r0HEr2uN01uFGgCplMo7SujIDFryP+fXJMkSw5PDFwwSi/4B
+ JFJojXqJBFg4337SVoCdI+gVgE5AEuToCVQFcIk1hopikZc2J7mTpHt/Ev7EHRDC3LMr
+ 7woJHM2YTy0TbV4aWYMoFXkQSlk/kflawoUgK8zgUvz92qDH9m3W+qlFtbkmnfPFex7r
+ OAaNultAfjKenMnMoqEVsv0+Q/EFkCkKulyr5QPIg66jY9WByfe68idS3/ajTMnkHPwn
+ 7MSA==
+X-Gm-Message-State: AOAM533yMRxTmtdQqpv3Ea+Y3qpZPAvU9CHpabHuhIsU4m+2JlqQkvLq
+ 2LbCoESlJgRoI36UzHB0tKPlD9xN7J7zxQ==
+X-Google-Smtp-Source: ABdhPJwavj8eNmRDTI44lGjzX74kssBWPrdxH9jGbO2ZS5B/phOGsd7Eyn81hzkpsEM7m69a71nMKA==
+X-Received: by 2002:a17:90a:930e:: with SMTP id
+ p14mr421362pjo.49.1599501903898; 
+ Mon, 07 Sep 2020 11:05:03 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v6sm11367768pfi.38.2020.09.07.11.05.01
+ by smtp.gmail.com with ESMTPSA id v6sm11367768pfi.38.2020.09.07.11.05.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 11:05:02 -0700 (PDT)
+ Mon, 07 Sep 2020 11:05:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 11/19] target/microblaze: Diagnose invalid insns in delay slots
-Date: Mon,  7 Sep 2020 11:04:51 -0700
-Message-Id: <20200907180459.29025-2-richard.henderson@linaro.org>
+Subject: [PULL 12/19] target/microblaze: Split out MicroBlazeCPUConfig
+Date: Mon,  7 Sep 2020 11:04:52 -0700
+Message-Id: <20200907180459.29025-3-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200907180459.29025-1-richard.henderson@linaro.org>
 References: <20200907175102.28027-1-richard.henderson@linaro.org>
  <20200907180459.29025-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42a;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x42a.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::62d;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,149 +101,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These cases result in undefined and undocumented behaviour but the
-behaviour is deterministic, i.e cores will not lock-up or expose
-security issues.  However, RTL will not raise exceptions either.
-
-Therefore, log a GUEST_ERROR and treat these cases as nops, to
-avoid corner cases which could put qemu into an invalid state.
+This struct was previously unnamed, and defined in MicroBlazeCPU.
+Pull it out to its own typedef so that we can reuse it.
 
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/translate.c | 48 ++++++++++++++++++++++++++++++-----
- 1 file changed, 41 insertions(+), 7 deletions(-)
+ target/microblaze/cpu.h | 55 ++++++++++++++++++++++-------------------
+ 1 file changed, 29 insertions(+), 26 deletions(-)
 
-diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index d98572fab9..ff0cb7dbb6 100644
---- a/target/microblaze/translate.c
-+++ b/target/microblaze/translate.c
-@@ -179,6 +179,21 @@ static bool trap_userspace(DisasContext *dc, bool cond)
-     return cond_user;
- }
+diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
+index 20c2979396..59d2a079c4 100644
+--- a/target/microblaze/cpu.h
++++ b/target/microblaze/cpu.h
+@@ -291,6 +291,34 @@ struct CPUMBState {
+     } pvr;
+ };
  
 +/*
-+ * Return true, and log an error, if the current insn is
-+ * within a delay slot.
++ * Microblaze Configuration Settings
 + */
-+static bool invalid_delay_slot(DisasContext *dc, const char *insn_type)
-+{
-+    if (dc->tb_flags & D_FLAG) {
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "Invalid insn in delay slot: %s at %08x\n",
-+                      insn_type, (uint32_t)dc->base.pc_next);
-+        return true;
-+    }
-+    return false;
-+}
++typedef struct {
++    bool stackprot;
++    uint32_t base_vectors;
++    uint8_t addr_size;
++    uint8_t use_fpu;
++    uint8_t use_hw_mul;
++    bool use_barrel;
++    bool use_div;
++    bool use_msr_instr;
++    bool use_pcmp_instr;
++    bool use_mmu;
++    bool dcache_writeback;
++    bool endi;
++    bool dopb_bus_exception;
++    bool iopb_bus_exception;
++    bool illegal_opcode_exception;
++    bool opcode_0_illegal;
++    bool div_zero_exception;
++    bool unaligned_exceptions;
++    uint8_t pvr_user1;
++    uint32_t pvr_user2;
++    char *version;
++    uint8_t pvr;
++} MicroBlazeCPUConfig;
 +
- static TCGv_i32 reg_for_read(DisasContext *dc, int reg)
- {
-     if (likely(reg != 0)) {
-@@ -500,6 +515,9 @@ DO_TYPEA_CFG(idivu, use_div, true, gen_idivu)
+ /**
+  * MicroBlazeCPU:
+  * @env: #CPUMBState
+@@ -305,32 +333,7 @@ struct MicroBlazeCPU {
  
- static bool trans_imm(DisasContext *dc, arg_imm *arg)
- {
-+    if (invalid_delay_slot(dc, "imm")) {
-+        return true;
-+    }
-     dc->ext_imm = arg->imm << 16;
-     tcg_gen_movi_i32(cpu_imm, dc->ext_imm);
-     dc->tb_flags_to_set = IMM_FLAG;
-@@ -1067,6 +1085,9 @@ static bool do_branch(DisasContext *dc, int dest_rb, int dest_imm,
- {
-     uint32_t add_pc;
+     CPUNegativeOffsetState neg;
+     CPUMBState env;
+-
+-    /* Microblaze Configuration Settings */
+-    struct {
+-        bool stackprot;
+-        uint32_t base_vectors;
+-        uint8_t addr_size;
+-        uint8_t use_fpu;
+-        uint8_t use_hw_mul;
+-        bool use_barrel;
+-        bool use_div;
+-        bool use_msr_instr;
+-        bool use_pcmp_instr;
+-        bool use_mmu;
+-        bool dcache_writeback;
+-        bool endi;
+-        bool dopb_bus_exception;
+-        bool iopb_bus_exception;
+-        bool illegal_opcode_exception;
+-        bool opcode_0_illegal;
+-        bool div_zero_exception;
+-        bool unaligned_exceptions;
+-        uint8_t pvr_user1;
+-        uint32_t pvr_user2;
+-        char *version;
+-        uint8_t pvr;
+-    } cfg;
++    MicroBlazeCPUConfig cfg;
+ };
  
-+    if (invalid_delay_slot(dc, "branch")) {
-+        return true;
-+    }
-     if (delay) {
-         setup_dslot(dc, dest_rb < 0);
-     }
-@@ -1106,6 +1127,9 @@ static bool do_bcc(DisasContext *dc, int dest_rb, int dest_imm,
- {
-     TCGv_i32 zero, next;
  
-+    if (invalid_delay_slot(dc, "bcc")) {
-+        return true;
-+    }
-     if (delay) {
-         setup_dslot(dc, dest_rb < 0);
-     }
-@@ -1158,6 +1182,10 @@ static bool trans_brk(DisasContext *dc, arg_typea_br *arg)
-     if (trap_userspace(dc, true)) {
-         return true;
-     }
-+    if (invalid_delay_slot(dc, "brk")) {
-+        return true;
-+    }
-+
-     tcg_gen_mov_i32(cpu_pc, reg_for_read(dc, arg->rb));
-     if (arg->rd) {
-         tcg_gen_movi_i32(cpu_R[arg->rd], dc->base.pc_next);
-@@ -1176,6 +1204,10 @@ static bool trans_brki(DisasContext *dc, arg_typeb_br *arg)
-     if (trap_userspace(dc, imm != 0x8 && imm != 0x18)) {
-         return true;
-     }
-+    if (invalid_delay_slot(dc, "brki")) {
-+        return true;
-+    }
-+
-     tcg_gen_movi_i32(cpu_pc, imm);
-     if (arg->rd) {
-         tcg_gen_movi_i32(cpu_R[arg->rd], dc->base.pc_next);
-@@ -1216,6 +1248,11 @@ static bool trans_mbar(DisasContext *dc, arg_mbar *arg)
- {
-     int mbar_imm = arg->imm;
- 
-+    /* Note that mbar is a specialized branch instruction. */
-+    if (invalid_delay_slot(dc, "mbar")) {
-+        return true;
-+    }
-+
-     /* Data access memory barrier.  */
-     if ((mbar_imm & 2) == 0) {
-         tcg_gen_mb(TCG_BAR_SC | TCG_MO_ALL);
-@@ -1263,6 +1300,10 @@ static bool do_rts(DisasContext *dc, arg_typeb_bc *arg, int to_set)
-     if (trap_userspace(dc, to_set)) {
-         return true;
-     }
-+    if (invalid_delay_slot(dc, "rts")) {
-+        return true;
-+    }
-+
-     dc->tb_flags_to_set |= to_set;
-     setup_dslot(dc, true);
- 
-@@ -1695,7 +1736,6 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
-     if (dc->jmp_cond != TCG_COND_NEVER && !(dc->tb_flags & D_FLAG)) {
-         /*
-          * Finish any return-from branch.
--         * TODO: Diagnose rtXd in delay slot of rtYd earlier.
-          */
-         uint32_t rt_ibe = dc->tb_flags & (DRTI_FLAG | DRTB_FLAG | DRTE_FLAG);
-         if (unlikely(rt_ibe != 0)) {
-@@ -1717,12 +1757,6 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
-              * and will handle D_FLAG in mb_cpu_do_interrupt.
-              */
-             break;
--        case DISAS_EXIT:
--            /*
--             * TODO: diagnose brk/brki in delay slot earlier.
--             * This would then fold into the illegal insn case above.
--             */
--            break;
-         case DISAS_NEXT:
-             /*
-              * Normal insn a delay slot.
 -- 
 2.25.1
 
