@@ -2,97 +2,80 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 150BAC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:44:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5377C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:44:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5695206E7
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:43:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C282206E7
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:44:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wJ7I1EUi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5695206E7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6DBMzrC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C282206E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLBO-0007vu-SR
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 13:43:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33636)
+	id 1kFLBX-00082q-CS
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 13:44:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLAe-0006em-2e
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:43:12 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:43587)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLAc-00086B-BP
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:43:11 -0400
-Received: by mail-pg1-x533.google.com with SMTP id t14so2866074pgl.10
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 10:43:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=EJnK8m0ROXcp5RwFJMM1hO16MFAdhvGuXsqJ5FWXvI0=;
- b=wJ7I1EUidBwsD/n8d4Z8+cB/X5AIcA1fRWdn1R1VCeCYblxQQwffHelQV23yw2POiK
- qNZcVYefVJQ/g8qtQoEODXIoI8VXtXwd4BFT9OLJU+CX3NUMEtZjNtyrtp889Qf77/fo
- UA7BQD+NkdL/3wJ1Mk4WEhisZyzwrBKDPGzQABpgCnrDXb+iIcL4EiLaOE7rN0ZPnBti
- sffJTH4nq0tGGxDfE30sA01hgnqadb6U2bXAIEIR7iVjXnwy9nPps50GQiA3jlRHTKmL
- dc+xWiKZ+FpU6hNR3Cfbak4E9vpUsFatPGGyhmTmPw7/qAiW2lIXp8rGk6gEtjmbm00S
- m2SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EJnK8m0ROXcp5RwFJMM1hO16MFAdhvGuXsqJ5FWXvI0=;
- b=iVoTnc7E5iiwMumLBdEqpfADWLCMp4xhJDgahzT9ZMZjCDXO7GtxJVku2SpKM8v6Pz
- 3ogL9GJ5fPCovUmQ4BMRgFy80hG7ik0El61Y3ijiQUGoLHN+WMDZZnBZ8FR3v+ng17cF
- CjRprdZDOx5wOBIwr+6/7YRzWjVirFnKRQluthN7bjcr1wGSOTCaDEglCQlG6p0hC7DM
- 0aoVrTxktO/h3KynegtuRz3pZCJjqWPGBRbNWSKBBln37sTMxfuKwrwhyZZzMXiOAEvw
- TavY8xABd/xwRGN/+Tmn09ag7AR/rl7dxz8c8HSOzXkvRLs8i46My/I0h4+UHx8mwwqI
- 4/8w==
-X-Gm-Message-State: AOAM5314GaELHDslhSXcNcMgmOZwxCpQ3xE/d2NEmOSMc01dKEwQ3yj/
- YTlaKzBQm1tUa40PS6dGrQ2VCA==
-X-Google-Smtp-Source: ABdhPJxw1I6DawfrYySFOposSfzkewUpW6Abdv897XGdLU78jeofneS+TJDc3Js+95O3o4TYwLtq6A==
-X-Received: by 2002:a62:33c2:: with SMTP id
- z185mr21373138pfz.242.1599500588758; 
- Mon, 07 Sep 2020 10:43:08 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j10sm16176028pff.171.2020.09.07.10.43.07
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Sep 2020 10:43:08 -0700 (PDT)
-Subject: Re: [PATCH v3 00/19] target/microblaze improvements
-To: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-References: <20200904190842.2282109-1-richard.henderson@linaro.org>
- <20200907092043.GV14249@toto>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <f8133c2e-e38e-22e6-9528-27f9a5a3d826@linaro.org>
-Date: Mon, 7 Sep 2020 10:43:06 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <20200907092043.GV14249@toto>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::533;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x533.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -38
-X-Spam_score: -3.9
-X-Spam_bar: ---
-X-Spam_report: (-3.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-1.825,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFLAZ-0006Xz-TH
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:43:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47805)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFLAY-00085y-6x
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:43:07 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599500585;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type;
+ bh=6YqafIK4MqxNUhU6+uyafqY/LqKqZsEXtzgjrXRCHfI=;
+ b=A6DBMzrCK3GpJMtEw7K3FpEhDtYjrorwYBJvchq3oKBOk4/TlqudL1URpbcHSVNY63xgTD
+ RotDryxeMA+BamUkBEgjFJWc7mBrMJ5SClm8P46LCwNjrK5t0ciS9HINTe/HF6Rg+PhoW3
+ lYTOmjXi3FZ2JwvBHVAOSs7E55fOWmc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-126-DKMGMJD5NEeWWRA_usburQ-1; Mon, 07 Sep 2020 13:43:01 -0400
+X-MC-Unique: DKMGMJD5NEeWWRA_usburQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86BBA1006701;
+ Mon,  7 Sep 2020 17:43:00 +0000 (UTC)
+Received: from thuth.com (ovpn-112-193.ams2.redhat.com [10.36.112.193])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B4BF17EEDC;
+ Mon,  7 Sep 2020 17:42:57 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH] Simplify the .gitignore file
+Date: Mon,  7 Sep 2020 19:42:55 +0200
+Message-Id: <20200907174255.179652-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 13:43:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,24 +88,193 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/7/20 2:20 AM, Edgar E. Iglesias wrote:
-> Looks good, none of the test issues were relatd. Thanks Richard!
-> 
-> On all the patches I had not previously reviewed:
-> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
-> Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Now that we always do out-of-tree builds (and the in-tree builds are
+faked via a "build" directory), we can simplify out .gitignore file
+quite a bit.
 
-Thanks,
+Signed-off-by: Thomas Huth <thuth@redhat.com>
+---
+ .gitignore | 158 -----------------------------------------------------
+ 1 file changed, 158 deletions(-)
 
-> Can you take the pull-req via your trees?
+diff --git a/.gitignore b/.gitignore
+index 4ccb9ed975..bb916594eb 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,165 +1,7 @@
+ /GNUmakefile
+ /build/
+-/.doctrees
+-/config-devices.*
+-/config-all-devices.*
+-/config-all-disas.*
+-/config-host.*
+-/config-target.*
+-/config.status
+-/config-temp
+-/tools/virtiofsd/50-qemu-virtiofsd.json
+-/elf2dmp
+-/trace-events-all
+-/trace/generated-events.h
+-/trace/generated-events.c
+-/trace/generated-helpers-wrappers.h
+-/trace/generated-helpers.h
+-/trace/generated-helpers.c
+-/trace/generated-tcg-tracers.h
+-/ui/shader/texture-blit-frag.h
+-/ui/shader/texture-blit-vert.h
+-/ui/shader/texture-blit-flip-vert.h
+-/ui/input-keymap-*.c.inc
+-*-timestamp
+-/*-softmmu
+-/*-darwin-user
+-/*-linux-user
+-/*-bsd-user
+-/ivshmem-client
+-/ivshmem-server
+-/libdis*
+-/libuser
+-/linux-headers/asm
+-/qga/qapi-generated
+-/qapi-gen-timestamp
+-/qapi/qapi-builtin-types.[ch]
+-/qapi/qapi-builtin-visit.[ch]
+-/qapi/qapi-commands-*.[ch]
+-**/qapi/qapi-commands.[ch]
+-**/qapi/qapi-emit-events.[ch]
+-/qapi/qapi-events-*.[ch]
+-**/qapi/qapi-events.[ch]
+-**/qapi/qapi-init-commands.[ch]
+-**/qapi/qapi-introspect.[ch]
+-/qapi/qapi-types-*.[ch]
+-**/qapi/qapi-types.[ch]
+-/qapi/qapi-visit-*.[ch]
+-!/qapi/qapi-visit-core.c
+-**/qapi/qapi-visit.[ch]
+-**/qapi/qapi-doc.texi
+-/qemu-edid
+-/qemu-img
+-/qemu-nbd
+-/qemu-options.def
+-/qemu-options.texi
+-/qemu-img-cmds.texi
+-/qemu-img-cmds.h
+-/qemu-io
+-/qemu-ga
+-/qemu-bridge-helper
+-/qemu-keymap
+-/qemu-monitor.texi
+-/qemu-monitor-info.texi
+-/qemu-storage-daemon
+-/qemu-version.h
+-/qemu-version.h.tmp
+-/module_block.h
+-/scsi/qemu-pr-helper
+-/vhost-user-scsi
+-/vhost-user-blk
+-/vhost-user-gpu
+-/vhost-user-input
+-/fsdev/virtfs-proxy-helper
+-*.tmp
+-*.[1-9]
+-*.a
+-*.aux
+-*.cp
+-*.exe
+-*.msi
+-*.dll
+-*.so
+-*.fn
+-*.ky
+-*.log
+-*.pdf
+-*.pod
+-*.cps
+-*.fns
+-*.kys
+-*.pg
+-*.pyc
+-*.toc
+-*.tp
+-*.vr
+-*.d
+-!/.gitlab-ci.d
+-!/scripts/qemu-guest-agent/fsfreeze-hook.d
+-*.o
+-.sdk
+-*.gcda
+-*.gcno
+-*.gcov
+-/pc-bios/bios-pq/status
+-/pc-bios/edk2-*.fd
+-/pc-bios/vgabios-pq/status
+-/pc-bios/optionrom/linuxboot.asm
+-/pc-bios/optionrom/linuxboot.bin
+-/pc-bios/optionrom/linuxboot.raw
+-/pc-bios/optionrom/linuxboot.img
+-/pc-bios/optionrom/linuxboot_dma.asm
+-/pc-bios/optionrom/linuxboot_dma.bin
+-/pc-bios/optionrom/linuxboot_dma.raw
+-/pc-bios/optionrom/linuxboot_dma.img
+-/pc-bios/optionrom/pvh.asm
+-/pc-bios/optionrom/pvh.bin
+-/pc-bios/optionrom/pvh.raw
+-/pc-bios/optionrom/pvh.img
+-/pc-bios/optionrom/multiboot.asm
+-/pc-bios/optionrom/multiboot.bin
+-/pc-bios/optionrom/multiboot.raw
+-/pc-bios/optionrom/multiboot.img
+-/pc-bios/optionrom/kvmvapic.asm
+-/pc-bios/optionrom/kvmvapic.bin
+-/pc-bios/optionrom/kvmvapic.raw
+-/pc-bios/optionrom/kvmvapic.img
+-/pc-bios/s390-ccw/s390-ccw.elf
+-/pc-bios/s390-ccw/s390-ccw.img
+-/docs/built
+-/docs/interop/qemu-ga-qapi.texi
+-/docs/interop/qemu-ga-ref.html
+-/docs/interop/qemu-ga-ref.info*
+-/docs/interop/qemu-ga-ref.txt
+-/docs/interop/qemu-qmp-qapi.texi
+-/docs/interop/qemu-qmp-ref.html
+-/docs/interop/qemu-qmp-ref.info*
+-/docs/interop/qemu-qmp-ref.txt
+-/docs/version.texi
+-/contrib/vhost-user-gpu/50-qemu-gpu.json
+-*.tps
+-.stgit-*
+ .git-submodule-status
+ cscope.*
+ tags
+ TAGS
+-docker-src.*
+ *~
+-*.ast_raw
+-*.depend_raw
+-trace.c
+-trace-ust.h
+-trace-ust.h
+-trace-dtrace.h
+-trace-dtrace.dtrace
+-trace-root.h
+-trace-root.c
+-trace-ust-root.h
+-trace-ust-root.h
+-trace-ust-all.h
+-trace-ust-all.c
+-trace-dtrace-root.h
+-trace-dtrace-root.dtrace
+-trace-ust-all.h
+-trace-ust-all.c
+-/target/arm/decode-sve.c.inc
+-- 
+2.18.2
 
-Yes.
-
-
-r~
 
