@@ -2,107 +2,99 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28467C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 15:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8663C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:03:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82B782087D
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 15:56:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 061D32080A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:03:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bZTlj66V"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82B782087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ldNa37Il"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 061D32080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56186 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFJVf-0006Kj-L1
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 11:56:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38632)
+	id 1kFJbk-0003PA-Uw
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:03:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kFJV7-0005sp-87
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 11:56:13 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:50204)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kFJV2-0002qo-8x
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 11:56:12 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 087Fs0fs058721;
- Mon, 7 Sep 2020 15:56:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=Bf+bkoH31Zm+QBFCbTi7T0GT23lPAQhvbkN6wRn4/z4=;
- b=bZTlj66VmRZ1FzBKVvYK/NVAWVzgszTNPuJLLK9ep1gxgV74VFbV96Rar01x9I7Nq6p6
- lRH0Xv/EISaQlY18ir0eLKMW5SB3NVRCgIVJWWghR5f3hc14ooCDlktCSC5sVW7mxjTr
- QXer6WT3Y29KnrxV1AhQKza/557nYyJk+/zEQ9zh+jGKe5wH6pFmWzwxGzGdOw+YPBF/
- Coq5MgkJvdyHxkeoiAjbDMH+/CfagOGwFPItdwnaG0Er62hTm9+A0M8aqENkh/Hm3V3K
- aBqykTkFwjP6IrnkHPM809D9gnxcGN8/gbGboLbybYP1V0MDRXZcjC4IjnyyaoekCcKM SA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 33c3amq6ta-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Mon, 07 Sep 2020 15:56:03 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 087FtdZf097087;
- Mon, 7 Sep 2020 15:56:02 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by aserp3030.oracle.com with ESMTP id 33dacgtacp-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 07 Sep 2020 15:56:02 +0000
-Received: from abhmp0001.oracle.com (abhmp0001.oracle.com [141.146.116.7])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 087Fu1ta010176;
- Mon, 7 Sep 2020 15:56:01 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Mon, 07 Sep 2020 08:56:00 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id A484613EC8DE; Mon,  7 Sep 2020 16:55:58 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v2 02/15] fuzz: Add general virtual-device fuzzer
-In-Reply-To: <20200907153932.pyzeiegsa3plzm37@mozz.bu.edu>
-References: <20200819061110.1320568-1-alxndr@bu.edu>
- <20200819061110.1320568-3-alxndr@bu.edu> <m2a6y8ts0n.fsf@oracle.com>
- <20200907153932.pyzeiegsa3plzm37@mozz.bu.edu>
-Date: Mon, 07 Sep 2020 16:55:58 +0100
-Message-ID: <m2sgbt4m41.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFJZW-0008SO-CS
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:00:46 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:54704)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFJZT-0003Ya-M6
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:00:45 -0400
+Received: by mail-wm1-x344.google.com with SMTP id s13so14783361wmh.4
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 09:00:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=r0k1JDUDnuLVZEcpkQFx9izm83l0K+K3seip2uQwMoc=;
+ b=ldNa37IlSrhM7iuyMQjfCgUHLixKFWmI3oDutNNx+av4tF+lzx7TuUyU6tU/S4hPAr
+ 4GRVg5wW1phtyX1CbdOeqve114LgW6EmCU4sSJA5QWMXKAC8V41tP8Bu4zMZTmRicyHc
+ JhV2R2iafirlkRnFKezkPnKhL8tGNGM6cG3c+f7uexyAaZBKMqyQ6d64xU5Nx6ceMlws
+ bmp4/r9+B38WPNOjmwlpX9CuYlEi86ebOxWGbkFJieHeJV+aXpxacH0WFpzQfuSapfcQ
+ dPUeiJHNQd6KDENx1RaWy+NxtB6SpgNMKLFB1zNyNadBTs6zK4R/JoX2kFTz4PokN1WW
+ 0PHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=r0k1JDUDnuLVZEcpkQFx9izm83l0K+K3seip2uQwMoc=;
+ b=rohcsKJopKp49fb6UC4Cjb5pHcQmS8rWCS2/Bz7zTTauoGfhDTyUvZ4FebmlNticIO
+ hyr6d9+F3mwT7jpGL+orOc0spOb96aZgPq6UmDtEymVEyYhvJ5Ish8uf7UGY5k4Yc9nZ
+ FQThQ+RprFs1SoSa/U3DSsuLm/JN/zAhRpLtM41Uxo/i4XXnH5PEboBXaZr6Oyy49Djj
+ 4lJ624IhR9WN8RG1fZ/biW0R2pamLpbT4Fnj2SpmF5nfuKfIe3kwfOej/N7kGR3r2R+9
+ 7vAvNRyrXTAMt1vKuPN0iRgZtR4f7ooBoU8UYAJ59P8uzcqjIfEbS+lNhvZCbovq/iCJ
+ mvOQ==
+X-Gm-Message-State: AOAM530UQ+1LV1ypM/VyDjCFODxVAS4z865kqjOGoVucccKStjfvEUWp
+ WBzE+bjyQwIgPhecaU1/whJpeQ==
+X-Google-Smtp-Source: ABdhPJyj2vFpkBrNX4z2NPgVzBjlLN91dexr1dOgIuf2b3cpK0+sH0JgFMbDuontXxYSPP+o1jJBYw==
+X-Received: by 2002:a1c:b608:: with SMTP id g8mr38716wmf.106.1599494441603;
+ Mon, 07 Sep 2020 09:00:41 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id u66sm2420101wme.1.2020.09.07.09.00.40
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 07 Sep 2020 09:00:40 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id DDD4E1FF7E;
+ Mon,  7 Sep 2020 17:00:39 +0100 (BST)
+References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
+ <159903457617.28509.2649326029575134141.stgit@pasha-ThinkPad-X280>
+ <87k0x5r4jg.fsf@linaro.org>
+ <1afbeab2-e363-9be3-a751-2692263e80d2@ispras.ru>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+Subject: Re: [PATCH v3 05/15] iotests: update snapshot test for new output
+ format
+In-reply-to: <1afbeab2-e363-9be3-a751-2692263e80d2@ispras.ru>
+Date: Mon, 07 Sep 2020 17:00:39 +0100
+Message-ID: <87h7s9r2zc.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9737
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- malwarescore=0
- bulkscore=0 phishscore=0 adultscore=0 suspectscore=0 spamscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009070154
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9737
- signatures=668679
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- priorityscore=1501
- clxscore=1015 bulkscore=0 malwarescore=0 lowpriorityscore=0
- mlxlogscore=999 suspectscore=0 adultscore=0 mlxscore=0 impostorscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2006250000 definitions=main-2009070154
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=darren.kenny@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 11:56:05
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,111 +107,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, f4bug@amsat.org, bsd@redhat.com, stefanha@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, crosa@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
+ philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Monday, 2020-09-07 at 11:39:32 -04, Alexander Bulekov wrote:
-> On 200902 1103, Darren Kenny wrote:
 
-...
+Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
 
->> > +
->> > +    while (ind >= 0 && fuzzable_memoryregions->len) {
->> > +        *result = (address_range){0, 0};
->> > +        mr = g_ptr_array_index(fuzzable_memoryregions, i);
->> > +        if (mr->enabled) {
->> > +            abs_addr = mr->addr;
->> > +            for (root = mr; root->container; ) {
->> > +                root = root->container;
->> > +                abs_addr += root->addr;
->> > +            }
->> > +            /*
->> > +             * Only consider the region if it is rooted at the io_space we want
->> > +             */
->> > +            if (root == io_space) {
->> > +                hwaddr xlat, len;
->> > +                if(address_space_translate(as, abs_addr, &xlat, &len, true, MEMTXATTRS_UNSPECIFIED) == mr){
->> > +                    ind--;
->> 
->> I'm wondering what is the purpose of ind, we never really do anything
->> with it except possibly decrement it here and test in the while
->> condition.
->> 
->> With candidate_regions also only being incremented here, we could just
->> as easily compare that against index.
->> 
+> On 07.09.2020 18:26, Alex Benn=C3=A9e wrote:
+>>=20
+>> Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
+>>=20
+>>> From: Pavel Dovgalyuk <pavel.dovgaluk@gmail.com>
+>>>
+>>> This patch updates iotests that verify qemu monitor output.
+>>> New output format for snapshot listing include ICOUNT column.
+>>=20
+>> I was curious if the monitor should still function during replay. In my
+>> setup:
+>>=20
+>>    ./qemu-system-aarch64 -cpu cortex-a53 -display none -serial mon:stdio=
+ -machine virt -kernel zephyr.elf -net none -icount shift=3D6,align=3Doff,s=
+leep=3Doff,rr=3Dreplay,rrfile=3Drecord.out -drive file=3Drecord.qcow2,if=3D=
+none,snapshot,id=3Drr -s -S
+>>    *** Booting Zephyr OS build zephyr-v2.3.0-1183-ge5628ad0faf3  ***
+>>    Hello World! qemu_cortex_a53
+>>    qemu-system-aarch64: Missing character write event in the replay log
 >
-> Yes it is not clear. The overall idea here is:
-> * fuzzable_memoryregions contains regions that belong both to the
->   Memory/MMIO AddressSpace and the PIO AddressSpace. 
-> * Thus fuzzable_mr can look like [PIO_1, MMIO_1, MMIO_2, PIO_2, PIO_3]
-> * If index == 4 and we want an MMIO region, we need to use that as an
->   index into the sub-array of only MMIO-Type regions
+> And what about -monitor stdio instead of -serial mon:stdio?
+
+Well I switched to:
+
+  -monitor telnet:127.0.0.1:4444
+
+and controlled that way. I appreciate having a multiplexed
+serial/monitor is a tricky edge case but I'm curious as to why it broke.
+
+
 >
-> I think instead, I should either
-> 1. Have separate arrays for PIO/MMIO MRs. This will simplify this
->    function, but I'm also not sure whether it is always possible to
->    identify whether the mr is pio/mmio (e.g. when a PCI BAR has not yet
->    been mapped)
-> 2. Have a single read/write operation instead of in/out and read/write.
->    Then, instead of differentiating between MMIO and PIO here, we could
->    do that in the OP.
-> 3. Instead of keeping track of MemoryRegions here, try instead to walk
->    the corresponding "flatview" and match the memory-region pointers.
->
-> I'll try out (3) first. hopefully that will clear this up and make
-> everything more legible. 
+>>=20
+>> although technically the C-a shouldn't be a character that ever makes it
+>> to the guest.
+>>=20
+>>>
+>>> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
+>>> ---
+>>>   tests/qemu-iotests/267.out |   48 ++++++++++++++++++++++-------------=
+---------
+>>>   1 file changed, 24 insertions(+), 24 deletions(-)
+>>>
+>>> diff --git a/tests/qemu-iotests/267.out b/tests/qemu-iotests/267.out
+>>> index 215902b3ad..27471ffae8 100644
+>>> --- a/tests/qemu-iotests/267.out
+>>> +++ b/tests/qemu-iotests/267.out
+>>> @@ -33,8 +33,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>> @@ -44,8 +44,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>> @@ -69,8 +69,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>> @@ -94,8 +94,8 @@ QEMU X.Y.Z monitor - type 'help' for more information
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>> @@ -105,8 +105,8 @@ QEMU X.Y.Z monitor - type 'help' for more informati=
+on
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>> @@ -119,8 +119,8 @@ QEMU X.Y.Z monitor - type 'help' for more informati=
+on
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>> @@ -134,8 +134,8 @@ QEMU X.Y.Z monitor - type 'help' for more informati=
+on
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>> @@ -145,15 +145,15 @@ QEMU X.Y.Z monitor - type 'help' for more informa=
+tion
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>>   Internal snapshots on overlay:
+>>>   Snapshot list:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> -1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   Internal snapshots on backing file:
+>>>=20=20=20
+>>>   =3D=3D=3D -blockdev with NBD server on the backing file =3D=3D=3D
+>>> @@ -166,17 +166,17 @@ QEMU X.Y.Z monitor - type 'help' for more informa=
+tion
+>>>   (qemu) savevm snap0
+>>>   (qemu) info snapshots
+>>>   List of snapshots present on all disks:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> ---        snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +--        snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   (qemu) loadvm snap0
+>>>   (qemu) quit
+>>>=20=20=20
+>>>   Internal snapshots on overlay:
+>>>   Snapshot list:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> -1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   Internal snapshots on backing file:
+>>>   Snapshot list:
+>>> -ID        TAG                 VM SIZE                DATE       VM CLO=
+CK
+>>> -1         snap0                  SIZE yyyy-mm-dd hh:mm:ss   00:00:00.0=
+00
+>>> +ID        TAG               VM SIZE                DATE     VM CLOCK  =
+   ICOUNT
+>>> +1         snap0                SIZE yyyy-mm-dd hh:mm:ss 00:00:00.000
+>>>   *** done
+>>=20
+>>=20
 
-OK, thanks.
 
-...
-
->> > +/*
->> > + * Here, we interpret random bytes from the fuzzer, as a sequence of commands.
->> > + * Our commands are variable-width, so we use a separator, SEPARATOR, to specify
->> > + * the boundaries between commands. This is just a random 32-bit value, which
->> > + * is easily identified by libfuzzer+AddressSanitizer, as long as we use
->> > + * memmem. It can also be included in the fuzzer's dictionary. More details
->> > + * here:
->> > + * https://github.com/google/fuzzing/blob/master/docs/split-inputs.md
->> > + *
->> > + * As a result, the stream of bytes is converted into a sequence of commands.
->> > + * In a simplified example where SEPARATOR is 0xFF:
->> > + * 00 01 02 FF 03 04 05 06 FF 01 FF ...
->> > + * becomes this sequence of commands:
->> > + * 00 01 02    -> op00 (0102)   -> in (0102, 2)
->> > + * 03 04 05 06 -> op03 (040506) -> write (040506, 3)
->> > + * 01          -> op01 (-,0)    -> out (-,0)
->> > + * ...
->> > + *
->> > + * Note here that it is the job of the individual opcode functions to check
->> > + * that enough data was provided. I.e. in the last command out (,0), out needs
->> > + * to check that there is not enough data provided to select an address/value
->> > + * for the operation.
->> > + */
->> 
->> Out if curiosity, do any of our corpus actually make use of the FUZZ string, or are we
->> just falling back to always using the full size of the provided input?
->> 
->
-> Do you mean if there is some case where "FUZZ" needs to be used as a
-> real value, rather than a magical separator?
->
-> Or are asking whether the fuzzer actually generates inputs with the
-> "FUZZ" separator?
-> With ASan enabled, libfuzzer immediately figures out that "FUZZ" is an
-> interesting string (because it instruments memmem) and starts inserting
-> it all over the place. Without --enable-sanitizers, I add it to a fuzzer
-> dictionary for the same effect (see bullet-point 1 in PATCH v2 00/15).
-
-Should have responded to this, saw that you also used FUZZ later in the
-patchset when I finally got there :)
-
-Thanks,
-
-Darren.
+--=20
+Alex Benn=C3=A9e
 
