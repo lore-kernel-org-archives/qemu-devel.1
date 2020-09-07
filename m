@@ -1,95 +1,89 @@
-Return-Path: <SRS0=M8gQ=CP=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98AA3C43461
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 20:21:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2255BC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 01:02:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0F71521473
-	for <qemu-devel@archiver.kernel.org>; Sun,  6 Sep 2020 20:21:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 694C32080A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 01:02:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TH2bSvsQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F71521473
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OTWrBZHt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 694C32080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51766 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56932 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kF1A5-0003eQ-85
-	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 16:21:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44550)
+	id 1kF5YE-0002c1-EX
+	for qemu-devel@archiver.kernel.org; Sun, 06 Sep 2020 21:02:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52564)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kF189-0001Nd-5z
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 16:19:17 -0400
-Received: from mail-ej1-x62e.google.com ([2a00:1450:4864:20::62e]:37593)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kF5XD-0001lq-1M; Sun, 06 Sep 2020 21:01:27 -0400
+Received: from mail-ot1-x341.google.com ([2607:f8b0:4864:20::341]:41169)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kF186-0006Eg-BR
- for qemu-devel@nongnu.org; Sun, 06 Sep 2020 16:19:16 -0400
-Received: by mail-ej1-x62e.google.com with SMTP id nw23so15327397ejb.4
- for <qemu-devel@nongnu.org>; Sun, 06 Sep 2020 13:19:14 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>)
+ id 1kF5XB-0001en-4q; Sun, 06 Sep 2020 21:01:26 -0400
+Received: by mail-ot1-x341.google.com with SMTP id a65so10982817otc.8;
+ Sun, 06 Sep 2020 18:01:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=K1sC0erXWNafGZuezn5xRA/KXWlfRzNYmjwwXplrQXo=;
- b=TH2bSvsQQJbXTcBmZndfA3aTqLX/UYUB2nf5Jt+AK7DcG2+JsKBIoIOOtFL0F2YVFI
- VqJNrk23kpRdyzesB+5+f4hqML3lSHMcBg49OdNXj4LY3yJZODkO5dJnAxLgWhoEPpyG
- HqDDySNSbyO2E3/MqRHFhvHnRbsz1XS7nKCntwthIL+0D/9vtdGdXPhLUw4dvtksPk9A
- Y8+6g6GZhMl0hxBBQwpwiNfXtTpKtbRA/EnRduSKVXk6/ZEJCWf1H5rAp5aMEy+N6BLb
- zQXYFIRaH8Zu4mD0auKAoQ1346gLbU81RZS41i/DV7B5BJ5QQ5Rc22DfaftsNk4aUZeX
- TP/A==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=vmLZIdUf1AENjpfh6DNQdv7YRpXdDJb7Kqoes9fdsfk=;
+ b=OTWrBZHtmK2ktZ7dnOizo864WES68BEAJh5N2akbVb/+SM2r8vfXR6tpjDe8kTI3go
+ nNQ0iM9nQLXBM//dJV9GOuc4nLD090+9aZ//evqAGymJpnFWxOJmLg++i0BEIiBEzHKi
+ eShubw3urwfs+y1Zc0nNjDWyaD8ras8bTCeEsXJp8htvuouZhfHwSocC1o15bUQs8QPL
+ 6iPhia95Lr4WejvqI0RpS1dgetWsU3X5bJb567iurxKdez73/uIQGhMHbe6X37n7wGFP
+ qoe5EPk7Y3VKeS5bVWNT41a8H43eEqiXZVLyCmhW785vI/c7sU5dOwWx083ZmnK6fxuC
+ HECQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=K1sC0erXWNafGZuezn5xRA/KXWlfRzNYmjwwXplrQXo=;
- b=dCFLa6UMYp73USzD2ffa2VqTPkl8VilTowLprLxvLbkGA0WT3Zmvng3yXlQabwgxpZ
- AGN0Dwoh9yUXBfFvQxbjdEFhgj0oxWsx9nUJpPaUn6QjkAgQx49jvSdqRBBkATH77Wau
- wv1aUs1TaBcpRrgT5VHzUlI+UkBhHrsR8W0XGDcjbzmtjCYeuzAr9CJv2JKwPH7hOmrb
- B+bMHMx27I/Hjkj0VX0UsishLfpamzQ7MG/kj72XYvpHIgya9hcQ2xQJ3yv7w8ieX+uu
- JPQHwoy7lnYPCqkN9AL9xl7wg38N96XSNRYqZonXLr0GJGnRiqHMvk9fFLvtNSiNzwaF
- sKkw==
-X-Gm-Message-State: AOAM533kldg/Jd0tAVEBI+tLlrASZi8CesJxOgqxojtRfti6YqpuM2GQ
- GM0YoRQVG8ViQbsSWCcmQQnuigyFwpg=
-X-Google-Smtp-Source: ABdhPJzvZzt+3WEHftioiT0lP7mzFb/fbWUBfe020v0bBWyBMqXLBH//yVrbXtuCuGQJjxVc1VUfGQ==
-X-Received: by 2002:a17:906:4a51:: with SMTP id
- a17mr8466237ejv.381.1599423552272; 
- Sun, 06 Sep 2020 13:19:12 -0700 (PDT)
-Received: from donizetti.lan ([2001:b07:6468:f312:79e5:61d2:1641:7362])
- by smtp.gmail.com with ESMTPSA id v2sm1399435ejh.57.2020.09.06.13.19.11
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 06 Sep 2020 13:19:11 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 17/45] meson: convert the unit tests
-Date: Sun,  6 Sep 2020 22:19:10 +0200
-Message-Id: <20200906201911.11814-2-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200906201911.11814-1-pbonzini@redhat.com>
-References: <20200906201911.11814-1-pbonzini@redhat.com>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=vmLZIdUf1AENjpfh6DNQdv7YRpXdDJb7Kqoes9fdsfk=;
+ b=Us7nlEaMTEBHkAvak9N0FHJZsjAeTi0KNmFd8WHxcjLDQDba5weFU14ow34SlN6B9I
+ owzESX/fVcw5dZM+WmiA3HoAmJv5tWwAEHpFs7eCroasQLLZKS4CoRKmn5TQ+ebLHhDF
+ AEw+K/UVP0XV/sXdBPcxG8Pycv0ns4f1zJIYmWvm2B2dZ3gLZqBWiiElMryJSo7/+iJ+
+ yvfvcZlfXKJdxV+eiKsgHaZhAQLmDoht+Va4l4IW3Uxys1eHZg9MKeIMinvs1jCWwUHC
+ 114ekCDfRO4vIMi3qrkaY10gwrJDp93zdxsf6EpSo3iByQ2sC7ZIWi0G9sNFOLiuH7EE
+ dNIA==
+X-Gm-Message-State: AOAM5311Pz4Nk+eQbMZbbGDenDteg+tiC+dLVAowIlEsPBnMslatlWOT
+ kpdKke1z2HiRWuDpNynnPAvvOCkS/ztl9mKGj7k=
+X-Google-Smtp-Source: ABdhPJwL0B/6I2tCQQvFwyHYehPJ5MZ54u+uU2aje9MHbKocizQ8tgAGK6VrdoIHvWb5iIQ4sTH/vPzCdgSuBDVCBuQ=
+X-Received: by 2002:a05:6830:2302:: with SMTP id
+ u2mr12439988ote.181.1599440482465; 
+ Sun, 06 Sep 2020 18:01:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::62e;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-ej1-x62e.google.com
+References: <20200904154439.643272-1-philmd@redhat.com>
+ <20200904154439.643272-2-philmd@redhat.com>
+In-Reply-To: <20200904154439.643272-2-philmd@redhat.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Mon, 7 Sep 2020 09:00:46 +0800
+Message-ID: <CAKXe6SLa6045REp+TyXVn3dYWrruromuW17e29Vkf841yW2hWQ@mail.gmail.com>
+Subject: Re: [PATCH 01/13] pci: pass along the return value of dma_memory_rw
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::341;
+ envelope-from=liq3ea@gmail.com; helo=mail-ot1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,543 +96,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Thomas Huth <thuth@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Qemu Developers <qemu-devel@nongnu.org>, Peter Xu <peterx@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>, qemu-block@nongnu.org,
+ Peter Chubb <peter.chubb@nicta.com.au>, Joel Stanley <joel@jms.id.au>,
+ Richard Henderson <rth@twiddle.net>, Laszlo Ersek <lersek@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Alistair Francis <alistair@alistair23.me>,
+ Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
+ qemu-arm@nongnu.org, Jan Kiszka <jan.kiszka@web.de>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ Keith Busch <kbusch@kernel.org>, John Snow <jsnow@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>, Andrew Jeffery <andrew@aj.id.au>,
+ Klaus Jensen <k.jensen@samsung.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=
+=9C=884=E6=97=A5=E5=91=A8=E4=BA=94 =E4=B8=8B=E5=8D=8811:47=E5=86=99=E9=81=
+=93=EF=BC=9A
+>
+> From: Klaus Jensen <k.jensen@samsung.com>
+>
+> Some might actually care about the return value of dma_memory_rw. So
+> let us pass it along instead of ignoring it.
+>
+> There are no existing users of the return value, so this patch should be
+> safe.
+>
+> Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+> Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+> Acked-by: Keith Busch <kbusch@kernel.org>
+> Message-Id: <20191011070141.188713-2-its@irrelevant.dk>
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
 
-Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-Id: <20200828110734.1638685-7-marcandre.lureau@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- tests/Makefile.include | 254 +----------------------------------------
- tests/meson.build      | 174 +++++++++++++++++++++++++++-
- tests/test-qga.c       |   2 +-
- 3 files changed, 177 insertions(+), 253 deletions(-)
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
 
-diff --git a/tests/Makefile.include b/tests/Makefile.include
-index 490a923384..ce0a9fd780 100644
---- a/tests/Makefile.include
-+++ b/tests/Makefile.include
-@@ -38,254 +38,20 @@ export SRC_PATH
- SYSEMU_TARGET_LIST := $(subst -softmmu.mak,,$(notdir \
-    $(wildcard $(SRC_PATH)/default-configs/*-softmmu.mak)))
- 
--check-unit-y += tests/check-qdict$(EXESUF)
--check-unit-y += tests/check-block-qdict$(EXESUF)
--check-unit-y += tests/check-qnum$(EXESUF)
--check-unit-y += tests/check-qstring$(EXESUF)
--check-unit-y += tests/check-qlist$(EXESUF)
--check-unit-y += tests/check-qnull$(EXESUF)
--check-unit-y += tests/check-qobject$(EXESUF)
--check-unit-y += tests/check-qjson$(EXESUF)
--check-unit-y += tests/check-qlit$(EXESUF)
--check-unit-y += tests/test-qobject-output-visitor$(EXESUF)
--check-unit-y += tests/test-clone-visitor$(EXESUF)
--check-unit-y += tests/test-qobject-input-visitor$(EXESUF)
--check-unit-$(CONFIG_SOFTMMU) += tests/test-qmp-cmds$(EXESUF)
--check-unit-y += tests/test-string-input-visitor$(EXESUF)
--check-unit-y += tests/test-string-output-visitor$(EXESUF)
--check-unit-y += tests/test-qmp-event$(EXESUF)
--check-unit-y += tests/test-opts-visitor$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-coroutine$(EXESUF)
--check-unit-y += tests/test-visitor-serialization$(EXESUF)
--check-unit-$(CONFIG_SOFTMMU) += tests/test-iov$(EXESUF)
--check-unit-y += tests/test-bitmap$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-aio$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-aio-multithread$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-throttle$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-thread-pool$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-hbitmap$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-bdrv-drain$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-bdrv-graph-mod$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-blockjob$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-blockjob-txn$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-block-backend$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-block-iothread$(EXESUF)
--ifeq ($(CONFIG_POSIX),y)
--check-unit-$(CONFIG_BLOCK) += tests/test-image-locking$(EXESUF)
--endif
--check-unit-y += tests/test-x86-cpuid$(EXESUF)
--# all code tested by test-x86-cpuid is inside topology.h
--ifeq ($(CONFIG_SOFTMMU),y)
--check-unit-y += tests/test-xbzrle$(EXESUF)
--check-unit-$(CONFIG_POSIX) += tests/test-vmstate$(EXESUF)
--endif
--check-unit-y += tests/test-cutils$(EXESUF)
--check-unit-y += tests/test-shift128$(EXESUF)
--check-unit-y += tests/test-mul64$(EXESUF)
--check-unit-y += tests/test-int128$(EXESUF)
--# all code tested by test-int128 is inside int128.h
--check-unit-y += tests/rcutorture$(EXESUF)
--check-unit-y += tests/test-rcu-list$(EXESUF)
--check-unit-y += tests/test-rcu-simpleq$(EXESUF)
--check-unit-y += tests/test-rcu-tailq$(EXESUF)
--check-unit-y += tests/test-rcu-slist$(EXESUF)
--check-unit-y += tests/test-qdist$(EXESUF)
--check-unit-y += tests/test-qht$(EXESUF)
--check-unit-y += tests/test-qht-par$(EXESUF)
--check-unit-y += tests/test-bitops$(EXESUF)
--check-unit-y += tests/test-bitcnt$(EXESUF)
--check-unit-y += tests/test-qgraph$(EXESUF)
--check-unit-y += tests/check-qom-interface$(EXESUF)
--check-unit-y += tests/check-qom-proplist$(EXESUF)
--check-unit-y += tests/test-qemu-opts$(EXESUF)
--check-unit-y += tests/test-keyval$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-write-threshold$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-crypto-hash$(EXESUF)
- check-speed-$(CONFIG_BLOCK) += tests/benchmark-crypto-hash$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-crypto-hmac$(EXESUF)
- check-speed-$(CONFIG_BLOCK) += tests/benchmark-crypto-hmac$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-crypto-cipher$(EXESUF)
- check-speed-$(CONFIG_BLOCK) += tests/benchmark-crypto-cipher$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-crypto-secret$(EXESUF)
--check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-crypto-tlscredsx509$(EXESUF)
--check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-crypto-tlssession$(EXESUF)
--ifndef CONFIG_TSAN
--# Some tests: test-char, test-qdev-global-props, and test-qga,
--# are not runnable under TSan due to a known issue.
--# https://github.com/google/sanitizers/issues/1116
--check-unit-$(CONFIG_SOFTMMU) += tests/test-char$(EXESUF)
--check-unit-$(CONFIG_SOFTMMU) += tests/test-qdev-global-props$(EXESUF)
--ifeq ($(CONFIG_GUEST_AGENT),y)
--check-unit-$(call land,$(CONFIG_LINUX),$(CONFIG_VIRTIO_SERIAL)) += tests/test-qga$(EXESUF)
--endif
--endif
--check-unit-$(CONFIG_SOFTMMU) += tests/test-timed-average$(EXESUF)
--check-unit-$(call land,$(CONFIG_SOFTMMU),$(CONFIG_INOTIFY1)) += tests/test-util-filemonitor$(EXESUF)
--check-unit-$(CONFIG_SOFTMMU) += tests/test-util-sockets$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-authz-simple$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-authz-list$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-authz-listfile$(EXESUF)
--check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_AUTH_PAM)) += tests/test-authz-pam$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-io-task$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-io-channel-socket$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-io-channel-file$(EXESUF)
--check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_GNUTLS)) += tests/test-io-channel-tls$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-io-channel-command$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-io-channel-buffer$(EXESUF)
--check-unit-$(CONFIG_SOFTMMU) += tests/test-base64$(EXESUF)
--check-unit-$(call land,$(CONFIG_BLOCK),$(if $(CONFIG_NETTLE),y,$(CONFIG_GCRYPT))) += tests/test-crypto-pbkdf$(EXESUF)
--check-unit-$(CONFIG_BLOCK) += tests/test-crypto-ivgen$(EXESUF)
--check-unit-$(CONFIG_BLOCK)  += tests/test-crypto-afsplit$(EXESUF)
--check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_QEMU_PRIVATE_XTS)) += tests/test-crypto-xts$(EXESUF)
--check-unit-$(CONFIG_BLOCK)  += tests/test-crypto-block$(EXESUF)
--check-unit-y += tests/test-logging$(EXESUF)
--check-unit-$(call land,$(CONFIG_BLOCK),$(CONFIG_REPLICATION)) += tests/test-replication$(EXESUF)
--check-unit-$(CONFIG_SOFTMMU) += tests/test-bufferiszero$(EXESUF)
--check-unit-y += tests/test-uuid$(EXESUF)
--check-unit-y += tests/ptimer-test$(EXESUF)
--check-unit-y += tests/test-qapi-util$(EXESUF)
- 
- QEMU_CFLAGS += -I$(SRC_PATH)/tests -I$(SRC_PATH)/tests/qtest
- 
--
- # Deps that are common to various different sets of tests below
- test-util-obj-y = libqemuutil.a
--test-qom-obj-y = $(qom-obj-y) $(test-util-obj-y)
--test-qapi-obj-y = $(test-qom-obj-y) tests/libtestqapi.a
--benchmark-crypto-obj-$(CONFIG_BLOCK) = $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj-y)
--test-crypto-obj-$(CONFIG_BLOCK) = $(authz-obj-y) $(crypto-obj-y) $(test-qom-obj-y)
--test-io-obj-$(CONFIG_BLOCK) = $(io-obj-y) $(test-crypto-obj-y)
--test-authz-obj-$(CONFIG_BLOCK) = $(test-qom-obj-y) $(authz-obj-y)
--test-block-obj-$(CONFIG_BLOCK) = $(block-obj-y) $(test-io-obj-y) tests/iothread.o
--
--tests/check-qnum$(EXESUF): tests/check-qnum.o $(test-util-obj-y)
--tests/check-qstring$(EXESUF): tests/check-qstring.o $(test-util-obj-y)
--tests/check-qdict$(EXESUF): tests/check-qdict.o $(test-util-obj-y)
--tests/check-block-qdict$(EXESUF): tests/check-block-qdict.o $(test-util-obj-y)
--tests/check-qlist$(EXESUF): tests/check-qlist.o $(test-util-obj-y)
--tests/check-qnull$(EXESUF): tests/check-qnull.o $(test-util-obj-y)
--tests/check-qobject$(EXESUF): tests/check-qobject.o $(test-util-obj-y)
--tests/check-qjson$(EXESUF): tests/check-qjson.o $(test-util-obj-y)
--tests/check-qlit$(EXESUF): tests/check-qlit.o $(test-util-obj-y)
--tests/check-qom-interface$(EXESUF): tests/check-qom-interface.o $(test-qom-obj-y)
--tests/check-qom-proplist$(EXESUF): tests/check-qom-proplist.o $(test-qom-obj-y)
--
--tests/test-char$(EXESUF): tests/test-char.o $(test-util-obj-y) $(test-io-obj-y) $(chardev-obj-y) tests/socket-helpers.o
--tests/test-coroutine$(EXESUF): tests/test-coroutine.o $(test-block-obj-y)
--tests/test-aio$(EXESUF): tests/test-aio.o $(test-block-obj-y)
--tests/test-aio-multithread$(EXESUF): tests/test-aio-multithread.o $(test-block-obj-y)
--tests/test-throttle$(EXESUF): tests/test-throttle.o $(test-block-obj-y)
--tests/test-bdrv-drain$(EXESUF): tests/test-bdrv-drain.o $(test-block-obj-y) $(test-util-obj-y)
--tests/test-bdrv-graph-mod$(EXESUF): tests/test-bdrv-graph-mod.o $(test-block-obj-y) $(test-util-obj-y)
--tests/test-blockjob$(EXESUF): tests/test-blockjob.o $(test-block-obj-y) $(test-util-obj-y)
--tests/test-blockjob-txn$(EXESUF): tests/test-blockjob-txn.o $(test-block-obj-y) $(test-util-obj-y)
--tests/test-block-backend$(EXESUF): tests/test-block-backend.o $(test-block-obj-y) $(test-util-obj-y)
--tests/test-block-iothread$(EXESUF): tests/test-block-iothread.o $(test-block-obj-y) $(test-util-obj-y)
--tests/test-image-locking$(EXESUF): tests/test-image-locking.o $(test-block-obj-y) $(test-util-obj-y)
--tests/test-thread-pool$(EXESUF): tests/test-thread-pool.o $(test-block-obj-y)
--tests/test-iov$(EXESUF): tests/test-iov.o $(test-util-obj-y)
--tests/test-hbitmap$(EXESUF): tests/test-hbitmap.o $(test-util-obj-y) $(test-crypto-obj-y)
--tests/test-bitmap$(EXESUF): tests/test-bitmap.o $(test-util-obj-y)
--tests/test-x86-cpuid$(EXESUF): tests/test-x86-cpuid.o
--tests/test-xbzrle$(EXESUF): tests/test-xbzrle.o migration/libmigration.fa $(test-util-obj-y) \
--	$(test-io-obj-y)
--tests/test-cutils$(EXESUF): tests/test-cutils.o util/cutils.o $(test-util-obj-y)
--tests/test-int128$(EXESUF): tests/test-int128.o
--tests/rcutorture$(EXESUF): tests/rcutorture.o $(test-util-obj-y)
--tests/test-rcu-list$(EXESUF): tests/test-rcu-list.o $(test-util-obj-y)
--tests/test-rcu-simpleq$(EXESUF): tests/test-rcu-simpleq.o $(test-util-obj-y)
--tests/test-rcu-tailq$(EXESUF): tests/test-rcu-tailq.o $(test-util-obj-y)
--tests/test-rcu-slist$(EXESUF): tests/test-rcu-slist.o $(test-util-obj-y)
--tests/test-qdist$(EXESUF): tests/test-qdist.o $(test-util-obj-y)
--tests/test-qht$(EXESUF): tests/test-qht.o $(test-util-obj-y)
--tests/test-qht-par$(EXESUF): tests/test-qht-par.o tests/qht-bench$(EXESUF) $(test-util-obj-y)
--tests/test-bufferiszero$(EXESUF): tests/test-bufferiszero.o $(test-util-obj-y)
- tests/atomic_add-bench$(EXESUF): tests/atomic_add-bench.o $(test-util-obj-y)
- tests/atomic64-bench$(EXESUF): tests/atomic64-bench.o $(test-util-obj-y)
- 
--tests/test-qdev-global-props$(EXESUF): tests/test-qdev-global-props.o hw/core/libhwcore.fa \
--	$(test-qapi-obj-y)
--tests/test-vmstate$(EXESUF): tests/test-vmstate.o migration/libmigration.fa \
--	$(test-io-obj-y)
--tests/test-timed-average$(EXESUF): tests/test-timed-average.o $(test-util-obj-y)
--tests/test-base64$(EXESUF): tests/test-base64.o $(test-util-obj-y)
--tests/ptimer-test$(EXESUF): tests/ptimer-test.o tests/ptimer-test-stubs.o hw/core/ptimer.o
--tests/test-qemu-opts$(EXESUF): tests/test-qemu-opts.o $(test-util-obj-y)
--tests/test-keyval$(EXESUF): tests/test-keyval.o $(test-util-obj-y) $(test-qapi-obj-y)
--tests/test-write-threshold$(EXESUF): tests/test-write-threshold.o $(test-block-obj-y)
--tests/test-uuid$(EXESUF): tests/test-uuid.o $(test-util-obj-y)
--tests/test-qapi-util$(EXESUF): tests/test-qapi-util.o $(test-util-obj-y)
--
--tests/test-logging$(EXESUF): tests/test-logging.o $(test-util-obj-y)
--
--tests/test-replication$(EXESUF): tests/test-replication.o $(test-util-obj-y) \
--	$(test-block-obj-y)
--
--tests/test-string-output-visitor$(EXESUF): tests/test-string-output-visitor.o $(test-qapi-obj-y)
--tests/test-string-input-visitor$(EXESUF): tests/test-string-input-visitor.o $(test-qapi-obj-y)
--tests/test-qmp-event$(EXESUF): tests/test-qmp-event.o $(test-qapi-obj-y) tests/test-qapi-emit-events.o tests/test-qapi-events.o
--tests/test-qobject-output-visitor$(EXESUF): tests/test-qobject-output-visitor.o $(test-qapi-obj-y)
--tests/test-clone-visitor$(EXESUF): tests/test-clone-visitor.o $(test-qapi-obj-y)
--tests/test-qobject-input-visitor$(EXESUF): tests/test-qobject-input-visitor.o $(test-qapi-obj-y)
--tests/test-qmp-cmds$(EXESUF): tests/test-qmp-cmds.o tests/test-qapi-commands.o tests/test-qapi-init-commands.o $(test-qapi-obj-y)
--tests/test-visitor-serialization$(EXESUF): tests/test-visitor-serialization.o $(test-qapi-obj-y)
--tests/test-opts-visitor$(EXESUF): tests/test-opts-visitor.o $(test-qapi-obj-y)
--
--tests/test-shift128$(EXESUF): tests/test-shift128.o $(test-util-obj-y)
--tests/test-mul64$(EXESUF): tests/test-mul64.o $(test-util-obj-y)
--tests/test-bitops$(EXESUF): tests/test-bitops.o $(test-util-obj-y)
--tests/test-bitcnt$(EXESUF): tests/test-bitcnt.o $(test-util-obj-y)
--tests/test-qgraph$(EXESUF): tests/test-qgraph.o tests/qtest/libqos/qgraph.o $(test-util-obj-y)
--tests/test-crypto-hash$(EXESUF): tests/test-crypto-hash.o $(test-crypto-obj-y)
- tests/benchmark-crypto-hash$(EXESUF): tests/benchmark-crypto-hash.o $(test-crypto-obj-y)
--tests/test-crypto-hmac$(EXESUF): tests/test-crypto-hmac.o $(test-crypto-obj-y)
- tests/benchmark-crypto-hmac$(EXESUF): tests/benchmark-crypto-hmac.o $(test-crypto-obj-y)
--tests/test-crypto-cipher$(EXESUF): tests/test-crypto-cipher.o $(test-crypto-obj-y)
- tests/benchmark-crypto-cipher$(EXESUF): tests/benchmark-crypto-cipher.o $(test-crypto-obj-y)
--tests/test-crypto-secret$(EXESUF): tests/test-crypto-secret.o $(test-crypto-obj-y)
--tests/test-crypto-xts$(EXESUF): tests/test-crypto-xts.o $(test-crypto-obj-y)
--
--ifeq ($(CONFIG_KEYUTILS),y)
--tests/test-crypto-secret.o-libs := -lkeyutils
--endif
--
--tests/crypto-tls-x509-helpers.o-cflags := $(TASN1_CFLAGS)
--tests/crypto-tls-x509-helpers.o-libs := $(TASN1_LIBS)
--tests/pkix_asn1_tab.o-cflags := $(TASN1_CFLAGS)
--
--tests/test-crypto-tlscredsx509.o-cflags := $(TASN1_CFLAGS)
--tests/test-crypto-tlscredsx509$(EXESUF): tests/test-crypto-tlscredsx509.o \
--	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o $(test-crypto-obj-y)
--
--tests/test-crypto-tlssession.o-cflags := $(TASN1_CFLAGS)
--tests/test-crypto-tlssession$(EXESUF): tests/test-crypto-tlssession.o \
--	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o \
--	tests/crypto-tls-psk-helpers.o \
--        $(test-crypto-obj-y)
--tests/test-util-filemonitor$(EXESUF): tests/test-util-filemonitor.o \
--	$(test-util-obj-y)
--tests/test-util-sockets$(EXESUF): tests/test-util-sockets.o \
--	tests/socket-helpers.o $(test-util-obj-y)
--tests/test-authz-simple$(EXESUF): tests/test-authz-simple.o $(test-authz-obj-y)
--tests/test-authz-list$(EXESUF): tests/test-authz-list.o $(test-authz-obj-y)
--tests/test-authz-listfile$(EXESUF): tests/test-authz-listfile.o $(test-authz-obj-y)
--tests/test-authz-pam$(EXESUF): tests/test-authz-pam.o $(test-authz-obj-y)
--tests/test-io-task$(EXESUF): tests/test-io-task.o $(test-io-obj-y)
--tests/test-io-channel-socket$(EXESUF): tests/test-io-channel-socket.o \
--        tests/io-channel-helpers.o tests/socket-helpers.o $(test-io-obj-y)
--tests/test-io-channel-file$(EXESUF): tests/test-io-channel-file.o \
--        tests/io-channel-helpers.o $(test-io-obj-y)
--tests/test-io-channel-tls$(EXESUF): tests/test-io-channel-tls.o \
--	tests/crypto-tls-x509-helpers.o tests/pkix_asn1_tab.o \
--	tests/io-channel-helpers.o $(test-io-obj-y)
--tests/test-io-channel-command$(EXESUF): tests/test-io-channel-command.o \
--        tests/io-channel-helpers.o $(test-io-obj-y)
--tests/test-io-channel-buffer$(EXESUF): tests/test-io-channel-buffer.o \
--        tests/io-channel-helpers.o $(test-io-obj-y)
--tests/test-crypto-pbkdf$(EXESUF): tests/test-crypto-pbkdf.o $(test-crypto-obj-y)
--tests/test-crypto-ivgen$(EXESUF): tests/test-crypto-ivgen.o $(test-crypto-obj-y)
--tests/test-crypto-afsplit$(EXESUF): tests/test-crypto-afsplit.o $(test-crypto-obj-y)
--tests/test-crypto-block$(EXESUF): tests/test-crypto-block.o $(test-crypto-obj-y)
- 
- tests/migration/stress$(EXESUF): tests/migration/stress.o
- 	$(call quiet-command, $(LINKPROG) -static -O3 $(PTHREAD_LIB) -o $@ $< ,"LINK","$(TARGET_DIR)$@")
-@@ -299,8 +65,6 @@ tests/migration/initrd-stress.img: tests/migration/stress$(EXESUF)
- 	rm $(INITRD_WORK_DIR)/init
- 	rmdir $(INITRD_WORK_DIR)
- 
--tests/test-qga$(EXESUF): qga/qemu-ga$(EXESUF)
--tests/test-qga$(EXESUF): tests/test-qga.o tests/qtest/libqtest.o $(test-util-obj-y)
- tests/vhost-user-bridge$(EXESUF): tests/vhost-user-bridge.o $(test-util-obj-y) libvhost-user.a
- tests/qemu-iotests/socket_scm_helper$(EXESUF): tests/qemu-iotests/socket_scm_helper.o
- 
-@@ -341,19 +105,9 @@ define do_test_tap
- 	  "TAP","$@")
- endef
- 
--build-unit: $(check-unit-y)
--
--check-unit: $(check-unit-y)
--	$(call do_test_human, $^)
--
- check-speed: $(check-speed-y)
- 	$(call do_test_human, $^)
- 
--# gtester tests with TAP output
--
--check-report-unit.tap: $(check-unit-y)
--	$(call do_test_tap,$^)
--
- # Per guest TCG tests
- 
- BUILD_TCG_TARGET_RULES=$(patsubst %,build-tcg-tests-%, $(TARGET_DIRS))
-@@ -446,7 +200,7 @@ check-acceptance: check-venv $(TESTS_RESULTS_DIR) get-vm-images
- 
- # Consolidated targets
- 
--.PHONY: check-block check-unit check check-clean get-vm-images
-+.PHONY: check-block check check-clean get-vm-images
- check:
- 
- ifeq ($(CONFIG_TOOLS)$(CONFIG_POSIX),yy)
-@@ -458,14 +212,12 @@ check-block: $(SRC_PATH)/tests/check-block.sh qemu-img$(EXESUF) \
- 	@$<
- endif
- 
--check-build: build-unit $(QEMU_IOTESTS_HELPERS-y)
-+check-build: $(QEMU_IOTESTS_HELPERS-y)
- 
- check-clean:
--	rm -rf $(check-unit-y) tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
-+	rm -rf tests/*.o tests/*/*.o $(QEMU_IOTESTS_HELPERS-y)
- 	rm -rf $(TESTS_VENV_DIR) $(TESTS_RESULTS_DIR)
- 
--check: check-unit
--
- clean: check-clean
- 
- # Build the help program automatically
-diff --git a/tests/meson.build b/tests/meson.build
-index 3aeae23d54..0af5a2667e 100644
---- a/tests/meson.build
-+++ b/tests/meson.build
-@@ -1,5 +1,7 @@
-+py3 = import('python').find_installation()
-+
- qht_bench = executable('qht-bench',
--                       sources: files('qht-bench.c'),
-+                       sources: 'qht-bench.c',
-                        dependencies: [qemuutil])
- 
- test_qapi_outputs = [
-@@ -47,6 +49,176 @@ subdir('include')
- libtestqapi = static_library('testqapi', sources: [test_qapi_files, test_qapi_outputs_extra])
- testqapi = declare_dependency(link_with: libtestqapi)
- 
-+testblock = declare_dependency(dependencies: [block], sources: 'iothread.c')
-+
-+tests = {
-+  'check-block-qdict': [],
-+  'check-qdict': [],
-+  'check-qnum': [],
-+  'check-qstring': [],
-+  'check-qlist': [],
-+  'check-qnull': [],
-+  'check-qobject': [],
-+  'check-qjson': [],
-+  'check-qlit': [],
-+  'test-qobject-output-visitor': [testqapi],
-+  'test-clone-visitor': [testqapi],
-+  'test-qobject-input-visitor': [testqapi],
-+  'test-string-input-visitor': [testqapi],
-+  'test-string-output-visitor': [testqapi],
-+  'test-qmp-event': [testqapi],
-+  'test-opts-visitor': [testqapi],
-+  'test-visitor-serialization': [testqapi],
-+  'test-bitmap': [],
-+  # all code tested by test-x86-cpuid is inside topology.h
-+  'test-x86-cpuid': [],
-+  'test-cutils': [],
-+  'test-shift128': [],
-+  'test-mul64': [],
-+  # all code tested by test-int128 is inside int128.h
-+  'test-int128': [],
-+  'rcutorture': [],
-+  'test-rcu-list': [],
-+  'test-rcu-simpleq': [],
-+  'test-rcu-tailq': [],
-+  'test-rcu-slist': [],
-+  'test-qdist': [],
-+  'test-qht': [],
-+  'test-bitops': [],
-+  'test-bitcnt': [],
-+  'test-qgraph': ['qtest/libqos/qgraph.c'],
-+  'check-qom-interface': [qom],
-+  'check-qom-proplist': [qom],
-+  'test-qemu-opts': [],
-+  'test-keyval': [testqapi],
-+  'test-logging': [],
-+  'test-uuid': [],
-+  'ptimer-test': ['ptimer-test-stubs.c', meson.source_root() / 'hw/core/ptimer.c'],
-+  'test-qapi-util': [],
-+}
-+
-+test_deps = {
-+  'test-qht-par': qht_bench,
-+}
-+
-+if have_block
-+  tests += {
-+    'test-coroutine': [testblock],
-+    'test-aio': [testblock],
-+    'test-aio-multithread': [testblock],
-+    'test-throttle': [testblock],
-+    'test-thread-pool': [testblock],
-+    'test-hbitmap': [testblock],
-+    'test-bdrv-drain': [testblock],
-+    'test-bdrv-graph-mod': [testblock],
-+    'test-blockjob': [testblock],
-+    'test-blockjob-txn': [testblock],
-+    'test-block-backend': [testblock],
-+    'test-block-iothread': [testblock],
-+    'test-write-threshold': [testblock],
-+    'test-crypto-hash': [crypto],
-+    'test-crypto-hmac': [crypto],
-+    'test-crypto-cipher': [crypto],
-+    'test-crypto-secret': [crypto, keyutils],
-+    'test-authz-simple': [authz],
-+    'test-authz-list': [authz],
-+    'test-authz-listfile': [authz],
-+    'test-io-task': [testblock],
-+    'test-io-channel-socket': ['socket-helpers.c', 'io-channel-helpers.c', io],
-+    'test-io-channel-file': ['io-channel-helpers.c', io],
-+    'test-io-channel-command': ['io-channel-helpers.c', io],
-+    'test-io-channel-buffer': ['io-channel-helpers.c', io],
-+    'test-crypto-ivgen': [io],
-+    'test-crypto-afsplit': [io],
-+    'test-crypto-block': [io],
-+  }
-+  if 'CONFIG_GNUTLS' in config_host and \
-+     'CONFIG_TASN1' in config_host
-+    tests += {
-+      'test-crypto-tlscredsx509': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
-+                                   tasn1, crypto],
-+      'test-crypto-tlssession': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c', 'crypto-tls-psk-helpers.c',
-+                                 tasn1, crypto],
-+      'test-io-channel-tls': ['io-channel-helpers.c', 'crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
-+                              tasn1, io, crypto]}
-+  endif
-+  if 'CONFIG_AUTH_PAM' in config_host
-+    tests += {'test-authz-pam': [authz]}
-+  endif
-+  if 'CONFIG_QEMU_PRIVATE_XTS' in config_host
-+    tests += {'test-crypto-xts': [crypto, io]}
-+  endif
-+  if 'CONFIG_POSIX' in config_host
-+    tests += {'test-image-locking': [testblock]}
-+  endif
-+  if 'CONFIG_REPLICATION' in config_host
-+    tests += {'test-replication': [testblock]}
-+  endif
-+  if 'CONFIG_NETTLE' in config_host or 'CONFIG_GCRYPT' in config_host
-+    tests += {'test-crypto-pbkdf': [io]}
-+  endif
-+endif
-+
-+if have_system
-+  tests += {
-+    'test-iov': [],
-+    'test-qmp-cmds': [testqapi],
-+    'test-xbzrle': [migration],
-+    'test-timed-average': [],
-+    'test-util-filemonitor': [],
-+    'test-util-sockets': ['socket-helpers.c'],
-+    'test-base64': [],
-+    'test-bufferiszero': [],
-+  }
-+  if 'CONFIG_POSIX' in config_host
-+    tests += {'test-vmstate': [migration, io]}
-+  endif
-+  if 'CONFIG_INOTIFY1' in config_host
-+    tests += {'test-util-filemonitor': []}
-+  endif
-+
-+  # Some tests: test-char, test-qdev-global-props, and test-qga,
-+  # are not runnable under TSan due to a known issue.
-+  # https://github.com/google/sanitizers/issues/1116
-+  if 'CONFIG_TSAN' not in config_host
-+    tests += {
-+      'test-char': ['socket-helpers.c', qom, io, chardev],
-+      'test-qdev-global-props': [qom, hwcore, testqapi]
-+    }
-+  endif
-+endif
-+
-+if 'CONFIG_TSAN' not in config_host and \
-+   'CONFIG_GUEST_AGENT' in config_host and \
-+   'CONFIG_LINUX' in config_host
-+  tests += {'test-qga': ['qtest/libqtest.c']}
-+  test_deps += {'test-qga': qga}
-+endif
-+
-+test_env = environment()
-+test_env.set('G_TEST_SRCDIR', meson.current_source_dir())
-+test_env.set('G_TEST_BUILDDIR', meson.current_build_dir())
-+
-+foreach test_name, extra: tests
-+  src = [test_name + '.c']
-+  deps = [qemuutil]
-+  if extra.length() > 0
-+    # use a sourceset to quickly separate sources and deps
-+    test_ss = ss.source_set()
-+    test_ss.add(extra)
-+    src += test_ss.all_sources()
-+    deps += test_ss.all_dependencies()
-+  endif
-+  exe = executable(test_name, src, dependencies: deps)
-+
-+  test(test_name, exe,
-+       depends: test_deps.get(test_name, []),
-+       env: test_env,
-+       args: ['--tap', '-k'],
-+       protocol: 'tap',
-+       suite: ['unit'])
-+endforeach
-+
- if have_system and 'CONFIG_POSIX' in config_host
-   subdir('qemu-iotests')
- endif
-diff --git a/tests/test-qga.c b/tests/test-qga.c
-index 65d7992edc..c1b173b3cb 100644
---- a/tests/test-qga.c
-+++ b/tests/test-qga.c
-@@ -4,7 +4,7 @@
- #include <sys/socket.h>
- #include <sys/un.h>
- 
--#include "libqos/libqtest.h"
-+#include "qtest/libqos/libqtest.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qlist.h"
- 
--- 
-2.26.2
-
-
+> ---
+>  include/hw/pci/pci.h | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+>
+> diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+> index 4ca7258b5b7..896cef9ad47 100644
+> --- a/include/hw/pci/pci.h
+> +++ b/include/hw/pci/pci.h
+> @@ -788,8 +788,7 @@ static inline AddressSpace *pci_get_address_space(PCI=
+Device *dev)
+>  static inline int pci_dma_rw(PCIDevice *dev, dma_addr_t addr,
+>                               void *buf, dma_addr_t len, DMADirection dir=
+)
+>  {
+> -    dma_memory_rw(pci_get_address_space(dev), addr, buf, len, dir);
+> -    return 0;
+> +    return dma_memory_rw(pci_get_address_space(dev), addr, buf, len, dir=
+);
+>  }
+>
+>  static inline int pci_dma_read(PCIDevice *dev, dma_addr_t addr,
+> --
+> 2.26.2
+>
+>
 
