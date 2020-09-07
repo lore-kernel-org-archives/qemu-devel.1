@@ -2,100 +2,69 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BDBC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8201CC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:56:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3631E207C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:52:37 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3631E207C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id D16CC20C09
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:56:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="VGFAVYYn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16CC20C09
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56968 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60698 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFFhM-00075e-3o
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:52:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38940)
+	id 1kFFlD-0000NG-1d
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:56:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kFFbs-0008Fk-GP; Mon, 07 Sep 2020 07:46:56 -0400
-Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:52419)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kFFkd-0008Nz-Il
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:55:59 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:60845)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kFFbq-00042K-0x; Mon, 07 Sep 2020 07:46:56 -0400
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
- by mailnew.west.internal (Postfix) with ESMTP id 8A1F8B54;
- Mon,  7 Sep 2020 07:46:51 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute7.internal (MEProxy); Mon, 07 Sep 2020 07:46:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=yI98meNgXpSXP6oYF6Pj/O94m9Y
- DRygprgitjLkmenA=; b=nL3OKerMBqTnr5+qmSWmhTp3GrdYYfRN5c2PyqwhM9L
- Gw1OtRRNbgaIHJpXm7aLcJvZ0I1ZVQbdgZKeuSHZgU53zaS93iDu1JrH3Vv+WJAq
- Ko4QC8dvdSswkNm73Ec8af6yDqfGve7j6agTpj4lEpgSaTM1h8SPnkzKoMW3M0AI
- Zlu7DdKREdyBhJd85RP86fPiKal2yuQtXQqeI/y+rvytZvLQbBG2nvtoXttMdI7m
- VVBqDj3X64WWGXrV/m+BFWroavYmai0aAZW4nkQvt3FUoZJXqd5wSSzRNLxLCq3V
- dc0j8ChEdfJ9kJrFq3INAWy4B34eUEy6A5d5ko4Xh+w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=yI98me
- NgXpSXP6oYF6Pj/O94m9YDRygprgitjLkmenA=; b=JMd8as1KUYGCiEMyfSRDPJ
- z3A9M0QfFgY7nicrtzjirJoewCL3uaZg+QxUo5nAnDEYTK14Sj+F27kqdc4Ti957
- WMm8LoLNtCD0kTOrkhah8kdiwspwYen13Yj1hMV012yMNzp2wUDzyH9vXpABmJy2
- b5BC29QQ1tLoCfQqiIYLEGivV20IIWUIjR7QcvgGE0aVhGJWitw1DfPlAy4IJwNI
- NQA/3xoVt0nMx4Gc4r2gIPK8FL7j6rdLA4GnqMS2fPoAsGmeRgAW9Gi+W732hBXE
- hlFoOt/qYzIoEExVHEJLR83l1sB+4sXj8VIfhIY47Vz0EzhEolFyJO2LYDARK/sA
- ==
-X-ME-Sender: <xms:qB1WX06WYjacbdFNiMdtG3JvvpZVt_lNehAEbVBVIEcoYUcqRD8geQ>
- <xme:qB1WX14v4jaZXUswGl7Xb9GZ4RqX8Qb1GwfjPrbxMRsFrd4scuKOYXq_jRjfm6wu9
- j1fDyFkI50njIhTV2M>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrudehtddggeehucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:qB1WXzf35LrPhUNA4xwlLdGPnaazDkEIvBM0Rx9JQ1tW0bI8ZSGS6A>
- <xmx:qB1WX5IYMCdqGOBHa3wOmjZir-hLLZAq_qKf5lxX7SelBH_-xgx5ug>
- <xmx:qB1WX4JmaWSplumsfdXabWipG72zy0t6cqGIqVG8dFBdnr1Xjrro7g>
- <xmx:qh1WXw8r-pp5OzlnRUTOaO7tbbVKFJ8DdNaxV_JDoTgjg2IuLeDl2Ro1CIZMG_Md>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 9B1963064610;
- Mon,  7 Sep 2020 07:46:47 -0400 (EDT)
-Date: Mon, 7 Sep 2020 13:46:45 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH] MAINTAINERS: add Stefan Hajnoczi as block/nvme.c
- maintainer
-Message-ID: <20200907114645.GA742971@apples.localdomain>
-References: <20200907111632.90499-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kFFkb-00056F-PX
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:55:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=sy46r6N/qldJM0oiTrG3457funHCL0XsA6nfl3DcEjs=; b=VGFAVYYnp6fCx9X1KUuHsYeNvg
+ pNuNPpexxH0lVw3ZSB/1lVwYXldeoqMQY807nxWNNzgSOwhbcAmJ5LOHnOTWqlS8bZL6sAxermlZE
+ umoztamwFKJR/f5KZrLoV8gBbHaaYG6ghys+ISrGFv/iZWoWRP7npN84KrUxCRixy+AaZCvxQQNqj
+ p+W4e+Vd/agEUqa9lsyQhG4hAr1OQejROWfB0qaYw7luHQRWq8Ij5EuN8TTXEwryKxBVpsU9Bfi2c
+ 2Tn2U3EKef5rbh+G8vuwFpDu8dXm2AaXxXft/f0kjLOz6+IeS1bxe3KAqmUfd7sIlM0h3bmsfdbSz
+ vQiOFS2w==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] 9pfs: disable msize warning for synth driver
+Date: Mon, 07 Sep 2020 13:55:52 +0200
+Message-ID: <1773061.9aR6DczYlW@silver>
+In-Reply-To: <20200907115758.70366924@bahia.lan>
+References: <E1kEyDy-0006nN-5A@lizzy.crudebyte.com>
+ <20200907115758.70366924@bahia.lan>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="d6Gm4EdcadzBjdND"
-Content-Disposition: inline
-In-Reply-To: <20200907111632.90499-1-stefanha@redhat.com>
-Received-SPF: pass client-ip=64.147.123.18; envelope-from=its@irrelevant.dk;
- helo=wnew4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 06:50:30
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 07:55:54
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,48 +78,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Fam Zheng <fam@euphon.net>, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Montag, 7. September 2020 11:57:58 CEST Greg Kurz wrote:
+> On Sun, 6 Sep 2020 18:50:32 +0200
+> 
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > Previous patch introduced a performance warning being logged on host
+> > side if client connected with an 'msize' <= 8192. Disable this
+> > performance warning for the synth driver to prevent that warning from
+> > being printed whenever the 9pfs (qtest) test cases are running.
+> > 
+> > Introduce a new export flag V9FS_NO_PERF_WARN for that purpose, which
+> > might also be used to disable such warnings from the CLI in future.
+> > 
+> > We could have also prevented the warning by simply raising P9_MAX_SIZE
+> > in virtio-9p-test.c to any value larger than 8192, however in the
+> > context of test cases it makes sense running for edge cases, which
+> > includes the lowest 'msize' value supported by the server which is
+> > 4096, hence we want to preserve an msize of 4096 for the test client.
+> > 
+> > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > ---
+> 
+> Heh, yes I guess it makes sense :)
+> 
+> I guess you could maybe queue this patch before the other one.
+> 
+> Reviewed-by: Greg Kurz <groug@kaod.org>
 
---d6Gm4EdcadzBjdND
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks!
 
-On Sep  7 12:16, Stefan Hajnoczi wrote:
-> Development of the userspace NVMe block driver picked up again recently.
-> After talking with Fam I am stepping up as block/nvme.c maintainer.
-> Patches will be merged through my 'block' tree.
->=20
-> Cc: Kevin Wolf <kwolf@redhat.com>
-> Cc: Klaus Jensen <k.jensen@samsung.com>
-> Cc: Fam Zheng <fam@euphon.net>
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+BTW, have you ever tried dealing with patchwork client's 'state' feature for 
+already transmited patches on the list (new, rejected, etc.)?
 
-I'm only superficially involved in block/nvme, so my Ack doesn't carry
-that much weight, but
+Not that there were many 9p patches for actually needing that; just curious if 
+that's an LKML only feature.
 
-Acked-by: Klaus Jensen <k.jensen@samsung.com>
+Best regards,
+Christian Schoenebeck
 
---d6Gm4EdcadzBjdND
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9WHaMACgkQTeGvMW1P
-Dendcgf+N9qgTrOXd5jXrQQk+0b10CsJa8ynAbpzxyMNn0fQzYzk6Coc8o33bSi2
-sXiogPRRKdDZTSpsy4IlsPV8V7mO5LrrS5MWjpZ/2cvm/tr0LX6cCDyiA3u6L23c
-pxCgHyy73bxP7mBJnuzbaBgWqX7da+XJdzkupVsWdPG9GCsM9fhkxrANPsI0dWEn
-q0PhGt3LgZyxOEMjTehl5DDOgV3xLg+/FBMEau4u/ccEWsGJaps69+9ubgynaxGX
-s8KoqcrQlfsXz6CIe3rOdEf/ChDWkf6QDumYVpiw7GWrA1iHthzVBaGy73UCbUQX
-2qeY1t/IeeFdzVNI1aZFRKgN1p9YMw==
-=xR2x
------END PGP SIGNATURE-----
-
---d6Gm4EdcadzBjdND--
 
