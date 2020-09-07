@@ -7,81 +7,83 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E157C43461
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 930B5C2BB84
 	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:11:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5D042177B
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:11:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 427CA217BA
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:11:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hie/+Zjv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5D042177B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IWD/Bspy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 427CA217BA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFF3T-0004IA-VS
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:11:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58548)
+	id 1kFF3U-0004H0-4y
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:11:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58742)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF20-0001m6-DV
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29060)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2A-00026M-47
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:02 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:41404
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF1w-0007qw-AK
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:09:52 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF27-0007tX-PY
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599476987;
+ s=mimecast20190719; t=1599476999;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Rc+nxY/9Fk45mPh1kIaSKYBaI04ecu+BUAOSf6xV8tM=;
- b=Hie/+Zjv6Dc3tFPwtlkd+pgnMRZhnChslKoZf/wirPcHRqSqYmbzREGh7LdINWiRbdTa7G
- yeO+07/CcSoHdCixgSIQSQLtcS857ixuTPjpdk9xJ8fwAg5HA5WfT1eY8ktQpOB3iPosEF
- R9QpoyEd/5g0pRhMaXCUpo1magM3jdY=
+ bh=X+14JoWNtBaxhfOpoEnDB11TLZjZj+7qSIWGgBuwgPs=;
+ b=IWD/Bspy5NX43unIBUv4mnt3up92w6q8+WW0wxVxVCWUHuFgY5bciCL4dIuDC8ZieYY6gW
+ HY/Ebp20/7R4qH9LXK79WNNZjBTM1Ca5Sdja/QLRfPtiNp0VLpXM4bDCpv8100uq5ObqGY
+ svOdTOcznmsj1gnMusml15StK4vygG4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-psTvn1WrNRSJEeRx-5HAUQ-1; Mon, 07 Sep 2020 07:09:45 -0400
-X-MC-Unique: psTvn1WrNRSJEeRx-5HAUQ-1
+ us-mta-452-3D3hgmuEPLCZV42rn0YU0A-1; Mon, 07 Sep 2020 07:09:56 -0400
+X-MC-Unique: 3D3hgmuEPLCZV42rn0YU0A-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7272E1007466;
- Mon,  7 Sep 2020 11:09:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF5BD1007470;
+ Mon,  7 Sep 2020 11:09:55 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7FCF77E43B;
- Mon,  7 Sep 2020 11:09:43 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8FD67E43C;
+ Mon,  7 Sep 2020 11:09:54 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 02/64] block/nvme: Replace magic value by SCALE_MS definition
-Date: Mon,  7 Sep 2020 13:08:34 +0200
-Message-Id: <20200907110936.261684-3-kwolf@redhat.com>
+Subject: [PULL 11/64] block/nvme: Replace qemu_try_blockalign(bs) by
+ qemu_try_memalign(pg_sz)
+Date: Mon,  7 Sep 2020 13:08:43 +0200
+Message-Id: <20200907110936.261684-12-kwolf@redhat.com>
 In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
 References: <20200907110936.261684-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.003
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:52:11
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
 X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,30 +103,73 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Use self-explicit SCALE_MS definition instead of magic value.
+qemu_try_blockalign() is a generic API that call back to the
+block driver to return its page alignment. As we call from
+within the very same driver, we already know to page alignment
+stored in our state. Remove indirections and use the value from
+BDRVNVMeState.
+This change is required to later remove the BlockDriverState
+argument, to make nvme_init_queue() per hardware, and not per
+block driver.
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200821195359.1285345-2-philmd@redhat.com>
+Message-Id: <20200821195359.1285345-11-philmd@redhat.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- block/nvme.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ block/nvme.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/block/nvme.c b/block/nvme.c
-index 05485fdd11..a2b006be56 100644
+index 60e39b69a2..0c8ad1d60b 100644
 --- a/block/nvme.c
 +++ b/block/nvme.c
-@@ -715,7 +715,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-     /* Reset device to get a clean state. */
-     s->regs->cc = cpu_to_le32(le32_to_cpu(s->regs->cc) & 0xFE);
-     /* Wait for CSTS.RDY = 0. */
--    deadline = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + timeout_ms * 1000000ULL;
-+    deadline = qemu_clock_get_ns(QEMU_CLOCK_REALTIME) + timeout_ms * SCALE_MS;
-     while (le32_to_cpu(s->regs->csts) & 0x1) {
-         if (qemu_clock_get_ns(QEMU_CLOCK_REALTIME) > deadline) {
-             error_setg(errp, "Timeout while waiting for device to reset (%"
+@@ -174,7 +174,7 @@ static void nvme_init_queue(BlockDriverState *bs, NVMeQueue *q,
+ 
+     bytes = ROUND_UP(nentries * entry_bytes, s->page_size);
+     q->head = q->tail = 0;
+-    q->queue = qemu_try_blockalign(bs, bytes);
++    q->queue = qemu_try_memalign(s->page_size, bytes);
+     if (!q->queue) {
+         error_setg(errp, "Cannot allocate queue");
+         return;
+@@ -223,7 +223,7 @@ static NVMeQueuePair *nvme_create_queue_pair(BlockDriverState *bs,
+     if (!q) {
+         return NULL;
+     }
+-    q->prp_list_pages = qemu_try_blockalign(bs,
++    q->prp_list_pages = qemu_try_memalign(s->page_size,
+                                           s->page_size * NVME_NUM_REQS);
+     if (!q->prp_list_pages) {
+         goto fail;
+@@ -522,7 +522,7 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
+         .cdw10 = cpu_to_le32(0x1),
+     };
+ 
+-    id = qemu_try_blockalign(bs, sizeof(*id));
++    id = qemu_try_memalign(s->page_size, sizeof(*id));
+     if (!id) {
+         error_setg(errp, "Cannot allocate buffer for identify response");
+         goto out;
+@@ -1141,7 +1141,7 @@ static int nvme_co_prw(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+         return nvme_co_prw_aligned(bs, offset, bytes, qiov, is_write, flags);
+     }
+     trace_nvme_prw_buffered(s, offset, bytes, qiov->niov, is_write);
+-    buf = qemu_try_blockalign(bs, bytes);
++    buf = qemu_try_memalign(s->page_size, bytes);
+ 
+     if (!buf) {
+         return -ENOMEM;
+@@ -1285,7 +1285,7 @@ static int coroutine_fn nvme_co_pdiscard(BlockDriverState *bs,
+ 
+     assert(s->nr_queues > 1);
+ 
+-    buf = qemu_try_blockalign(bs, s->page_size);
++    buf = qemu_try_memalign(s->page_size, s->page_size);
+     if (!buf) {
+         return -ENOMEM;
+     }
 -- 
 2.25.4
 
