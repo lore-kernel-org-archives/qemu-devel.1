@@ -2,140 +2,62 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A93C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 19:47:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F170EC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 19:50:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 743F621532
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 19:47:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LqV/ZOw3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 743F621532
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 56CF821532
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 19:50:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56CF821532
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFN70-0004LB-K0
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 15:47:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58368)
+	id 1kFN9U-0006HF-87
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 15:50:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58526)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFN65-0003gm-Bn
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 15:46:37 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:22683
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFN63-00069U-7D
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 15:46:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599507994;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=s0aJSzprLOcOzx03or6Da6vqQb9tdGcU5CLWmCvMngs=;
- b=LqV/ZOw39xaWcKzsirgq+8qodV0a9F9z6Wx5lsLIYFC+JZ8ToX0S5e0BKU57K7O2iPvfRx
- tmdf74aqbRDwRAchoLi0FcvzTRiDUSjkjA2KPFpc2Y2kzFOAdHynApubMbnMGjSyDRg3PA
- DPudsmxO9PlX/Xor2PRgpK5IacT+5Nk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-g9KB1flUN7mIUuF-CzxRQQ-1; Mon, 07 Sep 2020 15:46:32 -0400
-X-MC-Unique: g9KB1flUN7mIUuF-CzxRQQ-1
-Received: by mail-wr1-f71.google.com with SMTP id r15so6002584wrt.8
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 12:46:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=s0aJSzprLOcOzx03or6Da6vqQb9tdGcU5CLWmCvMngs=;
- b=Svf2tjBi8dp0WjlZhBcPTXU3i1h+RMpF6lzpYY3qNNioH/F8AYBpYYv5Zfy20iUjwS
- o1I3cZzeOed0GnwXNWU6JSJj3/G0DQkyTmoXoImcp81FvX+X0njKCdcewDH9ViqWhJc1
- ZePjFiHy2HsQaZQ8H0lzRO46m8GaJKx97VXrzjZYgw4SkxRIyWpV9tll6hJAoISZqrYh
- vqpVt11psInvrPS81e6GoVczCAkc+WgPKstucyieN48vknz8j70FqueKCSvsECAP0ZkM
- ZViHoYcxBgpN5Rm9KtqAN9lfTBr3Pk1gOnfkw5FJ9ThMHphLLgL8r/JuvTeCGVl9Nw/I
- gejA==
-X-Gm-Message-State: AOAM533s+Chx+UP11Lbh/KO6qxyFcQfdvHNIWH5u9EwJyt952R2JXw08
- A4+2EigeNzfc1N6cBNCGOocTbNhd2Quf7c3VuPkAmHugd07P7NQ8tml3yDX2BjEHFKHyL5dGWzT
- VVHudUnMZUS58QHA=
-X-Received: by 2002:a05:600c:2118:: with SMTP id
- u24mr807808wml.59.1599507991104; 
- Mon, 07 Sep 2020 12:46:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzoOdABf7dkO9kUVgfMoOcQxZVzNcRB6E1dwpfGJg99SdTw9YgiQ8Ic8a9sL8kseJW5T9NyRQ==
-X-Received: by 2002:a05:600c:2118:: with SMTP id
- u24mr807777wml.59.1599507990807; 
- Mon, 07 Sep 2020 12:46:30 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id u66sm28680116wmg.44.2020.09.07.12.46.29
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Sep 2020 12:46:30 -0700 (PDT)
-Subject: Re: [PULL 00/30] ppc-for-5.2 queue 20200904
-To: Laurent Vivier <lvivier@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
- <CAFEAcA8xCpRBcsCaozEXnCuM5SqWr5ZEDrwLjs+8va=316_70Q@mail.gmail.com>
- <20200907023800.GJ341806@yekko.fritz.box>
- <675253df-b750-1a0a-5447-9dadef1accba@redhat.com>
- <7c287125-70b3-4330-fd5c-8e644e1c347d@redhat.com>
- <ffee957d-0428-d167-c1ab-3fe67b4d8c7c@redhat.com>
- <20200907165132.683d2880.cohuck@redhat.com>
- <f93673f9-3e83-ef5f-9628-819b25908e43@redhat.com>
- <77b63a31-48a8-c77f-9956-7511db170594@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <0bca4e6e-f4ba-2108-ecaf-c3daaadbdb26@redhat.com>
-Date: Mon, 7 Sep 2020 21:46:28 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>)
+ id 1kFN7D-0004hh-O3; Mon, 07 Sep 2020 15:47:47 -0400
+Received: from relay64.bu.edu ([128.197.228.104]:41507)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>)
+ id 1kFN7A-0006Eu-Bx; Mon, 07 Sep 2020 15:47:47 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 087JlBfo008061
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Mon, 7 Sep 2020 15:47:14 -0400
+Date: Mon, 7 Sep 2020 15:47:11 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Havard Skinnemoen <hskinnemoen@google.com>
+Subject: Re: [PATCH v8 08/14] hw/nvram: NPCM7xx OTP device model
+Message-ID: <20200907194711.gqvtntqab2yt5gco@mozz.bu.edu>
+References: <20200825001711.1340443-1-hskinnemoen@google.com>
+ <20200825001711.1340443-9-hskinnemoen@google.com>
 MIME-Version: 1.0
-In-Reply-To: <77b63a31-48a8-c77f-9956-7511db170594@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.003
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.825, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200825001711.1340443-9-hskinnemoen@google.com>
+Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
+ helo=relay64.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 15:47:43
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -148,160 +70,685 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- Greg Kurz <groug@kaod.org>, QEMU Developers <qemu-devel@nongnu.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Cc: peter.maydell@linaro.org, f4bug@amsat.org, qemu-devel@nongnu.org,
+ kfting@nuvoton.com, qemu-arm@nongnu.org, Avi.Fishman@nuvoton.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/7/20 7:26 PM, Laurent Vivier wrote:
-> On 07/09/2020 18:29, Laurent Vivier wrote:
->> On 07/09/2020 16:51, Cornelia Huck wrote:
->>> On Mon, 7 Sep 2020 16:31:24 +0200
->>> Laurent Vivier <lvivier@redhat.com> wrote:
->>>
->>>> On 07/09/2020 16:05, Philippe Mathieu-Daudé wrote:
->>>>> Hi Thiago,
->>>>>
->>>>> On 9/7/20 3:29 PM, Laurent Vivier wrote:  
->>>>>> On 07/09/2020 04:38, David Gibson wrote:  
->>>>>>> On Sun, Sep 06, 2020 at 04:20:10PM +0100, Peter Maydell wrote:  
->>>
->>>>>>>> The 'check-tcg' tests for the linux-user static build also
->>>>>>>> failed on an s390x test:
->>>>>>>>
->>>>>>>>   CHECK   debian-s390x-cross
->>>>>>>>   BUILD   s390x-linux-user guest-tests with docker qemu/debian-s390x-cross
->>>>>>>>   RUN     tests for s390x
->>>>>>>>   TEST    threadcount on s390x
->>>>>>>> Unhandled trap: 0x10003  
->>>>>>
->>>>>> This is EXCP_HALTED (include/exec/cpu-all.h)
->>>>>>
->>>>>> The message error comes from cpu_loop() in linux-user/s390x/cpu_loop.c.
->>>>>>
->>>>>> The trap can only come from accel/tcg/cpu-exec.c
->>>>>>
->>>>>>     679 int cpu_exec(CPUState *cpu)
->>>>>>     680 {
->>>>>> ...
->>>>>>     688     if (cpu_handle_halt(cpu)) {
->>>>>>     689         return EXCP_HALTED;
->>>>>>     690     }
->>>>>>
->>>>>> and
->>>>>>
->>>>>>     428 static inline bool cpu_handle_halt(CPUState *cpu)
->>>>>>     429 {
->>>>>>     430     if (cpu->halted) {
->>>>>> ...
->>>>>>     441         if (!cpu_has_work(cpu)) {
->>>>>>     442             return true;
->>>>>>     443         }
->>>>>>
->>>>>> and
->>>>>>
->>>>>>      58 static bool s390_cpu_has_work(CPUState *cs)
->>>>>>      59 {
->>>>>>      60     S390CPU *cpu = S390_CPU(cs);
->>>>>>      61
->>>>>>      62     /* STOPPED cpus can never wake up */
->>>>>>      63     if (s390_cpu_get_state(cpu) != S390_CPU_STATE_LOAD &&
->>>>>>      64         s390_cpu_get_state(cpu) != S390_CPU_STATE_OPERATING) {
->>>>>>      65         return false;
->>>>>>      66     }
->>>>>>      67
->>>>>>      68     if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
->>>>>>      69         return false;
->>>>>>      70     }
->>>>>>      71
->>>>>>      72     return s390_cpu_has_int(cpu);
->>>>>>      73 }
->>>>>>
->>>>>> and in target/s390x/cpu.h:
->>>>>>
->>>>>>     772 #ifndef CONFIG_USER_ONLY
->>>>>>     773 unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU *cpu);
->>>>>>     774 #else
->>>>>>     775 static inline unsigned int s390_cpu_set_state(uint8_t cpu_state,
->>>>>> S390CPU *cpu)
->>>>>>     776 {
->>>>>>     777     return 0;
->>>>>>     778 }
->>>>>>     779 #endif /* CONFIG_USER_ONLY */
->>>>>>     780 static inline uint8_t s390_cpu_get_state(S390CPU *cpu)
->>>>>>     781 {
->>>>>>     782     return cpu->env.cpu_state;
->>>>>>     783 }
->>>>>>
->>>>>> As cpu_state is never set, perhaps in case of linux-user it should
->>>>>> always return S390_CPU_STATE_OPERATING?
->>>
->>> Possibly, we should not have any state handling for linux-user.
->>>
->>
->> I did that, but now 390_cpu_has_work() is false because
->> CPU_INTERRUPT_HARD is not set in cs->interrupt_request.
->>
->> I think we should not enter in cpu_loop() with halted set to 1.
->>
->> Before the patch of this series, s390_cpu_reset() is called twice, and
->> on the second call, halted is already 0.
->>
->> With start_powered_off set to true in initfn, on the first reset
->> "halted" is 0 and on the second it is 1 (because it has been copied from
->> start_powered_off) and so cpu_loop() starts with halted set to 1 and fails.
+On 200824 1717, Havard Skinnemoen via wrote:
+> This supports reading and writing OTP fuses and keys. Only fuse reading
+> has been tested. Protection is not implemented.
 > 
-> What is happening:
+> Reviewed-by: Avi Fishman <avi.fishman@nuvoton.com>
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+> ---
+>  include/hw/arm/npcm7xx.h       |   3 +
+>  include/hw/nvram/npcm7xx_otp.h |  79 ++++++
+>  hw/arm/npcm7xx.c               |  29 +++
+>  hw/nvram/npcm7xx_otp.c         | 439 +++++++++++++++++++++++++++++++++
+>  hw/nvram/meson.build           |   1 +
+>  5 files changed, 551 insertions(+)
+>  create mode 100644 include/hw/nvram/npcm7xx_otp.h
+>  create mode 100644 hw/nvram/npcm7xx_otp.c
 > 
-> [without start_powered_off]
-> 
->   1- halted is set to 1 in s390x_cpu_initfn()
->   2- halted is set to 0 in s390x_cpu_reset() by parent_reset()
->      (cpu_common_reset()
->   3- cpu_loop() is always entered with halted set to 0
-> 
-> [with start_powered_off]
-> 
->   1- halted is set to start_powered_off (1) in s390x_cpu_reset() by
->      parent_reset() (cpu_common_reset()
->   2- cpu_loop() is always entered with halted set to 1
-> 
-> So in the first case, cpu_loop() is always started with halted set to 0
-> and in the second case with halted set to 1.
-> 
-> And I think, with linux-user, it should never be started with halted set
-> to 1.
-> 
-> We can't add a "#ifdef CONFIG_USER_ONLY" in hw/core/cpu.c to set halted
-> to 0 because it is in the common files, but we can do:
-> 
-> diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> index 73d7d6007e8e..749cd548f0f3 100644
-> --- a/target/s390x/cpu.c
-> +++ b/target/s390x/cpu.c
-> @@ -291,9 +291,9 @@ static void s390_cpu_initfn(Object *obj)
->      S390CPU *cpu = S390_CPU(obj);
-> 
->      cpu_set_cpustate_pointers(cpu);
-> -    cs->start_powered_off = true;
->      cs->exception_index = EXCP_HLT;
->  #if !defined(CONFIG_USER_ONLY)
-> +    cs->start_powered_off = true;
->      object_property_add(obj, "crash-information", "GuestPanicInformation",
->                          s390_cpu_get_crash_info_qom, NULL, NULL, NULL);
->      cpu->env.tod_timer =
+> diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
+> index ba7495869d..5816a07a72 100644
+> --- a/include/hw/arm/npcm7xx.h
+> +++ b/include/hw/arm/npcm7xx.h
+> @@ -20,6 +20,7 @@
+>  #include "hw/cpu/a9mpcore.h"
+>  #include "hw/misc/npcm7xx_clk.h"
+>  #include "hw/misc/npcm7xx_gcr.h"
+> +#include "hw/nvram/npcm7xx_otp.h"
+>  #include "hw/timer/npcm7xx_timer.h"
+>  #include "target/arm/cpu.h"
+>  
+> @@ -68,6 +69,8 @@ typedef struct NPCM7xxState {
+>      NPCM7xxGCRState     gcr;
+>      NPCM7xxCLKState     clk;
+>      NPCM7xxTimerCtrlState tim[3];
+> +    NPCM7xxOTPState     key_storage;
+> +    NPCM7xxOTPState     fuse_array;
+>  } NPCM7xxState;
+>  
+>  #define TYPE_NPCM7XX    "npcm7xx"
+> diff --git a/include/hw/nvram/npcm7xx_otp.h b/include/hw/nvram/npcm7xx_otp.h
+> new file mode 100644
+> index 0000000000..156bbd151a
+> --- /dev/null
+> +++ b/include/hw/nvram/npcm7xx_otp.h
+> @@ -0,0 +1,79 @@
+> +/*
+> + * Nuvoton NPCM7xx OTP (Fuse Array) Interface
+> + *
+> + * Copyright 2020 Google LLC
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License as published by the
+> + * Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+> + * for more details.
+> + */
+> +#ifndef NPCM7XX_OTP_H
+> +#define NPCM7XX_OTP_H
+> +
+> +#include "exec/memory.h"
+> +#include "hw/sysbus.h"
+> +
+> +/* Each OTP module holds 8192 bits of one-time programmable storage */
+> +#define NPCM7XX_OTP_ARRAY_BITS (8192)
+> +#define NPCM7XX_OTP_ARRAY_BYTES (NPCM7XX_OTP_ARRAY_BITS / BITS_PER_BYTE)
+> +
+> +/* Fuse array offsets */
+> +#define NPCM7XX_FUSE_FUSTRAP (0)
+> +#define NPCM7XX_FUSE_CP_FUSTRAP (12)
+> +#define NPCM7XX_FUSE_DAC_CALIB (16)
+> +#define NPCM7XX_FUSE_ADC_CALIB (24)
+> +#define NPCM7XX_FUSE_DERIVATIVE (64)
+> +#define NPCM7XX_FUSE_TEST_SIG (72)
+> +#define NPCM7XX_FUSE_DIE_LOCATION (74)
+> +#define NPCM7XX_FUSE_GP1 (80)
+> +#define NPCM7XX_FUSE_GP2 (128)
+> +
+> +/*
+> + * Number of registers in our device state structure. Don't change this without
+> + * incrementing the version_id in the vmstate.
+> + */
+> +#define NPCM7XX_OTP_NR_REGS (0x18 / sizeof(uint32_t))
+> +
+> +/**
+> + * struct NPCM7xxOTPState - Device state for one OTP module.
+> + * @parent: System bus device.
+> + * @mmio: Memory region through which registers are accessed.
+> + * @regs: Register contents.
+> + * @array: OTP storage array.
+> + */
+> +typedef struct NPCM7xxOTPState {
+> +    SysBusDevice parent;
+> +
+> +    MemoryRegion mmio;
+> +    uint32_t regs[NPCM7XX_OTP_NR_REGS];
+> +    uint8_t array[NPCM7XX_OTP_ARRAY_BYTES];
+> +} NPCM7xxOTPState;
+> +
+> +#define TYPE_NPCM7XX_OTP "npcm7xx-otp"
+> +#define NPCM7XX_OTP(obj) OBJECT_CHECK(NPCM7xxOTPState, (obj), TYPE_NPCM7XX_OTP)
+> +
+> +#define TYPE_NPCM7XX_KEY_STORAGE "npcm7xx-key-storage"
+> +#define TYPE_NPCM7XX_FUSE_ARRAY "npcm7xx-fuse-array"
+> +
+> +typedef struct NPCM7xxOTPClass NPCM7xxOTPClass;
+> +
+> +/**
+> + * npcm7xx_otp_array_write - ECC encode and write data to OTP array.
+> + * @s: OTP module.
+> + * @data: Data to be encoded and written.
+> + * @offset: Offset of first byte to be written in the OTP array.
+> + * @len: Number of bytes before ECC encoding.
+> + *
+> + * Each nibble of data is encoded into a byte, so the number of bytes written
+> + * to the array will be @len * 2.
+> + */
+> +extern void npcm7xx_otp_array_write(NPCM7xxOTPState *s, const void *data,
+> +                                    unsigned int offset, unsigned int len);
+> +
+> +#endif /* NPCM7XX_OTP_H */
+> diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+> index 9669ac5fa0..9166002598 100644
+> --- a/hw/arm/npcm7xx.c
+> +++ b/hw/arm/npcm7xx.c
+> @@ -34,6 +34,10 @@
+>  #define NPCM7XX_MMIO_BA         (0x80000000)
+>  #define NPCM7XX_MMIO_SZ         (0x7ffd0000)
+>  
+> +/* OTP key storage and fuse strap array */
+> +#define NPCM7XX_OTP1_BA         (0xf0189000)
+> +#define NPCM7XX_OTP2_BA         (0xf018a000)
+> +
+>  /* Core system modules. */
+>  #define NPCM7XX_L2C_BA          (0xf03fc000)
+>  #define NPCM7XX_CPUP_BA         (0xf03fe000)
+> @@ -144,6 +148,20 @@ void npcm7xx_load_kernel(MachineState *machine, NPCM7xxState *soc)
+>      arm_load_kernel(&soc->cpu[0], machine, &npcm7xx_binfo);
+>  }
+>  
+> +static void npcm7xx_init_fuses(NPCM7xxState *s)
+> +{
+> +    NPCM7xxClass *nc = NPCM7XX_GET_CLASS(s);
+> +    uint32_t value;
+> +
+> +    /*
+> +     * The initial mask of disabled modules indicates the chip derivative (e.g.
+> +     * NPCM750 or NPCM730).
+> +     */
+> +    value = tswap32(nc->disabled_modules);
+> +    npcm7xx_otp_array_write(&s->fuse_array, &value, NPCM7XX_FUSE_DERIVATIVE,
+> +                            sizeof(value));
+> +}
+> +
+>  static qemu_irq npcm7xx_irq(NPCM7xxState *s, int n)
+>  {
+>      return qdev_get_gpio_in(DEVICE(&s->a9mpcore), n);
+> @@ -164,6 +182,10 @@ static void npcm7xx_init(Object *obj)
+>      object_property_add_alias(obj, "power-on-straps", OBJECT(&s->gcr),
+>                                "power-on-straps");
+>      object_initialize_child(obj, "clk", &s->clk, TYPE_NPCM7XX_CLK);
+> +    object_initialize_child(obj, "otp1", &s->key_storage,
+> +                            TYPE_NPCM7XX_KEY_STORAGE);
+> +    object_initialize_child(obj, "otp2", &s->fuse_array,
+> +                            TYPE_NPCM7XX_FUSE_ARRAY);
+>  
+>      for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
+>          object_initialize_child(obj, "tim[*]", &s->tim[i], TYPE_NPCM7XX_TIMER);
+> @@ -232,6 +254,13 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
+>      sysbus_realize(SYS_BUS_DEVICE(&s->clk), &error_abort);
+>      sysbus_mmio_map(SYS_BUS_DEVICE(&s->clk), 0, NPCM7XX_CLK_BA);
+>  
+> +    /* OTP key storage and fuse strap array. Cannot fail. */
+> +    sysbus_realize(SYS_BUS_DEVICE(&s->key_storage), &error_abort);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->key_storage), 0, NPCM7XX_OTP1_BA);
+> +    sysbus_realize(SYS_BUS_DEVICE(&s->fuse_array), &error_abort);
+> +    sysbus_mmio_map(SYS_BUS_DEVICE(&s->fuse_array), 0, NPCM7XX_OTP2_BA);
+> +    npcm7xx_init_fuses(s);
+> +
+>      /* Timer Modules (TIM). Cannot fail. */
+>      QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_tim_addr) != ARRAY_SIZE(s->tim));
+>      for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
+> diff --git a/hw/nvram/npcm7xx_otp.c b/hw/nvram/npcm7xx_otp.c
+> new file mode 100644
+> index 0000000000..ba4188ada8
+> --- /dev/null
+> +++ b/hw/nvram/npcm7xx_otp.c
+> @@ -0,0 +1,439 @@
+> +/*
+> + * Nuvoton NPCM7xx OTP (Fuse Array) Interface
+> + *
+> + * Copyright 2020 Google LLC
+> + *
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms of the GNU General Public License as published by the
+> + * Free Software Foundation; either version 2 of the License, or
+> + * (at your option) any later version.
+> + *
+> + * This program is distributed in the hope that it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+> + * for more details.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +
+> +#include "hw/nvram/npcm7xx_otp.h"
+> +#include "migration/vmstate.h"
+> +#include "qapi/error.h"
+> +#include "qemu/bitops.h"
+> +#include "qemu/log.h"
+> +#include "qemu/module.h"
+> +#include "qemu/units.h"
+> +
+> +/* Each module has 4 KiB of register space. Only a fraction of it is used. */
+> +#define NPCM7XX_OTP_REGS_SIZE (4 * KiB)
+> +
+> +/* 32-bit register indices. */
+> +typedef enum NPCM7xxOTPRegister {
+> +    NPCM7XX_OTP_FST,
+> +    NPCM7XX_OTP_FADDR,
+> +    NPCM7XX_OTP_FDATA,
+> +    NPCM7XX_OTP_FCFG,
+> +    /* Offset 0x10 is FKEYIND in OTP1, FUSTRAP in OTP2 */
+> +    NPCM7XX_OTP_FKEYIND = 0x0010 / sizeof(uint32_t),
+> +    NPCM7XX_OTP_FUSTRAP = 0x0010 / sizeof(uint32_t),
+> +    NPCM7XX_OTP_FCTL,
+> +    NPCM7XX_OTP_REGS_END,
+> +} NPCM7xxOTPRegister;
+> +
+> +/* Register field definitions. */
+> +#define FST_RIEN BIT(2)
+> +#define FST_RDST BIT(1)
+> +#define FST_RDY BIT(0)
+> +#define FST_RO_MASK (FST_RDST | FST_RDY)
+> +
+> +#define FADDR_BYTEADDR(rv) extract32((rv), 0, 10)
+> +#define FADDR_BITPOS(rv) extract32((rv), 10, 3)
+> +
+> +#define FDATA_CLEAR 0x00000001
+> +
+> +#define FCFG_FDIS BIT(31)
+> +#define FCFG_FCFGLK_MASK 0x00ff0000
+> +
+> +#define FCTL_PROG_CMD1 0x00000001
+> +#define FCTL_PROG_CMD2 0xbf79e5d0
+> +#define FCTL_READ_CMD 0x00000002
+> +
+> +/**
+> + * struct NPCM7xxOTPClass - OTP module class.
+> + * @parent: System bus device class.
+> + * @mmio_ops: MMIO register operations for this type of module.
+> + *
+> + * The two OTP modules (key-storage and fuse-array) have slightly different
+> + * behavior, so we give them different MMIO register operations.
+> + */
+> +struct NPCM7xxOTPClass {
+> +    SysBusDeviceClass parent;
+> +
+> +    const MemoryRegionOps *mmio_ops;
+> +};
+> +
+> +#define NPCM7XX_OTP_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(NPCM7xxOTPClass, (klass), TYPE_NPCM7XX_OTP)
+> +#define NPCM7XX_OTP_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(NPCM7xxOTPClass, (obj), TYPE_NPCM7XX_OTP)
+> +
+> +static uint8_t ecc_encode_nibble(uint8_t n)
+> +{
+> +    uint8_t result = n;
+> +
+> +    result |= (((n >> 0) & 1) ^ ((n >> 1) & 1)) << 4;
+> +    result |= (((n >> 2) & 1) ^ ((n >> 3) & 1)) << 5;
+> +    result |= (((n >> 0) & 1) ^ ((n >> 2) & 1)) << 6;
+> +    result |= (((n >> 1) & 1) ^ ((n >> 3) & 1)) << 7;
+> +
+> +    return result;
+> +}
+> +
+> +void npcm7xx_otp_array_write(NPCM7xxOTPState *s, const void *data,
+> +                             unsigned int offset, unsigned int len)
+> +{
+> +    const uint8_t *src = data;
+> +    uint8_t *dst = &s->array[offset];
+> +
+> +    while (len-- > 0) {
+> +        uint8_t c = *src++;
+> +
+> +        *dst++ = ecc_encode_nibble(extract8(c, 0, 4));
+> +        *dst++ = ecc_encode_nibble(extract8(c, 4, 4));
+> +    }
+> +}
+> +
+> +/* Common register read handler for both OTP classes. */
+> +static uint64_t npcm7xx_otp_read(NPCM7xxOTPState *s, NPCM7xxOTPRegister reg)
+> +{
+> +    uint32_t value = 0;
+> +
+> +    switch (reg) {
+> +    case NPCM7XX_OTP_FST:
+> +    case NPCM7XX_OTP_FADDR:
+> +    case NPCM7XX_OTP_FDATA:
+> +    case NPCM7XX_OTP_FCFG:
+> +        value = s->regs[reg];
+> +        break;
+> +
+> +    case NPCM7XX_OTP_FCTL:
+> +        qemu_log_mask(LOG_GUEST_ERROR,
+> +                      "%s: read from write-only FCTL register\n",
+> +                      DEVICE(s)->canonical_path);
+> +        break;
+> +
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: read from invalid offset 0x%zx\n",
+> +                      DEVICE(s)->canonical_path, reg * sizeof(uint32_t));
+> +        break;
+> +    }
+> +
+> +    return value;
+> +}
+> +
+> +/* Read a byte from the OTP array into the data register. */
+> +static void npcm7xx_otp_read_array(NPCM7xxOTPState *s)
+> +{
+> +    uint32_t faddr = s->regs[NPCM7XX_OTP_FADDR];
+> +
+> +    s->regs[NPCM7XX_OTP_FDATA] = s->array[FADDR_BYTEADDR(faddr)];
+> +    s->regs[NPCM7XX_OTP_FST] |= FST_RDST | FST_RDY;
+> +}
+> +
+> +/* Program a byte from the data register into the OTP array. */
+> +static void npcm7xx_otp_program_array(NPCM7xxOTPState *s)
+> +{
+> +    uint32_t faddr = s->regs[NPCM7XX_OTP_FADDR];
+> +
+> +    /* Bits can only go 0->1, never 1->0. */
+> +    s->array[FADDR_BYTEADDR(faddr)] |= (1U << FADDR_BITPOS(faddr));
+> +    s->regs[NPCM7XX_OTP_FST] |= FST_RDST | FST_RDY;
+> +}
+> +
+> +/* Compute the next value of the FCFG register. */
+> +static uint32_t npcm7xx_otp_compute_fcfg(uint32_t cur_value, uint32_t new_value)
+> +{
+> +    uint32_t lock_mask;
+> +    uint32_t value;
+> +
+> +    /*
+> +     * FCFGLK holds sticky bits 16..23, indicating which bits in FPRGLK (8..15)
+> +     * and FRDLK (0..7) that are read-only.
+> +     */
+> +    lock_mask = (cur_value & FCFG_FCFGLK_MASK) >> 8;
+> +    lock_mask |= lock_mask >> 8;
+> +    /* FDIS and FCFGLK bits are sticky (write 1 to set; can't clear). */
+> +    value = cur_value & (FCFG_FDIS | FCFG_FCFGLK_MASK);
+> +    /* Preserve read-only bits in FPRGLK and FRDLK */
+> +    value |= cur_value & lock_mask;
+> +    /* Set all bits that aren't read-only. */
+> +    value |= new_value & ~lock_mask;
+> +
+> +    return value;
+> +}
+> +
+> +/* Common register write handler for both OTP classes. */
+> +static void npcm7xx_otp_write(NPCM7xxOTPState *s, NPCM7xxOTPRegister reg,
+> +                              uint32_t value)
+> +{
+> +    switch (reg) {
+> +    case NPCM7XX_OTP_FST:
+> +        /* RDST is cleared by writing 1 to it. */
+> +        if (value & FST_RDST) {
+> +            s->regs[NPCM7XX_OTP_FST] &= ~FST_RDST;
+> +        }
+> +        /* Preserve read-only and write-one-to-clear bits */
+> +        value &= ~FST_RO_MASK;
+> +        value |= s->regs[NPCM7XX_OTP_FST] & FST_RO_MASK;
+> +        break;
+> +
+> +    case NPCM7XX_OTP_FADDR:
+> +        break;
+> +
+> +    case NPCM7XX_OTP_FDATA:
+> +        /*
+> +         * This register is cleared by writing a magic value to it; no other
+> +         * values can be written.
+> +         */
+> +        if (value == FDATA_CLEAR) {
+> +            value = 0;
+> +        } else {
+> +            value = s->regs[NPCM7XX_OTP_FDATA];
+> +        }
+> +        break;
+> +
+> +    case NPCM7XX_OTP_FCFG:
+> +        value = npcm7xx_otp_compute_fcfg(s->regs[NPCM7XX_OTP_FCFG], value);
+> +        break;
+> +
+> +    case NPCM7XX_OTP_FCTL:
+> +        switch (value) {
+> +        case FCTL_READ_CMD:
+> +            npcm7xx_otp_read_array(s);
+> +            break;
+> +
+> +        case FCTL_PROG_CMD1:
+> +            /*
+> +             * Programming requires writing two separate magic values to this
+> +             * register; this is the first one. Just store it so it can be
+> +             * verified later when the second magic value is received.
+> +             */
+> +            break;
+> +
+> +        case FCTL_PROG_CMD2:
+> +            /*
+> +             * Only initiate programming if we received the first half of the
+> +             * command immediately before this one.
+> +             */
+> +            if (s->regs[NPCM7XX_OTP_FCTL] == FCTL_PROG_CMD1) {
+> +                npcm7xx_otp_program_array(s);
+> +            }
+> +            break;
+> +
+> +        default:
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "%s: unrecognized FCNTL value 0x%" PRIx32 "\n",
+> +                          DEVICE(s)->canonical_path, value);
+> +            break;
+> +        }
+> +        if (value != FCTL_PROG_CMD1) {
+> +            value = 0;
+> +        }
+> +        break;
+> +
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR, "%s: write to invalid offset 0x%zx\n",
+> +                      DEVICE(s)->canonical_path, reg * sizeof(uint32_t));
+> +        return;
+> +    }
+> +
+> +    s->regs[reg] = value;
+> +}
+> +
+> +/* Register read handler specific to the fuse array OTP module. */
+> +static uint64_t npcm7xx_fuse_array_read(void *opaque, hwaddr addr,
+> +                                        unsigned int size)
+> +{
+> +    NPCM7xxOTPRegister reg = addr / sizeof(uint32_t);
+> +    NPCM7xxOTPState *s = opaque;
+> +    uint32_t value;
+> +
+> +    /*
+> +     * Only the Fuse Strap register needs special handling; all other registers
+> +     * work the same way for both kinds of OTP modules.
+> +     */
+> +    if (reg != NPCM7XX_OTP_FUSTRAP) {
+> +        value = npcm7xx_otp_read(s, reg);
+> +    } else {
+> +        /* FUSTRAP is stored as three copies in the OTP array. */
+> +        uint32_t fustrap[3];
+> +
+> +        memcpy(fustrap, &s->array[0], sizeof(fustrap));
+> +
+> +        /* Determine value by a majority vote on each bit. */
+> +        value = (fustrap[0] & fustrap[1]) | (fustrap[0] & fustrap[2]) |
+> +                (fustrap[1] & fustrap[2]);
+> +    }
+> +
+> +    return value;
+> +}
+> +
+> +/* Register write handler specific to the fuse array OTP module. */
+> +static void npcm7xx_fuse_array_write(void *opaque, hwaddr addr, uint64_t v,
+> +                                     unsigned int size)
+> +{
+> +    NPCM7xxOTPRegister reg = addr / sizeof(uint32_t);
+> +    NPCM7xxOTPState *s = opaque;
+> +
+> +    /*
+> +     * The Fuse Strap register is read-only. Other registers are handled by
+> +     * common code.
+> +     */
+> +    if (reg != NPCM7XX_OTP_FUSTRAP) {
+> +        npcm7xx_otp_write(s, reg, v);
+> +    }
+> +}
+> +
+> +static const MemoryRegionOps npcm7xx_fuse_array_ops = {
+> +    .read       = npcm7xx_fuse_array_read,
+> +    .write      = npcm7xx_fuse_array_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid      = {
+> +        .min_access_size        = 4,
+> +        .max_access_size        = 4,
+> +        .unaligned              = false,
+> +    },
+> +};
+> +
+> +/* Register read handler specific to the key storage OTP module. */
+> +static uint64_t npcm7xx_key_storage_read(void *opaque, hwaddr addr,
+> +                                         unsigned int size)
+> +{
+> +    NPCM7xxOTPRegister reg = addr / sizeof(uint32_t);
+> +    NPCM7xxOTPState *s = opaque;
+> +
+> +    /*
+> +     * Only the Fuse Key Index register needs special handling; all other
+> +     * registers work the same way for both kinds of OTP modules.
+> +     */
+> +    if (reg != NPCM7XX_OTP_FKEYIND) {
+> +        return npcm7xx_otp_read(s, reg);
+> +    }
+> +
+> +    qemu_log_mask(LOG_UNIMP, "%s: FKEYIND is not implemented\n", __func__);
+> +
+> +    return s->regs[NPCM7XX_OTP_FKEYIND];
+> +}
+> +
+> +/* Register write handler specific to the key storage OTP module. */
+> +static void npcm7xx_key_storage_write(void *opaque, hwaddr addr, uint64_t v,
+> +                                      unsigned int size)
+> +{
+> +    NPCM7xxOTPRegister reg = addr / sizeof(uint32_t);
+> +    NPCM7xxOTPState *s = opaque;
+> +
+> +    /*
+> +     * Only the Fuse Key Index register needs special handling; all other
+> +     * registers work the same way for both kinds of OTP modules.
+> +     */
+> +    if (reg != NPCM7XX_OTP_FKEYIND) {
+> +        npcm7xx_otp_write(s, reg, v);
+> +        return;
+> +    }
+> +
+> +    qemu_log_mask(LOG_UNIMP, "%s: FKEYIND is not implemented\n", __func__);
+> +
+> +    s->regs[NPCM7XX_OTP_FKEYIND] = v;
+> +}
+> +
+> +static const MemoryRegionOps npcm7xx_key_storage_ops = {
+> +    .read       = npcm7xx_key_storage_read,
+> +    .write      = npcm7xx_key_storage_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid      = {
+> +        .min_access_size        = 4,
+> +        .max_access_size        = 4,
+> +        .unaligned              = false,
+> +    },
+> +};
+> +
+> +static void npcm7xx_otp_enter_reset(Object *obj, ResetType type)
+> +{
+> +    NPCM7xxOTPState *s = NPCM7XX_OTP(obj);
+> +
+> +    memset(s->regs, 0, sizeof(s->regs));
+> +
+> +    s->regs[NPCM7XX_OTP_FST] = 0x00000001;
+> +    s->regs[NPCM7XX_OTP_FCFG] = 0x20000000;
+> +}
+> +
+> +static void npcm7xx_otp_realize(DeviceState *dev, Error **errp)
+> +{
+> +    NPCM7xxOTPClass *oc = NPCM7XX_OTP_GET_CLASS(dev);
+> +    NPCM7xxOTPState *s = NPCM7XX_OTP(dev);
+> +    SysBusDevice *sbd = &s->parent;
+> +
+> +    memset(s->array, 0, sizeof(s->array));
+> +
+> +    memory_region_init_io(&s->mmio, OBJECT(s), oc->mmio_ops, s, "regs",
+> +                          NPCM7XX_OTP_REGS_SIZE);
+> +    sysbus_init_mmio(sbd, &s->mmio);
+> +}
+> +
+> +static const VMStateDescription vmstate_npcm7xx_otp = {
+> +    .name = "npcm7xx-otp",
+> +    .version_id = 0,
+> +    .minimum_version_id = 0,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_UINT32_ARRAY(regs, NPCM7xxOTPState, NPCM7XX_OTP_NR_REGS),
+> +        VMSTATE_UINT8_ARRAY(array, NPCM7xxOTPState, NPCM7XX_OTP_ARRAY_BYTES),
+> +        VMSTATE_END_OF_LIST(),
+> +    },
+> +};
+> +
+> +static void npcm7xx_otp_class_init(ObjectClass *klass, void *data)
+> +{
+> +    ResettableClass *rc = RESETTABLE_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    QEMU_BUILD_BUG_ON(NPCM7XX_OTP_REGS_END > NPCM7XX_OTP_NR_REGS);
+> +
+> +    dc->realize = npcm7xx_otp_realize;
+> +    dc->vmsd = &vmstate_npcm7xx_otp;
+> +    rc->phases.enter = npcm7xx_otp_enter_reset;
+> +}
+> +
+> +static void npcm7xx_key_storage_class_init(ObjectClass *klass, void *data)
+> +{
+> +    NPCM7xxOTPClass *oc = NPCM7XX_OTP_CLASS(klass);
+> +
+> +    oc->mmio_ops = &npcm7xx_key_storage_ops;
+> +}
 
-This looks like the correct fix indeed :)
-(Maybe worth adding a comment around).
+Hello,
+With this series applied, when I build with --enable-sanitizers and run
+./qemu-system-arm:
 
-Thanks for investigating!
+==373753==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x61000000b400 at pc 0x557496abbefc bp 0x7ffdd5851210 sp 0x7ffdd5851208
+WRITE of size 8 at 0x61000000b400 thread T0
+    #0 0x557496abbefb in npcm7xx_key_storage_class_init /../hw/nvram/npcm7xx_otp.c:410:18
+    #1 0x5574998a8780 in type_initialize /../qom/object.c:362:9
+    #2 0x5574998a9bef in object_class_foreach_tramp /../qom/object.c:1030:5
+    #3 0x7fc26b427b2f in g_hash_table_foreach (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x3eb2f)
+    #4 0x5574998a9a41 in object_class_foreach /../qom/object.c:1052:5
+    #5 0x5574998ab28a in object_class_get_list /../qom/object.c:1109:5
+    #6 0x557498e6f8e1 in select_machine /../softmmu/vl.c:2438:24
+    #7 0x557498e5a921 in qemu_init /../softmmu/vl.c:3842:21
+    #8 0x557495b181d7 in main /../softmmu/main.c:49:5
+    #9 0x7fc269e7dcc9 in __libc_start_main csu/../csu/libc-start.c:308:16
+    #10 0x557495a6d9b9 in _start (/qemu-system-arm+0x35959b9)
 
+0x61000000b400 is located 0 bytes to the right of 192-byte region [0x61000000b340,0x61000000b400)
+allocated by thread T0 here:
+    #0 0x557495ae6272 in calloc (/qemu-system-arm+0x360e272)
+    #1 0x7fc26b43f210 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x56210)
+    #2 0x5574998a9bef in object_class_foreach_tramp /../qom/object.c:1030:5
+    #3 0x7fc26b427b2f in g_hash_table_foreach (/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x3eb2f)
+
+SUMMARY: AddressSanitizer: heap-buffer-overflow /../hw/nvram/npcm7xx_otp.c:410:18 in npcm7xx_key_storage_class_init
+
+-Alex
+
+> +
+> +static void npcm7xx_fuse_array_class_init(ObjectClass *klass, void *data)
+> +{
+> +    NPCM7xxOTPClass *oc = NPCM7XX_OTP_CLASS(klass);
+> +
+> +    oc->mmio_ops = &npcm7xx_fuse_array_ops;
+> +}
+> +
+> +static const TypeInfo npcm7xx_otp_types[] = {
+> +    {
+> +        .name = TYPE_NPCM7XX_OTP,
+> +        .parent = TYPE_SYS_BUS_DEVICE,
+> +        .instance_size = sizeof(NPCM7xxOTPState),
+> +        .class_init = npcm7xx_otp_class_init,
+> +        .abstract = true,
+> +    },
+> +    {
+> +        .name = TYPE_NPCM7XX_KEY_STORAGE,
+> +        .parent = TYPE_NPCM7XX_OTP,
+> +        .class_init = npcm7xx_key_storage_class_init,
+> +    },
+> +    {
+> +        .name = TYPE_NPCM7XX_FUSE_ARRAY,
+> +        .parent = TYPE_NPCM7XX_OTP,
+> +        .class_init = npcm7xx_fuse_array_class_init,
+> +    },
+> +};
+> +DEFINE_TYPES(npcm7xx_otp_types);
+> diff --git a/hw/nvram/meson.build b/hw/nvram/meson.build
+> index ba214558ac..1f2ed013b2 100644
+> --- a/hw/nvram/meson.build
+> +++ b/hw/nvram/meson.build
+> @@ -4,6 +4,7 @@ softmmu_ss.add(when: 'CONFIG_DS1225Y', if_true: files('ds1225y.c'))
+>  softmmu_ss.add(when: 'CONFIG_NMC93XX_EEPROM', if_true: files('eeprom93xx.c'))
+>  softmmu_ss.add(when: 'CONFIG_AT24C', if_true: files('eeprom_at24c.c'))
+>  softmmu_ss.add(when: 'CONFIG_MAC_NVRAM', if_true: files('mac_nvram.c'))
+> +softmmu_ss.add(when: 'CONFIG_NPCM7XX', if_true: files('npcm7xx_otp.c'))
+>  softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_nvm.c'))
+>  
+>  specific_ss.add(when: 'CONFIG_PSERIES', if_true: files('spapr_nvram.c'))
+> -- 
+> 2.28.0.297.g1956fa8f8d-goog
 > 
-> Thanks,
-> Laurent
-
+> 
 
