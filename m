@@ -2,84 +2,84 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86320C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:32:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0022FC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:33:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE2A62075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:32:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FD842075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:33:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hraV4+e/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE2A62075A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EkOpz1ze"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FD842075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFDVS-0000Kt-PX
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:32:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37148)
+	id 1kFDWX-0001XU-3v
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:33:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFDUh-0008LV-FS
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:31:23 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:29370
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFDVc-0000eS-D7
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:32:20 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:54644
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFDUf-0004KV-JZ
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:31:23 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFDVa-0004Ol-Nd
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:32:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599471080;
+ s=mimecast20190719; t=1599471138;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ix+vDhTh+n1g+0BqERo2XaFIbs4ujyls0wswSRL1RBc=;
- b=hraV4+e/RHsX+44bPhEEIyiuV1+YxnmaWUiBle83s93Pu5x888D+RT9aNIi4GUIz/cQeUQ
- owXCNwNVlWSiIc7sBT360/yO5vG3Utwf7yjGbuf0Sv/+VpdLAQxAWM5qGpF3F1aaH3DzUQ
- 38PvHuCzLdUlJfsXvIunCF9grbz28F4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-hSDnDNblORi0KMpQZqSLWQ-1; Mon, 07 Sep 2020 05:31:19 -0400
-X-MC-Unique: hSDnDNblORi0KMpQZqSLWQ-1
-Received: by mail-wr1-f72.google.com with SMTP id o6so5370634wrp.1
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 02:31:19 -0700 (PDT)
+ bh=dpRQsQnbcFuV3Z6yhtDM0D79Wk7MQ1Z95/+6JYTlyNQ=;
+ b=EkOpz1zeFEuVUrdfYDUYAn0FNCjkmCnyP6Gmgzcqy/7Cfvk2GQYTogY9HZtVD+xcnEwGGl
+ UQpZGzQ9m2+mIu/orN9KyopKrXj087XHpsakhkYpfFfai+uf9rv0KxBnq9/uKZv+tZy7tS
+ In1Dj3qBmXJE3mxJ3lU0eM2DHNM2t2k=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-472-iMjmxlkUP8KS-VLotqDjZQ-1; Mon, 07 Sep 2020 05:32:14 -0400
+X-MC-Unique: iMjmxlkUP8KS-VLotqDjZQ-1
+Received: by mail-wr1-f71.google.com with SMTP id i10so5494946wrq.5
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 02:32:14 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:cc:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=ix+vDhTh+n1g+0BqERo2XaFIbs4ujyls0wswSRL1RBc=;
- b=ir/P8JIdAdd+m0fdUjHliRjuN58jkMn7CyPw2SmjkVJ6raMduX2r1ySR2hMDzmXlyl
- 1EZlhN/Iu80pG4fTecdlZIEbecXn4BP/KfnvNYhYNANQQt+eRxQZcIZMx9Wxe66bLODt
- RPRq0n/FowcTd7tsxnLdUAsiY2YsQgC0+Rljq8uYbSOW/JmRZ86/lwM8yvodu8nwpeDK
- CuJ98To4Nl6yjSx8o8u5s/pzb0f32cyG/2C4pVK7AwNw8EXVqUdrkwnxsGHzPEwbf47h
- L9CbI8oh/3O2O4HfTJ0mzwl4+vOf0SVFIxDtiJtdH6VgdI7Hj+RcnnHsq0QcYFdgcj3M
- /xyQ==
-X-Gm-Message-State: AOAM531CH3nms2Cq2Qlv50YmEqrsdoat93ZqROnjaWUq6AxQoRm7BYwu
- A1O9YVB8VvMehvzFbGCAo0x9yfzNl7wf39JCML3xuebGcE8388CNkyZ/hfWLWlAsN92Kg940nQ8
- rPQrxSd7AefoYbwo=
-X-Received: by 2002:a1c:2d85:: with SMTP id t127mr1866762wmt.22.1599471077984; 
- Mon, 07 Sep 2020 02:31:17 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2Sl8QLyQrrmc/Jmk8n/fMihUW0Ssmy7vjX0co7nWZUP/TjIJCLyBsLDyUxNVfm+JdqpC5nw==
-X-Received: by 2002:a1c:2d85:: with SMTP id t127mr1866740wmt.22.1599471077765; 
- Mon, 07 Sep 2020 02:31:17 -0700 (PDT)
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dpRQsQnbcFuV3Z6yhtDM0D79Wk7MQ1Z95/+6JYTlyNQ=;
+ b=R2JEtuEMXd9nzXq7Q4FOV1oFB7o6HA2tQL9klk16ctYBTTxbPDeb41TPOFKtdIj773
+ B4YOefP4tSyhMwJ9Rt22ya6vzHmFv1eF0T7kkY2/XGKPwep7vC7hxMyDh3FcB1mUtsy5
+ m3wEEGwv33RV1juCqKK4gRf+fVT5cBGRqTQDjT/rd77pNlQ1AFBhofUJVgP1F/+K9Hst
+ 8hxP59siokCPx6e6nUOcIYfuAVqmqjpB8RVui8KIq7JW9edXb312a7IIzpbjyzGdeTcf
+ Dv/Txx3YrO8pvFstcfCwmnlDtCSO9iQIxEFhxOCI+lkLCYOWWuVNsrktSleo6OWc3cwx
+ e1Dg==
+X-Gm-Message-State: AOAM530w4NMBmhKfkGByPVsn6J+oqLTIyK/tCLVLdg3qmXmiRhwQANfV
+ n/1VUX5g108Gt3166UcQshd6431LpV3pX0g5vnuA1DA5YRxbjOm5c0U2c/y9Hp7I6MiS953YPyO
+ 0ATqsPc5PU8WwrV0=
+X-Received: by 2002:adf:ec90:: with SMTP id z16mr19853878wrn.145.1599471132972; 
+ Mon, 07 Sep 2020 02:32:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwwivfHerPxk6hJ27w1jHGjIt5/av74phSNan7igMgkwQh6LuzFb1IUkG/QCw03aGzL2qSz6g==
+X-Received: by 2002:adf:ec90:: with SMTP id z16mr19853859wrn.145.1599471132766; 
+ Mon, 07 Sep 2020 02:32:12 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id z7sm19352578wrw.93.2020.09.07.02.31.16
+ by smtp.gmail.com with ESMTPSA id y2sm23207676wmg.23.2020.09.07.02.32.11
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Sep 2020 02:31:17 -0700 (PDT)
-Subject: Re: [PATCH v2 3/3] qga: add implementation of guest-get-disks for
- Windows
+ Mon, 07 Sep 2020 02:32:12 -0700 (PDT)
+Subject: Re: [PATCH v2 1/3] qga: add command guest-get-disks
 To: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org
 References: <cover.1599470071.git.tgolembi@redhat.com>
- <2cd59ce454e0da02eeb75ab7461ef420b30864f5.1599470071.git.tgolembi@redhat.com>
+ <d8573ee72572ba586c285472789243b37527e2b9.1599470071.git.tgolembi@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Autocrypt: addr=philmd@redhat.com; keydata=
  mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
@@ -104,15 +104,15 @@ Autocrypt: addr=philmd@redhat.com; keydata=
  9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
  RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
  apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <bc08b17b-695e-b5d0-a616-c9ae39d337c1@redhat.com>
-Date: Mon, 7 Sep 2020 11:31:16 +0200
+Message-ID: <62742498-b3aa-c810-68c8-6a3c616925ca@redhat.com>
+Date: Mon, 7 Sep 2020 11:32:11 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <2cd59ce454e0da02eeb75ab7461ef420b30864f5.1599470071.git.tgolembi@redhat.com>
+In-Reply-To: <d8573ee72572ba586c285472789243b37527e2b9.1599470071.git.tgolembi@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
@@ -140,159 +140,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Yonggang Luo for review.
-
 On 9/7/20 11:14 AM, Tomáš Golembiovský wrote:
-> The command lists all the physical disk drives. Unlike for Linux
-> partitions and virtual volumes are not listed.
+> Add API and stubs for new guest-get-disks command.
 > 
-> Example output:
-> 
-> {
->   "return": [
->     {
->       "name": "\\\\.\\PhysicalDrive0",
->       "partition": false,
->       "address": {
->         "serial": "QM00001",
->         "bus-type": "sata",
->         ...
->       },
->       "slaves": []
->     }
->   ]
-> }
+> The command guest-get-fsinfo can be used to list information about disks
+> and partitions but it is limited only to mounted disks with filesystem.
+> This new command should allow listing information about disks of the VM
+> regardles whether they are mounted or not. This can be usefull for
+> management applications for mapping virtualized devices or pass-through
+> devices to device names in the guest OS.
 > 
 > Signed-off-by: Tomáš Golembiovský <tgolembi@redhat.com>
 > ---
->  qga/commands-win32.c | 97 +++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 91 insertions(+), 6 deletions(-)
-> 
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index e9976a0c46..9ac847a187 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -945,6 +945,91 @@ out:
->      return list;
->  }
->  
-> +GuestDiskInfoList *qmp_guest_get_disks(Error **errp)
-> +{
-> +    GuestDiskInfoList *new = NULL, *ret = NULL;
-> +    HDEVINFO dev_info;
-> +    SP_DEVICE_INTERFACE_DATA dev_iface_data;
-> +    int i;
-> +
-> +    dev_info = SetupDiGetClassDevs(&GUID_DEVINTERFACE_DISK, 0, 0,
-> +        DIGCF_PRESENT | DIGCF_DEVICEINTERFACE);
-> +    if (dev_info == INVALID_HANDLE_VALUE) {
-> +        error_setg_win32(errp, GetLastError(), "failed to get device tree");
-> +        return NULL;
-> +    }
-> +
-> +    g_debug("enumerating devices");
-> +    dev_iface_data.cbSize = sizeof(SP_DEVICE_INTERFACE_DATA);
-> +    for (i = 0;
-> +        SetupDiEnumDeviceInterfaces(dev_info, NULL, &GUID_DEVINTERFACE_DISK,
-> +            i, &dev_iface_data);
-> +        i++) {
-> +        GuestDiskAddress *address = NULL;
-> +        GuestDiskInfo *disk = NULL;
-> +        Error *local_err = NULL;
-> +        g_autofree PSP_DEVICE_INTERFACE_DETAIL_DATA
-> +            pdev_iface_detail_data = NULL;
-> +        STORAGE_DEVICE_NUMBER sdn;
-> +        HANDLE dev_file;
-> +        DWORD size = 0;
-> +
-> +        g_debug("  getting device path");
-> +        while (!SetupDiGetDeviceInterfaceDetail(dev_info, &dev_iface_data,
-> +                pdev_iface_detail_data,
-> +                size, &size,
-> +                NULL)) {
-> +            if (GetLastError() == ERROR_INSUFFICIENT_BUFFER) {
-> +                pdev_iface_detail_data = g_malloc(size);
-> +                pdev_iface_detail_data->cbSize =
-> +                    sizeof(*pdev_iface_detail_data);
-> +            } else {
-> +                g_debug("failed to get device interface details");
-> +                continue;
-> +            }
-> +        }
-> +
-> +        g_debug("  device: %s", pdev_iface_detail_data->DevicePath);
-> +        dev_file = CreateFile(pdev_iface_detail_data->DevicePath, 0,
-> +            FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-> +        if (!DeviceIoControl(dev_file, IOCTL_STORAGE_GET_DEVICE_NUMBER,
-> +                NULL, 0, &sdn, sizeof(sdn), &size, NULL)) {
-> +            CloseHandle(dev_file);
-> +            debug_error("failed to get storage device number");
-> +            continue;
-> +        }
-> +        CloseHandle(dev_file);
-> +
-> +        disk = g_new0(GuestDiskInfo, 1);
-> +        disk->name = g_strdup_printf("\\\\.\\PhysicalDrive%lu",
-> +            sdn.DeviceNumber);
-> +
-> +        g_debug("  number: %lu", sdn.DeviceNumber);
-> +        address = g_malloc0(sizeof(GuestDiskAddress));
-> +        address->has_dev = true;
-> +        address->dev = g_strdup(disk->name);
-> +        get_single_disk_info(sdn.DeviceNumber, address, &local_err);
-> +        if (local_err) {
-> +            g_debug("failed to get disk info: %s",
-> +                error_get_pretty(local_err));
-> +            error_free(local_err);
-> +            qapi_free_GuestDiskAddress(address);
-> +            address = NULL;
-> +        } else {
-> +            disk->address = address;
-> +            disk->has_address = true;
-> +        }
-> +
-> +        new = g_malloc0(sizeof(GuestDiskInfoList));
-> +        new->value = disk;
-> +        new->next = ret;
-> +        ret = new;
-> +    }
-> +
-> +    SetupDiDestroyDeviceInfoList(dev_info);
-> +    return ret;
-> +}
-> +
->  #else
->  
->  static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
-> @@ -952,6 +1037,12 @@ static GuestDiskAddressList *build_guest_disk_info(char *guid, Error **errp)
->      return NULL;
->  }
->  
-> +GuestDiskInfoList *qmp_guest_get_disks(Error **errp)
-> +{
-> +    error_setg(errp, QERR_UNSUPPORTED);
-> +    return NULL;
-> +}
-> +
->  #endif /* CONFIG_QGA_NTDDSCSI */
->  
->  static GuestFilesystemInfo *build_guest_fsinfo(char *guid, Error **errp)
-> @@ -2229,9 +2320,3 @@ GuestOSInfo *qmp_guest_get_osinfo(Error **errp)
->  
->      return info;
->  }
-> -
-> -GuestDiskInfoList *qmp_guest_get_disks(Error **errp)
-> -{
-> -    error_setg(errp, QERR_UNSUPPORTED);
-> -    return NULL;
-> -}
-> 
+>  qga/commands-posix.c |  6 ++++++
+>  qga/commands-win32.c |  6 ++++++
+>  qga/qapi-schema.json | 29 +++++++++++++++++++++++++++++
+>  3 files changed, 41 insertions(+)
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
