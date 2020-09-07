@@ -2,114 +2,97 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC735C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03EFEC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:12:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 353C221481
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:09:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 533002078E
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:12:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dWpruFKa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 353C221481
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TQL/Mpck"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 533002078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46136 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFD9C-00009U-0x
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:09:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60574)
+	id 1kFDCO-0001ah-FP
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:12:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kFD8U-00086w-EV
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:08:26 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46622
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kFD8S-0001UD-N6
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:08:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599469703;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=jbYGAivztdiWlC2evrz3NHzU8SpzCCCxn0s6JePJVdA=;
- b=dWpruFKaEENMZs7DRs0fMrdCw8odZODDRKHQ4x284yeLEueiely50nhEMaJuy9e/2RN2gi
- asr/1Qfa+zCb+jdvs3EREAfVHTEHzV6EeTFbTI8Hs4nlwjnqoXF1aRDf+hhRPV7o55i11e
- mwxpQ6ll0zyR2uHyQWV2c75ZF2UqSgg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-NSzxBXdDPzy-LAxAbdhLhw-1; Mon, 07 Sep 2020 05:08:17 -0400
-X-MC-Unique: NSzxBXdDPzy-LAxAbdhLhw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2D3818B9EC1;
- Mon,  7 Sep 2020 09:08:15 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-113-5.ams2.redhat.com
- [10.36.113.5])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 1169B1002382;
- Mon,  7 Sep 2020 09:08:13 +0000 (UTC)
-Subject: Re: [PATCH v2] qemu-img: Explicit number replaced by a constant
-To: Yi Li <yili@winhong.com>, qemu-block@nongnu.org, sgarzare@redhat.com
-References: <0107e40a-1d96-fa3d-bd15-019c004d0353@redhat.com>
- <20200819013607.32280-1-yili@winhong.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <da450f72-4023-fbc1-a721-63030e2c318a@redhat.com>
-Date: Mon, 7 Sep 2020 11:08:12 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFDBq-0000xh-Kv
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:11:54 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33315)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFDBo-0001xD-RJ
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:11:54 -0400
+Received: by mail-wr1-x443.google.com with SMTP id m6so15010195wrn.0
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 02:11:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=r3yL4F/BREaE/irOx7QyIAYifrGcKLqErgVN72uinxc=;
+ b=TQL/Mpck5+11R0ZBGEu2V/9bsOGEfVfUnhQUEavfbBOnqBNdKFGj5uYR8Jr3cuFvwE
+ cM1pvWMVvRSdBvc4fZTNWdr41mJmFQgUxtG1sx6cuUOCyRuNdbJm296FCs3r/GvSCRFQ
+ YP4ebXwVPZZBtqez3662iE0KjxqpqUCLZ/BDyf1XRODaQj1bEQY0mTlIn3sWPmrfocsb
+ gwUsgL8sGzb7I2oncpUh32Mc4MnL/co2nISqPV8PJZXOsT+ttpTCrhFOpCQ6hxdfKZLl
+ dG7UXDpvVwtQkqNcoEn1DLYrtMRu6S7/dkWiSyJLBYrRQaJD7ubPinFg5MH7Flf8SfVr
+ d1vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=r3yL4F/BREaE/irOx7QyIAYifrGcKLqErgVN72uinxc=;
+ b=UoENv8D0k2fBO8YnjuLC291/blW+nlpF4RXAEVsplGUoQ40eUkGbaHyCy9EOo0nqJa
+ ZpHIK9QVzWxo23tEgmO48LfRbA9IxKT4kMH9keXYtiKWqIZ7omt2Mf6v9WDhAlXDaV6V
+ jU3QI4T7lQHcB744dCMcqQ8AFT4ckSwPrlLHmzEIJ7NMZaK79ZSQ4VxJK7SoRu25YRs+
+ rY9pnMruJ3OvKb1fRNjdLePiBv4xUTQMXqz4ZSRkVWeeRS/GY/P+ZTFXrYkrxrdD9fUm
+ jJSTTud7a+QbxhMM8SFdONfdOqr9/7qxmNyiuFkIVq3joG2gnvvz0c63o0vBE8HDH8I8
+ LDEw==
+X-Gm-Message-State: AOAM533Q/2EEYbkDV5lcxPj8bcGCO1M0p8BLHD7AT2+nkA1lH7byM9Um
+ pPua26tRYvjBrVF8oZ7LZXViMA==
+X-Google-Smtp-Source: ABdhPJz0Y0zuFqjfaAOb3nqtirWHg2p4eipJBYBYbzWL3ifhaI8WE/7Cu9c9+BqqOYHM6R9Yxgb1YQ==
+X-Received: by 2002:a5d:4e0b:: with SMTP id p11mr19808553wrt.32.1599469911424; 
+ Mon, 07 Sep 2020 02:11:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c205sm26164349wmd.33.2020.09.07.02.11.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 07 Sep 2020 02:11:50 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 667D91FF7E;
+ Mon,  7 Sep 2020 10:11:49 +0100 (BST)
+References: <20200903112107.27367-1-alex.bennee@linaro.org>
+ <20200903112107.27367-7-alex.bennee@linaro.org>
+ <CABgObfZ_Xdd-pnRjpWO=8NjEznZhz84DTq95OzCdjL_rxnw=XQ@mail.gmail.com>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v1 6/8] tests/meson.build: fp tests don't need CONFIG_TCG
+In-reply-to: <CABgObfZ_Xdd-pnRjpWO=8NjEznZhz84DTq95OzCdjL_rxnw=XQ@mail.gmail.com>
+Date: Mon, 07 Sep 2020 10:11:49 +0100
+Message-ID: <87a6y2rlwq.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200819013607.32280-1-yili@winhong.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="KGXOMHijq87GqSrNKUt193FNQAc80IspZ"
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -48
-X-Spam_score: -4.9
-X-Spam_bar: ----
-X-Spam_report: (-4.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.099,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.69, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,50 +105,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, yilikernel@gmail.com, qemu-devel@nongnu.org
+Cc: fam@euphon.net, berrange@redhat.com, stefanb@linux.vnet.ibm.com,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ richard.henderson@linaro.org, qemu-devel <qemu-devel@nongnu.org>,
+ f4bug@amsat.org, "Emilio G. Cota" <cota@braap.org>, stefanha@redhat.com,
+ marcandre.lureau@redhat.com, aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---KGXOMHijq87GqSrNKUt193FNQAc80IspZ
-Content-Type: multipart/mixed; boundary="mL9sUOmRMm63HHDkgwXupPZWrBb6JEL1E"
 
---mL9sUOmRMm63HHDkgwXupPZWrBb6JEL1E
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-On 19.08.20 03:36, Yi Li wrote:
-> Signed-off-by: Yi Li <yili@winhong.com>
-> ---
->  qemu-img.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
+> Il gio 3 set 2020, 13:21 Alex Benn=C3=A9e <alex.bennee@linaro.org> ha scr=
+itto:
+>
+>> As the tests build only softfloat.c no actual TCG machinary is neede
+>> to test them (as is evidenced by GCC check-softfloat). Might as well
+>> fix the wording on Travis while at it.
+>>
+>
+> The reason is that softfloat is not built at all into QEMU if !CONFIG_TCG.
+> We similarly skip block layer tests if !CONFIG_SOFTMMU &&
+> !CONFIG_TOOLS.
 
-Thanks, applied to my block branch:
+It's not built anyway if you don't call the test. Are you saying a
+--disable-system and --disable-user build is invalid for running unit
+tests? That is what check-softfloat is doing as it doesn't involve
+softfloat built into any qemu binary.
 
-https://git.xanclic.moe/XanClic/qemu/commits/branch/block
+>
+> Paolo
+>
+>
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  .travis.yml       | 2 +-
+>>  tests/meson.build | 3 ++-
+>>  2 files changed, 3 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/.travis.yml b/.travis.yml
+>> index 1d0ade0a133..65341634d02 100644
+>> --- a/.travis.yml
+>> +++ b/.travis.yml
+>> @@ -138,7 +138,7 @@ jobs:
+>>
+>>
+>>      # Just build tools and run minimal unit and softfloat checks
+>> -    - name: "GCC check-softfloat (user)"
+>> +    - name: "GCC check-unit and check-softfloat"
+>>        env:
+>>          - BASE_CONFIG=3D"--enable-tools"
+>>          - CONFIG=3D"--disable-user --disable-system"
+>> diff --git a/tests/meson.build b/tests/meson.build
+>> index fe2c6d8e6b6..bdcc5d75293 100644
+>> --- a/tests/meson.build
+>> +++ b/tests/meson.build
+>> @@ -7,8 +7,9 @@ test('decodetree', sh,
+>>       workdir: meson.current_source_dir() / 'decode',
+>>       suite: 'decodetree')
+>>
+>> +subdir('fp')
+>> +
+>>  if 'CONFIG_TCG' in config_host
+>> -  subdir('fp')
+>>    if 'CONFIG_PLUGIN' in config_host
+>>      subdir('plugin')
+>>    endif
+>> --
+>> 2.20.1
+>>
+>>
 
 
---mL9sUOmRMm63HHDkgwXupPZWrBb6JEL1E--
-
---KGXOMHijq87GqSrNKUt193FNQAc80IspZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9V+HwACgkQ9AfbAGHV
-z0AjdggApvs090RFY5Bdnqr5iP8noMOcIcs3lQCWCNhWzO2UXqYIDTg88+4gW5fQ
-HZt/WeEsbcxMxq6qvK++fbKbo8r5Gh2pN6LXTzBOcnpG0qlej+kQbc5M9Wiu2Yga
-kFRYEYFO+Synv6bkXO71lxdvX6vYBDJfVrU79Tv/WONaJXu/v6LXC3WhcEsnUdHy
-V2TY3OkKAIElGbdG2Yoi1zcNLvYhQyfeSL2jBthlY0RLVEQ7r2VNFCt6nTYJ4S/i
-3idRaZzllSYI9FMAbOwWLHENoWjVUdieHkXKcwV0bwk6BFocwIXOrnypsGBIzjY3
-+2MFxcqYPPItxFF7ia/XmVRsasXIGA==
-=/Nkz
------END PGP SIGNATURE-----
-
---KGXOMHijq87GqSrNKUt193FNQAc80IspZ--
-
+--=20
+Alex Benn=C3=A9e
 
