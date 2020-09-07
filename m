@@ -2,135 +2,134 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FEE2C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA721C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:36:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A5B182075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:35:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 48DE92075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:36:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMR2wM+K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A5B182075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="Ex8eGB2/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48DE92075A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35058 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFDYI-0002x7-OD
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:35:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37646)
+	id 1kFDZk-0004ap-BX
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:36:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38138)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFDXF-0002L5-Ry
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:34:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54186)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFDXD-0004XN-Vt
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:34:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599471239;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=uy+81q2nWyy7jCp7PL/e0tHLezhbF9cUHjCEJLoxkoQ=;
- b=GMR2wM+K3+fvFa9+EUHUpNmAu99MQWF/nEqSCmCXrvn78PXHeE8bESYFj74zvKaynbMDKA
- o04TtAcO+VV0vNvDtGUH6+yrwaERvDOE87e1Lnz+PNEiEYPnwgklSJlUySV0CZzAP5Ibju
- 8vfg7WY7No2qV5IMZpRh6CsRR/aA69I=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-393--I00K-UeN_SvTEXobOVIsQ-1; Mon, 07 Sep 2020 05:33:57 -0400
-X-MC-Unique: -I00K-UeN_SvTEXobOVIsQ-1
-Received: by mail-wr1-f71.google.com with SMTP id l17so5467424wrw.11
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 02:33:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=uy+81q2nWyy7jCp7PL/e0tHLezhbF9cUHjCEJLoxkoQ=;
- b=jDeaUVSEyfNSBBm2ALYS+1PpZMdsFaSIsnQ0Pjvn11dK3ykvV+78PJeaek9mPbMlL1
- oMoM+kP6ylne6d52STYPuKQa6p+s7FtQvC85VQOipQiN9OMbkIFzfkLpAJQt/SoQAKKx
- ujYoB/iPkvRIwJYz+fiuLLN3D6wJt2MwvECZrOFpwg7Cdh8tZl5bdCUmun17JR8nUNQ/
- Gtxzlcqim5S43P1hIfNg4OKE2WCx0Dz4r/svnO6iMN+4/SJ1BRywePcLEduGIadHv5BG
- K17ZYVw2bm430f1Kt1QBpzDyH7icGCr8bS3C6iG9DxFJQzf95YyuTUbN89pjC0uJBXlE
- EwSg==
-X-Gm-Message-State: AOAM530S3YnFT9qpMvwtK7DME2pif83UtGN7cfPpLXxW6aDRrFo///xv
- 4JF3Bu4MZA1L1XXIIeB1KgstYdQVol4VM4Z5qJ2Zd20/5CqMUMmSK3wX5T9rcBmPoJYk1SU126t
- y0XudeMJJWbMR+2o=
-X-Received: by 2002:adf:c3cc:: with SMTP id d12mr21015628wrg.399.1599471236606; 
- Mon, 07 Sep 2020 02:33:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyqDTz6BjqCctZaPvtwAKZPOnuYn4sMqz8s2OrhsjkMp5nWWH1BNc/d9xwOtHobo4+x6e16yQ==
-X-Received: by 2002:adf:c3cc:: with SMTP id d12mr21015609wrg.399.1599471236439; 
- Mon, 07 Sep 2020 02:33:56 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id b11sm27468560wrt.38.2020.09.07.02.33.55
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 07 Sep 2020 02:33:55 -0700 (PDT)
-Subject: Re: [PATCH 17/17] hw/block/nvme: change controller pci id
-To: Klaus Jensen <its@irrelevant.dk>
-References: <20200904141956.576630-1-its@irrelevant.dk>
- <20200904141956.576630-18-its@irrelevant.dk>
- <894711e0-7823-5cf0-5b5a-a84f15b458ce@redhat.com>
- <20200907072332.GA690013@apples.localdomain>
- <8651d3fa-becf-7b86-8c16-bbfb8926cec7@redhat.com>
- <20200907085814.GA698329@apples.localdomain>
- <20200907092052.GA706837@apples.localdomain>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <7465047d-ad7a-edab-bb65-8ed0a96fe5f6@redhat.com>
-Date: Mon, 7 Sep 2020 11:33:54 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kFDZ6-0003z2-Uv
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:35:56 -0400
+Received: from mail-bn8nam11on2047.outbound.protection.outlook.com
+ ([40.107.236.47]:1313 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kFDZ4-0004rS-G9
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:35:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G0yhmDk4jmuvAz0bDREW8a3wYaSp2C5XdgT4Y2f6az13rZ3McvaFQFwUcSXmfcQuO3IZmBcuvbFmWjUL3e30TJfktsBBY47Q3+Nmzemc99As6+ETZePXGTJ9/+NoEyq9AB+/cZLrjou37qJ+rUv0s0Qwp7x9xlnJYFC2BqLQwgN9qc6tnwevmyQIN0WgSCDvIfUBgpt2ed/5Fb4Hi8+OXxm/N1skXYmtvbdx2OQBeFncBA8M5lfICsSiMlHIxPQdpFq8xXZ2X02kQ3iF9qmqKALt8aj+f0V92e0OEgR1fuMexQer5NzO3bJK0tBDzRqjYj/GMc28hdH8Nltd6V103g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RjuQo7r3v2OHRf9PFp4cGVYSh4Soaq2GRlVnJMPYdoU=;
+ b=D1jIIyVblKVbwc3fRxCL6NYJWhnByujsHVBM7xpB6YF+zS/J/9ls4Zx495cKknwn0kjLda7BEbYXq2eAb473QIGkjLVguy6qIF56KZtum3W6aNoiT1gj03iip09OCkR+NN11FGv8k+EMwcuZaUqSpewPb7+UjLMsCylylfzfZxmfmM0CFkH3PS5ei+UEYl1lmyXzFg/YtdSPEMVHhFddcTS2pseb0JTS8HZ89JLaR4ETfKnMmseu+AQBqvzcIvsTa/Zng3+63q8rFtYo67XGAWfqMiQOmXeUPQKiSrH7WWDw1Cfhnpsfh+HbvW4WbxtzbZ5LH8/gvPvjR7kRlF31Zw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=linaro.org smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RjuQo7r3v2OHRf9PFp4cGVYSh4Soaq2GRlVnJMPYdoU=;
+ b=Ex8eGB2/8UrRNcsP/hv0GFbT9Yy+Eb/6+8OaVnOieaUefj0K8WCKVcm9aMMW76CaFPMjBwCgc+crIx5GKGBwvehrwUPO7s2nXjjzDp2dT9yz4HiShCVDgVQPe+PgAwVCmrEomOB6hAhQVRhgyA53/I6vPgfuAWyB2oSADP8Ha5o=
+Received: from SA9PR03CA0012.namprd03.prod.outlook.com (2603:10b6:806:20::17)
+ by BN6PR02MB2465.namprd02.prod.outlook.com (2603:10b6:404:57::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Mon, 7 Sep
+ 2020 09:20:49 +0000
+Received: from SN1NAM02FT028.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:806:20:cafe::59) by SA9PR03CA0012.outlook.office365.com
+ (2603:10b6:806:20::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.16 via Frontend
+ Transport; Mon, 7 Sep 2020 09:20:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; linaro.org; dkim=none (message not signed)
+ header.d=none;linaro.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ SN1NAM02FT028.mail.protection.outlook.com (10.152.72.105) with Microsoft SMTP
+ Server id 15.20.3348.17 via Frontend Transport; Mon, 7 Sep 2020 09:20:49
+ +0000
+Received: from [149.199.38.66] (port=38846 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kFDKH-00042H-Bd; Mon, 07 Sep 2020 02:20:37 -0700
+Received: from [127.0.0.1] (helo=xsj-pvapsmtp01)
+ by smtp.xilinx.com with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kFDKT-0005kD-Go; Mon, 07 Sep 2020 02:20:49 -0700
+Received: from [10.71.116.235] (helo=localhost)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <edgar@xilinx.com>)
+ id 1kFDKT-0005jq-0g; Mon, 07 Sep 2020 02:20:49 -0700
+Date: Mon, 7 Sep 2020 11:20:43 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH v3 00/19] target/microblaze improvements
+Message-ID: <20200907092043.GV14249@toto>
+References: <20200904190842.2282109-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20200907092052.GA706837@apples.localdomain>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 05:27:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -58
-X-Spam_score: -5.9
-X-Spam_bar: -----
-X-Spam_report: (-5.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.099,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.69, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200904190842.2282109-1-richard.henderson@linaro.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c3f4a311-f14e-428e-9fb8-08d8530f4f95
+X-MS-TrafficTypeDiagnostic: BN6PR02MB2465:
+X-Microsoft-Antispam-PRVS: <BN6PR02MB246560E54A3690CC270AAFCCC2280@BN6PR02MB2465.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +zHxc7LMM0LP7swCrPoqbdZcjYiLvnONig75J48J12jbJs4J29k8cE6KjX85uGJzYFaMUzY0k11OV9dACwfwj1adXe3k19q5+x0uvY6V71rbYIK4VyCTODdy0ao9JpJj6hFoieEBj6moqsYoUNJXb0eeie11/KfPUZGJsjdPlJinTCUWgY/vH8UISVxtqLL4VSvARFZ4AGPcY3RXHTzb4f5NXwVBeytAeA76j7WZrr/rpTGxzz0cmaiJHTV0I9gv7fYvz0Oyk22XEpMrHFioplGDKYcNqwcd6STMx/rye/AOIfYkT7FHoFD7CVnWlaJQU1YDe00cIggcxxCNRJ6xhJ6vi+uuwf9Y2o5wppX0NH7sWJsy7HRwowUovic0/6Bv+xXFbpwbd9fDuqktsmb45g==
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(7916004)(39850400004)(346002)(396003)(136003)(376002)(46966005)(33656002)(81166007)(82740400003)(426003)(70586007)(356005)(336012)(186003)(70206006)(8936002)(1076003)(26005)(6666004)(316002)(9786002)(478600001)(33716001)(82310400003)(83380400001)(4326008)(9686003)(2906002)(5660300002)(47076004)(8676002)(6916009);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Sep 2020 09:20:49.7705 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3f4a311-f14e-428e-9fb8-08d8530f4f95
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: SN1NAM02FT028.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR02MB2465
+Received-SPF: pass client-ip=40.107.236.47; envelope-from=edgar@xilinx.com;
+ helo=NAM11-BN8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 05:35:53
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,69 +142,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Max Reitz <mreitz@redhat.com>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/7/20 11:20 AM, Klaus Jensen wrote:
-> On Sep  7 10:58, Klaus Jensen wrote:
->> On Sep  7 10:36, Philippe Mathieu-Daudé wrote:
->>> On 9/7/20 9:23 AM, Klaus Jensen wrote:
->>>> On Sep  7 04:28, Philippe Mathieu-Daudé wrote:
->>>>> +David in case
->>>>>
->>>>> On 9/4/20 4:19 PM, Klaus Jensen wrote:
->>>>>> From: Klaus Jensen <k.jensen@samsung.com>
->>>>>>
->>>>>> There are two reasons for changing this:
->>>>>>
->>>>>>   1. The nvme device currently uses an internal Intel device id.
->>>>>>
->>>>>>   2. Since commits "nvme: fix write zeroes offset and count" and "nvme:
->>>>>>      support multiple namespaces" the controller device no longer has
->>>>>>      the quirks that the Linux kernel think it has.
->>>>>>
->>>>>>      As the quirks are applied based on pci vendor and device id, change
->>>>>>      them to get rid of the quirks.
->>>>>>
->>>>>> To keep backward compatibility, add a new 'x-use-intel-id' parameter to
->>>>>> the nvme device to force use of the Intel vendor and device id. This is
->>>>>> off by default but add a compat property to set this for 5.1 machines
->>>>>> and older.
->>>>>
->>>>> So now what happens if you start a 5.1 machine with a recent kernel?
->>>>> Simply the kernel will use unnecessary quirks, or are there more
->>>>> changes in behavior?
->>>>>
->>>>
->>>> Yes, the kernel will then just apply unneccesary quirks, these are:
->>>>
->>>>   1. NVME_QUIRK_IDENTIFY_CNS which says that the device does not support
->>>>      anything else than values 0x0 and 0x1 for CNS (Identify Namespace and
->>>>      Identify Namespace). With multiple namespace support, this just
->>>>      means that the kernel will "scan" namespaces instead of using
->>>>      "Active Namespace ID list" (CNS 0x2).
->>>>
->>>>   2. NVME_QUIRK_DISABLE_WRITE_ZEROES. The nvme device started out with a
->>>>      broken Write Zeroes implementation which has since been fixed in
->>>>      commit 9d6459d21a6e ("nvme: fix write zeroes offset and count").
->>>
->>> OK thanks. Can you amend that information in the commit
->>> description please?
->>>
->>
->> Yes, absolutely.
+On Fri, Sep 04, 2020 at 12:08:23PM -0700, Richard Henderson wrote:
+> Version 3:
 > 
-> By the way. Is it correct use of an 'x-' parameter here - since it is
-> something that we might remove in the future? I was unable to find any
-> documentation on the purpose of the 'x-' prefix, but I was guessing it
-> was for stuff like this.
+>  * Splits out MicroBlazeCPUConfig, and moves some values
+>    out of CPUMBState (env) that are constant configuration
+>    parameters, or derived from configuration parameters.
+> 
+>  * Do not save configuration parameters with vmstate.
+>  * Pass around MicroBlazeCPUConfig in the translator.
+>  * Do not set TARGET_ABI32 in configure.
+> 
+> Version 2:
+> 
+>  * Includes fixes for iflags that could cause lockups.
+> 
+>    It seems it was easier to do so with icount=7, which is what we
+>    do during the replay acceptance tests.  This causes TBs to contain
+>    no more than 7 insns, and often less to make up for an incomplete
+>    count elsewhere.  Which stressed the iflags bits around delay slots
+>    and imm in ways that pure single-step doesn't.
+> 
+>   * cpu vmstate is filled in
+>   * interrupt logging is tidied.
+> 
+> 
+> r~
 
-Probably not. 'x-' is for unstable debugging/testing features.
+Looks good, none of the test issues were relatd. Thanks Richard!
 
+On all the patches I had not previously reviewed:
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+
+Can you take the pull-req via your trees?
+
+Cheers,
+Edgar
 
