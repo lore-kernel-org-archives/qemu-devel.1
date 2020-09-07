@@ -4,88 +4,101 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 599F3C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D6DC433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:53:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3A88206D4
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:52:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mlgz+7S/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3A88206D4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E881C206D4
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 10:53:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E881C206D4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFEks-0004Cz-PG
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 06:52:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54202)
+	id 1kFEmA-0004qL-J3
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 06:53:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kFEiC-000137-7a
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:49:24 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:20401
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kFEiA-0005ZV-DA
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 06:49:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599475761;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=E6wG+GIqq8r+ZxSdY2D1jPYW7AgSbitjyZuIlVMy/wE=;
- b=Mlgz+7S//JF4uwCGsCb/AhPWPOClyffrzwP0d7Q/xUYFafaHf067qVPAr+gEVlB1l03krX
- YZzEb80SXh6dQ7c0rGpD77Yhi0b4S6NBij26z7ixCaMo7xb6fw1Kbni+nnR2yckzrhDkvO
- W0ml7q9tsUyEpUvr07LRIFtqKd9sUF8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-472-ieDkzXYQMsWbSgFRN7c10g-1; Mon, 07 Sep 2020 06:49:17 -0400
-X-MC-Unique: ieDkzXYQMsWbSgFRN7c10g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 109941074662;
- Mon,  7 Sep 2020 10:49:17 +0000 (UTC)
-Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
- (ovpn-12-108.pek2.redhat.com [10.72.12.108])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DBE6610013C4;
- Mon,  7 Sep 2020 10:49:14 +0000 (UTC)
-From: Jason Wang <jasowang@redhat.com>
-To: mst@redhat.com,
-	qemu-devel@nongnu.org
-Subject: [PATCH 2/3] vhost: switch to use IOTLB v2 format
-Date: Mon,  7 Sep 2020 18:49:02 +0800
-Message-Id: <20200907104903.31551-3-jasowang@redhat.com>
-In-Reply-To: <20200907104903.31551-1-jasowang@redhat.com>
-References: <20200907104903.31551-1-jasowang@redhat.com>
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kFEjM-0002mH-NN; Mon, 07 Sep 2020 06:50:36 -0400
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:34925)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kFEjK-0005d1-5d; Mon, 07 Sep 2020 06:50:36 -0400
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.47])
+ by mailnew.west.internal (Postfix) with ESMTP id 984DF363;
+ Mon,  7 Sep 2020 06:50:29 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute7.internal (MEProxy); Mon, 07 Sep 2020 06:50:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=0FhPyCkd7OtM4N/rm6PPZjba8vf
+ Ga6iqr/kWJS3F3bc=; b=IGc2lo/pqZklcHkDvBGSwLWjboa7KGKkdC9YL6aqyHH
+ mHemNjoaCIDFyGv3OkO8F1OUMAm3ctOYP5IDefPurDZrdvrPyBlstTuGmalaMpp9
+ bHDC3h4OHUoXfa/oVnmw84EYDIRWs6g4PkBCblsbbYTsKslwQyiPsE1Yff2j0EYN
+ h5PzTNJmXcUbsI2q6y3r3STw9RYxek5pm+iJ+LQW2PsLcXZk2ChAPoILFLh7yUvI
+ hj6kgsNe+Ww9VrGkuaruD1wD9T8Jvb/m/aoyQXMFsMxNImbruS7r/RHX57HiIyKd
+ FZl9fj8kJTBIuy7DJStF9V7/801MpjdBc+1seckpNjg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; bh=0FhPyC
+ kd7OtM4N/rm6PPZjba8vfGa6iqr/kWJS3F3bc=; b=rhNCAIpk8hb1nEacM1952A
+ fSfrJCerT49tCvBFAKGiqR2k+MbtEKxhNYjjXTUr77s56/8dfbyJb/CBfyB8yQoK
+ tfA9ycDw8x+A1nZjJmbBHELWKE0e5AIpOE0oKMFvRPEcvbR011RLMjtnJNfuy1sd
+ 7hkaVR22x/ark6oE0NPa5RWr+9A5mmZ5SFHVlyHKtyiLbSxlGFT9sbr1mtQLMaci
+ UowubhRb8851nssMYtC2f7syxdz7bLI2g3/MZBbRTdtETxWD2DlWbiRSCgc/qQ8I
+ f9hT6etnTxoL8BRiPRIxY74Mmsc4ZmRbKeC4RV83+Ov5Kp2mqnTtDKYAu/0RGoKg
+ ==
+X-ME-Sender: <xms:dBBWX9c9oHdaW4tteiRRXetxr_xrdNO8TxVGhaNwEzTXc0TleMwUqA>
+ <xme:dBBWX7Oa86KVjLafzHURtwsUmKKiUDHmHLyuQbBHxamxs9Egs3li6KzZFakl0FnOw
+ 3ET_EOq-Kq39fIbxIc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduiedrudehtddgfeegucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
+ ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
+ gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
+ keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
+ curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:dBBWX2gIGg3L6uVci9CH1gDwW1vdzuswIexDMmh71SOtPv8Dd374_Q>
+ <xmx:dBBWX29wZixP3abgvK7PmAldD-xZSVtY1XOAfdXhnyK1ws2UXeq9TA>
+ <xmx:dBBWX5tdORWuvvXXKApDMGwuJo0TTokk5wmNfZL0BGFJ3tTKH1NWcw>
+ <xmx:dBBWX_KKRMI6-Z0iB5o13kjjoxiHn2IuAgE20E-WuuO5F1CTVVX884QaFWvNFnihqZXheA>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 95D6C328005E;
+ Mon,  7 Sep 2020 06:50:26 -0400 (EDT)
+Date: Mon, 7 Sep 2020 12:50:24 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH 17/17] hw/block/nvme: change controller pci id
+Message-ID: <20200907105024.GA732668@apples.localdomain>
+References: <20200904141956.576630-1-its@irrelevant.dk>
+ <20200904141956.576630-18-its@irrelevant.dk>
+ <894711e0-7823-5cf0-5b5a-a84f15b458ce@redhat.com>
+ <20200907103708.GG2682@work-vm>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:05:01
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="PEIAKu/WMn1b1Hv9"
+Content-Disposition: inline
+In-Reply-To: <20200907103708.GG2682@work-vm>
+Received-SPF: pass client-ip=64.147.123.18; envelope-from=its@irrelevant.dk;
+ helo=wnew4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 06:50:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,214 +111,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elic@nvidia.com, Jason Wang <jasowang@redhat.com>, lulu@redhat.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ qemu-block@nongnu.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Maxim Levitsky <mlevitsk@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch tries to switch to use new kernel IOTLB format V2. Previous
-version may have inconsistent ABI between 32bit and 64bit machines
-because of the hole after type field. Refer kernel commit
-("429711aec282 vhost: switch to use new message format") for more
-information.
 
-To enable this feature, qemu need to use a new ioctl
-VHOST_SET_BACKEND_FEATURE with VHOST_BACKEND_F_IOTLB_MSG_V2 bit. A new
-vhost setting backend features ops was introduced. And when we try to
-set features for vhost dev, we will examine the support of new IOTLB
-format and enable it. This process is total transparent to guest,
-which means we can have different IOTLB message type in src and dst
-during migration.
+--PEIAKu/WMn1b1Hv9
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The conversion of IOTLB message is straightforward, just check the
-type and behave accordingly.
+On Sep  7 11:37, Dr. David Alan Gilbert wrote:
+> * Philippe Mathieu-Daud=C3=83=C2=A9 (philmd@redhat.com) wrote:
+> > +David in case
+> >=20
+> > On 9/4/20 4:19 PM, Klaus Jensen wrote:
+> > > From: Klaus Jensen <k.jensen@samsung.com>
+> > >=20
+> > > There are two reasons for changing this:
+> > >=20
+> > >   1. The nvme device currently uses an internal Intel device id.
+> > >=20
+> > >   2. Since commits "nvme: fix write zeroes offset and count" and "nvm=
+e:
+> > >      support multiple namespaces" the controller device no longer has
+> > >      the quirks that the Linux kernel think it has.
+> > >=20
+> > >      As the quirks are applied based on pci vendor and device id, cha=
+nge
+> > >      them to get rid of the quirks.
+> > >=20
+> > > To keep backward compatibility, add a new 'x-use-intel-id' parameter =
+to
+> > > the nvme device to force use of the Intel vendor and device id. This =
+is
+> > > off by default but add a compat property to set this for 5.1 machines
+> > > and older.
+> >=20
+> > So now what happens if you start a 5.1 machine with a recent kernel?
+> > Simply the kernel will use unnecessary quirks, or are there more
+> > changes in behavior?
+>=20
+> Seems reasonable to me...but...
+>=20
+> > >=20
+> > > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> > > Reviewed-by: Keith Busch <kbusch@kernel.org>
+> > > Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
+> > > ---
+> > >  hw/block/nvme.c   | 12 ++++++++++--
+> > >  hw/block/nvme.h   |  1 +
+> > >  hw/core/machine.c |  1 +
+> > >  3 files changed, 12 insertions(+), 2 deletions(-)
+> > >=20
+> > > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > > index 453d3a89d475..8018f8679366 100644
+> > > --- a/hw/block/nvme.c
+> > > +++ b/hw/block/nvme.c
+> > > @@ -2749,6 +2749,15 @@ static void nvme_init_pci(NvmeCtrl *n, PCIDevi=
+ce *pci_dev, Error **errp)
+> > > =20
+> > >      pci_conf[PCI_INTERRUPT_PIN] =3D 1;
+> > >      pci_config_set_prog_interface(pci_conf, 0x2);
+> > > +
+> > > +    if (n->params.use_intel_id) {
+> > > +        pci_config_set_vendor_id(pci_conf, PCI_VENDOR_ID_INTEL);
+> > > +        pci_config_set_device_id(pci_conf, 0x5846);
+>=20
+> Wasn't that magic number 5845 down there ?
+>=20
 
-Signed-off-by: Jason Wang <jasowang@redhat.com>
----
- hw/virtio/vhost-backend.c         | 86 +++++++++++++++++++++++++------
- hw/virtio/vhost.c                 | 10 ++++
- include/hw/virtio/vhost-backend.h |  2 +
- include/hw/virtio/vhost.h         |  1 +
- 4 files changed, 83 insertions(+), 16 deletions(-)
+Argh! My first version of this just bumbed the intel device id and it
+got left there.
 
-diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-index 782b1d67d9..88c8ecc9e0 100644
---- a/hw/virtio/vhost-backend.c
-+++ b/hw/virtio/vhost-backend.c
-@@ -156,6 +156,28 @@ static int vhost_kernel_set_features(struct vhost_dev *dev,
-     return vhost_kernel_call(dev, VHOST_SET_FEATURES, &features);
- }
- 
-+static int vhost_kernel_set_backend_cap(struct vhost_dev *dev)
-+{
-+    uint64_t features;
-+    uint64_t f = 0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2;
-+    int r;
-+
-+    if (vhost_kernel_call(dev, VHOST_GET_BACKEND_FEATURES, &features)) {
-+        return 0;
-+    }
-+
-+    features &= f;
-+    r = vhost_kernel_call(dev, VHOST_SET_BACKEND_FEATURES,
-+                              &features);
-+    if (r) {
-+        return 0;
-+    }
-+
-+    dev->backend_cap = features;
-+
-+    return 0;
-+}
-+
- static int vhost_kernel_get_features(struct vhost_dev *dev,
-                                      uint64_t *features)
- {
-@@ -195,34 +217,65 @@ static int vhost_kernel_vsock_set_running(struct vhost_dev *dev, int start)
- static void vhost_kernel_iotlb_read(void *opaque)
- {
-     struct vhost_dev *dev = opaque;
--    struct vhost_msg msg;
-     ssize_t len;
- 
--    while ((len = read((uintptr_t)dev->opaque, &msg, sizeof msg)) > 0) {
--        if (len < sizeof msg) {
--            error_report("Wrong vhost message len: %d", (int)len);
--            break;
-+    if (dev->backend_cap &
-+        (0x1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)) {
-+        struct vhost_msg_v2 msg;
-+
-+        while ((len = read((uintptr_t)dev->opaque, &msg, sizeof msg)) > 0) {
-+            if (len < sizeof msg) {
-+                error_report("Wrong vhost message len: %d", (int)len);
-+                break;
-+            }
-+            if (msg.type != VHOST_IOTLB_MSG_V2) {
-+                error_report("Unknown vhost iotlb message type");
-+                break;
-+            }
-+
-+            vhost_backend_handle_iotlb_msg(dev, &msg.iotlb);
-         }
--        if (msg.type != VHOST_IOTLB_MSG) {
--            error_report("Unknown vhost iotlb message type");
--            break;
-+    } else {
-+        struct vhost_msg msg;
-+
-+        while ((len = read((uintptr_t)dev->opaque, &msg, sizeof msg)) > 0) {
-+            if (len < sizeof msg) {
-+                error_report("Wrong vhost message len: %d", (int)len);
-+                break;
-+            }
-+            if (msg.type != VHOST_IOTLB_MSG) {
-+                error_report("Unknown vhost iotlb message type");
-+                break;
-+            }
-+
-+            vhost_backend_handle_iotlb_msg(dev, &msg.iotlb);
-         }
--
--        vhost_backend_handle_iotlb_msg(dev, &msg.iotlb);
-     }
- }
- 
- static int vhost_kernel_send_device_iotlb_msg(struct vhost_dev *dev,
-                                               struct vhost_iotlb_msg *imsg)
- {
--    struct vhost_msg msg;
-+    if (dev->backend_cap & (1ULL << VHOST_BACKEND_F_IOTLB_MSG_V2)) {
-+        struct vhost_msg_v2 msg;
- 
--    msg.type = VHOST_IOTLB_MSG;
--    msg.iotlb = *imsg;
-+        msg.type = VHOST_IOTLB_MSG_V2;
-+        msg.iotlb = *imsg;
- 
--    if (write((uintptr_t)dev->opaque, &msg, sizeof msg) != sizeof msg) {
--        error_report("Fail to update device iotlb");
--        return -EFAULT;
-+        if (write((uintptr_t)dev->opaque, &msg, sizeof msg) != sizeof msg) {
-+            error_report("Fail to update device iotlb");
-+            return -EFAULT;
-+        }
-+    } else {
-+        struct vhost_msg msg;
-+
-+        msg.type = VHOST_IOTLB_MSG;
-+        msg.iotlb = *imsg;
-+
-+        if (write((uintptr_t)dev->opaque, &msg, sizeof msg) != sizeof msg) {
-+            error_report("Fail to update device iotlb");
-+            return -EFAULT;
-+        }
-     }
- 
-     return 0;
-@@ -260,6 +313,7 @@ static const VhostOps kernel_ops = {
-                                 vhost_kernel_set_vring_busyloop_timeout,
-         .vhost_set_features = vhost_kernel_set_features,
-         .vhost_get_features = vhost_kernel_get_features,
-+        .vhost_set_backend_cap = vhost_kernel_set_backend_cap,
-         .vhost_set_owner = vhost_kernel_set_owner,
-         .vhost_reset_device = vhost_kernel_reset_device,
-         .vhost_get_vq_index = vhost_kernel_get_vq_index,
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 1a1384e7a6..e986bf53e4 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -818,7 +818,17 @@ static int vhost_dev_set_features(struct vhost_dev *dev,
-     r = dev->vhost_ops->vhost_set_features(dev, features);
-     if (r < 0) {
-         VHOST_OPS_DEBUG("vhost_set_features failed");
-+        goto out;
-     }
-+    if (dev->vhost_ops->vhost_set_backend_cap) {
-+        r = dev->vhost_ops->vhost_set_backend_cap(dev);
-+        if (r < 0) {
-+            VHOST_OPS_DEBUG("vhost_set_backend_cap failed");
-+            goto out;
-+        }
-+    }
-+
-+out:
-     return r < 0 ? -errno : 0;
- }
- 
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index 8825bd278f..8a6f8e2a7a 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -74,6 +74,7 @@ typedef int (*vhost_set_features_op)(struct vhost_dev *dev,
-                                      uint64_t features);
- typedef int (*vhost_get_features_op)(struct vhost_dev *dev,
-                                      uint64_t *features);
-+typedef int (*vhost_set_backend_cap_op)(struct vhost_dev *dev);
- typedef int (*vhost_set_owner_op)(struct vhost_dev *dev);
- typedef int (*vhost_reset_device_op)(struct vhost_dev *dev);
- typedef int (*vhost_get_vq_index_op)(struct vhost_dev *dev, int idx);
-@@ -146,6 +147,7 @@ typedef struct VhostOps {
-     vhost_set_vring_busyloop_timeout_op vhost_set_vring_busyloop_timeout;
-     vhost_set_features_op vhost_set_features;
-     vhost_get_features_op vhost_get_features;
-+    vhost_set_backend_cap_op vhost_set_backend_cap;
-     vhost_set_owner_op vhost_set_owner;
-     vhost_reset_device_op vhost_reset_device;
-     vhost_get_vq_index_op vhost_get_vq_index;
-diff --git a/include/hw/virtio/vhost.h b/include/hw/virtio/vhost.h
-index 767a95ec0b..94585067f7 100644
---- a/include/hw/virtio/vhost.h
-+++ b/include/hw/virtio/vhost.h
-@@ -79,6 +79,7 @@ struct vhost_dev {
-     uint64_t backend_features;
-     uint64_t protocol_features;
-     uint64_t max_queues;
-+    uint64_t backend_cap;
-     bool started;
-     bool log_enabled;
-     uint64_t log_size;
--- 
-2.20.1
+Good find! Thank you!
 
+--PEIAKu/WMn1b1Hv9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl9WEG4ACgkQTeGvMW1P
+DekBDAf9EsxYjOSnlBo9+hAb8l1/hWZluQ70N2XcH9XUGj/gPLP6L/E99tWl1+ND
+y2nbtGKfacDXCC3yeBo05Io6yPnmSvdY/OYV8TZuDLbOe8+i5HKQLCvnCNbKR0/J
+ow7jIhoy++cyTpNlgGtgNZOeFQmXa7b8FaPN29akXrhjquEcC0Onr52FTsLY1EV3
+/KRG3m02UQhz+JSx36hN+bj6pvMys588nJl4/JHHfTaSoAVWzquuTUHa/6dUt++j
+fMKkwq/1TTpecjb+8YgXgzcZPiwUq0LLgi3Ei3UixaMJSYORix0rP31ekUemDSMy
+Jdz5NUmlkbnqeledBCEIb2pyN1B5Qg==
+=XdHR
+-----END PGP SIGNATURE-----
+
+--PEIAKu/WMn1b1Hv9--
 
