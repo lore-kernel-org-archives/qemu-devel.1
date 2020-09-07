@@ -4,82 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59443C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:38:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E762C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:41:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA32021941
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:38:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CA74C21532
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:41:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NGwwOK8a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA32021941
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dxMs8FGP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA74C21532
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41236 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFK9s-0000Ed-1A
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:38:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47882)
+	id 1kFKCY-00032I-ML
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:41:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFK4v-0008M9-8v; Mon, 07 Sep 2020 12:33:13 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:38566)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kFKBQ-0002Ua-Gn
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:39:56 -0400
+Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:39690)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFK4t-0007dB-DR; Mon, 07 Sep 2020 12:33:12 -0400
-Received: by mail-ed1-x544.google.com with SMTP id c8so13318869edv.5;
- Mon, 07 Sep 2020 09:33:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
+ id 1kFKBO-0008RL-Nx
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:39:56 -0400
+Received: by mail-ej1-x641.google.com with SMTP id p9so18936276ejf.6
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 09:39:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=jBgL1iKIvz4jH+dRa8U6fT1B6oJw6/SF3dkJ8j+0tYI=;
- b=NGwwOK8a+fHGjLxYQTX0miQrbkb8sWxiahi18i6/0l6gF2OCge51BPuralxFjDtOwG
- WCR670KtplUUFKsjcCQr8P1sU9i7rgyNA5lEb+6IT9gi6Dj+I2Tx350khN+lPnGT+9jm
- C3oI9QO/O1+Ly8LcPWfLjnwig/6OuLuH0aKntPyUxpIY9q2Fssck494TxIb9sPAyt+Ov
- sOTMz4y2wWmUh6W3mLJH4TujsmMJTDU8b8GqG5wEuVteNt1JAtP6rTk9P3yTnvqbd2cj
- WsDaiEDYYWivElWw5n4lmyvTcSlCVkPvEGNJ4GUxVgPa3Qhu4QrajWR5xmGR7XFNses5
- sPWg==
+ h=sender:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=n3B1PcPbtXyRKDvhkufpceOeW+LHKvTC04HSYKxTByM=;
+ b=dxMs8FGPTSULW2Y1Unz1o3tMQR2YEhgJjMLBxsLdHU3yJnO5OfxeAGVEVtjvzV+5GQ
+ a/gOhWCk5qk/Do9pyeTqwHMhudGORnXY72zvb2M5Dr644s/oLG09me+/+yUIIYDaHri1
+ uqvmZq8QWneHVqej6uzH9D9eiZYQ7jFnxl0MjJxyg8xQtcFGMFATe6ZCQmUBVmPzHj0M
+ ZKJdI4N+H+3L5QNSUNDtqKeFtUPI4eId2DSHhidKCaGJZIxUBMpchdFuCvhvp1723Pao
+ piFEahBAtt3ZjYUVV8M4hVffl0aFOhoVB2aKGdBxflLmN5eW+Ykd8l6+WDWFXC+VxUhk
+ pXkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=jBgL1iKIvz4jH+dRa8U6fT1B6oJw6/SF3dkJ8j+0tYI=;
- b=VR4EnWhribgHkMo4j+6jYUHUKFkVthRjAfQxVNZ6V7Jx2DJeQK05SYSY1SApP54RV6
- +yxylMpOfTd7ctxAeq7TK3zC3/o27rSRXVfazD3XzywuR24hwcC+CknOH+djDmE9T3AO
- xL1+kaHAf259cZmjCHway7Q3Zh5Xk6FezTxDMtiPwL/jf2uTesKO0K6J6SJVMXeADzQO
- pKEOoc2kzUPmjKYMN5xdrr2Lte9DxVaFt53AiQis/lH57N5Is2GZ6Wok+b7icbT2GD6g
- 3RMX8fQjeYVgAYb2uUz4xXsL0gAptFAw4BYmPZTVJuQcUQioxtC219kCpETPe7qVTS3r
- EVPQ==
-X-Gm-Message-State: AOAM530lzsbHSSApmjtKqKRn1hX6NQPt3Yfo/E/Ef4UwHpXOE+hQ8deI
- nTieUgxVSIdaX5kLf5LwGvDdnb41g5c=
-X-Google-Smtp-Source: ABdhPJzLqAShOBauj9CSuC2lWda9KUiMdypw8ZqnFRsq/c1VE1GLiZkhjn3SOr7dgMJjd13xiI7RlQ==
-X-Received: by 2002:a05:6402:b68:: with SMTP id
- cb8mr4902112edb.350.1599496389494; 
- Mon, 07 Sep 2020 09:33:09 -0700 (PDT)
-Received: from x1w.redhat.com (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id u13sm15700199ejn.82.2020.09.07.09.33.08
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=n3B1PcPbtXyRKDvhkufpceOeW+LHKvTC04HSYKxTByM=;
+ b=VrzSc3v6TA1CvowTsJsDJhKxlLRG3tstga+dn3R0lVf/ZH+m9oGgS03nFdN4O9sTWw
+ UhTDtAcUI4JCrgDkIR7MUjfiuzAa8dAYkzCWJ0utqRIfzN62FJxWZ3cRgr0lEOJZ9Aa0
+ xAXI3nDnpwhxwKbvCyxoL5OfWhShAebm2jaJQPCj+ChPeF9nuPRBOL+yj7gfn0aIsuMO
+ 6zlOjnKtsJX/fD+VfynCowT8ebNapDuMloWyHtdyteVJ+7T3pegwwExRB7rLJHuV8ax0
+ wFvSJPCqqy32egLLhpH4qGsmN87nVPWrUuMU5jIgCwg0hMvHz9NNNLBAg2JQwBn+8k7b
+ D/dA==
+X-Gm-Message-State: AOAM533ta5sBOnKTkZlyrnDRkPhUkPAm0P3L5BBiXSJOYq/R6cpPAeAW
+ ye8BY3tgKwulMhNtzB9T4E8xcukTnFI=
+X-Google-Smtp-Source: ABdhPJybCaaQLlbZe2vlw+b0XuGpiMSWrwPBMHYZR6e0W6dD2mza9jGsXEyzaX8xhPDjtaw2pUXniA==
+X-Received: by 2002:a17:906:b47:: with SMTP id
+ v7mr21121237ejg.310.1599496792485; 
+ Mon, 07 Sep 2020 09:39:52 -0700 (PDT)
+Received: from donizetti.lan ([2001:b07:6468:f312:6891:d6db:f6ec:d1df])
+ by smtp.gmail.com with ESMTPSA id y24sm15424308eds.35.2020.09.07.09.39.51
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 09:33:08 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ Mon, 07 Sep 2020 09:39:52 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 6/8] hw/misc/mps2-scc: Use the LED device
-Date: Mon,  7 Sep 2020 18:32:55 +0200
-Message-Id: <20200907163257.46527-7-f4bug@amsat.org>
+Subject: [PATCH] docs: update build system documentation
+Date: Mon,  7 Sep 2020 18:39:53 +0200
+Message-Id: <20200907163953.19097-1-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200907163257.46527-1-f4bug@amsat.org>
-References: <20200907163257.46527-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x544.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::641;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-ej1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -102,149 +100,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jeffery <andrew@aj.id.au>,
- Joaquin de Andres <me@xcancerberox.com.ar>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
- Luc Michel <luc.michel@greensocs.com>, Joel Stanley <joel@jms.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Per the 'ARM MPS2 and MPS2+ FPGA Prototyping Boards Technical
-Reference Manual' (100112_0200_07_en):
+Most of the Makefile bits are obsolete and can be removed.
 
-  2.1  Overview of the MPS2 and MPS2+ hardware
-
-       The MPS2 and MPS2+ FPGA Prototyping Boards contain the
-       following components and interfaces:
-
-       * User switches and user LEDs:
-
-         - Two green LEDs and two push buttons that connect to
-           the FPGA.
-         - Eight green LEDs and one 8-way dip switch that connect
-           to the MCC.
-
-Add the 8 LEDs connected to the MCC.
-
-This remplaces the 'mps2_scc_leds' trace events by the generic
-'led_set_intensity' event.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
-https://youtu.be/l9kD70uPchk?t=288
----
- include/hw/misc/mps2-scc.h |  2 ++
- hw/misc/mps2-scc.c         | 25 ++++++++++++++-----------
- hw/misc/Kconfig            |  1 +
- hw/misc/trace-events       |  1 -
- 4 files changed, 17 insertions(+), 12 deletions(-)
+ docs/devel/build-system.rst | 97 +++++--------------------------------
+ 1 file changed, 11 insertions(+), 86 deletions(-)
 
-diff --git a/include/hw/misc/mps2-scc.h b/include/hw/misc/mps2-scc.h
-index 7045473788b..8542f384227 100644
---- a/include/hw/misc/mps2-scc.h
-+++ b/include/hw/misc/mps2-scc.h
-@@ -13,6 +13,7 @@
- #define MPS2_SCC_H
+diff --git a/docs/devel/build-system.rst b/docs/devel/build-system.rst
+index 591e93f4b4..08e85c69e1 100644
+--- a/docs/devel/build-system.rst
++++ b/docs/devel/build-system.rst
+@@ -179,7 +179,7 @@ process for:
  
- #include "hw/sysbus.h"
-+#include "hw/misc/led.h"
+    - Userspace emulators - qemu-$ARCH
  
- #define TYPE_MPS2_SCC "mps2-scc"
- #define MPS2_SCC(obj) OBJECT_CHECK(MPS2SCC, (obj), TYPE_MPS2_SCC)
-@@ -25,6 +26,7 @@ typedef struct {
+-   - Some (but not all) unit tests
++   - Unit tests
  
-     /*< public >*/
-     MemoryRegion iomem;
-+    LEDState *led[8];
+ 2) documentation
  
-     uint32_t cfg0;
-     uint32_t cfg1;
-diff --git a/hw/misc/mps2-scc.c b/hw/misc/mps2-scc.c
-index 9d0909e7b35..745505b849d 100644
---- a/hw/misc/mps2-scc.c
-+++ b/hw/misc/mps2-scc.c
-@@ -20,11 +20,13 @@
- #include "qemu/osdep.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "qemu/bitops.h"
- #include "trace.h"
- #include "hw/sysbus.h"
- #include "migration/vmstate.h"
- #include "hw/registerfields.h"
- #include "hw/misc/mps2-scc.h"
-+#include "hw/misc/led.h"
- #include "hw/qdev-properties.h"
+@@ -204,8 +204,9 @@ are then turned into static libraries as follows::
  
- REG32(CFG0, 0)
-@@ -152,18 +154,10 @@ static void mps2_scc_write(void *opaque, hwaddr offset, uint64_t value,
-         s->cfg0 = value;
-         break;
-     case A_CFG1:
--        /* CFG1 bits [7:0] control the board LEDs. We don't currently have
--         * a mechanism for displaying this graphically, so use a trace event.
--         */
--        trace_mps2_scc_leds(value & 0x80 ? '*' : '.',
--                            value & 0x40 ? '*' : '.',
--                            value & 0x20 ? '*' : '.',
--                            value & 0x10 ? '*' : '.',
--                            value & 0x08 ? '*' : '.',
--                            value & 0x04 ? '*' : '.',
--                            value & 0x02 ? '*' : '.',
--                            value & 0x01 ? '*' : '.');
-         s->cfg1 = value;
-+        for (size_t i = 0; i < ARRAY_SIZE(s->led); i++) {
-+            led_set_state(s->led[i], extract32(value, i, 1));
-+        }
-         break;
-     case A_CFGDATA_OUT:
-         s->cfgdata_out = value;
-@@ -245,10 +239,19 @@ static void mps2_scc_init(Object *obj)
+     chardev = declare_dependency(link_whole: libchardev)
  
-     memory_region_init_io(&s->iomem, obj, &mps2_scc_ops, s, "mps2-scc", 0x1000);
-     sysbus_init_mmio(sbd, &s->iomem);
-+
- }
+-The special `.fa` suffix is needed as long as unit tests are built with
+-the older Makefile infrastructure, and will go away later.
++As of Meson 0.55.1, the special `.fa` suffix should be used for everything
++that is used with `link_whole`, to ensure that the link flags are placed
++correctly in the command line.
  
- static void mps2_scc_realize(DeviceState *dev, Error **errp)
- {
-+    MPS2SCC *s = MPS2_SCC(dev);
-+
-+    for (size_t i = 0; i < ARRAY_SIZE(s->led); i++) {
-+        char *name = g_strdup_printf("SCC LED%zu", i);
-+        s->led[i] = led_create_simple(OBJECT(dev), GPIO_POLARITY_ACTIVE_HIGH,
-+                                      LED_COLOR_GREEN, name);
-+        g_free(name);
-+    }
- }
+ Files linked into emulator targets there can be split into two distinct groups
+ of files, those which are independent of the QEMU emulation target and
+@@ -221,7 +222,8 @@ only in system emulators, `user_ss` only in user-mode emulators.
  
- static const VMStateDescription mps2_scc_vmstate = {
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 0cecad45aad..7557a3e7b46 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -97,6 +97,7 @@ config MPS2_FPGAIO
+ In the target-dependent set lives CPU emulation, device emulation and
+ much glue code. This sometimes also has to be compiled multiple times,
+-once for each target being built.
++once for each target being built.  Target-dependent files are included
++in the `specific_ss` sourceset.
  
- config MPS2_SCC
-     bool
-+    select LED
+ All binaries link with a static library `libqemuutil.a`, which is then
+ linked to all the binaries.  `libqemuutil.a` is built from several
+@@ -300,84 +302,9 @@ The resulting build system is largely non-recursive in nature, in
+ contrast to common practices seen with automake.
  
- config TZ_MPC
-     bool
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 43b9e0cf250..a620a358feb 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -85,7 +85,6 @@ aspeed_scu_write(uint64_t offset, unsigned size, uint32_t data) "To 0x%" PRIx64
- mps2_scc_read(uint64_t offset, uint64_t data, unsigned size) "MPS2 SCC read: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- mps2_scc_write(uint64_t offset, uint64_t data, unsigned size) "MPS2 SCC write: offset 0x%" PRIx64 " data 0x%" PRIx64 " size %u"
- mps2_scc_reset(void) "MPS2 SCC: reset"
--mps2_scc_leds(char led7, char led6, char led5, char led4, char led3, char led2, char led1, char led0) "MPS2 SCC LEDs: %c%c%c%c%c%c%c%c"
- mps2_scc_cfg_write(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config write: function %d device %d data 0x%" PRIx32
- mps2_scc_cfg_read(unsigned function, unsigned device, uint32_t value) "MPS2 SCC config read: function %d device %d data 0x%" PRIx32
+ Tests are also ran by the Makefile with the traditional `make check`
+-phony target.  Meson test suites such as `unit` can be ran with `make
+-check-unit` too.  It is also possible to run tests defined in meson.build
+-with `meson test`.
+-
+-The following text is only relevant for unit tests which still have to
+-be converted to Meson.
+-
+-All binaries should link to `libqemuutil.a`, e.g.:
+-
+-   qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a
+-
+-On Windows, all binaries have the suffix `.exe`, so all Makefile rules
+-which create binaries must include the $(EXESUF) variable on the binary
+-name. e.g.
+-
+-   qemu-img$(EXESUF): qemu-img.o ..snip..
+-
+-This expands to `.exe` on Windows, or an empty string on other platforms.
+-
+-Variable naming
+----------------
+-
+-The QEMU convention is to define variables to list different groups of
+-object files. These are named with the convention $PREFIX-obj-y.  The
+-Meson `chardev` variable in the previous example corresponds to a
+-variable 'chardev-obj-y'.
+-
+-Likewise, tests that are executed by `make check-unit` are grouped into
+-a variable check-unit-y, like this:
+-
+-  check-unit-y += tests/test-visitor-serialization$(EXESUF)
+-  check-unit-y += tests/test-iov$(EXESUF)
+-  check-unit-y += tests/test-bitmap$(EXESUF)
+-
+-When a test or object file which needs to be conditionally built based
+-on some characteristic of the host system, the configure script will
+-define a variable for the conditional. For example, on Windows it will
+-define $(CONFIG_POSIX) with a value of 'n' and $(CONFIG_WIN32) with a
+-value of 'y'. It is now possible to use the config variables when
+-listing object files. For example,
+-
+-  check-unit-$(CONFIG_POSIX) += tests/test-vmstate$(EXESUF)
+-
+-On Windows this expands to
+-
+-  check-unit-n += tests/vmstate.exe
+-
+-Since the `check-unit` target only runs tests included in `$(check-unit-y)`,
+-POSIX specific tests listed in `$(util-obj-n)` are ignored on the Windows
+-platform builds.
+-
+-
+-CFLAGS / LDFLAGS / LIBS handling
+---------------------------------
+-
+-There are many different binaries being built with differing purposes,
+-and some of them might even be 3rd party libraries pulled in via git
+-submodules. As such the use of the global CFLAGS variable is generally
+-avoided in QEMU, since it would apply to too many build targets.
+-
+-Flags that are needed by any QEMU code (i.e. everything *except* GIT
+-submodule projects) are put in $(QEMU_CFLAGS) variable. For linker
+-flags the $(LIBS) variable is sometimes used, but a couple of more
+-targeted variables are preferred.
+-
+-In addition to these variables, it is possible to provide cflags and
+-libs against individual source code files, by defining variables of the
+-form $FILENAME-cflags and $FILENAME-libs. For example, the test
+-test-crypto-tlscredsx509 needs to link to the libtasn1 library,
+-so tests/Makefile.include defines some variables:
+-
+-  tests/crypto-tls-x509-helpers.o-cflags := $(TASN1_CFLAGS)
+-  tests/crypto-tls-x509-helpers.o-libs := $(TASN1_LIBS)
+-
+-The scope is a little different between the two variables. The libs get
+-used when linking any target binary that includes the curl.o object
+-file, while the cflags get used when compiling the curl.c file only.
+-
++phony target, while benchmarks are run with `make bench`.  Meson test
++suites such as `unit` can be ran with `make check-unit` too.  It is also
++possible to run tests defined in meson.build with `meson test`.
  
+ Important files for the build system
+ ====================================
+@@ -402,10 +329,8 @@ number of dynamically created files listed later.
+   other meson.build files spread throughout the QEMU source tree.
+ 
+ `tests/Makefile.include`
+-  Rules for building the unit tests. This file is included directly by the
+-  top level Makefile, so anything defined in this file will influence the
+-  entire build system. Care needs to be taken when writing rules for tests
+-  to ensure they only apply to the unit test execution / build.
++  Rules for external test harnesses. These include the TCG tests,
++  `qemu-iotests` and the Avocado-based acceptance tests.
+ 
+ `tests/docker/Makefile.include`
+   Rules for Docker tests. Like tests/Makefile, this file is included
 -- 
 2.26.2
 
