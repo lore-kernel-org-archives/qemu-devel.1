@@ -2,79 +2,79 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1378C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 466C8C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:38:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2883320C09
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B75BD215A4
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:38:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y2Znat9u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2883320C09
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jl1+howg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B75BD215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59324 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFFT8-00020l-5M
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:37:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60180)
+	id 1kFFTb-0003Fv-MG
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:38:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF3K-0004Pu-W3
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:11:15 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57678
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF3B-00047i-4B
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:11:05 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:35555
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF3J-0008Lu-AK
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:11:14 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF37-0008Il-8F
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:11:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599477072;
+ s=mimecast20190719; t=1599477060;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ygo/XYZ+oQWSJqI6S7P8aPZrncRCzgkEv45s+bwAJrg=;
- b=Y2Znat9uX6P2SedWH0uxTZ5LnOiGzhfO7UhyXOJH7Uu6ac8jRfpS8bdYy/fFptz2a0RZso
- XuIwx0mOKVQpfI3Mo/MVH7UPdxpwMUc3qIiz8bbUpCvmLXFT7RP/UNiWBa9GKeLa87z9qj
- bELQVCroRBIgdG6gHkFoWLII3CFgvFU=
+ bh=5nmrVRJIfL3D2vBxS45cCHI7EEkQMg5DdPXGtTCD73U=;
+ b=Jl1+howg0lbEz6EXW/DXufwLdYNvIMzUW1mLyNVJziWnyp+HgTnBrUBFJnb9eM/xNcjyac
+ CFDPy8G0UzycmbvMrY9z6oliUtQ9kVp8UcBOGUMBXWBhJQ/6ldekGJjs+ti4jH3h+OFdpB
+ J8a5/s9AVeRcc733DsaI0rLPbPtEinY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-233-4Rc1XWBpP0OsyjHsJ_CwnQ-1; Mon, 07 Sep 2020 07:11:08 -0400
-X-MC-Unique: 4Rc1XWBpP0OsyjHsJ_CwnQ-1
+ us-mta-203-oCbafpj2MVGXKO_TYSXaQA-1; Mon, 07 Sep 2020 07:10:58 -0400
+X-MC-Unique: oCbafpj2MVGXKO_TYSXaQA-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B49C1007466;
- Mon,  7 Sep 2020 11:11:07 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 353791084C85;
+ Mon,  7 Sep 2020 11:10:57 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9452F9CBA;
- Mon,  7 Sep 2020 11:11:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 33F137E435;
+ Mon,  7 Sep 2020 11:10:56 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 64/64] block/nvme: Pair doorbell registers
-Date: Mon,  7 Sep 2020 13:09:36 +0200
-Message-Id: <20200907110936.261684-65-kwolf@redhat.com>
+Subject: [PULL 56/64] iotests: Add filter commit test cases
+Date: Mon,  7 Sep 2020 13:09:28 +0200
+Message-Id: <20200907110936.261684-57-kwolf@redhat.com>
 In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
 References: <20200907110936.261684-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/06 22:29:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
@@ -100,57 +100,216 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
 
-For each queue doorbell registers are paired as:
-- Submission Queue Tail Doorbell
-- Completion Queue Head Doorbell
+This patch adds some tests on how commit copes with filter nodes.
 
-Reflect that in the NVMeRegs structure, and adapt
-nvme_create_queue_pair() accordingly.
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200904124130.583838-4-philmd@redhat.com>
-Reviewed-by: Klaus Jensen <k.jensen@samsung.com>
-Reviewed-by: Fam Zheng <fam@euphon.net>
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/nvme.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ tests/qemu-iotests/040     | 177 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/040.out |   4 +-
+ 2 files changed, 179 insertions(+), 2 deletions(-)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index a216cc407f..f4f27b6da7 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -84,7 +84,10 @@ typedef struct {
- /* Memory mapped registers */
- typedef volatile struct {
-     NvmeBar ctrl;
--    uint32_t doorbells[];
-+    struct {
-+        uint32_t sq_tail;
-+        uint32_t cq_head;
-+    } doorbells[];
- } NVMeRegs;
+diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
+index f58f50d023..71c6d7f621 100755
+--- a/tests/qemu-iotests/040
++++ b/tests/qemu-iotests/040
+@@ -734,6 +734,183 @@ class TestErrorHandling(iotests.QMPTestCase):
+         self.assertTrue(iotests.compare_images(mid_img, backing_img, fmt2='raw'),
+                         'target image does not match source after commit')
  
- #define INDEX_ADMIN     0
-@@ -244,14 +247,14 @@ static NVMeQueuePair *nvme_create_queue_pair(BDRVNVMeState *s,
-         error_propagate(errp, local_err);
-         goto fail;
-     }
--    q->sq.doorbell = &s->regs->doorbells[idx * 2 * s->doorbell_scale];
-+    q->sq.doorbell = &s->regs->doorbells[idx * s->doorbell_scale].sq_tail;
++class TestCommitWithFilters(iotests.QMPTestCase):
++    img0 = os.path.join(iotests.test_dir, '0.img')
++    img1 = os.path.join(iotests.test_dir, '1.img')
++    img2 = os.path.join(iotests.test_dir, '2.img')
++    img3 = os.path.join(iotests.test_dir, '3.img')
++
++    def do_test_io(self, read_or_write):
++        for index, pattern_file in enumerate(self.pattern_files):
++            result = qemu_io('-f', iotests.imgfmt,
++                             '-c',
++                             f'{read_or_write} -P {index + 1} {index}M 1M',
++                             pattern_file)
++            self.assertFalse('Pattern verification failed' in result)
++
++    def setUp(self):
++        qemu_img('create', '-f', iotests.imgfmt, self.img0, '64M')
++        qemu_img('create', '-f', iotests.imgfmt, self.img1, '64M')
++        qemu_img('create', '-f', iotests.imgfmt, self.img2, '64M')
++        qemu_img('create', '-f', iotests.imgfmt, self.img3, '64M')
++
++        # Distributions of the patterns in the files; this is checked
++        # by tearDown() and should be changed by the test cases as is
++        # necessary
++        self.pattern_files = [self.img0, self.img1, self.img2, self.img3]
++
++        self.do_test_io('write')
++
++        self.vm = iotests.VM()
++        self.vm.launch()
++
++        result = self.vm.qmp('object-add', qom_type='throttle-group', id='tg')
++        self.assert_qmp(result, 'return', {})
++
++        result = self.vm.qmp('blockdev-add', **{
++                'node-name': 'top-filter',
++                'driver': 'throttle',
++                'throttle-group': 'tg',
++                'file': {
++                    'node-name': 'cow-3',
++                    'driver': iotests.imgfmt,
++                    'file': {
++                        'driver': 'file',
++                        'filename': self.img3
++                    },
++                    'backing': {
++                        'node-name': 'cow-2',
++                        'driver': iotests.imgfmt,
++                        'file': {
++                            'driver': 'file',
++                            'filename': self.img2
++                        },
++                        'backing': {
++                            'node-name': 'cow-1',
++                            'driver': iotests.imgfmt,
++                            'file': {
++                                'driver': 'file',
++                                'filename': self.img1
++                            },
++                            'backing': {
++                                'node-name': 'bottom-filter',
++                                'driver': 'throttle',
++                                'throttle-group': 'tg',
++                                'file': {
++                                    'node-name': 'cow-0',
++                                    'driver': iotests.imgfmt,
++                                    'file': {
++                                        'driver': 'file',
++                                        'filename': self.img0
++                                    }
++                                }
++                            }
++                        }
++                    }
++                }
++            })
++        self.assert_qmp(result, 'return', {})
++
++    def tearDown(self):
++        self.vm.shutdown()
++        self.do_test_io('read')
++
++        os.remove(self.img3)
++        os.remove(self.img2)
++        os.remove(self.img1)
++        os.remove(self.img0)
++
++    # Filters make for funny filenames, so we cannot just use
++    # self.imgX to get them
++    def get_filename(self, node):
++        return self.vm.node_info(node)['image']['filename']
++
++    def test_filterless_commit(self):
++        result = self.vm.qmp('block-commit',
++                             job_id='commit',
++                             device='top-filter',
++                             top_node='cow-2',
++                             base_node='cow-1')
++        self.assert_qmp(result, 'return', {})
++        self.wait_until_completed(drive='commit')
++
++        self.assertIsNotNone(self.vm.node_info('cow-3'))
++        self.assertIsNone(self.vm.node_info('cow-2'))
++        self.assertIsNotNone(self.vm.node_info('cow-1'))
++
++        # 2 has been comitted into 1
++        self.pattern_files[2] = self.img1
++
++    def test_commit_through_filter(self):
++        result = self.vm.qmp('block-commit',
++                             job_id='commit',
++                             device='top-filter',
++                             top_node='cow-1',
++                             base_node='cow-0')
++        self.assert_qmp(result, 'return', {})
++        self.wait_until_completed(drive='commit')
++
++        self.assertIsNotNone(self.vm.node_info('cow-2'))
++        self.assertIsNone(self.vm.node_info('cow-1'))
++        self.assertIsNone(self.vm.node_info('bottom-filter'))
++        self.assertIsNotNone(self.vm.node_info('cow-0'))
++
++        # 1 has been comitted into 0
++        self.pattern_files[1] = self.img0
++
++    def test_filtered_active_commit_with_filter(self):
++        # Add a device, so the commit job finds a parent it can change
++        # to point to the base node (so we can test that top-filter is
++        # dropped from the graph)
++        result = self.vm.qmp('device_add', id='drv0', driver='virtio-blk',
++                             drive='top-filter')
++        self.assert_qmp(result, 'return', {})
++
++        # Try to release our reference to top-filter; that should not
++        # work because drv0 uses it
++        result = self.vm.qmp('blockdev-del', node_name='top-filter')
++        self.assert_qmp(result, 'error/class', 'GenericError')
++        self.assert_qmp(result, 'error/desc', 'Node top-filter is in use')
++
++        result = self.vm.qmp('block-commit',
++                             job_id='commit',
++                             device='top-filter',
++                             base_node='cow-2')
++        self.assert_qmp(result, 'return', {})
++        self.complete_and_wait(drive='commit')
++
++        # Try to release our reference to top-filter again
++        result = self.vm.qmp('blockdev-del', node_name='top-filter')
++        self.assert_qmp(result, 'return', {})
++
++        self.assertIsNone(self.vm.node_info('top-filter'))
++        self.assertIsNone(self.vm.node_info('cow-3'))
++        self.assertIsNotNone(self.vm.node_info('cow-2'))
++
++        # Check that drv0 is now connected to cow-2
++        blockdevs = self.vm.qmp('query-block')['return']
++        drv0 = next(dev for dev in blockdevs if '/drv0' in dev['qdev'])
++        self.assertEqual(drv0['inserted']['node-name'], 'cow-2')
++
++        # 3 has been comitted into 2
++        self.pattern_files[3] = self.img2
++
++    def test_filtered_active_commit_without_filter(self):
++        result = self.vm.qmp('block-commit',
++                             job_id='commit',
++                             device='top-filter',
++                             top_node='cow-3',
++                             base_node='cow-2')
++        self.assert_qmp(result, 'return', {})
++        self.complete_and_wait(drive='commit')
++
++        self.assertIsNotNone(self.vm.node_info('top-filter'))
++        self.assertIsNone(self.vm.node_info('cow-3'))
++        self.assertIsNotNone(self.vm.node_info('cow-2'))
++
++        # 3 has been comitted into 2
++        self.pattern_files[3] = self.img2
++
+ if __name__ == '__main__':
+     iotests.main(supported_fmts=['qcow2', 'qed'],
+                  supported_protocols=['file'])
+diff --git a/tests/qemu-iotests/040.out b/tests/qemu-iotests/040.out
+index 6a917130b6..4823c113d5 100644
+--- a/tests/qemu-iotests/040.out
++++ b/tests/qemu-iotests/040.out
+@@ -1,5 +1,5 @@
+-...........................................................
++...............................................................
+ ----------------------------------------------------------------------
+-Ran 59 tests
++Ran 63 tests
  
-     nvme_init_queue(s, &q->cq, size, NVME_CQ_ENTRY_BYTES, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto fail;
-     }
--    q->cq.doorbell = &s->regs->doorbells[(idx * 2 + 1) * s->doorbell_scale];
-+    q->cq.doorbell = &s->regs->doorbells[idx * s->doorbell_scale].cq_head;
- 
-     return q;
- fail:
+ OK
 -- 
 2.25.4
 
