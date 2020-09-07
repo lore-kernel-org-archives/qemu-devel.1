@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C2D2C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D3BC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:24:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0607621473
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8771B206D4
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:24:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CG8Dztbm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0607621473
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZAHLYOyY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8771B206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFFFr-00059m-Q4
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:24:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59232)
+	id 1kFFFv-0005HE-Kp
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:24:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2Y-00035i-Sn
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:26 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31424
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2g-0003FL-EX
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:34 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39940
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2W-00082m-32
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:26 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2b-00085g-9Z
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:34 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599477023;
+ s=mimecast20190719; t=1599477028;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ziHyhx5LQcFzPB86bz8sA1YDCaQDEwMkHFvr8NhkDrs=;
- b=CG8DztbmkB3odpfKVvj+Hw29jPjhBfhSwZ6vckSMNDQ6VmPXc4Rp1XymAP6WKOTL8E8G5V
- bf44/cSGnSCfDsXQdp3zgvfAyuK9FPX9fIzYNiMRUZTRzgl1bvSd/uLNzWo5gZ3e5+e9Im
- 2HThN9yfnAkyvG6QbS00sMkhZ+aiwkM=
+ bh=lIzB7IHutW+3zqorqZPQLg0QJPATBvixZ5oyv2NhWko=;
+ b=ZAHLYOyYoXfnBEwswCP7xFCjt6G/jG3mmFQ6y7ImssNUBERnYyB82M1MZ2IgR3c1zowz+2
+ /yY83HYCFmmyF3jPwOrLNMrjJHHSPchGlFoiMuv49SW5/YdYhVFfQm5/nId+UraHWJXDzW
+ Kw3aUIkKs5yUkut2fk/ElPohLoKLVmY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-496-DRkwxj7zO0-Klp28lTmGeg-1; Mon, 07 Sep 2020 07:10:21 -0400
-X-MC-Unique: DRkwxj7zO0-Klp28lTmGeg-1
+ us-mta-372-mvwLbIfiPsarlIcM4an3VQ-1; Mon, 07 Sep 2020 07:10:23 -0400
+X-MC-Unique: mvwLbIfiPsarlIcM4an3VQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3DF6E802B6B;
- Mon,  7 Sep 2020 11:10:20 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C825A1084C88;
+ Mon,  7 Sep 2020 11:10:22 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4C8AD7E435;
- Mon,  7 Sep 2020 11:10:19 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D34DC9CBA;
+ Mon,  7 Sep 2020 11:10:21 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 27/64] block: Use CAFs in block status functions
-Date: Mon,  7 Sep 2020 13:08:59 +0200
-Message-Id: <20200907110936.261684-28-kwolf@redhat.com>
+Subject: [PULL 29/64] block: Use CAFs when working with backing chains
+Date: Mon,  7 Sep 2020 13:09:01 +0200
+Message-Id: <20200907110936.261684-30-kwolf@redhat.com>
 In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
 References: <20200907110936.261684-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -82,7 +82,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,72 +102,131 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-Use the child access functions in the block status inquiry functions as
-appropriate.
+Use child access functions when iterating through backing chains so
+filters do not break the chain.
+
+In addition, bdrv_find_overlay() will now always return the actual
+overlay; that is, it will never return a filter node but only one with a
+COW backing file (there may be filter nodes between that node and @bs).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- block/io.c | 19 ++++++++++---------
- 1 file changed, 10 insertions(+), 9 deletions(-)
+ block.c | 44 ++++++++++++++++++++++++++++++--------------
+ 1 file changed, 30 insertions(+), 14 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 01e3477a77..4ee8fe5465 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2409,9 +2409,10 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
-     if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
-         ret |= BDRV_BLOCK_ALLOCATED;
-     } else if (want_zero && bs->drv->supports_backing) {
--        if (bs->backing) {
--            BlockDriverState *bs2 = bs->backing->bs;
--            int64_t size2 = bdrv_getlength(bs2);
-+        BlockDriverState *cow_bs = bdrv_cow_bs(bs);
-+
-+        if (cow_bs) {
-+            int64_t size2 = bdrv_getlength(cow_bs);
- 
-             if (size2 >= 0 && offset >= size2) {
-                 ret |= BDRV_BLOCK_ZERO;
-@@ -2479,7 +2480,7 @@ static int coroutine_fn bdrv_co_block_status_above(BlockDriverState *bs,
-     bool first = true;
- 
-     assert(bs != base);
--    for (p = bs; p != base; p = backing_bs(p)) {
-+    for (p = bs; p != base; p = bdrv_filter_or_cow_bs(p)) {
-         ret = bdrv_co_block_status(p, want_zero, offset, bytes, pnum, map,
-                                    file);
-         if (ret < 0) {
-@@ -2553,7 +2554,7 @@ int bdrv_block_status_above(BlockDriverState *bs, BlockDriverState *base,
- int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
-                       int64_t *pnum, int64_t *map, BlockDriverState **file)
- {
--    return bdrv_block_status_above(bs, backing_bs(bs),
-+    return bdrv_block_status_above(bs, bdrv_filter_or_cow_bs(bs),
-                                    offset, bytes, pnum, map, file);
+diff --git a/block.c b/block.c
+index 887c125400..96bf8672f1 100644
+--- a/block.c
++++ b/block.c
+@@ -4745,9 +4745,9 @@ int bdrv_change_backing_file(BlockDriverState *bs, const char *backing_file,
  }
  
-@@ -2563,9 +2564,9 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-     int ret;
-     int64_t dummy;
- 
--    ret = bdrv_common_block_status_above(bs, backing_bs(bs), false, offset,
--                                         bytes, pnum ? pnum : &dummy, NULL,
--                                         NULL);
-+    ret = bdrv_common_block_status_above(bs, bdrv_filter_or_cow_bs(bs), false,
-+                                         offset, bytes, pnum ? pnum : &dummy,
-+                                         NULL, NULL);
-     if (ret < 0) {
-         return ret;
+ /*
+- * Finds the image layer in the chain that has 'bs' as its backing file.
+- *
+- * active is the current topmost image.
++ * Finds the first non-filter node above bs in the chain between
++ * active and bs.  The returned node is either an immediate parent of
++ * bs, or there are only filter nodes between the two.
+  *
+  * Returns NULL if bs is not found in active's image chain,
+  * or if active == bs.
+@@ -4757,11 +4757,18 @@ int bdrv_change_backing_file(BlockDriverState *bs, const char *backing_file,
+ BlockDriverState *bdrv_find_overlay(BlockDriverState *active,
+                                     BlockDriverState *bs)
+ {
+-    while (active && bs != backing_bs(active)) {
+-        active = backing_bs(active);
++    bs = bdrv_skip_filters(bs);
++    active = bdrv_skip_filters(active);
++
++    while (active) {
++        BlockDriverState *next = bdrv_backing_chain_next(active);
++        if (bs == next) {
++            return active;
++        }
++        active = next;
      }
-@@ -2628,7 +2629,7 @@ int bdrv_is_allocated_above(BlockDriverState *top,
-             break;
+ 
+-    return active;
++    return NULL;
+ }
+ 
+ /* Given a BDS, searches for the base layer. */
+@@ -4913,9 +4920,7 @@ int bdrv_drop_intermediate(BlockDriverState *top, BlockDriverState *base,
+      * other intermediate nodes have been dropped.
+      * If 'top' is an implicit node (e.g. "commit_top") we should skip
+      * it because no one inherits from it. We use explicit_top for that. */
+-    while (explicit_top && explicit_top->implicit) {
+-        explicit_top = backing_bs(explicit_top);
+-    }
++    explicit_top = bdrv_skip_implicit_filters(explicit_top);
+     update_inherits_from = bdrv_inherits_from_recursive(base, explicit_top);
+ 
+     /* success - we can delete the intermediate states, and link top->base */
+@@ -5372,7 +5377,7 @@ BlockDriverState *bdrv_lookup_bs(const char *device,
+ bool bdrv_chain_contains(BlockDriverState *top, BlockDriverState *base)
+ {
+     while (top && top != base) {
+-        top = backing_bs(top);
++        top = bdrv_filter_or_cow_bs(top);
+     }
+ 
+     return top != NULL;
+@@ -5613,6 +5618,7 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+     int is_protocol = 0;
+     BlockDriverState *curr_bs = NULL;
+     BlockDriverState *retval = NULL;
++    BlockDriverState *bs_below;
+ 
+     if (!bs || !bs->drv || !backing_file) {
+         return NULL;
+@@ -5623,7 +5629,17 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+ 
+     is_protocol = path_has_protocol(backing_file);
+ 
+-    for (curr_bs = bs; curr_bs->backing; curr_bs = curr_bs->backing->bs) {
++    /*
++     * Being largely a legacy function, skip any filters here
++     * (because filters do not have normal filenames, so they cannot
++     * match anyway; and allowing json:{} filenames is a bit out of
++     * scope).
++     */
++    for (curr_bs = bdrv_skip_filters(bs);
++         bdrv_cow_child(curr_bs) != NULL;
++         curr_bs = bs_below)
++    {
++        bs_below = bdrv_backing_chain_next(curr_bs);
+ 
+         /* If either of the filename paths is actually a protocol, then
+          * compare unmodified paths; otherwise make paths relative */
+@@ -5631,7 +5647,7 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+             char *backing_file_full_ret;
+ 
+             if (strcmp(backing_file, curr_bs->backing_file) == 0) {
+-                retval = curr_bs->backing->bs;
++                retval = bs_below;
+                 break;
+             }
+             /* Also check against the full backing filename for the image */
+@@ -5641,7 +5657,7 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+                 bool equal = strcmp(backing_file, backing_file_full_ret) == 0;
+                 g_free(backing_file_full_ret);
+                 if (equal) {
+-                    retval = curr_bs->backing->bs;
++                    retval = bs_below;
+                     break;
+                 }
+             }
+@@ -5667,7 +5683,7 @@ BlockDriverState *bdrv_find_backing_image(BlockDriverState *bs,
+             g_free(filename_tmp);
+ 
+             if (strcmp(backing_file_full, filename_full) == 0) {
+-                retval = curr_bs->backing->bs;
++                retval = bs_below;
+                 break;
+             }
          }
- 
--        intermediate = backing_bs(intermediate);
-+        intermediate = bdrv_filter_or_cow_bs(intermediate);
-     }
- 
-     *pnum = n;
 -- 
 2.25.4
 
