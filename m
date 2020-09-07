@@ -2,94 +2,99 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DBC9C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 942B4C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:41:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 874692075A
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:41:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 057852075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 09:41:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="czMdsQfC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 874692075A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=landley-net.20150623.gappssmtp.com header.i=@landley-net.20150623.gappssmtp.com header.b="fIUhBGdB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 057852075A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=landley.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43562 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFDeG-0008Ks-J3
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:41:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38810)
+	id 1kFDeM-00004t-Vf
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 05:41:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kFDdI-0007DR-79
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:40:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:33051
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kFDdE-0005Dp-EO
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:40:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599471611;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QExlLy8jSofv2tI/cGtlZTEeshpSz8fa87HJM8H60YU=;
- b=czMdsQfC2IxRswvCCarRj3M/GJJI2WfE9a16qk3VkxoxhxpNor+NGMZMsGqrtR7AlwC2bP
- Y9qmMUj38qH7JvKBgskHj6rBnp0wEGG6S5ifILIpdeXU72OkKotbD8bU6ga3nyLAt1AOZ0
- z4Y/yNA/zoOeUGh5DqFC5MyuMWeFkLU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-bD3C1VklMpSTxihxOG50ug-1; Mon, 07 Sep 2020 05:39:45 -0400
-X-MC-Unique: bD3C1VklMpSTxihxOG50ug-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8F01E1DDEC;
- Mon,  7 Sep 2020 09:39:42 +0000 (UTC)
-Received: from redhat.com (ovpn-114-70.ams2.redhat.com [10.36.114.70])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F3A3610013C4;
- Mon,  7 Sep 2020 09:39:32 +0000 (UTC)
-Date: Mon, 7 Sep 2020 10:39:30 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 1/4] Acceptance tests: use an available kernel image
- package for arm
-Message-ID: <20200907093930.GD810755@redhat.com>
-References: <20200907042000.415931-1-crosa@redhat.com>
- <20200907042000.415931-2-crosa@redhat.com>
- <001385a1-92eb-d311-88b5-8e1e7f6f1f48@redhat.com>
+ (Exim 4.90_1) (envelope-from <rob@landley.net>) id 1kFDdd-0007c5-Ag
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:40:37 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:46040)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <rob@landley.net>) id 1kFDda-0005KL-R5
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 05:40:36 -0400
+Received: by mail-oi1-x242.google.com with SMTP id d189so13044307oig.12
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 02:40:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=landley-net.20150623.gappssmtp.com; s=20150623;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=x0DpBTBpkMG2MJ2vLiOL6mRffvT7xAVShmNIa7/ahZ0=;
+ b=fIUhBGdBo+/FQ3eQztL5h33318oVtP6W4AFA2ehNRuCbHmhHsZIjadJ+3s7gwoS+R6
+ mTZW6JzB+A6Yx+SzWdP2SypyXauP0FumQiFC9vGjgr45y7aqdSOrOf1t3AEYwsvFybgC
+ zoMLcjxJFwCOcbkbcb5eQ5yne1uFDlXKSc7kZrvc445IBPNV2ZRAvbeOCOQyNgB6ATUk
+ jHpUE757NaML6NuFmH4wKvT0oaW9vhuW88OKZBdoRAA+Ts9VhlFrsDxJFzG8NNwMlbZo
+ AZs3d3wo/xJrR1A1xmqBby63N9cCLMdrjCxyTZxQO/qu67xvlPW7lXrFGd9Twxq+YXgQ
+ iOFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=x0DpBTBpkMG2MJ2vLiOL6mRffvT7xAVShmNIa7/ahZ0=;
+ b=suIA7HnVmmStqcjPWSU0cWXszVeCzHtCMGwuU3l0GErd1+bZZHAvcJ6/4nQbtQPZyB
+ xJ1EgwQN5LBU9vxhs3TAj28/Y4+/Hp+jSiKm0buH3zkwYl2Rx7z8zqCz6F/8UEtrS36+
+ pqehBBphkC0Ni6iyPzMoQ7S025Fcfvf9ZTaX8YGuxHhv31Pv5wILFU1ebjSj5Xk5LAFN
+ RPL5huvSV8FmlvLSKRrg1glPcG/ILjhwuuEY0QzfjmRpe/7BcPV8jMKU2G0fprcadQud
+ ijcpfWFylnEcFSfSkFvK1GbVoIzr6uH46LpWwdhvhFKmPmDoQlbTWEwdVOQZZHmUdCux
+ Yhag==
+X-Gm-Message-State: AOAM530guCMo1FvcZnVW4XmO9qGl2mp7PInHBQOcpRReZccTlZA5jyFj
+ RKWFstH7PVHKIRvSJW7PEXJ+tQ==
+X-Google-Smtp-Source: ABdhPJy0X1iMy+WtC8C8vDx9MCMrUVs2doXEBDma8TzYP6he/kV9DbtebVwk1JZDVOURTamUv+YlGg==
+X-Received: by 2002:aca:5d89:: with SMTP id
+ r131mr11378884oib.120.1599471632964; 
+ Mon, 07 Sep 2020 02:40:32 -0700 (PDT)
+Received: from ?IPv6:2607:fb90:839:54f:e8ff:7fff:fe76:c1b2?
+ ([2607:fb90:839:54f:e8ff:7fff:fe76:c1b2])
+ by smtp.gmail.com with ESMTPSA id d26sm2728055otl.10.2020.09.07.02.40.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 07 Sep 2020 02:40:32 -0700 (PDT)
+Subject: Re: [RFC PATCH v3 00/34] Hexagon patch series
+To: Taylor Simpson <tsimpson@quicinc.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+References: <1597765847-16637-1-git-send-email-tsimpson@quicinc.com>
+ <fbb5a85b-6208-1791-0d3e-7e741e674a70@linaro.org>
+ <BYAPR02MB48862BC00AD7217B715EBFC7DE500@BYAPR02MB4886.namprd02.prod.outlook.com>
+From: Rob Landley <rob@landley.net>
+Message-ID: <ac0e68a8-671c-7d6d-f85f-0d25d5775cca@landley.net>
+Date: Mon, 7 Sep 2020 04:49:53 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <001385a1-92eb-d311-88b5-8e1e7f6f1f48@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <BYAPR02MB48862BC00AD7217B715EBFC7DE500@BYAPR02MB4886.namprd02.prod.outlook.com>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=berrange@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
-X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.099,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: none client-ip=2607:f8b0:4864:20::242;
+ envelope-from=rob@landley.net; helo=mail-oi1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -45
+X-Spam_score: -4.6
+X-Spam_bar: ----
+X-Spam_report: (-4.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, NICE_REPLY_A=-2.69, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,241 +107,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Sarah Harris <S.E.Harris@kent.ac.uk>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- KONRAD Frederic <frederic.konrad@adacore.com>,
- Willian Rampazzo <wrampazz@redhat.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- =?utf-8?B?SGVydsOp?= Poussineau <hpoussin@reactos.org>,
- Antony Pavlov <antonynpavlov@gmail.com>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Fabien Chouteau <chouteau@adacore.com>,
- qemu-arm@nongnu.org, Michael Rolnik <mrolnik@gmail.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Cleber Rosa <crosa@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Beraldo Leal <bleal@redhat.com>, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: "ale@rev.ng" <ale@rev.ng>, "riku.voipio@iki.fi" <riku.voipio@iki.fi>,
+ "philmd@redhat.com" <philmd@redhat.com>,
+ "laurent@vivier.eu" <laurent@vivier.eu>,
+ "aleksandar.m.mail@gmail.com" <aleksandar.m.mail@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 07, 2020 at 10:06:13AM +0200, Philippe Mathieu-Daudé wrote:
-> [Cc'ing Daniel who usually have good ideas for that
-> kind if project-wide problem]
+On 8/30/20 3:47 PM, Taylor Simpson wrote:
+> Richard,
 > 
-> On 9/7/20 6:19 AM, Cleber Rosa wrote:
-> > Which means a newer kernel version.  Expected output was changed
-> > to match the new kernel too.
+> Thank you so much for the feedback.  I really appreciate it.
 > 
-> Nack.
+> I'll get to work addressing the issues.  Since some of the items will take longer than others, please advise whether it's preferred to send intermediate updates or wait until they are all addressed.
 > 
-> Acceptance tests are not to test the latest Linux kernel,
-> they aim to assert a specific kernel tested by some developer
-> still works while QEMU evolves.
-> QEMU doesn't have to adapt to the latest kernel;
-> QEMU should keep boot an old kernel.
-> 
-> Testing new kernels is good, you are adding coverage. But
-> this break the acceptance testing contract "keep testing
-> the same thing over time".
-> 
-> The problem you are trying to fix is the "where to keep
-> assets from public locations where they are being removed?"
-> one. Two years ago [*] you suggested to use some storage on
-> the avocado-project.org:
-> 
->   For Avocado-VT, there are the JeOS images[1], which we
->   keep on a test "assets" directory.  We have a lot of
->   storage/bandwidth availability, so it can be used for
->   other assets proven to be necessary for tests.
-> 
->   As long as distribution rights and licensing are not
->   issues, we can definitely use the same server for kernels,
->   u-boot images and what not.
-> 
->   [1] - https://avocado-project.org/data/assets/
+> Taylor
 
-If I look at stuff under that directory I see a bunch of "Jeos" qcow2
-images, and zero information about the corresponding source for the
-images, nor any information about the licenses of software included.
-IOW what is stored their right now does not appear to comply with the
-GPL licensing requirements for providing full and corresponding source.
+Which branch of https://github.com/quic/qemu do I pull to try this without
+scraping 30 patches out of the mailing list?
 
-> It is time to have QEMU assets managed the same way.
+>>> Once the series is applied, the Hexagon port will pass "make check-tcg".
+>>> The series also includes Hexagon-specific tests in tcg/tests/hexagon.
+>>>
+>>> We have a parallel effort to make the Hexagon Linux toolchain inside a
+>> docker
+>>> container publically available.
+>>
+>> Oh, excellent.
 
-I'd rather we didn't do anything relying on binary blobs with no
-info about how they were built. Pointing to the 3rd party download
-URLs was the easy way to ensure we don't have to worry about licensing
-problems.
+Is that a follow-up to https://www.spinics.net/lists/linux-hexagon/msg01706.html
+and is this a clang toolchain or a gcc toolchain?
 
-IIUC, the majority of our acceptance tests needs should be satisfied
-with a combination of a Linux kernel and busybox tools. We already
-use cross-compilers to build TCG test cases.
+I've noticed gcc 9.2 has hexagon in config.guess and config.sub, but the only
+other file outside of the test suite containing the word "hexagon" in a case
+insensitive match is the Changelog saying Linas Veptas added it to config.guess
+and config.sub in 2011. And while https://github.com/quic has a musl fork it
+doesn't have any compiler or linker forks...
 
-I'd like to see us provide a minimal "config" file for each Linux
-kernel combo we need to test. We should be able to define a fairly
-simple script that do the Linux build, busybox build and then puts
-the combination of them into a disk image.  Something 100% automated
-and reviewable.
-
-Even a minimal linux build takes some time, so we would need to cache
-the binary result in some suitable manner. At least this way we have
-a clear record of what we're building & how and can thus satisfy the
-license rules.
-
-> 
-> [*] https://www.mail-archive.com/avocado-devel@redhat.com/msg00860.html
-> 
-> > 
-> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > ---
-> >  tests/acceptance/boot_linux_console.py | 44 +++++++++++++-------------
-> >  tests/acceptance/replay_kernel.py      |  8 ++---
-> >  2 files changed, 26 insertions(+), 26 deletions(-)
-> > 
-> > diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
-> > index aaa781a581..751b47b8fd 100644
-> > --- a/tests/acceptance/boot_linux_console.py
-> > +++ b/tests/acceptance/boot_linux_console.py
-> > @@ -490,12 +490,12 @@ class BootLinuxConsole(LinuxKernelTest):
-> >          :avocado: tags=arch:arm
-> >          :avocado: tags=machine:cubieboard
-> >          """
-> > -        deb_url = ('https://apt.armbian.com/pool/main/l/'
-> > -                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-> > -        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-> > +        deb_url = ('https://apt.armbian.com/pool/main/l/linux-5.8.0-sunxi/'
-> > +                   'linux-image-dev-sunxi_20.08_armhf.deb')
-> > +        deb_hash = 'ae553a9f7d43b18abfa8f3e64bf2d31878b9be89'
-> >          deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> >          kernel_path = self.extract_from_deb(deb_path,
-> > -                                            '/boot/vmlinuz-4.20.7-sunxi')
-> > +                                            '/boot/vmlinuz-5.8.0-sunxi')
-> >          dtb_path = '/usr/lib/linux-image-dev-sunxi/sun4i-a10-cubieboard.dtb'
-> >          dtb_path = self.extract_from_deb(deb_path, dtb_path)
-> >          initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
-> > @@ -522,7 +522,7 @@ class BootLinuxConsole(LinuxKernelTest):
-> >          exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo',
-> >                                                  'Allwinner sun4i/sun5i')
-> >          exec_command_and_wait_for_pattern(self, 'cat /proc/iomem',
-> > -                                                'system-control@1c00000')
-> > +                                                '1c00000.system-control')
-> >          # cubieboard's reboot is not functioning; omit reboot test.
-> >  
-> >      def test_arm_cubieboard_sata(self):
-> > @@ -530,12 +530,12 @@ class BootLinuxConsole(LinuxKernelTest):
-> >          :avocado: tags=arch:arm
-> >          :avocado: tags=machine:cubieboard
-> >          """
-> > -        deb_url = ('https://apt.armbian.com/pool/main/l/'
-> > -                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-> > -        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-> > +        deb_url = ('https://apt.armbian.com/pool/main/l/linux-5.8.0-sunxi/'
-> > +                   'linux-image-dev-sunxi_20.08_armhf.deb')
-> > +        deb_hash = 'ae553a9f7d43b18abfa8f3e64bf2d31878b9be89'
-> >          deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> >          kernel_path = self.extract_from_deb(deb_path,
-> > -                                            '/boot/vmlinuz-4.20.7-sunxi')
-> > +                                            '/boot/vmlinuz-5.8.0-sunxi')
-> >          dtb_path = '/usr/lib/linux-image-dev-sunxi/sun4i-a10-cubieboard.dtb'
-> >          dtb_path = self.extract_from_deb(deb_path, dtb_path)
-> >          rootfs_url = ('https://github.com/groeck/linux-build-test/raw/'
-> > @@ -573,12 +573,12 @@ class BootLinuxConsole(LinuxKernelTest):
-> >          :avocado: tags=arch:arm
-> >          :avocado: tags=machine:orangepi-pc
-> >          """
-> > -        deb_url = ('https://apt.armbian.com/pool/main/l/'
-> > -                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-> > -        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-> > +        deb_url = ('https://apt.armbian.com/pool/main/l/linux-5.8.0-sunxi/'
-> > +                   'linux-image-dev-sunxi_20.08_armhf.deb')
-> > +        deb_hash = 'ae553a9f7d43b18abfa8f3e64bf2d31878b9be89'
-> >          deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> >          kernel_path = self.extract_from_deb(deb_path,
-> > -                                            '/boot/vmlinuz-4.20.7-sunxi')
-> > +                                            '/boot/vmlinuz-5.8.0-sunxi')
-> >          dtb_path = '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
-> >          dtb_path = self.extract_from_deb(deb_path, dtb_path)
-> >  
-> > @@ -598,12 +598,12 @@ class BootLinuxConsole(LinuxKernelTest):
-> >          :avocado: tags=arch:arm
-> >          :avocado: tags=machine:orangepi-pc
-> >          """
-> > -        deb_url = ('https://apt.armbian.com/pool/main/l/'
-> > -                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-> > -        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-> > +        deb_url = ('https://apt.armbian.com/pool/main/l/linux-5.8.0-sunxi/'
-> > +                   'linux-image-dev-sunxi_20.08_armhf.deb')
-> > +        deb_hash = 'ae553a9f7d43b18abfa8f3e64bf2d31878b9be89'
-> >          deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> >          kernel_path = self.extract_from_deb(deb_path,
-> > -                                            '/boot/vmlinuz-4.20.7-sunxi')
-> > +                                            '/boot/vmlinuz-5.8.0-sunxi')
-> >          dtb_path = '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
-> >          dtb_path = self.extract_from_deb(deb_path, dtb_path)
-> >          initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
-> > @@ -629,7 +629,7 @@ class BootLinuxConsole(LinuxKernelTest):
-> >          exec_command_and_wait_for_pattern(self, 'cat /proc/cpuinfo',
-> >                                                  'Allwinner sun8i Family')
-> >          exec_command_and_wait_for_pattern(self, 'cat /proc/iomem',
-> > -                                                'system-control@1c00000')
-> > +                                                '1c00000.system-control')
-> >          exec_command_and_wait_for_pattern(self, 'reboot',
-> >                                                  'reboot: Restarting system')
-> >          # Wait for VM to shut down gracefully
-> > @@ -641,12 +641,12 @@ class BootLinuxConsole(LinuxKernelTest):
-> >          :avocado: tags=machine:orangepi-pc
-> >          :avocado: tags=device:sd
-> >          """
-> > -        deb_url = ('https://apt.armbian.com/pool/main/l/'
-> > -                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-> > -        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-> > +        deb_url = ('https://apt.armbian.com/pool/main/l/linux-5.8.0-sunxi/'
-> > +                   'linux-image-dev-sunxi_20.08_armhf.deb')
-> > +        deb_hash = 'ae553a9f7d43b18abfa8f3e64bf2d31878b9be89'
-> >          deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> >          kernel_path = self.extract_from_deb(deb_path,
-> > -                                            '/boot/vmlinuz-4.20.7-sunxi')
-> > +                                            '/boot/vmlinuz-5.8.0-sunxi')
-> >          dtb_path = '/usr/lib/linux-image-dev-sunxi/sun8i-h3-orangepi-pc.dtb'
-> >          dtb_path = self.extract_from_deb(deb_path, dtb_path)
-> >          rootfs_url = ('http://storage.kernelci.org/images/rootfs/buildroot/'
-> > diff --git a/tests/acceptance/replay_kernel.py b/tests/acceptance/replay_kernel.py
-> > index b79fc8daf8..80a460814f 100644
-> > --- a/tests/acceptance/replay_kernel.py
-> > +++ b/tests/acceptance/replay_kernel.py
-> > @@ -132,12 +132,12 @@ class ReplayKernel(LinuxKernelTest):
-> >          :avocado: tags=arch:arm
-> >          :avocado: tags=machine:cubieboard
-> >          """
-> > -        deb_url = ('https://apt.armbian.com/pool/main/l/'
-> > -                   'linux-4.20.7-sunxi/linux-image-dev-sunxi_5.75_armhf.deb')
-> > -        deb_hash = '1334c29c44d984ffa05ed10de8c3361f33d78315'
-> > +        deb_url = ('https://apt.armbian.com/pool/main/l/linux-5.8.0-sunxi/'
-> > +                   'linux-image-dev-sunxi_20.08_armhf.deb')
-> > +        deb_hash = 'ae553a9f7d43b18abfa8f3e64bf2d31878b9be89'
-> >          deb_path = self.fetch_asset(deb_url, asset_hash=deb_hash)
-> >          kernel_path = self.extract_from_deb(deb_path,
-> > -                                            '/boot/vmlinuz-4.20.7-sunxi')
-> > +                                            '/boot/vmlinuz-5.8.0-sunxi')
-> >          dtb_path = '/usr/lib/linux-image-dev-sunxi/sun4i-a10-cubieboard.dtb'
-> >          dtb_path = self.extract_from_deb(deb_path, dtb_path)
-> >          initrd_url = ('https://github.com/groeck/linux-build-test/raw/'
-> > 
-> 
-> 
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+Rob
 
