@@ -2,84 +2,73 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94A06C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CC47C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:28:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0A9EF206E6
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:27:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yFzFYVxh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A9EF206E6
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5D33B206E6
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:28:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D33B206E6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51836 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFGFH-0003Yt-3x
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 08:27:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47630)
+	id 1kFGFy-0004Qv-IR
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 08:28:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kFGEE-0002wT-7D
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:26:34 -0400
-Received: from mail-ed1-x52f.google.com ([2a00:1450:4864:20::52f]:39325)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kFGEC-0000u3-9L
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:26:33 -0400
-Received: by mail-ed1-x52f.google.com with SMTP id c10so12610278edk.6
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 05:26:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Cv4Cn0M1qXagRSOgKePGgSRTT6tiF/GSi+0A4QzDuPw=;
- b=yFzFYVxh9u9x/hEZHWCuLOJ7MrLWWWkX9HDFQmcZn5bl0x2v+1dI/PnoXTbdCq4YDc
- fKptRtFP+3ZIqPqOPXB4B1oxy4Ra4W+dg5S5FD2SOaG/4Yy40zC6J3Jd+Zz3c1RgG2Nf
- Z6ujWZvp7+JJj2rjzjfMERVoQYZA/a+xx6Hn+ekSv7aDOkTlxMkdJz07HK+pWZcYG0tg
- tB8CquPJMaJPlegoi78iez9k5uycsaziZSGIFzJuXzDkp05pjdZk4p1l8eENQiSrmpLa
- 5ERv0WPQ++A5JwEN6wulgPTbsJ4QTFEkktEYL62O8gMO41XCp2Kk/68dXPPc97/UTFd8
- myOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Cv4Cn0M1qXagRSOgKePGgSRTT6tiF/GSi+0A4QzDuPw=;
- b=JkSJdX1CH67fs2XP6vmH9XUIIG2sHiZahnfIKEhOUKmxvx5fRk7AAK+4cIL6Bu7bAs
- B/gCkHdFrfkJ/4hbfn8JwdO/BYEKT8OxfmR9sHQkVEQcby+Pcnzr1GWdKs3oKqPyXoek
- DjKwoRZmVw9IpdXhp7EfbN/JK8drzT7q4pg+0UeLhz+ufWuDQvL/1iiZWiqWBptBLWFH
- ID+7f+JH0b+0YqEOoVCkXHUNFAm4avBbpteURcAI3Hj5z2Cfc8GplPKntkXulLAg27d5
- W2LW+wHCw5oULqcH5Jmtgg535Itxu9peT4BsDqdj9dSh+PTMn/EjCIf/NtFtCakpDz58
- T4Tw==
-X-Gm-Message-State: AOAM531ZSpt64v2TCBQygyhW2E3k9zcBuQP+Vj7bAYUuxnQlnmBCUTGS
- PrvHQVcjuIzGPluFH1XmKpK8yZwlIp5bdLCOKTtnbg==
-X-Google-Smtp-Source: ABdhPJxcHYzQ1PjLo7MSRBGtWy3uNvx7XVrNqf50o+/lSCKHw5P6cEGnL4sjqKYH/GowzrR3WiC72KcWnimremNHDVE=
-X-Received: by 2002:aa7:dd4b:: with SMTP id o11mr15225149edw.251.1599481590264; 
- Mon, 07 Sep 2020 05:26:30 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kFGF6-0003dA-O7
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:27:28 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:46447)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kFGF4-00010a-5a
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:27:28 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.108.16.189])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id B67C1584CD5A;
+ Mon,  7 Sep 2020 14:27:20 +0200 (CEST)
+Received: from kaod.org (37.59.142.95) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 7 Sep 2020
+ 14:27:20 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-95G0010295eab7-bc45-4a3a-ad0a-489c564ff677,
+ FB6B05930862AC66219C483F6F551C079519CC1C) smtp.auth=groug@kaod.org
+Date: Mon, 7 Sep 2020 14:27:19 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH] 9pfs: disable msize warning for synth driver
+Message-ID: <20200907142719.35a4f079@bahia.lan>
+In-Reply-To: <1773061.9aR6DczYlW@silver>
+References: <E1kEyDy-0006nN-5A@lizzy.crudebyte.com>
+ <20200907115758.70366924@bahia.lan> <1773061.9aR6DczYlW@silver>
+X-Mailer: Claws Mail 3.17.6 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-References: <20200906201911.11814-1-pbonzini@redhat.com>
-In-Reply-To: <20200906201911.11814-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 7 Sep 2020 13:26:19 +0100
-Message-ID: <CAFEAcA-uc3QRW8T6nnrPsJuRQeeh--cz8gemr3YuUpAcYEgqpQ@mail.gmail.com>
-Subject: Re: [PULL 00/45] Next round of Meson bugfixes and cleanups
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::52f;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52f.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG5EX1.mxp5.local (172.16.2.41) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 2daec7ea-80a5-451d-acdc-e1f931857972
+X-Ovh-Tracer-Id: 2821505168702871962
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgeduiedrudehtddgheefucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucenucfjughrpeffhffvuffkjghfofggtgfgihesthejredtredtvdenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepfedutdeijeejveehkeeileetgfelteekteehtedtieefffevhffflefftdefleejnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrdelheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 08:27:21
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,38 +82,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 6 Sep 2020 at 21:21, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit 227de21ed0759e275a469394af72c999d0134bb5:
->
->   Merge remote-tracking branch 'remotes/rth/tags/pull-tcg-20200903' into staging (2020-09-05 15:30:41 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 17701f5a5d5ca20e9af8034b219c9b11c66f325a:
->
->   meson: remove linkage of sdl to baum (2020-09-06 22:07:58 +0200)
->
-> ---------------------------------------------------------------
+On Mon, 07 Sep 2020 13:55:52 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-Windows: same mkdir() issue as previous version
-OpenBSD: same epoxy/gl.h issue as previous version
+> On Montag, 7. September 2020 11:57:58 CEST Greg Kurz wrote:
+> > On Sun, 6 Sep 2020 18:50:32 +0200
+> > 
+> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > > Previous patch introduced a performance warning being logged on host
+> > > side if client connected with an 'msize' <= 8192. Disable this
+> > > performance warning for the synth driver to prevent that warning from
+> > > being printed whenever the 9pfs (qtest) test cases are running.
+> > > 
+> > > Introduce a new export flag V9FS_NO_PERF_WARN for that purpose, which
+> > > might also be used to disable such warnings from the CLI in future.
+> > > 
+> > > We could have also prevented the warning by simply raising P9_MAX_SIZE
+> > > in virtio-9p-test.c to any value larger than 8192, however in the
+> > > context of test cases it makes sense running for edge cases, which
+> > > includes the lowest 'msize' value supported by the server which is
+> > > 4096, hence we want to preserve an msize of 4096 for the test client.
+> > > 
+> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > > ---
+> > 
+> > Heh, yes I guess it makes sense :)
+> > 
+> > I guess you could maybe queue this patch before the other one.
+> > 
+> > Reviewed-by: Greg Kurz <groug@kaod.org>
+> 
+> Thanks!
+> 
+> BTW, have you ever tried dealing with patchwork client's 'state' feature for 
+> already transmited patches on the list (new, rejected, etc.)?
+> 
 
-all-linux-static config fails to link:
+Nope, never used patchwork's state at all and I've no idea on how it
+works... but I can ask to my former IBM colleagues at Ozlabs.
 
-Linking target qemu-aarch64
-/usr/bin/ld: cannot find -lepoxy
-/usr/bin/ld: cannot find -lgbm
-collect2: error: ld returned 1 exit status
-Makefile.ninja:710: recipe for target 'qemu-aarch64' failed
+> Not that there were many 9p patches for actually needing that; just curious if 
+> that's an LKML only feature.
+> 
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
 
-thanks
--- PMM
 
