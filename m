@@ -2,95 +2,131 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_NONE,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E689C2BB84
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEFF3C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:48:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DBD202080A
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:46:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 997662080A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 16:48:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nXgrufAJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBD202080A
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="exRUEJRk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 997662080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFKHl-0007UU-0q
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:46:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50328)
+	id 1kFKJT-0000sQ-OG
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 12:48:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kFKFm-0004xx-8T
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:44:26 -0400
-Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:41906)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kFKFk-0000ZP-6u
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:44:25 -0400
-Received: by mail-ej1-x633.google.com with SMTP id lo4so18965727ejb.8
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 09:44:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NJCG291sP5k6rqzSSOSg1NyDHQEnkAmTSor1WlXw0DU=;
- b=nXgrufAJbvLCPRmvq13zIrV8mDHSnNAdQR5SDsq0PjCjzEvuU2t+ZmBtOWJTZBYIR0
- AqAYD+rWu3w82zLQoH3G80VgVgR0/ZPvefmOBnokyzzVcAjt9+mJxOmsgRtL4pKNXFKm
- rEmb3XNqxVC5eyGYuILuQm6BYjtRbjYjVOhNVCcHcIjNIZNeFDGZI3X0dTi7cxYsO2bJ
- xIOAsc78F4NRo2vGK4msVZZi8TaPXd6r/U7Z/0Yc27zKCkdDE6qSSvcjXQutxHn/g8hl
- vBxzqu3kMIGV/3MTkI0xTh4e2Y4V3qGVbF6Z5aZNVFtnkPo7pQXbiFG1/gT4AEXoZjR6
- cOOA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFKIr-0000PM-9Y
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:47:37 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43287
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFKIo-00013V-N1
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 12:47:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599497253;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=aeuTdmiZFkcCdevZ8b+ER2lE0L5fq4XO9xMiIfMhSz8=;
+ b=exRUEJRk3tDTawNEfK0vnvFg4u/oD4MLEvK572c+A7gLSxjBH7WD/99UHLPZvISz1MNR1y
+ XCAM87+MQYRNSZIDdN7I513pKj0oUwTi4b8h6ECAP3L7OfuCbofVEKmKFkoDB/Yh5X06mI
+ 3z/u4d5WTeK6jKcejIhGN4N1gfEecP4=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-230-y7sUB6V_NEqgPtjNCC2yeQ-1; Mon, 07 Sep 2020 12:47:30 -0400
+X-MC-Unique: y7sUB6V_NEqgPtjNCC2yeQ-1
+Received: by mail-ej1-f72.google.com with SMTP id md9so5420976ejb.8
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 09:47:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=NJCG291sP5k6rqzSSOSg1NyDHQEnkAmTSor1WlXw0DU=;
- b=fSLhK4kc5EGUUd69t3BVqE+JOhG6ChnNLTgbv4TgOtr3nyOjwm/H4z66GFxflavq2g
- v8sNxrzhIhDrbOlfJk5J6E+QoGLSX5OUYPbGltJcgibsLHsgBTO4MW1mYdvYLLqt68/0
- iYrTVKlIvw004MX1RrgwH2UUrp8Aiv5sfianJUMmAIGdlPbyFFJnhL/zex0pXulKsVDo
- Ts/5Ag8Iu9TlTDc95z5tDKUkw/3SIf7PIm0avgt4HJqVNaOcDGJvhjWhFaz3k3u+ZC9m
- 5UupD8HOXJpxII2jooJnZag6soKQcb2JUU4ZRnzSzF3qwQOqzG6E1CbFVzpIY7HjAqIL
- nyug==
-X-Gm-Message-State: AOAM5324/13JdSqGkLEOxEtRg+L37yUZXpG4MHt/vi2iJnGDOIWdE8g3
- siSyl9zIWrYg9oRi+tupqb5RUOVk3X8=
-X-Google-Smtp-Source: ABdhPJxqSI1Kafahr+mYf258sK1ApX4ulrplmXfj3oNj/THNKN84wSQnEIB/f0f0M2vt8gbIPiSwng==
-X-Received: by 2002:a17:906:715b:: with SMTP id
- z27mr23224920ejj.166.1599497062347; 
- Mon, 07 Sep 2020 09:44:22 -0700 (PDT)
-Received: from donizetti.lan ([2001:b07:6468:f312:6891:d6db:f6ec:d1df])
- by smtp.gmail.com with ESMTPSA id n20sm15760391ejg.65.2020.09.07.09.44.21
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 09:44:21 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 38/46] configure: do not include dependency flags in
- QEMU_CFLAGS and LIBS
-Date: Mon,  7 Sep 2020 18:44:21 +0200
-Message-Id: <20200907164421.19886-3-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200907164421.19886-1-pbonzini@redhat.com>
-References: <20200907164421.19886-1-pbonzini@redhat.com>
+ h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aeuTdmiZFkcCdevZ8b+ER2lE0L5fq4XO9xMiIfMhSz8=;
+ b=rBk0n2OYpWmAfBYcNVGgPzT0g0t6MeknWGk5lYMS9dAp7UNsSDz7rypAMq6FQQbbR1
+ gR5AK62p81/LZsqJ3qmBqBr9J4GXkmno0JB+T6tT6wHvafE7eVtbRHCtNaJd0dDcxVJ9
+ muivizMMWmASP8hwcniPhplISPwwl+ktmP/VZ+ehb52zCOtFK3aJa2JHMVmnnm4ZAXSU
+ jyRsd8EgB2EK6CN7iE24pPSzwYT64JrJtiM330/C4yTHm9iKufkpVvPHrCtD9KvgA+h0
+ mdK3hCkq0j2y4PrDSg76FBtbxd6uW9Loc3zIsid3gzSKsBDvAJt2QGE2AXe/oWUwZkfa
+ uvNA==
+X-Gm-Message-State: AOAM533XhZ7NlpOJo0pgjatMiU9vtFgdXdp2PAfRWWeH5FC2QPWsX8CP
+ 3QTtHasvNDFzvIQlLZlAIZS1CIig7KRhjpFF2AOMB8a200AEX8xIHsMCzWHiyGUk1jJVCfgiYoZ
+ WD5PRi5OhOQW+fwo=
+X-Received: by 2002:a17:906:692:: with SMTP id
+ u18mr21503506ejb.43.1599497248599; 
+ Mon, 07 Sep 2020 09:47:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzAmEmBLsblK8j9ZNONhSOorALWVxXPNzq4Ev/ggJUZ90LXUYH61kIoRpo6Wu6axlUv8Xatyw==
+X-Received: by 2002:a17:906:692:: with SMTP id
+ u18mr21503484ejb.43.1599497248267; 
+ Mon, 07 Sep 2020 09:47:28 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id t14sm15618117edc.7.2020.09.07.09.47.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 07 Sep 2020 09:47:27 -0700 (PDT)
+Subject: Re: [PATCH] docs: update build system documentation
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200907163953.19097-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <20bc6751-3656-c40b-fd1c-7bce6db4e315@redhat.com>
+Date: Mon, 7 Sep 2020 18:47:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <20200907163953.19097-1-pbonzini@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::633;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-ej1-x633.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Language: en-US
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -39
+X-Spam_score: -4.0
+X-Spam_bar: ----
+X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.825, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,291 +143,153 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All Meson executables should specify their dependencies explicitly, either
-directly or indirectly via declare_dependency.  Makefiles instead did
-not propagate dependencies correctly from static libraries, for example.
-Therefore, flags for dependencies need not be included in QEMU_CFLAGS.
-LIBS is not used at all, so drop that one as well.
+On 9/7/20 6:39 PM, Paolo Bonzini wrote:
+> Most of the Makefile bits are obsolete and can be removed.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-In a few cases the dependencies were not yet specified, so add them.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Makefile             |  2 +-
- configure            | 40 ----------------------------------------
- hw/arm/meson.build   |  2 +-
- hw/mips/meson.build  |  2 +-
- hw/riscv/meson.build |  2 +-
- monitor/meson.build  |  2 +-
- ui/meson.build       |  3 ++-
- 7 files changed, 7 insertions(+), 46 deletions(-)
+> ---
+>  docs/devel/build-system.rst | 97 +++++--------------------------------
+>  1 file changed, 11 insertions(+), 86 deletions(-)
+> 
+> diff --git a/docs/devel/build-system.rst b/docs/devel/build-system.rst
+> index 591e93f4b4..08e85c69e1 100644
+> --- a/docs/devel/build-system.rst
+> +++ b/docs/devel/build-system.rst
+> @@ -179,7 +179,7 @@ process for:
+>  
+>     - Userspace emulators - qemu-$ARCH
+>  
+> -   - Some (but not all) unit tests
+> +   - Unit tests
+>  
+>  2) documentation
+>  
+> @@ -204,8 +204,9 @@ are then turned into static libraries as follows::
+>  
+>      chardev = declare_dependency(link_whole: libchardev)
+>  
+> -The special `.fa` suffix is needed as long as unit tests are built with
+> -the older Makefile infrastructure, and will go away later.
+> +As of Meson 0.55.1, the special `.fa` suffix should be used for everything
+> +that is used with `link_whole`, to ensure that the link flags are placed
+> +correctly in the command line.
+>  
+>  Files linked into emulator targets there can be split into two distinct groups
+>  of files, those which are independent of the QEMU emulation target and
+> @@ -221,7 +222,8 @@ only in system emulators, `user_ss` only in user-mode emulators.
+>  
+>  In the target-dependent set lives CPU emulation, device emulation and
+>  much glue code. This sometimes also has to be compiled multiple times,
+> -once for each target being built.
+> +once for each target being built.  Target-dependent files are included
+> +in the `specific_ss` sourceset.
+>  
+>  All binaries link with a static library `libqemuutil.a`, which is then
+>  linked to all the binaries.  `libqemuutil.a` is built from several
+> @@ -300,84 +302,9 @@ The resulting build system is largely non-recursive in nature, in
+>  contrast to common practices seen with automake.
+>  
+>  Tests are also ran by the Makefile with the traditional `make check`
+> -phony target.  Meson test suites such as `unit` can be ran with `make
+> -check-unit` too.  It is also possible to run tests defined in meson.build
+> -with `meson test`.
+> -
+> -The following text is only relevant for unit tests which still have to
+> -be converted to Meson.
+> -
+> -All binaries should link to `libqemuutil.a`, e.g.:
+> -
+> -   qemu-img$(EXESUF): qemu-img.o ..snip.. libqemuutil.a
+> -
+> -On Windows, all binaries have the suffix `.exe`, so all Makefile rules
+> -which create binaries must include the $(EXESUF) variable on the binary
+> -name. e.g.
+> -
+> -   qemu-img$(EXESUF): qemu-img.o ..snip..
+> -
+> -This expands to `.exe` on Windows, or an empty string on other platforms.
+> -
+> -Variable naming
+> ----------------
+> -
+> -The QEMU convention is to define variables to list different groups of
+> -object files. These are named with the convention $PREFIX-obj-y.  The
+> -Meson `chardev` variable in the previous example corresponds to a
+> -variable 'chardev-obj-y'.
+> -
+> -Likewise, tests that are executed by `make check-unit` are grouped into
+> -a variable check-unit-y, like this:
+> -
+> -  check-unit-y += tests/test-visitor-serialization$(EXESUF)
+> -  check-unit-y += tests/test-iov$(EXESUF)
+> -  check-unit-y += tests/test-bitmap$(EXESUF)
+> -
+> -When a test or object file which needs to be conditionally built based
+> -on some characteristic of the host system, the configure script will
+> -define a variable for the conditional. For example, on Windows it will
+> -define $(CONFIG_POSIX) with a value of 'n' and $(CONFIG_WIN32) with a
+> -value of 'y'. It is now possible to use the config variables when
+> -listing object files. For example,
+> -
+> -  check-unit-$(CONFIG_POSIX) += tests/test-vmstate$(EXESUF)
+> -
+> -On Windows this expands to
+> -
+> -  check-unit-n += tests/vmstate.exe
+> -
+> -Since the `check-unit` target only runs tests included in `$(check-unit-y)`,
+> -POSIX specific tests listed in `$(util-obj-n)` are ignored on the Windows
+> -platform builds.
+> -
+> -
+> -CFLAGS / LDFLAGS / LIBS handling
+> ---------------------------------
+> -
+> -There are many different binaries being built with differing purposes,
+> -and some of them might even be 3rd party libraries pulled in via git
+> -submodules. As such the use of the global CFLAGS variable is generally
+> -avoided in QEMU, since it would apply to too many build targets.
+> -
+> -Flags that are needed by any QEMU code (i.e. everything *except* GIT
+> -submodule projects) are put in $(QEMU_CFLAGS) variable. For linker
+> -flags the $(LIBS) variable is sometimes used, but a couple of more
+> -targeted variables are preferred.
+> -
+> -In addition to these variables, it is possible to provide cflags and
+> -libs against individual source code files, by defining variables of the
+> -form $FILENAME-cflags and $FILENAME-libs. For example, the test
+> -test-crypto-tlscredsx509 needs to link to the libtasn1 library,
+> -so tests/Makefile.include defines some variables:
+> -
+> -  tests/crypto-tls-x509-helpers.o-cflags := $(TASN1_CFLAGS)
+> -  tests/crypto-tls-x509-helpers.o-libs := $(TASN1_LIBS)
+> -
+> -The scope is a little different between the two variables. The libs get
+> -used when linking any target binary that includes the curl.o object
+> -file, while the cflags get used when compiling the curl.c file only.
+> -
+> +phony target, while benchmarks are run with `make bench`.  Meson test
+> +suites such as `unit` can be ran with `make check-unit` too.  It is also
+> +possible to run tests defined in meson.build with `meson test`.
+>  
+>  Important files for the build system
+>  ====================================
+> @@ -402,10 +329,8 @@ number of dynamically created files listed later.
+>    other meson.build files spread throughout the QEMU source tree.
+>  
+>  `tests/Makefile.include`
+> -  Rules for building the unit tests. This file is included directly by the
+> -  top level Makefile, so anything defined in this file will influence the
+> -  entire build system. Care needs to be taken when writing rules for tests
+> -  to ensure they only apply to the unit test execution / build.
+> +  Rules for external test harnesses. These include the TCG tests,
+> +  `qemu-iotests` and the Avocado-based acceptance tests.
+>  
+>  `tests/docker/Makefile.include`
+>    Rules for Docker tests. Like tests/Makefile, this file is included
+> 
 
-diff --git a/Makefile b/Makefile
-index 678e76d6f2..d6c5c9fdef 100644
---- a/Makefile
-+++ b/Makefile
-@@ -155,7 +155,7 @@ dtc/%: .git-submodule-status
- # Therefore we replicate some of the logic in the sub-makefile.
- # Remove all the extra -Warning flags that QEMU uses that Capstone doesn't;
- # no need to annoy QEMU developers with such things.
--CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS))
-+CAP_CFLAGS = $(patsubst -W%,,$(CFLAGS) $(QEMU_CFLAGS)) $(CAPSTONE_CFLAGS)
- CAP_CFLAGS += -DCAPSTONE_USE_SYS_DYN_MEM
- CAP_CFLAGS += -DCAPSTONE_HAS_ARM
- CAP_CFLAGS += -DCAPSTONE_HAS_ARM64
-diff --git a/configure b/configure
-index e18f3e2156..b94ba9b239 100755
---- a/configure
-+++ b/configure
-@@ -832,7 +832,6 @@ FreeBSD)
-   audio_drv_list="oss try-sdl"
-   audio_possible_drivers="oss sdl pa"
-   # needed for kinfo_getvmmap(3) in libutil.h
--  LIBS="-lutil $LIBS"
-   netmap=""  # enable netmap autodetect
-   HOST_VARIANT_DIR="freebsd"
- ;;
-@@ -890,13 +889,10 @@ SunOS)
-   QEMU_CFLAGS="-D_XOPEN_SOURCE=600 $QEMU_CFLAGS"
- # needed for TIOCWIN* defines in termios.h
-   QEMU_CFLAGS="-D__EXTENSIONS__ $QEMU_CFLAGS"
--  solarisnetlibs="-lsocket -lnsl -lresolv"
--  LIBS="$solarisnetlibs $LIBS"
- ;;
- Haiku)
-   haiku="yes"
-   QEMU_CFLAGS="-DB_USE_POSITIVE_POSIX_ERRORS -DBSD_SOURCE $QEMU_CFLAGS"
--  LIBS="-lposix_error_mapper -lnetwork -lbsd $LIBS"
- ;;
- Linux)
-   audio_drv_list="try-pa oss"
-@@ -966,11 +962,7 @@ if test "$mingw32" = "yes" ; then
-   HOST_DSOSUF=".dll"
-   # MinGW needs -mthreads for TLS and macro _MT.
-   CFLAGS="-mthreads $CFLAGS"
--  LIBS="-lwinmm -lws2_32 $LIBS"
-   write_c_skeleton;
--  if compile_prog "" "-liberty" ; then
--    LIBS="-liberty $LIBS"
--  fi
-   prefix="c:/Program Files/QEMU"
-   qemu_suffix=""
-   libs_qga="-lws2_32 -lwinmm -lpowrprof -lwtsapi32 -lwininet -liphlpapi -lnetapi32 $libs_qga"
-@@ -2691,7 +2683,6 @@ if test "$xen" != "no" ; then
-     if $pkg_config --exists xentoolcore; then
-       xen_pc="$xen_pc xentoolcore"
-     fi
--    QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags $xen_pc)"
-     xen_cflags="$($pkg_config --cflags $xen_pc)"
-     xen_libs="$($pkg_config --libs $xen_pc)"
-   else
-@@ -3076,8 +3067,6 @@ if test "$gnutls" != "no"; then
-         # At least ubuntu 18.04 ships only shared libraries.
-         write_c_skeleton
-         if compile_prog "" "$gnutls_libs" ; then
--            LIBS="$gnutls_libs $LIBS"
--            QEMU_CFLAGS="$QEMU_CFLAGS $gnutls_cflags"
-             pass="yes"
-         fi
-     fi
-@@ -3147,8 +3136,6 @@ if test "$nettle" != "no"; then
-         # Link test to make sure the given libraries work (e.g for static).
-         write_c_skeleton
-         if compile_prog "" "$nettle_libs" ; then
--            LIBS="$nettle_libs $LIBS"
--            QEMU_CFLAGS="$QEMU_CFLAGS $nettle_cflags"
-             if test -z "$gcrypt"; then
-                gcrypt="no"
-             fi
-@@ -3191,8 +3178,6 @@ if test "$gcrypt" != "no"; then
-         # Link test to make sure the given libraries work (e.g for static).
-         write_c_skeleton
-         if compile_prog "" "$gcrypt_libs" ; then
--            LIBS="$gcrypt_libs $LIBS"
--            QEMU_CFLAGS="$QEMU_CFLAGS $gcrypt_cflags"
-             pass="yes"
-         fi
-     fi
-@@ -3764,7 +3749,6 @@ for i in $glib_modules; do
-     if $pkg_config --atleast-version=$glib_req_ver $i; then
-         glib_cflags=$($pkg_config --cflags $i)
-         glib_libs=$($pkg_config --libs $i)
--        LIBS="$glib_libs $LIBS"
-     else
-         error_exit "glib-$glib_req_ver $i is required to compile QEMU"
-     fi
-@@ -4074,11 +4058,6 @@ if test "$linux_io_uring" != "no" ; then
-     linux_io_uring_cflags=$($pkg_config --cflags liburing)
-     linux_io_uring_libs=$($pkg_config --libs liburing)
-     linux_io_uring=yes
--
--    # io_uring is used in libqemuutil.a where per-file -libs variables are not
--    # seen by programs linking the archive.  It's not ideal, but just add the
--    # library dependency globally.
--    LIBS="$linux_io_uring_libs $LIBS"
-   else
-     if test "$linux_io_uring" = "yes" ; then
-       feature_not_found "linux io_uring" "Install liburing devel"
-@@ -4123,7 +4102,6 @@ EOF
-   elif compile_prog "-DCONFIG_LIBATTR" "-lattr" ; then
-     attr=yes
-     libattr_libs="-lattr"
--    LIBS="$libattr_libs $LIBS"
-     libattr=yes
-   else
-     if test "$attr" = "yes" ; then
-@@ -4243,7 +4221,6 @@ if test "$opengl" != "no" ; then
-     if test "$gtk" = "yes" && $pkg_config --exists "$gtkpackage >= 3.16"; then
-         gtk_gl="yes"
-     fi
--    QEMU_CFLAGS="$QEMU_CFLAGS $opengl_cflags"
-   else
-     if test "$opengl" = "yes" ; then
-       feature_not_found "opengl" "Please install opengl (mesa) devel pkgs: $opengl_pkgs"
-@@ -4998,7 +4975,6 @@ EOF
-      $pkg_config --atleast-version=0.12.3 spice-protocol && \
-      compile_prog "$spice_cflags" "$spice_libs" ; then
-     spice="yes"
--    QEMU_CFLAGS="$QEMU_CFLAGS $spice_cflags"
-   else
-     if test "$spice" = "yes" ; then
-       feature_not_found "spice" \
-@@ -5181,7 +5157,6 @@ case "$capstone" in
-       git_submodules="${git_submodules} capstone"
-     fi
-     mkdir -p capstone
--    QEMU_CFLAGS="$QEMU_CFLAGS -I${source_path}/capstone/include"
-     if test "$mingw32" = "yes"; then
-       LIBCAPSTONE=capstone.lib
-     else
-@@ -5194,7 +5169,6 @@ case "$capstone" in
-   system)
-     capstone_libs="$($pkg_config --libs capstone)"
-     capstone_cflags="$($pkg_config --cflags capstone)"
--    QEMU_CFLAGS="$QEMU_CFLAGS $($pkg_config --cflags capstone)"
-     ;;
- 
-   no)
-@@ -5343,8 +5317,6 @@ EOF
-     else
-       urcu_bp_libs="-lurcu-bp"
-     fi
--
--    LIBS="$lttng_ust_libs $urcu_bp_libs $LIBS"
-   else
-     error_exit "Trace backend 'ust' missing lttng-ust header files"
-   fi
-@@ -6125,7 +6097,6 @@ if test "$libpmem" != "no"; then
- 		libpmem="yes"
- 		libpmem_libs=$($pkg_config --libs libpmem)
- 		libpmem_cflags=$($pkg_config --cflags libpmem)
--		QEMU_CFLAGS="$QEMU_CFLAGS $libpmem_cflags"
- 	else
- 		if test "$libpmem" = "yes" ; then
- 			feature_not_found "libpmem" "Install nvml or pmdk"
-@@ -6142,7 +6113,6 @@ if test "$libdaxctl" != "no"; then
- 		libdaxctl="yes"
- 		libdaxctl_libs=$($pkg_config --libs libdaxctl)
- 		libdaxctl_cflags=$($pkg_config --cflags libdaxctl)
--		QEMU_CFLAGS="$QEMU_CFLAGS $libdaxctl_cflags"
- 	else
- 		if test "$libdaxctl" = "yes" ; then
- 			feature_not_found "libdaxctl" "Install libdaxctl"
-@@ -6325,11 +6295,6 @@ if test "$libudev" != "no" ; then
-   fi
- fi
- 
--# Now we've finished running tests it's OK to add -Werror to the compiler flags
--if test "$werror" = "yes"; then
--    QEMU_CFLAGS="-Werror $QEMU_CFLAGS"
--fi
--
- # Exclude --warn-common with TSan to suppress warnings from the TSan libraries.
- if test "$solaris" = "no" && test "$tsan" = "no"; then
-     if $ld --version 2>/dev/null | grep "GNU ld" >/dev/null 2>/dev/null ; then
-@@ -6546,10 +6511,6 @@ echo_version() {
-     fi
- }
- 
--# prepend ftd flags after all config tests are done
--QEMU_CFLAGS="$fdt_cflags $QEMU_CFLAGS"
--QEMU_LDFLAGS="$fdt_ldflags $QEMU_LDFLAGS"
--
- config_host_mak="config-host.mak"
- 
- echo "# Automatically generated by configure - do not modify" > $config_host_mak
-@@ -7482,7 +7443,6 @@ echo "QEMU_LDFLAGS=$QEMU_LDFLAGS" >> $config_host_mak
- echo "LDFLAGS_NOPIE=$LDFLAGS_NOPIE" >> $config_host_mak
- echo "LD_REL_FLAGS=$LD_REL_FLAGS" >> $config_host_mak
- echo "LD_I386_EMULATION=$ld_i386_emulation" >> $config_host_mak
--echo "LIBS+=$LIBS" >> $config_host_mak
- echo "LIBS_TOOLS+=$libs_tools" >> $config_host_mak
- echo "PTHREAD_LIB=$PTHREAD_LIB" >> $config_host_mak
- echo "EXESUF=$EXESUF" >> $config_host_mak
-diff --git a/hw/arm/meson.build b/hw/arm/meson.build
-index 1ae5e17eeb..8480b7f37d 100644
---- a/hw/arm/meson.build
-+++ b/hw/arm/meson.build
-@@ -1,5 +1,5 @@
- arm_ss = ss.source_set()
--arm_ss.add(files('boot.c'))
-+arm_ss.add(files('boot.c'), fdt)
- arm_ss.add(when: 'CONFIG_PLATFORM_BUS', if_true: files('sysbus-fdt.c'))
- arm_ss.add(when: 'CONFIG_ARM_VIRT', if_true: files('virt.c'))
- arm_ss.add(when: 'CONFIG_ACPI', if_true: files('virt-acpi-build.c'))
-diff --git a/hw/mips/meson.build b/hw/mips/meson.build
-index 6ac9dc4cff..46294b7382 100644
---- a/hw/mips/meson.build
-+++ b/hw/mips/meson.build
-@@ -4,7 +4,7 @@ mips_ss.add(when: 'CONFIG_FULOONG', if_true: files('fuloong2e.c'))
- mips_ss.add(when: 'CONFIG_JAZZ', if_true: files('jazz.c'))
- mips_ss.add(when: 'CONFIG_MALTA', if_true: files('gt64xxx_pci.c', 'malta.c'))
- mips_ss.add(when: 'CONFIG_MIPSSIM', if_true: files('mipssim.c'))
--mips_ss.add(when: 'CONFIG_MIPS_BOSTON', if_true: files('boston.c'))
-+mips_ss.add(when: 'CONFIG_MIPS_BOSTON', if_true: [files('boston.c'), fdt])
- mips_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('cps.c'))
- mips_ss.add(when: 'CONFIG_R4K', if_true: files('r4k.c'))
- 
-diff --git a/hw/riscv/meson.build b/hw/riscv/meson.build
-index 25af9db75e..fe2ea75f65 100644
---- a/hw/riscv/meson.build
-+++ b/hw/riscv/meson.build
-@@ -1,5 +1,5 @@
- riscv_ss = ss.source_set()
--riscv_ss.add(files('boot.c'))
-+riscv_ss.add(files('boot.c'), fdt)
- riscv_ss.add(files('numa.c'))
- riscv_ss.add(when: 'CONFIG_HART', if_true: files('riscv_hart.c'))
- riscv_ss.add(when: 'CONFIG_OPENTITAN', if_true: files('opentitan.c'))
-diff --git a/monitor/meson.build b/monitor/meson.build
-index 0484a64341..eb2a534fdc 100644
---- a/monitor/meson.build
-+++ b/monitor/meson.build
-@@ -6,4 +6,4 @@ softmmu_ss.add(files(
-   'qmp-cmds.c',
- ))
- 
--specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files('misc.c'))
-+specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: [files('misc.c'), spice])
-diff --git a/ui/meson.build b/ui/meson.build
-index 82f60756d9..dd6c110136 100644
---- a/ui/meson.build
-+++ b/ui/meson.build
-@@ -1,5 +1,5 @@
- softmmu_ss.add(pixman)
--specific_ss.add(pixman)   # for the include path
-+specific_ss.add(when: ['CONFIG_SOFTMMU'], if_true: pixman)   # for the include path
- 
- softmmu_ss.add(files(
-   'console.c',
-@@ -35,6 +35,7 @@ softmmu_ss.add_all(when: vnc, if_true: vnc_ss)
- softmmu_ss.add(when: vnc, if_false: files('vnc-stubs.c'))
- softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
- softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL_DMABUF'], if_true: files('egl-headless.c'))
-+specific_ss.add(when: ['CONFIG_SOFTMMU'], if_true: opengl)
- 
- ui_modules = {}
- 
--- 
-2.26.2
 
