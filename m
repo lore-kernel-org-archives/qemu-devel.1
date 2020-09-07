@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96BEAC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:11:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C7BC43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:12:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0622E206B5
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:11:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF1B8206B5
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:12:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vSMx1dUJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0622E206B5
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zMVbP3oL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF1B8206B5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLcO-0004vG-7P
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:11:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38828)
+	id 1kFLdK-0005wZ-5g
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:12:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLVx-0003qY-7X
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:13 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:52368)
+ id 1kFLVz-0003vF-FT
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:15 -0400
+Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:38327)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLVv-0002Ny-08
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:12 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id o16so7033367pjr.2
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 11:05:10 -0700 (PDT)
+ id 1kFLVx-0002Ok-IM
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:05:15 -0400
+Received: by mail-pf1-x435.google.com with SMTP id l126so1934908pfd.5
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 11:05:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9SsoToSMEh6dKfrGI01LaB8qyEfZ2YCbynKlKreMREc=;
- b=vSMx1dUJ0uEscPO3eGU3SDlGaKU3kQieIJJo2vT2RJM2DY53H+nNLMUEx1zBI6iwqK
- bheunhV4zBXjMZTkUeE2EJ9GVnrHIzAHS86vQGsoHOEzZjx+kYrvTUg8dfCvYVPbKCux
- a/Yu68zRE8gL9KNIUNvwRx4uW4PVK2XXN30Axlero1F+J4oHFEsMfqqlNlzDup5HgB3W
- hn1N0g9B3ZwoWMhvimDqeGWwamcNQRfOfmEXlrw4JBNoa2mLg6VtbL6uoBvMCLolghH/
- 4/rrERC/8/bvIXNNcaEuZRzfil7CF4G7isLbJXOQJmnFBuB83lSVLBH4cu38rxZ4uUUO
- wIOA==
+ bh=mCgjeXLmeN5hMfhXUcUPxa4AMIlfBZL76Mf1qDfxbvQ=;
+ b=zMVbP3oLWWgFM30PnOzJp2LqHHxqM/KwiridqzGv5Iezku2MXp5uQGack/MQbdp8C/
+ ZRmV0xJPJJHAPYFuKg6MHHZaBMv0IpFdpEeW6uzq7m03LMQCkq+1DMrGzM3BeB8+9+7+
+ 6YxaaYRo3k4G9K/w43SOR8odFpHEcW8WGy6U15yYF9kXvIhmvubPKZ4jSZfPjB8wjjn0
+ OLBDeHijSpQjSucxuTY0tQXAwuAcuPuOmtitV8IrWJGJ751rk3UxvOxGE5zf0GzC/cvd
+ 202hTyOdpF7V50ng2NrZeIiEZWLMfSVUexL4t3e1a7WfnKVb5hozmhSrQk8UZVxRIQHF
+ fjKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=9SsoToSMEh6dKfrGI01LaB8qyEfZ2YCbynKlKreMREc=;
- b=oDXZDEC5nfsuGSQyewlKyIUzxUhylYg9JzJAsMzZpYeMqn8XIDBUqahAWK5OFSgH7L
- NEvRuolQYCnW0lOvagGlEMo7gohfUN8k+qlVZ6/r+p/vawdK49bPodH4XUBBDIye8WlF
- toT7it6kIholF8Wgis9OH9S3v6sSB2Hewnr0UZgmwwUweZVLWlSG2tQFEajfjGF1JnS9
- WIhGaqF1xo60pNqxbWJxd6LSpAHYoqbMUADisMAAiTkOYYRrtgR9vfKR3G4EqYKuw1DE
- QYQVHUUyFdm3dJHH0G7eWvmnZq5KkX4ZqfE0/92jPiLpO8LpEeJodc4rfOJ3+l67lLmK
- XKTA==
-X-Gm-Message-State: AOAM5338X7DO3qXm98xFiyQRisPQmlRq8HfD7O+Q2M6Ri4zg7UYZzeU3
- P7VPJ27mTC3rJk9Vn0+C71uPY3MF0eqRUg==
-X-Google-Smtp-Source: ABdhPJwmu9haz+vE+t7K6NYQQhbrjN7ttAQAg+q531Jg86T/3ZvRqy7lcYilLuVKC0cVDDlsf/S8uw==
-X-Received: by 2002:a17:90b:b0b:: with SMTP id
- bf11mr396811pjb.227.1599501909163; 
- Mon, 07 Sep 2020 11:05:09 -0700 (PDT)
+ bh=mCgjeXLmeN5hMfhXUcUPxa4AMIlfBZL76Mf1qDfxbvQ=;
+ b=IGQIRiTPhXs7EZXLFwyldRVoad2Uu6fgkmI49cbyGOSzzPVjPI3GTeYYPA6DcHIaxt
+ 5+Foj+CO7byOaVYd4XNPts/Q/CYGc0i29dM09dqT20+VtmSTUrglAfeLG71tSc6YNYRv
+ UKSBgSBJusC+b1QtUmBylR3FYQW8anXyUcIxbptz0huhCMZqc6yxxXhHMrPBGv3fqkKz
+ Gz9V5Sk9Gj3UdrWXklCKo5hKME7/TLVXA8oOP21sYTIQ6jnkD+5F0uUSonk91Vmi0tOv
+ aWc4o/Mji2ygy+NytkuCwKatpQJsZxLO4tGeSRSilINr5K92IMqFaYAO8KVcxNVZXYuN
+ +/gw==
+X-Gm-Message-State: AOAM531S6DH2lQA8el9pMTcOa1yrxOVUayl08G4Q1GY2aSRMqSgnJWle
+ bdx1HBuIxu5cjioLHhwp8PF5J0uePDnQ8A==
+X-Google-Smtp-Source: ABdhPJyuciwgiQhEkgbRM9gsEyirQGlMKKArijn/4A2qoJMNdLyLVxHJ3dlkCp7jzTv4gRKm2susyA==
+X-Received: by 2002:aa7:9aef:: with SMTP id y15mr671228pfp.119.1599501911800; 
+ Mon, 07 Sep 2020 11:05:11 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id v6sm11367768pfi.38.2020.09.07.11.05.07
+ by smtp.gmail.com with ESMTPSA id v6sm11367768pfi.38.2020.09.07.11.05.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 11:05:08 -0700 (PDT)
+ Mon, 07 Sep 2020 11:05:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 16/19] target/microblaze: Move mmu parameters to
- MicroBlazeCPUConfig
-Date: Mon,  7 Sep 2020 11:04:56 -0700
-Message-Id: <20200907180459.29025-7-richard.henderson@linaro.org>
+Subject: [PULL 18/19] target/microblaze: Put MicroBlazeCPUConfig into
+ DisasContext
+Date: Mon,  7 Sep 2020 11:04:58 -0700
+Message-Id: <20200907180459.29025-9-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200907180459.29025-1-richard.henderson@linaro.org>
 References: <20200907175102.28027-1-richard.henderson@linaro.org>
  <20200907180459.29025-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::435;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x435.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,244 +106,132 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The final 4 fields in MicroBlazeMMU are configuration constants.
-Move them into MicroBlazeCPUConfig where they belong.
+The bulk of the translator should not have access to the
+complete cpu state, to avoid the temptation to examine bits
+that are in run time, but not translation time context.
 
-Remove the leading "c_" from the member names, as that presumably
-implied "config", and that should not be explicit in the location.
+We do need access to the constant cpu configuration, and
+that is sufficient, so put that into DisasContext.
 
 Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/cpu.h    |  5 +++++
- target/microblaze/mmu.h    |  7 +------
- target/microblaze/cpu.c    |  9 +++++----
- target/microblaze/helper.c |  4 ++--
- target/microblaze/mmu.c    | 30 +++++++++++++++++-------------
- 5 files changed, 30 insertions(+), 25 deletions(-)
+ target/microblaze/translate.c | 24 ++++++++++++------------
+ 1 file changed, 12 insertions(+), 12 deletions(-)
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index ef96f2fe02..b54f99da61 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -295,6 +295,8 @@ struct CPUMBState {
- typedef struct {
-     char *version;
+diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
+index eca422b3db..abfcc7e6c8 100644
+--- a/target/microblaze/translate.c
++++ b/target/microblaze/translate.c
+@@ -60,7 +60,7 @@ static TCGv_i32 cpu_res_val;
+ /* This is the state at translation time.  */
+ typedef struct DisasContext {
+     DisasContextBase base;
+-    MicroBlazeCPU *cpu;
++    const MicroBlazeCPUConfig *cfg;
  
-+    uint64_t addr_mask;
-+
-     uint32_t base_vectors;
-     uint32_t pvr_user2;
-     uint32_t pvr_regs[13];
-@@ -304,6 +306,9 @@ typedef struct {
-     uint8_t use_hw_mul;
-     uint8_t pvr_user1;
-     uint8_t pvr;
-+    uint8_t mmu;
-+    uint8_t mmu_tlb_access;
-+    uint8_t mmu_zones;
+     /* TCG op of the current insn_start.  */
+     TCGOp *insn_start;
+@@ -159,7 +159,7 @@ static void gen_goto_tb(DisasContext *dc, int n, target_ulong dest)
+ static bool trap_illegal(DisasContext *dc, bool cond)
+ {
+     if (cond && (dc->tb_flags & MSR_EE)
+-        && dc->cpu->cfg.illegal_opcode_exception) {
++        && dc->cfg->illegal_opcode_exception) {
+         gen_raise_hw_excp(dc, ESR_EC_ILLEGAL_OP);
+     }
+     return cond;
+@@ -291,7 +291,7 @@ static bool do_typeb_val(DisasContext *dc, arg_typeb *arg, bool side_effects,
  
-     bool stackprot;
-     bool use_barrel;
-diff --git a/target/microblaze/mmu.h b/target/microblaze/mmu.h
-index c1feb811b9..7d0fbb8341 100644
---- a/target/microblaze/mmu.h
-+++ b/target/microblaze/mmu.h
-@@ -70,11 +70,6 @@ typedef struct {
-     uint8_t tids[TLB_ENTRIES];
-     /* Control flops.  */
-     uint32_t regs[3];
--
--    int c_mmu;
--    int c_mmu_tlb_access;
--    int c_mmu_zones;
--    uint64_t c_addr_mask; /* Mask to apply to physical addresses.  */
- } MicroBlazeMMU;
+ #define DO_TYPEA_CFG(NAME, CFG, SE, FN) \
+     static bool trans_##NAME(DisasContext *dc, arg_typea *a) \
+-    { return dc->cpu->cfg.CFG && do_typea(dc, a, SE, FN); }
++    { return dc->cfg->CFG && do_typea(dc, a, SE, FN); }
  
- typedef struct {
-@@ -88,7 +83,7 @@ typedef struct {
-     } err;
- } MicroBlazeMMULookup;
+ #define DO_TYPEA0(NAME, SE, FN) \
+     static bool trans_##NAME(DisasContext *dc, arg_typea0 *a) \
+@@ -299,7 +299,7 @@ static bool do_typeb_val(DisasContext *dc, arg_typeb *arg, bool side_effects,
  
--unsigned int mmu_translate(MicroBlazeMMU *mmu, MicroBlazeMMULookup *lu,
-+unsigned int mmu_translate(MicroBlazeCPU *cpu, MicroBlazeMMULookup *lu,
-                            target_ulong vaddr, int rw, int mmu_idx);
- uint32_t mmu_read(CPUMBState *env, bool ea, uint32_t rn);
- void mmu_write(CPUMBState *env, bool ea, uint32_t rn, uint32_t v);
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index b9bb7f0cc7..fde646a7ad 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -135,10 +135,6 @@ static void mb_cpu_reset(DeviceState *dev)
- #else
-     mb_cpu_write_msr(env, 0);
-     mmu_init(&env->mmu);
--    env->mmu.c_mmu = 3;
--    env->mmu.c_mmu_tlb_access = 3;
--    env->mmu.c_mmu_zones = 16;
--    env->mmu.c_addr_mask = MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
- #endif
- }
+ #define DO_TYPEA0_CFG(NAME, CFG, SE, FN) \
+     static bool trans_##NAME(DisasContext *dc, arg_typea0 *a) \
+-    { return dc->cpu->cfg.CFG && do_typea0(dc, a, SE, FN); }
++    { return dc->cfg->CFG && do_typea0(dc, a, SE, FN); }
  
-@@ -232,6 +228,11 @@ static void mb_cpu_realizefn(DeviceState *dev, Error **errp)
-     cpu->cfg.pvr_regs[11] = ((cpu->cfg.use_mmu ? PVR11_USE_MMU : 0) |
-                              16 << 17);
+ #define DO_TYPEBI(NAME, SE, FNI) \
+     static bool trans_##NAME(DisasContext *dc, arg_typeb *a) \
+@@ -307,7 +307,7 @@ static bool do_typeb_val(DisasContext *dc, arg_typeb *arg, bool side_effects,
  
-+    cpu->cfg.mmu = 3;
-+    cpu->cfg.mmu_tlb_access = 3;
-+    cpu->cfg.mmu_zones = 16;
-+    cpu->cfg.addr_mask = MAKE_64BIT_MASK(0, cpu->cfg.addr_size);
-+
-     mcc->parent_realize(dev, errp);
- }
+ #define DO_TYPEBI_CFG(NAME, CFG, SE, FNI) \
+     static bool trans_##NAME(DisasContext *dc, arg_typeb *a) \
+-    { return dc->cpu->cfg.CFG && do_typeb_imm(dc, a, SE, FNI); }
++    { return dc->cfg->CFG && do_typeb_imm(dc, a, SE, FNI); }
  
-diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
-index c9f236c897..3d6ce1b31b 100644
---- a/target/microblaze/helper.c
-+++ b/target/microblaze/helper.c
-@@ -64,7 +64,7 @@ bool mb_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+ #define DO_TYPEBV(NAME, SE, FN) \
+     static bool trans_##NAME(DisasContext *dc, arg_typeb *a) \
+@@ -683,7 +683,7 @@ static TCGv compute_ldst_addr_typea(DisasContext *dc, int ra, int rb)
+         tcg_gen_movi_tl(ret, 0);
+     }
+ 
+-    if ((ra == 1 || rb == 1) && dc->cpu->cfg.stackprot) {
++    if ((ra == 1 || rb == 1) && dc->cfg->stackprot) {
+         gen_helper_stackprot(cpu_env, ret);
+     }
+     return ret;
+@@ -703,7 +703,7 @@ static TCGv compute_ldst_addr_typeb(DisasContext *dc, int ra, int imm)
+         tcg_gen_movi_tl(ret, (uint32_t)imm);
+     }
+ 
+-    if (ra == 1 && dc->cpu->cfg.stackprot) {
++    if (ra == 1 && dc->cfg->stackprot) {
+         gen_helper_stackprot(cpu_env, ret);
+     }
+     return ret;
+@@ -712,7 +712,7 @@ static TCGv compute_ldst_addr_typeb(DisasContext *dc, int ra, int imm)
+ #ifndef CONFIG_USER_ONLY
+ static TCGv compute_ldst_addr_ea(DisasContext *dc, int ra, int rb)
+ {
+-    int addr_size = dc->cpu->cfg.addr_size;
++    int addr_size = dc->cfg->addr_size;
+     TCGv ret = tcg_temp_new();
+ 
+     if (addr_size == 32 || ra == 0) {
+@@ -772,7 +772,7 @@ static bool do_load(DisasContext *dc, int rd, TCGv addr, MemOp mop,
+ 
+     if (size > MO_8 &&
+         (dc->tb_flags & MSR_EE) &&
+-        dc->cpu->cfg.unaligned_exceptions) {
++        dc->cfg->unaligned_exceptions) {
+         record_unaligned_ess(dc, rd, size, false);
+         mop |= MO_ALIGN;
+     }
+@@ -918,7 +918,7 @@ static bool do_store(DisasContext *dc, int rd, TCGv addr, MemOp mop,
+ 
+     if (size > MO_8 &&
+         (dc->tb_flags & MSR_EE) &&
+-        dc->cpu->cfg.unaligned_exceptions) {
++        dc->cfg->unaligned_exceptions) {
+         record_unaligned_ess(dc, rd, size, true);
+         mop |= MO_ALIGN;
+     }
+@@ -1325,7 +1325,7 @@ DO_RTS(rtsd, 0)
+ static bool trans_zero(DisasContext *dc, arg_zero *arg)
+ {
+     /* If opcode_0_illegal, trap.  */
+-    if (dc->cpu->cfg.opcode_0_illegal) {
++    if (dc->cfg->opcode_0_illegal) {
+         trap_illegal(dc, true);
          return true;
      }
+@@ -1658,7 +1658,7 @@ static void mb_tr_init_disas_context(DisasContextBase *dcb, CPUState *cs)
+     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
+     int bound;
  
--    hit = mmu_translate(&env->mmu, &lu, address, access_type, mmu_idx);
-+    hit = mmu_translate(cpu, &lu, address, access_type, mmu_idx);
-     if (likely(hit)) {
-         uint32_t vaddr = address & TARGET_PAGE_MASK;
-         uint32_t paddr = lu.paddr + vaddr - lu.vaddr;
-@@ -240,7 +240,7 @@ hwaddr mb_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
-     unsigned int hit;
- 
-     if (mmu_idx != MMU_NOMMU_IDX) {
--        hit = mmu_translate(&env->mmu, &lu, addr, 0, 0);
-+        hit = mmu_translate(cpu, &lu, addr, 0, 0);
-         if (hit) {
-             vaddr = addr & TARGET_PAGE_MASK;
-             paddr = lu.paddr + vaddr - lu.vaddr;
-diff --git a/target/microblaze/mmu.c b/target/microblaze/mmu.c
-index 0546cfd0bc..1dbbb271c4 100644
---- a/target/microblaze/mmu.c
-+++ b/target/microblaze/mmu.c
-@@ -73,9 +73,10 @@ static void mmu_change_pid(CPUMBState *env, unsigned int newpid)
- }
- 
- /* rw - 0 = read, 1 = write, 2 = fetch.  */
--unsigned int mmu_translate(MicroBlazeMMU *mmu, MicroBlazeMMULookup *lu,
-+unsigned int mmu_translate(MicroBlazeCPU *cpu, MicroBlazeMMULookup *lu,
-                            target_ulong vaddr, int rw, int mmu_idx)
- {
-+    MicroBlazeMMU *mmu = &cpu->env.mmu;
-     unsigned int i, hit = 0;
-     unsigned int tlb_ex = 0, tlb_wr = 0, tlb_zsel;
-     uint64_t tlb_tag, tlb_rpn, mask;
-@@ -114,13 +115,13 @@ unsigned int mmu_translate(MicroBlazeMMU *mmu, MicroBlazeMMULookup *lu,
-             t0 = mmu->regs[MMU_R_ZPR] >> (30 - (tlb_zsel * 2));
-             t0 &= 0x3;
- 
--            if (tlb_zsel > mmu->c_mmu_zones) {
-+            if (tlb_zsel > cpu->cfg.mmu_zones) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "tlb zone select out of range! %d\n", tlb_zsel);
-                 t0 = 1; /* Ignore.  */
-             }
- 
--            if (mmu->c_mmu == 1) {
-+            if (cpu->cfg.mmu == 1) {
-                 t0 = 1; /* Zones are disabled.  */
-             }
- 
-@@ -157,7 +158,7 @@ unsigned int mmu_translate(MicroBlazeMMU *mmu, MicroBlazeMMULookup *lu,
-             tlb_rpn = d & TLB_RPN_MASK;
- 
-             lu->vaddr = tlb_tag;
--            lu->paddr = tlb_rpn & mmu->c_addr_mask;
-+            lu->paddr = tlb_rpn & cpu->cfg.addr_mask;
-             lu->size = tlb_size;
-             lu->err = ERR_HIT;
-             lu->idx = i;
-@@ -175,10 +176,11 @@ done:
- /* Writes/reads to the MMU's special regs end up here.  */
- uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
- {
-+    MicroBlazeCPU *cpu = env_archcpu(env);
-     unsigned int i;
-     uint32_t r = 0;
- 
--    if (env->mmu.c_mmu < 2 || !env->mmu.c_mmu_tlb_access) {
-+    if (cpu->cfg.mmu < 2 || !cpu->cfg.mmu_tlb_access) {
-         qemu_log_mask(LOG_GUEST_ERROR, "MMU access on MMU-less system\n");
-         return 0;
-     }
-@@ -191,7 +193,7 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
-         /* Reads to HI/LO trig reads from the mmu rams.  */
-         case MMU_R_TLBLO:
-         case MMU_R_TLBHI:
--            if (!(env->mmu.c_mmu_tlb_access & 1)) {
-+            if (!(cpu->cfg.mmu_tlb_access & 1)) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return 0;
-@@ -204,7 +206,7 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
-             break;
-         case MMU_R_PID:
-         case MMU_R_ZPR:
--            if (!(env->mmu.c_mmu_tlb_access & 1)) {
-+            if (!(cpu->cfg.mmu_tlb_access & 1)) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return 0;
-@@ -227,12 +229,14 @@ uint32_t mmu_read(CPUMBState *env, bool ext, uint32_t rn)
- 
- void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
- {
-+    MicroBlazeCPU *cpu = env_archcpu(env);
-     uint64_t tmp64;
-     unsigned int i;
-+
-     qemu_log_mask(CPU_LOG_MMU,
-                   "%s rn=%d=%x old=%x\n", __func__, rn, v, env->mmu.regs[rn]);
- 
--    if (env->mmu.c_mmu < 2 || !env->mmu.c_mmu_tlb_access) {
-+    if (cpu->cfg.mmu < 2 || !cpu->cfg.mmu_tlb_access) {
-         qemu_log_mask(LOG_GUEST_ERROR, "MMU access on MMU-less system\n");
-         return;
-     }
-@@ -258,7 +262,7 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
-             env->mmu.rams[rn & 1][i] = deposit64(tmp64, ext * 32, 32, v);
-             break;
-         case MMU_R_ZPR:
--            if (env->mmu.c_mmu_tlb_access <= 1) {
-+            if (cpu->cfg.mmu_tlb_access <= 1) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return;
-@@ -272,7 +276,7 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
-             env->mmu.regs[rn] = v;
-             break;
-         case MMU_R_PID:
--            if (env->mmu.c_mmu_tlb_access <= 1) {
-+            if (cpu->cfg.mmu_tlb_access <= 1) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return;
-@@ -292,14 +296,14 @@ void mmu_write(CPUMBState *env, bool ext, uint32_t rn, uint32_t v)
-             MicroBlazeMMULookup lu;
-             int hit;
- 
--            if (env->mmu.c_mmu_tlb_access <= 1) {
-+            if (cpu->cfg.mmu_tlb_access <= 1) {
-                 qemu_log_mask(LOG_GUEST_ERROR,
-                               "Invalid access to MMU reg %d\n", rn);
-                 return;
-             }
- 
--            hit = mmu_translate(&env->mmu, &lu,
--                                v & TLB_EPN_MASK, 0, cpu_mmu_index(env, false));
-+            hit = mmu_translate(cpu, &lu, v & TLB_EPN_MASK,
-+                                0, cpu_mmu_index(env, false));
-             if (hit) {
-                 env->mmu.regs[MMU_R_TLBX] = lu.idx;
-             } else {
+-    dc->cpu = cpu;
++    dc->cfg = &cpu->cfg;
+     dc->tb_flags = dc->base.tb->flags;
+     dc->ext_imm = dc->base.tb->cs_base;
+     dc->r0 = NULL;
 -- 
 2.25.1
 
