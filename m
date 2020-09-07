@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3649C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:52:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95A0C2BB84
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:52:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2BE652177B
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:52:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7CF3A2177B
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 17:52:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LV9zaVyX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BE652177B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bjX4YVFr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF3A2177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLJF-0006Ju-8z
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 13:52:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35628)
+	id 1kFLJJ-0006XY-F9
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 13:52:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLIM-0004gN-Ea
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:51:10 -0400
-Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:41269)
+ id 1kFLIR-0004q2-0b
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:51:15 -0400
+Received: from mail-pg1-x531.google.com ([2607:f8b0:4864:20::531]:46822)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFLIK-0000kg-Kp
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:51:10 -0400
-Received: by mail-pl1-x636.google.com with SMTP id m15so3629984pls.8
- for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 10:51:08 -0700 (PDT)
+ id 1kFLIP-0000lB-Bo
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 13:51:14 -0400
+Received: by mail-pg1-x531.google.com with SMTP id 31so8298240pgy.13
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 10:51:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=NuEz6+kQZUq9cGZGZ8oi5i58Pnr2fh1fXAdy37NU5ys=;
- b=LV9zaVyXYmWOFcrXW8qLRPjefXaUPDgRXYfR6LkdmJjQKTWb3+JnCnEVvrVEPrGqnR
- vaKF1BN6hQsBVFLlDTJeYbqr2e7fxBJWyixmf0I2RIlk46KfKt8d1sLw2J8xGD7HOSiP
- 393pqmux0y3BG87L8AK4+RTV4SOWu7qdqIgTAm89u5Y8JA+rQ8V4AU9wePuCZ+tN/OMh
- mEQlirpLEWEb6dAVUxVW5qP04QQ+xPQqwmwec0f/qVSdTE46OAZgt6A8yV0vVwkrtd2q
- fY90OE/7P+q6gW92WxPjd0Rt4LVzIU6UrqfqTAyHGQBM84ciK5V1gWNZtRBZ/FzMpyxR
- eYzg==
+ bh=5SlIcFIM68w880BR4Kxx0NdCPJqMQrugFoEKlxU3Dhc=;
+ b=bjX4YVFrxtUbjnPvtOS2WCIhlHxp8FEjfy6BP+O28pqXDqtnCZcQ2Yp7goNnSKP3r0
+ VYiWgplKRHJ4L5jXZxLGBpZwem8MXhLzrXR62ePbUy8xuJoyLKPMhCNpkVnyBhx/Ydgj
+ s+paOadB50oSOrO5Rcqh3zRKiQO7kHMUA28NKhNDjf6VD7jQrk1qKxTrEqKjiYaTH7FW
+ esD/QfvPbXspq1H36p7u9Pb0XyEWKMHdkWbaSCama2nHjfU20j948WOQVbskEJjtRV2a
+ eWnM0ecLZ3Piyo1MOj1z3nFVe/PySX/DtMFnAn6trzf1muj63jkRfQB5K3YF38NoE3Pi
+ Jn9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=NuEz6+kQZUq9cGZGZ8oi5i58Pnr2fh1fXAdy37NU5ys=;
- b=XuzxoAUOT9pTVa9amxiudqD5k6bvQFGeY0Kmy53KBWa9wRIabPZiMXKxR6s8bapxnF
- yJksNkITB9Vyj6TknGYC7kISH59/BHgiEzf+fJ3ySP/waRZHwyi3IlvWlkAKmlrlUo9m
- O4gqTkgwwmO+tU4h8+OUdulBqf9ClFab6OgFK0imY8YaVDe3UTFYhiWBnnOhpuFeL4lH
- 3JRx+JyKW9ixCcwFyWkndPM1OtcXnhPGBSLMNJzh1A7CAcUjoYRyOUa/r3q/E1i2Ugsu
- xT/G29ZZwrRGG1BesLu4CNevquA8/gcYLIsRcFiZs1aYX6zcxfEEk/+BuztpYyHlxn2l
- bmDQ==
-X-Gm-Message-State: AOAM532W+9B6oI59hf/6qqH1FKNce3FNQmbctqz73jUFubPd+lEvQPmb
- 7IC8zFnkDb5YpyVW/Mnx2r1Huj2ZT8OKJA==
-X-Google-Smtp-Source: ABdhPJyNZ0C8XO2tnSDdB3vOFmMLZRo4TlbNxbqyEPo2qZ5Dvw2xd+J+bBneujpSRCqre3SBVFoC7A==
-X-Received: by 2002:a17:90a:4481:: with SMTP id
- t1mr328460pjg.167.1599501066779; 
- Mon, 07 Sep 2020 10:51:06 -0700 (PDT)
+ bh=5SlIcFIM68w880BR4Kxx0NdCPJqMQrugFoEKlxU3Dhc=;
+ b=X/LEJDV88TaRo9fHGob6o9lhS9BxtOVc4Q78lS17EtOOJBZ8yyKps+NMnYGBybPygH
+ AlHrUYAmAhyjMBhHV02l1BGLZKVkfKgXKCkB/RvOhcrgQ3dy/p6gnHmplN5Zmn4bZ7un
+ PcZM1SZcBBZtylXASbQcdPnddY2QFKLyfdWDqrhpQQkmzgrv5nBULBeGVc5eTt3XFu/I
+ cHNMwXXbDT9URr32fY6HKZFrF5ssGXi/YzDBt87ieLsIQGQP9wzechx1O0HZ32jXLSXt
+ u6HcxHzza80bTDgWuqbptaj3jxSCiDpk2Dgs5sWfXJ18N6o66Bv7o7HS/kdgO7FAZzxX
+ 8ACg==
+X-Gm-Message-State: AOAM533ODfPCcDGdMBdG6EzGRJkT8mFotO2qj1qvQz+kCeG5nBD3sDNZ
+ 12J2wINlfZoWmhFfwRyrsjKzWcs24kNkqg==
+X-Google-Smtp-Source: ABdhPJzt25uRw9FoQzBM95zcJGHIKzXVArgjRcHnWxiU+D/RRB5mf0BPyNGLSP3sKb5UhxkA3Cj5xQ==
+X-Received: by 2002:a62:e108:: with SMTP id q8mr3975683pfh.214.1599501071683; 
+ Mon, 07 Sep 2020 10:51:11 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id ga3sm1651496pjb.18.2020.09.07.10.51.05
+ by smtp.gmail.com with ESMTPSA id ga3sm1651496pjb.18.2020.09.07.10.51.10
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 07 Sep 2020 10:51:06 -0700 (PDT)
+ Mon, 07 Sep 2020 10:51:11 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/19] target/microblaze: Collected fixes for env->iflags
-Date: Mon,  7 Sep 2020 10:50:44 -0700
-Message-Id: <20200907175102.28027-3-richard.henderson@linaro.org>
+Subject: [PULL 05/19] target/microblaze: Rename DISAS_UPDATE to DISAS_EXIT
+Date: Mon,  7 Sep 2020 10:50:48 -0700
+Message-Id: <20200907175102.28027-7-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200907175102.28027-1-richard.henderson@linaro.org>
 References: <20200907175102.28027-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::636;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x636.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::531;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x531.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,159 +101,72 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, peter.maydell@linaro.org,
- Thomas Huth <thuth@redhat.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There are several problems here that can result in soft lockup,
-depending on exactly where an interrupt or exception is delivered:
+The name "update" suggests that something needs updating, but
+this is not the case.  Use "exit" to emphasize that nothing
+needs doing except to exit.
 
-Include BIMM_FLAG in IFLAGS_TB_MASK, since it needs to follow D_FLAG.
-Ensure that iflags is 0 when entering an interrupt/exception handler.
-Add mb_cpu_synchronize_from_tb to restore iflags from tb->flags.
-The change to t_sync_flags is cosmetic, but makes the code clearer.
-
-This fixes the reported regression in acceptance/replay_kernel.py.
-
-Fixes: 683a247ed7a4 ("target/microblaze: Store "current" iflags in insn_start")
-Reported-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Thomas Huth <thuth@redhat.com>
-Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Tested-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/microblaze/cpu.h       |  3 ++-
- target/microblaze/cpu.c       | 11 +++++++++++
- target/microblaze/helper.c    | 17 +++++++++++------
- target/microblaze/translate.c |  4 ++--
- 4 files changed, 26 insertions(+), 9 deletions(-)
+ target/microblaze/translate.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/target/microblaze/cpu.h b/target/microblaze/cpu.h
-index d11b6fa995..a25a2b427f 100644
---- a/target/microblaze/cpu.h
-+++ b/target/microblaze/cpu.h
-@@ -270,7 +270,8 @@ struct CPUMBState {
- #define D_FLAG		(1 << 19)  /* Bit in ESR.  */
- 
- /* TB dependent CPUMBState.  */
--#define IFLAGS_TB_MASK  (D_FLAG | IMM_FLAG | DRTI_FLAG | DRTE_FLAG | DRTB_FLAG)
-+#define IFLAGS_TB_MASK  (D_FLAG | BIMM_FLAG | IMM_FLAG | \
-+                         DRTI_FLAG | DRTE_FLAG | DRTB_FLAG)
- #define MSR_TB_MASK     (MSR_UM | MSR_VM | MSR_EE)
- 
-     uint32_t iflags;
-diff --git a/target/microblaze/cpu.c b/target/microblaze/cpu.c
-index 67017ecc33..6392524135 100644
---- a/target/microblaze/cpu.c
-+++ b/target/microblaze/cpu.c
-@@ -80,6 +80,16 @@ static void mb_cpu_set_pc(CPUState *cs, vaddr value)
-     MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
- 
-     cpu->env.pc = value;
-+    /* Ensure D_FLAG and IMM_FLAG are clear for the new PC */
-+    cpu->env.iflags = 0;
-+}
-+
-+static void mb_cpu_synchronize_from_tb(CPUState *cs, TranslationBlock *tb)
-+{
-+    MicroBlazeCPU *cpu = MICROBLAZE_CPU(cs);
-+
-+    cpu->env.pc = tb->pc;
-+    cpu->env.iflags = tb->flags & IFLAGS_TB_MASK;
- }
- 
- static bool mb_cpu_has_work(CPUState *cs)
-@@ -321,6 +331,7 @@ static void mb_cpu_class_init(ObjectClass *oc, void *data)
-     cc->cpu_exec_interrupt = mb_cpu_exec_interrupt;
-     cc->dump_state = mb_cpu_dump_state;
-     cc->set_pc = mb_cpu_set_pc;
-+    cc->synchronize_from_tb = mb_cpu_synchronize_from_tb;
-     cc->gdb_read_register = mb_cpu_gdb_read_register;
-     cc->gdb_write_register = mb_cpu_gdb_write_register;
-     cc->tlb_fill = mb_cpu_tlb_fill;
-diff --git a/target/microblaze/helper.c b/target/microblaze/helper.c
-index 48547385b0..00090526da 100644
---- a/target/microblaze/helper.c
-+++ b/target/microblaze/helper.c
-@@ -113,7 +113,10 @@ void mb_cpu_do_interrupt(CPUState *cs)
-     uint32_t t, msr = mb_cpu_read_msr(env);
- 
-     /* IMM flag cannot propagate across a branch and into the dslot.  */
--    assert(!((env->iflags & D_FLAG) && (env->iflags & IMM_FLAG)));
-+    assert((env->iflags & (D_FLAG | IMM_FLAG)) != (D_FLAG | IMM_FLAG));
-+    /* BIMM flag cannot be set without D_FLAG. */
-+    assert((env->iflags & (D_FLAG | BIMM_FLAG)) != BIMM_FLAG);
-+    /* RTI flags are private to translate. */
-     assert(!(env->iflags & (DRTI_FLAG | DRTE_FLAG | DRTB_FLAG)));
-     env->res_addr = RES_ADDR_NONE;
-     switch (cs->exception_index) {
-@@ -146,7 +149,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
-                           env->pc, env->ear,
-                           env->esr, env->iflags);
-             log_cpu_state_mask(CPU_LOG_INT, cs, 0);
--            env->iflags &= ~(IMM_FLAG | D_FLAG);
-+            env->iflags = 0;
-             env->pc = cpu->cfg.base_vectors + 0x20;
-             break;
- 
-@@ -186,14 +189,14 @@ void mb_cpu_do_interrupt(CPUState *cs)
-                           "exception at pc=%x ear=%" PRIx64 " iflags=%x\n",
-                           env->pc, env->ear, env->iflags);
-             log_cpu_state_mask(CPU_LOG_INT, cs, 0);
--            env->iflags &= ~(IMM_FLAG | D_FLAG);
-+            env->iflags = 0;
-             env->pc = cpu->cfg.base_vectors + 0x20;
-             break;
- 
-         case EXCP_IRQ:
-             assert(!(msr & (MSR_EIP | MSR_BIP)));
-             assert(msr & MSR_IE);
--            assert(!(env->iflags & D_FLAG));
-+            assert(!(env->iflags & (D_FLAG | IMM_FLAG)));
- 
-             t = (msr & (MSR_VM | MSR_UM)) << 1;
- 
-@@ -226,13 +229,14 @@ void mb_cpu_do_interrupt(CPUState *cs)
-             mb_cpu_write_msr(env, msr);
- 
-             env->regs[14] = env->pc;
-+            env->iflags = 0;
-             env->pc = cpu->cfg.base_vectors + 0x10;
-             //log_cpu_state_mask(CPU_LOG_INT, cs, 0);
-             break;
- 
-         case EXCP_HW_BREAK:
--            assert(!(env->iflags & IMM_FLAG));
--            assert(!(env->iflags & D_FLAG));
-+            assert(!(env->iflags & (D_FLAG | IMM_FLAG)));
-+
-             t = (msr & (MSR_VM | MSR_UM)) << 1;
-             qemu_log_mask(CPU_LOG_INT,
-                           "break at pc=%x msr=%x %x iflags=%x\n",
-@@ -242,6 +246,7 @@ void mb_cpu_do_interrupt(CPUState *cs)
-             msr |= t;
-             msr |= MSR_BIP;
-             env->regs[16] = env->pc;
-+            env->iflags = 0;
-             env->pc = cpu->cfg.base_vectors + 0x18;
-             mb_cpu_write_msr(env, msr);
-             break;
 diff --git a/target/microblaze/translate.c b/target/microblaze/translate.c
-index a377818b5e..a8a3249185 100644
+index a8a3249185..8ceb04f4f0 100644
 --- a/target/microblaze/translate.c
 +++ b/target/microblaze/translate.c
-@@ -91,8 +91,8 @@ static int typeb_imm(DisasContext *dc, int x)
- static void t_sync_flags(DisasContext *dc)
- {
-     /* Synch the tb dependent flags between translator and runtime.  */
--    if ((dc->tb_flags ^ dc->base.tb->flags) & ~MSR_TB_MASK) {
--        tcg_gen_movi_i32(cpu_iflags, dc->tb_flags & ~MSR_TB_MASK);
-+    if ((dc->tb_flags ^ dc->base.tb->flags) & IFLAGS_TB_MASK) {
-+        tcg_gen_movi_i32(cpu_iflags, dc->tb_flags & IFLAGS_TB_MASK);
-     }
+@@ -37,7 +37,7 @@
+ 
+ /* is_jmp field values */
+ #define DISAS_JUMP    DISAS_TARGET_0 /* only pc was modified dynamically */
+-#define DISAS_UPDATE  DISAS_TARGET_1 /* cpu state was modified dynamically */
++#define DISAS_EXIT    DISAS_TARGET_1 /* all cpu state modified dynamically */
+ 
+ static TCGv_i32 cpu_R[32];
+ static TCGv_i32 cpu_pc;
+@@ -1161,7 +1161,7 @@ static bool trans_brk(DisasContext *dc, arg_typea_br *arg)
+     tcg_gen_ori_i32(cpu_msr, cpu_msr, MSR_BIP);
+     tcg_gen_movi_tl(cpu_res_addr, -1);
+ 
+-    dc->base.is_jmp = DISAS_UPDATE;
++    dc->base.is_jmp = DISAS_EXIT;
+     return true;
  }
  
+@@ -1202,7 +1202,7 @@ static bool trans_brki(DisasContext *dc, arg_typeb_br *arg)
+                          ~(MSR_VMS | MSR_UMS | MSR_VM | MSR_UM));
+     }
+     tcg_gen_ori_i32(cpu_msr, cpu_msr, msr_to_set);
+-    dc->base.is_jmp = DISAS_UPDATE;
++    dc->base.is_jmp = DISAS_EXIT;
+ #endif
+ 
+     return true;
+@@ -1712,7 +1712,7 @@ static void mb_tr_translate_insn(DisasContextBase *dcb, CPUState *cs)
+ 
+     /* Force an exit if the per-tb cpu state has changed.  */
+     if (dc->base.is_jmp == DISAS_NEXT && dc->cpustate_changed) {
+-        dc->base.is_jmp = DISAS_UPDATE;
++        dc->base.is_jmp = DISAS_EXIT;
+         tcg_gen_movi_i32(cpu_pc, dc->base.pc_next);
+     }
+ }
+@@ -1733,7 +1733,7 @@ static void mb_tr_tb_stop(DisasContextBase *dcb, CPUState *cs)
+         gen_goto_tb(dc, 0, dc->base.pc_next);
+         return;
+ 
+-    case DISAS_UPDATE:
++    case DISAS_EXIT:
+         if (unlikely(cs->singlestep_enabled)) {
+             gen_raise_exception(dc, EXCP_DEBUG);
+         } else {
 -- 
 2.25.1
 
