@@ -2,85 +2,87 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D266C433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:31:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75DE3C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:32:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0360B207C3
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:31:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E745C207C3
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 11:32:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xs+1kPZy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0360B207C3
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jG2iqGHi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E745C207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFFNI-0005jB-4d
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:31:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33076)
+	id 1kFFO3-0007Iv-Tt
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 07:32:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kFF8g-0005xE-FD
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:16:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:60381
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2s-0003QX-5t
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:46 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:32652
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kFF8e-0000gX-SW
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:16:46 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFF2p-00088Z-4Y
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 07:10:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599477404;
+ s=mimecast20190719; t=1599477042;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=cMqIkVPXIWKRe4nl5FXSNfOMgI41529E9OBkbmkK7fU=;
- b=Xs+1kPZy7SAWgVY2xjjOsgvB2zRm1m6VUcIwjNSyzRYfoO7TdiZxbhfwf/axSvEmnoqTGr
- pUouH/kUOu50NrHBLQba04j5iZE6bWy9Vw4pbxKUrSHCzTLgrogQdum6IO9BVOezCCjF5T
- IjuYZ+jbAbyh+uMTt6iKuFg3xlb8Ook=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=4T+A976Y3/RyQPca5qP7YaAhcaVxrgwgOabcSsvya00=;
+ b=jG2iqGHiJF54Ar1XmtQ8S/mDcJQ+5nMKPdEJMcjcb30E1luwLj52QgBAEjGPPHvuKQ0Bkn
+ 0CF7R6fM7tot1mE78GGTLf348L0SzIeynYsZxNmeeKer12i0h0p+nPQCjwsn+a/oNwxEKu
+ Lg13u6QY9S05MsBWgeehfLiQzGbe52s=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-EHR46C_DN7CIeiHVsy3rqw-1; Mon, 07 Sep 2020 07:16:38 -0400
-X-MC-Unique: EHR46C_DN7CIeiHVsy3rqw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-270-e_OCIpmRM5qtuSZ3YNYjdg-1; Mon, 07 Sep 2020 07:10:37 -0400
+X-MC-Unique: e_OCIpmRM5qtuSZ3YNYjdg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BE75710BBED6;
- Mon,  7 Sep 2020 11:16:36 +0000 (UTC)
-Received: from localhost (ovpn-114-167.ams2.redhat.com [10.36.114.167])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5CF187E19A;
- Mon,  7 Sep 2020 11:16:33 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] MAINTAINERS: add Stefan Hajnoczi as block/nvme.c maintainer
-Date: Mon,  7 Sep 2020 12:16:32 +0100
-Message-Id: <20200907111632.90499-1-stefanha@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 95D1518B9EC1;
+ Mon,  7 Sep 2020 11:10:36 +0000 (UTC)
+Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
+ [10.36.114.154])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A3A7D9CBA;
+ Mon,  7 Sep 2020 11:10:35 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PULL 40/64] block/null: Implement bdrv_get_allocated_file_size
+Date: Mon,  7 Sep 2020 13:09:12 +0200
+Message-Id: <20200907110936.261684-41-kwolf@redhat.com>
+In-Reply-To: <20200907110936.261684-1-kwolf@redhat.com>
+References: <20200907110936.261684-1-kwolf@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=stefanha@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=kwolf@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 02:54:37
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:19:10
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -4
-X-Spam_score: -0.5
-X-Spam_bar: /
-X-Spam_report: (-0.5 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,29 +95,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Fam Zheng <fam@euphon.net>,
- philmd@redhat.com
+Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RGV2ZWxvcG1lbnQgb2YgdGhlIHVzZXJzcGFjZSBOVk1lIGJsb2NrIGRyaXZlciBwaWNrZWQgdXAg
-YWdhaW4gcmVjZW50bHkuCkFmdGVyIHRhbGtpbmcgd2l0aCBGYW0gSSBhbSBzdGVwcGluZyB1cCBh
-cyBibG9jay9udm1lLmMgbWFpbnRhaW5lci4KUGF0Y2hlcyB3aWxsIGJlIG1lcmdlZCB0aHJvdWdo
-IG15ICdibG9jaycgdHJlZS4KCkNjOiBLZXZpbiBXb2xmIDxrd29sZkByZWRoYXQuY29tPgpDYzog
-S2xhdXMgSmVuc2VuIDxrLmplbnNlbkBzYW1zdW5nLmNvbT4KQ2M6IEZhbSBaaGVuZyA8ZmFtQGV1
-cGhvbi5uZXQ+ClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0
-LmNvbT4KLS0tCiBNQUlOVEFJTkVSUyB8IDQgKysrLQogMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0
-aW9ucygrKSwgMSBkZWxldGlvbigtKQoKZGlmZiAtLWdpdCBhL01BSU5UQUlORVJTIGIvTUFJTlRB
-SU5FUlMKaW5kZXggYjIzM2RhMmE3My4uYTE0Mzk0MTU1MSAxMDA2NDQKLS0tIGEvTUFJTlRBSU5F
-UlMKKysrIGIvTUFJTlRBSU5FUlMKQEAgLTI4OTUsMTAgKzI4OTUsMTIgQEAgUzogU3VwcG9ydGVk
-CiBGOiBibG9jay9udWxsLmMKIAogTlZNZSBCbG9jayBEcml2ZXIKLU06IEZhbSBaaGVuZyA8ZmFt
-QGV1cGhvbi5uZXQ+CitNOiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+CitS
-OiBGYW0gWmhlbmcgPGZhbUBldXBob24ubmV0PgogTDogcWVtdS1ibG9ja0Bub25nbnUub3JnCiBT
-OiBTdXBwb3J0ZWQKIEY6IGJsb2NrL252bWUqCitUOiBnaXQgaHR0cHM6Ly9naXRodWIuY29tL3N0
-ZWZhbmhhL3FlbXUuZ2l0IGJsb2NrCiAKIEJvb3RkZXZpY2UKIE06IEdvbmdsZWkgPGFyZWkuZ29u
-Z2xlaUBodWF3ZWkuY29tPgotLSAKMi4yNi4yCgo=
+From: Max Reitz <mreitz@redhat.com>
+
+It is trivial, so we might as well do it.
+
+Remove _filter_actual_image_size from iotest 184, so we get to see the
+result in its reference output.
+
+Signed-off-by: Max Reitz <mreitz@redhat.com>
+---
+ block/null.c               | 7 +++++++
+ tests/qemu-iotests/153.out | 2 +-
+ tests/qemu-iotests/184     | 3 +--
+ tests/qemu-iotests/184.out | 6 ++++--
+ 4 files changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/block/null.c b/block/null.c
+index 15e1d56746..cc9b1d4ea7 100644
+--- a/block/null.c
++++ b/block/null.c
+@@ -262,6 +262,11 @@ static void null_refresh_filename(BlockDriverState *bs)
+              bs->drv->format_name);
+ }
+ 
++static int64_t null_allocated_file_size(BlockDriverState *bs)
++{
++    return 0;
++}
++
+ static const char *const null_strong_runtime_opts[] = {
+     BLOCK_OPT_SIZE,
+     NULL_OPT_ZEROES,
+@@ -277,6 +282,7 @@ static BlockDriver bdrv_null_co = {
+     .bdrv_file_open         = null_file_open,
+     .bdrv_parse_filename    = null_co_parse_filename,
+     .bdrv_getlength         = null_getlength,
++    .bdrv_get_allocated_file_size = null_allocated_file_size,
+ 
+     .bdrv_co_preadv         = null_co_preadv,
+     .bdrv_co_pwritev        = null_co_pwritev,
+@@ -297,6 +303,7 @@ static BlockDriver bdrv_null_aio = {
+     .bdrv_file_open         = null_file_open,
+     .bdrv_parse_filename    = null_aio_parse_filename,
+     .bdrv_getlength         = null_getlength,
++    .bdrv_get_allocated_file_size = null_allocated_file_size,
+ 
+     .bdrv_aio_preadv        = null_aio_preadv,
+     .bdrv_aio_pwritev       = null_aio_pwritev,
+diff --git a/tests/qemu-iotests/153.out b/tests/qemu-iotests/153.out
+index 8a79e1ee87..fcaa71aeee 100644
+--- a/tests/qemu-iotests/153.out
++++ b/tests/qemu-iotests/153.out
+@@ -464,7 +464,7 @@ No conflict:
+ image: null-co://
+ file format: null-co
+ virtual size: 1 GiB (1073741824 bytes)
+-disk size: unavailable
++disk size: 0 B
+ 
+ Conflict:
+ qemu-img: --force-share/-U conflicts with image options
+diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
+index 33dd8d2a4f..eebb53faed 100755
+--- a/tests/qemu-iotests/184
++++ b/tests/qemu-iotests/184
+@@ -45,8 +45,7 @@ do_run_qemu()
+ run_qemu()
+ {
+     do_run_qemu "$@" 2>&1 | _filter_testdir | _filter_qemu | _filter_qmp\
+-                          | _filter_qemu_io | _filter_generated_node_ids \
+-                          | _filter_actual_image_size
++                          | _filter_qemu_io | _filter_generated_node_ids
+ }
+ 
+ test_throttle=$($QEMU_IMG --help|grep throttle)
+diff --git a/tests/qemu-iotests/184.out b/tests/qemu-iotests/184.out
+index 3deb3cfb94..dec4017ad5 100644
+--- a/tests/qemu-iotests/184.out
++++ b/tests/qemu-iotests/184.out
+@@ -29,7 +29,8 @@ Testing:
+             "image": {
+                 "virtual-size": 1073741824,
+                 "filename": "json:{\"throttle-group\": \"group0\", \"driver\": \"throttle\", \"file\": {\"driver\": \"null-co\"}}",
+-                "format": "throttle"
++                "format": "throttle",
++                "actual-size": 0
+             },
+             "iops_wr": 0,
+             "ro": false,
+@@ -56,7 +57,8 @@ Testing:
+             "image": {
+                 "virtual-size": 1073741824,
+                 "filename": "null-co://",
+-                "format": "null-co"
++                "format": "null-co",
++                "actual-size": 0
+             },
+             "iops_wr": 0,
+             "ro": false,
+-- 
+2.25.4
 
 
