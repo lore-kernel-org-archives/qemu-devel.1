@@ -7,68 +7,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D736C43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF666C43461
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:33:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9282E20C09
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:33:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4CEB121532
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 18:33:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LP3RqbZj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9282E20C09
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E8DshLL4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CEB121532
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFLxK-00032d-C3
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:33:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42836)
+	id 1kFLxQ-0003Q7-Fc
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 14:33:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42680)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlK-0005qS-3B
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:06 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:45882
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlE-0005c5-Rq
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:00 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:29049
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLlH-0004fw-WA
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:05 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFLl9-0004d4-2t
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 14:21:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599502861;
+ s=mimecast20190719; t=1599502854;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bK+ifR3wkt+Es7s9DRYwoq1Qk7xHQcwwhiFnJO3KQZ4=;
- b=LP3RqbZjQoYn4CSG7YXGcP9OtJN6pMoJmSUzvz0FMUpSRo5B3ZAhFQObzW3M4M3xt6P/AZ
- WlxToS9w6A/3X16Dy2jJ7n12aRwiQ0qav/b4EjKVgijdFMavkaH8IWCgqrY7z68L3R6SU3
- tWITeyA15tzvx+yUjEW8wPByjFOYuXg=
+ bh=IdzsvnUMxxhY/D0Ucw+0robGaJl1lxYaJwx7VsF+HbE=;
+ b=E8DshLL49ukCFvfbFYDh9xiX93810qcD7mGsGiUGUlAF9umG+yS5ilVTMldnZMk9bnTX6+
+ gEkrAHRDM8n8eRYYiJnOG7cTOhOSDOI96IiwLsJueJSOXbdh9yPymtlDt8//N+foSgkaDV
+ A55yHoBq3Ytu4WnrTaKUK2FJcb3lYzA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-271-8x0SeIdaOceRNUg7Z-dP9Q-1; Mon, 07 Sep 2020 14:20:59 -0400
-X-MC-Unique: 8x0SeIdaOceRNUg7Z-dP9Q-1
+ us-mta-575-s5xsd3hjMYGLQpEqiLFcSw-1; Mon, 07 Sep 2020 14:20:52 -0400
+X-MC-Unique: s5xsd3hjMYGLQpEqiLFcSw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2FAF8030A7;
- Mon,  7 Sep 2020 18:20:58 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A166818B9ED9;
+ Mon,  7 Sep 2020 18:20:51 +0000 (UTC)
 Received: from linux.fritz.box.com (ovpn-114-154.ams2.redhat.com
  [10.36.114.154])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 981E26198E;
- Mon,  7 Sep 2020 18:20:57 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8755160BF3;
+ Mon,  7 Sep 2020 18:20:50 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH 24/29] block/export: Add query-block-exports
-Date: Mon,  7 Sep 2020 20:20:06 +0200
-Message-Id: <20200907182011.521007-25-kwolf@redhat.com>
+Subject: [PATCH 19/29] block/export: Move strong user reference to
+ block_exports
+Date: Mon,  7 Sep 2020 20:20:01 +0200
+Message-Id: <20200907182011.521007-20-kwolf@redhat.com>
 In-Reply-To: <20200907182011.521007-1-kwolf@redhat.com>
 References: <20200907182011.521007-1-kwolf@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
@@ -82,7 +83,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,85 +101,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds a simple QMP command to query the list of block exports.
+The reference owned by the user/monitor that is created when adding the
+export and dropped when removing it was tied to the 'exports' list in
+nbd/server.c. Every block export will have a user reference, so move it
+to the block export level and tie it to the 'block_exports' list in
+block/export/export.c instead. This is necessary for introducing a QMP
+command for removing exports.
+
+Note that exports are present in block_exports even after the user has
+requested shutdown. This is different from NBD's exports where exports
+are immediately removed on a shutdown request, even if they are still in
+the process of shutting down. In order to avoid that the user still
+interacts with an export that is shutting down (and possibly removes it
+a second time), we need to remember if the user actually still owns it.
 
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- qapi/block-export.json | 32 ++++++++++++++++++++++++++++++++
- block/export/export.c  | 23 +++++++++++++++++++++++
- 2 files changed, 55 insertions(+)
+ include/block/export.h | 8 ++++++++
+ block/export/export.c  | 6 ++++++
+ blockdev-nbd.c         | 5 -----
+ nbd/server.c           | 2 --
+ 4 files changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/qapi/block-export.json b/qapi/block-export.json
-index dac3250f08..d4e9290210 100644
---- a/qapi/block-export.json
-+++ b/qapi/block-export.json
-@@ -245,3 +245,35 @@
- ##
- { 'event': 'BLOCK_EXPORT_DELETED',
-   'data': { 'id': 'str' } }
+diff --git a/include/block/export.h b/include/block/export.h
+index cdc6e161ea..4833947e89 100644
+--- a/include/block/export.h
++++ b/include/block/export.h
+@@ -60,6 +60,14 @@ struct BlockExport {
+      */
+     int refcount;
+ 
++    /*
++     * True if one of the references in refcount belongs to the user. After the
++     * user has dropped their reference, they may not e.g. remove the same
++     * export a second time (which would decrease the refcount without having
++     * it incremented first).
++     */
++    bool user_owned;
 +
-+##
-+# @BlockExportInfo:
-+#
-+# Information about a single block export.
-+#
-+# @id: The unique identifier for the block export
-+#
-+# @type: The block export type
-+#
-+# @node-name: The node name of the block node that is exported
-+#
-+# @shutting-down: True if the export is shutting down (e.g. after a
-+#                 block-export-del command, but before the shutdown has
-+#                 completed)
-+#
-+# Since:  5.2
-+##
-+{ 'struct': 'BlockExportInfo',
-+  'data': { 'id': 'str',
-+            'type': 'BlockExportType',
-+            'node-name': 'str',
-+            'shutting-down': 'bool' } }
-+
-+##
-+# @query-block-exports:
-+#
-+# Returns: A list of BlockExportInfo describing all block exports
-+#
-+# Since: 5.2
-+##
-+{ 'command': 'query-block-exports', 'returns': ['BlockExportInfo'] }
+     /* The AioContext whose lock protects this BlockExport object. */
+     AioContext *ctx;
+ 
 diff --git a/block/export/export.c b/block/export/export.c
-index 52ec00dfcf..bbdb256267 100644
+index 21e9013fb6..42aac867e9 100644
 --- a/block/export/export.c
 +++ b/block/export/export.c
-@@ -279,3 +279,26 @@ void qmp_block_export_del(const char *id,
+@@ -80,6 +80,7 @@ BlockExport *blk_exp_add(BlockExportOptions *export, Error **errp)
+     *exp = (BlockExport) {
+         .drv        = &blk_exp_nbd,
+         .refcount   = 1,
++        .user_owned = true,
+         .id         = g_strdup(export->id),
+     };
  
-     blk_exp_request_shutdown(exp);
+@@ -136,6 +137,11 @@ void blk_exp_request_shutdown(BlockExport *exp)
+ 
+     aio_context_acquire(aio_context);
+     exp->drv->request_shutdown(exp);
++
++    assert(exp->user_owned);
++    exp->user_owned = false;
++    blk_exp_unref(exp);
++
+     aio_context_release(aio_context);
  }
-+
-+BlockExportInfoList *qmp_query_block_exports(Error **errp)
-+{
-+    BlockExportInfoList *head = NULL, **p_next = &head;
-+    BlockExport *exp;
-+
-+    QLIST_FOREACH(exp, &block_exports, next) {
-+        BlockExportInfoList *entry = g_new0(BlockExportInfoList, 1);
-+        BlockExportInfo *info = g_new(BlockExportInfo, 1);
-+        *info = (BlockExportInfo) {
-+            .id             = g_strdup(exp->id),
-+            .type           = exp->drv->type,
-+            .node_name      = g_strdup(bdrv_get_node_name(blk_bs(exp->blk))),
-+            .shutting_down  = !exp->user_owned,
-+        };
-+
-+        entry->value = info;
-+        *p_next = entry;
-+        p_next = &entry->next;
-+    }
-+
-+    return head;
-+}
+ 
+diff --git a/blockdev-nbd.c b/blockdev-nbd.c
+index 814554dd90..9efbaef8f7 100644
+--- a/blockdev-nbd.c
++++ b/blockdev-nbd.c
+@@ -235,11 +235,6 @@ int nbd_export_create(BlockExport *exp, BlockExportOptions *exp_args,
+         goto out;
+     }
+ 
+-    /* The list of named exports has a strong reference to this export now and
+-     * our only way of accessing it is through nbd_export_find(), so we can drop
+-     * the strong reference that is @exp. */
+-    blk_exp_unref(exp);
+-
+     ret = 0;
+  out:
+     aio_context_release(aio_context);
+diff --git a/nbd/server.c b/nbd/server.c
+index 32147e4871..22a1d66168 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -1616,7 +1616,6 @@ int nbd_export_new(BlockExport *blk_exp, BlockDriverState *bs,
+ 
+     blk_add_aio_context_notifier(blk, blk_aio_attached, blk_aio_detach, exp);
+ 
+-    blk_exp_ref(&exp->common);
+     QTAILQ_INSERT_TAIL(&exports, exp, next);
+ 
+     return 0;
+@@ -1663,7 +1662,6 @@ static void nbd_export_request_shutdown(BlockExport *blk_exp)
+         client_close(client, true);
+     }
+     if (exp->name) {
+-        blk_exp_unref(&exp->common);
+         g_free(exp->name);
+         exp->name = NULL;
+         QTAILQ_REMOVE(&exports, exp, next);
 -- 
 2.25.4
 
