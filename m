@@ -2,78 +2,75 @@ Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9898BC433E2
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:14:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B19C433E2
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:14:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 37F022137B
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:14:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0DD302075A
+	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 12:14:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VySgr2cx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37F022137B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ELjbGuMS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DD302075A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFG23-0000Vc-C5
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 08:13:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45436)
+	id 1kFG24-0000b4-Rm
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 08:14:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFG02-0004QD-Mr
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:11:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55285)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFFzs-0003vu-5d
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:11:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32737)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFG00-0007x6-VU
- for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:11:54 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFFzq-0007uZ-13
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 08:11:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599480712;
+ s=mimecast20190719; t=1599480701;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=cBHngwQh2WHGy1NZTqMUGTscaMM8OvzGJ3zyPEeugts=;
- b=VySgr2cxuHzjhlLlcd+7isYK7tepenP06ay7qaux06IHCfzFIwX6DCdiP36xCK8le1cfS0
- hyzV3ByWLz2ni/kc1fD1qKdK0B9bjqEv4mfBj66N4/PjPGyeiKeP5e5VStUjNoOB0Ti7SL
- YGjjtTa91SXTuSP3rL0fDbHYxRvn1DU=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=kbG6xG5pn9C0ADYNHatpYB+8Z95DeeTLDPLSMxyXI+g=;
+ b=ELjbGuMSjY6BIULTTPfQpmR6vs22kdWlAhOqiTMmUTgFvTot2UeGw9htB89KEGEowzAvAB
+ nudfa9YLkpYUl81jdM9TdLd+A8U0Zj6XsWWSFq+G6wcuIXlTib68xroxELzEavhwJyYXLh
+ t/QSGexjXRqnFelIr5gLkDMxgzGYan8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-516-qId6D8F0MNCDMgYOuM62Lg-1; Mon, 07 Sep 2020 08:11:50 -0400
-X-MC-Unique: qId6D8F0MNCDMgYOuM62Lg-1
+ us-mta-1-mfIZIu_JMzOBW6gDoXfNOA-1; Mon, 07 Sep 2020 08:11:37 -0400
+X-MC-Unique: mfIZIu_JMzOBW6gDoXfNOA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3A647801FDF;
- Mon,  7 Sep 2020 12:11:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 502A6640E3;
+ Mon,  7 Sep 2020 12:11:36 +0000 (UTC)
 Received: from thuth.com (ovpn-112-193.ams2.redhat.com [10.36.112.193])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E0205C1BB;
- Mon,  7 Sep 2020 12:11:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5468E5C1BB;
+ Mon,  7 Sep 2020 12:11:35 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 13/14] tests/qtest: do not list ahci-test twice
-Date: Mon,  7 Sep 2020 14:11:26 +0200
-Message-Id: <20200907121127.136243-14-thuth@redhat.com>
+Subject: [PULL 04/14] tests: Fixes building test-util-filemonitor.c on
+ msys2/mingw
+Date: Mon,  7 Sep 2020 14:11:17 +0200
+Message-Id: <20200907121127.136243-5-thuth@redhat.com>
 In-Reply-To: <20200907121127.136243-1-thuth@redhat.com>
 References: <20200907121127.136243-1-thuth@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 03:52:11
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 05:27:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
@@ -99,32 +96,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Paolo Bonzini <pbonzini@redhat.com>
+From: Yonggang Luo <luoyonggang@gmail.com>
 
-This is caught by "meson test", which complains about two tests with the
-same name.
+Fixes the following compiling error:
+../tests/test-util-filemonitor.c: In function 'test_file_monitor_events':
+../tests/test-util-filemonitor.c:620:17: error: too many arguments to function 'mkdir'
+  620 |             if (mkdir(pathsrc, 0700) < 0) {
+      |                 ^~~~~
+In file included from C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/unistd.h:10,
+                 from C:/work/xemu/qemu/include/qemu/osdep.h:93,
+                 from ../tests/test-util-filemonitor.c:21:
+C:/CI-Tools/msys64/mingw64/x86_64-w64-mingw32/include/io.h:282:15: note: declared here
+  282 |   int __cdecl mkdir (const char *) __MINGW_ATTRIB_DEPRECATED_MSVC2005;
+      |               ^~~~~
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-Message-Id: <20200904120342.11370-1-pbonzini@redhat.com>
-Fixes: a2ce7dbd917 ("meson: convert tests/qtest to meson")
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Message-Id: <20200905203425.1470-1-luoyonggang@gmail.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- tests/qtest/meson.build | 1 -
- 1 file changed, 1 deletion(-)
+ tests/test-util-filemonitor.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index 8f8fdb1336..874b5be62b 100644
---- a/tests/qtest/meson.build
-+++ b/tests/qtest/meson.build
-@@ -49,7 +49,6 @@ qtests_i386 = \
-   qtests_pci +                                                                              \
-   ['fdc-test',
-    'ide-test',
--   'ahci-test',
-    'hd-geo-test',
-    'boot-order-test',
-    'bios-tables-test',
+diff --git a/tests/test-util-filemonitor.c b/tests/test-util-filemonitor.c
+index 8f0eff3d03..b629e10857 100644
+--- a/tests/test-util-filemonitor.c
++++ b/tests/test-util-filemonitor.c
+@@ -23,6 +23,8 @@
+ #include "qapi/error.h"
+ #include "qemu/filemonitor.h"
+ 
++#include <glib/gstdio.h>
++
+ #include <utime.h>
+ 
+ enum {
+@@ -617,7 +619,7 @@ test_file_monitor_events(void)
+             if (debug) {
+                 g_printerr("Mkdir %s\n", pathsrc);
+             }
+-            if (mkdir(pathsrc, 0700) < 0) {
++            if (g_mkdir_with_parents(pathsrc, 0700) < 0) {
+                 g_printerr("Unable to mkdir %s: %s",
+                            pathsrc, strerror(errno));
+                 goto cleanup;
 -- 
 2.18.2
 
