@@ -7,56 +7,55 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05955C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82253C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:29:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98E3221897
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:29:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EB2021897
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:29:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ERTwoItl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98E3221897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZtncQTNj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB2021897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40538 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWBj-0005IK-P6
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:29:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57408)
+	id 1kFWBn-0005T9-8R
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:29:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3P-0006Ej-Nz; Tue, 08 Sep 2020 01:20:28 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:56169 helo=ozlabs.org)
+ id 1kFW3O-0006Bz-AJ; Tue, 08 Sep 2020 01:20:26 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:44533)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3M-0005yR-G7; Tue, 08 Sep 2020 01:20:27 -0400
+ id 1kFW3M-0005xr-A7; Tue, 08 Sep 2020 01:20:25 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkn4j7Cz9sVR; Tue,  8 Sep 2020 15:20:01 +1000 (AEST)
+ id 4Bltkm3Gp0z9sV5; Tue,  8 Sep 2020 15:20:00 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542401;
- bh=gMiAtQjsk/Rf8aQpgZPjpS1b6eRF/e1DiGSzGhHBsJ4=;
+ d=gibson.dropbear.id.au; s=201602; t=1599542400;
+ bh=PeIhZBLtydKrEKfpTxjVJjL8zkvkMJjiCuSHLy0Dyv4=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ERTwoItlbtHE23KmVMc7eyc7BYUJ3xoMAw836HTm+JyRm25dMGxW7T2iRsGzR2NaW
- YpmKT+U+hO4+aduS9B/aNF1Je1YDHzvtejwW/XaSYXXwEfi3ztfNwy01JNrH/Wwn5Q
- UF6XAqcZVOF6Ckqvd5FgAZPBMlfi1YINBQ8oFz7Q=
+ b=ZtncQTNjzI6CYgyaR3Qzd3u+WUOGUUPK6y+r5Kq+xd7BQDg4EcgHf6SwZ/MR6ocJP
+ giTY5ZQsttrQwAUGiWa0/ADPMUqDqrZ+RXn4QAbsb+8BecOolCwddMcAr1VYNzfWrJ
+ xZUhBp5CSbU6WHyFXVOAy7OhnVMcoXMpA7NDGKRI=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 15/33] target/arm: Move start-powered-off property to generic
- CPUState
-Date: Tue,  8 Sep 2020 15:19:35 +1000
-Message-Id: <20200908051953.1616885-16-david@gibson.dropbear.id.au>
+Subject: [PULL 13/33] spapr,
+ spapr_nvdimm: fold NVDIMM validation in the same place
+Date: Tue,  8 Sep 2020 15:19:33 +1000
+Message-Id: <20200908051953.1616885-14-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:19:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -75,131 +74,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, danielhb413@gmail.com,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-There are other platforms which also have CPUs that start powered off, so
-generalize the start-powered-off property so that it can be used by them.
+NVDIMM has different contraints and conditions than the regular
+DIMM and we'll need to add at least one more.
 
-Note that ARMv7MState also has a property of the same name but this patch
-doesn't change it because that class isn't a subclass of CPUState so it
-wouldn't be a trivial change.
+Instead of relying on 'if (nvdimm)' conditionals in the body of
+spapr_memory_pre_plug(), use the existing spapr_nvdimm_validate_opts()
+and put all NVDIMM handling code there. Rename it to
+spapr_nvdimm_validate() to reflect that the function is now checking
+more than the nvdimm device options. This makes spapr_memory_pre_plug()
+a bit easier to follow, and we can tune in NVDIMM parameters
+and validation in the same place.
 
-This change should not cause any change in behavior.
-
-Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Message-Id: <20200826055535.951207-2-bauerman@linux.ibm.com>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-Id: <20200825215749.213536-3-danielhb413@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- exec.c                | 1 +
- include/hw/core/cpu.h | 4 ++++
- target/arm/cpu.c      | 5 ++---
- target/arm/cpu.h      | 3 ---
- target/arm/kvm32.c    | 2 +-
- target/arm/kvm64.c    | 2 +-
- 6 files changed, 9 insertions(+), 8 deletions(-)
+ hw/ppc/spapr.c                | 18 ++++++------------
+ hw/ppc/spapr_nvdimm.c         | 10 ++++++++--
+ include/hw/ppc/spapr_nvdimm.h |  4 ++--
+ 3 files changed, 16 insertions(+), 16 deletions(-)
 
-diff --git a/exec.c b/exec.c
-index 7683afb6a8..e34b602bdf 100644
---- a/exec.c
-+++ b/exec.c
-@@ -899,6 +899,7 @@ Property cpu_common_props[] = {
-     DEFINE_PROP_LINK("memory", CPUState, memory, TYPE_MEMORY_REGION,
-                      MemoryRegion *),
- #endif
-+    DEFINE_PROP_BOOL("start-powered-off", CPUState, start_powered_off, false),
-     DEFINE_PROP_END_OF_LIST(),
- };
+diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+index dd2fa4826b..b0a04443fb 100644
+--- a/hw/ppc/spapr.c
++++ b/hw/ppc/spapr.c
+@@ -3520,7 +3520,6 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+ {
+     const SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(hotplug_dev);
+     SpaprMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+-    const MachineClass *mc = MACHINE_CLASS(smc);
+     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+     PCDIMMDevice *dimm = PC_DIMM(dev);
+     Error *local_err = NULL;
+@@ -3533,27 +3532,22 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
  
-diff --git a/include/hw/core/cpu.h b/include/hw/core/cpu.h
-index 8f145733ce..9fc2696db5 100644
---- a/include/hw/core/cpu.h
-+++ b/include/hw/core/cpu.h
-@@ -374,6 +374,10 @@ struct CPUState {
-     bool created;
-     bool stop;
-     bool stopped;
-+
-+    /* Should CPU start in powered-off state? */
-+    bool start_powered_off;
-+
-     bool unplug;
-     bool crash_occurred;
-     bool exit_request;
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index c179e0752d..9f814194fb 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -174,8 +174,8 @@ static void arm_cpu_reset(DeviceState *dev)
-     env->vfp.xregs[ARM_VFP_MVFR1] = cpu->isar.mvfr1;
-     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
- 
--    cpu->power_state = cpu->start_powered_off ? PSCI_OFF : PSCI_ON;
--    s->halted = cpu->start_powered_off;
-+    cpu->power_state = s->start_powered_off ? PSCI_OFF : PSCI_ON;
-+    s->halted = s->start_powered_off;
- 
-     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
-         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
-@@ -2186,7 +2186,6 @@ static const ARMCPUInfo arm_cpus[] = {
- };
- 
- static Property arm_cpu_properties[] = {
--    DEFINE_PROP_BOOL("start-powered-off", ARMCPU, start_powered_off, false),
-     DEFINE_PROP_UINT32("psci-conduit", ARMCPU, psci_conduit, 0),
-     DEFINE_PROP_UINT64("midr", ARMCPU, midr, 0),
-     DEFINE_PROP_UINT64("mp-affinity", ARMCPU,
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index a1c7d8ebae..6036f61d60 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -817,9 +817,6 @@ struct ARMCPU {
-      */
-     uint32_t psci_version;
- 
--    /* Should CPU start in PSCI powered-off state? */
--    bool start_powered_off;
+-    if (is_nvdimm && !mc->nvdimm_supported) {
+-        error_setg(errp, "NVDIMM hotplug not supported for this machine");
+-        return;
+-    }
 -
-     /* Current power state, access guarded by BQL */
-     ARMPSCIState power_state;
- 
-diff --git a/target/arm/kvm32.c b/target/arm/kvm32.c
-index 0af46b41c8..1f2b8f8b7a 100644
---- a/target/arm/kvm32.c
-+++ b/target/arm/kvm32.c
-@@ -218,7 +218,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
- 
-     /* Determine init features for this CPU */
-     memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
--    if (cpu->start_powered_off) {
-+    if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
+     size = memory_device_get_region_size(MEMORY_DEVICE(dimm), &local_err);
+     if (local_err) {
+         error_propagate(errp, local_err);
+         return;
      }
-     if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index ef1e960285..987b35e33f 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -774,7 +774,7 @@ int kvm_arch_init_vcpu(CPUState *cs)
  
-     /* Determine init features for this CPU */
-     memset(cpu->kvm_init_features, 0, sizeof(cpu->kvm_init_features));
--    if (cpu->start_powered_off) {
-+    if (cs->start_powered_off) {
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_POWER_OFF;
+-    if (!is_nvdimm && size % SPAPR_MEMORY_BLOCK_SIZE) {
+-        error_setg(errp, "Hotplugged memory size must be a multiple of "
+-                   "%" PRIu64 " MB", SPAPR_MEMORY_BLOCK_SIZE / MiB);
+-        return;
+-    } else if (is_nvdimm) {
+-        spapr_nvdimm_validate_opts(NVDIMM(dev), size, &local_err);
++    if (is_nvdimm) {
++        spapr_nvdimm_validate(hotplug_dev, NVDIMM(dev), size, &local_err);
+         if (local_err) {
+             error_propagate(errp, local_err);
+             return;
+         }
++    } else if (size % SPAPR_MEMORY_BLOCK_SIZE) {
++        error_setg(errp, "Hotplugged memory size must be a multiple of "
++                   "%" PRIu64 " MB", SPAPR_MEMORY_BLOCK_SIZE / MiB);
++        return;
      }
-     if (kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PSCI_0_2)) {
+ 
+     memdev = object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
+diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+index 9a20a65640..bc2b65420c 100644
+--- a/hw/ppc/spapr_nvdimm.c
++++ b/hw/ppc/spapr_nvdimm.c
+@@ -30,13 +30,19 @@
+ #include "hw/ppc/fdt.h"
+ #include "qemu/range.h"
+ 
+-void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uint64_t size,
+-                                Error **errp)
++void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
++                           uint64_t size, Error **errp)
+ {
++    const MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
+     g_autofree char *uuidstr = NULL;
+     QemuUUID uuid;
+     int ret;
+ 
++    if (!mc->nvdimm_supported) {
++        error_setg(errp, "NVDIMM hotplug not supported for this machine");
++        return;
++    }
++
+     if (object_property_get_int(OBJECT(nvdimm), NVDIMM_LABEL_SIZE_PROP,
+                                 &error_abort) == 0) {
+         error_setg(errp, "PAPR requires NVDIMM devices to have label-size set");
+diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
+index b3330cc485..fd1736634c 100644
+--- a/include/hw/ppc/spapr_nvdimm.h
++++ b/include/hw/ppc/spapr_nvdimm.h
+@@ -29,8 +29,8 @@ int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+                            void *fdt, int *fdt_start_offset, Error **errp);
+ int spapr_dt_nvdimm(void *fdt, int parent_offset, NVDIMMDevice *nvdimm);
+ void spapr_dt_persistent_memory(void *fdt);
+-void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uint64_t size,
+-                                Error **errp);
++void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
++                           uint64_t size, Error **errp);
+ void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp);
+ void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr);
+ 
 -- 
 2.26.2
 
