@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 001C0C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:31:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD06C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:32:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8AFC92166E
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:31:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 10BFF2137B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:32:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GTPr9hdF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AFC92166E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="hAYt+RG2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10BFF2137B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWEQ-0002gZ-Jf
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:31:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57484)
+	id 1kFWEp-0003sZ-55
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:32:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3V-0006Kr-E7; Tue, 08 Sep 2020 01:20:36 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:41433)
+ id 1kFW3V-0006Kq-Eb; Tue, 08 Sep 2020 01:20:36 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:52433)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3T-00062w-4M; Tue, 08 Sep 2020 01:20:32 -0400
+ id 1kFW3T-00062t-2J; Tue, 08 Sep 2020 01:20:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkt1S8lz9sVm; Tue,  8 Sep 2020 15:20:05 +1000 (AEST)
+ id 4Bltks570Tz9sVn; Tue,  8 Sep 2020 15:20:05 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542406;
- bh=oeTwfet2JM4g+Thw1qR7fessfnR6Qs0F3YzSLDUcLJc=;
+ d=gibson.dropbear.id.au; s=201602; t=1599542405;
+ bh=+wRMb4x4M1I0zN16EWCl1WpIOSHPqee5UeeBLhwlsQY=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=GTPr9hdFlk4wEAG7l8WiBj+s+Ej+XgIq0h0Ym1Mo3waOYbsZkk88n//1yzWpBo0H9
- 97a0jdezjUgPsbsLSZs1eMBT9xPzIl9etllT/JlqUpPMYa4mCiYFkNUxYhuHdpPiqS
- 56xVm2lMUK0qtWhG3fd8Dp2jXzI+skO941F/0/g0=
+ b=hAYt+RG2GsDHJoPB9kdbLSL1x67bIcLEaxQwPMiKF9h/e8sebQ5BBoD2FppWzS1hX
+ JLsw68vUgmfX2QuhiKlbSvmGsLMP2d8mFGhx6UEgKFWImXf6Gqkk4nQdVCF0BokvTe
+ 3dWga0ELmgDziq3mPZowazUN3+0VcO4dNRjdgf7k=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 22/33] target/s390x: Use start-powered-off CPUState property
-Date: Tue,  8 Sep 2020 15:19:42 +1000
-Message-Id: <20200908051953.1616885-23-david@gibson.dropbear.id.au>
+Subject: [PULL 21/33] sparc/sun4m: Use start-powered-off CPUState property
+Date: Tue,  8 Sep 2020 15:19:41 +1000
+Message-Id: <20200908051953.1616885-22-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
@@ -74,8 +74,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: danielhb413@gmail.com, Cornelia Huck <cohuck@redhat.com>,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
@@ -84,38 +84,86 @@ Sender: "Qemu-devel"
 
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 
-Instead of setting CPUState::halted to 1 in s390_cpu_initfn(), use the
+Instead of setting CPUState::halted to 1 in secondary_cpu_reset(), use the
 start-powered-off property which makes cpu_common_reset() initialize it
 to 1 in common code.
 
-Note that this changes behavior by setting cs->halted to 1 on reset, which
-didn't happen before.
+Now secondary_cpu_reset() becomes equivalent to main_cpu_reset() so rename
+the function to sun4m_cpu_reset().
 
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Also remove setting of cs->halted from cpu_devinit(), which seems out of
+place when compared to similar code in other architectures (e.g.,
+ppce500_init() in hw/ppc/e500.c).
+
+Finally, change creation of CPU object from cpu_create() to object_new()
+and qdev_realize_and_unref() because cpu_create() realizes the CPU and it's
+not possible to set a property after the object is realized.
+
+Suggested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Message-Id: <20200826055535.951207-9-bauerman@linux.ibm.com>
-[dwg: Fix from Laurent Vivier for user only case]
+Message-Id: <20200826055535.951207-8-bauerman@linux.ibm.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/s390x/cpu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/sparc/sun4m.c | 25 ++++++-------------------
+ 1 file changed, 6 insertions(+), 19 deletions(-)
 
-diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-index 08eb674d22..749cd548f0 100644
---- a/target/s390x/cpu.c
-+++ b/target/s390x/cpu.c
-@@ -291,9 +291,9 @@ static void s390_cpu_initfn(Object *obj)
-     S390CPU *cpu = S390_CPU(obj);
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 7484aa4438..6bf9d27d8a 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -218,7 +218,7 @@ static void dummy_cpu_set_irq(void *opaque, int irq, int level)
+ {
+ }
  
-     cpu_set_cpustate_pointers(cpu);
+-static void main_cpu_reset(void *opaque)
++static void sun4m_cpu_reset(void *opaque)
+ {
+     SPARCCPU *cpu = opaque;
+     CPUState *cs = CPU(cpu);
+@@ -226,15 +226,6 @@ static void main_cpu_reset(void *opaque)
+     cpu_reset(cs);
+ }
+ 
+-static void secondary_cpu_reset(void *opaque)
+-{
+-    SPARCCPU *cpu = opaque;
+-    CPUState *cs = CPU(cpu);
+-
+-    cpu_reset(cs);
 -    cs->halted = 1;
-     cs->exception_index = EXCP_HLT;
- #if !defined(CONFIG_USER_ONLY)
-+    cs->start_powered_off = true;
-     object_property_add(obj, "crash-information", "GuestPanicInformation",
-                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL);
-     cpu->env.tod_timer =
+-}
+-
+ static void cpu_halt_signal(void *opaque, int irq, int level)
+ {
+     if (level && current_cpu) {
+@@ -818,21 +809,17 @@ static const TypeInfo ram_info = {
+ static void cpu_devinit(const char *cpu_type, unsigned int id,
+                         uint64_t prom_addr, qemu_irq **cpu_irqs)
+ {
+-    CPUState *cs;
+     SPARCCPU *cpu;
+     CPUSPARCState *env;
+ 
+-    cpu = SPARC_CPU(cpu_create(cpu_type));
++    cpu = SPARC_CPU(object_new(cpu_type));
+     env = &cpu->env;
+ 
+     cpu_sparc_set_id(env, id);
+-    if (id == 0) {
+-        qemu_register_reset(main_cpu_reset, cpu);
+-    } else {
+-        qemu_register_reset(secondary_cpu_reset, cpu);
+-        cs = CPU(cpu);
+-        cs->halted = 1;
+-    }
++    qemu_register_reset(sun4m_cpu_reset, cpu);
++    object_property_set_bool(OBJECT(cpu), "start-powered-off", id != 0,
++                             &error_fatal);
++    qdev_realize_and_unref(DEVICE(cpu), NULL, &error_fatal);
+     *cpu_irqs = qemu_allocate_irqs(cpu_set_irq, cpu, MAX_PILS);
+     env->prom_addr = prom_addr;
+ }
 -- 
 2.26.2
 
