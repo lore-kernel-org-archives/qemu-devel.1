@@ -2,92 +2,80 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C5AC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1859AC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:32:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49A0122450
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:29:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EEwTZ+C6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49A0122450
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 819DD21D7E
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:32:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819DD21D7E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFfYf-0004tm-To
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 11:29:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56592)
+	id 1kFfbT-0000KU-IB
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 11:32:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kFfXT-00037c-2d
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:28:07 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46805
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kFfXP-00086a-ES
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:28:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599578881;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=IwVSEx6YZ2XG30mSvVOC1qzzypf0Z70MJsIuWqjOecM=;
- b=EEwTZ+C6lHg83mpg9jaGIKMPmzmtZmlb7gLffDjFMOhNtIY9nzcz7PL/E2U88N1hZBjvEV
- qpSqvaUxSVvc+GpTozhZw4DVX060MXZCbXLTf1ViZxFkbsf3z7U8SmUY1oKUYxqkY00Dym
- auFvU35h6jbXlFWnZ/tPHXSjeVk7cuY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-432-gzXo_5-EOuKONC8VQk-Kzw-1; Tue, 08 Sep 2020 11:27:56 -0400
-X-MC-Unique: gzXo_5-EOuKONC8VQk-Kzw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2620E1006B0E;
- Tue,  8 Sep 2020 15:27:45 +0000 (UTC)
-Received: from localhost (ovpn-112-16.ams2.redhat.com [10.36.112.16])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 00FD65D9E8;
- Tue,  8 Sep 2020 15:27:43 +0000 (UTC)
-Date: Tue, 8 Sep 2020 16:27:40 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Subject: Re: [PATCH v4 9/9] scsi/scsi_bus: fix races in REPORT LUNS
-Message-ID: <20200908152740.GF7154@stefanha-x1.localdomain>
-References: <20200831150124.206267-1-mlevitsk@redhat.com>
- <20200831150124.206267-10-mlevitsk@redhat.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kFfa2-0007Kf-Lq
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:30:46 -0400
+Received: from indium.canonical.com ([91.189.90.7]:59788)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kFfZy-0000EC-BG
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:30:46 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kFfZw-0000JP-8j
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 15:30:40 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 3D8862E804E
+ for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 15:30:40 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20200831150124.206267-10-mlevitsk@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gdTfX7fkYsEEjebm"
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=stefanha@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 08 Sep 2020 15:24:26 -0000
+From: "Dr. David Alan Gilbert" <1893691@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: dgilbert-h piotrjurkiewicz
+X-Launchpad-Bug-Reporter: Piotr Jurkiewicz (piotrjurkiewicz)
+X-Launchpad-Bug-Modifier: Dr. David Alan Gilbert (dgilbert-h)
+References: <159890390988.14589.1084059668441088626.malonedeb@gac.canonical.com>
+Message-Id: <159957866618.17693.10289347705444025821.malone@soybean.canonical.com>
+Subject: [Bug 1893691] Re: Chardev logfile is not written (regression between
+ 5.0 and 5.1)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: 29089ecc0a9a057c2e9e9fc189109563c6b5f45f
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 11:30:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -96,91 +84,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>,
- Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Bug 1893691 <1893691@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---gdTfX7fkYsEEjebm
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+(Subscribing Dan Berrange as char person).
 
-On Mon, Aug 31, 2020 at 06:01:24PM +0300, Maxim Levitsky wrote:
-> Currently scsi_target_emulate_report_luns iterates
-> over child devices list twice, and there is guarantee, that
-> it will not be changed meanwhile.
->=20
-> This reason for two loops is that it needs to know how much memory
-> to allocate.
->=20
-> Avoid this by iterating once, and allocating the memory for the output
-> dynamically with reserving enought memory so that in practice it won't
-> be reallocated often.
->=20
-> Bugzilla for reference: https://bugzilla.redhat.com/show_bug.cgi?id=3D186=
-6707
+Is there any chance you could bisect to see the exact change?
 
-"Buglink:" is the tag name documented in
-https://wiki.qemu.org/Contribute/SubmitAPatch#Write_a_meaningful_commit_mes=
-sage
+-- =
 
->  static bool scsi_target_emulate_report_luns(SCSITargetReq *r)
->  {
->      BusChild *kid;
-> -    int i, len, n;
->      int channel, id;
-> -    bool found_lun0;
-> +    uint8_t tmp[8] =3D {0};
-> +    int len =3D 0;
-> +
-> +    /* reserve space for 63 LUNs*/
-> +    GByteArray *buf =3D g_byte_array_sized_new(512);
-> =20
->      if (r->req.cmd.xfer < 16) {
->          return false;
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1893691
 
-buf is leaked.
+Title:
+  Chardev logfile is not written (regression between 5.0 and 5.1)
 
-> @@ -460,46 +466,36 @@ static bool scsi_target_emulate_report_luns(SCSITar=
-getReq *r)
->      }
->      channel =3D r->req.dev->channel;
->      id =3D r->req.dev->id;
-> -    found_lun0 =3D false;
-> -    n =3D 0;
-> =20
-> -    rcu_read_lock();
-> =20
-> -    QTAILQ_FOREACH_RCU(kid, &r->req.bus->qbus.children, sibling) {
-> -        DeviceState *qdev =3D kid->child;
-> -        SCSIDevice *dev =3D SCSI_DEVICE(qdev);
-> +    /* add size (will be updated later to correct value */
-> +    g_byte_array_append(buf, tmp, 8);
-> +    len +=3D 8;
+Status in QEMU:
+  New
 
-Can g_byte_array_size() be used instead of keeping a len local variable?
+Bug description:
+  After update from version 5.0 to 5.1, logfile stopped being populated
+  with console output. The file is being created, but remains empty.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+  Relevant command line options:
 
---gdTfX7fkYsEEjebm
-Content-Type: application/pgp-signature; name="signature.asc"
+  -mon chardev=3Dchar0
+  -serial chardev:char0
+  -chardev socket,host=3D127.0.0.10,port=3D2323,server,nowait,telnet,mux=3D=
+on,id=3Dchar0,logfile=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/=
+internal/log
 
------BEGIN PGP SIGNATURE-----
+  =
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9XouwACgkQnKSrs4Gr
-c8jgUgf8DZ4cFLScaBpyWW6LaHAJ2wat7NsP6M1CG4nQ++HcjY+UpWqZFPs0sC5c
-D6iym1aXcYwVvxyLyLvDifPKm6Bc529InTwDIbsUPIAEaonUl+KyZCfpt+kysL1n
-qR5/BjJt+A1Uxyrh6ZsaPZAnvIf58YHjtdW/SSlwykBZVDjp3uMVB+ucORkkuw17
-KSRk0vO0I5iB8MyjQ55NMDTcNlSopvVUAEJImFMZ2JDxC0GgFGJhHkJt3F1dKqkz
-xsBOLV27o79ZmcytKhmc4nTvzMP1PzlQf0Z7T1NDHiQcdxaisvpNPO3fZG22OFXO
-x+/nQr2ocIsJEVo464eDGgDb7UshEg==
-=7v/y
------END PGP SIGNATURE-----
+  Full command line:
 
---gdTfX7fkYsEEjebm--
+  qemu-system-x86_64
+  -nodefaults
+  -no-user-config
+  -snapshot
+  -enable-kvm
+  -cpu
+  host
+  -nographic
+  -echr
+  17
+  -mon
+  chardev=3Dchar0
+  -serial
+  chardev:char0
+  -rtc
+  clock=3Dvm
+  -object
+  rng-random,filename=3D/dev/urandom,id=3Drng0
+  -device
+  virtio-rng-pci,rng=3Drng0,max-bytes=3D512,period=3D1000
+  -name
+  2020-08-31T21:46:55-0,debug-threads=3Don
+  -smp
+  sockets=3D1,cores=3D9,threads=3D2
+  -m
+  251G
+  -overcommit
+  cpu-pm=3Don
+  -pidfile
+  /home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/internal/pid
+  -net
+  nic,model=3Dvirtio
+  -net
+  user,hostfwd=3Dtcp:127.0.0.10:2222-:22,hostfwd=3Dtcp:127.0.0.10:8000-:800=
+0,hostfwd=3Dtcp:127.0.0.10:9000-:9000
+  -fsdev
+  local,id=3Dmachiner_internal_dir,security_model=3Dnone,path=3D/home/jurki=
+ew/.machiner/runs/2020-08-31T21:46:55-0/internal
+  -device
+  virtio-9p-pci,fsdev=3Dmachiner_internal_dir,mount_tag=3Dmachiner_internal=
+_dir
+  -fsdev
+  local,id=3Dmachiner_lower_dir,security_model=3Dnone,readonly,path=3D.
+  -device
+  virtio-9p-pci,fsdev=3Dmachiner_lower_dir,mount_tag=3Dmachiner_lower_dir
+  -fsdev
+  local,id=3Dmachiner_upper_dir,security_model=3Dmapped-xattr,fmode=3D0777,=
+dmode=3D0777,path=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0
+  -device
+  virtio-9p-pci,fsdev=3Dmachiner_upper_dir,mount_tag=3Dmachiner_upper_dir
+  -device
+  virtio-scsi
+  -drive
+  if=3Dnone,file=3D/home/jurkiew/.machiner/images/famtar/image.qcow2,discar=
+d=3Don,id=3Dfamtar
+  -device
+  scsi-hd,drive=3Dfamtar
+  -chardev
+  socket,host=3D127.0.0.10,port=3D2323,server,nowait,telnet,mux=3Don,id=3Dc=
+har0,logfile=3D/home/jurkiew/.machiner/runs/2020-08-31T21:46:55-0/internal/=
+log
 
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1893691/+subscriptions
 
