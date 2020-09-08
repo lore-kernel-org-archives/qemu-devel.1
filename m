@@ -2,96 +2,83 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C218C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 17:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8713DC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 17:32:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8590B20738
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 17:26:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eyiYAUQ8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8590B20738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A1EA320738
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 17:32:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1EA320738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49466 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35788 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFhOP-00016T-L0
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 13:26:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33446)
+	id 1kFhU4-0007WN-MI
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 13:32:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFhNW-0000bs-Ko
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 13:25:58 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:57944
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFhNU-0008J3-9y
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 13:25:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599585955;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6WjMnrl1+3+CXF/ihW6mU4aH+so1wzZfL2R1qSHXayk=;
- b=eyiYAUQ8Q+q2+CKL1gQl0/6N/eSD6jibvo5RIvmjtOM8rb0LwTW07+TgST7pkNbn6X9zKz
- ZXGh9rJoJd4az7gSGGhY3+NN9JnQnAvk3HW83ZH9PPPuHrHLz7jYu+ERVRHc8qiYpTdV6J
- 5yVJM+LhDtQwUELdaG2Xnfh7YCS27hk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-490-kJ1mTR3DOl2z5eya63Tidw-1; Tue, 08 Sep 2020 13:25:53 -0400
-X-MC-Unique: kJ1mTR3DOl2z5eya63Tidw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C9220100A605;
- Tue,  8 Sep 2020 17:25:51 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-131.ams2.redhat.com [10.36.112.131])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9242F10013C4;
- Tue,  8 Sep 2020 17:25:48 +0000 (UTC)
-Subject: Re: [PATCH V2 for-5.2] hw/null-machine: Add the kvm_type() hook for
- MIPS
-To: Huacai Chen <zltjiangshi@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <1598256668-12131-1-git-send-email-chenhc@lemote.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <caa3c014-ba68-0875-4dd5-faed9282ca95@redhat.com>
-Date: Tue, 8 Sep 2020 19:25:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kFhSD-0006AP-VK
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 13:30:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45046)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kFhSB-0000Ty-Iw
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 13:30:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kFhS9-00059E-BN
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 17:30:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 51A882E80DB
+ for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 17:30:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <1598256668-12131-1-git-send-email-chenhc@lemote.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=thuth@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.626, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 08 Sep 2020 17:20:50 -0000
+From: Daniel Berrange <1826200@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=berrange@redhat.com; 
+X-Launchpad-Bug-Tags: feature-request
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: berrange lersek
+X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
+X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
+References: <155610584995.13565.1262636932024040431.malonedeb@wampee.canonical.com>
+Message-Id: <159958565059.20174.12016916955949097842.malone@gac.canonical.com>
+Subject: [Bug 1826200] Re: RFE: populate "OEM Strings" (type 11) SMBIOS table
+ strings from regular files
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: e263c249676b584a33461885f4b305dd27461d7a
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 11:30:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,153 +87,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
+Reply-To: Bug 1826200 <1826200@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/08/2020 10.11, Huacai Chen wrote:
-> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now,
-> libvirt uses a null-machine to detect the kvm capability. In the MIPS
-> case, it will return "KVM not supported" on a VZ platform by default.
-> So, add the kvm_type() hook to the null-machine.
-> 
-> This seems not a very good solution, but I cannot do it better now.
+Surprise...
 
-This is still ugly. Why do the other architectures do not have the
-same problem? Let's see... in kvm-all.c, we have:
+https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg03023.html
 
-    int type = 0;
-    [...]
-    kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
-    if (mc->kvm_type) {
-        type = mc->kvm_type(ms, kvm_type);
-    } else if (kvm_type) {
-        ret = -EINVAL;
-        fprintf(stderr, "Invalid argument kvm-type=%s\n", kvm_type);
-        goto err;
-    }
+Discovering the firmware limits was tedious.  SeaBIOS limits SMBIOS to
+64KB total size due to support for SMBIOS 2.1 spec only, while EDK2
+fails a little over 128 KB total size despite supporting SMBIOS 3.0
+which should not be limited IIUC
 
-    do {
-        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
-    } while (ret == -EINTR);
+** Changed in: qemu
+       Status: Invalid =3D> In Progress
 
-Thus the KVM_CREATE_VM ioctl is likely called with type = 0 in this
-case (i.e. when libvirt probes with the "null"-machine).
+-- =
 
-Now let's have a look at the kernel. The "type" parameter is passed
-there to the architecture specific function kvm_arch_init_vm().
-For powerpc, this looks like:
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1826200
 
-	if (type == 0) {
-		if (kvmppc_hv_ops)
-			kvm_ops = kvmppc_hv_ops;
-		else
-			kvm_ops = kvmppc_pr_ops;
-		if (!kvm_ops)
-			goto err_out;
-	} else	if (type == KVM_VM_PPC_HV) {
-		if (!kvmppc_hv_ops)
-			goto err_out;
-		kvm_ops = kvmppc_hv_ops;
-	} else if (type == KVM_VM_PPC_PR) {
-		if (!kvmppc_pr_ops)
-			goto err_out;
-		kvm_ops = kvmppc_pr_ops;
-	} else
-		goto err_out;
+Title:
+  RFE: populate "OEM Strings" (type 11) SMBIOS table strings from
+  regular files
 
-That means for type == 0, it automatically detects the best
-kvm-type.
+Status in QEMU:
+  In Progress
 
-For mips, this function looks like this:
+Bug description:
+  The feature added in
 
-	switch (type) {
-#ifdef CONFIG_KVM_MIPS_VZ
-	case KVM_VM_MIPS_VZ:
-#else
-	case KVM_VM_MIPS_TE:
-#endif
-		break;
-	default:
-		/* Unsupported KVM type */
-		return -EINVAL;
-	};
+  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D2d6dcbf93fb01b4a7f4=
+5a93d276d4d74b16392dd
 
-That means, for type == 0, it returns -EINVAL here!
+  and exposed by libvirt as
 
-Looking at the API docu in Documentation/virt/kvm/api.rst
-the description of the type parameter is quite sparse, but it
-says:
+    https://libvirt.org/formatdomain.html#elementsSysinfo
 
- "You probably want to use 0 as machine type."
+  allows the user to specify up to 255 strings in the unofmatted area of
+  the Type 11 SMBIOS table, where each string may be of arbitrary
+  length. This feature is useful for exposing arbitrary text to
+  arbitrary guest components (in particular when strings are prefixed
+  with "application identifiers").
 
-So I think this is a bug in the implementation of KVM in the
-mips kernel code. The kvm_arch_init_vm() in the mips code should
-do the same as on powerpc, and use the best available KVM type
-there instead of returning EINVAL. Once that is fixed there,
-you don't need this patch here for QEMU anymore.
+  Right now, strings can only be specified on the QEMU command line,
+  which limits the amount of data that can be passed. Please enable
+  users to pass data from regular files too.
 
- HTH,
-  Thomas
+  For example:
 
+    $QEMU -smbios
+  type=3D11,value=3DHello,txtfile=3Dfile1.txt,txtfile=3Dfile2.txt
 
-> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> ---
->  hw/core/meson.build    | 2 +-
->  hw/core/null-machine.c | 6 ++++++
->  2 files changed, 7 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/meson.build b/hw/core/meson.build
-> index fc91f98..b6591b9 100644
-> --- a/hw/core/meson.build
-> +++ b/hw/core/meson.build
-> @@ -35,7 +35,6 @@ softmmu_ss.add(files(
->    'machine-hmp-cmds.c',
->    'machine.c',
->    'nmi.c',
-> -  'null-machine.c',
->    'qdev-fw.c',
->    'qdev-properties-system.c',
->    'sysbus.c',
-> @@ -45,5 +44,6 @@ softmmu_ss.add(files(
->  
->  specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
->    'machine-qmp-cmds.c',
-> +  'null-machine.c',
->    'numa.c',
->  ))
-> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> index 7e69352..4b4ab76 100644
-> --- a/hw/core/null-machine.c
-> +++ b/hw/core/null-machine.c
-> @@ -17,6 +17,9 @@
->  #include "sysemu/sysemu.h"
->  #include "exec/address-spaces.h"
->  #include "hw/core/cpu.h"
-> +#ifdef TARGET_MIPS
-> +#include "kvm_mips.h"
-> +#endif
->  
->  static void machine_none_init(MachineState *mch)
->  {
-> @@ -55,6 +58,9 @@ static void machine_none_machine_init(MachineClass *mc)
->      mc->no_floppy = 1;
->      mc->no_cdrom = 1;
->      mc->no_sdcard = 1;
-> +#ifdef TARGET_MIPS
-> +    mc->kvm_type = mips_kvm_type;
-> +#endif
->  }
->  
->  DEFINE_MACHINE("none", machine_none_machine_init)
-> 
+  where "file1.txt" and "file2.txt" could be text files containing ASCII
+  application prefixes, followed by base64-encoded binary data.
 
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1826200/+subscriptions
 
