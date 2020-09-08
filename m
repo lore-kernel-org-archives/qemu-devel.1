@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 635BAC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:59:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8731AC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:01:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E302B20658
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:59:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EB342206E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:01:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fihq/HN4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E302B20658
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aO0sB51L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB342206E7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49110 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFg28-0002V9-00
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 11:59:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35644)
+	id 1kFg3i-0004OX-SR
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 12:01:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFfyV-0004iA-SB
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:56:03 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39687
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFfyP-0004V1-RV
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:55:57 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:52749
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFfyT-00041h-U8
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:56:03 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFfyN-0003x2-0l
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:55:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599580560;
+ s=mimecast20190719; t=1599580553;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=l7Ag5wnuoUQYeKlBzjbRjYp0ocSUB86y3tv8q6ZNJJA=;
- b=fihq/HN4h3EzkZN64zLjdkXt9ea00B4XIHjJulWttRV9tvDxuiHGRdRE/+u+ShoE7SsO+v
- UF7IZxEFvXP/fXB9ZksotwHKzxkYKEA4/NpafFixZSy2DKaA64cPdcUkWddU/ugXL0ywuf
- Q53kyvEYnsMz/0aBX/RItsvaLoAEkJU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-580-8uY5cVRPOv2wBNLRFNoZXw-1; Tue, 08 Sep 2020 11:55:59 -0400
-X-MC-Unique: 8uY5cVRPOv2wBNLRFNoZXw-1
-Received: by mail-wm1-f69.google.com with SMTP id l26so3618620wmg.7
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 08:55:59 -0700 (PDT)
+ bh=3aIqBnRsvFqZ230wZvv7A0ZAUlxhRiHC/gfnYkiWsME=;
+ b=aO0sB51L/asleHlmR2bOP5nwE7S6lawaWkNZtLrDnjmBVGi1Ht8QfaOBaz35YZwTXTQ6fh
+ 17uL1OmZ4J9ycWW62ONTktvP5VLnMthDqfMT6H2GICdhn7j9tziSvnSiV8VC18YHBCVCR1
+ CAA+XxfyBLIE+B/RXCpRSdro14FcGPQ=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-UKl5j3llMsWrmUNMEFTgpA-1; Tue, 08 Sep 2020 11:55:49 -0400
+X-MC-Unique: UKl5j3llMsWrmUNMEFTgpA-1
+Received: by mail-wr1-f71.google.com with SMTP id s8so7092898wrb.15
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 08:55:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=l7Ag5wnuoUQYeKlBzjbRjYp0ocSUB86y3tv8q6ZNJJA=;
- b=tu/QLKtd8u59Pf1asXv/f9r3I2j4/3AR/5MmSadvc+6oSg/GvrG7GQZ8f3qav02op0
- O91Bjv59HBxj4/Gjcs0o5CkkXJZv2QV0B65T+rkioHpmx/dFsOmdwEdDdOttK+X6n7Dh
- Sx0N31H5GtLLW8kT66kNADmd05YiiSqAknCHl5JPqpGXSaUUBES+jjTwc4Eh6X94il1i
- j1KMBhJ8SpI/SVI33o46a0FJCqQ0ddnU1PN+Wa6Tf91AcBPXPeB7tNn3FOSx9UUHtWZO
- X9ifVaRsPw1TXD1jEXDdq0gCN3I4pjwIhd58HMuHTRtLcf6Bxjd4Nytc6MeiTD4L0D60
- yE9g==
-X-Gm-Message-State: AOAM531NPVfoVT1CSz/0FtcuFsAJ9eCD7++TFDrZunYYIHmJKlMhIlFo
- FbC7K5nvF3bOUWude5iINnYCAAe3b6zq9jmilyUnhDgCKzcbwyUmERTJhWmV/pAJwvJLt5xcw3o
- YQuG5KEIxpWKZxmk=
-X-Received: by 2002:a1c:408a:: with SMTP id n132mr171987wma.45.1599580557610; 
- Tue, 08 Sep 2020 08:55:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxUFRkRRVJCqVG6l89owtWDMK776psHv3Hm0UYLZ9EZUoKSwjLV4cvgxH1H8jSVri7Qh45g4w==
-X-Received: by 2002:a1c:408a:: with SMTP id n132mr171968wma.45.1599580557436; 
- Tue, 08 Sep 2020 08:55:57 -0700 (PDT)
+ bh=3aIqBnRsvFqZ230wZvv7A0ZAUlxhRiHC/gfnYkiWsME=;
+ b=JD1k5UXZs5j03Kh75BHGWS2xYUs5gRMXYiN4EH4rkt8YXEuuX3tJu4gQB1hOKWZlBj
+ l85huqSksygWqi8ROOR8BTZQw4D1EOQoxSPE3nAT4VmYMku8/eWZOGFlp3w7WVv1Pcsh
+ 9c11oiTOlsS1IewuxVwFQc9hO8TSQcRmnRC0k6FRyKsivKTgIHM7fjkbOAMPGouBTpl2
+ kXckhtP87DPVeR4bdg2y9q98cnfmp4cob8eE2NESIwyMwVIzG6UxRwludwfI1rqKkNqt
+ vMq3micUBDefwz/xBuF9iNg24RzyDSMfpN0pbjxx1U8fFN9K9JJmjwwRog2XsDfvsKT/
+ fAdA==
+X-Gm-Message-State: AOAM530+91Js2qypbdts/ypoo9bHlM+MEflTC+9ecAsvGMeIkZmJOvyc
+ BF5ZO7x2R83OGaDLMbWitfiPyG7R8hRN5/kbdhECIqZVYlEr/MkFJaiZFnxU9N1Ge/WPnzeY/Mj
+ 7p9F32tlF7LwIT9M=
+X-Received: by 2002:adf:f10a:: with SMTP id r10mr322934wro.86.1599580547717;
+ Tue, 08 Sep 2020 08:55:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJydvCW82xRfqRQuTdYF1MHP5+r8Gl/n2M1Hanlh29I5Vyk61N4IxwQtFwRjtnXQqr5GdlWs1A==
+X-Received: by 2002:adf:f10a:: with SMTP id r10mr322919wro.86.1599580547580;
+ Tue, 08 Sep 2020 08:55:47 -0700 (PDT)
 Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id 11sm32118347wmi.14.2020.09.08.08.55.56
+ by smtp.gmail.com with ESMTPSA id j14sm34928939wrr.66.2020.09.08.08.55.46
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 08:55:56 -0700 (PDT)
+ Tue, 08 Sep 2020 08:55:47 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/6] hw/xen: Split x86-specific declaration from generic
- hardware ones
-Date: Tue,  8 Sep 2020 17:55:29 +0200
-Message-Id: <20200908155530.249806-6-philmd@redhat.com>
+Subject: [PATCH v2 3/6] sysemu/xen: Add missing 'exec/cpu-common.h' header for
+ ram_addr_t type
+Date: Tue,  8 Sep 2020 17:55:27 +0200
+Message-Id: <20200908155530.249806-4-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908155530.249806-1-philmd@redhat.com>
 References: <20200908155530.249806-1-philmd@redhat.com>
@@ -123,89 +123,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-xen_hvm_init() is restricted to the X86 architecture.
+As this header use the ram_addr_t type, it has to include
+"exec/cpu-common.h" to avoid odd errors such:
+
+  include/sysemu/xen.h:35:44: error: unknown type name 'ram_addr_t'; did you mean 'in_addr_t'?
+   35 | static inline void xen_hvm_modified_memory(ram_addr_t start, ram_addr_t length)
+      |                                            ^~~~~~~~~~
+      |                                            in_addr_t
 
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/hw/xen/xen-x86.h | 15 +++++++++++++++
- include/hw/xen/xen.h     |  2 --
- hw/i386/pc_piix.c        |  2 +-
- hw/i386/xen/xen-hvm.c    |  1 +
- stubs/xen-hw-stub.c      |  1 +
- 5 files changed, 18 insertions(+), 3 deletions(-)
- create mode 100644 include/hw/xen/xen-x86.h
+ include/sysemu/xen.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/include/hw/xen/xen-x86.h b/include/hw/xen/xen-x86.h
-new file mode 100644
-index 00000000000..85e3db1b8de
---- /dev/null
-+++ b/include/hw/xen/xen-x86.h
-@@ -0,0 +1,15 @@
-+/*
-+ * Xen X86-specific
-+ *
-+ * Copyright 2020 Red Hat, Inc.
-+ *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-+ */
-+#ifndef QEMU_HW_XEN_X86_H
-+#define QEMU_HW_XEN_X86_H
+diff --git a/include/sysemu/xen.h b/include/sysemu/xen.h
+index 2c2c429ea8b..0ca25697e4f 100644
+--- a/include/sysemu/xen.h
++++ b/include/sysemu/xen.h
+@@ -8,6 +8,8 @@
+ #ifndef SYSEMU_XEN_H
+ #define SYSEMU_XEN_H
+ 
++#include "exec/cpu-common.h"
 +
-+#include "hw/i386/pc.h"
-+
-+void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory);
-+
-+#endif /* QEMU_HW_XEN_X86_H */
-diff --git a/include/hw/xen/xen.h b/include/hw/xen/xen.h
-index b2b459964cb..1406648ca58 100644
---- a/include/hw/xen/xen.h
-+++ b/include/hw/xen/xen.h
-@@ -30,8 +30,6 @@ qemu_irq *xen_interrupt_controller_init(void);
- 
- void xenstore_store_pv_console_info(int i, struct Chardev *chr);
- 
--void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory);
--
- void xen_register_framebuffer(struct MemoryRegion *mr);
- 
- #endif /* QEMU_HW_XEN_H */
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 3e008bb0b1a..43205f48188 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -46,7 +46,7 @@
- #include "hw/sysbus.h"
- #include "sysemu/arch_init.h"
- #include "hw/i2c/smbus_eeprom.h"
--#include "hw/xen/xen.h"
-+#include "hw/xen/xen-x86.h"
- #include "exec/memory.h"
- #include "exec/address-spaces.h"
- #include "hw/acpi/acpi.h"
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index 49748cda3fb..e03c59e53da 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -22,6 +22,7 @@
- #include "hw/xen/xen_common.h"
- #include "hw/xen/xen-legacy-backend.h"
- #include "hw/xen/xen-bus.h"
-+#include "hw/xen/xen-x86.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-misc.h"
- #include "qemu/error-report.h"
-diff --git a/stubs/xen-hw-stub.c b/stubs/xen-hw-stub.c
-index d14efef49e9..2ea81909217 100644
---- a/stubs/xen-hw-stub.c
-+++ b/stubs/xen-hw-stub.c
-@@ -8,6 +8,7 @@
- 
- #include "qemu/osdep.h"
- #include "hw/xen/xen.h"
-+#include "hw/xen/xen-x86.h"
- 
- void xenstore_store_pv_console_info(int i, Chardev *chr)
- {
+ #ifdef NEED_CPU_H
+ # ifdef CONFIG_XEN
+ #  define CONFIG_XEN_IS_POSSIBLE
 -- 
 2.26.2
 
