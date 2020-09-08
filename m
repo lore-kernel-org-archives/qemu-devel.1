@@ -2,96 +2,90 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE42C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:28:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D6E8C2BBD0
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:29:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 425A72087D
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:28:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CD101208FE
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:29:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nxlrz0ah"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 425A72087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eh8LcB5s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD101208FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFbno-0001jQ-CS
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:28:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46192)
+	id 1kFbou-0002eT-1r
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:29:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFbmw-0001GW-1s
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:27:50 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40058)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFbmr-0008Co-LV
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:27:49 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j2so18711433wrx.7
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 04:27:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=pQV6CrSIwspR/+hQrDd1u9yRA53VUf83tmXUTH4P02w=;
- b=Nxlrz0ahBxQXNHiA9/AenCUDXr6cT2AaWsqqiw3YOEc78h18hsAD5DXVrjwx3kjCqL
- m/PW3UKPpwNjwCamJCc+7dmPeslZgJPCbDE7rHxvW06iidPQ/HFI5890+Bq+1Owv131y
- ORFzIweXF0lJ5NUJSv+wrwuWZVtf6/MZnqyxSYLc3juYsRUcvaOygjCur0T+tMT/egt+
- Pv6F1AuFmMGB1J4yPC1rUBy0nOSwtv07s5dRR1K//3+Xg65E30t3tmb5+Ll5EX+h/G/8
- mV3/KZIxSv6iY44FUCzXUacPG9M5XxYiIaS2uW1q61msf2dx+EsTtIDIJ7H2yZKFeqNs
- CM7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=pQV6CrSIwspR/+hQrDd1u9yRA53VUf83tmXUTH4P02w=;
- b=V2TeQzyKl8oKkQKsbg3UjlJHZr5gC9P28B/TzbOrCy9kM9ibBSP7wbtraTtJGDYpK+
- QZYkR7Ma98VwI8vJcvEcIrw9EUAE9PvOt7VQV73VWou91two9vz0H0Ol5kN07HMnH8+x
- yDkQpun3klvlkLY6IUgg7RAL0KxtMYJJpVvR0jy9ymP0d294FRR4poSCnXDpIvp8eVzF
- CfoJHmWbqNHUvhQBYFCIxpnmgbVsEGzmPSjPvrHHQ1LBuGntLVYRz3wpQz6ypp0UOsAl
- 0jbsw28zXBKKkU/TZl/3t5DGtBuvAZk6fZ/OWh2M/ElCKGAvPxmb5tIthn+t5SpN/d+p
- FCqg==
-X-Gm-Message-State: AOAM530U0VW9vsaXAj+FNa4b/1UF6FTjnGzxOeW9a0ik3gJL7tD+X+yC
- 59842YkrKuk6Yp+njqj5I/9c5A==
-X-Google-Smtp-Source: ABdhPJx2HsZV/ETucLfOeojoKFx6oijKDv3AMHkaL42fkSkRi3dS+0i5EoNogzlChjfmdcVRJn8MyQ==
-X-Received: by 2002:a5d:69cd:: with SMTP id s13mr25498039wrw.379.1599564463807; 
- Tue, 08 Sep 2020 04:27:43 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id s124sm32225794wme.29.2020.09.08.04.27.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 04:27:42 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id E658F1FF7E;
- Tue,  8 Sep 2020 12:27:40 +0100 (BST)
-References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
- <159903462227.28509.8201860642659050083.stgit@pasha-ThinkPad-X280>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Subject: Re: [PATCH v3 13/15] replay: describe reverse debugging in
- docs/replay.txt
-In-reply-to: <159903462227.28509.8201860642659050083.stgit@pasha-ThinkPad-X280>
-Date: Tue, 08 Sep 2020 12:27:40 +0100
-Message-ID: <87wo14pkyb.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFbn6-0001M8-ML
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:28:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53884)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFbn1-0008DU-F6
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:28:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599564473;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TSJ+kz9gJFV8JdxeUQVWtelrBjIdPn4qHWZeFW4BoPs=;
+ b=Eh8LcB5s55ALWHtLpGhfdG5L3E+NYI6Ji5TJO+2+0XxRoJ8ELDIdu88h/OKUQIIbnX61oi
+ lKmIZNNn0GsHjQYcRE1o8ZfPR5Flcg/vgd+QeNM/iCGVQlMNwnF/jlD4+iSmVxsv0sWjyV
+ 9HYAYNeAmDkUNCzARYcIDzbd1R2KCso=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-267--aW3tA8_MZiknRVDr9N_SA-1; Tue, 08 Sep 2020 07:27:51 -0400
+X-MC-Unique: -aW3tA8_MZiknRVDr9N_SA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F16B31800D41
+ for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 11:27:50 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-131.ams2.redhat.com [10.36.112.131])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5E05F9CBA;
+ Tue,  8 Sep 2020 11:27:47 +0000 (UTC)
+Subject: Re: [PATCH] tests/socket-helpers: Only fail socket protocol check if
+ it is really necessary
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200908105435.218715-1-thuth@redhat.com>
+ <20200908110715.GF899163@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <7a78c69d-28f4-e73b-4acc-fc8dd923db3e@redhat.com>
+Date: Tue, 8 Sep 2020 13:27:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20200908110715.GF899163@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.626, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,84 +99,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, crosa@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
- philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 08/09/2020 13.07, Daniel P. Berrangé wrote:
+> On Tue, Sep 08, 2020 at 12:54:35PM +0200, Thomas Huth wrote:
+>> The tests/test-char test is currently always failing on my system since
+>> socket_can_bind_connect("::1", PF_INET6) fails with EINVAL and thus
+>> socket_check_protocol_support() is returning -1 for an error. But IPv4
+>> is working fine. The logic in socket_check_protocol_support() seems to
+>> be wrong here, if either IPv6 or IPv4 is working, we should not return
+>> an error here. Thus rework the function to only return errors if both
+>> checks failed.
+> 
+> Can you tell me which exact syscall is giving EINVAL in this scenario ?
 
-Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
+getaddrinfo() fails with -2 (EAI_NONAME ?). The logic in
+socket_can_bind_connect() then translates this into EINVAL.
 
-> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> This patch updates the documentation and describes usage of the reverse
-> debugging in QEMU+GDB.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
-> ---
->  docs/replay.txt |   33 +++++++++++++++++++++++++++++++++
->  1 file changed, 33 insertions(+)
+[...]
+>> -    if (socket_can_bind_connect("::1", PF_INET6) < 0) {
+>> -        if (errno != EADDRNOTAVAIL) {
+>> -            return -1;
+>> -        }
+>> -    } else {
+>> -        *has_ipv6 = true;
+>> +    errv6 = socket_can_bind_connect("::1", PF_INET6);
+>> +    *has_ipv6 = (errv6 == 0);
+>> +
+>> +    if (!*has_ipv4 && !*has_ipv6 &&
+>> +        (errv4 != EADDRNOTAVAIL || errv6 != EADDRNOTAVAIL)) {
+>> +        return -1;
+>>      }
+> 
+> The return value of socket_can_bind_connect is either 0 or -1,
+> but you're treating it an errno which isn't right.
 
-Minor aside - it is probably worth having a separate patch to convert
-this file into an .rst and put it in the docs/system folder so we can
-properly incorporate it into the user documentation.=20
+Uh, where's my brown paperbag? ... looks like I need more coffee today...
 
->
-> diff --git a/docs/replay.txt b/docs/replay.txt
-> index 70c27edb36..18d6169f3b 100644
-> --- a/docs/replay.txt
-> +++ b/docs/replay.txt
-> @@ -294,6 +294,39 @@ for recording and replaying must contain identical n=
-umber of ports in record
->  and replay modes, but their backends may differ.
->  E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
->=20=20
-> +Reverse debugging
-> +-----------------
-> +
-> +Reverse debugging allows "executing" the program in reverse direction.
-> +GDB remote protocol supports "reverse step" and "reverse continue"
-> +commands. The first one steps single instruction backwards in time,
-> +and the second one finds the last breakpoint in the past.
-> +
-> +Recorded executions may be used to enable reverse debugging. QEMU can't
-> +execute the code in backwards direction, but can load a snapshot and
-> +replay forward to find the desired position or breakpoint.
-> +
-> +The following GDB commands are supported:
-> + - reverse-stepi (or rsi) - step one instruction backwards
-> + - reverse-continue (or rc) - find last breakpoint in the past
-> +
-> +Reverse step loads the nearest snapshot and replays the execution until
-> +the required instruction is met.
-> +
-> +Reverse continue may include several passes of examining the execution
-> +between the snapshots. Each of the passes include the following steps:
-> + 1. loading the snapshot
-> + 2. replaying to examine the breakpoints
-> + 3. if breakpoint or watchpoint was met
-> +    - loading the snaphot again
-> +    - replaying to the required breakpoint
-> + 4. else
-> +    - proceeding to the p.1 with the earlier snapshot
-> +
-> +Therefore usage of the reverse debugging requires at least one snapshot
-> +created in advance. See the "Snapshotting" section to learn about running
-> +record/replay and creating the snapshot in these modes.
+ Thomas
 
-I would explicitly state you need:
-
-  - a block device for storing VM snapshots (independent of storage
-    devices you may have)
-  - to specify the starting rrsnapshot in both the record and replay runs
-
-Otherwise:
-
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
---=20
-Alex Benn=C3=A9e
 
