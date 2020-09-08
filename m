@@ -7,50 +7,49 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1736C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:33:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F163C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:33:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 441C02137B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:33:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC7A32137B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:33:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="OUaTilZN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 441C02137B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="c7fm2uoG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC7A32137B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36710 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWG1-0007Ch-7I
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:33:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57496)
+	id 1kFWG5-0007Ot-Pq
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:33:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3W-0006MB-JN; Tue, 08 Sep 2020 01:20:36 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:50473 helo=ozlabs.org)
+ id 1kFW3r-0006tK-Pv; Tue, 08 Sep 2020 01:20:56 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:37349 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3U-00063e-4G; Tue, 08 Sep 2020 01:20:34 -0400
+ id 1kFW3p-00065x-V7; Tue, 08 Sep 2020 01:20:55 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkv1hXWz9sVy; Tue,  8 Sep 2020 15:20:06 +1000 (AEST)
+ id 4Bltkv6Jmkz9sW3; Tue,  8 Sep 2020 15:20:07 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1599542407;
- bh=cdhL0/jPVxK+ALKqIw6+psSZs6LOfD1nDBLYAnFnOOQ=;
+ bh=lcJl+18AADR+U6YFsMe0OcdCykc44CX/5zvHrK7DkR0=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=OUaTilZNDaurjgBZrjktu5/AIct4K/MDAezaJGOMageJZH/xegWHQ5EgiUjAWzeOo
- W1yIw8EU7nd/Vrb8DCFGz3ZjQOoGSjMbmmzjV0P3zH4EzJ1wYjWLlxY6iryD9eRWHo
- +NTaf9A8NHvCUXqJ3wrepDm144Td4AzBbFrEeZyI=
+ b=c7fm2uoGpER5oD+5kN4oiYuUgUujuUiQzjS8ANiV0JKND+E8u5wF6KEEpu0H3Hmri
+ RjvAv47gXLkkZqDYLUCTfDnjOqI7VjDeh1+wDZWL+4/wgZ7rNxfgwYPC1Hc156L3kR
+ vDgzLWeLyjCoXonqHwZ5raVeudkm6v4T4pekmPPc=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 24/33] hw/ppc/ppc4xx_pci: Replace pointless warning by assert()
-Date: Tue,  8 Sep 2020 15:19:44 +1000
-Message-Id: <20200908051953.1616885-25-david@gibson.dropbear.id.au>
+Subject: [PULL 26/33] ppc/spapr_nvdimm: turn spapr_dt_nvdimm() static
+Date: Tue,  8 Sep 2020 15:19:46 +1000
+Message-Id: <20200908051953.1616885-27-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
@@ -74,45 +73,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: danielhb413@gmail.com, Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
- bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
+Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
+ qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-We call pci_register_root_bus() to register 4 IRQs with the
-ppc4xx_pci_set_irq() handler. As it can only be called with
-values in the [0-4[ range, replace the pointless warning by
-an assert().
+This function is only used inside spapr_nvdimm.c.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200901104043.91383-5-f4bug@amsat.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
+Message-Id: <20200901125645.118026-3-danielhb413@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/ppc4xx_pci.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ hw/ppc/spapr_nvdimm.c         | 22 +++++++++++-----------
+ include/hw/ppc/spapr_nvdimm.h |  1 -
+ 2 files changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/hw/ppc/ppc4xx_pci.c b/hw/ppc/ppc4xx_pci.c
-index cd3f192a13..503ef46b39 100644
---- a/hw/ppc/ppc4xx_pci.c
-+++ b/hw/ppc/ppc4xx_pci.c
-@@ -256,10 +256,7 @@ static void ppc4xx_pci_set_irq(void *opaque, int irq_num, int level)
-     qemu_irq *pci_irqs = opaque;
- 
-     trace_ppc4xx_pci_set_irq(irq_num);
--    if (irq_num < 0) {
--        fprintf(stderr, "%s: PCI irq %d\n", __func__, irq_num);
--        return;
--    }
-+    assert(irq_num >= 0);
-     qemu_set_irq(pci_irqs[irq_num], level);
+diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+index 95cbc30528..5188e2f503 100644
+--- a/hw/ppc/spapr_nvdimm.c
++++ b/hw/ppc/spapr_nvdimm.c
+@@ -106,16 +106,6 @@ void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp)
+     }
  }
  
+-int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+-                           void *fdt, int *fdt_start_offset, Error **errp)
+-{
+-    NVDIMMDevice *nvdimm = NVDIMM(drc->dev);
+-
+-    *fdt_start_offset = spapr_dt_nvdimm(fdt, 0, nvdimm);
+-
+-    return 0;
+-}
+-
+ void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr)
+ {
+     MachineState *machine = MACHINE(spapr);
+@@ -127,7 +117,7 @@ void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr)
+ }
+ 
+ 
+-int spapr_dt_nvdimm(void *fdt, int parent_offset,
++static int spapr_dt_nvdimm(void *fdt, int parent_offset,
+                            NVDIMMDevice *nvdimm)
+ {
+     int child_offset;
+@@ -184,6 +174,16 @@ int spapr_dt_nvdimm(void *fdt, int parent_offset,
+     return child_offset;
+ }
+ 
++int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
++                           void *fdt, int *fdt_start_offset, Error **errp)
++{
++    NVDIMMDevice *nvdimm = NVDIMM(drc->dev);
++
++    *fdt_start_offset = spapr_dt_nvdimm(fdt, 0, nvdimm);
++
++    return 0;
++}
++
+ void spapr_dt_persistent_memory(void *fdt)
+ {
+     int offset = fdt_subnode_offset(fdt, 0, "persistent-memory");
+diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
+index fd1736634c..10a6d9dbbc 100644
+--- a/include/hw/ppc/spapr_nvdimm.h
++++ b/include/hw/ppc/spapr_nvdimm.h
+@@ -27,7 +27,6 @@ QEMU_BUILD_BUG_ON(SPAPR_MINIMUM_SCM_BLOCK_SIZE % SPAPR_MEMORY_BLOCK_SIZE);
+ 
+ int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
+                            void *fdt, int *fdt_start_offset, Error **errp);
+-int spapr_dt_nvdimm(void *fdt, int parent_offset, NVDIMMDevice *nvdimm);
+ void spapr_dt_persistent_memory(void *fdt);
+ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
+                            uint64_t size, Error **errp);
 -- 
 2.26.2
 
