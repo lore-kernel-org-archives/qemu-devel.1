@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D785AC43461
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 001C0C433E2
 	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:31:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 809802137B
+	by mail.kernel.org (Postfix) with ESMTPS id 8AFC92166E
 	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:31:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZIGTpnh6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 809802137B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GTPr9hdF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8AFC92166E
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54392 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWEQ-0002gK-HJ
+	id 1kFWEQ-0002gZ-Jf
 	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:31:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57566)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3u-0006uN-HA; Tue, 08 Sep 2020 01:20:58 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:45295 helo=ozlabs.org)
+ id 1kFW3V-0006Kr-E7; Tue, 08 Sep 2020 01:20:36 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:41433)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3s-00067F-3n; Tue, 08 Sep 2020 01:20:58 -0400
+ id 1kFW3T-00062w-4M; Tue, 08 Sep 2020 01:20:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkx2MX0z9sW6; Tue,  8 Sep 2020 15:20:08 +1000 (AEST)
+ id 4Bltkt1S8lz9sVm; Tue,  8 Sep 2020 15:20:05 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542409;
- bh=uXD1j989gi+UqljwaBJ4eXP5DEHu3m3tC+F0UdnctWA=;
+ d=gibson.dropbear.id.au; s=201602; t=1599542406;
+ bh=oeTwfet2JM4g+Thw1qR7fessfnR6Qs0F3YzSLDUcLJc=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ZIGTpnh6gor0+Lfku1LL+LZRdWUs2u648aT5SkCsURWHKGjhJWtEduHu5B9yYVN/v
- D24V+tBhtW0BEXG0rYBOP3FX7YPvkWCWRbO1560mnna4gnqAhAY6cW5N1+MOI+Mkc6
- /uVMlKi70BL08ICYv/eSHr1JT3S5XhY2qHp6Rz1c=
+ b=GTPr9hdFlk4wEAG7l8WiBj+s+Ej+XgIq0h0Ym1Mo3waOYbsZkk88n//1yzWpBo0H9
+ 97a0jdezjUgPsbsLSZs1eMBT9xPzIl9etllT/JlqUpPMYa4mCiYFkNUxYhuHdpPiqS
+ 56xVm2lMUK0qtWhG3fd8Dp2jXzI+skO941F/0/g0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 29/33] spapr,
- spapr_numa: move lookup-arrays handling to spapr_numa.c
-Date: Tue,  8 Sep 2020 15:19:49 +1000
-Message-Id: <20200908051953.1616885-30-david@gibson.dropbear.id.au>
+Subject: [PULL 22/33] target/s390x: Use start-powered-off CPUState property
+Date: Tue,  8 Sep 2020 15:19:42 +1000
+Message-Id: <20200908051953.1616885-23-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:19:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -74,133 +74,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: danielhb413@gmail.com, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 
-In a similar fashion as the previous patch, let's move the
-handling of ibm,associativity-lookup-arrays from spapr.c to
-spapr_numa.c. A spapr_numa_write_assoc_lookup_arrays() helper was
-created, and spapr_dt_dynamic_reconfiguration_memory() can now
-use it to advertise the lookup-arrays.
+Instead of setting CPUState::halted to 1 in s390_cpu_initfn(), use the
+start-powered-off property which makes cpu_common_reset() initialize it
+to 1 in common code.
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200903220639.563090-4-danielhb413@gmail.com>
+Note that this changes behavior by setting cs->halted to 1 on reset, which
+didn't happen before.
+
+Acked-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Message-Id: <20200826055535.951207-9-bauerman@linux.ibm.com>
+[dwg: Fix from Laurent Vivier for user only case]
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c              | 25 ++-----------------------
- hw/ppc/spapr_numa.c         | 34 ++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr_numa.h |  2 ++
- 3 files changed, 38 insertions(+), 23 deletions(-)
+ target/s390x/cpu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index badfa86319..9bce1892b5 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -535,13 +535,10 @@ static int spapr_dt_dynamic_reconfiguration_memory(SpaprMachineState *spapr,
-                                                    void *fdt)
- {
-     MachineState *machine = MACHINE(spapr);
--    int nb_numa_nodes = machine->numa_state->num_nodes;
--    int ret, i, offset;
-+    int ret, offset;
-     uint64_t lmb_size = SPAPR_MEMORY_BLOCK_SIZE;
-     uint32_t prop_lmb_size[] = {cpu_to_be32(lmb_size >> 32),
-                                 cpu_to_be32(lmb_size & 0xffffffff)};
--    uint32_t *int_buf, *cur_index, buf_len;
--    int nr_nodes = nb_numa_nodes ? nb_numa_nodes : 1;
-     MemoryDeviceInfoList *dimms = NULL;
+diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
+index 08eb674d22..749cd548f0 100644
+--- a/target/s390x/cpu.c
++++ b/target/s390x/cpu.c
+@@ -291,9 +291,9 @@ static void s390_cpu_initfn(Object *obj)
+     S390CPU *cpu = S390_CPU(obj);
  
-     /*
-@@ -582,25 +579,7 @@ static int spapr_dt_dynamic_reconfiguration_memory(SpaprMachineState *spapr,
-         return ret;
-     }
- 
--    /* ibm,associativity-lookup-arrays */
--    buf_len = (nr_nodes * 4 + 2) * sizeof(uint32_t);
--    cur_index = int_buf = g_malloc0(buf_len);
--    int_buf[0] = cpu_to_be32(nr_nodes);
--    int_buf[1] = cpu_to_be32(4); /* Number of entries per associativity list */
--    cur_index += 2;
--    for (i = 0; i < nr_nodes; i++) {
--        uint32_t associativity[] = {
--            cpu_to_be32(0x0),
--            cpu_to_be32(0x0),
--            cpu_to_be32(0x0),
--            cpu_to_be32(i)
--        };
--        memcpy(cur_index, associativity, sizeof(associativity));
--        cur_index += 4;
--    }
--    ret = fdt_setprop(fdt, offset, "ibm,associativity-lookup-arrays", int_buf,
--            (cur_index - int_buf) * sizeof(uint32_t));
--    g_free(int_buf);
-+    ret = spapr_numa_write_assoc_lookup_arrays(spapr, fdt, offset);
- 
-     return ret;
- }
-diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index 523801fb14..42394f36e9 100644
---- a/hw/ppc/spapr_numa.c
-+++ b/hw/ppc/spapr_numa.c
-@@ -72,6 +72,40 @@ int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
-                        vcpu_assoc, sizeof(vcpu_assoc));
- }
- 
-+
-+int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void *fdt,
-+                                         int offset)
-+{
-+    MachineState *machine = MACHINE(spapr);
-+    int nb_numa_nodes = machine->numa_state->num_nodes;
-+    int nr_nodes = nb_numa_nodes ? nb_numa_nodes : 1;
-+    uint32_t *int_buf, *cur_index, buf_len;
-+    int ret, i;
-+
-+    /* ibm,associativity-lookup-arrays */
-+    buf_len = (nr_nodes * MAX_DISTANCE_REF_POINTS + 2) * sizeof(uint32_t);
-+    cur_index = int_buf = g_malloc0(buf_len);
-+    int_buf[0] = cpu_to_be32(nr_nodes);
-+     /* Number of entries per associativity list */
-+    int_buf[1] = cpu_to_be32(MAX_DISTANCE_REF_POINTS);
-+    cur_index += 2;
-+    for (i = 0; i < nr_nodes; i++) {
-+        /*
-+         * For the lookup-array we use the ibm,associativity array,
-+         * from numa_assoc_array. without the first element (size).
-+         */
-+        uint32_t *associativity = spapr->numa_assoc_array[i];
-+        memcpy(cur_index, ++associativity,
-+               sizeof(uint32_t) * MAX_DISTANCE_REF_POINTS);
-+        cur_index += MAX_DISTANCE_REF_POINTS;
-+    }
-+    ret = fdt_setprop(fdt, offset, "ibm,associativity-lookup-arrays", int_buf,
-+                      (cur_index - int_buf) * sizeof(uint32_t));
-+    g_free(int_buf);
-+
-+    return ret;
-+}
-+
- /*
-  * Helper that writes ibm,associativity-reference-points and
-  * max-associativity-domains in the RTAS pointed by @rtas
-diff --git a/include/hw/ppc/spapr_numa.h b/include/hw/ppc/spapr_numa.h
-index 43c6a16fe3..b3fd950634 100644
---- a/include/hw/ppc/spapr_numa.h
-+++ b/include/hw/ppc/spapr_numa.h
-@@ -29,5 +29,7 @@ void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
-                                        int offset, int nodeid);
- int spapr_numa_fixup_cpu_dt(SpaprMachineState *spapr, void *fdt,
-                             int offset, PowerPCCPU *cpu);
-+int spapr_numa_write_assoc_lookup_arrays(SpaprMachineState *spapr, void *fdt,
-+                                         int offset);
- 
- #endif /* HW_SPAPR_NUMA_H */
+     cpu_set_cpustate_pointers(cpu);
+-    cs->halted = 1;
+     cs->exception_index = EXCP_HLT;
+ #if !defined(CONFIG_USER_ONLY)
++    cs->start_powered_off = true;
+     object_property_add(obj, "crash-information", "GuestPanicInformation",
+                         s390_cpu_get_crash_info_qom, NULL, NULL, NULL);
+     cpu->env.tod_timer =
 -- 
 2.26.2
 
