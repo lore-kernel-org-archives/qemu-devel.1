@@ -2,78 +2,82 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4287AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 09:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A53BC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 09:44:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D175D2076C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 09:43:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C23512076C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 09:44:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MMfpbcpy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D175D2076C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GBW6GQPD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C23512076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFa9q-0005jL-OE
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 05:43:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49652)
+	id 1kFaBA-0007OO-NG
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 05:44:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50080)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kFa9G-0005DV-W9; Tue, 08 Sep 2020 05:42:47 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43998)
+ id 1kFaAb-0006pe-Lr
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 05:44:09 -0400
+Received: from mail-ed1-x52b.google.com ([2a00:1450:4864:20::52b]:42739)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <paolo.bonzini@gmail.com>)
- id 1kFa9F-00039t-Dh; Tue, 08 Sep 2020 05:42:46 -0400
-Received: by mail-wr1-x443.google.com with SMTP id k15so18335801wrn.10;
- Tue, 08 Sep 2020 02:42:44 -0700 (PDT)
+ id 1kFaAZ-0003Iv-8h
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 05:44:09 -0400
+Received: by mail-ed1-x52b.google.com with SMTP id l63so15303316edl.9
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 02:44:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
+ h=sender:from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=vRvvNFuPLMOty9OGBT9DAPAEn8hxMWpojKikY7Rxziw=;
- b=MMfpbcpyiOfkU4eIuwXfw7wvXmeU0CYXQfAWAqsZAqZvjv/TUGGUt2Jar7j2pNvg3h
- apfqGTGcT5CiW7eWS25ypgkpp0EbulMD+Ys/wvSevXamEw/f3Ux6NnxCpUy0JNBhw3Rx
- Q3Kx0oTDsZjs/rfVobr1c4TKxcnuYaLS63vagaR3BQCCXGjYQzKcMcfKd4vx0E3P6AzL
- /hKwJ8iPi5pii7X1mrOSq/x/Gu+rb7mMSmk3rGOAeQJEuroe16j4FGHA4YOflxR5GCfY
- AgzC+d2q/7RlwOJCh+gGxqp+shRZewpjIX5sefoWSheFzZ6SWIOW/ZGrdL2jWiy8t135
- Or2g==
+ bh=Iew5QQrmPu3N74dshfcSIH1r3lLDsEFiPrYfsB4hmjs=;
+ b=GBW6GQPDiPDXpIQAfst2XJuKqCmWUk/bqmoLR/KdM07KLq8mhOjQK7Gyru8K9JlqLa
+ fY5bnawJPWrYrBLaJDZ9fD1vm5PbgR7ArDLA1/+1i86uQaT/0trKx0YaZ/Gz8wrbh38k
+ UZjE0IQ+QNtjUOMRqRAJr6Z7sg2/O9ISzJmmzX6DuzsMvkL5W4WJbnl4SCJkyGPBZekQ
+ 6uBjreW5Ai9oxCgIxpyqZDhYXvPOUWfuXwsgyWzZuNvH+AIjrJHdIxzbxvKCsiDcLHl+
+ HSfHfvlS9+e1U87l2PXDp2gtACueH0gm6Wj7i6RqVzIsEZcZ3PhlpSfp+7LokqC8L4+P
+ 010g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ h=x-gm-message-state:sender:from:to:subject:date:message-id
  :mime-version:content-transfer-encoding;
- bh=vRvvNFuPLMOty9OGBT9DAPAEn8hxMWpojKikY7Rxziw=;
- b=mVchIA2Kcvj9AUeN7wsIxbOn1zRklfIbjqhHH9belPezRmHBGrHG7KbGX55DbHdf14
- Ex6NK9wDuLTauv0YQylC4WrGaBGY4/XeBJpVa1+YACf0IxjZCmhVtojIhLxJO5sNfuNa
- K3t9/B7GAO+EBYwTLPcUAFTuwC8fUZ7KGCjQsE2s3Kxyq1M9tk3eoGJtAaHSxHP44LrN
- n2DsnFOjNJ7a3ClzqDRZP5ieOuYTVBOUMoHJl8mCWvAW6DJzUMiwWWk+pkua7W5EmF8C
- YwGWdfc1IsyUkczaZMU0eDyWPxYYk5TMTUCwtXyyfRAkgfeLjgp+rFIXJyAHXoEWxHqB
- HeOA==
-X-Gm-Message-State: AOAM533m4UHpPbQ+JgPfwd4OmzvaCNcBKz8xSsSGk3mApsOf4x4YYt+M
- mrEXNC5Xx43FhpDfIi/dyoV8fFpsro4=
-X-Google-Smtp-Source: ABdhPJwVepSNOhJcP26FPT9432P6d2cuVNednWxiCYln1Tke++MB80BmQeSzVO5ipowK+YiWYyShbw==
-X-Received: by 2002:a5d:574e:: with SMTP id q14mr24730857wrw.281.1599558162380; 
- Tue, 08 Sep 2020 02:42:42 -0700 (PDT)
+ bh=Iew5QQrmPu3N74dshfcSIH1r3lLDsEFiPrYfsB4hmjs=;
+ b=d0lN7pm8G5r0hPMnj5z8owQI5LekqBDbj7uyBS6Ny8FjdpDQDeET4I9vHgqrAO8Q5k
+ 8BHheh9HZzNufcbv4XzBPPo4ZPosLDs/v1SZmyk7jA/dWUh/YtuNL5ObzegywmZ5Jw3w
+ lWQRh3U6CR1UYzfv4c2y8BKPt0EMG9Kt0JaHt03C6Ek0kHhxnerQPcaMNHXTC15vilIV
+ AmZjhNMyVMNLaG+sIavBOyOMr7DIbpyZK2v7R09VQpeBwknWLljPB8eZ652c69pFlis4
+ Kn5OVXVOnJLAAkCkmJcKemiCAaXZBb1t6ObdqDecvoZabqo/greWiaZTW2H5a0JkbJit
+ bTkg==
+X-Gm-Message-State: AOAM530xp7be8u3N1VbOMzfF9e/Wtc2Yaq8MJHx/RfCQr8T0uUq4XB6P
+ pHNo8KPKnV8ZVOhhQx9qnw+8lqGHN0s=
+X-Google-Smtp-Source: ABdhPJxSn7Tqhw0l80mozcbCRE+qfsr3pN8zn0rwUnma9P2foB4DIHU7YnTa2nJH9wPD+zKntypOCQ==
+X-Received: by 2002:a50:e685:: with SMTP id z5mr25345491edm.305.1599558245327; 
+ Tue, 08 Sep 2020 02:44:05 -0700 (PDT)
 Received: from donizetti.lan ([2001:b07:6468:f312:6c4a:4cae:bef0:843f])
- by smtp.gmail.com with ESMTPSA id o4sm29701827wru.55.2020.09.08.02.42.41
+ by smtp.gmail.com with ESMTPSA id q10sm17064133eja.107.2020.09.08.02.44.04
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 02:42:41 -0700 (PDT)
+ Tue, 08 Sep 2020 02:44:04 -0700 (PDT)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] kconfig: fix comment referring to old Makefiles
-Date: Tue,  8 Sep 2020 11:42:44 +0200
-Message-Id: <20200908094244.26327-1-pbonzini@redhat.com>
+Subject: [PULL v5 00/46] Next round of Meson bugfixes and cleanups
+Date: Tue,  8 Sep 2020 11:44:08 +0200
+Message-Id: <20200908094408.27091-1-pbonzini@redhat.com>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=paolo.bonzini@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::52b;
+ envelope-from=paolo.bonzini@gmail.com; helo=mail-ed1-x52b.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -96,30 +100,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- Kconfig.host | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+The following changes since commit e11bd71f89649da3cff439c030d2ccac0cc914e3:
 
-diff --git a/Kconfig.host b/Kconfig.host
-index a6d871c399..4af19bf70e 100644
---- a/Kconfig.host
-+++ b/Kconfig.host
-@@ -1,6 +1,6 @@
- # These are "proxy" symbols used to pass config-host.mak values
--# down to Kconfig.  See also MINIKCONF_ARGS in the Makefile:
--# these two need to be kept in sync.
-+# down to Kconfig.  See also kconfig_external_symbols in
-+# meson.build: these two need to be kept in sync.
- 
- config LINUX
-     bool
+  Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-09-07' into staging (2020-09-07 16:51:00 +0100)
+
+are available in the Git repository at:
+
+  https://gitlab.com/bonzini/qemu.git tags/for-upstream
+
+for you to fetch changes up to ef6a0d6e3927464de67f70cb13abbfe67361e0c9:
+
+  docs: update build system documentation (2020-09-08 07:21:55 +0200)
+
+----------------------------------------------------------------
+meson related:
+* convert unit tests
+* bugfixes for mtest2make
+* miscellaneous bugfixes
+* dead code removal and configure cleanups
+* oss-fuzz fixes
+* msys fixes
+
+----------------------------------------------------------------
+Alexander Bulekov (3):
+      oss-fuzz: fix rpath
+      meson: specify fuzz linker script as a project arg
+      fuzz: Add support for custom fuzzing library
+
+Bruce Rogers (1):
+      meson: remove linkage of sdl to baum
+
+Marc-André Lureau (12):
+      meson: build qapi tests library
+      meson: declare tasn1 dependency
+      meson: declare keyutils dependency
+      meson: convert qht-bench
+      meson: move keyutils dependency check
+      meson: remove old socket_scm_helper rule
+      meson: convert vhost-user-bridge
+      meson: convert atomic*-bench
+      tests: do not print benchmark output to stdout
+      tests/migration/stress: remove unused exit_success
+      meson: fix migration/stress compilation with glibc>=2.30
+      meson: convert migration/initrd-stress
+
+Paolo Bonzini (26):
+      qemu-iotests: move check-block back to Makefiles
+      mtest2make: split environment from test command
+      mtest2make: split working directory from test command
+      mtest2make: hide output of successful tests
+      mtest2make: unify tests that appear in multiple suites
+      meson: remove b_lundef option
+      configure: do not include absolute paths in -I and -L paths
+      configure: include cross sdl2-config in meson cross file
+      ninjatool: use constant names for stamp files
+      meson: fix libqos linking
+      meson: convert the speed tests
+      configure: remove dead code for in-tree builds
+      meson: compute config_all_devices directly
+      Makefile: remove dead variables and includes
+      Makefile: inline the relevant parts of rules.mak
+      configure: move disassembler configuration to meson
+      meson: keep all compiler flags detection together
+      configure: move -ldl test to meson
+      configure: remove unnecessary libm test
+      configure: do not look for install(1)
+      meson: get glib compilation flags from GLIB_CFLAGS
+      meson: get opengl compilation flags from OPENGL_CFLAGS
+      configure: do not include dependency flags in QEMU_CFLAGS and LIBS
+      configure: drop dead variables and functions
+      docs: suggest Meson replacements for various configure functions
+      docs: update build system documentation
+
+Thomas Huth (1):
+      meson: convert the unit tests
+
+Yonggang Luo (2):
+      configure: update dtc submodule
+      meson: Convert undefsym.sh to undefsym.py
+
+ .gitignore                       |   2 -
+ Makefile                         |  63 +++---
+ Makefile.objs                    |  34 ----
+ accel/tcg/meson.build            |   2 +-
+ chardev/meson.build              |   4 +-
+ configure                        | 304 ++++------------------------
+ disas/meson.build                |   4 +-
+ docs/devel/build-system.rst      | 115 ++---------
+ hw/arm/meson.build               |   2 +-
+ hw/mips/meson.build              |   2 +-
+ hw/riscv/meson.build             |   2 +-
+ meson.build                      | 127 ++++++++----
+ monitor/meson.build              |   2 +-
+ rules.mak                        | 158 ---------------
+ scripts/grepy.sh                 |   3 -
+ scripts/mtest2make.py            | 100 +++++-----
+ scripts/ninjatool.py             |   8 +-
+ scripts/oss-fuzz/build.sh        |   2 +-
+ scripts/test-driver.py           |  35 ++++
+ scripts/undefsym.py              |  49 +++++
+ scripts/undefsym.sh              |  20 --
+ tests/Makefile.include           | 416 ++-------------------------------------
+ tests/benchmark-crypto-cipher.c  |   8 +-
+ tests/benchmark-crypto-hash.c    |   2 +-
+ tests/benchmark-crypto-hmac.c    |   8 +-
+ tests/docker/Makefile.include    |   4 +
+ tests/include/meson.build        |  16 ++
+ tests/meson.build                | 253 ++++++++++++++++++++++++
+ tests/migration/initrd-stress.sh |  10 +
+ tests/migration/meson.build      |  14 ++
+ tests/migration/stress.c         |  15 +-
+ tests/qemu-iotests/meson.build   |   4 -
+ tests/qtest/fuzz/meson.build     |   7 +-
+ tests/qtest/libqos/meson.build   |   9 +-
+ tests/tcg/Makefile.qemu          |   2 -
+ tests/test-crypto-secret.c       |  10 +-
+ tests/test-qga.c                 |   2 +-
+ ui/meson.build                   |   3 +-
+ 38 files changed, 667 insertions(+), 1154 deletions(-)
+ delete mode 100644 Makefile.objs
+ delete mode 100644 rules.mak
+ delete mode 100755 scripts/grepy.sh
+ create mode 100644 scripts/test-driver.py
+ create mode 100644 scripts/undefsym.py
+ delete mode 100755 scripts/undefsym.sh
+ create mode 100644 tests/include/meson.build
+ create mode 100755 tests/migration/initrd-stress.sh
+ create mode 100644 tests/migration/meson.build
 -- 
 2.26.2
-
 
