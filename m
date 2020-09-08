@@ -2,101 +2,100 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294B5C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:45:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2B5C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:49:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1858206A4
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:45:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4A73F2137B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:49:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A/y9lt3n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1858206A4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="duQAwKII"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A73F2137B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44720 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFc4L-0003fl-OD
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:45:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50520)
+	id 1kFc7y-0005in-A9
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:49:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kFc1h-0000ib-NT
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:43:05 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:39282
+ id 1kFc7O-00059k-9f
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:48:58 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:49521
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kFc1g-0001tY-0T
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:43:05 -0400
+ id 1kFc7M-0002Vi-2W
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:48:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599565383;
+ s=mimecast20190719; t=1599565733;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ivC7vUbxtaJ7G5UmTaqj/zawMr9v9i0KSt9iF0l0sFs=;
- b=A/y9lt3nk5ilqraVBLbc8QODa01vY0dOdyiMCQIbG40zsBFYaefznef1PHYD/KACSDKQwC
- xirxTAyZukCHNHbljLcPUq6wm6/Nso5uSa4IvAZ7YlOohcWSCE9qkBSadD0uEc4buSB6Ku
- cTEOqK28jc/4eUPAcnivlGy/7f7WZ2Q=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-dwxZYSp-M3-0dANuPMRjug-1; Tue, 08 Sep 2020 07:43:01 -0400
-X-MC-Unique: dwxZYSp-M3-0dANuPMRjug-1
-Received: by mail-ej1-f72.google.com with SMTP id ml20so6502411ejb.23
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 04:43:01 -0700 (PDT)
+ bh=u8O7hJM5AuZX/Sk1/iv9MFeyt3ahre9xP4PIk00IXpo=;
+ b=duQAwKII5P0aSkADt6PTWCYXLkKE8Wl5efc+nbUX6EbIezsmP2xfjaIAqYeA8dyVSKH56n
+ SOZMDHbPDSaepqoS80QPxmpdqvtQv7uMPWSRJLfTJwk0VDEa4Op5Xvzg2QyjG9HKufI1Pr
+ Cba4sWIIeLpRB8/9mXyDIvquiMgjROA=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-cIFAlw66MRycdQsCjapo2A-1; Tue, 08 Sep 2020 07:48:52 -0400
+X-MC-Unique: cIFAlw66MRycdQsCjapo2A-1
+Received: by mail-ej1-f71.google.com with SMTP id e13so2001262ejk.1
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 04:48:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=ivC7vUbxtaJ7G5UmTaqj/zawMr9v9i0KSt9iF0l0sFs=;
- b=qIbnme7ZbiT78d31QhOJMC66yx7lNsqYBq9z2d3FoHMxiztN3O3uAJUwJwCkSF34b4
- 8V9vPDSh0+h9r3EXIJqCmdXi2UQFUOeUn94myYg0fwRd6x52i5mGfsjvHad4UhhrDLOr
- 655ga/DB6tkabn8vC/GxEuQMMSXTxwIy3X2PRvbG8G/XYeMghufz94SaICwV3dvj0Hsr
- OXO9Z3ruKHpL+BIMZLe913VGedzmdisJn4vqwKd/H1YFEBd5olNSYtCVsTNiO1tCCdQg
- dc7g64keKHAVm9IueDE+jUC0uGPsdm4wd31btB5cBfV3SceZ3ZwLGfP15yCLoyrWQBQy
- EH3Q==
-X-Gm-Message-State: AOAM532YDdCCMDlN9L3YrhRb+GS8P7NAPLeD/dCLoKp+MFcCPVww0F9D
- k6kOnMOOKWrG1ihqFdwgVr+UfCWGJUadLiTt8rtd4rzyGdYYWcFzmrdJMBtowcquKcAafuv6aHz
- p3Lc9c/f7xcwGCdc=
-X-Received: by 2002:aa7:cb92:: with SMTP id r18mr26697793edt.158.1599565380170; 
- Tue, 08 Sep 2020 04:43:00 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzn7Hj2Kuph0+GzrrTweZ3UeKW2xdWILtGo6d59h5dYoqit0ejqiFzW0OGDqnSNMDy2l11GrQ==
-X-Received: by 2002:aa7:cb92:: with SMTP id r18mr26697775edt.158.1599565379985; 
- Tue, 08 Sep 2020 04:42:59 -0700 (PDT)
+ bh=u8O7hJM5AuZX/Sk1/iv9MFeyt3ahre9xP4PIk00IXpo=;
+ b=ewzPjrnLI8ELzeC3EYf4+9xVyjWrFHCZw85h6AQAFZ3MVfZWV1PyW4FPFCo7eoKWHG
+ pYx2nsyWHFXXLCvs00mIGkFLz9ct2DkdTCFY/xFc7dfqQ1rUOyue7Jf4ysiw2uyX1Mi9
+ pIaNoNHxn4r5WuZWgsASdB85kz0BcZnVy0XtLxjyQYNHGhBxzcBiyvEG+FUAzLoGeHuz
+ FfOFGRymx8c+ldy/LGOkuw+Gq1NoB00pSwmAYp8Y174tMS+GeoF+bx1BlnWk+XvdbK3N
+ uKwDCbGwFytr4R0absZ6pd8j4nv6p23p1tDjsE1k7kS6icTnK+z6pR3G4A00pGK5A8tY
+ TFZw==
+X-Gm-Message-State: AOAM532HnsC2cPt1/jl04sG3Voka4VTmcRnwmwM8zB4aR+EwCo7tp6zz
+ k1a41AdWWSHiSWxE4A4VPbmTuxWNXb/B3DGw1FnmKRxO6OeTA0JNin2sACXp8SNaKS9VL8OZW+2
+ yvZChsdLqRWxxIGs=
+X-Received: by 2002:a50:e80a:: with SMTP id e10mr27041452edn.4.1599565730811; 
+ Tue, 08 Sep 2020 04:48:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwuIrGNYSV5lxSBKYKakdpcCXtpLS/l9xmHol/PWR+iWbWQTImjWDNviJDYQPv5yvM4aXHGyg==
+X-Received: by 2002:a50:e80a:: with SMTP id e10mr27041437edn.4.1599565730640; 
+ Tue, 08 Sep 2020 04:48:50 -0700 (PDT)
 Received: from ?IPv6:2001:b07:6468:f312:6c4a:4cae:bef0:843f?
  ([2001:b07:6468:f312:6c4a:4cae:bef0:843f])
- by smtp.gmail.com with ESMTPSA id r26sm17923064ejb.102.2020.09.08.04.42.58
+ by smtp.gmail.com with ESMTPSA id m2sm6965756ejo.4.2020.09.08.04.48.49
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 08 Sep 2020 04:42:59 -0700 (PDT)
-Subject: Re: [RFC PATCH] cpus: Initialize current_cpu with the first vCPU
- created
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20200701182100.26930-1-philmd@redhat.com>
- <CAFEAcA8ZKEVySwDAQ+x9xA9bosOs5q20CZLZjBvkXj_d6ZVBuA@mail.gmail.com>
- <20200907203505.hpq5v32gayc5o5yd@mozz.bu.edu>
- <dfac2489-3c4a-aa44-c38b-435db5b0fd2c@redhat.com>
- <CAAdtpL6i52airFP_p7Z5tBU-F3hYtbfv8_2=-QYbjt-NOnP6xQ@mail.gmail.com>
+ Tue, 08 Sep 2020 04:48:50 -0700 (PDT)
+Subject: Re: [PATCH v2] scripts/git.orderfile: Display meson files along with
+ buildsys ones
+To: Laszlo Ersek <lersek@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20200907161222.41915-1-philmd@redhat.com>
+ <bd658d44-d9bd-81d1-f3c7-89c0d61f6dd2@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <c4625c0e-dd46-1348-c4db-40b1e6e53154@redhat.com>
-Date: Tue, 8 Sep 2020 13:43:02 +0200
+Message-ID: <79de1ef4-6e08-6f1c-030e-f40e7410e06c@redhat.com>
+Date: Tue, 8 Sep 2020 13:48:53 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <CAAdtpL6i52airFP_p7Z5tBU-F3hYtbfv8_2=-QYbjt-NOnP6xQ@mail.gmail.com>
+In-Reply-To: <bd658d44-d9bd-81d1-f3c7-89c0d61f6dd2@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Content-Language: en-US
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -122,36 +121,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/09/20 08:39, Philippe Mathieu-Daudé wrote:
-> Le mar. 8 sept. 2020 08:33, Paolo Bonzini <pbonzini@redhat.com
-> <mailto:pbonzini@redhat.com>> a écrit :
+On 08/09/20 12:02, Laszlo Ersek wrote:
+> Possibly related (not sure if there's another patch pending for it
+> already): if you run a "make clean" in the source tree, and have the
+> Meson submodule initialized, the "make clean" will delete files from the
+> Meson submodule.
 > 
->     On 07/09/20 22:35, Alexander Bulekov wrote:
->     >>> RFC because I believe the correct fix is to NOT use current_cpu
->     >>> out of cpus.c, at least use qemu_get_cpu(0) to get the first vCPU.
->     >> Yes, I agree -- I don't think this is the correct fix.
->     >> current_cpu is documented as "only valid inside cpu_exec()",
->     >> ie if you're actually on a vcpu thread you can use it, but if
->     >> you're not on a CPU thread, like the monitor, you need to
->     >> say which vCPU you want to affect. For the monitor, that
->     > Following up on this old thread.. Does qtest count as a pseudo-vCPU?
->     > Since qtest already uses first_cpu for all of its address_space calls,
->     > would it be appropriate to set current_cpu to first_cpu in qtest's
->     > initialization?
+> find . \( -name '*.so' -o -name '*.dll' -o -name '*.[oda]' \) -type f \
 > 
+> "*.d" matches various meson files.
 > 
-> qtest doesn't provide vCPU so first_cpu = NULL, that wouldn't help.
+> (Again, apologies if this is already known; I understand this is
+> probably the worst context to report his in...)
 
-Doesn't qtest use qemu_dummy_start_vcpu?
+Is this running "make clean" from an old commit (i.e. as in an in-tree
+build) after having checked out the meson submodule?
 
 Paolo
 
