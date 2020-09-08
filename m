@@ -2,90 +2,91 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D9D2C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54058C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:51:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D8B622225
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:47:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5CC722205
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:51:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GUBcHA1w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D8B622225
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QAfJAYOv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5CC722205
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFd1j-0005YK-52
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:47:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37522)
+	id 1kFd63-0007xu-PA
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:51:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39482)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1kFczF-00022n-Er
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:44:37 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:42472)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <aleksandar.qemu.devel@gmail.com>)
- id 1kFczD-0001LC-LV
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:44:37 -0400
-Received: by mail-ed1-x543.google.com with SMTP id l63so15814899edl.9
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 05:44:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=lCrIb5WUVl3SkQdV+w3xyR/zikAcpGVj/acDDdcJ41k=;
- b=GUBcHA1wqnvxU9PRbwyJncSD8jwDS7+xXWNt6Sul3RQdFjWCvW2cI4uQ2lCKY2Wcdm
- vOeDHM9OeTcojR1WsvqzaolMGC/2ysfgG1yZBHrGwuhEAAjZHvcqYnTyaxrRvWB0XxLN
- W6lC5sZQaNCKr3Q13uypLX2aXHojXro+a7ZIqAhHjMbXloctrhu7ZSD/w87rVnZOWZRr
- VrI/oHRtRzKmPKBi5LbYL8e4+ux270Bhq2L+beO8Pp35e+SC7dp1GyefQ4sYqogE9oo7
- lXoaHtI8yVpzHTywkj/jWwLFkZNSB5tSjung+utPvH4TKUevFM5xUNq8ItRDDNonZ3nk
- l8hQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=lCrIb5WUVl3SkQdV+w3xyR/zikAcpGVj/acDDdcJ41k=;
- b=rNFQ6tGM2J719osnefqqMNi3TTwoUoNQpnXNQLhBQIAmXGvJ/jQAlM9YheN4LSSRYW
- +05SDAFHyG61Whk1W+u5SJw2B8KTfkxbD19KRy0wDk5ih81rPUEklzPBTP8Vqa4+6HcB
- 5diWtw/JaoLxVTv/smtlH+FiFH/JIS8IpU7flRxhWuvlQOn6iOttrQzTFMzDaTG3uTgE
- R/n1sQWNxc8T+THzEmZ316QA40VWTybDbCfu/BCLTiMZg/FT7zDnuDP1fOhHi5E/6n4T
- IoYrLqZsXJhou7UO0YMB+utfksY50AqF8fmYGWvoWnE21f20ti3vFKXpXCU6Ryju5iXB
- M71A==
-X-Gm-Message-State: AOAM532RYSS2rux6+HV2K8GtKTU8ecgWGDGU5SHzTrz/QIW6U6jfsv0t
- 71rPbGPn13RqjEuuHOUJ0PXYO68bxqo=
-X-Google-Smtp-Source: ABdhPJx7/2ArYX2RyR9jknaODlJ/BLuBavNs2ZRrHyHFmkmV5t3Y2YxeTF8xV+c2PMLSdY9VfiDodw==
-X-Received: by 2002:a50:84a2:: with SMTP id 31mr27602764edq.138.1599569074200; 
- Tue, 08 Sep 2020 05:44:34 -0700 (PDT)
-Received: from rtrkw774-lin.syrmia.com ([46.240.135.226])
- by smtp.gmail.com with ESMTPSA id u23sm4396604ejc.108.2020.09.08.05.44.33
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 08 Sep 2020 05:44:33 -0700 (PDT)
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] target/mips: Refactor helpers for fp comparison
- instructions
-Date: Tue,  8 Sep 2020 14:44:28 +0200
-Message-Id: <1599569068-9855-5-git-send-email-aleksandar.qemu.devel@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1599569068-9855-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-References: <1599569068-9855-1-git-send-email-aleksandar.qemu.devel@gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=aleksandar.qemu.devel@gmail.com; helo=mail-ed1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kFd5P-000758-Fo
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:50:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:59659
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kFd5N-0002Lt-Ql
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:50:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599569456;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=totXJWfV9IvFbw6KnZn7UXo9ipwmAnRghVwNfPbytJ4=;
+ b=QAfJAYOvN7re+K6860+2D//mt/cFt+CKiLtqh3YIwieAu20ZgFZpTQBiDTR/Vb5lZawDNP
+ t4UISOF4R9PEiFHJyUfAd0jm7eQ+3kRXBkBo9EmUq1WfYRVtSrb96kEOMKerxXMgd8B3li
+ 8qRv4/+Iav2TZxfhpT69OWvx+PxTHhw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-I39YSz6lPKyBPCleWY9A6Q-1; Tue, 08 Sep 2020 08:50:55 -0400
+X-MC-Unique: I39YSz6lPKyBPCleWY9A6Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E398C801FDC;
+ Tue,  8 Sep 2020 12:50:53 +0000 (UTC)
+Received: from [10.3.112.176] (ovpn-112-176.phx2.redhat.com [10.3.112.176])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 747095D9F7;
+ Tue,  8 Sep 2020 12:50:53 +0000 (UTC)
+Subject: Re: [PATCH] Simplify the .gitignore file
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20200907174255.179652-1-thuth@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <2f1b8cb5-6639-a530-1467-28fb6a89c926@redhat.com>
+Date: Tue, 8 Sep 2020 07:50:52 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+MIME-Version: 1.0
+In-Reply-To: <20200907174255.179652-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=eblake@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:33:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.626, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,164 +99,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: aleksandar.rikalo@syrmia.com,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, aurelien@aurel32.net
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This change causes slighlty better performance of emulation of fp
-comparison instructions via better compiler optimization of refactored
-code. The functionality is otherwise unchanged.
+On 9/7/20 12:42 PM, Thomas Huth wrote:
+> Now that we always do out-of-tree builds (and the in-tree builds are
+> faked via a "build" directory), we can simplify out .gitignore file
 
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
----
- target/mips/fpu_helper.c | 56 +++++++++++++++++++++++-----------------
- 1 file changed, 32 insertions(+), 24 deletions(-)
+s/out/our/
 
-diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index f480c7296e..22d533322b 100644
---- a/target/mips/fpu_helper.c
-+++ b/target/mips/fpu_helper.c
-@@ -1780,11 +1780,12 @@ void helper_cmp_d_ ## op(CPUMIPSState *env, uint64_t fdt0,     \
- {                                                              \
-     int c;                                                     \
-     c = cond;                                                  \
--    update_fcr31(env, GETPC());                                \
--    if (c)                                                     \
-+    if (c) {                                                   \
-         SET_FP_COND(cc, env->active_fpu);                      \
--    else                                                       \
-+    } else {                                                   \
-         CLEAR_FP_COND(cc, env->active_fpu);                    \
-+    }                                                          \
-+    update_fcr31(env, GETPC());                                \
- }                                                              \
- void helper_cmpabs_d_ ## op(CPUMIPSState *env, uint64_t fdt0,  \
-                             uint64_t fdt1, int cc)             \
-@@ -1793,11 +1794,12 @@ void helper_cmpabs_d_ ## op(CPUMIPSState *env, uint64_t fdt0,  \
-     fdt0 = float64_abs(fdt0);                                  \
-     fdt1 = float64_abs(fdt1);                                  \
-     c = cond;                                                  \
--    update_fcr31(env, GETPC());                                \
--    if (c)                                                     \
-+    if (c) {                                                   \
-         SET_FP_COND(cc, env->active_fpu);                      \
--    else                                                       \
-+    } else {                                                   \
-         CLEAR_FP_COND(cc, env->active_fpu);                    \
-+    }                                                          \
-+    update_fcr31(env, GETPC());                                \
- }
- 
- /*
-@@ -1859,11 +1861,12 @@ void helper_cmp_s_ ## op(CPUMIPSState *env, uint32_t fst0,     \
- {                                                              \
-     int c;                                                     \
-     c = cond;                                                  \
--    update_fcr31(env, GETPC());                                \
--    if (c)                                                     \
-+    if (c) {                                                   \
-         SET_FP_COND(cc, env->active_fpu);                      \
--    else                                                       \
-+    } else {                                                   \
-         CLEAR_FP_COND(cc, env->active_fpu);                    \
-+    }                                                          \
-+    update_fcr31(env, GETPC());                                \
- }                                                              \
- void helper_cmpabs_s_ ## op(CPUMIPSState *env, uint32_t fst0,  \
-                             uint32_t fst1, int cc)             \
-@@ -1872,11 +1875,12 @@ void helper_cmpabs_s_ ## op(CPUMIPSState *env, uint32_t fst0,  \
-     fst0 = float32_abs(fst0);                                  \
-     fst1 = float32_abs(fst1);                                  \
-     c = cond;                                                  \
--    update_fcr31(env, GETPC());                                \
--    if (c)                                                     \
-+    if (c) {                                                   \
-         SET_FP_COND(cc, env->active_fpu);                      \
--    else                                                       \
-+    } else {                                                   \
-         CLEAR_FP_COND(cc, env->active_fpu);                    \
-+    }                                                          \
-+    update_fcr31(env, GETPC());                                \
- }
- 
- /*
-@@ -1944,15 +1948,17 @@ void helper_cmp_ps_ ## op(CPUMIPSState *env, uint64_t fdt0,     \
-     fsth1 = fdt1 >> 32;                                         \
-     cl = condl;                                                 \
-     ch = condh;                                                 \
--    update_fcr31(env, GETPC());                                 \
--    if (cl)                                                     \
-+    if (cl) {                                                   \
-         SET_FP_COND(cc, env->active_fpu);                       \
--    else                                                        \
-+    } else {                                                    \
-         CLEAR_FP_COND(cc, env->active_fpu);                     \
--    if (ch)                                                     \
-+    }                                                           \
-+    if (ch) {                                                   \
-         SET_FP_COND(cc + 1, env->active_fpu);                   \
--    else                                                        \
-+    } else {                                                    \
-         CLEAR_FP_COND(cc + 1, env->active_fpu);                 \
-+    }                                                           \
-+    update_fcr31(env, GETPC());                                 \
- }                                                               \
- void helper_cmpabs_ps_ ## op(CPUMIPSState *env, uint64_t fdt0,  \
-                              uint64_t fdt1, int cc)             \
-@@ -1965,15 +1971,17 @@ void helper_cmpabs_ps_ ## op(CPUMIPSState *env, uint64_t fdt0,  \
-     fsth1 = float32_abs(fdt1 >> 32);                            \
-     cl = condl;                                                 \
-     ch = condh;                                                 \
--    update_fcr31(env, GETPC());                                 \
--    if (cl)                                                     \
-+    if (cl) {                                                   \
-         SET_FP_COND(cc, env->active_fpu);                       \
--    else                                                        \
-+    } else {                                                    \
-         CLEAR_FP_COND(cc, env->active_fpu);                     \
--    if (ch)                                                     \
-+    }                                                           \
-+    if (ch) {                                                   \
-         SET_FP_COND(cc + 1, env->active_fpu);                   \
--    else                                                        \
-+    } else {                                                    \
-         CLEAR_FP_COND(cc + 1, env->active_fpu);                 \
-+    }                                                           \
-+    update_fcr31(env, GETPC());                                 \
- }
- 
- /*
-@@ -2080,12 +2088,12 @@ uint64_t helper_r6_cmp_d_ ## op(CPUMIPSState *env, uint64_t fdt0,   \
- {                                                                   \
-     uint64_t c;                                                     \
-     c = cond;                                                       \
--    update_fcr31(env, GETPC());                                     \
-     if (c) {                                                        \
-         return -1;                                                  \
-     } else {                                                        \
-         return 0;                                                   \
-     }                                                               \
-+    update_fcr31(env, GETPC());                                     \
- }
- 
- /*
-@@ -2175,12 +2183,12 @@ uint32_t helper_r6_cmp_s_ ## op(CPUMIPSState *env, uint32_t fst0,   \
- {                                                                   \
-     uint64_t c;                                                     \
-     c = cond;                                                       \
--    update_fcr31(env, GETPC());                                     \
-     if (c) {                                                        \
-         return -1;                                                  \
-     } else {                                                        \
-         return 0;                                                   \
-     }                                                               \
-+    update_fcr31(env, GETPC());                                     \
- }
- 
- /*
+> quite a bit.
+> 
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> ---
+>   .gitignore | 158 -----------------------------------------------------
+>   1 file changed, 158 deletions(-)
+> 
+
+I like the idea.  As Phillipe pointed out, there are still a few files 
+that may be created by merely running './configure' or common editor 
+droppings or workflow setups that are still worth ignoring, but as most 
+of these truly no longer appear during a fresh checkout, it makes sense 
+to clean it up.
+
+Someone who still wants to use 'fake in-tree' builds and creates 
+symlinks for themselves will no longer have those symlinks ignored by 
+this pruned file, but can edit their own .git/info/exclude file to match 
+their preferences.
+
+> diff --git a/.gitignore b/.gitignore
+> index 4ccb9ed975..bb916594eb 100644
+> --- a/.gitignore
+> +++ b/.gitignore
+> @@ -1,165 +1,7 @@
+>   /GNUmakefile
+>   /build/
+
+Our 'fake in-tree' build uses just 'build', but ignoring '/build*/' 
+might be wiser to automatically ignore all other variations on the theme 
+of a subdirectory per build.
+
 -- 
-2.20.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
