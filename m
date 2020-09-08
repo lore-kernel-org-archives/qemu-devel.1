@@ -2,96 +2,79 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D2CC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D714C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:32:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D022F221ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:31:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlgXJuva"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D022F221ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1192B221ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:32:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1192B221ED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFcn0-0000t1-Nr
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:31:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33654)
+	id 1kFcnB-0001Ed-0r
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:32:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33814)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFclF-0006Uh-TD; Tue, 08 Sep 2020 08:30:10 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:53375)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kFclx-0007i3-2U
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:30:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:44922)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFclE-0007tJ-Cj; Tue, 08 Sep 2020 08:30:09 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id t7so5058319pjd.3;
- Tue, 08 Sep 2020 05:30:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=NnBwIumxkiQ9pXVAp8TmFXF/H8dsT5OnHNvh40zg8GM=;
- b=nlgXJuvajsV6EVofGcBVubi3XES9iM32XvguvblyE2/x++QfbNfXIHmRQp7HCbeRSm
- uy1efTq3xiG6MGXqG2WWqvzINvCyj6mqNjLjp+/IcI0NBZp04RhnaHj6/mWjVZfO3l9y
- 5ABVaYqvMBNJaH5T0CrRzYSchrhKKp8XHahso5Xe1L1KGEFU7cwIC5C6rtZa+cVd1PuK
- i4UAqlXj87Qencq0rTVBrp7aduqko5x0wv2Q84GUT2DtFH6alFX3UCEkZI5jc6eoGJw1
- dikiS6uxzzdniCdb4CZXYP5xG4mFuVx8Jj5Qq86Gnstbar48YlnAywdqZEeMlDsccajP
- bSFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NnBwIumxkiQ9pXVAp8TmFXF/H8dsT5OnHNvh40zg8GM=;
- b=cLM5YW//rhFRAVQB/C/zHPEvJI3ZTErP2FC2Me+/0oF4q4+QyvqRhKnIwgDKRjzEH9
- RfBDgpNvHhUpJJIo6GsnzOLU+qEp7jTmZFrgECWVaEyhCk/VDlhqm2pGEUkMZYaNO51j
- BXzNARHP6lQ9UXFvcmj+jLwcqaZVAmKAJebxOLpvJgibPuNeogjAMIz9Hfk/s5V1RhpI
- mJHPawoNDmpA6vrlPHLkaTOaWIY4ReC4t4FnNqYFHmojnZ4hhV+rOxixNs10nw2mTDeU
- fnQ88mxAVWV3ojZChWax84ai6/QhkcPl76tzRnGYSs0m99c+LAkSyCO1cktm/IrRDL18
- JP0Q==
-X-Gm-Message-State: AOAM531PgM4lsEhcDziKVs9W5lq+xCScE5XyOJbEPySTYSApsaDXYbU9
- sljJKyZ1ynTirJUWfINajkVqjizm11CHxU9T
-X-Google-Smtp-Source: ABdhPJzSPvDBDDK3W570h3XZ/pdTKeYfKd39ugakGAzb8O4Adx2X3XlCJ8/lctxp1YAX5uqTuTR+/A==
-X-Received: by 2002:a17:90a:e984:: with SMTP id
- v4mr3744387pjy.202.1599568204843; 
- Tue, 08 Sep 2020 05:30:04 -0700 (PDT)
-Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id d8sm14833887pgt.19.2020.09.08.05.30.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 05:30:04 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 1/2] logging: Fixes memory leak in test-logging.c
-Date: Tue,  8 Sep 2020 20:29:43 +0800
-Message-Id: <20200908122944.414-2-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200908122944.414-1-luoyonggang@gmail.com>
-References: <20200908122944.414-1-luoyonggang@gmail.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kFclu-00086k-8W
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:30:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kFcls-0000O9-34
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 12:30:48 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 10B372E80E7
+ for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 12:30:48 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 08 Sep 2020 12:21:27 -0000
+From: Jordan Williams <1894836@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: hvf
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: jwillikers
+X-Launchpad-Bug-Reporter: Jordan Williams (jwillikers)
+X-Launchpad-Bug-Modifier: Jordan Williams (jwillikers)
+Message-Id: <159956768761.20174.3940381536855370035.malonedeb@gac.canonical.com>
+Subject: [Bug 1894836] [NEW] kernel panic using hvf with CPU passthrough
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: 5ef35c51f7f8b956e43495b9e1fe0d40e634848e
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 03:20:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -100,39 +83,205 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
- Daniel Brodsky <dnbrdsky@gmail.com>, Yonggang Luo <luoyonggang@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Reply-To: Bug 1894836 <1894836@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-g_dir_make_tmp Returns the actual name used. This string should be
-freed with g_free() when not needed any longer and is is in the GLib
-file name encoding. In case of errors, NULL is returned and error will
-be set. Use g_autofree to free it properly
+Public bug reported:
 
-Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- tests/test-logging.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Host Details
+QEMU 5.1 (Homebrew)
+macOS 10.15.6 Catalina
+Late 2014 iMac
+i5-4690 @ 3.5 GHz
+8 GB RAM
 
-diff --git a/tests/test-logging.c b/tests/test-logging.c
-index 8a1161de1d..957f6c08cd 100644
---- a/tests/test-logging.c
-+++ b/tests/test-logging.c
-@@ -196,7 +196,7 @@ static void rmdir_full(gchar const *root)
- 
- int main(int argc, char **argv)
- {
--    gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
-+    g_autofree gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
-     int rc;
- 
-     g_test_init(&argc, &argv, NULL);
--- 
-2.28.0.windows.1
+Guest Details
+Ubuntu Desktop 20.04.1 Installer ISO
 
+Problem
+Whenever I boot with "-accel hvf -cpu host", the Ubuntu desktop installer w=
+ill immediately crash with a kernel panic after the initial splash screen.
+See the attached picture of the kernel panic for more details.
+
+Steps to recreate
+>From https://www.jwillikers.com/posts/virtualize_ubuntu_desktop_on_macos_wi=
+th_qemu/
+
+1. Install QEMU with Homebrew.
+$ brew install qemu
+
+2. Create a qcow2 disk image to which to install.
+$ qemu-img create -f qcow2 ubuntu2004.qcow2 60G
+
+3. Download the ISO.
+$ curl -L -o ubuntu-20.04.1-desktop-amd64.iso https://releases.ubuntu.com/2=
+0.04/ubuntu-20.04.1-desktop-amd64.iso
+
+4. Run the installer in QEMU.
+$ qemu-system-x86_64 \
+=C2=A0=C2=A0-accel hvf \
+=C2=A0=C2=A0-cpu host \
+=C2=A0=C2=A0-smp 2 \
+=C2=A0=C2=A0-m 4G \
+=C2=A0=C2=A0-usb \
+=C2=A0=C2=A0-device usb-tablet \
+=C2=A0=C2=A0-vga virtio \
+=C2=A0=C2=A0-display default,show-cursor=3Don \
+=C2=A0=C2=A0-device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic \
+=C2=A0=C2=A0-audiodev coreaudio,id=3Dsnd0 \
+=C2=A0=C2=A0-device ich9-intel-hda -device hda-output,audiodev=3Dsnd0 \
+=C2=A0=C2=A0-cdrom ubuntu-20.04.1-desktop-amd64.iso \
+=C2=A0=C2=A0-drive file=3Dubuntu2004.qcow2,if=3Dvirtio
+
+Workaround
+Emulating the CPU with "-cpu qemu64" does not result in a kernel panic.
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: hvf
+
+** Attachment added: "Kernel Panic Message"
+   https://bugs.launchpad.net/bugs/1894836/+attachment/5408668/+files/kerne=
+l_panic.png
+
+** Description changed:
+
+  Host Details
+  QEMU 5.1 (Homebrew)
+  macOS 10.15.6 Catalina
+- Late 2014 model
++ Late 2014 iMac
+  i5-4690 @ 3.5 GHz
+  8 GB RAM
+  =
+
+  Guest Details
+  Ubuntu Desktop 20.04.1 Installer ISO
+  =
+
+  Problem
+  Whenever I boot with "-accel hvf -cpu host", the Ubuntu desktop installer=
+ will immediately crash with a kernel panic after the initial splash screen.
+  See the attached picture of the kernel panic for more details.
+  =
+
+  Steps to recreate
+  From https://www.jwillikers.com/posts/virtualize_ubuntu_desktop_on_macos_=
+with_qemu/
+  =
+
+  1. Install QEMU with Homebrew.
+  $ brew install qemu
+  =
+
+  2. Create a qcow2 disk image to which to install.
+  $ qemu-img create -f qcow2 ubuntu2004.qcow2 60G
+  =
+
+  3. Download the ISO.
+  $ curl -L -o ubuntu-20.04.1-desktop-amd64.iso https://releases.ubuntu.com=
+/20.04/ubuntu-20.04.1-desktop-amd64.iso
+  =
+
+  4. Run the installer in QEMU.
+  $ qemu-system-x86_64 \
+-   -accel hvf \
+-   -cpu host \
+-   -smp 2 \
+-   -m 4G \
+-   -usb \
+-   -device usb-tablet \
+-   -vga virtio \
+-   -display default,show-cursor=3Don \
+-   -device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic \
+-   -audiodev coreaudio,id=3Dsnd0 \
+-   -device ich9-intel-hda -device hda-output,audiodev=3Dsnd0 \
+-   -cdrom ubuntu-20.04.1-desktop-amd64.iso \
+-   -drive file=3Dubuntu2004.qcow2,if=3Dvirtio
++ =C2=A0=C2=A0-accel hvf \
++ =C2=A0=C2=A0-cpu host \
++ =C2=A0=C2=A0-smp 2 \
++ =C2=A0=C2=A0-m 4G \
++ =C2=A0=C2=A0-usb \
++ =C2=A0=C2=A0-device usb-tablet \
++ =C2=A0=C2=A0-vga virtio \
++ =C2=A0=C2=A0-display default,show-cursor=3Don \
++ =C2=A0=C2=A0-device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic \
++ =C2=A0=C2=A0-audiodev coreaudio,id=3Dsnd0 \
++ =C2=A0=C2=A0-device ich9-intel-hda -device hda-output,audiodev=3Dsnd0 \
++ =C2=A0=C2=A0-cdrom ubuntu-20.04.1-desktop-amd64.iso \
++ =C2=A0=C2=A0-drive file=3Dubuntu2004.qcow2,if=3Dvirtio
+  =
+
+  Workaround
+  Emulating the CPU with "-cpu qemu64" does not result in a kernel panic.
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894836
+
+Title:
+  kernel panic using hvf with CPU passthrough
+
+Status in QEMU:
+  New
+
+Bug description:
+  Host Details
+  QEMU 5.1 (Homebrew)
+  macOS 10.15.6 Catalina
+  Late 2014 iMac
+  i5-4690 @ 3.5 GHz
+  8 GB RAM
+
+  Guest Details
+  Ubuntu Desktop 20.04.1 Installer ISO
+
+  Problem
+  Whenever I boot with "-accel hvf -cpu host", the Ubuntu desktop installer=
+ will immediately crash with a kernel panic after the initial splash screen.
+  See the attached picture of the kernel panic for more details.
+
+  Steps to recreate
+  From https://www.jwillikers.com/posts/virtualize_ubuntu_desktop_on_macos_=
+with_qemu/
+
+  1. Install QEMU with Homebrew.
+  $ brew install qemu
+
+  2. Create a qcow2 disk image to which to install.
+  $ qemu-img create -f qcow2 ubuntu2004.qcow2 60G
+
+  3. Download the ISO.
+  $ curl -L -o ubuntu-20.04.1-desktop-amd64.iso https://releases.ubuntu.com=
+/20.04/ubuntu-20.04.1-desktop-amd64.iso
+
+  4. Run the installer in QEMU.
+  $ qemu-system-x86_64 \
+  =C2=A0=C2=A0-accel hvf \
+  =C2=A0=C2=A0-cpu host \
+  =C2=A0=C2=A0-smp 2 \
+  =C2=A0=C2=A0-m 4G \
+  =C2=A0=C2=A0-usb \
+  =C2=A0=C2=A0-device usb-tablet \
+  =C2=A0=C2=A0-vga virtio \
+  =C2=A0=C2=A0-display default,show-cursor=3Don \
+  =C2=A0=C2=A0-device virtio-net,netdev=3Dvmnic -netdev user,id=3Dvmnic \
+  =C2=A0=C2=A0-audiodev coreaudio,id=3Dsnd0 \
+  =C2=A0=C2=A0-device ich9-intel-hda -device hda-output,audiodev=3Dsnd0 \
+  =C2=A0=C2=A0-cdrom ubuntu-20.04.1-desktop-amd64.iso \
+  =C2=A0=C2=A0-drive file=3Dubuntu2004.qcow2,if=3Dvirtio
+
+  Workaround
+  Emulating the CPU with "-cpu qemu64" does not result in a kernel panic.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894836/+subscriptions
 
