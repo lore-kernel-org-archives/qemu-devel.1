@@ -2,88 +2,85 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41DF8C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:15:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AED4C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:20:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C349F221EC
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:15:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D88D8206A5
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:20:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eEVLt2sf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C349F221EC
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TGs0+cCx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D88D8206A5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60810 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFePc-000256-Vq
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 10:15:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34384)
+	id 1kFeUK-0004Ue-RV
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 10:20:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kFeOs-0001OX-VH
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:15:10 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:58323
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kFeTl-0003ud-SZ
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:20:13 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26582
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kFeOp-00056s-L1
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:15:10 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kFeTj-0005hF-Az
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:20:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599574506;
+ s=mimecast20190719; t=1599574810;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=JBfn1uwS/HXJyKQJavxEB72ANSmvSxaf1R2sTUU4ZWw=;
- b=eEVLt2sfNwI7E8qgoKS8Vaqq7XQzofZe5HdA1YjvAh7CpTUId3FM375zWtdVCnao4daNs3
- mMs2Xluw3RJypHUWtkH75JAIxqSpj/6X53QK5g7SLvZYk9RP0+4TJMj7Fzxfu6KCa+CcE4
- /XnGZ/o1mHNGPodUuO0hbCEmhRujWDM=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-ilTu3vVhNmymbPD9edXbzA-1; Tue, 08 Sep 2020 10:15:05 -0400
-X-MC-Unique: ilTu3vVhNmymbPD9edXbzA-1
-Received: by mail-wm1-f72.google.com with SMTP id d5so3534177wmb.2
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 07:15:04 -0700 (PDT)
+ bh=AepqlJzty59lExFXqKs5CMiEOvgUHXLXBI3RP7CaMcQ=;
+ b=TGs0+cCxJQPZEtrwUKLDYR7En5VFQ8yOz2svcv59I2y542vE7vpvjuXKjzi6LAlHRC1aXl
+ M0Q+igyhmlSn3bSRQKcusfiexZygyA3nRmUyXWSzRUD3WJE69gnF3gx6AfCDWXOGNAZXJR
+ xZ0tIQc2YL4H16SDW8k1TyXywAmeEr8=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-K0_Dt8GJNu6evMpbLS_qrg-1; Tue, 08 Sep 2020 10:20:02 -0400
+X-MC-Unique: K0_Dt8GJNu6evMpbLS_qrg-1
+Received: by mail-wm1-f69.google.com with SMTP id d5so3538972wmb.2
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 07:20:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=JBfn1uwS/HXJyKQJavxEB72ANSmvSxaf1R2sTUU4ZWw=;
- b=osbVp7iVGzj05N3PTMMCFLpjGk3J2wZH1I754ta32LOiR4otragvS5hIa1DzqG5J81
- owalGSpJMJ3jo4Qzh5HtLpg5S0JkuWna9olhJs8VwuTwZFc44qsPvzsOiayQo2I/3fLr
- QfDQI5a8eYfda85vhGLHLEzCKj4rUUaKAlB25obPVEGRvHwxpf91dvvl2zoiVhSqagYW
- abUM7kkNoXkHVEEMCeNqbcLuBjoLHMPpZfbilPq1zL3/afn9iHt+CB2UeKUmxAve1iJ+
- ujE6uyuiH7nXXZ6fP1jQ+quai9LZuvL5iNuE/OQSAe0oadAA0hLnqI88NGZOVU34XdB+
- lTxA==
-X-Gm-Message-State: AOAM5302+/sXZ9klf/4zI7JF/Fqg6eZpKfAU4gVMWYfWODFe838iBBnu
- L/AfMT9B9yjIF2bjQAtZHvUcBZLRVkIQcW6D+06Q3a558B/ddHZVy+4riwyoMzPeJ6rqoPyz/gl
- QnSzXYHQYXxvY3kk=
-X-Received: by 2002:a5d:60d0:: with SMTP id x16mr26883621wrt.196.1599574503054; 
- Tue, 08 Sep 2020 07:15:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyvjBTx6u8Gv7OKBqCejmbm0zEpLKsfeLB+ZiAkRTzjBcjPRwX27I9XpXLIwDG/aap3YDfGNQ==
-X-Received: by 2002:a5d:60d0:: with SMTP id x16mr26883597wrt.196.1599574502788; 
- Tue, 08 Sep 2020 07:15:02 -0700 (PDT)
+ bh=AepqlJzty59lExFXqKs5CMiEOvgUHXLXBI3RP7CaMcQ=;
+ b=pdycrLxjCk7kVbIlyKdcyBkdfZh7Zj9o3upfJLl/7uCCneswj+pnM7uBGcfS5hzKXs
+ rsQuPNEmCkRHb2NYSPZGVpuNAeorV2YozvI3Fts352yZUff/G+p7kCMyQFa3oWr3q6EG
+ s1XichfgXgLhzVa510h4y8Rw/5IOJsBd2HzJT97nv6tCi22FdK217js04RHmIyxq6ckV
+ gYxr32MI37n1IdJQaYy5K8L9LWRBEh98hfecvSKrHVGHhB5x29DajOZ5N29+2p09+hua
+ ZRHaWZ85lg+qgSQykXsmRI0sHbKEX8lwxvJ+wFTePoTZkQgsFrKVnmNVc+10Uore8++L
+ +8QQ==
+X-Gm-Message-State: AOAM530i4s8rU7meKjZeeRhMCsyWvSa2oh0iATziFx5nM78V+Hg2b91s
+ 3m/BcS+m+zH7A7mewH+7+IvCYTxZN2Dl0eMwVyOKND7zGI+3EdC8Nl9+Iinn8kMNU5FBBjC06+7
+ I2fvp13Kp9lsqUto=
+X-Received: by 2002:adf:a18c:: with SMTP id u12mr28134294wru.90.1599574799224; 
+ Tue, 08 Sep 2020 07:19:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzKkj0s3yGyFI/7nhvQbFj3a1dUtwUEaaWQYXURyDsXn+xMJEAewexjQQTtCs78qW9vjPzkxQ==
+X-Received: by 2002:adf:a18c:: with SMTP id u12mr28134270wru.90.1599574799008; 
+ Tue, 08 Sep 2020 07:19:59 -0700 (PDT)
 Received: from redhat.com (IGLD-80-230-218-236.inter.net.il. [80.230.218.236])
  by smtp.gmail.com with ESMTPSA id
- s5sm34580903wrm.33.2020.09.08.07.14.58
+ i6sm38373917wra.1.2020.09.08.07.19.56
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 07:15:00 -0700 (PDT)
-Date: Tue, 8 Sep 2020 10:14:56 -0400
+ Tue, 08 Sep 2020 07:19:57 -0700 (PDT)
+Date: Tue, 8 Sep 2020 10:19:54 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Laurent Vivier <lvivier@redhat.com>
-Subject: Re: [PATCH v3] virtio-rng: return available data with O_NONBLOCK
-Message-ID: <20200908101413-mutt-send-email-mst@kernel.org>
-References: <20200811142821.12323-1-mwilck@suse.com>
- <4ae4f348-c186-f7e4-f7e3-b1f1e4a4b408@redhat.com>
- <20200826082613-mutt-send-email-mst@kernel.org>
- <519e0296a7d61d5e9e8d258a855eb42a57c641c5.camel@suse.com>
- <a5d4bcd3-e468-e818-3bd2-3a1b0fa172d8@redhat.com>
+To: andrew@daynix.com
+Subject: Re: [PATCH 2/2] hw/virtio-pci Added AER capability.
+Message-ID: <20200908101813-mutt-send-email-mst@kernel.org>
+References: <20200813071931.19846-1-andrew@daynix.com>
+ <20200813071931.19846-2-andrew@daynix.com>
 MIME-Version: 1.0
-In-Reply-To: <a5d4bcd3-e468-e818-3bd2-3a1b0fa172d8@redhat.com>
+In-Reply-To: <20200813071931.19846-2-andrew@daynix.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -113,227 +110,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Amit Shah <amit@kernel.org>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, virtualization@lists.linux-foundation.org,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Martin Wilck <mwilck@suse.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Aug 31, 2020 at 02:37:26PM +0200, Laurent Vivier wrote:
-> On 28/08/2020 23:34, Martin Wilck wrote:
-> > On Wed, 2020-08-26 at 08:26 -0400, Michael S. Tsirkin wrote:
-> >> On Tue, Aug 11, 2020 at 04:42:32PM +0200, Laurent Vivier wrote:
-> >>> On 11/08/2020 16:28, mwilck@suse.com wrote:
-> >>>> From: Martin Wilck <mwilck@suse.com>
-> >>>>
-> >>>> If a program opens /dev/hwrng with O_NONBLOCK and uses poll() and
-> >>>> non-blocking read() to retrieve random data, it ends up in a
-> >>>> tight
-> >>>> loop with poll() always returning POLLIN and read() returning
-> >>>> EAGAIN.
-> >>>> This repeats forever until some process makes a blocking read()
-> >>>> call.
-> >>>> The reason is that virtio_read() always returns 0 in non-blocking 
-> >>>> mode,
-> >>>> even if data is available. Worse, it fetches random data from the
-> >>>> hypervisor after every non-blocking call, without ever using this
-> >>>> data.
-> >>>>
-> >>>> The following test program illustrates the behavior and can be
-> >>>> used
-> >>>> for testing and experiments. The problem will only be seen if all
-> >>>> tasks use non-blocking access; otherwise the blocking reads will
-> >>>> "recharge" the random pool and cause other, non-blocking reads to
-> >>>> succeed at least sometimes.
-> >>>>
-> >>>> /* Whether to use non-blocking mode in a task, problem occurs if
-> >>>> CONDITION is 1 */
-> >>>> //#define CONDITION (getpid() % 2 != 0)
-> >>>>
-> >>>> static volatile sig_atomic_t stop;
-> >>>> static void handler(int sig __attribute__((unused))) { stop = 1;
-> >>>> }
-> >>>>
-> >>>> static void loop(int fd, int sec)
-> >>>> {
-> >>>> 	struct pollfd pfd = { .fd = fd, .events  = POLLIN, };
-> >>>> 	unsigned long errors = 0, eagains = 0, bytes = 0, succ = 0;
-> >>>> 	int size, rc, rd;
-> >>>>
-> >>>> 	srandom(getpid());
-> >>>> 	if (CONDITION && fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) |
-> >>>> O_NONBLOCK) == -1)
-> >>>> 		perror("fcntl");
-> >>>> 	size = MINBUFSIZ + random() % (MAXBUFSIZ - MINBUFSIZ + 1);
-> >>>>
-> >>>> 	for(;;) {
-> >>>> 		char buf[size];
-> >>>>
-> >>>> 		if (stop)
-> >>>> 			break;
-> >>>> 		rc = poll(&pfd, 1, sec);
-> >>>> 		if (rc > 0) {
-> >>>> 			rd = read(fd, buf, sizeof(buf));
-> >>>> 			if (rd == -1 && errno == EAGAIN)
-> >>>> 				eagains++;
-> >>>> 			else if (rd == -1)
-> >>>> 				errors++;
-> >>>> 			else {
-> >>>> 				succ++;
-> >>>> 				bytes += rd;
-> >>>> 				write(1, buf, sizeof(buf));
-> >>>> 			}
-> >>>> 		} else if (rc == -1) {
-> >>>> 			if (errno != EINTR)
-> >>>> 				perror("poll");
-> >>>> 			break;
-> >>>> 		} else
-> >>>> 			fprintf(stderr, "poll: timeout\n");
-> >>>> 	}
-> >>>> 	fprintf(stderr,
-> >>>> 		"pid %d %sblocking, bufsize %d, %d seconds, %lu bytes
-> >>>> read, %lu success, %lu eagain, %lu errors\n",
-> >>>> 		getpid(), CONDITION ? "non-" : "", size, sec, bytes,
-> >>>> succ, eagains, errors);
-> >>>> }
-> >>>>
-> >>>> int main(void)
-> >>>> {
-> >>>> 	int fd;
-> >>>>
-> >>>> 	fork(); fork();
-> >>>> 	fd = open("/dev/hwrng", O_RDONLY);
-> >>>> 	if (fd == -1) {
-> >>>> 		perror("open");
-> >>>> 		return 1;
-> >>>> 	};
-> >>>> 	signal(SIGALRM, handler);
-> >>>> 	alarm(SECONDS);
-> >>>> 	loop(fd, SECONDS);
-> >>>> 	close(fd);
-> >>>> 	wait(NULL);
-> >>>> 	return 0;
-> >>>> }
-> >>>>
-> >>>> void loop(int fd)
-> >>>> {
-> >>>>         struct pollfd pfd0 = { .fd = fd, .events  = POLLIN, };
-> >>>>         int rc;
-> >>>>         unsigned int n;
-> >>>>
-> >>>>         for (n = LOOPS; n > 0; n--) {
-> >>>>                 struct pollfd pfd = pfd0;
-> >>>>                 char buf[SIZE];
-> >>>>
-> >>>>                 rc = poll(&pfd, 1, 1);
-> >>>>                 if (rc > 0) {
-> >>>>                         int rd = read(fd, buf, sizeof(buf));
-> >>>>
-> >>>>                         if (rd == -1)
-> >>>>                                 perror("read");
-> >>>>                         else
-> >>>>                                 printf("read %d bytes\n", rd);
-> >>>>                 } else if (rc == -1)
-> >>>>                         perror("poll");
-> >>>>                 else
-> >>>>                         fprintf(stderr, "timeout\n");
-> >>>>
-> >>>>         }
-> >>>> }
-> >>>>
-> >>>> int main(void)
-> >>>> {
-> >>>>         int fd;
-> >>>>
-> >>>>         fd = open("/dev/hwrng", O_RDONLY|O_NONBLOCK);
-> >>>>         if (fd == -1) {
-> >>>>                 perror("open");
-> >>>>                 return 1;
-> >>>>         };
-> >>>>         loop(fd);
-> >>>>         close(fd);
-> >>>>         return 0;
-> >>>> }
-> >>>>
-> >>>> This can be observed in the real word e.g. with nested qemu/KVM
-> >>>> virtual
-> >>>> machines, if both the "outer" and "inner" VMs have a virtio-rng
-> >>>> device.
-> >>>> If the "inner" VM requests random data, qemu running in the
-> >>>> "outer" VM
-> >>>> uses this device in a non-blocking manner like the test program
-> >>>> above.
-> >>>>
-> >>>> Fix it by returning available data if a previous hypervisor call
-> >>>> has
-> >>>> completed. I tested this patch with the program above, and with
-> >>>> rng-tools.
-> >>>>
-> >>>> v2 -> v3: Simplified the implementation as suggested by Laurent
-> >>>> Vivier
-> >>>>
-> >>>> Signed-off-by: Martin Wilck <mwilck@suse.com>
-> >>>> ---
-> >>>>  drivers/char/hw_random/virtio-rng.c | 4 ++--
-> >>>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/drivers/char/hw_random/virtio-rng.c
-> >>>> b/drivers/char/hw_random/virtio-rng.c
-> >>>> index a90001e02bf7..8eaeceecb41e 100644
-> >>>> --- a/drivers/char/hw_random/virtio-rng.c
-> >>>> +++ b/drivers/char/hw_random/virtio-rng.c
-> >>>> @@ -65,7 +65,7 @@ static int virtio_read(struct hwrng *rng, void
-> >>>> *buf, size_t size, bool wait)
-> >>>>  		register_buffer(vi, buf, size);
-> >>>>  	}
-> >>>>  
-> >>>> -	if (!wait)
-> >>>> +	if (!wait && !completion_done(&vi->have_data))
-> >>>>  		return 0;
-> >>>>  
-> >>>>  	ret = wait_for_completion_killable(&vi->have_data);
-> >>>> @@ -74,7 +74,7 @@ static int virtio_read(struct hwrng *rng, void
-> >>>> *buf, size_t size, bool wait)
-> >>>>  
-> >>>>  	vi->busy = false;
-> >>>>  
-> >>>> -	return vi->data_avail;
-> >>>> +	return min_t(size_t, size, vi->data_avail);
-> >>>>  }
-> >>>>  
-> >>>>  static void virtio_cleanup(struct hwrng *rng)
-> >>>>
-> >>>
-> >>> Reviewed-by: Laurent Vivier <lvivier@redhat.com>
-> >>
-> >> Laurent didn't we agree the real fix is private buffers in the
-> >> driver,
-> >> and copying out from there?
-> >>
-> > 
-> > Can we perhaps proceed with this for now? AFAICS the private buffer
-> > implementation would be a larger effort, while we have the issues with
-> > nested VMs getting no entropy today.
-> > 
+On Thu, Aug 13, 2020 at 10:19:31AM +0300, andrew@daynix.com wrote:
+> From: Andrew <andrew@daynix.com>
 > 
-> I agree. I think it's important to have a simple and quick fix for the
-> problem reported by Martin.
+> Buglink: https://bugzilla.redhat.com/show_bug.cgi?id=1857668
+> Added AER capability for virtio-pci devices.
+> Also added property for devices, by default AER is enabled.
 > 
-> We need the private buffers but not sure how long it will take to have
-> them included in the kernel and how many new bugs will be introduced
-> doing that as the code is hard to understand and the core is shared with
-> several other hardware backends that can be impacted by the changes needed.
-> 
-> Thanks,
-> Laurent
+> Signed-off-by: Andrew Melnychenko <andrew@daynix.com>
 
-However I am not sure with the patch applies we never return
-the same buffer to userspace twice, e.g. if one is
-non blocking another blocking. Doing that would be a bug.
+Well AER is pci express only. I suspect you need to limit
+this to express, fail on pci.
 
--- 
-MST
+
+
+
+> ---
+>  hw/virtio/virtio-pci.c | 16 ++++++++++++++++
+>  hw/virtio/virtio-pci.h |  4 ++++
+>  2 files changed, 20 insertions(+)
+> 
+> diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
+> index 8e02709605..646dfb8a0d 100644
+> --- a/hw/virtio/virtio-pci.c
+> +++ b/hw/virtio/virtio-pci.c
+> @@ -1806,6 +1806,12 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+>           */
+>          pci_set_word(pci_dev->config + pos + PCI_PM_PMC, 0x3);
+>  
+> +        if (proxy->flags & VIRTIO_PCI_FLAG_AER) {
+> +            pcie_aer_init(pci_dev, PCI_ERR_VER, last_pcie_cap_offset,
+> +                          PCI_ERR_SIZEOF, NULL);
+> +            last_pcie_cap_offset += PCI_ERR_SIZEOF;
+> +        }
+> +
+>          if (proxy->flags & VIRTIO_PCI_FLAG_INIT_DEVERR) {
+>              /* Init error enabling flags */
+>              pcie_cap_deverr_init(pci_dev);
+> @@ -1847,7 +1853,15 @@ static void virtio_pci_realize(PCIDevice *pci_dev, Error **errp)
+>  
+>  static void virtio_pci_exit(PCIDevice *pci_dev)
+>  {
+> +    VirtIOPCIProxy *proxy = VIRTIO_PCI(pci_dev);
+> +    bool pcie_port = pci_bus_is_express(pci_get_bus(pci_dev)) &&
+> +                     !pci_bus_is_root(pci_get_bus(pci_dev));
+> +
+>      msix_uninit_exclusive_bar(pci_dev);
+> +    if (proxy->flags & VIRTIO_PCI_FLAG_AER && pcie_port &&
+> +        pci_is_express(pci_dev)) {
+> +        pcie_aer_exit(pci_dev);
+> +    }
+>  }
+>  
+>  static void virtio_pci_reset(DeviceState *qdev)
+> @@ -1900,6 +1914,8 @@ static Property virtio_pci_properties[] = {
+>                      VIRTIO_PCI_FLAG_INIT_PM_BIT, true),
+>      DEFINE_PROP_BIT("x-pcie-flr-init", VirtIOPCIProxy, flags,
+>                      VIRTIO_PCI_FLAG_INIT_FLR_BIT, true),
+> +    DEFINE_PROP_BIT("aer", VirtIOPCIProxy, flags,
+> +                    VIRTIO_PCI_FLAG_AER_BIT, true),
+>      DEFINE_PROP_END_OF_LIST(),
+>  };
+>
+
+This will break cross version migration. Please disable this for
+old machine types.
+
+I am also unsure why it's on by default generally.
+It is optional in express spec.
+
+
+  
+> diff --git a/hw/virtio/virtio-pci.h b/hw/virtio/virtio-pci.h
+> index e2eaaa9182..4b2491ff15 100644
+> --- a/hw/virtio/virtio-pci.h
+> +++ b/hw/virtio/virtio-pci.h
+> @@ -45,6 +45,7 @@ enum {
+>      VIRTIO_PCI_FLAG_INIT_LNKCTL_BIT,
+>      VIRTIO_PCI_FLAG_INIT_PM_BIT,
+>      VIRTIO_PCI_FLAG_INIT_FLR_BIT,
+> +    VIRTIO_PCI_FLAG_AER_BIT,
+>  };
+>  
+>  /* Need to activate work-arounds for buggy guests at vmstate load. */
+> @@ -84,6 +85,9 @@ enum {
+>  /* Init Function Level Reset capability */
+>  #define VIRTIO_PCI_FLAG_INIT_FLR (1 << VIRTIO_PCI_FLAG_INIT_FLR_BIT)
+>  
+> +/* Advanced Error Reporting capability */
+> +#define VIRTIO_PCI_FLAG_AER (1 << VIRTIO_PCI_FLAG_AER_BIT)
+> +
+>  typedef struct {
+>      MSIMessage msg;
+>      int virq;
+> -- 
+> 2.27.0
 
 
