@@ -2,130 +2,86 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7B1BC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:26:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E3FC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:29:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6589C2080A
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:26:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 92D672080A
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:29:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cCQBPnMo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6589C2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Zim+elRM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92D672080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFkBk-0001cS-Ip
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:26:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49254)
+	id 1kFkFN-0003Qm-KU
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:29:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFkAq-0000YQ-HL
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:25:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:43842
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFkAo-0007CF-KP
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:25:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599596701;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=jt+EoWhGkGewVzY1REwvtTX22XtGx0i7DYvd5K+toJk=;
- b=cCQBPnMopBNLi9d9PPsdYw0DblTFwvIiBhGMah6AxvbEb2wHu7pAWolkHSUxAiJhSq5aP+
- 0mlxXGQMey/sxhMBXDfMF5EuQo84n77Wz2sXXinOvX5Q54dxMaDxtmPsR1KtjqDJUiHYrw
- M182rpksRV4HC2xj2BmQ82eNti/LJKQ=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-366-gnKCd0BZNLiBIa0DYjKpCw-1; Tue, 08 Sep 2020 16:25:00 -0400
-X-MC-Unique: gnKCd0BZNLiBIa0DYjKpCw-1
-Received: by mail-wr1-f71.google.com with SMTP id i10so55691wrq.5
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 13:24:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFkEj-0002uq-Lw
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:29:05 -0400
+Received: from mail-ed1-x52d.google.com ([2a00:1450:4864:20::52d]:34650)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFkEi-0007cr-1p
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:29:05 -0400
+Received: by mail-ed1-x52d.google.com with SMTP id q21so438317edv.1
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 13:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=UW8qu0aSyJDtgjYDO4cJ4kvZyTESM6mhROk0I5RVbG4=;
+ b=Zim+elRMrojDWLrHB5sugtOvfU/rPrjITY3CSa3N7DDFB2nHkjCRFs0W6pNC3qCX9b
+ U8GqA6PwrhUSjd98rXDiFMuytaOsAPVYUpMrSQ/l9RbeypUOOGtMAw/b5R1HWrsaQP4C
+ OUYnI6ro/rDfsRpnY4GExCR01cEaI4cuoveMh3EE7+xNmyMbUcOlBn3Ryae0U2mnhvew
+ 2tG7eWTxwWG9h9rQDguT/SbdfwxrhBTLmQB0S8gILMbE808V8Rkz9CHuGd5Z140KCvy0
+ YhKPdMFimhfFHsccC9a35tLbeVPQJ6f5GUbq22PRrXHTt+SaH4z/h0JcPWi5qAF5hOF+
+ m/QA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=jt+EoWhGkGewVzY1REwvtTX22XtGx0i7DYvd5K+toJk=;
- b=ouNNljenEbzRFF7pmlS49hiNYS10qLYKYoOZ1WfLsSUFr5zhyPgPgpW+LvDGb9bdYg
- ZbHIzxZpCIeHqCBHRpfZdis5WS/QMxuXCOrjdEPmyJgUyyRiehiARz/Wf0AGn/A26/Y0
- saimYPm+7aDsvlLCzbcC7COdXFPg3u4PsZQ4Rlt+kTUoi3wbhg6UREO/pY065ESTh0FY
- OlBaxcppKGZCczIrpFeEO0nfEifQHbxWKwSkh29vGbg3l3NZ9n2desCg8S1dflw5+6Jx
- It3Wlq8B+2q5UYIcZyXGfTSZ1OcNNXy8CseNChKS7gpl9t3lyO3vgBM4gTVeSugMm0nE
- IH8Q==
-X-Gm-Message-State: AOAM5335p8PyrUHA1H7V4FHC7ShPxt4fYdeLaQjRtzLpm5W59Bwogkj0
- dJZrFcMPlenwlvRxHpG12xISDPecnwD7jfELIluyy/qb6mpRxIoupPATRqJDvdKs3SPEGMdfGfT
- ADH/GyYIsGOHVK3s=
-X-Received: by 2002:a1c:7d55:: with SMTP id y82mr173853wmc.100.1599596698911; 
- Tue, 08 Sep 2020 13:24:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzP7EI3DjClAjfk7k4WjJJn72SxAs6mAhZxe+RQaqnNMjMQWiLT7oLd02H8pUK3MebKwYyRGQ==
-X-Received: by 2002:a1c:7d55:: with SMTP id y82mr173832wmc.100.1599596698615; 
- Tue, 08 Sep 2020 13:24:58 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id a83sm597475wmh.48.2020.09.08.13.24.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 08 Sep 2020 13:24:58 -0700 (PDT)
-Subject: Re: [PATCH] memory: Convert IOMMUMemoryRegionClass doc comment to
- kernel-doc
-To: Eduardo Habkost <ehabkost@redhat.com>, qemu-devel@nongnu.org
-References: <20200908201129.3407568-1-ehabkost@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <638d74f2-3086-8ac0-7403-d8d9f8176dfc@redhat.com>
-Date: Tue, 8 Sep 2020 22:24:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=UW8qu0aSyJDtgjYDO4cJ4kvZyTESM6mhROk0I5RVbG4=;
+ b=Yfso0v6kq1Yb8X5QMWRwnEmPgc624D0ghQM/1ewHn9I18EzSLSg8od30GLL/mqvJ5n
+ kcHQorYatQCUND/pQFZARKc2ngec9+zxZdwOVFJfv7jpk3OnMpXoka/BmYxRAy7JTp6B
+ t8DQjdB6UoR3FpIEHtOmX3Nn5gDnYDm3KrBL6HtIkSYfI/d8QCP+e19qn6U+PNKKPVeI
+ 8YJoGBoaAvjDJrMHOE7doGE755eLuQeYfzWuQ11ysiHuVksBcHH4vbxDAUtoSfy+BK+b
+ gCWhOZq/Btwb3pIxkyZ1tH1UfOTjqKL7rxZz5hCZebe1yswgVWxr0o8qw6kZWQ8ABTwV
+ 8JyA==
+X-Gm-Message-State: AOAM533nLY0mIa8S4JcCeNgBrhGYhzBKc/JyBo8kKLcRN0ldIMgTFDKA
+ 9K1jRuHobCt0ik+JM15SpVA0ZvMKq+LlJ9DgNQLmdw==
+X-Google-Smtp-Source: ABdhPJx+Tt1bzQUaQdssIGKO4h/heSySdRabNgFydj9GZE7lciXEDJkWMOEPC6OSGdzzbq1X6DZSRQdgTsRwHtxAieg=
+X-Received: by 2002:a50:f28b:: with SMTP id f11mr844914edm.44.1599596942256;
+ Tue, 08 Sep 2020 13:29:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200908201129.3407568-1-ehabkost@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.626, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200908184918.1085-1-luoyonggang@gmail.com>
+ <20200908184918.1085-5-luoyonggang@gmail.com>
+In-Reply-To: <20200908184918.1085-5-luoyonggang@gmail.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 Sep 2020 21:28:51 +0100
+Message-ID: <CAFEAcA-FGVMKNObinzWgq6sYm9p0GCgPb3mXgx1LD5UnX0wZCQ@mail.gmail.com>
+Subject: Re: [PULL 04/16] curses: Fixes curses compiling errors.
+To: Yonggang Luo <luoyonggang@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::52d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,166 +94,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>, Max Reitz <mreitz@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/8/20 10:11 PM, Eduardo Habkost wrote:
-> Convert the existing documentation comments of
-> IOMMUMemoryRegionClass to kernel-doc format so their contents
-> will appear in the API reference at docs/devel/memory.html.
-> 
-> Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+On Tue, 8 Sep 2020 at 19:56, Yonggang Luo <luoyonggang@gmail.com> wrote:
+>
+> This is the compiling error:
+> ../ui/curses.c: In function 'curses_refresh':
+> ../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>   256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
+>       |     ^~~~~~~~~~
+> ../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
+>   302 |             enum maybe_keycode next_maybe_keycode;
+>       |                                ^~~~~~~~~~~~~~~~~~
+> ../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+>   256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
+>       |     ^~~~~~~~~~
+> ../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
+>   265 |     enum maybe_keycode maybe_keycode;
+>       |                        ^~~~~~~~~~~~~
+> cc1.exe: all warnings being treated as errors
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
+> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 > ---
->  include/exec/memory.h | 52 ++++++++++++++++++++++++++++++++++---------
->  1 file changed, 42 insertions(+), 10 deletions(-)
-> 
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index f1bb2a7df5..c01475a4e9 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -211,7 +211,7 @@ enum IOMMUMemoryRegionAttr {
->      IOMMU_ATTR_SPAPR_TCE_FD
->  };
->  
-> -/*
-> +/**
->   * IOMMUMemoryRegionClass:
->   *
->   * All IOMMU implementations need to subclass TYPE_IOMMU_MEMORY_REGION
-> @@ -228,8 +228,11 @@ enum IOMMUMemoryRegionAttr {
->   * attributes and the output TLB entry depends on the transaction
->   * attributes, we represent this using IOMMU indexes. Each index
->   * selects a particular translation table that the IOMMU has:
-> + *
->   *   @attrs_to_index returns the IOMMU index for a set of transaction attributes
-> + *
->   *   @translate takes an input address and an IOMMU index
-> + *
->   * and the mapping returned can only depend on the input address and the
->   * IOMMU index.
->   *
-> @@ -238,10 +241,13 @@ enum IOMMUMemoryRegionAttr {
->   * for secure transactions and one for non-secure transactions.
->   */
->  struct IOMMUMemoryRegionClass {
-> -    /* private */
-> +    /* private: */
->      MemoryRegionClass parent_class;
->  
-> -    /*
-> +    /* public: */
-> +    /**
-> +     * @translate:
-> +     *
->       * Return a TLB entry that contains a given address.
->       *
->       * The IOMMUAccessFlags indicated via @flag are optional and may
-> @@ -262,26 +268,38 @@ struct IOMMUMemoryRegionClass {
->       * information when the IOMMU mapping changes.
->       *
->       * @iommu: the IOMMUMemoryRegion
-> +     *
->       * @hwaddr: address to be translated within the memory region
-> -     * @flag: requested access permissions
-> +     *
-> +     * @flag: requested access permission
-> +     *
->       * @iommu_idx: IOMMU index for the translation
->       */
->      IOMMUTLBEntry (*translate)(IOMMUMemoryRegion *iommu, hwaddr addr,
->                                 IOMMUAccessFlags flag, int iommu_idx);
-> -    /* Returns minimum supported page size in bytes.
-> +    /**
-> +     * @get_min_page_size:
-> +     *
-> +     * Returns minimum supported page size in bytes.
-> +     *
->       * If this method is not provided then the minimum is assumed to
->       * be TARGET_PAGE_SIZE.
->       *
->       * @iommu: the IOMMUMemoryRegion
->       */
->      uint64_t (*get_min_page_size)(IOMMUMemoryRegion *iommu);
-> -    /* Called when IOMMU Notifier flag changes (ie when the set of
-> +    /**
-> +     * @notify_flag_changed:
-> +     *
-> +     * Called when IOMMU Notifier flag changes (ie when the set of
->       * events which IOMMU users are requesting notification for changes).
->       * Optional method -- need not be provided if the IOMMU does not
->       * need to know exactly which events must be notified.
->       *
->       * @iommu: the IOMMUMemoryRegion
-> +     *
->       * @old_flags: events which previously needed to be notified
-> +     *
->       * @new_flags: events which now need to be notified
->       *
->       * Returns 0 on success, or a negative errno; in particular
-> @@ -293,7 +311,10 @@ struct IOMMUMemoryRegionClass {
->                                 IOMMUNotifierFlag old_flags,
->                                 IOMMUNotifierFlag new_flags,
->                                 Error **errp);
-> -    /* Called to handle memory_region_iommu_replay().
-> +    /**
-> +     * @replay:
-> +     *
-> +     * Called to handle memory_region_iommu_replay().
->       *
->       * The default implementation of memory_region_iommu_replay() is to
->       * call the IOMMU translate method for every page in the address space
-> @@ -310,7 +331,10 @@ struct IOMMUMemoryRegionClass {
->       */
->      void (*replay)(IOMMUMemoryRegion *iommu, IOMMUNotifier *notifier);
->  
-> -    /* Get IOMMU misc attributes. This is an optional method that
-> +    /**
-> +     * @get_attr:
-> +     *
-> +     * Get IOMMU misc attributes. This is an optional method that
->       * can be used to allow users of the IOMMU to get implementation-specific
->       * information. The IOMMU implements this method to handle calls
->       * by IOMMU users to memory_region_iommu_get_attr() by filling in
-> @@ -319,7 +343,9 @@ struct IOMMUMemoryRegionClass {
->       * memory_region_iommu_get_attr() will always return -EINVAL.
->       *
->       * @iommu: the IOMMUMemoryRegion
-> +     *
->       * @attr: attribute being queried
-> +     *
->       * @data: memory to fill in with the attribute data
->       *
->       * Returns 0 on success, or a negative errno; in particular
-> @@ -328,7 +354,10 @@ struct IOMMUMemoryRegionClass {
->      int (*get_attr)(IOMMUMemoryRegion *iommu, enum IOMMUMemoryRegionAttr attr,
->                      void *data);
->  
-> -    /* Return the IOMMU index to use for a given set of transaction attributes.
-> +    /**
-> +     * @attrs_to_index:
-> +     *
-> +     * Return the IOMMU index to use for a given set of transaction attributes.
->       *
->       * Optional method: if an IOMMU only supports a single IOMMU index then
->       * the default implementation of memory_region_iommu_attrs_to_index()
-> @@ -341,7 +370,10 @@ struct IOMMUMemoryRegionClass {
->       */
->      int (*attrs_to_index)(IOMMUMemoryRegion *iommu, MemTxAttrs attrs);
->  
-> -    /* Return the number of IOMMU indexes this IOMMU supports.
-> +    /**
-> +     * @num_indexes:
-> +     *
-> +     * Return the number of IOMMU indexes this IOMMU supports.
->       *
->       * Optional method: if this method is not provided, then
->       * memory_region_iommu_num_indexes() will return 1, indicating that
-> 
+>  ui/curses.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/ui/curses.c b/ui/curses.c
+> index 12bc682cf9..e4f9588c3e 100644
+> --- a/ui/curses.c
+> +++ b/ui/curses.c
+> @@ -262,7 +262,7 @@ static int curses2foo(const int _curses2foo[], const int _curseskey2foo[],
+>  static void curses_refresh(DisplayChangeListener *dcl)
+>  {
+>      int chr, keysym, keycode, keycode_alt;
+> -    enum maybe_keycode maybe_keycode;
+> +    enum maybe_keycode maybe_keycode = CURSES_KEYCODE;
+>
+>      curses_winch_check();
+>
+> @@ -299,7 +299,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
+>
+>          /* alt or esc key */
+>          if (keycode == 1) {
+> -            enum maybe_keycode next_maybe_keycode;
+> +            enum maybe_keycode next_maybe_keycode = CURSES_KEYCODE;
+>              int nextchr = console_getch(&next_maybe_keycode);
+>
+>              if (nextchr != -1) {
 
+The problem here is that the compiler hasn't noticed that it's
+impossible to return something other than -1 from console_getch()
+without initializing next_maybe_keycode.
+
+There are two possible reasons for this:
+(1) your gcc is a bit old -- newer gcc are better at working
+out this kind of thing. But you said on irc that you're using
+gcc 10.2.0, which is new...
+
+(2) this is a variant of the problem with the system headers
+that causes us to have to redefine assert() in osdep.h, only
+with abort() (ie abort() is perhaps not marked as noreturn in
+the system headers). If this theory is true, then changing
+the abort() in console_getch() to instead be g_assert_not_reached()
+would be a different way to avoid the warnings (and if that works
+we should probably fix up abort() the way we do assert()).
+
+thanks
+-- PMM
 
