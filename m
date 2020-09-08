@@ -2,103 +2,87 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67E26C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16A09C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:21:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B012208FE
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:21:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B3BEE20936
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:21:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UIU2WgAp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B012208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k7GK7Fud"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3BEE20936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFk7N-0003Z1-4x
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:21:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47892)
+	id 1kFk7b-00046v-Su
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:21:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kFk6B-0001fM-Hj
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:20:15 -0400
-Received: from us-smtp-2.mimecast.com ([205.139.110.61]:36132
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kFk69-0006RD-Bz
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:20:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599596411;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=h0RADqcbk85myjM7to0VdG4gRFBiOHTuuQyUgLRs2QE=;
- b=UIU2WgAp1ymeR8kHSx8lJALSgcA34SezBKmkG0f9JHSR5EqEsY4dh8EDZlSqqNUnspuGbu
- uh8W84tj7MJ4mCjc7Rd+69zB3dmsylD2Bmc/qPf0hGp11uzCeG8oUFAdXLcsUwoefjYN+/
- seiBW8r69NGX4Prim+yi6CZMgpVhSjA=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-198-O9rpFPOdO92_oDhA-jweDg-1; Tue, 08 Sep 2020 16:20:10 -0400
-X-MC-Unique: O9rpFPOdO92_oDhA-jweDg-1
-Received: by mail-qt1-f200.google.com with SMTP id o14so348045qtq.0
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 13:20:10 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFk6s-0002pp-Lw
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:20:58 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:38426)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFk6q-0006ha-HE
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:20:58 -0400
+Received: by mail-ed1-x544.google.com with SMTP id c8so391902edv.5
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 13:20:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=1BkTCI+47VXu3QHk3YsYNWt55DttbUP6HZu1YPlc//4=;
+ b=k7GK7Fudd23G0vSnvnnTk0OOMP1nbnqdSYIdmFQJz9UOVtVHEPltICRzdx+LLxupkd
+ IoJ4BsNIMT85yA71Ei6zlrX1g2GUAQH41hFWoPb/TsZTBZz6tlYa3JjqtSL8/oJ+Pg/H
+ fI3+CseREs1RSpQqhAq0Ifvp0EOTUIr2LyRoGjaLLr6k25y/HBmNDwJr0zGI7W2CrEbc
+ 0tJUXrqsbRspvRddc2OaQIJvfFmUilqr4xOCxcu0rEaO4RGeOfVX0/COJKNVrFsCjpFt
+ NkoiCz35MfMTKHocYRAIoChtQyT0NI9WYHMC2hxX/S/nY0/PRNIi607c3VvO1Kj0kg7o
+ K2AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=h0RADqcbk85myjM7to0VdG4gRFBiOHTuuQyUgLRs2QE=;
- b=dOv/naAO57eQBtMih/xNNOUhmQsPSEjIuS372C8enYyltJKKA4iMycdYE1o9C+/Ftr
- eMGsKiB5A9IRYFQrbt8CQxjXnwmEt5ZIJ85SrQ8CIlgZ1zGs2WDveotV8efToTjLKRd5
- fuFHr29tH7hVVKsR07EVUFODXINet9cZOx+CETmiYyrLGtBjggfDg3nkCpzBVKIOorK3
- +/lGwvGH3zpGyDX+LSQCU/ahBdLthcrtJLEvzGaOd/uRmVYYIq/KXxKbluuB6XhS+djl
- hBb1cRmG6OnNr4vhBhvPLewVrxXyPZp40VQHkFiKQ7iJzd6HZ00sfCqY/44lQ/Ylk+gJ
- 2lFA==
-X-Gm-Message-State: AOAM530o63Mz14lV4n5rhxxt9Vmvu/+ERHZlK9O9qCKHvlUEaiq3R6mf
- gHaQwE2R+G5+JjzVgOzVNX4xQHBJcCALtJXdkZmq2RKxXL8geoHsA/zkgHw5G7vGJCVweDTv7Vt
- G3JqVZ1zQ3QhFCeg=
-X-Received: by 2002:aed:3030:: with SMTP id 45mr153379qte.73.1599596409888;
- Tue, 08 Sep 2020 13:20:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw71iQrzXEN/kpX9Dz+F8gFZtwc5P4CzVad0uw6YQbN2OB11eo9WNXZ7YTinGuuxj/ucKEbQw==
-X-Received: by 2002:aed:3030:: with SMTP id 45mr153356qte.73.1599596409638;
- Tue, 08 Sep 2020 13:20:09 -0700 (PDT)
-Received: from xz-x1 (bras-vprn-toroon474qw-lp130-11-70-53-122-15.dsl.bell.ca.
- [70.53.122.15])
- by smtp.gmail.com with ESMTPSA id x6sm363041qke.54.2020.09.08.13.20.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 13:20:08 -0700 (PDT)
-Date: Tue, 8 Sep 2020 16:20:07 -0400
-From: Peter Xu <peterx@redhat.com>
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-Subject: Re: [PATCH 2/5] migration: Introduce
- migrate_send_rp_message_req_pages()
-Message-ID: <20200908202007.GA247092@xz-x1>
-References: <20200903152646.93336-1-peterx@redhat.com>
- <20200903152646.93336-3-peterx@redhat.com>
- <20200908095757.GF3295@work-vm>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=1BkTCI+47VXu3QHk3YsYNWt55DttbUP6HZu1YPlc//4=;
+ b=aIMhshITAr87MUSOPXedv5NSezookEFQNcy4udAAy6meoETk60piaJP1/2uXhCjbgD
+ QloTFCtr+C9arzrtCQUMBOk+e4T837C0WkYbVNKXEMfIV1EjZh7LiysBqOp3KAvrzbIe
+ /w61SnOXLhcdhafdjo+/ZzEjjMQ1ppohSmhLrMMUZXJAhSI1MWFf8Cf3uoIyXrvMjfe7
+ 2hGsqzYd665UTaIwAYL/JaCm0LNwaJ/nSP4WLP4tnEefXQu8etxLyUsKb+kq1ogL6zQ5
+ /Ed+YxI9WKltaifitR2V9/N2ySlHw+WAmZAgI5zYKj9J46mCwyzYCc1cGlpWSy7Ro4Xb
+ EP7g==
+X-Gm-Message-State: AOAM530o2ee4WK3o+A78sIfQJ2iMJmaV+AmwJcXB5viDhO+Y2ngGG2x9
+ G0o+AFVcuQvLzADJ/3W/IGXTbgTWcoBRg2miL4KAEw==
+X-Google-Smtp-Source: ABdhPJxKuWmI5rPFMmFJetHPQjS8iOzqmywKwgqn0gCS8Cw8FQeBnivlRINwccx8S0X7aX7U/o1MtNdj/04Tv6gGBh0=
+X-Received: by 2002:aa7:dd4b:: with SMTP id o11mr762625edw.251.1599596454640; 
+ Tue, 08 Sep 2020 13:20:54 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200908095757.GF3295@work-vm>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:08:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200908200123.3402311-1-ehabkost@redhat.com>
+In-Reply-To: <20200908200123.3402311-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 Sep 2020 21:20:43 +0100
+Message-ID: <CAFEAcA9WEjne5TfwggVWPuBprkRs-a2-iNc43Xa_jBamaf9t8A@mail.gmail.com>
+Subject: Re: [PULL 00/34] QOM boilerplate cleanup (v2)
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,26 +95,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Xiaohui Li <xiaohli@redhat.com>, qemu-devel@nongnu.org,
- Juan Quintela <quintela@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 08, 2020 at 10:57:57AM +0100, Dr. David Alan Gilbert wrote:
-> * Peter Xu (peterx@redhat.com) wrote:
-> > This is another layer wrapper for sending a page request to the source VM,
-> 
-> Ah, it's not obvious why this is needed until 4/5 :-)
+On Tue, 8 Sep 2020 at 21:01, Eduardo Habkost <ehabkost@redhat.com> wrote:
+>
+> The following changes since commit b95ba83fc56ebfc4b6869f21db0c757c0c1911=
+04:
+>
+>   Merge remote-tracking branch 'remotes/dgibson/tags/ppc-for-5.2-20200908=
+' in=3D
+> to staging (2020-09-08 16:18:48 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>
+> for you to fetch changes up to 86f08d9faa5c05bff56c84ead337063e50e7eb4d:
+>
+>   virtio-vga: Use typedef name for instance_size (2020-09-08 15:32:38 -04=
+00)
+>
+> Changes included in v2:
+> * memory: Remove kernel-doc comment marker (Eduardo Habkost)
+>
+> ----------------------------------------------------------------
+> QOM boilerplate cleanup
+>
+> Documentation build fix:
+> * memory: Remove kernel-doc comment marker (Eduardo Habkost)
+>
+> QOM cleanups:
+> * Rename QOM macros for consistency between
+>   TYPE_* and type checking constants (Eduardo Habkost)
+>
+> QOM new macros:
+> * OBJECT_DECLARE_* and OBJECT_DEFINE_* macros (Daniel P. Berrang=3DC3=3DA=
+9)
+> * DECLARE_*_CHECKER macros (Eduardo Habkost)
+>
+> Automated QOM boilerplate changes:
+> * Automated changes to use DECLARE_*_CHECKER (Eduardo Habkost
+> * Automated changes to use OBJECT_DECLARE* (Eduardo Habkost)
 
-Yeah. :) I'll try to move this to be before that one in the next version.
+Compile failure, Windows:
 
-> 
-> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+In file included from /home/petmay01/qemu-for-merges/include/exec/memory.h:=
+28:0,
+                 from /home/petmay01/qemu-for-merges/include/sysemu/dma.h:1=
+3,
+                 from ../../hw/nvram/fw_cfg.c:28:
+/home/petmay01/qemu-for-merges/include/sysemu/accel.h:65:22: error:
+'ACCEL' redeclared as different kind of symbol
+                      ACCEL, TYPE_ACCEL)
+                      ^
+/home/petmay01/qemu-for-merges/include/qom/object.h:571:5: note: in
+definition of macro 'DECLARE_INSTANCE_CHECKER'
+     OBJ_NAME(const void *obj) \
+     ^
+/home/petmay01/qemu-for-merges/include/sysemu/accel.h:64:1: note: in
+expansion of macro 'DECLARE_OBJ_CHECKERS'
+ DECLARE_OBJ_CHECKERS(AccelState, AccelClass,
+ ^
+In file included from
+/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/windows.h:72:0,
+                 from
+/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/winsock2.h:23,
+                 from
+/home/petmay01/qemu-for-merges/include/sysemu/os-win32.h:29,
+                 from /home/petmay01/qemu-for-merges/include/qemu/osdep.h:1=
+19,
+                 from ../../hw/nvram/fw_cfg.c:25:
+/usr/lib/mxe/usr/x86_64-w64-mingw32.shared/include/winuser.h:1757:5:
+note: previous declaration of 'ACCEL' was here
+   } ACCEL,*LPACCEL;
+     ^
+Compiling C object libcommon.fa.p/hw_misc_aspeed_scu.c.obj
 
-Thanks!
 
--- 
-Peter Xu
+Compile failure, Linux, NetBSD, FReeBSD:
 
+In file included from ../../hw/riscv/sifive_u.c:51:0:
+/home/petmay01/linaro/qemu-for-merges/include/hw/riscv/sifive_u.h:80:5:
+error: =E2=80=98SIFIVE_U_PRCI=E2=80=99 redeclared as different kind of symb=
+ol
+     SIFIVE_U_PRCI,
+     ^~~~~~~~~~~~~
+In file included from
+/home/petmay01/linaro/qemu-for-merges/include/exec/memory.h:28:0,
+                 from
+/home/petmay01/linaro/qemu-for-merges/include/hw/boards.h:6,
+                 from ../../hw/riscv/sifive_u.c:39:
+/home/petmay01/linaro/qemu-for-merges/include/hw/riscv/sifive_u_prci.h:63:4=
+4:
+note: previous definition of =E2=80=98SIFIVE_U_PRCI=E2=80=99 was here
+ DECLARE_INSTANCE_CHECKER(SiFiveUPRCIState, SIFIVE_U_PRCI,
+                                            ^
+/home/petmay01/linaro/qemu-for-merges/include/qom/object.h:571:5:
+note: in definition of macro =E2=80=98DECLARE_INSTANCE_CHECKER=E2=80=99
+     OBJ_NAME(const void *obj) \
+     ^~~~~~~~
+In file included from ../../hw/riscv/sifive_u.c:51:0:
+/home/petmay01/linaro/qemu-for-merges/include/hw/riscv/sifive_u.h:84:5:
+error: =E2=80=98SIFIVE_U_OTP=E2=80=99 redeclared as different kind of symbo=
+l
+     SIFIVE_U_OTP,
+     ^~~~~~~~~~~~
+In file included from
+/home/petmay01/linaro/qemu-for-merges/include/exec/memory.h:28:0,
+                 from
+/home/petmay01/linaro/qemu-for-merges/include/hw/boards.h:6,
+                 from ../../hw/riscv/sifive_u.c:39:
+/home/petmay01/linaro/qemu-for-merges/include/hw/riscv/sifive_u_otp.h:54:43=
+:
+note: previous definition of =E2=80=98SIFIVE_U_OTP=E2=80=99 was here
+ DECLARE_INSTANCE_CHECKER(SiFiveUOTPState, SIFIVE_U_OTP,
+                                           ^
+/home/petmay01/linaro/qemu-for-merges/include/qom/object.h:571:5:
+note: in definition of macro =E2=80=98DECLARE_INSTANCE_CHECKER=E2=80=99
+     OBJ_NAME(const void *obj) \
+     ^~~~~~~~
+
+
+and the similar
+
+Compiling C object libqemu-riscv32-softmmu.fa.p/hw_riscv_sifive_e.c.o
+In file included from
+/home/petmay01/linaro/qemu-for-merges/include/exec/memory.h:28:0,
+                 from
+/home/petmay01/linaro/qemu-for-merges/include/hw/boards.h:6,
+                 from ../../hw/riscv/sifive_e.c:35:
+/home/petmay01/linaro/qemu-for-merges/include/hw/riscv/sifive_e_prci.h:56:4=
+4:
+error: =E2=80=98SIFIVE_E_PRCI=E2=80=99 redeclared as different kind of symb=
+ol
+ DECLARE_INSTANCE_CHECKER(SiFiveEPRCIState, SIFIVE_E_PRCI,
+                                            ^
+/home/petmay01/linaro/qemu-for-merges/include/qom/object.h:571:5:
+note: in definition of macro =E2=80=98DECLARE_INSTANCE_CHECKER=E2=80=99
+     OBJ_NAME(const void *obj) \
+     ^~~~~~~~
+In file included from ../../hw/riscv/sifive_e.c:45:0:
+/home/petmay01/linaro/qemu-for-merges/include/hw/riscv/sifive_e.h:65:5:
+note: previous definition of =E2=80=98SIFIVE_E_PRCI=E2=80=99 was here
+     SIFIVE_E_PRCI,
+     ^~~~~~~~~~~~~
+../../hw/riscv/sifive_e.c:63:6: error: array index in initializer not
+of integer type
+     [SIFIVE_E_PRCI] =3D     { 0x10008000,     0x8000 },
+      ^~~~~~~~~~~~~
+../../hw/riscv/sifive_e.c:63:6: note: (near initialization for
+=E2=80=98sifive_e_memmap=E2=80=99)
+../../hw/riscv/sifive_e.c: In function =E2=80=98sifive_e_soc_realize=E2=80=
+=99:
+../../hw/riscv/sifive_e.c:218:32: error: array subscript is not an integer
+     sifive_e_prci_create(memmap[SIFIVE_E_PRCI].base);
+                                ^
+Makefile.ninja:4285: recipe for target
+'libqemu-riscv32-softmmu.fa.p/hw_riscv_sifive_e.c.o' failed
+
+
+thanks
+-- PMM
 
