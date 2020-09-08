@@ -7,92 +7,92 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C396C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 18:06:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FEF2C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 18:06:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 07806207DE
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 18:06:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 432422080A
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 18:06:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUPm2zFJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07806207DE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BKQW9dAc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 432422080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42552 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFi0F-0007Pd-TL
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 14:05:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44236)
+	id 1kFi0F-0007Qx-Vl
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 14:06:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFhyV-0004Zi-8Z
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 14:04:11 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46279
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFhyN-0004Qf-U8
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 14:04:04 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46517
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFhyT-0004wC-Im
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 14:04:10 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFhyM-0004vX-D8
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 14:04:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599588248;
+ s=mimecast20190719; t=1599588241;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+lJd8nD2jqa2o5e8EuQkrgaflOtxxur7Mk4eqGcrCy0=;
- b=DUPm2zFJ7C2aRd9J7gCwcG8u2R7FlWqiblAkkx3PaXizON5jvW6X/O312lVZuawRKkyhsx
- jnoZGvqqIIlE6PS/09bm6nMoZ8cBJZ8Hu86ofi8aZWThITa+3qE7nVqLGx2bKJpGLxd63U
- v/+FcKK/5H984Q2Uh6ABLCbpQwmaiqg=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-cGj67CWbNwydFmE92ZLZiQ-1; Tue, 08 Sep 2020 14:04:03 -0400
-X-MC-Unique: cGj67CWbNwydFmE92ZLZiQ-1
-Received: by mail-wm1-f70.google.com with SMTP id d5so60605wmb.2
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 11:04:03 -0700 (PDT)
+ bh=QkwqpwV9K55PFTel8SazfLxb9PfIPnyx+3YiTKkFJro=;
+ b=BKQW9dAcsaMCZQPv6hGQgHUVwxl33AoByQBtV+STeX3r9U9qYNSvyrnsI/sBxCVCWWfn5C
+ RPThWtKiJMJ5MoZ1DH3Li5WhClWEbiUv09k7tdPBoNLDA1CvvkIKZlXjJSfV0pi+9JvUXp
+ eYO9roQVKBzvr2JFz++FJZsAw6xjEN0=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-189-Bn4NzZcLMFaPtS8YS-NYww-1; Tue, 08 Sep 2020 14:03:57 -0400
+X-MC-Unique: Bn4NzZcLMFaPtS8YS-NYww-1
+Received: by mail-wm1-f69.google.com with SMTP id x6so51547wmb.6
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 11:03:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=+lJd8nD2jqa2o5e8EuQkrgaflOtxxur7Mk4eqGcrCy0=;
- b=P5AXlZY82/sJWvwItyZh7FvFUcdoAyPfitiHmB2JGVxnKxAZud3SURRMXHALFH8SW2
- wbPZx6mngQ0dysxtQnxVf5rb36T70by6PuSa1qCuUulSb+5n2fsOn/xddkyeVFYOopfK
- sByARPvnWNV8bm0fAyzdui2wsWqX1h8SBBbnqiLffGapRVOfh2trkwoENxjnhMbk63u1
- YP2EEfigRgECTz+z4KLuTtmWrZ0ISh4MSyzMVyxOs+CEXD+xBuxHcfEHXXEO0jvrADte
- CUmar/NmLafBByeKkOM9jPfvGFSfa0oIn1JLedHzdCSdUP3qQo8x9hXKg1HM3kGkpJKW
- kKfw==
-X-Gm-Message-State: AOAM532KSRUI9FW1P0LmaQ0xyv3Z7bLGplQCtCjJBmjR/gwSxtpRXnDC
- +Mdr7+V3Hna7o6eg9hjXHqFR7+HaqPWaA1T4oHYncfMp3vT7QqNy65wWPMCyJyjFxnyXelyoLf0
- LglQjoTaH/zX1lTg=
-X-Received: by 2002:a5d:46cf:: with SMTP id g15mr819994wrs.107.1599588242060; 
- Tue, 08 Sep 2020 11:04:02 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw1DEtUwQ4XpwBIMlfKmAWRjs0TQ0GCVM1Z0uuH4aSi6zBWfcarmj0A+YP23mfUffP+z9fo/Q==
-X-Received: by 2002:a5d:46cf:: with SMTP id g15mr819971wrs.107.1599588241787; 
- Tue, 08 Sep 2020 11:04:01 -0700 (PDT)
+ bh=QkwqpwV9K55PFTel8SazfLxb9PfIPnyx+3YiTKkFJro=;
+ b=QxOFHgl4Rukw3M6o84ZyDrJeYxjSoNAtxbf2Keb3B/7YZuzKfdqWvXUxgWLGLuur//
+ TKKmXPzPnMOFyat7EmdvRuvUP28h+UzcfIVqjr0/1wPrPB4CkCihCBkSrGUNsCQ3sa0f
+ GHzIakJ/SmjufTZYGMsQtgIdbD7M32D4Cr0sW7qhmoy3hpVqy2qnc6o7ievIMS7VS5h2
+ OJfgUO9Now8SSSRdbZcakeeKb1YvMgLVjydpuKQ4EZSDXy+uZxdN+V10kCBE2Utb70Gb
+ bIoCbFfU4v3WJ0cXJKnJGzuC7BpkcL/p2wWvMLVTWkr1NZpIS8MAB7Pt2VBeZEWZdPWv
+ 6SBw==
+X-Gm-Message-State: AOAM533W6Tci8nAO0zLAJpGeEV5DnbuQVxsDH0N986/dZUbbgUtLPsBg
+ LOBVawLXnEoQ/Wy0+UehVpzhgtMw+Y5GljFn/4e2YcEEjFBVm43rwA5Xziry7cJEbgGICqBHu6Q
+ mWsxx2MVg8h1eY6U=
+X-Received: by 2002:a1c:678a:: with SMTP id b132mr362236wmc.10.1599588236177; 
+ Tue, 08 Sep 2020 11:03:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz//4M1d+IJHQCXdJ2QV50tFS/dNKBh5bUfVhBLnE2TkgyYmtJcUcg+bni5dc+a3Y+Ay+Lw9w==
+X-Received: by 2002:a1c:678a:: with SMTP id b132mr362209wmc.10.1599588235905; 
+ Tue, 08 Sep 2020 11:03:55 -0700 (PDT)
 Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id v7sm201532wmj.28.2020.09.08.11.04.00
+ by smtp.gmail.com with ESMTPSA id j10sm351531wrn.2.2020.09.08.11.03.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 11:04:01 -0700 (PDT)
+ Tue, 08 Sep 2020 11:03:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v5 3/4] util/vfio-helpers: Introduce
- qemu_vfio_pci_init_msix_irqs()
-Date: Tue,  8 Sep 2020 20:03:41 +0200
-Message-Id: <20200908180342.280749-4-philmd@redhat.com>
+Subject: [RFC PATCH v5 2/4] util/vfio-helpers: Report error when IOMMU page
+ size is not supported
+Date: Tue,  8 Sep 2020 20:03:40 +0200
+Message-Id: <20200908180342.280749-3-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908180342.280749-1-philmd@redhat.com>
 References: <20200908180342.280749-1-philmd@redhat.com>
 MIME-Version: 1.0
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8;
 	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:53
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 12:55:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -122,131 +122,63 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu_vfio_pci_init_irq() allows us to initialize any type of IRQ,
-but only one. Introduce qemu_vfio_pci_init_msix_irqs() which is
-specific to MSIX IRQ type, and allow us to use multiple IRQs
-(thus passing multiple eventfd notifiers).
+This driver uses the host page size to align its memory regions,
+but this size is not always compatible with the IOMMU. Add a
+check if the size matches, and bails out with listing the sizes
+the IOMMU supports.
 
+Example on Aarch64:
+
+ $ qemu-system-aarch64 -M virt -drive if=none,id=nvme0,file=nvme://0006:90:00.0/1,format=raw
+ qemu-system-aarch64: -drive if=none,id=nvme0,file=nvme://0006:90:00.0/1,format=raw: Unsupported IOMMU page size: 4 KiB
+ Available page size:
+  64 KiB
+  512 MiB
+
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- include/qemu/vfio-helpers.h |  6 +++-
- util/vfio-helpers.c         | 65 ++++++++++++++++++++++++++++++++++++-
- 2 files changed, 69 insertions(+), 2 deletions(-)
+ util/vfio-helpers.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
-index 1f057c2b9e4..092b7b243f9 100644
---- a/include/qemu/vfio-helpers.h
-+++ b/include/qemu/vfio-helpers.h
-@@ -1,11 +1,13 @@
- /*
-  * QEMU VFIO helpers
-  *
-- * Copyright 2016 - 2018 Red Hat, Inc.
-+ * Copyright 2016 - 2020 Red Hat, Inc.
-  *
-  * Authors:
-  *   Fam Zheng <famz@redhat.com>
-+ *   Philippe Mathieu-Daudé <philmd@redhat.com>
-  *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-  * This work is licensed under the terms of the GNU GPL, version 2 or later.
-  * See the COPYING file in the top-level directory.
-  */
-@@ -28,5 +30,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
-                              uint64_t offset, uint64_t size);
- int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
-                            int irq_type, Error **errp);
-+int qemu_vfio_pci_init_msix_irqs(QEMUVFIOState *s, EventNotifier *e,
-+                                 unsigned *irq_count, Error **errp);
- 
- #endif
 diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index 6d9ec7d365c..a5970db8ae2 100644
+index 55b4107ce69..6d9ec7d365c 100644
 --- a/util/vfio-helpers.c
 +++ b/util/vfio-helpers.c
-@@ -1,11 +1,13 @@
- /*
-  * VFIO utility
-  *
-- * Copyright 2016 - 2018 Red Hat, Inc.
-+ * Copyright 2016 - 2020 Red Hat, Inc.
-  *
-  * Authors:
-  *   Fam Zheng <famz@redhat.com>
-+ *   Philippe Mathieu-Daudé <philmd@redhat.com>
-  *
-+ * SPDX-License-Identifier: GPL-2.0-or-later
-  * This work is licensed under the terms of the GNU GPL, version 2 or later.
-  * See the COPYING file in the top-level directory.
+@@ -11,6 +11,7 @@
   */
-@@ -216,6 +218,67 @@ int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
-     return 0;
- }
  
-+/**
-+ * Initialize device MSIX IRQs and register event notifiers.
-+ * @irq_count: pointer to number of MSIX IRQs to initialize
-+ * @notifier: Array of @irq_count notifiers (each corresponding to a MSIX IRQ)
-+
-+ * If the number of IRQs requested exceeds the available on the device,
-+ * store the number of available IRQs in @irq_count and return -EOVERFLOW.
-+ */
-+int qemu_vfio_pci_init_msix_irqs(QEMUVFIOState *s, EventNotifier *notifier,
-+                                 unsigned *irq_count, Error **errp)
-+{
-+    int r;
-+    size_t irq_set_size;
-+    struct vfio_irq_set *irq_set;
-+    struct vfio_irq_info irq_info = {
-+        .argsz = sizeof(irq_info),
-+        .index = VFIO_PCI_MSIX_IRQ_INDEX
-+    };
-+
-+    if (ioctl(s->device, VFIO_DEVICE_GET_IRQ_INFO, &irq_info)) {
-+        error_setg_errno(errp, errno, "Failed to get device interrupt info");
-+        return -errno;
+ #include "qemu/osdep.h"
++#include "qemu/cutils.h"
+ #include <sys/ioctl.h>
+ #include <linux/vfio.h>
+ #include "qapi/error.h"
+@@ -316,6 +317,25 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, const char *device,
+         ret = -errno;
+         goto fail;
+     }
++    if (!(iommu_info.flags & VFIO_IOMMU_INFO_PGSIZES)) {
++        error_setg(errp, "Failed to get IOMMU page size info");
++        ret = -errno;
++        goto fail;
 +    }
-+    if (irq_info.count < *irq_count) {
-+        error_setg(errp, "Not enough device interrupts available");
-+        *irq_count = irq_info.count;
-+        return -EOVERFLOW;
++    if (!extract64(iommu_info.iova_pgsizes,
++                   ctz64(qemu_real_host_page_size), 1)) {
++        g_autofree char *host_page_size = size_to_str(qemu_real_host_page_size);
++        error_setg(errp, "Unsupported IOMMU page size: %s", host_page_size);
++        error_append_hint(errp, "Available page size:\n");
++        for (int i = 0; i < 64; i++) {
++            if (extract64(iommu_info.iova_pgsizes, i, 1)) {
++                g_autofree char *iova_pgsizes = size_to_str(1UL << i);
++                error_append_hint(errp, " %s\n", iova_pgsizes);
++            }
++        }
++        ret = -EINVAL;
++        goto fail;
 +    }
-+    if (!(irq_info.flags & VFIO_IRQ_INFO_EVENTFD)) {
-+        error_setg(errp, "Device interrupt doesn't support eventfd");
-+        return -EINVAL;
-+    }
-+
-+    irq_set_size = sizeof(*irq_set) + *irq_count * sizeof(int32_t);
-+    irq_set = g_malloc0(irq_set_size);
-+
-+    /* Get to a known IRQ state */
-+    *irq_set = (struct vfio_irq_set) {
-+        .argsz = irq_set_size,
-+        .flags = VFIO_IRQ_SET_DATA_EVENTFD | VFIO_IRQ_SET_ACTION_TRIGGER,
-+        .index = irq_info.index,
-+        .start = 0,
-+        .count = *irq_count,
-+    };
-+
-+    for (unsigned i = 0; i < *irq_count; i++) {
-+        ((int32_t *)&irq_set->data)[i] = event_notifier_get_fd(&notifier[i]);
-+    }
-+    r = ioctl(s->device, VFIO_DEVICE_SET_IRQS, irq_set);
-+    g_free(irq_set);
-+    if (r <= 0) {
-+        error_setg_errno(errp, errno, "Failed to setup device interrupts");
-+        return -errno;
-+    } else if (r < *irq_count) {
-+        error_setg(errp, "Not enough device interrupts available");
-+        *irq_count = r;
-+        return -EOVERFLOW;
-+    }
-+    return 0;
-+}
-+
- static int qemu_vfio_pci_read_config(QEMUVFIOState *s, void *buf,
-                                      int size, int ofs)
- {
+ 
+     s->device = ioctl(s->group, VFIO_GROUP_GET_DEVICE_FD, device);
+ 
 -- 
 2.26.2
 
