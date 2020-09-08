@@ -8,77 +8,76 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35684C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF5AC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:49:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D639F20768
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:49:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B179020768
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:49:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i8x32Tmv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D639F20768
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gA91ZjGy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B179020768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40658 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42060 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFjcW-0006PG-RK
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:49:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40284)
+	id 1kFjcj-0006zS-SB
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:49:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjbl-0004oY-Du; Tue, 08 Sep 2020 15:48:49 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35087)
+ id 1kFjbx-0005GT-Aa; Tue, 08 Sep 2020 15:49:01 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42075)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjbj-0002Tt-Lw; Tue, 08 Sep 2020 15:48:49 -0400
-Received: by mail-pg1-x543.google.com with SMTP id g29so311455pgl.2;
- Tue, 08 Sep 2020 12:48:46 -0700 (PDT)
+ id 1kFjbv-0002Vm-JV; Tue, 08 Sep 2020 15:49:00 -0400
+Received: by mail-pf1-x443.google.com with SMTP id d6so26421pfn.9;
+ Tue, 08 Sep 2020 12:48:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=4ojKecXaQTTfPhCYFFKjoo9GXGqrC0TrAFwXqdlTji4=;
- b=i8x32Tmvc8UWXJQ7y3/AWAhrJ0yhR/HYvU86fmiP3qPuPF5X6Y/5n3Z6zy5Fv/gN/M
- PArKLyHTgzafP+R/Lq0R6CEIGxkTAs8SXSZRu80HD+mqexO1iAtF/C7mqxbeqB+qJIoE
- z9WOjCq7gjm3NMV0syRVhDO/UkjMqdVWQT9F604X5aEvXRRStw5X48Ck0fWBKlZMQ4fA
- 40xeMvI18DpBQ8WL6i6AgYpyL47xnZKZ3nm/3TOumOKjERWuyzS7rm9mtOAxYQTC+JqV
- XAXDzYCc8BDl0UQWN3A19m/sfuegYMWGX5t0mf2CJLzRG/c7v6vulqjd3SwUbCeqpEw8
- oTTQ==
+ bh=FykcAGlQ92KK8Qz4pGd0AfXWzqAA8073pCgMiQdYiFk=;
+ b=gA91ZjGyT/RxlTSgC/+KW6G0ko3p3sKrjs692qW5jAFheJSH6Fk6vYajypISOfcYEI
+ bL0N7sX7eGyRtHjaVKFrtxkmypxQP3RWvJFlwpIItGTbk2RH7lIOQtbUUn/TtzFTsr97
+ tqpdw/UfQmqPbUyL1WJHhJoSFenFTHuHZXNjvd0XTZQULBTuiwkQSy2fztVygR18q8KI
+ s4WgegmIrUl0YpW5adepw/goJL9Ij4jHXaqrlZMz2SBxUOMMfJFe5sv4YEdOwE/NBO6I
+ 9XanFqYJ0+QWVEkPwjE7pdxYSxlEUVFgwLHNWAhCR3GrUnUo3gsAOwzLF5jSnYgzRwD+
+ 64IA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=4ojKecXaQTTfPhCYFFKjoo9GXGqrC0TrAFwXqdlTji4=;
- b=NDjuCh2Vn2h1PFSVN2JrN/vJyShCGQ/MkbCSlH7MeKgsSgQjoj0TUT3NEdPYJQuCXH
- Pkfk32jbi18AjYJa3PZpCLrDZb5nOJ+uuPpI1yymNkQylYHjPQPQxZRiB0r6eB2Ni5GE
- vdzNF6iXgC7/3JZdEtON5x/jQeIcEI/JEFUPFMzurzkFqGzxA6rnWCSb95Row2gMNhzi
- O6f0Z2YKE1Vc9ePrsDDSIXfwdjKZuaEiWP1Lzpa9rC/O7ykMAl01sPcBu48olpTptD6M
- 42rC7GqN/XqJ381T3jwO2p+XFn9pK81YhvgUj0/H0PKQ9njGU8/UILlPKcFP9rW0FcSh
- 1fKA==
-X-Gm-Message-State: AOAM531C4UstaXfI1UEWzXLlvk2x/sI8uEj2dsnK+e8vyoCjhhkXg/3W
- OQBbWFLczsGvpxFWMPGcbGAv/Tww4foyzrjr
-X-Google-Smtp-Source: ABdhPJzB+E0fVLpQUkUst1OKtIS1+lsa2szrZIrjwB/Vkt7bcZo0bYFKTRq/0nwpCbOVzVOg5av8+Q==
-X-Received: by 2002:a17:902:6bc9:b029:d0:cb2d:f272 with SMTP id
- m9-20020a1709026bc9b02900d0cb2df272mr661938plt.11.1599594525217; 
- Tue, 08 Sep 2020 12:48:45 -0700 (PDT)
+ bh=FykcAGlQ92KK8Qz4pGd0AfXWzqAA8073pCgMiQdYiFk=;
+ b=ub5MSoFPvDiG/hfLq8Gsye7TrnLt9JWzQ1veCL3aFPsq6vH50w2rrqFQWDzAgQ9Y2C
+ UCTM4g4+NqRPGTKzmZEBW+/abxenQpsWsx32jmZ8MD7VOD9rpdpAQyVW/O9bkpb12nBK
+ pLPJs7sd4R3iSxEAFufZo/TnKsWQ9YMwp/ScWkyUcOdyg/6uHbIBJvtC/88De5y3luxf
+ +dRh3WGrIekzhUWJGZkMbzxZgZ/hNGuFV5+eRWcK9hn+TAC/0f/MXEYd6jRigc0jDX4l
+ PxPgNq2pxe9HfUGNL836gwq33d8s/8GN5zPbBAWx2O4Fhwnk2ltEN3LufdB2t/hijpZv
+ v8hQ==
+X-Gm-Message-State: AOAM53035CA7PpveTE7ua6WW6oJp5uGsu8r7xMGroYSch1tLS+QH6g2S
+ NtpK59w4g/PuYRNQ4d28PC+shbwqse1kebt1
+X-Google-Smtp-Source: ABdhPJxQgMzmhzlyBh4e55RPzzxExnIpT7gbimqnyDkR6dUkmHFJEqdv9IcxKi4wmhGm+IK16gC2gA==
+X-Received: by 2002:a63:5515:: with SMTP id j21mr253428pgb.31.1599594537629;
+ Tue, 08 Sep 2020 12:48:57 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.48.41
+ by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.48.53
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 12:48:44 -0700 (PDT)
+ Tue, 08 Sep 2020 12:48:56 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/16] ci: fixes msys2 build by upgrading capstone to 4.0.2
-Date: Wed,  9 Sep 2020 03:48:06 +0800
-Message-Id: <20200908194820.702-3-luoyonggang@gmail.com>
+Subject: [PATCH 05/16] tests: disable /char/stdio/* tests in test-char.c on
+ win32
+Date: Wed,  9 Sep 2020 03:48:09 +0800
+Message-Id: <20200908194820.702-6-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200908194820.702-1-luoyonggang@gmail.com>
 References: <20200908194820.702-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,65 +111,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The currently random version capstone have the following compiling issue:
-  CC      /c/work/xemu/qemu/build/slirp/src/arp_table.o
-make[1]: *** No rule to make target “/c/work/xemu/qemu/build/capstone/capstone.lib”。 Stop.
-
-Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the tagged version 4.0.2
-when upgrading to this version, the folder structure of include are changed to
-qemu\capstone\include
-│  platform.h
-│
-├─capstone
-│      arm.h
-│      arm64.h
-│      capstone.h
-│      evm.h
-│      m680x.h
-│      m68k.h
-│      mips.h
-│      platform.h
-│      ppc.h
-│      sparc.h
-│      systemz.h
-│      tms320c64x.h
-│      x86.h
-│      xcore.h
-│
-└─windowsce
-        intrin.h
-        stdint.h
-
-in capstone. so we need add extra include path -I${source_path}/capstone/include/capstone
-for directly #include <capstone.h>, and the exist include path should preserve, because
-in capstone code there something like #include "capstone/capstone.h"
+These tests are blocking test-char to be finished.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- capstone  | 2 +-
- configure | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/test-char.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/capstone b/capstone
-index 22ead3e0bf..1d23053284 160000
---- a/capstone
-+++ b/capstone
-@@ -1 +1 @@
--Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
-+Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1
-diff --git a/configure b/configure
-index 4231d56bcc..f4f8bc3756 100755
---- a/configure
-+++ b/configure
-@@ -5156,7 +5156,7 @@ case "$capstone" in
-       LIBCAPSTONE=libcapstone.a
-     fi
-     capstone_libs="-Lcapstone -lcapstone"
--    capstone_cflags="-I${source_path}/capstone/include"
-+    capstone_cflags="-I${source_path}/capstone/include -I${source_path}/capstone/include/capstone"
-     ;;
+diff --git a/tests/test-char.c b/tests/test-char.c
+index d35cc839bc..80e5bac61a 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -103,6 +103,7 @@ static void char_console_test(void)
+     g_test_trap_assert_stdout("CONSOLE");
+ }
+ #endif
++#ifndef _WIN32
+ static void char_stdio_test_subprocess(void)
+ {
+     Chardev *chr;
+@@ -126,6 +127,7 @@ static void char_stdio_test(void)
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stdout("buf");
+ }
++#endif
  
-   system)
+ static void char_ringbuf_test(void)
+ {
+@@ -1471,8 +1473,10 @@ int main(int argc, char **argv)
+     g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
+     g_test_add_func("/char/console", char_console_test);
+ #endif
++#ifndef _WIN32
+     g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
+     g_test_add_func("/char/stdio", char_stdio_test);
++#endif
+ #ifndef _WIN32
+     g_test_add_func("/char/pipe", char_pipe_test);
+ #endif
 -- 
 2.28.0.windows.1
 
