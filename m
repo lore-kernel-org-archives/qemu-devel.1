@@ -7,49 +7,50 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36AACC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:26:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EBCAC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:26:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77FF721897
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:26:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC23A21897
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:26:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XThN45UP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77FF721897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="jEf0iqoC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC23A21897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFW8z-0008WI-Ew
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:26:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57390)
+	id 1kFW9h-0001Qp-Vz
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:26:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57358)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3O-0006CI-FB; Tue, 08 Sep 2020 01:20:26 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:36395)
+ id 1kFW3J-00060B-QF; Tue, 08 Sep 2020 01:20:21 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:56197)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3M-0005y1-92; Tue, 08 Sep 2020 01:20:26 -0400
+ id 1kFW3H-0005uF-Mu; Tue, 08 Sep 2020 01:20:21 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkm6GNHz9sVF; Tue,  8 Sep 2020 15:20:00 +1000 (AEST)
+ id 4Bltkl1MqHz9sTK; Tue,  8 Sep 2020 15:19:58 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542400;
- bh=K/XOjeGYSlZyMS1PfORGCBWpuW2vS31qvW4gcdn1dfM=;
+ d=gibson.dropbear.id.au; s=201602; t=1599542399;
+ bh=oNqINut4m7yPkBkTE4WEvkmXs8Ug4gFGqv9k3XWsOTQ=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=XThN45UPri8jbVjiasQ/oHGBzHOiM7C+lDbHxCPo4iKsVS7HolQJM8PJn88yVS1Xn
- ymnH2jh6AMCDJd+2cPePrwXyI/g6Gw7gRudYUPdaL8oZxmHFHL7x2IiFZX+Pw0TB/E
- 7Shh33sxobssEflt0Uzy3Yywi2asEyEilgx5IbP8=
+ b=jEf0iqoCZmfuEs7XYs7lyDN/WUInOPYKlkSIJPiQlrtRoBArCLwf+g593yFsPqOqx
+ obekzdzDyxKJMKqL84A3ucrHXn9Lpav2wEFxkh8BntCOPfiNloQbv17PVoZ9CXJcbJ
+ n0f1NpZn8TvCrVwJFfvj/UCPb2IEW/u1hr4zN4Qk=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 14/33] ppc/spapr_nvdimm: do not enable support with 'nvdimm=off'
-Date: Tue,  8 Sep 2020 15:19:34 +1000
-Message-Id: <20200908051953.1616885-15-david@gibson.dropbear.id.au>
+Subject: [PULL 11/33] spapr/xive: Allocate vCPU IPIs from the vCPU contexts
+Date: Tue,  8 Sep 2020 15:19:31 +1000
+Message-Id: <20200908051953.1616885-12-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
@@ -74,96 +75,94 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
- David Gibson <david@gibson.dropbear.id.au>
+ qemu-ppc@nongnu.org, =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>,
+ bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+From: Cédric Le Goater <clg@kaod.org>
 
-The NVDIMM support for pSeries was introduced in 5.1, but it
-didn't contemplate the 'nvdimm' machine option that other
-archs uses. For every other arch, if no '-machine nvdimm(=on)'
-is present, it is assumed that the NVDIMM support is disabled.
-The user must explictly inform that the machine supports
-NVDIMM. For pseries-5.1 the 'nvdimm' option is completely
-ignored, and support is always assumed to exist. This
-leads to situations where the user is able to set 'nvdimm=off'
-but the guest boots up with the NVDIMMs anyway.
+When QEMU switches to the XIVE interrupt mode, it creates all the
+guest interrupts at the level of the KVM device. These interrupts are
+backed by real HW interrupts from the IPI interrupt pool of the XIVE
+controller.
 
-Fixing this now, after 5.1 launch, can put the overall NVDIMM
-support for pseries in a strange place regarding this 'nvdimm'
-machine option. If we force everything to be like other archs,
-existing pseries-5.1 guests that didn't use 'nvdimm' to use NVDIMM
-devices will break. If we attempt to make the newer pseries
-machines (5.2+) behave like everyone else, but keep pseries-5.1
-untouched, we'll have consistency problems on machine upgrade
-(5.1 will have different default values for NVDIMM support than
-5.2).
+Currently, this is done from the QEMU main thread, which results in
+allocating all interrupts from the chip on which QEMU is running. IPIs
+are not distributed across the system and the load is not well
+balanced across the interrupt controllers.
 
-The common ground here is, if the user sets 'nvdimm=off', we
-must comply regardless of being 5.1 or 5.2+. This patch
-changes spapr_nvdimm_validate() to verify if the user set
-NVDIMM support off in the machine options and, in that
-case, error out if we have a NVDIMM device. The default
-value for 5.2+ pseries machines will still be 'nvdimm=on'
-when there is no 'nvdimm' option declared, just like it is today
-with pseries-5.1. In the end we'll have different default
-semantics from everyone else in the absence of the 'nvdimm'
-machine option, but this boat has sailed.
+Change the vCPU IPI allocation to run from the vCPU context. The
+associated XIVE IPI interrupt will be allocated on the chip on which
+the vCPU is running and improve distribution of the IPIs in the system.
+When the vCPUs are pinned, this will make the IPI local to the chip of
+the vCPU. It will reduce rerouting between interrupt controllers and
+gives better performance.
 
-Fixes: https://bugzilla.redhat.com/show_bug.cgi?id=1848887
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200825215749.213536-4-danielhb413@gmail.com>
+Device interrupts are still treated the same. To improve placement, we
+would need some information on the chip owning the virtual source or
+the HW source in case of a passthrough device but this reuires
+changes in PAPR.
+
+Signed-off-by: Cédric Le Goater <clg@kaod.org>
+Message-Id: <20200820134547.2355743-5-clg@kaod.org>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_nvdimm.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ hw/intc/spapr_xive_kvm.c | 36 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 33 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-index bc2b65420c..95cbc30528 100644
---- a/hw/ppc/spapr_nvdimm.c
-+++ b/hw/ppc/spapr_nvdimm.c
-@@ -27,13 +27,17 @@
- #include "hw/ppc/spapr_nvdimm.h"
- #include "hw/mem/nvdimm.h"
- #include "qemu/nvdimm-utils.h"
-+#include "qemu/option.h"
- #include "hw/ppc/fdt.h"
- #include "qemu/range.h"
-+#include "sysemu/sysemu.h"
+diff --git a/hw/intc/spapr_xive_kvm.c b/hw/intc/spapr_xive_kvm.c
+index 507637d51e..66bf4c06fe 100644
+--- a/hw/intc/spapr_xive_kvm.c
++++ b/hw/intc/spapr_xive_kvm.c
+@@ -146,13 +146,43 @@ int kvmppc_xive_cpu_synchronize_state(XiveTCTX *tctx, Error **errp)
+     return s.ret;
+ }
  
- void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-                            uint64_t size, Error **errp)
- {
-     const MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
-+    const MachineState *ms = MACHINE(hotplug_dev);
-+    const char *nvdimm_opt = qemu_opt_get(qemu_get_machine_opts(), "nvdimm");
-     g_autofree char *uuidstr = NULL;
-     QemuUUID uuid;
-     int ret;
-@@ -43,6 +47,20 @@ void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-         return;
-     }
- 
-+    /*
-+     * NVDIMM support went live in 5.1 without considering that, in
-+     * other archs, the user needs to enable NVDIMM support with the
-+     * 'nvdimm' machine option and the default behavior is NVDIMM
-+     * support disabled. It is too late to roll back to the standard
-+     * behavior without breaking 5.1 guests. What we can do is to
-+     * ensure that, if the user sets nvdimm=off, we error out
-+     * regardless of being 5.1 or newer.
-+     */
-+    if (!ms->nvdimms_state->is_enabled && nvdimm_opt) {
-+        error_setg(errp, "nvdimm device found but 'nvdimm=off' was set");
-+        return;
-+    }
+-static int kvmppc_xive_reset_ipi(SpaprXive *xive, CPUState *cs, Error **errp)
++/*
++ * Allocate the vCPU IPIs from the vCPU context. This will allocate
++ * the XIVE IPI interrupt on the chip on which the vCPU is running.
++ * This gives a better distribution of IPIs when the guest has a lot
++ * of vCPUs. When the vCPUs are pinned, this will make the IPI local
++ * to the chip of the vCPU. It will reduce rerouting between interrupt
++ * controllers and gives better performance.
++ */
++typedef struct {
++    SpaprXive *xive;
++    Error *err;
++    int rc;
++} XiveInitIPI;
 +
-     if (object_property_get_int(OBJECT(nvdimm), NVDIMM_LABEL_SIZE_PROP,
-                                 &error_abort) == 0) {
-         error_setg(errp, "PAPR requires NVDIMM devices to have label-size set");
++static void kvmppc_xive_reset_ipi_on_cpu(CPUState *cs, run_on_cpu_data arg)
+ {
+     unsigned long ipi = kvm_arch_vcpu_id(cs);
++    XiveInitIPI *s = arg.host_ptr;
+     uint64_t state = 0;
+ 
+-    return kvm_device_access(xive->fd, KVM_DEV_XIVE_GRP_SOURCE, ipi,
+-                              &state, true, errp);
++    s->rc = kvm_device_access(s->xive->fd, KVM_DEV_XIVE_GRP_SOURCE, ipi,
++                              &state, true, &s->err);
++}
++
++static int kvmppc_xive_reset_ipi(SpaprXive *xive, CPUState *cs, Error **errp)
++{
++    XiveInitIPI s = {
++        .xive = xive,
++        .err  = NULL,
++        .rc   = 0,
++    };
++
++    run_on_cpu(cs, kvmppc_xive_reset_ipi_on_cpu, RUN_ON_CPU_HOST_PTR(&s));
++    if (s.err) {
++        error_propagate(errp, s.err);
++    }
++    return s.rc;
+ }
+ 
+ int kvmppc_xive_cpu_connect(XiveTCTX *tctx, Error **errp)
 -- 
 2.26.2
 
