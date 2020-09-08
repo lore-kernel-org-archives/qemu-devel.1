@@ -4,87 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA04AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C255AC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8D6062078E
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:45:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24D4E20936
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:48:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BfDggT/J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D6062078E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W22L3lEA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24D4E20936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFkU9-0001uk-Fp
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:45:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53898)
+	id 1kFkXb-00034g-8O
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:48:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFkTb-0001VF-Vq
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:44:28 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:53865)
+ id 1kFkWv-0002at-8M
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:47:53 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36048)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kFkTa-0001In-5h
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:44:27 -0400
-Received: by mail-wm1-x343.google.com with SMTP id x23so280579wmi.3
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 13:44:25 -0700 (PDT)
+ id 1kFkWt-0001o8-IQ
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:47:52 -0400
+Received: by mail-wr1-x443.google.com with SMTP id z1so624614wrt.3
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 13:47:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=E3CzrOLjuFdDFXouti4VzFK/WOyzmpMOJmN8F8ta6FY=;
- b=BfDggT/JhYT8Eyt5ZRmjbnzHRLIqAou4qRuK+st2GUTMQ5enDhTVU7BDBizmWdtKjq
- YPsFNhD6qKjG9pCVhIEOnQEy7lx0fPkbwgC9AvBJJPoSXWQCE/+xOwlABMkDLJHrErPV
- kDSVqMLeSypx0escoSlQXOi50Yb7+poIhxYw0vVOE6YB/EsNPoCL5RjEJF4ca2T8TX2F
- IBV/8DiaQyY3N3RppRcBhgxAB7k0UTm31ymv6NUrTOwb1gTR5TpLgKimPhCqqm95Xz1Q
- JbRcpIjJl8gLLIl67tCHf0pwbr8rkzQahyRao+5N8WNQtWKCgRia6But+8iGQ/eDkYYP
- xakg==
+ bh=1gERhPhGqBPCUdRLAW3FwfZ+0ecfLiCKlFhp+EpnWak=;
+ b=W22L3lEAZfPwDog1IH/1Z26iMrmC0rjJKoMr1SfK4dlFs3rFz9ZQ/BKOZ0oiWfS4HN
+ uQmXq7v2SC8lCbbizLLp748J0yqMHVUzdx/yJpWw3u/KUQUGKNE+F2bD4gorRvfPBZbt
+ 3sU6+1BDFZ8qrzgX/K2OfWp2ifBZ8+hXd7wz/rDJ/PqUK5XkmCwEBi+w0BFtVeEJiswl
+ KGNOHibsZyB7Xmfq/o8n4ECUA0KFP1uHIkHopfE5zO4vkJe9BKIjtMvhAHaPbFUQyd4S
+ Vwa1ifdooMrq9ptxd5re+KEf+A1uoR89j2Qku24WVI9gqVG+psEA73XEN0ItN8B9glEU
+ goZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=E3CzrOLjuFdDFXouti4VzFK/WOyzmpMOJmN8F8ta6FY=;
- b=bPpowPATKhY2P7mFvSWID30zZwE5dnK+/Jza+WW+4YN3RkNpUjKOSJx4/TNbMsMMLg
- BiRvA8KvzS+KE3Vs7O8ztkQccrEimFhPlkaHBHaI4vZ8SdZ6HKFtWV8SJ/5VY0TqwySZ
- VIuDe1El/RXMDXpN0tMfQfzWvSP0S3gR2xgi+1h+i2pK45GZ2nDmiZCh8uZyqXfwBKXI
- 5G/C7epALaz3NAs3vDxbW2gWe5fN7/l6hqSD2NMwAO4ceHrRgv086kt/ic1xy2bDxHti
- NE3NywK0I6QfFJpVvA07zmSLhS23/ZVARsyhBJFfJ1pVIquA8apo9fNqB3PbnppJPaVC
- bnVw==
-X-Gm-Message-State: AOAM533dwhAqtfaEMgkX6svrMDw575URaTa396FNzwgsrF2K4CAcL0bH
- dVrOXG9rm6WV5SHWfoPzDFo=
-X-Google-Smtp-Source: ABdhPJxgRS+SZxUTUshR901IKtoO4Jxzd2kQszPDxBW0cjqz5fW81UT4x0EYR6SSGifKj5ClhMIImg==
-X-Received: by 2002:a05:600c:2283:: with SMTP id 3mr204060wmf.37.1599597864546; 
- Tue, 08 Sep 2020 13:44:24 -0700 (PDT)
+ bh=1gERhPhGqBPCUdRLAW3FwfZ+0ecfLiCKlFhp+EpnWak=;
+ b=cPCHHuYIwEReEw4TbpOZvZUwQoMyA3D4hPTLyMpskXbPNjwheBOBaVZxXAwJvKodge
+ /paMYfAIc72HF0EqwGzT2AaIPowbgBXmlu88iAm3sazUAv+OAtbvmTNyCmKJOKHdGGcT
+ B8QJmo2HIW1MEb+K8iAS+iUd4ChW09ceViHWNrez37lNSr/Syj0aeItgvmNwK3gmPigN
+ 4KlfsfDQ5DAEGF+sEpe3h38YUCqvQSRgQoQQXvGS8MnI83WbFckQPtVcwaIWeY+NrFEg
+ h7NUgutD8QUqLukHm5gYF/aDZWSiK6XH1nirKkZrA3+zyg/vXmI+QFwWgbLRhQ3h+lSV
+ FAnQ==
+X-Gm-Message-State: AOAM533OwutLneT1RdnhkwOReJkpYeunwFn4JAffV4ZR2UVA7p30z7yi
+ w+4DDnLxdaB7fqQoFrFNH9ayInLIH2s=
+X-Google-Smtp-Source: ABdhPJzV2Ahnp6uikPd0JkC5z2Cb9uu/cDPfaiLPwi+Le5oDFTapeAVZ4MBeXWgjNB3mcLsgkeKrbg==
+X-Received: by 2002:a5d:4a0e:: with SMTP id m14mr300939wrq.313.1599598069639; 
+ Tue, 08 Sep 2020 13:47:49 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id i16sm782210wrq.73.2020.09.08.13.44.23
+ by smtp.gmail.com with ESMTPSA id i1sm977064wrc.49.2020.09.08.13.47.48
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 08 Sep 2020 13:44:23 -0700 (PDT)
-Subject: Re: [PATCH 01/20] loader.c: Add support Motrola S-record format.
-To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org,
- Thomas Huth <thuth@redhat.com>
+ Tue, 08 Sep 2020 13:47:48 -0700 (PDT)
+Subject: Re: [PATCH 03/20] hw/rx: Firmware and kernel loader.
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
 References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
- <20200827123859.81793-2-ysato@users.sourceforge.jp>
+ <20200827123859.81793-4-ysato@users.sourceforge.jp>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <94a12748-2333-0d09-a842-1dc1adbd1b3a@amsat.org>
-Date: Tue, 8 Sep 2020 22:44:22 +0200
+Message-ID: <0902b5b5-af5d-5740-8525-3733d62b65c7@amsat.org>
+Date: Tue, 8 Sep 2020 22:47:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200827123859.81793-2-ysato@users.sourceforge.jp>
+In-Reply-To: <20200827123859.81793-4-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -30
@@ -111,44 +110,78 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yoshinori,
-
 On 8/27/20 2:38 PM, Yoshinori Sato wrote:
+> Suppoerted format.
+
+Typo "Supported".
+
+(Also, QEMU commits avoid to have a trailing dot '.'
+ in their subject).
+
+> ELF, HEX, SREC and Raw firmware.
+> fit and Raw kernel image.
+> 
 > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > ---
->  include/hw/loader.h |  14 +++
->  hw/core/loader.c    | 208 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 222 insertions(+)
+>  include/hw/rx/loader.h |  35 ++++++++
+>  hw/rx/loader.c         | 182 +++++++++++++++++++++++++++++++++++++++++
+>  hw/rx/Kconfig          |   1 +
+>  hw/rx/meson.build      |   1 +
+>  4 files changed, 219 insertions(+)
+>  create mode 100644 include/hw/rx/loader.h
+>  create mode 100644 hw/rx/loader.c
 > 
-> diff --git a/include/hw/loader.h b/include/hw/loader.h
-> index a9eeea3952..6f1fb62ded 100644
-> --- a/include/hw/loader.h
-> +++ b/include/hw/loader.h
-> @@ -55,6 +55,20 @@ int load_image_targphys_as(const char *filename,
->   */
->  int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as);
->  
+> diff --git a/include/hw/rx/loader.h b/include/hw/rx/loader.h
+> new file mode 100644
+> index 0000000000..71f3bd2bb3
+> --- /dev/null
+> +++ b/include/hw/rx/loader.h
+> @@ -0,0 +1,35 @@
 > +/*
-> + * load_targphys_srec_as:
-> + * @filename: Path to the .hex file
-> + * @entry: Store the entry point given by the .hex file
-> + * @as: The AddressSpace to load the .hex file to. The value of
-> + *      address_space_memory is used if nothing is supplied here.
+> + * RX QEMU frimware loader
 > + *
-> + * Load a fixed .srec file into memory.
+> + * Copyright (c) 2020 Yoshinori Sato
 > + *
-> + * Returns the size of the loaded .hex file on success, -1 otherwise.
+> + * This program is free software; you can redistribute it and/or modify it
+> + * under the terms and conditions of the GNU General Public License,
+> + * version 2 or later, as published by the Free Software Foundation.
+> + *
+> + * This program is distributed in the hope it will be useful, but WITHOUT
+> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+> + * more details.
+> + *
+> + * You should have received a copy of the GNU General Public License along with
+> + * this program.  If not, see <http://www.gnu.org/licenses/>.
 > + */
-> +int load_targphys_srec_as(const char *filename,
-> +                          hwaddr *entry, AddressSpace *as);
+> +
+> +#include "qapi/error.h"
+> +#include "qemu/error-report.h"
+> +
+> +typedef struct {
+> +    hwaddr ram_start;
+> +    size_t ram_size;
+> +    hwaddr entry;
+> +    hwaddr kernel_entry;
+> +    hwaddr dtb_address;
+> +    const char *filename;
+> +    const char *dtbname;
+> +    const char *cmdline;
+> +} rx_kernel_info_t;
+> +
+> +bool load_bios(const char *filename, int rom_size, Error **errp);
+> +
+> +bool load_kernel(rx_kernel_info_t *info);
+> diff --git a/hw/rx/loader.c b/hw/rx/loader.c
+> new file mode 100644
+> index 0000000000..c262f3ef86
+> --- /dev/null
+> +++ b/hw/rx/loader.c
+> @@ -0,0 +1,182 @@
+> +/*
+> + * RX QEMU frimware loader
 
-Can you add a qtest for this format please?
+Typo "firmware".
 
-See tests/qtest/hexloader-test.c added in commit 645d3cbebb1:
-("Add QTest testcase for the Intel Hexadecimal"), it should
-be pretty trivial.
-
-Thanks,
-
-Phil.
+[...]
 
