@@ -2,131 +2,98 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 837A7C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10EC3C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:25:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 119B221D43
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:23:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 87EAF21D43
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:25:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mx+6e+dk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 119B221D43
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N62zdN6l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87EAF21D43
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34776 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFYuc-0004DP-8O
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 04:23:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60240)
+	id 1kFYw0-0005MW-IF
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 04:25:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFYu5-0003nJ-IX
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:23:01 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:55188
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kFYvR-0004oV-Je
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:24:25 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:23306
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFYu3-0001bW-DW
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:23:00 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kFYvP-0001fb-SP
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:24:25 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599553378;
+ s=mimecast20190719; t=1599553462;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=1mxoaWMs8wFqOLi9pm9/hlvh0zyWqwL+EPmboWlIccs=;
- b=Mx+6e+dkD1+hoCrYGK0YxvGXqM0SyRa5b9aoIoecPrjOFlcFnlaDXt9FQnTf1+VYeDh8iL
- DhM66h/sm0biD7dvHpktG6M9Rtw5RDM6mwnY7wez7FNRsRCf7txhd+Zr5YxOIbxLrxB+UP
- jXfrVfETNwOMu8qRcL0FjAb/CvFwGgM=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-gIqwgQvXMyaHQRCVmmQq4g-1; Tue, 08 Sep 2020 04:22:55 -0400
-X-MC-Unique: gIqwgQvXMyaHQRCVmmQq4g-1
-Received: by mail-wr1-f70.google.com with SMTP id v12so6702636wrm.9
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 01:22:54 -0700 (PDT)
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=2fVmz7jWX1pwvhYNJ1ndXgcxumRNQiTW5e4GTg1Xbp8=;
+ b=N62zdN6lIUIGah68BcpYd5x6cV6ZWg4QEE1BsBuNunIsCuA8ML5Bech3vDB9jMmFoG+gKm
+ 6LU4iIR3XJz9Y22II49wXUWCro32gJU38hkoj+LSSeQlGCI3GP6IG/jX9gN/IwDumHchwH
+ fYi9UsQPhhzQhwjsrDErsppTuwvLeJE=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-Sp3GFa-UPfa_I44KqMzzUw-1; Tue, 08 Sep 2020 04:24:18 -0400
+X-MC-Unique: Sp3GFa-UPfa_I44KqMzzUw-1
+Received: by mail-ed1-f69.google.com with SMTP id z11so5893852edj.3
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 01:24:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1mxoaWMs8wFqOLi9pm9/hlvh0zyWqwL+EPmboWlIccs=;
- b=shFxYO82FmXMXV3sL1Tn7NpllWcsszOREUclXBXLjU7lsA8FK/a1vn/LuyTrXSJvtd
- 8IixfRAttyJcW6jnncGag085MX6R2GiYntHtp+D8zs+EYwvTQ0XEzhWudGA17GzSjiEL
- vuItFvTaUmNNvc0gwyw/YrWdbBdqgR7n6ND6qpsRk0kk8rq5gQl8EjWk+kotmtcCoSxw
- NFCC78w7emOoFaAQuqtqF9wVhFnQ26TYuIONJ1Hv217Ml1vaLxm931UfX4AWkWeyCntp
- n184HgEn1M4IOFw+QY4218HdObTdZgJg0RqlUAEiywKQ3M4n2n4DXLmU+ByU+lXv0mbS
- KunQ==
-X-Gm-Message-State: AOAM533NYsPztM9HjivcoOnan5ayiLcTUwfTUaVmpWF++j34oGz4LYnE
- 3j68J0R+b/c8YP4yTLYm67w9pOj09adFOlxznCktPPQwbrEXMMsw1far1DI4Ns62qKo6p46qnvL
- pTja8HVRel7ZQAJs=
-X-Received: by 2002:a1c:e1d6:: with SMTP id y205mr3186986wmg.92.1599553373721; 
- Tue, 08 Sep 2020 01:22:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyEU7zhNqwReAwToh4+7ZMqwXUX/idR7C0+Ww968e/f/XhIKYjM9AR9MbryTiyJ+PGxaZazhw==
-X-Received: by 2002:a1c:e1d6:: with SMTP id y205mr3186972wmg.92.1599553373518; 
- Tue, 08 Sep 2020 01:22:53 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id y5sm22773236wrh.6.2020.09.08.01.22.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 08 Sep 2020 01:22:52 -0700 (PDT)
-Subject: Re: [PATCH 05/10] roms/edk2: update submodule from edk2-stable201905
- to edk2-stable202008
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-References: <20200908072939.30178-1-lersek@redhat.com>
- <20200908072939.30178-6-lersek@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <1356c404-517c-cf5c-bc04-04237c03f572@redhat.com>
-Date: Tue, 8 Sep 2020 10:22:52 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=2fVmz7jWX1pwvhYNJ1ndXgcxumRNQiTW5e4GTg1Xbp8=;
+ b=nLexvmBLTk7M7O95W03tocbANE+Mm1qUzS5geG6ephqZpEs+Rphibe3rC0vJJkb97A
+ EDkVW2WXrvdXP1rGhZ6AtoD2YFFerdGn8oDu4qxJMbKx6V9A3U85BNUjwG5UHNKwp6dB
+ tG/nITULSnC93+KGarvu5VFySqdmI1zqwUjDUdhYi4G934hW7/+czjNkB5jMYLVlbVci
+ BhW/UgiD160HQpvTJ0+nki0Zt/qbDFQH0ayXOVn85TTA+NSXbj0dWQIsNbAhQ/UUk+YD
+ 4NLvb0utcABwWYRo0Qz0hXYStXYBhBetgFOhxHEKOrNHyJtXX9cR3jacBW+ha2+KGTn1
+ NFIQ==
+X-Gm-Message-State: AOAM532RmnxUihoCddoh1Xm2Sjf0aFwSEDxXZutdbXJrCfmRGzhWSZAH
+ MJcoAARiYo1ewoW9y2j2AEwmOmZo47AArM1YoLsjLZHmW1kWFjBTWW4Col6uLtKVs6gbMpNbk0w
+ 06mwXOa1TiM2xjL9qqi4pdGhiUPSykOw=
+X-Received: by 2002:a17:906:a845:: with SMTP id
+ dx5mr24229488ejb.543.1599553457686; 
+ Tue, 08 Sep 2020 01:24:17 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwTm4xMVnv3KsjpQYiR0fmg3MeycCkOl7ag/k0kdFyH9RosucqcfAH3iy0EAAm5AU30bUV6+ljvE/Ge1OjyW+U=
+X-Received: by 2002:a17:906:a845:: with SMTP id
+ dx5mr24229473ejb.543.1599553457471; 
+ Tue, 08 Sep 2020 01:24:17 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200908072939.30178-6-lersek@redhat.com>
+References: <20200908074016.2593596-1-slyfox@gentoo.org>
+In-Reply-To: <20200908074016.2593596-1-slyfox@gentoo.org>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Tue, 8 Sep 2020 10:24:05 +0200
+Message-ID: <CABgObfaqxdOuH93OB=_ioiHR3np00hwNuzvpOXD=Wte4ErkUqQ@mail.gmail.com>
+Subject: Re: [PATCH] meson.build: tweak sdl-image error message
+To: Sergei Trofimovich <slyfox@gentoo.org>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+Content-Type: multipart/alternative; boundary="000000000000a1d85205aec90fe6"
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:33:58
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -39
-X-Spam_score: -4.0
-X-Spam_bar: ----
-X-Spam_report: (-4.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.825, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -140,45 +107,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Rafael Kitover <rkitover@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Laszlo,
+--000000000000a1d85205aec90fe6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 9/8/20 9:29 AM, Laszlo Ersek wrote:
-> Update the edk2 submodule from release edk2-stable201905 to
-> edk2-stable202008. The release notes can be read at
-[...]
-> 
-> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Ref: https://bugs.launchpad.net/qemu/+bug/1852196
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-trivial@nongnu.org
+
+Il mar 8 set 2020, 09:50 Sergei Trofimovich <slyfox@gentoo.org> ha scritto:
+
+> Before the change missing SDL was reported as:
+>
+>     ../meson.build:253:4: ERROR: Expected 1 arguments, got 2.
+>
+> After the error as:
+>
+>     ../meson.build:258:4: ERROR: Problem encountered: sdl-image required,
+> but SDL was not found
+>
+> CC: Paolo Bonzini <pbonzini@redhat.com>
+> CC: "Marc-Andr=C3=A9 Lureau" <marcandre.lureau@redhat.com>
+> CC: "Philippe Mathieu-Daud=C3=A9" <philmd@redhat.com>
+> CC: Rafael Kitover <rkitover@gmail.com>
+> Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
 > ---
->  roms/edk2 | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/roms/edk2 b/roms/edk2
-> index 20d2e5a125e3..06dc822d045c 160000
-> --- a/roms/edk2
-> +++ b/roms/edk2
-> @@ -1 +1 @@
-> -Subproject commit 20d2e5a125e34fc8501026613a71549b2a1a3e54
-> +Subproject commit 06dc822d045c2bb42e497487935485302486e151
+>  meson.build | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/meson.build b/meson.build
+> index 04e070bb3b..7fd2a903c5 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -255,8 +255,8 @@ if sdl.found()
+>                           method: 'pkg-config', static: enable_static)
+>  else
+>    if get_option('sdl_image').enabled()
+> -    error('sdl-image required, but SDL was @0@',
+> -          get_option('sdl').disabled() ? 'disabled' : 'not found')
+> +    error('sdl-image required, but SDL was @0@'.format(
+> +          get_option('sdl').disabled() ? 'disabled' : 'not found'))
+>    endif
+>    sdl_image =3D not_found
+>  endif
+> --
+> 2.28.0
+>
+>
 
-FYI applying this I got:
+--000000000000a1d85205aec90fe6
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fetching submodule roms/edk2
-Fetching submodule roms/edk2/CryptoPkg/Library/OpensslLib/openssl
-From https://github.com/openssl/openssl
-Could not access submodule 'krb5'
-Errors during submodule fetch:
-        CryptoPkg/Library/OpensslLib/openssl
-Errors during submodule fetch:
-        roms/edk2
+<div dir=3D"auto">Cc: <a href=3D"mailto:qemu-trivial@nongnu.org">qemu-trivi=
+al@nongnu.org</a></div><br><div class=3D"gmail_quote"><div dir=3D"ltr" clas=
+s=3D"gmail_attr">Il mar 8 set 2020, 09:50 Sergei Trofimovich &lt;<a href=3D=
+"mailto:slyfox@gentoo.org">slyfox@gentoo.org</a>&gt; ha scritto:<br></div><=
+blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px=
+ #ccc solid;padding-left:1ex">Before the change missing SDL was reported as=
+:<br>
+<br>
+=C2=A0 =C2=A0 ../meson.build:253:4: ERROR: Expected 1 arguments, got 2.<br>
+<br>
+After the error as:<br>
+<br>
+=C2=A0 =C2=A0 ../meson.build:258:4: ERROR: Problem encountered: sdl-image r=
+equired, but SDL was not found<br>
+<br>
+CC: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" target=3D"_bla=
+nk" rel=3D"noreferrer">pbonzini@redhat.com</a>&gt;<br>
+CC: &quot;Marc-Andr=C3=A9 Lureau&quot; &lt;<a href=3D"mailto:marcandre.lure=
+au@redhat.com" target=3D"_blank" rel=3D"noreferrer">marcandre.lureau@redhat=
+.com</a>&gt;<br>
+CC: &quot;Philippe Mathieu-Daud=C3=A9&quot; &lt;<a href=3D"mailto:philmd@re=
+dhat.com" target=3D"_blank" rel=3D"noreferrer">philmd@redhat.com</a>&gt;<br=
+>
+CC: Rafael Kitover &lt;<a href=3D"mailto:rkitover@gmail.com" target=3D"_bla=
+nk" rel=3D"noreferrer">rkitover@gmail.com</a>&gt;<br>
+Signed-off-by: Sergei Trofimovich &lt;<a href=3D"mailto:slyfox@gentoo.org" =
+target=3D"_blank" rel=3D"noreferrer">slyfox@gentoo.org</a>&gt;<br>
+---<br>
+=C2=A0meson.build | 4 ++--<br>
+=C2=A01 file changed, 2 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/meson.build b/meson.build<br>
+index 04e070bb3b..7fd2a903c5 100644<br>
+--- a/meson.build<br>
++++ b/meson.build<br>
+@@ -255,8 +255,8 @@ if sdl.found()<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 method: &#39;pkg-config&#39;, static: enable_static)<br>
+=C2=A0else<br>
+=C2=A0 =C2=A0if get_option(&#39;sdl_image&#39;).enabled()<br>
+-=C2=A0 =C2=A0 error(&#39;sdl-image required, but SDL was @0@&#39;,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_option(&#39;sdl&#39;).disabled() ? =
+&#39;disabled&#39; : &#39;not found&#39;)<br>
++=C2=A0 =C2=A0 error(&#39;sdl-image required, but SDL was @0@&#39;.format(<=
+br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 get_option(&#39;sdl&#39;).disabled() ? =
+&#39;disabled&#39; : &#39;not found&#39;))<br>
+=C2=A0 =C2=A0endif<br>
+=C2=A0 =C2=A0sdl_image =3D not_found<br>
+=C2=A0endif<br>
+-- <br>
+2.28.0<br>
+<br>
+</blockquote></div>
 
-Probably harmless, as if one care about this submodule,
-will run "make edk2-basetools" which runs 'git submodule
-update --init --force' and silently fixes the submodules.
+--000000000000a1d85205aec90fe6--
 
 
