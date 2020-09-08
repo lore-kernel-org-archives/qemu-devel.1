@@ -4,70 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BECDC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 21:58:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7009EC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 21:59:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9AB82137B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 21:58:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1CC12087C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 21:59:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MvvhwfQy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9AB82137B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z7XYIqA5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1CC12087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFldM-000689-3G
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 17:58:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38402)
+	id 1kFldx-0007p6-Ud
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 17:59:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38172)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kFlYB-0005IZ-Rx
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 17:53:15 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:42913
+ id 1kFlXs-0004Xb-3J
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 17:52:56 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:54207
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kFlY8-0001JR-40
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 17:53:15 -0400
+ id 1kFlXp-0001G0-8u
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 17:52:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599601991;
+ s=mimecast20190719; t=1599601971;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Zqa6aaKmwm6Igb+aD9Zq+/iOUndIFn2SdOJEhdzGFFY=;
- b=MvvhwfQy7REFaKYSAlmlwy6YLMbXEaUQfG/wASbm2fRWNIIHTOeELX78yuqCjfWVN+TgFM
- e1JJM1hUBajBIwsMpmBWOGkZH1LJKUk8/WQ0ps45ga1CefDwCnEaGciBCHG/4WnJAIYgOk
- uDgSv4JJbsdwJuI9MOgXFk9H6FtMcrQ=
+ bh=JkqiBB6icU60yHAv0YmC/ClUkdOtm/IL+BUw87QCUtU=;
+ b=Z7XYIqA5ocNc8vIQD9B5VIXFj9SlqMzFgdilOzVFnWGaF4wSveVbAZnR+wqOjQ2MoLEuOp
+ /P6CXNru4DUudkxg4Zsqhclmq/833oEe/+PkUIMQnQzrYHfYWDH5MLuTNoZNpYlU0ePWUi
+ DI5hfoJOUdXkvv7LECDN51Or/apMIm8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-519-TVvHaLmMPFqs_rp3PgTLxg-1; Tue, 08 Sep 2020 17:53:09 -0400
-X-MC-Unique: TVvHaLmMPFqs_rp3PgTLxg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-33-ETYEn6W9NciCgPR2ZAz--w-1; Tue, 08 Sep 2020 17:52:50 -0400
+X-MC-Unique: ETYEn6W9NciCgPR2ZAz--w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4F7F1091063;
- Tue,  8 Sep 2020 21:53:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5554F8018AB;
+ Tue,  8 Sep 2020 21:52:49 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E73260C15;
- Tue,  8 Sep 2020 21:53:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1D0E119D7C;
+ Tue,  8 Sep 2020 21:52:49 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 20/34] ahci: Rename ICH_AHCI to ICH9_AHCI
-Date: Tue,  8 Sep 2020 17:52:25 -0400
-Message-Id: <20200908215239.3519638-21-ehabkost@redhat.com>
+Subject: [PULL 08/34] Delete duplicate QOM typedefs
+Date: Tue,  8 Sep 2020 17:52:13 -0400
+Message-Id: <20200908215239.3519638-9-ehabkost@redhat.com>
 In-Reply-To: <20200908215239.3519638-1-ehabkost@redhat.com>
 References: <20200908215239.3519638-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
@@ -98,99 +98,47 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Make the type checking macro name consistent with the TYPE_*
-constant.
+Generated using:
 
+ $ ./scripts/codeconverter/converter.py -i \
+   --pattern=QOMDuplicatedTypedefs $(git grep -l '' -- '*.[ch]')
+
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200902224311.1321159-33-ehabkost@redhat.com>
+Message-Id: <20200831210740.126168-8-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- include/hw/ide/ahci.h | 2 +-
- hw/ide/ahci.c         | 4 ++--
- hw/ide/ich.c          | 8 ++++----
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ include/crypto/secret_keyring.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/ide/ahci.h b/include/hw/ide/ahci.h
-index 4cf6813d80..da3cddcc65 100644
---- a/include/hw/ide/ahci.h
-+++ b/include/hw/ide/ahci.h
-@@ -54,7 +54,7 @@ typedef struct AHCIState {
- typedef struct AHCIPCIState AHCIPCIState;
+diff --git a/include/crypto/secret_keyring.h b/include/crypto/secret_keyring.h
+index 9f371ad251..4345eb048e 100644
+--- a/include/crypto/secret_keyring.h
++++ b/include/crypto/secret_keyring.h
+@@ -39,14 +39,14 @@
+ typedef struct QCryptoSecretKeyring QCryptoSecretKeyring;
+ typedef struct QCryptoSecretKeyringClass QCryptoSecretKeyringClass;
  
- #define TYPE_ICH9_AHCI "ich9-ahci"
--DECLARE_INSTANCE_CHECKER(AHCIPCIState, ICH_AHCI,
-+DECLARE_INSTANCE_CHECKER(AHCIPCIState, ICH9_AHCI,
-                          TYPE_ICH9_AHCI)
+-typedef struct QCryptoSecretKeyring {
++struct QCryptoSecretKeyring {
+     QCryptoSecretCommon parent;
+     int32_t serial;
+-} QCryptoSecretKeyring;
++};
  
- int32_t ahci_get_num_ports(PCIDevice *dev);
-diff --git a/hw/ide/ahci.c b/hw/ide/ahci.c
-index b696c6291a..ee1d47ff75 100644
---- a/hw/ide/ahci.c
-+++ b/hw/ide/ahci.c
-@@ -1819,7 +1819,7 @@ type_init(sysbus_ahci_register_types)
  
- int32_t ahci_get_num_ports(PCIDevice *dev)
- {
--    AHCIPCIState *d = ICH_AHCI(dev);
-+    AHCIPCIState *d = ICH9_AHCI(dev);
-     AHCIState *ahci = &d->ahci;
+-typedef struct QCryptoSecretKeyringClass {
++struct QCryptoSecretKeyringClass {
+     QCryptoSecretCommonClass parent;
+-} QCryptoSecretKeyringClass;
++};
  
-     return ahci->ports;
-@@ -1827,7 +1827,7 @@ int32_t ahci_get_num_ports(PCIDevice *dev)
- 
- void ahci_ide_create_devs(PCIDevice *dev, DriveInfo **hd)
- {
--    AHCIPCIState *d = ICH_AHCI(dev);
-+    AHCIPCIState *d = ICH9_AHCI(dev);
-     AHCIState *ahci = &d->ahci;
-     int i;
- 
-diff --git a/hw/ide/ich.c b/hw/ide/ich.c
-index eff3188fff..51cd2f38b7 100644
---- a/hw/ide/ich.c
-+++ b/hw/ide/ich.c
-@@ -91,14 +91,14 @@ static const VMStateDescription vmstate_ich9_ahci = {
- 
- static void pci_ich9_reset(DeviceState *dev)
- {
--    AHCIPCIState *d = ICH_AHCI(dev);
-+    AHCIPCIState *d = ICH9_AHCI(dev);
- 
-     ahci_reset(&d->ahci);
- }
- 
- static void pci_ich9_ahci_init(Object *obj)
- {
--    struct AHCIPCIState *d = ICH_AHCI(obj);
-+    struct AHCIPCIState *d = ICH9_AHCI(obj);
- 
-     ahci_init(&d->ahci, DEVICE(obj));
- }
-@@ -108,7 +108,7 @@ static void pci_ich9_ahci_realize(PCIDevice *dev, Error **errp)
-     struct AHCIPCIState *d;
-     int sata_cap_offset;
-     uint8_t *sata_cap;
--    d = ICH_AHCI(dev);
-+    d = ICH9_AHCI(dev);
-     int ret;
- 
-     ahci_realize(&d->ahci, DEVICE(dev), pci_get_address_space(dev), 6);
-@@ -154,7 +154,7 @@ static void pci_ich9_ahci_realize(PCIDevice *dev, Error **errp)
- static void pci_ich9_uninit(PCIDevice *dev)
- {
-     struct AHCIPCIState *d;
--    d = ICH_AHCI(dev);
-+    d = ICH9_AHCI(dev);
- 
-     msi_uninit(dev);
-     ahci_uninit(&d->ahci);
+ #endif /* QCRYPTO_SECRET_KEYRING_H */
 -- 
 2.26.2
 
