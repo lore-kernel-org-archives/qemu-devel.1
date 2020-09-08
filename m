@@ -2,92 +2,87 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1506C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E221C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:53:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 470502074D
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F6C72078B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:53:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qy9GPd2L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 470502074D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q2bFdz0m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F6C72078B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFext-0005Ed-FD
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 10:51:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45074)
+	id 1kFezw-0008G9-IA
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 10:53:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFexH-0004i0-Rx
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:50:43 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:56847
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFexF-00021M-29
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:50:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599576639;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=eoRFHLUdMSkSgyer7bttDSdg2ApYkQth4g7QPCSDkjY=;
- b=Qy9GPd2L+NdgdWatTDuVKyoH+1PZU03WISuJWmzL5BkSiZrjIsqVvemZoy+N3AEYcChHU2
- X6JBuVWnpOcER7RtQgcV0j3JZKznc+7D8f9xgN/ZNrLwo1M7KtW3cns9JFPuiRQSLmoCXr
- XvQGW9KfQNJfoYnRMmnMdAl9rIEtMxs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-503-lEQFGiiGNkOaDKuRJjKTXA-1; Tue, 08 Sep 2020 10:50:38 -0400
-X-MC-Unique: lEQFGiiGNkOaDKuRJjKTXA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 418CF18B9F00;
- Tue,  8 Sep 2020 14:50:37 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-131.ams2.redhat.com [10.36.112.131])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 129415D9EF;
- Tue,  8 Sep 2020 14:50:35 +0000 (UTC)
-Subject: Re: [PATCH] Simplify the .gitignore file
-From: Thomas Huth <thuth@redhat.com>
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20200907174255.179652-1-thuth@redhat.com>
- <e6755ee5-5d41-da76-1a34-e4a05fd76663@redhat.com>
- <fac14891-3cff-4a27-8fa5-12ddd286e9db@redhat.com>
-Message-ID: <01416c95-b956-0b58-f272-c75cceff73a9@redhat.com>
-Date: Tue, 8 Sep 2020 16:50:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFezK-0007SC-Vq
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:52:50 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:33176)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFezJ-0002DQ-8z
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:52:50 -0400
+Received: by mail-ej1-x644.google.com with SMTP id j11so23048824ejk.0
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 07:52:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=GezjhMinrKGuK08uJoVyOZMTK6mhnTZ5YhOgEQjyS+E=;
+ b=q2bFdz0m07SmMBBIl98ZaJqtC0JFuf9J7jTLs+LyhZl7vU/VmzREG7vYE8hShsuykA
+ 32EaZiKW9I9tM6yA8r9o69f5elWuXwwsxo/9LUVQvz6T7HjLE4Gk4WJCHZt5OP6a0Q4n
+ 2P5LkxcgWxKkzsKPtcwggh2xhbjlMQVmiI9Ie6Br2FxWMSR5h/4x4JUlgp5OzHAEEUt/
+ 2muvNpCSWrgK/xvVr+SW8FkQ6jrfY/ows/0mZWhdAfvX02on2pE7dlFzKv4m7BhomGA7
+ 2RcMKKyPE69REuOHN/tzVb/fJX8wlWUbIgDIDu4PwZbQzQMJ3nD+dAq4LKMlPOY6Vgt6
+ yRsg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=GezjhMinrKGuK08uJoVyOZMTK6mhnTZ5YhOgEQjyS+E=;
+ b=h+NcyMqmXGQ0Eoxq3q24dIdIitABeS7dquRFA0rtL2F4eS3r3sgmSC7Wb2oK/mJK2Q
+ WHDo4uadha+/srqk1zHghHEoqoQId2XniNUvGpOOFabTzlkJSbdg1De91gKeM2MiF6Ws
+ HYoC7HsAJze0kkgutQgqm7JmYTOm1NQFArZKcEDRkkZvTJ3SPhDYQBOJvKOYsmz9k7oW
+ 4MMzJl4D6YbMvRlancjF+T1sfteJWwvocjbXMyp4AGHZ5Dc0hwVfVT3MBFxaOFVM4XR2
+ 9EFWWV3TKIsIVkaG4s8hRSM4xhJA+S7xmzDRZ7gclvm4f+IJkBWI9i6jyWqp+SEAn3Sy
+ fy0w==
+X-Gm-Message-State: AOAM532vPcOCzuUemH2z6wBuw5WPRUVYJPfuWn6n81APyTiVGwOrAg1Y
+ f/Nny3/tdwGimMvZ0mR8wGmpZwsXJjJjgHEBMAQScg==
+X-Google-Smtp-Source: ABdhPJzLwI+21WMVHbKAEcinTkhjaDTOnsqNsMVsgHm2qkFNzwpY5ZANtRrJcsf2Yx/SBxTYgz6Cr6pxYWzfFZW7VKc=
+X-Received: by 2002:a17:906:2cc2:: with SMTP id
+ r2mr25815970ejr.482.1599576767432; 
+ Tue, 08 Sep 2020 07:52:47 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <fac14891-3cff-4a27-8fa5-12ddd286e9db@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 03:00:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.626, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <cover.1590704015.git.alistair.francis@wdc.com>
+ <0ab3cecbe801f9e14ad1a5447d02483b9008fdbb.1590704015.git.alistair.francis@wdc.com>
+In-Reply-To: <0ab3cecbe801f9e14ad1a5447d02483b9008fdbb.1590704015.git.alistair.francis@wdc.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 Sep 2020 15:52:36 +0100
+Message-ID: <CAFEAcA83=4=EhtQLmGJn5Z_PVZaDyo7pMwdX-9fTVUkVKe7Acw@mail.gmail.com>
+Subject: Re: [PATCH v5 06/11] riscv: Initial commit of OpenTitan machine
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,112 +95,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 08/09/2020 16.41, Thomas Huth wrote:
-> On 07/09/2020 21.43, Philippe Mathieu-Daudé wrote:
->> On 9/7/20 7:42 PM, Thomas Huth wrote:
->>> Now that we always do out-of-tree builds (and the in-tree builds are
->>> faked via a "build" directory), we can simplify out .gitignore file
->>> quite a bit.
->>>
->>> Signed-off-by: Thomas Huth <thuth@redhat.com>
->>> ---
->>>  .gitignore | 158 -----------------------------------------------------
->>>  1 file changed, 158 deletions(-)
->>>
->>> diff --git a/.gitignore b/.gitignore
->>> index 4ccb9ed975..bb916594eb 100644
->>> --- a/.gitignore
->>> +++ b/.gitignore
->>> @@ -1,165 +1,7 @@
->>>  /GNUmakefile
->>>  /build/
->>> -/.doctrees
->>> -/config-devices.*
->>> -/config-all-devices.*
->>> -/config-all-disas.*
->>> -/config-host.*
->>> -/config-target.*
->>> -/config.status
->>> -/config-temp
->>> -/tools/virtiofsd/50-qemu-virtiofsd.json
->>> -/elf2dmp
->>> -/trace-events-all
->>> -/trace/generated-events.h
->>> -/trace/generated-events.c
->>> -/trace/generated-helpers-wrappers.h
->>> -/trace/generated-helpers.h
->>> -/trace/generated-helpers.c
->>> -/trace/generated-tcg-tracers.h
->>> -/ui/shader/texture-blit-frag.h
->>> -/ui/shader/texture-blit-vert.h
->>> -/ui/shader/texture-blit-flip-vert.h
->>> -/ui/input-keymap-*.c.inc
->>> -*-timestamp
->>> -/*-softmmu
->>> -/*-darwin-user
->>> -/*-linux-user
->>> -/*-bsd-user
->>> -/ivshmem-client
->>> -/ivshmem-server
->>> -/libdis*
->>> -/libuser
->>> -/linux-headers/asm
->>> -/qga/qapi-generated
->>> -/qapi-gen-timestamp
->>> -/qapi/qapi-builtin-types.[ch]
->>> -/qapi/qapi-builtin-visit.[ch]
->>> -/qapi/qapi-commands-*.[ch]
->>> -**/qapi/qapi-commands.[ch]
->>> -**/qapi/qapi-emit-events.[ch]
->>> -/qapi/qapi-events-*.[ch]
->>> -**/qapi/qapi-events.[ch]
->>> -**/qapi/qapi-init-commands.[ch]
->>> -**/qapi/qapi-introspect.[ch]
->>> -/qapi/qapi-types-*.[ch]
->>> -**/qapi/qapi-types.[ch]
->>> -/qapi/qapi-visit-*.[ch]
->>> -!/qapi/qapi-visit-core.c
->>> -**/qapi/qapi-visit.[ch]
->>> -**/qapi/qapi-doc.texi
->>> -/qemu-edid
->>> -/qemu-img
->>> -/qemu-nbd
->>> -/qemu-options.def
->>> -/qemu-options.texi
->>> -/qemu-img-cmds.texi
->>> -/qemu-img-cmds.h
->>> -/qemu-io
->>> -/qemu-ga
->>> -/qemu-bridge-helper
->>> -/qemu-keymap
->>> -/qemu-monitor.texi
->>> -/qemu-monitor-info.texi
->>> -/qemu-storage-daemon
->>> -/qemu-version.h
->>> -/qemu-version.h.tmp
->>> -/module_block.h
->>> -/scsi/qemu-pr-helper
->>> -/vhost-user-scsi
->>> -/vhost-user-blk
->>> -/vhost-user-gpu
->>> -/vhost-user-input
->>> -/fsdev/virtfs-proxy-helper
->>> -*.tmp
->>
->> I'm not sure about this one.
-> 
-> According to git blame, it has been added in commit b8bd2f598b7 for
-> tests/vm images.
+On Thu, 28 May 2020 at 23:31, Alistair Francis <alistair.francis@wdc.com> wrote:
+>
+> This adds a barebone OpenTitan machine to QEMU.
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Bin Meng <bin.meng@windriver.com>
+> ---
+>  default-configs/riscv32-softmmu.mak |   1 +
+>  default-configs/riscv64-softmmu.mak |  11 +-
 
-I forgot to add: These are properly created in the build directory, so
-it is fine to remove this line.
+Just noticed this, but:
 
- Thomas
+> diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+> index 1ae077ed87..94a236c9c2 100644
+> --- a/default-configs/riscv32-softmmu.mak
+> +++ b/default-configs/riscv32-softmmu.mak
+> @@ -10,3 +10,4 @@ CONFIG_SPIKE=y
+>  CONFIG_SIFIVE_E=y
+>  CONFIG_SIFIVE_U=y
+>  CONFIG_RISCV_VIRT=y
+> +CONFIG_OPENTITAN=y
+> diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+> index 235c6f473f..aaf6d735bb 100644
+> --- a/default-configs/riscv64-softmmu.mak
+> +++ b/default-configs/riscv64-softmmu.mak
+> @@ -1,3 +1,12 @@
+>  # Default configuration for riscv64-softmmu
+>
+> -include riscv32-softmmu.mak
+> +# Uncomment the following lines to disable these optional devices:
+> +#
+> +#CONFIG_PCI_DEVICES=n
+> +
+> +# Boards:
+> +#
+> +CONFIG_SPIKE=y
+> +CONFIG_SIFIVE_E=y
+> +CONFIG_SIFIVE_U=y
+> +CONFIG_RISCV_VIRT=y
 
+...shouldn't the riscv64-softmmu config have CONFIG_OPENTITAN too?
+The usual principle is that the 64-bit executable can run the
+32-bit boards too.
+
+thanks
+-- PMM
 
