@@ -2,69 +2,80 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF96C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 02:16:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 368EDC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 04:06:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82C7821481
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 02:16:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NBVYv5ZZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82C7821481
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	by mail.kernel.org (Postfix) with ESMTPS id 9666521481
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 04:06:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9666521481
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34462 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFTB2-0005mH-Il
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 22:16:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35176)
+	id 1kFUtY-000072-CV
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 00:06:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49312)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFTAS-0005HT-SY; Mon, 07 Sep 2020 22:15:32 -0400
-Received: from ozlabs.org ([203.11.71.1]:34703)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFTAQ-0000NY-Gu; Mon, 07 Sep 2020 22:15:32 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Blpdm3fcRz9sTM; Tue,  8 Sep 2020 12:15:24 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599531324;
- bh=TxcNh61nTe3fY4NNmUg2LUNWuD9E76/h89dieXCwae4=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=NBVYv5ZZ0Zl48J7DfzUBVrZKu7Lz9Cw8OLJNvL+Qbz/TcYQskXd7AxGADdiZPmNOl
- krQ6yNHaofopbeSCnsybS1kQjji7DpW9TIuXvyHOlqmUadPlHz71L+O9GD4dzLgaWW
- qV5CN7iWh9NohtJdb9W6MDV7/tBjKWkB/B47+dEQ=
-Date: Tue, 8 Sep 2020 11:52:37 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Daniel Henrique Barboza <danielhb413@gmail.com>
-Subject: Re: [PATCH v6 0/3] pseries NUMA distance rework
-Message-ID: <20200908015237.GM341806@yekko.fritz.box>
-References: <20200904172422.617460-1-danielhb413@gmail.com>
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kFUt1-00089W-Hi
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 00:05:39 -0400
+Received: from indium.canonical.com ([91.189.90.7]:43864)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kFUsz-0006PN-5a
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 00:05:39 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kFUsx-0004Wm-5Y
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 04:05:35 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 270842E8023
+ for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 04:05:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="M2Pxvdb9QxnGd/3e"
-Content-Disposition: inline
-In-Reply-To: <20200904172422.617460-1-danielhb413@gmail.com>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/07 22:15:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 08 Sep 2020 04:00:01 -0000
+From: Vjaceslavs Klimovs <1894781@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: vklimovs
+X-Launchpad-Bug-Reporter: Vjaceslavs Klimovs (vklimovs)
+X-Launchpad-Bug-Modifier: Vjaceslavs Klimovs (vklimovs)
+Message-Id: <159953760175.19565.14791337348074084173.malonedeb@gac.canonical.com>
+Subject: [Bug 1894781] [NEW] [Feature request] Provide a way to do TLS first
+ in QEMU/NBD connections (not after NBD negotiation)
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
+X-Launchpad-Hash: 33360e6bf3c8ca9e3306ae4bc5a9a387453b4182
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:05:35
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -73,67 +84,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, groug@kaod.org
+Reply-To: Bug 1894781 <1894781@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Public bug reported:
 
---M2Pxvdb9QxnGd/3e
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+(following from
+https://gitlab.com/libvirt/libvirt/-/issues/68#note_400960567)
 
-On Fri, Sep 04, 2020 at 02:24:19PM -0300, Daniel Henrique Barboza wrote:
+As is very well explained in https://www.berrange.com/posts/2016/04/05
+/improving-qemu-security-part-5-tls-support-for-nbd-server-client/, and
+easily confirmed with captures, NBD stream starts in cleartext and
+upgrades to TLS inline (similar to STARTTLS mechanism). As a rationale,
+it is stated that this provides better error messages for the user of
+NBD.
 
-> changes from v5, all suggested by Greg:
-> - patch 2:
->     * changed g_malloc() to g_new()
->     * removed the unneeded g_assert()
-> - all patches: added Greg's R-b
+However, this approach has downsides:
 
-Applied to ppc-for-5.2.
+1) Clear indication to a network observer that NBD (and therefore likely qe=
+mu/libvirt) is used. In contrast, TLS1.3 hides even the SNI of the servers =
+(ESNI, https://blog.cloudflare.com/encrypted-sni/).
+2) Potential for bugs in NBD protocol negotiation code. That code just stat=
+istically, likely less looked at code than gnutls. This is not a reflection=
+ on NBD code quality, just the fact that TLS code does receive a bit more s=
+crutiny. =
 
->=20
-> v5 link: https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg01978.h=
-tml
->=20
-> Daniel Henrique Barboza (3):
->   spapr: move h_home_node_associativity to spapr_numa.c
->   spapr_numa: create a vcpu associativity helper
->   spapr_numa: use spapr_numa_get_vcpu_assoc() in home_node hcall
->=20
->  hw/ppc/spapr_hcall.c   |  40 ----------------
->  hw/ppc/spapr_numa.c    | 101 +++++++++++++++++++++++++++++++++++------
->  include/hw/ppc/spapr.h |   7 ++-
->  3 files changed, 94 insertions(+), 54 deletions(-)
->=20
+3) Inability to inspect TLS listener interface for compliance, e.g. with a =
+security scanner. Making sure TLS listeners only select certain ciphersuits=
+ is a requirement of some compliance regimes. =
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
 
---M2Pxvdb9QxnGd/3e
-Content-Type: application/pgp-signature; name="signature.asc"
+I think it's fully possible to satisfy the original requirement of good
+error messages as well, detecting that the other end is initiating TLS
+connection.
 
------BEGIN PGP SIGNATURE-----
+It's very unlikely that it's currently sae to recommend to run QEMU
+migration stream over a hostile network, but it should be possible to do
+with TLS only option.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9W4+UACgkQbDjKyiDZ
-s5IY/g//emSow/I39tkindCZrH+1oyLsfyj7taBVRhtJ1/YOkH212LT046O9svbG
-QadEDz9JpyMXLtEUAxBUQa3PIqI9l9Opqopng3K4IdFauh0WQlZC1ggNTAIXSw8r
-JTS8m5mWm5CCAU/N1H4VbesNrtrx8Bqz6buPBWvuVk83uMU0G1dFs4xAt7+G2tKm
-l47AtsnQhIMfyxnynZsxdBPE2qKv+yH5YIf0z9UQBK9RDsOrqdkaC1RMd5QWgKvw
-B3ojJzTV7Ov+Jpat5I1BwEjmzzpwmJjU0USvQCbAfqCf9cxNG31vriC1X59SJYBj
-Cj++sm5PhRHzv0Rv5DPFzbxrpmrB1Sqp9pVh9YnBumO7Sxb36q8DhIIgUj3ULsVh
-gUyMzuw3/waXncYkxX1UeqgQIOyaKrpP97Mr7aqIAD2biwgmy/o/wQEJf2QCP+Lw
-8AueBXJ4A5sWpcZnENiesPxSvRM0lmxqXqxXDikhRvFD+hSz//GQONmkEL7X2RDq
-wR78nJFYV/1WWb/BLKj4W3ezWS9MPS6f7kUWvIMseJE7dF8w3KU2i+iDzikZydWF
-ScSuAjEv7PqLQRF0zVrZOJUb3aS6QqQSHm5bRT11Ms6GiWPFST+ef/lduDASOaFU
-p7p/AD02I4mMFMxm0TuJuYsAqUB2fVK8b8xQ7Q8z4YyVqH2W71Q=
-=xfO2
------END PGP SIGNATURE-----
+Solution to this, just like in the case of SMTP, is to provide TLS only
+option (no initial cleartext at all) for QEMU migration, which hopefully
+it not a large addition.
 
---M2Pxvdb9QxnGd/3e--
+Thank you for your consideration!
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1894781
+
+Title:
+  [Feature request] Provide a way to do TLS first in QEMU/NBD
+  connections (not after NBD negotiation)
+
+Status in QEMU:
+  New
+
+Bug description:
+  (following from
+  https://gitlab.com/libvirt/libvirt/-/issues/68#note_400960567)
+
+  As is very well explained in https://www.berrange.com/posts/2016/04/05
+  /improving-qemu-security-part-5-tls-support-for-nbd-server-client/,
+  and easily confirmed with captures, NBD stream starts in cleartext and
+  upgrades to TLS inline (similar to STARTTLS mechanism). As a
+  rationale, it is stated that this provides better error messages for
+  the user of NBD.
+
+  However, this approach has downsides:
+
+  1) Clear indication to a network observer that NBD (and therefore likely =
+qemu/libvirt) is used. In contrast, TLS1.3 hides even the SNI of the server=
+s (ESNI, https://blog.cloudflare.com/encrypted-sni/).
+  2) Potential for bugs in NBD protocol negotiation code. That code just st=
+atistically, likely less looked at code than gnutls. This is not a reflecti=
+on on NBD code quality, just the fact that TLS code does receive a bit more=
+ scrutiny. =
+
+  3) Inability to inspect TLS listener interface for compliance, e.g. with =
+a security scanner. Making sure TLS listeners only select certain ciphersui=
+ts is a requirement of some compliance regimes. =
+
+
+  I think it's fully possible to satisfy the original requirement of
+  good error messages as well, detecting that the other end is
+  initiating TLS connection.
+
+  It's very unlikely that it's currently sae to recommend to run QEMU
+  migration stream over a hostile network, but it should be possible to
+  do with TLS only option.
+
+  Solution to this, just like in the case of SMTP, is to provide TLS
+  only option (no initial cleartext at all) for QEMU migration, which
+  hopefully it not a large addition.
+
+  Thank you for your consideration!
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1894781/+subscriptions
 
