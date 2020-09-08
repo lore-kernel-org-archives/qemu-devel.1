@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D392C2BBD0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F24C433E2
 	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BE8DD21897
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6877B21897
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GHvyhnV8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE8DD21897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Dw0GQw/D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6877B21897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46228 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWCo-0007bv-SR
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:30:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57538)
+	id 1kFWCp-0007dp-Fz
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:30:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3r-0006tM-Rs; Tue, 08 Sep 2020 01:20:56 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:47691 helo=ozlabs.org)
+ id 1kFW3V-0006Km-E0; Tue, 08 Sep 2020 01:20:36 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:54003 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3p-00065u-QC; Tue, 08 Sep 2020 01:20:55 -0400
+ id 1kFW3S-0005zP-HU; Tue, 08 Sep 2020 01:20:32 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkv4Rywz9sVw; Tue,  8 Sep 2020 15:20:07 +1000 (AEST)
+ id 4Bltkp4gPKz9sVZ; Tue,  8 Sep 2020 15:20:02 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542407;
- bh=w0gaD0fnoCPcwqc7oF2cauElCoYD0AjnH+kJtJ0zhA8=;
+ d=gibson.dropbear.id.au; s=201602; t=1599542402;
+ bh=WHUZRE8xBkBhoLgTp8c17urX6r5gVdkN3abjLoZHMUE=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=GHvyhnV8kj/UJaICsSjBzp97z5WXPoV0msLraiTP+9/bHq/lk3mzxBsIIaOeO5gZ5
- BJP6Zot/XKopOkWno4TYhG3CtO+R2tJtEkTHsgPFC1bpCKBRBu1FVlDPr71a/i/BQH
- EQaE4EPVzRgzXqYOa+xJq3DhMEnTt0TVB1RVGye0=
+ b=Dw0GQw/DC9YzKmaQfkMBhm7UNb4l21xNe94YAqGA6ffU2UhZDtLEgUX634CMHBmok
+ WS0j+b0Ds0vXTm+Q8dRr1Kwov/h8w29o8Vut07HdA2cg3stQwIvxYrgeIWLPJL3tun
+ BDJrTDvfwrHdGCW7FG0UnmeXDl6RsmmsMb/C4YfY=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 25/33] ppc: introducing spapr_numa.c NUMA code helper
-Date: Tue,  8 Sep 2020 15:19:45 +1000
-Message-Id: <20200908051953.1616885-26-david@gibson.dropbear.id.au>
+Subject: [PULL 17/33] ppc/spapr: Use start-powered-off CPUState property
+Date: Tue,  8 Sep 2020 15:19:37 +1000
+Message-Id: <20200908051953.1616885-18-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
@@ -73,202 +73,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, danielhb413@gmail.com,
+ qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 
-We're going to make changes in how spapr handles all
-ibm,associativity* related properties to enhance our current NUMA
-support.
+PowerPC sPAPR CPUs start in the halted state, and spapr_reset_vcpu()
+attempts to implement this by setting CPUState::halted to 1. But that's too
+late for the case of hotplugged CPUs in a machine configure with 2 or more
+threads per core.
 
-At this moment we have associativity code scattered all around
-spapr_* files, with hardcoded values and array sizes. This
-makes it harder to change any NUMA specific parameters in
-the future. Having everything in the same place allows not
-only for easier tuning, but also easier understanding since all
-NUMA related code is on the same file.
+By then, other parts of QEMU have already caused the vCPU to run in an
+unitialized state a couple of times. For example, ppc_cpu_reset() calls
+ppc_tlb_invalidate_all(), which ends up calling async_run_on_cpu(). This
+kicks the new vCPU while it has CPUState::halted = 0, causing QEMU to issue
+a KVM_RUN ioctl on the new vCPU before the guest is able to make the
+start-cpu RTAS call to initialize its register state.
 
-This patch introduces a new file to gather all NUMA/associativity
-handling code in spapr, spapr_numa.c. To get things started, let's
-remove associativity-reference-points and max-associativity-domains
-code from spapr_dt_rtas() to a new helper called spapr_numa_write_rtas_dt().
-This will decouple spapr_dt_rtas() from the NUMA changes that
-are going to happen in those two properties.
+This problem doesn't seem to cause visible issues for regular guests, but
+on a secure guest running under the Ultravisor it does. The Ultravisor
+relies on being able to snoop on the start-cpu RTAS call to map vCPUs to
+guests, and this issue causes it to see a stray vCPU that doesn't belong to
+any guest.
 
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200901125645.118026-2-danielhb413@gmail.com>
+Fix by setting the start-powered-off CPUState property in
+spapr_create_vcpu(), which makes cpu_common_reset() initialize
+CPUState::halted to 1 at an earlier moment.
+
+Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Message-Id: <20200826055535.951207-4-bauerman@linux.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/meson.build          |  3 ++-
- hw/ppc/spapr.c              | 26 ++-----------------
- hw/ppc/spapr_numa.c         | 50 +++++++++++++++++++++++++++++++++++++
- include/hw/ppc/spapr_numa.h | 20 +++++++++++++++
- 4 files changed, 74 insertions(+), 25 deletions(-)
- create mode 100644 hw/ppc/spapr_numa.c
- create mode 100644 include/hw/ppc/spapr_numa.h
+ hw/ppc/spapr_cpu_core.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/ppc/meson.build b/hw/ppc/meson.build
-index 918969b320..ffa2ec37fa 100644
---- a/hw/ppc/meson.build
-+++ b/hw/ppc/meson.build
-@@ -25,7 +25,8 @@ ppc_ss.add(when: 'CONFIG_PSERIES', if_true: files(
-   'spapr_irq.c',
-   'spapr_tpm_proxy.c',
-   'spapr_nvdimm.c',
--  'spapr_rtas_ddw.c'
-+  'spapr_rtas_ddw.c',
-+  'spapr_numa.c',
- ))
- ppc_ss.add(when: 'CONFIG_SPAPR_RNG', if_true: files('spapr_rng.c'))
- ppc_ss.add(when: ['CONFIG_PSERIES', 'CONFIG_LINUX'], if_true: files(
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index b0a04443fb..a45912acac 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -81,6 +81,7 @@
- #include "hw/mem/memory-device.h"
- #include "hw/ppc/spapr_tpm_proxy.h"
- #include "hw/ppc/spapr_nvdimm.h"
-+#include "hw/ppc/spapr_numa.h"
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index c4f47dcc04..2125fdac34 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -36,11 +36,6 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
  
- #include "monitor/monitor.h"
+     cpu_reset(cs);
  
-@@ -891,16 +892,9 @@ static int spapr_dt_rng(void *fdt)
- static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
- {
-     MachineState *ms = MACHINE(spapr);
--    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
-     int rtas;
-     GString *hypertas = g_string_sized_new(256);
-     GString *qemu_hypertas = g_string_sized_new(256);
--    uint32_t refpoints[] = {
--        cpu_to_be32(0x4),
--        cpu_to_be32(0x4),
--        cpu_to_be32(0x2),
--    };
--    uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
-     uint64_t max_device_addr = MACHINE(spapr)->device_memory->base +
-         memory_region_size(&MACHINE(spapr)->device_memory->mr);
-     uint32_t lrdr_capacity[] = {
-@@ -910,14 +904,6 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
-         cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE & 0xffffffff),
-         cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
-     };
--    uint32_t maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
--    uint32_t maxdomains[] = {
--        cpu_to_be32(4),
--        maxdomain,
--        maxdomain,
--        maxdomain,
--        cpu_to_be32(spapr->gpu_numa_id),
--    };
- 
-     _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
- 
-@@ -953,15 +939,7 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
-                      qemu_hypertas->str, qemu_hypertas->len));
-     g_string_free(qemu_hypertas, TRUE);
- 
--    if (smc->pre_5_1_assoc_refpoints) {
--        nr_refpoints = 2;
--    }
+-    /* All CPUs start halted.  CPU0 is unhalted from the machine level
+-     * reset code and the rest are explicitly started up by the guest
+-     * using an RTAS call */
+-    cs->halted = 1;
 -
--    _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
--                     refpoints, nr_refpoints * sizeof(refpoints[0])));
--
--    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
--                     maxdomains, sizeof(maxdomains)));
-+    spapr_numa_write_rtas_dt(spapr, fdt, rtas);
+     env->spr[SPR_HIOR] = 0;
  
-     /*
-      * FWNMI reserves RTAS_ERROR_LOG_MAX for the machine check error log,
-diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-new file mode 100644
-index 0000000000..cdf3288cbd
---- /dev/null
-+++ b/hw/ppc/spapr_numa.c
-@@ -0,0 +1,50 @@
-+/*
-+ * QEMU PowerPC pSeries Logical Partition NUMA associativity handling
-+ *
-+ * Copyright IBM Corp. 2020
-+ *
-+ * Authors:
-+ *  Daniel Henrique Barboza      <danielhb413@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu-common.h"
-+#include "hw/ppc/spapr_numa.h"
-+#include "hw/ppc/fdt.h"
-+
-+/*
-+ * Helper that writes ibm,associativity-reference-points and
-+ * max-associativity-domains in the RTAS pointed by @rtas
-+ * in the DT @fdt.
-+ */
-+void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas)
-+{
-+    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-+    uint32_t refpoints[] = {
-+        cpu_to_be32(0x4),
-+        cpu_to_be32(0x4),
-+        cpu_to_be32(0x2),
-+    };
-+    uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
-+    uint32_t maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
-+    uint32_t maxdomains[] = {
-+        cpu_to_be32(4),
-+        maxdomain,
-+        maxdomain,
-+        maxdomain,
-+        cpu_to_be32(spapr->gpu_numa_id),
-+    };
-+
-+    if (smc->pre_5_1_assoc_refpoints) {
-+        nr_refpoints = 2;
-+    }
-+
-+    _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
-+                     refpoints, nr_refpoints * sizeof(refpoints[0])));
-+
-+    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
-+                     maxdomains, sizeof(maxdomains)));
-+}
-diff --git a/include/hw/ppc/spapr_numa.h b/include/hw/ppc/spapr_numa.h
-new file mode 100644
-index 0000000000..7a370a8768
---- /dev/null
-+++ b/include/hw/ppc/spapr_numa.h
-@@ -0,0 +1,20 @@
-+/*
-+ * QEMU PowerPC pSeries Logical Partition NUMA associativity handling
-+ *
-+ * Copyright IBM Corp. 2020
-+ *
-+ * Authors:
-+ *  Daniel Henrique Barboza      <danielhb413@gmail.com>
-+ *
-+ * This work is licensed under the terms of the GNU GPL, version 2 or later.
-+ * See the COPYING file in the top-level directory.
-+ */
-+
-+#ifndef HW_SPAPR_NUMA_H
-+#define HW_SPAPR_NUMA_H
-+
-+#include "hw/ppc/spapr.h"
-+
-+void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas);
-+
-+#endif /* HW_SPAPR_NUMA_H */
+     lpcr = env->spr[SPR_LPCR];
+@@ -274,6 +269,11 @@ static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
+ 
+     cs = CPU(obj);
+     cpu = POWERPC_CPU(obj);
++    /*
++     * All CPUs start halted. CPU0 is unhalted from the machine level reset code
++     * and the rest are explicitly started up by the guest using an RTAS call.
++     */
++    cs->start_powered_off = true;
+     cs->cpu_index = cc->core_id + i;
+     spapr_set_vcpu_id(cpu, cs->cpu_index, &local_err);
+     if (local_err) {
 -- 
 2.26.2
 
