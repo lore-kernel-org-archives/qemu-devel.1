@@ -2,89 +2,102 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 286D0C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 10:03:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C016C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 10:03:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98E7F21D6C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 10:03:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D517C21D47
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 10:03:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6X78RkK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98E7F21D6C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aAVpidKw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D517C21D47
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37484 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFaT7-0007N0-Mx
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 06:03:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54026)
+	id 1kFaTE-0007dp-TV
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 06:03:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFaSS-0006Ou-M3
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 06:02:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32471)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kFaSY-0006ZB-Vm
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 06:02:43 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:26759
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFaSR-0005U4-2t
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 06:02:36 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kFaSX-0005Un-AV
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 06:02:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599559354;
+ s=mimecast20190719; t=1599559360;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cV+ZJMROYZG50DpmZo7CSvA2V/Nw/T84LzXM0bcGhPI=;
- b=e6X78RkKA2dqDkucvB7KVJ5DRPAzkV9ZBa+KvD4NJ0Ncwf1vG7dGHIbbWElczq/V3I3tEE
- 4J2icBywZwnu6cJwoeaP4SGjDZ+xvpv2mH9OECCGkIvKlNfxtemRbnt9TpfnFhISsqxY4b
- 0OEfxQLgNPyZSnH8Eh/SGRPbOFKV47I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-65-M8LS-mQ0P8quhH-SsQ2gOQ-1; Tue, 08 Sep 2020 06:02:30 -0400
-X-MC-Unique: M8LS-mQ0P8quhH-SsQ2gOQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A84E1801AE4;
- Tue,  8 Sep 2020 10:02:29 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-122.ams2.redhat.com
- [10.36.112.122])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE2EB7D8AE;
- Tue,  8 Sep 2020 10:02:25 +0000 (UTC)
-Subject: Re: [PATCH v2] scripts/git.orderfile: Display meson files along with
- buildsys ones
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200907161222.41915-1-philmd@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <bd658d44-d9bd-81d1-f3c7-89c0d61f6dd2@redhat.com>
-Date: Tue, 8 Sep 2020 12:02:24 +0200
+ bh=JBFHjcUtbBXAsdvv5y0IusU6uEyPfsMtwGczYTQlzdQ=;
+ b=aAVpidKwmcguLs83m8cpE5WmLr9TqrAcHOQ/Qg9lqRxT9GcUt2jR5Ws9ub8NDLg04znQq1
+ qkDoSGB8XILJYIEaJjofTxdySzFir1mdFsHgwb0GKY5r5vaidgmI44ZhS17nNOYFDWNHjQ
+ WCQbevmUI9+n2NILuvkngdJs6+ou1D0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-mFF-idGgPC6Q4Zvf6Uujzw-1; Tue, 08 Sep 2020 06:02:39 -0400
+X-MC-Unique: mFF-idGgPC6Q4Zvf6Uujzw-1
+Received: by mail-wr1-f71.google.com with SMTP id g6so6804827wrv.3
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 03:02:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=JBFHjcUtbBXAsdvv5y0IusU6uEyPfsMtwGczYTQlzdQ=;
+ b=RLclz17oITUOtcl92hCa+6A7Rwv7L52/+a8xLBuVujbTadGr9DuHkR9fdnmhRZ2BoM
+ c+hOkz1tc6dCtonR8o6sVdcftuS3Mbwf+gWto+NxgvTgNNQ4go+chjTwEFdhzb6jDtUe
+ +Ve56s/k4rKslONP7RRWYmn73xHG6CAvA5Gggjkf0plaDyvVc/4iDurgMhOwhrc4pLCT
+ 1eLdJfPt38lBzMMa5512BKLrKMQDK0Xbb8YvrfERF/AqqBQkxxaWnhBAhJWwYm0Wua01
+ /kdPtqXUpAnAas+7iuzKtOFclZ6ekWJz2mCiQb0o/MzvpBv7FK3mH/S2DMeFe39K2h5C
+ 2vrA==
+X-Gm-Message-State: AOAM530Vq6gSxpUc0sIzLn/aPJDCG3Qp6wkF5WB2HS0d+0U6xYfSSrb5
+ Y4s79BdvfEC14JkjTL1YwOXqmWbBS6GdAIzzlKmZTPkbRpOw6iQjVZelcXvW0ZOhl9JWEQcYMhS
+ NTAP5KBT3UP+6ddU=
+X-Received: by 2002:a1c:c256:: with SMTP id s83mr3613098wmf.93.1599559357915; 
+ Tue, 08 Sep 2020 03:02:37 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx/JIoH5nAM1wd712lB+3yi3UMLsNxYs4hbX1oGqkB0dt1bVC9nYUYuBxpliHq5YxAA5QYASw==
+X-Received: by 2002:a1c:c256:: with SMTP id s83mr3613078wmf.93.1599559357741; 
+ Tue, 08 Sep 2020 03:02:37 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-221-30.inter.net.il. [80.230.221.30])
+ by smtp.gmail.com with ESMTPSA id z15sm32708955wrv.94.2020.09.08.03.02.35
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Sep 2020 03:02:36 -0700 (PDT)
+Date: Tue, 8 Sep 2020 06:02:33 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH v1] pc: fix
+ auto_enable_numa_with_memhp/auto_enable_numa_with_memdev for the 5.0 machine
+Message-ID: <20200908060219-mutt-send-email-mst@kernel.org>
+References: <20200820094828.30348-1-david@redhat.com>
+ <72ef0b4f-e0a1-ce1e-0b92-9228843a774f@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200907161222.41915-1-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <72ef0b4f-e0a1-ce1e-0b92-9228843a774f@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=lersek@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:54
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
 X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,50 +110,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, qemu-stable@nongnu.org,
+ qemu-devel@nongnu.org, "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/07/20 18:12, Philippe Mathieu-Daudé wrote:
-> Since commit a56650518f5 ("configure: integrate Meson in the build
-> system") we replaced many Makefile by Meson files. Adapt the
-> git.orderfile script to display the new file at the same position.
+On Tue, Sep 08, 2020 at 10:56:53AM +0200, David Hildenbrand wrote:
+> On 20.08.20 11:48, David Hildenbrand wrote:
+> > Unfortunately, a typo sneeked in: we want to set
+> > auto_enable_numa_with_memdev to false, not auto_enable_numa_with_memhp.
+> > 
+> > Cc: qemu-stable@nongnu.org # v5.1
+> > Fixes: 195784a0cfad (numa: Auto-enable NUMA when any memory devices are possible)
+> > Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > Cc: Paolo Bonzini <pbonzini@redhat.com>
+> > Cc: Richard Henderson <rth@twiddle.net>
+> > Cc: Eduardo Habkost <ehabkost@redhat.com>
+> > Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> > Signed-off-by: David Hildenbrand <david@redhat.com>
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  scripts/git.orderfile | 1 +
->  1 file changed, 1 insertion(+)
+> @MST, do you want to queue this patch? thanks!
+
+queued, thanks!
 > 
-> diff --git a/scripts/git.orderfile b/scripts/git.orderfile
-> index 73fd818d7f3..a021afc2d51 100644
-> --- a/scripts/git.orderfile
-> +++ b/scripts/git.orderfile
-> @@ -18,6 +18,7 @@ docs/*
->  configure
->  Makefile*
->  *.mak
-> +meson.build
->  
->  # qapi schema
->  qapi/*.json
+> -- 
+> Thanks,
 > 
-
-Possibly related (not sure if there's another patch pending for it
-already): if you run a "make clean" in the source tree, and have the
-Meson submodule initialized, the "make clean" will delete files from the
-Meson submodule.
-
-find . \( -name '*.so' -o -name '*.dll' -o -name '*.[oda]' \) -type f \
-
-"*.d" matches various meson files.
-
-(Again, apologies if this is already known; I understand this is
-probably the worst context to report his in...)
-
-Thanks
-Laszlo
+> David / dhildenb
 
 
