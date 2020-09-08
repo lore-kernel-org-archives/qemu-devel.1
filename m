@@ -2,80 +2,95 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 368EDC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 04:06:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C22B6C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:09:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9666521481
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 04:06:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9666521481
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id F3B6021532
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:09:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jA+09Sxz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3B6021532
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFUtY-000072-CV
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 00:06:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49312)
+	id 1kFVsM-0004H5-2r
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:09:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFUt1-00089W-Hi
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 00:05:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43864)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFUsz-0006PN-5a
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 00:05:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kFUsx-0004Wm-5Y
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 04:05:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 270842E8023
- for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 04:05:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kFVrp-0003rc-MQ
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 01:08:29 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42641
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kFVrn-0004gM-7E
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 01:08:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599541705;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=swmMFWj31hy21R24HOPhDb3bLtnTArgt9iIfrV3WrAg=;
+ b=jA+09SxzpXq+jixLqI8em4JUDmHc4Qceus1dkUtHxkjk5s/cwohc8JjDKkTep8eycO/Nk/
+ H8DnDNK4Q0qg83nKozFhuy0XRFCa2pqdu6QyOY89jLyy9S9GVAYeFxqAudZEv6L3iuRptC
+ GWUDaHoVL6s2+OwOYTFRDIRKeUUhg2M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-370-rh8jPgxCODGjemyTDLw9Bg-1; Tue, 08 Sep 2020 01:08:22 -0400
+X-MC-Unique: rh8jPgxCODGjemyTDLw9Bg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CB9E31DDEF;
+ Tue,  8 Sep 2020 05:08:21 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 691445C1C4;
+ Tue,  8 Sep 2020 05:08:21 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 81CE7ED9; Tue,  8 Sep 2020 07:08:20 +0200 (CEST)
+Date: Tue, 8 Sep 2020 07:08:20 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: Plans to refreshing iPXE roms ?
+Message-ID: <20200908050820.l7a6dpsz7aa5wdib@sirius.home.kraxel.org>
+References: <20200907125212.GH810755@redhat.com>
+ <CAFEAcA_O8huQnONrVKwYdUgHQaZEqf1FudZaNscwRcbYWuWaaA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Sep 2020 04:00:01 -0000
-From: Vjaceslavs Klimovs <1894781@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: vklimovs
-X-Launchpad-Bug-Reporter: Vjaceslavs Klimovs (vklimovs)
-X-Launchpad-Bug-Modifier: Vjaceslavs Klimovs (vklimovs)
-Message-Id: <159953760175.19565.14791337348074084173.malonedeb@gac.canonical.com>
-Subject: [Bug 1894781] [NEW] [Feature request] Provide a way to do TLS first
- in QEMU/NBD connections (not after NBD negotiation)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: 33360e6bf3c8ca9e3306ae4bc5a9a387453b4182
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:05:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAFEAcA_O8huQnONrVKwYdUgHQaZEqf1FudZaNscwRcbYWuWaaA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:08:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,109 +99,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1894781 <1894781@bugs.launchpad.net>
+Cc: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On Mon, Sep 07, 2020 at 01:58:20PM +0100, Peter Maydell wrote:
+> On Mon, 7 Sep 2020 at 13:53, Daniel P. Berrangé <berrange@redhat.com> wrote:
+> >
+> > The current iPXE ROMs in QEMU date from Janary 2019, so feels like
+> > they are overdue for a refresh.
+> 
+> Sounds good.
 
-(following from
-https://gitlab.com/libvirt/libvirt/-/issues/68#note_400960567)
+Thanks for the reminder, I'll look into it.
 
-As is very well explained in https://www.berrange.com/posts/2016/04/05
-/improving-qemu-security-part-5-tls-support-for-nbd-server-client/, and
-easily confirmed with captures, NBD stream starts in cleartext and
-upgrades to TLS inline (similar to STARTTLS mechanism). As a rationale,
-it is stated that this provides better error messages for the user of
-NBD.
+> My impression has been that ROM refreshes
+> seem to tend to arrive comparatively late in the QEMU
+> release cycle -- I think it would be ideal if we did
+> them earlier, given that they amount often to a big
+> infusion of code changes all at once.
 
-However, this approach has downsides:
+Well, ipxe update was discussed recently and I skipped it
+for 5.1 exactly because it would have landed during the
+freeze.  And there was no good reason to risk that.
 
-1) Clear indication to a network observer that NBD (and therefore likely qe=
-mu/libvirt) is used. In contrast, TLS1.3 hides even the SNI of the servers =
-(ESNI, https://blog.cloudflare.com/encrypted-sni/).
-2) Potential for bugs in NBD protocol negotiation code. That code just stat=
-istically, likely less looked at code than gnutls. This is not a reflection=
- on NBD code quality, just the fact that TLS code does receive a bit more s=
-crutiny. =
+For seabios I usually try to land larger updates at the
+begin of the freeze, so we have the whole -rc phase for
+testing.
 
-3) Inability to inspect TLS listener interface for compliance, e.g. with a =
-security scanner. Making sure TLS listeners only select certain ciphersuits=
- is a requirement of some compliance regimes. =
+take care,
+  Gerd
 
-
-I think it's fully possible to satisfy the original requirement of good
-error messages as well, detecting that the other end is initiating TLS
-connection.
-
-It's very unlikely that it's currently sae to recommend to run QEMU
-migration stream over a hostile network, but it should be possible to do
-with TLS only option.
-
-Solution to this, just like in the case of SMTP, is to provide TLS only
-option (no initial cleartext at all) for QEMU migration, which hopefully
-it not a large addition.
-
-Thank you for your consideration!
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1894781
-
-Title:
-  [Feature request] Provide a way to do TLS first in QEMU/NBD
-  connections (not after NBD negotiation)
-
-Status in QEMU:
-  New
-
-Bug description:
-  (following from
-  https://gitlab.com/libvirt/libvirt/-/issues/68#note_400960567)
-
-  As is very well explained in https://www.berrange.com/posts/2016/04/05
-  /improving-qemu-security-part-5-tls-support-for-nbd-server-client/,
-  and easily confirmed with captures, NBD stream starts in cleartext and
-  upgrades to TLS inline (similar to STARTTLS mechanism). As a
-  rationale, it is stated that this provides better error messages for
-  the user of NBD.
-
-  However, this approach has downsides:
-
-  1) Clear indication to a network observer that NBD (and therefore likely =
-qemu/libvirt) is used. In contrast, TLS1.3 hides even the SNI of the server=
-s (ESNI, https://blog.cloudflare.com/encrypted-sni/).
-  2) Potential for bugs in NBD protocol negotiation code. That code just st=
-atistically, likely less looked at code than gnutls. This is not a reflecti=
-on on NBD code quality, just the fact that TLS code does receive a bit more=
- scrutiny. =
-
-  3) Inability to inspect TLS listener interface for compliance, e.g. with =
-a security scanner. Making sure TLS listeners only select certain ciphersui=
-ts is a requirement of some compliance regimes. =
-
-
-  I think it's fully possible to satisfy the original requirement of
-  good error messages as well, detecting that the other end is
-  initiating TLS connection.
-
-  It's very unlikely that it's currently sae to recommend to run QEMU
-  migration stream over a hostile network, but it should be possible to
-  do with TLS only option.
-
-  Solution to this, just like in the case of SMTP, is to provide TLS
-  only option (no initial cleartext at all) for QEMU migration, which
-  hopefully it not a large addition.
-
-  Thank you for your consideration!
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1894781/+subscriptions
 
