@@ -2,93 +2,91 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32CB2C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA8A7C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:34:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D5DAB22204
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:33:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5BD1622204
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:34:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B4RztemT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5DAB22204
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dhOZGM/+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BD1622204
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52622 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55966 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFcoh-0004av-SK
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:33:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33844)
+	id 1kFcpJ-0005wk-Cg
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:34:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34116)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFclz-0007n1-5d
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:30:55 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:35533
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFclx-000871-4X
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:30:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599568252;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=diIacTlQYTokGdQ2+Tvjn/UdRwZ0NuHMsPby1L6K7X4=;
- b=B4RztemThwEyu+PEC94500rtBHZ9ctS5tMdpCa9rBb5pQTJnEguMpz+lEhD3B+4341p9xZ
- LYh0ZH+qWmGaHUKUvn62aB227ZdKVDKSHZGQgh4Zx4hkYKO/P63ZXOPzSeEZU937xmtLBG
- 3spcrO4eB55lOv2e30XqNjrxqvxxhh0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-300-DMB6IdyxPbmdHz2gp6OBCg-1; Tue, 08 Sep 2020 08:30:50 -0400
-X-MC-Unique: DMB6IdyxPbmdHz2gp6OBCg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A28E4E75C;
- Tue,  8 Sep 2020 12:30:49 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-122.ams2.redhat.com
- [10.36.112.122])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DF2782460;
- Tue,  8 Sep 2020 12:30:45 +0000 (UTC)
-Subject: Re: [PATCH v2] scripts/git.orderfile: Display meson files along with
- buildsys ones
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20200907161222.41915-1-philmd@redhat.com>
- <bd658d44-d9bd-81d1-f3c7-89c0d61f6dd2@redhat.com>
- <79de1ef4-6e08-6f1c-030e-f40e7410e06c@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <2d435bb0-eb8d-7a12-b962-2bce246c30fb@redhat.com>
-Date: Tue, 8 Sep 2020 14:30:44 +0200
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kFcnI-00020E-E5; Tue, 08 Sep 2020 08:32:16 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:35105)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kFcnG-0008De-IQ; Tue, 08 Sep 2020 08:32:16 -0400
+Received: by mail-pg1-x543.google.com with SMTP id g29so9947900pgl.2;
+ Tue, 08 Sep 2020 05:32:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=6IbIev6UphKtRupMGnz/q+0CYLU1wctlYm7gArTx0pQ=;
+ b=dhOZGM/+WrvXhFCPrQkriGNYYtN//wXapOzAAJV15ehlp8EpDkK46bDH/vjKdgwi2m
+ TqGSJPhJSqZbjIJcM9kdQo07w38elyREQDTYYiJ4QxzlsAEzPpRpcnCsQkMTF6JmexaZ
+ xl9FdaRMWQTHEYtrJpBBh8XoCuQUuoL1K5burUctnlzBMQYxNqivB/OMvz0Je2wzQ7VA
+ wqnA1DeQByb4OmQuzAqQVp53TACOSzTQ7pEEJckF2fnkC2BOqjQsph6wyCNJH8mZXJBu
+ S+R7Kt2kw1o4yIMQ1WTogaOANrc+ntgoVZwyES3HpEG3w1CSCX6rHIzvGHy5e4H+aPXk
+ 1bQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=6IbIev6UphKtRupMGnz/q+0CYLU1wctlYm7gArTx0pQ=;
+ b=RKHotCEUGqYpHpJOZBR9fCiGpIgGXHmioVYs0mtxQVWTMj3LqSudqmKmbuhxYd1ClP
+ 3a8gbCZqfv2JnAgXqL76oXchMj5qjbgUAEgONqy8LGMaEev80Vi2U4jkdo8iEZJn6Nz3
+ FZ3yPfjjNU7NNEFgVpZuDktj8NGzUCGHSMtTht5E4sEoWmaP9JlInT3x/b16fmAC2BQ1
+ idMiYG/l6p3+jI3RPHa7W7lCbBdZHDl4pVJGyAZA4+5fxNfZJaR1GbE4BndSnc5PyW8j
+ Hf1uVj3yykgNqp6PzI3CURFHlrvuOgUfgiBrU2yBRyZJMsoNB8L3GIF5zSotuI9R/N9V
+ kQqA==
+X-Gm-Message-State: AOAM531xvK833NsX6RhT6/kn+Z0SX4wyta0PDOKIVHAVzusOFI6WCU+y
+ qpOPn+xhSTrUlbTgNiYLDzcqHaR9QA/X16Hs
+X-Google-Smtp-Source: ABdhPJylffKa9jtUUkYcB/Cd7nqnkLD9/k0+XQ5xQy3m8l4OAoaFKx/jXbdNinePdO02xJ0ymo5c7Q==
+X-Received: by 2002:a63:29c7:: with SMTP id
+ p190mr20078387pgp.292.1599568332265; 
+ Tue, 08 Sep 2020 05:32:12 -0700 (PDT)
+Received: from localhost.localdomain ([222.95.248.6])
+ by smtp.googlemail.com with ESMTPSA id k5sm29172087pjl.3.2020.09.08.05.32.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Sep 2020 05:32:11 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 2/2] rcu: add uninit destructor for rcu
+Date: Tue,  8 Sep 2020 20:31:49 +0800
+Message-Id: <20200908123149.1475-3-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20200908123149.1475-1-luoyonggang@gmail.com>
+References: <20200908123149.1475-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <79de1ef4-6e08-6f1c-030e-f40e7410e06c@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lersek@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:53
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,104 +99,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Daniel Brodsky <dnbrdsky@gmail.com>,
+ Yonggang Luo <luoyonggang@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/08/20 13:48, Paolo Bonzini wrote:
-> On 08/09/20 12:02, Laszlo Ersek wrote:
->> Possibly related (not sure if there's another patch pending for it
->> already): if you run a "make clean" in the source tree, and have the
->> Meson submodule initialized, the "make clean" will delete files from the
->> Meson submodule.
->>
->> find . \( -name '*.so' -o -name '*.dll' -o -name '*.[oda]' \) -type f \
->>
->> "*.d" matches various meson files.
->>
->> (Again, apologies if this is already known; I understand this is
->> probably the worst context to report his in...)
->
-> Is this running "make clean" from an old commit (i.e. as in an in-tree
-> build) after having checked out the meson submodule?
+This is necessary if the pending  rcu calls are closing and removing
+temp files. This also provide a function
+void rcu_wait_finished(void);
+to fixes test-logging.c test failure on msys2/mingw.
+On windows if the file doesn't closed, you can not remove it.
 
-The source tree is checked out at commit 9d5589bb3fee ("Merge
-remote-tracking branch
-'remotes/vivier2/tags/linux-user-for-5.2-pull-request' into staging",
-2020-09-07).
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ include/qemu/rcu.h   |  5 +++++
+ tests/test-logging.c |  2 ++
+ util/rcu.c           | 28 ++++++++++++++++++++++++----
+ 3 files changed, 31 insertions(+), 4 deletions(-)
 
-The current working directory is the source tree.
-
-The working directory is pristine, as in:
-$ git reset --hard
-$ git clean -ffdx
-$ git submodule deinit --force --all
-
-Then:
-
-$ git submodule update --init --force
-$ make clean
-$ git status
-
-> On branch master
-> Your branch is up to date with 'origin/master'.
->
-> Changes not staged for commit:
->   (use "git add <file>..." to update what will be committed)
->   (use "git checkout -- <file>..." to discard changes in working > directory)
->   (commit or discard the untracked or modified content in submodules)
->
->         modified:   meson (modified content)
->
-> no changes added to commit (use "git add" and/or "git commit -a")
-
-And if I change to meson:
-
-$ cd meson
-$ git status
-
-> HEAD detached at 68ed748f84f1
-> Changes not staged for commit:
->   (use "git add/rm <file>..." to update what will be committed)
->   (use "git checkout -- <file>..." to discard changes in working directory)
->
->         deleted:    test cases/d/1 simple/app.d
->         deleted:    test cases/d/1 simple/utils.d
->         deleted:    test cases/d/10 d cpp/dmain.d
->         deleted:    test cases/d/10 d cpp/libfile.d
->         deleted:    test cases/d/11 dub/test.d
->         deleted:    test cases/d/2 static library/app.d
->         deleted:    test cases/d/2 static library/libstuff.d
->         deleted:    test cases/d/3 shared library/app.d
->         deleted:    test cases/d/3 shared library/libstuff.d
->         deleted:    test cases/d/3 shared library/sub/libstuff.d
->         deleted:    test cases/d/4 library versions/lib.d
->         deleted:    test cases/d/5 mixed/app.d
->         deleted:    test cases/d/6 unittest/app.d
->         deleted:    test cases/d/6 unittest/second_unit.d
->         deleted:    test cases/d/7 multilib/app.d
->         deleted:    test cases/d/7 multilib/say1.d
->         deleted:    test cases/d/7 multilib/say2.d
->         deleted:    test cases/d/9 features/app.d
->         deleted:    test cases/d/9 features/extra.d
->
-> no changes added to commit (use "git add" and/or "git commit -a")
-
-I don't know if the "clean" target has any relevance left, in the
-top-level Makefile; I've only looked at it now because the command
-
-> 	find . \( -name '*.so' -o -name '*.dll' -o -name '*.[oda]' \) -type f \
-> 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-aarch64.a \
-> 		! -path ./roms/edk2/ArmPkg/Library/GccLto/liblto-arm.a \
-> 		! -path ./roms/edk2/BaseTools/Source/Python/UPT/Dll/sqlite3.dll \
-> 		-exec rm {} +
-
-needed an update (removing the sqlite3.dll exception) for the
-edk2-stable202008 update.
-
-Thanks!
-Laszlo
+diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
+index 570aa603eb..dd0a92c1d0 100644
+--- a/include/qemu/rcu.h
++++ b/include/qemu/rcu.h
+@@ -124,6 +124,11 @@ extern void rcu_unregister_thread(void);
+ extern void rcu_enable_atfork(void);
+ extern void rcu_disable_atfork(void);
+ 
++/*
++ * Wait all rcu call executed and exit the rcu thread.
++ */
++extern void rcu_wait_finished(void);
++
+ struct rcu_head;
+ typedef void RCUCBFunc(struct rcu_head *head);
+ 
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index 957f6c08cd..7a5b59f4a5 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -210,6 +210,8 @@ int main(int argc, char **argv)
+                          tmp_path, test_logfile_lock);
+ 
+     rc = g_test_run();
++    qemu_log_close();
++    rcu_wait_finished();
+ 
+     rmdir_full(tmp_path);
+     g_free(tmp_path);
+diff --git a/util/rcu.c b/util/rcu.c
+index 60a37f72c3..3d5ba695a4 100644
+--- a/util/rcu.c
++++ b/util/rcu.c
+@@ -234,6 +234,7 @@ retry:
+ 
+ static void *call_rcu_thread(void *opaque)
+ {
++    int *rcu_finished_ptr = (int *)opaque;
+     struct rcu_head *node;
+ 
+     rcu_register_thread();
+@@ -241,6 +242,10 @@ static void *call_rcu_thread(void *opaque)
+     for (;;) {
+         int tries = 0;
+         int n = atomic_read(&rcu_call_count);
++        if (n == 0 && atomic_mb_read(rcu_finished_ptr) == 1)
++        {
++            return NULL;
++        }
+ 
+         /* Heuristically wait for a decent number of callbacks to pile up.
+          * Fetch rcu_call_count now, we only must process elements that were
+@@ -308,10 +313,12 @@ void rcu_unregister_thread(void)
+     qemu_mutex_unlock(&rcu_registry_lock);
+ }
+ 
++static QemuThread rcu_thread;
++static int rcu_finished = 0;
++
+ static void rcu_init_complete(void)
+ {
+-    QemuThread thread;
+-
++    atomic_mb_set(&rcu_finished, 0);
+     qemu_mutex_init(&rcu_registry_lock);
+     qemu_mutex_init(&rcu_sync_lock);
+     qemu_event_init(&rcu_gp_event, true);
+@@ -321,12 +328,20 @@ static void rcu_init_complete(void)
+     /* The caller is assumed to have iothread lock, so the call_rcu thread
+      * must have been quiescent even after forking, just recreate it.
+      */
+-    qemu_thread_create(&thread, "call_rcu", call_rcu_thread,
+-                       NULL, QEMU_THREAD_DETACHED);
++    qemu_thread_create(&rcu_thread, "call_rcu", call_rcu_thread,
++                       &rcu_finished, QEMU_THREAD_JOINABLE);
+ 
+     rcu_register_thread();
+ }
+ 
++void rcu_wait_finished(void)
++{
++    if (atomic_xchg(&rcu_finished, 1) == 0)
++    {
++        qemu_thread_join(&rcu_thread);
++    }
++}
++
+ static int atfork_depth = 1;
+ 
+ void rcu_enable_atfork(void)
+@@ -379,3 +394,8 @@ static void __attribute__((__constructor__)) rcu_init(void)
+ #endif
+     rcu_init_complete();
+ }
++
++static void __attribute__((__destructor__)) rcu_uninit(void)
++{
++    rcu_wait_finished();
++}
+-- 
+2.28.0.windows.1
 
 
