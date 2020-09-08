@@ -7,84 +7,92 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 382FFC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE42C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:28:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A66382087D
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:18:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 425A72087D
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:28:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKWvtbM9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A66382087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nxlrz0ah"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 425A72087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47140 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFbdc-0007WX-RA
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:18:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44176)
+	id 1kFbno-0001jQ-CS
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:28:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kFbc7-00068g-Bs
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:16:40 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29113
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kFbc4-0006zC-Jt
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:16:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599563795;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=pqjlsphl2j3znMxyXVEcKoaK8XPXKbhFnNOoXlqt2qo=;
- b=ZKWvtbM9ivfLZXnfheoXx7JZ3kbnj1Ax4fscb/w7EWintHXswgbUYCS9XIL9L5DGdNlPe9
- bOleSDk9zGmOTFbUcPyzt8zIyJVoZ4T3mcWG+1BF6JPXmd5OmH3VW/pA2bfn/uTQnmK/K+
- ZaQFnPqnlx6c0XM6zAlkveWQ5/VL2BM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-4thXYxsZNLek1_8fb-0fHA-1; Tue, 08 Sep 2020 07:16:32 -0400
-X-MC-Unique: 4thXYxsZNLek1_8fb-0fHA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C74B18015A6;
- Tue,  8 Sep 2020 11:16:30 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B51E45C1BB;
- Tue,  8 Sep 2020 11:16:28 +0000 (UTC)
-Date: Tue, 8 Sep 2020 13:16:25 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Haibo Xu <haibo.xu@linaro.org>
-Subject: Re: [PATCH v2 09/12] hw/arm/virt: spe: Add SPE fdt binding for virt
- machine
-Message-ID: <20200908111625.2wzzn7jh5wt4nnmu@kamzik.brq.redhat.com>
-References: <cover.1599549462.git.haibo.xu@linaro.org>
- <c6ac607d2cd253de6a990538edfde7f86066f04f.1599549462.git.haibo.xu@linaro.org>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFbmw-0001GW-1s
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:27:50 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:40058)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFbmr-0008Co-LV
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:27:49 -0400
+Received: by mail-wr1-x442.google.com with SMTP id j2so18711433wrx.7
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 04:27:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=pQV6CrSIwspR/+hQrDd1u9yRA53VUf83tmXUTH4P02w=;
+ b=Nxlrz0ahBxQXNHiA9/AenCUDXr6cT2AaWsqqiw3YOEc78h18hsAD5DXVrjwx3kjCqL
+ m/PW3UKPpwNjwCamJCc+7dmPeslZgJPCbDE7rHxvW06iidPQ/HFI5890+Bq+1Owv131y
+ ORFzIweXF0lJ5NUJSv+wrwuWZVtf6/MZnqyxSYLc3juYsRUcvaOygjCur0T+tMT/egt+
+ Pv6F1AuFmMGB1J4yPC1rUBy0nOSwtv07s5dRR1K//3+Xg65E30t3tmb5+Ll5EX+h/G/8
+ mV3/KZIxSv6iY44FUCzXUacPG9M5XxYiIaS2uW1q61msf2dx+EsTtIDIJ7H2yZKFeqNs
+ CM7A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=pQV6CrSIwspR/+hQrDd1u9yRA53VUf83tmXUTH4P02w=;
+ b=V2TeQzyKl8oKkQKsbg3UjlJHZr5gC9P28B/TzbOrCy9kM9ibBSP7wbtraTtJGDYpK+
+ QZYkR7Ma98VwI8vJcvEcIrw9EUAE9PvOt7VQV73VWou91two9vz0H0Ol5kN07HMnH8+x
+ yDkQpun3klvlkLY6IUgg7RAL0KxtMYJJpVvR0jy9ymP0d294FRR4poSCnXDpIvp8eVzF
+ CfoJHmWbqNHUvhQBYFCIxpnmgbVsEGzmPSjPvrHHQ1LBuGntLVYRz3wpQz6ypp0UOsAl
+ 0jbsw28zXBKKkU/TZl/3t5DGtBuvAZk6fZ/OWh2M/ElCKGAvPxmb5tIthn+t5SpN/d+p
+ FCqg==
+X-Gm-Message-State: AOAM530U0VW9vsaXAj+FNa4b/1UF6FTjnGzxOeW9a0ik3gJL7tD+X+yC
+ 59842YkrKuk6Yp+njqj5I/9c5A==
+X-Google-Smtp-Source: ABdhPJx2HsZV/ETucLfOeojoKFx6oijKDv3AMHkaL42fkSkRi3dS+0i5EoNogzlChjfmdcVRJn8MyQ==
+X-Received: by 2002:a5d:69cd:: with SMTP id s13mr25498039wrw.379.1599564463807; 
+ Tue, 08 Sep 2020 04:27:43 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id s124sm32225794wme.29.2020.09.08.04.27.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Sep 2020 04:27:42 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id E658F1FF7E;
+ Tue,  8 Sep 2020 12:27:40 +0100 (BST)
+References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
+ <159903462227.28509.8201860642659050083.stgit@pasha-ThinkPad-X280>
+User-agent: mu4e 1.5.5; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+Subject: Re: [PATCH v3 13/15] replay: describe reverse debugging in
+ docs/replay.txt
+In-reply-to: <159903462227.28509.8201860642659050083.stgit@pasha-ThinkPad-X280>
+Date: Tue, 08 Sep 2020 12:27:40 +0100
+Message-ID: <87wo14pkyb.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <c6ac607d2cd253de6a990538edfde7f86066f04f.1599549462.git.haibo.xu@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:08:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,194 +105,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, philmd@redhat.com
+Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, crosa@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
+ philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-This patch does much more than the summary "hw/arm/virt: spe: Add SPE fdt
-binding for virt machine" says it does. Please revise the summary.
+Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
 
-On Tue, Sep 08, 2020 at 08:13:27AM +0000, Haibo Xu wrote:
-> Add a virtual SPE device for virt machine while using
-> PPI 5 for SPE overflow interrupt number which has already
-> selected in kvmtool.
-> 
-> Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
+> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>
+> This patch updates the documentation and describes usage of the reverse
+> debugging in QEMU+GDB.
+>
+> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
 > ---
->  hw/arm/virt-acpi-build.c    |  3 +++
->  hw/arm/virt.c               | 43 ++++++++++++++++++++++++++++++++++++-
->  include/hw/acpi/acpi-defs.h |  3 +++
->  include/hw/arm/virt.h       |  1 +
->  target/arm/cpu.c            |  2 ++
->  target/arm/cpu.h            |  2 ++
->  6 files changed, 53 insertions(+), 1 deletion(-)
-> 
-> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-> index 9efd7a3881..3fd80fda53 100644
-> --- a/hw/arm/virt-acpi-build.c
-> +++ b/hw/arm/virt-acpi-build.c
-> @@ -665,6 +665,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
->          if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
->              gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
->          }
-> +        if (cpu_isar_feature(aa64_spe, armcpu)) {
-> +            gicc->spe_interrupt = cpu_to_le32(PPI(VIRTUAL_SPE_IRQ));
-> +        }
->          if (vms->virt) {
->              gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GIC_MAINT_IRQ));
->          }
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index 6bacfb668d..bdb1ce925c 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -545,6 +545,32 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
->      }
->  }
->  
-> +static void fdt_add_spe_nodes(const VirtMachineState *vms)
-> +{
-> +    ARMCPU *armcpu = ARM_CPU(first_cpu);
-> +    uint32_t irqflags = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
-> +
-> +    if (!cpu_isar_feature(aa64_spe, armcpu)) {
-> +        assert(!object_property_get_bool(OBJECT(armcpu), "spe", NULL));
-> +        return;
-> +    }
-> +
-> +    if (vms->gic_version == VIRT_GIC_VERSION_2) {
-> +        irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
-> +                             GIC_FDT_IRQ_PPI_CPU_WIDTH,
-> +                             (1 << vms->smp_cpus) - 1);
-> +    }
-> +
-> +    qemu_fdt_add_subnode(vms->fdt, "/spe");
-> +    if (arm_feature(&armcpu->env, ARM_FEATURE_V8)) {
-> +        const char compat[] = "arm,statistical-profiling-extension-v1";
-> +        qemu_fdt_setprop(vms->fdt, "/spe", "compatible",
-> +                         compat, sizeof(compat));
-> +        qemu_fdt_setprop_cells(vms->fdt, "/spe", "interrupts",
-> +                               GIC_FDT_IRQ_TYPE_PPI, VIRTUAL_SPE_IRQ, irqflags);
-> +    }
-> +}
-> +
->  static inline DeviceState *create_acpi_ged(VirtMachineState *vms)
->  {
->      DeviceState *dev;
-> @@ -717,6 +743,10 @@ static void create_gic(VirtMachineState *vms)
->                                      qdev_get_gpio_in(vms->gic, ppibase
->                                                       + VIRTUAL_PMU_IRQ));
->  
-> +        qdev_connect_gpio_out_named(cpudev, "spe-interrupt", 0,
-> +                                    qdev_get_gpio_in(vms->gic, ppibase
-> +                                                     + VIRTUAL_SPE_IRQ));
-> +
->          sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
->          sysbus_connect_irq(gicbusdev, i + smp_cpus,
->                             qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
-> @@ -1664,11 +1694,12 @@ static void finalize_gic_version(VirtMachineState *vms)
->  
->  static void virt_cpu_post_init(VirtMachineState *vms)
->  {
-> -    bool aarch64, pmu;
-> +    bool aarch64, pmu, spe;
->      CPUState *cpu;
->  
->      aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
->      pmu = object_property_get_bool(OBJECT(first_cpu), "pmu", NULL);
-> +    spe = object_property_get_bool(OBJECT(first_cpu), "spe", NULL);
->  
->      if (kvm_enabled()) {
->          CPU_FOREACH(cpu) {
-> @@ -1679,6 +1710,14 @@ static void virt_cpu_post_init(VirtMachineState *vms)
->                  }
->                  kvm_arm_pmu_init(cpu);
->              }
-> +
-> +            if (spe) {
-> +                assert(ARM_CPU(cpu)->has_spe == ON_OFF_AUTO_ON);
-> +                if (kvm_irqchip_in_kernel()) {
-> +                    kvm_arm_spe_set_irq(cpu, PPI(VIRTUAL_SPE_IRQ));
-> +                }
-> +                kvm_arm_spe_init(cpu);
+>  docs/replay.txt |   33 +++++++++++++++++++++++++++++++++
+>  1 file changed, 33 insertions(+)
 
-A later patch introduces userspace irqchip support. Should we avoid
-allowing it until then to avoid breaking bisection?
+Minor aside - it is probably worth having a separate patch to convert
+this file into an .rst and put it in the docs/system folder so we can
+properly incorporate it into the user documentation.=20
 
-> +            }
->          }
->      } else {
->          if (aarch64 && vms->highmem) {
-> @@ -1927,6 +1966,8 @@ static void machvirt_init(MachineState *machine)
->  
->      fdt_add_pmu_nodes(vms);
->  
-> +    fdt_add_spe_nodes(vms);
+>
+> diff --git a/docs/replay.txt b/docs/replay.txt
+> index 70c27edb36..18d6169f3b 100644
+> --- a/docs/replay.txt
+> +++ b/docs/replay.txt
+> @@ -294,6 +294,39 @@ for recording and replaying must contain identical n=
+umber of ports in record
+>  and replay modes, but their backends may differ.
+>  E.g., '-serial stdio' in record mode, and '-serial null' in replay mode.
+>=20=20
+> +Reverse debugging
+> +-----------------
 > +
->      create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
->  
->      if (vms->secure) {
-> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
-> index 38a42f409a..21e58f27c5 100644
-> --- a/include/hw/acpi/acpi-defs.h
-> +++ b/include/hw/acpi/acpi-defs.h
-> @@ -302,6 +302,9 @@ struct AcpiMadtGenericCpuInterface {
->      uint32_t vgic_interrupt;
->      uint64_t gicr_base_address;
->      uint64_t arm_mpidr;
-> +    uint8_t  efficiency_class;
-> +    uint8_t  reserved2[1];
-> +    uint16_t spe_interrupt; /* ACPI 6.3 */
->  } QEMU_PACKED;
->  
->  typedef struct AcpiMadtGenericCpuInterface AcpiMadtGenericCpuInterface;
-> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
-> index 72c269aaa5..6013b6d535 100644
-> --- a/include/hw/arm/virt.h
-> +++ b/include/hw/arm/virt.h
-> @@ -49,6 +49,7 @@
->  #define ARCH_TIMER_NS_EL1_IRQ 14
->  #define ARCH_TIMER_NS_EL2_IRQ 10
->  
-> +#define VIRTUAL_SPE_IRQ 5
->  #define VIRTUAL_PMU_IRQ 7
->  
->  #define PPI(irq) ((irq) + 16)
-> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> index f211958eaa..786cc6134c 100644
-> --- a/target/arm/cpu.c
-> +++ b/target/arm/cpu.c
-> @@ -1041,6 +1041,8 @@ static void arm_cpu_initfn(Object *obj)
->                               "gicv3-maintenance-interrupt", 1);
->      qdev_init_gpio_out_named(DEVICE(cpu), &cpu->pmu_interrupt,
->                               "pmu-interrupt", 1);
-> +    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->spe_interrupt,
-> +                             "spe-interrupt", 1);
->  #endif
->  
->      /* DTB consumers generally don't in fact care what the 'compatible'
-> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> index baf2bbcee8..395a1e5df8 100644
-> --- a/target/arm/cpu.h
-> +++ b/target/arm/cpu.h
-> @@ -800,6 +800,8 @@ struct ARMCPU {
->      qemu_irq gicv3_maintenance_interrupt;
->      /* GPIO output for the PMU interrupt */
->      qemu_irq pmu_interrupt;
-> +    /* GPIO output for the SPE interrupt */
-> +    qemu_irq spe_interrupt;
->  
->      /* MemoryRegion to use for secure physical accesses */
->      MemoryRegion *secure_memory;
-> -- 
-> 2.17.1
-> 
-> 
+> +Reverse debugging allows "executing" the program in reverse direction.
+> +GDB remote protocol supports "reverse step" and "reverse continue"
+> +commands. The first one steps single instruction backwards in time,
+> +and the second one finds the last breakpoint in the past.
+> +
+> +Recorded executions may be used to enable reverse debugging. QEMU can't
+> +execute the code in backwards direction, but can load a snapshot and
+> +replay forward to find the desired position or breakpoint.
+> +
+> +The following GDB commands are supported:
+> + - reverse-stepi (or rsi) - step one instruction backwards
+> + - reverse-continue (or rc) - find last breakpoint in the past
+> +
+> +Reverse step loads the nearest snapshot and replays the execution until
+> +the required instruction is met.
+> +
+> +Reverse continue may include several passes of examining the execution
+> +between the snapshots. Each of the passes include the following steps:
+> + 1. loading the snapshot
+> + 2. replaying to examine the breakpoints
+> + 3. if breakpoint or watchpoint was met
+> +    - loading the snaphot again
+> +    - replaying to the required breakpoint
+> + 4. else
+> +    - proceeding to the p.1 with the earlier snapshot
+> +
+> +Therefore usage of the reverse debugging requires at least one snapshot
+> +created in advance. See the "Snapshotting" section to learn about running
+> +record/replay and creating the snapshot in these modes.
 
-Otherwise
+I would explicitly state you need:
 
-Reviewed-by: Andrew Jones <drjones@redhat.com>
+  - a block device for storing VM snapshots (independent of storage
+    devices you may have)
+  - to specify the starting rrsnapshot in both the record and replay runs
 
+Otherwise:
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
