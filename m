@@ -7,73 +7,72 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16BA4C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:10:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AA31C2D0E4
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:11:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B76BD207DE
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:10:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DE3782080A
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:11:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b166yxvt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B76BD207DE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fJ8ALYPe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DE3782080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49096 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFjwL-0001eH-MG
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:10:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43926)
+	id 1kFjxn-00038W-PR
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:11:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43918)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kFjoc-0001UG-JS
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:02:06 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43193
+ id 1kFjob-0001Rd-JD
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:02:05 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:31714
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kFjoY-0004Nj-UL
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:02:06 -0400
+ id 1kFjoY-0004O0-U5
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:02:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599595318;
+ s=mimecast20190719; t=1599595320;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/K3E4AQB9Wyo8p40roP4rTMm1MIlAuiE6H9hhreumsE=;
- b=b166yxvt/Ccq7tsjogEdcW4l6pHqNmQ1jAcP1O6C5EitBJhY27gSWAWs4i+Cp9pwQGZuhJ
- h7BVZBKDbsGBXYmuWQLbi3r1M+1uiMIjpHjyZRwFMh7NqsUci6Dsg9KxsKv/ASIBqDe74M
- AGDjMFuBQBFKYX7JQZ4SOdemDk1/OzU=
+ bh=oFZO6p04Xo1cCQTwbHus+a7/KxGBO0PW+N9S1mCxOuY=;
+ b=fJ8ALYPeTTIxtGEeCRWRF+oyF/nQ8evDBsKeavUfP3cMYp/R0B/QN5xl/hHl9zYNFHPiYx
+ jljfBAtWMcxkPbFcQeudSu1wfWwT561/7cbq18Hnb88mF6ODrU4AJR9JWIOL6ZK5U5/amW
+ ECV10G9lTe+hZQPpChqSUTjYxmEKsFc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-28-iIL9uwguMlW4gOiClrkIkQ-1; Tue, 08 Sep 2020 16:01:56 -0400
-X-MC-Unique: iIL9uwguMlW4gOiClrkIkQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-116-8SU1Ws-jNhy1hajPuS_dJQ-1; Tue, 08 Sep 2020 16:01:58 -0400
+X-MC-Unique: 8SU1Ws-jNhy1hajPuS_dJQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 228691DDEF;
- Tue,  8 Sep 2020 20:01:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 001588015DB;
+ Tue,  8 Sep 2020 20:01:56 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id ACD97702E7;
- Tue,  8 Sep 2020 20:01:54 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BFCEA100239F;
+ Tue,  8 Sep 2020 20:01:56 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 22/34] filter-rewriter: Rename FILTER_COLO_REWRITER to
- FILTER_REWRITER
-Date: Tue,  8 Sep 2020 16:01:11 -0400
-Message-Id: <20200908200123.3402311-23-ehabkost@redhat.com>
+Subject: [PULL 24/34] sabre: Rename SABRE_DEVICE to SABRE
+Date: Tue,  8 Sep 2020 16:01:13 -0400
+Message-Id: <20200908200123.3402311-25-ehabkost@redhat.com>
 In-Reply-To: <20200908200123.3402311-1-ehabkost@redhat.com>
 References: <20200908200123.3402311-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
@@ -100,7 +99,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Zhang Chen <chen.zhang@intel.com>
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -109,97 +108,81 @@ Make the type checking macro name consistent with the TYPE_*
 constant.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-Message-Id: <20200902224311.1321159-41-ehabkost@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200902224311.1321159-49-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- net/filter-rewriter.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ include/hw/pci-host/sabre.h | 2 +-
+ hw/pci-host/sabre.c         | 8 ++++----
+ hw/sparc64/sun4u.c          | 2 +-
+ 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/net/filter-rewriter.c b/net/filter-rewriter.c
-index 113e293207..44f6021dd8 100644
---- a/net/filter-rewriter.c
-+++ b/net/filter-rewriter.c
-@@ -25,7 +25,7 @@
+diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
+index 597bf70d69..7a76de4b9e 100644
+--- a/include/hw/pci-host/sabre.h
++++ b/include/hw/pci-host/sabre.h
+@@ -51,7 +51,7 @@ struct SabreState {
+ typedef struct SabreState SabreState;
  
- #define TYPE_FILTER_REWRITER "filter-rewriter"
- typedef struct RewriterState RewriterState;
--DECLARE_INSTANCE_CHECKER(RewriterState, FILTER_COLO_REWRITER,
-+DECLARE_INSTANCE_CHECKER(RewriterState, FILTER_REWRITER,
-                          TYPE_FILTER_REWRITER)
+ #define TYPE_SABRE "sabre"
+-DECLARE_INSTANCE_CHECKER(SabreState, SABRE_DEVICE,
++DECLARE_INSTANCE_CHECKER(SabreState, SABRE,
+                          TYPE_SABRE)
  
- #define FAILOVER_MODE_ON  true
-@@ -47,7 +47,7 @@ static void filter_rewriter_failover_mode(RewriterState *s)
+ #endif
+diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
+index 0cc68585f8..5ac6283623 100644
+--- a/hw/pci-host/sabre.c
++++ b/hw/pci-host/sabre.c
+@@ -338,7 +338,7 @@ static void pci_sabre_set_irq(void *opaque, int irq_num, int level)
  
- static void filter_rewriter_flush(NetFilterState *nf)
+ static void sabre_reset(DeviceState *d)
  {
--    RewriterState *s = FILTER_COLO_REWRITER(nf);
-+    RewriterState *s = FILTER_REWRITER(nf);
+-    SabreState *s = SABRE_DEVICE(d);
++    SabreState *s = SABRE(d);
+     PCIDevice *pci_dev;
+     unsigned int i;
+     uint16_t cmd;
+@@ -376,7 +376,7 @@ static const MemoryRegionOps pci_config_ops = {
  
-     if (!qemu_net_queue_flush(s->incoming_queue)) {
-         /* Unable to empty the queue, purge remaining packets */
-@@ -252,7 +252,7 @@ static ssize_t colo_rewriter_receive_iov(NetFilterState *nf,
-                                          int iovcnt,
-                                          NetPacketSent *sent_cb)
+ static void sabre_realize(DeviceState *dev, Error **errp)
  {
--    RewriterState *s = FILTER_COLO_REWRITER(nf);
-+    RewriterState *s = FILTER_REWRITER(nf);
-     Connection *conn;
-     ConnectionKey key;
-     Packet *pkt;
-@@ -350,7 +350,7 @@ static gboolean offset_is_nonzero(gpointer key,
- static void colo_rewriter_handle_event(NetFilterState *nf, int event,
-                                        Error **errp)
+-    SabreState *s = SABRE_DEVICE(dev);
++    SabreState *s = SABRE(dev);
+     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(s);
+     PCIDevice *pci_dev;
+@@ -421,7 +421,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+ 
+ static void sabre_init(Object *obj)
  {
--    RewriterState *rs = FILTER_COLO_REWRITER(nf);
-+    RewriterState *rs = FILTER_REWRITER(nf);
+-    SabreState *s = SABRE_DEVICE(obj);
++    SabreState *s = SABRE(obj);
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     unsigned int i;
  
-     switch (event) {
-     case COLO_EVENT_CHECKPOINT:
-@@ -370,7 +370,7 @@ static void colo_rewriter_handle_event(NetFilterState *nf, int event,
+@@ -502,7 +502,7 @@ static const TypeInfo sabre_pci_info = {
  
- static void colo_rewriter_cleanup(NetFilterState *nf)
+ static char *sabre_ofw_unit_address(const SysBusDevice *dev)
  {
--    RewriterState *s = FILTER_COLO_REWRITER(nf);
-+    RewriterState *s = FILTER_REWRITER(nf);
+-    SabreState *s = SABRE_DEVICE(dev);
++    SabreState *s = SABRE(dev);
  
-     /* flush packets */
-     if (s->incoming_queue) {
-@@ -381,7 +381,7 @@ static void colo_rewriter_cleanup(NetFilterState *nf)
+     return g_strdup_printf("%x,%x",
+                (uint32_t)((s->special_base >> 32) & 0xffffffff),
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 67985414e2..b4aabfc076 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -585,7 +585,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+     prom_init(hwdef->prom_addr, bios_name);
  
- static void colo_rewriter_setup(NetFilterState *nf, Error **errp)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(nf);
-+    RewriterState *s = FILTER_REWRITER(nf);
- 
-     s->connection_track_table = g_hash_table_new_full(connection_key_hash,
-                                                       connection_key_equal,
-@@ -392,7 +392,7 @@ static void colo_rewriter_setup(NetFilterState *nf, Error **errp)
- 
- static bool filter_rewriter_get_vnet_hdr(Object *obj, Error **errp)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+    RewriterState *s = FILTER_REWRITER(obj);
- 
-     return s->vnet_hdr;
- }
-@@ -401,14 +401,14 @@ static void filter_rewriter_set_vnet_hdr(Object *obj,
-                                          bool value,
-                                          Error **errp)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+    RewriterState *s = FILTER_REWRITER(obj);
- 
-     s->vnet_hdr = value;
- }
- 
- static void filter_rewriter_init(Object *obj)
- {
--    RewriterState *s = FILTER_COLO_REWRITER(obj);
-+    RewriterState *s = FILTER_REWRITER(obj);
- 
-     s->vnet_hdr = false;
-     s->failover_mode = FAILOVER_MODE_OFF;
+     /* Init sabre (PCI host bridge) */
+-    sabre = SABRE_DEVICE(qdev_new(TYPE_SABRE));
++    sabre = SABRE(qdev_new(TYPE_SABRE));
+     qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
+     qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
+     object_property_set_link(OBJECT(sabre), "iommu", OBJECT(iommu),
 -- 
 2.26.2
 
