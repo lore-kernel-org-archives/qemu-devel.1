@@ -2,82 +2,85 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34C96C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49737C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1C7F21D20
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DC30921D20
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mOXtCU3s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1C7F21D20
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qbQZsJ6C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC30921D20
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35100 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFYnY-0002Ik-SP
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 04:16:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58244)
+	id 1kFYni-0002kH-RL
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 04:16:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58370)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kFYl9-0005ZT-0h
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:47 -0400
-Received: from mail-pg1-x52b.google.com ([2607:f8b0:4864:20::52b]:43632)
+ id 1kFYlD-0005j5-PC
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:51 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:39099)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kFYl6-0000Q8-Mk
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:46 -0400
-Received: by mail-pg1-x52b.google.com with SMTP id t14so4057304pgl.10
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 01:13:43 -0700 (PDT)
+ id 1kFYl9-0000R2-Cd
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:51 -0400
+Received: by mail-pg1-x542.google.com with SMTP id v15so9508291pgh.6
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 01:13:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Dme5wOJZvNDhKpDBEi74Ima5Rw3hvZ52vtZKHURP4rY=;
- b=mOXtCU3sfQYCyaYDEF3467iwanb/BnVVUkjRgJ2724aFN2GTTwczcMKw67aiTpzQ5/
- UI9Zu7/cn5g/T3L2mfmcXHDtUG/PxYN0b5ZBq7lnY525LRfVnNNDV2KZK4mWrXcY2bZT
- w2pzcBAxnL3OQIai+9TnuGN7CPNx6BkKHW1/0oqanZrxnkOyLReCyvoEtan2NYyfxPiV
- WiMsjPiRsnRrfH6+q7KxYQ/TED3CDomAXsmWt3twbjY9LrCJTmBe8EwCskedRmMtD7TE
- vKFH90buBGcoZ3Bl2NvCnbyhVIF3WGo+NrmnGXijgPMrXRk6U7S1pRujWt/DDlbLeqYB
- lqIQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=sSfBFaYDNM91Wy+aR//OSZgCQwJ7nAz+b7+r07t012o=;
+ b=qbQZsJ6CF8jpwRRRounCQp5bL88YG0Br0PMNnQ/UvzZgAQEQPAkdgp3MXCVMn7SZOB
+ 7levT9Y6Qbb5tD2xMCJmr4nv9iNl6QhxxT4w0tWFjdb1Lfo7VxWowR+K9I707xX25TW6
+ bZFoN04bcRKuQ4sYFyFPbhc/d2YcnydUmQIdR74hv/nGVVJ7GqDJXkqR4LMBlf8g0R7t
+ +jvvIl1ZEjq7W6Rk3MMdmwwKGvZ/nVG4qQkglGWbYmSiydsnBxE+YRnZPBqKjefLmR8e
+ 5uFxj/esmZKg3XMSiooAZg3GkSXKZ2zdqz5Mu2oj4S9cqqW2UaATx7hWpIWUFLY8cVdD
+ Kitw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=Dme5wOJZvNDhKpDBEi74Ima5Rw3hvZ52vtZKHURP4rY=;
- b=CMrj/TvKwO9GtqbcrBFxefe0bWTaHK4lZ6E6sKlDxkS3AUf9CnTo+Ow/qI9thiKo4g
- gPXB9T+ir/ewjiAJFn65r+mEh0pZ5GSJPJdn4i20gwTONGbnic9IafNrW89zfTZ3ytK+
- uxmD+abtIBVhzAZQMa8zwh81CmlRV3Fb5lmHQXtyL+8XyB36PolmtfxwvTn5BR1UF6Tb
- Qr+jgbJZCGwYbo1+3Q8trhukOirZlrn3fo0FiLM0fBzPDOBN1iHWq0CZOfVXVj1fxl+z
- uA50v/s2NTEKTNdDNiCRO0wBRWWMEpGWK3PfLlBAYv66VELa5gXmuxso0XzPw752t+KN
- KWvg==
-X-Gm-Message-State: AOAM530yQiNdoukoZgSaiPX1/L06XpvFqr9FHn8Q4dT0Bjp70kJvaTf1
- wMikccFe6HPFD9ZhCQgbmATe
-X-Google-Smtp-Source: ABdhPJxYZmOfnfKjnuKddGmh9o43gJ69MZCZy6GnJIG0MbRVsrBPIY49ISgpgB2O/MUcvf3gRggxqA==
-X-Received: by 2002:a17:902:b108:b029:d0:cbe1:e770 with SMTP id
- q8-20020a170902b108b02900d0cbe1e770mr102286plr.23.1599552822378; 
- Tue, 08 Sep 2020 01:13:42 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=sSfBFaYDNM91Wy+aR//OSZgCQwJ7nAz+b7+r07t012o=;
+ b=aT7birlQOxTos1F/SqSckayU88Gpw5yYc7LQa5wJURo3bXr8p/HtPQAijevWJR+PdJ
+ cxdaNb8A54xnb5iu0Xi5nkobokbYy8J+M7S15jb/Z9xNGzZNq6DHEEYSC4jY9Kl01n3u
+ ZeiXF8s6n3cNdLp9/15nKdSY0+1WGffL/TUSvKbrEEI2wfF8CW9WC0h1J8dtRXbH3o6Z
+ 5HA3gF/Nm08Hje/qSbTGgFmF6C+VZQIwixIPkFlwsjEz8zTEc6oGUF7fbYF4bNn2Q5tv
+ /rVJ91lQPY2tN/KD2t5L30dfotD/DuT3DbMGiV5sA65FFBHi2zhaBb0p1QSZPXNh289I
+ ht/g==
+X-Gm-Message-State: AOAM5328Y0NzsjaTfKrSSpzTx7VsXe6vGgYh8TSxJsqSsXnhynJyvAG4
+ TZbteidj6GMvl9DjTU5huSEql8nI//6gjTY=
+X-Google-Smtp-Source: ABdhPJwgBcKHQQjI2ii5UQWMZs6xY7efcdt52sP36Po66LfCEwUTD25oLYWilg0+5nJfmnKCUaq9ow==
+X-Received: by 2002:a62:7c82:0:b029:13c:1611:66b9 with SMTP id
+ x124-20020a627c820000b029013c161166b9mr22028120pfc.4.1599552826033; 
+ Tue, 08 Sep 2020 01:13:46 -0700 (PDT)
 Received: from localhost.localdomain ([147.75.106.138])
- by smtp.gmail.com with ESMTPSA id m190sm16934788pfm.184.2020.09.08.01.13.41
+ by smtp.gmail.com with ESMTPSA id m190sm16934788pfm.184.2020.09.08.01.13.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 01:13:41 -0700 (PDT)
+ Tue, 08 Sep 2020 01:13:45 -0700 (PDT)
 From: Haibo Xu <haibo.xu@linaro.org>
 To: drjones@redhat.com,
 	richard.henderson@linaro.org
-Subject: [PATCH v2 00/12] target/arm: Add vSPE support to KVM guest
-Date: Tue,  8 Sep 2020 08:13:18 +0000
-Message-Id: <cover.1599549462.git.haibo.xu@linaro.org>
+Subject: [PATCH v2 03/12] target/arm/cpu: spe: Add an option to turn on/off
+ vSPE support
+Date: Tue,  8 Sep 2020 08:13:21 +0000
+Message-Id: <77b57f43d4fa6319cfa666d6c77e39ec76c44d88.1599549462.git.haibo.xu@linaro.org>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <cover.1599549462.git.haibo.xu@linaro.org>
+References: <cover.1599549462.git.haibo.xu@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52b;
- envelope-from=haibo.xu@linaro.org; helo=mail-pg1-x52b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=haibo.xu@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,125 +108,151 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2:
-  - Rebased on Andrew's patches[3]
-  - Added compat codes to enable vSPE only for the 5.2 and 
-    later machine types [Andrew]
-  - Changed to use the ID register bit to identify the spe
-    feature [Andrew/Richard]
-  - Added the missing field in AcpiMadtGenericCpuInterface
-    definition [Auger]
-  - Split the un-tested userspace irqchip support for vSPE
-    into a separate patch [Andrew]
-  - Added doc and qtest for vSPE [Andrew]
+Adds a spe=[on/off] option to enable/disable vSPE support in
+guest vCPU.
 
-Many thanks to Andrew, Richard, Philippe and Auger for their comments. 
+Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
+---
+ target/arm/cpu.c   |  6 ++++++
+ target/arm/cpu.h   | 13 ++++++++++++
+ target/arm/cpu64.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 71 insertions(+)
 
-This series add support for SPE(Statistical Profiling Extension)[1]
-in KVM guest. It's based on Andrew Murray's kernel KVM patches V2[2],
-and has been tested to ensure that guest can use SPE with valid data.
-E.g.
-
-In host:
-$ ./qemu-system-aarch64 \
-        -cpu host -M virt,accel=kvm,gic-version=3 -nographic -m 2048M \
-        -kernel ./Image-new \
-        -initrd /boot/initrd.img-5.6.0-rc2+ \
-        -append "root=/dev/vda rw console=ttyAMA0" -nodefaults -serial stdio\
-        -drive if=none,file=./xenial.rootfs.ext4,id=hd0,format=raw \
-        -device virtio-blk-device,drive=hd0  \
-
-In guest:
-$ perf record -e arm_spe/ts_enable=1,pa_enable=1,pct_enable=1/ \
-        dd if=/dev/zero of=/dev/null count=1000
-$ perf report --dump-raw-trace > spe_buf.txt
-
-The spe_buf.txt should contain similar data as below:
-
-. ... ARM SPE data: size 135944 bytes
-.  00000000:  b0 f4 d3 29 10 00 80 ff a0                      PC 0xff80001029d3f4 el1 ns=1
-.  00000009:  99 0b 00                                        LAT 11 ISSUE
-.  0000000c:  98 0d 00                                        LAT 13 TOT
-.  0000000f:  52 16 00                                        EV RETIRED L1D-ACCESS TLB-ACCESS
-.  00000012:  49 00                                           LD
-.  00000014:  b2 d0 40 d8 70 00 00 ff 00                      VA 0xff000070d840d0
-.  0000001d:  9a 01 00                                        LAT 1 XLAT
-.  00000020:  00 00 00                                        PAD
-.  00000023:  71 a5 1f b3 20 14 00 00 00                      TS 86447955877
-.  0000002c:  b0 7c f9 29 10 00 80 ff a0                      PC 0xff80001029f97c el1 ns=1
-.  00000035:  99 02 00                                        LAT 2 ISSUE
-.  00000038:  98 03 00                                        LAT 3 TOT
-.  0000003b:  52 02 00                                        EV RETIRED
-.  0000003e:  48 00                                           INSN-OTHER
-.  00000040:  00 00 00                                        PAD
-.  00000043:  71 ef 1f b3 20 14 00 00 00                      TS 86447955951
-.  0000004c:  b0 f0 e9 29 10 00 80 ff a0                      PC 0xff80001029e9f0 el1 ns=1
-.  00000055:  99 02 00                                        LAT 2 ISSUE
-.  00000058:  98 03 00                                        LAT 3 TOT
-.  0000005b:  52 02 00                                        EV RETIRED
-
-If you want to disable the vSPE support, you can use the 'spe=off' cpu
-property:
-
-./qemu-system-aarch64 \
-        -cpu host,spe=off -M virt,accel=kvm,gic-version=3 -nographic -m 2048M \
-        -kernel ./Image-new \
-        -initrd /boot/initrd.img-5.6.0-rc2+ \
-        -append "root=/dev/vda rw console=ttyAMA0" -nodefaults -serial stdio\
-        -drive if=none,file=./xenial.rootfs.ext4,id=hd0,format=raw \
-        -device virtio-blk-device,drive=hd0  \
-
-Note:
-(1) Since the kernel patches are still under review, some of the macros
-    in the header files may be changed after merging. We may need to
-    update them accordingly. To be specific, if you want to have a try
-    on this patch series, you needs to replace on the kernel 5.5-rc2 based
-    series, and do minor changes:
-
-    -#define KVM_CAP_ARM_SPE_V1 179
-    +#define KVM_CAP_ARM_SPE_V1 184
-
-(2) These patches only add vSPE support in KVM mode, for TCG mode, I'm
-    not sure whether we need to support it.
-(3) Just followed the 'sve' property, we only allow this feature to be
-    removed from CPUs which enable it by default when the host cpu support it.
-
-[1]https://community.arm.com/developer/ip-products/processors/b/processors-ip-blog/
-   posts/statistical-profiling-extension-for-armv8-a
-[2]https://www.spinics.net/lists/arm-kernel/msg776228.html
-[3]https://www.mail-archive.com/qemu-devel@nongnu.org/msg727588.html
-
-Haibo Xu (12):
-  update Linux headers with new vSPE macros
-  target/arm/kvm: spe: Add helper to detect SPE when using KVM
-  target/arm/cpu: spe: Add an option to turn on/off vSPE support
-  target/arm: spe: Only enable SPE from 5.2 compat machines.
-  target/arm/kvm: spe: Unify device attr operation helper
-  target/arm/kvm: spe: Add device init and set_irq operations
-  hw/arm/virt: Move post cpu realize check into its own function
-  hw/arm/virt: Move kvm pmu setup to virt_cpu_post_init
-  hw/arm/virt: spe: Add SPE fdt binding for virt machine
-  target/arm/cpu: spe: Enable spe to work with host cpu
-  target/arm/kvm: spe: Enable userspace irqchip support.
-  target/arm: spe: Add corresponding doc and test.
-
- docs/system/arm/cpu-features.rst |  20 ++++++
- hw/arm/virt-acpi-build.c         |   3 +
- hw/arm/virt.c                    | 116 +++++++++++++++++++++++--------
- include/hw/acpi/acpi-defs.h      |   3 +
- include/hw/arm/virt.h            |   2 +
- linux-headers/asm-arm64/kvm.h    |   4 ++
- linux-headers/linux/kvm.h        |   2 +
- target/arm/cpu.c                 |  11 +++
- target/arm/cpu.h                 |  17 +++++
- target/arm/cpu64.c               |  57 +++++++++++++++
- target/arm/kvm.c                 |  10 +++
- target/arm/kvm64.c               |  56 +++++++++++++--
- target/arm/kvm_arm.h             |  18 +++++
- target/arm/monitor.c             |   2 +-
- tests/qtest/arm-cpu-features.c   |   9 +++
- 15 files changed, 294 insertions(+), 36 deletions(-)
-
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index c179e0752d..f211958eaa 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -1310,6 +1310,12 @@ void arm_cpu_finalize_features(ARMCPU *cpu, Error **errp)
+             error_propagate(errp, local_err);
+             return;
+         }
++
++        arm_cpu_spe_finalize(cpu, &local_err);
++        if (local_err != NULL) {
++            error_propagate(errp, local_err);
++            return;
++        }
+     }
+ }
+ 
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index a1c7d8ebae..baf2bbcee8 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -24,6 +24,7 @@
+ #include "hw/registerfields.h"
+ #include "cpu-qom.h"
+ #include "exec/cpu-defs.h"
++#include "qapi/qapi-types-common.h"
+ 
+ /* ARM processors have a weak memory model */
+ #define TCG_GUEST_DEFAULT_MO      (0)
+@@ -196,9 +197,11 @@ typedef struct {
+ #ifdef TARGET_AARCH64
+ # define ARM_MAX_VQ    16
+ void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp);
++void arm_cpu_spe_finalize(ARMCPU *cpu, Error **errp);
+ #else
+ # define ARM_MAX_VQ    1
+ static inline void arm_cpu_sve_finalize(ARMCPU *cpu, Error **errp) { }
++static inline void arm_cpu_spe_finalize(ARMCPU *cpu, Error **errp) { }
+ #endif
+ 
+ typedef struct ARMVectorReg {
+@@ -829,6 +832,8 @@ struct ARMCPU {
+     bool has_el3;
+     /* CPU has PMU (Performance Monitor Unit) */
+     bool has_pmu;
++    /* CPU has SPE (Statistical Profiling Extension) */
++    OnOffAuto has_spe;
+     /* CPU has VFP */
+     bool has_vfp;
+     /* CPU has Neon */
+@@ -3869,6 +3874,14 @@ static inline bool isar_feature_aa64_pmu_8_4(const ARMISARegisters *id)
+         FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMUVER) != 0xf;
+ }
+ 
++/*
++ * Currently we don't differentiate between the ARMv8.2-SPE and ARMv8.3-SPE.
++ */
++static inline bool isar_feature_aa64_spe(const ARMISARegisters *id)
++{
++    return FIELD_EX64(id->id_aa64dfr0, ID_AA64DFR0, PMSVER) != 0;
++}
++
+ static inline bool isar_feature_aa64_rcpc_8_3(const ARMISARegisters *id)
+ {
+     return FIELD_EX64(id->id_aa64isar1, ID_AA64ISAR1, LRCPC) != 0;
+diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
+index 3c2b3d9599..4997c4a3c0 100644
+--- a/target/arm/cpu64.c
++++ b/target/arm/cpu64.c
+@@ -572,6 +572,55 @@ void aarch64_add_sve_properties(Object *obj)
+     }
+ }
+ 
++void arm_cpu_spe_finalize(ARMCPU *cpu, Error **errp)
++{
++    uint64_t t;
++    uint32_t value = 0;
++
++    if (cpu->has_spe == ON_OFF_AUTO_AUTO) {
++        if (kvm_enabled() && kvm_arm_spe_supported()) {
++            cpu->has_spe = ON_OFF_AUTO_ON;
++        } else {
++            cpu->has_spe = ON_OFF_AUTO_OFF;
++        }
++    } else if (cpu->has_spe == ON_OFF_AUTO_ON) {
++        if (!kvm_enabled() || !kvm_arm_spe_supported()) {
++            error_setg(errp, "'spe' cannot be enabled on this host");
++            return;
++        }
++    }
++
++    /*
++     * According to the ARM ARM, the ID_AA64DFR0[PMSVER] currently
++     * support 3 values:
++     *
++     * 0b0000: SPE not implemented
++     * 0b0001: ARMv8.2-SPE implemented
++     * 0b0010: ARMv8.3-SPE implemented
++     *
++     * But the kernel KVM API didn't expose all these 3 values, and
++     * we can only get whether the SPE feature is supported or not.
++     * So here we just set the PMSVER to 1 if this feature was supported.
++     */
++    if (cpu->has_spe == ON_OFF_AUTO_ON) {
++        value = 1;
++    }
++
++    t = cpu->isar.id_aa64dfr0;
++    t = FIELD_DP64(t, ID_AA64DFR0, PMSVER, value);
++    cpu->isar.id_aa64dfr0 = t;
++}
++
++static bool arm_spe_get(Object *obj, Error **errp)
++{
++    return ARM_CPU(obj)->has_spe != ON_OFF_AUTO_OFF;
++}
++
++static void arm_spe_set(Object *obj, bool value, Error **errp)
++{
++    ARM_CPU(obj)->has_spe = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
++}
++
+ /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
+  * otherwise, a CPU with as many features enabled as our emulation supports.
+  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
+@@ -721,6 +770,9 @@ static void aarch64_max_initfn(Object *obj)
+     aarch64_add_sve_properties(obj);
+     object_property_add(obj, "sve-max-vq", "uint32", cpu_max_get_sve_max_vq,
+                         cpu_max_set_sve_max_vq, NULL, NULL);
++
++    cpu->has_spe = ON_OFF_AUTO_AUTO;
++    object_property_add_bool(obj, "spe", arm_spe_get, arm_spe_set);
+ }
+ 
+ static const ARMCPUInfo aarch64_cpus[] = {
 -- 
 2.17.1
 
