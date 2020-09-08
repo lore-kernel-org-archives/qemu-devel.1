@@ -2,85 +2,108 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C3DC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:57:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8645EC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:58:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2268020738
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:57:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F199020658
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 15:58:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="vdhy36Hd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2268020738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HcVbZUX9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F199020658
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36432 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFg0A-0007Rq-5w
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 11:57:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34694)
+	id 1kFg14-0000J9-Ou
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 11:58:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35626)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kFfvQ-0000H3-Ux
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:52:52 -0400
-Received: from forwardcorp1j.mail.yandex.net ([2a02:6b8:0:1619::183]:48374)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
- id 1kFfvK-0003L6-Pg
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:52:51 -0400
-Received: from myt5-23f0be3aa648.qloud-c.yandex.net
- (myt5-23f0be3aa648.qloud-c.yandex.net
- [IPv6:2a02:6b8:c12:3e29:0:640:23f0:be3a])
- by forwardcorp1j.mail.yandex.net (Yandex) with ESMTP id A9CDA2E1768;
- Tue,  8 Sep 2020 18:52:40 +0300 (MSK)
-Received: from localhost (localhost [::1])
- by myt5-23f0be3aa648.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- c5XFXTgpvd-qdwC4IKd; Tue, 08 Sep 2020 18:52:40 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1599580360; bh=tBY3Ug4cbO6QjLjoroU33lOpmN4LKcxgFP0TjDfNwIM=;
- h=References:Date:Message-Id:Cc:Subject:To:From;
- b=vdhy36Hd4MRpU0Fa0WUbd4jXq4xO/voB6QuQDOdMhcQgag2b5WTbcKN6OjkYPvlpg
- ldAAsvQWyLSbtGJFfwL26v3dyBoM/yARRdBS9P9DsI1CL9ScApzK2ffTX38IEmNmYZ
- kNxY6oJd+GWh4FwcMPuphfgCMOwXla6d2g0RD5R0=
-Authentication-Results: myt5-23f0be3aa648.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-X-Yandex-Sender-Uid: 1120000000161690
-Received: by myt4-457577cc370d.qloud-c.yandex.net with HTTP;
- Tue, 08 Sep 2020 18:52:39 +0300
-From: Alexey Kirillov <lekiravi@yandex-team.ru>
-To: Markus Armbruster <armbru@redhat.com>
-References: <20200901182326.59633-1-lekiravi@yandex-team.ru>
- <20200901182326.59633-2-lekiravi@yandex-team.ru>
- <87lfhsjubv.fsf@dusky.pond.sub.org>
- <37711599469320@mail.yandex-team.ru> <871rjdrca0.fsf@dusky.pond.sub.org>
-Subject: Re: [PATCH v3 1/4] qapi: net: Add query-netdevs command
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFfyT-0004d6-Jw
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:56:01 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21251
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFfyQ-0003yQ-0o
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 11:56:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599580555;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=8VUrfo15vNafeYg0h4TuIp0D8UFhdJzYacZhDlojTCw=;
+ b=HcVbZUX9ycdboCHsra5YfpKr5bApn2CMydJGD9G0n8MEtm3+DOZ1NowXteG8udRdXp9ddV
+ OFHLCWBacUsSffuVbtOnQQu+qzTSf1qKKZ8vNZW6tzDQkp0m4sXtj+yMyR2LvvAqOSux7n
+ uC9odwrmW48VsTSq2ZD2El9qj6W3+qE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-UMiK_vl1MsOeXhnsrjJMyg-1; Tue, 08 Sep 2020 11:55:54 -0400
+X-MC-Unique: UMiK_vl1MsOeXhnsrjJMyg-1
+Received: by mail-wr1-f72.google.com with SMTP id r16so7096497wrm.18
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 08:55:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=8VUrfo15vNafeYg0h4TuIp0D8UFhdJzYacZhDlojTCw=;
+ b=TmICcXL4fJHLG4smzSMehm4gCSZOxKabF4QeUetp1st62rRr9shqQy4xgZXlSQv7on
+ 29qnW/CnIaHAg6YVQMTLvQlaKP5n5jXwL7VmAqLkUDb3Zp++dfybR/+gZyysSiDsOvbd
+ /mxqCZSxp3rBWdZPMA06VBqb05/+IgP59pw6xYd7ywQLMjaI2PQePTrgqEOq/wdhcxF+
+ 4Y6siLwbp/I72TiwZ3nlEDabf4UNhEBZLgtZIO18EA4/uMnyyysS/SAieDEiGrubTZM/
+ cYNlU08+NMahgdVl19kEuHorJmUUino7vOzic0g77qWGluSacfipCbkNxfbKrATXjwUT
+ WLzw==
+X-Gm-Message-State: AOAM530nClvqXfGe3oVWB19kJi0nIG1peX8hVxk1BJcbbZzbaudhtZeT
+ d32UcqHiEGpTJOWNO8eUkkcUsI+SopSkwp06S0wR5wWqXYM6scO3WzIys3qf7wBhB7byLaudVZO
+ dhy1j5l83n/E3BY8=
+X-Received: by 2002:a5d:49d2:: with SMTP id t18mr270732wrs.99.1599580552696;
+ Tue, 08 Sep 2020 08:55:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyEdHc1pv7BGXCTe+BIUfFARswN/4qnGyClHhLRspWocVPg/ArmCIreq1geKKgL3FqYCE8gsQ==
+X-Received: by 2002:a5d:49d2:: with SMTP id t18mr270716wrs.99.1599580552510;
+ Tue, 08 Sep 2020 08:55:52 -0700 (PDT)
+Received: from localhost.localdomain (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id o5sm31934683wmc.33.2020.09.08.08.55.51
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Sep 2020 08:55:51 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 4/6] stubs: Split accelerator / hardware related stubs
+Date: Tue,  8 Sep 2020 17:55:28 +0200
+Message-Id: <20200908155530.249806-5-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200908155530.249806-1-philmd@redhat.com>
+References: <20200908155530.249806-1-philmd@redhat.com>
 MIME-Version: 1.0
-X-Mailer: Yamail [ http://yandex.ru ] 5.0
-Date: Tue, 08 Sep 2020 18:52:39 +0300
-Message-Id: <18211599579782@mail.yandex-team.ru>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8;
+	text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset=utf-8
-Received-SPF: pass client-ip=2a02:6b8:0:1619::183;
- envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1j.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:08:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -89,171 +112,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>,
- Jason Wang <jasowang@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Vincenzo Maffione <v.maffione@gmail.com>,
- "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-07.09.2020, 15:40, "Markus Armbruster" <armbru@redhat.com>:
-> Alexey Kirillov <lekiravi@yandex-team.ru> writes:
->
->>  Hi!
->>
->>  02.09.2020, 14:23, "Markus Armbruster" <armbru@redhat.com>:
->>>  Alexey Kirillov <lekiravi@yandex-team.ru> writes:
->>>
->>>>   Add a qmp command that provides information about currently attached
->>>>   backend network devices and their configuration.
->>>>
->>>>   Signed-off-by: Alexey Kirillov <lekiravi@yandex-team.ru>
->>>
->>>  [...]
->>>>   diff --git a/qapi/net.json b/qapi/net.json
->>>>   index ddb113e5e5..c09322bb42 100644
->>>>   --- a/qapi/net.json
->>>>   +++ b/qapi/net.json
->>>>   @@ -714,3 +714,71 @@
->>>>    ##
->>>>    { 'event': 'FAILOVER_NEGOTIATED',
->>>>      'data': {'device-id': 'str'} }
->>>>   +
->>>>   +##
->>>>   +# @NetdevInfo:
->>>>   +#
->>>>   +# Configuration of a network backend device (netdev).
->>>>   +#
->>>>   +# @id: Device identifier.
->>>>   +#
->>>>   +# @type: Specify the driver used for interpreting remaining arguments.
->>>>   +#
->>>>   +# @peer-id: Connected frontend network device identifier.
->>>>   +#
->>>>   +# Since: 5.2
->>>>   +##
->>>>   +{ 'union': 'NetdevInfo',
->>>>   + 'base': { 'id': 'str',
->>>>   + 'type': 'NetClientDriver',
->>>>   + '*peer-id': 'str' },
->>>>   + 'discriminator': 'type',
->>>>   + 'data': {
->>>>   + 'user': 'NetdevUserOptions',
->>>>   + 'tap': 'NetdevTapOptions',
->>>>   + 'l2tpv3': 'NetdevL2TPv3Options',
->>>>   + 'socket': 'NetdevSocketOptions',
->>>>   + 'vde': 'NetdevVdeOptions',
->>>>   + 'bridge': 'NetdevBridgeOptions',
->>>>   + 'netmap': 'NetdevNetmapOptions',
->>>>   + 'vhost-user': 'NetdevVhostUserOptions',
->>>>   + 'vhost-vdpa': 'NetdevVhostVDPAOptions' } }
->>>
->>>  This is union Netdev plus a common member @peer-id, less the variant
->>>  members for NetClientDriver values 'nic' and 'hubport'.
->>>
->>>  Can 'type: 'nic' and 'type': 'hubport' occur?
->>
->>  No, it can't. We don't support NIC/hubport in query-netdevs, so we neither create this
->>  structure for them, nor store config.
->
-> Same for 'none', I guess.
->
-> As defined, NetdevInfo allows types 'none', 'nic', and 'hubport', it
-> just has no variant members for them. The fact that they can't occur is
-> not coded into the type, and therefore not visible in introspection.
->
-> To make introspection more precise, we'd have to define a new enum type.
-> How much that would complicate the C code is unclear.
->
-> Do we need it to be more precise? Eric, got an opinion?
->
-> Existing type Netdev has the same issue for 'none' and 'nic'. I guess
-> this is so we can reuse the type for -net. Not sure that's a good idea,
-> but not this patch's problem.
->
->>>  What's the use case for @peer-id?
->>
->>  Main reason is to provide information "is this backend connected to frontend device".
->>  User also may want to know which backend used for frontend device.
->>
->>>  Assuming we want @peer-id: its documentation is too vague. Cases:
->>>
->>>  * Not connected to a frontend: I guess @peer-id is absent then.
->>
->>  Absolutely correct.
->>
->>>  * Connected to a frontend
->>>
->>>    - that has a qdev ID (the thing you set with -device id=...): I guess
->>>      it's the qdev ID then.
->>
->>  Correct.
->>
->>>    - that doesn't have a qdev ID: anyone's guess.
->>
->>  We use field "name" of structure NetClientState, so if there is no direct ID setting,
->>  there must be generated name (in format "model.id").
->
-> Perhaps:
->
->       # @peer-id: the connected network backend's name (absent if no
->       # backend is connected)
+Move hardware stubs unrelated from the accelerator to xen-hw-stub.c.
 
-Maybe you mean:
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ accel/stubs/xen-stub.c | 41 +----------------------------------
+ stubs/xen-hw-stub.c    | 49 ++++++++++++++++++++++++++++++++++++++++++
+ MAINTAINERS            |  1 +
+ stubs/meson.build      |  1 +
+ 4 files changed, 52 insertions(+), 40 deletions(-)
+ create mode 100644 stubs/xen-hw-stub.c
 
-# @peer-id: The connected frontend network device name (absent if no frontend
-# is connected).
+diff --git a/accel/stubs/xen-stub.c b/accel/stubs/xen-stub.c
+index fa3dddbce57..7ba0b697f49 100644
+--- a/accel/stubs/xen-stub.c
++++ b/accel/stubs/xen-stub.c
+@@ -6,50 +6,11 @@
+  */
+ 
+ #include "qemu/osdep.h"
+-#include "hw/xen/xen.h"
++#include "sysemu/xen.h"
+ #include "qapi/qapi-commands-misc.h"
+ 
+ bool xen_allowed;
+ 
+-void xenstore_store_pv_console_info(int i, Chardev *chr)
+-{
+-}
+-
+-int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num)
+-{
+-    return -1;
+-}
+-
+-void xen_piix3_set_irq(void *opaque, int irq_num, int level)
+-{
+-}
+-
+-void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
+-{
+-}
+-
+-void xen_hvm_inject_msi(uint64_t addr, uint32_t data)
+-{
+-}
+-
+-int xen_is_pirq_msi(uint32_t msi_data)
+-{
+-    return 0;
+-}
+-
+-qemu_irq *xen_interrupt_controller_init(void)
+-{
+-    return NULL;
+-}
+-
+-void xen_register_framebuffer(MemoryRegion *mr)
+-{
+-}
+-
+-void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory)
+-{
+-}
+-
+ void qmp_xen_set_global_dirty_log(bool enable, Error **errp)
+ {
+ }
+diff --git a/stubs/xen-hw-stub.c b/stubs/xen-hw-stub.c
+new file mode 100644
+index 00000000000..d14efef49e9
+--- /dev/null
++++ b/stubs/xen-hw-stub.c
+@@ -0,0 +1,49 @@
++/*
++ * Copyright (C) 2014       Citrix Systems UK Ltd.
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/xen/xen.h"
++
++void xenstore_store_pv_console_info(int i, Chardev *chr)
++{
++}
++
++int xen_pci_slot_get_pirq(PCIDevice *pci_dev, int irq_num)
++{
++    return -1;
++}
++
++void xen_piix3_set_irq(void *opaque, int irq_num, int level)
++{
++}
++
++void xen_piix_pci_write_config_client(uint32_t address, uint32_t val, int len)
++{
++}
++
++void xen_hvm_inject_msi(uint64_t addr, uint32_t data)
++{
++}
++
++int xen_is_pirq_msi(uint32_t msi_data)
++{
++    return 0;
++}
++
++qemu_irq *xen_interrupt_controller_init(void)
++{
++    return NULL;
++}
++
++void xen_register_framebuffer(MemoryRegion *mr)
++{
++}
++
++void xen_hvm_init_pc(PCMachineState *pcms, MemoryRegion **ram_memory)
++{
++}
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7d0a5e91e4f..b3366713903 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -480,6 +480,7 @@ F: include/hw/block/dataplane/xen*
+ F: include/hw/xen/
+ F: include/sysemu/xen.h
+ F: include/sysemu/xen-mapcache.h
++F: stubs/xen-hw-stub.c
+ 
+ Guest CPU Cores (HAXM)
+ ---------------------
+diff --git a/stubs/meson.build b/stubs/meson.build
+index e0b322bc282..c3e318a57f3 100644
+--- a/stubs/meson.build
++++ b/stubs/meson.build
+@@ -46,4 +46,5 @@ stub_ss.add(files('vm-stop.c'))
+ stub_ss.add(files('win32-kbd-hook.c'))
+ if have_system
+   stub_ss.add(files('semihost.c'))
++  stub_ss.add(when: 'CONFIG_XEN', if_false: files('xen-hw-stub.c'))
+ endif
+-- 
+2.26.2
 
-In any case, thanks for pointing. I'll add this in the next patch version.
-
->>>>   +
->>>>   +##
->>>>   +# @query-netdevs:
->>>>   +#
->>>>   +# Get a list of @NetdevInfo for all virtual network backend devices (netdevs).
->>>>   +#
->>>>   +# Returns: a list of @NetdevInfo describing each netdev.
->>>>   +#
->>>>   +# Since: 5.2
->>>>   +#
->>>>   +# Example:
->>>>   +#
->>>>   +# -> { "execute": "query-netdevs" }
->>>>   +# <- { "return": [
->>>>   +# {
->>>>   +# "ipv6": true,
->>>>   +# "ipv4": true,
->>>>   +# "host": "10.0.2.2",
->>>>   +# "ipv6-dns": "fec0::3",
->>>>   +# "ipv6-prefix": "fec0::",
->>>>   +# "net": "10.0.2.0/255.255.255.0",
->>>>   +# "ipv6-host": "fec0::2",
->>>>   +# "type": "user",
->>>>   +# "peer-id": "net0",
->>>>   +# "dns": "10.0.2.3",
->>>>   +# "hostfwd": [
->>>>   +# {
->>>>   +# "str": "tcp::20004-:22"
->>>>   +# }
->>>>   +# ],
->>>>   +# "ipv6-prefixlen": 64,
->>>>   +# "id": "netdev0",
->>>>   +# "restrict": false
->>>>   +# }
->>>>   +# ]
->>>>   +# }
->>>>   +#
->>>>   +##
->>>>   +{ 'command': 'query-netdevs', 'returns': ['NetdevInfo'] }
-
-
--- 
-Alexey Kirillov
-Yandex.Cloud
 
