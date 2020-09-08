@@ -4,82 +4,82 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8ABAC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 096A5C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:17:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A45E21D7D
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:16:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 927482177B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:17:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tygBGNMB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A45E21D7D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ap1msIb8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 927482177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFYnw-0003Gn-I4
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 04:16:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58536)
+	id 1kFYp9-0005Lq-JT
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 04:17:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kFYlJ-0005zd-T4
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:57 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:38543)
+ id 1kFYlK-00060P-7G
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:58 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:40726)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kFYlH-0000US-W2
+ id 1kFYlF-0000Se-MB
  for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:57 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id u3so4406317pjr.3
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 01:13:55 -0700 (PDT)
+Received: by mail-pj1-x1042.google.com with SMTP id gf14so7629647pjb.5
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 01:13:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=RpQ5D9PS9xG+hTVvcmsid1OIpZVPjd/FQJ67FPFmIxg=;
- b=tygBGNMByyJ4nCb/OLcN5vsYChUumDca0o1GOgCzknvCENCS2CHn/UCzjQJDYXME+p
- My4hkNbt+tgQJNzqclI3OmZqcHYHm1lGwfDR1ijhUd6NHm/lH2gHJ/gIqnzYrzbmo5xU
- L9gen8VsMmMmyDQ6PbBJwiComDmcLyfukkBzBdgbQ7jn+OJghm8PNksjiTzkDiYoNQeV
- dDLVNHW2p6UABTPPUc2JkFPbtAtTE9FMh4SNVZ4REbaY32xTIXM26sTtMIuy5eJ3ZdVS
- D3t8cnpmQQXMe2kmy/KkRZIisZ60J+WoNoJIkiH+ZHNSquj2nnd0iucrFCqc1GulvhBx
- deXA==
+ bh=VVgURpjuArAMDrEKjpU9KwbLTs4HVxWM7QaG/94weX8=;
+ b=ap1msIb8TT2AJK0n67LMP9CkJ7Zh9jrn8OzxQoi5+AiPMPuPFTpEPp8vw0o+zZ6fOo
+ c9pp2gy4B4HBO0o9+/rSFx0gqKjFFVPCKZZPQ9ElNy+p3xGtYAR82dVJV2N+GLPoiKAI
+ sSio2R1rAAjQbaEtg0Rp5NNL9fs6DZin2UR9Jwe5Xo0jUmfmAnlDUoGoiHSI8aYGe5YX
+ vHUOybrqLMCVCbTX1SkyY70YpWtyWdHogAtVUovjepeP4c6GTBLGLzZscs/FiaZuMisF
+ E+2wFWR20cp2fZqt07vDp8q7D1ibeb+Hm0HA4Tg7wsF2Fmcw3hnKuQ5fxXfrej7NN35J
+ Me6Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=RpQ5D9PS9xG+hTVvcmsid1OIpZVPjd/FQJ67FPFmIxg=;
- b=CFk+bSfSO7AumJrTFVuiyJSizY9MYaVTnGiU0SD0bchlBS9vNSracLBYIWLwSLE5lM
- eTAwYDpDoC8V6k7gtHstDbGdQfdBEbIp4M0VirIjB5n75OLsXYsdBB5FuZeuKOE7VjLW
- KelmQ7ZipCUEAmkvIhpFLBXNcs9cOv1OAnoRukjMxf1QIZOvC9+ExEePjB67rUAyh41g
- kzryphDPt17y/c5bLYhwo+9TkOBSxYIi+YImnOmXHkeBRLA39K7gP7IUjRVhb9NetNcu
- lJXbJy6XQ+f+AgqaaJTThStZaYFffmR5DF+ppD330mgeA0jl7OzCk8Z3B4tu+jPGa7ML
- TyxQ==
-X-Gm-Message-State: AOAM532RTBUt0uEeSbq5xQb4DGLwGqEvxKVFUuS5GQKH1yUul0YdOfet
- oqcGvhZbR+fPUW6YH6NZHfVX
-X-Google-Smtp-Source: ABdhPJz45Ifo6Q1lY3+IlGTfYu+R5+x3g441RPNHPknBpdQWiTFOq8F4vr6PdvlfRcKO/ssP0yZbOA==
-X-Received: by 2002:a17:90a:fb52:: with SMTP id
- iq18mr2977782pjb.162.1599552834732; 
- Tue, 08 Sep 2020 01:13:54 -0700 (PDT)
+ bh=VVgURpjuArAMDrEKjpU9KwbLTs4HVxWM7QaG/94weX8=;
+ b=rj++G4VWeiMBN14feIyjbvlQm1JWIH9HFROSX63nrLMA27flzSwd/AEPUTnIWmQ8p5
+ RhKjzzIgADCIeb3C9jJOS9X75hJSAQBsYgo4rUZ01cv1lbAKK0hYJwZQqnJ4ROmFclj/
+ j3ypcMrVcBMvpdtDKirKp+g9WHCEvfN12dwSvy8pEW/8dnVge0hClIPDKErEJqc/fcRg
+ 4NlZkws+vGKLK4vla2kvghmrYdJmHdLwXowqfaIU6dOdZ0Ka0NL87WF7dZPwaivRsA/j
+ b80Lspngd9O4Q4kTGONoLX0LRo1bkY7tGbkWEplqWZgn5+MQ/gn6k5ArajABSFsEX7oP
+ 8z8Q==
+X-Gm-Message-State: AOAM531UrET9hELArRiJuFm7avY0sUB7zDV1cHMtWfaU7wc2q/PYoW3+
+ ueP1WC2pBBqtXSe9z7CP23dw
+X-Google-Smtp-Source: ABdhPJwmdzKaizukC5GULCv5mYoAJxk/GSr/XtcZD3W/bMDqx6+S5/4A/5yx747umDvAmKxDaiEVjg==
+X-Received: by 2002:a17:90a:634c:: with SMTP id
+ v12mr2904904pjs.57.1599552832108; 
+ Tue, 08 Sep 2020 01:13:52 -0700 (PDT)
 Received: from localhost.localdomain ([147.75.106.138])
- by smtp.gmail.com with ESMTPSA id m190sm16934788pfm.184.2020.09.08.01.13.53
+ by smtp.gmail.com with ESMTPSA id m190sm16934788pfm.184.2020.09.08.01.13.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 01:13:54 -0700 (PDT)
+ Tue, 08 Sep 2020 01:13:51 -0700 (PDT)
 From: Haibo Xu <haibo.xu@linaro.org>
 To: drjones@redhat.com,
 	richard.henderson@linaro.org
-Subject: [PATCH v2 10/12] target/arm/cpu: spe: Enable spe to work with host cpu
-Date: Tue,  8 Sep 2020 08:13:28 +0000
-Message-Id: <26b4ace9ea3c5b43d14802d6fc5ceea90befbcc8.1599549462.git.haibo.xu@linaro.org>
+Subject: [PATCH v2 08/12] hw/arm/virt: Move kvm pmu setup to virt_cpu_post_init
+Date: Tue,  8 Sep 2020 08:13:26 +0000
+Message-Id: <7982854bb6cdb90390ea3f3c39c2801ef84fd2e5.1599549462.git.haibo.xu@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1599549462.git.haibo.xu@linaro.org>
 References: <cover.1599549462.git.haibo.xu@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=haibo.xu@linaro.org; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=haibo.xu@linaro.org; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -88,7 +88,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,121 +107,84 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Turn on the spe cpu property by default if host cpu
-support it, i.e. we can now do '-cpu max|host' to add
-the vSPE, and '-cpu max|host,spe=off' to remove it.
+From: Andrew Jones <drjones@redhat.com>
 
-Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
+Move the KVM PMU setup part of fdt_add_pmu_nodes() to
+virt_cpu_post_init(), which is a more appropriate location. Now
+fdt_add_pmu_nodes() is also named more appropriately, because it
+no longer does anything but fdt node creation.
+
+No functional change intended.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- target/arm/cpu.c   |  3 +++
- target/arm/cpu.h   |  2 ++
- target/arm/cpu64.c |  7 ++++++-
- target/arm/kvm64.c | 12 ++++++++++++
- 4 files changed, 23 insertions(+), 1 deletion(-)
+ hw/arm/virt.c | 34 ++++++++++++++++++----------------
+ 1 file changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-index 786cc6134c..58f12d6eb5 100644
---- a/target/arm/cpu.c
-+++ b/target/arm/cpu.c
-@@ -2271,6 +2271,9 @@ static void arm_host_initfn(Object *obj)
-     kvm_arm_set_cpu_features_from_host(cpu);
-     if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-         aarch64_add_sve_properties(obj);
-+
-+        cpu->has_spe = ON_OFF_AUTO_AUTO;
-+        aarch64_add_spe_properties(obj);
-     }
-     arm_cpu_post_init(obj);
- }
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index 395a1e5df8..5a3ea876c8 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1040,6 +1040,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
- void aarch64_sve_change_el(CPUARMState *env, int old_el,
-                            int new_el, bool el0_a64);
- void aarch64_add_sve_properties(Object *obj);
-+void aarch64_add_spe_properties(Object *obj);
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index 2ffcb073af..6bacfb668d 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -521,21 +521,12 @@ static void fdt_add_gic_node(VirtMachineState *vms)
  
- /*
-  * SVE registers are encoded in KVM's memory in an endianness-invariant format.
-@@ -1071,6 +1072,7 @@ static inline void aarch64_sve_change_el(CPUARMState *env, int o,
-                                          int n, bool a)
- { }
- static inline void aarch64_add_sve_properties(Object *obj) { }
-+static inline void aarch64_add_spe_properties(Object *obj) { }
- #endif
+ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+ {
+-    CPUState *cpu;
+-    ARMCPU *armcpu;
++    ARMCPU *armcpu = ARM_CPU(first_cpu);
+     uint32_t irqflags = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
  
- #if !defined(CONFIG_TCG)
-diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-index 4997c4a3c0..d38c55e2ca 100644
---- a/target/arm/cpu64.c
-+++ b/target/arm/cpu64.c
-@@ -621,6 +621,11 @@ static void arm_spe_set(Object *obj, bool value, Error **errp)
-     ARM_CPU(obj)->has_spe = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
- }
- 
-+void aarch64_add_spe_properties(Object *obj)
-+{
-+    object_property_add_bool(obj, "spe", arm_spe_get, arm_spe_set);
-+}
-+
- /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-  * otherwise, a CPU with as many features enabled as our emulation supports.
-  * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-@@ -772,7 +777,7 @@ static void aarch64_max_initfn(Object *obj)
-                         cpu_max_set_sve_max_vq, NULL, NULL);
- 
-     cpu->has_spe = ON_OFF_AUTO_AUTO;
--    object_property_add_bool(obj, "spe", arm_spe_get, arm_spe_set);
-+    aarch64_add_spe_properties(obj);
- }
- 
- static const ARMCPUInfo aarch64_cpus[] = {
-diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-index 5a2032fc9e..3f0a09c05b 100644
---- a/target/arm/kvm64.c
-+++ b/target/arm/kvm64.c
-@@ -515,6 +515,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-      */
-     int fdarray[3];
-     bool sve_supported;
-+    bool spe_supported;
-     uint64_t features = 0;
-     uint64_t t;
-     int err;
-@@ -655,6 +656,8 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+-    CPU_FOREACH(cpu) {
+-        armcpu = ARM_CPU(cpu);
+-        if (!arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
+-            return;
+-        }
+-        if (kvm_enabled()) {
+-            if (kvm_irqchip_in_kernel()) {
+-                kvm_arm_pmu_set_irq(cpu, PPI(VIRTUAL_PMU_IRQ));
+-            }
+-            kvm_arm_pmu_init(cpu);
+-        }
++    if (!arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
++        assert(!object_property_get_bool(OBJECT(armcpu), "pmu", NULL));
++        return;
      }
  
-     sve_supported = ioctl(fdarray[0], KVM_CHECK_EXTENSION, KVM_CAP_ARM_SVE) > 0;
-+    spe_supported = ioctl(fdarray[0], KVM_CHECK_EXTENSION,
-+                                      KVM_CAP_ARM_SPE_V1) > 0;
- 
-     kvm_arm_destroy_scratch_host_vcpu(fdarray);
- 
-@@ -668,6 +671,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-         t = FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
-         ahcf->isar.id_aa64pfr0 = t;
+     if (vms->gic_version == VIRT_GIC_VERSION_2) {
+@@ -544,7 +535,6 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+                              (1 << vms->smp_cpus) - 1);
      }
-+    if (!spe_supported) {
-+        t = ahcf->isar.id_aa64dfr0;
-+        t = FIELD_DP64(t, ID_AA64DFR0, PMSVER, 0);
-+        ahcf->isar.id_aa64dfr0 = t;
-+    }
  
-     /*
-      * We can assume any KVM supporting CPU is at least a v8
-@@ -830,6 +838,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         assert(kvm_arm_sve_supported());
-         cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
-     }
-+    if (cpu_isar_feature(aa64_spe, cpu)) {
-+        assert(kvm_arm_spe_supported());
-+        cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SPE_V1;
-+    }
+-    armcpu = ARM_CPU(qemu_get_cpu(0));
+     qemu_fdt_add_subnode(vms->fdt, "/pmu");
+     if (arm_feature(&armcpu->env, ARM_FEATURE_V8)) {
+         const char compat[] = "arm,armv8-pmuv3";
+@@ -1674,11 +1664,23 @@ static void finalize_gic_version(VirtMachineState *vms)
  
-     /* Do KVM_ARM_VCPU_INIT ioctl */
-     ret = kvm_arm_vcpu_init(cs);
+ static void virt_cpu_post_init(VirtMachineState *vms)
+ {
+-    bool aarch64;
++    bool aarch64, pmu;
++    CPUState *cpu;
+ 
+     aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
++    pmu = object_property_get_bool(OBJECT(first_cpu), "pmu", NULL);
+ 
+-    if (!kvm_enabled()) {
++    if (kvm_enabled()) {
++        CPU_FOREACH(cpu) {
++            if (pmu) {
++                assert(arm_feature(&ARM_CPU(cpu)->env, ARM_FEATURE_PMU));
++                if (kvm_irqchip_in_kernel()) {
++                    kvm_arm_pmu_set_irq(cpu, PPI(VIRTUAL_PMU_IRQ));
++                }
++                kvm_arm_pmu_init(cpu);
++            }
++        }
++    } else {
+         if (aarch64 && vms->highmem) {
+             int requested_pa_size = 64 - clz64(vms->highest_gpa);
+             int pamax = arm_pamax(ARM_CPU(first_cpu));
 -- 
 2.17.1
 
