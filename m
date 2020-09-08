@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1981DC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0368DC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:19:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BC91421D46
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:18:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7EBFA2177B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 08:19:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QfFfk0Hu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC91421D46
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DtnWrrkp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EBFA2177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44694 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFYpW-00069D-TR
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 04:18:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58610)
+	id 1kFYqP-0007mx-HZ
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 04:19:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58562)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kFYlO-0006Dy-L6
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:14:02 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:51783)
+ id 1kFYlL-00065X-SN
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:59 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:39530)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kFYlL-0000VL-Uz
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:14:02 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id a9so4692026pjg.1
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 01:13:59 -0700 (PDT)
+ id 1kFYlJ-0000Ug-32
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 04:13:59 -0400
+Received: by mail-pf1-x441.google.com with SMTP id n14so2383086pff.6
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 01:13:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=zq8jUh6rr55C3iWlgIX0sFstenVLmlXQeyrdeGeUxsU=;
- b=QfFfk0HucHpO/x5Jc0DCHPv1/TNxgbR0bKs0thQNWDve3EYX38Od2x6m0shvaVR3lm
- 9IPFIl3SxZp1ttV76d2ZXNjFdLiO58rjGbORvuCAE5b8JZncIo2sVSmId5z8POfV1aH9
- mup4t48Yh6gCUidgmvJr7xt+opOUkEC8neR7IcPYhlSxfw1GOLIR7Gp6yRjKDAcniPay
- xPVMotf6YWG9sZvVyZXOEoAn8d2z5K75Fz7Y3iWfEOpVtYORH/cpPhYzETIDxnh7WFgj
- 1BJ4jDdOBjd04i05OZ6LPLc+Y4Bq4tgN+lMr5GatQcVaVRxbQooWukUPSyU8MGGUsmWB
- AS3w==
+ bh=65uW6/eJtxdVQ3erFH0nAd+ZJZrP6B7JK355CS4Evd4=;
+ b=DtnWrrkppBALmGDk6WyZ9zbWxElLLqFd9TEqM/7gVsatasdVioc4gVzJGhrkQU9CvY
+ r2seFpZkf0Y1tPjBnQyLjqAuOpjzpCRNPksrPmfQNiigepK13Nzi5oVqsvBaVgNd7Yqt
+ rL0zvLs0SSBsVDDts6Zuc+vRtb15G7Rzrwk+j1f9ka9gg+UzTcYTLTc3qaRMgja/OzLf
+ /4wMqxn6l9fb19RXdpnL6D2BN+nM6O7UufmEBfKYS7tKXrYtn3dsCEjegd79OV55L3Cd
+ SCS8xqINFAHT7ELkaZItAMT+PXx+/aful3FmFbCbdJI1Q6sB58nE4NNhcDMe0mOlTi4v
+ ElYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=zq8jUh6rr55C3iWlgIX0sFstenVLmlXQeyrdeGeUxsU=;
- b=t8JU80heHZpxL5GpQomgSTOrZIWMm7m6vJTyTdTJkNNzsOiHyD2eets+tpL3+7gSeX
- HEgpfm4+z1wPYRsWQO/LODcCod//CE+LThuiNFeg3WmeIla7+ubOyf444T7UKuxeBDHE
- zcRwDkTC5kUkmloVYxtLfe0/yuZkH6xx0LCc9KYvMmxdp/zAUTYTCph3VakNdKMO3jMZ
- 50w1+saOYZJecZao8zQzUB4b7QywQUEfhIGKwxOKCdgI/gX/YER1u8h9Z/ttCuzvMQZE
- UnYB2Kg2nO2/Kp19l/Hz8oTY/uKFkkCPLDOwSwlg3He6+UK5Gfk03TRBpxmlrjzshPdy
- 6Www==
-X-Gm-Message-State: AOAM533ngwOhImqr7b/0EbnchuJHJY+tONvO+0QxTSMv3NkhNXju3fbO
- RCD7JC1ewWn1ua89lxnkKKrO
-X-Google-Smtp-Source: ABdhPJzlRN1M8h16oz81XvukGczif4UIfS0V9BlFyYExNj30RXZy9QyNWrwE2SI2w53DuR4Z3v8czg==
-X-Received: by 2002:a17:90b:1212:: with SMTP id
- gl18mr2103309pjb.138.1599552837216; 
- Tue, 08 Sep 2020 01:13:57 -0700 (PDT)
+ bh=65uW6/eJtxdVQ3erFH0nAd+ZJZrP6B7JK355CS4Evd4=;
+ b=InAqCmhOiu0jO7vXx6/dv3cvoD+2QMx4DGflnMASkJSwX7NJwepA5Un3phqEATwT1h
+ fkB7ucnLqo5HzAWtp48sF8HZQuARnSU3zGIOgzbG1VvRTl5LSP+ih/thOXEHmIyBAptl
+ AsFMWCp3Y7mrFK7lpq+xcOXf/TRgqKOTRmWVSDuC9IZXZoJw7CrIuVO6zJiKHAX3+uP9
+ H/BWODq7esUOuzd+9xMlNuVs/TPZO9OUBY1IJj+zT5RwgxXgFlNPlQHLk7kNLXA2gTHH
+ klD8ldZ9aJdPw2S26TJaktSua4wb/kKZ1AFlUt4IdMfnhksdYVQJfZr8CMLVP3IrvnMN
+ CDGg==
+X-Gm-Message-State: AOAM5306DJZC//L9hvwSk0F8pgceg2sQWW4Rtdrzr71Sb+7qWsX+E7c3
+ hVVAPJbsj7TfR+MBIsBQSxgf
+X-Google-Smtp-Source: ABdhPJyjW9Rf19phSJVRmmBhzz09xfjWkMYaw+EMA/BJBf1jliCjDfdBTTiFTJDMkLPh7KorHTtOBw==
+X-Received: by 2002:a17:902:ba81:b029:d0:cbe1:e7ad with SMTP id
+ k1-20020a170902ba81b02900d0cbe1e7admr104185pls.30.1599552835913; 
+ Tue, 08 Sep 2020 01:13:55 -0700 (PDT)
 Received: from localhost.localdomain ([147.75.106.138])
- by smtp.gmail.com with ESMTPSA id m190sm16934788pfm.184.2020.09.08.01.13.56
+ by smtp.gmail.com with ESMTPSA id m190sm16934788pfm.184.2020.09.08.01.13.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 01:13:56 -0700 (PDT)
+ Tue, 08 Sep 2020 01:13:55 -0700 (PDT)
 From: Haibo Xu <haibo.xu@linaro.org>
 To: drjones@redhat.com,
 	richard.henderson@linaro.org
-Subject: [PATCH v2 12/12] target/arm: spe: Add corresponding doc and test.
-Date: Tue,  8 Sep 2020 08:13:30 +0000
-Message-Id: <f85b67a841ad86f461c7dc0c8f5f8b1e5d490da5.1599549462.git.haibo.xu@linaro.org>
+Subject: [PATCH v2 11/12] target/arm/kvm: spe: Enable userspace irqchip
+ support.
+Date: Tue,  8 Sep 2020 08:13:29 +0000
+Message-Id: <6aaa406b824d0c427acbc3f3abfbbe841f3bb93c.1599549462.git.haibo.xu@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1599549462.git.haibo.xu@linaro.org>
 References: <cover.1599549462.git.haibo.xu@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=haibo.xu@linaro.org; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=haibo.xu@linaro.org; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,94 +108,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Since the current kernel patches haven't enabled the
+userspace irqchip support, this patch is not verified yet!
+
 Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
 ---
- docs/system/arm/cpu-features.rst | 20 ++++++++++++++++++++
- target/arm/monitor.c             |  2 +-
- tests/qtest/arm-cpu-features.c   |  9 +++++++++
- 3 files changed, 30 insertions(+), 1 deletion(-)
+ linux-headers/linux/kvm.h | 1 +
+ target/arm/kvm.c          | 5 +++++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/docs/system/arm/cpu-features.rst b/docs/system/arm/cpu-features.rst
-index 2d5c06cd01..5b81b9a560 100644
---- a/docs/system/arm/cpu-features.rst
-+++ b/docs/system/arm/cpu-features.rst
-@@ -344,3 +344,23 @@ verbose command lines.  However, the recommended way to select vector
- lengths is to explicitly enable each desired length.  Therefore only
- example's (1), (4), and (6) exhibit recommended uses of the properties.
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 8840cbb01c..35ef0ae842 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -1672,6 +1672,7 @@ struct kvm_assigned_msix_entry {
+ #define KVM_ARM_DEV_EL1_VTIMER		(1 << 0)
+ #define KVM_ARM_DEV_EL1_PTIMER		(1 << 1)
+ #define KVM_ARM_DEV_PMU			(1 << 2)
++#define KVM_ARM_DEV_SPE			(1 << 3)
  
-+SPE CPU Property
-+==================
-+
-+The SPE CPU property `spe` is used to enable or disable the SPE feature,
-+just as the `pmu` CPU property completely enables or disables the PMU.
-+
-+Currently, this property is only available with KVM mode, and is enabled
-+by default if KVM support it. When KVM is enabled, if the host does not
-+support SPE, then an error is generated when attempting to enable it.
-+
-+Following are 2 examples to use this property:
-+
-+  1) Disable SPE::
-+
-+     $ qemu-system-aarch64 -M virt,accel=kvm -cpu max,spe=off
-+
-+  2) Implicitly enable it with the `host` CPU type if host cpu
-+     support it::
-+
-+     $ qemu-system-aarch64 -M virt,accel=kvm -cpu host
-diff --git a/target/arm/monitor.c b/target/arm/monitor.c
-index ba6e01abd0..1b8f08988a 100644
---- a/target/arm/monitor.c
-+++ b/target/arm/monitor.c
-@@ -99,7 +99,7 @@ QEMU_BUILD_BUG_ON(ARM_MAX_VQ > 16);
-  * then the order that considers those dependencies must be used.
-  */
- static const char *cpu_model_advertised_features[] = {
--    "aarch64", "pmu", "sve",
-+    "aarch64", "pmu", "spe", "sve",
-     "sve128", "sve256", "sve384", "sve512",
-     "sve640", "sve768", "sve896", "sve1024", "sve1152", "sve1280",
-     "sve1408", "sve1536", "sve1664", "sve1792", "sve1920", "sve2048",
-diff --git a/tests/qtest/arm-cpu-features.c b/tests/qtest/arm-cpu-features.c
-index 77b5e30a9c..4d393fb2e2 100644
---- a/tests/qtest/arm-cpu-features.c
-+++ b/tests/qtest/arm-cpu-features.c
-@@ -494,6 +494,7 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
- 
-     if (g_str_equal(qtest_get_arch(), "aarch64")) {
-         bool kvm_supports_sve;
-+        bool kvm_supports_spe;
-         char max_name[8], name[8];
-         uint32_t max_vq, vq;
-         uint64_t vls;
-@@ -512,8 +513,10 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
-             "with KVM on this host", NULL);
- 
-         assert_has_feature(qts, "host", "sve");
-+        assert_has_feature(qts, "host", "spe");
-         resp = do_query_no_props(qts, "host");
-         kvm_supports_sve = resp_get_feature(resp, "sve");
-+        kvm_supports_spe = resp_get_feature(resp, "spe");
-         vls = resp_get_sve_vls(resp);
-         qobject_unref(resp);
- 
-@@ -573,10 +576,16 @@ static void test_query_cpu_model_expansion_kvm(const void *data)
-         } else {
-             g_assert(vls == 0);
+ struct kvm_hyperv_eventfd {
+ 	__u32 conn_id;
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 58f991e890..7950ff1d83 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -820,6 +820,11 @@ MemTxAttrs kvm_arch_post_run(CPUState *cs, struct kvm_run *run)
+             switched_level &= ~KVM_ARM_DEV_PMU;
          }
-+
-+        if (kvm_supports_spe) {
-+                assert_set_feature(qts, "host", "spe", false);
-+                assert_set_feature(qts, "host", "spe", true);
-+        }
-     } else {
-         assert_has_not_feature(qts, "host", "aarch64");
-         assert_has_not_feature(qts, "host", "pmu");
-         assert_has_not_feature(qts, "host", "sve");
-+        assert_has_not_feature(qts, "host", "spe");
-     }
  
-     qtest_quit(qts);
++        if (switched_level & KVM_ARM_DEV_SPE) {
++            qemu_set_irq(cpu->spe_interrupt,
++                         !!(run->s.regs.device_irq_level & KVM_ARM_DEV_SPE));
++            switched_level &= ~KVM_ARM_DEV_SPE;
++        }
+         if (switched_level) {
+             qemu_log_mask(LOG_UNIMP, "%s: unhandled in-kernel device IRQ %x\n",
+                           __func__, switched_level);
 -- 
 2.17.1
 
