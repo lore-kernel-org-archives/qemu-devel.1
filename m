@@ -7,54 +7,56 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F24C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00547C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6877B21897
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 91381206E7
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Dw0GQw/D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6877B21897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="XBL8rCT6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91381206E7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWCp-0007dp-Fz
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:30:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57480)
+	id 1kFWDF-0000EW-Ly
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:30:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57410)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3V-0006Km-E0; Tue, 08 Sep 2020 01:20:36 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:54003 helo=ozlabs.org)
+ id 1kFW3P-0006Ek-O8; Tue, 08 Sep 2020 01:20:28 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:55593)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3S-0005zP-HU; Tue, 08 Sep 2020 01:20:32 -0400
+ id 1kFW3N-0005z9-2K; Tue, 08 Sep 2020 01:20:27 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkp4gPKz9sVZ; Tue,  8 Sep 2020 15:20:02 +1000 (AEST)
+ id 4Bltkp0tTQz9sVL; Tue,  8 Sep 2020 15:20:01 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1599542402;
- bh=WHUZRE8xBkBhoLgTp8c17urX6r5gVdkN3abjLoZHMUE=;
+ bh=P6w2VcCYj0cQ8uhhqzjGXWRtMd9iDsSuS8MezV7lEKU=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=Dw0GQw/DC9YzKmaQfkMBhm7UNb4l21xNe94YAqGA6ffU2UhZDtLEgUX634CMHBmok
- WS0j+b0Ds0vXTm+Q8dRr1Kwov/h8w29o8Vut07HdA2cg3stQwIvxYrgeIWLPJL3tun
- BDJrTDvfwrHdGCW7FG0UnmeXDl6RsmmsMb/C4YfY=
+ b=XBL8rCT61cR/+oP9yxI9y4vaPkCDNLrgUq5S7Mvq9PaQv8ZU6l5CQIJ+MMpGMgd3L
+ zeg89nfm4G/rHqEl1U21DtEc3xWGUuZLK1Lc91P9TJ+kiCuGnwHvxh56supugWKMXR
+ TgeRP6OgJjgPMuCwxXwwK9G3066UdGtJbwzj3yLI=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 17/33] ppc/spapr: Use start-powered-off CPUState property
-Date: Tue,  8 Sep 2020 15:19:37 +1000
-Message-Id: <20200908051953.1616885-18-david@gibson.dropbear.id.au>
+Subject: [PULL 16/33] target/arm: Move setting of CPU halted state to generic
+ code
+Date: Tue,  8 Sep 2020 15:19:36 +1000
+Message-Id: <20200908051953.1616885-17-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:19:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -75,6 +77,7 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Eduardo Habkost <ehabkost@redhat.com>, danielhb413@gmail.com,
  qemu-devel@nongnu.org, groug@kaod.org, qemu-ppc@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  bauerman@linux.ibm.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -82,66 +85,46 @@ Sender: "Qemu-devel"
 
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 
-PowerPC sPAPR CPUs start in the halted state, and spapr_reset_vcpu()
-attempts to implement this by setting CPUState::halted to 1. But that's too
-late for the case of hotplugged CPUs in a machine configure with 2 or more
-threads per core.
-
-By then, other parts of QEMU have already caused the vCPU to run in an
-unitialized state a couple of times. For example, ppc_cpu_reset() calls
-ppc_tlb_invalidate_all(), which ends up calling async_run_on_cpu(). This
-kicks the new vCPU while it has CPUState::halted = 0, causing QEMU to issue
-a KVM_RUN ioctl on the new vCPU before the guest is able to make the
-start-cpu RTAS call to initialize its register state.
-
-This problem doesn't seem to cause visible issues for regular guests, but
-on a secure guest running under the Ultravisor it does. The Ultravisor
-relies on being able to snoop on the start-cpu RTAS call to map vCPUs to
-guests, and this issue causes it to see a stray vCPU that doesn't belong to
-any guest.
-
-Fix by setting the start-powered-off CPUState property in
-spapr_create_vcpu(), which makes cpu_common_reset() initialize
-CPUState::halted to 1 at an earlier moment.
+This change is in a separate patch because it's not so obvious that it
+won't cause a regression.
 
 Suggested-by: Eduardo Habkost <ehabkost@redhat.com>
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Message-Id: <20200826055535.951207-4-bauerman@linux.ibm.com>
+Message-Id: <20200826055535.951207-3-bauerman@linux.ibm.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ hw/core/cpu.c    | 2 +-
+ target/arm/cpu.c | 1 -
+ 2 files changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index c4f47dcc04..2125fdac34 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -36,11 +36,6 @@ static void spapr_reset_vcpu(PowerPCCPU *cpu)
+diff --git a/hw/core/cpu.c b/hw/core/cpu.c
+index 22bc3f974a..8f65383ffb 100644
+--- a/hw/core/cpu.c
++++ b/hw/core/cpu.c
+@@ -258,7 +258,7 @@ static void cpu_common_reset(DeviceState *dev)
+     }
  
-     cpu_reset(cs);
+     cpu->interrupt_request = 0;
+-    cpu->halted = 0;
++    cpu->halted = cpu->start_powered_off;
+     cpu->mem_io_pc = 0;
+     cpu->icount_extra = 0;
+     atomic_set(&cpu->icount_decr_ptr->u32, 0);
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 9f814194fb..6b4e708c08 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -175,7 +175,6 @@ static void arm_cpu_reset(DeviceState *dev)
+     env->vfp.xregs[ARM_VFP_MVFR2] = cpu->isar.mvfr2;
  
--    /* All CPUs start halted.  CPU0 is unhalted from the machine level
--     * reset code and the rest are explicitly started up by the guest
--     * using an RTAS call */
--    cs->halted = 1;
--
-     env->spr[SPR_HIOR] = 0;
+     cpu->power_state = s->start_powered_off ? PSCI_OFF : PSCI_ON;
+-    s->halted = s->start_powered_off;
  
-     lpcr = env->spr[SPR_LPCR];
-@@ -274,6 +269,11 @@ static PowerPCCPU *spapr_create_vcpu(SpaprCpuCore *sc, int i, Error **errp)
- 
-     cs = CPU(obj);
-     cpu = POWERPC_CPU(obj);
-+    /*
-+     * All CPUs start halted. CPU0 is unhalted from the machine level reset code
-+     * and the rest are explicitly started up by the guest using an RTAS call.
-+     */
-+    cs->start_powered_off = true;
-     cs->cpu_index = cc->core_id + i;
-     spapr_set_vcpu_id(cpu, cs->cpu_index, &local_err);
-     if (local_err) {
+     if (arm_feature(env, ARM_FEATURE_IWMMXT)) {
+         env->iwmmxt.cregs[ARM_IWMMXT_wCID] = 0x69051000 | 'Q';
 -- 
 2.26.2
 
