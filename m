@@ -2,83 +2,89 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8713DC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 17:32:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 956A0C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 17:37:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1EA320738
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 17:32:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1EA320738
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id E84BE2076C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 17:37:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ih0lSZcs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E84BE2076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38088 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFhU4-0007WN-MI
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 13:32:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34870)
+	id 1kFhYk-0000VP-PW
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 13:37:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36272)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFhSD-0006AP-VK
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 13:30:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:45046)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFhSB-0000Ty-Iw
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 13:30:49 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kFhS9-00059E-BN
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 17:30:45 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 51A882E80DB
- for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 17:30:45 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Sep 2020 17:20:50 -0000
-From: Daniel Berrange <1826200@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kFhYB-0008VS-SD
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 13:36:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:38993
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kFhY9-00019p-M8
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 13:36:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599586616;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=eWgC0esL5+VAkVHQ2WC6SC9xMQNINLQh6GjQ++5hhdk=;
+ b=ih0lSZcsORz02fHjbVtQb0sjlqoTtoaCcJ/PSB5O7sUFZvUxrdOq5G3iBS+BQSOmNts+d1
+ QJqRfZpgRYIrD3J5bWUlBvep1sOqEIx/3Db2/lN13C3qgBa/UylTYR7cvtVYaqLDhcV2ZA
+ cVmN9ukISUBpO3JcFDZ/snneSuiEJOo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-401-iocBBpjcNGWWgZI0PhrKaA-1; Tue, 08 Sep 2020 13:36:52 -0400
+X-MC-Unique: iocBBpjcNGWWgZI0PhrKaA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A3AC1084C9B;
+ Tue,  8 Sep 2020 17:36:51 +0000 (UTC)
+Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 161849CBA;
+ Tue,  8 Sep 2020 17:36:50 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=berrange@redhat.com; 
-X-Launchpad-Bug-Tags: feature-request
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: berrange lersek
-X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
-X-Launchpad-Bug-Modifier: Daniel Berrange (berrange)
-References: <155610584995.13565.1262636932024040431.malonedeb@wampee.canonical.com>
-Message-Id: <159958565059.20174.12016916955949097842.malone@gac.canonical.com>
-Subject: [Bug 1826200] Re: RFE: populate "OEM Strings" (type 11) SMBIOS table
- strings from regular files
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: e263c249676b584a33461885f4b305dd27461d7a
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 11:30:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [PATCH] memory: Remove kernel-doc comment marker
+Date: Tue,  8 Sep 2020 13:36:50 -0400
+Message-Id: <20200908173650.3293057-1-ehabkost@redhat.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 12:55:20
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,64 +93,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1826200 <1826200@bugs.launchpad.net>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Surprise...
+The IOMMUMemoryRegionClass struct documentation was never in the
+kernel-doc format.  Stop pretending it is, by removing the "/**"
+comment marker.
 
-https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg03023.html
+This fixes a documentation build error introduced when we split
+the IOMMUMemoryRegionClass typedef from the struct declaration.
 
-Discovering the firmware limits was tedious.  SeaBIOS limits SMBIOS to
-64KB total size due to support for SMBIOS 2.1 spec only, while EDK2
-fails a little over 128 KB total size despite supporting SMBIOS 3.0
-which should not be limited IIUC
+Reported-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+I will submit a separate patch to convert the documentation to
+kernel-doc format later.  This is just a build fix that restores
+the previous behavior (IOMMUMemoryRegionClass was never included
+in the generated documentation).
+---
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel@nongnu.org
+---
+ include/exec/memory.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-** Changed in: qemu
-       Status: Invalid =3D> In Progress
+diff --git a/include/exec/memory.h b/include/exec/memory.h
+index dc908738c6..f1bb2a7df5 100644
+--- a/include/exec/memory.h
++++ b/include/exec/memory.h
+@@ -211,7 +211,7 @@ enum IOMMUMemoryRegionAttr {
+     IOMMU_ATTR_SPAPR_TCE_FD
+ };
+ 
+-/**
++/*
+  * IOMMUMemoryRegionClass:
+  *
+  * All IOMMU implementations need to subclass TYPE_IOMMU_MEMORY_REGION
+-- 
+2.26.2
 
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1826200
-
-Title:
-  RFE: populate "OEM Strings" (type 11) SMBIOS table strings from
-  regular files
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  The feature added in
-
-  https://git.qemu.org/?p=3Dqemu.git;a=3Dcommitdiff;h=3D2d6dcbf93fb01b4a7f4=
-5a93d276d4d74b16392dd
-
-  and exposed by libvirt as
-
-    https://libvirt.org/formatdomain.html#elementsSysinfo
-
-  allows the user to specify up to 255 strings in the unofmatted area of
-  the Type 11 SMBIOS table, where each string may be of arbitrary
-  length. This feature is useful for exposing arbitrary text to
-  arbitrary guest components (in particular when strings are prefixed
-  with "application identifiers").
-
-  Right now, strings can only be specified on the QEMU command line,
-  which limits the amount of data that can be passed. Please enable
-  users to pass data from regular files too.
-
-  For example:
-
-    $QEMU -smbios
-  type=3D11,value=3DHello,txtfile=3Dfile1.txt,txtfile=3Dfile2.txt
-
-  where "file1.txt" and "file2.txt" could be text files containing ASCII
-  application prefixes, followed by base64-encoded binary data.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1826200/+subscriptions
 
