@@ -8,76 +8,75 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AF5AC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:49:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79DAFC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:51:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B179020768
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:49:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06E0B20658
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:51:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gA91ZjGy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B179020768
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FNC+ch7Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06E0B20658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFjcj-0006zS-SB
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:49:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40340)
+	id 1kFjdz-0001TC-1i
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:51:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjbx-0005GT-Aa; Tue, 08 Sep 2020 15:49:01 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:42075)
+ id 1kFjbt-000584-8o; Tue, 08 Sep 2020 15:48:57 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:43406)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjbv-0002Vm-JV; Tue, 08 Sep 2020 15:49:00 -0400
-Received: by mail-pf1-x443.google.com with SMTP id d6so26421pfn.9;
- Tue, 08 Sep 2020 12:48:58 -0700 (PDT)
+ id 1kFjbr-0002UP-Iq; Tue, 08 Sep 2020 15:48:56 -0400
+Received: by mail-pf1-x442.google.com with SMTP id f18so22799pfa.10;
+ Tue, 08 Sep 2020 12:48:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=FykcAGlQ92KK8Qz4pGd0AfXWzqAA8073pCgMiQdYiFk=;
- b=gA91ZjGyT/RxlTSgC/+KW6G0ko3p3sKrjs692qW5jAFheJSH6Fk6vYajypISOfcYEI
- bL0N7sX7eGyRtHjaVKFrtxkmypxQP3RWvJFlwpIItGTbk2RH7lIOQtbUUn/TtzFTsr97
- tqpdw/UfQmqPbUyL1WJHhJoSFenFTHuHZXNjvd0XTZQULBTuiwkQSy2fztVygR18q8KI
- s4WgegmIrUl0YpW5adepw/goJL9Ij4jHXaqrlZMz2SBxUOMMfJFe5sv4YEdOwE/NBO6I
- 9XanFqYJ0+QWVEkPwjE7pdxYSxlEUVFgwLHNWAhCR3GrUnUo3gsAOwzLF5jSnYgzRwD+
- 64IA==
+ bh=qfatTX2Pahw3MLtTsQ90jsfuDFxj9dg6nxrJN7ZCMQY=;
+ b=FNC+ch7YMYzASNmiUcgDSkK3IOBxHrYSVLawrpj4e5S9iAUrc7LJL9QPhkMyhvoZbI
+ S8jX2hQfZ/DIQVhyDSX3+CMSMAdok5OkUpmmpgGb00RkPKf1lD5QhHQJcDjTfcJWCVce
+ pcVrheKdNqb36ku742Cgo5+S4pmc61C3kD9Ynh3XlHsilddfnrPhXlqADnrH3XtcPNdN
+ 0EZglBzlEKE3g9vUNWsENQgN+2sUsybV3za85y//FZMhK8bF+kzyzwJXI0ksac4k4OrG
+ sNOmXSW9Ei1Pv3MvGzJWxMQ3zpVXCiLX1sBYgjSRj9gNTQvK8XRq4/+Iky82EP1sbH6u
+ tn/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FykcAGlQ92KK8Qz4pGd0AfXWzqAA8073pCgMiQdYiFk=;
- b=ub5MSoFPvDiG/hfLq8Gsye7TrnLt9JWzQ1veCL3aFPsq6vH50w2rrqFQWDzAgQ9Y2C
- UCTM4g4+NqRPGTKzmZEBW+/abxenQpsWsx32jmZ8MD7VOD9rpdpAQyVW/O9bkpb12nBK
- pLPJs7sd4R3iSxEAFufZo/TnKsWQ9YMwp/ScWkyUcOdyg/6uHbIBJvtC/88De5y3luxf
- +dRh3WGrIekzhUWJGZkMbzxZgZ/hNGuFV5+eRWcK9hn+TAC/0f/MXEYd6jRigc0jDX4l
- PxPgNq2pxe9HfUGNL836gwq33d8s/8GN5zPbBAWx2O4Fhwnk2ltEN3LufdB2t/hijpZv
- v8hQ==
-X-Gm-Message-State: AOAM53035CA7PpveTE7ua6WW6oJp5uGsu8r7xMGroYSch1tLS+QH6g2S
- NtpK59w4g/PuYRNQ4d28PC+shbwqse1kebt1
-X-Google-Smtp-Source: ABdhPJxQgMzmhzlyBh4e55RPzzxExnIpT7gbimqnyDkR6dUkmHFJEqdv9IcxKi4wmhGm+IK16gC2gA==
-X-Received: by 2002:a63:5515:: with SMTP id j21mr253428pgb.31.1599594537629;
- Tue, 08 Sep 2020 12:48:57 -0700 (PDT)
+ bh=qfatTX2Pahw3MLtTsQ90jsfuDFxj9dg6nxrJN7ZCMQY=;
+ b=LvAJoYG85vLd1Z0Dr+4ghiI8JMaElxHDRZ70hSbqhGRvNFcOXWRUgjavlRIExWCg71
+ EGai49J0TvXPWgr4HC1DoChpATnyiEs1R7zE1BxB6o9FpZLpcBB8KqI7qgx+zoEd1K0+
+ dKF8Ex69EKrGa2xwaqXTS4cZcrReh5nexO7lzFCRdc/QT0JFGuok3EEkjwmXflEyku5V
+ yMIQI8iQ3jNZKlSeHebFLpmq+gDxUXJnUlBDJeIQ+tjgmX+gIsVVNCJH9umMq17koIJq
+ LOBnVgnsOKoRjp03aO9YNNlgB4tciwIPvbmUWrtSR+F+Fhc+dYNZ4xvKr6acNQtkMYe1
+ imkw==
+X-Gm-Message-State: AOAM533z+Crw1ddOZ4dKOw/hJ62oncYOF/jqFQFiKxXhQscjfDBfow+r
+ 2AmibzsantZ0WEJLjUpuRq3hEGdluo/3LZaT
+X-Google-Smtp-Source: ABdhPJw0DWfVh8XdJz4hcghoxvqGIXvokdTs+pmWDFjhfi21V8EJFloLpdy9uz2PE+5QMsZNfaMVxQ==
+X-Received: by 2002:a63:355:: with SMTP id 82mr257177pgd.384.1599594533472;
+ Tue, 08 Sep 2020 12:48:53 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.48.53
+ by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.48.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 12:48:56 -0700 (PDT)
+ Tue, 08 Sep 2020 12:48:52 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/16] tests: disable /char/stdio/* tests in test-char.c on
- win32
-Date: Wed,  9 Sep 2020 03:48:09 +0800
-Message-Id: <20200908194820.702-6-luoyonggang@gmail.com>
+Subject: [PATCH 04/16] curses: Fixes curses compiling errors.
+Date: Wed,  9 Sep 2020 03:48:08 +0800
+Message-Id: <20200908194820.702-5-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200908194820.702-1-luoyonggang@gmail.com>
 References: <20200908194820.702-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,44 +110,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These tests are blocking test-char to be finished.
+This is the compiling error:
+../ui/curses.c: In function 'curses_refresh':
+../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
+      |     ^~~~~~~~~~
+../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
+  302 |             enum maybe_keycode next_maybe_keycode;
+      |                                ^~~~~~~~~~~~~~~~~~
+../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
+  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
+      |     ^~~~~~~~~~
+../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
+  265 |     enum maybe_keycode maybe_keycode;
+      |                        ^~~~~~~~~~~~~
+cc1.exe: all warnings being treated as errors
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- tests/test-char.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ ui/curses.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/test-char.c b/tests/test-char.c
-index d35cc839bc..80e5bac61a 100644
---- a/tests/test-char.c
-+++ b/tests/test-char.c
-@@ -103,6 +103,7 @@ static void char_console_test(void)
-     g_test_trap_assert_stdout("CONSOLE");
- }
- #endif
-+#ifndef _WIN32
- static void char_stdio_test_subprocess(void)
+diff --git a/ui/curses.c b/ui/curses.c
+index 12bc682cf9..e4f9588c3e 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -262,7 +262,7 @@ static int curses2foo(const int _curses2foo[], const int _curseskey2foo[],
+ static void curses_refresh(DisplayChangeListener *dcl)
  {
-     Chardev *chr;
-@@ -126,6 +127,7 @@ static void char_stdio_test(void)
-     g_test_trap_assert_passed();
-     g_test_trap_assert_stdout("buf");
- }
-+#endif
+     int chr, keysym, keycode, keycode_alt;
+-    enum maybe_keycode maybe_keycode;
++    enum maybe_keycode maybe_keycode = CURSES_KEYCODE;
  
- static void char_ringbuf_test(void)
- {
-@@ -1471,8 +1473,10 @@ int main(int argc, char **argv)
-     g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
-     g_test_add_func("/char/console", char_console_test);
- #endif
-+#ifndef _WIN32
-     g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
-     g_test_add_func("/char/stdio", char_stdio_test);
-+#endif
- #ifndef _WIN32
-     g_test_add_func("/char/pipe", char_pipe_test);
- #endif
+     curses_winch_check();
+ 
+@@ -299,7 +299,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
+ 
+         /* alt or esc key */
+         if (keycode == 1) {
+-            enum maybe_keycode next_maybe_keycode;
++            enum maybe_keycode next_maybe_keycode = CURSES_KEYCODE;
+             int nextchr = console_getch(&next_maybe_keycode);
+ 
+             if (nextchr != -1) {
 -- 
 2.28.0.windows.1
 
