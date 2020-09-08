@@ -2,85 +2,90 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7941BC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:31:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D2CC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:32:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B1CC221ED
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:31:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D022F221ED
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:31:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ReEAQ5zG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B1CC221ED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlgXJuva"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D022F221ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42860 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43684 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFcmt-0000Y8-1b
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:31:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60518)
+	id 1kFcn0-0000t1-Nr
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:31:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kFcfD-0003aG-7b
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:23:55 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:33376)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kFclF-0006Uh-TD; Tue, 08 Sep 2020 08:30:10 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:53375)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kFcf8-00072s-8q
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:23:54 -0400
-Received: by mail-ej1-x643.google.com with SMTP id j11so22288619ejk.0
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 05:23:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GDLtsYB99o1cQZjfnCzGMEPipE9c8fSmQs87SW11jwQ=;
- b=ReEAQ5zG0fsIzK37mi5dkTek+emQXtJxoTtOVLjEyL+mOxVqY3bZaoBxwM4d6eJEjw
- 28/mDWF1iQMyQQfXYNQp3ceFoZoN0vmfhxCQuiihNfvIk6I8j25ALAlpoUWEZRXnWEh7
- aP9d2isCxvKz8L5gWHAAXRKxoIDBDmBojL29LzjFO0svvhCdi7bJBuziek7XgqnVMvCQ
- Ya/JVvHD9HzCWRGiMdpqj9OYIFf9P1bOab+j6c9P7xfAyZ/JBejmYJPrJnxAuHsY9yBa
- gsJ3tI6L53YnDCvgjfC3E0vh4rkF36iUam6mzH1ogDlavHu4M0tdA+VIQTI1OtMt0rVw
- pWvg==
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kFclE-0007tJ-Cj; Tue, 08 Sep 2020 08:30:09 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id t7so5058319pjd.3;
+ Tue, 08 Sep 2020 05:30:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=NnBwIumxkiQ9pXVAp8TmFXF/H8dsT5OnHNvh40zg8GM=;
+ b=nlgXJuvajsV6EVofGcBVubi3XES9iM32XvguvblyE2/x++QfbNfXIHmRQp7HCbeRSm
+ uy1efTq3xiG6MGXqG2WWqvzINvCyj6mqNjLjp+/IcI0NBZp04RhnaHj6/mWjVZfO3l9y
+ 5ABVaYqvMBNJaH5T0CrRzYSchrhKKp8XHahso5Xe1L1KGEFU7cwIC5C6rtZa+cVd1PuK
+ i4UAqlXj87Qencq0rTVBrp7aduqko5x0wv2Q84GUT2DtFH6alFX3UCEkZI5jc6eoGJw1
+ dikiS6uxzzdniCdb4CZXYP5xG4mFuVx8Jj5Qq86Gnstbar48YlnAywdqZEeMlDsccajP
+ bSFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=GDLtsYB99o1cQZjfnCzGMEPipE9c8fSmQs87SW11jwQ=;
- b=KY/f4gH60luQSufZRDA08l9mGldgCz0PjPU1I+9auaHRR44FuZFErX5l3C1RpqwkHt
- FG1gm/HPpM1greEHtQ97CGONEvg094VoTCAJ2Hr9pgadn7CqZVE4x6Lf5/r/DgEN5elk
- yXn0NPppT0UnAaexWF3+R7VAE5pQGTKCzByOOSUmTrEppff1G0F74v9RPFf5kk0UPTsV
- tH1qfz1I8FFgTf+HglQDTHrliBzFEY1G0xH8Nm++QS3IN1zsw1Of8CxHFeRIf8C5VtkK
- 3n+7zOsZestC1LzQc2iNUNbKOk4OADXwOsBOdN6LOUn1zPAM7d2EXeP4Q+ILCTyTs8zv
- TPfg==
-X-Gm-Message-State: AOAM532+9NsjRAqHdOj7qJZQzc5ImLX6/THDhW+hDnm8t5Iubw0vBVo/
- WbcrbWJtI/dnJBs8BznlQvH6cpQ8Vuq+B3PULJu1Wg==
-X-Google-Smtp-Source: ABdhPJxzHNowPMlCI6/XFW+nipJXPMDeVLnOPT4IsLvUHQN6b8IXeh+2wXQDHVm1Lpy6PKdUqvfwjMiCH2oAyCmaiOE=
-X-Received: by 2002:a17:906:4a53:: with SMTP id
- a19mr8258720ejv.56.1599567828598; 
- Tue, 08 Sep 2020 05:23:48 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=NnBwIumxkiQ9pXVAp8TmFXF/H8dsT5OnHNvh40zg8GM=;
+ b=cLM5YW//rhFRAVQB/C/zHPEvJI3ZTErP2FC2Me+/0oF4q4+QyvqRhKnIwgDKRjzEH9
+ RfBDgpNvHhUpJJIo6GsnzOLU+qEp7jTmZFrgECWVaEyhCk/VDlhqm2pGEUkMZYaNO51j
+ BXzNARHP6lQ9UXFvcmj+jLwcqaZVAmKAJebxOLpvJgibPuNeogjAMIz9Hfk/s5V1RhpI
+ mJHPawoNDmpA6vrlPHLkaTOaWIY4ReC4t4FnNqYFHmojnZ4hhV+rOxixNs10nw2mTDeU
+ fnQ88mxAVWV3ojZChWax84ai6/QhkcPl76tzRnGYSs0m99c+LAkSyCO1cktm/IrRDL18
+ JP0Q==
+X-Gm-Message-State: AOAM531PgM4lsEhcDziKVs9W5lq+xCScE5XyOJbEPySTYSApsaDXYbU9
+ sljJKyZ1ynTirJUWfINajkVqjizm11CHxU9T
+X-Google-Smtp-Source: ABdhPJzSPvDBDDK3W570h3XZ/pdTKeYfKd39ugakGAzb8O4Adx2X3XlCJ8/lctxp1YAX5uqTuTR+/A==
+X-Received: by 2002:a17:90a:e984:: with SMTP id
+ v4mr3744387pjy.202.1599568204843; 
+ Tue, 08 Sep 2020 05:30:04 -0700 (PDT)
+Received: from localhost.localdomain ([222.95.248.6])
+ by smtp.googlemail.com with ESMTPSA id d8sm14833887pgt.19.2020.09.08.05.30.01
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Sep 2020 05:30:04 -0700 (PDT)
+From: Yonggang Luo <luoyonggang@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/2] logging: Fixes memory leak in test-logging.c
+Date: Tue,  8 Sep 2020 20:29:43 +0800
+Message-Id: <20200908122944.414-2-luoyonggang@gmail.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20200908122944.414-1-luoyonggang@gmail.com>
+References: <20200908122944.414-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-References: <20200903160746.27491-1-deller@gmx.de>
-In-Reply-To: <20200903160746.27491-1-deller@gmx.de>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 8 Sep 2020 13:23:37 +0100
-Message-ID: <CAFEAcA-axxEdySD5hRq+7DFs6dMmcUYgqo2zyzzji3GzQF1Rfw@mail.gmail.com>
-Subject: Re: [PULL 00/10] hppa power button support, graphics updates and
- firmware fixes
-To: Helge Deller <deller@gmx.de>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -95,47 +100,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: Juan Quintela <quintela@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
+ Daniel Brodsky <dnbrdsky@gmail.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 3 Sep 2020 at 17:07, Helge Deller <deller@gmx.de> wrote:
->
-> hppa power button support, graphics updates and firmware fixes
->
-> The following changes since commit ac8b279f13865d1a4f1958d3bf34240c1c3af90d:
->
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20200827' into staging (2020-08-27 13:48:12 +0100)
->
-> are available in the Git repository at:
->
->    https://github.com/hdeller/qemu-hppa.git tags/target-hppa-pull-request
->
-> for you to fetch changes up to 32a2b033f0a406c0dd4cc7375367ee63cc36789a:
->
->   hw/display/artist: Allow screen size up to 2048 lines (2020-09-03 17:30:04 +0200)
->
-> ----------------------------------------------------------------
->
-> Helge Deller (10):
->   seabios-hppa: Update SeaBIOS to hppa-qemu-5.2-2 tag
->   hw/hppa: Make number of TLB and BTLB entries configurable
->   hw/hppa: Store boot device in fw_cfg section
->   hw/hppa: Change fw_cfg port address
->   hw/hppa: Tell SeaBIOS port address of fw_cfg
->   hw/hppa: Add power button emulation
->   target/hppa: Fix boot with old Linux installation CDs
->   hw/display/artist: Verify artist screen resolution
->   hw/display/artist: Refactor x/y coordination extraction
->   hw/display/artist: Allow screen size up to 2048 lines
+g_dir_make_tmp Returns the actual name used. This string should be
+freed with g_free() when not needed any longer and is is in the GLib
+file name encoding. In case of errors, NULL is returned and error will
+be set. Use g_autofree to free it properly
 
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+ tests/test-logging.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Applied, thanks.
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index 8a1161de1d..957f6c08cd 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -196,7 +196,7 @@ static void rmdir_full(gchar const *root)
+ 
+ int main(int argc, char **argv)
+ {
+-    gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
++    g_autofree gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
+     int rc;
+ 
+     g_test_init(&argc, &argv, NULL);
+-- 
+2.28.0.windows.1
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
