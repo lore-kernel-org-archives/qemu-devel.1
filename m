@@ -2,66 +2,88 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74849C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:38:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 709A4C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 06:11:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D16972137B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:38:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCBE020732
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 06:11:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RmtPuAR2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16972137B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TLNNQngA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCBE020732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39240 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWKd-0006cc-Rb
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:38:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57656)
+	id 1kFWqz-0005RX-PN
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 02:11:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW4G-0007AV-6l; Tue, 08 Sep 2020 01:21:20 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:45191)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW4E-00069c-FV; Tue, 08 Sep 2020 01:21:19 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkz2Nkcz9sWB; Tue,  8 Sep 2020 15:20:11 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542411;
- bh=qGDKszCu7L1a5W4LErh5xaKIlShUztA7IfBe8gYA/fo=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=RmtPuAR2NgKD+Y10K7GgIhmWGAi2NwX47Kn7awWU02zxbKkEk0/voXGVrtgT/cW6Z
- +Hzrs3zbPempiYnTa0GnxYQRZYCfNAuApWz+02zqLlDq99fZ3xiCZmGrW+Dvyg8itY
- qf79sPgkZ6+QxfFzdpnOo2gJxFZysdT2wezpioIU=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 33/33] spapr_numa: use spapr_numa_get_vcpu_assoc() in home_node
- hcall
-Date: Tue,  8 Sep 2020 15:19:53 +1000
-Message-Id: <20200908051953.1616885-34-david@gibson.dropbear.id.au>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
-References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kFWqI-0004du-7J
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 02:10:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44528)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kFWqF-0003GU-C7
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 02:10:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599545454;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TrO8Uw9DBLkX2hTjhuvPSZj5uEJTMtzwQJlZ8hDWc5I=;
+ b=TLNNQngAryDTNEiw+gFvZzG8FtG9wY47Oj/n2O8myBz48z48lQjM7t+9jMeUfw7BgJCLIf
+ 5ySpMmQFMPN+/n0BABWx4vByKsEhCfYdhCrEh6bZO8FkjGXzk34vBFBV6oMiN8jaZbeo2G
+ rcL6ypXMQwydpLnLpYtbGEJxekKbfjo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-59-0e-N2dblM5i8foHPnQBczg-1; Tue, 08 Sep 2020 02:10:52 -0400
+X-MC-Unique: 0e-N2dblM5i8foHPnQBczg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E95810066FF
+ for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 06:10:51 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A73897ED7A;
+ Tue,  8 Sep 2020 06:10:47 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id A6FE945AE; Tue,  8 Sep 2020 08:10:46 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 2/3] ipxe: drop ia32 efi roms
+Date: Tue,  8 Sep 2020 08:10:45 +0200
+Message-Id: <20200908061046.10871-3-kraxel@redhat.com>
+In-Reply-To: <20200908061046.10871-1-kraxel@redhat.com>
+References: <20200908061046.10871-1-kraxel@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,100 +96,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: danielhb413@gmail.com, qemu-devel@nongnu.org, groug@kaod.org,
- qemu-ppc@nongnu.org, bauerman@linux.ibm.com,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Daniel Henrique Barboza <danielhb413@gmail.com>
+UEFI on ia32 never really took off.  Basically the BIOS -> UEFI shift
+came too late, x64 was widespread already, so vendors went from BIOS
+straight to UEFI on x64.
 
-The current implementation of h_home_node_associativity hard codes
-the values of associativity domains of the vcpus. Let's make
-it consider the values already initialized in spapr->numa_assoc_array,
-via the spapr_numa_get_vcpu_assoc() helper.
-
-We want to set it and forget it, and for that we also need to
-assert that we don't overflow the registers of the hypercall.
->From R4 to R9 we can squeeze in 12 associativity domains for
-vcpus, so let's assert that VCPU_ASSOC_SIZE -1 isn't greater
-than that.
-
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200904172422.617460-4-danielhb413@gmail.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/ppc/spapr_numa.c | 41 +++++++++++++++++++++++++++++++++--------
- 1 file changed, 33 insertions(+), 8 deletions(-)
+ roms/Makefile | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index 066ffc2a5f..64fe567f5d 100644
---- a/hw/ppc/spapr_numa.c
-+++ b/hw/ppc/spapr_numa.c
-@@ -176,10 +176,11 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-                                               target_ulong opcode,
-                                               target_ulong *args)
- {
-+    g_autofree uint32_t *vcpu_assoc = NULL;
-     target_ulong flags = args[0];
-     target_ulong procno = args[1];
-     PowerPCCPU *tcpu;
--    int idx;
-+    int idx, assoc_idx;
+diff --git a/roms/Makefile b/roms/Makefile
+index 5d9f15b6777f..8cafced348e5 100644
+--- a/roms/Makefile
++++ b/roms/Makefile
+@@ -113,7 +113,6 @@ efirom: $(patsubst %,efi-rom-%,$(pxerom_variants))
+ efi-rom-%: build-pxe-roms build-efi-roms edk2-basetools
+ 	$(EDK2_EFIROM) -f "0x$(VID)" -i "0x$(DID)" -l 0x02 \
+ 		-b ipxe/src/bin/$(VID)$(DID).rom \
+-		-ec ipxe/src/bin-i386-efi/$(VID)$(DID).efidrv \
+ 		-ec ipxe/src/bin-x86_64-efi/$(VID)$(DID).efidrv \
+ 		-o ../pc-bios/efi-$*.rom
  
-     /* only support procno from H_REGISTER_VPA */
-     if (flags != 0x1) {
-@@ -191,16 +192,40 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
-         return H_P2;
-     }
+@@ -125,7 +124,6 @@ build-pxe-roms:
+ build-efi-roms: build-pxe-roms
+ 	$(MAKE) -C ipxe/src CONFIG=qemu \
+ 		CROSS_COMPILE=$(x86_64_cross_prefix) \
+-		$(patsubst %,bin-i386-efi/%.efidrv,$(pxerom_targets)) \
+ 		$(patsubst %,bin-x86_64-efi/%.efidrv,$(pxerom_targets))
  
--    /* sequence is the same as in the "ibm,associativity" property */
-+    /*
-+     * Given that we want to be flexible with the sizes and indexes,
-+     * we must consider that there is a hard limit of how many
-+     * associativities domain we can fit in R4 up to R9, which would be
-+     * 12 associativity domains for vcpus. Assert and bail if that's
-+     * not the case.
-+     */
-+    G_STATIC_ASSERT((VCPU_ASSOC_SIZE - 1) <= 12);
-+
-+    vcpu_assoc = spapr_numa_get_vcpu_assoc(spapr, tcpu);
-+    /* assoc_idx starts at 1 to skip associativity size */
-+    assoc_idx = 1;
- 
--    idx = 0;
- #define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
-                              ((uint64_t)(b) & 0xffffffff))
--    args[idx++] = ASSOCIATIVITY(0, 0);
--    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
--    args[idx++] = ASSOCIATIVITY(procno, -1);
--    for ( ; idx < 6; idx++) {
--        args[idx] = -1;
-+
-+    for (idx = 0; idx < 6; idx++) {
-+        int32_t a, b;
-+
-+        /*
-+         * vcpu_assoc[] will contain the associativity domains for tcpu,
-+         * including tcpu->node_id and procno, meaning that we don't
-+         * need to use these variables here.
-+         *
-+         * We'll read 2 values at a time to fill up the ASSOCIATIVITY()
-+         * macro. The ternary will fill the remaining registers with -1
-+         * after we went through vcpu_assoc[].
-+         */
-+        a = assoc_idx < VCPU_ASSOC_SIZE ?
-+            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
-+        b = assoc_idx < VCPU_ASSOC_SIZE ?
-+            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
-+
-+        args[idx] = ASSOCIATIVITY(a, b);
-     }
- #undef ASSOCIATIVITY
- 
+ # Build scripts can pass compiler/linker flags to the EDK2
 -- 
-2.26.2
+2.27.0
 
 
