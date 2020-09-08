@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8479FC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2250FC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:28:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F33A821897
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:28:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EF8421897
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:28:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="B8AmnqFd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F33A821897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="CIrxmQDD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EF8421897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36314 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWB1-0003ZQ-1k
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:28:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57478)
+	id 1kFWBM-0004Mh-JH
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:28:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57444)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3V-0006Kj-E7; Tue, 08 Sep 2020 01:20:36 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:53557 helo=ozlabs.org)
+ id 1kFW3T-0006Hu-Gk; Tue, 08 Sep 2020 01:20:31 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:58895 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3S-0005zX-6f; Tue, 08 Sep 2020 01:20:32 -0400
+ id 1kFW3R-0005zU-PT; Tue, 08 Sep 2020 01:20:31 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkr0mkPz9sVb; Tue,  8 Sep 2020 15:20:03 +1000 (AEST)
+ id 4Bltkq4rc0z9sVg; Tue,  8 Sep 2020 15:20:03 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542404;
- bh=nJoBs/BV0XUu7Aj0kMHw1zqSmXlXG1x5Ion9wGnErAY=;
+ d=gibson.dropbear.id.au; s=201602; t=1599542403;
+ bh=Ed8eNmI6TeOF00ug4vwXg3Ihw5WGZ2MpoWZJgwfPLvg=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=B8AmnqFdGJtHlrznZNwvoM26upOjUjG7C9zuW6YnpYGGSJvnxnWlAl/NiD8EfGAbj
- q14NRFcfvsQVQrH6i8eONSYAoL8MmnSipMT5K+jzBY5WugdkmC46NBYZBYf/ouiTxD
- px3oRVPZJivWei6hNiOUSwnqjlErGudeoR4uZQuo=
+ b=CIrxmQDDwyU3wMzmvLD85H6VVZN7/VfAvb9h1awuk25OGBNAP6EYAw1AfAWfONfZ/
+ 2pu9//t33h8RgUG/s2e+dqX/KDDZzQFXFj46Ptgw/B4gD+wmwWyTNl2oQOM4jH2I8n
+ PPriuP/xlRUzid0liMOPYG+2lmpQqOlXtX8cabUs=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 19/33] mips/cps: Use start-powered-off CPUState property
-Date: Tue,  8 Sep 2020 15:19:39 +1000
-Message-Id: <20200908051953.1616885-20-david@gibson.dropbear.id.au>
+Subject: [PULL 18/33] ppc/e500: Use start-powered-off CPUState property
+Date: Tue,  8 Sep 2020 15:19:38 +1000
+Message-Id: <20200908051953.1616885-19-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
@@ -84,8 +84,8 @@ Sender: "Qemu-devel"
 
 From: Thiago Jung Bauermann <bauerman@linux.ibm.com>
 
-Instead of setting CPUState::halted to 1 in main_cpu_reset(), use the
-start-powered-off property which makes cpu_common_reset() initialize it
+Instead of setting CPUState::halted to 1 in ppce500_cpu_reset_sec(), use
+the start-powered-off property which makes cpu_common_reset() initialize it
 to 1 in common code.
 
 Also change creation of CPU object from cpu_create() to object_new() and
@@ -93,46 +93,51 @@ qdev_realize_and_unref() because cpu_create() realizes the CPU and it's not
 possible to set a property after the object is realized.
 
 Signed-off-by: Thiago Jung Bauermann <bauerman@linux.ibm.com>
-Message-Id: <20200826055535.951207-6-bauerman@linux.ibm.com>
+Message-Id: <20200826055535.951207-5-bauerman@linux.ibm.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/mips/cps.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+ hw/ppc/e500.c | 13 +++++++++----
+ 1 file changed, 9 insertions(+), 4 deletions(-)
 
-diff --git a/hw/mips/cps.c b/hw/mips/cps.c
-index 615e1a1ad2..23c0f87e41 100644
---- a/hw/mips/cps.c
-+++ b/hw/mips/cps.c
-@@ -52,9 +52,6 @@ static void main_cpu_reset(void *opaque)
-     CPUState *cs = CPU(cpu);
+diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+index ab9884e315..ae39b9358e 100644
+--- a/hw/ppc/e500.c
++++ b/hw/ppc/e500.c
+@@ -704,9 +704,6 @@ static void ppce500_cpu_reset_sec(void *opaque)
  
      cpu_reset(cs);
--
--    /* All VPs are halted on reset. Leave powering up to CPC. */
+ 
+-    /* Secondary CPU starts in halted state for now. Needs to change when
+-       implementing non-kernel boot. */
 -    cs->halted = 1;
+     cs->exception_index = EXCP_HLT;
  }
  
- static bool cpu_mips_itu_supported(CPUMIPSState *env)
-@@ -76,7 +73,17 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
-     bool saar_present = false;
+@@ -865,7 +862,7 @@ void ppce500_init(MachineState *machine)
+         CPUState *cs;
+         qemu_irq *input;
  
-     for (i = 0; i < s->num_vp; i++) {
--        cpu = MIPS_CPU(cpu_create(s->cpu_type));
-+        cpu = MIPS_CPU(object_new(s->cpu_type));
-+
-+        /* All VPs are halted on reset. Leave powering up to CPC. */
-+        if (!object_property_set_bool(OBJECT(cpu), "start-powered-off", true,
-+                                      errp)) {
-+            return;
-+        }
-+
-+        if (!qdev_realize_and_unref(DEVICE(cpu), NULL, errp)) {
-+            return;
-+        }
+-        cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
++        cpu = POWERPC_CPU(object_new(machine->cpu_type));
+         env = &cpu->env;
+         cs = CPU(cpu);
  
-         /* Init internal devices */
-         cpu_mips_irq_init_cpu(cpu);
+@@ -875,6 +872,14 @@ void ppce500_init(MachineState *machine)
+             exit(1);
+         }
+ 
++        /*
++         * Secondary CPU starts in halted state for now. Needs to change
++         * when implementing non-kernel boot.
++         */
++        object_property_set_bool(OBJECT(cs), "start-powered-off", i != 0,
++                                 &error_fatal);
++        qdev_realize_and_unref(DEVICE(cs), NULL, &error_fatal);
++
+         if (!firstenv) {
+             firstenv = env;
+         }
 -- 
 2.26.2
 
