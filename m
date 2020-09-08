@@ -8,75 +8,75 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B470C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:53:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B03C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:54:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9B5420658
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:53:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B2C220768
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:54:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pdjv6DK2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9B5420658
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+p85ef8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B2C220768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38352 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFjfu-0005ez-Qx
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:53:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40600)
+	id 1kFjh7-0008UE-6f
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:54:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjch-0007Oj-MF; Tue, 08 Sep 2020 15:49:47 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39831)
+ id 1kFjcQ-0006bV-OE; Tue, 08 Sep 2020 15:49:30 -0400
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:42794)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjcg-0002Za-0Z; Tue, 08 Sep 2020 15:49:47 -0400
-Received: by mail-pg1-x543.google.com with SMTP id v15so297678pgh.6;
- Tue, 08 Sep 2020 12:49:45 -0700 (PDT)
+ id 1kFjcP-0002Y0-40; Tue, 08 Sep 2020 15:49:30 -0400
+Received: by mail-pf1-x42e.google.com with SMTP id d6so27356pfn.9;
+ Tue, 08 Sep 2020 12:49:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Mis/yrVWeY+EL6B3pLHydPEbEg8SDdnmsH3w5+AQmwk=;
- b=pdjv6DK2sXnNkV4WyJA5AnDPpSusmMZ8P9FJ6/K3nDcsYAuKUben43m+b3LZl5BS1p
- QnW2dZvjGfISKebySIomBqTWDm5xa89rSferkqUUYxLYlZd7GGWwTbLcqvQEVaDR/B3j
- pLd+3YhpDRiZNJlE+pyy2pbYQrvOD6DmfkjPjAfYkidpMA5QS+5kLyqR5d7887wJs2oa
- 1eFY+GE/TAY428vGtseYEdBmDWe6mrlGBSAEWohimQ2AGQlbo6Q0al7tekuHYcEkcfzl
- wAxjVhR5Nq1jYWMdb5qv1N85TMgEF8Ryilmu1X2H9HOdaDXJoNtUgcGrsgNmxxL4DZLx
- 35tA==
+ bh=30KkRCFEtXNka1aga0YHq3EqESHJABavOs610tDas18=;
+ b=q+p85ef8a3EKzgpllK8bF6DDmoTMT3WWdcPtbx5xDANt1wZ4ydgna8jRjINQtGKxtN
+ RALOjee9svUEpcKlEvwoprqPAxrLvfIN+ptIHCj6UEmGZJ4rPlovYLN8JEIjDfWcdGiV
+ mLnvKcjy9Gn7pY9en7fBvDh1pwEXXrvE+TI/07JFugE3DXHd/pPZc4vWwAtPclGbzLjZ
+ D2+KJym71ZA+Z5nV+gmPFwhJN9mx7ytJt+otdq4REVYAaKycHsFSkqAmSImE56r+Pgw4
+ c3gcwaNPSlV2sFOqv0z0re2SjgQ/8P243QkjH30i/Xk9EhmhQcT/l00yXAxOUXKPMtS6
+ TTEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Mis/yrVWeY+EL6B3pLHydPEbEg8SDdnmsH3w5+AQmwk=;
- b=sQvDSYqEZbUK/sYYeIShIvCmmo5PV7nBmUUMx5fp9ueAOxbeybnmUHy2G56hivy+Gk
- VJpyoMZ7SoQHeH+iZBzN7brfrHB/RhPuuVgmi/RIXyMg4PDRRRONLEe0D5ypXmjepRon
- puw9zSKgc3FA/DEL/5RCAkIdUeA6nwm7LVOsJ59q0G+Xn4Y3amB1czcu7DAJ7O3NA8Br
- OnnIf2r9HtYnJIV1Ufh2/EMjNdGF+OYXQEq1AGGkksIWesz7rPEHNJtxYxjTpaL9csak
- ylvta5HFhrbc1Oy3niUE5dnpONWtSpD/zT6gvo8nwb1z9c2kZUlhQFEHB5nS+NCbYHFq
- INHg==
-X-Gm-Message-State: AOAM533WWPqZAK2eQrWMEE0RDE6TGd62+xsBxAn9J0nn3fh8wWBM4Ux+
- zfN9LRMurdACpOe1v7wfgrBS1u2UH0CfiBFk
-X-Google-Smtp-Source: ABdhPJwYvcMEOL5IhmQwJqYtLcqd6NNGfn8WKwiWzfaVRLdwNyBLflmEtMtt28D8Z7MeQ/T6ZqksOQ==
-X-Received: by 2002:a63:5d4a:: with SMTP id o10mr268551pgm.346.1599594584013; 
- Tue, 08 Sep 2020 12:49:44 -0700 (PDT)
+ bh=30KkRCFEtXNka1aga0YHq3EqESHJABavOs610tDas18=;
+ b=cvic1TnsDIOuudt5JOgAA0rVsbeuNPcuo8ld1TzkAG0xAra+0vATqPGkx1CNhf5Cf0
+ iAXxtBHL/J+R1LzLT8WPxHexFnYRBH3zexK+f3I7/Ki2MqHGsH+17UQvaBjJAHFGa0Yu
+ Q5x72B3JN0NoeygYnIDnXq7+J/0Hhqs/BhaYQz00hkukq2wuDkcZF6epDE0V5oe3WoU8
+ PkOK0O1I9irTuuo//9pVZ4SxLVaiRhCUnRqP69DekgdxhvJ0LG//UvEodZVeeUW7Gx9i
+ +n5RCNtLCa2/lRQhMsx+EnWXeqbdl6dtwNNCtpDfM4y/e6AWTd+vxD137qRX0FkAHUX0
+ 4aLA==
+X-Gm-Message-State: AOAM532oYLvg6DZiAfGOqPjfUKiDePj/5J10nHxLB8U8S5/bMvtN5ueh
+ swdTNnMwAkEtRCQR4FL57YWmd/j8zF0nhBjT
+X-Google-Smtp-Source: ABdhPJykW8UuNSMZAZRXw7m1Asu0y7vFxSy05CIZz/DrPpBfErJPgb/XlGJAn3SKc2VbbCOKv1hOmg==
+X-Received: by 2002:a63:5160:: with SMTP id r32mr301050pgl.112.1599594567064; 
+ Tue, 08 Sep 2020 12:49:27 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.49.40
+ by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.49.23
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 12:49:43 -0700 (PDT)
+ Tue, 08 Sep 2020 12:49:26 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 16/16] rcu: add uninit destructor for rcu
-Date: Wed,  9 Sep 2020 03:48:20 +0800
-Message-Id: <20200908194820.702-17-luoyonggang@gmail.com>
+Subject: [PATCH 12/16] meson: remove empty else and duplicated gio deps
+Date: Wed,  9 Sep 2020 03:48:16 +0800
+Message-Id: <20200908194820.702-13-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200908194820.702-1-luoyonggang@gmail.com>
 References: <20200908194820.702-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42e;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -110,110 +110,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is necessary if the pending  rcu calls are closing and removing
-temp files. This also provide a function
-void rcu_wait_finished(void);
-to fixes test-logging.c test failure on msys2/mingw.
-On windows if the file doesn't closed, you can not remove it.
-
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- include/qemu/rcu.h   |  5 +++++
- tests/test-logging.c |  2 ++
- util/rcu.c           | 37 ++++++++++++++++++++++++++++++++++++-
- 3 files changed, 43 insertions(+), 1 deletion(-)
+ meson.build | 6 ------
+ 1 file changed, 6 deletions(-)
 
-diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-index 570aa603eb..dd0a92c1d0 100644
---- a/include/qemu/rcu.h
-+++ b/include/qemu/rcu.h
-@@ -124,6 +124,11 @@ extern void rcu_unregister_thread(void);
- extern void rcu_enable_atfork(void);
- extern void rcu_disable_atfork(void);
- 
-+/*
-+ * Wait all rcu call executed and exit the rcu thread.
-+ */
-+extern void rcu_wait_finished(void);
-+
- struct rcu_head;
- typedef void RCUCBFunc(struct rcu_head *head);
- 
-diff --git a/tests/test-logging.c b/tests/test-logging.c
-index 957f6c08cd..7a5b59f4a5 100644
---- a/tests/test-logging.c
-+++ b/tests/test-logging.c
-@@ -210,6 +210,8 @@ int main(int argc, char **argv)
-                          tmp_path, test_logfile_lock);
- 
-     rc = g_test_run();
-+    qemu_log_close();
-+    rcu_wait_finished();
- 
-     rmdir_full(tmp_path);
-     g_free(tmp_path);
-diff --git a/util/rcu.c b/util/rcu.c
-index 60a37f72c3..43367988b9 100644
---- a/util/rcu.c
-+++ b/util/rcu.c
-@@ -308,10 +308,20 @@ void rcu_unregister_thread(void)
-     qemu_mutex_unlock(&rcu_registry_lock);
- }
- 
-+typedef struct QemuRcuMessage {
-+    struct rcu_head rcu;
-+    void *message;
-+} QemuRcuMessage;
-+
-+static int rcu_thread_exit_called = 0;
-+static int rcu_thread_exited = 0;
-+static QemuRcuMessage rcu_thread_message;
-+
- static void rcu_init_complete(void)
- {
-     QemuThread thread;
--
-+    atomic_mb_set(&rcu_thread_exit_called, 0);
-+    atomic_mb_set(&rcu_thread_exited, 0);
-     qemu_mutex_init(&rcu_registry_lock);
-     qemu_mutex_init(&rcu_sync_lock);
-     qemu_event_init(&rcu_gp_event, true);
-@@ -327,6 +337,26 @@ static void rcu_init_complete(void)
-     rcu_register_thread();
- }
- 
-+static void rcu_thread_exit(QemuRcuMessage *param)
-+{
-+    atomic_mb_set((int*)param->message, 1);
-+    qemu_thread_exit(NULL);
-+}
-+
-+void rcu_wait_finished(void)
-+{
-+    if (atomic_xchg(&rcu_thread_exit_called, 1) == 0)
-+    {
-+        rcu_thread_message.message = &rcu_thread_exited;
-+        call_rcu(&rcu_thread_message, rcu_thread_exit, rcu);
-+    }
-+
-+    while (atomic_mb_read(&rcu_thread_exited) == 0)
-+    {
-+        g_usleep(10000);
-+    }
-+}
-+
- static int atfork_depth = 1;
- 
- void rcu_enable_atfork(void)
-@@ -379,3 +409,8 @@ static void __attribute__((__constructor__)) rcu_init(void)
- #endif
-     rcu_init_complete();
- }
-+
-+static void __attribute__((__destructor__)) rcu_uninit(void)
-+{
-+    rcu_wait_finished();
-+}
+diff --git a/meson.build b/meson.build
+index 5421eca66a..0b1741557d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -317,7 +317,6 @@ opengl = not_found
+ if 'CONFIG_OPENGL' in config_host
+   opengl = declare_dependency(compile_args: config_host['OPENGL_CFLAGS'].split(),
+                               link_args: config_host['OPENGL_LIBS'].split())
+-else
+ endif
+ gtk = not_found
+ if 'CONFIG_GTK' in config_host
+@@ -344,11 +343,6 @@ if 'CONFIG_ICONV' in config_host
+   iconv = declare_dependency(compile_args: config_host['ICONV_CFLAGS'].split(),
+                              link_args: config_host['ICONV_LIBS'].split())
+ endif
+-gio = not_found
+-if 'CONFIG_GIO' in config_host
+-  gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
+-                           link_args: config_host['GIO_LIBS'].split())
+-endif
+ vnc = not_found
+ png = not_found
+ jpeg = not_found
 -- 
 2.28.0.windows.1
 
