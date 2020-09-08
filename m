@@ -2,88 +2,93 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4317AC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B38C3C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:39:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C630E22206
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:38:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 23C66221EC
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:39:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fqg+osWH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C630E22206
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iYOeOZzS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23C66221EC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49414 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFct8-0005I5-Ol
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:38:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34060)
+	id 1kFcu5-0006bR-4X
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:39:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFcnB-0001jQ-Pu; Tue, 08 Sep 2020 08:32:09 -0400
-Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:41282)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFcn9-0008D7-Oh; Tue, 08 Sep 2020 08:32:09 -0400
-Received: by mail-pf1-x441.google.com with SMTP id z19so8669335pfn.8;
- Tue, 08 Sep 2020 05:32:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=EKG1apOrW8tjor/2mLwmR3nr+4172Hc8gwfm/Y5sTeg=;
- b=Fqg+osWHj477oq2eTRSxx9C9i46/LHZsB3jIbup3heyaLgZT+NVXAtwwIy6q7V7L9r
- VZ9aVyfryuYV6v9I4ebukk0+Xf+XR1JzvY9HCJdTR09zAbG4LVDdm0Q6P39dxRUCDTyl
- OXLhlhot2wSnA0CIl6TYRj3/Tf5NzAtm0XCt2/njSosB0mi73yiYeChvMG/cywBNbkck
- 8cZAshRc8fBcny1HN+GC8S+tGe10i5X88ukaj/lOL1Eyr8nIwocLyScL8sY5CLp/psGx
- 8srINwSdSwXZCXtldmnhD9/Q3bMBBLkUDrOhaFs9Ig77nJa0ILqNhRg0Sdqz45kec6HO
- Lw0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=EKG1apOrW8tjor/2mLwmR3nr+4172Hc8gwfm/Y5sTeg=;
- b=MUP73xjjCpF2HzLZoFeB55/86TTC8U7d8OeHmwRMApDZdQDp6v8F4ioma/9aAnc1Yo
- Vkw8XC9i/MiWnNlS3skeRgT1E43Qv2YiSqJEGLdo7Cqumujiecbg6LNR2srYswos/8G3
- NwxxO0rixih43y7PRXhlHTt7z1v6Py7MIxKdjKBjigsxc7IBU5f8HvSx4zzsefLwh6zw
- CaRBJx95iH0zatRhnwCuPWh+f9qPspAXpNVaqmQ27B6VwaysaX0Mk5kivuf8xI7+hZGn
- Eq7eyKSKTo/ej41Es1yhxdHTRnQSiLkHPb1caWNdEE1I6g+3GakxuiOhaqMoped2NGzG
- wDAg==
-X-Gm-Message-State: AOAM533i2zmNd2Do54wOvZVQ3WUfQvIu2P7bpmJI7nLMNfMG3N/1ylpG
- rlrSUsd2PghDqYZrx+w15MsuFBr+kG1sACC9
-X-Google-Smtp-Source: ABdhPJxkSaI7X/gUk3TTp6E8PUjpVZixCVEGCnUxcmHBaX2ohx8ZYd5lIIgw/qY5c83Pv06W1LxAqg==
-X-Received: by 2002:a17:902:c151:: with SMTP id
- 17mr10207356plj.49.1599568325493; 
- Tue, 08 Sep 2020 05:32:05 -0700 (PDT)
-Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id k5sm29172087pjl.3.2020.09.08.05.32.02
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 05:32:04 -0700 (PDT)
-From: Yonggang Luo <luoyonggang@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/2] rcu: fixes rcu and test-logging.c
-Date: Tue,  8 Sep 2020 20:31:47 +0800
-Message-Id: <20200908123149.1475-1-luoyonggang@gmail.com>
-X-Mailer: git-send-email 2.28.0.windows.1
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kFcrv-0003VF-01
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:37:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51607)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kFcrt-0000ID-7T
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:37:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599568620;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=beNf1RWaRkSGnYCdxNHyDjnxNdYpPdXjoU5qH8vtbTE=;
+ b=iYOeOZzSKOC5YMKuP5dQ7OPS4juarHThoRQ0SbdvOzC+ZXssLNptUtUyi1POOYSx/6jo4r
+ 8XXAB/EPCRrxZcxbQ/m9PeCZrbqXjeOROs/g04UWUF0Gz4Tdz+nwng65yMSpmhJPc+iaNK
+ 0guU+/qMV+5RcQvOEIh44Kvnu0SKDhc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-9-DzYtW-OMPMmAE9Rc1hRpBg-1; Tue, 08 Sep 2020 08:36:55 -0400
+X-MC-Unique: DzYtW-OMPMmAE9Rc1hRpBg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3889618B9EEC;
+ Tue,  8 Sep 2020 12:36:54 +0000 (UTC)
+Received: from [10.3.112.176] (ovpn-112-176.phx2.redhat.com [10.3.112.176])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E468F5D9F3;
+ Tue,  8 Sep 2020 12:36:47 +0000 (UTC)
+Subject: Re: [PATCH v3 1/4] qapi: net: Add query-netdevs command
+To: Markus Armbruster <armbru@redhat.com>,
+ Alexey Kirillov <lekiravi@yandex-team.ru>
+References: <20200901182326.59633-1-lekiravi@yandex-team.ru>
+ <20200901182326.59633-2-lekiravi@yandex-team.ru>
+ <87lfhsjubv.fsf@dusky.pond.sub.org> <37711599469320@mail.yandex-team.ru>
+ <871rjdrca0.fsf@dusky.pond.sub.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b632d444-bdf9-648b-9d55-a9e72efb8fbc@redhat.com>
+Date: Tue, 8 Sep 2020 07:36:47 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <871rjdrca0.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:54
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.626, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,29 +102,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Daniel Brodsky <dnbrdsky@gmail.com>,
- Yonggang Luo <luoyonggang@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Juan Quintela <quintela@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Stefan Weil <sw@weilnetz.de>,
+ Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Vincenzo Maffione <v.maffione@gmail.com>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is necessary if the pending  rcu calls are closing and removing=0D
-temp files. This also provide a function=0D
-void rcu_wait_finished(void);=0D
-to fixes test-logging.c test failure on msys2/mingw.=0D
-On windows if the file doesn't closed, you can not remove it.=0D
-=0D
-Yonggang Luo (2):=0D
-  logging: Fixes memory leak in test-logging.c=0D
-  rcu: add uninit destructor for rcu=0D
-=0D
- include/qemu/rcu.h   |  5 +++++=0D
- tests/test-logging.c |  4 +++-=0D
- util/rcu.c           | 28 ++++++++++++++++++++++++----=0D
- 3 files changed, 32 insertions(+), 5 deletions(-)=0D
-=0D
--- =0D
-2.28.0.windows.1=0D
-=0D
+On 9/7/20 7:39 AM, Markus Armbruster wrote:
+
+>>>
+>>> This is union Netdev plus a common member @peer-id, less the variant
+>>> members for NetClientDriver values 'nic' and 'hubport'.
+>>>
+>>> Can 'type: 'nic' and 'type': 'hubport' occur?
+>>
+>> No, it can't. We don't support NIC/hubport in query-netdevs, so we neither create this
+>> structure for them, nor store config.
+> 
+> Same for 'none', I guess.
+> 
+> As defined, NetdevInfo allows types 'none', 'nic', and 'hubport', it
+> just has no variant members for them.  The fact that they can't occur is
+> not coded into the type, and therefore not visible in introspection.
+> 
+> To make introspection more precise, we'd have to define a new enum type.
+> How much that would complicate the C code is unclear.
+> 
+> Do we need it to be more precise?  Eric, got an opinion?
+
+Is the problem that a new enum would be duplicating things?  Is it worth 
+allowing one enum to have a 'base':'OtherEnum' in the schema to reduce 
+some of the duplication?
+
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
