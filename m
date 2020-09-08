@@ -2,83 +2,63 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EFDCC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:54:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E22F2C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:59:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1A482087D
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:54:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eXbnFf0Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A482087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3146D21D20
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:59:17 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3146D21D20
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52590 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFcCY-0007S2-Of
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:54:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52906)
+	id 1kFcHM-0001ez-7H
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:59:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54012)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFcBs-0006r2-VX
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:53:36 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:36041
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFcBq-00031h-5d
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:53:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599566012;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=50bLK80+kvmvCy6+HKqwDv+hhqF+n4H7IyR748V7KdA=;
- b=eXbnFf0Yg+IIoc0hOrEa9dpK9xXpuZSgiUlGKexdKq5esgJGm2jKla8cdMbC/Gz1tKV5mT
- aN3fK77Y1aHkJBZ6Q2jk/yZ8N04GT0WUPw0NuGupNzkoRApc1opJZ9HKvOdH52KZHDB5Io
- azQzh/eZW/Z/4yVxJgqaMDAcTG43z9I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-yoqpxz8GMKuAjgBBmTfbkg-1; Tue, 08 Sep 2020 07:53:31 -0400
-X-MC-Unique: yoqpxz8GMKuAjgBBmTfbkg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE64A1DDEF;
- Tue,  8 Sep 2020 11:53:29 +0000 (UTC)
-Received: from linux.fritz.box.com (ovpn-113-55.ams2.redhat.com [10.36.113.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 01A9B60DA0;
- Tue,  8 Sep 2020 11:53:28 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PULL v2] Block layer patches
-Date: Tue,  8 Sep 2020 13:53:22 +0200
-Message-Id: <20200908115322.325832-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kFcGk-0000sy-E1
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:58:38 -0400
+Received: from mx2.suse.de ([195.135.220.15]:36944)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kFcGh-0003in-Gl
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:58:38 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id C40D1ABD5;
+ Tue,  8 Sep 2020 11:58:33 +0000 (UTC)
+Subject: Re: [PATCH v7 00/16] QEMU cpus.c refactoring part2
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20200903105614.17772-1-cfontana@suse.de>
+ <13e066b4-03dd-e8f6-4420-25e25e404c72@suse.de>
+ <CABgObfZBARDX=tFb03xEnSVMGAiG8TPn4TAKUpGEi=_iRChmWA@mail.gmail.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <7e518674-b2a4-d6fb-f9f0-20a19765b995@suse.de>
+Date: Tue, 8 Sep 2020 13:58:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CABgObfZBARDX=tFb03xEnSVMGAiG8TPn4TAKUpGEi=_iRChmWA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:33:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:22:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -57
+X-Spam_score: -5.8
+X-Spam_bar: -----
+X-Spam_report: (-5.8 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.626,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,154 +71,435 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 7c37270b3fbe3d034ba80e488761461676e21eb4:
+On 9/4/20 7:29 PM, Paolo Bonzini wrote:
+> 
+> 
+> Il ven 4 set 2020, 18:08 Claudio Fontana <cfontana@suse.de <mailto:cfontana@suse.de>> ha scritto:
+> 
+>     btw not sure whose queues should these go through?
+> 
+> 
+> I can take this; the dust from the meson merge should settle soon.
+> 
+> Paolo
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20200904-pull-request' into staging (2020-09-06 16:23:55 +0100)
+Thanks Paolo,
 
-are available in the Git repository at:
+if it can help I try to keep a rebased functioning version at
 
-  git://repo.or.cz/qemu/kevin.git tags/for-upstream
+https://github.com/hw-claudio/qemu.git "cpus-refactoring"
 
-for you to fetch changes up to c984095a47c30e0952d34e77decf9f4c0f8d5a19:
+some of the CI complains about:
 
-  block/nvme: Pair doorbell registers (2020-09-08 13:40:53 +0200)
+check: qemu-img not found
+Makefile.mtest:1229: recipe for target 'check-block' failed
 
-----------------------------------------------------------------
-Block layer patches:
+Ciao,
 
-- qemu-img create: Fail gracefully when backing file is an empty string
-- Fixes related to filter block nodes ("Deal with filters" series)
-- block/nvme: Various cleanups required to use multiple queues
-- block/nvme: Use NvmeBar structure from "block/nvme.h"
-- file-win32: Fix "locking" option
-- iotests: Allow running from different directory
+Claudio
 
-----------------------------------------------------------------
-Connor Kuehl (1):
-      block: Raise an error when backing file parameter is an empty string
-
-Kevin Wolf (2):
-      iotests: Allow running from different directory
-      file-win32: Fix "locking" option
-
-Max Reitz (43):
-      block: Add child access functions
-      block: Add chain helper functions
-      block: bdrv_cow_child() for bdrv_has_zero_init()
-      block: bdrv_set_backing_hd() is about bs->backing
-      block: Include filters when freezing backing chain
-      block: Drop bdrv_is_encrypted()
-      block: Add bdrv_supports_compressed_writes()
-      throttle: Support compressed writes
-      copy-on-read: Support compressed writes
-      block: Use bdrv_filter_(bs|child) where obvious
-      block: Use CAFs in block status functions
-      stream: Deal with filters
-      block: Use CAFs when working with backing chains
-      block: Use bdrv_cow_child() in bdrv_co_truncate()
-      block: Re-evaluate backing file handling in reopen
-      block: Flush all children in generic code
-      vmdk: Drop vmdk_co_flush()
-      block: Iterate over children in refresh_limits
-      block: Use CAFs in bdrv_refresh_filename()
-      block: Use CAF in bdrv_co_rw_vmstate()
-      block/snapshot: Fix fallback
-      block: Use CAFs for debug breakpoints
-      block: Improve get_allocated_file_size's default
-      block/null: Implement bdrv_get_allocated_file_size
-      blockdev: Use CAF in external_snapshot_prepare()
-      block: Report data child for query-blockstats
-      block: Use child access functions for QAPI queries
-      block-copy: Use CAF to find sync=top base
-      mirror: Deal with filters
-      backup: Deal with filters
-      commit: Deal with filters
-      nbd: Use CAF when looking for dirty bitmap
-      qemu-img: Use child access functions
-      block: Drop backing_bs()
-      blockdev: Fix active commit choice
-      block: Inline bdrv_co_block_status_from_*()
-      block: Leave BDS.backing_{file,format} constant
-      iotests: Test that qcow2's data-file is flushed
-      iotests: Let complete_and_wait() work with commit
-      iotests: Add filter commit test cases
-      iotests: Add filter mirror test cases
-      iotests: Add test for commit in sub directory
-      iotests: Test committing to overridden backing
-
-Philippe Mathieu-Daudé (18):
-      block/nvme: Replace magic value by SCALE_MS definition
-      block/nvme: Avoid further processing if trace event not enabled
-      block/nvme: Let nvme_create_queue_pair() fail gracefully
-      block/nvme: Define INDEX macros to ease code review
-      block/nvme: Improve error message when IO queue creation failed
-      block/nvme: Use common error path in nvme_add_io_queue()
-      block/nvme: Rename local variable
-      block/nvme: Use union of NvmeIdCtrl / NvmeIdNs structures
-      block/nvme: Replace qemu_try_blockalign0 by qemu_try_blockalign/memset
-      block/nvme: Replace qemu_try_blockalign(bs) by qemu_try_memalign(pg_sz)
-      block/nvme: Simplify nvme_init_queue() arguments
-      block/nvme: Replace BDRV_POLL_WHILE by AIO_WAIT_WHILE
-      block/nvme: Simplify nvme_create_queue_pair() arguments
-      block/nvme: Extract nvme_poll_queue()
-      block/nvme: Use an array of EventNotifier
-      block/nvme: Group controller registers in NVMeRegs structure
-      block/nvme: Use generic NvmeBar structure
-      block/nvme: Pair doorbell registers
-
- qapi/block-core.json           |  58 +++--
- include/block/block.h          |   2 +-
- include/block/block_int.h      |  95 +++++---
- block.c                        | 492 +++++++++++++++++++++++++++++++++--------
- block/backup-top.c             |   4 +-
- block/backup.c                 |   9 +-
- block/blkdebug.c               |   7 +-
- block/blklogwrites.c           |   1 -
- block/block-backend.c          |   7 +-
- block/block-copy.c             |   4 +-
- block/commit.c                 |  95 +++++---
- block/copy-on-read.c           |  13 +-
- block/file-win32.c             |  22 +-
- block/filter-compress.c        |   2 -
- block/io.c                     | 142 ++++++------
- block/mirror.c                 | 119 +++++++---
- block/monitor/block-hmp-cmds.c |   2 +-
- block/null.c                   |   7 +
- block/nvme.c                   | 248 +++++++++++----------
- block/qapi.c                   |  74 +++++--
- block/snapshot.c               | 104 +++++++--
- block/stream.c                 |  63 ++++--
- block/throttle.c               |  11 +-
- block/vmdk.c                   |  16 --
- blockdev.c                     | 101 +++++++--
- migration/block-dirty-bitmap.c |   8 +-
- nbd/server.c                   |   6 +-
- qemu-img.c                     |  43 ++--
- tests/qemu-iotests/iotests.py  |  10 +-
- tests/qemu-iotests/020         |  44 ++++
- tests/qemu-iotests/020.out     |  10 +
- tests/qemu-iotests/040         | 238 ++++++++++++++++++++
- tests/qemu-iotests/040.out     |   4 +-
- tests/qemu-iotests/041         | 146 +++++++++++-
- tests/qemu-iotests/041.out     |   4 +-
- tests/qemu-iotests/049         |   4 +
- tests/qemu-iotests/049.out     |   5 +
- tests/qemu-iotests/153.out     |   2 +-
- tests/qemu-iotests/184         |   3 +-
- tests/qemu-iotests/184.out     |  14 +-
- tests/qemu-iotests/204.out     |   1 +
- tests/qemu-iotests/228         |   6 +-
- tests/qemu-iotests/228.out     |   6 +-
- tests/qemu-iotests/244         |  49 ++++
- tests/qemu-iotests/244.out     |   7 +
- tests/qemu-iotests/245         |   4 +-
- tests/qemu-iotests/273.out     |   4 +-
- tests/qemu-iotests/check       |   2 +-
- 48 files changed, 1763 insertions(+), 555 deletions(-)
+> 
+> 
+>     Thanks,
+> 
+>     Claudio
+> 
+>     On 9/3/20 12:55 PM, Claudio Fontana wrote:
+>     > Motivation and higher level steps:
+>     >
+>     > https://lists.gnu.org/archive/html/qemu-devel/2020-05/msg04628.html
+>     >
+>     > Current state is all reviewed, I think this is a good base to
+>     > include at this point.
+>     > I had to fix one build issue in patch 1 that went undetected previously due to
+>     > a meson thing (parallel build).
+>     >
+>     > Further work for future patches include:
+>     >
+>     > * additional improvements to naming consistency in QEMU files. (Claudio, Alex, Roman)
+>     >
+>     > * tcg vcpu start refactoring, providing then multiple structs for mttg, icount, normal.
+>     >   (Claudio, Alex)
+>     >
+>     > * possible removal of NULL check for virtual clock if the qcow2 early call is solved.
+>     >   (Claudio, Paolo, Berto)
+>     >
+>     > PATCH v6 -> PATCH v7:
+>     >
+>     > * in patch "cpu-timers, icount: new modules":
+>     >   - remove redundant double initialization of spice
+>     >   - remove lingering calls to icount_get
+>     >
+>     > PATCH v5 -> PATCH v6:
+>     >
+>     > * moved to mason build system
+>     >
+>     > * patch (new): cpus: remove checks for non-NULL cpus_accel (Richard)
+>     >
+>     >   This has however a big caveat: in some cases the virtual clock is
+>     >   queried before an accelerator is set or ticks are enabled; this is
+>     >   currently special cased (keeping the NULL check in cpus_get_virtual_clock),
+>     >   but maybe this should not happen at all? (Paolo, Berto)
+>     >
+>     > * in patch "cpu-timers, icount: new modules"
+>     >   do not change (yet) icount_enabled() to a function.
+>     >   Mimic instead what is done with tcg_enabled(). (Richard)
+>     >
+>     > * split the changes into two separate patches, with name-only changes
+>     >   extracted out into a separate patch (Richard).
+>     >   Removed existing Reviewed-by because of these changes (Alex)-
+>     >   Alex are you ok with them?
+>     >
+>     > * in patch "cpus: prepare new CpusAccel cpu accelerator interface"
+>     >   remove some unneeded stubs from stubs/cpu-synchronize-state.c
+>     >   Use const for the CpusAccel interface. (Richard)
+>     >
+>     > * in patch "cpus: extract out TCG-specific code to accel/tcg"
+>     >   use const for the CpusAccel interface. (Richard)
+>     >
+>     > * in patch "cpus: extract out qtest-specific code to accel/qtest"
+>     >   use const for the CpusAccel interface;
+>     >   use g_assert_not_reached (Richard)
+>     >
+>     > * in patch "cpus: extract out kvm-specific code to accel/kvm"
+>     >   use const for the CpusAccel interface. (Richard)
+>     >
+>     > * in patch "cpus: extract out hax-specific code to target/i386/"
+>     >   use const for the CpusAccel interface. (Richard)
+>     >
+>     > * in patch "cpus: extract out whpx-specific code to target/i386/"
+>     >   use const for the CpusAccel interface. (Richard)
+>     >
+>     > * in patch "cpus: extract out hvf-specific code to target/i386/hvf/"
+>     >   use const for the CpusAccel interface. (Richard)
+>     >
+>     >
+>     > RFC v4 -> PATCH v5:
+>     >
+>     > * in patch 2, move comment about cpus_get_elapsed_ticks from patch 3
+>     >   (Philippe)
+>     >
+>     > * in patch 11-14, do not create separate xxx-int.h files,
+>     >   instead use the xxx-cpus.h files (Philippe)
+>     >
+>     > RFC v3 -> v4:
+>     >
+>     > * added patch 9: cleanup unneeded includes
+>     >
+>     > * added patch 10: add handle_interrupt to the interface (Roman)
+>     >
+>     > * added patch 11-14: remove accelerator specific internal functions
+>     >   from global includes (Roman)
+>     >
+>     > * in patch 2, removed leftover "if hvf_enabled" hunk
+>     >
+>     > * in patch 2, convert if (!tcg_enabled) with more punctual if (hax_enabled)
+>     >   when eating dummy APC
+>     >
+>     > ----
+>     >
+>     > RFC v2 -> v3:
+>     >
+>     > * provided defaults for all methods.
+>     >   Only create_vcpu_thread is now a mandatory field. (Paolo)
+>     >
+>     > * separated new CpusAccel patch from its first user, new patch nr. 2:
+>     >   "cpus: prepare new CpusAccel cpu accelerator interface"
+>     >
+>     > * new CpusAccel methods: get_virtual_clock and get_elapsed_ticks.
+>     >   (Paolo)
+>     >
+>     >   In this series, get_virtual_clock has a separate implementation
+>     >   between TCG/icount and qtest,
+>     >   while get_elapsed_ticks only returns a virtual counter for icount.
+>     >
+>     >   Looking for more comments in this area.
+>     >
+>     > ----
+>     >
+>     > RFC v1 -> v2:
+>     >
+>     > * split the cpus.c accelerator refactoring into 6 patches.
+>     >
+>     > * other minor changes to be able to proceed step by step.
+>     >
+>     > ----
+>     >
+>     > * Rebased on commit 255ae6e2158c743717bed76c9a2365ee4bcd326e,
+>     > "replay: notify the main loop when there are no instructions"
+>     >
+>     > [SPLIT into part1 and part2]
+>     >
+>     > ----
+>     >
+>     > v6 -> v7:
+>     >
+>     > * rebased changes on top of Pavel Dovgalyuk changes to dma-helpers.c
+>     >   "icount: make dma reads deterministic"
+>     >
+>     > ----
+>     >
+>     > v5 -> v6:
+>     >
+>     > * rebased changes on top of Emilio G. Cota changes to cpus.c
+>     >   "cpu: convert queued work to a QSIMPLEQ"
+>     >
+>     > * keep a pointer in cpus.c instead of a copy of CpusAccel
+>     >   (Alex)
+>     >
+>     > ----
+>     >
+>     >
+>     > v4 -> v5: rebase on latest master
+>     >
+>     > * rebased changes on top of roman series to remove one of the extra states for hvf.
+>     >   (Is the result now functional for HVF?)
+>     >
+>     > * rebased changes on top of icount changes and fixes to icount_configure and
+>     >   the new shift vmstate. (Markus)
+>     >
+>     > v3 -> v4:
+>     >
+>     > * overall: added copyright headers to all files that were missing them
+>     >   (used copyright and license of the module the stuff was extracted from).
+>     >   For the new interface files, added SUSE LLC.
+>     >
+>     > * 1/4 (move softmmu only files from root):
+>     >
+>     >   MAINTAINERS: moved softmmu/cpus.c to its final location (from patch 2)
+>     >
+>     > * 2/4 (cpu-throttle):
+>     >
+>     >   MAINTAINERS (to patch 1),
+>     >   copyright Fabrice Bellard and license from cpus.c
+>     >
+>     > * 3/4 (cpu-timers, icount):
+>     >
+>     >   - MAINTAINERS: add cpu-timers.c and icount.c to Paolo
+>     >
+>     >   - break very long lines (patchew)
+>     >
+>     >   - add copyright SUSE LLC, GPLv2 to cpu-timers.h
+>     >
+>     >   - add copyright Fabrice Bellard and license from cpus.c to timers-state.h
+>     >     as it is lifted from cpus.c
+>     >
+>     >   - vl.c: in configure_accelerators bail out if icount_enabled()
+>     >     and !tcg_enabled() as qtest does not enable icount anymore.
+>     >
+>     > * 4/4 (accel stuff to accel):
+>     >
+>     >   - add copyright SUSE LLC to files that mostly only consist of the
+>     >     new interface. Add whatever copyright was in the accelerator code
+>     >     if instead they mostly consist of accelerator code.
+>     >
+>     >   - change a comment to mention the result of the AccelClass experiment
+>     >
+>     >   - moved qtest accelerator into accel/qtest/ , make it like the others.
+>     >
+>     >   - rename xxx-cpus-interface to xxx-cpus (remove "interface" from names)
+>     >
+>     >   - rename accel_int to cpus_accel
+>     >
+>     >   - rename CpusAccel functions from cpu_synchronize_* to synchronize_*
+>     >
+>     >
+>     > --------
+>     >
+>     > v2 -> v3:
+>     >
+>     > * turned into a 4 patch series, adding a first patch moving
+>     >   softmmu code currently in top_srcdir to softmmu/
+>     >
+>     > * cpu-throttle: moved to softmmu/
+>     >
+>     > * cpu-timers, icount:
+>     >
+>     >   - moved to softmmu/
+>     >
+>     >   - fixed assumption of qtest_enabled() => icount_enabled()
+>     >   causing the failure of check-qtest-arm goal, in test-arm-mptimer.c
+>     >
+>     >   Fix is in hw/core/ptimer.c,
+>     >
+>     >   where the artificial timeout rate limit should not be applied
+>     >   under qtest_enabled(), in a similar way to how it is not applied
+>     >   for icount_enabled().
+>     >
+>     > * CpuAccelInterface: no change.
+>     >
+>     >
+>     > --------
+>     >
+>     >
+>     > v1 -> v2:
+>     >
+>     > * 1/3 (cpu-throttle): provide a description in the commit message
+>     >
+>     > * 2/3 (cpu-timers, icount): in this v2 separate icount from cpu-timers,
+>     >   as icount is actually TCG-specific. Only build it under CONFIG_TCG.
+>     >
+>     >   To do this, qtest had to be detached from icount. To this end, a
+>     >   trivial global counter for qtest has been introduced.
+>     >
+>     > * 3/3 (CpuAccelInterface): provided a description.
+>     >
+>     > This is point 8) in that plan. The idea is to extract the unrelated parts
+>     > in cpus, and register interfaces from each single accelerator to the main
+>     > cpus module (cpus.c).
+>     >
+>     > While doing this RFC, I noticed some assumptions about Windows being
+>     > either TCG or HAX (not considering WHPX) that might need to be revisited.
+>     > I added a comment there.
+>     >
+>     > The thing builds successfully based on Linux cross-compilations for
+>     > windows/hax, windows/whpx, and I got a good build on Darwin/hvf.
+>     >
+>     > Tests run successully for tcg and kvm configurations, but did not test on
+>     > windows or darwin.
+>     >
+>     > Welcome your feedback and help on this,
+>     >
+>     > Claudio
+>     >
+>     >
+>     > Claudio Fontana (16):
+>     >   cpu-timers, icount: new modules
+>     >   icount: rename functions to be consistent with the module name
+>     >   cpus: prepare new CpusAccel cpu accelerator interface
+>     >   cpus: extract out TCG-specific code to accel/tcg
+>     >   cpus: extract out qtest-specific code to accel/qtest
+>     >   cpus: extract out kvm-specific code to accel/kvm
+>     >   cpus: extract out hax-specific code to target/i386/
+>     >   cpus: extract out whpx-specific code to target/i386/
+>     >   cpus: extract out hvf-specific code to target/i386/hvf/
+>     >   cpus: cleanup now unneeded includes
+>     >   cpus: remove checks for non-NULL cpus_accel
+>     >   cpus: add handle_interrupt to the CpusAccel interface
+>     >   hvf: remove hvf specific functions from global includes
+>     >   whpx: remove whpx specific functions from global includes
+>     >   hax: remove hax specific functions from global includes
+>     >   kvm: remove kvm specific functions from global includes
+>     >
+>     >  MAINTAINERS                    |    5 +-
+>     >  accel/kvm/kvm-all.c            |   14 +-
+>     >  accel/kvm/kvm-cpus.c           |   88 ++
+>     >  accel/kvm/kvm-cpus.h           |   24 +
+>     >  accel/kvm/meson.build          |    5 +-
+>     >  accel/meson.build              |    2 +-
+>     >  accel/qtest/meson.build        |    7 +
+>     >  accel/qtest/qtest-cpus.c       |   91 ++
+>     >  accel/qtest/qtest-cpus.h       |   17 +
+>     >  accel/{ => qtest}/qtest.c      |   13 +-
+>     >  accel/stubs/hax-stub.c         |   10 -
+>     >  accel/stubs/hvf-stub.c         |   30 -
+>     >  accel/stubs/kvm-stub.c         |   23 -
+>     >  accel/stubs/meson.build        |    2 -
+>     >  accel/stubs/whpx-stub.c        |   47 -
+>     >  accel/tcg/cpu-exec.c           |   43 +-
+>     >  accel/tcg/meson.build          |    2 +-
+>     >  accel/tcg/tcg-all.c            |   43 +-
+>     >  accel/tcg/tcg-cpus.c           |  569 +++++++++++
+>     >  accel/tcg/tcg-cpus.h           |   17 +
+>     >  accel/tcg/translate-all.c      |    3 +-
+>     >  dma-helpers.c                  |    4 +-
+>     >  docs/replay.txt                |    6 +-
+>     >  exec.c                         |    4 -
+>     >  hw/core/cpu.c                  |   14 +-
+>     >  hw/core/ptimer.c               |    8 +-
+>     >  hw/i386/x86.c                  |    3 +-
+>     >  include/exec/cpu-all.h         |    4 +
+>     >  include/exec/exec-all.h        |    4 +-
+>     >  include/hw/core/cpu.h          |   14 -
+>     >  include/qemu/timer.h           |   24 +-
+>     >  include/sysemu/cpu-timers.h    |   90 ++
+>     >  include/sysemu/cpus.h          |   50 +-
+>     >  include/sysemu/hax.h           |   17 -
+>     >  include/sysemu/hvf.h           |    8 -
+>     >  include/sysemu/hw_accel.h      |   69 +-
+>     >  include/sysemu/kvm.h           |    7 -
+>     >  include/sysemu/qtest.h         |    2 +
+>     >  include/sysemu/replay.h        |    4 +-
+>     >  include/sysemu/whpx.h          |   19 -
+>     >  replay/replay.c                |    6 +-
+>     >  softmmu/cpu-timers.c           |  279 ++++++
+>     >  softmmu/cpus.c                 | 1697 +++-----------------------------
+>     >  softmmu/icount.c               |  492 +++++++++
+>     >  softmmu/meson.build            |   10 +-
+>     >  softmmu/qtest.c                |   34 +-
+>     >  softmmu/timers-state.h         |   69 ++
+>     >  softmmu/vl.c                   |    8 +-
+>     >  stubs/clock-warp.c             |    7 -
+>     >  stubs/cpu-get-clock.c          |    3 +-
+>     >  stubs/cpu-get-icount.c         |   21 -
+>     >  stubs/cpu-synchronize-state.c  |    9 +
+>     >  stubs/cpus-get-virtual-clock.c |    8 +
+>     >  stubs/icount.c                 |   45 +
+>     >  stubs/meson.build              |    6 +-
+>     >  stubs/qemu-timer-notify-cb.c   |    8 +
+>     >  stubs/qtest.c                  |    5 +
+>     >  target/alpha/translate.c       |    3 +-
+>     >  target/arm/helper.c            |    7 +-
+>     >  target/i386/hax-all.c          |   17 +-
+>     >  target/i386/hax-cpus.c         |   84 ++
+>     >  target/i386/hax-cpus.h         |   33 +
+>     >  target/i386/hax-i386.h         |    2 +
+>     >  target/i386/hax-mem.c          |    2 +-
+>     >  target/i386/hax-posix.c        |   13 +-
+>     >  target/i386/hax-windows.c      |   22 +-
+>     >  target/i386/hax-windows.h      |    2 +
+>     >  target/i386/hvf/hvf-cpus.c     |  131 +++
+>     >  target/i386/hvf/hvf-cpus.h     |   25 +
+>     >  target/i386/hvf/hvf.c          |   12 +-
+>     >  target/i386/hvf/meson.build    |    1 +
+>     >  target/i386/hvf/x86hvf.c       |    2 +
+>     >  target/i386/hvf/x86hvf.h       |    1 -
+>     >  target/i386/meson.build        |   14 +-
+>     >  target/i386/whpx-all.c         |   13 +-
+>     >  target/i386/whpx-cpus.c        |   96 ++
+>     >  target/i386/whpx-cpus.h        |   34 +
+>     >  target/riscv/csr.c             |    8 +-
+>     >  tests/ptimer-test-stubs.c      |    5 +-
+>     >  tests/test-timed-average.c     |    2 +-
+>     >  util/main-loop.c               |   12 +-
+>     >  util/qemu-timer.c              |   14 +-
+>     >  82 files changed, 2637 insertions(+), 2031 deletions(-)
+>     >  create mode 100644 accel/kvm/kvm-cpus.c
+>     >  create mode 100644 accel/kvm/kvm-cpus.h
+>     >  create mode 100644 accel/qtest/meson.build
+>     >  create mode 100644 accel/qtest/qtest-cpus.c
+>     >  create mode 100644 accel/qtest/qtest-cpus.h
+>     >  rename accel/{ => qtest}/qtest.c (81%)
+>     >  delete mode 100644 accel/stubs/hvf-stub.c
+>     >  delete mode 100644 accel/stubs/whpx-stub.c
+>     >  create mode 100644 accel/tcg/tcg-cpus.c
+>     >  create mode 100644 accel/tcg/tcg-cpus.h
+>     >  create mode 100644 include/sysemu/cpu-timers.h
+>     >  create mode 100644 softmmu/cpu-timers.c
+>     >  create mode 100644 softmmu/icount.c
+>     >  create mode 100644 softmmu/timers-state.h
+>     >  delete mode 100644 stubs/clock-warp.c
+>     >  delete mode 100644 stubs/cpu-get-icount.c
+>     >  create mode 100644 stubs/cpu-synchronize-state.c
+>     >  create mode 100644 stubs/cpus-get-virtual-clock.c
+>     >  create mode 100644 stubs/icount.c
+>     >  create mode 100644 stubs/qemu-timer-notify-cb.c
+>     >  create mode 100644 target/i386/hax-cpus.c
+>     >  create mode 100644 target/i386/hax-cpus.h
+>     >  create mode 100644 target/i386/hvf/hvf-cpus.c
+>     >  create mode 100644 target/i386/hvf/hvf-cpus.h
+>     >  create mode 100644 target/i386/whpx-cpus.c
+>     >  create mode 100644 target/i386/whpx-cpus.h
+>     >
+> 
 
 
