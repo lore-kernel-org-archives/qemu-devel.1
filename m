@@ -8,75 +8,76 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83B03C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F329C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:54:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B2C220768
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:54:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1A82220768
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:54:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+p85ef8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B2C220768
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AtAeqahI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1A82220768
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38352 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFjh7-0008UE-6f
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40510)
+	id 1kFjhD-0000Fz-8Y
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:54:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjcQ-0006bV-OE; Tue, 08 Sep 2020 15:49:30 -0400
-Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:42794)
+ id 1kFjcM-0006Qv-Ub; Tue, 08 Sep 2020 15:49:26 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42081)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjcP-0002Y0-40; Tue, 08 Sep 2020 15:49:30 -0400
-Received: by mail-pf1-x42e.google.com with SMTP id d6so27356pfn.9;
- Tue, 08 Sep 2020 12:49:28 -0700 (PDT)
+ id 1kFjcL-0002Xn-06; Tue, 08 Sep 2020 15:49:26 -0400
+Received: by mail-pf1-x444.google.com with SMTP id d6so27238pfn.9;
+ Tue, 08 Sep 2020 12:49:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=30KkRCFEtXNka1aga0YHq3EqESHJABavOs610tDas18=;
- b=q+p85ef8a3EKzgpllK8bF6DDmoTMT3WWdcPtbx5xDANt1wZ4ydgna8jRjINQtGKxtN
- RALOjee9svUEpcKlEvwoprqPAxrLvfIN+ptIHCj6UEmGZJ4rPlovYLN8JEIjDfWcdGiV
- mLnvKcjy9Gn7pY9en7fBvDh1pwEXXrvE+TI/07JFugE3DXHd/pPZc4vWwAtPclGbzLjZ
- D2+KJym71ZA+Z5nV+gmPFwhJN9mx7ytJt+otdq4REVYAaKycHsFSkqAmSImE56r+Pgw4
- c3gcwaNPSlV2sFOqv0z0re2SjgQ/8P243QkjH30i/Xk9EhmhQcT/l00yXAxOUXKPMtS6
- TTEQ==
+ bh=yqpsa73bQrzKkEPT9F/kH2K7vNqI8slBD9edFCTrOo0=;
+ b=AtAeqahIaVUAJpCf42i75pB5vhCazSyFJ1qxd/QD5jCVs3AbQWsB99T9KIYqZ6v9nr
+ DhuhCoqTNMcItNGyHOYhUen9VEemY5E+20Q+PA3niKFeg03OLtXJtxz8JsFxFE8e5hbQ
+ EoVn8Q3UeUYlkLCQazOv3tx3tsUd64znywDmoic1Q0peyJu1Z1hcCDzO6L5xy7cERp3Y
+ MbHRTM93gKIDTwrK+QXttFfn0Ml6OSzaJoeRK8t9PEx6IhLBZ1c07TXp+2MPcQBCqZ9i
+ 31weaSVCOr613ig8oGkLwEHTaQ7bbaLjDQoQ4msv/ZkOKW5i/1wejs6ZbrLFJg+lKRwf
+ WeTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=30KkRCFEtXNka1aga0YHq3EqESHJABavOs610tDas18=;
- b=cvic1TnsDIOuudt5JOgAA0rVsbeuNPcuo8ld1TzkAG0xAra+0vATqPGkx1CNhf5Cf0
- iAXxtBHL/J+R1LzLT8WPxHexFnYRBH3zexK+f3I7/Ki2MqHGsH+17UQvaBjJAHFGa0Yu
- Q5x72B3JN0NoeygYnIDnXq7+J/0Hhqs/BhaYQz00hkukq2wuDkcZF6epDE0V5oe3WoU8
- PkOK0O1I9irTuuo//9pVZ4SxLVaiRhCUnRqP69DekgdxhvJ0LG//UvEodZVeeUW7Gx9i
- +n5RCNtLCa2/lRQhMsx+EnWXeqbdl6dtwNNCtpDfM4y/e6AWTd+vxD137qRX0FkAHUX0
- 4aLA==
-X-Gm-Message-State: AOAM532oYLvg6DZiAfGOqPjfUKiDePj/5J10nHxLB8U8S5/bMvtN5ueh
- swdTNnMwAkEtRCQR4FL57YWmd/j8zF0nhBjT
-X-Google-Smtp-Source: ABdhPJykW8UuNSMZAZRXw7m1Asu0y7vFxSy05CIZz/DrPpBfErJPgb/XlGJAn3SKc2VbbCOKv1hOmg==
-X-Received: by 2002:a63:5160:: with SMTP id r32mr301050pgl.112.1599594567064; 
- Tue, 08 Sep 2020 12:49:27 -0700 (PDT)
+ bh=yqpsa73bQrzKkEPT9F/kH2K7vNqI8slBD9edFCTrOo0=;
+ b=UcKhCAdbP0EZWMY9YkMigtQ0cWQNjQMi3mIIPHvGSsLAU9+yxI+QQn22EvgVniELRg
+ E5odi13pTJQ3A0Ys3c9xMOgY9Ngu/Gq5HB2j8ptEr7eiwIZt+IcuYSpIV0fM2ZKi7ev0
+ O3AnBXKG2QJei3I+NcHm9bBY4IXoOh7fQdGs+FU4psPN3aLYm+G+mTRNa2PcWJbJdozn
+ CURsCZM/CeV1a7DTau9k1t8EDftzNN4P+uYBYz2P5pVjuhGPaK5R/fV9v7GazzXBsEll
+ JK9K3WIc3ShYoLAy2gQMim+xI4RxBSHhoeAr8P4bfnaYfF+P/looM+Xh4Nq3jtmEAbmq
+ jzmA==
+X-Gm-Message-State: AOAM530Cq1jETJ/3b3qDlWEWlez3fkgo2PnVWED8LDI9fpCw9JwG3zFy
+ qReWH+9G0tcL6G2GzxFeUqWSbdRUwdBTHMzd
+X-Google-Smtp-Source: ABdhPJzJAZgO9ILHPeHhANTLXXAoaJCB71EdQqYU0pL8Mv0UX1o/59Z3ZzAqA254z5A9Py1GTocjUg==
+X-Received: by 2002:a17:902:8f8a:b029:d0:cc02:8541 with SMTP id
+ z10-20020a1709028f8ab02900d0cc028541mr694317plo.32.1599594562940; 
+ Tue, 08 Sep 2020 12:49:22 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.49.23
+ by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.49.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 12:49:26 -0700 (PDT)
+ Tue, 08 Sep 2020 12:49:21 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 12/16] meson: remove empty else and duplicated gio deps
-Date: Wed,  9 Sep 2020 03:48:16 +0800
-Message-Id: <20200908194820.702-13-luoyonggang@gmail.com>
+Subject: [PATCH 11/16] meson: disable crypto tests are empty under win32
+Date: Wed,  9 Sep 2020 03:48:15 +0800
+Message-Id: <20200908194820.702-12-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200908194820.702-1-luoyonggang@gmail.com>
 References: <20200908194820.702-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42e;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42e.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -110,35 +111,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Disable following tests on msys2/mingw
+      'test-crypto-tlscredsx509': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
+                                   tasn1, crypto],
+      'test-crypto-tlssession': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c', 'crypto-tls-psk-helpers.c',
+                                 tasn1, crypto],
+      'test-io-channel-tls': ['io-channel-helpers.c', 'crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
+                              tasn1, io, crypto]}
+
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- meson.build | 6 ------
- 1 file changed, 6 deletions(-)
+ tests/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 5421eca66a..0b1741557d 100644
---- a/meson.build
-+++ b/meson.build
-@@ -317,7 +317,6 @@ opengl = not_found
- if 'CONFIG_OPENGL' in config_host
-   opengl = declare_dependency(compile_args: config_host['OPENGL_CFLAGS'].split(),
-                               link_args: config_host['OPENGL_LIBS'].split())
--else
- endif
- gtk = not_found
- if 'CONFIG_GTK' in config_host
-@@ -344,11 +343,6 @@ if 'CONFIG_ICONV' in config_host
-   iconv = declare_dependency(compile_args: config_host['ICONV_CFLAGS'].split(),
-                              link_args: config_host['ICONV_LIBS'].split())
- endif
--gio = not_found
--if 'CONFIG_GIO' in config_host
--  gio = declare_dependency(compile_args: config_host['GIO_CFLAGS'].split(),
--                           link_args: config_host['GIO_LIBS'].split())
--endif
- vnc = not_found
- png = not_found
- jpeg = not_found
+diff --git a/tests/meson.build b/tests/meson.build
+index 998e4c48f9..b470a90e3a 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -145,7 +145,8 @@ if have_block
+     'test-crypto-block': [io],
+   }
+   if 'CONFIG_GNUTLS' in config_host and \
+-     'CONFIG_TASN1' in config_host
++     'CONFIG_TASN1' in config_host and \
++     'CONFIG_POSIX' in config_host
+     tests += {
+       'test-crypto-tlscredsx509': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
+                                    tasn1, crypto],
 -- 
 2.28.0.windows.1
 
