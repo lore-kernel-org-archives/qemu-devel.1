@@ -7,55 +7,54 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82253C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D392C2BBD0
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EB2021897
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:29:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE8DD21897
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:30:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZtncQTNj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EB2021897
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="GHvyhnV8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE8DD21897
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40960 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWBn-0005T9-8R
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:29:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57388)
+	id 1kFWCo-0007bv-SR
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:30:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3O-0006Bz-AJ; Tue, 08 Sep 2020 01:20:26 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:44533)
+ id 1kFW3r-0006tM-Rs; Tue, 08 Sep 2020 01:20:56 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:47691 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3M-0005xr-A7; Tue, 08 Sep 2020 01:20:25 -0400
+ id 1kFW3p-00065u-QC; Tue, 08 Sep 2020 01:20:55 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkm3Gp0z9sV5; Tue,  8 Sep 2020 15:20:00 +1000 (AEST)
+ id 4Bltkv4Rywz9sVw; Tue,  8 Sep 2020 15:20:07 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542400;
- bh=PeIhZBLtydKrEKfpTxjVJjL8zkvkMJjiCuSHLy0Dyv4=;
+ d=gibson.dropbear.id.au; s=201602; t=1599542407;
+ bh=w0gaD0fnoCPcwqc7oF2cauElCoYD0AjnH+kJtJ0zhA8=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=ZtncQTNjzI6CYgyaR3Qzd3u+WUOGUUPK6y+r5Kq+xd7BQDg4EcgHf6SwZ/MR6ocJP
- giTY5ZQsttrQwAUGiWa0/ADPMUqDqrZ+RXn4QAbsb+8BecOolCwddMcAr1VYNzfWrJ
- xZUhBp5CSbU6WHyFXVOAy7OhnVMcoXMpA7NDGKRI=
+ b=GHvyhnV8kj/UJaICsSjBzp97z5WXPoV0msLraiTP+9/bHq/lk3mzxBsIIaOeO5gZ5
+ BJP6Zot/XKopOkWno4TYhG3CtO+R2tJtEkTHsgPFC1bpCKBRBu1FVlDPr71a/i/BQH
+ EQaE4EPVzRgzXqYOa+xJq3DhMEnTt0TVB1RVGye0=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 13/33] spapr,
- spapr_nvdimm: fold NVDIMM validation in the same place
-Date: Tue,  8 Sep 2020 15:19:33 +1000
-Message-Id: <20200908051953.1616885-14-david@gibson.dropbear.id.au>
+Subject: [PULL 25/33] ppc: introducing spapr_numa.c NUMA code helper
+Date: Tue,  8 Sep 2020 15:19:45 +1000
+Message-Id: <20200908051953.1616885-26-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:19:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -83,113 +82,193 @@ Sender: "Qemu-devel"
 
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-NVDIMM has different contraints and conditions than the regular
-DIMM and we'll need to add at least one more.
+We're going to make changes in how spapr handles all
+ibm,associativity* related properties to enhance our current NUMA
+support.
 
-Instead of relying on 'if (nvdimm)' conditionals in the body of
-spapr_memory_pre_plug(), use the existing spapr_nvdimm_validate_opts()
-and put all NVDIMM handling code there. Rename it to
-spapr_nvdimm_validate() to reflect that the function is now checking
-more than the nvdimm device options. This makes spapr_memory_pre_plug()
-a bit easier to follow, and we can tune in NVDIMM parameters
-and validation in the same place.
+At this moment we have associativity code scattered all around
+spapr_* files, with hardcoded values and array sizes. This
+makes it harder to change any NUMA specific parameters in
+the future. Having everything in the same place allows not
+only for easier tuning, but also easier understanding since all
+NUMA related code is on the same file.
+
+This patch introduces a new file to gather all NUMA/associativity
+handling code in spapr, spapr_numa.c. To get things started, let's
+remove associativity-reference-points and max-associativity-domains
+code from spapr_dt_rtas() to a new helper called spapr_numa_write_rtas_dt().
+This will decouple spapr_dt_rtas() from the NUMA changes that
+are going to happen in those two properties.
 
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200825215749.213536-3-danielhb413@gmail.com>
+Message-Id: <20200901125645.118026-2-danielhb413@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr.c                | 18 ++++++------------
- hw/ppc/spapr_nvdimm.c         | 10 ++++++++--
- include/hw/ppc/spapr_nvdimm.h |  4 ++--
- 3 files changed, 16 insertions(+), 16 deletions(-)
+ hw/ppc/meson.build          |  3 ++-
+ hw/ppc/spapr.c              | 26 ++-----------------
+ hw/ppc/spapr_numa.c         | 50 +++++++++++++++++++++++++++++++++++++
+ include/hw/ppc/spapr_numa.h | 20 +++++++++++++++
+ 4 files changed, 74 insertions(+), 25 deletions(-)
+ create mode 100644 hw/ppc/spapr_numa.c
+ create mode 100644 include/hw/ppc/spapr_numa.h
 
+diff --git a/hw/ppc/meson.build b/hw/ppc/meson.build
+index 918969b320..ffa2ec37fa 100644
+--- a/hw/ppc/meson.build
++++ b/hw/ppc/meson.build
+@@ -25,7 +25,8 @@ ppc_ss.add(when: 'CONFIG_PSERIES', if_true: files(
+   'spapr_irq.c',
+   'spapr_tpm_proxy.c',
+   'spapr_nvdimm.c',
+-  'spapr_rtas_ddw.c'
++  'spapr_rtas_ddw.c',
++  'spapr_numa.c',
+ ))
+ ppc_ss.add(when: 'CONFIG_SPAPR_RNG', if_true: files('spapr_rng.c'))
+ ppc_ss.add(when: ['CONFIG_PSERIES', 'CONFIG_LINUX'], if_true: files(
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index dd2fa4826b..b0a04443fb 100644
+index b0a04443fb..a45912acac 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -3520,7 +3520,6 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
- {
-     const SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(hotplug_dev);
-     SpaprMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
--    const MachineClass *mc = MACHINE_CLASS(smc);
-     bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     Error *local_err = NULL;
-@@ -3533,27 +3532,22 @@ static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-         return;
-     }
+@@ -81,6 +81,7 @@
+ #include "hw/mem/memory-device.h"
+ #include "hw/ppc/spapr_tpm_proxy.h"
+ #include "hw/ppc/spapr_nvdimm.h"
++#include "hw/ppc/spapr_numa.h"
  
--    if (is_nvdimm && !mc->nvdimm_supported) {
--        error_setg(errp, "NVDIMM hotplug not supported for this machine");
--        return;
+ #include "monitor/monitor.h"
+ 
+@@ -891,16 +892,9 @@ static int spapr_dt_rng(void *fdt)
+ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+ {
+     MachineState *ms = MACHINE(spapr);
+-    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(ms);
+     int rtas;
+     GString *hypertas = g_string_sized_new(256);
+     GString *qemu_hypertas = g_string_sized_new(256);
+-    uint32_t refpoints[] = {
+-        cpu_to_be32(0x4),
+-        cpu_to_be32(0x4),
+-        cpu_to_be32(0x2),
+-    };
+-    uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
+     uint64_t max_device_addr = MACHINE(spapr)->device_memory->base +
+         memory_region_size(&MACHINE(spapr)->device_memory->mr);
+     uint32_t lrdr_capacity[] = {
+@@ -910,14 +904,6 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+         cpu_to_be32(SPAPR_MEMORY_BLOCK_SIZE & 0xffffffff),
+         cpu_to_be32(ms->smp.max_cpus / ms->smp.threads),
+     };
+-    uint32_t maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
+-    uint32_t maxdomains[] = {
+-        cpu_to_be32(4),
+-        maxdomain,
+-        maxdomain,
+-        maxdomain,
+-        cpu_to_be32(spapr->gpu_numa_id),
+-    };
+ 
+     _FDT(rtas = fdt_add_subnode(fdt, 0, "rtas"));
+ 
+@@ -953,15 +939,7 @@ static void spapr_dt_rtas(SpaprMachineState *spapr, void *fdt)
+                      qemu_hypertas->str, qemu_hypertas->len));
+     g_string_free(qemu_hypertas, TRUE);
+ 
+-    if (smc->pre_5_1_assoc_refpoints) {
+-        nr_refpoints = 2;
 -    }
 -
-     size = memory_device_get_region_size(MEMORY_DEVICE(dimm), &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         return;
-     }
+-    _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
+-                     refpoints, nr_refpoints * sizeof(refpoints[0])));
+-
+-    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
+-                     maxdomains, sizeof(maxdomains)));
++    spapr_numa_write_rtas_dt(spapr, fdt, rtas);
  
--    if (!is_nvdimm && size % SPAPR_MEMORY_BLOCK_SIZE) {
--        error_setg(errp, "Hotplugged memory size must be a multiple of "
--                   "%" PRIu64 " MB", SPAPR_MEMORY_BLOCK_SIZE / MiB);
--        return;
--    } else if (is_nvdimm) {
--        spapr_nvdimm_validate_opts(NVDIMM(dev), size, &local_err);
-+    if (is_nvdimm) {
-+        spapr_nvdimm_validate(hotplug_dev, NVDIMM(dev), size, &local_err);
-         if (local_err) {
-             error_propagate(errp, local_err);
-             return;
-         }
-+    } else if (size % SPAPR_MEMORY_BLOCK_SIZE) {
-+        error_setg(errp, "Hotplugged memory size must be a multiple of "
-+                   "%" PRIu64 " MB", SPAPR_MEMORY_BLOCK_SIZE / MiB);
-+        return;
-     }
- 
-     memdev = object_property_get_link(OBJECT(dimm), PC_DIMM_MEMDEV_PROP,
-diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-index 9a20a65640..bc2b65420c 100644
---- a/hw/ppc/spapr_nvdimm.c
-+++ b/hw/ppc/spapr_nvdimm.c
-@@ -30,13 +30,19 @@
- #include "hw/ppc/fdt.h"
- #include "qemu/range.h"
- 
--void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uint64_t size,
--                                Error **errp)
-+void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-+                           uint64_t size, Error **errp)
- {
-+    const MachineClass *mc = MACHINE_GET_CLASS(hotplug_dev);
-     g_autofree char *uuidstr = NULL;
-     QemuUUID uuid;
-     int ret;
- 
-+    if (!mc->nvdimm_supported) {
-+        error_setg(errp, "NVDIMM hotplug not supported for this machine");
-+        return;
+     /*
+      * FWNMI reserves RTAS_ERROR_LOG_MAX for the machine check error log,
+diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
+new file mode 100644
+index 0000000000..cdf3288cbd
+--- /dev/null
++++ b/hw/ppc/spapr_numa.c
+@@ -0,0 +1,50 @@
++/*
++ * QEMU PowerPC pSeries Logical Partition NUMA associativity handling
++ *
++ * Copyright IBM Corp. 2020
++ *
++ * Authors:
++ *  Daniel Henrique Barboza      <danielhb413@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include "qemu-common.h"
++#include "hw/ppc/spapr_numa.h"
++#include "hw/ppc/fdt.h"
++
++/*
++ * Helper that writes ibm,associativity-reference-points and
++ * max-associativity-domains in the RTAS pointed by @rtas
++ * in the DT @fdt.
++ */
++void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas)
++{
++    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
++    uint32_t refpoints[] = {
++        cpu_to_be32(0x4),
++        cpu_to_be32(0x4),
++        cpu_to_be32(0x2),
++    };
++    uint32_t nr_refpoints = ARRAY_SIZE(refpoints);
++    uint32_t maxdomain = cpu_to_be32(spapr->gpu_numa_id > 1 ? 1 : 0);
++    uint32_t maxdomains[] = {
++        cpu_to_be32(4),
++        maxdomain,
++        maxdomain,
++        maxdomain,
++        cpu_to_be32(spapr->gpu_numa_id),
++    };
++
++    if (smc->pre_5_1_assoc_refpoints) {
++        nr_refpoints = 2;
 +    }
 +
-     if (object_property_get_int(OBJECT(nvdimm), NVDIMM_LABEL_SIZE_PROP,
-                                 &error_abort) == 0) {
-         error_setg(errp, "PAPR requires NVDIMM devices to have label-size set");
-diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
-index b3330cc485..fd1736634c 100644
---- a/include/hw/ppc/spapr_nvdimm.h
-+++ b/include/hw/ppc/spapr_nvdimm.h
-@@ -29,8 +29,8 @@ int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
-                            void *fdt, int *fdt_start_offset, Error **errp);
- int spapr_dt_nvdimm(void *fdt, int parent_offset, NVDIMMDevice *nvdimm);
- void spapr_dt_persistent_memory(void *fdt);
--void spapr_nvdimm_validate_opts(NVDIMMDevice *nvdimm, uint64_t size,
--                                Error **errp);
-+void spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-+                           uint64_t size, Error **errp);
- void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp);
- void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr);
- 
++    _FDT(fdt_setprop(fdt, rtas, "ibm,associativity-reference-points",
++                     refpoints, nr_refpoints * sizeof(refpoints[0])));
++
++    _FDT(fdt_setprop(fdt, rtas, "ibm,max-associativity-domains",
++                     maxdomains, sizeof(maxdomains)));
++}
+diff --git a/include/hw/ppc/spapr_numa.h b/include/hw/ppc/spapr_numa.h
+new file mode 100644
+index 0000000000..7a370a8768
+--- /dev/null
++++ b/include/hw/ppc/spapr_numa.h
+@@ -0,0 +1,20 @@
++/*
++ * QEMU PowerPC pSeries Logical Partition NUMA associativity handling
++ *
++ * Copyright IBM Corp. 2020
++ *
++ * Authors:
++ *  Daniel Henrique Barboza      <danielhb413@gmail.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef HW_SPAPR_NUMA_H
++#define HW_SPAPR_NUMA_H
++
++#include "hw/ppc/spapr.h"
++
++void spapr_numa_write_rtas_dt(SpaprMachineState *spapr, void *fdt, int rtas);
++
++#endif /* HW_SPAPR_NUMA_H */
 -- 
 2.26.2
 
