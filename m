@@ -2,81 +2,81 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C8EC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B470C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:53:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDB6020658
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:53:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9B5420658
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 19:53:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6nn4pcn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDB6020658
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pdjv6DK2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9B5420658
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59556 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFjfn-0005Le-Td
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:52:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40460)
+	id 1kFjfu-0005ez-Qx
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 15:53:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjcI-0006Dl-B2; Tue, 08 Sep 2020 15:49:22 -0400
-Received: from mail-pf1-x42c.google.com ([2607:f8b0:4864:20::42c]:36204)
+ id 1kFjch-0007Oj-MF; Tue, 08 Sep 2020 15:49:47 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:39831)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFjcG-0002XV-J9; Tue, 08 Sep 2020 15:49:22 -0400
-Received: by mail-pf1-x42c.google.com with SMTP id d9so51269pfd.3;
- Tue, 08 Sep 2020 12:49:19 -0700 (PDT)
+ id 1kFjcg-0002Za-0Z; Tue, 08 Sep 2020 15:49:47 -0400
+Received: by mail-pg1-x543.google.com with SMTP id v15so297678pgh.6;
+ Tue, 08 Sep 2020 12:49:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=INK+kK1nWbJF7y+rXihzR5UqDDo3HdyPVAq4bdijot0=;
- b=V6nn4pcnL30ehqXQzPe1KBoBzzKm6eGqBUxesciQmyC8zX6UVJ44msCrAKEx5e9t7y
- TD/1Rn3SsreOBSOGOfSaf8R5aWQmVKRIxPU5wp5YqhmwDHdXcn6jvHoqFiA7V1HzaNDy
- Pt4uiiMKCSDlgMHFJyRldDrDpZqHYtGnKN8O8Kf+LyWl6YOhfviFAsGu4kx1rFfASE85
- 5Qu7Rv358uzVCQsVLY4HFZP7hSD/maA5uefNBXLgVw7c8y2pWtv8bXeGaZcxmsD0fJ61
- 8DFcgBSUsowLRPKyb5HPthfn/Vf35yHK8MgtXqiKcgfkpRsmoZSnVD5gcIQ8o/mPgg4I
- R09w==
+ bh=Mis/yrVWeY+EL6B3pLHydPEbEg8SDdnmsH3w5+AQmwk=;
+ b=pdjv6DK2sXnNkV4WyJA5AnDPpSusmMZ8P9FJ6/K3nDcsYAuKUben43m+b3LZl5BS1p
+ QnW2dZvjGfISKebySIomBqTWDm5xa89rSferkqUUYxLYlZd7GGWwTbLcqvQEVaDR/B3j
+ pLd+3YhpDRiZNJlE+pyy2pbYQrvOD6DmfkjPjAfYkidpMA5QS+5kLyqR5d7887wJs2oa
+ 1eFY+GE/TAY428vGtseYEdBmDWe6mrlGBSAEWohimQ2AGQlbo6Q0al7tekuHYcEkcfzl
+ wAxjVhR5Nq1jYWMdb5qv1N85TMgEF8Ryilmu1X2H9HOdaDXJoNtUgcGrsgNmxxL4DZLx
+ 35tA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=INK+kK1nWbJF7y+rXihzR5UqDDo3HdyPVAq4bdijot0=;
- b=PyKK73La6RYyDt+im6zNQyd0m9FiEjUxKoo81OcLhNB9LbCJjRV/scNM8YrPzipe2i
- ET83dAfTJpihtSyc4Tpny8pk9b4O6qcpyNj2sg1ms7ocGa5GCCJT9C8kqgXZhHPFrBiO
- eMOHviogHwoaq6R+TdCsWx2TvbKXnfvBvntqZPI/AkFzqGANAcRTxbKJGlV7YqPeLfFL
- tvyRI0nZ3tMPfST8PwCOFnPk3buDK00WZo6I//YxnNq5TpJYCHWvroGTcuYOJvyLnyb3
- rLqUl91votqnUbixcNze0ficoZs9HIznPg3pCabpj0QzOwE46IgWWxhrzA28b+C8Oo2+
- UOrA==
-X-Gm-Message-State: AOAM530IRVRzkpjRL9gp3UwWgQWGHxhuvUX7tXbw9QNbWmPmsvW7vqvi
- eIb3a5OEpttcV77sMJpUZ8jyn6JRe1BwkR/f
-X-Google-Smtp-Source: ABdhPJwUDRreLw/8rTSc/YKm5sOooQFPCdwHcxyxDNOBrOsWzOnRPWsqBHwJQc3mDrR6hf931EywWw==
-X-Received: by 2002:a63:4405:: with SMTP id r5mr270755pga.382.1599594558554;
- Tue, 08 Sep 2020 12:49:18 -0700 (PDT)
+ bh=Mis/yrVWeY+EL6B3pLHydPEbEg8SDdnmsH3w5+AQmwk=;
+ b=sQvDSYqEZbUK/sYYeIShIvCmmo5PV7nBmUUMx5fp9ueAOxbeybnmUHy2G56hivy+Gk
+ VJpyoMZ7SoQHeH+iZBzN7brfrHB/RhPuuVgmi/RIXyMg4PDRRRONLEe0D5ypXmjepRon
+ puw9zSKgc3FA/DEL/5RCAkIdUeA6nwm7LVOsJ59q0G+Xn4Y3amB1czcu7DAJ7O3NA8Br
+ OnnIf2r9HtYnJIV1Ufh2/EMjNdGF+OYXQEq1AGGkksIWesz7rPEHNJtxYxjTpaL9csak
+ ylvta5HFhrbc1Oy3niUE5dnpONWtSpD/zT6gvo8nwb1z9c2kZUlhQFEHB5nS+NCbYHFq
+ INHg==
+X-Gm-Message-State: AOAM533WWPqZAK2eQrWMEE0RDE6TGd62+xsBxAn9J0nn3fh8wWBM4Ux+
+ zfN9LRMurdACpOe1v7wfgrBS1u2UH0CfiBFk
+X-Google-Smtp-Source: ABdhPJwYvcMEOL5IhmQwJqYtLcqd6NNGfn8WKwiWzfaVRLdwNyBLflmEtMtt28D8Z7MeQ/T6ZqksOQ==
+X-Received: by 2002:a63:5d4a:: with SMTP id o10mr268551pgm.346.1599594584013; 
+ Tue, 08 Sep 2020 12:49:44 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.49.14
+ by smtp.googlemail.com with ESMTPSA id n127sm216922pfn.155.2020.09.08.12.49.40
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 12:49:17 -0700 (PDT)
+ Tue, 08 Sep 2020 12:49:43 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 10/16] meson: Use -b to ignore CR vs. CR-LF issues on Windows
-Date: Wed,  9 Sep 2020 03:48:14 +0800
-Message-Id: <20200908194820.702-11-luoyonggang@gmail.com>
+Subject: [PATCH 16/16] rcu: add uninit destructor for rcu
+Date: Wed,  9 Sep 2020 03:48:20 +0800
+Message-Id: <20200908194820.702-17-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200908194820.702-1-luoyonggang@gmail.com>
 References: <20200908194820.702-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42c;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42c.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -110,28 +110,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On windows, a difference in line endings causes testsuite failures
-complaining that every single line in files such as
-'tests/qapi-schemadoc-good.texi' is wrong.  Fix it by adding -b to diff.
+This is necessary if the pending  rcu calls are closing and removing
+temp files. This also provide a function
+void rcu_wait_finished(void);
+to fixes test-logging.c test failure on msys2/mingw.
+On windows if the file doesn't closed, you can not remove it.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
 ---
- tests/qapi-schema/meson.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ include/qemu/rcu.h   |  5 +++++
+ tests/test-logging.c |  2 ++
+ util/rcu.c           | 37 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build
-index c87d141417..f1449298b0 100644
---- a/tests/qapi-schema/meson.build
-+++ b/tests/qapi-schema/meson.build
-@@ -220,6 +220,6 @@ qapi_doc = custom_target('QAPI doc',
+diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
+index 570aa603eb..dd0a92c1d0 100644
+--- a/include/qemu/rcu.h
++++ b/include/qemu/rcu.h
+@@ -124,6 +124,11 @@ extern void rcu_unregister_thread(void);
+ extern void rcu_enable_atfork(void);
+ extern void rcu_disable_atfork(void);
  
- # "full_path()" needed here to work around
- # https://github.com/mesonbuild/meson/issues/7585
--test('QAPI doc', diff, args: ['-u', files('doc-good.texi'), qapi_doc[0].full_path()],
-+test('QAPI doc', diff, args: ['-b', '-u', files('doc-good.texi'), qapi_doc[0].full_path()],
-      depends: qapi_doc,
-      suite: ['qapi-schema', 'qapi-doc'])
++/*
++ * Wait all rcu call executed and exit the rcu thread.
++ */
++extern void rcu_wait_finished(void);
++
+ struct rcu_head;
+ typedef void RCUCBFunc(struct rcu_head *head);
+ 
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index 957f6c08cd..7a5b59f4a5 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -210,6 +210,8 @@ int main(int argc, char **argv)
+                          tmp_path, test_logfile_lock);
+ 
+     rc = g_test_run();
++    qemu_log_close();
++    rcu_wait_finished();
+ 
+     rmdir_full(tmp_path);
+     g_free(tmp_path);
+diff --git a/util/rcu.c b/util/rcu.c
+index 60a37f72c3..43367988b9 100644
+--- a/util/rcu.c
++++ b/util/rcu.c
+@@ -308,10 +308,20 @@ void rcu_unregister_thread(void)
+     qemu_mutex_unlock(&rcu_registry_lock);
+ }
+ 
++typedef struct QemuRcuMessage {
++    struct rcu_head rcu;
++    void *message;
++} QemuRcuMessage;
++
++static int rcu_thread_exit_called = 0;
++static int rcu_thread_exited = 0;
++static QemuRcuMessage rcu_thread_message;
++
+ static void rcu_init_complete(void)
+ {
+     QemuThread thread;
+-
++    atomic_mb_set(&rcu_thread_exit_called, 0);
++    atomic_mb_set(&rcu_thread_exited, 0);
+     qemu_mutex_init(&rcu_registry_lock);
+     qemu_mutex_init(&rcu_sync_lock);
+     qemu_event_init(&rcu_gp_event, true);
+@@ -327,6 +337,26 @@ static void rcu_init_complete(void)
+     rcu_register_thread();
+ }
+ 
++static void rcu_thread_exit(QemuRcuMessage *param)
++{
++    atomic_mb_set((int*)param->message, 1);
++    qemu_thread_exit(NULL);
++}
++
++void rcu_wait_finished(void)
++{
++    if (atomic_xchg(&rcu_thread_exit_called, 1) == 0)
++    {
++        rcu_thread_message.message = &rcu_thread_exited;
++        call_rcu(&rcu_thread_message, rcu_thread_exit, rcu);
++    }
++
++    while (atomic_mb_read(&rcu_thread_exited) == 0)
++    {
++        g_usleep(10000);
++    }
++}
++
+ static int atfork_depth = 1;
+ 
+ void rcu_enable_atfork(void)
+@@ -379,3 +409,8 @@ static void __attribute__((__constructor__)) rcu_init(void)
+ #endif
+     rcu_init_complete();
+ }
++
++static void __attribute__((__destructor__)) rcu_uninit(void)
++{
++    rcu_wait_finished();
++}
 -- 
 2.28.0.windows.1
 
