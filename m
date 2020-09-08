@@ -2,78 +2,81 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5075C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 21:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE045C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 21:56:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25B062087C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 21:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 600032087C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 21:56:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6Bpv0I4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25B062087C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OaQzDh4O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 600032087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFlat-0001Ad-B9
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 17:56:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38102)
+	id 1kFlav-0001Cb-De
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 17:56:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kFlXl-0004QU-4B
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 17:52:49 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:55271
- helo=us-smtp-delivery-1.mimecast.com)
+ id 1kFlXw-0004lq-IQ
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 17:53:00 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:26671
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kFlXh-0001Eq-F5
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 17:52:48 -0400
+ id 1kFlXr-0001GI-S3
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 17:53:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599601963;
+ s=mimecast20190719; t=1599601975;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=7+tgG0NsZN8iE9NORsPDX7k9zPMAlxyZwJpfHPySoQs=;
- b=P6Bpv0I4skBwlHYqlgaB/jennre3bI9JkZvSlkuRTsQoukRcVG9UA3eeVz6UtUhYwwiYJC
- OVYjvNVLpB8/PpkNPwlLy/aQsvMArX41rBS0lbZfXxZWCn09xh4V4O8gdRrq8NJumW0SPH
- aZ42ANwDP8fsS1x3+aEEs53syAOQ9nI=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=RQJntoqCdCLmV+8//8eixBXAv2yCsfCJQc6g7qApNac=;
+ b=OaQzDh4OiYCJTly5/COL3bqKSGmH96Uzsfnj1PM77ZhV3JL7MxPATWYxYuqNYX+Fzi80hq
+ 69fs/DERqePOMutVcSslzDaI+5mPRmI0LHe67w5GXhtJekIe0+QNukUbxW1aeoMCA/7UZW
+ kVhV1MAqbsrhgK6TROsB8yR4mNa0TC8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-397-f7xlvp4mPYqghGQsQWi_NQ-1; Tue, 08 Sep 2020 17:52:41 -0400
-X-MC-Unique: f7xlvp4mPYqghGQsQWi_NQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-171-d9OdRgT-NlibHHsQzCMHAQ-1; Tue, 08 Sep 2020 17:52:49 -0400
+X-MC-Unique: d9OdRgT-NlibHHsQzCMHAQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7B2968015F6;
- Tue,  8 Sep 2020 21:52:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AADC8015F6;
+ Tue,  8 Sep 2020 21:52:48 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 174ED5D9EF;
- Tue,  8 Sep 2020 21:52:39 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8A6BD5C1C4;
+ Tue,  8 Sep 2020 21:52:47 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 00/34] QOM boilerplate cleanup (v3)
-Date: Tue,  8 Sep 2020 17:52:05 -0400
-Message-Id: <20200908215239.3519638-1-ehabkost@redhat.com>
+Subject: [PULL 07/34] codeconverter: script for automating QOM code cleanups
+Date: Tue,  8 Sep 2020 17:52:12 -0400
+Message-Id: <20200908215239.3519638-8-ehabkost@redhat.com>
+In-Reply-To: <20200908215239.3519638-1-ehabkost@redhat.com>
+References: <20200908215239.3519638-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 03:00:34
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 12:55:20
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -100,941 +103,2295 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Changes v2 -> v3:=0D
-* Fix build errors: dropped all changes in=0D
-  include/hw/riscv/sifive* and include/accel/accel.h=0D
-=0D
-The following changes since commit 6779038537360e957dbded830f76b08ef5070161=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/armbru/tags/pull-qapi-2020-09-08' i=
-nt=3D=0D
-o staging (2020-09-08 17:23:31 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request=0D
-=0D
-for you to fetch changes up to 7661577c45301bf37a56988eeb084e01bd119de7:=0D
-=0D
-  virtio-vga: Use typedef name for instance_size (2020-09-08 17:32:01 -0400=
-)=0D
-=0D
-----------------------------------------------------------------=0D
-QOM boilerplate cleanup=0D
-=0D
-Documentation build fix:=0D
-* memory: Remove kernel-doc comment marker (Eduardo Habkost)=0D
-=0D
-QOM cleanups:=0D
-* Rename QOM macros for consistency between=0D
-  TYPE_* and type checking constants (Eduardo Habkost)=0D
-=0D
-QOM new macros:=0D
-* OBJECT_DECLARE_* and OBJECT_DEFINE_* macros (Daniel P. Berrang=3DC3=3DA9)=
-=0D
-* DECLARE_*_CHECKER macros (Eduardo Habkost)=0D
-=0D
-Automated QOM boilerplate changes:=0D
-* Automated changes to use DECLARE_*_CHECKER (Eduardo Habkost=0D
-* Automated changes to use OBJECT_DECLARE* (Eduardo Habkost)=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Daniel P. Berrang=3DC3=3DA9 (2):=0D
-  qom: make object_ref/unref use a void * instead of Object *.=0D
-  qom: provide convenient macros for declaring and defining types=0D
-=0D
-Eduardo Habkost (32):=0D
-  memory: Remove kernel-doc comment marker=0D
-  qom: Allow class type name to be specified in OBJECT_DECLARE*=0D
-  qom: DECLARE_*_CHECKERS macros=0D
-  qom: Make type checker functions accept const pointers=0D
-  codeconverter: script for automating QOM code cleanups=0D
-  Delete duplicate QOM typedefs=0D
-  Move QOM typedefs and add missing includes=0D
-  Use DECLARE_*CHECKER* macros=0D
-  Use DECLARE_*CHECKER* when possible (--force mode)=0D
-  Use OBJECT_DECLARE_TYPE where possible=0D
-  Use OBJECT_DECLARE_SIMPLE_TYPE when possible=0D
-  gpex: Fix type checking function name=0D
-  chardev: Rename TYPE_CHARDEV_* to TYPE_*_CHARDEV=0D
-  ap-device: Rename AP_DEVICE_TYPE to TYPE_AP_DEVICE=0D
-  dev-smartcard-reader: Rename CCID_DEV_NAME to TYPE_USB_CCID_DEV=0D
-  vfio: Rename VFIO_AP_DEVICE_TYPE to TYPE_VFIO_AP_DEVICE=0D
-  vmgenid: Rename VMGENID_DEVICE to TYPE_VMGENID=0D
-  ahci: Rename ICH_AHCI to ICH9_AHCI=0D
-  esp: Rename ESP_STATE to ESP=0D
-  filter-rewriter: Rename FILTER_COLO_REWRITER to FILTER_REWRITER=0D
-  rs6000_mc: Rename RS6000MC_DEVICE to RS6000MC=0D
-  sabre: Rename SABRE_DEVICE to SABRE=0D
-  usb: Rename USB_SERIAL_DEV to USB_SERIAL=0D
-  vfio: Rename PCI_VFIO to VFIO_PCI=0D
-  pc87312: Rename TYPE_PC87312_SUPERIO to TYPE_PC87312=0D
-  tusb6010: Rename TUSB to TUSB6010=0D
-  xilinx_axidma: Use typedef name for instance_size=0D
-  omap_intc: Use typedef name for instance_size=0D
-  lpc_ich9: Use typedef name for instance_size=0D
-  xilinx_axienet: Use typedef name for instance_size=0D
-  vhost-user-vga: Use typedef name for instance_size=0D
-  virtio-vga: Use typedef name for instance_size=0D
-=0D
- .../codeconverter/codeconverter/__init__.py   |   0=0D
- .../codeconverter/codeconverter/patching.py   | 397 +++++++++++=0D
- .../codeconverter/codeconverter/qom_macros.py | 652 ++++++++++++++++++=0D
- .../codeconverter/qom_type_info.py            | 434 ++++++++++++=0D
- .../codeconverter/codeconverter/regexps.py    | 118 ++++=0D
- .../codeconverter/test_patching.py            | 105 +++=0D
- .../codeconverter/test_regexps.py             | 282 ++++++++=0D
- scripts/codeconverter/codeconverter/utils.py  |  72 ++=0D
- scripts/codeconverter/converter.py            | 123 ++++=0D
- chardev/chardev-internal.h                    |  10 +-=0D
- hw/9pfs/virtio-9p.h                           |  11 +-=0D
- hw/audio/intel-hda.h                          |  20 +-=0D
- hw/avr/atmega.h                               |   9 +-=0D
- hw/display/ati_int.h                          |   9 +-=0D
- hw/display/qxl.h                              |   9 +-=0D
- hw/display/virtio-vga.h                       |  17 +-=0D
- hw/i386/amd_iommu.h                           |  10 +-=0D
- hw/misc/tmp105.h                              |   9 +-=0D
- hw/net/fsl_etsec/etsec.h                      |  10 +-=0D
- hw/net/rocker/rocker.h                        |   5 +-=0D
- hw/net/tulip.h                                |   4 +-=0D
- hw/net/vmxnet3_defs.h                         |   9 +-=0D
- hw/ppc/e500-ccsr.h                            |   9 +-=0D
- hw/ppc/e500.h                                 |  19 +-=0D
- hw/ppc/mac.h                                  |  19 +-=0D
- hw/rdma/vmw/pvrdma.h                          |   9 +-=0D
- hw/s390x/ccw-device.h                         |  17 +-=0D
- hw/s390x/ipl.h                                |   6 +-=0D
- hw/s390x/s390-pci-bus.h                       |  34 +-=0D
- hw/s390x/virtio-ccw.h                         | 141 ++--=0D
- hw/scsi/mptsas.h                              |   5 +-=0D
- hw/usb/ccid.h                                 |  14 +-=0D
- hw/usb/hcd-dwc2.h                             |   9 +-=0D
- hw/usb/hcd-ehci.h                             |  36 +-=0D
- hw/usb/hcd-ohci.h                             |   9 +-=0D
- hw/usb/hcd-xhci.h                             |   7 +-=0D
- hw/vfio/pci.h                                 |   9 +-=0D
- hw/virtio/virtio-mem-pci.h                    |   5 +-=0D
- hw/virtio/virtio-pci.h                        |  24 +-=0D
- hw/virtio/virtio-pmem-pci.h                   |   5 +-=0D
- hw/xen/xen_pt.h                               |   5 +-=0D
- include/authz/base.h                          |  15 +-=0D
- include/authz/list.h                          |  17 +-=0D
- include/authz/listfile.h                      |  17 +-=0D
- include/authz/pamacct.h                       |  17 +-=0D
- include/authz/simple.h                        |  17 +-=0D
- include/block/throttle-groups.h               |   4 +-=0D
- include/chardev/char-fd.h                     |  11 +-=0D
- include/chardev/char-win-stdio.h              |   2 +-=0D
- include/chardev/char-win.h                    |  11 +-=0D
- include/chardev/char.h                        |  44 +-=0D
- include/chardev/spice.h                       |  15 +-=0D
- include/crypto/secret.h                       |   6 +-=0D
- include/crypto/secret_common.h                |  12 +-=0D
- include/crypto/secret_keyring.h               |  24 +-=0D
- include/crypto/tls-cipher-suites.h            |   9 +-=0D
- include/crypto/tlscreds.h                     |   6 +-=0D
- include/crypto/tlscredsanon.h                 |   7 +-=0D
- include/crypto/tlscredspsk.h                  |   7 +-=0D
- include/crypto/tlscredsx509.h                 |   7 +-=0D
- include/exec/memory.h                         |  21 +-=0D
- include/hw/acpi/acpi_dev_interface.h          |  13 +-=0D
- include/hw/acpi/generic_event_device.h        |  10 +-=0D
- include/hw/acpi/vmgenid.h                     |  13 +-=0D
- include/hw/adc/stm32f2xx_adc.h                |  10 +-=0D
- include/hw/arm/allwinner-a10.h                |   9 +-=0D
- include/hw/arm/allwinner-h3.h                 |   8 +-=0D
- include/hw/arm/armsse.h                       |  16 +-=0D
- include/hw/arm/armv7m.h                       |  17 +-=0D
- include/hw/arm/aspeed.h                       |  14 +-=0D
- include/hw/arm/aspeed_soc.h                   |  18 +-=0D
- include/hw/arm/bcm2835_peripherals.h          |  10 +-=0D
- include/hw/arm/bcm2836.h                      |  18 +-=0D
- include/hw/arm/digic.h                        |   9 +-=0D
- include/hw/arm/exynos4210.h                   |  10 +-=0D
- include/hw/arm/fsl-imx25.h                    |   9 +-=0D
- include/hw/arm/fsl-imx31.h                    |   9 +-=0D
- include/hw/arm/fsl-imx6.h                     |   9 +-=0D
- include/hw/arm/fsl-imx6ul.h                   |   9 +-=0D
- include/hw/arm/fsl-imx7.h                     |   9 +-=0D
- include/hw/arm/linux-boot-if.h                |  11 +-=0D
- include/hw/arm/msf2-soc.h                     |   9 +-=0D
- include/hw/arm/nrf51_soc.h                    |  10 +-=0D
- include/hw/arm/omap.h                         |  20 +-=0D
- include/hw/arm/pxa.h                          |  15 +-=0D
- include/hw/arm/smmu-common.h                  |  18 +-=0D
- include/hw/arm/smmuv3.h                       |  18 +-=0D
- include/hw/arm/stm32f205_soc.h                |  10 +-=0D
- include/hw/arm/stm32f405_soc.h                |  10 +-=0D
- include/hw/arm/virt.h                         |  19 +-=0D
- include/hw/arm/xlnx-versal.h                  |   9 +-=0D
- include/hw/arm/xlnx-zynqmp.h                  |  10 +-=0D
- include/hw/block/flash.h                      |  13 +-=0D
- include/hw/block/swim.h                       |  15 +-=0D
- include/hw/boards.h                           |   8 +-=0D
- include/hw/char/avr_usart.h                   |  10 +-=0D
- include/hw/char/bcm2835_aux.h                 |   9 +-=0D
- include/hw/char/cadence_uart.h                |  10 +-=0D
- include/hw/char/cmsdk-apb-uart.h              |  10 +-=0D
- include/hw/char/digic-uart.h                  |  10 +-=0D
- include/hw/char/escc.h                        |   9 +-=0D
- include/hw/char/ibex_uart.h                   |  10 +-=0D
- include/hw/char/imx_serial.h                  |   9 +-=0D
- include/hw/char/nrf51_uart.h                  |   9 +-=0D
- include/hw/char/pl011.h                       |   9 +-=0D
- include/hw/char/renesas_sci.h                 |   9 +-=0D
- include/hw/char/serial.h                      |  25 +-=0D
- include/hw/char/stm32f2xx_usart.h             |  10 +-=0D
- include/hw/clock.h                            |   5 +-=0D
- include/hw/core/cpu.h                         |  10 +-=0D
- include/hw/core/generic-loader.h              |  10 +-=0D
- include/hw/core/split-irq.h                   |   3 +-=0D
- include/hw/cpu/a15mpcore.h                    |  10 +-=0D
- include/hw/cpu/a9mpcore.h                     |  10 +-=0D
- include/hw/cpu/arm11mpcore.h                  |  10 +-=0D
- include/hw/cpu/cluster.h                      |  10 +-=0D
- include/hw/cpu/core.h                         |  10 +-=0D
- include/hw/display/bcm2835_fb.h               |   9 +-=0D
- include/hw/display/dpcd.h                     |   4 +-=0D
- include/hw/display/i2c-ddc.h                  |   4 +-=0D
- include/hw/display/macfb.h                    |  30 +-=0D
- include/hw/display/xlnx_dp.h                  |   9 +-=0D
- include/hw/dma/bcm2835_dma.h                  |  10 +-=0D
- include/hw/dma/i8257.h                        |  10 +-=0D
- include/hw/dma/pl080.h                        |   9 +-=0D
- include/hw/dma/xlnx-zdma.h                    |  10 +-=0D
- include/hw/dma/xlnx-zynq-devcfg.h             |  10 +-=0D
- include/hw/dma/xlnx_dpdma.h                   |   4 +-=0D
- include/hw/fw-path-provider.h                 |  11 +-=0D
- include/hw/gpio/aspeed_gpio.h                 |  18 +-=0D
- include/hw/gpio/bcm2835_gpio.h                |  10 +-=0D
- include/hw/gpio/imx_gpio.h                    |   9 +-=0D
- include/hw/gpio/nrf51_gpio.h                  |   9 +-=0D
- include/hw/hotplug.h                          |  11 +-=0D
- include/hw/hyperv/vmbus-bridge.h              |   9 +-=0D
- include/hw/hyperv/vmbus.h                     |  17 +-=0D
- include/hw/i2c/arm_sbcon_i2c.h                |  10 +-=0D
- include/hw/i2c/aspeed_i2c.h                   |  19 +-=0D
- include/hw/i2c/i2c.h                          |  19 +-=0D
- include/hw/i2c/imx_i2c.h                      |   9 +-=0D
- include/hw/i2c/microbit_i2c.h                 |  10 +-=0D
- include/hw/i2c/ppc4xx_i2c.h                   |   9 +-=0D
- include/hw/i2c/smbus_slave.h                  |  15 +-=0D
- include/hw/i386/apic_internal.h               |  17 +-=0D
- include/hw/i386/ich9.h                        |  10 +-=0D
- include/hw/i386/intel_iommu.h                 |   7 +-=0D
- include/hw/i386/ioapic_internal.h             |  16 +-=0D
- include/hw/i386/microvm.h                     |  19 +-=0D
- include/hw/i386/pc.h                          |  14 +-=0D
- include/hw/i386/x86-iommu.h                   |  13 +-=0D
- include/hw/i386/x86.h                         |  19 +-=0D
- include/hw/ide/ahci.h                         |  22 +-=0D
- include/hw/ide/internal.h                     |  19 +-=0D
- include/hw/ide/pci.h                          |   9 +-=0D
- include/hw/input/adb.h                        |  16 +-=0D
- include/hw/input/i8042.h                      |   6 +-=0D
- include/hw/intc/allwinner-a10-pic.h           |   9 +-=0D
- include/hw/intc/arm_gic.h                     |  15 +-=0D
- include/hw/intc/arm_gic_common.h              |  21 +-=0D
- include/hw/intc/arm_gicv3.h                   |  14 +-=0D
- include/hw/intc/arm_gicv3_common.h            |  16 +-=0D
- include/hw/intc/arm_gicv3_its_common.h        |  11 +-=0D
- include/hw/intc/armv7m_nvic.h                 |  10 +-=0D
- include/hw/intc/aspeed_vic.h                  |   9 +-=0D
- include/hw/intc/bcm2835_ic.h                  |   9 +-=0D
- include/hw/intc/bcm2836_control.h             |  10 +-=0D
- include/hw/intc/heathrow_pic.h                |   9 +-=0D
- include/hw/intc/ibex_plic.h                   |  10 +-=0D
- include/hw/intc/imx_avic.h                    |   9 +-=0D
- include/hw/intc/imx_gpcv2.h                   |   9 +-=0D
- include/hw/intc/intc.h                        |  11 +-=0D
- include/hw/intc/mips_gic.h                    |   6 +-=0D
- include/hw/intc/realview_gic.h                |  10 +-=0D
- include/hw/intc/rx_icu.h                      |   4 +-=0D
- include/hw/intc/xlnx-pmu-iomod-intc.h         |  10 +-=0D
- include/hw/intc/xlnx-zynqmp-ipi.h             |  10 +-=0D
- include/hw/ipack/ipack.h                      |  14 +-=0D
- include/hw/ipmi/ipmi.h                        |  36 +-=0D
- include/hw/isa/i8259_internal.h               |  15 +-=0D
- include/hw/isa/isa.h                          |  28 +-=0D
- include/hw/isa/pc87312.h                      |  11 +-=0D
- include/hw/isa/superio.h                      |  19 +-=0D
- include/hw/m68k/mcf_fec.h                     |   4 +-=0D
- include/hw/mem/memory-device.h                |  11 +-=0D
- include/hw/mem/nvdimm.h                       |  11 +-=0D
- include/hw/mem/pc-dimm.h                      |  17 +-=0D
- include/hw/mips/cps.h                         |   9 +-=0D
- include/hw/misc/a9scu.h                       |   9 +-=0D
- include/hw/misc/allwinner-cpucfg.h            |   9 +-=0D
- include/hw/misc/allwinner-h3-ccu.h            |   9 +-=0D
- include/hw/misc/allwinner-h3-dramc.h          |   9 +-=0D
- include/hw/misc/allwinner-h3-sysctrl.h        |   9 +-=0D
- include/hw/misc/allwinner-sid.h               |   9 +-=0D
- include/hw/misc/arm11scu.h                    |   9 +-=0D
- include/hw/misc/armsse-cpuid.h                |   9 +-=0D
- include/hw/misc/armsse-mhu.h                  |   9 +-=0D
- include/hw/misc/aspeed_scu.h                  |  18 +-=0D
- include/hw/misc/aspeed_sdmc.h                 |  18 +-=0D
- include/hw/misc/aspeed_xdma.h                 |   9 +-=0D
- include/hw/misc/auxbus.h                      |  11 +-=0D
- include/hw/misc/avr_power.h                   |   9 +-=0D
- include/hw/misc/bcm2835_mbox.h                |  10 +-=0D
- include/hw/misc/bcm2835_mphi.h                |   5 +-=0D
- include/hw/misc/bcm2835_property.h            |  10 +-=0D
- include/hw/misc/bcm2835_rng.h                 |  10 +-=0D
- include/hw/misc/bcm2835_thermal.h             |  10 +-=0D
- include/hw/misc/grlib_ahb_apb_pnp.h           |   9 +-=0D
- include/hw/misc/imx25_ccm.h                   |   9 +-=0D
- include/hw/misc/imx31_ccm.h                   |   9 +-=0D
- include/hw/misc/imx6_ccm.h                    |   9 +-=0D
- include/hw/misc/imx6_src.h                    |   9 +-=0D
- include/hw/misc/imx6ul_ccm.h                  |   9 +-=0D
- include/hw/misc/imx7_ccm.h                    |  17 +-=0D
- include/hw/misc/imx7_gpr.h                    |   9 +-=0D
- include/hw/misc/imx7_snvs.h                   |   9 +-=0D
- include/hw/misc/imx_ccm.h                     |  19 +-=0D
- include/hw/misc/imx_rngc.h                    |   9 +-=0D
- include/hw/misc/iotkit-secctl.h               |   6 +-=0D
- include/hw/misc/iotkit-sysctl.h               |  10 +-=0D
- include/hw/misc/iotkit-sysinfo.h              |  10 +-=0D
- include/hw/misc/mac_via.h                     |  27 +-=0D
- include/hw/misc/macio/cuda.h                  |  18 +-=0D
- include/hw/misc/macio/gpio.h                  |   9 +-=0D
- include/hw/misc/macio/macio.h                 |  43 +-=0D
- include/hw/misc/macio/pmu.h                   |  18 +-=0D
- include/hw/misc/max111x.h                     |  10 +-=0D
- include/hw/misc/mips_cmgcr.h                  |   6 +-=0D
- include/hw/misc/mips_cpc.h                    |   9 +-=0D
- include/hw/misc/mips_itu.h                    |   9 +-=0D
- include/hw/misc/mos6522.h                     |  18 +-=0D
- include/hw/misc/mps2-fpgaio.h                 |   9 +-=0D
- include/hw/misc/mps2-scc.h                    |   9 +-=0D
- include/hw/misc/msf2-sysreg.h                 |   9 +-=0D
- include/hw/misc/nrf51_rng.h                   |   9 +-=0D
- include/hw/misc/pca9552.h                     |   9 +-=0D
- include/hw/misc/stm32f2xx_syscfg.h            |  10 +-=0D
- include/hw/misc/stm32f4xx_exti.h              |  10 +-=0D
- include/hw/misc/stm32f4xx_syscfg.h            |  10 +-=0D
- include/hw/misc/tz-mpc.h                      |   6 +-=0D
- include/hw/misc/tz-msc.h                      |   9 +-=0D
- include/hw/misc/tz-ppc.h                      |   6 +-=0D
- include/hw/misc/unimp.h                       |  10 +-=0D
- include/hw/misc/vmcoreinfo.h                  |   9 +-=0D
- include/hw/misc/zynq-xadc.h                   |  10 +-=0D
- include/hw/net/allwinner-sun8i-emac.h         |   9 +-=0D
- include/hw/net/allwinner_emac.h               |   9 +-=0D
- include/hw/net/cadence_gem.h                  |   9 +-=0D
- include/hw/net/ftgmac100.h                    |  17 +-=0D
- include/hw/net/imx_fec.h                      |   9 +-=0D
- include/hw/net/lance.h                        |  10 +-=0D
- include/hw/net/lasi_82596.h                   |  10 +-=0D
- include/hw/net/msf2-emac.h                    |  10 +-=0D
- include/hw/nmi.h                              |  11 +-=0D
- include/hw/nubus/mac-nubus-bridge.h           |  10 +-=0D
- include/hw/nubus/nubus.h                      |  18 +-=0D
- include/hw/nvram/fw_cfg.h                     |  21 +-=0D
- include/hw/nvram/nrf51_nvm.h                  |   9 +-=0D
- include/hw/or-irq.h                           |   3 +-=0D
- include/hw/pci-bridge/simba.h                 |  10 +-=0D
- include/hw/pci-host/designware.h              |  16 +-=0D
- include/hw/pci-host/gpex.h                    |  19 +-=0D
- include/hw/pci-host/i440fx.h                  |  10 +-=0D
- include/hw/pci-host/pnv_phb3.h                |  20 +-=0D
- include/hw/pci-host/pnv_phb4.h                |  21 +-=0D
- include/hw/pci-host/q35.h                     |  19 +-=0D
- include/hw/pci-host/sabre.h                   |  19 +-=0D
- include/hw/pci-host/spapr.h                   |   7 +-=0D
- include/hw/pci-host/uninorth.h                |  31 +-=0D
- include/hw/pci-host/xilinx-pcie.h             |  19 +-=0D
- include/hw/pci/pci.h                          |  19 +-=0D
- include/hw/pci/pci_bridge.h                   |   4 +-=0D
- include/hw/pci/pci_host.h                     |  14 +-=0D
- include/hw/pci/pcie_host.h                    |   5 +-=0D
- include/hw/pci/pcie_port.h                    |  18 +-=0D
- include/hw/pcmcia.h                           |  19 +-=0D
- include/hw/platform-bus.h                     |   5 +-=0D
- include/hw/ppc/mac_dbdma.h                    |   9 +-=0D
- include/hw/ppc/openpic.h                      |   9 +-=0D
- include/hw/ppc/pnv.h                          |  75 +-=0D
- include/hw/ppc/pnv_core.h                     |  26 +-=0D
- include/hw/ppc/pnv_homer.h                    |  22 +-=0D
- include/hw/ppc/pnv_lpc.h                      |  28 +-=0D
- include/hw/ppc/pnv_occ.h                      |  22 +-=0D
- include/hw/ppc/pnv_pnor.h                     |   9 +-=0D
- include/hw/ppc/pnv_psi.h                      |  35 +-=0D
- include/hw/ppc/pnv_xive.h                     |  16 +-=0D
- include/hw/ppc/pnv_xscom.h                    |  10 +-=0D
- include/hw/ppc/spapr.h                        |  23 +-=0D
- include/hw/ppc/spapr_cpu_core.h               |  17 +-=0D
- include/hw/ppc/spapr_irq.h                    |  12 +-=0D
- include/hw/ppc/spapr_tpm_proxy.h              |   9 +-=0D
- include/hw/ppc/spapr_vio.h                    |  19 +-=0D
- include/hw/ppc/xics.h                         |  31 +-=0D
- include/hw/ppc/xics_spapr.h                   |   5 +-=0D
- include/hw/ppc/xive.h                         |  77 +--=0D
- include/hw/qdev-core.h                        |  15 +-=0D
- include/hw/rdma/rdma.h                        |  11 +-=0D
- include/hw/register.h                         |   4 +-=0D
- include/hw/resettable.h                       |  11 +-=0D
- include/hw/riscv/opentitan.h                  |  10 +-=0D
- include/hw/riscv/riscv_hart.h                 |  10 +-=0D
- include/hw/riscv/spike.h                      |  10 +-=0D
- include/hw/riscv/virt.h                       |  10 +-=0D
- include/hw/rtc/allwinner-rtc.h                |  18 +-=0D
- include/hw/rtc/aspeed_rtc.h                   |   9 +-=0D
- include/hw/rtc/goldfish_rtc.h                 |  10 +-=0D
- include/hw/rtc/m48t59.h                       |  11 +-=0D
- include/hw/rtc/mc146818rtc.h                  |   9 +-=0D
- include/hw/rtc/pl031.h                        |   9 +-=0D
- include/hw/rtc/xlnx-zynqmp-rtc.h              |  10 +-=0D
- include/hw/rx/rx62n.h                         |   9 +-=0D
- include/hw/s390x/3270-ccw.h                   |  19 +-=0D
- include/hw/s390x/ap-device.h                  |  12 +-=0D
- include/hw/s390x/css-bridge.h                 |  18 +-=0D
- include/hw/s390x/event-facility.h             |  34 +-=0D
- include/hw/s390x/s390-ccw.h                   |  19 +-=0D
- include/hw/s390x/s390-virtio-ccw.h            |  17 +-=0D
- include/hw/s390x/s390_flic.h                  |  30 +-=0D
- include/hw/s390x/sclp.h                       |  14 +-=0D
- include/hw/s390x/storage-attributes.h         |  37 +-=0D
- include/hw/s390x/storage-keys.h               |  28 +-=0D
- include/hw/s390x/tod.h                        |  18 +-=0D
- include/hw/s390x/vfio-ccw.h                   |   7 +-=0D
- include/hw/scsi/esp.h                         |   9 +-=0D
- include/hw/scsi/scsi.h                        |  19 +-=0D
- include/hw/sd/allwinner-sdhost.h              |  18 +-=0D
- include/hw/sd/aspeed_sdhci.h                  |  10 +-=0D
- include/hw/sd/bcm2835_sdhost.h                |  10 +-=0D
- include/hw/sd/sd.h                            |  23 +-=0D
- include/hw/sd/sdhci.h                         |  13 +-=0D
- include/hw/southbridge/piix.h                 |  10 +-=0D
- include/hw/sparc/sparc32_dma.h                |  34 +-=0D
- include/hw/sparc/sun4m_iommu.h                |   9 +-=0D
- include/hw/sparc/sun4u_iommu.h                |   9 +-=0D
- include/hw/ssi/aspeed_smc.h                   |  18 +-=0D
- include/hw/ssi/imx_spi.h                      |   9 +-=0D
- include/hw/ssi/mss-spi.h                      |   9 +-=0D
- include/hw/ssi/pl022.h                        |   9 +-=0D
- include/hw/ssi/ssi.h                          |  11 +-=0D
- include/hw/ssi/stm32f2xx_spi.h                |  10 +-=0D
- include/hw/ssi/xilinx_spips.h                 |  32 +-=0D
- include/hw/stream.h                           |  11 +-=0D
- include/hw/sysbus.h                           |  17 +-=0D
- include/hw/timer/a9gtimer.h                   |   6 +-=0D
- include/hw/timer/allwinner-a10-pit.h          |   6 +-=0D
- include/hw/timer/arm_mptimer.h                |  10 +-=0D
- include/hw/timer/armv7m_systick.h             |   9 +-=0D
- include/hw/timer/aspeed_timer.h               |  19 +-=0D
- include/hw/timer/avr_timer16.h                |  10 +-=0D
- include/hw/timer/bcm2835_systmr.h             |  10 +-=0D
- include/hw/timer/cmsdk-apb-dualtimer.h        |   7 +-=0D
- include/hw/timer/cmsdk-apb-timer.h            |  10 +-=0D
- include/hw/timer/digic-timer.h                |   9 +-=0D
- include/hw/timer/i8254.h                      |   9 +-=0D
- include/hw/timer/imx_epit.h                   |   9 +-=0D
- include/hw/timer/imx_gpt.h                    |   9 +-=0D
- include/hw/timer/mss-timer.h                  |  10 +-=0D
- include/hw/timer/nrf51_timer.h                |   9 +-=0D
- include/hw/timer/renesas_cmt.h                |   9 +-=0D
- include/hw/timer/renesas_tmr.h                |   9 +-=0D
- include/hw/timer/stm32f2xx_timer.h            |  10 +-=0D
- include/hw/usb.h                              |  17 +-=0D
- include/hw/usb/chipidea.h                     |   9 +-=0D
- include/hw/usb/imx-usb-phy.h                  |   9 +-=0D
- include/hw/vfio/vfio-amd-xgbe.h               |  11 +-=0D
- include/hw/vfio/vfio-calxeda-xgmac.h          |  21 +-=0D
- include/hw/vfio/vfio-platform.h               |  19 +-=0D
- include/hw/virtio/vhost-scsi-common.h         |  10 +-=0D
- include/hw/virtio/vhost-scsi.h                |  10 +-=0D
- include/hw/virtio/vhost-user-blk.h            |  10 +-=0D
- include/hw/virtio/vhost-user-fs.h             |  10 +-=0D
- include/hw/virtio/vhost-user-scsi.h           |  10 +-=0D
- include/hw/virtio/vhost-user-vsock.h          |  10 +-=0D
- include/hw/virtio/vhost-vsock-common.h        |  10 +-=0D
- include/hw/virtio/vhost-vsock.h               |  10 +-=0D
- include/hw/virtio/virtio-balloon.h            |  10 +-=0D
- include/hw/virtio/virtio-blk.h                |  10 +-=0D
- include/hw/virtio/virtio-bus.h                |  15 +-=0D
- include/hw/virtio/virtio-crypto.h             |  10 +-=0D
- include/hw/virtio/virtio-gpu-pci.h            |   5 +-=0D
- include/hw/virtio/virtio-gpu.h                |  35 +-=0D
- include/hw/virtio/virtio-input.h              |  29 +-=0D
- include/hw/virtio/virtio-iommu.h              |  10 +-=0D
- include/hw/virtio/virtio-mem.h                |  17 +-=0D
- include/hw/virtio/virtio-mmio.h               |  19 +-=0D
- include/hw/virtio/virtio-net.h                |   7 +-=0D
- include/hw/virtio/virtio-pmem.h               |  17 +-=0D
- include/hw/virtio/virtio-rng.h                |  10 +-=0D
- include/hw/virtio/virtio-scsi.h               |  19 +-=0D
- include/hw/virtio/virtio-serial.h             |  22 +-=0D
- include/hw/virtio/virtio.h                    |  14 +-=0D
- include/hw/vmstate-if.h                       |  11 +-=0D
- include/hw/watchdog/cmsdk-apb-watchdog.h      |  10 +-=0D
- include/hw/watchdog/wdt_aspeed.h              |  19 +-=0D
- include/hw/watchdog/wdt_diag288.h             |  19 +-=0D
- include/hw/watchdog/wdt_imx2.h                |   9 +-=0D
- include/hw/xen/xen-block.h                    |  39 +-=0D
- include/hw/xen/xen-bus.h                      |  37 +-=0D
- include/hw/xen/xen-legacy-backend.h           |   5 +-=0D
- include/io/channel-buffer.h                   |   7 +-=0D
- include/io/channel-command.h                  |   7 +-=0D
- include/io/channel-file.h                     |   7 +-=0D
- include/io/channel-socket.h                   |   7 +-=0D
- include/io/channel-tls.h                      |   7 +-=0D
- include/io/channel-websock.h                  |   7 +-=0D
- include/io/channel.h                          |  12 +-=0D
- include/io/dns-resolver.h                     |  13 +-=0D
- include/io/net-listener.h                     |  14 +-=0D
- include/net/can_emu.h                         |   4 +-=0D
- include/net/can_host.h                        |  21 +-=0D
- include/net/filter.h                          |  13 +-=0D
- include/qom/object.h                          | 327 ++++++++-=0D
- include/qom/object_interfaces.h               |  13 +-=0D
- include/scsi/pr-manager.h                     |  16 +-=0D
- include/sysemu/cryptodev.h                    |  16 +-=0D
- include/sysemu/hostmem.h                      |  10 +-=0D
- include/sysemu/hvf.h                          |   5 +-=0D
- include/sysemu/iothread.h                     |   9 +-=0D
- include/sysemu/kvm.h                          |   5 +-=0D
- include/sysemu/rng-random.h                   |   5 +-=0D
- include/sysemu/rng.h                          |  10 +-=0D
- include/sysemu/tpm.h                          |  11 +-=0D
- include/sysemu/tpm_backend.h                  |  12 +-=0D
- include/sysemu/vhost-user-backend.h           |  17 +-=0D
- include/ui/console.h                          |  10 +-=0D
- migration/migration.h                         |  14 +-=0D
- target/alpha/cpu-qom.h                        |  14 +-=0D
- target/arm/cpu-qom.h                          |  25 +-=0D
- target/arm/idau.h                             |  11 +-=0D
- target/avr/cpu-qom.h                          |  14 +-=0D
- target/cris/cpu-qom.h                         |  14 +-=0D
- target/hppa/cpu-qom.h                         |  14 +-=0D
- target/i386/cpu-qom.h                         |  14 +-=0D
- target/lm32/cpu-qom.h                         |  14 +-=0D
- target/m68k/cpu-qom.h                         |  14 +-=0D
- target/microblaze/cpu-qom.h                   |  14 +-=0D
- target/mips/cpu-qom.h                         |  14 +-=0D
- target/moxie/cpu.h                            |  17 +-=0D
- target/nios2/cpu.h                            |  17 +-=0D
- target/openrisc/cpu.h                         |  17 +-=0D
- target/ppc/cpu-qom.h                          |  14 +-=0D
- target/ppc/cpu.h                              |  11 +-=0D
- target/riscv/cpu.h                            |  17 +-=0D
- target/rx/cpu-qom.h                           |  14 +-=0D
- target/s390x/cpu-qom.h                        |  14 +-=0D
- target/sh4/cpu-qom.h                          |  14 +-=0D
- target/sparc/cpu-qom.h                        |  14 +-=0D
- target/tilegx/cpu.h                           |  17 +-=0D
- target/tricore/cpu-qom.h                      |  14 +-=0D
- target/unicore32/cpu-qom.h                    |  14 +-=0D
- target/xtensa/cpu-qom.h                       |  14 +-=0D
- accel/tcg/tcg-all.c                           |   9 +-=0D
- backends/cryptodev-builtin.c                  |   8 +-=0D
- backends/cryptodev-vhost-user.c               |  11 +-=0D
- backends/dbus-vmstate.c                       |  16 +-=0D
- backends/hostmem-file.c                       |   7 +-=0D
- backends/hostmem-memfd.c                      |   7 +-=0D
- backends/rng-builtin.c                        |   9 +-=0D
- backends/rng-egd.c                            |  10 +-=0D
- backends/tpm/tpm_emulator.c                   |  10 +-=0D
- backends/tpm/tpm_passthrough.c                |   7 +-=0D
- chardev/baum.c                                |  13 +-=0D
- chardev/char-console.c                        |   4 +-=0D
- chardev/char-fd.c                             |   2 +-=0D
- chardev/char-file.c                           |   6 +-=0D
- chardev/char-mux.c                            |   2 +-=0D
- chardev/char-null.c                           |   2 +-=0D
- chardev/char-parallel.c                       |  19 +-=0D
- chardev/char-pipe.c                           |   6 +-=0D
- chardev/char-pty.c                            |  11 +-=0D
- chardev/char-ringbuf.c                        |  16 +-=0D
- chardev/char-serial.c                         |   6 +-=0D
- chardev/char-socket.c                         |  12 +-=0D
- chardev/char-stdio.c                          |   6 +-=0D
- chardev/char-udp.c                            |  11 +-=0D
- chardev/char-win-stdio.c                      |  12 +-=0D
- chardev/char-win.c                            |   2 +-=0D
- chardev/char.c                                |   2 +-=0D
- chardev/msmouse.c                             |  14 +-=0D
- chardev/spice.c                               |  10 +-=0D
- chardev/testdev.c                             |  14 +-=0D
- chardev/wctablet.c                            |  14 +-=0D
- gdbstub.c                                     |   6 +-=0D
- hw/acpi/piix4.c                               |  10 +-=0D
- hw/acpi/vmgenid.c                             |   6 +-=0D
- hw/alpha/typhoon.c                            |  10 +-=0D
- hw/arm/collie.c                               |  10 +-=0D
- hw/arm/highbank.c                             |  10 +-=0D
- hw/arm/integratorcp.c                         |  28 +-=0D
- hw/arm/microbit.c                             |  10 +-=0D
- hw/arm/mps2-tz.c                              |  19 +-=0D
- hw/arm/mps2.c                                 |  19 +-=0D
- hw/arm/musca.c                                |  19 +-=0D
- hw/arm/musicpal.c                             |  73 +-=0D
- hw/arm/palm.c                                 |  10 +-=0D
- hw/arm/pxa2xx.c                               |  28 +-=0D
- hw/arm/pxa2xx_gpio.c                          |   7 +-=0D
- hw/arm/pxa2xx_pic.c                           |  10 +-=0D
- hw/arm/raspi.c                                |  19 +-=0D
- hw/arm/sbsa-ref.c                             |  10 +-=0D
- hw/arm/spitz.c                                |  61 +-=0D
- hw/arm/stellaris.c                            |  28 +-=0D
- hw/arm/strongarm.c                            |  49 +-=0D
- hw/arm/tosa.c                                 |  18 +-=0D
- hw/arm/versatilepb.c                          |  10 +-=0D
- hw/arm/vexpress.c                             |  19 +-=0D
- hw/arm/xilinx_zynq.c                          |  10 +-=0D
- hw/arm/xlnx-versal-virt.c                     |  10 +-=0D
- hw/arm/xlnx-zcu102.c                          |  10 +-=0D
- hw/arm/z2.c                                   |  17 +-=0D
- hw/audio/ac97.c                               |  10 +-=0D
- hw/audio/adlib.c                              |   9 +-=0D
- hw/audio/cs4231.c                             |  10 +-=0D
- hw/audio/cs4231a.c                            |   9 +-=0D
- hw/audio/es1370.c                             |  10 +-=0D
- hw/audio/gus.c                                |   9 +-=0D
- hw/audio/hda-codec.c                          |   4 +-=0D
- hw/audio/intel-hda.c                          |   5 +-=0D
- hw/audio/marvell_88w8618.c                    |  10 +-=0D
- hw/audio/milkymist-ac97.c                     |   7 +-=0D
- hw/audio/pcspk.c                              |   9 +-=0D
- hw/audio/pl041.c                              |   9 +-=0D
- hw/audio/sb16.c                               |   9 +-=0D
- hw/audio/wm8750.c                             |   9 +-=0D
- hw/avr/arduino.c                              |  19 +-=0D
- hw/avr/atmega.c                               |  12 +-=0D
- hw/block/fdc.c                                |  34 +-=0D
- hw/block/m25p80.c                             |  19 +-=0D
- hw/block/nand.c                               |   5 +-=0D
- hw/block/onenand.c                            |   9 +-=0D
- hw/char/debugcon.c                            |  10 +-=0D
- hw/char/etraxfs_ser.c                         |  10 +-=0D
- hw/char/exynos4210_uart.c                     |  10 +-=0D
- hw/char/grlib_apbuart.c                       |  10 +-=0D
- hw/char/ipoctal232.c                          |   5 +-=0D
- hw/char/lm32_juart.c                          |   6 +-=0D
- hw/char/lm32_uart.c                           |   6 +-=0D
- hw/char/mcf_uart.c                            |   9 +-=0D
- hw/char/milkymist-uart.c                      |   7 +-=0D
- hw/char/parallel.c                            |  10 +-=0D
- hw/char/sclpconsole-lm.c                      |  10 +-=0D
- hw/char/sclpconsole.c                         |  10 +-=0D
- hw/char/serial-isa.c                          |   9 +-=0D
- hw/char/serial-pci.c                          |   9 +-=0D
- hw/char/spapr_vty.c                           |  10 +-=0D
- hw/char/terminal3270.c                        |  10 +-=0D
- hw/char/virtio-console.c                      |  10 +-=0D
- hw/char/xilinx_uartlite.c                     |  10 +-=0D
- hw/core/irq.c                                 |   3 +-=0D
- hw/cpu/realview_mpcore.c                      |  10 +-=0D
- hw/display/ads7846.c                          |   9 +-=0D
- hw/display/artist.c                           |   9 +-=0D
- hw/display/bochs-display.c                    |  10 +-=0D
- hw/display/cg3.c                              |   9 +-=0D
- hw/display/cirrus_vga.c                       |  10 +-=0D
- hw/display/cirrus_vga_isa.c                   |  10 +-=0D
- hw/display/exynos4210_fimd.c                  |  10 +-=0D
- hw/display/g364fb.c                           |   9 +-=0D
- hw/display/jazz_led.c                         |   9 +-=0D
- hw/display/milkymist-tmu2.c                   |   7 +-=0D
- hw/display/milkymist-vgafb.c                  |   7 +-=0D
- hw/display/next-fb.c                          |   6 +-=0D
- hw/display/pl110.c                            |   9 +-=0D
- hw/display/ramfb-standalone.c                 |   9 +-=0D
- hw/display/sii9022.c                          |   9 +-=0D
- hw/display/sm501.c                            |  18 +-=0D
- hw/display/ssd0303.c                          |   9 +-=0D
- hw/display/ssd0323.c                          |   9 +-=0D
- hw/display/tcx.c                              |   9 +-=0D
- hw/display/vga-isa.c                          |   9 +-=0D
- hw/display/vga-pci.c                          |   9 +-=0D
- hw/display/vhost-user-gpu-pci.c               |  10 +-=0D
- hw/display/vhost-user-gpu.c                   |   2 +-=0D
- hw/display/vhost-user-vga.c                   |  12 +-=0D
- hw/display/virtio-gpu-pci.c                   |  10 +-=0D
- hw/display/virtio-vga.c                       |  16 +-=0D
- hw/display/vmware_vga.c                       |   5 +-=0D
- hw/dma/i82374.c                               |   9 +-=0D
- hw/dma/pl330.c                                |   4 +-=0D
- hw/dma/puv3_dma.c                             |   9 +-=0D
- hw/dma/pxa2xx_dma.c                           |   9 +-=0D
- hw/dma/rc4030.c                               |  10 +-=0D
- hw/dma/sparc32_dma.c                          |   2 +-=0D
- hw/dma/xilinx_axidma.c                        |  23 +-=0D
- hw/gpio/gpio_key.c                            |   9 +-=0D
- hw/gpio/max7310.c                             |   9 +-=0D
- hw/gpio/mpc8xxx.c                             |   9 +-=0D
- hw/gpio/pl061.c                               |   9 +-=0D
- hw/gpio/puv3_gpio.c                           |   9 +-=0D
- hw/gpio/zaurus.c                              |   6 +-=0D
- hw/hppa/dino.c                                |  10 +-=0D
- hw/hppa/lasi.c                                |  10 +-=0D
- hw/hyperv/hyperv.c                            |   9 +-=0D
- hw/hyperv/hyperv_testdev.c                    |   5 +-=0D
- hw/i2c/bitbang_i2c.c                          |   9 +-=0D
- hw/i2c/exynos4210_i2c.c                       |  10 +-=0D
- hw/i2c/mpc_i2c.c                              |  10 +-=0D
- hw/i2c/smbus_eeprom.c                         |  10 +-=0D
- hw/i2c/smbus_ich9.c                           |  10 +-=0D
- hw/i2c/versatile_i2c.c                        |   7 +-=0D
- hw/i386/kvm/clock.c                           |   9 +-=0D
- hw/i386/kvm/i8254.c                           |  18 +-=0D
- hw/i386/kvm/i8259.c                           |  12 +-=0D
- hw/i386/kvmvapic.c                            |   9 +-=0D
- hw/i386/port92.c                              |   9 +-=0D
- hw/i386/vmmouse.c                             |  10 +-=0D
- hw/i386/vmport.c                              |   9 +-=0D
- hw/i386/xen/xen_platform.c                    |  10 +-=0D
- hw/i386/xen/xen_pvdevice.c                    |  10 +-=0D
- hw/ide/ahci.c                                 |   4 +-=0D
- hw/ide/ich.c                                  |   8 +-=0D
- hw/ide/isa.c                                  |   9 +-=0D
- hw/ide/microdrive.c                           |   9 +-=0D
- hw/ide/mmio.c                                 |   9 +-=0D
- hw/ide/sii3112.c                              |   8 +-=0D
- hw/input/adb-kbd.c                            |  18 +-=0D
- hw/input/adb-mouse.c                          |  18 +-=0D
- hw/input/lm832x.c                             |   9 +-=0D
- hw/input/milkymist-softusb.c                  |   7 +-=0D
- hw/input/pl050.c                              |   9 +-=0D
- hw/intc/apic.c                                |   6 +-=0D
- hw/intc/arm_gic_kvm.c                         |  17 +-=0D
- hw/intc/arm_gicv2m.c                          |   9 +-=0D
- hw/intc/arm_gicv3_its_kvm.c                   |  14 +-=0D
- hw/intc/arm_gicv3_kvm.c                       |  15 +-=0D
- hw/intc/etraxfs_pic.c                         |   5 +-=0D
- hw/intc/exynos4210_combiner.c                 |  10 +-=0D
- hw/intc/exynos4210_gic.c                      |  19 +-=0D
- hw/intc/grlib_irqmp.c                         |   9 +-=0D
- hw/intc/i8259.c                               |  10 +-=0D
- hw/intc/lm32_pic.c                            |   6 +-=0D
- hw/intc/loongson_liointc.c                    |   5 +-=0D
- hw/intc/nios2_iic.c                           |  10 +-=0D
- hw/intc/omap_intc.c                           |   2 +-=0D
- hw/intc/ompic.c                               |   6 +-=0D
- hw/intc/openpic_kvm.c                         |  10 +-=0D
- hw/intc/pl190.c                               |   9 +-=0D
- hw/intc/puv3_intc.c                           |   9 +-=0D
- hw/intc/s390_flic_kvm.c                       |  12 +-=0D
- hw/intc/slavio_intctl.c                       |  10 +-=0D
- hw/intc/xilinx_intc.c                         |   4 +-=0D
- hw/ipack/tpci200.c                            |  10 +-=0D
- hw/ipmi/ipmi_bmc_extern.c                     |  10 +-=0D
- hw/ipmi/isa_ipmi_bt.c                         |  10 +-=0D
- hw/ipmi/isa_ipmi_kcs.c                        |  10 +-=0D
- hw/ipmi/pci_ipmi_bt.c                         |  10 +-=0D
- hw/ipmi/pci_ipmi_kcs.c                        |  10 +-=0D
- hw/ipmi/smbus_ipmi.c                          |   9 +-=0D
- hw/isa/i82378.c                               |  10 +-=0D
- hw/isa/lpc_ich9.c                             |   2 +-=0D
- hw/isa/pc87312.c                              |   2 +-=0D
- hw/isa/piix4.c                                |  10 +-=0D
- hw/isa/vt82c686.c                             |  37 +-=0D
- hw/m68k/mcf_intc.c                            |   9 +-=0D
- hw/m68k/next-cube.c                           |   9 +-=0D
- hw/m68k/next-kbd.c                            |   9 +-=0D
- hw/m68k/q800.c                                |   2 +-=0D
- hw/microblaze/xlnx-zynqmp-pmu.c               |  10 +-=0D
- hw/mips/boston.c                              |   9 +-=0D
- hw/mips/gt64xxx_pci.c                         |  10 +-=0D
- hw/mips/jazz.c                                |   2 +-=0D
- hw/mips/malta.c                               |   9 +-=0D
- hw/misc/applesmc.c                            |   6 +-=0D
- hw/misc/arm_integrator_debug.c                |  10 +-=0D
- hw/misc/arm_l2x0.c                            |   9 +-=0D
- hw/misc/arm_sysctl.c                          |  10 +-=0D
- hw/misc/debugexit.c                           |  10 +-=0D
- hw/misc/eccmemctl.c                           |   9 +-=0D
- hw/misc/edu.c                                 |   9 +-=0D
- hw/misc/empty_slot.c                          |   9 +-=0D
- hw/misc/exynos4210_clk.c                      |  10 +-=0D
- hw/misc/exynos4210_pmu.c                      |  10 +-=0D
- hw/misc/exynos4210_rng.c                      |  10 +-=0D
- hw/misc/ivshmem.c                             |  22 +-=0D
- hw/misc/milkymist-hpdmc.c                     |   7 +-=0D
- hw/misc/milkymist-pfpu.c                      |   7 +-=0D
- hw/misc/mst_fpga.c                            |  10 +-=0D
- hw/misc/pc-testdev.c                          |  10 +-=0D
- hw/misc/pca9552.c                             |  12 +-=0D
- hw/misc/pci-testdev.c                         |  10 +-=0D
- hw/misc/puv3_pm.c                             |   9 +-=0D
- hw/misc/pvpanic.c                             |  10 +-=0D
- hw/misc/sga.c                                 |   9 +-=0D
- hw/misc/slavio_misc.c                         |  17 +-=0D
- hw/misc/tmp421.c                              |  18 +-=0D
- hw/misc/zynq_slcr.c                           |   9 +-=0D
- hw/net/can/can_kvaser_pci.c                   |  10 +-=0D
- hw/net/can/can_mioe3680_pci.c                 |  10 +-=0D
- hw/net/can/can_pcm3680_pci.c                  |  10 +-=0D
- hw/net/dp8393x.c                              |   9 +-=0D
- hw/net/e1000.c                                |  19 +-=0D
- hw/net/e1000e.c                               |   9 +-=0D
- hw/net/etraxfs_eth.c                          |  11 +-=0D
- hw/net/lan9118.c                              |   9 +-=0D
- hw/net/milkymist-minimac2.c                   |   7 +-=0D
- hw/net/mipsnet.c                              |   9 +-=0D
- hw/net/ne2000-isa.c                           |   9 +-=0D
- hw/net/opencores_eth.c                        |   9 +-=0D
- hw/net/pcnet-pci.c                            |  10 +-=0D
- hw/net/rtl8139.c                              |  10 +-=0D
- hw/net/smc91c111.c                            |   9 +-=0D
- hw/net/spapr_llan.c                           |  10 +-=0D
- hw/net/stellaris_enet.c                       |  10 +-=0D
- hw/net/sungem.c                               |   9 +-=0D
- hw/net/sunhme.c                               |   9 +-=0D
- hw/net/vmxnet3.c                              |  12 +-=0D
- hw/net/xgmac.c                                |   9 +-=0D
- hw/net/xilinx_axienet.c                       |  23 +-=0D
- hw/net/xilinx_ethlite.c                       |   5 +-=0D
- hw/nvram/ds1225y.c                            |   9 +-=0D
- hw/nvram/eeprom_at24c.c                       |   9 +-=0D
- hw/nvram/spapr_nvram.c                        |  10 +-=0D
- hw/pci-bridge/dec.c                           |   9 +-=0D
- hw/pci-bridge/gen_pcie_root_port.c            |  10 +-=0D
- hw/pci-bridge/pci_bridge_dev.c                |   7 +-=0D
- hw/pci-bridge/pci_expander_bridge.c           |  23 +-=0D
- hw/pci-bridge/pcie_pci_bridge.c               |  10 +-=0D
- hw/pci-host/bonito.c                          |  14 +-=0D
- hw/pci-host/grackle.c                         |  10 +-=0D
- hw/pci-host/i440fx.c                          |  10 +-=0D
- hw/pci-host/pnv_phb3.c                        |   5 +-=0D
- hw/pci-host/pnv_phb4.c                        |   5 +-=0D
- hw/pci-host/ppce500.c                         |  13 +-=0D
- hw/pci-host/prep.c                            |  19 +-=0D
- hw/pci-host/sabre.c                           |   8 +-=0D
- hw/pci-host/versatile.c                       |  14 +-=0D
- hw/ppc/mpc8544_guts.c                         |   6 +-=0D
- hw/ppc/ppc440_pcix.c                          |  10 +-=0D
- hw/ppc/ppc440_uc.c                            |  10 +-=0D
- hw/ppc/ppc4xx_pci.c                           |   7 +-=0D
- hw/ppc/ppce500_spin.c                         |   9 +-=0D
- hw/ppc/prep_systemio.c                        |  10 +-=0D
- hw/ppc/rs6000_mc.c                            |  12 +-=0D
- hw/ppc/spapr_rng.c                            |   7 +-=0D
- hw/rtc/ds1338.c                               |   9 +-=0D
- hw/rtc/exynos4210_rtc.c                       |  10 +-=0D
- hw/rtc/m41t80.c                               |   9 +-=0D
- hw/rtc/m48t59-isa.c                           |  21 +-=0D
- hw/rtc/m48t59.c                               |  19 +-=0D
- hw/rtc/sun4v-rtc.c                            |   9 +-=0D
- hw/rtc/twl92230.c                             |   9 +-=0D
- hw/rx/rx-gdbsim.c                             |  19 +-=0D
- hw/rx/rx62n.c                                 |  12 +-=0D
- hw/s390x/ap-device.c                          |   2 +-=0D
- hw/scsi/esp-pci.c                             |  19 +-=0D
- hw/scsi/esp.c                                 |   6 +-=0D
- hw/scsi/lsi53c895a.c                          |  10 +-=0D
- hw/scsi/megasas.c                             |  19 +-=0D
- hw/scsi/scsi-disk.c                           |  20 +-=0D
- hw/scsi/spapr_vscsi.c                         |  10 +-=0D
- hw/scsi/vmw_pvscsi.c                          |  18 +-=0D
- hw/sd/allwinner-sdhost.c                      |   6 +-=0D
- hw/sd/bcm2835_sdhost.c                        |   6 +-=0D
- hw/sd/milkymist-memcard.c                     |   7 +-=0D
- hw/sd/pl181.c                                 |   9 +-=0D
- hw/sd/pxa2xx_mmci.c                           |   5 +-=0D
- hw/sd/sdhci.c                                 |   5 +-=0D
- hw/sd/ssi-sd.c                                |   9 +-=0D
- hw/sh4/sh_pci.c                               |  10 +-=0D
- hw/sparc/sun4m.c                              |  36 +-=0D
- hw/sparc64/sun4u.c                            |  35 +-=0D
- hw/ssi/ssi.c                                  |   4 +-=0D
- hw/ssi/xilinx_spi.c                           |   9 +-=0D
- hw/timer/altera_timer.c                       |  10 +-=0D
- hw/timer/arm_timer.c                          |  18 +-=0D
- hw/timer/cadence_ttc.c                        |  10 +-=0D
- hw/timer/etraxfs_timer.c                      |  10 +-=0D
- hw/timer/exynos4210_mct.c                     |  10 +-=0D
- hw/timer/exynos4210_pwm.c                     |  10 +-=0D
- hw/timer/grlib_gptimer.c                      |   7 +-=0D
- hw/timer/hpet.c                               |   9 +-=0D
- hw/timer/i8254.c                              |  10 +-=0D
- hw/timer/lm32_timer.c                         |   6 +-=0D
- hw/timer/milkymist-sysctl.c                   |   7 +-=0D
- hw/timer/puv3_ost.c                           |   9 +-=0D
- hw/timer/pxa2xx_timer.c                       |   7 +-=0D
- hw/timer/slavio_timer.c                       |  10 +-=0D
- hw/timer/xilinx_timer.c                       |   5 +-=0D
- hw/tpm/tpm_crb.c                              |   9 +-=0D
- hw/tpm/tpm_spapr.c                            |  10 +-=0D
- hw/tpm/tpm_tis_isa.c                          |   9 +-=0D
- hw/tpm/tpm_tis_sysbus.c                       |   9 +-=0D
- hw/usb/ccid-card-emulated.c                   |   7 +-=0D
- hw/usb/ccid-card-passthru.c                   |   5 +-=0D
- hw/usb/dev-audio.c                            |   9 +-=0D
- hw/usb/dev-hid.c                              |   9 +-=0D
- hw/usb/dev-hub.c                              |   9 +-=0D
- hw/usb/dev-mtp.c                              |   4 +-=0D
- hw/usb/dev-network.c                          |   9 +-=0D
- hw/usb/dev-serial.c                           |  11 +-=0D
- hw/usb/dev-smartcard-reader.c                 |  23 +-=0D
- hw/usb/dev-storage.c                          |   9 +-=0D
- hw/usb/dev-uas.c                              |   4 +-=0D
- hw/usb/dev-wacom.c                            |   9 +-=0D
- hw/usb/hcd-ohci-pci.c                         |   9 +-=0D
- hw/usb/hcd-uhci.c                             |   4 +-=0D
- hw/usb/host-libusb.c                          |   7 +-=0D
- hw/usb/redirect.c                             |   4 +-=0D
- hw/usb/tusb6010.c                             |  13 +-=0D
- hw/vfio/ap.c                                  |  18 +-=0D
- hw/vfio/pci.c                                 |  22 +-=0D
- hw/virtio/vhost-scsi-pci.c                    |   5 +-=0D
- hw/virtio/vhost-user-blk-pci.c                |   5 +-=0D
- hw/virtio/vhost-user-fs-pci.c                 |   5 +-=0D
- hw/virtio/vhost-user-input-pci.c              |   5 +-=0D
- hw/virtio/vhost-user-scsi-pci.c               |   5 +-=0D
- hw/virtio/vhost-user-vsock-pci.c              |   5 +-=0D
- hw/virtio/vhost-vsock-pci.c                   |   5 +-=0D
- hw/virtio/virtio-9p-pci.c                     |  10 +-=0D
- hw/virtio/virtio-balloon-pci.c                |   5 +-=0D
- hw/virtio/virtio-blk-pci.c                    |   5 +-=0D
- hw/virtio/virtio-crypto-pci.c                 |   5 +-=0D
- hw/virtio/virtio-input-host-pci.c             |   5 +-=0D
- hw/virtio/virtio-input-pci.c                  |   9 +-=0D
- hw/virtio/virtio-iommu-pci.c                  |   5 +-=0D
- hw/virtio/virtio-net-pci.c                    |   5 +-=0D
- hw/virtio/virtio-rng-pci.c                    |   5 +-=0D
- hw/virtio/virtio-scsi-pci.c                   |   5 +-=0D
- hw/virtio/virtio-serial-pci.c                 |   5 +-=0D
- hw/watchdog/wdt_i6300esb.c                    |   5 +-=0D
- hw/watchdog/wdt_ib700.c                       |   9 +-=0D
- iothread.c                                    |   6 +-=0D
- migration/rdma.c                              |   7 +-=0D
- net/can/can_socketcan.c                       |  10 +-=0D
- net/colo-compare.c                            |   9 +-=0D
- net/dump.c                                    |   7 +-=0D
- net/filter-buffer.c                           |   9 +-=0D
- net/filter-mirror.c                           |  17 +-=0D
- net/filter-replay.c                           |   7 +-=0D
- net/filter-rewriter.c                         |  27 +-=0D
- qom/object.c                                  |   6 +-=0D
- scsi/pr-manager-helper.c                      |  11 +-=0D
- target/i386/sev.c                             |   7 +-=0D
- tests/check-qom-interface.c                   |  11 +-=0D
- tests/check-qom-proplist.c                    |  16 +-=0D
- tests/test-char.c                             |   4 +-=0D
- tests/test-qdev-global-props.c                |  13 +-=0D
- ui/console.c                                  |  15 +-=0D
- ui/gtk.c                                      |  12 +-=0D
- ui/input-barrier.c                            |  14 +-=0D
- ui/input-linux.c                              |  14 +-=0D
- ui/spice-app.c                                |  17 +-=0D
- MAINTAINERS                                   |   5 +=0D
- 843 files changed, 7960 insertions(+), 4514 deletions(-)=0D
- create mode 100644 scripts/codeconverter/codeconverter/__init__.py=0D
- create mode 100644 scripts/codeconverter/codeconverter/patching.py=0D
- create mode 100644 scripts/codeconverter/codeconverter/qom_macros.py=0D
- create mode 100644 scripts/codeconverter/codeconverter/qom_type_info.py=0D
- create mode 100644 scripts/codeconverter/codeconverter/regexps.py=0D
- create mode 100644 scripts/codeconverter/codeconverter/test_patching.py=0D
- create mode 100644 scripts/codeconverter/codeconverter/test_regexps.py=0D
- create mode 100644 scripts/codeconverter/codeconverter/utils.py=0D
- create mode 100755 scripts/codeconverter/converter.py=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+This started as a simple script that scanned for regular
+expressions, but became more and more complex when exceptions to
+the rules were found.
+
+I don't know if this should be maintained in the QEMU source tree
+long term (maybe it can be reused for other code transformations
+that Coccinelle can't handle).  In either case, this is included
+as part of the patch series to document how exactly the automated
+code transformations in the next patches were done.
+
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+Message-Id: <20200831210740.126168-7-ehabkost@redhat.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ .../codeconverter/codeconverter/__init__.py   |   0
+ .../codeconverter/codeconverter/patching.py   | 397 +++++++++++
+ .../codeconverter/codeconverter/qom_macros.py | 652 ++++++++++++++++++
+ .../codeconverter/qom_type_info.py            | 434 ++++++++++++
+ .../codeconverter/codeconverter/regexps.py    | 118 ++++
+ .../codeconverter/test_patching.py            | 105 +++
+ .../codeconverter/test_regexps.py             | 282 ++++++++
+ scripts/codeconverter/codeconverter/utils.py  |  72 ++
+ scripts/codeconverter/converter.py            | 123 ++++
+ MAINTAINERS                                   |   5 +
+ 10 files changed, 2188 insertions(+)
+ create mode 100644 scripts/codeconverter/codeconverter/__init__.py
+ create mode 100644 scripts/codeconverter/codeconverter/patching.py
+ create mode 100644 scripts/codeconverter/codeconverter/qom_macros.py
+ create mode 100644 scripts/codeconverter/codeconverter/qom_type_info.py
+ create mode 100644 scripts/codeconverter/codeconverter/regexps.py
+ create mode 100644 scripts/codeconverter/codeconverter/test_patching.py
+ create mode 100644 scripts/codeconverter/codeconverter/test_regexps.py
+ create mode 100644 scripts/codeconverter/codeconverter/utils.py
+ create mode 100755 scripts/codeconverter/converter.py
+
+diff --git a/scripts/codeconverter/codeconverter/__init__.py b/scripts/codeconverter/codeconverter/__init__.py
+new file mode 100644
+index 0000000000..e69de29bb2
+diff --git a/scripts/codeconverter/codeconverter/patching.py b/scripts/codeconverter/codeconverter/patching.py
+new file mode 100644
+index 0000000000..627a1a1b04
+--- /dev/null
++++ b/scripts/codeconverter/codeconverter/patching.py
+@@ -0,0 +1,397 @@
++# Copyright (C) 2020 Red Hat Inc.
++#
++# Authors:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++from typing import IO, Match, NamedTuple, Optional, Literal, Iterable, Type, Dict, List, Any, TypeVar, NewType, Tuple
++from pathlib import Path
++from itertools import chain
++from tempfile import NamedTemporaryFile
++import os
++import re
++import subprocess
++from io import StringIO
++
++import logging
++logger = logging.getLogger(__name__)
++DBG = logger.debug
++INFO = logger.info
++WARN = logger.warning
++ERROR = logger.error
++
++from .utils import *
++
++T = TypeVar('T')
++
++class Patch(NamedTuple):
++    # start inside file.original_content
++    start: int
++    # end position inside file.original_content
++    end: int
++    # replacement string for file.original_content[start:end]
++    replacement: str
++
++IdentifierType = Literal['type', 'symbol', 'include', 'constant']
++class RequiredIdentifier(NamedTuple):
++    type: IdentifierType
++    name: str
++
++class FileMatch:
++    """Base class for regex matches
++
++    Subclasses just need to set the `regexp` class attribute
++    """
++    regexp: Optional[str] = None
++
++    def __init__(self, f: 'FileInfo', m: Match) -> None:
++        self.file: 'FileInfo' = f
++        self.match: Match = m
++
++    @property
++    def name(self) -> str:
++        if 'name' not in self.match.groupdict():
++            return '[no name]'
++        return self.group('name')
++
++    @classmethod
++    def compiled_re(klass):
++        return re.compile(klass.regexp, re.MULTILINE)
++
++    def start(self) -> int:
++        return self.match.start()
++
++    def end(self) -> int:
++        return self.match.end()
++
++    def line_col(self) -> LineAndColumn:
++        return self.file.line_col(self.start())
++
++    def group(self, *args):
++        return self.match.group(*args)
++
++    def log(self, level, fmt, *args) -> None:
++        pos = self.line_col()
++        logger.log(level, '%s:%d:%d: '+fmt, self.file.filename, pos.line, pos.col, *args)
++
++    def debug(self, fmt, *args) -> None:
++        self.log(logging.DEBUG, fmt, *args)
++
++    def info(self, fmt, *args) -> None:
++        self.log(logging.INFO, fmt, *args)
++
++    def warn(self, fmt, *args) -> None:
++        self.log(logging.WARNING, fmt, *args)
++
++    def error(self, fmt, *args) -> None:
++        self.log(logging.ERROR, fmt, *args)
++
++    def sub(self, original: str, replacement: str) -> str:
++        """Replace content
++
++        XXX: this won't use the match position, but will just
++        replace all strings that look like the original match.
++        This should be enough for all the patterns used in this
++        script.
++        """
++        return original.replace(self.group(0), replacement)
++
++    def sanity_check(self) -> None:
++        """Sanity check match, and print warnings if necessary"""
++        pass
++
++    def replacement(self) -> Optional[str]:
++        """Return replacement text for pattern, to use new code conventions"""
++        return None
++
++    def make_patch(self, replacement: str) -> 'Patch':
++        """Make patch replacing the content of this match"""
++        return Patch(self.start(), self.end(), replacement)
++
++    def make_subpatch(self, start: int, end: int, replacement: str) -> 'Patch':
++        return Patch(self.start() + start, self.start() + end, replacement)
++
++    def make_removal_patch(self) -> 'Patch':
++        """Make patch removing contents of match completely"""
++        return self.make_patch('')
++
++    def append(self, s: str) -> 'Patch':
++        """Make patch appending string after this match"""
++        return Patch(self.end(), self.end(), s)
++
++    def prepend(self, s: str) -> 'Patch':
++        """Make patch prepending string before this match"""
++        return Patch(self.start(), self.start(), s)
++
++    def gen_patches(self) -> Iterable['Patch']:
++        """Patch source code contents to use new code patterns"""
++        replacement = self.replacement()
++        if replacement is not None:
++            yield self.make_patch(replacement)
++
++    @classmethod
++    def has_replacement_rule(klass) -> bool:
++        return (klass.gen_patches is not FileMatch.gen_patches
++                or klass.replacement is not FileMatch.replacement)
++
++    def contains(self, other: 'FileMatch') -> bool:
++        return other.start() >= self.start() and other.end() <= self.end()
++
++    def __repr__(self) -> str:
++        start = self.file.line_col(self.start())
++        end = self.file.line_col(self.end() - 1)
++        return '<%s %s at %d:%d-%d:%d: %r>' % (self.__class__.__name__,
++                                                    self.name,
++                                                    start.line, start.col,
++                                                    end.line, end.col, self.group(0)[:100])
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        """Can be implemented by subclasses to keep track of identifier references
++
++        This method will be used by the code that moves declarations around the file,
++        to make sure we find the right spot for them.
++        """
++        raise NotImplementedError()
++
++    def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
++        """Can be implemented by subclasses to keep track of identifier references
++
++        This method will be used by the code that moves declarations around the file,
++        to make sure we find the right spot for them.
++        """
++        raise NotImplementedError()
++
++    @classmethod
++    def find_matches(klass, content: str) -> Iterable[Match]:
++        """Generate match objects for class
++
++        Might be reimplemented by subclasses if they
++        intend to look for matches using a different method.
++        """
++        return klass.compiled_re().finditer(content)
++
++    @property
++    def allfiles(self) -> 'FileList':
++        return self.file.allfiles
++
++def all_subclasses(c: Type[FileMatch]) -> Iterable[Type[FileMatch]]:
++    for sc in c.__subclasses__():
++        yield sc
++        yield from all_subclasses(sc)
++
++def match_class_dict() -> Dict[str, Type[FileMatch]]:
++    d = dict((t.__name__, t) for t in all_subclasses(FileMatch))
++    return d
++
++def names(matches: Iterable[FileMatch]) -> Iterable[str]:
++    return [m.name for m in matches]
++
++class PatchingError(Exception):
++    pass
++
++class OverLappingPatchesError(PatchingError):
++    pass
++
++def apply_patches(s: str, patches: Iterable[Patch]) -> str:
++    """Apply a sequence of patches to string
++
++    >>> apply_patches('abcdefg', [Patch(2,2,'xxx'), Patch(0, 1, 'yy')])
++    'yybxxxcdefg'
++    """
++    r = StringIO()
++    last = 0
++    for p in sorted(patches):
++        DBG("Applying patch at position %d (%s) - %d (%s): %r",
++            p.start, line_col(s, p.start),
++            p.end, line_col(s, p.end),
++            p.replacement)
++        if last > p.start:
++            raise OverLappingPatchesError("Overlapping patch at position %d (%s), last patch at %d (%s)" % \
++                (p.start, line_col(s, p.start), last, line_col(s, last)))
++        r.write(s[last:p.start])
++        r.write(p.replacement)
++        last = p.end
++    r.write(s[last:])
++    return r.getvalue()
++
++class RegexpScanner:
++    def __init__(self) -> None:
++        self.match_index: Dict[Type[Any], List[FileMatch]] = {}
++        self.match_name_index: Dict[Tuple[Type[Any], str, str], Optional[FileMatch]] = {}
++
++    def _find_matches(self, klass: Type[Any]) -> Iterable[FileMatch]:
++        raise NotImplementedError()
++
++    def matches_of_type(self, t: Type[T]) -> List[T]:
++        if t not in self.match_index:
++            self.match_index[t] = list(self._find_matches(t))
++        return  self.match_index[t] # type: ignore
++
++    def find_match(self, t: Type[T], name: str, group: str='name') -> Optional[T]:
++        indexkey = (t, name, group)
++        if indexkey in self.match_name_index:
++            return self.match_name_index[indexkey] # type: ignore
++        r: Optional[T] = None
++        for m in self.matches_of_type(t):
++            assert isinstance(m, FileMatch)
++            if m.group(group) == name:
++                r = m # type: ignore
++        self.match_name_index[indexkey] = r # type: ignore
++        return r
++
++    def reset_index(self) -> None:
++        self.match_index.clear()
++        self.match_name_index.clear()
++
++class FileInfo(RegexpScanner):
++    filename: Path
++    original_content: Optional[str] = None
++
++    def __init__(self, files: 'FileList', filename: os.PathLike, force:bool=False) -> None:
++        super().__init__()
++        self.allfiles = files
++        self.filename = Path(filename)
++        self.patches: List[Patch] = []
++        self.force = force
++
++    def __repr__(self) -> str:
++        return f'<FileInfo {repr(self.filename)}>'
++
++    def line_col(self, start: int) -> LineAndColumn:
++        """Return line and column for a match object inside original_content"""
++        return line_col(self.original_content, start)
++
++    def _find_matches(self, klass: Type[Any]) -> List[FileMatch]:
++        """Build FileMatch objects for each match of regexp"""
++        if not hasattr(klass, 'regexp') or klass.regexp is None:
++            return []
++        assert hasattr(klass, 'regexp')
++        DBG("%s: scanning for %s", self.filename, klass.__name__)
++        DBG("regexp: %s", klass.regexp)
++        matches = [klass(self, m) for m in klass.find_matches(self.original_content)]
++        DBG('%s: %d matches found for %s: %s', self.filename, len(matches),
++            klass.__name__,' '.join(names(matches)))
++        return matches
++
++    def find_match(self, t: Type[T], name: str, group: str='name') -> Optional[T]:
++        for m in self.matches_of_type(t):
++            assert isinstance(m, FileMatch)
++            if m.group(group) == name:
++                return m # type: ignore
++        return None
++
++    def reset_content(self, s:str):
++        self.original_content = s
++        self.patches.clear()
++        self.reset_index()
++        self.allfiles.reset_index()
++
++    def load(self) -> None:
++        if self.original_content is not None:
++            return
++        with open(self.filename, 'rt') as f:
++            self.reset_content(f.read())
++
++    @property
++    def all_matches(self) -> Iterable[FileMatch]:
++        lists = list(self.match_index.values())
++        return (m for l in lists
++                  for m in l)
++
++    def scan_for_matches(self, class_names: Optional[List[str]]=None) -> None:
++        DBG("class names: %r", class_names)
++        class_dict = match_class_dict()
++        if class_names is None:
++            DBG("default class names")
++            class_names = list(name for name,klass in class_dict.items()
++                               if klass.has_replacement_rule())
++        DBG("class_names: %r", class_names)
++        for cn in class_names:
++            matches = self.matches_of_type(class_dict[cn])
++            if len(matches) > 0:
++                DBG('%s: %d matches found for %s: %s', self.filename,
++                     len(matches), cn, ' '.join(names(matches)))
++
++    def gen_patches(self) -> None:
++        for m in self.all_matches:
++            for i,p in enumerate(m.gen_patches()):
++                DBG("patch %d generated by %r:", i, m)
++                DBG("replace contents at %s-%s with %r",
++                    self.line_col(p.start), self.line_col(p.end), p.replacement)
++                self.patches.append(p)
++
++    def patch_content(self, max_passes=0, class_names: Optional[List[str]]=None) -> None:
++        """Multi-pass content patching loop
++
++        We run multiple passes because there are rules that will
++        delete init functions once they become empty.
++        """
++        passes = 0
++        total_patches  = 0
++        DBG("max_passes: %r", max_passes)
++        while not max_passes or max_passes <= 0 or passes < max_passes:
++            passes += 1
++            self.scan_for_matches(class_names)
++            self.gen_patches()
++            DBG("patch content: pass %d: %d patches generated", passes, len(self.patches))
++            total_patches += len(self.patches)
++            if not self.patches:
++                break
++            try:
++                self.apply_patches()
++            except PatchingError:
++                logger.exception("%s: failed to patch file", self.filename)
++        DBG("%s: %d patches applied total in %d passes", self.filename, total_patches, passes)
++
++    def apply_patches(self) -> None:
++        """Replace self.original_content after applying patches from self.patches"""
++        self.reset_content(self.get_patched_content())
++
++    def get_patched_content(self) -> str:
++        assert self.original_content is not None
++        return apply_patches(self.original_content, self.patches)
++
++    def write_to_file(self, f: IO[str]) -> None:
++        f.write(self.get_patched_content())
++
++    def write_to_filename(self, filename: os.PathLike) -> None:
++        with open(filename, 'wt') as of:
++            self.write_to_file(of)
++
++    def patch_inplace(self) -> None:
++        newfile = self.filename.with_suffix('.changed')
++        self.write_to_filename(newfile)
++        os.rename(newfile, self.filename)
++
++    def show_diff(self) -> None:
++        with NamedTemporaryFile('wt') as f:
++            self.write_to_file(f)
++            f.flush()
++            subprocess.call(['diff', '-u', self.filename, f.name])
++
++    def ref(self):
++        return TypeInfoReference
++
++class FileList(RegexpScanner):
++    def __init__(self):
++        super().__init__()
++        self.files: List[FileInfo] = []
++
++    def extend(self, *args, **kwargs):
++        self.files.extend(*args, **kwargs)
++
++    def __iter__(self):
++        return iter(self.files)
++
++    def _find_matches(self, klass: Type[Any]) -> Iterable[FileMatch]:
++        return chain(*(f._find_matches(klass) for f in self.files))
++
++    def find_file(self, name) -> Optional[FileInfo]:
++        """Get file with path ending with @name"""
++        nameparts = Path(name).parts
++        for f in self.files:
++            if f.filename.parts[:len(nameparts)] == nameparts:
++                return f
++        else:
++            return None
+\ No newline at end of file
+diff --git a/scripts/codeconverter/codeconverter/qom_macros.py b/scripts/codeconverter/codeconverter/qom_macros.py
+new file mode 100644
+index 0000000000..68a33d5c6f
+--- /dev/null
++++ b/scripts/codeconverter/codeconverter/qom_macros.py
+@@ -0,0 +1,652 @@
++# Copyright (C) 2020 Red Hat Inc.
++#
++# Authors:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++import re
++from itertools import chain
++from typing import *
++
++from .regexps import *
++from .patching import *
++from .utils import *
++
++import logging
++logger = logging.getLogger(__name__)
++DBG = logger.debug
++INFO = logger.info
++WARN = logger.warning
++
++# simple expressions:
++
++RE_CONSTANT = OR(RE_STRING, RE_NUMBER)
++
++class ConstantDefine(FileMatch):
++    """Simple #define preprocessor directive for a constant"""
++    # if the macro contents are very simple, it might be included
++    # in the match group 'value'
++    regexp = S(r'^[ \t]*#[ \t]*define', CPP_SPACE, NAMED('name', RE_IDENTIFIER),
++               CPP_SPACE, NAMED('value', RE_CONSTANT), r'[ \t]*\n')
++
++    def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('constant', self.group('name'))
++
++class TypeIdentifiers(NamedTuple):
++    """Type names found in type declarations"""
++    # TYPE_MYDEVICE
++    typename: Optional[str]
++    # MYDEVICE
++    uppercase: Optional[str] = None
++    # MyDevice
++    instancetype: Optional[str] = None
++    # MyDeviceClass
++    classtype: Optional[str] = None
++    # my_device
++    lowercase: Optional[str] = None
++
++    def allfields(self):
++        return tuple(getattr(self, f) for f in self._fields)
++
++    def merge(self, other: 'TypeIdentifiers') -> Optional['TypeIdentifiers']:
++        """Check if identifiers match, return new identifier with complete list"""
++        if any(not opt_compare(a, b) for a,b in zip(self, other)):
++            return None
++        return TypeIdentifiers(*(merge(a, b) for a,b in zip(self, other)))
++
++    def __str__(self) -> str:
++        values = ((f, getattr(self, f)) for f in self._fields)
++        s = ', '.join('%s=%s' % (f,v) for f,v in values if v is not None)
++        return f'{s}'
++
++    def check_consistency(self) -> List[str]:
++        """Check if identifiers are consistent with each other,
++        return list of problems (or empty list if everything seems consistent)
++        """
++        r = []
++        if self.typename is None:
++            r.append("typename (TYPE_MYDEVICE) is unavailable")
++
++        if self.uppercase is None:
++            r.append("uppercase name is unavailable")
++
++        if (self.instancetype is not None
++            and self.classtype is not None
++            and self.classtype != f'{self.instancetype}Class'):
++                r.append("class typedef %s doesn't match instance typedef %s" %
++                         (self.classtype, self.instancetype))
++
++        if (self.uppercase is not None
++            and self.typename is not None
++            and f'TYPE_{self.uppercase}' != self.typename):
++            r.append("uppercase name (%s) doesn't match type name (%s)" %
++                     (self.uppercase, self.typename))
++
++        return r
++
++class TypedefMatch(FileMatch):
++    """typedef declaration"""
++    def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('type', self.group('name'))
++
++class SimpleTypedefMatch(TypedefMatch):
++    """Simple typedef declaration
++    (no replacement rules)"""
++    regexp = S(r'^[ \t]*typedef', SP,
++               NAMED('typedef_type', RE_TYPE), SP,
++               NAMED('name', RE_IDENTIFIER), r'\s*;[ \t]*\n')
++
++RE_MACRO_DEFINE = S(r'^[ \t]*#\s*define\s+', NAMED('name', RE_IDENTIFIER),
++                    r'\s*\(\s*', RE_IDENTIFIER, r'\s*\)', CPP_SPACE)
++
++RE_STRUCT_ATTRIBUTE = r'QEMU_PACKED'
++
++# This doesn't parse the struct definitions completely, it just assumes
++# the closing brackets are going to be in an unindented line:
++RE_FULL_STRUCT = S('struct', SP, M(RE_IDENTIFIER, n='?', name='structname'), SP,
++                   NAMED('body', r'{\n',
++                         # acceptable inside the struct body:
++                         # - lines starting with space or tab
++                         # - empty lines
++                         # - preprocessor directives
++                         # - comments
++                         OR(r'[ \t][^\n]*\n',
++                            r'#[^\n]*\n',
++                            r'\n',
++                            S(r'[ \t]*', RE_COMMENT, r'[ \t]*\n'),
++                            repeat='*?'),
++                         r'}', M(RE_STRUCT_ATTRIBUTE, SP, n='*')))
++RE_STRUCT_TYPEDEF = S(r'^[ \t]*typedef', SP, RE_FULL_STRUCT, SP,
++                      NAMED('name', RE_IDENTIFIER), r'\s*;[ \t]*\n')
++
++class FullStructTypedefMatch(TypedefMatch):
++    """typedef struct [SomeStruct] { ...} SomeType
++    Will be replaced by separate struct declaration + typedef
++    """
++    regexp = RE_STRUCT_TYPEDEF
++
++    def make_structname(self) -> str:
++        """Make struct name for struct+typedef split"""
++        name = self.group('structname')
++        if not name:
++            name = self.name
++        return name
++
++    def strip_typedef(self) -> Patch:
++        """generate patch that will strip typedef from the struct declartion
++
++        The caller is responsible for readding the typedef somewhere else.
++        """
++        name = self.make_structname()
++        body = self.group('body')
++        return self.make_patch(f'struct {name} {body};\n')
++
++    def make_simple_typedef(self) -> str:
++        structname = self.make_structname()
++        name = self.name
++        return f'typedef struct {structname} {name};\n'
++
++    def move_typedef(self, position) -> Iterator[Patch]:
++        """Generate patches to move typedef elsewhere"""
++        yield self.strip_typedef()
++        yield Patch(position, position, self.make_simple_typedef())
++
++    def split_typedef(self) -> Iterator[Patch]:
++        """Split into struct definition + typedef in-place"""
++        yield self.strip_typedef()
++        yield self.append(self.make_simple_typedef())
++
++class StructTypedefSplit(FullStructTypedefMatch):
++    """split struct+typedef declaration"""
++    def gen_patches(self) -> Iterator[Patch]:
++        if self.group('structname'):
++            yield from self.split_typedef()
++
++class DuplicatedTypedefs(SimpleTypedefMatch):
++    """Delete ALL duplicate typedefs (unsafe)"""
++    def gen_patches(self) -> Iterable[Patch]:
++        other_td = [td for td in chain(self.file.matches_of_type(SimpleTypedefMatch),
++                                       self.file.matches_of_type(FullStructTypedefMatch))
++                    if td.name == self.name]
++        DBG("other_td: %r", other_td)
++        if any(td.start() < self.start() for td in other_td):
++            # patch only if handling the first typedef
++            return
++        for td in other_td:
++            if isinstance(td, SimpleTypedefMatch):
++                DBG("other td: %r", td.match.groupdict())
++                if td.group('typedef_type') != self.group('typedef_type'):
++                    yield td.make_removal_patch()
++            elif isinstance(td, FullStructTypedefMatch):
++                DBG("other td: %r", td.match.groupdict())
++                if self.group('typedef_type') == 'struct '+td.group('structname'):
++                    yield td.strip_typedef()
++
++class QOMDuplicatedTypedefs(DuplicatedTypedefs):
++    """Delete duplicate typedefs if used by QOM type"""
++    def gen_patches(self) -> Iterable[Patch]:
++        qom_macros = [TypeCheckMacro, DeclareInstanceChecker, DeclareClassCheckers, DeclareObjCheckers]
++        qom_matches = chain(*(self.file.matches_of_type(t) for t in qom_macros))
++        in_use = any(RequiredIdentifier('type', self.name) in m.required_identifiers()
++                     for m in qom_matches)
++        if in_use:
++            yield from DuplicatedTypedefs.gen_patches(self)
++
++class QOMStructTypedefSplit(FullStructTypedefMatch):
++    """split struct+typedef declaration if used by QOM type"""
++    def gen_patches(self) -> Iterator[Patch]:
++        qom_macros = [TypeCheckMacro, DeclareInstanceChecker, DeclareClassCheckers, DeclareObjCheckers]
++        qom_matches = chain(*(self.file.matches_of_type(t) for t in qom_macros))
++        in_use = any(RequiredIdentifier('type', self.name) in m.required_identifiers()
++                     for m in qom_matches)
++        if in_use:
++            yield from self.split_typedef()
++
++def typedefs(file: FileInfo) -> Iterable[TypedefMatch]:
++    return (cast(TypedefMatch, m)
++            for m in chain(file.matches_of_type(SimpleTypedefMatch),
++                           file.matches_of_type(FullStructTypedefMatch)))
++
++def find_typedef(f: FileInfo, name: Optional[str]) -> Optional[TypedefMatch]:
++    if not name:
++        return None
++    for td in typedefs(f):
++        if td.name == name:
++            return td
++    return None
++
++CHECKER_MACROS = ['OBJECT_CHECK', 'OBJECT_CLASS_CHECK', 'OBJECT_GET_CLASS']
++CheckerMacroName = Literal['OBJECT_CHECK', 'OBJECT_CLASS_CHECK', 'OBJECT_GET_CLASS']
++
++RE_CHECK_MACRO = \
++    S(RE_MACRO_DEFINE,
++      OR(*CHECKER_MACROS, name='checker'),
++      M(r'\s*\(\s*', OR(NAMED('typedefname', RE_IDENTIFIER), RE_TYPE, name='c_type'), r'\s*,', CPP_SPACE,
++        OPTIONAL_PARS(RE_IDENTIFIER), r',', CPP_SPACE,
++        NAMED('qom_typename', RE_IDENTIFIER), r'\s*\)\n',
++        n='?', name='check_args'))
++
++EXPECTED_CHECKER_SUFFIXES: List[Tuple[CheckerMacroName, str]] = [
++    ('OBJECT_GET_CLASS', '_GET_CLASS'),
++    ('OBJECT_CLASS_CHECK', '_CLASS'),
++]
++
++class TypeCheckMacro(FileMatch):
++    """OBJECT_CHECK/OBJECT_CLASS_CHECK/OBJECT_GET_CLASS macro definitions
++    Will be replaced by DECLARE_*_CHECKERS macro
++    """
++    #TODO: handle and convert INTERFACE_CHECK macros
++    regexp = RE_CHECK_MACRO
++
++    @property
++    def checker(self) -> CheckerMacroName:
++        """Name of checker macro being used"""
++        return self.group('checker')
++
++    @property
++    def typedefname(self) -> Optional[str]:
++        return self.group('typedefname')
++
++    def find_typedef(self) -> Optional[TypedefMatch]:
++        return find_typedef(self.file, self.typedefname)
++
++    def sanity_check(self) -> None:
++        DBG("groups: %r", self.match.groups())
++        if not self.group('check_args'):
++            self.warn("type check macro not parsed completely: %s", self.name)
++            return
++        DBG("type identifiers: %r", self.type_identifiers)
++        if self.typedefname and self.find_typedef() is None:
++            self.warn("typedef used by %s not found", self.name)
++
++    def find_matching_macros(self) -> List['TypeCheckMacro']:
++        """Find other check macros that generate the same macro names
++
++        The returned list will always be sorted.
++        """
++        my_ids = self.type_identifiers
++        assert my_ids
++        return [m for m in self.file.matches_of_type(TypeCheckMacro)
++                if m.type_identifiers is not None
++                   and my_ids.uppercase is not None
++                   and (my_ids.uppercase == m.type_identifiers.uppercase
++                        or my_ids.typename == m.type_identifiers.typename)]
++
++    def merge_ids(self, matches: List['TypeCheckMacro']) -> Optional[TypeIdentifiers]:
++        """Try to merge info about type identifiers from all matches in a list"""
++        if not matches:
++            return None
++        r = matches[0].type_identifiers
++        if r is None:
++            return None
++        for m in matches[1:]:
++            assert m.type_identifiers
++            new = r.merge(m.type_identifiers)
++            if new is None:
++                self.warn("macro %s identifiers (%s) don't match macro %s (%s)",
++                          matches[0].name, r, m.name, m.type_identifiers)
++                return None
++            r = new
++        return r
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', '"qom/object.h"')
++        if self.type_identifiers is None:
++            return
++        # to make sure typedefs will be moved above all related macros,
++        # return dependencies from all of them, not just this match
++        for m in self.find_matching_macros():
++            yield RequiredIdentifier('type', m.group('c_type'))
++            yield RequiredIdentifier('constant', m.group('qom_typename'))
++
++    @property
++    def type_identifiers(self) -> Optional[TypeIdentifiers]:
++        """Extract type identifier information from match"""
++        typename = self.group('qom_typename')
++        c_type = self.group('c_type')
++        if not typename or not c_type:
++            return None
++        typedef = self.group('typedefname')
++        classtype = None
++        instancetype = None
++        uppercase = None
++        expected_suffix = dict(EXPECTED_CHECKER_SUFFIXES).get(self.checker)
++
++        # here the available data depends on the checker macro being called:
++        # - we need to remove the suffix from the macro name
++        # - depending on the macro type, we know the class type name, or
++        #   the instance type name
++        if self.checker in ('OBJECT_GET_CLASS', 'OBJECT_CLASS_CHECK'):
++            classtype = c_type
++        elif self.checker == 'OBJECT_CHECK':
++            instancetype = c_type
++            uppercase = self.name
++        else:
++            assert False
++        if expected_suffix and self.name.endswith(expected_suffix):
++            uppercase = self.name[:-len(expected_suffix)]
++        return TypeIdentifiers(typename=typename, classtype=classtype,
++                               instancetype=instancetype, uppercase=uppercase)
++
++    def gen_patches(self) -> Iterable[Patch]:
++        if self.type_identifiers is None:
++            self.warn("couldn't extract type information from macro %s", self.name)
++            return
++
++        if self.name == 'INTERFACE_CLASS':
++            # INTERFACE_CLASS is special and won't be patched
++            return
++
++        for checker,suffix in EXPECTED_CHECKER_SUFFIXES:
++            if self.name.endswith(suffix):
++                if self.checker != checker:
++                    self.warn("macro %s is using macro %s instead of %s", self.name, self.checker, checker)
++                    return
++                break
++
++        matches = self.find_matching_macros()
++        DBG("found %d matching macros: %s", len(matches), ' '.join(m.name for m in matches))
++        # we will generate patches only when processing the first macro:
++        if matches[0].start != self.start:
++            DBG("skipping %s (will patch when handling %s)", self.name, matches[0].name)
++            return
++
++
++        ids = self.merge_ids(matches)
++        if ids is None:
++            DBG("type identifier mismatch, won't patch %s", self.name)
++            return
++
++        if not ids.uppercase:
++            self.warn("macro %s doesn't follow the expected name pattern", self.name)
++            return
++        if not ids.typename:
++            self.warn("macro %s: couldn't extract type name", self.name)
++            return
++
++        #issues = ids.check_consistency()
++        #if issues:
++        #    for i in issues:
++        #        self.warn("inconsistent identifiers: %s", i)
++
++        names = [n for n in (ids.instancetype, ids.classtype, ids.uppercase, ids.typename)
++                 if n is not None]
++        if len(set(names)) != len(names):
++            self.warn("duplicate names used by macro: %r", ids)
++            return
++
++        assert ids.classtype or ids.instancetype
++        assert ids.typename
++        assert ids.uppercase
++        if ids.classtype and ids.instancetype:
++            new_decl = (f'DECLARE_OBJ_CHECKERS({ids.instancetype}, {ids.classtype},\n'
++                        f'                     {ids.uppercase}, {ids.typename})\n')
++        elif ids.classtype:
++            new_decl = (f'DECLARE_CLASS_CHECKERS({ids.classtype}, {ids.uppercase},\n'
++                        f'                       {ids.typename})\n')
++        elif ids.instancetype:
++            new_decl = (f'DECLARE_INSTANCE_CHECKER({ids.instancetype}, {ids.uppercase},\n'
++                        f'                         {ids.typename})\n')
++        else:
++            assert False
++
++        # we need to ensure the typedefs are already available
++        issues = []
++        for t in [ids.instancetype, ids.classtype]:
++            if not t:
++                continue
++            if re.fullmatch(RE_STRUCT_TYPE, t):
++                self.info("type %s is not a typedef", t)
++                continue
++            td = find_typedef(self.file, t)
++            #if not td and self.allfiles.find_file('include/qemu/typedefs.h'):
++            #
++            if not td:
++                # it is OK if the typedef is in typedefs.h
++                f = self.allfiles.find_file('include/qemu/typedefs.h')
++                if f and find_typedef(f, t):
++                    self.info("typedef %s found in typedefs.h", t)
++                    continue
++
++                issues.append("couldn't find typedef %s" % (t))
++            elif td.start() > self.start():
++                issues.append("typedef %s need to be moved earlier in the file" % (td.name))
++
++        for issue in issues:
++            self.warn(issue)
++
++        if issues and not self.file.force:
++            return
++
++        # delete all matching macros and add new declaration:
++        for m in matches:
++            yield m.make_patch('')
++        for issue in issues:
++            yield self.prepend("/* FIXME: %s */\n" % (issue))
++        yield self.append(new_decl)
++
++class DeclareInstanceChecker(FileMatch):
++    """DECLARE_INSTANCE_CHECKER use
++    Will be replaced with DECLARE_OBJ_CHECKERS if possible
++    """
++    #TODO: replace lonely DECLARE_INSTANCE_CHECKER with DECLARE_OBJ_CHECKERS
++    #      if all types are found.
++    #      This will require looking up the correct class type in the TypeInfo
++    #      structs in another file
++    regexp = S(r'^[ \t]*DECLARE_INSTANCE_CHECKER\s*\(\s*',
++               NAMED('instancetype', RE_TYPE), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               OR(RE_IDENTIFIER, RE_STRING, RE_MACRO_CONCAT, RE_FUN_CALL, name='typename'), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', '"qom/object.h"')
++        yield RequiredIdentifier('constant', self.group('typename'))
++        yield RequiredIdentifier('type', self.group('instancetype'))
++
++class DeclareClassCheckers(FileMatch):
++    """DECLARE_INSTANCE_CHECKER use"""
++    regexp = S(r'^[ \t]*DECLARE_CLASS_CHECKERS\s*\(\s*',
++               NAMED('classtype', RE_TYPE), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               OR(RE_IDENTIFIER, RE_STRING, RE_MACRO_CONCAT, RE_FUN_CALL, name='typename'), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', '"qom/object.h"')
++        yield RequiredIdentifier('constant', self.group('typename'))
++        yield RequiredIdentifier('type', self.group('classtype'))
++
++class DeclareObjCheckers(FileMatch):
++    """DECLARE_OBJ_CHECKERS use
++    Will be replaced with OBJECT_DECLARE_TYPE if possible
++    """
++    #TODO: detect when OBJECT_DECLARE_SIMPLE_TYPE can be used
++    regexp = S(r'^[ \t]*DECLARE_OBJ_CHECKERS\s*\(\s*',
++               NAMED('instancetype', RE_TYPE), r'\s*,\s*',
++               NAMED('classtype', RE_TYPE), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               OR(RE_IDENTIFIER, RE_STRING, RE_MACRO_CONCAT, RE_FUN_CALL, name='typename'), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++    def required_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', '"qom/object.h"')
++        yield RequiredIdentifier('constant', self.group('typename'))
++        yield RequiredIdentifier('type', self.group('classtype'))
++        yield RequiredIdentifier('type', self.group('instancetype'))
++
++    def gen_patches(self):
++        ids = TypeIdentifiers(uppercase=self.group('uppercase'),
++                              typename=self.group('typename'),
++                              classtype=self.group('classtype'),
++                              instancetype=self.group('instancetype'))
++        issues = ids.check_consistency()
++        if issues:
++            for i in issues:
++                self.warn("inconsistent identifiers: %s", i)
++            return
++
++        if self.group('typename') != 'TYPE_'+self.group('uppercase'):
++            self.warn("type %s mismatch with uppercase name %s", ids.typename, ids.uppercase)
++            return
++
++        typedefs = [(t,self.file.find_match(SimpleTypedefMatch, t))
++                    for t in (ids.instancetype, ids.classtype)]
++        for t,td in typedefs:
++            if td is None:
++                self.warn("typedef %s not found", t)
++                break
++            if td.start() > self.start():
++                self.warn("typedef %s needs to be move earlier in the file", t)
++                break
++            #HACK: check if typedef is used between its definition and the macro
++            #TODO: check if the only match is inside the "struct { ... }" declaration
++            if re.search(r'\b'+t+r'\b', self.file.original_content[td.end():self.start()]):
++                self.warn("typedef %s can't be moved, it is used before the macro", t)
++                break
++        else:
++            for t,td in typedefs:
++                yield td.make_removal_patch()
++
++            lowercase = ids.uppercase.lower()
++            # all is OK, we can replace the macro!
++            c = (f'OBJECT_DECLARE_TYPE({ids.instancetype}, {ids.classtype},\n'
++                 f'                    {lowercase}, {ids.uppercase})\n')
++            yield self.make_patch(c)
++
++class TrivialClassStruct(FileMatch):
++    """Trivial class struct"""
++    regexp = S(r'^[ \t]*struct\s*', NAMED('name', RE_IDENTIFIER),
++               r'\s*{\s*', NAMED('parent_struct', RE_IDENTIFIER), r'\s*parent(_class)?\s*;\s*};\n')
++
++class DeclareTypeName(FileMatch):
++    """DECLARE_TYPE_NAME usage"""
++    regexp = S(r'^[ \t]*DECLARE_TYPE_NAME\s*\(',
++               NAMED('uppercase', RE_IDENTIFIER), r'\s*,\s*',
++               OR(RE_IDENTIFIER, RE_STRING, RE_MACRO_CONCAT, RE_FUN_CALL, name='typename'),
++               r'\s*\);?[ \t]*\n')
++
++class ObjectDeclareType(FileMatch):
++    """OBJECT_DECLARE_TYPE usage
++    Will be replaced with OBJECT_DECLARE_SIMPLE_TYPE if possible
++    """
++    regexp = S(r'^[ \t]*OBJECT_DECLARE_TYPE\s*\(',
++               NAMED('instancetype', RE_TYPE), r'\s*,\s*',
++               NAMED('classtype', RE_TYPE), r'\s*,\s*',
++               NAMED('lowercase', RE_IDENTIFIER), r'\s*,\s*',
++               NAMED('uppercase', RE_IDENTIFIER), SP,
++               r'\)[ \t]*;?[ \t]*\n')
++
++    def gen_patches(self):
++        DBG("groups: %r", self.match.groupdict())
++        trivial_struct = self.file.find_match(TrivialClassStruct, self.group('classtype'))
++        if trivial_struct:
++            d = self.match.groupdict().copy()
++            d['parent_struct'] = trivial_struct.group("parent_struct")
++            yield trivial_struct.make_removal_patch()
++            c = ("OBJECT_DECLARE_SIMPLE_TYPE(%(instancetype)s, %(lowercase)s,\n"
++                 "                           %(uppercase)s, %(parent_struct)s)\n" % d)
++            yield self.make_patch(c)
++
++def find_type_declaration(files: FileList, typename: str) -> Optional[FileMatch]:
++    """Find usage of DECLARE*CHECKER macro"""
++    for c in (DeclareInstanceChecker, DeclareClassCheckers, DeclareObjCheckers, DeclareTypeName):
++        d = files.find_match(c, name=typename, group='typename')
++        if d:
++            return d
++    return None
++
++
++class Include(FileMatch):
++    """#include directive"""
++    regexp = RE_INCLUDE
++    def provided_identifiers(self) -> Iterable[RequiredIdentifier]:
++        yield RequiredIdentifier('include', self.group('includepath'))
++
++class InitialIncludes(FileMatch):
++    """Initial #include block"""
++    regexp = S(RE_FILE_BEGIN,
++               M(SP, RE_COMMENTS,
++                 r'^[ \t]*#[ \t]*ifndef[ \t]+', RE_IDENTIFIER, r'[ \t]*\n',
++                 n='?', name='ifndef_block'),
++               M(SP, RE_COMMENTS,
++                 OR(RE_INCLUDE, RE_SIMPLEDEFINE),
++                 n='*', name='includes'))
++
++class SymbolUserList(NamedTuple):
++    definitions: List[FileMatch]
++    users: List[FileMatch]
++
++class MoveSymbols(FileMatch):
++    """Handle missing symbols
++    - Move typedefs and defines when necessary
++    - Add missing #include lines when necessary
++    """
++    regexp = RE_FILE_BEGIN
++
++    def gen_patches(self) -> Iterator[Patch]:
++        index: Dict[RequiredIdentifier, SymbolUserList] = {}
++        definition_classes = [SimpleTypedefMatch, FullStructTypedefMatch, ConstantDefine, Include]
++        user_classes = [TypeCheckMacro, DeclareObjCheckers, DeclareInstanceChecker, DeclareClassCheckers]
++
++        # first we scan for all symbol definitions and usage:
++        for dc in definition_classes:
++            defs = self.file.matches_of_type(dc)
++            for d in defs:
++                DBG("scanning %r", d)
++                for i in d.provided_identifiers():
++                    index.setdefault(i, SymbolUserList([], [])).definitions.append(d)
++        DBG("index: %r", list(index.keys()))
++        for uc in user_classes:
++            users = self.file.matches_of_type(uc)
++            for u in users:
++                for i in u.required_identifiers():
++                    index.setdefault(i, SymbolUserList([], [])).users.append(u)
++
++        # validate all symbols:
++        for i,ul in index.items():
++            if not ul.users:
++                # unused symbol
++                continue
++
++            # symbol not defined
++            if len(ul.definitions) == 0:
++                if i.type == 'include':
++                   includes, = self.file.matches_of_type(InitialIncludes)
++                   #FIXME: don't do this if we're already inside qom/object.h
++                   yield includes.append(f'#include {i.name}\n')
++                else:
++                    u.warn("definition of %s %s not found in file", i.type, i.name)
++                continue
++
++            # symbol defined twice:
++            if len(ul.definitions) > 1:
++                ul.definitions[1].warn("%s defined twice", i.name)
++                ul.definitions[0].warn("previously defined here")
++                continue
++
++            # symbol defined.  check if all users are after its definition:
++            assert len(ul.definitions) == 1
++            definition = ul.definitions[0]
++            DBG("handling repositioning of %r", definition)
++            earliest = min(ul.users, key=lambda u: u.start())
++            if earliest.start() > definition.start():
++                DBG("%r is OK", definition)
++                continue
++
++            DBG("%r needs to be moved", definition)
++            if isinstance(definition, SimpleTypedefMatch) \
++               or isinstance(definition, ConstantDefine):
++                # simple typedef or define can be moved directly:
++                yield definition.make_removal_patch()
++                yield earliest.prepend(definition.group(0))
++            elif isinstance(definition, FullStructTypedefMatch) \
++                 and definition.group('structname'):
++                # full struct typedef is more complex: we need to remove
++                # the typedef
++                yield from definition.move_typedef(earliest.start())
++            else:
++                definition.warn("definition of %s %s needs to be moved earlier in the file", i.type, i.name)
++                earliest.warn("definition of %s %s is used here", i.type, i.name)
++
+diff --git a/scripts/codeconverter/codeconverter/qom_type_info.py b/scripts/codeconverter/codeconverter/qom_type_info.py
+new file mode 100644
+index 0000000000..fc02058739
+--- /dev/null
++++ b/scripts/codeconverter/codeconverter/qom_type_info.py
+@@ -0,0 +1,434 @@
++# Copyright (C) 2020 Red Hat Inc.
++#
++# Authors:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++import re
++from .regexps import *
++from .patching import *
++from .utils import *
++from .qom_macros import *
++
++TI_FIELDS = [ 'name', 'parent', 'abstract', 'interfaces',
++    'instance_size', 'instance_init', 'instance_post_init', 'instance_finalize',
++    'class_size', 'class_init', 'class_base_init', 'class_data']
++
++RE_TI_FIELD_NAME = OR(*TI_FIELDS)
++
++RE_TI_FIELD_INIT = S(r'[ \t]*', NAMED('comments', RE_COMMENTS),
++                     r'\.', NAMED('field', RE_TI_FIELD_NAME), r'\s*=\s*',
++                     NAMED('value', RE_EXPRESSION), r'[ \t]*,?[ \t]*\n')
++RE_TI_FIELDS = M(RE_TI_FIELD_INIT)
++
++RE_TYPEINFO_START = S(r'^[ \t]*', M(r'(static|const)\s+', name='modifiers'), r'TypeInfo\s+',
++                      NAMED('name', RE_IDENTIFIER), r'\s*=\s*{[ \t]*\n')
++RE_TYPEINFO_DEF = S(RE_TYPEINFO_START,
++                    M(NAMED('fields', RE_TI_FIELDS),
++                      SP, NAMED('endcomments', RE_COMMENTS),
++                      r'};?\n',
++                      n='?', name='fullspec'))
++
++ParsedArray = List[str]
++ParsedInitializerValue = Union[str, ParsedArray]
++class InitializerValue(NamedTuple):
++    raw: str
++    parsed: Optional[ParsedInitializerValue]
++    match: Optional[Match]
++TypeInfoInitializers = Dict[str, InitializerValue]
++
++def parse_array(m: Match) -> ParsedArray:
++    #DBG('parse_array: %r', m.group(0))
++    return [m.group('arrayitem') for m in re.finditer(RE_ARRAY_ITEM, m.group('arrayitems'))]
++
++def parse_initializer_value(m: Match, s: str) -> InitializerValue:
++    parsed: Optional[ParsedInitializerValue] = None
++    #DBG("parse_initializer_value: %r", s)
++    array = re.match(RE_ARRAY, s)
++    if array:
++        parsed = parse_array(array)
++    return InitializerValue(s, parsed, m)
++
++class TypeInfoVar(FileMatch):
++    """TypeInfo variable declaration with initializer
++    Will be replaced by OBJECT_DEFINE_TYPE_EXTENDED macro
++    (not implemented yet)
++    """
++    regexp = RE_TYPEINFO_DEF
++
++    @property
++    def initializers(self) -> Optional[TypeInfoInitializers]:
++        if getattr(self, '_inititalizers', None):
++            self._initializers: TypeInfoInitializers
++            return self._initializers
++        fields = self.group('fields')
++        if fields is None:
++            return None
++        d = dict((fm.group('field'), parse_initializer_value(fm, fm.group('value')))
++                  for fm in re.finditer(RE_TI_FIELD_INIT, fields))
++        self._initializers = d
++        return d
++
++    def is_static(self) -> bool:
++        return 'static' in self.group('modifiers')
++
++    def is_full(self) -> bool:
++        return bool(self.group('fullspec'))
++
++    def get_initializers(self) -> TypeInfoInitializers:
++        """Helper for code that needs to deal with missing initializer info"""
++        if self.initializers is None:
++            return {}
++        return self.initializers
++
++    def get_initializer_value(self, field: str) -> InitializerValue:
++        return self.get_initializers().get(field, InitializerValue('', '', None))
++
++    #def extract_identifiers(self) -> Optional[TypeIdentifiers]:
++    #    """Try to extract identifiers from names being used"""
++    #    DBG("extracting idenfiers from %s", self.name)
++        #uppercase = None
++        #if typename and re.fullmatch(RE_IDENTIFIER, typename) and typename.startswith("TYPE_"):
++        #    uppercase = typename[len('TYPE_'):]
++        #lowercase = None
++        #funcs = set()
++        #prefixes = set()
++        #for field,suffix in [('instance_init', '_init'),
++        #                     ('instance_finalize', '_finalize'),
++        #                     ('class_init', '_class_init')]:
++        #    if field not in values:
++        #        continue
++        #    func = values[field].raw
++        #    funcs.add(func)
++        #    if func.endswith(suffix):
++        #        prefixes.add(func[:-len(suffix)])
++        #    else:
++        #        self.warn("function name %s doesn't have expected %s suffix",
++        #                  func, suffix)
++        #if len(prefixes) == 1:
++        #    lowercase = prefixes.pop()
++        #elif len(prefixes) > 1:
++        #    self.warn("inconsistent function names: %s", ' '.join(funcs))
++
++        #.parent = TYPE_##PARENT_MODULE_OBJ_NAME, \
++        #return TypeIdentifiers(typename=typename,
++        #                       uppercase=uppercase, lowercase=lowercase,
++        #                       instancetype=instancetype, classtype=classtype)
++
++    def append_field(self, field, value) -> Patch:
++        """Generate patch appending a field initializer"""
++        content = f'    .{field} = {value},\n'
++        return Patch(self.match.end('fields'), self.match.end('fields'),
++                     content)
++
++    def patch_field(self, field: str, replacement: str) -> Patch:
++        """Generate patch replacing a field initializer"""
++        values = self.initializers
++        assert values
++        value = values.get(field)
++        assert value
++        fm = value.match
++        assert fm
++        fstart = self.match.start('fields') + fm.start()
++        fend = self.match.start('fields') + fm.end()
++        return Patch(fstart, fend, replacement)
++
++    def gen_patches(self) -> Iterable[Patch]:
++        values = self.initializers
++        if values is None:
++            return
++        if 'name' not in values:
++            self.warn("name not set in TypeInfo variable %s", self.name)
++            return
++        typename = values['name'].raw
++        if 'parent' not in values:
++            self.warn("parent not set in TypeInfo variable %s", self.name)
++            return
++        parent_typename = values['parent'].raw
++
++        instancetype = None
++        if 'instance_size' in values:
++            m = re.fullmatch(RE_SIZEOF, values['instance_size'].raw)
++            if m:
++                instancetype = m.group('sizeoftype')
++            else:
++                self.warn("can't extract instance type in TypeInfo variable %s", self.name)
++                self.warn("instance_size is set to: %r", values['instance_size'].raw)
++                return
++
++        classtype = None
++        if 'class_size' in values:
++            m = re.fullmatch(RE_SIZEOF, values['class_size'].raw)
++            if m:
++                classtype = m.group('sizeoftype')
++            else:
++                self.warn("can't extract class type in TypeInfo variable %s", self.name)
++                self.warn("class_size is set to: %r", values['class_size'].raw)
++                return
++
++        #NOTE: this will NOT work after declarations are converted
++        #      to OBJECT_DECLARE*
++
++        # Now, the challenge is to find out the right MODULE_OBJ_NAME for the
++        # type and for the parent type
++        instance_decl = find_type_declaration(self.allfiles, typename)
++        parent_decl = find_type_declaration(self.allfiles, parent_typename)
++
++        self.info("TypeInfo variable for %s is here", typename)
++        if instance_decl:
++            instance_decl.info("instance type declaration (%s) is here", instance_decl.match.group('uppercase'))
++        if parent_decl:
++            parent_decl.info("parent type declaration (%s) is here", parent_decl.match.group('uppercase'))
++
++        ok = True
++        if (instance_decl is None and (instancetype or classtype)):
++            self.warn("Can't find where type checkers for %s are declared.  We need them to validate sizes of %s", typename, self.name)
++            ok = False
++
++        if (instance_decl is not None
++            and 'instancetype' in instance_decl.match.groupdict()
++            and instancetype != instance_decl.group('instancetype')):
++            self.warn("type at instance_size is %r.  Should instance_size be set to sizeof(%s) ?",
++                      instancetype, instance_decl.group('instancetype'))
++            instance_decl.warn("Type checker declaration for %s is here", typename)
++            ok = False
++        if (instance_decl is not None
++            and 'classtype' in instance_decl.match.groupdict()
++            and classtype != instance_decl.group('classtype')):
++            self.warn("type at class_size is %r.  Should class_size be set to sizeof(%s) ?",
++                      classtype, instance_decl.group('classtype'))
++            instance_decl.warn("Type checker declaration for %s is here", typename)
++            ok = False
++
++        if not ok:
++            return
++
++        #if parent_decl is None:
++        #    self.warn("Can't find where parent type %s is declared", parent_typename)
++
++        self.info("%s can be patched!", self.name)
++        return
++        yield
++
++class RedundantTypeSizes(TypeInfoVar):
++    """Remove redundant instance_size/class_size from TypeInfo vars"""
++    def gen_patches(self) -> Iterable[Patch]:
++        values = self.initializers
++        if values is None:
++            return
++        if 'name' not in values:
++            self.warn("name not set in TypeInfo variable %s", self.name)
++            return
++        typename = values['name'].raw
++        if 'parent' not in values:
++            self.warn("parent not set in TypeInfo variable %s", self.name)
++            return
++        parent_typename = values['parent'].raw
++
++        if 'instance_size' not in values and 'class_size' not in values:
++            self.debug("no need to validate %s", self.name)
++            return
++
++        instance_decl = find_type_declaration(self.allfiles, typename)
++        if instance_decl:
++            self.debug("won't touch TypeInfo var that has type checkers")
++            return
++
++        parent = find_type_info(self.allfiles, parent_typename)
++        if not parent:
++            self.warn("Can't find TypeInfo for %s", parent_typename)
++            return
++
++        if 'instance_size' in values and parent.get_initializer_value('instance_size').raw != values['instance_size'].raw:
++            self.info("instance_size mismatch")
++            parent.info("parent type declared here")
++            return
++
++        if 'class_size' in values and parent.get_initializer_value('class_size').raw != values['class_size'].raw:
++            self.info("class_size mismatch")
++            parent.info("parent type declared here")
++            return
++
++        self.debug("will patch variable %s", self.name)
++
++        if 'instance_size' in values:
++            self.debug("deleting instance_size")
++            yield self.patch_field('instance_size', '')
++
++        if 'class_size' in values:
++            self.debug("deleting class_size")
++            yield self.patch_field('class_size', '')
++
++
++#class TypeInfoVarInitFuncs(TypeInfoVar):
++#    """TypeInfo variable
++#    Will create missing init functions
++#    """
++#    def gen_patches(self) -> Iterable[Patch]:
++#        values = self.initializers
++#        if values is None:
++#            self.warn("type not parsed completely: %s", self.name)
++#            return
++#
++#        macro = self.file.find_match(TypeInfoVar, self.name)
++#        if macro is None:
++#            self.warn("No TYPE_INFO macro for %s", self.name)
++#            return
++#
++#        ids = self.extract_identifiers()
++#        if ids is None:
++#            return
++#
++#        DBG("identifiers extracted: %r", ids)
++#        fields = set(values.keys())
++#        if ids.lowercase:
++#            if 'instance_init' not in fields:
++#                yield self.prepend(('static void %s_init(Object *obj)\n'
++#                                    '{\n'
++#                                    '}\n\n') % (ids.lowercase))
++#                yield self.append_field('instance_init', ids.lowercase+'_init')
++#
++#            if 'instance_finalize' not in fields:
++#                yield self.prepend(('static void %s_finalize(Object *obj)\n'
++#                                    '{\n'
++#                                    '}\n\n') % (ids.lowercase))
++#                yield self.append_field('instance_finalize', ids.lowercase+'_finalize')
++#
++#
++#            if 'class_init' not in fields:
++#                yield self.prepend(('static void %s_class_init(ObjectClass *oc, void *data)\n'
++#                                    '{\n'
++#                                    '}\n\n') % (ids.lowercase))
++#                yield self.append_field('class_init', ids.lowercase+'_class_init')
++
++class TypeInitMacro(FileMatch):
++    """type_init(...) macro use
++    Will be deleted if function is empty
++    """
++    regexp = S(r'^[ \t]*type_init\s*\(\s*', NAMED('name', RE_IDENTIFIER), r'\s*\);?[ \t]*\n')
++    def gen_patches(self) -> Iterable[Patch]:
++        fn = self.file.find_match(StaticVoidFunction, self.name)
++        DBG("function for %s: %s", self.name, fn)
++        if fn and fn.body == '':
++            yield fn.make_patch('')
++            yield self.make_patch('')
++
++class StaticVoidFunction(FileMatch):
++    """simple static void function
++    (no replacement rules)
++    """
++    #NOTE: just like RE_FULL_STRUCT, this doesn't parse any of the body contents
++    #      of the function.  Tt will just look for "}" in the beginning of a line
++    regexp = S(r'static\s+void\s+', NAMED('name', RE_IDENTIFIER), r'\s*\(\s*void\s*\)\n',
++               r'{\n',
++               NAMED('body',
++                     # acceptable inside the function body:
++                     # - lines starting with space or tab
++                     # - empty lines
++                     # - preprocessor directives
++                     OR(r'[ \t][^\n]*\n',
++                        r'#[^\n]*\n',
++                        r'\n',
++                        repeat='*')),
++               r'}\n')
++
++    @property
++    def body(self) -> str:
++        return self.group('body')
++
++    def has_preprocessor_directive(self) -> bool:
++        return bool(re.search(r'^[ \t]*#', self.body, re.MULTILINE))
++
++class TypeRegisterCall(FileMatch):
++    """type_register_static() call
++    Will be replaced by TYPE_INFO() macro
++    """
++    regexp = S(r'^[ \t]*type_register_static\s*\(&\s*', NAMED('name', RE_IDENTIFIER), r'\s*\);[ \t]*\n')
++
++    def function(self) -> Optional['StaticVoidFunction']:
++        """Return function containing this call"""
++        for m in self.file.matches_of_type(StaticVoidFunction):
++            if m.contains(self):
++                return m
++        return None
++
++    def gen_patches(self) -> Iterable[Patch]:
++        fn = self.function()
++        if fn is None:
++            self.warn("can't find function where type_register_static(&%s) is called", self.name)
++            return
++
++        #if fn.has_preprocessor_directive() and not self.file.force:
++        #    self.warn("function %s has preprocessor directives, this requires --force", fn.name)
++        #    return
++
++        type_init = self.file.find_match(TypeInitMacro, fn.name)
++        if type_init is None:
++            self.warn("can't find type_init(%s) line", fn.name)
++            return
++
++        var = self.file.find_match(TypeInfoVar, self.name)
++        if var is None:
++            self.warn("can't find TypeInfo var declaration for %s", self.name)
++            return
++
++        if not var.is_full():
++            self.warn("variable declaration %s wasn't parsed fully", var.name)
++            return
++
++        if fn.contains(var):
++            self.warn("TypeInfo %s variable is inside a function", self.name)
++            return
++
++        # delete type_register_static() call:
++        yield self.make_patch('')
++        # append TYPE_REGISTER(...) after variable declaration:
++        yield var.append(f'TYPE_INFO({self.name})\n')
++
++class TypeInfoMacro(FileMatch):
++    """TYPE_INFO macro usage"""
++    regexp = S(r'^[ \t]*TYPE_INFO\s*\(\s*', NAMED('name', RE_IDENTIFIER), r'\s*\)[ \t]*;?[ \t]*\n')
++
++def find_type_info(files: RegexpScanner, name: str) -> Optional[TypeInfoVar]:
++    ti = [ti for ti in files.matches_of_type(TypeInfoVar)
++            if ti.get_initializer_value('name').raw == name]
++    DBG("type info vars: %r", ti)
++    if len(ti) > 1:
++        DBG("multiple TypeInfo vars found for %s", name)
++        return None
++    if len(ti) == 0:
++        DBG("no TypeInfo var found for %s", name)
++        return None
++    return ti[0]
++
++class CreateClassStruct(DeclareInstanceChecker):
++    """Replace DECLARE_INSTANCE_CHECKER with OBJECT_DECLARE_SIMPLE_TYPE"""
++    def gen_patches(self) -> Iterable[Patch]:
++        typename = self.group('typename')
++        DBG("looking for TypeInfo variable for %s", typename)
++        var = find_type_info(self.allfiles, typename)
++        if var is None:
++            self.warn("no TypeInfo var found for %s", typename)
++            return
++        assert var.initializers
++        if 'class_size' in var.initializers:
++            self.warn("class size already set for TypeInfo %s", var.name)
++            return
++        classtype = self.group('instancetype')+'Class'
++        return
++        yield
++        #TODO: need to find out what's the parent class type...
++        #yield var.append_field('class_size', f'sizeof({classtype})')
++        #c = (f'OBJECT_DECLARE_SIMPLE_TYPE({instancetype}, {lowercase},\n'
++        #     f'                           MODULE_OBJ_NAME, ParentClassType)\n')
++        #yield self.make_patch(c)
++
++def type_infos(file: FileInfo) -> Iterable[TypeInfoVar]:
++    return file.matches_of_type(TypeInfoVar)
++
++def full_types(file: FileInfo) -> Iterable[TypeInfoVar]:
++    return [t for t in type_infos(file) if t.is_full()]
++
++def partial_types(file: FileInfo) -> Iterable[TypeInfoVar]:
++    return [t for t in type_infos(file) if not t.is_full()]
+diff --git a/scripts/codeconverter/codeconverter/regexps.py b/scripts/codeconverter/codeconverter/regexps.py
+new file mode 100644
+index 0000000000..77993cc3b9
+--- /dev/null
++++ b/scripts/codeconverter/codeconverter/regexps.py
+@@ -0,0 +1,118 @@
++# Copyright (C) 2020 Red Hat Inc.
++#
++# Authors:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++"""Helpers for creation of regular expressions"""
++import re
++
++import logging
++logger = logging.getLogger(__name__)
++DBG = logger.debug
++INFO = logger.info
++WARN = logger.warning
++
++def S(*regexps) -> str:
++    """Just a shortcut to concatenate multiple regexps more easily"""
++    return ''.join(regexps)
++
++def P(*regexps, name=None, capture=False, repeat='') -> str:
++    """Just add parenthesis around regexp(s), with optional name or repeat suffix"""
++    s = S(*regexps)
++    if name:
++        return f'(?P<{name}>{s}){repeat}'
++    elif capture:
++        return f'({s}){repeat}'
++    else:
++        return f'(?:{s}){repeat}'
++
++def NAMED(name, *regexps) -> str:
++    """Make named group using <P<name>...) syntax
++
++    >>> NAMED('mygroup', 'xyz', 'abc')
++    '(?P<mygroup>xyzabc)'
++    """
++    return P(*regexps, name=name)
++
++def OR(*regexps, **kwargs) -> str:
++    """Build (a|b|c) regexp"""
++    return P('|'.join(regexps), **kwargs)
++
++def M(*regexps, n='*', name=None) -> str:
++    """Add repetition qualifier to regexp(s)
++
++    >>> M('a', 'b')
++    '(?:ab)*'
++    >>> M('a' , 'b', n='+')
++    '(?:ab)+'
++    >>> M('a' , 'b', n='{2,3}', name='name')
++    '(?P<name>(?:ab){2,3})'
++    """
++    r = P(*regexps, repeat=n)
++    if name:
++        r = NAMED(name, r)
++    return r
++
++# helper to make parenthesis optional around regexp
++OPTIONAL_PARS = lambda R: OR(S(r'\(\s*', R, r'\s*\)'), R)
++def test_optional_pars():
++    r = OPTIONAL_PARS('abc')+'$'
++    assert re.match(r, 'abc')
++    assert re.match(r, '(abc)')
++    assert not re.match(r, '(abcd)')
++    assert not re.match(r, '(abc')
++    assert not re.match(r, 'abc)')
++
++
++# this disables the MULTILINE flag, so it will match at the
++# beginning of the file:
++RE_FILE_BEGIN = r'(?-m:^)'
++
++# C primitives:
++
++SP = r'\s*'
++
++RE_COMMENT = r'//[^\n]*$|/\*([^*]|\*[^/])*\*/'
++RE_COMMENTS = M(RE_COMMENT + SP)
++
++RE_IDENTIFIER = r'[a-zA-Z_][a-zA-Z0-9_]*(?![a-zA-Z0-9])'
++RE_STRING = r'\"([^\"\\]|\\[a-z\"])*\"'
++RE_NUMBER = r'[0-9]+|0x[0-9a-fA-F]+'
++
++# space or escaped newlines:
++CPP_SPACE = OR(r'\s', r'\\\n', repeat='+')
++
++RE_PATH = '[a-zA-Z0-9/_.-]+'
++
++RE_INCLUDEPATH = OR(S(r'\"', RE_PATH, r'\"'),
++                    S(r'<', RE_PATH, r'>'))
++
++RE_INCLUDE = S(r'^[ \t]*#[ \t]*include[ \t]+', NAMED('includepath', RE_INCLUDEPATH), r'[ \t]*\n')
++RE_SIMPLEDEFINE = S(r'^[ \t]*#[ \t]*define[ \t]+', RE_IDENTIFIER, r'[ \t]*\n')
++
++RE_STRUCT_TYPE = S(r'struct\s+', RE_IDENTIFIER)
++RE_TYPE = OR(RE_IDENTIFIER, RE_STRUCT_TYPE)
++
++RE_MACRO_CONCAT = M(S(OR(RE_IDENTIFIER, RE_STRING), SP), n='{2,}')
++
++RE_SIMPLE_VALUE = OR(RE_IDENTIFIER, RE_STRING, RE_NUMBER)
++
++RE_FUN_CALL = S(RE_IDENTIFIER, r'\s*\(\s*', RE_SIMPLE_VALUE, r'\s*\)')
++RE_SIZEOF = S(r'sizeof\s*\(\s*', NAMED('sizeoftype', RE_TYPE), r'\s*\)')
++
++RE_ADDRESS = S(r'&\s*', RE_IDENTIFIER)
++
++RE_ARRAY_ITEM = S(r'{\s*', NAMED('arrayitem', M(RE_SIMPLE_VALUE, n='?')), r'\s*}\s*,?')
++RE_ARRAY_CAST = S(r'\(\s*', RE_IDENTIFIER, r'\s*\[\s*\]\)')
++RE_ARRAY_ITEMS = M(S(RE_ARRAY_ITEM, SP))
++RE_ARRAY = S(M(RE_ARRAY_CAST, n='?'), r'\s*{\s*',
++             NAMED('arrayitems', RE_ARRAY_ITEMS),
++             r'}')
++
++# NOTE: this covers a very small subset of valid expressions
++
++RE_EXPRESSION = OR(RE_SIZEOF, RE_FUN_CALL, RE_MACRO_CONCAT, RE_SIMPLE_VALUE,
++                   RE_ARRAY, RE_ADDRESS)
++
+diff --git a/scripts/codeconverter/codeconverter/test_patching.py b/scripts/codeconverter/codeconverter/test_patching.py
+new file mode 100644
+index 0000000000..5998af81c9
+--- /dev/null
++++ b/scripts/codeconverter/codeconverter/test_patching.py
+@@ -0,0 +1,105 @@
++# Copyright (C) 2020 Red Hat Inc.
++#
++# Authors:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++from tempfile import NamedTemporaryFile
++from .patching import FileInfo, FileMatch, Patch, FileList
++from .regexps import *
++
++class BasicPattern(FileMatch):
++    regexp = '[abc]{3}'
++
++    @property
++    def name(self):
++        return self.group(0)
++
++    def replacement(self) -> str:
++        # replace match with the middle character repeated 5 times
++        return self.group(0)[1].upper()*5
++
++def test_pattern_patching():
++    of = NamedTemporaryFile('wt')
++    of.writelines(['one line\n',
++                  'this pattern will be patched: defbbahij\n',
++                  'third line\n',
++                  'another pattern: jihaabfed'])
++    of.flush()
++
++    files = FileList()
++    f = FileInfo(files, of.name)
++    f.load()
++    f.scan_for_matches()
++    matches = f.matches_of_type(BasicPattern)
++    assert len(matches) == 2
++    p2 = matches[1]
++
++    # manually add patch, to see if .append() works:
++    f.patches.append(p2.append('XXX'))
++
++    # apply all patches:
++    f.gen_patches()
++    patched = f.get_patched_content()
++    assert patched == ('one line\n'+
++                       'this pattern will be patched: defBBBBBhij\n'+
++                       'third line\n'+
++                       'another pattern: jihAAAAAXXXfed')
++
++class Function(FileMatch):
++    regexp = S(r'BEGIN\s+', NAMED('name', RE_IDENTIFIER), r'\n',
++               r'(.*\n)*?END\n')
++
++class Statement(FileMatch):
++    regexp = S(r'^\s*', NAMED('name', RE_IDENTIFIER), r'\(\)\n')
++
++def test_container_match():
++    of = NamedTemporaryFile('wt')
++    of.writelines(['statement1()\n',
++                   'statement2()\n',
++                   'BEGIN function1\n',
++                   '  statement3()\n',
++                   '  statement4()\n',
++                   'END\n',
++                   'BEGIN function2\n',
++                   '  statement5()\n',
++                   '  statement6()\n',
++                   'END\n',
++                   'statement7()\n'])
++    of.flush()
++
++    files = FileList()
++    f = FileInfo(files, of.name)
++    f.load()
++    assert len(f.matches_of_type(Function)) == 2
++    print(' '.join(m.name for m in f.matches_of_type(Statement)))
++    assert len(f.matches_of_type(Statement)) == 7
++
++    f1 = f.find_match(Function, 'function1')
++    f2 = f.find_match(Function, 'function2')
++    st1 = f.find_match(Statement, 'statement1')
++    st2 = f.find_match(Statement, 'statement2')
++    st3 = f.find_match(Statement, 'statement3')
++    st4 = f.find_match(Statement, 'statement4')
++    st5 = f.find_match(Statement, 'statement5')
++    st6 = f.find_match(Statement, 'statement6')
++    st7 = f.find_match(Statement, 'statement7')
++
++    assert not f1.contains(st1)
++    assert not f1.contains(st2)
++    assert not f1.contains(st2)
++    assert f1.contains(st3)
++    assert f1.contains(st4)
++    assert not f1.contains(st5)
++    assert not f1.contains(st6)
++    assert not f1.contains(st7)
++
++    assert not f2.contains(st1)
++    assert not f2.contains(st2)
++    assert not f2.contains(st2)
++    assert not f2.contains(st3)
++    assert not f2.contains(st4)
++    assert f2.contains(st5)
++    assert f2.contains(st6)
++    assert not f2.contains(st7)
+diff --git a/scripts/codeconverter/codeconverter/test_regexps.py b/scripts/codeconverter/codeconverter/test_regexps.py
+new file mode 100644
+index 0000000000..9b84d689a6
+--- /dev/null
++++ b/scripts/codeconverter/codeconverter/test_regexps.py
+@@ -0,0 +1,282 @@
++# Copyright (C) 2020 Red Hat Inc.
++#
++# Authors:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++from .regexps import *
++from .qom_macros import *
++from .qom_type_info import *
++
++def test_res():
++    def fullmatch(regexp, s):
++        return re.fullmatch(regexp, s, re.MULTILINE)
++
++    assert fullmatch(RE_IDENTIFIER, 'sizeof')
++    assert fullmatch(RE_IDENTIFIER, 'X86CPU')
++    assert fullmatch(RE_FUN_CALL, 'sizeof(X86CPU)')
++    assert fullmatch(RE_IDENTIFIER, 'X86_CPU_TYPE_NAME')
++    assert fullmatch(RE_SIMPLE_VALUE, '"base"')
++    print(RE_FUN_CALL)
++    assert fullmatch(RE_FUN_CALL, 'X86_CPU_TYPE_NAME("base")')
++    print(RE_TI_FIELD_INIT)
++    assert fullmatch(RE_TI_FIELD_INIT, '.name = X86_CPU_TYPE_NAME("base"),\n')
++
++
++    assert fullmatch(RE_MACRO_CONCAT, 'TYPE_ASPEED_GPIO "-ast2600"')
++    assert fullmatch(RE_EXPRESSION, 'TYPE_ASPEED_GPIO "-ast2600"')
++
++    print(RE_MACRO_DEFINE)
++    assert re.search(RE_MACRO_DEFINE, r'''
++    #define OFFSET_CHECK(c)                     \
++    do {                                        \
++        if (!(c)) {                             \
++            goto bad_offset;                    \
++        }                                       \
++    } while (0)
++    ''', re.MULTILINE)
++
++    print(RE_CHECK_MACRO)
++    print(CPP_SPACE)
++    assert not re.match(RE_CHECK_MACRO, r'''
++    #define OFFSET_CHECK(c)                     \
++    do {                                        \
++        if (!(c)) {                             \
++            goto bad_offset;                    \
++        }                                       \
++    } while (0)''', re.MULTILINE)
++
++    print(RE_CHECK_MACRO)
++    assert fullmatch(RE_CHECK_MACRO, r'''#define PCI_DEVICE(obj) \
++                     OBJECT_CHECK(PCIDevice, (obj), TYPE_PCI_DEVICE)
++''')
++    assert fullmatch(RE_CHECK_MACRO, r'''#define COLLIE_MACHINE(obj) \
++                     OBJECT_CHECK(CollieMachineState, obj, TYPE_COLLIE_MACHINE)
++''')
++
++    print(RE_TYPEINFO_START)
++    assert re.search(RE_TYPEINFO_START, r'''
++    cc->open = qmp_chardev_open_file;
++}
++
++static const TypeInfo char_file_type_info = {
++    .name = TYPE_CHARDEV_FILE,
++#ifdef _WIN32
++    .parent = TYPE_CHARDEV_WIN,
++''', re.MULTILINE)
++    assert re.search(RE_TYPEINFO_START, r'''
++        TypeInfo ti = {
++            .name = armsse_variants[i].name,
++            .parent = TYPE_ARMSSE,
++            .class_init = armsse_class_init,
++            .class_data = (void *)&armsse_variants[i],
++        };''', re.MULTILINE)
++
++    print(RE_ARRAY_ITEM)
++    assert fullmatch(RE_ARRAY_ITEM, '{ TYPE_HOTPLUG_HANDLER },')
++    assert fullmatch(RE_ARRAY_ITEM, '{ TYPE_ACPI_DEVICE_IF },')
++    assert fullmatch(RE_ARRAY_ITEM, '{ }')
++    assert fullmatch(RE_ARRAY_CAST, '(InterfaceInfo[])')
++    assert fullmatch(RE_ARRAY, '''(InterfaceInfo[]) {
++            { TYPE_HOTPLUG_HANDLER },
++            { TYPE_ACPI_DEVICE_IF },
++            { }
++    }''')
++    print(RE_COMMENT)
++    assert fullmatch(RE_COMMENT, r'''/* multi-line
++                                      * comment
++                                      */''')
++
++    print(RE_TI_FIELDS)
++    assert fullmatch(RE_TI_FIELDS,
++    r'''/* could be TYPE_SYS_BUS_DEVICE (or LPC etc) */
++        .parent = TYPE_DEVICE,
++''')
++    assert fullmatch(RE_TI_FIELDS, r'''.name = TYPE_TPM_CRB,
++        /* could be TYPE_SYS_BUS_DEVICE (or LPC etc) */
++        .parent = TYPE_DEVICE,
++        .instance_size = sizeof(CRBState),
++        .class_init  = tpm_crb_class_init,
++        .interfaces = (InterfaceInfo[]) {
++            { TYPE_TPM_IF },
++            { }
++        }
++''')
++    assert fullmatch(RE_TI_FIELDS + SP + RE_COMMENTS,
++        r'''.name = TYPE_PALM_MISC_GPIO,
++            .parent = TYPE_SYS_BUS_DEVICE,
++            .instance_size = sizeof(PalmMiscGPIOState),
++            .instance_init = palm_misc_gpio_init,
++            /*
++             * No class init required: device has no internal state so does not
++             * need to set up reset or vmstate, and has no realize method.
++             */''')
++
++    print(RE_TYPEINFO_DEF)
++    test_empty = 'static const TypeInfo x86_base_cpu_type_info = {\n'+\
++                 '};\n';
++    assert fullmatch(RE_TYPEINFO_DEF, test_empty)
++
++    test_simple = r'''
++    static const TypeInfo x86_base_cpu_type_info = {
++        .name = X86_CPU_TYPE_NAME("base"),
++        .parent = TYPE_X86_CPU,
++        .class_init = x86_cpu_base_class_init,
++    };
++    '''
++    assert re.search(RE_TYPEINFO_DEF, test_simple, re.MULTILINE)
++
++    test_interfaces = r'''
++    static const TypeInfo acpi_ged_info = {
++        .name          = TYPE_ACPI_GED,
++        .parent        = TYPE_SYS_BUS_DEVICE,
++        .instance_size = sizeof(AcpiGedState),
++        .instance_init  = acpi_ged_initfn,
++        .class_init    = acpi_ged_class_init,
++        .interfaces = (InterfaceInfo[]) {
++            { TYPE_HOTPLUG_HANDLER },
++            { TYPE_ACPI_DEVICE_IF },
++            { }
++        }
++    };
++    '''
++    assert re.search(RE_TYPEINFO_DEF, test_interfaces, re.MULTILINE)
++
++    test_comments = r'''
++    static const TypeInfo palm_misc_gpio_info = {
++        .name = TYPE_PALM_MISC_GPIO,
++        .parent = TYPE_SYS_BUS_DEVICE,
++        .instance_size = sizeof(PalmMiscGPIOState),
++        .instance_init = palm_misc_gpio_init,
++        /*
++         * No class init required: device has no internal state so does not
++         * need to set up reset or vmstate, and has no realize method.
++         */
++    };
++    '''
++    assert re.search(RE_TYPEINFO_DEF, test_comments, re.MULTILINE)
++
++    test_comments = r'''
++    static const TypeInfo tpm_crb_info = {
++        .name = TYPE_TPM_CRB,
++        /* could be TYPE_SYS_BUS_DEVICE (or LPC etc) */
++        .parent = TYPE_DEVICE,
++        .instance_size = sizeof(CRBState),
++        .class_init  = tpm_crb_class_init,
++        .interfaces = (InterfaceInfo[]) {
++            { TYPE_TPM_IF },
++            { }
++        }
++    };
++    '''
++    assert re.search(RE_TYPEINFO_DEF, test_comments, re.MULTILINE)
++
++def test_struct_re():
++    print('---')
++    print(RE_STRUCT_TYPEDEF)
++    assert re.search(RE_STRUCT_TYPEDEF, r'''
++typedef struct TCGState {
++    AccelState parent_obj;
++
++    bool mttcg_enabled;
++    unsigned long tb_size;
++} TCGState;
++''', re.MULTILINE)
++
++    assert re.search(RE_STRUCT_TYPEDEF, r'''
++typedef struct {
++    ISADevice parent_obj;
++
++    QEMUSoundCard card;
++    uint32_t freq;
++    uint32_t port;
++    int ticking[2];
++    int enabled;
++    int active;
++    int bufpos;
++#ifdef DEBUG
++    int64_t exp[2];
++#endif
++    int16_t *mixbuf;
++    uint64_t dexp[2];
++    SWVoiceOut *voice;
++    int left, pos, samples;
++    QEMUAudioTimeStamp ats;
++    FM_OPL *opl;
++    PortioList port_list;
++} AdlibState;
++''', re.MULTILINE)
++
++    false_positive = r'''
++typedef struct dma_pagetable_entry {
++    int32_t frame;
++    int32_t owner;
++} A B C D E;
++struct foo {
++    int x;
++} some_variable;
++'''
++    assert not re.search(RE_STRUCT_TYPEDEF, false_positive, re.MULTILINE)
++
++def test_initial_includes():
++    print(InitialIncludes.regexp)
++    c = '''
++#ifndef HW_FLASH_H
++#define HW_FLASH_H
++
++/* NOR flash devices */
++
++#include "qom/object.h"
++#include "exec/hwaddr.h"
++
++/* pflash_cfi01.c */
++'''
++    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
++    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
++    assert m
++    print(repr(m.group(0)))
++    assert m.group(0).endswith('#include "exec/hwaddr.h"\n')
++
++    c = '''#ifndef QEMU_VIRTIO_9P_H
++#define QEMU_VIRTIO_9P_H
++
++#include "standard-headers/linux/virtio_9p.h"
++#include "hw/virtio/virtio.h"
++#include "9p.h"
++
++
++'''
++    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
++    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
++    assert m
++    print(repr(m.group(0)))
++    assert m.group(0).endswith('#include "9p.h"\n')
++
++    c = '''#include "qom/object.h"
++/*
++ * QEMU ES1370 emulation
++...
++ */
++
++/* #define DEBUG_ES1370 */
++/* #define VERBOSE_ES1370 */
++#define SILENT_ES1370
++
++#include "qemu/osdep.h"
++#include "hw/audio/soundhw.h"
++#include "audio/audio.h"
++#include "hw/pci/pci.h"
++#include "migration/vmstate.h"
++#include "qemu/module.h"
++#include "sysemu/dma.h"
++
++/* Missing stuff:
++   SCTRL_P[12](END|ST)INC
++'''
++    print(repr(list(m.groupdict() for m in re.finditer(InitialIncludes.regexp, c, re.MULTILINE))))
++    m = re.match(InitialIncludes.regexp, c, re.MULTILINE)
++    assert m
++    print(repr(m.group(0)))
++    assert m.group(0).endswith('#include "sysemu/dma.h"\n')
++
+diff --git a/scripts/codeconverter/codeconverter/utils.py b/scripts/codeconverter/codeconverter/utils.py
+new file mode 100644
+index 0000000000..760ab7eecd
+--- /dev/null
++++ b/scripts/codeconverter/codeconverter/utils.py
+@@ -0,0 +1,72 @@
++# Copyright (C) 2020 Red Hat Inc.
++#
++# Authors:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++from typing import *
++
++import logging
++logger = logging.getLogger(__name__)
++DBG = logger.debug
++INFO = logger.info
++WARN = logger.warning
++
++T = TypeVar('T')
++def opt_compare(a: T, b: T) -> bool:
++    """Compare two values, ignoring mismatches if one of them is None"""
++    return (a is None) or (b is None) or (a == b)
++
++def merge(a: T, b: T) -> T:
++    """Merge two values if they matched using opt_compare()"""
++    assert opt_compare(a, b)
++    if a is None:
++        return b
++    else:
++        return a
++
++def test_comp_merge():
++    assert opt_compare(None, 1) == True
++    assert opt_compare(2, None) == True
++    assert opt_compare(1, 1) == True
++    assert opt_compare(1, 2) == False
++
++    assert merge(None, None) is None
++    assert merge(None, 10) == 10
++    assert merge(10, None) == 10
++    assert merge(10, 10) == 10
++
++
++LineNumber = NewType('LineNumber', int)
++ColumnNumber = NewType('ColumnNumber', int)
++class LineAndColumn(NamedTuple):
++    line: int
++    col: int
++
++    def __str__(self):
++        return '%d:%d' % (self.line, self.col)
++
++def line_col(s, position: int) -> LineAndColumn:
++    """Return line and column for a char position in string
++
++    Character position starts in 0, but lines and columns start in 1.
++    """
++    before = s[:position]
++    lines = before.split('\n')
++    line = len(lines)
++    col = len(lines[-1]) + 1
++    return LineAndColumn(line, col)
++
++def test_line_col():
++    assert line_col('abc\ndefg\nhijkl', 0) == (1, 1)
++    assert line_col('abc\ndefg\nhijkl', 2) == (1, 3)
++    assert line_col('abc\ndefg\nhijkl', 3) == (1, 4)
++    assert line_col('abc\ndefg\nhijkl', 4) == (2, 1)
++    assert line_col('abc\ndefg\nhijkl', 10) == (3, 2)
++
++def not_optional(arg: Optional[T]) -> T:
++    assert arg is not None
++    return arg
++
++__all__ = ['not_optional', 'opt_compare', 'merge', 'line_col', 'LineAndColumn']
+\ No newline at end of file
+diff --git a/scripts/codeconverter/converter.py b/scripts/codeconverter/converter.py
+new file mode 100755
+index 0000000000..ebaf9b57ce
+--- /dev/null
++++ b/scripts/codeconverter/converter.py
+@@ -0,0 +1,123 @@
++#!/usr/bin/env python3
++# QEMU library
++#
++# Copyright (C) 2020 Red Hat Inc.
++#
++# Authors:
++#  Eduardo Habkost <ehabkost@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2.  See
++# the COPYING file in the top-level directory.
++#
++import sys
++import argparse
++import os
++import os.path
++import re
++from typing import *
++
++from codeconverter.patching import FileInfo, match_class_dict, FileList
++import codeconverter.qom_macros
++from codeconverter.qom_type_info import TI_FIELDS, type_infos, TypeInfoVar
++
++import logging
++logger = logging.getLogger(__name__)
++DBG = logger.debug
++INFO = logger.info
++WARN = logger.warning
++
++def process_all_files(parser: argparse.ArgumentParser, args: argparse.Namespace) -> None:
++    DBG("filenames: %r", args.filenames)
++
++    files = FileList()
++    files.extend(FileInfo(files, fn, args.force) for fn in args.filenames)
++    for f in files:
++        DBG('opening %s', f.filename)
++        f.load()
++
++    if args.table:
++        fields = ['filename', 'variable_name'] + TI_FIELDS
++        print('\t'.join(fields))
++        for f in files:
++            for t in f.matches_of_type(TypeInfoVar):
++                assert isinstance(t, TypeInfoVar)
++                values = [f.filename, t.name] + \
++                         [t.get_initializer_value(f).raw
++                          for f in TI_FIELDS]
++                DBG('values: %r', values)
++                assert all('\t' not in v for v in values)
++                values = [v.replace('\n', ' ').replace('"', '') for v in values]
++                print('\t'.join(values))
++        return
++
++    match_classes = match_class_dict()
++    if not args.patterns:
++        parser.error("--pattern is required")
++
++    classes = [p for arg in args.patterns
++                for p in re.split(r'[\s,]', arg)]
++    for c in classes:
++        if c not in match_classes:
++            print("Invalid pattern name: %s" % (c), file=sys.stderr)
++            print("Valid patterns:", file=sys.stderr)
++            print(PATTERN_HELP, file=sys.stderr)
++            sys.exit(1)
++
++    DBG("classes: %r", classes)
++    for f in files:
++        DBG("patching contents of %s", f.filename)
++        f.patch_content(max_passes=args.passes, class_names=classes)
++
++    for f in files:
++        #alltypes.extend(f.type_infos)
++        #full_types.extend(f.full_types())
++
++        if not args.dry_run:
++            if args.inplace:
++                f.patch_inplace()
++            if args.diff:
++                f.show_diff()
++            if not args.diff and not args.inplace:
++                f.write_to_file(sys.stdout)
++                sys.stdout.flush()
++
++
++PATTERN_HELP = ('\n'.join("  %s: %s" % (n, str(c.__doc__).strip())
++                for (n,c) in sorted(match_class_dict().items())
++                if c.has_replacement_rule()))
++
++def main() -> None:
++    p = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter)
++    p.add_argument('filenames', nargs='+')
++    p.add_argument('--passes', type=int, default=1,
++                   help="Number of passes (0 means unlimited)")
++    p.add_argument('--pattern', required=True, action='append',
++                   default=[], dest='patterns',
++                   help="Pattern to scan for")
++    p.add_argument('--inplace', '-i', action='store_true',
++                   help="Patch file in place")
++    p.add_argument('--dry-run', action='store_true',
++                   help="Don't patch files or print patching results")
++    p.add_argument('--force', '-f', action='store_true',
++                   help="Perform changes even if not completely safe")
++    p.add_argument('--diff', action='store_true',
++                   help="Print diff output on stdout")
++    p.add_argument('--debug', '-d', action='store_true',
++                   help="Enable debugging")
++    p.add_argument('--verbose', '-v', action='store_true',
++                   help="Verbose logging on stderr")
++    p.add_argument('--table', action='store_true',
++                   help="Print CSV table of type information")
++    p.add_argument_group("Valid pattern names",
++                         PATTERN_HELP)
++    args = p.parse_args()
++
++    loglevel = (logging.DEBUG if args.debug
++             else logging.INFO if args.verbose
++             else logging.WARN)
++    logging.basicConfig(format='%(levelname)s: %(message)s', level=loglevel)
++    DBG("args: %r", args)
++    process_all_files(p, args)
++
++if __name__ == '__main__':
++    main()
+\ No newline at end of file
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 7d0a5e91e4..cf96fa8379 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2423,6 +2423,11 @@ F: tests/check-qom-interface.c
+ F: tests/check-qom-proplist.c
+ F: tests/test-qdev-global-props.c
+ 
++QOM boilerplate conversion script
++M: Eduardo Habkost <ehabkost@redhat.com>
++S: Maintained
++F: scripts/codeconverter/
++
+ QMP
+ M: Markus Armbruster <armbru@redhat.com>
+ S: Supported
+-- 
+2.26.2
 
 
