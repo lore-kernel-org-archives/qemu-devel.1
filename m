@@ -8,75 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC82C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 18:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CFDC433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 18:58:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFCD62068D
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 18:57:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A1D0F2068D
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 18:58:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="s09b1O8/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFCD62068D
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EnSvImZ9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1D0F2068D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFio9-0000Zo-1z
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 14:57:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55226)
+	id 1kFiob-0001Kp-Q6
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 14:58:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFihR-0003OX-0t; Tue, 08 Sep 2020 14:50:37 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:46162)
+ id 1kFigq-0002Gi-St; Tue, 08 Sep 2020 14:50:00 -0400
+Received: from mail-pj1-x102a.google.com ([2607:f8b0:4864:20::102a]:39471)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFihP-0002oU-8a; Tue, 08 Sep 2020 14:50:36 -0400
-Received: by mail-pf1-x442.google.com with SMTP id b124so11693041pfg.13;
- Tue, 08 Sep 2020 11:50:34 -0700 (PDT)
+ id 1kFigp-0002dD-8j; Tue, 08 Sep 2020 14:50:00 -0400
+Received: by mail-pj1-x102a.google.com with SMTP id s2so60412pjr.4;
+ Tue, 08 Sep 2020 11:49:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=GCgbOADJo9SgTrFvdP0jEa9PoTonwhtwSH4+oqHE/pQ=;
- b=s09b1O8/qPl0Wx5E6dWGi3ro2nFGD/w50/L3c+0UPd2GxLWgGxgWs7C2I5MRrvwmom
- scgrnZR9lFURs4Pf05KGDJTJZy1tgHbhXgGVcPR2WPBp6CQnQ10GDMqabv/7C0BVcvAP
- TSrTeQ1Ru/pU5HhrQ1bJxgEi7822FJPsV36GERd1qcA0S90ed6NLm3+J0ReNBDtJqWrP
- GgNxr91TYKn9bkejac+vNs8dr8NB+2c+GvQB51e/1NGsihqd3BdNeWk14k14xgv+b+jL
- A9kwgN9cJEAIkKvp04v1JzMXhNSZroStSIy08lVyNApwTgTU6Ipd7px1JqZRdenm6Mz4
- ZHyQ==
+ bh=FykcAGlQ92KK8Qz4pGd0AfXWzqAA8073pCgMiQdYiFk=;
+ b=EnSvImZ9ysIOoTeUW56fjqLNh69zqxHYNmBL5xDWPtpCezyxZ1Ly2nea85yjCKA4eL
+ iaOyqeugTudpRXhIUgLcovXUToZlskhYSdCqnptdrEQtO9Y22rIcJvu0aNIlQ694PSPH
+ eGVPwibkhPa8mimNCDHCEL6SB2NfG/E0FbE3h3zMHzcwsWy39jhOB+B6U5jep8UKU3AH
+ HRWvgHHITTAZ4mpF0g0PDeXclc8cC5n4YH6zR2v6WPyflj4/0AS4xPrvYzZpxfj+AYP6
+ fOT0njiEJ7OkS9iBnNjJfBdbfU3tv/IkhHI7B0gFLGlW64RQsMZxn2+m7Zen29P1eJcw
+ 0XAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=GCgbOADJo9SgTrFvdP0jEa9PoTonwhtwSH4+oqHE/pQ=;
- b=jaicMdP3aRa6C9bFhCur80myPB6yxW3dp2WTCcE79XkHewuYoqnvMq1h5uBWeRPeOr
- QCEUF9mBvdN3+BTxbuRSO/lLhthijheVDWfmRdbtDQCUZ/gPSfwwUyJHGB1V3GKD6Pw8
- aI/nfvGEsWJJWfO13Mt3bWk8iSKcuHYpiPh8IHThtiRZg8n0wfJ2S0WKkv1lhPQpuSMJ
- jXFbUKPINmSZ6HmnFKaimrFi+d9+ulBpCfx6WGFOxYmFfbxIkc0n7f1F3vW8kUBJrC7U
- lZ5NDaZAuuG6DNlntfBej0f6o+6JpqtsOGntzEP3tyNNhWbeo8LkpPSM/3M2TdGyzVPz
- N94w==
-X-Gm-Message-State: AOAM5314CRe+VCDqCmVQrYJsUlfh7ZW40F8ScK9xkD1fFKoaefNtNFoJ
- jRhmHf3l4m3d+V1D7FwM2H6jnTqp5mXJNjd8
-X-Google-Smtp-Source: ABdhPJxss9DgG3QnNN+8erdww6zfCgfMadiAlPJPVXzGP3y6VV/DSjOvl45KgBSPW9jrbQvajAE+aQ==
-X-Received: by 2002:a63:f70e:: with SMTP id x14mr83825pgh.407.1599591032872;
- Tue, 08 Sep 2020 11:50:32 -0700 (PDT)
+ bh=FykcAGlQ92KK8Qz4pGd0AfXWzqAA8073pCgMiQdYiFk=;
+ b=kXdDJxDoNIiEt0/2kHwZxbgHiUVDjNRa67i3yLCGmxlRz9pTJn+fsMo/wnAQ2QRO99
+ mUeHASlWIcDK53pOlZoX/6R0wl4QpEYHf4pJSOWpixoUaXBSeLxU2iqFv6JOaEup8eW6
+ zef0hCbaNSj9xgrEMotH4zb9oVsgooTyzPt2eZn4eYws1VFQTv6vUmf+fLoyDk7yh32o
+ 4QZ9Vr1MQ2PumPhWeUjr9mM2KR/aRNgacHMF2CTjuBxHMx/N+krQblhGhhg3mMQNbbRI
+ 4rXXzrDEUoc2ka3MhsvnlWpxcfEOnzzPI94/SsFHd/3WVhRLjpZ30iCGfn4qdUAScBzA
+ xSKQ==
+X-Gm-Message-State: AOAM532A126MvUXkeB1wHOeGsXIdlqbRXxNRVegdjweqpG+NIkGBioKp
+ NjE20/KmmS+NhwYRSJnAxOafvyj28sHsUK+j
+X-Google-Smtp-Source: ABdhPJyN9mtI1X6PPEQMIj+rHr55fCzNb5mtEv/p1xzJg/WeOkzCWfJPBCv6ZoJaqR1vBRJkH782aw==
+X-Received: by 2002:a17:90a:414d:: with SMTP id
+ m13mr181147pjg.163.1599590994692; 
+ Tue, 08 Sep 2020 11:49:54 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 8sm43553pjx.14.2020.09.08.11.50.29
+ by smtp.googlemail.com with ESMTPSA id 8sm43553pjx.14.2020.09.08.11.49.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 11:50:32 -0700 (PDT)
+ Tue, 08 Sep 2020 11:49:53 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/16] cirrus: Building freebsd in a single short
-Date: Wed,  9 Sep 2020 02:49:16 +0800
-Message-Id: <20200908184918.1085-15-luoyonggang@gmail.com>
+Subject: [PULL 05/16] tests: disable /char/stdio/* tests in test-char.c on
+ win32
+Date: Wed,  9 Sep 2020 02:49:07 +0800
+Message-Id: <20200908184918.1085-6-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200908184918.1085-1-luoyonggang@gmail.com>
 References: <20200908184918.1085-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102a;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x102a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -109,64 +111,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-freebsd 1 hour limit not hit anymore
+These tests are blocking test-char to be finished.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- .cirrus.yml | 35 ++++++++---------------------------
- 1 file changed, 8 insertions(+), 27 deletions(-)
+ tests/test-char.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index 49335e68c9..b0004273bb 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -1,38 +1,19 @@
- env:
-   CIRRUS_CLONE_DEPTH: 1
+diff --git a/tests/test-char.c b/tests/test-char.c
+index d35cc839bc..80e5bac61a 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -103,6 +103,7 @@ static void char_console_test(void)
+     g_test_trap_assert_stdout("CONSOLE");
+ }
+ #endif
++#ifndef _WIN32
+ static void char_stdio_test_subprocess(void)
+ {
+     Chardev *chr;
+@@ -126,6 +127,7 @@ static void char_stdio_test(void)
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stdout("buf");
+ }
++#endif
  
--freebsd_1st_task:
-+freebsd_12_task:
-   freebsd_instance:
-     image_family: freebsd-12-1
--    cpu: 4
--    memory: 4G
--  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
--    bash curl cyrus-sasl git glib gmake gnutls gsed
--    nettle perl5 pixman pkgconf png usbredir
-+    cpu: 8
-+    memory: 8G
-+  install_script:
-+    - ASSUME_ALWAYS_YES=yes pkg bootstrap -f ;
-+    - pkg install -y bash curl cyrus-sasl git glib gmake gnutls gsed 
-+          nettle perl5 pixman pkgconf png usbredir
-   script:
-     - mkdir build
-     - cd build
--    - ../configure --disable-user --target-list-exclude='alpha-softmmu
--        ppc64-softmmu ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
--        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu'
--        --enable-werror || { cat config.log; exit 1; }
--    - gmake -j$(sysctl -n hw.ncpu)
--    - gmake -j$(sysctl -n hw.ncpu) check
--
--freebsd_2nd_task:
--  freebsd_instance:
--    image_family: freebsd-12-1
--    cpu: 4
--    memory: 4G
--  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
--    bash curl cyrus-sasl git glib gmake gnutls gtk3 gsed libepoxy mesa-libs
--    nettle perl5 pixman pkgconf png SDL2 usbredir
--  script:
--    - ./configure --enable-werror --target-list='alpha-softmmu ppc64-softmmu
--        ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
--        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu
--        sparc-bsd-user sparc64-bsd-user x86_64-bsd-user i386-bsd-user'
--        || { cat config.log; exit 1; }
-+    - ../configure --enable-werror || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
-     - gmake -j$(sysctl -n hw.ncpu) check
- 
+ static void char_ringbuf_test(void)
+ {
+@@ -1471,8 +1473,10 @@ int main(int argc, char **argv)
+     g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
+     g_test_add_func("/char/console", char_console_test);
+ #endif
++#ifndef _WIN32
+     g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
+     g_test_add_func("/char/stdio", char_stdio_test);
++#endif
+ #ifndef _WIN32
+     g_test_add_func("/char/pipe", char_pipe_test);
+ #endif
 -- 
 2.28.0.windows.1
 
