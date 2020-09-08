@@ -2,83 +2,107 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A68CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 07:56:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F06DC2BBD0
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 07:56:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BF442177B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 07:56:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BF442177B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id DBC3C2177B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 07:56:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EugSNvo5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DBC3C2177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFYUh-0003sc-RS
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 03:56:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54254)
+	id 1kFYUp-00047T-Od
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 03:56:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54336)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFYU2-00039j-BS
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 03:56:06 -0400
-Received: from indium.canonical.com ([91.189.90.7]:44938)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kFYU9-0003FP-H0
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 03:56:13 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:38079)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFYU0-0006sB-3y
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 03:56:06 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kFYTw-0007wr-PT
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 07:56:01 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 074F82E810B
- for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 07:56:00 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kFYU6-0006t6-SX
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 03:56:13 -0400
+Received: by mail-wm1-x344.google.com with SMTP id l9so16157552wme.3
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 00:56:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ylO4jrjrlAQ2lXutzxooc+bJ5b0Obl8J096TbkcCXnA=;
+ b=EugSNvo5NlXFSDjpMjiEGoSWknTA/+Eqd/Lpb62QpYtIseSrDmPOT3Jbv0Fn0HJUrT
+ M3VawcH+cKKpqze2Vhe4B1X5XSIy4oB3Lq5qxencfGRo/ygj+EqMqgm4sTE/kinedQOK
+ Bnkuy/nAwxKYgrgCXZRYuya/enqXXdEChVKjXRLfQJYSfmmQv98aSNGER97qKvtsWbrd
+ Y+81dpxGfVcbdEUORBOiJiGtOxZ6wW8P/cSfZ7HthpdZuJhnBTTX+hghrbr7/TT41jK0
+ A3xcN4LeXHf4mY3ZM9iNew2lrv3kRsNpLKiJf7XX62G8U1lgPiBgf79L/dE2D53ZTxhI
+ PH1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ylO4jrjrlAQ2lXutzxooc+bJ5b0Obl8J096TbkcCXnA=;
+ b=HXyOnGnJkCnSWpLrXQ582wu7W5tgSQ23XVvQI5JcWKkI64+pQA+VvpRNsgxJShwaph
+ b1T6dHuDD8gI5spXsm9ktvS5Zg/nTsrwrfaLJj/XbDCd/wHoKnIkCjxo2tbEN7MNdJBy
+ eVCVSTivoIPDBQZCIr4mf4hodjFBq9ZjPleUsEvE1oRgnFlfhlYMIqiCiVTtoYp7P6Z9
+ oUo6M9TDl598T2clFcYnQORrRzPRwuVwCERXefxAyvBq7bZ2+ZPY3ApEqTD9BMMvKqx6
+ QgZijHhJRbEgk3wVV0sJYguTvVtWm0sYCwdHmQfEyY1yd2Rt67otJdGTxx+tBczOvwSz
+ HPJQ==
+X-Gm-Message-State: AOAM533u2JWmJDkBBlmub+rvbUPlaOEcHary5rkvUbvb4yaqfiF71/3I
+ KsKB84JalG3ZdfDv9deuIdw=
+X-Google-Smtp-Source: ABdhPJzzsMzK+GrnTboopeVNeVcq30l8Ui70SMuE9sNBcHd6gaix/ug8FkfSJR/5BTSgagyLI5c/4A==
+X-Received: by 2002:a1c:f415:: with SMTP id z21mr3036013wma.88.1599551769019; 
+ Tue, 08 Sep 2020 00:56:09 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id a83sm30380677wmh.48.2020.09.08.00.56.07
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 08 Sep 2020 00:56:08 -0700 (PDT)
+Subject: Re: [PULL 3/5] softmmu/cpus: Only set parallel_cpus for SMP
+To: Claudio Fontana <cfontana@suse.de>
+References: <20200903214101.1746878-1-richard.henderson@linaro.org>
+ <20200903214101.1746878-4-richard.henderson@linaro.org>
+ <1f573d2d-b3bb-21ab-bbcd-b759fc14ad2b@suse.de>
+ <3dfae924-34c9-e36a-77bf-f3abcdeaf268@amsat.org>
+ <7454d121-3ebd-623a-55a3-4ba6e7e870dc@suse.de>
+ <e47376bf-8ced-57eb-93d5-a1229d258dd6@amsat.org>
+ <75c313df-da09-f3c2-5d34-0bfaad4290a9@suse.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <652516a1-6a63-89eb-8b04-728a95b76d5f@amsat.org>
+Date: Tue, 8 Sep 2020 09:56:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Sep 2020 07:47:23 -0000
-From: "Laszlo Ersek \(Red Hat\)" <1852196@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
- assignee=lersek@redhat.com; 
-X-Launchpad-Bug-Tags: feature-request
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: lersek philmd
-X-Launchpad-Bug-Reporter: Laszlo Ersek (Red Hat) (lersek)
-X-Launchpad-Bug-Modifier: Laszlo Ersek (Red Hat) (lersek)
-References: <157355353271.7205.5763587027166419396.malonedeb@gac.canonical.com>
-Message-Id: <159955124335.11462.2457354770405854578.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1852196] Re: update edk2 submodule & binaries to
- edk2-stable202008
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: ef0f7ee29f9df26893a592e3bbcd8c068864f5a3
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 03:20:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <75c313df-da09-f3c2-5d34-0bfaad4290a9@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -32
+X-Spam_score: -3.3
+X-Spam_bar: ---
+X-Spam_report: (-3.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-1.825,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,112 +111,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1852196 <1852196@bugs.launchpad.net>
+Cc: peter.maydell@linaro.org, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Description changed:
++Laurent
 
-- edk2-stable202005 has been tagged:
-+ Consume the following upstream edk2 releases:
-  =
+On 9/8/20 9:09 AM, Claudio Fontana wrote:
+> On 9/7/20 6:49 PM, Philippe Mathieu-Daudé wrote:
+>> On 9/7/20 6:30 PM, Claudio Fontana wrote:
+>>> On 9/7/20 12:20 PM, Philippe Mathieu-Daudé wrote:
+>>>> On 9/7/20 12:05 PM, Claudio Fontana wrote:
+>>>>> Hi Richard,
+>>>>>
+>>>>> currently rebasing on top of this one,
+>>>>> just a question, why is the patch not directly using "current_machine"?
+>>>>
+>>>> For user mode?
+>>>
+>>> In user mode I'd not expect softmmu/cpus.c to be built at all...
+>>
+>> Which is why :) current_machine is NULL in user-mode.
+> 
+> Ciao Philippe,
+> 
+> then why does the patch change softmmu/cpus.c in a way that accounts for user mode?
+> 
+> The function that the patch changes is never called in user mode.
+> 
+> The patch could instead use current_machine without any concern of it being NULL, it will always be set in vl.c .
 
-- =C2=A0=C2=A0https://github.com/tianocore/tianocore.github.io/wiki/EDK-II-=
-Release-
-- Planning
-+ https://github.com/tianocore/edk2/releases/tag/edk2-stable201908
-+ https://github.com/tianocore/edk2/releases/tag/edk2-stable201911
-+ https://github.com/tianocore/edk2/releases/tag/edk2-stable202002
-+ https://github.com/tianocore/edk2/releases/tag/edk2-stable202005
-+ https://github.com/tianocore/edk2/releases/tag/edk2-stable202008
-  =
+Better send a patch to prove your point :)
 
-- =C2=A0=C2=A0https://github.com/tianocore/edk2/releases/tag/edk2-stable202=
-005
-+ Worth mentioning (in random order):
-  =
+I have bad remember about the last time I tried to understand/modify
+that part, because IIRC the user-mode creates some fake machine to
+satisfy various QEMU generic code assumptions. Sincerely I now prefer
+stay away from this; too many unmerged patches there.
 
-- Relevant fixes / features in edk2, since edk2-stable201905 (which is
-- what QEMU bundles at the moment, from LP#1831477):
-+ - various CVE fixes [*]
-+ - OpenSSL-1.1.1g
-+ - UEFI HTTPS Boot for ARM/AARCH64
-+ - TPM2 for ARM/AARCH64
-+ - VCPU hotplug with SMI
-+ - support for Linux v5.7+ initrd and mixed mode loading
-+ - Fusion-MPT SCSI driver in OVMF
-+ - VMware PVSCSI driver in OVMF
-+ - PXEv4 / PXEv6 boot possible to disable on the QEMU command line
-+ - SEV-ES support
-  =
-
-- - enable UEFI HTTPS Boot in ArmVirtQemu* platforms
-- =C2=A0=C2=A0https://bugzilla.tianocore.org/show_bug.cgi?id=3D1009
-- =C2=A0=C2=A0(this is from edk2-stable201908)
-+ [*] the below list has been collected simply from the subject lines in
-+ commit range edk2-stable201905..edk2-stable202008:
-  =
-
-- - fix CVE-2019-14553 (Invalid server certificate accepted in HTTPS Boot)
-- =C2=A0=C2=A0https://bugzilla.tianocore.org/show_bug.cgi?id=3D960
-+   CVE-2019-11098 CVE-2019-14553 CVE-2019-14558 CVE-2019-14559
-+   CVE-2019-14562 CVE-2019-14563 CVE-2019-14575 CVE-2019-14586
-+   CVE-2019-14587
-  =
-
-- - consume OpenSSL-1.1.1d, for fixing CVE-2019-1543, CVE-2019-1552 and
-- =C2=A0=C2=A0CVE-2019-1563
-- =C2=A0=C2=A0https://bugzilla.tianocore.org/show_bug.cgi?id=3D2226
-+ (Note that any given CVE from the above list may or may not affect the
-+ firmware binaries packaged with upstream QEMU; consult the upstream
-+ TianoCore bug tracker at <https://bugzilla.tianocore.org/> for details.)
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1852196
-
-Title:
-  update edk2 submodule & binaries to edk2-stable202008
-
-Status in QEMU:
-  In Progress
-
-Bug description:
-  Consume the following upstream edk2 releases:
-
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable201908
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable201911
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202002
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202005
-  https://github.com/tianocore/edk2/releases/tag/edk2-stable202008
-
-  Worth mentioning (in random order):
-
-  - various CVE fixes [*]
-  - OpenSSL-1.1.1g
-  - UEFI HTTPS Boot for ARM/AARCH64
-  - TPM2 for ARM/AARCH64
-  - VCPU hotplug with SMI
-  - support for Linux v5.7+ initrd and mixed mode loading
-  - Fusion-MPT SCSI driver in OVMF
-  - VMware PVSCSI driver in OVMF
-  - PXEv4 / PXEv6 boot possible to disable on the QEMU command line
-  - SEV-ES support
-
-  [*] the below list has been collected simply from the subject lines in
-  commit range edk2-stable201905..edk2-stable202008:
-
-    CVE-2019-11098 CVE-2019-14553 CVE-2019-14558 CVE-2019-14559
-    CVE-2019-14562 CVE-2019-14563 CVE-2019-14575 CVE-2019-14586
-    CVE-2019-14587
-
-  (Note that any given CVE from the above list may or may not affect the
-  firmware binaries packaged with upstream QEMU; consult the upstream
-  TianoCore bug tracker at <https://bugzilla.tianocore.org/> for details.)
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1852196/+subscriptions
+> 
+> Ciao,
+> 
+> Claudio
+> 
+>>
+>>>
+>>> Ciao,
+>>>
+>>> Claudio
+>>>
+>>>>
+>>>>>
+>>>>> Is using MACHINE(qdev_get_machine()) preferrable here?
+>>>>>
+>>>>> Thanks,
+>>>>>
+>>>>> Claudio
+>>>>>
+>>>>> On 9/3/20 11:40 PM, Richard Henderson wrote:
+>>>>>> Do not set parallel_cpus if there is only one cpu instantiated.
+>>>>>> This will allow tcg to use serial code to implement atomics.
+>>>>>>
+>>>>>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>>>> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+>>>>>> ---
+>>>>>>  softmmu/cpus.c | 11 ++++++++++-
+>>>>>>  1 file changed, 10 insertions(+), 1 deletion(-)
+>>>>>>
+>>>>>> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
+>>>>>> index a802e899ab..e3b98065c9 100644
+>>>>>> --- a/softmmu/cpus.c
+>>>>>> +++ b/softmmu/cpus.c
+>>>>>> @@ -1895,6 +1895,16 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>>>>>>      if (!tcg_region_inited) {
+>>>>>>          tcg_region_inited = 1;
+>>>>>>          tcg_region_init();
+>>>>>> +        /*
+>>>>>> +         * If MTTCG, and we will create multiple cpus,
+>>>>>> +         * then we will have cpus running in parallel.
+>>>>>> +         */
+>>>>>> +        if (qemu_tcg_mttcg_enabled()) {
+>>>>>> +            MachineState *ms = MACHINE(qdev_get_machine());
+>>>>>
+>>>>> MachineState *ms = current_machine;
+>>>>> ?
+>>>>>
+>>>>>
+>>>>>> +            if (ms->smp.max_cpus > 1) {
+>>>>>> +                parallel_cpus = true;
+>>>>>> +            }
+>>>>>> +        }
+>>>>>>      }
+>>>>>>  
+>>>>>>      if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
+>>>>>> @@ -1904,7 +1914,6 @@ static void qemu_tcg_init_vcpu(CPUState *cpu)
+>>>>>>  
+>>>>>>          if (qemu_tcg_mttcg_enabled()) {
+>>>>>>              /* create a thread per vCPU with TCG (MTTCG) */
+>>>>>> -            parallel_cpus = true;
+>>>>>>              snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+>>>>>>                   cpu->cpu_index);
+>>>>>>  
+>>>>>>
+>>>>>
+>>>>>
+>>>
+>>>
+> 
+> 
 
