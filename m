@@ -2,62 +2,88 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8035C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 06:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BCEFC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 06:13:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CC4020732
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 06:12:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CC4020732
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 26CC720732
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 06:13:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZwVF8Ps"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26CC720732
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWs7-0007q4-Cx
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 02:12:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37274)
+	id 1kFWsK-000850-8v
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 02:13:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenjiajun8@huawei.com>)
- id 1kFWrM-0006Wk-AB
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 02:12:04 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:53364 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenjiajun8@huawei.com>)
- id 1kFWrJ-0003LN-Av
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 02:12:03 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 82FDABA99FBD54F3D992;
- Tue,  8 Sep 2020 14:11:50 +0800 (CST)
-Received: from DESKTOP-RHHE7UD.china.huawei.com (10.174.187.16) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 8 Sep 2020 14:11:44 +0800
-From: Jiajun Chen <chenjiajun8@huawei.com>
-To: <raphael.s.norwitz@gmail.com>
-Subject: [PATCH] vhost-user: add separate memslot counter for vhost-user
-Date: Tue, 8 Sep 2020 14:11:41 +0800
-Message-ID: <20200908061141.90900-1-chenjiajun8@huawei.com>
-X-Mailer: git-send-email 2.21.0.windows.1
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kFWqL-0004fx-J5
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 02:11:01 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58733
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kFWqJ-0003H7-EW
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 02:11:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599545458;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=WWag+r3eKGvAohddnJn+bFfOxTaQIWsNlAzENuZWfTk=;
+ b=ZZwVF8Ps27Mg+00HMDqnkCotmbsfq/iJxn0o/YicAjLB2ss8hUEVlDaAP0IfLmESVFYu1n
+ 0+xIjLk+j9OFYQtRs/i8+P15/OvsDYL6fgqq47GMMmMnXeCFfKMCbFlmDrqZxXbyzC0BkR
+ RWg04+t++y8a/nGsSw11ZguD7T0cG5E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-467-ml6wlI52NsiykMvzXkwuuQ-1; Tue, 08 Sep 2020 02:10:52 -0400
+X-MC-Unique: ml6wlI52NsiykMvzXkwuuQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C156E801AE2
+ for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 06:10:51 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A6F327E43C;
+ Tue,  8 Sep 2020 06:10:47 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 9E6EC9C87; Tue,  8 Sep 2020 08:10:46 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PULL 1/3] ipxe: update submodule
+Date: Tue,  8 Sep 2020 08:10:44 +0200
+Message-Id: <20200908061046.10871-2-kraxel@redhat.com>
+In-Reply-To: <20200908061046.10871-1-kraxel@redhat.com>
+References: <20200908061046.10871-1-kraxel@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0.003
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.16]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35;
- envelope-from=chenjiajun8@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:11:51
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:33:58
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.1,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,270 +97,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: zhang.zhanghailiang@huawei.com, jasowang@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, mst@redhat.com
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Used_memslots is equal to dev->mem->nregions now, it is true for
-vhost kernel, but not for vhost user, which uses the memory regions
-that have file descriptor. In fact, not all of the memory regions
-have file descriptor.
-It is usefully in some scenarios, e.g. used_memslots is 8, and only
-5 memory slots can be used by vhost user, it is failed to hot plug
-a new memory RAM because vhost_has_free_slot just returned false,
-but we can hot plug it safely in fact.
+master snapshot, most recent commit from Aug 23th
 
---
-ChangeList:
-v2:
--eliminating useless used_memslots_exceeded variable and used_memslots_is_exceeded() API
+shortlog
+========
 
-v1:
--vhost-user: add separate memslot counter for vhost-user
+Andrew Grasso (1):
+      [intel] Add INTEL_NO_PHY_RST for I218LM
 
-Signed-off-by: Jiajun Chen <chenjiajun8@huawei.com>
-Signed-off-by: Jianjay Zhou <jianjay.zhou@huawei.com>
+Ben Bleything (1):
+      [intel] Set INTEL_NO_PHY_RST on i218v
+
+Bobby Lockwood (1):
+      [libgcc] Change __divmoddi4 from int64 [unknown] to int64_t
+
+Bruce Rogers (1):
+      [build] Be explicit about -fcommon compiler directive
+
+Christian Nilsson (1):
+      [intel] Add PCI ID for I219-V and -LM 6 to 9
+
+Daniel Johnson (1):
+      [deflate] Fix typo in comment describing length codes
+
+David Decotigny (2):
+      [pcbios] Fix "out of memory" detection when expanding bottom area
+      [pcbios] Take alignment into account when checking for available space
+
+Dentcho Ludmilov Bankov (1):
+      [comboot] Fix stack pointer retrieval after COM32 binary returns
+
+Ignat Korchagin (3):
+      [snp] Try promiscuous multicast receive filter if the regular one fails
+      [snp] Set EFI_SIMPLE_NETWORK_RECEIVE_MULTICAST bit as per UEFI spec
+      [efi] Check the status code from AllocatePool()
+
+Joe Groocock (1):
+      [cmdline] Add "--timeout" parameter to "ifconf" command
+
+Joseph Wong (1):
+      [bnxt] Add driver support for Broadcom NetXtreme-E Adapters
+
+LaDerrick H (1):
+      [sfc] Add PCI ID for Solarflare SFC9120 and Solarflare SFC9140
+
+Michael Brown (105):
+      [init] Show startup and shutdown function names in debug messages
+      [efi] Blacklist the Dell Ip4ConfigDxe driver
+      [tls] Support stateful session resumption
+      [tls] Fix incorrectly duplicated error number
+      [tls] Support stateless session resumption
+      [crypto] Use x509_name() in validator debug messages
+      [tls] Display cross-certificate and OCSP status messages
+      [tls] Display validator messages only while validation is in progress
+      [tcp] Display "connecting" status until connection is established
+      [ocsp] Accept response certID with missing hashAlgorithm parameters
+      [pci] Add support for PCI MSI-X interrupts
+      [vlan] Provide vlan_netdev_rx() and vlan_netdev_rx_err()
+      [intelxl] Use VLAN tag in receive descriptor if present
+      [intelxl] Allow for virtual function admin queue register maps
+      [intelxl] Use one admin queue buffer per admin queue descriptor
+      [intelxl] Allow admin queues to be reinitialised
+      [intelxl] Allow admin cookie to hold extended opcode and return code
+      [intelxl] Provide a mechanism for handling "send to VF" events
+      [intelxl] Use 32-byte receive descriptors
+      [intelxl] Allow for arbitrary placement of ring tail registers
+      [intelxl] Split out ring creation from context programming
+      [intelxl] Allow for arbitrary placement of interrupt control register
+      [intelxl] Expose functions required by virtual function driver
+      [intelxl] Choose to operate in non-PXE mode
+      [intelxl] Add driver for Intel 40 Gigabit Ethernet NIC virtual functions
+      [build] Fix use of inline assembly on GCC 8 ARM64 builds
+      [arm] Provide dummy implementations for {in,out}[s]{b,w,l}
+      [efi] Return only registered EFI devices from efidev_parent()
+      [fdt] Add ability to parse a MAC address from a flattened device tree
+      [efi] Register a device tree if provided by the platform firmware
+      [smsc95xx] Fetch MAC from device tree for Raspberry Pi
+      [build] Add named configuration for Raspberry Pi
+      [smscusb] Fetch MAC from device tree for Raspberry Pi Model B+
+      [build] Do not apply WORKAROUND_CFLAGS for host compiler
+      [build] Move predefined all-drivers build shortcut to Makefile
+      [build] Add predefined shortcut for Raspberry Pi builds
+      [process] Add PROC_INIT() for initialising static processes
+      [peerdist] Start block download timers from within opener methods
+      [peerdist] Limit number of concurrent raw block downloads
+      [tls] Add missing call to tls_tx_resume() when restarting negotiation
+      [crypto] Drag in configured digestInfo prefixes for any use of RSA
+      [crypto] Profile the various stages of modular multiplication
+      [coverity] Override assumptions about wcrtomb() and hmac_init()
+      [ethernet] Avoid false positive Coverity warning
+      [golan] Fix address-of-pointer bug for multicast attach/detach
+      [efi] Report failed control transfers as expected by the USB core
+      [efi] Do not attempt EFI_USB_IO_PROTOCOL transfers during shutdown
+      [lan78xx] Always enable automatic speed and duplex detection
+      [peerdist] Allow PeerDist to be globally enabled or disabled
+      [peerdist] Allow for the use of a hosted cache server
+      [build] Construct full version number automatically from git revision
+      [travis] Ensure that most recent tag is always available
+      [tftp] Eliminate unnecessary variable-length stack allocation
+      [infiniband] Eliminate variable-length stack allocation
+      [slam] Eliminate variable-length stack allocation
+      [slam] Allow for the possibility of IPv6 multicast addresses
+      [settings] Eliminate variable-length stack allocation
+      [iscsi] Eliminate variable-length stack allocations in CHAP handlers
+      [iscsi] Eliminate variable-length stack allocation in URI parsing
+      [bios] Define macros for constructing partition table entries
+      [int13con] Create log partition only when CONSOLE_INT13 is enabled
+      [efi] Disambiguate errors returned by ConnectController
+      [png] Fix potential integer overflow
+      [efi] Work around UEFI specification bug in LoadImage
+      [efi] Work around UEFI specification bug in LoadImage for SAN boot
+      [uri] Avoid appearing to access final byte of a potentially empty string
+      [efi] Attempt to connect our driver directly if ConnectController fails
+      [tls] Allow a minimum TLS protocol version to be specified
+      [tls] Default to supporting only TLSv1.1 or above
+      [crypto] Allow algorithms to be included without being OID-identifiable
+      [crypto] Ensure that test code drags in required ASN.1 object identifiers
+      [crypto] Disable MD5 as an OID-identifiable algorithm by default
+      [snp] Retry initialisation if link is reported as down
+      [util] Treat empty integer strings as invalid
+      [parseopt] Treat empty integer strings in user input as invalid
+      [efi] Enable stack protection where possible
+      [ocsp] Accept SHA1 certID responses even if SHA1 is not enabled
+      [intel] Avoid spurious compiler warning on GCC 10
+      [golan] Add explicit type casts for nodnic_queue_pair_type
+      [build] Disable position-independent code for ARM64 EFI builds
+      [efi] Detect and disable seriously broken EFI_RNG_PROTOCOL implementations
+      [efi] Raise TPL during driver entry point
+      [axge] Handle non-gigabit link speeds
+      [usb] Clear device endpoint halt before resetting host endpoint
+      [usb] Add missing usb_recycle() for completed hub interrupt transfers
+      [usb] Do not attempt to disable USB3 hub ports
+      [xhci] Set link state to RxDetect after disabling USB3 root hub port
+      [usb] Avoid unnecessary calls to usb_hub_set_drvdata()
+      [xhci] Increase link state settling delay to 100ms
+      [axge] Reapply USB device configuration when opening network device
+      [usb] Leave port enabled after a failed device registration
+      [crypto] Avoid temporarily setting direction flag in bigint_is_geq()
+      [libc] Provide an unoptimised generic_memcpy_reverse()
+      [efi] Avoid setting direction flag on EFI platforms
+      [libc] Add bit-rotation functions for unsigned long values
+      [efi] Distribute available entropy within stack cookie
+      [efi] Ensure NUL byte is at lowest address within stack cookie
+      [efi] Claim SNP devices early in efi_download_start()
+      [xfer] Remove address family from definition of a socket opener
+      [dns] Use all configured DNS servers
+      [wpa] Fix erroneous debug message in wpa_derive_ptk
+      [efi] Match EDK2 numbering for USB ports
+      [efi] Use device path to locate filesystem from which we were loaded
+      [efi] Attempt NII initialisation both with and without cable detection
+      [build] Fix building on older versions of gcc
+
+Michael J. Bazzinotti (1):
+      [libc] Fix memcmp() to return proper values
+
+Mohammed (1):
+      [golan] Add various new PCI device IDs
+
+Rob Taglang (1):
+      [intelx] Added PCI_ROM entry for Intel x553/x557-AT and x553 (SFP+) NICs
+
+Tobias Kortkamp (1):
+      [build] Fix a GNUism that FreeBSD's sed(1) cannot deal with
+
+Valentine Barshak (2):
+      [build] Fix "'%s' directive argument is null" error
+      [build] Workaround compilation error with gcc 9.1
+
+bit (1):
+      [build] Fix default target in sdsk image
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/virtio/vhost-backend.c         | 14 ++++++++++++
- hw/virtio/vhost-user.c            | 28 +++++++++++++++++++++++
- hw/virtio/vhost.c                 | 37 +++++++++++++++++++++++--------
- include/hw/virtio/vhost-backend.h |  5 +++++
- net/vhost-user.c                  |  7 ++++++
- 5 files changed, 82 insertions(+), 9 deletions(-)
+ roms/ipxe | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/vhost-backend.c b/hw/virtio/vhost-backend.c
-index 782b1d67d9..35eec7e166 100644
---- a/hw/virtio/vhost-backend.c
-+++ b/hw/virtio/vhost-backend.c
-@@ -20,6 +20,8 @@
- #include <linux/vhost.h>
- #include <sys/ioctl.h>
- 
-+static unsigned int vhost_kernel_used_memslots;
-+
- static int vhost_kernel_call(struct vhost_dev *dev, unsigned long int request,
-                              void *arg)
- {
-@@ -238,6 +240,16 @@ static void vhost_kernel_set_iotlb_callback(struct vhost_dev *dev,
-         qemu_set_fd_handler((uintptr_t)dev->opaque, NULL, NULL, NULL);
- }
- 
-+static void vhost_kernel_set_used_memslots(struct vhost_dev *dev)
-+{
-+    vhost_kernel_used_memslots = dev->mem->nregions;
-+}
-+
-+static unsigned int vhost_kernel_get_used_memslots(void)
-+{
-+    return vhost_kernel_used_memslots;
-+}
-+
- static const VhostOps kernel_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_KERNEL,
-         .vhost_backend_init = vhost_kernel_init,
-@@ -269,6 +281,8 @@ static const VhostOps kernel_ops = {
- #endif /* CONFIG_VHOST_VSOCK */
-         .vhost_set_iotlb_callback = vhost_kernel_set_iotlb_callback,
-         .vhost_send_device_iotlb_msg = vhost_kernel_send_device_iotlb_msg,
-+        .vhost_set_used_memslots = vhost_kernel_set_used_memslots,
-+        .vhost_get_used_memslots = vhost_kernel_get_used_memslots,
- };
- #endif
- 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 31231218dc..ec46a745fa 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -232,6 +232,7 @@ static VhostUserMsg m __attribute__ ((unused));
- 
- /* The version of the protocol we support */
- #define VHOST_USER_VERSION    (0x1)
-+static unsigned int vhost_user_used_memslots;
- 
- struct vhost_user {
-     struct vhost_dev *dev;
-@@ -2354,6 +2355,31 @@ void vhost_user_cleanup(VhostUserState *user)
-     user->chr = NULL;
- }
- 
-+static void vhost_user_set_used_memslots(struct vhost_dev *dev)
-+{
-+    unsigned int counter = 0;
-+    int i;
-+
-+    for (i = 0; i < dev->mem->nregions; ++i) {
-+        struct vhost_memory_region *reg = dev->mem->regions + i;
-+        ram_addr_t offset;
-+        MemoryRegion *mr;
-+        int fd;
-+
-+        assert((uintptr_t)reg->userspace_addr == reg->userspace_addr);
-+        mr = vhost_user_get_mr_data(reg->userspace_addr, &offset, &fd);
-+        if (mr && fd > 0) {
-+            counter++;
-+        }
-+    }
-+    vhost_user_used_memslots = counter;
-+}
-+
-+static unsigned int vhost_user_get_used_memslots(void)
-+{
-+    return vhost_user_used_memslots;
-+}
-+
- const VhostOps user_ops = {
-         .backend_type = VHOST_BACKEND_TYPE_USER,
-         .vhost_backend_init = vhost_user_backend_init,
-@@ -2387,4 +2413,6 @@ const VhostOps user_ops = {
-         .vhost_backend_mem_section_filter = vhost_user_mem_section_filter,
-         .vhost_get_inflight_fd = vhost_user_get_inflight_fd,
-         .vhost_set_inflight_fd = vhost_user_set_inflight_fd,
-+        .vhost_set_used_memslots = vhost_user_set_used_memslots,
-+        .vhost_get_used_memslots = vhost_user_get_used_memslots,
- };
-diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-index 1a1384e7a6..b8d617d24c 100644
---- a/hw/virtio/vhost.c
-+++ b/hw/virtio/vhost.c
-@@ -45,20 +45,20 @@
- static struct vhost_log *vhost_log;
- static struct vhost_log *vhost_log_shm;
- 
--static unsigned int used_memslots;
- static QLIST_HEAD(, vhost_dev) vhost_devices =
-     QLIST_HEAD_INITIALIZER(vhost_devices);
- 
- bool vhost_has_free_slot(void)
- {
--    unsigned int slots_limit = ~0U;
-     struct vhost_dev *hdev;
- 
-     QLIST_FOREACH(hdev, &vhost_devices, entry) {
--        unsigned int r = hdev->vhost_ops->vhost_backend_memslots_limit(hdev);
--        slots_limit = MIN(slots_limit, r);
-+        if (hdev->vhost_ops->vhost_get_used_memslots() >=
-+            hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-+            return false;
-+        }
-     }
--    return slots_limit > used_memslots;
-+    return true;
- }
- 
- static void vhost_dev_sync_region(struct vhost_dev *dev,
-@@ -502,7 +502,6 @@ static void vhost_commit(MemoryListener *listener)
-                        dev->n_mem_sections * sizeof dev->mem->regions[0];
-     dev->mem = g_realloc(dev->mem, regions_size);
-     dev->mem->nregions = dev->n_mem_sections;
--    used_memslots = dev->mem->nregions;
-     for (i = 0; i < dev->n_mem_sections; i++) {
-         struct vhost_memory_region *cur_vmr = dev->mem->regions + i;
-         struct MemoryRegionSection *mrs = dev->mem_sections + i;
-@@ -678,6 +677,7 @@ static void vhost_region_add_section(struct vhost_dev *dev,
-         dev->tmp_sections[dev->n_tmp_sections - 1].fv = NULL;
-         memory_region_ref(section->mr);
-     }
-+    dev->vhost_ops->vhost_set_used_memslots(dev);
- }
- 
- /* Used for both add and nop callbacks */
-@@ -693,6 +693,17 @@ static void vhost_region_addnop(MemoryListener *listener,
-     vhost_region_add_section(dev, section);
- }
- 
-+static void vhost_region_del(MemoryListener *listener,
-+                             MemoryRegionSection *section)
-+{
-+    struct vhost_dev *dev = container_of(listener, struct vhost_dev,
-+                                         memory_listener);
-+    if (!vhost_section(dev, section)) {
-+        return;
-+    }
-+    dev->vhost_ops->vhost_set_used_memslots(dev);
-+}
-+
- static void vhost_iommu_unmap_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
- {
-     struct vhost_iommu *iommu = container_of(n, struct vhost_iommu, n);
-@@ -1300,6 +1311,7 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-     hdev->memory_listener = (MemoryListener) {
-         .begin = vhost_begin,
-         .commit = vhost_commit,
-+        .region_del = vhost_region_del,
-         .region_add = vhost_region_addnop,
-         .region_nop = vhost_region_addnop,
-         .log_start = vhost_log_start,
-@@ -1346,9 +1358,16 @@ int vhost_dev_init(struct vhost_dev *hdev, void *opaque,
-     memory_listener_register(&hdev->memory_listener, &address_space_memory);
-     QLIST_INSERT_HEAD(&vhost_devices, hdev, entry);
- 
--    if (used_memslots > hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
--        error_report("vhost backend memory slots limit is less"
--                " than current number of present memory slots");
-+    /*
-+     * If we started a VM without any vhost device,
-+     * for the first time vhost device hot-plug
-+     * (vhost_get_used_memslots is always 0),
-+     * so it needs to double check here
-+     */
-+    if (hdev->vhost_ops->vhost_get_used_memslots() >
-+        hdev->vhost_ops->vhost_backend_memslots_limit(hdev)) {
-+        error_report("vhost backend memory slots limit is less than"
-+                     " current number of present memory slots");
-         r = -1;
-         if (busyloop_timeout) {
-             goto fail_busyloop;
-diff --git a/include/hw/virtio/vhost-backend.h b/include/hw/virtio/vhost-backend.h
-index 8825bd278f..ed43a93692 100644
---- a/include/hw/virtio/vhost-backend.h
-+++ b/include/hw/virtio/vhost-backend.h
-@@ -124,6 +124,9 @@ typedef int (*vhost_get_device_id_op)(struct vhost_dev *dev, uint32_t *dev_id);
- 
- typedef bool (*vhost_force_iommu_op)(struct vhost_dev *dev);
- 
-+typedef void (*vhost_set_used_memslots_op)(struct vhost_dev *dev);
-+typedef unsigned int (*vhost_get_used_memslots_op)(void);
-+
- typedef struct VhostOps {
-     VhostBackendType backend_type;
-     vhost_backend_init vhost_backend_init;
-@@ -168,6 +171,8 @@ typedef struct VhostOps {
-     vhost_vq_get_addr_op  vhost_vq_get_addr;
-     vhost_get_device_id_op vhost_get_device_id;
-     vhost_force_iommu_op vhost_force_iommu;
-+    vhost_set_used_memslots_op vhost_set_used_memslots;
-+    vhost_get_used_memslots_op vhost_get_used_memslots;
- } VhostOps;
- 
- extern const VhostOps user_ops;
-diff --git a/net/vhost-user.c b/net/vhost-user.c
-index 17532daaf3..7e93955537 100644
---- a/net/vhost-user.c
-+++ b/net/vhost-user.c
-@@ -20,6 +20,7 @@
- #include "qemu/error-report.h"
- #include "qemu/option.h"
- #include "trace.h"
-+#include "include/hw/virtio/vhost.h"
- 
- typedef struct NetVhostUserState {
-     NetClientState nc;
-@@ -347,6 +348,12 @@ static int net_vhost_user_init(NetClientState *peer, const char *device,
-         qemu_chr_fe_set_handlers(&s->chr, NULL, NULL,
-                                  net_vhost_user_event, NULL, nc0->name, NULL,
-                                  true);
-+
-+        if (!vhost_has_free_slot()) {
-+            error_report("used memslots exceeded the backend limit, quit "
-+                         "loop");
-+            goto err;
-+        }
-     } while (!s->started);
- 
-     assert(s->vhost_net);
+diff --git a/roms/ipxe b/roms/ipxe
+index de4565cbe76e..4bd064de239d 160000
+--- a/roms/ipxe
++++ b/roms/ipxe
+@@ -1 +1 @@
+-Subproject commit de4565cbe76ea9f7913a01f331be3ee901bb6e17
++Subproject commit 4bd064de239dab2426b31c9789a1f4d78087dc63
 -- 
-2.19.1
+2.27.0
 
 
