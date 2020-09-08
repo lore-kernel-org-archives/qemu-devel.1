@@ -7,84 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0837C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:08:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 956B0C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:09:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B3E0207DE
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:08:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30BE1204FD
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 20:09:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EfFXwxHd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B3E0207DE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3BZjpm9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30BE1204FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFjv2-0007ek-1L
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:08:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43904)
+	id 1kFjvt-0000iH-6S
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 16:09:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kFjoa-0001Pq-Pq
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:02:04 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:48304
- helo=us-smtp-1.mimecast.com)
+ id 1kFjoZ-0001Ng-Mv
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:02:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49702)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kFjoY-0004Nu-Sj
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:02:04 -0400
+ id 1kFjoU-0004MJ-Gg
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 16:02:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599595319;
+ s=mimecast20190719; t=1599595317;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=T4dBx0MZfsfJpNpI7a/vbxtuu/0AO++J414wc1ABxzM=;
- b=EfFXwxHdk/Wyf6UrOnMfXniEjcNaNTV8dv0XM+h9MZ5Fi/w/4VFQy0TWDfoba8WlFt5bb+
- 7XKigc9lV0k3l019vZGLtEkRs/KrFZxJxxKF4n1/hbhV5N9UY5ypAl8IyCSKgoGO/w0f+C
- CWYsiHS38WvBZPSpWt1O2tUtiYJ+PsA=
+ bh=KBBQHKCaZNmcoT8GjRywod67shGKvN15dsv6PCG16Vk=;
+ b=N3BZjpm9fjkspk4na0JehVyagd9TPhVTIuojcv5RY0Y08DNMrGlpXpqDdd/L5wJsQqDoV9
+ gGvPK3WF77zIGNSQJBNiY/tZ+P/JxcOcQTKAxJo/H/9ehcx8w0m3V3R8ZZvuMcr4OfXurg
+ 7uq2/lcjAXgKRXCKHwze2FZo1mVLL/Q=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-409-84eoK-WKN-6ZIUXpY2dQSw-1; Tue, 08 Sep 2020 16:01:57 -0400
-X-MC-Unique: 84eoK-WKN-6ZIUXpY2dQSw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-536-h3V2ktocNdaQ5GjNpdrwfw-1; Tue, 08 Sep 2020 16:01:55 -0400
+X-MC-Unique: h3V2ktocNdaQ5GjNpdrwfw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CBA980F041;
- Tue,  8 Sep 2020 20:01:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F21BD80F044;
+ Tue,  8 Sep 2020 20:01:53 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DA3C25D9E8;
- Tue,  8 Sep 2020 20:01:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8B813805CF;
+ Tue,  8 Sep 2020 20:01:53 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
 	qemu-devel@nongnu.org
-Subject: [PULL 23/34] rs6000_mc: Rename RS6000MC_DEVICE to RS6000MC
-Date: Tue,  8 Sep 2020 16:01:12 -0400
-Message-Id: <20200908200123.3402311-24-ehabkost@redhat.com>
+Subject: [PULL 21/34] esp: Rename ESP_STATE to ESP
+Date: Tue,  8 Sep 2020 16:01:10 -0400
+Message-Id: <20200908200123.3402311-22-ehabkost@redhat.com>
 In-Reply-To: <20200908200123.3402311-1-ehabkost@redhat.com>
 References: <20200908200123.3402311-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 12:55:20
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 12:54:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,7 +98,6 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,
  =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
@@ -110,35 +108,113 @@ constant.
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20200902224311.1321159-48-ehabkost@redhat.com>
+Message-Id: <20200902224311.1321159-40-ehabkost@redhat.com>
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- hw/ppc/rs6000_mc.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/hw/scsi/esp.h | 2 +-
+ hw/dma/sparc32_dma.c  | 2 +-
+ hw/m68k/q800.c        | 2 +-
+ hw/mips/jazz.c        | 2 +-
+ hw/scsi/esp.c         | 6 +++---
+ hw/sparc/sun4m.c      | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/hw/ppc/rs6000_mc.c b/hw/ppc/rs6000_mc.c
-index 56e96010b8..8611ffa96d 100644
---- a/hw/ppc/rs6000_mc.c
-+++ b/hw/ppc/rs6000_mc.c
-@@ -30,7 +30,7 @@
+diff --git a/include/hw/scsi/esp.h b/include/hw/scsi/esp.h
+index f281625dd5..20800dbf5b 100644
+--- a/include/hw/scsi/esp.h
++++ b/include/hw/scsi/esp.h
+@@ -67,7 +67,7 @@ struct ESPState {
  
- #define TYPE_RS6000MC "rs6000-mc"
- typedef struct RS6000MCState RS6000MCState;
--DECLARE_INSTANCE_CHECKER(RS6000MCState, RS6000MC_DEVICE,
-+DECLARE_INSTANCE_CHECKER(RS6000MCState, RS6000MC,
-                          TYPE_RS6000MC)
+ #define TYPE_ESP "esp"
+ typedef struct SysBusESPState SysBusESPState;
+-DECLARE_INSTANCE_CHECKER(SysBusESPState, ESP_STATE,
++DECLARE_INSTANCE_CHECKER(SysBusESPState, ESP,
+                          TYPE_ESP)
  
- struct RS6000MCState {
-@@ -143,7 +143,7 @@ static const MemoryRegionPortio rs6000mc_port_list[] = {
+ struct SysBusESPState {
+diff --git a/hw/dma/sparc32_dma.c b/hw/dma/sparc32_dma.c
+index bcd1626fbd..d20a5bc065 100644
+--- a/hw/dma/sparc32_dma.c
++++ b/hw/dma/sparc32_dma.c
+@@ -303,7 +303,7 @@ static void sparc32_espdma_device_realize(DeviceState *dev, Error **errp)
  
- static void rs6000mc_realize(DeviceState *dev, Error **errp)
+     d = qdev_new(TYPE_ESP);
+     object_property_add_child(OBJECT(dev), "esp", OBJECT(d));
+-    sysbus = ESP_STATE(d);
++    sysbus = ESP(d);
+     esp = &sysbus->esp;
+     esp->dma_memory_read = espdma_memory_read;
+     esp->dma_memory_write = espdma_memory_write;
+diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+index 1ca482ad81..ce4b47c3e3 100644
+--- a/hw/m68k/q800.c
++++ b/hw/m68k/q800.c
+@@ -290,7 +290,7 @@ static void q800_init(MachineState *machine)
+     /* SCSI */
+ 
+     dev = qdev_new(TYPE_ESP);
+-    sysbus_esp = ESP_STATE(dev);
++    sysbus_esp = ESP(dev);
+     esp = &sysbus_esp->esp;
+     esp->dma_memory_read = NULL;
+     esp->dma_memory_write = NULL;
+diff --git a/hw/mips/jazz.c b/hw/mips/jazz.c
+index 82a6e3220e..47723093b6 100644
+--- a/hw/mips/jazz.c
++++ b/hw/mips/jazz.c
+@@ -309,7 +309,7 @@ static void mips_jazz_init(MachineState *machine,
+ 
+     /* SCSI adapter */
+     dev = qdev_new(TYPE_ESP);
+-    sysbus_esp = ESP_STATE(dev);
++    sysbus_esp = ESP(dev);
+     esp = &sysbus_esp->esp;
+     esp->dma_memory_read = rc4030_dma_read;
+     esp->dma_memory_write = rc4030_dma_write;
+diff --git a/hw/scsi/esp.c b/hw/scsi/esp.c
+index 405f8b7cbc..b84e0fe33e 100644
+--- a/hw/scsi/esp.c
++++ b/hw/scsi/esp.c
+@@ -929,7 +929,7 @@ static const struct SCSIBusInfo esp_scsi_info = {
+ 
+ static void sysbus_esp_gpio_demux(void *opaque, int irq, int level)
  {
--    RS6000MCState *s = RS6000MC_DEVICE(dev);
-+    RS6000MCState *s = RS6000MC(dev);
-     int socket = 0;
-     unsigned int ram_size = s->ram_size / MiB;
-     Error *local_err = NULL;
+-    SysBusESPState *sysbus = ESP_STATE(opaque);
++    SysBusESPState *sysbus = ESP(opaque);
+     ESPState *s = &sysbus->esp;
+ 
+     switch (irq) {
+@@ -945,7 +945,7 @@ static void sysbus_esp_gpio_demux(void *opaque, int irq, int level)
+ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
+ {
+     SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+-    SysBusESPState *sysbus = ESP_STATE(dev);
++    SysBusESPState *sysbus = ESP(dev);
+     ESPState *s = &sysbus->esp;
+ 
+     sysbus_init_irq(sbd, &s->irq);
+@@ -967,7 +967,7 @@ static void sysbus_esp_realize(DeviceState *dev, Error **errp)
+ 
+ static void sysbus_esp_hard_reset(DeviceState *dev)
+ {
+-    SysBusESPState *sysbus = ESP_STATE(dev);
++    SysBusESPState *sysbus = ESP(dev);
+     esp_hard_reset(&sysbus->esp);
+ }
+ 
+diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
+index 256033b9a0..947b69d159 100644
+--- a/hw/sparc/sun4m.c
++++ b/hw/sparc/sun4m.c
+@@ -335,7 +335,7 @@ static void *sparc32_dma_init(hwaddr dma_base,
+                                    OBJECT(dma), "espdma"));
+     sysbus_connect_irq(SYS_BUS_DEVICE(espdma), 0, espdma_irq);
+ 
+-    esp = ESP_STATE(object_resolve_path_component(OBJECT(espdma), "esp"));
++    esp = ESP(object_resolve_path_component(OBJECT(espdma), "esp"));
+     sysbus_mmio_map(SYS_BUS_DEVICE(esp), 0, esp_base);
+     scsi_bus_legacy_handle_cmdline(&esp->esp.bus);
+ 
 -- 
 2.26.2
 
