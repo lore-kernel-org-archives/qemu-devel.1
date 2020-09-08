@@ -5,60 +5,61 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A192C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:43:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C12FAC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:43:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82C0B206E7
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:43:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 570E5206DB
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:43:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ev3Nk22J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82C0B206E7
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="i1VTksq9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 570E5206DB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49620 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFgiX-0008LA-Lg
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 12:43:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49496)
+	id 1kFgiZ-0008Qs-Fy
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 12:43:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1kFghW-00075L-Mt
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 12:42:34 -0400
-Received: from mail-m975.mail.163.com ([123.126.97.5]:49856)
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1kFghY-00075w-22
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 12:42:36 -0400
+Received: from mail-m975.mail.163.com ([123.126.97.5]:49894)
  by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1kFghR-0002LP-GR
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 12:42:33 -0400
+ (Exim 4.90_1) (envelope-from <liq3ea@163.com>) id 1kFghV-0002Lj-Sc
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 12:42:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=From:Subject:Date:Message-Id; bh=6o6Keb5oFii1iCN3xI
- h04mis0S3GAV4u9wS5ltt8Iao=; b=ev3Nk22JBi+5itTFJJn3QhYmJmo0HJvfgP
- 6vgZHfY5jEV/9efBYTNu7+xuAnbyG7Y4PNm/EhgzkMlGgZmRIULFsWyWnvbF7PNn
- OqpbowiwJfbAJ6+EvHg662BqDgWxOaT2AS3oREri7e56XMzATFFRMrx1eQk9iv7+
- vzzPhJoHw=
+ s=s110527; h=From:Subject:Date:Message-Id; bh=ue6ZFmUxcoAPwFD/W8
+ EjddlF4L1dxZ5iyH/qq+Mkd7Q=; b=i1VTksq9cypu4xvCMDCvtI5anP35ZHT7/V
+ kvpQx75HCJXNXQ2oSNsjPvK7hR8FzJaUWhdxmrn729R6kL+E77+uJzKCdE31o5Cw
+ lsXNcx76xC8TdEC0L06Y7vSirqLtljNYxn7MNWGcgB8EH0mKneHxQdPoisbPdDhF
+ RnQJQ1w7U=
 Received: from localhost.localdomain (unknown [183.158.94.209])
- by smtp5 (Coremail) with SMTP id HdxpCgCnGRhetFdf9j7RJg--.1087S5;
- Wed, 09 Sep 2020 00:42:09 +0800 (CST)
+ by smtp5 (Coremail) with SMTP id HdxpCgCnGRhetFdf9j7RJg--.1087S8;
+ Wed, 09 Sep 2020 00:42:15 +0800 (CST)
 From: Li Qiang <liq3ea@163.com>
 To: dmitry.fleytman@gmail.com, jasowang@redhat.com, kraxel@redhat.com,
  pbonzini@redhat.com, berrange@redhat.com, ehabkost@redhat.com,
  alxndr@bu.edu, peter.maydell@linaro.org, f4bug@amsat.org
-Subject: [RFC 1/4] memory: add memory_region_init_io_with_dev interface
-Date: Tue,  8 Sep 2020 09:41:54 -0700
-Message-Id: <20200908164157.47108-2-liq3ea@163.com>
+Subject: [RFC 4/4] hcd-xhci: use the new memory_region_init_io_with_dev
+ interface
+Date: Tue,  8 Sep 2020 09:41:57 -0700
+Message-Id: <20200908164157.47108-5-liq3ea@163.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200908164157.47108-1-liq3ea@163.com>
 References: <20200908164157.47108-1-liq3ea@163.com>
-X-CM-TRANSID: HdxpCgCnGRhetFdf9j7RJg--.1087S5
-X-Coremail-Antispam: 1Uf129KBjvJXoW7ZrW8ZF1kur48Kr1DKw47CFg_yoW8CF1kpF
- 97uF9Ygr48tF9xZF1ftF4DWFyrA3y8K3W7Cr9rZwn2krs7tF9xArWUG345AryUCrWUX3W5
- XFyUXr4fuan5J3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
- 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRaYL9UUUUU=
+X-CM-TRANSID: HdxpCgCnGRhetFdf9j7RJg--.1087S8
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KFykCFWfGF18ZrWxGr15urg_yoW8KFy5pF
+ 4fXas8WryfJFnIqrsxta1kZFs5A34kKryxGFyxA3sFqFs2kw1qya1Iyw1FkF97KrykJr45
+ XF4rJF1fWw1DJaUanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+ 9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UzmhrUUUUU=
 X-Originating-IP: [183.158.94.209]
-X-CM-SenderInfo: 5oltjvrd6rljoofrz/1tbiKQGZbVXlxmTITQAAsL
+X-CM-SenderInfo: 5oltjvrd6rljoofrz/xtbBZgeZbVaD53waIAAAsh
 Received-SPF: pass client-ip=123.126.97.5; envelope-from=liq3ea@163.com;
  helo=mail-m975.mail.163.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 12:42:19
@@ -87,70 +88,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently the MR is not explicitly connecting with its device instead of
-a opaque. In most situation this opaque is the deivce but it is not an
-enforcement. This patch adds a DeviceState member of to MemoryRegion
-we will use it in later patch.
+This can avoid the DMA to MMIO issue here:
 
+https://bugs.launchpad.net/qemu/+bug/1891354
 Signed-off-by: Li Qiang <liq3ea@163.com>
 ---
- include/exec/memory.h |  9 +++++++++
- softmmu/memory.c      | 15 +++++++++++++++
- 2 files changed, 24 insertions(+)
+ hw/usb/hcd-xhci.c | 25 +++++++++++++++----------
+ 1 file changed, 15 insertions(+), 10 deletions(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 0cfe987ab4..620fb12d9b 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -404,6 +404,7 @@ struct MemoryRegion {
-     const char *name;
-     unsigned ioeventfd_nb;
-     MemoryRegionIoeventfd *ioeventfds;
-+    DeviceState *dev;
- };
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 46a2186d91..1954ae2ae7 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -3437,14 +3437,18 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
  
- struct IOMMUMemoryRegion {
-@@ -794,6 +795,14 @@ void memory_region_init_io(MemoryRegion *mr,
-                            const char *name,
-                            uint64_t size);
+     memory_region_init(&xhci->mem, OBJECT(xhci), "xhci", LEN_REGS);
+-    memory_region_init_io(&xhci->mem_cap, OBJECT(xhci), &xhci_cap_ops, xhci,
+-                          "capabilities", LEN_CAP);
+-    memory_region_init_io(&xhci->mem_oper, OBJECT(xhci), &xhci_oper_ops, xhci,
+-                          "operational", 0x400);
+-    memory_region_init_io(&xhci->mem_runtime, OBJECT(xhci), &xhci_runtime_ops, xhci,
+-                          "runtime", LEN_RUNTIME);
+-    memory_region_init_io(&xhci->mem_doorbell, OBJECT(xhci), &xhci_doorbell_ops, xhci,
+-                          "doorbell", LEN_DOORBELL);
++    memory_region_init_io_with_dev(&xhci->mem_cap, OBJECT(xhci),
++                                   &xhci_cap_ops, xhci,
++                                   "capabilities", LEN_CAP, &dev->qdev);
++    memory_region_init_io_with_dev(&xhci->mem_oper, OBJECT(xhci),
++                                   &xhci_oper_ops, xhci,
++                                   "operational", 0x400, &dev->qdev);
++    memory_region_init_io_with_dev(&xhci->mem_runtime, OBJECT(xhci),
++                                   &xhci_runtime_ops, xhci,
++                                   "runtime", LEN_RUNTIME, &dev->qdev);
++    memory_region_init_io_with_dev(&xhci->mem_doorbell, OBJECT(xhci),
++                                   &xhci_doorbell_ops, xhci,
++                                   "doorbell", LEN_DOORBELL, &dev->qdev);
  
-+void memory_region_init_io_with_dev(MemoryRegion *mr,
-+                           struct Object *owner,
-+                           const MemoryRegionOps *ops,
-+                           void *opaque,
-+                           const char *name,
-+                           uint64_t size,
-+                           DeviceState *dev);
-+
- /**
-  * memory_region_init_ram_nomigrate:  Initialize RAM memory region.  Accesses
-  *                                    into the region will modify memory
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index 70b93104e8..2628c9d2d9 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -1490,6 +1490,21 @@ void memory_region_init_io(MemoryRegion *mr,
-     mr->terminates = true;
- }
+     memory_region_add_subregion(&xhci->mem, 0,            &xhci->mem_cap);
+     memory_region_add_subregion(&xhci->mem, OFF_OPER,     &xhci->mem_oper);
+@@ -3455,8 +3459,9 @@ static void usb_xhci_realize(struct PCIDevice *dev, Error **errp)
+         XHCIPort *port = &xhci->ports[i];
+         uint32_t offset = OFF_OPER + 0x400 + 0x10 * i;
+         port->xhci = xhci;
+-        memory_region_init_io(&port->mem, OBJECT(xhci), &xhci_port_ops, port,
+-                              port->name, 0x10);
++        memory_region_init_io_with_dev(&port->mem, OBJECT(xhci),
++                                       &xhci_port_ops, port,
++                                       port->name, 0x10, &dev->qdev);
+         memory_region_add_subregion(&xhci->mem, offset, &port->mem);
+     }
  
-+void memory_region_init_io_with_dev(MemoryRegion *mr,
-+                           Object *owner,
-+                           const MemoryRegionOps *ops,
-+                           void *opaque,
-+                           const char *name,
-+                           uint64_t size,
-+                           DeviceState *dev)
-+{
-+    memory_region_init(mr, owner, name, size);
-+    mr->ops = ops ? ops : &unassigned_mem_ops;
-+    mr->opaque = opaque;
-+    mr->terminates = true;
-+    mr->dev = dev;
-+}
-+
- void memory_region_init_ram_nomigrate(MemoryRegion *mr,
-                                       Object *owner,
-                                       const char *name,
 -- 
 2.17.1
 
