@@ -2,81 +2,97 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D4FC43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:04:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE73C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:04:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B287321D81
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:04:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0054321D82
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 12:04:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QDkybgc/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B287321D81
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyRqLU46"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0054321D82
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36156 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFcMP-0004h2-QV
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:04:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55514)
+	id 1kFcMo-0005KY-28
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 08:04:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFcLf-0003nP-Ck
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:03:43 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:46876
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kFcLJ-0003Vc-S3
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:03:22 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:56551
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFcLd-0004WX-SB
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:03:43 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kFcLI-0004Tx-2q
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 08:03:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599566621;
+ s=mimecast20190719; t=1599566599;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qnNxmmJCEHovj+jxeCQrNN4ORE/fPi7Vmdiu6Bz+PCQ=;
- b=QDkybgc/7F//dlaongK4LmEEjlnm//ka957AyL/ebdpyYdy4h9ETEmJi+qJvxwN4jcsTDY
- ZLqLt+dtm70NiXga8pPinOD58XaIJKJ9Qu6POPwMUqg4pLje0At/PWK58QUtXdcB36/FAx
- +Etna4dMg9wXUOAr3j0IvF/NP9+SJFQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-549-rSdyn_9yOe-8cO6K0qS0FA-1; Tue, 08 Sep 2020 08:03:39 -0400
-X-MC-Unique: rSdyn_9yOe-8cO6K0qS0FA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7490718BA285;
- Tue,  8 Sep 2020 12:03:38 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-112-122.ams2.redhat.com
- [10.36.112.122])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E2A010013C4;
- Tue,  8 Sep 2020 12:03:34 +0000 (UTC)
-Subject: Re: [PATCH 1/4] docs: lift block-core.json rST header into parents
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20200908093113.47564-1-stefanha@redhat.com>
- <20200908093113.47564-2-stefanha@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f5de1038-5bf3-8bd4-d664-45d6f201ae9b@redhat.com>
-Date: Tue, 8 Sep 2020 14:03:34 +0200
+ bh=B62JRL2X8+ZThetqEnGEcM1eNrz74CVKJLHmcLUul2o=;
+ b=iyRqLU46iDfEjrYqe/We1UVgEM65bz/QIFQaVp9r6L6E1wcY3kbfzhe70AqO6lNtunxuhz
+ Sn6Eunk72yaId/NTrYIanU4zkLoYGDv43AgDxNhXeTR/WrEz0Hf8NmNpkYmzSPD8iBT1rt
+ vukUBHidyhyHbl1QuuOSOitl2zh9BdI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-572-2NokKKy1M2W9K91ukxxKYw-1; Tue, 08 Sep 2020 08:03:16 -0400
+X-MC-Unique: 2NokKKy1M2W9K91ukxxKYw-1
+Received: by mail-wm1-f70.google.com with SMTP id x6so376961wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 05:03:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:content-transfer-encoding
+ :in-reply-to;
+ bh=FRW8GTYCbth4PFoMPsQ7CovdYqkNb1MGHCGC1NELfaE=;
+ b=kbFSldr4W9LArJrcG38sHp1uI/VeJsmUyxIY2oewYKajVDFU0g8d2ra7vyZlO7OYPD
+ Cjp05oIntC+M8+mJ8Arcx9pJVOlhrjOmbe644sX7FXNhpdnunIVyLek0sQu+lhH/eNNG
+ bnizodOsp2P6lzllMW4WKgqiV7DGd+6pmpszTakzjBJVKciYKOEXeyh58WYPj/yi+CbP
+ yOZrAY7vbdHuPAJ2jMgxX4qvTOfroqNwqGCKQAEZoysHzwdpRwWKoOxNicBOFMW4Ma4+
+ xnGTsnSsfQ660TQrroiwg10+GjMVODLppuATH5Bp0iNVqJJ3mzLAgZikJYXTuTIENOky
+ SMaA==
+X-Gm-Message-State: AOAM530JkDxyc220IZkMyXnJ+2fc7UZMznjn0ttb8+PXgdxv1f+BUAI1
+ lLvNJa8auW4lZDBjLdoTLoNSIfiwn+4KQ2w6wsSheDN/c9A4PDCmOI8jXHt1VUUC401ivNAMZt7
+ QXv9ChJZpdV9nKfM=
+X-Received: by 2002:a1c:9a48:: with SMTP id c69mr3940894wme.43.1599566595219; 
+ Tue, 08 Sep 2020 05:03:15 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzsJQRzzJuqR06VRWoKfP3BhX8H4BgA70S4D6vHbCipkn2OjEbOrQ9L4Qmg5Sm79AHXj9zVUA==
+X-Received: by 2002:a1c:9a48:: with SMTP id c69mr3940869wme.43.1599566594999; 
+ Tue, 08 Sep 2020 05:03:14 -0700 (PDT)
+Received: from redhat.com (IGLD-80-230-221-30.inter.net.il. [80.230.221.30])
+ by smtp.gmail.com with ESMTPSA id k22sm34535076wrd.29.2020.09.08.05.03.13
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 08 Sep 2020 05:03:14 -0700 (PDT)
+Date: Tue, 8 Sep 2020 08:03:10 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Laszlo Ersek <lersek@redhat.com>
+Subject: Re: [PATCH 10/10] tests: acpi: update "virt/SSDT.memhp" for
+ edk2-stable202008
+Message-ID: <20200908080301-mutt-send-email-mst@kernel.org>
+References: <20200908072939.30178-1-lersek@redhat.com>
+ <20200908072939.30178-11-lersek@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200908093113.47564-2-stefanha@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20200908072939.30178-11-lersek@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=lersek@redhat.com;
+Content-Type: text/plain; charset=iso-8859-1
+Content-Transfer-Encoding: 8bit
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=mst@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:33:58
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:53
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -84,7 +100,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,94 +113,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- "=?UTF-8?Q?Daniel_P._Berrang=c3=a9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>,
- afrosi@redhat.com, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu devel list <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+On Tue, Sep 08, 2020 at 09:29:39AM +0200, Laszlo Ersek wrote:
+> The NVDIMM_ACPI_MEM_ADDR dword in "virt/SSDT.memhp" needs an update due to
+> the firmware now allocating NVDIMM_DSM_MEM_FILE at a lower address.
+> 
+> >          }
+> >      }
+> >
+> > -    Name (MEMA, 0x43DD0000)
+> > +    Name (MEMA, 0x43D10000)
+> >  }
+> >
+> 
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Igor Mammedov <imammedo@redhat.com>
+> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Ref: https://bugs.launchpad.net/qemu/+bug/1852196
+> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
 
-On 09/08/20 11:31, Stefan Hajnoczi wrote:
-> block-core.json is included from several places. It has no way of
-> knowing what header level (h1, h2, ...) is appropriate. Sphinx reports
-> errors when it encounters an h2 header where it expects an h1 header.
-> This issue prevents the next patch from generating documentation for
-> qemu-storage-daemon QMP commands.
-> 
-> Move the header into parents so that the correct header level can be
-> used. Note that transaction.json is not updated since it doesn't seem to
-> need a header.
-> 
-> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+
 > ---
->  docs/interop/firmware.json | 4 ++++
->  qapi/block-core.json       | 4 ----
->  qapi/block.json            | 1 +
->  3 files changed, 5 insertions(+), 4 deletions(-)
+>  tests/qtest/bios-tables-test-allowed-diff.h |   1 -
+>  tests/data/acpi/virt/SSDT.memhp             | Bin 736 -> 736 bytes
+>  2 files changed, 1 deletion(-)
 > 
-> diff --git a/docs/interop/firmware.json b/docs/interop/firmware.json
-> index 989f10b626..48af327f98 100644
-> --- a/docs/interop/firmware.json
-> +++ b/docs/interop/firmware.json
-> @@ -15,6 +15,10 @@
->  ##
->  
->  { 'include' : 'machine.json' }
-> +
-> +##
-> +# == Block devices
-> +##
->  { 'include' : 'block-core.json' }
->  
->  ##
-
-I think "docs/interop/firmware.json" deserves the same treatment as
-"transaction.json".
-
-It's been a long time since I last looked at a rendered view of
-"docs/interop/firmware.json", but it only includes "block-core.json" so
-it can refer to some block-related types (@BlockdevDriver seems like the
-main, or only, one).
-
-I wouldn't expect the rendered view of "firmware.json" to have a section
-header saying "Block devices".
-
-I think it should be fine to drop this hunk (and my CC along with it ;))
-
-Thanks!
-Laszlo
-
-> diff --git a/qapi/block-core.json b/qapi/block-core.json
-> index 55b58ba892..e986341997 100644
-> --- a/qapi/block-core.json
-> +++ b/qapi/block-core.json
-> @@ -1,10 +1,6 @@
->  # -*- Mode: Python -*-
->  # vim: filetype=python
->  
-> -##
-> -# == Block core (VM unrelated)
-> -##
-> -
->  { 'include': 'common.json' }
->  { 'include': 'crypto.json' }
->  { 'include': 'job.json' }
-> diff --git a/qapi/block.json b/qapi/block.json
-> index c54a393cf3..473b294a3b 100644
-> --- a/qapi/block.json
-> +++ b/qapi/block.json
-> @@ -3,6 +3,7 @@
->  
->  ##
->  # = Block devices
-> +# == Block core (VM unrelated)
->  ##
->  
->  { 'include': 'block-core.json' }
+> diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+> index e569098abddc..dfb8523c8bf4 100644
+> --- a/tests/qtest/bios-tables-test-allowed-diff.h
+> +++ b/tests/qtest/bios-tables-test-allowed-diff.h
+> @@ -1,2 +1 @@
+>  /* List of comma-separated changed AML files to ignore */
+> -"tests/data/acpi/virt/SSDT.memhp",
+> diff --git a/tests/data/acpi/virt/SSDT.memhp b/tests/data/acpi/virt/SSDT.memhp
+> index db61d6733284..375d7b6fc85a 100644
+> Binary files a/tests/data/acpi/virt/SSDT.memhp and b/tests/data/acpi/virt/SSDT.memhp differ
+> -- 
+> 2.19.1.3.g30247aa5d201
 > 
 
 
