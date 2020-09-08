@@ -7,91 +7,84 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF2E5C43461
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:17:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 382FFC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:18:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 109142087D
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:17:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A66382087D
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 11:18:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zIPLqRwh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 109142087D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZKWvtbM9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A66382087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44728 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFbce-0006Vp-1T
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:17:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44122)
+	id 1kFbdc-0007WX-RA
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 07:18:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFbbr-00065F-OB
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:16:23 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:50492)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFbbo-0006xo-96
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:16:23 -0400
-Received: by mail-wm1-x342.google.com with SMTP id e17so16894035wme.0
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 04:16:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=52vGuVHtN8uh8nLvem/V4SWIZqHqWQtplNoIEVK3kiM=;
- b=zIPLqRwhnPMtJhGr1vXhXG5i7XbS9An5co5yfAx3z7HWOHn8fHTOaWkuP5czvl28Hw
- YVfEGe3jA2X/d0kJ1BBZ7JMKjmdfg5lKHUx5tP87hImWeQ9vxjOS1pfRangQA4sFS1+6
- TS+kvSij4FyGmaTIAcDkS6eIgscBM3V7KLSb2/i141WLcm7YOCc6VhXZQC6b9CurlFXg
- VqKLlYT8y9B7cgJXhVzl99sRRooNCZ2fapDo2CR2czPDyasWwGHuKQqbkwDkLNrzztIx
- 4mw4l8M+HQraMnCY6RA6JilMEAZcVLnYHncoyLWVjMdEDP8OKmnkwn2gNLR53ymWJG8a
- zW4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=52vGuVHtN8uh8nLvem/V4SWIZqHqWQtplNoIEVK3kiM=;
- b=SYC0Yu22VjvLZ4ThQnZEHFNVxTiYEhGnsrTGEvcct4/25uXoB8a/rhqO4NEc8WTOdU
- nMYfSJ79EA7SeDTBezsiv8XRtD87LbgKBxeOW6mSd1kKPf+klwo936CKKgbOJ+YBZtwW
- KDR4Ah5cSby1EPHEIF9pMpg/Tc62cb7ykMMSZ+a7JHoT2BsUF/HPFkLJLRLTp8XSwHNM
- MLEjR4vXVNm+0qzU6YJCDcPX8ZOrjHy0mjQhihImPOO5n07OFs7Bqg+5uuzHA9ampoWn
- EHXR54kTUWreDgLKokNg7jYYXQoYkKjt7Ra/dfQF9UVAThnbTemkmV6XZ70uDR9JAPxX
- Jl6w==
-X-Gm-Message-State: AOAM5323/eZofPY5iBMeBxtauqy2wOlAu+qecX/TTiIJhz79F2BSaNd0
- mBp/Eki+uwi7gFecHqN2pj57+g==
-X-Google-Smtp-Source: ABdhPJz6aPPuZ3CdJM1Tmfxyg27Z2n7oC71ba13TZAr4eqh7CQS0CRuCrmJ+xd9iIVcSy8ATCQ3BLg==
-X-Received: by 2002:a1c:40c6:: with SMTP id n189mr3882816wma.48.1599563778535; 
- Tue, 08 Sep 2020 04:16:18 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id k24sm31447773wmj.19.2020.09.08.04.16.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 04:16:17 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B0F001FF7E;
- Tue,  8 Sep 2020 12:16:16 +0100 (BST)
-References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
- <159903461078.28509.9310557942659425312.stgit@pasha-ThinkPad-X280>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Subject: Re: [PATCH v3 11/15] gdbstub: add reverse step support in replay mode
-In-reply-to: <159903461078.28509.9310557942659425312.stgit@pasha-ThinkPad-X280>
-Date: Tue, 08 Sep 2020 12:16:16 +0100
-Message-ID: <87zh60plhb.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kFbc7-00068g-Bs
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:16:40 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:29113
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kFbc4-0006zC-Jt
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 07:16:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599563795;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=pqjlsphl2j3znMxyXVEcKoaK8XPXKbhFnNOoXlqt2qo=;
+ b=ZKWvtbM9ivfLZXnfheoXx7JZ3kbnj1Ax4fscb/w7EWintHXswgbUYCS9XIL9L5DGdNlPe9
+ bOleSDk9zGmOTFbUcPyzt8zIyJVoZ4T3mcWG+1BF6JPXmd5OmH3VW/pA2bfn/uTQnmK/K+
+ ZaQFnPqnlx6c0XM6zAlkveWQ5/VL2BM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-426-4thXYxsZNLek1_8fb-0fHA-1; Tue, 08 Sep 2020 07:16:32 -0400
+X-MC-Unique: 4thXYxsZNLek1_8fb-0fHA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C74B18015A6;
+ Tue,  8 Sep 2020 11:16:30 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.192.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B51E45C1BB;
+ Tue,  8 Sep 2020 11:16:28 +0000 (UTC)
+Date: Tue, 8 Sep 2020 13:16:25 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Haibo Xu <haibo.xu@linaro.org>
+Subject: Re: [PATCH v2 09/12] hw/arm/virt: spe: Add SPE fdt binding for virt
+ machine
+Message-ID: <20200908111625.2wzzn7jh5wt4nnmu@kamzik.brq.redhat.com>
+References: <cover.1599549462.git.haibo.xu@linaro.org>
+ <c6ac607d2cd253de6a990538edfde7f86066f04f.1599549462.git.haibo.xu@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <c6ac607d2cd253de6a990538edfde7f86066f04f.1599549462.git.haibo.xu@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=drjones@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:08:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,287 +97,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
- mtosatti@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- stefanha@redhat.com, crosa@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
- philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
+Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, richard.henderson@linaro.org,
+ qemu-devel@nongnu.org, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
+This patch does much more than the summary "hw/arm/virt: spe: Add SPE fdt
+binding for virt machine" says it does. Please revise the summary.
 
-> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
->
-> GDB remote protocol supports two reverse debugging commands:
-> reverse step and reverse continue.
-> This patch adds support of the first one to the gdbstub.
-> Reverse step is intended to step one instruction in the backwards
-> direction. This is not possible in regular execution.
-> But replayed execution is deterministic, therefore we can load one of
-> the prior snapshots and proceed to the desired step. It is equivalent
-> to stepping one instruction back.
-> There should be at least one snapshot preceding the debugged part of
-> the replay log.
->
-> Signed-off-by: Pavel Dovgalyuk <Pavel.Dovgalyuk@ispras.ru>
+On Tue, Sep 08, 2020 at 08:13:27AM +0000, Haibo Xu wrote:
+> Add a virtual SPE device for virt machine while using
+> PPI 5 for SPE overflow interrupt number which has already
+> selected in kvmtool.
+> 
+> Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
 > ---
->  accel/tcg/translator.c    |    1 +
->  exec.c                    |    7 ++++++
->  gdbstub.c                 |   55 +++++++++++++++++++++++++++++++++++++++=
-++++--
->  include/sysemu/replay.h   |   11 +++++++++
->  replay/replay-debugging.c |   33 +++++++++++++++++++++++++++
->  softmmu/cpus.c            |   14 +++++++++--
->  stubs/replay.c            |    5 ++++
->  7 files changed, 121 insertions(+), 5 deletions(-)
->
-> diff --git a/accel/tcg/translator.c b/accel/tcg/translator.c
-> index 603d17ff83..fb1e19c585 100644
-> --- a/accel/tcg/translator.c
-> +++ b/accel/tcg/translator.c
-> @@ -17,6 +17,7 @@
->  #include "exec/log.h"
->  #include "exec/translator.h"
->  #include "exec/plugin-gen.h"
-> +#include "sysemu/replay.h"
->=20=20
->  /* Pairs with tcg_clear_temp_count.
->     To be called by #TranslatorOps.{translate_insn,tb_stop} if
-> diff --git a/exec.c b/exec.c
-> index 7683afb6a8..47512e950c 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -2750,6 +2750,13 @@ void cpu_check_watchpoint(CPUState *cpu, vaddr add=
-r, vaddr len,
->      QTAILQ_FOREACH(wp, &cpu->watchpoints, entry) {
->          if (watchpoint_address_matches(wp, addr, len)
->              && (wp->flags & flags)) {
-> +            if (replay_running_debug()) {
-> +                /*
-> +                 * Don't process the watchpoints when we are
-> +                 * in a reverse debugging operation.
-> +                 */
-> +                return;
-> +            }
->              if (flags =3D=3D BP_MEM_READ) {
->                  wp->flags |=3D BP_WATCHPOINT_HIT_READ;
->              } else {
-> diff --git a/gdbstub.c b/gdbstub.c
-> index 9dfb6e4142..79e8ccc050 100644
-> --- a/gdbstub.c
-> +++ b/gdbstub.c
-> @@ -51,6 +51,7 @@
->  #include "sysemu/runstate.h"
->  #include "hw/semihosting/semihost.h"
->  #include "exec/exec-all.h"
-> +#include "sysemu/replay.h"
->=20=20
->  #ifdef CONFIG_USER_ONLY
->  #define GDB_ATTACHED "0"
-> @@ -375,6 +376,20 @@ typedef struct GDBState {
->   */
->  static int sstep_flags =3D SSTEP_ENABLE|SSTEP_NOIRQ|SSTEP_NOTIMER;
->=20=20
-> +/* Retrieves flags for single step mode. */
-> +static int get_sstep_flags(void)
-> +{
-> +    /*
-> +     * In replay mode all events written into the log should be replayed.
-> +     * That is why NOIRQ flag is removed in this mode.
-> +     */
-> +    if (replay_mode !=3D REPLAY_MODE_NONE) {
-> +        return SSTEP_ENABLE;
-> +    } else {
-> +        return sstep_flags;
-> +    }
-> +}
-> +
->  static GDBState gdbserver_state;
->=20=20
->  static void init_gdbserver_state(void)
-> @@ -501,7 +516,7 @@ static int gdb_continue_partial(char *newstates)
->                  break; /* nothing to do here */
->              case 's':
->                  trace_gdbstub_op_stepping(cpu->cpu_index);
-> -                cpu_single_step(cpu, sstep_flags);
-> +                cpu_single_step(cpu, get_sstep_flags());
->                  cpu_resume(cpu);
->                  flag =3D 1;
->                  break;
-> @@ -1874,10 +1889,31 @@ static void handle_step(GdbCmdContext *gdb_ctx, v=
-oid *user_ctx)
->          gdb_set_cpu_pc((target_ulong)gdb_ctx->params[0].val_ull);
->      }
->=20=20
-> -    cpu_single_step(gdbserver_state.c_cpu, sstep_flags);
-> +    cpu_single_step(gdbserver_state.c_cpu, get_sstep_flags());
->      gdb_continue();
->  }
->=20=20
-> +static void handle_backward(GdbCmdContext *gdb_ctx, void *user_ctx)
-> +{
-> +    if (replay_mode !=3D REPLAY_MODE_PLAY) {
-> +        put_packet("E22");
-> +    }
-> +    if (gdb_ctx->num_params =3D=3D 1) {
-> +        switch (gdb_ctx->params[0].opcode) {
-> +        case 's':
-> +            if (replay_reverse_step()) {
-> +                gdb_continue();
-> +            } else {
-> +                put_packet("E14");
-> +            }
-> +            return;
-> +        }
-> +    }
-> +
-> +    /* Default invalid command */
-> +    put_packet("");
-> +}
-> +
->  static void handle_v_cont_query(GdbCmdContext *gdb_ctx, void *user_ctx)
->  {
->      put_packet("vCont;c;C;s;S");
-> @@ -2124,6 +2160,10 @@ static void handle_query_supported(GdbCmdContext *=
-gdb_ctx, void *user_ctx)
->          g_string_append(gdbserver_state.str_buf, ";qXfer:features:read+"=
-);
->      }
->=20=20
-> +    if (replay_mode =3D=3D REPLAY_MODE_PLAY) {
-> +        g_string_append(gdbserver_state.str_buf, ";ReverseStep+");
-> +    }
-> +
->      if (gdb_ctx->num_params &&
->          strstr(gdb_ctx->params[0].data, "multiprocess+")) {
->          gdbserver_state.multiprocess =3D true;
-> @@ -2460,6 +2500,17 @@ static int gdb_handle_packet(const char *line_buf)
->              cmd_parser =3D &step_cmd_desc;
+>  hw/arm/virt-acpi-build.c    |  3 +++
+>  hw/arm/virt.c               | 43 ++++++++++++++++++++++++++++++++++++-
+>  include/hw/acpi/acpi-defs.h |  3 +++
+>  include/hw/arm/virt.h       |  1 +
+>  target/arm/cpu.c            |  2 ++
+>  target/arm/cpu.h            |  2 ++
+>  6 files changed, 53 insertions(+), 1 deletion(-)
+> 
+> diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+> index 9efd7a3881..3fd80fda53 100644
+> --- a/hw/arm/virt-acpi-build.c
+> +++ b/hw/arm/virt-acpi-build.c
+> @@ -665,6 +665,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+>          if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
+>              gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
 >          }
->          break;
-> +    case 'b':
-> +        {
-> +            static const GdbCmdParseEntry backward_cmd_desc =3D {
-> +                .handler =3D handle_backward,
-> +                .cmd =3D "b",
-> +                .cmd_startswith =3D 1,
-> +                .schema =3D "o0"
-> +            };
-> +            cmd_parser =3D &backward_cmd_desc;
+> +        if (cpu_isar_feature(aa64_spe, armcpu)) {
+> +            gicc->spe_interrupt = cpu_to_le32(PPI(VIRTUAL_SPE_IRQ));
 > +        }
-> +        break;
->      case 'F':
->          {
->              static const GdbCmdParseEntry file_io_cmd_desc =3D {
-> diff --git a/include/sysemu/replay.h b/include/sysemu/replay.h
-> index 239c01e7df..13a8123b09 100644
-> --- a/include/sysemu/replay.h
-> +++ b/include/sysemu/replay.h
-> @@ -75,6 +75,17 @@ void replay_finish(void);
->  void replay_add_blocker(Error *reason);
->  /* Returns name of the replay log file */
->  const char *replay_get_filename(void);
-> +/*
-> + * Start making one step in backward direction.
-> + * Used by gdbstub for backwards debugging.
-> + * Returns true on success.
-> + */
-> +bool replay_reverse_step(void);
-> +/*
-> + * Returns true if replay module is processing
-> + * reverse_continue or reverse_step request
-> + */
-> +bool replay_running_debug(void);
->=20=20
->  /* Processing the instructions */
->=20=20
-> diff --git a/replay/replay-debugging.c b/replay/replay-debugging.c
-> index cfd0221692..aa3ca040e2 100644
-> --- a/replay/replay-debugging.c
-> +++ b/replay/replay-debugging.c
-> @@ -22,6 +22,13 @@
->  #include "block/snapshot.h"
->  #include "migration/snapshot.h"
->=20=20
-> +static bool replay_is_debugging;
-> +
-> +bool replay_running_debug(void)
-> +{
-> +    return replay_is_debugging;
-> +}
-> +
->  void hmp_info_replay(Monitor *mon, const QDict *qdict)
->  {
->      if (replay_mode =3D=3D REPLAY_MODE_NONE) {
-> @@ -219,3 +226,29 @@ void hmp_replay_seek(Monitor *mon, const QDict *qdic=
-t)
->          return;
+>          if (vms->virt) {
+>              gicc->vgic_interrupt = cpu_to_le32(PPI(ARCH_GIC_MAINT_IRQ));
+>          }
+> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> index 6bacfb668d..bdb1ce925c 100644
+> --- a/hw/arm/virt.c
+> +++ b/hw/arm/virt.c
+> @@ -545,6 +545,32 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
 >      }
 >  }
-> +
-> +static void replay_stop_vm_debug(void *opaque)
+>  
+> +static void fdt_add_spe_nodes(const VirtMachineState *vms)
 > +{
-> +    replay_is_debugging =3D false;
-> +    vm_stop(RUN_STATE_DEBUG);
-> +    replay_delete_break();
-> +}
+> +    ARMCPU *armcpu = ARM_CPU(first_cpu);
+> +    uint32_t irqflags = GIC_FDT_IRQ_FLAGS_LEVEL_HI;
 > +
-> +bool replay_reverse_step(void)
-> +{
-> +    Error *err =3D NULL;
-> +
-> +    assert(replay_mode =3D=3D REPLAY_MODE_PLAY);
-> +
-> +    if (replay_get_current_icount() !=3D 0) {
-> +        replay_seek(replay_get_current_icount() - 1, replay_stop_vm_debu=
-g, &err);
-> +        if (err) {
-> +            error_free(err);
-> +            return false;
-> +        }
-> +        replay_is_debugging =3D true;
-> +        return true;
+> +    if (!cpu_isar_feature(aa64_spe, armcpu)) {
+> +        assert(!object_property_get_bool(OBJECT(armcpu), "spe", NULL));
+> +        return;
 > +    }
 > +
-> +    return false;
+> +    if (vms->gic_version == VIRT_GIC_VERSION_2) {
+> +        irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+> +                             GIC_FDT_IRQ_PPI_CPU_WIDTH,
+> +                             (1 << vms->smp_cpus) - 1);
+> +    }
+> +
+> +    qemu_fdt_add_subnode(vms->fdt, "/spe");
+> +    if (arm_feature(&armcpu->env, ARM_FEATURE_V8)) {
+> +        const char compat[] = "arm,statistical-profiling-extension-v1";
+> +        qemu_fdt_setprop(vms->fdt, "/spe", "compatible",
+> +                         compat, sizeof(compat));
+> +        qemu_fdt_setprop_cells(vms->fdt, "/spe", "interrupts",
+> +                               GIC_FDT_IRQ_TYPE_PPI, VIRTUAL_SPE_IRQ, irqflags);
+> +    }
 > +}
-> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-> index a802e899ab..377fe3298c 100644
-> --- a/softmmu/cpus.c
-> +++ b/softmmu/cpus.c
-> @@ -1004,9 +1004,17 @@ static bool cpu_can_run(CPUState *cpu)
->=20=20
->  static void cpu_handle_guest_debug(CPUState *cpu)
+> +
+>  static inline DeviceState *create_acpi_ged(VirtMachineState *vms)
 >  {
-> -    gdb_set_stop_cpu(cpu);
-> -    qemu_system_debug_request();
-> -    cpu->stopped =3D true;
-> +    if (!replay_running_debug()) {
-> +        gdb_set_stop_cpu(cpu);
-> +        qemu_system_debug_request();
-> +        cpu->stopped =3D true;
-> +    } else {
-> +        if (!cpu->singlestep_enabled) {
-> +            cpu_single_step(cpu, SSTEP_ENABLE);
-> +        } else {
-> +            cpu_single_step(cpu, 0);
-> +        }
-> +    }
+>      DeviceState *dev;
+> @@ -717,6 +743,10 @@ static void create_gic(VirtMachineState *vms)
+>                                      qdev_get_gpio_in(vms->gic, ppibase
+>                                                       + VIRTUAL_PMU_IRQ));
+>  
+> +        qdev_connect_gpio_out_named(cpudev, "spe-interrupt", 0,
+> +                                    qdev_get_gpio_in(vms->gic, ppibase
+> +                                                     + VIRTUAL_SPE_IRQ));
+> +
+>          sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
+>          sysbus_connect_irq(gicbusdev, i + smp_cpus,
+>                             qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
+> @@ -1664,11 +1694,12 @@ static void finalize_gic_version(VirtMachineState *vms)
+>  
+>  static void virt_cpu_post_init(VirtMachineState *vms)
+>  {
+> -    bool aarch64, pmu;
+> +    bool aarch64, pmu, spe;
+>      CPUState *cpu;
+>  
+>      aarch64 = object_property_get_bool(OBJECT(first_cpu), "aarch64", NULL);
+>      pmu = object_property_get_bool(OBJECT(first_cpu), "pmu", NULL);
+> +    spe = object_property_get_bool(OBJECT(first_cpu), "spe", NULL);
+>  
+>      if (kvm_enabled()) {
+>          CPU_FOREACH(cpu) {
+> @@ -1679,6 +1710,14 @@ static void virt_cpu_post_init(VirtMachineState *vms)
+>                  }
+>                  kvm_arm_pmu_init(cpu);
+>              }
+> +
+> +            if (spe) {
+> +                assert(ARM_CPU(cpu)->has_spe == ON_OFF_AUTO_ON);
+> +                if (kvm_irqchip_in_kernel()) {
+> +                    kvm_arm_spe_set_irq(cpu, PPI(VIRTUAL_SPE_IRQ));
+> +                }
+> +                kvm_arm_spe_init(cpu);
 
-I'd prefer to avoid this negative if cases as it scans poorly. Just do:
+A later patch introduces userspace irqchip support. Should we avoid
+allowing it until then to avoid breaking bisection?
 
-  if (replay_running_debug()) {
-     /* replay stuff */
-  } else {
-     /* normal stuff */
-  }
+> +            }
+>          }
+>      } else {
+>          if (aarch64 && vms->highmem) {
+> @@ -1927,6 +1966,8 @@ static void machvirt_init(MachineState *machine)
+>  
+>      fdt_add_pmu_nodes(vms);
+>  
+> +    fdt_add_spe_nodes(vms);
+> +
+>      create_uart(vms, VIRT_UART, sysmem, serial_hd(0));
+>  
+>      if (vms->secure) {
+> diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+> index 38a42f409a..21e58f27c5 100644
+> --- a/include/hw/acpi/acpi-defs.h
+> +++ b/include/hw/acpi/acpi-defs.h
+> @@ -302,6 +302,9 @@ struct AcpiMadtGenericCpuInterface {
+>      uint32_t vgic_interrupt;
+>      uint64_t gicr_base_address;
+>      uint64_t arm_mpidr;
+> +    uint8_t  efficiency_class;
+> +    uint8_t  reserved2[1];
+> +    uint16_t spe_interrupt; /* ACPI 6.3 */
+>  } QEMU_PACKED;
+>  
+>  typedef struct AcpiMadtGenericCpuInterface AcpiMadtGenericCpuInterface;
+> diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+> index 72c269aaa5..6013b6d535 100644
+> --- a/include/hw/arm/virt.h
+> +++ b/include/hw/arm/virt.h
+> @@ -49,6 +49,7 @@
+>  #define ARCH_TIMER_NS_EL1_IRQ 14
+>  #define ARCH_TIMER_NS_EL2_IRQ 10
+>  
+> +#define VIRTUAL_SPE_IRQ 5
+>  #define VIRTUAL_PMU_IRQ 7
+>  
+>  #define PPI(irq) ((irq) + 16)
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index f211958eaa..786cc6134c 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1041,6 +1041,8 @@ static void arm_cpu_initfn(Object *obj)
+>                               "gicv3-maintenance-interrupt", 1);
+>      qdev_init_gpio_out_named(DEVICE(cpu), &cpu->pmu_interrupt,
+>                               "pmu-interrupt", 1);
+> +    qdev_init_gpio_out_named(DEVICE(cpu), &cpu->spe_interrupt,
+> +                             "spe-interrupt", 1);
+>  #endif
+>  
+>      /* DTB consumers generally don't in fact care what the 'compatible'
+> diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+> index baf2bbcee8..395a1e5df8 100644
+> --- a/target/arm/cpu.h
+> +++ b/target/arm/cpu.h
+> @@ -800,6 +800,8 @@ struct ARMCPU {
+>      qemu_irq gicv3_maintenance_interrupt;
+>      /* GPIO output for the PMU interrupt */
+>      qemu_irq pmu_interrupt;
+> +    /* GPIO output for the SPE interrupt */
+> +    qemu_irq spe_interrupt;
+>  
+>      /* MemoryRegion to use for secure physical accesses */
+>      MemoryRegion *secure_memory;
+> -- 
+> 2.17.1
+> 
+> 
 
-Otherwise:
+Otherwise
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
 
---=20
-Alex Benn=C3=A9e
 
