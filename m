@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E046CC2BBD0
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74849C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:38:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ADBC2137B
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:36:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D16972137B
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 05:38:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="d+1HskbS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ADBC2137B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="RmtPuAR2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D16972137B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51132 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFWJN-0004qt-Jz
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:36:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57596)
+	id 1kFWKd-0006cc-Rb
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 01:38:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3v-0006ww-Rk; Tue, 08 Sep 2020 01:21:00 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:32773 helo=ozlabs.org)
+ id 1kFW4G-0007AV-6l; Tue, 08 Sep 2020 01:21:20 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:45191)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFW3s-00067G-6Z; Tue, 08 Sep 2020 01:20:59 -0400
+ id 1kFW4E-00069c-FV; Tue, 08 Sep 2020 01:21:19 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4Bltkx683Zz9sW7; Tue,  8 Sep 2020 15:20:09 +1000 (AEST)
+ id 4Bltkz2Nkcz9sWB; Tue,  8 Sep 2020 15:20:11 +1000 (AEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599542409;
- bh=JYn0WjdIsU8E0JJgKyIIVGtKu4ngDBYEc+FPNNcKcg8=;
+ d=gibson.dropbear.id.au; s=201602; t=1599542411;
+ bh=qGDKszCu7L1a5W4LErh5xaKIlShUztA7IfBe8gYA/fo=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=d+1HskbSuviYCuDPLZ21H8y9l7AwfgGh5g42ce9IzEbLFoBZky4WEbNZ5blBTYKUt
- ZFbGLs/Pp7CXDwrXyQRlr1fthrm4kdMQlo64s+f1wyuGL7grrXt5uJ5d+M7lxdNJ3L
- kTa6bNfm1yUcdEkWv1TmAa2mXXbbzSwkVHNyoJxM=
+ b=RmtPuAR2NgKD+Y10K7GgIhmWGAi2NwX47Kn7awWU02zxbKkEk0/voXGVrtgT/cW6Z
+ +Hzrs3zbPempiYnTa0GnxYQRZYCfNAuApWz+02zqLlDq99fZ3xiCZmGrW+Dvyg8itY
+ qf79sPgkZ6+QxfFzdpnOo2gJxFZysdT2wezpioIU=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 30/33] spapr_numa: move NVLink2 associativity handling to
- spapr_numa.c
-Date: Tue,  8 Sep 2020 15:19:50 +1000
-Message-Id: <20200908051953.1616885-31-david@gibson.dropbear.id.au>
+Subject: [PULL 33/33] spapr_numa: use spapr_numa_get_vcpu_assoc() in home_node
+ hcall
+Date: Tue,  8 Sep 2020 15:19:53 +1000
+Message-Id: <20200908051953.1616885-34-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 01:19:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -83,126 +83,90 @@ Sender: "Qemu-devel"
 
 From: Daniel Henrique Barboza <danielhb413@gmail.com>
 
-The NVLink2 GPUs works like a regular NUMA node with its
-own associativity values, regardless of user input.
+The current implementation of h_home_node_associativity hard codes
+the values of associativity domains of the vcpus. Let's make
+it consider the values already initialized in spapr->numa_assoc_array,
+via the spapr_numa_get_vcpu_assoc() helper.
 
-This can be handled inside spapr_numa_associativity_init(),
-initializing NVGPU_MAX_NUM associativity arrays that can
-be used by the GPUs.
+We want to set it and forget it, and for that we also need to
+assert that we don't overflow the registers of the hypercall.
+>From R4 to R9 we can squeeze in 12 associativity domains for
+vcpus, so let's assert that VCPU_ASSOC_SIZE -1 isn't greater
+than that.
 
+Reviewed-by: Greg Kurz <groug@kaod.org>
 Signed-off-by: Daniel Henrique Barboza <danielhb413@gmail.com>
-Message-Id: <20200903220639.563090-5-danielhb413@gmail.com>
+Message-Id: <20200904172422.617460-4-danielhb413@gmail.com>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_numa.c        | 28 +++++++++++++++++++++++++++-
- hw/ppc/spapr_pci_nvlink2.c | 20 +++-----------------
- 2 files changed, 30 insertions(+), 18 deletions(-)
+ hw/ppc/spapr_numa.c | 41 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
 
 diff --git a/hw/ppc/spapr_numa.c b/hw/ppc/spapr_numa.c
-index 42394f36e9..9073dbbceb 100644
+index 066ffc2a5f..64fe567f5d 100644
 --- a/hw/ppc/spapr_numa.c
 +++ b/hw/ppc/spapr_numa.c
-@@ -13,14 +13,18 @@
- #include "qemu/osdep.h"
- #include "qemu-common.h"
- #include "hw/ppc/spapr_numa.h"
-+#include "hw/pci-host/spapr.h"
- #include "hw/ppc/fdt.h"
- 
-+/* Moved from hw/ppc/spapr_pci_nvlink2.c */
-+#define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
- 
- void spapr_numa_associativity_init(SpaprMachineState *spapr,
-                                    MachineState *machine)
+@@ -176,10 +176,11 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+                                               target_ulong opcode,
+                                               target_ulong *args)
  {
-+    SpaprMachineClass *smc = SPAPR_MACHINE_GET_CLASS(spapr);
-     int nb_numa_nodes = machine->numa_state->num_nodes;
--    int i;
-+    int i, j, max_nodes_with_gpus;
++    g_autofree uint32_t *vcpu_assoc = NULL;
+     target_ulong flags = args[0];
+     target_ulong procno = args[1];
+     PowerPCCPU *tcpu;
+-    int idx;
++    int idx, assoc_idx;
  
-     /*
-      * For all associativity arrays: first position is the size,
-@@ -35,6 +39,28 @@ void spapr_numa_associativity_init(SpaprMachineState *spapr,
-         spapr->numa_assoc_array[i][0] = cpu_to_be32(MAX_DISTANCE_REF_POINTS);
-         spapr->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] = cpu_to_be32(i);
+     /* only support procno from H_REGISTER_VPA */
+     if (flags != 0x1) {
+@@ -191,16 +192,40 @@ static target_ulong h_home_node_associativity(PowerPCCPU *cpu,
+         return H_P2;
      }
-+
+ 
+-    /* sequence is the same as in the "ibm,associativity" property */
 +    /*
-+     * Initialize NVLink GPU associativity arrays. We know that
-+     * the first GPU will take the first available NUMA id, and
-+     * we'll have a maximum of NVGPU_MAX_NUM GPUs in the machine.
-+     * At this point we're not sure if there are GPUs or not, but
-+     * let's initialize the associativity arrays and allow NVLink
-+     * GPUs to be handled like regular NUMA nodes later on.
++     * Given that we want to be flexible with the sizes and indexes,
++     * we must consider that there is a hard limit of how many
++     * associativities domain we can fit in R4 up to R9, which would be
++     * 12 associativity domains for vcpus. Assert and bail if that's
++     * not the case.
 +     */
-+    max_nodes_with_gpus = nb_numa_nodes + NVGPU_MAX_NUM;
++    G_STATIC_ASSERT((VCPU_ASSOC_SIZE - 1) <= 12);
 +
-+    for (i = nb_numa_nodes; i < max_nodes_with_gpus; i++) {
-+        spapr->numa_assoc_array[i][0] = cpu_to_be32(MAX_DISTANCE_REF_POINTS);
++    vcpu_assoc = spapr_numa_get_vcpu_assoc(spapr, tcpu);
++    /* assoc_idx starts at 1 to skip associativity size */
++    assoc_idx = 1;
+ 
+-    idx = 0;
+ #define ASSOCIATIVITY(a, b) (((uint64_t)(a) << 32) | \
+                              ((uint64_t)(b) & 0xffffffff))
+-    args[idx++] = ASSOCIATIVITY(0, 0);
+-    args[idx++] = ASSOCIATIVITY(0, tcpu->node_id);
+-    args[idx++] = ASSOCIATIVITY(procno, -1);
+-    for ( ; idx < 6; idx++) {
+-        args[idx] = -1;
 +
-+        for (j = 1; j < MAX_DISTANCE_REF_POINTS; j++) {
-+            uint32_t gpu_assoc = smc->pre_5_1_assoc_refpoints ?
-+                                 SPAPR_GPU_NUMA_ID : cpu_to_be32(i);
-+            spapr->numa_assoc_array[i][j] = gpu_assoc;
-+        }
++    for (idx = 0; idx < 6; idx++) {
++        int32_t a, b;
 +
-+        spapr->numa_assoc_array[i][MAX_DISTANCE_REF_POINTS] = cpu_to_be32(i);
-+    }
- }
++        /*
++         * vcpu_assoc[] will contain the associativity domains for tcpu,
++         * including tcpu->node_id and procno, meaning that we don't
++         * need to use these variables here.
++         *
++         * We'll read 2 values at a time to fill up the ASSOCIATIVITY()
++         * macro. The ternary will fill the remaining registers with -1
++         * after we went through vcpu_assoc[].
++         */
++        a = assoc_idx < VCPU_ASSOC_SIZE ?
++            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
++        b = assoc_idx < VCPU_ASSOC_SIZE ?
++            be32_to_cpu(vcpu_assoc[assoc_idx++]) : -1;
++
++        args[idx] = ASSOCIATIVITY(a, b);
+     }
+ #undef ASSOCIATIVITY
  
- void spapr_numa_write_associativity_dt(SpaprMachineState *spapr, void *fdt,
-diff --git a/hw/ppc/spapr_pci_nvlink2.c b/hw/ppc/spapr_pci_nvlink2.c
-index 76ae77ebc8..8ef9b40a18 100644
---- a/hw/ppc/spapr_pci_nvlink2.c
-+++ b/hw/ppc/spapr_pci_nvlink2.c
-@@ -26,6 +26,7 @@
- #include "qemu-common.h"
- #include "hw/pci/pci.h"
- #include "hw/pci-host/spapr.h"
-+#include "hw/ppc/spapr_numa.h"
- #include "qemu/error-report.h"
- #include "hw/ppc/fdt.h"
- #include "hw/pci/pci_bridge.h"
-@@ -37,8 +38,6 @@
- #define PHANDLE_NVLINK(phb, gn, nn)  (0x00130000 | (((phb)->index) << 8) | \
-                                      ((gn) << 4) | (nn))
- 
--#define SPAPR_GPU_NUMA_ID           (cpu_to_be32(1))
--
- typedef struct SpaprPhbPciNvGpuSlot {
-         uint64_t tgt;
-         uint64_t gpa;
-@@ -360,13 +359,6 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
-         Object *nv_mrobj = object_property_get_link(OBJECT(nvslot->gpdev),
-                                                     "nvlink2-mr[0]",
-                                                     &error_abort);
--        uint32_t associativity[] = {
--            cpu_to_be32(0x4),
--            cpu_to_be32(nvslot->numa_id),
--            cpu_to_be32(nvslot->numa_id),
--            cpu_to_be32(nvslot->numa_id),
--            cpu_to_be32(nvslot->numa_id)
--        };
-         uint64_t size = object_property_get_uint(nv_mrobj, "size", NULL);
-         uint64_t mem_reg[2] = { cpu_to_be64(nvslot->gpa), cpu_to_be64(size) };
-         char *mem_name = g_strdup_printf("memory@%"PRIx64, nvslot->gpa);
-@@ -376,14 +368,8 @@ void spapr_phb_nvgpu_ram_populate_dt(SpaprPhbState *sphb, void *fdt)
-         _FDT((fdt_setprop_string(fdt, off, "device_type", "memory")));
-         _FDT((fdt_setprop(fdt, off, "reg", mem_reg, sizeof(mem_reg))));
- 
--        if (sphb->pre_5_1_assoc) {
--            associativity[1] = SPAPR_GPU_NUMA_ID;
--            associativity[2] = SPAPR_GPU_NUMA_ID;
--            associativity[3] = SPAPR_GPU_NUMA_ID;
--        }
--
--        _FDT((fdt_setprop(fdt, off, "ibm,associativity", associativity,
--                          sizeof(associativity))));
-+        spapr_numa_write_associativity_dt(SPAPR_MACHINE(qdev_get_machine()),
-+                                          fdt, off, nvslot->numa_id);
- 
-         _FDT((fdt_setprop_string(fdt, off, "compatible",
-                                  "ibm,coherent-device-memory")));
 -- 
 2.26.2
 
