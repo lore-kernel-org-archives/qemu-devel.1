@@ -2,81 +2,90 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3441DC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A41AC43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:24:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 641B82087C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:16:23 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 641B82087C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 91D6B205CB
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 16:24:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aJvr6o8S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91D6B205CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFgIA-0005tx-DI
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 12:16:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42072)
+	id 1kFgQF-0005iW-Ic
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 12:24:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFgHU-000545-7h
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 12:15:40 -0400
-Received: from indium.canonical.com ([91.189.90.7]:39326)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFgP5-0004Nw-Fa
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 12:23:31 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:36162)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kFgHR-0006pl-EQ
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 12:15:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kFgHO-0005PE-6l
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 16:15:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 3152B2E80DB
- for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 16:15:34 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kFgP3-00085W-IL
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 12:23:31 -0400
+Received: by mail-ed1-x541.google.com with SMTP id w1so16657788edr.3
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 09:23:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=y4WsRxhlTx/2hHK9NXItGoisfo4HT4jTNgWzYXpZs6g=;
+ b=aJvr6o8SmvjXCZqdpivltjTP2eb/a1TWZWHWPRLDFATolr5sNkd8Ilf90yVj06Y2R2
+ JEkR2PIyBuYCEOfeB1oiWXh6sB1CYVaViEfQmSX4JYwNID9/62HzsJ1w09wM0QvEgoQz
+ L9o/yKo9QklDjlW1sKvPmNugpu4Nswizp6hQQ3L1Lc/EDgfWkdKWG0LSDJYUbZEH6HgU
+ fXgB6rdqHW1RVA+N+rrQNJ3bzy3E7JmosyPUJZuOxgQn9bFsXMmLVuXlv/oe/OEl6OKk
+ bunIxqLvnD9lwNEvljK4IFjWBqUhdOog0kMT/u4CjsOKUR+mjCOJl7a8b1tfOPhlf4rp
+ saLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=y4WsRxhlTx/2hHK9NXItGoisfo4HT4jTNgWzYXpZs6g=;
+ b=obd5J00qPYyUL5f00Biijwc7zfH/2M7Y9PzfF4xBU0j0mlj557Bn/pvi2FGzJzEMkV
+ tTXrrJwqQfj8JFMMzKjAXEHP8JQyq4lP7tHX1rct6Yxy52cfLyA6KRNxDfalzrmxSP8U
+ qAAPDKqZjxpP2mPYZ8Sd80yAngbys93QcWKAjizxwgPLUJnd3XNgzm+Vz31IzC9l6KiO
+ 9gPJiu0d+N2ZDFrywe89PpIDjnf29Olu2OGGynrbE9E5XiPS6RFK0LhCHwXiiioj63uJ
+ 5ud/UywVPTFHurqqPe/ldJ1aqG6fNcRr9y3fM/6jNvyTviZLZr9zwI8VvPSaAiceBvE7
+ HLvA==
+X-Gm-Message-State: AOAM5334Z5Vr3nWXusUr9CfBQd4tn6XXhVY1XG2FHuSIo9rjfDiVps+P
+ uhCqFGTAYxoHjS5SEFMy7oMeaxsvufXsMLb6/Vn3mg==
+X-Google-Smtp-Source: ABdhPJyaZjjbg0c4M2Pr45qUDwQve2aIEFnBPgu1LU7gAiX0DCX4ep13EwEsBLAvHFTk60L6DYPHAWE7cCuFk/940Ig=
+X-Received: by 2002:a05:6402:1495:: with SMTP id
+ e21mr26974052edv.146.1599582207357; 
+ Tue, 08 Sep 2020 09:23:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 08 Sep 2020 16:05:18 -0000
-From: Derek Su <1894818@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: dereksu lukey3332
-X-Launchpad-Bug-Reporter: Derek Su (dereksu)
-X-Launchpad-Bug-Modifier: Derek Su (dereksu)
-References: <159955977855.17769.18273034994411209537.malonedeb@soybean.canonical.com>
- <20200908142040.1977b5cc@luklap>
-Message-Id: <CAKEOLWWf51Tu_+Xa+awcCLbhefDOY-z3uxyzprCEEmgLa2NmVg@mail.gmail.com>
-Subject: Re: [Bug 1894818] [NEW] COLO's guest VNC client hang after failover
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="90a5703803d95539bdb5c0b289b1675630569e1e"; Instance="production"
-X-Launchpad-Hash: bc9a98b7f2f6f0b563e7329b8a0284735b3925bf
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 11:30:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20200908051953.1616885-1-david@gibson.dropbear.id.au>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 8 Sep 2020 17:23:16 +0100
+Message-ID: <CAFEAcA9s0N7zz1w1sSQ+d1nuhcMmEU43KO29nzQA-xpBP8v7yg@mail.gmail.com>
+Subject: Re: [PULL 00/33] ppc-for-5.2 queue 20200908
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,167 +94,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1894818 <1894818@bugs.launchpad.net>
+Cc: Daniel Henrique Barboza <danielhb413@gmail.com>,
+ qemu-ppc <qemu-ppc@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Thiago Jung Bauermann <bauerman@linux.ibm.com>, Greg Kurz <groug@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Lukas
-
-It caused by the advanced watchdog (AWD) feature instead of COLO itself.
-I will check it if my misuse or not, thanks.
-
-Best regards,
-
-Derek
-
-Lukas Straub <1894818@bugs.launchpad.net> =E6=96=BC 2020=E5=B9=B49=E6=9C=88=
-8=E6=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8B=E5=8D=888:30=E5=AF=AB=E9=81=93=EF=
-=BC=9A
-
-> On Tue, 08 Sep 2020 10:25:52 -0000
-> Launchpad Bug Tracker <1894818@bugs.launchpad.net> wrote:
+On Tue, 8 Sep 2020 at 06:20, David Gibson <david@gibson.dropbear.id.au> wrote:
 >
-> > You have been subscribed to a public bug by Derek Su (dereksu):
-> >
-> > Hello,
-> >
-> > After setting up COLO's primary and secondary VMs,
-> > I installed the vncserver and xrdp (apt install tightvncserver xrdp)
-> inside the VM.
-> >
-> > I access the VM from another PC via VNC/RDP client, and everything is O=
-K.
-> > Then, kill the primary VM and issue the failover commands.
-> >
-> > The expected result is that the VNC/RDP client can reconnect and resume
-> > automatically after failover. (I've confirmed the VNC/RDP client can
-> > reconnect automatically.)
-> >
-> > But in my test, the VNC client's screen hangs and cannot be recovered no
-> > longer. (I need to restart VNC client by myself.)
-> >
-> > BTW, it works well after killing SVM.
-> >
-> > Here is my QEMU networking device
-> > ```
-> > -device virtio-net-pci,id=3De0,netdev=3Dhn0 \
-> > -netdev
-> tap,id=3Dhn0,br=3Dbr0,vhost=3Doff,helper=3D/usr/local/libexec/qemu-bridge=
--helper \
-> > ```
-> >
-> > Thanks.
-> >
-> > Regards,
-> > Derek
-> >
-> > ** Affects: qemu
-> >      Importance: Undecided
-> >          Status: New
-> >
+> The following changes since commit e11bd71f89649da3cff439c030d2ccac0cc914e3:
 >
-> Hello,
-> Can you show the full qemu command line?
+>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-09-07' into staging (2020-09-07 16:51:00 +0100)
 >
-> Regards,
-> Lukas Straub
+> are available in the Git repository at:
 >
-> --
-> You received this bug notification because you are subscribed to the bug
-> report.
-> https://bugs.launchpad.net/bugs/1894818
+>   git://github.com/dgibson/qemu.git tags/ppc-for-5.2-20200908
 >
-> Title:
->   COLO's guest VNC client hang after failover
+> for you to fetch changes up to 876ab8d89d0d288945334c8caa908b07ef847de2:
 >
-> Status in QEMU:
->   New
+>   spapr_numa: use spapr_numa_get_vcpu_assoc() in home_node hcall (2020-09-08 11:34:30 +1000)
 >
-> Bug description:
->   Hello,
+> ----------------------------------------------------------------
+> ppc patch queue 2020-09-08
 >
->   After setting up COLO's primary and secondary VMs,
->   I installed the vncserver and xrdp (apt install tightvncserver xrdp)
-> inside the VM.
+> This supersedes ppc-for-5.2-20200904, it fixes a couple of bugs in
+> that PR and adds a few extra patches.
 >
->   I access the VM from another PC via VNC/RDP client, and everything is O=
-K.
->   Then, kill the primary VM and issue the failover commands.
+> Next pull request for qemu-5.2.  The biggest thing here is the
+> generalization of ARM's start-powered-off machine property to all
+> targets.  This can fix a number of odd little edge cases where KVM
+> could run vcpus before they were properly initialized.  This does
+> include changes to a number of files that aren't normally in my
+> purview.  There are suitable Acked-by lines and Peter requested this
+> come in via my tree, since the most pressing requirement for it is in
+> pseries machines with the POWER secure virtual machine facility.
 >
->   The expected result is that the VNC/RDP client can reconnect and
->   resume automatically after failover. (I've confirmed the VNC/RDP
->   client can reconnect automatically.)
->
->   But in my test, the VNC client's screen hangs and cannot be recovered
->   no longer. I need to restart VNC client by myself.
->
->   BTW, it works well after killing SVM.
->
->   Here is my QEMU networking device
->   ```
->   -device virtio-net-pci,id=3De0,netdev=3Dhn0 \
->   -netdev
-> tap,id=3Dhn0,br=3Dbr0,vhost=3Doff,helper=3D/usr/local/libexec/qemu-bridge=
--helper \
->   ```
->
->   Thanks.
->
->   Regards,
->   Derek
->
-> To manage notifications about this bug go to:
-> https://bugs.launchpad.net/qemu/+bug/1894818/+subscriptions
->
+> In addition we have:
+>  * Daniel Barboza's rework and clean up of pseries machine NUMA handling
+>  * Correction to behaviour of the nvdimm= generic machine property on
+>    pseries
+>  * An optimization to the allocation of XIVE interrupts on KVM
+>  * Some fixes for confused behaviour with kernel_irqchip when both
+>    XICS and XIVE are in play
+>  * Add HIOMAP comamnd to pnv flash
+>  * Properly advertise the fact that spapr_vscsi doesn't handle
+>    hotplugged disks
+>  * Some assorted minor enhancements
 
 
-** Changed in: qemu
-       Status: New =3D> Invalid
+Applied, thanks.
 
--- =
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1894818
-
-Title:
-  COLO's guest VNC client hang after failover
-
-Status in QEMU:
-  Invalid
-
-Bug description:
-  Hello,
-
-  After setting up COLO's primary and secondary VMs,
-  I installed the vncserver and xrdp (apt install tightvncserver xrdp) insi=
-de the VM.
-
-  I access the VM from another PC via VNC/RDP client, and everything is OK.
-  Then, kill the primary VM and issue the failover commands.
-
-  The expected result is that the VNC/RDP client can reconnect and
-  resume automatically after failover. (I've confirmed the VNC/RDP
-  client can reconnect automatically.)
-
-  But in my test, the VNC client's screen hangs and cannot be recovered
-  no longer. I need to restart VNC client by myself.
-
-  BTW, it works well after killing SVM.
-
-  Here is my QEMU networking device
-  ```
-  -device virtio-net-pci,id=3De0,netdev=3Dhn0 \
-  -netdev tap,id=3Dhn0,br=3Dbr0,vhost=3Doff,helper=3D/usr/local/libexec/qem=
-u-bridge-helper \
-  ```
-
-  Thanks.
-
-  Regards,
-  Derek
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1894818/+subscriptions
+-- PMM
 
