@@ -2,83 +2,131 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E869CC433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B547C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:14:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93B6C22955
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:12:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C684322838
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 14:14:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QJIMmvgP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93B6C22955
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NfmU132u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C684322838
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFeMh-000880-OV
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 10:12:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33824)
+	id 1kFeOO-0000uN-S1
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 10:14:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kFeM3-00070L-C7
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:12:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51342)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFeNj-0000Tf-R7
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:13:59 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:37756
+ helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kFeM1-0004t5-9z
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:12:15 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kFeNi-00051L-7v
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 10:13:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599574332;
+ s=mimecast20190719; t=1599574437;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=p+b8SKLhwqA0+AdEOSLhMwJLWRiMvR4myifiRSWFBFI=;
- b=QJIMmvgPhwek4GwBHhfeRcUrtAB7Fp21f8iNLh215hU+PAVeuSi0U0Vs+DOgFqRcIYLc7u
- 8nPlQQQbPUCGVd8ITWzjw+G+8HGlxvYUn8Ck1EK24uGaKDajgP3l2QV6JbefbmqIr3ruZq
- ELmJuVBNz5zfCsq2z59LmSMZHHPGNzg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-57-bP2cYlUsMFSFK32jRRkagg-1; Tue, 08 Sep 2020 10:12:09 -0400
-X-MC-Unique: bP2cYlUsMFSFK32jRRkagg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E71EE805EE2
- for <qemu-devel@nongnu.org>; Tue,  8 Sep 2020 14:12:08 +0000 (UTC)
-Received: from vitty.brq.redhat.com (unknown [10.40.194.93])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AD27419728;
- Tue,  8 Sep 2020 14:12:07 +0000 (UTC)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] target/i386: support KVM_FEATURE_ASYNC_PF_INT
-Date: Tue,  8 Sep 2020 16:12:06 +0200
-Message-Id: <20200908141206.357450-1-vkuznets@redhat.com>
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=4CrLf6Iv5x5rLW0cbZf0c0jZaqZ0s4edj8gilGSfglk=;
+ b=NfmU132ukM2WuSRdi/nWdgFJ9lk7Yec6Y6fO9lZW7w08I5XL7ktOFOqQb5CyEkZw3gvwU3
+ 64BROqaP65r648SgE6CUEzsBivE3cLhb4DVL3DVHtUojJi/oXvjgAyt9cjVBuha94/maEB
+ f00AIhS24VbraUI9mOLjg5mCMHggtdE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-299-oSZ2HK3aMhyntVDFPf9INg-1; Tue, 08 Sep 2020 10:13:56 -0400
+X-MC-Unique: oSZ2HK3aMhyntVDFPf9INg-1
+Received: by mail-wr1-f72.google.com with SMTP id v12so7036562wrm.9
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 07:13:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+ :message-id:date:user-agent:mime-version:in-reply-to
+ :content-language:content-transfer-encoding;
+ bh=4CrLf6Iv5x5rLW0cbZf0c0jZaqZ0s4edj8gilGSfglk=;
+ b=Z+YHA37BfDGWGsQfcoGueHz0sMWIa/o01iT9rIQYtnpu4oAcFkRzvnDxDqpLxMGLE+
+ xjJ9fWWLwvIfszX07sIjxsGKjhXetG8xhPB588jE/TsMatOkHVytNDawsAiA/DzYRzHJ
+ 7kyN+n4JRLRWRmD0ha4nMeB1DrBotR8tQ1ZX3IcBRH3RCUVZ/EeBpudeIkyzU1ucgHua
+ AMFyHrWUb/KPY6wUWrwRgepS6K5I/u7Tre3qFGtX+LXq+HzNud+sM7SFPr8nUEeFLhAV
+ WH/6qCkHOA4UAS+jdERf9HCEo0cfcChAksu75iFVJI3xulJRiPVPlNjwofKo720dGVJs
+ kVyQ==
+X-Gm-Message-State: AOAM532+ovuDoLnRNmfA2lghUEgD4FrqM1sUX4ifwMTx5rrgBBGLJw+y
+ bJ7oemc2T+JlF1uQucQbgf7x+Qvr8YQflNsEDsQkHBMjnWVtUU74y5jwow1+I0ZGd6e8a++DzHJ
+ TSreqA+YmAzelKIc=
+X-Received: by 2002:adf:e952:: with SMTP id m18mr26524990wrn.171.1599574432268; 
+ Tue, 08 Sep 2020 07:13:52 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwqdpEvd1AkFho84XyWakDPEc2izUFkpYhK+ou/fNgf5xBQ5kh2WZyoCHi1FsEs+wb7MtVUHQ==
+X-Received: by 2002:adf:e952:: with SMTP id m18mr26524977wrn.171.1599574432095; 
+ Tue, 08 Sep 2020 07:13:52 -0700 (PDT)
+Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
+ [83.57.170.65])
+ by smtp.gmail.com with ESMTPSA id d5sm37366165wrb.28.2020.09.08.07.13.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 08 Sep 2020 07:13:51 -0700 (PDT)
+Subject: Re: [PULL v5 00/46] Next round of Meson bugfixes and cleanups
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20200908094408.27091-1-pbonzini@redhat.com>
+ <CAFEAcA8JZhrxNgayLaCGqQiGLhybvXo7qrXDUpVmkrX5FmjV5A@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Autocrypt: addr=philmd@redhat.com; keydata=
+ mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
+ bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
+ GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
+ z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
+ XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
+ CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
+ bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
+ qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
+ MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
+ qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
+ YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
+ CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
+ KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
+ 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
+ JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
+ piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
+ 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
+ gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
+ 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
+ 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
+ RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
+ apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
+Message-ID: <dbc559bd-8e4c-d4d3-6719-143cd8b7b8d7@redhat.com>
+Date: Tue, 8 Sep 2020 16:13:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <CAFEAcA8JZhrxNgayLaCGqQiGLhybvXo7qrXDUpVmkrX5FmjV5A@mail.gmail.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=vkuznets@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 02:10:54
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=philmd@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:33:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ NICE_REPLY_A=-1.626, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -92,161 +140,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Linux-5.8 introduced interrupt based mechanism for 'page ready' events
-delivery and disabled the old, #PF based one (see commit 2635b5c4a0e4
-"KVM: x86: interrupt based APF 'page ready' event delivery"). Linux
-guest switches to using in in 5.9 (see commit b1d405751cd5 "KVM: x86:
-Switch KVM guest to using interrupts for page ready APF delivery").
-The feature has a new KVM_FEATURE_ASYNC_PF_INT bit assigned and
-the interrupt vector is set in MSR_KVM_ASYNC_PF_INT MSR. Support this
-in QEMU.
+On 9/8/20 3:26 PM, Peter Maydell wrote:
+> On Tue, 8 Sep 2020 at 10:45, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>
+>> The following changes since commit e11bd71f89649da3cff439c030d2ccac0cc914e3:
+>>
+>>   Merge remote-tracking branch 'remotes/huth-gitlab/tags/pull-request-2020-09-07' into staging (2020-09-07 16:51:00 +0100)
+>>
+>> are available in the Git repository at:
+>>
+>>   https://gitlab.com/bonzini/qemu.git tags/for-upstream
+>>
+>> for you to fetch changes up to ef6a0d6e3927464de67f70cb13abbfe67361e0c9:
+>>
+>>   docs: update build system documentation (2020-09-08 07:21:55 +0200)
+>>
+>> ----------------------------------------------------------------
+>> meson related:
+>> * convert unit tests
+>> * bugfixes for mtest2make
+>> * miscellaneous bugfixes
+>> * dead code removal and configure cleanups
+>> * oss-fuzz fixes
+>> * msys fixes
+> 
+> 
+> Applied, thanks.
 
-Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
----
-- Note, Linux-5.9-rc4 is currently broken (see
-https://lore.kernel.org/kvm/20200908135350.355053-3-vkuznets@redhat.com/T/#u)
-but I hope it will get fixed before 5.9 is released.
----
- target/i386/cpu.c     |  4 +++-
- target/i386/cpu.h     |  1 +
- target/i386/kvm.c     | 10 ++++++++++
- target/i386/machine.c | 19 +++++++++++++++++++
- 4 files changed, 33 insertions(+), 1 deletion(-)
+Once rebased I got:
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 49d89585288d..76037843511f 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -903,7 +903,7 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
-             "kvmclock", "kvm-nopiodelay", "kvm-mmu", "kvmclock",
-             "kvm-asyncpf", "kvm-steal-time", "kvm-pv-eoi", "kvm-pv-unhalt",
-             NULL, "kvm-pv-tlb-flush", NULL, "kvm-pv-ipi",
--            "kvm-poll-control", "kvm-pv-sched-yield", NULL, NULL,
-+            "kvm-poll-control", "kvm-pv-sched-yield", "kvm-asyncpf-int", NULL,
-             NULL, NULL, NULL, NULL,
-             NULL, NULL, NULL, NULL,
-             "kvmclock-stable-bit", NULL, NULL, NULL,
-@@ -4209,6 +4209,7 @@ static PropValue kvm_default_props[] = {
-     { "kvmclock", "on" },
-     { "kvm-nopiodelay", "on" },
-     { "kvm-asyncpf", "on" },
-+    { "kvm-asyncpf-int", "on" },
-     { "kvm-steal-time", "on" },
-     { "kvm-pv-eoi", "on" },
-     { "kvmclock-stable-bit", "on" },
-@@ -7092,6 +7093,7 @@ static void x86_cpu_initfn(Object *obj)
-     object_property_add_alias(obj, "kvm_nopiodelay", obj, "kvm-nopiodelay");
-     object_property_add_alias(obj, "kvm_mmu", obj, "kvm-mmu");
-     object_property_add_alias(obj, "kvm_asyncpf", obj, "kvm-asyncpf");
-+    object_property_add_alias(obj, "kvm_asyncpf_int", obj, "kvm-asyncpf-int");
-     object_property_add_alias(obj, "kvm_steal_time", obj, "kvm-steal-time");
-     object_property_add_alias(obj, "kvm_pv_eoi", obj, "kvm-pv-eoi");
-     object_property_add_alias(obj, "kvm_pv_unhalt", obj, "kvm-pv-unhalt");
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index d3097be6a50a..18e99e9b392a 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1492,6 +1492,7 @@ typedef struct CPUX86State {
-     uint64_t wall_clock_msr;
-     uint64_t steal_time_msr;
-     uint64_t async_pf_en_msr;
-+    uint64_t async_pf_int_msr;
-     uint64_t pv_eoi_en_msr;
-     uint64_t poll_control_msr;
- 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index 205b68bc0ce8..b26370662075 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -287,6 +287,7 @@ static const struct kvm_para_features {
-     { KVM_CAP_NOP_IO_DELAY, KVM_FEATURE_NOP_IO_DELAY },
-     { KVM_CAP_PV_MMU, KVM_FEATURE_MMU_OP },
-     { KVM_CAP_ASYNC_PF, KVM_FEATURE_ASYNC_PF },
-+    { KVM_CAP_ASYNC_PF_INT, KVM_FEATURE_ASYNC_PF_INT },
- };
- 
- static int get_para_features(KVMState *s)
-@@ -2820,6 +2821,9 @@ static int kvm_put_msrs(X86CPU *cpu, int level)
-         if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF)) {
-             kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_EN, env->async_pf_en_msr);
-         }
-+        if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF_INT)) {
-+            kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_EN, env->async_pf_int_msr);
-+        }
-         if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_PV_EOI)) {
-             kvm_msr_entry_add(cpu, MSR_KVM_PV_EOI_EN, env->pv_eoi_en_msr);
-         }
-@@ -3205,6 +3209,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-     if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF)) {
-         kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_EN, 0);
-     }
-+    if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_ASYNC_PF_INT)) {
-+        kvm_msr_entry_add(cpu, MSR_KVM_ASYNC_PF_INT, 0);
-+    }
-     if (env->features[FEAT_KVM] & (1 << KVM_FEATURE_PV_EOI)) {
-         kvm_msr_entry_add(cpu, MSR_KVM_PV_EOI_EN, 0);
-     }
-@@ -3445,6 +3452,9 @@ static int kvm_get_msrs(X86CPU *cpu)
-         case MSR_KVM_ASYNC_PF_EN:
-             env->async_pf_en_msr = msrs[i].data;
-             break;
-+        case MSR_KVM_ASYNC_PF_INT:
-+            env->async_pf_int_msr = msrs[i].data;
-+            break;
-         case MSR_KVM_PV_EOI_EN:
-             env->pv_eoi_en_msr = msrs[i].data;
-             break;
-diff --git a/target/i386/machine.c b/target/i386/machine.c
-index b1acf7d0ef46..233e46bb70b5 100644
---- a/target/i386/machine.c
-+++ b/target/i386/machine.c
-@@ -394,6 +394,13 @@ static bool async_pf_msr_needed(void *opaque)
-     return cpu->env.async_pf_en_msr != 0;
- }
- 
-+static bool async_pf_int_msr_needed(void *opaque)
-+{
-+    X86CPU *cpu = opaque;
-+
-+    return cpu->env.async_pf_int_msr != 0;
-+}
-+
- static bool pv_eoi_msr_needed(void *opaque)
- {
-     X86CPU *cpu = opaque;
-@@ -467,6 +474,17 @@ static const VMStateDescription vmstate_async_pf_msr = {
-     }
- };
- 
-+static const VMStateDescription vmstate_async_pf_int_msr = {
-+    .name = "cpu/async_pf_int_msr",
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .needed = async_pf_int_msr_needed,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT64(env.async_pf_int_msr, X86CPU),
-+        VMSTATE_END_OF_LIST()
-+    }
-+};
-+
- static const VMStateDescription vmstate_pv_eoi_msr = {
-     .name = "cpu/async_pv_eoi_msr",
-     .version_id = 1,
-@@ -1438,6 +1456,7 @@ VMStateDescription vmstate_x86_cpu = {
-     .subsections = (const VMStateDescription*[]) {
-         &vmstate_exception_info,
-         &vmstate_async_pf_msr,
-+        &vmstate_async_pf_int_msr,
-         &vmstate_pv_eoi_msr,
-         &vmstate_steal_time_msr,
-         &vmstate_poll_control_msr,
--- 
-2.25.4
+Makefile.include:144: warning: overriding recipe for target 'check-block'
+Makefile.mtest:1339: warning: ignoring old recipe for target 'check-block'
+config-host.mak is out-of-date, running configure
+
+Nothing to worry about as Makefile.mtest is generated.
+I wonder if it is possible to avoid such warnings though...
 
 
