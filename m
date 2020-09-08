@@ -1,76 +1,93 @@
-Return-Path: <SRS0=tzYv=CQ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2EECC43461
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 23:51:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FF5C43461
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 00:42:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85E1A21927
-	for <qemu-devel@archiver.kernel.org>; Mon,  7 Sep 2020 23:51:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9656C215A4
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 00:42:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="TE7iqe5c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85E1A21927
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kgVjcuMt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9656C215A4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37424 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFQvN-0000xo-Ig
-	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 19:51:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44832)
+	id 1kFRi5-0008Kq-6K
+	for qemu-devel@archiver.kernel.org; Mon, 07 Sep 2020 20:42:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFQur-0000Ws-6z; Mon, 07 Sep 2020 19:51:17 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:56023 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kFQun-0001gH-GP; Mon, 07 Sep 2020 19:51:16 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4BllRG1PHfz9sTK; Tue,  8 Sep 2020 09:51:06 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1599522666;
- bh=qD454x6JcxFguVNpjv/cmg5ZwHuCt9VHMjWmODsm1zQ=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=TE7iqe5cdt8ogekpOflqbp6h3TpqOmQdflc8JNjCzUiPpQVRvtyuf9CWsePBSpc59
- zBH1z4QMhlYINL+Ta7LJjr5I59DG2uTwA32h9DHL/5ypTo/sPiXhT0egaKl+QcJXUw
- ovFttUp00yjSyjUCRLUpRNvcFRZOLingZhR4B/uo=
-Date: Tue, 8 Sep 2020 09:50:59 +1000
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PULL 00/30] ppc-for-5.2 queue 20200904
-Message-ID: <20200907235059.GL341806@yekko.fritz.box>
-References: <20200904034719.673626-1-david@gibson.dropbear.id.au>
- <CAFEAcA8xCpRBcsCaozEXnCuM5SqWr5ZEDrwLjs+8va=316_70Q@mail.gmail.com>
- <20200907023800.GJ341806@yekko.fritz.box>
- <675253df-b750-1a0a-5447-9dadef1accba@redhat.com>
- <7c287125-70b3-4330-fd5c-8e644e1c347d@redhat.com>
- <ffee957d-0428-d167-c1ab-3fe67b4d8c7c@redhat.com>
- <20200907165132.683d2880.cohuck@redhat.com>
- <f93673f9-3e83-ef5f-9628-819b25908e43@redhat.com>
- <77b63a31-48a8-c77f-9956-7511db170594@redhat.com>
- <0bca4e6e-f4ba-2108-ecaf-c3daaadbdb26@redhat.com>
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1kFRhM-0007uv-3k
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 20:41:24 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:41039)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1kFRhK-0006lp-0z
+ for qemu-devel@nongnu.org; Mon, 07 Sep 2020 20:41:23 -0400
+Received: by mail-il1-x143.google.com with SMTP id w8so13786630ilj.8
+ for <qemu-devel@nongnu.org>; Mon, 07 Sep 2020 17:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=2imIpy1311azDE+Sopd9ksoJmiBYEkbHQbCvOv41/0o=;
+ b=kgVjcuMtcvcFnImBJOS3vjYALi4fuhXKWXXkkhrxy8o4yblQ0akeT1jqRRQMyzSqJH
+ H+7yaUYE+KXmJeNeXzloPMPlN49WFh2vukjc0ZzfB1QySSV10k8jp3h7rt2t3E62kwe+
+ RN9TZ2rcGpvvs1J7HMSRjhwXiC9WaAejHnVIfNxBBY8NXju5xuhXjHMc5baQ8qr8dJDN
+ aJeXNZ4m61th4IdAPkL6yI85EkAY3kWwH4OWp49rjXMk/EZndJOFSmIzry/c4h8B2isF
+ bZT5ZP4yhG6tTGN/AhLCqE/7Hn+RKnzeFzxRbc3MxVCvmd6fyIEp4kRSbmhQki7JGAMz
+ GiJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=2imIpy1311azDE+Sopd9ksoJmiBYEkbHQbCvOv41/0o=;
+ b=jInsB1b6fd/+E3UYIO92/Wo6FiE6Fmgm0hhKgmKE95flllefYP4h+Cp4CTaopmEH66
+ 3RxIPrmcaI2YQl4lQsEn5JYGPNMved1KFTtmmop46DdBMf2fZiwjlmHmEk34185zYLlP
+ 2Fkh7S73lN2/3x4PnpF46rMSsJ28jpk5pu30WKWsPTeMZa4xebKQHZGoOMRtRExo6d7E
+ kznlh+ft+rlbb7BJ8GaMkvHBlh270y+/qaJk0dHIq1rp/jOXdLwhh2udQjYKDStyJR0P
+ D4Phgmg80XoM+u2vRdoYen0sn5e4UlWx8FYJ3i6Vz2FB4a2uJNtBc25QUbyqar1DckMx
+ A/Mw==
+X-Gm-Message-State: AOAM531Df1H5EaL4oZxM/Q7F6S7c8hYsv7b0U7Wlr3m6dLLtelXXnnWH
+ kU+9PH8NT6WXCoVyYApEJz7x69ZpJIKcwa8N4u4=
+X-Google-Smtp-Source: ABdhPJz7gayT42xM11xl+dD1BWlDzSlhO0068B0blm36aNfw8DRhvyQBK0VmQKK4yTl0IkRntsi5hSD/AytD6A04NHs=
+X-Received: by 2002:a92:c083:: with SMTP id h3mr21243337ile.208.1599525680526; 
+ Mon, 07 Sep 2020 17:41:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="dpynvXbW/eW9Tpc3"
-Content-Disposition: inline
-In-Reply-To: <0bca4e6e-f4ba-2108-ecaf-c3daaadbdb26@redhat.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
+References: <1598256668-12131-1-git-send-email-chenhc@lemote.com>
+ <d594ed8e-1cb5-f9ac-09d3-7da28f5a95d3@amsat.org>
+ <CAAhV-H4hRT+7KNCDX7bWwxK_mgYRSkWh+9rh1o6LLfD8zmGdqg@mail.gmail.com>
+ <15357cf6-43d0-557c-f3c8-1668aa44fd5d@amsat.org>
+In-Reply-To: <15357cf6-43d0-557c-f3c8-1668aa44fd5d@amsat.org>
+From: Huacai Chen <chenhuacai@gmail.com>
+Date: Tue, 8 Sep 2020 08:41:09 +0800
+Message-ID: <CAAhV-H5FdKzBxJQZTtxCQnA0SDr1qYSSupsQ96PQU2mpyr4TMA@mail.gmail.com>
+Subject: Re: [PATCH V2 for-5.2] hw/null-machine: Add the kvm_type() hook for
+ MIPS
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=chenhuacai@gmail.com; helo=mail-il1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,203 +100,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Daniel Henrique Barboza <danielhb413@gmail.com>,
- David Hildenbrand <david@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, Thiago Jung Bauermann <bauerman@linux.ibm.com>
+Cc: Huacai Chen <zltjiangshi@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, Philippe,
 
---dpynvXbW/eW9Tpc3
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Mon, Sep 7, 2020 at 11:39 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> You forgot to Cc the maintainers, doing it for you:
+>
+> ./scripts/get_maintainer.pl -f hw/core/null-machine.c
+> Eduardo Habkost <ehabkost@redhat.com> (supporter:Machine core)
+> Marcel Apfelbaum <marcel.apfelbaum@gmail.com> (supporter:Machine core)
+Thank you very much!
 
-On Mon, Sep 07, 2020 at 09:46:28PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> On 9/7/20 7:26 PM, Laurent Vivier wrote:
-> > On 07/09/2020 18:29, Laurent Vivier wrote:
-> >> On 07/09/2020 16:51, Cornelia Huck wrote:
-> >>> On Mon, 7 Sep 2020 16:31:24 +0200
-> >>> Laurent Vivier <lvivier@redhat.com> wrote:
-> >>>
-> >>>> On 07/09/2020 16:05, Philippe Mathieu-Daud=E9 wrote:
-> >>>>> Hi Thiago,
-> >>>>>
-> >>>>> On 9/7/20 3:29 PM, Laurent Vivier wrote: =20
-> >>>>>> On 07/09/2020 04:38, David Gibson wrote: =20
-> >>>>>>> On Sun, Sep 06, 2020 at 04:20:10PM +0100, Peter Maydell wrote: =
-=20
-> >>>
-> >>>>>>>> The 'check-tcg' tests for the linux-user static build also
-> >>>>>>>> failed on an s390x test:
-> >>>>>>>>
-> >>>>>>>>   CHECK   debian-s390x-cross
-> >>>>>>>>   BUILD   s390x-linux-user guest-tests with docker qemu/debian-s=
-390x-cross
-> >>>>>>>>   RUN     tests for s390x
-> >>>>>>>>   TEST    threadcount on s390x
-> >>>>>>>> Unhandled trap: 0x10003 =20
-> >>>>>>
-> >>>>>> This is EXCP_HALTED (include/exec/cpu-all.h)
-> >>>>>>
-> >>>>>> The message error comes from cpu_loop() in linux-user/s390x/cpu_lo=
-op.c.
-> >>>>>>
-> >>>>>> The trap can only come from accel/tcg/cpu-exec.c
-> >>>>>>
-> >>>>>>     679 int cpu_exec(CPUState *cpu)
-> >>>>>>     680 {
-> >>>>>> ...
-> >>>>>>     688     if (cpu_handle_halt(cpu)) {
-> >>>>>>     689         return EXCP_HALTED;
-> >>>>>>     690     }
-> >>>>>>
-> >>>>>> and
-> >>>>>>
-> >>>>>>     428 static inline bool cpu_handle_halt(CPUState *cpu)
-> >>>>>>     429 {
-> >>>>>>     430     if (cpu->halted) {
-> >>>>>> ...
-> >>>>>>     441         if (!cpu_has_work(cpu)) {
-> >>>>>>     442             return true;
-> >>>>>>     443         }
-> >>>>>>
-> >>>>>> and
-> >>>>>>
-> >>>>>>      58 static bool s390_cpu_has_work(CPUState *cs)
-> >>>>>>      59 {
-> >>>>>>      60     S390CPU *cpu =3D S390_CPU(cs);
-> >>>>>>      61
-> >>>>>>      62     /* STOPPED cpus can never wake up */
-> >>>>>>      63     if (s390_cpu_get_state(cpu) !=3D S390_CPU_STATE_LOAD &&
-> >>>>>>      64         s390_cpu_get_state(cpu) !=3D S390_CPU_STATE_OPERAT=
-ING) {
-> >>>>>>      65         return false;
-> >>>>>>      66     }
-> >>>>>>      67
-> >>>>>>      68     if (!(cs->interrupt_request & CPU_INTERRUPT_HARD)) {
-> >>>>>>      69         return false;
-> >>>>>>      70     }
-> >>>>>>      71
-> >>>>>>      72     return s390_cpu_has_int(cpu);
-> >>>>>>      73 }
-> >>>>>>
-> >>>>>> and in target/s390x/cpu.h:
-> >>>>>>
-> >>>>>>     772 #ifndef CONFIG_USER_ONLY
-> >>>>>>     773 unsigned int s390_cpu_set_state(uint8_t cpu_state, S390CPU=
- *cpu);
-> >>>>>>     774 #else
-> >>>>>>     775 static inline unsigned int s390_cpu_set_state(uint8_t cpu_=
-state,
-> >>>>>> S390CPU *cpu)
-> >>>>>>     776 {
-> >>>>>>     777     return 0;
-> >>>>>>     778 }
-> >>>>>>     779 #endif /* CONFIG_USER_ONLY */
-> >>>>>>     780 static inline uint8_t s390_cpu_get_state(S390CPU *cpu)
-> >>>>>>     781 {
-> >>>>>>     782     return cpu->env.cpu_state;
-> >>>>>>     783 }
-> >>>>>>
-> >>>>>> As cpu_state is never set, perhaps in case of linux-user it should
-> >>>>>> always return S390_CPU_STATE_OPERATING?
-> >>>
-> >>> Possibly, we should not have any state handling for linux-user.
-> >>>
+Huacai
+>
+> On 9/3/20 2:58 AM, Huacai Chen wrote:
+> > Hi, Philippe,
+> >
+> > On Wed, Sep 2, 2020 at 9:55 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat=
+.org> wrote:
 > >>
-> >> I did that, but now 390_cpu_has_work() is false because
-> >> CPU_INTERRUPT_HARD is not set in cs->interrupt_request.
+> >> Hi Huacai,
 > >>
-> >> I think we should not enter in cpu_loop() with halted set to 1.
+> >> On 8/24/20 10:11 AM, Huacai Chen wrote:
+> >>> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now,
+> >>> libvirt uses a null-machine to detect the kvm capability. In the MIPS
+> >>> case, it will return "KVM not supported" on a VZ platform by default.
+> >>> So, add the kvm_type() hook to the null-machine.
+> >>>
+> >>> This seems not a very good solution, but I cannot do it better now.
+> >>>
+> >>> Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+> >>> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> >>> Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> >>> ---
+> >>>  hw/core/meson.build    | 2 +-
+> >>>  hw/core/null-machine.c | 6 ++++++
+> >>>  2 files changed, 7 insertions(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/hw/core/meson.build b/hw/core/meson.build
+> >>> index fc91f98..b6591b9 100644
+> >>> --- a/hw/core/meson.build
+> >>> +++ b/hw/core/meson.build
+> >>> @@ -35,7 +35,6 @@ softmmu_ss.add(files(
+> >>>    'machine-hmp-cmds.c',
+> >>>    'machine.c',
+> >>>    'nmi.c',
+> >>> -  'null-machine.c',
+> >>>    'qdev-fw.c',
+> >>>    'qdev-properties-system.c',
+> >>>    'sysbus.c',
+> >>> @@ -45,5 +44,6 @@ softmmu_ss.add(files(
+> >>>
+> >>>  specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
+> >>>    'machine-qmp-cmds.c',
+> >>> +  'null-machine.c',
+> >>>    'numa.c',
+> >>>  ))
+> >>> diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
+> >>> index 7e69352..4b4ab76 100644
+> >>> --- a/hw/core/null-machine.c
+> >>> +++ b/hw/core/null-machine.c
+> >>> @@ -17,6 +17,9 @@
+> >>>  #include "sysemu/sysemu.h"
+> >>>  #include "exec/address-spaces.h"
+> >>>  #include "hw/core/cpu.h"
+> >>> +#ifdef TARGET_MIPS
+> >>> +#include "kvm_mips.h"
+> >>> +#endif
+> >>>
+> >>>  static void machine_none_init(MachineState *mch)
+> >>>  {
+> >>> @@ -55,6 +58,9 @@ static void machine_none_machine_init(MachineClass =
+*mc)
+> >>>      mc->no_floppy =3D 1;
+> >>>      mc->no_cdrom =3D 1;
+> >>>      mc->no_sdcard =3D 1;
+> >>> +#ifdef TARGET_MIPS
+> >>> +    mc->kvm_type =3D mips_kvm_type;
+> >>> +#endif
 > >>
-> >> Before the patch of this series, s390_cpu_reset() is called twice, and
-> >> on the second call, halted is already 0.
+> >> I'm a bit confused here, you are taking the same path from your v4...
+> >> https://www.mail-archive.com/qemu-devel@nongnu.org/msg712550.html
 > >>
-> >> With start_powered_off set to true in initfn, on the first reset
-> >> "halted" is 0 and on the second it is 1 (because it has been copied fr=
-om
-> >> start_powered_off) and so cpu_loop() starts with halted set to 1 and f=
-ails.
-> >=20
-> > What is happening:
-> >=20
-> > [without start_powered_off]
-> >=20
-> >   1- halted is set to 1 in s390x_cpu_initfn()
-> >   2- halted is set to 0 in s390x_cpu_reset() by parent_reset()
-> >      (cpu_common_reset()
-> >   3- cpu_loop() is always entered with halted set to 0
-> >=20
-> > [with start_powered_off]
-> >=20
-> >   1- halted is set to start_powered_off (1) in s390x_cpu_reset() by
-> >      parent_reset() (cpu_common_reset()
-> >   2- cpu_loop() is always entered with halted set to 1
-> >=20
-> > So in the first case, cpu_loop() is always started with halted set to 0
-> > and in the second case with halted set to 1.
-> >=20
-> > And I think, with linux-user, it should never be started with halted set
-> > to 1.
-> >=20
-> > We can't add a "#ifdef CONFIG_USER_ONLY" in hw/core/cpu.c to set halted
-> > to 0 because it is in the common files, but we can do:
-> >=20
-> > diff --git a/target/s390x/cpu.c b/target/s390x/cpu.c
-> > index 73d7d6007e8e..749cd548f0f3 100644
-> > --- a/target/s390x/cpu.c
-> > +++ b/target/s390x/cpu.c
-> > @@ -291,9 +291,9 @@ static void s390_cpu_initfn(Object *obj)
-> >      S390CPU *cpu =3D S390_CPU(obj);
-> >=20
-> >      cpu_set_cpustate_pointers(cpu);
-> > -    cs->start_powered_off =3D true;
-> >      cs->exception_index =3D EXCP_HLT;
-> >  #if !defined(CONFIG_USER_ONLY)
-> > +    cs->start_powered_off =3D true;
-> >      object_property_add(obj, "crash-information", "GuestPanicInformati=
-on",
-> >                          s390_cpu_get_crash_info_qom, NULL, NULL, NULL);
-> >      cpu->env.tod_timer =3D
->=20
-> This looks like the correct fix indeed :)
-> (Maybe worth adding a comment around).
->=20
-> Thanks for investigating!
-
-Yes, thanks for figuring this out.  I'll fix up my PR accordingly and
-resend today.
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---dpynvXbW/eW9Tpc3
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl9Wx2MACgkQbDjKyiDZ
-s5JmPxAAxcW9xvfNS5AhmrDMBwNiFrmgej40Q6eQUJh3yphWxiog/x3PYPnjH8l+
-D1LnIBJFfZIvk0rkaEiHeK66RV8OqCLbvZY6qfXjG02Rc6+4UObe3teV9GeQQf1K
-eAP4UFzbyibVIS4RaKt4Y38GkuV0m/8NdPu+jW8zyinhCmpVfJarIIjspI/4x3k2
-a6w5O4TMrpPr1FKpVO88q3kK+JHQzmNxeZyFKirVmvGdJqDJXVS3lxKbGPZ8wxmk
-0NdMdU/Uzru4LhhBdJDj60ifTPWU5ZJkl4SEEyHHkVYC4EL2wS9hCJ4qtNwxNHwI
-kghAsRDEte0K31UOVOwhSyaAngbFvQp040qasOnwhrDoLux8I1PZaJlpF9Az9YQE
-0Lvi3IegZDhxBv+i2tPmOT1sLC2kED7fy60B6rrwX+w1MzwVNXFxtpQmfNBlYflv
-fCSqz5if6HuxMvrpnxhYvDsrudMv0PmLuJ3kTnNmS/mv9Dk6C6b9YxGysSw/H3f2
-5rLsmW5CF8eK9vKO8Vyg6n8o1MliSJLLNfkZ0g/fSbr3nBSrEF82tblmYOHhQ69C
-jQTRz5fqwI8/r12iyY0HwpHfkeB7EBvHh/cJ584GZGzKgfVAQ8lydr9WWzNKb99F
-TK8e1zxlzDuu4Hr+c65R1cOCsceMLUfOJLzvqwJr1KZywzkbjjk=
-=opko
------END PGP SIGNATURE-----
-
---dpynvXbW/eW9Tpc3--
+> >> Did you rebase the correct version?
+> > The old patch has split to two parts, the first part is used by MIPS
+> > machine and already merged. This is the second part used by the
+> > null-machine (and libvirt use null-machine to detect kvm
+> > capabilities).
+> >
+> > Huacai
+> >>
+> >>>  }
+> >>>
+> >>>  DEFINE_MACHINE("none", machine_none_machine_init)
+> >>>
+> >
 
