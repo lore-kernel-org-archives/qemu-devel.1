@@ -2,89 +2,66 @@ Return-Path: <SRS0=2IDT=CR=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A83F8C433E2
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 10:57:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 257B3C433E2
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 10:58:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D3EF2087C
-	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 10:57:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O9suInEh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D3EF2087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 71FB92087C
+	for <qemu-devel@archiver.kernel.org>; Tue,  8 Sep 2020 10:58:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71FB92087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36852 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFbJr-0007ci-AE
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 06:57:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39852)
+	id 1kFbKM-0008Is-KX
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 06:58:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kFbIo-0006by-I2
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 06:56:42 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:40378
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kFbIm-0004T6-VF
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 06:56:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599562600;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=GIbNL/nVH5BNe+CWhBWkidXimhE+y5MW5kJvjNQ4FpI=;
- b=O9suInEhYvgH3m9zuudSZyfounuCykPLOcwE68FpGofARrI4YFTBkdKtuH5C+XDFYUzBy3
- 42ZZEpSqTB0B+lXGL5kxajd3uVkYVS426i4T4YK98wlOE6M3yz2CLvOXk/MJHHJf0fpqwO
- p/zlPZA19S6OGUQuhyBcnn84KFZ49CM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-293-Uoa5l87BOjOghEpUzOdnbA-1; Tue, 08 Sep 2020 06:56:37 -0400
-X-MC-Unique: Uoa5l87BOjOghEpUzOdnbA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA977AF200;
- Tue,  8 Sep 2020 10:56:35 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0A52C82461;
- Tue,  8 Sep 2020 10:56:33 +0000 (UTC)
-Date: Tue, 8 Sep 2020 12:56:31 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Haibo Xu <haibo.xu@linaro.org>
-Subject: Re: [PATCH v2 05/12] target/arm/kvm: spe: Unify device attr
- operation helper
-Message-ID: <20200908105631.etggiu56l65ohlyq@kamzik.brq.redhat.com>
-References: <cover.1599549462.git.haibo.xu@linaro.org>
- <45eecae26272efc7a09837573cd5278296b58dc5.1599549462.git.haibo.xu@linaro.org>
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kFbJe-0007Vp-4J
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 06:57:34 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:59590)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kFbJb-0004WM-Tc
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 06:57:33 -0400
+Received: from [192.168.0.183] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id C708540A207B;
+ Tue,  8 Sep 2020 10:57:29 +0000 (UTC)
+Subject: Re: [PATCH v3 09/15] replay: implement replay-seek command
+To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <159903454714.28509.7439453309116734374.stgit@pasha-ThinkPad-X280>
+ <159903459923.28509.4300111201059622860.stgit@pasha-ThinkPad-X280>
+ <87sgbtrbf5.fsf@linaro.org> <8f077f41-f99b-cd46-ff3b-3cb191dc1c4c@ispras.ru>
+ <87mu21r5t0.fsf@linaro.org> <1a0b8180-ae11-c6a0-6fc6-bfe87bbeaf27@ispras.ru>
+ <87eendr1ty.fsf@linaro.org> <087c1214-d82f-8cd1-6418-5d823b9b5ae9@ispras.ru>
+ <875z8or5qy.fsf@linaro.org>
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+Message-ID: <c4544d4d-9c13-51eb-1038-c45ec262550e@ispras.ru>
+Date: Tue, 8 Sep 2020 13:57:29 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <45eecae26272efc7a09837573cd5278296b58dc5.1599549462.git.haibo.xu@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=drjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:33:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <875z8or5qy.fsf@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 06:54:10
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -34
+X-Spam_score: -3.5
+X-Spam_bar: ---
+X-Spam_report: (-3.5 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.626,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,79 +74,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, philmd@redhat.com
+Cc: kwolf@redhat.com, wrampazz@redhat.com, ehabkost@redhat.com,
+ mtosatti@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, crosa@redhat.com, pbonzini@redhat.com, mreitz@redhat.com,
+ philmd@redhat.com, zhiwei_liu@c-sky.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Sep 08, 2020 at 08:13:23AM +0000, Haibo Xu wrote:
-> From: Andrew Jones <drjones@redhat.com>
+On 08.09.2020 12:13, Alex Bennée wrote:
 > 
-> Rename kvm_arm_pmu_set_attr() to kvm_arm_set_device_attr(),
-> So both the vPMU and vSPE device can share the same API.
+> Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
 > 
-> Signed-off-by: Andrew Jones <drjones@redhat.com>
+>> On 07.09.2020 19:25, Alex Bennée wrote:
+>>>
+>>> Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
+>>>
+>>>> On 07.09.2020 17:59, Alex Bennée wrote:
+>>>>>
+>>>>> Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
+>>>>>
+>>>>>> On 07.09.2020 15:58, Alex Bennée wrote:
+>>>>>>>
+>>>>>>> Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> writes:
+>>>>>>>
+>>>>>>>> From: Pavel Dovgalyuk <Pavel.Dovgaluk@ispras.ru>
+>>>>>>>>
+>>>>>>>> This patch adds hmp/qmp commands replay_seek/replay-seek that proceed
+>>>>>>>> the execution to the specified instruction count.
+>>>>>>>> The command automatically loads nearest snapshot and replays the execution
+>>>>>>>> to find the desired instruction count.
+>>>>>>>
+>>>>>>> Should there be an initial snapshot created at instruction 0? Using a
+>>>>>>> separate monitor channel:
+>>>>>>
+>>>>>> Right, you can't go to the prior state, when there is no preceding
+>>>>>> snapshot available.
+>>>>>
+>>>>> It seems creating an initial snapshot automatically would be more user
+>>>>
+>>>> Please take a look at 'Snapshotting' section of docs/replay.txt.
+>>>> Reverse debugging is considered to be run with disk image (overlay)
+>>>> and rrsnapshot option of icount, which allows creating an initial
+>>>> VM snapshot.
+>>>
+>>> Given that I'm using the block device purely for VM snapshots I think it
+>>> would be useful to document the minimal "no disk" approach - i.e. where
+>>> the disk is only used for record/replay.
+>>>
+>>> However I'm still having trouble. I can record the trace with:
+>>>
+>>>     ./qemu-system-aarch64 -cpu cortex-a53 -display none -serial stdio \
+>>>       -machine virt -kernel zephyr.elf -net none \
+>>>       -icount shift=6,align=off,sleep=off,rr=record,rrfile=record.out,rrsnapshot=rrstart  \
+>>>       -drive file=record.qcow2,if=none,id=rr \
+>>>       -monitor telnet:127.0.0.1:4444 -S
+>>
+>> Can you provide your zephyr.elf image?
+>>
+>>>
+>>> which shows:
+>>>
+>>>     (qemu) info snapshots
+>>>     info snapshots
+>>>     List of snapshots present on all disks:
+>>>     ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
+>>>     --        rrstart           653 KiB 2020-09-07 17:12:42 00:00:00.000          0
+>>>
+>>> but do I need a whole separate overlay in the replay case? I thought
+>>> supplying snapshot to the drive would prevent the replay case
+>>> overwriting what has been recorded but with:
+>>>
+>>>       -icount shift=6,align=off,sleep=off,rr=replay,rrfile=record.out \
+>>>       -drive file=record.qcow2,if=none,id=rr,snapshot
+>>
+>> When you provide qcow2 (overlay or not) for snapshotting, you don't need
+>> any 'snapshot' option on drive.
+>>
+>>>
+>>> but I get:
+>>>
+>>>     (qemu) info snapshots
+>>>     info snapshots
+>>>     There is no snapshot available.
+>>>
+>>> so if I drop the ,snapshot from the line I can at least see the snapshot
+>>> but continue doesn't seem to work:
+>>>
+>>>     (qemu) info snapshots
+>>>     info snapshots
+>>>     List of snapshots present on all disks:
+>>>     ID        TAG               VM SIZE                DATE     VM CLOCK     ICOUNT
+>>>     --        rrstart           653 KiB 2020-09-07 17:12:42 00:00:00.000          0
+>>>     (qemu) replay_break 190505
+>>>     replay_break 190505
+>>>     (qemu) c
+>>>     c
+>>>     (qemu) info replay
+>>>     info replay
+>>>     Replaying execution 'record.out': instruction count = 0
+>>
+>> It seems, that replay hangs. Can you try removing '-S' in record command
+>> line?
+> 
+> That doesn't make any difference removing from both the record and
+> replay cases. It seems to need a loadvm to start things off.
+> 
+> I've sent you an image off list. Please let me know if you can replicate.
+> 
 
-Looks like a faithful port of what I posted as a hunk of another patch, so
-I'll accept the authorship. Please also add you s-b though.
+With rrsnapshot in replay reverse debugging of your image seem to be ok:
 
-Thanks,
-drew
+(gdb) set arch aarch64
+The target architecture is assumed to be aarch64
+(gdb) tar rem :1234
+Remote debugging using :1234
+warning: No executable has been specified and target does not support
+determining executable automatically.  Try using the "file" command.
+0x00000000400003f8 in ?? ()
+(gdb) monitor info replay
+Replaying execution 'record.out': instruction count = 0
+(gdb) monitor replay_break 100000
+(gdb) c
+Continuing.
 
-> ---
->  target/arm/kvm64.c | 11 ++++++-----
->  1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> index ef1e960285..8ffd31ffdf 100644
-> --- a/target/arm/kvm64.c
-> +++ b/target/arm/kvm64.c
-> @@ -397,19 +397,20 @@ static CPUWatchpoint *find_hw_watchpoint(CPUState *cpu, target_ulong addr)
->      return NULL;
->  }
->  
-> -static bool kvm_arm_pmu_set_attr(CPUState *cs, struct kvm_device_attr *attr)
-> +static bool kvm_arm_set_device_attr(CPUState *cs, struct kvm_device_attr *attr,
-> +                                    const char *name)
->  {
->      int err;
->  
->      err = kvm_vcpu_ioctl(cs, KVM_HAS_DEVICE_ATTR, attr);
->      if (err != 0) {
-> -        error_report("PMU: KVM_HAS_DEVICE_ATTR: %s", strerror(-err));
-> +        error_report("%s: KVM_HAS_DEVICE_ATTR: %s", name, strerror(-err));
->          return false;
->      }
->  
->      err = kvm_vcpu_ioctl(cs, KVM_SET_DEVICE_ATTR, attr);
->      if (err != 0) {
-> -        error_report("PMU: KVM_SET_DEVICE_ATTR: %s", strerror(-err));
-> +        error_report("%s: KVM_SET_DEVICE_ATTR: %s", name, strerror(-err));
->          return false;
->      }
->  
-> @@ -426,7 +427,7 @@ void kvm_arm_pmu_init(CPUState *cs)
->      if (!ARM_CPU(cs)->has_pmu) {
->          return;
->      }
-> -    if (!kvm_arm_pmu_set_attr(cs, &attr)) {
-> +    if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
->          error_report("failed to init PMU");
->          abort();
->      }
-> @@ -443,7 +444,7 @@ void kvm_arm_pmu_set_irq(CPUState *cs, int irq)
->      if (!ARM_CPU(cs)->has_pmu) {
->          return;
->      }
-> -    if (!kvm_arm_pmu_set_attr(cs, &attr)) {
-> +    if (!kvm_arm_set_device_attr(cs, &attr, "PMU")) {
->          error_report("failed to set irq for PMU");
->          abort();
->      }
-> -- 
-> 2.17.1
-> 
-> 
+Program received signal SIGINT, Interrupt.
+0x0000000040001690 in ?? ()
+(gdb) monitor info replay
+Replaying execution 'record.out': instruction count = 100000
+(gdb) rsi
+0x0000000040001670 in ?? ()
+(gdb) monitor info replay
+Replaying execution 'record.out': instruction count = 99999
+(gdb)
+
+
+Pavel Dovgalyuk
+
 
 
