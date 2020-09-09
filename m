@@ -7,38 +7,36 @@ X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD701C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F4FC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:29:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CC262087C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CC262087C
+	by mail.kernel.org (Postfix) with ESMTPS id 8D6CC2087C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:29:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D6CC2087C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38068 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39054 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG09e-0001td-AG
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:28:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33892)
+	id 1kG09w-0002I3-IE
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:29:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG08q-0000T1-5Y; Wed, 09 Sep 2020 09:28:04 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:60355)
+ id 1kG07r-0007QQ-SI; Wed, 09 Sep 2020 09:27:04 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:51271)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG08l-0005B3-Lc; Wed, 09 Sep 2020 09:28:03 -0400
+ id 1kG07p-00055x-Sn; Wed, 09 Sep 2020 09:27:03 -0400
 Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
  (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N4z2a-1khKfP1ynU-010vsV; Wed, 09 Sep 2020 15:27:55 +0200
-Subject: Re: [PATCH 1/2] hw/gpio/omap_gpio: Replace fprintf() by
- qemu_log_mask(GUEST_ERROR)
+ 1MryKr-1kurJd1MxR-00nudc; Wed, 09 Sep 2020 15:26:56 +0200
+Subject: Re: [PATCH] hw/acpi/tco: Remove unused definitions
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
-References: <20200901104234.92159-1-f4bug@amsat.org>
- <20200901104234.92159-2-f4bug@amsat.org>
+References: <20200901101951.85892-1-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,35 +80,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <3bbc47c7-168a-317f-60d4-cb6a74db1d22@vivier.eu>
-Date: Wed, 9 Sep 2020 15:27:54 +0200
+Message-ID: <ad29f6ad-694d-948c-f3e5-6c25bf04b1f3@vivier.eu>
+Date: Wed, 9 Sep 2020 15:26:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200901104234.92159-2-f4bug@amsat.org>
+In-Reply-To: <20200901101951.85892-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:24XJ9qIlRo8xVggyzfpbikZIyXTmtuzcpwr3EepvMqEhiqChwDO
- aBRYxJh8xooT1RFERvnyw1I8lQ090CcJMU84z2E1K2qKDRMzshvGseVI8mhtDsnulYq9mtW
- kUEC9CUJfM0nSBqEFAqcjHyPDs2mFvwdTooHi8g/0psnAjk9KGsCccjvRyxyClM8dr1uDHP
- Z29WlYQR4pLJxMm8yCh2Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gLXtg0/hDg4=:AMYN7fWLayPDPUcAcXm3lf
- kkM+JIsMzRP2iRXYPVKWj3PsZz7yyzv906UNsG5kC1+5GIk8FiAsYNlQhNPaOTSVmHP6LPpDd
- V1sVI8UK3OXR4O1b3nIRrCcFlMJ9to7pdS6eNhzoS6bHEFAClQq1DH68SbryPHpTHTCMZ4541
- GuBp1xqBH4GxCOP6jHYewfwqrq7t6Gh1VIsHD1wXOWqDBcrrkqCvus4MjjSWe2L4F11MfVD4C
- Ig6czPBHoGAxyUyEwEy0gKBHv53GA8884gc8irEQfDQeoQ+ZPtAgZokEmok4H6ofQbUv50l39
- eaGhjAf7U4VKtxOxI3wDwB95JN8E9v3OSWCkMbXgEtxs6Sm/kvrb+5P6J4mimbQeh9pzwMMMb
- YLtgdNgdWetLRO7VX6AQrMNr81Mhs4PxVanxz0TyOke5aZm8tDrXWnBX90LumyM522jVlbtZJ
- j26AD07gWzkmjbG2Ce0vw4/jVcEH8JspPXroMUIHD+n/YIhsiC0P0xPW6gePnObreM6f0jl1i
- aAzsim0ewdGQaCa4lxXywBUFRDmW+QdPqVqoR2cyYa8aEwZ/0glsB+/893hGWVf2vhTPf9aqx
- nvrwsjZHGNKqAzBVLGhrElXwMRnFe8DjSd9RQTTplvFJw4CPxMP6CRW8d0DViYyxGRaXGt7HA
- CtPX6AtPQ5TyshgeeQUxvVfkGKUYB/BowLZ1eEnkIge/ODh7uF6Kcckpb9K7KxVgnkksiBaaW
- 4dvr5ik5MwSOFt3Ao+Rywy8VolPZQrKiPP6F1KFHZxvFQQCpPgnnomQLMIBV0sEKaOM2sC59M
- /viKnJGlAVPg7yQnDlJO427Fe8udn3zqjLijVRU0317FZa9THYzdZ7G8YMkgpUfLAUrsqVe
-Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:syj5Hemr6B/ZuvOTwAIrBJbWOrqjh7QTcGnFZpZhTas7k7tvlA8
+ fcVG+/1tFvXKg9sOFmfJtZGi6FA3b6j/Ti/TzGljDTokQnZyV7eZR2y4lwcdCo+DaOU2069
+ c8cXxDTbv2RV9GCZgdp+J92wOmVwumra/+mDF1pBBytEI5IeDaDjTVwdHgGP1GETalFJbkN
+ Cj/V9uu2+a0FbqCg5l9Qw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:TgC7KHR/uDY=:ehtn/45K8Z2RG04aRIm9js
+ dkf2wgXR++Q2uinWwtiC3KSTjp9fmZT0t+Uq4sMNW5RmM95oNmBHHfSktwwRS+R5yHFOCKFgd
+ cC4T2z+pZtHEof7rII5ivbooG5koYSGMe2q2tL+oREvoF8SktldTPqaHNJy6UbWdG5R9r01ra
+ 0+8Pa+lx8a8UnSxNKgyNIAGSPZ2lms08pqXsF3U14SDeCgnr9R1188gpziFuuXwuZAMTMcgrj
+ 5c2q+PHPYeeljn7D8pgA0/Pscn7gpoyNvGaRIoA5rW4Grx3QLBlv9828G7etz2DDsbmIZyu27
+ A83aiiUtK7PxKYfgM40SBrY6C7RiA5C2hkfJVXJ54SIpe7YGR8Mkfzp3HRpI5kZ/RlIKi0ZR/
+ 2tUvX/2dG0aYuqV7IymGzAUBrmLtHzxBE5Ekft8sGMbE3k5p3HU8oyDYhkQzEDdPN+/POj4YG
+ QoWX4KBxmuC3jpF+hpV/2H6P2HAwZ7MVXjzS9hjLUeC5EV0WR7uf4As7rx+g/MRub46F6Lku/
+ T9G1IMjgnpngCbUjAwbmoe0N+cA/bRXJgBDbzG7hylrLJwIgNKfyYQphxDDCUUPNCj2r7I6xR
+ OfPHsxwQi3m36xr8bl8tu00pneRDBRqFc8BJchFN0gFZJ+KOmSDGH+aHb5yQXVQMaspvDOrOf
+ BMdlqPwqAawqHNSFVgB5xBeq7qRCTHs7JX8W/v0TiqI3gVQJFBf5QlVcMIcCWt2Fj6DJ8jwyq
+ Y6auIcR3jkwaAoEN+AItF3FRXjgIl3xyJQkuQgDJB8ZpaeLpFuueIUq3QmzztqjG/u8I2bt4o
+ jTPEKDrWudkTO9LewmegpSOq67WHllHk2pgX4rlL6U7Q+36QVwOl/FBE6V0K3dbTYktkafi
+Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:26:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:27:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -54
 X-Spam_score: -5.5
@@ -130,42 +128,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org
+Cc: qemu-trivial@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paulo Alcantara <pcacjr@gmail.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 01/09/2020 à 12:42, Philippe Mathieu-Daudé a écrit :
-> Replace fprintf() by qemu_log_mask(LOG_GUEST_ERROR).
+Le 01/09/2020 à 12:19, Philippe Mathieu-Daudé a écrit :
+> TCO_DEBUG() and DEBUG definitions are not used, remove them.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/gpio/omap_gpio.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  hw/acpi/tco.c | 11 -----------
+>  1 file changed, 11 deletions(-)
 > 
-> diff --git a/hw/gpio/omap_gpio.c b/hw/gpio/omap_gpio.c
-> index f662c4cb958..e25084b40c9 100644
-> --- a/hw/gpio/omap_gpio.c
-> +++ b/hw/gpio/omap_gpio.c
-> @@ -392,8 +392,10 @@ static void omap2_gpio_module_write(void *opaque, hwaddr addr,
->          break;
+> diff --git a/hw/acpi/tco.c b/hw/acpi/tco.c
+> index fb9052dbca2..cf1e68a5393 100644
+> --- a/hw/acpi/tco.c
+> +++ b/hw/acpi/tco.c
+> @@ -15,17 +15,6 @@
+>  #include "hw/acpi/tco.h"
+>  #include "trace.h"
 >  
->      case 0x10:	/* GPIO_SYSCONFIG */
-> -        if (((value >> 3) & 3) == 3)
-> -            fprintf(stderr, "%s: bad IDLEMODE value\n", __func__);
-> +        if (((value >> 3) & 3) == 3) {
-> +            qemu_log_mask(LOG_GUEST_ERROR,
-> +                          "%s: Illegal IDLEMODE value: 3\n", __func__);
-> +        }
->          if (value & 2)
->              omap2_gpio_module_reset(s);
->          s->config[0] = value & 0x1d;
+> -//#define DEBUG
+> -
+> -#ifdef DEBUG
+> -#define TCO_DEBUG(fmt, ...)                                     \
+> -    do {                                                        \
+> -        fprintf(stderr, "%s "fmt, __func__, ## __VA_ARGS__);    \
+> -    } while (0)
+> -#else
+> -#define TCO_DEBUG(fmt, ...) do { } while (0)
+> -#endif
+> -
+>  enum {
+>      TCO_RLD_DEFAULT         = 0x0000,
+>      TCO_DAT_IN_DEFAULT      = 0x00,
 > 
 
 Applied to my trivial-patches branch.
 
 Thanks,
 Laurent
-
 
