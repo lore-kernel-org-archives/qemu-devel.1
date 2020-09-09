@@ -2,87 +2,95 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4086BC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:28:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10B57C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:29:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 49B59218AC
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:28:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AAA50218AC
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:29:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K0mw0gX/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B59218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuKmfNh0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAA50218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG21X-0006Ow-3m
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:28:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40670)
+	id 1kG221-0007Ev-QG
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:29:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG20H-0004bd-CZ; Wed, 09 Sep 2020 11:27:21 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42212)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG20F-0005yb-7A; Wed, 09 Sep 2020 11:27:21 -0400
-Received: by mail-lj1-x243.google.com with SMTP id k25so4065010ljg.9;
- Wed, 09 Sep 2020 08:27:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=/orM2YQHOAKYTAFTJn4+vg2bhJBYDzxo1r6i3k0QpWE=;
- b=K0mw0gX/D3gf/YVZNgYOqApxZr1FlHfz9GYUMgxWEqmEYygyhRXeR60DdqH0PMDXNr
- a2E5NYp6TVqBgaEw/7/Qe3rzEg6sRuqLqdcIlytykuqp382/5fBCB86e70ZBFdH6OCdv
- MAsPXt7kQExvThFqdrb6MiYJoBFzo3XeKjXmHa0w1qDbSPyfP7N+vtrtqtq1HTX00QBQ
- 640Tomt++D9yLTtWs+KFnwHLH4urbAUeC6exZjLg3dZgSqmNZDQ4vfg70SvYSD6S2zDN
- L+nP+wj1y/VHBHUsNlj23sf614b3jJsv/eP29VrZ+vtXqA/cNi3CXrouMhftY49cXjLX
- ouAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=/orM2YQHOAKYTAFTJn4+vg2bhJBYDzxo1r6i3k0QpWE=;
- b=Qi3mO6gliHZZsSrqi0UOZgaFc4wiiHvWwY9xjqnb9Li6fr8R8NWHGqgP75+S+DWjOa
- gx8+9HGHsn1fYrz/beNQ4wShqBkSQ1Wua4x2Yu3N7vmYSmCwxcxj9aR8XCiGhixpCFCl
- iSgfNLHKQ7L549++HLKRA08RsxMrNO62qVVcwATEjOR2mzttWWb/0jUSBuhBx4egk68g
- wnz+Di6Lf0IRkXol2u7W+3u2RyPbuGLtfFUYyxx5N2FzAiYHtQpCty3ngHaXtFYPnx1I
- CMVtnXcKRmwNULPF9SP+LCaAi3EplVHCUzkChuwOgwdVuj9TIVXB3WjsKdLU+xdGbcYG
- NQMA==
-X-Gm-Message-State: AOAM5301Y/z4TdYaNK9L1yiUj4T0rnQp5ORuSOil4RYg/+B9jE2YzK/s
- jZtOweqmhLSUq4q+t8QJOq0w/2DVZuwL9iC2byc=
-X-Google-Smtp-Source: ABdhPJxc9cO3058j9bFTfUM7ycqczFEKQCNLla0Y4fOOREf7g7/SIrTPH3jSQ7u/58FE4hcY9ATes13VZ65LbNMdqbw=
-X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr2337818ljj.447.1599665236793; 
- Wed, 09 Sep 2020 08:27:16 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kG217-00060x-Hx
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 11:28:13 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60956
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kG215-00066D-2Q
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 11:28:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599665289;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=05t5Kh5HCrReDIfcQZBEBkCKCxSWM5T5nE40Engpe7U=;
+ b=NuKmfNh05CGVLru+PgnZAeq+LeeEk2LNHM0PCNY8L2sKFOCNGmt18ReMS8QVMCMGN1X3+V
+ DxGnBd8kv+zvEX0x4LzRkRNcOr0PqvMxZp6R6oUV+73QHGkkFtmFN74zBYCca1lK/kYlmn
+ naMytI9x45N99BQd9f7v+ePXrfa24Uo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-223-cMeCPzmDMc6gsvWmt_35Ww-1; Wed, 09 Sep 2020 11:28:07 -0400
+X-MC-Unique: cMeCPzmDMc6gsvWmt_35Ww-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B55B10BBEC5;
+ Wed,  9 Sep 2020 15:28:06 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
+ [10.36.113.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E5DFF10013D0;
+ Wed,  9 Sep 2020 15:28:02 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 6C22D113865F; Wed,  9 Sep 2020 17:28:01 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 1/4] docs: lift block-core.json rST header into parents
+References: <20200908093113.47564-1-stefanha@redhat.com>
+ <20200908093113.47564-2-stefanha@redhat.com>
+ <f5de1038-5bf3-8bd4-d664-45d6f201ae9b@redhat.com>
+ <20200908142308.GD8175@linux.fritz.box>
+ <87h7s7z9g4.fsf@dusky.pond.sub.org>
+ <20200909075222.GA5219@linux.fritz.box>
+ <87v9gnw3q2.fsf@dusky.pond.sub.org>
+ <20200909132225.GE5219@linux.fritz.box>
+Date: Wed, 09 Sep 2020 17:28:01 +0200
+In-Reply-To: <20200909132225.GE5219@linux.fritz.box> (Kevin Wolf's message of
+ "Wed, 9 Sep 2020 15:22:25 +0200")
+Message-ID: <87y2ljt1fi.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-References: <20200909094617.1582-1-luoyonggang@gmail.com>
- <20200909094617.1582-3-luoyonggang@gmail.com>
- <20200909122658.GT1011023@redhat.com>
-In-Reply-To: <20200909122658.GT1011023@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Wed, 9 Sep 2020 23:27:06 +0800
-Message-ID: <CAE2XoE9tf01jZYt-BJBS4tdJWaJPOROJ0TCXGibQ_q1kkrL3RA@mail.gmail.com>
-Subject: Re: [PATCH v2 02/21] ci: fixes msys2 build by upgrading capstone to
- 4.0.2
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000032deac05aee316db"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 02:43:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,229 +104,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
+ qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>,
+ afrosi@redhat.com, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000032deac05aee316db
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Kevin Wolf <kwolf@redhat.com> writes:
 
-On Wed, Sep 9, 2020 at 8:27 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+> Am 09.09.2020 um 14:10 hat Markus Armbruster geschrieben:
+>> Kevin Wolf <kwolf@redhat.com> writes:
+>> 
+>> > Am 09.09.2020 um 09:38 hat Markus Armbruster geschrieben:
+>> >> Kevin Wolf <kwolf@redhat.com> writes:
+>> >> 
+>> >> > Am 08.09.2020 um 14:03 hat Laszlo Ersek geschrieben:
+>> >> >> Hi Stefan,
+>> >> >> 
+>> >> >> On 09/08/20 11:31, Stefan Hajnoczi wrote:
+>> >> >> > block-core.json is included from several places. It has no way of
+>> >> >> > knowing what header level (h1, h2, ...) is appropriate. Sphinx reports
+>> >> >> > errors when it encounters an h2 header where it expects an h1 header.
+>> >> >> > This issue prevents the next patch from generating documentation for
+>> >> >> > qemu-storage-daemon QMP commands.
+>> >> >> > 
+>> >> >> > Move the header into parents so that the correct header level can be
+>> >> >> > used. Note that transaction.json is not updated since it doesn't seem to
+>> >> >> > need a header.
+>> >> >> > 
+>> >> >> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+>> >> >> > ---
+>> >> >> >  docs/interop/firmware.json | 4 ++++
+>> >> >> >  qapi/block-core.json       | 4 ----
+>> >> >> >  qapi/block.json            | 1 +
+>> >> >> >  3 files changed, 5 insertions(+), 4 deletions(-)
+>> >> >> > 
+>> >> >> > diff --git a/docs/interop/firmware.json b/docs/interop/firmware.json
+>> >> >> > index 989f10b626..48af327f98 100644
+>> >> >> > --- a/docs/interop/firmware.json
+>> >> >> > +++ b/docs/interop/firmware.json
+>> >> >> > @@ -15,6 +15,10 @@
+>> >> >> >  ##
+>> >> >> >  
+>> >> >> >  { 'include' : 'machine.json' }
+>> >> >> > +
+>> >> >> > +##
+>> >> >> > +# == Block devices
+>> >> >> > +##
+>> >> >> >  { 'include' : 'block-core.json' }
+>> >> >> >  
+>> >> >> >  ##
+>> >> >> 
+>> >> >> I think "docs/interop/firmware.json" deserves the same treatment as
+>> >> >> "transaction.json".
+>> >> >> 
+>> >> >> It's been a long time since I last looked at a rendered view of
+>> >> >> "docs/interop/firmware.json", but it only includes "block-core.json" so
+>> >> >> it can refer to some block-related types (@BlockdevDriver seems like the
+>> >> >> main, or only, one).
+>> >> >> 
+>> >> >> I wouldn't expect the rendered view of "firmware.json" to have a section
+>> >> >> header saying "Block devices".
+>> >> >> 
+>> >> >> I think it should be fine to drop this hunk (and my CC along with it ;))
+>> >> >
+>> >> > I think this is actually a more general problem with the way we generate
+>> >> > the documentation. For example, the "Background jobs" documentation ends
+>> >> > up under "Block Devices" just because qapi-schema.json includes
+>> >> > block-core.json before job.json and block-core.json includes job.json to
+>> >> > be able to access some types.
+>> >> 
+>> >> The doc generator is stupid and greedy (which also makes it
+>> >> predictable): a module's documentation is emitted where it is first
+>> >> included.
+>> >> 
+>> >> For full control of the order, have the main module include all
+>> >> sub-modules in the order you want.
+>> >
+>> > This works as long as the order that we want is consistent with the
+>> > requirement that every file must be included by qapi-schea.json before
+>> > it is included by any other file (essentially making the additional
+>> > includes in other files useless).
+>> 
+>> These other includes are not useless: they are essential for generating
+>> self-contained headers.
+>> 
+>> When MOD.json includes SUBMOD.json, then the generated qapi-FOO-MOD.h
+>> include qapi-FOO-SUBMOD.h.  When every module pulls in the modules it
+>> requires, so do the generated headers.  When a module doesn't, its
+>> generated headers won't compile unless you manually include the missing
+>> generated headers it requires.
 >
-wrote:
+> Hm, right. So we're using includes for two different purposes, but just
+> from looking at the include line, you can't know which one it is.
 
-> On Wed, Sep 09, 2020 at 05:45:58PM +0800, Yonggang Luo wrote:
-> > The currently random version capstone have the following compiling issu=
-e:
-> >   CC      /c/work/xemu/qemu/build/slirp/src/arp_table.o
-> > make[1]: *** No rule to make target
-> =E2=80=9C/c/work/xemu/qemu/build/capstone/capstone.lib=E2=80=9D=E3=80=82 =
-Stop.
-> >
-> > Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the
-> tagged version 4.0.2
-> > when upgrading to this version, the folder structure of include are
-> changed to
-> > qemu\capstone\include
-> > =E2=94=82  platform.h
-> > =E2=94=82
-> > =E2=94=9C=E2=94=80capstone
-> > =E2=94=82      arm.h
-> > =E2=94=82      arm64.h
-> > =E2=94=82      capstone.h
-> > =E2=94=82      evm.h
-> > =E2=94=82      m680x.h
-> > =E2=94=82      m68k.h
-> > =E2=94=82      mips.h
-> > =E2=94=82      platform.h
-> > =E2=94=82      ppc.h
-> > =E2=94=82      sparc.h
-> > =E2=94=82      systemz.h
-> > =E2=94=82      tms320c64x.h
-> > =E2=94=82      x86.h
-> > =E2=94=82      xcore.h
-> > =E2=94=82
-> > =E2=94=94=E2=94=80windowsce
-> >         intrin.h
-> >         stdint.h
-> >
-> > in capstone. so we need add extra include path
-> -I${source_path}/capstone/include/capstone
-> > for directly #include <capstone.h>, and the exist include path should
-> preserve, because
-> > in capstone code there something like #include "capstone/capstone.h"
-> >
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >  capstone  | 2 +-
-> >  configure | 2 +-
-> >  2 files changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/capstone b/capstone
-> > index 22ead3e0bf..1d23053284 160000
-> > --- a/capstone
-> > +++ b/capstone
-> > @@ -1 +1 @@
-> > -Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
-> > +Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1
-> > diff --git a/configure b/configure
-> > index 4231d56bcc..f4f8bc3756 100755
-> > --- a/configure
-> > +++ b/configure
-> > @@ -5156,7 +5156,7 @@ case "$capstone" in
-> >        LIBCAPSTONE=3Dlibcapstone.a
-> >      fi
-> >      capstone_libs=3D"-Lcapstone -lcapstone"
-> > -    capstone_cflags=3D"-I${source_path}/capstone/include"
-> > +    capstone_cflags=3D"-I${source_path}/capstone/include
-> -I${source_path}/capstone/include/capstone"
->
-> IIUC, the original -I arg can be removed - we just need the new one.
->
-That's not correct, doing that will cause compiling failure
-Please take a look at
-https://cirrus-ci.com/task/6709042959613952?command=3Dmain#L384
+Correct.  The use for controlling doc order is a bit of a hack.
 
+>> > Is this the order that we want?
+>> >
+>> > If so, we could support following the rule consistently by making double
+>> > include of a file an error.
+>> 
+>> Breaks our simple & stupid way to generate self-contained headers.
+>> 
+>> >> Alternatively, add just enough includes to get the order you want.
+>> >
+>> > There are orders that I can't get this way.
+>> 
+>> You're right, ordering by first include is not completely general.
+>> 
+>> >                                             For example, if I want to
+>> > have "Block devices" documented before "Background jobs", there is no
+>> > way to add includes to actually get this order without having
+>> > "Background jobs" as a subsection in "Block devices".
+>> 
+>> "Background jobs" is job.json.
+>> 
+>> "Block devices" is block.json, which includes block-core.json, which
+>> includes job.json.
+>> 
+>> To be able to put "Block devices" first, you'd have to break the chain
+>> from block.json to job.json.  Which might even be an improvement:
+>> 
+>> $ wc -l qapi/*.json | awk '$1 >= 1000 { print }'
+>>   5527 qapi/block-core.json
+>>   1722 qapi/migration.json
+>>   1617 qapi/misc.json
+>>   1180 qapi/ui.json
+>>  17407 total
+>> 
+>> Could we split block-core.json into several cohesive parts?
 >
+> Possibly. However, while it would be an improvement generally speaking,
+> how does this change the specific problem? All of the smaller files will
+> be included by block.json (or whatever file provides the "Block devices"
+> chapter in the documentation) and at least one of them will still have
+> to include job.json.
+
+Splitting block-core.json can help only if other modules then use less
+than all the parts.  In particular, as long as block.json includes the
+same stuff, it'll surely still include jobs.json.  Could it include
+less?
+
+> (As it happens, the block export series splits off a block-export QAPI
+> module, but it's probably small enough to be barely noticable in this
+> comparison.)
 >
-> Regards,
-> Daniel
-> --
-> |: https://berrange.com      -o-
-> https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-
-> https://www.instagram.com/dberrange :|
->
->
+> Kevin
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---00000000000032deac05aee316db
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Sep 9, 2020 at 8:27 PM Daniel=
- P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@redha=
-t.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex">On Wed, Sep 09, 2020 at 05:45:58PM +0800, Yonggang Luo wrote:<br>
-&gt; The currently random version capstone have the following compiling iss=
-ue:<br>
-&gt;=C2=A0 =C2=A0CC=C2=A0 =C2=A0 =C2=A0 /c/work/xemu/qemu/build/slirp/src/a=
-rp_table.o<br>
-&gt; make[1]: *** No rule to make target =E2=80=9C/c/work/xemu/qemu/build/c=
-apstone/capstone.lib=E2=80=9D=E3=80=82 Stop.<br>
-&gt; <br>
-&gt; Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the tag=
-ged version 4.0.2<br>
-&gt; when upgrading to this version, the folder structure of include are ch=
-anged to<br>
-&gt; qemu\capstone\include<br>
-&gt; =E2=94=82=C2=A0 platform.h<br>
-&gt; =E2=94=82<br>
-&gt; =E2=94=9C=E2=94=80capstone<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 arm.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 arm64.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 capstone.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 evm.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 m680x.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 m68k.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 mips.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 platform.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 ppc.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 sparc.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 systemz.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 tms320c64x.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 x86.h<br>
-&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 xcore.h<br>
-&gt; =E2=94=82<br>
-&gt; =E2=94=94=E2=94=80windowsce<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0intrin.h<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stdint.h<br>
-&gt; <br>
-&gt; in capstone. so we need add extra include path -I${source_path}/capsto=
-ne/include/capstone<br>
-&gt; for directly #include &lt;capstone.h&gt;, and the exist include path s=
-hould preserve, because<br>
-&gt; in capstone code there something like #include &quot;capstone/capstone=
-.h&quot;<br>
-&gt; <br>
-&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
-m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 capstone=C2=A0 | 2 +-<br>
-&gt;=C2=A0 configure | 2 +-<br>
-&gt;=C2=A0 2 files changed, 2 insertions(+), 2 deletions(-)<br>
-&gt; <br>
-&gt; diff --git a/capstone b/capstone<br>
-&gt; index 22ead3e0bf..1d23053284 160000<br>
-&gt; --- a/capstone<br>
-&gt; +++ b/capstone<br>
-&gt; @@ -1 +1 @@<br>
-&gt; -Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf<br>
-&gt; +Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1<br>
-&gt; diff --git a/configure b/configure<br>
-&gt; index 4231d56bcc..f4f8bc3756 100755<br>
-&gt; --- a/configure<br>
-&gt; +++ b/configure<br>
-&gt; @@ -5156,7 +5156,7 @@ case &quot;$capstone&quot; in<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 LIBCAPSTONE=3Dlibcapstone.a<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 fi<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 capstone_libs=3D&quot;-Lcapstone -lcapstone&quot;<=
-br>
-&gt; -=C2=A0 =C2=A0 capstone_cflags=3D&quot;-I${source_path}/capstone/inclu=
-de&quot;<br>
-&gt; +=C2=A0 =C2=A0 capstone_cflags=3D&quot;-I${source_path}/capstone/inclu=
-de -I${source_path}/capstone/include/capstone&quot;<br>
-<br>
-IIUC, the original -I arg can be removed - we just need the new one.<br></b=
-lockquote><div>That&#39;s not correct, doing that will cause compiling fail=
-ure</div><div>Please take a look at</div><div><a href=3D"https://cirrus-ci.=
-com/task/6709042959613952?command=3Dmain#L384">https://cirrus-ci.com/task/6=
-709042959613952?command=3Dmain#L384</a>=C2=A0<br></div><blockquote class=3D=
-"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(2=
-04,204,204);padding-left:1ex">
-<br>
-<br>
-Regards,<br>
-Daniel<br>
--- <br>
-|: <a href=3D"https://berrange.com" rel=3D"noreferrer" target=3D"_blank">ht=
-tps://berrange.com</a>=C2=A0 =C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D"http=
-s://www.flickr.com/photos/dberrange" rel=3D"noreferrer" target=3D"_blank">h=
-ttps://www.flickr.com/photos/dberrange</a> :|<br>
-|: <a href=3D"https://libvirt.org" rel=3D"noreferrer" target=3D"_blank">htt=
-ps://libvirt.org</a>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-o-=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://fstop138.berrange.com" rel=3D"n=
-oreferrer" target=3D"_blank">https://fstop138.berrange.com</a> :|<br>
-|: <a href=3D"https://entangle-photo.org" rel=3D"noreferrer" target=3D"_bla=
-nk">https://entangle-photo.org</a>=C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D=
-"https://www.instagram.com/dberrange" rel=3D"noreferrer" target=3D"_blank">=
-https://www.instagram.com/dberrange</a> :|<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---00000000000032deac05aee316db--
 
