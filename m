@@ -4,39 +4,38 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB757C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE47C43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:33:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 42E4C218AC
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:32:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E4C218AC
+	by mail.kernel.org (Postfix) with ESMTPS id 85239218AC
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:33:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85239218AC
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG25H-0000d5-Oq
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:32:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41640)
+	id 1kG26S-0001p0-L6
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:33:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG24Q-00009v-7x; Wed, 09 Sep 2020 11:31:38 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:45595)
+ id 1kG252-0000dH-JZ; Wed, 09 Sep 2020 11:32:16 -0400
+Received: from mout.kundenserver.de ([212.227.17.24]:55573)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG24O-0006r7-1J; Wed, 09 Sep 2020 11:31:37 -0400
+ id 1kG250-0006xM-P8; Wed, 09 Sep 2020 11:32:16 -0400
 Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
- (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
- 1N6KQZ-1kZr9I2kYL-016dEi; Wed, 09 Sep 2020 17:31:17 +0200
-Subject: Re: [PATCH] meson.build: tweak sdl-image error message
-To: Paolo Bonzini <pbonzini@redhat.com>, Sergei Trofimovich <slyfox@gentoo.org>
-References: <20200908074016.2593596-1-slyfox@gentoo.org>
- <CABgObfaqxdOuH93OB=_ioiHR3np00hwNuzvpOXD=Wte4ErkUqQ@mail.gmail.com>
+ (mreue106 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1M27ix-1kE7CV0SZV-002YCv; Wed, 09 Sep 2020 17:32:10 +0200
+Subject: Re: [PATCH] kconfig: fix comment referring to old Makefiles
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20200908094244.26327-1-pbonzini@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -80,35 +79,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <51084888-77f4-f3ca-4eee-fbfd765c13ef@vivier.eu>
-Date: Wed, 9 Sep 2020 17:31:16 +0200
+Message-ID: <0f5f8afc-a62f-6e84-d020-1fc485f9b795@vivier.eu>
+Date: Wed, 9 Sep 2020 17:32:09 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <CABgObfaqxdOuH93OB=_ioiHR3np00hwNuzvpOXD=Wte4ErkUqQ@mail.gmail.com>
+In-Reply-To: <20200908094244.26327-1-pbonzini@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:odvXJiwPXaCt4vG0eRonaM41wSzzkaA7Uej6z26t+hWeiTOLiS2
- z3qvKjMetYNdVdCrjmR2hR6S9McX4ZK+Zo7pUM71RToltw8K04FrKQoNFqraKfHu8LC0+DU
- WXhPv0+xF3wbr40sbvMmk57Vws4yOmAsLsSebJlGTicgzV8LasepX/vFO6GhzyK3IspCwLS
- m4bCFDkulfjudogqvng1w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:jeu/XPcCtiI=:FfbTAUhch2gU/qpQLhl1SU
- bP0RA0+h++G6pDWcjmlRW2b4ZNux/0XJR3zx/R6BqUarB0FTeLcXFP/ithPrte0mOz6Bx/3oe
- tsl0zxWj6vj9EJEWlfb1QEzOT27GM6Nm4PZcO7flR7Hb4oCjdpJ4fibgKaw8fc/H4kL0sSS6Y
- 7ByIMek5NKwOJY0HpZAUoxtnnwCLGcxlGX45FHR0Gzga/VQuNfRqZOs/FdPPiYKuyGRm3QZlI
- qp05l5EEpEeMdzlJK8D6qFNcD1eJPoSUV0vmAKZ2a/XtWM3BBL6T9F/y9M0jwF7iHk3FmciFV
- 9qZSQD1QqLzD2n1b4vtqLZvSfrXCz3xIPFm6ef3sS9ziY343XjO4nmim6e8DxYSRUZs3M90cC
- OTA6qJytB91G98YOC0UaS8YLf6T9BpsxIqNYg+J+4Vsl7kc5VIqV+GagcnCQRLHZ6K7ZzGZra
- 6wvmL5GeK5IJrrX6oEUveIVGWBs1/tnpwMPIIYPnMyHSUSbe/IdcSpqKE528W8LXXo3V222tb
- Z5ZNZ5Gsu78GiaYyfTPlvwkGRinaeFRvMzrk6SLAJsHQ7gG0HaS91LD7ut2JBMy8dtMNQosU+
- aNh8fcOmDBtvf31VTakHjWJSQSxCIwE4ZsDXCk80GXTK8sIIIS+y+RfS3lFBuDg1kWCE0wH4u
- mthHJ6naWcgvJnrSjRWozbxUkIneFHacO2G783tM0n44A5NtYskjytGxEqky+DCvrqVkDALD4
- +/iZxiE8TzyqhVot+R6Hz26BXkiKt8j2/FZdUm4nDz3aYXkpppsQDVL5YbOtFxSs5fqNtS2te
- 9ltGx/pcIM5ocOkGQpMY5WjS8CYxN9VFkV7df0MT74LFXShMB+R0WXhW6peWFxPsLvejRpN
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:YNe3oWx8za8ty70jujLs+Uz4pxYJF2epG6DugwYjsR+Oc8yLYv0
+ sV+FE7NpV8SjFBPBFCmm3TpFMBcguMgB9/EvrqMduKH/1QRjIyf83JZ+yCEeO7+IhXJjq/4
+ MQoxRpw79PwvqdFeC3S2N73OqBc0aEfDzYnzhzemDeapCCTVfQiAOEAFwsFJbdipczgwutY
+ kIYfkZ0kfmPcE+6n6VQSQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:PEAz2gM4Dn0=:uLrHoin6IbtLlzSb225CsX
+ xUizFW7vp0GIrrHm6bKNvz5TrOJyCmygSIqUWrvEuqYPmRNW1DjHhZzQuzZ4Jp0ArvU2RmAzC
+ zt8FVWBlglQY73Vfv27P/P150j//cZRunTC2nkkZRcMn9eV8D80b1ti21ocxODPzdNqabQfM6
+ Un4fvj5SM1fPdkGpDslX8Pn2Jt/QM+K3qpIzmG6fEHvdLtCqLnbFU8TdwHPSsOqdxlXuEHBly
+ SrKK/sHtYel/MILFRy1UHjk9TJXdi016iArv584q9zy/pgc7H31/365kA12oDyJpUts7wAWut
+ jbjTqbIHA+ATgMpccapaoGZ5Clq8LnIIL3Z7c8fBUEJnV3hhsRZWlsoYJBBLzT5nSerfMVTYi
+ P55CmuihYAKz0bv/xK93zF/uES/u92fkS+iL+lhJBvslkic3oiHsk+SZZRHV8/yCKfAiA3gwL
+ U50nSrDsWyETbJGTVAZ/e3joaboHfxE7QYvYo3pGQp+3gKVK7lg198Usu5dHQG6rNbr5f2gD4
+ O3Wo70im9zJFum8Vf5nMvwVdkYwHTtU8E6t0NlDCSmMm/0q/6iOw9VgwM3muuLIaoPJMdLP7N
+ 6FI/RwmBf1iwidOL2OeYyv7kJ9MKscYgbpVO2GLDCYWqwYCwW0UEbSODRRCg9E6T3B8nHYfQf
+ ww15C6aC/G3Hw7z8/dczpv0aS4T6s0KY76q//Ebp/C8jSxnpz5SOWhY6A9Ea2Cld6hZuLWFY3
+ bTUUovS2h3gG3j4/jBt72hAkLbqGHljCbZJlClhWhPYqGjiw7L3oeTK9xK2qWBQR7VBN1TdCe
+ 8PkXloG7IqyIxAC72QEpu7DP8VWxZ+jmG1C70ptOnt3HnlTqb2AWXgLe9UlAHbPyDHhYiD3
+Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 11:31:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 11:32:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -54
 X-Spam_score: -5.5
@@ -128,58 +127,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Rafael Kitover <rkitover@gmail.com>
+Cc: qemu-trivial@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 08/09/2020 à 10:24, Paolo Bonzini a écrit :
-> Cc: qemu-trivial@nongnu.org <mailto:qemu-trivial@nongnu.org>
+Le 08/09/2020 à 11:42, Paolo Bonzini a écrit :
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  Kconfig.host | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Il mar 8 set 2020, 09:50 Sergei Trofimovich <slyfox@gentoo.org
-> <mailto:slyfox@gentoo.org>> ha scritto:
-> 
->     Before the change missing SDL was reported as:
-> 
->         ../meson.build:253:4: ERROR: Expected 1 arguments, got 2.
-> 
->     After the error as:
-> 
->         ../meson.build:258:4: ERROR: Problem encountered: sdl-image
->     required, but SDL was not found
-> 
->     CC: Paolo Bonzini <pbonzini@redhat.com <mailto:pbonzini@redhat.com>>
->     CC: "Marc-André Lureau" <marcandre.lureau@redhat.com
->     <mailto:marcandre.lureau@redhat.com>>
->     CC: "Philippe Mathieu-Daudé" <philmd@redhat.com
->     <mailto:philmd@redhat.com>>
->     CC: Rafael Kitover <rkitover@gmail.com <mailto:rkitover@gmail.com>>
->     Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org
->     <mailto:slyfox@gentoo.org>>
->     ---
->      meson.build | 4 ++--
->      1 file changed, 2 insertions(+), 2 deletions(-)
-> 
->     diff --git a/meson.build b/meson.build
->     index 04e070bb3b..7fd2a903c5 100644
->     --- a/meson.build
->     +++ b/meson.build
->     @@ -255,8 +255,8 @@ if sdl.found()
->                               method: 'pkg-config', static: enable_static)
->      else
->        if get_option('sdl_image').enabled()
->     -    error('sdl-image required, but SDL was @0@',
->     -          get_option('sdl').disabled() ? 'disabled' : 'not found')
->     +    error('sdl-image required, but SDL was @0@'.format(
->     +          get_option('sdl').disabled() ? 'disabled' : 'not found'))
->        endif
->        sdl_image = not_found
->      endif
->     -- 
->     2.28.0
+> diff --git a/Kconfig.host b/Kconfig.host
+> index a6d871c399..4af19bf70e 100644
+> --- a/Kconfig.host
+> +++ b/Kconfig.host
+> @@ -1,6 +1,6 @@
+>  # These are "proxy" symbols used to pass config-host.mak values
+> -# down to Kconfig.  See also MINIKCONF_ARGS in the Makefile:
+> -# these two need to be kept in sync.
+> +# down to Kconfig.  See also kconfig_external_symbols in
+> +# meson.build: these two need to be kept in sync.
+>  
+>  config LINUX
+>      bool
 > 
 
 Applied to my trivial-patches branch.
