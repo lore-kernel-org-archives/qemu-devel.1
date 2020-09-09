@@ -5,79 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58042C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:48:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC190C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:48:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E1BD121D79
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:48:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6FF8621D79
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:48:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OixHOT3K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1BD121D79
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFJsgCbr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FF8621D79
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36288 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFwi8-00081C-Qy
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:48:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57082)
+	id 1kFwiT-0000LQ-5u
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:48:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57140)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwgc-000691-Dc; Wed, 09 Sep 2020 05:46:43 -0400
-Received: from mail-pg1-x52c.google.com ([2607:f8b0:4864:20::52c]:35308)
+ id 1kFwgs-0006jJ-T3; Wed, 09 Sep 2020 05:46:58 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:51311)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwga-0007fK-Ik; Wed, 09 Sep 2020 05:46:42 -0400
-Received: by mail-pg1-x52c.google.com with SMTP id g29so1698147pgl.2;
- Wed, 09 Sep 2020 02:46:39 -0700 (PDT)
+ id 1kFwgr-0007gS-8W; Wed, 09 Sep 2020 05:46:58 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id a9so1071077pjg.1;
+ Wed, 09 Sep 2020 02:46:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=SUvRS89sUzi/CKcVKuZSUX6fRCoMdjCQPEKiAKbAayo=;
- b=OixHOT3KaPYqoUwhFrDwExzHIdp4Vc0XCFEi/EZQ1DTw+mlpPbwl9IeEzA8RUPZh32
- YTZEHHPLWn7eEqyLlsnVjYEI8MIJZ5Gdq//MvHphpR+SJ7F+vmndnk2CJGL6Mwh+Pozt
- mKavPGvWXRUqFseZ8qvKhCMtHNwf+OGqIsYMPp65prfF7dK7xWRZGPhotpgbhl6nl2oH
- NE8HzBElsc8fi2yqyyZk5dZO/mRl9aixyycGe+wpcn2hDLrWY5mYvyO+n+uSKwwgE773
- 9BNxu6AazVyGnmavVH1t9v+yeGPnDYNjCd1Y6uk+x6zW3s+kIdeDZrVrFV3hLgWfbq6R
- WhHg==
+ bh=QPOpSG9Zo5ax6O+oTlvoQEKu10ulnbdfFW/pj17nxUM=;
+ b=IFJsgCbr696oMGcFoMiuw94twVJ0hxIZIxqJaTRRkVwT28XFw0ctJfF50N6GbE868Q
+ 6IqCHwKum1aVEmEuEwG18BLJrD+dXglRHBTHtKFOabAg/9MQ7hpaaECI/cTd00TX3PLM
+ LQytcWEkKKDKVEeLWlZmrNyUeo2n5urKYu08N4DSpYY1TA1RP4QYsd+2GV8tNCbVZ14R
+ nZUDxDvaDhe6ma1qyBVgGmYDDJLIDj/EPeoPO331aRQOu2IxBxQw3+K20HdAhZTI9YW5
+ cMW37z1JgHpGScyC5ylWcCmS94Rv70xzbfoED8unl35kxzWP6XTtoP8+78hPbFaZXKfi
+ Uqpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=SUvRS89sUzi/CKcVKuZSUX6fRCoMdjCQPEKiAKbAayo=;
- b=eOpHY96neSnwtY76/tTglS+M6lzl2X+RGHrrnHNkJCpXkEcvoOMwdrOG+O4bhjvJ6P
- mokPran0vEVzDXxhww5Oa1WYrWqn6/uiVIBkB/io7P1c3i003qSLuBzFsIGjfMCT4ecU
- tA18IM/FMv+ESyLUxHzvyY4Sg1ZnjvpAi3QKYx2SxKtvVZip7NdeyEy4RBd50bwsNzvi
- lHrqG3kkepQn2pbc9HOymlP7S7zpX+bdZmb45c5TWY0eGC0s/ClIYkJAMp2n9DJzo548
- kjXrWFLOHw07Kiq28W1UxzRyisogpw05jaXDEJo1IhhtTEl/2kONZGyg7wClHk6IuZTv
- Wiiw==
-X-Gm-Message-State: AOAM530xSmSkiq8gLxJjjYN25Kz3l8NxAGHJ7NdpHODVTCo1p2dIxpLT
- VQxKiPwikqOO1sRUB50mVIG5kzcpREAtYrL1
-X-Google-Smtp-Source: ABdhPJxwFfqpbPvNIGJ6oD1uG0Ri2owu6ZosKjJxEgrzsdFhMLSojBgYC1D6dCaCPzYc6tNyiSCKqw==
-X-Received: by 2002:a17:902:c411:b029:d0:589f:6e1c with SMTP id
- k17-20020a170902c411b02900d0589f6e1cmr217248plk.0.1599644798122; 
- Wed, 09 Sep 2020 02:46:38 -0700 (PDT)
+ bh=QPOpSG9Zo5ax6O+oTlvoQEKu10ulnbdfFW/pj17nxUM=;
+ b=S2A1G8SofIkGalaAdBPtYqaTZed17I35jlckQu2OV/+C6Pr7AqBWiNYOOPtxS7Px8y
+ kTOUkLZ8v5KwW7oGlYJ7HAHn/3cdNmcIIdFAggaZB6CegTgw9PsGDYkE3KbT9qCNbieV
+ Z4IZXaarMxzUJL2oCWgk9UgWrHgc3opNvxuW9JQA4z6pW7kF0rNcPc0MU59696AiOmkt
+ vI2ztz2wf/5aw+PDu5dRf9hs9Pt/5qN3yIs5GRuwk6O0nMKPel4CbGikTl1G+3TOc37t
+ ma3rgGoUQv4O5YeUYAFq8ofCseQfL1RdBqv8YrNi9K0l3wvqxQSA1Zzn4HZGiuUSK+uy
+ aqSA==
+X-Gm-Message-State: AOAM532YK2PPhGLPM0vA1x+uCqcxWs86+VOTFZAsZYSQpwVIqASPhQTf
+ 0RlJIGz5Py9eRJvhd/af0tKJHX2LFdmyCQ0e
+X-Google-Smtp-Source: ABdhPJzBNbrqC4gJ0/fzYXe8BK/zG6edytANrC2VU8cHxHNRFgQsFXTzKVPKo+J/SdmwNOOjLvQGjQ==
+X-Received: by 2002:a17:90b:4b82:: with SMTP id
+ lr2mr111870pjb.184.1599644815180; 
+ Wed, 09 Sep 2020 02:46:55 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.46.33
+ by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.46.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 02:46:37 -0700 (PDT)
+ Wed, 09 Sep 2020 02:46:54 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 01/21] block: Fixes nfs compiling error on msys2/mingw
-Date: Wed,  9 Sep 2020 17:45:57 +0800
-Message-Id: <20200909094617.1582-2-luoyonggang@gmail.com>
+Subject: [PATCH v2 05/21] tests: disable /char/stdio/* tests in test-char.c on
+ win32
+Date: Wed,  9 Sep 2020 17:46:01 +0800
+Message-Id: <20200909094617.1582-6-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200909094617.1582-1-luoyonggang@gmail.com>
 References: <20200909094617.1582-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52c;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x52c.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,143 +112,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These compiling errors are fixed:
-../block/nfs.c:27:10: fatal error: poll.h: No such file or directory
-   27 | #include <poll.h>
-      |          ^~~~~~~~
-compilation terminated.
-
-../block/nfs.c:63:5: error: unknown type name 'blkcnt_t'
-   63 |     blkcnt_t st_blocks;
-      |     ^~~~~~~~
-../block/nfs.c: In function 'nfs_client_open':
-../block/nfs.c:550:27: error: 'struct _stat64' has no member named 'st_blocks'
-  550 |     client->st_blocks = st.st_blocks;
-      |                           ^
-../block/nfs.c: In function 'nfs_get_allocated_file_size':
-../block/nfs.c:751:41: error: 'struct _stat64' has no member named 'st_blocks'
-  751 |     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
-      |                                         ^
-../block/nfs.c: In function 'nfs_reopen_prepare':
-../block/nfs.c:805:31: error: 'struct _stat64' has no member named 'st_blocks'
-  805 |         client->st_blocks = st.st_blocks;
-      |                               ^
-../block/nfs.c: In function 'nfs_get_allocated_file_size':
-../block/nfs.c:752:1: error: control reaches end of non-void function [-Werror=return-type]
-  752 | }
-      | ^
-
-On msys2/mingw, there is no st_blocks in struct _stat64, so we use consistence st_size instead.
+These tests are blocking test-char to be finished.
+Merge three #ifndef _WIN32
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- block/nfs.c | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+ tests/test-char.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/block/nfs.c b/block/nfs.c
-index 61a249a9fc..34b2cd5708 100644
---- a/block/nfs.c
-+++ b/block/nfs.c
-@@ -24,7 +24,9 @@
- 
- #include "qemu/osdep.h"
- 
-+#if !defined(_WIN32)
- #include <poll.h>
-+#endif
- #include "qemu/config-file.h"
- #include "qemu/error-report.h"
- #include "qapi/error.h"
-@@ -51,6 +53,12 @@
- #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
- #define QEMU_NFS_MAX_DEBUG_LEVEL 2
- 
-+#if defined (_WIN32)
-+#define nfs_stat __stat64
-+#else
-+#define nfs_stat stat
-+#endif
-+
- typedef struct NFSClient {
-     struct nfs_context *context;
-     struct nfsfh *fh;
-@@ -58,7 +66,7 @@ typedef struct NFSClient {
-     bool has_zero_init;
-     AioContext *aio_context;
-     QemuMutex mutex;
--    blkcnt_t st_blocks;
-+    int64_t st_size;
-     bool cache_used;
-     NFSServer *server;
-     char *path;
-@@ -70,7 +78,7 @@ typedef struct NFSRPC {
-     int ret;
-     int complete;
-     QEMUIOVector *iov;
--    struct stat *st;
-+    struct nfs_stat *st;
-     Coroutine *co;
-     NFSClient *client;
- } NFSRPC;
-@@ -419,7 +427,7 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
-                                int flags, int open_flags, Error **errp)
- {
-     int64_t ret = -EINVAL;
--    struct stat st;
-+    struct nfs_stat st;
-     char *file = NULL, *strp = NULL;
- 
-     qemu_mutex_init(&client->mutex);
-@@ -545,7 +553,7 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
-     }
- 
-     ret = DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
--    client->st_blocks = st.st_blocks;
-+    client->st_size = st.st_size;
-     client->has_zero_init = S_ISREG(st.st_mode);
-     *strp = '/';
-     goto out;
-@@ -729,11 +737,11 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
- {
-     NFSClient *client = bs->opaque;
-     NFSRPC task = {0};
--    struct stat st;
-+    struct nfs_stat st;
- 
-     if (bdrv_is_read_only(bs) &&
-         !(bs->open_flags & BDRV_O_NOCACHE)) {
--        return client->st_blocks * 512;
-+        return client->st_size;
-     }
- 
-     task.bs = bs;
-@@ -746,7 +754,7 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
-     nfs_set_events(client);
-     BDRV_POLL_WHILE(bs, !task.complete);
- 
--    return (task.ret < 0 ? task.ret : st.st_blocks * 512);
-+    return (task.ret < 0 ? task.ret : st.st_size);
+diff --git a/tests/test-char.c b/tests/test-char.c
+index d35cc839bc..ab037647bf 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -103,6 +103,7 @@ static void char_console_test(void)
+     g_test_trap_assert_stdout("CONSOLE");
  }
- 
- static int coroutine_fn
-@@ -778,7 +786,7 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
-                               BlockReopenQueue *queue, Error **errp)
+ #endif
++#ifndef _WIN32
+ static void char_stdio_test_subprocess(void)
  {
-     NFSClient *client = state->bs->opaque;
--    struct stat st;
-+    struct nfs_stat st;
-     int ret = 0;
+     Chardev *chr;
+@@ -126,6 +127,7 @@ static void char_stdio_test(void)
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stdout("buf");
+ }
++#endif
  
-     if (state->flags & BDRV_O_RDWR && bdrv_is_read_only(state->bs)) {
-@@ -800,7 +808,7 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
-                        nfs_get_error(client->context));
-             return ret;
-         }
--        client->st_blocks = st.st_blocks;
-+        client->st_size = st.st_size;
-     }
+ static void char_ringbuf_test(void)
+ {
+@@ -1471,15 +1473,13 @@ int main(int argc, char **argv)
+     g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
+     g_test_add_func("/char/console", char_console_test);
+ #endif
++#ifndef _WIN32
+     g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
+     g_test_add_func("/char/stdio", char_stdio_test);
+-#ifndef _WIN32
+     g_test_add_func("/char/pipe", char_pipe_test);
+-#endif
+-    g_test_add_func("/char/file", char_file_test);
+-#ifndef _WIN32
+     g_test_add_func("/char/file-fifo", char_file_fifo_test);
+ #endif
++    g_test_add_func("/char/file", char_file_test);
  
-     return 0;
+ #define SOCKET_SERVER_TEST(name, addr)                                  \
+     static CharSocketServerTestConfig server1 ## name =                 \
 -- 
 2.28.0.windows.1
 
