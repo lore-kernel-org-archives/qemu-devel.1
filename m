@@ -7,73 +7,73 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE168C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D50CCC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:44:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 56F7B2080C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:43:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4C2832080C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:44:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X1YBOiQD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56F7B2080C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bVJxIGa/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C2832080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG54I-0000dI-9r
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:43:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56486)
+	id 1kG54l-0001QZ-Bq
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:44:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kG51c-0005TE-Sh
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 14:40:56 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:46580
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kG51r-0005yw-0n
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 14:41:11 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:38813
+ helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kG51b-0007Lx-4b
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 14:40:56 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kG51p-0007SL-F5
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 14:41:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599676854;
+ s=mimecast20190719; t=1599676868;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=iD3nU3q29aS+NTmVIJFCCkIEfzkuLj2dF9Y2ZbLAPos=;
- b=X1YBOiQD6eLxyQS3brne9RcitLtHe3jyHvBz/KNFQVKMZCbXVP0/uGFQEI0ZIYIOV8uTBi
- tTYZlrmaHj3I0XD4L3FremjprtcWI42m8pciVpX5xxLw2caAKgPz1n3aj6Dvp/A1WnNZ9q
- k5Kwkh6amJx3Zxt2YbkGGUxg4VHY0+0=
+ bh=nh0FPSe4hR16BIoT/N4xYTXt5vkDFlUFUIGOhNvTSeI=;
+ b=bVJxIGa/7KsWqzYC62toP4Fsw+3JH84DMbhflW/KbTRsOKiHQ4oS6V2GT+twXeAoODDFcV
+ iZgbzAr3GIvPop8H5/FGXrdsXVSXrOQ4z4Vfa6yW1Utu0s7OW7qJNDBjXHRca7m5suCU/H
+ M2DnnuOZTiE26hUaWS0YpEzImtMZkjE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-512-RRXArTR_OmylrN2gsfeP4A-1; Wed, 09 Sep 2020 14:40:52 -0400
-X-MC-Unique: RRXArTR_OmylrN2gsfeP4A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-125-cn6qZ8zrMl6JqWeBZOb9_Q-1; Wed, 09 Sep 2020 14:41:06 -0400
+X-MC-Unique: cn6qZ8zrMl6JqWeBZOb9_Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1024B80EF8C
- for <qemu-devel@nongnu.org>; Wed,  9 Sep 2020 18:40:52 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E94FC80EF8A
+ for <qemu-devel@nongnu.org>; Wed,  9 Sep 2020 18:41:05 +0000 (UTC)
 Received: from localhost (ovpn-113-94.ams2.redhat.com [10.36.113.94])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 3079719C78;
- Wed,  9 Sep 2020 18:40:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CC2A860BEC;
+ Wed,  9 Sep 2020 18:40:59 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/8] virtiofsd: Announce FUSE_ATTR_FLAGS
-Date: Wed,  9 Sep 2020 20:40:22 +0200
-Message-Id: <20200909184028.262297-3-mreitz@redhat.com>
+Subject: [PATCH 5/8] virtiofsd: Store every lo_inode's parent_dev
+Date: Wed,  9 Sep 2020 20:40:25 +0200
+Message-Id: <20200909184028.262297-6-mreitz@redhat.com>
 In-Reply-To: <20200909184028.262297-1-mreitz@redhat.com>
 References: <20200909184028.262297-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=mreitz@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:13:17
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 02:43:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -101,67 +101,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The fuse_attr.flags field is currently just initialized to 0, which is
-valid.  Thus, there is no reason not to always announce FUSE_ATTR_FLAGS
-(when the kernel supports it).
+We want to detect mount points in the shared tree.  We report them to
+the guest by setting the FUSE_ATTR_SUBMOUNT flag in fuse_attr.flags, but
+because the FUSE client will create a submount for every directory that
+has this flag set, we must do this only for the actual mount points.
+
+We can detect mount points by comparing a directory's st_dev with its
+parent's st_dev.  To be able to do so, we need to store the parent's
+st_dev in the lo_inode object.
+
+Note that mount points need not necessarily be directories; a single
+file can be a mount point as well.  However, for the sake of simplicity
+let us ignore any non-directory mount points for now.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 ---
- tools/virtiofsd/fuse_common.h   | 8 ++++++++
- tools/virtiofsd/fuse_lowlevel.c | 7 +++++++
- 2 files changed, 15 insertions(+)
+ tools/virtiofsd/passthrough_ll.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_common.h
-index 686c42c0a5..870544fe13 100644
---- a/tools/virtiofsd/fuse_common.h
-+++ b/tools/virtiofsd/fuse_common.h
-@@ -352,6 +352,14 @@ struct fuse_file_info {
-  */
- #define FUSE_CAP_NO_OPENDIR_SUPPORT (1 << 24)
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index 784330e0e4..2c48c03b4c 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -124,6 +124,14 @@ struct lo_inode {
+     GHashTable *posix_locks; /* protected by lo_inode->plock_mutex */
  
-+/**
-+ * Indicates that the client will provide fuse_attr.flags, and the kernel will
-+ * interpret it.
-+ *
-+ * This feature is enabled by default when supported by the kernel.
-+ */
-+#define FUSE_CAP_ATTR_FLAGS (1 << 27)
+     mode_t filetype;
 +
- /**
-  * Ioctl flags
-  *
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
-index 2dd36ec03b..e9e2652d33 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -1988,6 +1988,9 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid,
-             bufsize = max_bufsize;
-         }
++    /*
++     * So we can detect crossmount roots
++     * (As such, this only needs to be valid for directories.  Note
++     * that files can have multiple parents due to hard links, and so
++     * their parent_dev may fluctuate.)
++     */
++    dev_t parent_dev;
+ };
+ 
+ struct lo_cred {
+@@ -821,6 +829,7 @@ static int lo_do_lookup(fuse_req_t req, fuse_ino_t parent, const char *name,
+         g_hash_table_insert(lo->inodes, &inode->key, inode);
+         pthread_mutex_unlock(&lo->mutex);
      }
-+    if (arg->flags & FUSE_ATTR_FLAGS) {
-+        se->conn.capable |= FUSE_CAP_ATTR_FLAGS;
-+    }
- #ifdef HAVE_SPLICE
- #ifdef HAVE_VMSPLICE
-     se->conn.capable |= FUSE_CAP_SPLICE_WRITE | FUSE_CAP_SPLICE_MOVE;
-@@ -2014,6 +2017,7 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid,
-     LL_SET_DEFAULT(1, FUSE_CAP_ASYNC_DIO);
-     LL_SET_DEFAULT(1, FUSE_CAP_IOCTL_DIR);
-     LL_SET_DEFAULT(1, FUSE_CAP_ATOMIC_O_TRUNC);
-+    LL_SET_DEFAULT(1, FUSE_CAP_ATTR_FLAGS);
-     LL_SET_DEFAULT(se->op.write_buf, FUSE_CAP_SPLICE_READ);
-     LL_SET_DEFAULT(se->op.getlk && se->op.setlk, FUSE_CAP_POSIX_LOCKS);
-     LL_SET_DEFAULT(se->op.flock, FUSE_CAP_FLOCK_LOCKS);
-@@ -2103,6 +2107,9 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid,
-     if (se->conn.want & FUSE_CAP_POSIX_ACL) {
-         outarg.flags |= FUSE_POSIX_ACL;
-     }
-+    if (se->conn.want & FUSE_CAP_ATTR_FLAGS) {
-+        outarg.flags |= FUSE_ATTR_FLAGS;
-+    }
-     outarg.max_readahead = se->conn.max_readahead;
-     outarg.max_write = se->conn.max_write;
-     if (se->conn.max_background >= (1 << 16)) {
++    inode->parent_dev = dir->key.dev;
+     e->ino = inode->fuse_ino;
+     lo_inode_put(lo, &inode);
+     lo_inode_put(lo, &dir);
+@@ -1047,6 +1056,14 @@ static void lo_link(fuse_req_t req, fuse_ino_t ino, fuse_ino_t parent,
+     fuse_log(FUSE_LOG_DEBUG, "  %lli/%s -> %lli\n", (unsigned long long)parent,
+              name, (unsigned long long)e.ino);
+ 
++    /*
++     * No need to update inode->parent_dev, because
++     * (1) We cannot, the inode now has more than one parent,
++     * (2) Directories cannot have more than one parent, so link()
++     *     does not work for them; but parent_dev only needs to be
++     *     valid for directories.
++     */
++
+     fuse_reply_entry(req, &e);
+     lo_inode_put(lo, &parent_inode);
+     lo_inode_put(lo, &inode);
 -- 
 2.26.2
 
