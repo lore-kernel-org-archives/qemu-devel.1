@@ -2,100 +2,90 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,FSL_HELO_FAKE,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DBFC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 16:23:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA0B4C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 16:23:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF208206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 16:23:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 330C8206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 16:23:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OvbV2zVB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF208206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JAlHZAsj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 330C8206B8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG2sX-0003RI-3N
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 12:23:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55610)
+	id 1kG2sf-0003fl-6P
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 12:23:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kG2nd-0005i5-H4
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 12:18:21 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:41028)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kG2ki-0000ib-Te; Wed, 09 Sep 2020 12:15:20 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:38427)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kG2na-0006z2-Dz
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 12:18:21 -0400
-Received: by mail-pg1-x542.google.com with SMTP id w186so2415267pgb.8
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 09:18:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=99UZ288H5ij2iEAl6q76lCUPqn1VoDCLJI1C3EIgH/g=;
- b=OvbV2zVBsqF8cQWEGp2fl+MU1DvQuZ6EiRE+ExORl9/282fShzgwkO4ZV03wm1LY2w
- ijAIjsSXgoI2n0DzoLp9+4Xya5OpR2YfomW6BONbraubfCL3/ktcHf0HDmvx4V4CLxmo
- S06GqzR7147l8ok9IrCy3YKklO4ai9nGrBS0oAFKqBeiddkM21Fmi70C9gTtF+OfDTdS
- MTs+0GLvPKH3bdbBDnGs01duUO9mKVzPBA5wTZEGmQJo/kz7b0jzQPbic1/Hc/dmjsRO
- QGR/X5vokK8QRbB0+mOVW0ExELn1JTawHRVyrkNqH08AGlk1iFs4B5wAS5dASXO73XEL
- 0a8w==
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kG2kg-0006YY-Pg; Wed, 09 Sep 2020 12:15:20 -0400
+Received: by mail-lj1-x243.google.com with SMTP id w3so4314542ljo.5;
+ Wed, 09 Sep 2020 09:15:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=dIh6NerjiH44LwAXPnjVVHbLhSVLBK5aoH6ORepxJpQ=;
+ b=JAlHZAsjTSLsjU9QXb7HDnZmYC2f3ERI/+Q+8MDJQ/1rICT8dB1/UuQFLDZnKA/8iV
+ cbVQc41ySLGBzv69Z2MHj4vKzoo5Ssx7YjPWl9VqQXvX3S69Y7dgUUvuG57w5XJ4hJnP
+ AS/z/sUVSsqePBP76Wr6JXpsc3aTEX20ztdVYQiSFdDzoEiht6KrN4uQ7xzzaV7mHdIO
+ AzULheaoCgjbnVVGtbbZdStf/vuUA/tvYuvD4DFexc64rqNTO4dzqpJLfYOR2qcIGx8h
+ O5B6GkPzEf+cOaLKwWTvcRRj4rTeTXceAIZO0IW6xqo5b3htLT2fXUwPcSlwDe9QGEST
+ KCCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=99UZ288H5ij2iEAl6q76lCUPqn1VoDCLJI1C3EIgH/g=;
- b=FJC3pu17mKGFJCPnYKF7bYGYwWZv9M0rv3SdInDz7Mr8CXMd3dtAUnonAykTIqHuPA
- l/e4A17z9t6B85kw+e+xvFFMHsfWhnHjXX6ZoxfyzdBUHQQioEaAL3hgS/Um7A5c5g70
- S31hfHG7Pq7XITvgHRy8Kb33oQrQgiL1/ExX5+6D9Otj6gAJA4k2wAC/QxFFzaUV31oD
- sJsN3hFCzVd5Q8IBIQ760G+8Q1LSQT372GFqCc7fuPabosVTN6Q+/a8d+JlHnspJMuMw
- OLYJLSWciMjAL31Y4e2DA0u/r/MxLI2wXIzuQCxnPlyHqmNeYR9Z8KuomkJZoLXBuI6B
- dlgA==
-X-Gm-Message-State: AOAM533QSeF/T2Wv3t3kwUzctR+V3FBEfq0Np9Y0w7K4vk744TqwPc6S
- /s9v0vqHDeLxHAXSFVZ9fk7Kfg==
-X-Google-Smtp-Source: ABdhPJw7zmLYBci0+yhisFi2NSLwYjdshwai+ECZRO/NumecFg/c6zL7hLPbdz/4QCLsFf0LjyreQQ==
-X-Received: by 2002:a63:4559:: with SMTP id u25mr1131732pgk.162.1599668296857; 
- Wed, 09 Sep 2020 09:18:16 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id a1sm3199142pfr.12.2020.09.09.09.18.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Sep 2020 09:18:15 -0700 (PDT)
-Subject: Re: [PATCH v5 2/2] hw: hyperv: vmbus: Fix 32bit compilation
-To: Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Jon Doron <arilou@gmail.com>, qemu-devel@nongnu.org
-References: <20200715084326.678715-1-arilou@gmail.com>
- <20200715084326.678715-3-arilou@gmail.com>
- <87028ae2-f31e-a6ee-a4ba-c147837fc52d@amsat.org>
- <fb8f1744-4c28-4171-2ffb-61d3ad39be88@vivier.eu>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <05bf1564-636a-5022-357b-73725a754e59@linaro.org>
-Date: Wed, 9 Sep 2020 09:18:13 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=dIh6NerjiH44LwAXPnjVVHbLhSVLBK5aoH6ORepxJpQ=;
+ b=rE6omSaa9KRtMGRhIpHyoLdP/FeLfH0s9+4W8nbtnQLNN8i8+7DihuZYhOmC5wUGM9
+ znUd2DFQlJ9M4gNppN7hm62u+wp/3JUR6URDN9VvpvtFc560tVRCHGMsM3A3PNs+axi+
+ dmX2RGFj8FE0TQ07RGMYygSes1nQFz3HKR8tfhWAoZOcUSz0gzxauAHEHw59B5r5dSxN
+ XV2Mp/qR5YCAwDeGYdie4Xq0FnPZzHuXQe8GCUOBqr4WfHEG0vffTsxgWFKcHZEXLCfy
+ fERwlr161lHgLr5dWqhc4TZt0YwI1oXTxlL/amI/5heQXej7nh4l3cGHkEAGTESf2T8O
+ /bOQ==
+X-Gm-Message-State: AOAM532A2MpWIrEJWrlLGobDD9wKxh4YaKb36nj+H9pmukWWBJ0daJCL
+ W/WdRd+5a5u0rdPVMNxmsctzg5uRXhg=
+X-Google-Smtp-Source: ABdhPJzewtq3LmSXFG3VH/BZJKnRvUkznoT+jeSoQwprPehQN2n8El2bkKOhs+/adm1h/DuU1JZs6w==
+X-Received: by 2002:a2e:814b:: with SMTP id t11mr2467712ljg.367.1599668116736; 
+ Wed, 09 Sep 2020 09:15:16 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id w17sm670391lfr.31.2020.09.09.09.15.15
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 09 Sep 2020 09:15:16 -0700 (PDT)
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v1 1/1] hw/arm: versal-virt: Correct the tx/rx GEM clocks
+Date: Wed,  9 Sep 2020 18:15:14 +0200
+Message-Id: <20200909161514.622998-2-edgar.iglesias@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200909161514.622998-1-edgar.iglesias@gmail.com>
+References: <20200909161514.622998-1-edgar.iglesias@gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <fb8f1744-4c28-4171-2ffb-61d3ad39be88@vivier.eu>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-3.576,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -2
+X-Spam_score: -0.3
+X-Spam_bar: /
+X-Spam_report: (-0.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FSL_HELO_FAKE=1.8, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,25 +98,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mail@maciej.szmigiero.name, QEMU Trivial <qemu-trivial@nongnu.org>,
- rvkagan@yandex-team.ru, pbonzini@redhat.com, imammedo@redhat.com,
- vkuznets@redhat.com
+Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
+ edgar.iglesias@xilinx.com, sai.pavan.boddu@xilinx.com,
+ frasse.iglesias@gmail.com, alistair@alistair23.me, frederic.konrad@adacore.com,
+ qemu-arm@nongnu.org, philmd@redhat.com, luc.michel@greensocs.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/9/20 6:56 AM, Laurent Vivier wrote:
-> Le 06/09/2020 à 12:14, Philippe Mathieu-Daudé a écrit :
->> Cc'ing qemu-trivial@
->>
->> Can we add the commit description Richard wrote?
-> 
-> I have no message from Richard regarding this patch.
+From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
 
-https://lists.nongnu.org/archive/html/qemu-devel/2020-09/msg02283.html
+Correct the GEMs tx/rx clocks to use the 125Mhz fixed-clock.
+This matches the setup with the fixed-link 100Mbit PHY.
+I also avoids the following warnings from the Linux kernel
+driver:
 
-Different thread, same problem.
+eth0: unable to generate target frequency: 125000000 Hz
 
+Signed-off-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+---
+ hw/arm/xlnx-versal-virt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-r~
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+index 4b3152ee77..43d74b850f 100644
+--- a/hw/arm/xlnx-versal-virt.c
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -212,7 +212,7 @@ static void fdt_add_gem_nodes(VersalVirt *s)
+                               s->phandle.ethernet_phy[i]);
+         qemu_fdt_setprop_cells(s->fdt, name, "clocks",
+                                s->phandle.clk_25Mhz, s->phandle.clk_25Mhz,
+-                               s->phandle.clk_25Mhz, s->phandle.clk_25Mhz);
++                               s->phandle.clk_125Mhz, s->phandle.clk_125Mhz);
+         qemu_fdt_setprop(s->fdt, name, "clock-names",
+                          clocknames, sizeof(clocknames));
+         qemu_fdt_setprop_cells(s->fdt, name, "interrupts",
+-- 
+2.25.1
+
 
