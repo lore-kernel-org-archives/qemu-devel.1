@@ -2,83 +2,78 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A7EEC43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:10:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3EAC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:18:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CB9C207DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:10:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA0DB21D7A
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:17:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TV3ecIFt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CB9C207DE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h/2olWCj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA0DB21D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFxzk-0002Th-Lh
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 07:10:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54528)
+	id 1kFy6x-0004mG-32
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 07:17:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFxys-0001i9-ED
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:09:38 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:33320
+ (Exim 4.90_1) (envelope-from <jtomko@redhat.com>) id 1kFy67-00049d-CS
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:17:07 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:52620
  helo=us-smtp-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFxyq-00040T-Fi
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:09:38 -0400
+ (Exim 4.90_1) (envelope-from <jtomko@redhat.com>) id 1kFy65-0005Dz-3R
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:17:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599649775;
+ s=mimecast20190719; t=1599650223;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=0BctuzXjG/iPYA/Qjk6qE7TaosnByqoYjgyXev2ZMC0=;
- b=TV3ecIFtaFnR58uyOaynxknTZD9HI53D38pp8LzsXva3/UluNbG0sO5Ivlr/+9fC9uM/13
- EOULMfKSVAH1CEDu0mK1v3CN7E2LUR4WCUf0esUpeDBpIIEpa5ZG88mc95ASjfAXsAjRa+
- tu4NimrDLjIC7y5+SspAgs8b9x8QMx4=
+ bh=1y2gU+TPjnYqAZWsSP85tIq5psc/pNymQ1odxfZLWCw=;
+ b=h/2olWCjs7Uez2G43yhcEIKHVNoZxAu26UrKvOp55Q/pA8TwgP9XAzveK1ZhNTAD7+Wnlu
+ xx9+LYzvKD8oATIh/yJJ4vSSecZrDKrkUgCli8E64eGC1YYJQerQxxL0Tb78LUulyfDyFs
+ pBUYhhpgJa3jPL9W8TzJAKIeTjIKSDU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108--O3UC7LsOg6QdInEch68Wg-1; Wed, 09 Sep 2020 07:09:29 -0400
-X-MC-Unique: -O3UC7LsOg6QdInEch68Wg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-431-IlOraKxkMO275v-DphPcEQ-1; Wed, 09 Sep 2020 07:17:00 -0400
+X-MC-Unique: IlOraKxkMO275v-DphPcEQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 55D3485C705;
- Wed,  9 Sep 2020 11:09:28 +0000 (UTC)
-Received: from lacos-laptop-7.usersys.redhat.com (ovpn-114-82.ams2.redhat.com
- [10.36.114.82])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 930885C1C2;
- Wed,  9 Sep 2020 11:09:27 +0000 (UTC)
-Subject: Re: [PATCH RESEND] manual: escape backslashes in "parsed-literal"
- blocks
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>
-References: <20200908172111.19072-1-lersek@redhat.com>
- <3c2d2a59-b556-180d-5a74-5fe74d46ccd2@redhat.com>
-From: Laszlo Ersek <lersek@redhat.com>
-Message-ID: <f4289f81-1927-33a3-333b-eee552f02632@redhat.com>
-Date: Wed, 9 Sep 2020 13:09:25 +0200
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EDAE10BBED2
+ for <qemu-devel@nongnu.org>; Wed,  9 Sep 2020 11:16:59 +0000 (UTC)
+Received: from lpt (unknown [10.43.2.94])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 69ED160C0F;
+ Wed,  9 Sep 2020 11:16:52 +0000 (UTC)
+Date: Wed, 9 Sep 2020 13:16:49 +0200
+From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH v2 1/6] virtiofsd: Silence gcc warning
+Message-ID: <20200909111649.GC1377607@lpt>
+References: <20200827153657.111098-1-dgilbert@redhat.com>
+ <20200827153657.111098-2-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <3c2d2a59-b556-180d-5a74-5fe74d46ccd2@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20200827153657.111098-2-dgilbert@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
-X-Mimecast-Spam-Score: 0.001
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jtomko@redhat.com
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=lersek@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="V88s5gaDVPzZ0KCq"
+Content-Disposition: inline
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jtomko@redhat.com;
  helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:13:17
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:05:47
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -99,38 +94,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: virtio-fs@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/08/20 20:14, Philippe Mathieu-Daudé wrote:
-> On 9/8/20 7:21 PM, Laszlo Ersek wrote:
->> According to
->> <https://docutils.sourceforge.io/docs/ref/rst/directives.html#parsed-literal>,
->> "inline markup is recognized and there is no protection from parsing.
->> Backslash-escapes may be necessary to prevent unintended parsing".
->>
->> The qemu(1) manual page (formatted with Sphinx 2.2.2) has several overlong
->> lines on my system. A stand-alone backslash at EOL serves as line
->> continuation in a "parsed-literal" block. Therefore, escape the
->> backslashes that we want to appear as such in the formatted documentation.
->>
->> Cc: Peter Maydell <peter.maydell@linaro.org>
->> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->> ---
->>
->> Notes:
->>     Resending with Peter's email address in the Cc: tag fixed. Sorry!
->>
->>  docs/system/device-url-syntax.rst.inc |   8 +-
->>  qemu-options.hx                       | 108 ++++++++++----------
->>  2 files changed, 58 insertions(+), 58 deletions(-)
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
+--V88s5gaDVPzZ0KCq
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for the quick check!
-Laszlo
+On a Thursday in 2020, Dr. David Alan Gilbert (git) wrote:
+>From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>
+>Gcc worries fd might be used unset, in reality it's always set if
+>fi is set, and only used if fi is set so it's safe.  Initialise it to -1
+>just to keep gcc happy for now.
+>
+>Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>---
+> tools/virtiofsd/passthrough_ll.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+
+Reviewed-by: J=E1n Tomko <jtomko@redhat.com>
+
+Jano
+
+--V88s5gaDVPzZ0KCq
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE7DTm0WabvfIr7YZ4Ak1z5KIMl5QFAl9YuZ0ACgkQAk1z5KIM
+l5S4MAf/dm2VM2eVZnN8FydhcFUE4anDIpf1cAcLpFXmSBcFXae4OEZAP6miQxlf
+q0an22nLJKcMsOJhajx0BEZ3lKlydSVr2Nj7YA2eAQ1psf7zZVdb9nBJuNh7lyBV
+ZqKmfPCZdDZDwfJplon7cclU/o0tf1yhOwZ4HmBlf3gaU3tren9p4PB4jrkla/gI
+zTi1n8C5kVjrY710ThEMzgN4cmESJ1sEr9jY9ywuRcTsNXjV61HDCqkTW6WlPn0Q
+nEeAixVk9kk0d15xWQx0xRJ2Y+zgdVWEn/wtQ8lJmCAnTvDNGm+SOYZDrcfM/0mz
+VSUVd7RxUExwsfeToX8qs/RgOYnYDg==
+=xftR
+-----END PGP SIGNATURE-----
+
+--V88s5gaDVPzZ0KCq--
 
 
