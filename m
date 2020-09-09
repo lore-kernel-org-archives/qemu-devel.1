@@ -2,90 +2,81 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DATE_IN_FUTURE_03_06,
-	DKIM_SIGNED,DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B92C1C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:01:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71247C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:04:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 348582087C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:01:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EAC4C2087C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:04:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20150623.gappssmtp.com header.i=@smartx-com.20150623.gappssmtp.com header.b="Y8dfvxIL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 348582087C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ca+Dsr40"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EAC4C2087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFv2P-0001JG-CU
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:01:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56674)
+	id 1kFv5I-0004TY-RU
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:04:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1kFv1L-0000n6-LU
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 03:59:59 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:44186)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <fengli@smartx.com>) id 1kFv1J-0001OP-IQ
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 03:59:59 -0400
-Received: by mail-pg1-x541.google.com with SMTP id 7so1474901pgm.11
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 00:59:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=smartx-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WiShvUgskqykiMOdHsLuoFlNAhgGyPel+lPdGWHOWw4=;
- b=Y8dfvxILFIRlKBeZO4xfcy5PDroS8YHFuc1M6H4S58u3va6vL9bLM+cUOL/CwLkils
- /uB3wNFhotRn91oR4ub7w5bFXvXkbVAx16pjva/hGm/RCXgrxBCRQ4Tl2qO5ZX6klaO9
- uWKt9TffsSu+j2QoGhqOuSLURX+85i3NG87WKLIAOMvmUVvRZc+GrIC0plsFRWYsiRss
- E7b1EmMY7HcvVz7XpSdPA9uZCniYQW3mcYtjeJKqQymjT4XgGcPJMW7abRImySxu6XH3
- 0v61Vu9pPa5o6zXt2rsa8v3xCdPdQ7HXfDEjuA0q1QV0vKffh3kEtQxL9fKoUoSj45sw
- R0tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=WiShvUgskqykiMOdHsLuoFlNAhgGyPel+lPdGWHOWw4=;
- b=PJRzb1420pEvYZtxf+YK24t5Gcy9PziV/bZsfjmn892u1W6v7s8A3vVtzh1b707Tu/
- ltEmEoWAX7qa+zvlvzJUQsB6wAjsP5ylW3CUhBr3GppuWG6JEpW4ElYUpePTzYR0gDVA
- 0tjRKgdloWBmAL0jiN7Yh3ETXtw2XLUAHl6JSwGQ5yEtwDFTCx6i8h6fKKQBkmlvct57
- 8FdDO0HgAme2M5UEL2spj5nEl/cvr1snxMA7a75eJfb+KRT98EvHfOc2LlnE9Pdx1MGv
- eUgDULl3uqPuMRbqiJoSDnzfgaZifxw3mW6iTr2LvAPF2pMhDXQIiDegnHJSHudZEJco
- YCNg==
-X-Gm-Message-State: AOAM530YFErl2SEjP0KZAY4mAJiWTLLsNvYA+ELlouhanhKkVW/mvpSO
- tC9URoWkaEY1eVbcuiiqMAKHpA==
-X-Google-Smtp-Source: ABdhPJxgyEdZu0K7g+gJl5J/zMNPMGaoze7DNxnt399qOSjsWy3b/vNd5YOhbWFfuzKAQCCoRewy/A==
-X-Received: by 2002:a17:902:8c96:b029:d0:ad87:6668 with SMTP id
- t22-20020a1709028c96b02900d0ad876668mr3100305plo.2.1599638394848; 
- Wed, 09 Sep 2020 00:59:54 -0700 (PDT)
-Received: from localhost.localdomain ([47.75.244.237])
- by smtp.gmail.com with ESMTPSA id l2sm1217093pjy.3.2020.09.09.00.59.52
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 00:59:54 -0700 (PDT)
-From: Li Feng <fengli@smartx.com>
-To: lifeng1519@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- Fam Zheng <fam@euphon.net>, "Michael S. Tsirkin" <mst@redhat.com>,
- qemu-devel@nongnu.org (open list:All patches CC here)
-Subject: [PATCH] vhost-scsi: support inflight io track
-Date: Wed,  9 Sep 2020 20:20:21 +0800
-Message-Id: <20200909122021.1055174-1-fengli@smartx.com>
-X-Mailer: git-send-email 2.26.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=2607:f8b0:4864:20::541;
- envelope-from=fengli@smartx.com; helo=mail-pg1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 11
-X-Spam_score: 1.1
-X-Spam_bar: +
-X-Spam_report: (1.1 / 5.0 requ) BAYES_00=-1.9, DATE_IN_FUTURE_03_06=3.027,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFv4X-0003M8-8S
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:03:17 -0400
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:49748
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kFv4U-0001sW-4r
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:03:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599638593;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type;
+ bh=vojAXZqxzal26D3to2jpE2dl3HFaIX4ffZoU3EcxXYc=;
+ b=Ca+Dsr40zks9y/VOsHn2Hs0XXht80HIwq4ktPc+8dna8P+dqh/wqc7KvylZ9lSuRwGEbjR
+ GBeqSm8kKOE3PXQfOW+Hv0YEq+y458s6u4w7KihtZIcHcwfPaxRB7G5SQpU/SKcsK81Dlq
+ cw++qGsC+S6/hd8EhiL2kyPKMa2NKx8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-wKQLvlmJOdOq2EO8NgmnZA-1; Wed, 09 Sep 2020 04:03:11 -0400
+X-MC-Unique: wKQLvlmJOdOq2EO8NgmnZA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2B2C78730A8;
+ Wed,  9 Sep 2020 08:03:10 +0000 (UTC)
+Received: from thuth.com (ovpn-112-234.ams2.redhat.com [10.36.112.234])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2DA761002D54;
+ Wed,  9 Sep 2020 08:03:07 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
+To: qemu-devel@nongnu.org,
+	Paolo Bonzini <pbonzini@redhat.com>
+Subject: [PATCH v2] Simplify the .gitignore file
+Date: Wed,  9 Sep 2020 10:03:05 +0200
+Message-Id: <20200909080305.258961-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 02:43:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,94 +89,194 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Feng <fengli@smartx.com>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Qemu will send GET_INFLIGHT_FD and SET_INFLIGH_FD to backend, and
-the backend setup the inflight memory to track the io.
+Now that we always do out-of-tree builds (and the in-tree builds are
+faked via a "build" directory), we can simplify out .gitignore file
+quite a bit.
 
-Change-Id: I805d6189996f7a1b44c65f0b12ef7473b1789510
-Signed-off-by: Li Feng <fengli@smartx.com>
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- hw/scsi/vhost-scsi-common.c           | 27 +++++++++++++++++++++++++++
- include/hw/virtio/vhost-scsi-common.h |  2 ++
- 2 files changed, 29 insertions(+)
+ v2: Do not delete the .sdk, stgit and coccinelle lines 
 
-diff --git a/hw/scsi/vhost-scsi-common.c b/hw/scsi/vhost-scsi-common.c
-index 8ec49d7fef..767f827e55 100644
---- a/hw/scsi/vhost-scsi-common.c
-+++ b/hw/scsi/vhost-scsi-common.c
-@@ -32,6 +32,8 @@ int vhost_scsi_common_start(VHostSCSICommon *vsc)
-     BusState *qbus = BUS(qdev_get_parent_bus(DEVICE(vdev)));
-     VirtioBusClass *k = VIRTIO_BUS_GET_CLASS(qbus);
- 
-+    VirtIOSCSICommon *vs = (VirtIOSCSICommon *)vsc;
-+
-     if (!k->set_guest_notifiers) {
-         error_report("binding does not support guest notifiers");
-         return -ENOSYS;
-@@ -49,6 +51,23 @@ int vhost_scsi_common_start(VHostSCSICommon *vsc)
-     }
- 
-     vsc->dev.acked_features = vdev->guest_features;
-+
-+    assert(vsc->inflight == NULL);
-+    vsc->inflight = g_new0(struct vhost_inflight, 1);
-+    ret = vhost_dev_get_inflight(&vsc->dev,
-+                                 vs->conf.virtqueue_size,
-+                                 vsc->inflight);
-+    if (ret < 0) {
-+        error_report("Error get inflight: %d", -ret);
-+        goto err_guest_notifiers;
-+    }
-+
-+    ret = vhost_dev_set_inflight(&vsc->dev, vsc->inflight);
-+    if (ret < 0) {
-+        error_report("Error set inflight: %d", -ret);
-+        goto err_guest_notifiers;
-+    }
-+
-     ret = vhost_dev_start(&vsc->dev, vdev);
-     if (ret < 0) {
-         error_report("Error start vhost dev");
-@@ -66,6 +85,9 @@ int vhost_scsi_common_start(VHostSCSICommon *vsc)
-     return ret;
- 
- err_guest_notifiers:
-+    g_free(vsc->inflight);
-+    vsc->inflight = NULL;
-+
-     k->set_guest_notifiers(qbus->parent, vsc->dev.nvqs, false);
- err_host_notifiers:
-     vhost_dev_disable_notifiers(&vsc->dev, vdev);
-@@ -89,6 +111,11 @@ void vhost_scsi_common_stop(VHostSCSICommon *vsc)
-     }
-     assert(ret >= 0);
- 
-+    if (vsc->inflight) {
-+        vhost_dev_free_inflight(vsc->inflight);
-+        vsc->inflight = NULL;
-+    }
-+
-     vhost_dev_disable_notifiers(&vsc->dev, vdev);
- }
- 
-diff --git a/include/hw/virtio/vhost-scsi-common.h b/include/hw/virtio/vhost-scsi-common.h
-index 16bf1a73c1..6cd6431d67 100644
---- a/include/hw/virtio/vhost-scsi-common.h
-+++ b/include/hw/virtio/vhost-scsi-common.h
-@@ -35,6 +35,8 @@ typedef struct VHostSCSICommon {
-     int lun;
-     uint64_t host_features;
-     bool migratable;
-+
-+    struct vhost_inflight *inflight;
- } VHostSCSICommon;
- 
- int vhost_scsi_common_start(VHostSCSICommon *vsc);
+ .gitignore | 152 -----------------------------------------------------
+ 1 file changed, 152 deletions(-)
+
+diff --git a/.gitignore b/.gitignore
+index b6fdd34ddf..5515f595e6 100644
+--- a/.gitignore
++++ b/.gitignore
+@@ -1,163 +1,11 @@
+ /GNUmakefile
+ /build/
+-/.doctrees
+-/config-devices.*
+-/config-host.*
+-/config-target.*
+-/config.status
+-/config-temp
+-/tools/virtiofsd/50-qemu-virtiofsd.json
+-/elf2dmp
+-/trace-events-all
+-/trace/generated-events.h
+-/trace/generated-events.c
+-/trace/generated-helpers-wrappers.h
+-/trace/generated-helpers.h
+-/trace/generated-helpers.c
+-/trace/generated-tcg-tracers.h
+-/ui/shader/texture-blit-frag.h
+-/ui/shader/texture-blit-vert.h
+-/ui/shader/texture-blit-flip-vert.h
+-/ui/input-keymap-*.c.inc
+-*-timestamp
+-/*-softmmu
+-/*-darwin-user
+-/*-linux-user
+-/*-bsd-user
+-/ivshmem-client
+-/ivshmem-server
+-/libdis*
+-/libuser
+-/linux-headers/asm
+-/qga/qapi-generated
+-/qapi-gen-timestamp
+-/qapi/qapi-builtin-types.[ch]
+-/qapi/qapi-builtin-visit.[ch]
+-/qapi/qapi-commands-*.[ch]
+-**/qapi/qapi-commands.[ch]
+-**/qapi/qapi-emit-events.[ch]
+-/qapi/qapi-events-*.[ch]
+-**/qapi/qapi-events.[ch]
+-**/qapi/qapi-init-commands.[ch]
+-**/qapi/qapi-introspect.[ch]
+-/qapi/qapi-types-*.[ch]
+-**/qapi/qapi-types.[ch]
+-/qapi/qapi-visit-*.[ch]
+-!/qapi/qapi-visit-core.c
+-**/qapi/qapi-visit.[ch]
+-**/qapi/qapi-doc.texi
+-/qemu-edid
+-/qemu-img
+-/qemu-nbd
+-/qemu-options.def
+-/qemu-options.texi
+-/qemu-img-cmds.texi
+-/qemu-img-cmds.h
+-/qemu-io
+-/qemu-ga
+-/qemu-bridge-helper
+-/qemu-keymap
+-/qemu-monitor.texi
+-/qemu-monitor-info.texi
+-/qemu-storage-daemon
+-/qemu-version.h
+-/qemu-version.h.tmp
+-/module_block.h
+-/scsi/qemu-pr-helper
+-/vhost-user-scsi
+-/vhost-user-blk
+-/vhost-user-gpu
+-/vhost-user-input
+-/fsdev/virtfs-proxy-helper
+-*.tmp
+-*.[1-9]
+-*.a
+-*.aux
+-*.cp
+-*.exe
+-*.msi
+-*.dll
+-*.so
+-*.fn
+-*.ky
+-*.log
+-*.pdf
+-*.pod
+-*.cps
+-*.fns
+-*.kys
+-*.pg
+-*.pyc
+-*.toc
+-*.tp
+-*.vr
+-*.d
+-!/.gitlab-ci.d
+-!/scripts/qemu-guest-agent/fsfreeze-hook.d
+-*.o
+ .sdk
+-*.gcda
+-*.gcno
+-*.gcov
+-/pc-bios/bios-pq/status
+-/pc-bios/edk2-*.fd
+-/pc-bios/vgabios-pq/status
+-/pc-bios/optionrom/linuxboot.asm
+-/pc-bios/optionrom/linuxboot.bin
+-/pc-bios/optionrom/linuxboot.raw
+-/pc-bios/optionrom/linuxboot.img
+-/pc-bios/optionrom/linuxboot_dma.asm
+-/pc-bios/optionrom/linuxboot_dma.bin
+-/pc-bios/optionrom/linuxboot_dma.raw
+-/pc-bios/optionrom/linuxboot_dma.img
+-/pc-bios/optionrom/pvh.asm
+-/pc-bios/optionrom/pvh.bin
+-/pc-bios/optionrom/pvh.raw
+-/pc-bios/optionrom/pvh.img
+-/pc-bios/optionrom/multiboot.asm
+-/pc-bios/optionrom/multiboot.bin
+-/pc-bios/optionrom/multiboot.raw
+-/pc-bios/optionrom/multiboot.img
+-/pc-bios/optionrom/kvmvapic.asm
+-/pc-bios/optionrom/kvmvapic.bin
+-/pc-bios/optionrom/kvmvapic.raw
+-/pc-bios/optionrom/kvmvapic.img
+-/pc-bios/s390-ccw/s390-ccw.elf
+-/pc-bios/s390-ccw/s390-ccw.img
+-/docs/built
+-/docs/interop/qemu-ga-qapi.texi
+-/docs/interop/qemu-ga-ref.html
+-/docs/interop/qemu-ga-ref.info*
+-/docs/interop/qemu-ga-ref.txt
+-/docs/interop/qemu-qmp-qapi.texi
+-/docs/interop/qemu-qmp-ref.html
+-/docs/interop/qemu-qmp-ref.info*
+-/docs/interop/qemu-qmp-ref.txt
+-/docs/version.texi
+-/contrib/vhost-user-gpu/50-qemu-gpu.json
+-*.tps
+ .stgit-*
+ .git-submodule-status
+ cscope.*
+ tags
+ TAGS
+-docker-src.*
+ *~
+ *.ast_raw
+ *.depend_raw
+-trace.c
+-trace-ust.h
+-trace-ust.h
+-trace-dtrace.h
+-trace-dtrace.dtrace
+-trace-root.h
+-trace-root.c
+-trace-ust-root.h
+-trace-ust-root.h
+-trace-ust-all.h
+-trace-ust-all.c
+-trace-dtrace-root.h
+-trace-dtrace-root.dtrace
+-trace-ust-all.h
+-trace-ust-all.c
+-/target/arm/decode-sve.c.inc
 -- 
-2.26.2
+2.18.2
 
 
