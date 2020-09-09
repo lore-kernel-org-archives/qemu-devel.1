@@ -2,92 +2,125 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCE40C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 19:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ABB0C43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 19:09:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C19B218AC
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 19:08:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06485218AC
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 19:09:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=livius-net.20150623.gappssmtp.com header.i=@livius-net.20150623.gappssmtp.com header.b="vwCpkrMd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C19B218AC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=livius.net
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="t00rc2so"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06485218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41748 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46706 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG5Rt-00068a-Cf
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 15:08:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33674)
+	id 1kG5Sr-00089f-1x
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 15:09:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ilg@livius.net>) id 1kG5Na-0005b1-5g
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 15:03:38 -0400
-Received: from mail-ej1-x635.google.com ([2a00:1450:4864:20::635]:36645)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <ilg@livius.net>) id 1kG5NY-0001uf-Cg
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 15:03:37 -0400
-Received: by mail-ej1-x635.google.com with SMTP id e23so5139273eja.3
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 12:03:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=livius-net.20150623.gappssmtp.com; s=20150623;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=W00qVUsVR5dYIJoUQxX8/8Tc9YOvKTwyTrX5cIiorek=;
- b=vwCpkrMdmXVQi+SR7NIzoq+DljNNpKoOUJxCo7AvOu4viGBRTLXAsZYvUqOsQwOqv5
- VQeik5whIdhvSjyORNKUiVZwJ+TXdfxug/5eUUmxTfO7XTruk6RwJOKVad1qSav6sCQ/
- l4YcVpMRqI95lEnSRTzazQ4ADDVshaZjH/VcQXC/p7Di19GMMqnof/oElPMAHzQ/ev1H
- jbb6AVrAMf1KcfbPPXFzwX4OjzZx8r0dZuZ9pUtU8T5sUnVs7rA+QE1WUgkk8RS+SmLP
- XOFkeSlJ8JiE1Kxsq4aPloYm00mK4Hmg+a4O1cVt7Ok6LlMxvbrtwPVPYV95ST+gRGi3
- xM6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=W00qVUsVR5dYIJoUQxX8/8Tc9YOvKTwyTrX5cIiorek=;
- b=PxKSKS3V5J0YtxQ2AaOn4SWtnry79+7voEgIJr3Emcw5ISFY1H430sZVsaeLPr273P
- MYhX5iqjfl/s7DbV3EFt1SJwvJkFDJVXPZM5RQ3U5NoPlmdthEpVBXOGpANKZ8oSPH73
- h1J06LfFbhcsgDIofHHSEd4QwSQPsBa8TP+u+sbp+dt6hKF/5L20lJRPsKHwX+HLggwN
- 8CFuaitVglshIfSosy1xfVeFN+LEfyo7IVx5JyMIFPqFWW4xpPu7fV69K2gXuuXochWh
- WJBuIo6Fv+d8VSlRjFQUQRI0jzBn5sgL7QLppKMGWqd8DLKaGTzD27beplNLenWNZr0l
- nenw==
-X-Gm-Message-State: AOAM530sOyGncoD/QnJH327YeuLZI6ax7oRb/9z6x1X7ju93qzC9Jq22
- mcV+aMmNoyLL+c4aVX0f2LCjaA==
-X-Google-Smtp-Source: ABdhPJxIqdx3b9oHO6fnv2cPE8dfaFizA/8JaOkiVwgJoKCnF5yeUrM+rUZllEzdCoMm5x2EhMO0yA==
-X-Received: by 2002:a17:906:660f:: with SMTP id
- b15mr5368702ejp.333.1599678214791; 
- Wed, 09 Sep 2020 12:03:34 -0700 (PDT)
-Received: from wks.local ([86.120.181.246])
- by smtp.gmail.com with ESMTPSA id e15sm3449635eds.5.2020.09.09.12.03.33
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 09 Sep 2020 12:03:33 -0700 (PDT)
-Content-Type: text/plain;
-	charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.120.23.2.1\))
-Subject: Re: [RFC] QEMU as Xcode project on macOS
-From: Liviu Ionescu <ilg@livius.net>
-In-Reply-To: <1695914.5EixHECA2G@silver>
-Date: Wed, 9 Sep 2020 22:03:32 +0300
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <508327A7-58A6-42FC-8BDC-F1D4FE1F43C6@livius.net>
-References: <2764135.D4k31Gy3CM@silver> <13443969.F0S6BcH2UH@silver>
- <20200909181355.GV1011023@redhat.com> <1695914.5EixHECA2G@silver>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-X-Mailer: Apple Mail (2.3608.120.23.2.1)
-Received-SPF: none client-ip=2a00:1450:4864:20::635;
- envelope-from=ilg@livius.net; helo=mail-ej1-x635.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kG5KJ-0007OQ-Nx; Wed, 09 Sep 2020 15:00:15 -0400
+Received: from mail-eopbgr70097.outbound.protection.outlook.com
+ ([40.107.7.97]:14387 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kG5KH-0001M1-Ft; Wed, 09 Sep 2020 15:00:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ednNCjXdB9Isas3VzrjFurXKCzYDWs+hLtSN5zZK78UZsCXgc0WLTvt6RGzeEj9AMa49fQcImOZleOo3uBKTIh8+3YelULv4LiHvAOew9YHcanpk7wCx4WcW4FcN/VEiBC7pKmjWEwvi6D80RT9kMh8GGGq/65mAw3/Da00WDKZbzdjQDAz64vn/3w+l7ETSC8I5O2wVydHlPit5BoG9wIHt37so3kB81TmhaD3uJse5sk265VN1QwbyQbW2D6cAjzD5C7he5caS1sKQSWCyUcdrcHJT7H7dOSlEXeD8qfxS0BION0nqI6l2EbQ+rRWFBtYoUvj4bmVm2ypGiLf9TQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+dusX2j1Jt5SPLqTE3CkDdy31iOn4Gh9J9A6f7Oye8M=;
+ b=mbv0cEC5PNHAyG1JJKuV1mO5PvT2hbkgH6A7KXGpUkKZUnKR9z4+NHqHJz37ASVhn83l/DCWZN8QlOW6MITAnEItT8rh93BvG6rQPrP/bxaTQ4FzChtyt+dwiBu9YVxotVmKLrjd+HAGkeZWscdNeYK6W1ojm7Q+mifGKdRknyfk9/zrBAG2mX2XzONOxtSTcE7oMUdbI09wIRN/EPZ2RPkdN6qGr7MxW9bxk2ngF4O640vANPxZC/pUPSUPVc2eLqcZ0beeL3U+nFqGd1Vqij+zyF1Ufcv+q9PWt8Ua2Q5TyN/xyhjCzO9HiDtXxL+u9ySgXd/dDY1uimJXqjI7Gg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+dusX2j1Jt5SPLqTE3CkDdy31iOn4Gh9J9A6f7Oye8M=;
+ b=t00rc2sosBuLcrZKFSWLkyQnse58rW4Jmxjmyv9P7WXlw7g8ncfUwb9wj+ARfE/NXrQmymx2Mg/SSts2fToBTPxYaTKdU3JwZBJe4xNhV9iDoHR+sC4R86rAOcg4lUn9LYDnUSi98NI2AxgYSj4+1wq/TkD+uKUX3S6aZ/SFJ78=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB3445.eurprd08.prod.outlook.com (2603:10a6:20b:43::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Wed, 9 Sep
+ 2020 19:00:00 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::b179:9641:7589:d692%7]) with mapi id 15.20.3348.019; Wed, 9 Sep 2020
+ 19:00:00 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, berto@igalia.com,
+ vsementsov@virtuozzo.com, eblake@redhat.com, jsnow@redhat.com,
+ stefanha@redhat.com, pbonzini@redhat.com, pavel.dovgaluk@ispras.ru,
+ ari@tuxera.com, mreitz@redhat.com, kwolf@redhat.com, groug@kaod.org
+Subject: [PATCH 09/14] block/qcow2: qcow2_get_specific_info(): drop error
+ propagation
+Date: Wed,  9 Sep 2020 21:59:25 +0300
+Message-Id: <20200909185930.26524-10-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20200909185930.26524-1-vsementsov@virtuozzo.com>
+References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM3PR07CA0054.eurprd07.prod.outlook.com
+ (2603:10a6:207:4::12) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.136) by
+ AM3PR07CA0054.eurprd07.prod.outlook.com (2603:10a6:207:4::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3391.5 via Frontend Transport; Wed, 9 Sep 2020 18:59:59 +0000
+X-Mailer: git-send-email 2.21.3
+X-Originating-IP: [185.215.60.136]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 599333cf-1a19-45f0-e198-08d854f28d60
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3445:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3445C19056F823DB1B57C04BC1260@AM6PR08MB3445.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:256;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: n3qRVwYL60AEx0I3v96EX/J1BAmlhEfqBKh7ji4vHlMIkfa4sKY1pVtP3eufaY2/qkX5qRcZUT1dOgK4s+cn89VpPFihKF3VyOLxR35tDd5OWDYkl1Y553feRY5vRAQ0nvhVW91iDxz7/raPYQHMGdz7kaNCFBUHt0zTHmlx/JP5kUD0I77+zXXs+9Kf3DGwqmfVClX0P5PSEf7mJy1arWGibxPhFHA//ZsUh/WVeWHVJZsv1mFOe2e/mTkYCjwbHwPpbyhXzpGg9dtIBNkdcRMNlOmBsVEGiTHJuUzHF9vRE+9H+jpEZMU+XjeVit0e
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(396003)(136003)(39840400004)(376002)(346002)(66946007)(52116002)(83380400001)(2616005)(956004)(2906002)(6666004)(8676002)(6512007)(1076003)(86362001)(5660300002)(26005)(36756003)(6916009)(478600001)(6506007)(8936002)(316002)(16526019)(66556008)(19627235002)(186003)(66476007)(7416002)(6486002)(4326008);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 1BBEarLH+zVJTKus0owgqU9GUYuDYdSarLEPIiBvCX0xWLKNBIcZJv+4ebTWel+tm2DxU/YGYWuKWtwa94+BtYrH+wN/xcH5s6RCu2uwuN1aKVSAtwqZzFiMDzBwCEhJYEFFloHQg5qDGxWoCqzTFG3dLVUUZzQCnrFaUvJ3J8UfpLFfKK7LNLiW7eaBnLg48SJ/j7JJ7y5sPiRgni2H+UvD2Pe4qQtmaNskbO+Qj48pdFj4MzXhK0fSpXCjqrSTDBEInSjdrLFT2924A9nyC1J2xVnLjTxRC44WNUp6BAxs4ZmGpCAhD+VzutVt8gWDwUSy3qqDCPvHT30dmuwoxkVHlsSrC0FWESesEUlUk5gGmNQ69xxfQfElMtmsHUg5Bqte7tdZlRMrniVIkw038j0nERJSd8Y3DpZdEWEnGUKg1XECEA79QUG8liBpBZX4NWsMDfehbpUg8aixGZzdOpNZgogTr7jYyIFvapLd/n8Y0cXKIj6IiC/vJ7DipoVWZlkbfl8io9CRvnO0D55gs9obK0Ondl2LfRM/mh35BMFOO7VxiYvcPSr8F5GhCuydPoreR2dJkUta4Ut/9L7giNRZoRDw1ud9YSJDD3Tz9xknBX3AyeBxqUDdy/8AMQvrWeYC4sRmZ350Agn1aApoqA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 599333cf-1a19-45f0-e198-08d854f28d60
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2020 19:00:00.5492 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: R960iTS85E75SxCCCpPxx2T6cyaOpl+5sXhI83ExzK1xSsBbUnigzn0VsX9D+f2IwJnyarLGO6DeZU0pK2Fx9MISoyviQDuM+CFPo0VO0Cc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3445
+Received-SPF: pass client-ip=40.107.7.97;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 14:59:51
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,37 +133,129 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?utf-8?B?IkRhbmllbCBQLiBCZXJyYW5nw6ki?= <berrange@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>, G 3 <programmingkidx@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Don't use error propagation in qcow2_get_specific_info(). For this
+refactor qcow2_get_bitmap_info_list, its current interface rather
+weird.
 
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ block/qcow2.h        |  4 ++--
+ block/qcow2-bitmap.c | 27 +++++++++++++--------------
+ block/qcow2.c        | 10 +++-------
+ 3 files changed, 18 insertions(+), 23 deletions(-)
 
-> On 9 Sep 2020, at 21:56, Christian Schoenebeck =
-<qemu_oss@crudebyte.com> wrote:
->=20
-> ... However you would=20
-> still be opted out from (4.) all those Xcode IDE features that make=20
-> development such efficient.
-
-Could you elaborate?
-
-I thought that a standalone meson can be used with any environment, it =
-just reduces the dependency on Python and possibly other system =
-libraries, otherwise it provides the same functionality. You unpack the =
-archive anywhere, place that location in the path and use it as usual.
-
-Why would it be opted out for Xcode?
-
-
-Thank you,
-
-Liviu
-
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 065ec3df0b..ac6a2d3e2a 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -967,8 +967,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+                                   void **refcount_table,
+                                   int64_t *refcount_table_size);
+ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+-Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+-                                                Error **errp);
++bool qcow2_get_bitmap_info_list(BlockDriverState *bs,
++                                Qcow2BitmapInfoList **info_list, Error **errp);
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+ int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index 8c34b2aef7..9b14c0791f 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1090,30 +1090,29 @@ static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
+ /*
+  * qcow2_get_bitmap_info_list()
+  * Returns a list of QCOW2 bitmap details.
+- * In case of no bitmaps, the function returns NULL and
+- * the @errp parameter is not set.
+- * When bitmap information can not be obtained, the function returns
+- * NULL and the @errp parameter is set.
++ * On success return true with bm_list set (probably to NULL, if no bitmaps),
++ * on failure return false with errp set.
+  */
+-Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+-                                                Error **errp)
++bool qcow2_get_bitmap_info_list(BlockDriverState *bs,
++                                Qcow2BitmapInfoList **info_list, Error **errp)
+ {
+     BDRVQcow2State *s = bs->opaque;
+     Qcow2BitmapList *bm_list;
+     Qcow2Bitmap *bm;
+-    Qcow2BitmapInfoList *list = NULL;
+-    Qcow2BitmapInfoList **plist = &list;
+ 
+     if (s->nb_bitmaps == 0) {
+-        return NULL;
++        *info_list = NULL;
++        return true;
+     }
+ 
+     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+                                s->bitmap_directory_size, errp);
+-    if (bm_list == NULL) {
+-        return NULL;
++    if (!bm_list) {
++        return false;
+     }
+ 
++    *info_list = NULL;
++
+     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+         Qcow2BitmapInfo *info = g_new0(Qcow2BitmapInfo, 1);
+         Qcow2BitmapInfoList *obj = g_new0(Qcow2BitmapInfoList, 1);
+@@ -1121,13 +1120,13 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+         info->name = g_strdup(bm->name);
+         info->flags = get_bitmap_info_flags(bm->flags & ~BME_RESERVED_FLAGS);
+         obj->value = info;
+-        *plist = obj;
+-        plist = &obj->next;
++        *info_list = obj;
++        info_list = &obj->next;
+     }
+ 
+     bitmap_list_free(bm_list);
+ 
+-    return list;
++    return true;
+ }
+ 
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
+diff --git a/block/qcow2.c b/block/qcow2.c
+index 10175fa399..eb7c82120c 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -5056,12 +5056,10 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
+     BDRVQcow2State *s = bs->opaque;
+     ImageInfoSpecific *spec_info;
+     QCryptoBlockInfo *encrypt_info = NULL;
+-    Error *local_err = NULL;
+ 
+     if (s->crypto != NULL) {
+-        encrypt_info = qcrypto_block_get_info(s->crypto, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        encrypt_info = qcrypto_block_get_info(s->crypto, errp);
++        if (!encrypt_info) {
+             return NULL;
+         }
+     }
+@@ -5078,9 +5076,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
+         };
+     } else if (s->qcow_version == 3) {
+         Qcow2BitmapInfoList *bitmaps;
+-        bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (!qcow2_get_bitmap_info_list(bs, &bitmaps, errp)) {
+             qapi_free_ImageInfoSpecific(spec_info);
+             qapi_free_QCryptoBlockInfo(encrypt_info);
+             return NULL;
+-- 
+2.21.3
 
 
