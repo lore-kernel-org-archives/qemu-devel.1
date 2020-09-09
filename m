@@ -2,89 +2,119 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DABE7C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D619EC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:37:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77192215A4
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:37:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E7873207DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:37:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QL+NyviU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77192215A4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ePTayoSc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7873207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFvbk-0007Um-C4
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:37:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39812)
+	id 1kFvbr-0007hn-20
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:37:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kFvaL-00058M-NQ
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:36:10 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:34932)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <haibo.xu@linaro.org>)
- id 1kFvaJ-0006hg-Gk
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:36:09 -0400
-Received: by mail-il1-x142.google.com with SMTP id l4so1571793ilq.2
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 01:36:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8lmo7B52MqzvZ9+E1/DhpswZ0QiEmoM8ELNnZhLo2Xk=;
- b=QL+NyviULWLnjj7hTQXkWtx4jgQ+JOes4JcUbtPq/brotTsvswesOXE2G2jQaD5OjA
- r6b2jK0/sTz1e6kO1umILifpoxteaaGVrfJbBmRhYtvnUzdS6GFu8vL7hFnsZ2L68A0Q
- ecQlXc3MlLbv07V3I5xpghTJ6MJ6Pk/TTsbkzq2WYsxufLCWz8gnotuI4z+HakQ7SKay
- iFH1rBtg+PWO120xyNzeD4HJ+RZE7PcRNk2k9iUfqtbGyCiS8T64jj3+qzWkq6f+ZdEJ
- msvrRUcqJT1coZUAxsPap6c9LcsPQrcPouUHVVldIhWAv9e3sO7KhD+qwHkafFl/LK9J
- N4ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8lmo7B52MqzvZ9+E1/DhpswZ0QiEmoM8ELNnZhLo2Xk=;
- b=M3FQyxOVDuCR4DZ8lF15lZHEViMazD913aRd5vsx54R2402e2dRumftp4GW1nfgidH
- FAxmZKTKVyRptKm3CWBNYZqNBWjVOjiK+j3LYLOxuIy1U1X5yget13ke0sJhzwdb1HWZ
- uqA7c8hTIi7cVXClhjBoWS1/neQVj7XZQ/jG7DVThOOewxitZsOG6X0G7/3VBvdrcfiB
- UacsluHGqsOK/BK0ry/6aXzkNVIJ5Eef73F0lNaqvXd50NozLjrVmanbZ+e1KSwYJirk
- MWcQAYNg9eirEZhwcj7qjXmxZB4JtVf1Rvu23lEk4ak9KPrWLGLd+vL74yMaDr/vzD/P
- ca8w==
-X-Gm-Message-State: AOAM530HppE/B7SKNj6hkM5/gK2soYq0T7/pWogDXMinNsyHJC0IsBkN
- EQSLNZTZYPcP5tnA/6th5KY1xEW/BHqg87KvzE9s
-X-Google-Smtp-Source: ABdhPJxJkhz45iKwJ4R/kqIKtVA8PqMAaX0hcUiHD30vUZo18nkJH4Gx/Xv7GJzGMSEUOemA8Gj9JEUNgaMrlQxw8QU=
-X-Received: by 2002:a05:6e02:dd3:: with SMTP id
- l19mr2813667ilj.233.1599640565561; 
- Wed, 09 Sep 2020 01:36:05 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
+ id 1kFvb5-0006P0-RX
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:36:55 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:60070
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
+ id 1kFvb4-0006ol-1n
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:36:55 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 0898WlIn061921
+ for <qemu-devel@nongnu.org>; Wed, 9 Sep 2020 04:36:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=XnwGrHnz0hjw33T/1VOH9Vlm1yuq9nK2dVtIqO8326M=;
+ b=ePTayoScSNM/shFNNrnOaU8UDjihzv9rSGCQstGh9I+VGKJS8cCub2mhEc4Meip+cS1l
+ qzAkG0hMjaa7qituIn6SfHkLj1Kb9rk8tJMTsXwTaTFPDFe+dUzf55Vglj6STI7bHQIZ
+ CHhYyLu7Z6WdzOGqSuXx2UZ/zVN9C16NODeOm2JHLqGAX6KyIkF2YGdkXV9WjUvBdBHn
+ GgTtZW6IeajT1U0uTKPVWXKkZOQpHxhJ3vX84HKLbSYpKIPPf5Rx5/B7kxQ6WsKJ00oT
+ i9njRbGMni4df7GXgG2is/khyiP9/um7PdTkerkaOzHMkMAZuPvUgTOWvPcr64mmJLAS vQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33et9uasmu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+ for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 04:36:52 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0898XmCs065497
+ for <qemu-devel@nongnu.org>; Wed, 9 Sep 2020 04:36:52 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 33et9uasmm-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 09 Sep 2020 04:36:52 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0898RVEu002300;
+ Wed, 9 Sep 2020 08:36:51 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma04wdc.us.ibm.com with ESMTP id 33c2a8wv4v-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 09 Sep 2020 08:36:51 +0000
+Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
+ [9.57.199.110])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 0898apEY53608858
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 9 Sep 2020 08:36:51 GMT
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3E68DAE05C;
+ Wed,  9 Sep 2020 08:36:51 +0000 (GMT)
+Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1AE2FAE062;
+ Wed,  9 Sep 2020 08:36:51 +0000 (GMT)
+Received: from amdrome1.watson.ibm.com (unknown [9.2.130.16])
+ by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
+ Wed,  9 Sep 2020 08:36:51 +0000 (GMT)
+From: Dov Murik <dovmurik@linux.vnet.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/2] hw/timer/hpet: Remove unused functions hpet_ram_readb,
+ hpet_ram_readw
+Date: Wed,  9 Sep 2020 08:36:49 +0000
+Message-Id: <20200909083650.46771-2-dovmurik@linux.vnet.ibm.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200909083650.46771-1-dovmurik@linux.vnet.ibm.com>
+References: <20200909083650.46771-1-dovmurik@linux.vnet.ibm.com>
 MIME-Version: 1.0
-References: <cover.1599549462.git.haibo.xu@linaro.org>
- <26b4ace9ea3c5b43d14802d6fc5ceea90befbcc8.1599549462.git.haibo.xu@linaro.org>
- <20200908113253.b6owlcu62hypp6aw@kamzik.brq.redhat.com>
-In-Reply-To: <20200908113253.b6owlcu62hypp6aw@kamzik.brq.redhat.com>
-From: Haibo Xu <haibo.xu@linaro.org>
-Date: Wed, 9 Sep 2020 16:35:54 +0800
-Message-ID: <CAJc+Z1Fh6AkQ=b4C=SFHRE9R2gRmMM-qpL7qpkGoOZX1mF98wA@mail.gmail.com>
-Subject: Re: [PATCH v2 10/12] target/arm/cpu: spe: Enable spe to work with
- host cpu
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=haibo.xu@linaro.org; helo=mail-il1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-09_03:2020-09-08,
+ 2020-09-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 mlxlogscore=983
+ bulkscore=0 impostorscore=0 phishscore=0 clxscore=1011 spamscore=0
+ priorityscore=1501 lowpriorityscore=0 suspectscore=1 adultscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009090073
+Received-SPF: none client-ip=148.163.158.5;
+ envelope-from=dovmurik@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 02:27:07
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,164 +127,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com, qemu-arm@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Peter Maydell <peter.maydell@linaro.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Dov Murik <dovmurik@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 8 Sep 2020 at 19:33, Andrew Jones <drjones@redhat.com> wrote:
->
-> On Tue, Sep 08, 2020 at 08:13:28AM +0000, Haibo Xu wrote:
-> > Turn on the spe cpu property by default if host cpu
-> > support it, i.e. we can now do '-cpu max|host' to add
-> > the vSPE, and '-cpu max|host,spe=off' to remove it.
-> >
-> > Signed-off-by: Haibo Xu <haibo.xu@linaro.org>
-> > ---
-> >  target/arm/cpu.c   |  3 +++
-> >  target/arm/cpu.h   |  2 ++
-> >  target/arm/cpu64.c |  7 ++++++-
-> >  target/arm/kvm64.c | 12 ++++++++++++
-> >  4 files changed, 23 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/target/arm/cpu.c b/target/arm/cpu.c
-> > index 786cc6134c..58f12d6eb5 100644
-> > --- a/target/arm/cpu.c
-> > +++ b/target/arm/cpu.c
-> > @@ -2271,6 +2271,9 @@ static void arm_host_initfn(Object *obj)
-> >      kvm_arm_set_cpu_features_from_host(cpu);
-> >      if (arm_feature(&cpu->env, ARM_FEATURE_AARCH64)) {
-> >          aarch64_add_sve_properties(obj);
-> > +
-> > +        cpu->has_spe = ON_OFF_AUTO_AUTO;
-> > +        aarch64_add_spe_properties(obj);
->
-> Why not put the assignment of has_spe into aarch64_add_spe_properties()?
->
+Fix compiler error about defined but not used functions when compiling
+with -DHPET_DEBUG by deleting the unused debug functions hpet_ram_readb
+and hpet_ram_readw.
 
-Yes, it could be. Will fix it in v3.
+Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
+---
+ hw/timer/hpet.c | 14 --------------
+ 1 file changed, 14 deletions(-)
 
-> >      }
-> >      arm_cpu_post_init(obj);
-> >  }
-> > diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-> > index 395a1e5df8..5a3ea876c8 100644
-> > --- a/target/arm/cpu.h
-> > +++ b/target/arm/cpu.h
-> > @@ -1040,6 +1040,7 @@ void aarch64_sve_narrow_vq(CPUARMState *env, unsigned vq);
-> >  void aarch64_sve_change_el(CPUARMState *env, int old_el,
-> >                             int new_el, bool el0_a64);
-> >  void aarch64_add_sve_properties(Object *obj);
-> > +void aarch64_add_spe_properties(Object *obj);
-> >
-> >  /*
-> >   * SVE registers are encoded in KVM's memory in an endianness-invariant format.
-> > @@ -1071,6 +1072,7 @@ static inline void aarch64_sve_change_el(CPUARMState *env, int o,
-> >                                           int n, bool a)
-> >  { }
-> >  static inline void aarch64_add_sve_properties(Object *obj) { }
-> > +static inline void aarch64_add_spe_properties(Object *obj) { }
-> >  #endif
-> >
-> >  #if !defined(CONFIG_TCG)
-> > diff --git a/target/arm/cpu64.c b/target/arm/cpu64.c
-> > index 4997c4a3c0..d38c55e2ca 100644
-> > --- a/target/arm/cpu64.c
-> > +++ b/target/arm/cpu64.c
-> > @@ -621,6 +621,11 @@ static void arm_spe_set(Object *obj, bool value, Error **errp)
-> >      ARM_CPU(obj)->has_spe = value ? ON_OFF_AUTO_ON : ON_OFF_AUTO_OFF;
-> >  }
-> >
-> > +void aarch64_add_spe_properties(Object *obj)
-> > +{
-> > +    object_property_add_bool(obj, "spe", arm_spe_get, arm_spe_set);
-> > +}
-> > +
-> >  /* -cpu max: if KVM is enabled, like -cpu host (best possible with this host);
-> >   * otherwise, a CPU with as many features enabled as our emulation supports.
-> >   * The version of '-cpu max' for qemu-system-arm is defined in cpu.c;
-> > @@ -772,7 +777,7 @@ static void aarch64_max_initfn(Object *obj)
-> >                          cpu_max_set_sve_max_vq, NULL, NULL);
-> >
-> >      cpu->has_spe = ON_OFF_AUTO_AUTO;
-> > -    object_property_add_bool(obj, "spe", arm_spe_get, arm_spe_set);
-> > +    aarch64_add_spe_properties(obj);
->
-> If TCG doesn't support this cpu feature then this should be in the
-> kvm_enabled() part of this function.
->
->
+diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+index 380acfa7c8..b683f64f1d 100644
+--- a/hw/timer/hpet.c
++++ b/hw/timer/hpet.c
+@@ -416,20 +416,6 @@ static void hpet_del_timer(HPETTimer *t)
+     update_irq(t, 0);
+ }
+ 
+-#ifdef HPET_DEBUG
+-static uint32_t hpet_ram_readb(void *opaque, hwaddr addr)
+-{
+-    printf("qemu: hpet_read b at %" PRIx64 "\n", addr);
+-    return 0;
+-}
+-
+-static uint32_t hpet_ram_readw(void *opaque, hwaddr addr)
+-{
+-    printf("qemu: hpet_read w at %" PRIx64 "\n", addr);
+-    return 0;
+-}
+-#endif
+-
+ static uint64_t hpet_ram_read(void *opaque, hwaddr addr,
+                               unsigned size)
+ {
+-- 
+2.20.1
 
-Will fix it in v3.
-
-> >  }
-> >
-> >  static const ARMCPUInfo aarch64_cpus[] = {
-> > diff --git a/target/arm/kvm64.c b/target/arm/kvm64.c
-> > index 5a2032fc9e..3f0a09c05b 100644
-> > --- a/target/arm/kvm64.c
-> > +++ b/target/arm/kvm64.c
-> > @@ -515,6 +515,7 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-> >       */
-> >      int fdarray[3];
-> >      bool sve_supported;
-> > +    bool spe_supported;
-> >      uint64_t features = 0;
-> >      uint64_t t;
-> >      int err;
-> > @@ -655,6 +656,8 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-> >      }
-> >
-> >      sve_supported = ioctl(fdarray[0], KVM_CHECK_EXTENSION, KVM_CAP_ARM_SVE) > 0;
-> > +    spe_supported = ioctl(fdarray[0], KVM_CHECK_EXTENSION,
-> > +                                      KVM_CAP_ARM_SPE_V1) > 0;
-> >
-> >      kvm_arm_destroy_scratch_host_vcpu(fdarray);
-> >
-> > @@ -668,6 +671,11 @@ bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
-> >          t = FIELD_DP64(t, ID_AA64PFR0, SVE, 1);
-> >          ahcf->isar.id_aa64pfr0 = t;
-> >      }
-> > +    if (!spe_supported) {
-> > +        t = ahcf->isar.id_aa64dfr0;
-> > +        t = FIELD_DP64(t, ID_AA64DFR0, PMSVER, 0);
-> > +        ahcf->isar.id_aa64dfr0 = t;
-> > +    }
-> >
->
-> If this works then there's a bug with the KVM implementation. get-one-reg
-> shouldn't expose SPE unless userspace has enabled it, which we're not
-> doing on the scratch vcpu. That's why we set, not clear, the ID bits for
-> SVE.
->
->
-
-You are right. I have printed the returned field, and it's 0.
-Thanks for pointing this out, I will fix it in v3.
-
-Regards,
-Haibo
-
-> >      /*
-> >       * We can assume any KVM supporting CPU is at least a v8
-> > @@ -830,6 +838,10 @@ int kvm_arch_init_vcpu(CPUState *cs)
-> >          assert(kvm_arm_sve_supported());
-> >          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SVE;
-> >      }
-> > +    if (cpu_isar_feature(aa64_spe, cpu)) {
-> > +        assert(kvm_arm_spe_supported());
-> > +        cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_SPE_V1;
-> > +    }
-> >
-> >      /* Do KVM_ARM_VCPU_INIT ioctl */
-> >      ret = kvm_arm_vcpu_init(cs);
-> > --
-> > 2.17.1
-> >
->
-> Thanks,
-> drew
->
 
