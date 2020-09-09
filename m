@@ -4,41 +4,40 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB71CC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:32:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC31C10DAA
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:35:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 502B121532
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:32:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 502B121532
+	by mail.kernel.org (Postfix) with ESMTPS id 13FC52087C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:35:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13FC52087C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG0Cg-0004ra-Bj
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:32:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34400)
+	id 1kG0Fx-0006Yy-SO
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:35:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG0BZ-0003nh-Ma; Wed, 09 Sep 2020 09:30:53 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:52795)
+ id 1kG0F4-0005kC-L3; Wed, 09 Sep 2020 09:34:30 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:40521)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG0BX-0005dL-SK; Wed, 09 Sep 2020 09:30:53 -0400
+ id 1kG0F2-0005wn-SF; Wed, 09 Sep 2020 09:34:30 -0400
 Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MNwXA-1jri2h3ADY-00OG8a; Wed, 09 Sep 2020 15:30:47 +0200
-Subject: Re: [PATCH 2/2] hw/gpio/max7310: Replace disabled printf() by
- qemu_log_mask(UNIMP)
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MJVU0-1jw7uB0KrY-00Jp9e; Wed, 09 Sep 2020 15:34:23 +0200
+Subject: Re: [PATCH 2/2] hw/timer/hpet: Fix DPRINTF format string
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
-References: <20200901104234.92159-1-f4bug@amsat.org>
- <20200901104234.92159-3-f4bug@amsat.org>
+References: <20200903134506.440082-1-philmd@redhat.com>
+ <20200903134506.440082-3-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <be971075-e3c6-627a-e330-256a3342e3cb@vivier.eu>
-Date: Wed, 9 Sep 2020 15:30:46 +0200
+Message-ID: <dde28c3d-d3a4-eaae-9839-a65307e4336c@vivier.eu>
+Date: Wed, 9 Sep 2020 15:34:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200901104234.92159-3-f4bug@amsat.org>
+In-Reply-To: <20200903134506.440082-3-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:f30uoKL3byF7T+7ybgEjjlErwyvlXNo1LHlZCuRj+cx3QIB1A/C
- T1BKgJttLdPqJzwx/gVNwxMnxUITmuq42TSecD6v2exlZGOByQSFfHTOg5DnZ6oh3Hkj2F9
- wJrQfqrawbaaRVDbGcoIRMHyATZKQC1mAmEvwZjSWcvORdNErWpqVwHgwgFefAOfBq3He4y
- QQzqfok1TKLRo2ra4+NTQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:wvFvDnsiVE8=:QZhKIzB2qDu0Y+cB57K8Vp
- nEyslDAHPPEJmpEBlJmyeCLJMtOZ3unWes07ErMfINvg2xFRXPjoTzZ0tObpLvo2Nl8/zD3SA
- YKrT1xX8Ebsgpy9qiaqjv4fQRaaqYS3CS7sinTFD9RdSkAGfLsRezAOxeAYcRtgHOJ42GBaOF
- mKK+JsO/CDGwB+XL2JFi2hPwhMeOQafEjICzPEeUaIeb8QbO6K/ucU9fLjNjkawzHFfmoe6fq
- VGLB/pUOaXXRVQ67M6+cAer85UKvoFKUzY/KFJbkzbzUGEsaIhEaaipEZRr3KgrxriBpnvB0S
- WzOtQYjVt+JtzvhiQHZFaJ/zU+p7jkAauYA2vvKFz3HFS55mNIHcHWOTaWguJ/3pZgyHkrAbw
- MLmEWUilo8I5vvp9aJ7/YeblAjx3b41S+Xl0aeHmhtjMxsCuEypIPJNyZ6+8zRA7QDd+923C7
- /JReix25rT8B2nBeXK3L5et6T+63e/f6HvWvStIt7mVHAOVLzX+837BJqyeweZJRZOOfR3r9e
- jfFVlQspXfbcRsVhSd86NWvQrxoEj8WppJi/FapMrGu9pSCS9vqdYQk2qaRABEB5JDP2lXKlJ
- U46twBBPUt8MEIixi8WP3WQ5ESuGYtLAkqZEZgnc7UHHNiqKuVJ22VzRJni6BcTPrYQsv+lSV
- FBg6GWM5qR1bNZ3Jx0mGfGJUlxi/RBa2Ap1NW/+hkhqhjVFWTh1W0lpuDCQPwa1bH8j+co8Xp
- PIssm/MtzwPOEyoB0pAPT/sB91kWGM5uOJqOjqgvulnJjbAdZ1jKaYUnJvEJoX2h4SLqBYGdo
- oHsvDQ+yQYujbitJ+Up1zeJAvnLQlo1B7Va82I3cvGT//mGMMm8TAoTmXLvc0mib6VA5Tfh
-Received-SPF: none client-ip=212.227.126.131; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:0bdvnudVIuZgHzpA3SVgIVes0ATvCY/PolJIy4Nktp4PadoP0Ex
+ KD+lYGSQB6/HLLEipBD0gHvJz7ej3855IIgTeqBtmAE5seJCXSTk8C7UNRdLYwpjElY6srk
+ Fv90lSAzfjCIsvr7lvhMD01k3/6NvRydet7jhBA68SHZ2x7VW7XWlJYEqFsgzNURfTfZg5Z
+ 4ktdDCRKWu2Wmz5MgTPbQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zz6/YvUu01g=:lJvocgt9zAIUKvROQcntK4
+ PDoRZYrTHK1Lknlu8mnAeKnmGG70b1xHprtz72QUov3xETONKwU4fnt0i9LnmO62CIDP2XJtd
+ O5Aw3V9/QN9ezLS+SIr6q8K+rF/U1JrfkB5GMNUNzCn051YOerWMK5epk+SmrRubnNdPXnx+l
+ 3rPAJtKXdCdXDUA19Ndjh99tVr2NturdFH2ugpPVl7I7fa1i7kFeOVTUedDwUn9BKXHu95o4e
+ 4kbZtCC5Kqv+vgO715OvqA9hAIfPEYVj8cF1sicxhIAHeNvMzLCCBOugviWk2FDPHgdfpYjVV
+ 8tHfuHH6Ri4UDwDeonLVp0dPVrDeqM7wKU1JjS85ACR0PdjRHcXaUCOyPwATrSim00RyMi6Zf
+ x6EmIOqB3ZA2A8oML0lcwGH5E4JiejKxq1iWaIHFTmxnyzlkIZ1GPTAhB+FZLY6POnvWC8U0L
+ yZLGuDIciCGdBkG/5n2gLD0aJQRk68cMnqqyXcVgMxVpV49zEE/H0gr3XgOI7bol2Wp6JVT2l
+ +lZA0aWdy7X535sbxswTvzpl8BLsmnir5tySTtuX5qkpwkwp+zgKe2ySRpUA26KbfL2Ec2NNx
+ fwUz0rDMPPGq5KD2gRZXf8FSbyOtjcwatE0wgV9U0AE8nlWcgPXj4QtS/ijYI12hVXHwLCZij
+ 2SpNIf/6kF1YFe28O1Ww/5TiDGswxsET64Dd9jBqXWLsqACTzpW/UciVWf8f5JzzPe9Z+Sgun
+ +lnGJCLj9q4UBQ1fK2efPSjAXZOZwY+J2cIO1OFxAVpSshUf+IAAsJmH6wchBorl3qUaWia58
+ 5Mgb+Ot6P2WZNEGMLC5ptRWkNQ0Z+rTpWvOCD1dA6tDS7U2imE3QLSj3Q1AO1gC68Kc1JgR
+Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:27:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:34:27
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
 X-Spam_score_int: -54
 X-Spam_score: -5.5
 X-Spam_bar: -----
@@ -130,56 +129,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- qemu-arm@nongnu.org
+Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 01/09/2020 à 12:42, Philippe Mathieu-Daudé a écrit :
-> Replace disabled printf() by qemu_log_mask(UNIMP).
+Le 03/09/2020 à 15:45, Philippe Mathieu-Daudé a écrit :
+> Fix building with HPET_DEBUG enabled:
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>   hw/timer/hpet.c:512:73: error: format specifies type 'unsigned int' but the argument has type 'uint64_t' (aka 'unsigned long') [-Werror,-Wformat]
+>       DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n", addr, value);
+>                                                             ~~~           ^~~~~
+>                                                             %#lx
+>   hw/timer/hpet.c:655:21: error: format specifies type 'unsigned int' but the argument has type 'uint64_t' (aka 'unsigned long') [-Werror,-Wformat]
+>                       value, s->hpet_counter);
+>                       ^~~~~
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
->  hw/gpio/max7310.c | 11 +++++------
->  1 file changed, 5 insertions(+), 6 deletions(-)
+> Keep trace-events conversion as ByteSizeTask.
+> ---
+>  hw/timer/hpet.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/hw/gpio/max7310.c b/hw/gpio/max7310.c
-> index 7f5de189acf..c58a1996418 100644
-> --- a/hw/gpio/max7310.c
-> +++ b/hw/gpio/max7310.c
-> @@ -11,6 +11,7 @@
->  #include "hw/i2c/i2c.h"
->  #include "hw/irq.h"
->  #include "migration/vmstate.h"
-> +#include "qemu/log.h"
->  #include "qemu/module.h"
+> diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
+> index b683f64f1d3..8115e42cff3 100644
+> --- a/hw/timer/hpet.c
+> +++ b/hw/timer/hpet.c
+> @@ -495,7 +495,7 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
+>      HPETState *s = opaque;
+>      uint64_t old_val, new_val, val, index;
 >  
->  #define TYPE_MAX7310 "max7310"
-> @@ -69,9 +70,8 @@ static uint8_t max7310_rx(I2CSlave *i2c)
->          return 0xff;
->  
->      default:
-> -#ifdef VERBOSE
-> -        printf("%s: unknown register %02x\n", __func__, s->command);
-> -#endif
-> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported register 0x02%" PRIx8 "\n",
-> +                      __func__, s->command);
->          break;
->      }
->      return 0xff;
-> @@ -123,9 +123,8 @@ static int max7310_tx(I2CSlave *i2c, uint8_t data)
->      case 0x00:	/* Input port - ignore writes */
->          break;
->      default:
-> -#ifdef VERBOSE
-> -        printf("%s: unknown register %02x\n", __func__, s->command);
-> -#endif
-> +        qemu_log_mask(LOG_UNIMP, "%s: Unsupported register 0x02%" PRIx8 "\n",
-> +                      __func__, s->command);
->          return 1;
->      }
->  
+> -    DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n", addr, value);
+> +    DPRINTF("qemu: Enter hpet_ram_writel at 0x%" HWADDR_PRIx " = 0x%#"PRIx64"\n", addr, value);
+>      index = addr;
+>      old_val = hpet_ram_read(opaque, addr, 4);
+>      new_val = value;
+> @@ -637,7 +637,7 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
+>              }
+>              s->hpet_counter =
+>                  (s->hpet_counter & 0xffffffff00000000ULL) | value;
+> -            DPRINTF("qemu: HPET counter written. ctr = %#x -> %" PRIx64 "\n",
+> +            DPRINTF("qemu: HPET counter written. ctr = %#" PRIx64 " -> %" PRIx64 "\n",
+>                      value, s->hpet_counter);
+>              break;
+>          case HPET_COUNTER + 4:
+> @@ -646,7 +646,7 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
+>              }
+>              s->hpet_counter =
+>                  (s->hpet_counter & 0xffffffffULL) | (((uint64_t)value) << 32);
+> -            DPRINTF("qemu: HPET counter + 4 written. ctr = %#x -> %" PRIx64 "\n",
+> +            DPRINTF("qemu: HPET counter + 4 written. ctr = %#" PRIx64 " -> %" PRIx64 "\n",
+>                      value, s->hpet_counter);
+>              break;
+>          default:
 > 
 
 Applied to my trivial-patches branch.
