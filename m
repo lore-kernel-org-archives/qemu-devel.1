@@ -2,135 +2,110 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E22C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85165C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:24:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF740206D4
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED38121532
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:24:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="FKPXLaeE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF740206D4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ECGA1fqU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED38121532
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53758 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG3nv-00073E-UO
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 13:22:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43890)
+	id 1kG3pu-00018q-RQ
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 13:24:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45238)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
- id 1kG3nF-00060a-Pi; Wed, 09 Sep 2020 13:22:01 -0400
-Received: from mail-dm6nam12on2060.outbound.protection.outlook.com
- ([40.107.243.60]:62977 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>)
- id 1kG3nD-0007u6-M4; Wed, 09 Sep 2020 13:22:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hzrz1x2rjyUQSBW/zebVCAIXtGIExtD86b23/takTdTrWdKbAOKuOaNkHAyBDXohw5nHkMZ27gscLbiRe/R0qa66BI6vGrgqclPaV1iG+fhI7VnkzLeg5HCfY5nUVpJEeftmahxQ8uQwGLercN7zWTwpfVbMtW8FoicAnOo9aR1+st/76gNiRJsHG8VWPplujYzwZqURO+72aAtShO4CGkCBax7nWaBsGIQT3Kk0nH5rKlj2npCW63hjhgCCsPkeRQkStpDzef6WCG6NEj9jl0jRHFABhBmr9pmWn+zWPD0WK3aM6fKSTYLWi5+h6BXBWfovGekoogYEcbSca5Q3ig==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jJzX9TT1Nyn3jONRB715iQIXOymvGJ4WH8zDas8d42k=;
- b=MTGlCJ5aNcNUYutk52nWo0AXk+A2hKiU5QFdIWcX8VmkQ2ek2mkOIP40+pkGZaSyq1KPpDevBUslpks+hDT25EkhMSLrbhBqERpcuFZ3AKc/cZUk8/uuJo08pZD9LyzHT09jiwXd5qbb+DBHectrOpPy7QSav4UTATbbA8TAtocw9tcxaa5ByGu1214wmcBdMzbEuaCstk2T8EVCL0ERXEL9sO6acanMiDGVkgQz9qbi3hd7C3R/t4r4X9uKOtr1rno50emicfqcbea/OyXFO2Lcat08hQyjgs2VLK1n6WnLJZ/U2B5Wpai5ohvzUy6ORX5b093nJxWD0auGu4AJ+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=gmail.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jJzX9TT1Nyn3jONRB715iQIXOymvGJ4WH8zDas8d42k=;
- b=FKPXLaeEc+BygMW7ZxE2/LNw6jpFjACOMjmw4gQMpUq3s+nFdn3oRuQaVSzCVY7fe9eAVuFYfyqJQATenR3ju3+x5s4FZ3E17lMJEvjNpmvb04uMgB/fCxXHFICzSKjdhCeBLt8vHDqFYby5Yon46x8aNNygCpPfWQwBWC9KExs=
-Received: from BL0PR02CA0034.namprd02.prod.outlook.com (2603:10b6:207:3c::47)
- by DM6PR02MB6494.namprd02.prod.outlook.com (2603:10b6:5:208::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15; Wed, 9 Sep
- 2020 17:21:54 +0000
-Received: from BL2NAM02FT046.eop-nam02.prod.protection.outlook.com
- (2603:10b6:207:3c:cafe::2d) by BL0PR02CA0034.outlook.office365.com
- (2603:10b6:207:3c::47) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3348.15 via Frontend
- Transport; Wed, 9 Sep 2020 17:21:54 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT046.mail.protection.outlook.com (10.152.76.118) with Microsoft SMTP
- Server id 15.20.3348.17 via Frontend Transport; Wed, 9 Sep 2020 17:21:54
- +0000
-Received: from [149.199.38.66] (port=59756 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <edgar@xilinx.com>)
- id 1kG3mr-000725-A4; Wed, 09 Sep 2020 10:21:37 -0700
-Received: from [127.0.0.1] (helo=localhost)
- by smtp.xilinx.com with smtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kG3n7-0001BU-AM; Wed, 09 Sep 2020 10:21:53 -0700
-Received: from [10.71.116.235] (helo=localhost)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kG3mz-00019t-PF; Wed, 09 Sep 2020 10:21:45 -0700
-Date: Wed, 9 Sep 2020 19:21:40 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
-Subject: Re: [PATCH v1 1/1] hw/arm: versal-virt: Correct the tx/rx GEM clocks
-Message-ID: <20200909172140.GH14249@toto>
-References: <20200909161514.622998-1-edgar.iglesias@gmail.com>
- <20200909161514.622998-2-edgar.iglesias@gmail.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kG3oo-0008B2-PT
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:23:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20154)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kG3om-0008J0-Kh
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:23:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599672215;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=AYiZgi4h+6eqgd3gj/RTG+eBMdIlEzpVOebQ8c0fUE0=;
+ b=ECGA1fqUwd4nKVSPr1MbXbQXQtUY9uQG2zB6FjW7VudrFbdAk8yKna4buCuiF1Z5uq4+3P
+ aepZ6YzpFH9EyPwJuLe+n/a5he9nWV31EWvKnMU+hrCr31+HkmeDMcLeYuJN4gHY5TVqCW
+ fSNBNUFJByiq+DM+mSfIbhdgMTLMJVs=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-Apsg8j-ZMBOmCaefQqKpdQ-1; Wed, 09 Sep 2020 13:23:31 -0400
+X-MC-Unique: Apsg8j-ZMBOmCaefQqKpdQ-1
+Received: by mail-ed1-f69.google.com with SMTP id y21so1293767edu.23
+ for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 10:23:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to;
+ bh=1p3ZwIpTH3dPYY8PdxWi0EMg1fRWGbTZDs6CU9KkMdo=;
+ b=RSw43i1YTZgSRRzbM8rQelinNZM5irtt08EbKexvIYWXtlHmSPNenWCVbetTacOijo
+ D30uwqonywiWC/k8VX766ms+/yBBjzxECvJ3qrSx0i3ho4wa6lkhFXBqSwNLjguViJtl
+ 6D3ChuhHF/+OCj2K2ZKTxj5T0rnPcRb8N2Nnytucj2s1jOfD7IgDqVlDhbBgTU4IKMRK
+ iVJAus7D0vpn4U8qLVNa55Mz1Uw0o5j6pTjph3sBciHymKA9nODjBuIsLV68QxE+usqs
+ gMQiYu5let3JO/2V4teRxCjwJ94s8UmJlh4v6Y8V0TN+79bZIkFgeNlPbo9+HnylWfq4
+ KK/A==
+X-Gm-Message-State: AOAM531RJyTBD1Ari05t0TdISJvKzDR6SeIZTN2vgowWZnEBAOZu/cLQ
+ nxz831QSjGkgVSJ3ynwXBkB3jCch6+wE/NZCINerhxRNlx7lPr45wXY92/sz8L4tQkoutTv/eNQ
+ DKA1eLZ0Av00ZJhU=
+X-Received: by 2002:a05:6402:1353:: with SMTP id
+ y19mr5291430edw.71.1599672209786; 
+ Wed, 09 Sep 2020 10:23:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz4ssz4Q0QjqGwquAwPJ4F0RYg11yKDGuezlYvVrLjFlAq3vLDty1CTQhf2FN1HKaf2+Tn8UA==
+X-Received: by 2002:a05:6402:1353:: with SMTP id
+ y19mr5291410edw.71.1599672209539; 
+ Wed, 09 Sep 2020 10:23:29 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:37de:1d96:8ea2:b59a?
+ ([2001:b07:6468:f312:37de:1d96:8ea2:b59a])
+ by smtp.gmail.com with ESMTPSA id k16sm3109722ejg.64.2020.09.09.10.23.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 09 Sep 2020 10:23:28 -0700 (PDT)
+Subject: Re: [PATCH v4 2/2] rcu: add uninit destructor for rcu
+To: Stefan Hajnoczi <stefanha@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>
+References: <20200908151052.713-1-luoyonggang@gmail.com>
+ <20200908151052.713-3-luoyonggang@gmail.com>
+ <20200909084107.GE12090@stefanha-x1.localdomain>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <ef674b21-cdad-9aea-662e-315006438ed4@redhat.com>
+Date: Wed, 9 Sep 2020 19:23:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200909161514.622998-2-edgar.iglesias@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: b037fdb0-2cfa-4369-3a5b-08d854e4d94e
-X-MS-TrafficTypeDiagnostic: DM6PR02MB6494:
-X-Microsoft-Antispam-PRVS: <DM6PR02MB6494FDC3A2C526A2453127EDC2260@DM6PR02MB6494.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:7219;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 1AIdVe6xbmSg820wHchMGj3sCkZhNRU/AvZAWfFaur9F/tHaHGtJJPlleVGKhUW0t68uNXYwZtEyDULlVIS5H8DbtlwM0LNMoEEc7vbljYX2TVqFRoIoxuUcwvqR0NWlID/H08cr3geABlNe7wjy+86bEXspmEp7Awj7PIO9I0vn1/gtdalNRnghoLWSVJniH2jhfy1B5U2H1R3nYF1vODavMS23Y7h1Ny6ohpchkSxkrycoHjwXZeZNgg2bR4c41Z7bYlMwAUkxTh5LBEoa1oIG7lmluTPspj9ZfIzRd8GyQer5/oZoMwsGAFEzqTc2fiCwtiKbWWW4o39cyL+CDefuUC80apROB3Vtf/wtGSjnP7bBiKE6PTBeItRuTF5Wr1kv1/IHDK3Xie+sIG9zGg==
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(7916004)(396003)(376002)(346002)(136003)(39860400002)(46966005)(107886003)(33656002)(26005)(186003)(8676002)(81166007)(82740400003)(47076004)(8936002)(33716001)(478600001)(1076003)(7416002)(5660300002)(4744005)(2906002)(70586007)(83380400001)(6916009)(70206006)(6666004)(426003)(336012)(82310400003)(316002)(4326008)(9686003)(356005)(9786002);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2020 17:21:54.7834 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b037fdb0-2cfa-4369-3a5b-08d854e4d94e
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT046.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR02MB6494
-Received-SPF: pass client-ip=40.107.243.60; envelope-from=edgar@xilinx.com;
- helo=NAM12-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 13:21:56
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200909084107.GE12090@stefanha-x1.localdomain>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="x8S9bcrW7GJ1rgPbvmqBqejHejfptio5v"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:25:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -143,25 +118,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: figlesia@xilinx.com, peter.maydell@linaro.org, sstabellini@kernel.org,
- sai.pavan.boddu@xilinx.com, frasse.iglesias@gmail.com, alistair@alistair23.me,
- qemu-devel@nongnu.org, frederic.konrad@adacore.com, qemu-arm@nongnu.org,
- philmd@redhat.com, luc.michel@greensocs.com
+Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Daniel Brodsky <dnbrdsky@gmail.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 09, 2020 at 06:15:14PM +0200, Edgar E. Iglesias wrote:
-> From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-> 
-> Correct the GEMs tx/rx clocks to use the 125Mhz fixed-clock.
-> This matches the setup with the fixed-link 100Mbit PHY.
-> I also avoids the following warnings from the Linux kernel
- ^^^
-Argh, this should say It, not I.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--x8S9bcrW7GJ1rgPbvmqBqejHejfptio5v
+Content-Type: multipart/mixed; boundary="fDS7oe3lcKUpGDgxoukzCeZ4EVWC9XcTN"
 
-I'll send a v2 keeping the RB tags.
+--fDS7oe3lcKUpGDgxoukzCeZ4EVWC9XcTN
+Content-Type: text/plain; charset=windows-1252
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-Cheers,
-Edgar
+On 09/09/20 10:41, Stefan Hajnoczi wrote:
+> On Tue, Sep 08, 2020 at 11:10:52PM +0800, Yonggang Luo wrote:
+>> This is necessary if the pending  rcu calls are closing and removing
+>> temp files. This also provide a function
+>> void rcu_wait_finished(void);
+>> to fixes test-logging.c test failure on msys2/mingw.
+>> On windows if the file doesn't closed, you can not remove it.
+>>
+>> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+>> ---
+>>  include/qemu/rcu.h   |  5 +++++
+>>  tests/test-logging.c |  2 ++
+>>  util/rcu.c           | 37 ++++++++++++++++++++++++++++++++++++-
+>>  3 files changed, 43 insertions(+), 1 deletion(-)
+> Can the new drain_call_rcu() function be used? Maxim recently posted the
+> following patch:
+> https://patchew.org/QEMU/20200831150124.206267-1-mlevitsk@redhat.com/2020=
+0831150124.206267-3-mlevitsk@redhat.com/
+>=20
+> Whether drain_call_rcu() or rcu_wait_finished() is used, please include
+> a comment in the code that documents why the wait is necessary. For
+> example, "qemu_log_close() uses RCU for its FILE pointer but Windows
+> cannot remove open files, so we need to wait for RCU here".
+>=20
+> Another option is to wait for RCU inside qemu_log_close() so that
+> callers don't need to worry about this implementation detail:
+>=20
+>   #ifdef _WIN32
+>   /* Windows cannot remove open files so we need to wait for RCU here */
+>   drain_call_rcu();
+>   #endif
+>=20
+
+In this case even synchronize_rcu() should be okay.
+
+Paolo
+
+
+--fDS7oe3lcKUpGDgxoukzCeZ4EVWC9XcTN--
+
+--x8S9bcrW7GJ1rgPbvmqBqejHejfptio5v
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEE8TM4V0tmI4mGbHaCv/vSX3jHroMFAl9ZD5QACgkQv/vSX3jH
+roP5nwf/SRSYatVuF6tGNWiB0ly3abNl3Y+n9hgjQ1bOcgK1Cuk8k3GYFPgCLJYP
+SyYh9aNfkJLBExc73BDt7VOW4PVqVvLOO8nkIISTcnAAKjARaDJvDsa28FA9Q7k1
+5LaGrvgJmqbGRc2lM9s/5wFKmzUYI+eodjHIulg2KfKNz8Yjqry5H44RdCqEm+Gj
+s8jje5pYJ6k6jUelaQkLFCRTI1Btck5jIdHQ5tXB+h/UtSgkPZvYNvoDzmxdNo6M
+Kjw9NKLZ7rHKM9uEzuUpq/QI4bz1lRBnZTmVX82+kGZowkiYiK4xRkgITFx9PCCu
+k1WuPLv0o9d8gJfXxViUEVdomhVP9A==
+=g4X0
+-----END PGP SIGNATURE-----
+
+--x8S9bcrW7GJ1rgPbvmqBqejHejfptio5v--
+
 
