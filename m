@@ -2,88 +2,89 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C533C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:53:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A06DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A296421D46
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:53:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F048121D46
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:56:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pzh7blJ6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A296421D46
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4nCYdxs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F048121D46
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60006 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG4HD-0000bg-OS
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 13:52:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42444)
+	id 1kG4L4-0003A3-V0
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 13:56:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kG4GZ-0008Bf-3j
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:52:19 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:39093)
+ id 1kG4KW-0002hu-52
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:56:24 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34905)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kG4GX-0000S9-63
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:52:18 -0400
-Received: by mail-wr1-x442.google.com with SMTP id a17so3908471wrn.6
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 10:52:16 -0700 (PDT)
+ id 1kG4KU-00015K-8Z
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:56:23 -0400
+Received: by mail-wm1-x343.google.com with SMTP id y15so3292850wmi.0
+ for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 10:56:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=cxAR6GGzSL9bTpKLyCCp/+JyGcGaHWVE6iOvZVeh4Xw=;
- b=pzh7blJ6lkAAl46AEf3xwgSZwCnPDZzCCXBVBNcBzRslxYbGxL9OVop/APuZNang8x
- t+qe0nZTa3upwzEq83j3jcSpqaZNhTuTdYp9rHUIekwqP1mnv0MgbE5XCO5EfwdcSuXO
- CnSbmOUGdjx81v6+4MsOQx1Er0890/AM5WHj4swj9MIG1pEShWIE8Q1mz937kdhktrG4
- k2YnphxzhKBnR5ZdIFGE8FhY0uQculqfUfZLZIaqpW+sJPDVfWqEi7uk29LJ6p8/iHsy
- dvvpc9/bo3cSA5AwsNRxWcrqMUh8gghCLCJHv0My+/aUmviFvioq5vc1EPb+S/DXT/dj
- JARQ==
+ bh=kklDda8xcwHHYE1R2nI3fwUc62PSqJ5jSx8FygF1khw=;
+ b=W4nCYdxsCEacs8JOi05dqejBSivm90U/Ita/stJ0Dch20M0FDz4o+6JOvblOiSaZO1
+ U/iE2cjdC46oXp0+ThLIknPu7sFBLdTwAm5i6A1uhJuiaYW+FQ4iAndzcZMisoEspDkv
+ xwf+xBPP1L6NIngDaDkYo62thkJzplx9hAnBPP0iD5Pt5qQgxbqIQWBVqqEgmRidXqbR
+ wIJysniaSgnwXkG5xVsQDiNVw9JAibE/GsYaH02T+TeiDiKCcn3ANamGSgkX4xubT6To
+ sCI+oCrgCuntHvTDs8Y7n8LIiERNo5EdkHvUB2xxtNob7nuloEGm9La0vQVKxDnEQWQl
+ Lf2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=cxAR6GGzSL9bTpKLyCCp/+JyGcGaHWVE6iOvZVeh4Xw=;
- b=BRC/lqBsrBqRWb8KnxdNW7To/yhbaPQkxComRZ+1IOnyQ3jwbwOS4ZlhJL1BUZ0ot7
- /liP4CtLTd7S7jzlQyW0f70TWKdMzOM/LfSIsb9EPbB1TC31AVv487g3uCkUmACh0+GC
- 6kmrMPFGOitmcC+qT8BOEF/zGJO8s+Ej63rOvKnFIwSUkFbRMQFLgYgC/cnMPr4bu7kO
- XgLvXNy28+ziFi3uCaiXSzE2ygQtdrehIGzLHSAH1EPE5Gv1wK0Jf9QjTJc89NXz3jON
- Ezt9ibNtFRtK6iSVlyW7inhfyV4WeUuc3TRFYZ4RcQ453zgr59Ay4wQKdXqDPcWWTQe+
- +Vng==
-X-Gm-Message-State: AOAM531Fnp23PrPyjFMpJNL7H9SXq2u2fpP8JnRQQn2ZzCmqmgNyImpX
- pZQcZGjviN6NONls+U+J2Mg=
-X-Google-Smtp-Source: ABdhPJx00G2miwfECXZCzHhQDclyw95PbWiqdrPm4Miy6vc/pMXulFnb+WARNcF76o31CGW1cYOYlA==
-X-Received: by 2002:adf:81c6:: with SMTP id 64mr4967927wra.176.1599673935713; 
- Wed, 09 Sep 2020 10:52:15 -0700 (PDT)
+ bh=kklDda8xcwHHYE1R2nI3fwUc62PSqJ5jSx8FygF1khw=;
+ b=EcsCnnYaB+iJxH+maTXD5D1GBQwbxUUwyGILvPoGfSXyhqYB1iRsCbunG343ftbyNW
+ 0viBO5h9t1tvfpPfiDsi5L7vQdlN9MskWA7Z6co5jytz5h+KiYsOz7JPPkSSyWtqMeCA
+ zfQ0D9Z2JIwCgJC8VU+kU2iSxOXw60nPjc1CI0bbkzoLduWXcqvvfRkOYWk3aNkj9lcA
+ wJho0h5Q7LKMezdHldHjEbFlbkVl3Nl1LtDwvClYpG+kCXuC9XINXCw0muwDHvWmntcT
+ fJ0xRxTnttJkNWkd6rS7NpuyqBFogRPvE33qpMCV0XjzruhCdRGfSBEEuiKZjpxwx4KX
+ Iojw==
+X-Gm-Message-State: AOAM533QAvp6xbEBYXY6Wqsx9ndLJSPEEdRuC13XnkEjHcymQLVTh24V
+ 59jJrloDD4unehx00Us4OA4=
+X-Google-Smtp-Source: ABdhPJxgwuhewb9esxTejWhvC40uyc+pGk8uJBJCw5pHEUDRXArVDgWW2kNPw14KBg0dRfz9Hc1IUg==
+X-Received: by 2002:a1c:f612:: with SMTP id w18mr4511419wmc.47.1599674180548; 
+ Wed, 09 Sep 2020 10:56:20 -0700 (PDT)
 Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
  [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id u66sm4906258wmg.44.2020.09.09.10.52.14
+ by smtp.gmail.com with ESMTPSA id z13sm5234781wro.97.2020.09.09.10.56.19
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Sep 2020 10:52:15 -0700 (PDT)
-Subject: Re: [PATCH 13/43] tcg: Consolidate 3 bits into enum TCGTempKind
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200909001647.532249-1-richard.henderson@linaro.org>
- <20200909001647.532249-14-richard.henderson@linaro.org>
+ Wed, 09 Sep 2020 10:56:19 -0700 (PDT)
+Subject: Re: [PULL v2 13/15] hw/rx: Add RX GDB simulator
+To: Peter Maydell <peter.maydell@linaro.org>
+References: <20200622191746.18031-1-f4bug@amsat.org>
+ <20200622191746.18031-2-f4bug@amsat.org>
+ <CAFEAcA9SK1BmrY9_LO6ERy-e22rXOVUP1+vSmUYSTEwWywuzuA@mail.gmail.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <33675f76-0d1f-af7a-f819-445d456de3d4@amsat.org>
-Date: Wed, 9 Sep 2020 19:52:14 +0200
+Message-ID: <24fc5d34-8af3-53cb-3257-62b3b07defcb@amsat.org>
+Date: Wed, 9 Sep 2020 19:56:18 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200909001647.532249-14-richard.henderson@linaro.org>
+In-Reply-To: <CAFEAcA9SK1BmrY9_LO6ERy-e22rXOVUP1+vSmUYSTEwWywuzuA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -50
@@ -106,69 +107,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
+ Magnus Damm <magnus.damm@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/9/20 2:16 AM, Richard Henderson wrote:
-> The temp_fixed, temp_global, temp_local bits are all related.
-> Combine them into a single enumeration.
+Hi Yoshinori,
+
+On 9/7/20 3:13 PM, Peter Maydell wrote:
+> On Mon, 22 Jun 2020 at 20:20, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+>>
+>> From: Yoshinori Sato <ysato@users.sourceforge.jp>
+>>
+>> Add the RX machine internally simulated in GDB.
 > 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-
-Already reviewed:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg701705.html
-
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
->  include/tcg/tcg.h |  20 +++++---
->  tcg/optimize.c    |   8 +--
->  tcg/tcg.c         | 122 ++++++++++++++++++++++++++++------------------
->  3 files changed, 90 insertions(+), 60 deletions(-)
+> Hi; Coverity points out a memory leak (CID 1432307) in this function:
 > 
-> diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-> index 8804a8c4a2..f157092b51 100644
-> --- a/include/tcg/tcg.h
-> +++ b/include/tcg/tcg.h
-> @@ -483,23 +483,27 @@ typedef enum TCGTempVal {
->      TEMP_VAL_CONST,
->  } TCGTempVal;
->  
-> +typedef enum TCGTempKind {
-> +    /* Temp is dead at the end of all basic blocks. */
-> +    TEMP_NORMAL,
-> +    /* Temp is saved across basic blocks but dead at the end of TBs. */
-> +    TEMP_LOCAL,
-> +    /* Temp is saved across both basic blocks and translation blocks. */
-> +    TEMP_GLOBAL,
-> +    /* Temp is in a fixed register. */
-> +    TEMP_FIXED,
-> +} TCGTempKind;
-> +
->  typedef struct TCGTemp {
->      TCGReg reg:8;
->      TCGTempVal val_type:8;
->      TCGType base_type:8;
->      TCGType type:8;
-> -    unsigned int fixed_reg:1;
-> +    TCGTempKind kind:3;
+>> +static void rx_gdbsim_init(MachineState *machine)
+>> +{
+> 
+>> +        if (dtb_filename) {
+>> +            ram_addr_t dtb_offset;
+>> +            int dtb_size;
+>> +            void *dtb;
+>> +
+>> +            dtb = load_device_tree(dtb_filename, &dtb_size);
+> 
+> This allocates memory...
+> 
+>> +            if (dtb == NULL) {
+>> +                error_report("Couldn't open dtb file %s", dtb_filename);
+>> +                exit(1);
+>> +            }
+>> +            if (machine->kernel_cmdline &&
+>> +                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
+>> +                                        machine->kernel_cmdline) < 0) {
+>> +                error_report("Couldn't set /chosen/bootargs");
+>> +                exit(1);
+>> +            }
+>> +            /* DTB is located at the end of SDRAM space. */
+>> +            dtb_offset = machine->ram_size - dtb_size;
+>> +            rom_add_blob_fixed("dtb", dtb, dtb_size,
+>> +                               SDRAM_BASE + dtb_offset);
+> 
+> ...and rom_add_blob_fixed() copies that memory, it doesn't take
+> ownership of it, so after we've called it we need to
+>     g_free(fdt);
 
-3 bits for TEMP_CONST later.
+Can you send a patch to fix this please?
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-
->      unsigned int indirect_reg:1;
->      unsigned int indirect_base:1;
->      unsigned int mem_coherent:1;
->      unsigned int mem_allocated:1;
-> -    /* If true, the temp is saved across both basic blocks and
-> -       translation blocks.  */
-> -    unsigned int temp_global:1;
-> -    /* If true, the temp is saved across basic blocks but dead
-> -       at the end of translation blocks.  If false, the temp is
-> -       dead at the end of basic blocks.  */
-> -    unsigned int temp_local:1;
->      unsigned int temp_allocated:1;
->  
+> 
+>> +            /* Set dtb address to R1 */
+>> +            RXCPU(first_cpu)->env.regs[1] = SDRAM_BASE + dtb_offset;
+>> +        }
+>> +    }
+> 
+> thanks
+> -- PMM
+> 
 
