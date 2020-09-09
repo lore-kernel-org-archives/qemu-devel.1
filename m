@@ -2,87 +2,145 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A094AC43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFDDC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:43:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D51F6207DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:43:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B5F7207DE
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:43:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FcNiaMBw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D51F6207DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SwkfaXKK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B5F7207DE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55112 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFvh6-0007ux-Q0
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:43:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42124)
+	id 1kFvh9-00080I-0g
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:43:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFvgA-0006D5-C6; Wed, 09 Sep 2020 04:42:10 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:44937)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFvg8-0007hC-Kc; Wed, 09 Sep 2020 04:42:10 -0400
-Received: by mail-lj1-x243.google.com with SMTP id b19so2403250lji.11;
- Wed, 09 Sep 2020 01:42:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=NDABxyVyl1pQooZpojSpIpc+FlozjQKM/r8a8BjFwX4=;
- b=FcNiaMBw0HBPk2cXQ62q1Ga7q4A/bCUts0K1vDxuhDYRmGQXC4XUvYsOjy0HfNxLHt
- IrAo0DOnGmUs5Mqf1rijCwDJujyYtbEFwB6o47RcRrYYNTHqs35JJtkAMt7j/tv94/WD
- hXCkOMuOULbMGmP/cDm4YGvsWY1BATSa5cHteOe0XWu5trflRmW+if0h1QH1rrQinKKY
- /x+WLKVtX2hZoPTmi81cJPSDl7fxmR7pIiBn+RZEnNX3BIZEDvj/mmogEscMLA42+Ijp
- IldWQlUVr9hWSJWUea+A1Hly8gAkL8Ls1joTjbn3evkvd3JpHnrUJTRADo6/TwbY9ycN
- 4tYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=NDABxyVyl1pQooZpojSpIpc+FlozjQKM/r8a8BjFwX4=;
- b=cBgTmZpfR5rStSOiPosrvKmYbQCjqYwOBLg8/d6TTVzcxMO1DZhzy4ZuV9/PfGizKt
- ome4QFcQi2RdBOkEV+1N0/k5Tl6fwDqhzD5qgxzas2Xn30N1++bkcw0y/r24dGJOpxe/
- Jb3F415Bs34w9DTtbX4XqgOKRrdfpcdQxXTEIsf/DRktV3srup0TkrQ1YCxYJcmRtCU9
- UbPir+ee4HVo0uyOSPAQ3CPl/1PM8ltlaBe/ABvESJc51pJBxLUQC1TiVVh6rM95SChb
- cMNiBxdGbH5KhTrDMjP0DmuA9tlgy8TWw6WFFn2QQtgt/C+7lkJSO59Q3vSkVJhH004R
- 6dFw==
-X-Gm-Message-State: AOAM5328Qdlei0ejz98uzi2QlmDs3bmQK7zjCccwXuZ1g5oCrh04m+A3
- 1MaNPcM+fmi3Jz01N4vJeK1E2E2/ao7bRgGmthY=
-X-Google-Smtp-Source: ABdhPJzkPiwnTNwpZlrHWjQMrstK/ef9FK5+nPaL5aj11Up4z+9hTXXAenOEmqEbU67Us0oQUh5Mei+rXh4c7criZ5I=
-X-Received: by 2002:a2e:854c:: with SMTP id u12mr1322402ljj.120.1599640926351; 
- Wed, 09 Sep 2020 01:42:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1kFvex-0004HA-Rl
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:40:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53817)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lvivier@redhat.com>)
+ id 1kFvew-0007Sn-0a
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:40:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599640852;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=IHF4P/3W8a0URIc9FG0NeOk7aSfsx6fsVtwhw+zDVbM=;
+ b=SwkfaXKKEoAQBt75tQ7HAe1n2rs/IHv1d0m8fiIoBgBa1sbKXelLI0MkjQls3OICKPAj8R
+ qRIPEhBCyCRPRlhm9ivqEME676IoWq8pG9SpKvVjD6puZ39VY6zFjy+rLd6MBuM6z/w+Ud
+ B6ncIK7juxHcRmthjAw+VjyeSToeOv8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-425-iE7JSjJmPweTSlMjtzMEaQ-1; Wed, 09 Sep 2020 04:40:50 -0400
+X-MC-Unique: iE7JSjJmPweTSlMjtzMEaQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3910E1DDFA
+ for <qemu-devel@nongnu.org>; Wed,  9 Sep 2020 08:40:49 +0000 (UTC)
+Received: from [10.36.113.197] (ovpn-113-197.ams2.redhat.com [10.36.113.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7F11F60C87;
+ Wed,  9 Sep 2020 08:40:43 +0000 (UTC)
+Subject: Re: [PATCH 1/9] vhost-vdpa: remove the default devname
+To: Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org
+References: <20200831082737.10983-1-jasowang@redhat.com>
+ <20200831082737.10983-2-jasowang@redhat.com>
+From: Laurent Vivier <lvivier@redhat.com>
+Autocrypt: addr=lvivier@redhat.com; prefer-encrypt=mutual; keydata=
+ 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
+ D+Ofp0T3KOr1RUHvCZoLURfFhSQ=
+Message-ID: <d2c1b263-7cc0-1ebc-38fe-198c44951bb5@redhat.com>
+Date: Wed, 9 Sep 2020 10:40:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20200908194820.702-1-luoyonggang@gmail.com>
- <20200908194820.702-9-luoyonggang@gmail.com>
- <20200909081931.GC5219@linux.fritz.box>
-In-Reply-To: <20200909081931.GC5219@linux.fritz.box>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Wed, 9 Sep 2020 16:41:55 +0800
-Message-ID: <CAE2XoE-g=jw_=j8RbZ29FBrERt6mj8WHbR2Pt9LQ0PaC2tg96g@mail.gmail.com>
-Subject: Re: [PATCH 08/16] block: get file-win32.c handle locking option
- consistence with file-posix.c
-To: Kevin Wolf <kwolf@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000002ef3c205aedd6dc2"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20200831082737.10983-2-jasowang@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lvivier@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=lvivier@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 00:56:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-1.626, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,110 +154,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Peter Lieven <pl@kamp.de>, Ed Maste <emaste@freebsd.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Qemu-block <qemu-block@nongnu.org>,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
+Cc: lulu@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000002ef3c205aedd6dc2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 31/08/2020 10:27, Jason Wang wrote:
+> The code doesn't have a default vhostdev, so remove the default
+> description in net.json.
+> 
+> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> ---
+>  qapi/net.json | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/qapi/net.json b/qapi/net.json
+> index ddb113e5e5..a2a94fad3e 100644
+> --- a/qapi/net.json
+> +++ b/qapi/net.json
+> @@ -438,7 +438,6 @@
+>  # specifications with a vendor specific control path.
+>  #
+>  # @vhostdev: path of vhost-vdpa device
+> -#            (default:'/dev/vhost-vdpa-0')
+>  #
+>  # @queues: number of queues to be created for multiqueue vhost-vdpa
+>  #          (default: 1)
+> 
 
-On Wed, Sep 9, 2020 at 4:19 PM Kevin Wolf <kwolf@redhat.com> wrote:
+If you remove the default, you must also set the parameter as not
+optional (remove the star in front of its declaration):
 
-> Am 08.09.2020 um 21:48 hat Yonggang Luo geschrieben:
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >  block/file-win32.c | 23 +++++++++++++++++++++--
-> >  1 file changed, 21 insertions(+), 2 deletions(-)
->
-> This is almost the same as my separately posted 'file-win32: Fix
-> "locking" option', except that you changed the order of variable
-> definitions which will cause a merge conflict.
->
-> When you take patches from other people, you should correctly attribute
-> them and not make them look as if they were your own.
->
-> Commit messages should not be empty, but explain the motivation for the
-> change.
->
-I know someone else have already have fixes for it, so I didn't detail it
-much, Ineed
-I wanna skip it when sending patches, but  git-publish.py didn't handle it
-well under Win32 yet
+diff --git a/qapi/net.json b/qapi/net.json
+index ddb113e5e5a8..012830ca1a27 100644
+--- a/qapi/net.json
++++ b/qapi/net.json
+@@ -447,7 +447,7 @@
+ ##
+ { 'struct': 'NetdevVhostVDPAOptions',
+   'data': {
+-    '*vhostdev':     'str',
++    'vhostdev':     'str',
+     '*queues':       'int' } }
 
->
-> In this case, dropping the patch is easiest because my patch is already
-> in a pull request and will probably be merged soon.
->
-I am waiting it to merged, at the current stage, if I don't include this
-patch the
-test runner will fail.
+ ##
 
->
-> Kevin
->
->
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+And then you'll have:
 
---0000000000002ef3c205aedd6dc2
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+$ ./qemu-system-x86_64  -netdev vhost-vdpa,id=hostnet1
+qemu-system-x86_64: Parameter 'vhostdev' is missing
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Sep 9, 2020 at 4:19 PM Kevin =
-Wolf &lt;<a href=3D"mailto:kwolf@redhat.com">kwolf@redhat.com</a>&gt; wrote=
-:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.=
-8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Am 08.09.2020 =
-um 21:48 hat Yonggang Luo geschrieben:<br>
-&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
-m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 block/file-win32.c | 23 +++++++++++++++++++++--<br>
-&gt;=C2=A0 1 file changed, 21 insertions(+), 2 deletions(-)<br>
-<br>
-This is almost the same as my separately posted &#39;file-win32: Fix<br>
-&quot;locking&quot; option&#39;, except that you changed the order of varia=
-ble<br>
-definitions which will cause a merge conflict.<br>
-<br>
-When you take patches from other people, you should correctly attribute<br>
-them and not make them look as if they were your own.<br>
-<br>
-Commit messages should not be empty, but explain the motivation for the<br>
-change.<br></blockquote><div>I know someone else have already have fixes fo=
-r it, so I didn&#39;t detail it much, Ineed</div><div>I wanna skip it when =
-sending patches, but=C2=A0 git-publish.py didn&#39;t handle it well under W=
-in32 yet=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
-<br>
-In this case, dropping the patch is easiest because my patch is already<br>
-in a pull request and will probably be merged soon.<br></blockquote><div>I =
-am waiting it to merged, at the current stage, if I don&#39;t include this =
-patch the</div><div>test runner will fail.=C2=A0</div><blockquote class=3D"=
-gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(20=
-4,204,204);padding-left:1ex">
-<br>
-Kevin<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
+And PATCH 2 becomes useless.
 
---0000000000002ef3c205aedd6dc2--
+Thanks,
+Laurent
+
 
