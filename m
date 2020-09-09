@@ -2,95 +2,64 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C3C2C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 10:52:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 352C2C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 10:57:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEE6B2087C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 10:52:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mfwD7T3v"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEE6B2087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 94E3A21582
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 10:57:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94E3A21582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45316 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFxiE-0000vT-Cz
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 06:52:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48456)
+	id 1kFxmj-0002CB-HK
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 06:57:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49760)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFxha-0000Qb-Iz
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 06:51:46 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:35440)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFxhY-0000LD-Sm
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 06:51:46 -0400
-Received: by mail-wm1-x341.google.com with SMTP id y15so1890443wmi.0
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 03:51:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=yl71U6kcm97eXeik8Iz1rlH6MDRThYpLpOTfs02QNIw=;
- b=mfwD7T3vrRYj4fOGJBEk+ak7L+BNlfeuL+DB947vHt/XM6qOeeCdhVuVJu2qt2oDMb
- x2ZznhAqq83utb8NW1Jq1OFpGLAf14vryNFJATEBr95XpS7m3QpufXz8Y4NxchcSnxff
- /x7Mi5BxBMmJpvP8Ucu5ZYuu2dLC6w3FX5I4hMzxV315qc5ax+A5ojD7oSWm2S7MJIvg
- PCks1QSiHau4f8CwQ0swGVr+pgEZa/ZjD0UUkh+o7dJFlNzunPSxF5SEZnhv2lVawV4q
- NqsBOCZBJBq/oeTaYXhYF6n17toReVdeH1AwMQgf/mJXIWEPepdkG2gePIibyVIOotdV
- 93YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=yl71U6kcm97eXeik8Iz1rlH6MDRThYpLpOTfs02QNIw=;
- b=cI0kykWpuDUjGgynv/uvI7RgRMdMy0+aOzDIR6Co4g+IbhhY7IhTJZWOJFnDpxiAHj
- VRQDWwABBiq3OyGC/kF/kGo7IPYgovqyAaOnLSTxVYJfS2KOLxu1VbvkPMQsZBFn0Vz9
- MV+WLHkCz9M4jPfWi/XaBVSghq6nxLRs0HYCAOa7TpZRPyUYo3TkFJilYSp3qX2XBqXx
- DkQ6Hl5XwP+hvrRPiDr+1u2erV4DmXF2U5rs2kwZCU5JDUmVXOAXC9OtVA6b7cnDE2rz
- 4RIlBCzLXZnXbA7Ncn8VPvnwBKA6saiHHvD/ITQoiOYObrjt8nD7CaLxO+Xg7sh6nc2e
- EKVw==
-X-Gm-Message-State: AOAM530oFC22X+0rnn3jLQGPT/6wTK1qvJwzzfDL/zwnXLCOXuGmfRgr
- eFoyf0Y/USmwg3WM0wXc7wfTvwJTZLjucw==
-X-Google-Smtp-Source: ABdhPJwbbHfG/N/F6u7ChCC5PsgbuJpx8sBxp+n8dzYWPhEFjSNk0vfZWLA1owZMK8ed2sk2dmfLKw==
-X-Received: by 2002:a1c:6254:: with SMTP id w81mr2885646wmb.94.1599648702270; 
- Wed, 09 Sep 2020 03:51:42 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id z14sm3470048wrh.14.2020.09.09.03.51.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 03:51:41 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8B3B91FF7E;
- Wed,  9 Sep 2020 11:51:40 +0100 (BST)
-References: <20200908202352.298506-1-philmd@redhat.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 0/2] Acceptance Tests: update assets location and
- cancel tests if missing
-In-reply-to: <20200908202352.298506-1-philmd@redhat.com>
-Date: Wed, 09 Sep 2020 11:51:40 +0100
-Message-ID: <87o8mfp6ir.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kFxmF-0001nN-F2
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 06:56:35 -0400
+Received: from mx2.suse.de ([195.135.220.15]:58556)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kFxmD-0001MZ-Bs
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 06:56:35 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 959E1AEF8;
+ Wed,  9 Sep 2020 10:56:32 +0000 (UTC)
+Subject: Re: meson build failure, configure without tcg, fixed by running make
+ again
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <c9971e27-fded-3e5d-d489-b1fb539b8ec1@suse.de>
+ <41c09bb2-1704-47c0-9638-9f1eff010e8c@redhat.com>
+ <462d6cfa-f4ba-d001-200b-9fc017f7e2fc@suse.de>
+Message-ID: <3981cd71-deaf-b939-d6fa-09b9b3b94521@suse.de>
+Date: Wed, 9 Sep 2020 12:56:31 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
+In-Reply-To: <462d6cfa-f4ba-d001-200b-9fc017f7e2fc@suse.de>
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:22:31
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -57
+X-Spam_score: -5.8
+X-Spam_bar: -----
+X-Spam_report: (-5.8 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.626,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,34 +72,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 9/2/20 3:02 PM, Claudio Fontana wrote:
+> On 9/2/20 12:27 PM, Paolo Bonzini wrote:
+>> On 02/09/20 12:03, Claudio Fontana wrote:
+>>> Hi Paolo,
+>>>
+>>> there seems to be some parallelism or race condition somewhere?
+>>>
+>>> with master, commit 8d90bfc5c31ad60f6049dd39be636b06bc00b652
+>>> I am doing:
+>>>
+>>> mkdir build-nontcg
+>>> cd build-nontcg
+>>> ../configure --disable-tcg --enable-kvm --enable-hax
+>>> make -j120
+>>> make -j120 check
+>>>
+>>> I am getting:
+>>
+>> Yes:
+>>
+>> diff --git a/tests/qtest/libqos/meson.build b/tests/qtest/libqos/meson.build
+>> index 19931b9248..268ea23803 100644
+>> --- a/tests/qtest/libqos/meson.build
+>> +++ b/tests/qtest/libqos/meson.build
+>> @@ -52,6 +52,6 @@ libqos = static_library('qos',
+>>          'arm-xilinx-zynq-a9-machine.c',
+>>          'ppc64_pseries-machine.c',
+>>          'x86_64_pc-machine.c',
+>> -), build_by_default: false)
+>> +) + genh, build_by_default: false)
+>>  
+>>  qos = declare_dependency(link_whole: libqos)
+>>
+>> Paolo
+>>
+> 
+> Hi Paolo,
+> 
+> this one worked for me just fine, I did not try your latest patch which is a bit different.
+> 
+> Ciao,
+> 
+> Claudio
+> 
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+Hi Paolo,
 
-> Cover from Cleber's v1:
->
->   To minimize the inconvenciente caused by test and job failures in the
->   future, an option is enabled that will cancel (AKA skip) tests early
->   when those assets are not available.
->
-> Pavel Dovgaluk (1):
->   tests: bump avocado version
->
-> Philippe Mathieu-Daud=C3=A9 (1):
->   tests/acceptance: Add Test.fetch_asset(cancel_on_missing=3DTrue)
->
->  tests/Makefile.include                    |  2 +-
->  tests/acceptance/avocado_qemu/__init__.py | 12 ++++++++++++
->  tests/requirements.txt                    |  2 +-
->  3 files changed, 14 insertions(+), 2 deletions(-)
+a heads-up on this: while the diff above worked for me just fine, your latest patch committed to master does _not_ solve the issue for me.
+Same errors as before during parallel builds with large number of cpus.
 
-Queued to testing/next, thanks.
+I replaced the solution currently in master with the meson.build as per the diff above, but still I got problems:
 
---=20
-Alex Benn=C3=A9e
+In file included from tests/test-qapi-events-sub-sub-module.c:16:0:
+tests/test-qapi-visit-sub-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+In file included from tests/include/test-qapi-events-sub-module.c:16:0:
+tests/include/test-qapi-visit-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+compilation terminated.
+In file included from tests/test-qapi-visit-sub-sub-module.c:16:0:
+tests/test-qapi-visit-sub-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from tests/include/test-qapi-visit-sub-module.c:16:0:
+tests/include/test-qapi-visit-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+tests/qapi-builtin-visit.c:15:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from tests/test-qapi-commands-sub-sub-module.c:20:0:
+tests/test-qapi-visit-sub-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from tests/include/test-qapi-types-sub-module.c:16:0:
+tests/include/test-qapi-visit-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+tests/qapi-builtin-types.c:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from tests/test-qapi-events.c:16:0:
+tests/test-qapi-visit.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from tests/test-qapi-types-sub-sub-module.c:16:0:
+tests/test-qapi-visit-sub-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make: *** [Makefile.ninja:1760: tests/libtestqapi.a.p/meson-generated_.._qapi-builtin-types.c.o] Error 1
+make: *** Waiting for unfinished jobs....
+make: *** [Makefile.ninja:1761: tests/libtestqapi.a.p/meson-generated_.._qapi-builtin-visit.c.o] Error 1
+make: *** [Makefile.ninja:1762: tests/libtestqapi.a.p/meson-generated_.._test-qapi-commands-sub-sub-module.c.o] Error 1
+make: *** [Makefile.ninja:1765: tests/libtestqapi.a.p/meson-generated_.._test-qapi-events-sub-sub-module.c.o] Error 1
+make: *** [Makefile.ninja:1766: tests/libtestqapi.a.p/meson-generated_.._test-qapi-events.c.o] Error 1
+make: *** [Makefile.ninja:1771: tests/libtestqapi.a.p/meson-generated_.._test-qapi-visit-sub-sub-module.c.o] Error 1
+make: *** [Makefile.ninja:1774: tests/libtestqapi.a.p/meson-generated_.._include_test-qapi-events-sub-module.c.o] Error 1
+make: *** [Makefile.ninja:1775: tests/libtestqapi.a.p/meson-generated_.._include_test-qapi-types-sub-module.c.o] Error 1
+make: *** [Makefile.ninja:1776: tests/libtestqapi.a.p/meson-generated_.._include_test-qapi-visit-sub-module.c.o] Error 1
+make: *** [Makefile.ninja:1769: tests/libtestqapi.a.p/meson-generated_.._test-qapi-types-sub-sub-module.c.o] Error 1
+In file included from tests/test-qapi-types.c:16:0:
+tests/test-qapi-visit.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from tests/test-qapi-visit.c:16:0:
+tests/test-qapi-visit.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+In file included from tests/test-qapi-commands.c:20:0:
+tests/test-qapi-visit.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make: *** [Makefile.ninja:1772: tests/libtestqapi.a.p/meson-generated_.._test-qapi-visit.c.o] Error 1
+make: *** [Makefile.ninja:1770: tests/libtestqapi.a.p/meson-generated_.._test-qapi-types.c.o] Error 1
+In file included from tests/include/test-qapi-commands-sub-module.c:20:0:
+tests/include/test-qapi-visit-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
+ #include "qapi/qapi-builtin-visit.h"
+          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+compilation terminated.
+make: *** [Makefile.ninja:1763: tests/libtestqapi.a.p/meson-generated_.._test-qapi-commands.c.o] Error 1
+make: *** [Makefile.ninja:1773: tests/libtestqapi.a.p/meson-generated_.._include_test-qapi-commands-sub-module.c.o] Error 1
+
+
+Thanks!
+
+Claudio
+
+
+
 
