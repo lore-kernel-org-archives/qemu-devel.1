@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5A4C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9401FC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:30:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E4842074B
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:30:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1BA5F2074B
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:30:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IfrZbKBz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E4842074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NesUVPWh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1BA5F2074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFyJN-0005AR-JV
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 07:30:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60354)
+	id 1kFyJU-0005WJ-Tu
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 07:30:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFyGW-0008T3-IV
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:52 -0400
-Received: from mail-wr1-x436.google.com ([2a00:1450:4864:20::436]:34772)
+ id 1kFyGb-0000CI-Fk
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:57 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35079)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFyGU-0006Wr-J4
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:52 -0400
-Received: by mail-wr1-x436.google.com with SMTP id t10so2565455wrv.1
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 04:27:50 -0700 (PDT)
+ id 1kFyGZ-0006Xe-MZ
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:57 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e16so2562999wrm.2
+ for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 04:27:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xYzK93R335zRMjvSDIkJPyE3RplpCsCBHGGRS+l5Oy8=;
- b=IfrZbKBztv82ehGSAD2BkY50l42f4zqfMvtGe3l6xDQvxvcnr5ZPWU5WOQAvC/hcQl
- cxM2kwP3uCHlc6qLCc72IQYkCMgZHTNE1wdRhnaCLHVRHBhGxS2dXzSAbfkNdtyG8Vah
- KaUUWWcr2kTmYs4kRY30md3x/eHh2td7+JUoFlQtWhIThHjIqiqSIWJEtjnX2sDqoak7
- vkrR5zjf9XYRo5GmqKehUS82Fh0uqxZe11JqATRIuYZFMoj8sYpyE8Q6joO1z/pPRjV+
- cviVXD/Bk5Ul/0kY/YX1nIJl242jcSG3aajqYZ/1EMNZ2bmKI+ronfeEAH3SvHSfFqc3
- IzXw==
+ bh=x50AKbw2C1EpufEPXDHUDVL3npAkap6GTDHFJFmIt0E=;
+ b=NesUVPWhBcQDal87ZYPspetZ9Kf56iy+WtLFgil7FzV0+Dqohpz4/7J4gCX0QxWW4i
+ RJ+lqNGJIycrgyUSpwm5h49XaVwyRkK28YXkTl0hIiTBQ3aCQNJq2QCPmNopbtP7BEfD
+ OqLQ0E35a1VBooxIa0hc8uJlUzDjyODg745gufMl1m5dE5vMjAvuryXQUh7PqBhkzUSX
+ h8l4gSnHiR5hNQAsxwd8mmt4Ih+drvPej4fvSUDvLeVnw8yV6EmgUiDTE1PDl/KoLhqQ
+ eEQ93JjpoxWcwBHLGswmkDOKQpqzO3A10xBGDcxf7BZf1lhm6X7OHHSjcIukjQjVblog
+ jurQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xYzK93R335zRMjvSDIkJPyE3RplpCsCBHGGRS+l5Oy8=;
- b=h9yawzNw2N8f3PeLdQn7CxHRpJbV0Z8XFsHghSEBcq+9o6a5bucaNfVLjXVRneDP0F
- 6FnIUYi4N7JmFz0WBBuEuhnW31vTvGP91VRbfFT0WamqcggUWeGKzWQaaMTaI9ck6ADk
- o+q+n+MjWYRgaRx4/X9RbBE0AlI2ChcObFcgTQVBWeM31D2aQm0oSUVFYkAolTSOnGyL
- RyP2MkqSOJ+QM4qCWK8dwHNDm0YT+pO6ZnAJWTEVsZIPVuvikaOqEw742Lrw0oZhBKVb
- FXhSxfnN+aFE27t3hBjucfxZqD2uJmLpeAr7ts74on7bmg/POo/NpC/dJrZeRMdfQtQe
- iYZw==
-X-Gm-Message-State: AOAM532Vq3UC9CfnrZTU2uSSrmFzSh1kAE5jZCss3CbxO4Y3dqaW/D9G
- BijnGhIvgys8T78X/E4tsynikg==
-X-Google-Smtp-Source: ABdhPJyrbGdqC+tD898R79MIWa51+u7QbmCDnGpCjV0kc2rtgo9VbWtNKOAgJZpVcvj/oPDp35L4hw==
-X-Received: by 2002:a5d:5106:: with SMTP id s6mr3787392wrt.166.1599650869147; 
- Wed, 09 Sep 2020 04:27:49 -0700 (PDT)
+ bh=x50AKbw2C1EpufEPXDHUDVL3npAkap6GTDHFJFmIt0E=;
+ b=PhYZ0vt3RtItRDgtw9miR1INXZLjIunHqri69xUlm6/hL9F1zNubJ8y9iegXyUszlu
+ kol/t0NiOWoZz5bKKzMQwgZ60JO0ON/d1j18/FsMc04YLfoe9UU8q/yOX1IMRySNmpXE
+ NY3EhsXlMgbCxk2UO8qQEtEsHOTlVbD2VT2AlTrNEynH0Trn5PsQmhMDrwclGEJRbken
+ nrdvyEisUL14tenIirX+eo1nRUixfrtWFZPVxos84Y+tmC6VDQ+mcceqccKVnRw4ZvoD
+ Ct+5x6F7tfkJ0dVLPOWEz6QP/DP4K+jaPz63KET9L4YzJcPyIOkf6WHNW+/uMc74pIZP
+ ehig==
+X-Gm-Message-State: AOAM530f48ssbi0sjJp3rE4XcEjVxF4fB8+5+MJkWvCNwlGzxUcKmx3T
+ 2+hBf0uTenySRQuNi77HrPSgLg==
+X-Google-Smtp-Source: ABdhPJwFKih2UFctB1MS1kH0RmHZEJ1fUJvF0PBTrLqE/5C5p7wjXUGYE8uvHLZz8jPZD9LuS0DB/g==
+X-Received: by 2002:adf:efc9:: with SMTP id i9mr3546046wrp.187.1599650874411; 
+ Wed, 09 Sep 2020 04:27:54 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id t4sm3632061wrr.26.2020.09.09.04.27.42
+ by smtp.gmail.com with ESMTPSA id t22sm4029931wmt.1.2020.09.09.04.27.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 04:27:45 -0700 (PDT)
+ Wed, 09 Sep 2020 04:27:47 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 53DDC1FF8F;
+ by zen.linaroharston (Postfix) with ESMTP id AD7B71FF93;
  Wed,  9 Sep 2020 12:27:42 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH  v2 03/10] tests/meson.build: fp tests don't need CONFIG_TCG
-Date: Wed,  9 Sep 2020 12:27:34 +0100
-Message-Id: <20200909112742.25730-4-alex.bennee@linaro.org>
+Subject: [PATCH  v2 07/10] hw/i386: make explicit clearing of pch_rev_id
+Date: Wed,  9 Sep 2020 12:27:38 +0100
+Message-Id: <20200909112742.25730-8-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200909112742.25730-1-alex.bennee@linaro.org>
 References: <20200909112742.25730-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::436;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x436.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,54 +103,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
+Cc: fam@euphon.net, berrange@redhat.com, Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- aurelien@aurel32.net
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ Paolo Bonzini <pbonzini@redhat.com>, aurelien@aurel32.net,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As the tests build only softfloat.c no actual TCG machinary is neede
-to test them (as is evidenced by GCC check-softfloat). Might as well
-fix the wording on Travis while at it.
+Some compilers (notably the Xenial gcc in Travis) fail to spot that
+this will always be set if pch_dev_id != 0xffff. Given this is setup
+code and using _Pragma to override is equally as ugly lets just remove
+the doubt from the compilers mind.
 
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20200903112107.27367-7-alex.bennee@linaro.org>
 ---
- .travis.yml       | 2 +-
- tests/meson.build | 3 ++-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ hw/i386/pc_piix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/.travis.yml b/.travis.yml
-index 1d0ade0a133..65341634d02 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -138,7 +138,7 @@ jobs:
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 32b1453e6a8..33fa035fb7f 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -930,7 +930,7 @@ void igd_passthrough_isa_bridge_create(PCIBus *bus, uint16_t gpu_dev_id)
+     struct PCIDevice *bridge_dev;
+     int i, num;
+     uint16_t pch_dev_id = 0xffff;
+-    uint8_t pch_rev_id;
++    uint8_t pch_rev_id = 0;
  
- 
-     # Just build tools and run minimal unit and softfloat checks
--    - name: "GCC check-softfloat (user)"
-+    - name: "GCC check-unit and check-softfloat"
-       env:
-         - BASE_CONFIG="--enable-tools"
-         - CONFIG="--disable-user --disable-system"
-diff --git a/tests/meson.build b/tests/meson.build
-index 998e4c48f90..dae8a77df14 100644
---- a/tests/meson.build
-+++ b/tests/meson.build
-@@ -259,8 +259,9 @@ test('decodetree', sh,
-      workdir: meson.current_source_dir() / 'decode',
-      suite: 'decodetree')
- 
-+subdir('fp')
-+
- if 'CONFIG_TCG' in config_host
--  subdir('fp')
-   if 'CONFIG_PLUGIN' in config_host
-     subdir('plugin')
-   endif
+     num = ARRAY_SIZE(igd_combo_id_infos);
+     for (i = 0; i < num; i++) {
 -- 
 2.20.1
 
