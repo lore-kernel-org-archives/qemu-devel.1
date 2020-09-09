@@ -8,73 +8,71 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E4EC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 02:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05723C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 03:01:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 62DA320EDD
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 02:58:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E9FA2098B
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 03:01:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="crOWA+S5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62DA320EDD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YtaQo0iv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E9FA2098B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFqJr-0003Gk-Hv
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 22:58:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34316)
+	id 1kFqMI-0004Yp-P4
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 23:01:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kFqJ8-0002UZ-3u
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 22:58:02 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:34348)
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1kFqLR-0003uo-1F; Tue, 08 Sep 2020 23:00:25 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:43391)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kFqJ4-0008F6-Rf
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 22:58:01 -0400
-Received: by mail-lj1-x242.google.com with SMTP id v23so1573020ljd.1
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 19:57:57 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1kFqLN-0000lx-GX; Tue, 08 Sep 2020 23:00:24 -0400
+Received: by mail-oi1-x243.google.com with SMTP id i17so902442oig.10;
+ Tue, 08 Sep 2020 20:00:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6q0qO8r2NTq7pnimF+Mx4S7abiDBU3hJeehOWWdY3q4=;
- b=crOWA+S5VTDvdiVRFf+KeFYdAS34fLf/DHVCrqu/IXVMiwq5eLu41kNz0lP9ZpWYjl
- ukvGuQqgEDtT1RvdN4VJNw0qitFKHgdZ0GvK/PJAOPn+ZjIqE+2N/qBCJEUM6hjhygAV
- eOqQg+VevkfP3fwJpi3uDI7An65ruiKyVepwQhWOaXeH9KgCg1Zmnh+S20ztrbYKaRHV
- ScoTWP4bZsliCPiasWCsgQIC6QlJ9M1m7jtV4hc9Of+lQAJG/4HGwPkvI7Go2GxMpDc5
- 6tDiwXmx8JfivVS/yyVjQ0ApWXZAIB2p4/d2XSwkW7n+u6nhknu/HZMBtU9dck/B3EJJ
- o7gw==
+ :cc; bh=lu1qO+i1yJWxNXCHPW7JaUeVdESzeH82NAFTr9owFpQ=;
+ b=YtaQo0ivP1k2eGfRSYiL/5d/EbeUJoBLqnoHieY0nBAT5vqmcVo+ySVIrvcCVFCktS
+ 0d4Mp30QEpq199R/cgkLeO7OfJ6Qz7+mJ3kbfr1fluhZmhlEr7bdRsDvmy9X4ajGf0yR
+ RL+vXHgluxMDE23+khPyoa3FPu7flkLlcoYpw5z9PrnPs2O7mAOLtqvPvtDRLgFYA2mj
+ 1HKN2dYxyGm5Tb/71pvEEUTHe2dBR2FPc3xzNl1VxqlCyIceKTA93CYcg8PzTK+vj85M
+ SGId+G1q7LEHdFbKHIw8VptgrqupKvOkfxPNtgIRpfxG4/RvkTePm02tvrj/2EJLrCM8
+ 7Tag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=6q0qO8r2NTq7pnimF+Mx4S7abiDBU3hJeehOWWdY3q4=;
- b=cHI1Lh24NJslSJGU9cQkFIZayvwEexxwcfM4pyLPzQyz0vLjeB8z1tedxRPG8Ebu42
- zXhwQSd8kMeuBL5BWt3hsWTSaveIqDEvh/tC+F0JRcGwxW+mvhfajPGBEqMZ497Tj/P9
- 0Pks1HmD6M52XztYMAEwr2l2gopvyt9+l+7WhQgCICEgT5F+SqpSUyXL+KUkhVUlk/Ky
- aCBw1gVKZyk0Wjk+p5svD/OzqO9MtBSsE1GU+YQxX1Uom/S/KrwdyeWL5Lllr7ReknFf
- 8TJ6KQsMqrV0RpWH595vXQvoqEnFOzEQj13dPSSEG3M0kNF7kE43cwfvHA0b2h4qkfJs
- ugtg==
-X-Gm-Message-State: AOAM5302Pxkl3gNHUyxOEEjz1B2AY+Zye4PuE/WP/9LBMxy4IyXewVBD
- WMn0Ht26UNLKdJxaYdZA4puRtJ3LeVYJoR/Duks=
-X-Google-Smtp-Source: ABdhPJwCOwqCJ+1yUIeb78ZktoCyQNGbP7vZcQLSEfvo7ODxEQME1hGXUAOpTftRtUBgEFRmCDEKddc/B8qn+jKYvU8=
-X-Received: by 2002:a2e:8215:: with SMTP id w21mr720559ljg.43.1599620276033;
- Tue, 08 Sep 2020 19:57:56 -0700 (PDT)
+ bh=lu1qO+i1yJWxNXCHPW7JaUeVdESzeH82NAFTr9owFpQ=;
+ b=EQSPHeUBzAUuS6hPl0Atvns8QHTQnkOw/4YuM/ZO2zltJhuet5kXK0gONS5EOOKiZ5
+ sZSgpWExKuFgMmnfvTk/1MEjicTi2EyDtZm571kfa2gY1UI6nta/8alPG9EKUVyxrvDj
+ 7rcbO33rwAUAs4zfJX3anTM85Z87QANZufuIEsS5FcelmR43TbaVNoGdMlYTm7bHrGQ4
+ HJBSC0hehjSIZkc1Esnk7v+guCFo0oXs0jf0ZAK3TFsl7y4kSFKalVeo7aIllo54RdJt
+ PGDiJbDBQDtDzH20MlcjUfKFaJvNQleWw0mfw7wFbMwZRjtwMdv/MGwJrcY5zVeHAJ+j
+ cEOA==
+X-Gm-Message-State: AOAM530lpgSsNhxel0m6W9QKeVT927vbKhZcTMV1iAV0vK+18cpyiWyA
+ kF5oe2OmqiPWNG2qiW108v+qj6+6fWS/hsvFIo8=
+X-Google-Smtp-Source: ABdhPJymsb69LITXdDk7RsUAMRO3P5Sxp9OvT1iFoMgVp1xK4o0SKpJF7BeOQRV3nGS9GbK8X4HM3HCuTp9buw1D5z8=
+X-Received: by 2002:aca:c0c1:: with SMTP id q184mr1439688oif.56.1599620419790; 
+ Tue, 08 Sep 2020 20:00:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <1598256668-12131-1-git-send-email-chenhc@lemote.com>
- <caa3c014-ba68-0875-4dd5-faed9282ca95@redhat.com>
-In-Reply-To: <caa3c014-ba68-0875-4dd5-faed9282ca95@redhat.com>
-From: chen huacai <zltjiangshi@gmail.com>
-Date: Wed, 9 Sep 2020 10:57:44 +0800
-Message-ID: <CABDp7VoRCMsW6b17XEek3-EJLHgY=bCXnx5B1ZWCOkHq0aasxw@mail.gmail.com>
-Subject: Re: [PATCH V2 for-5.2] hw/null-machine: Add the kvm_type() hook for
- MIPS
-To: Thomas Huth <thuth@redhat.com>
+References: <cover.1599211479.git.dimastep@yandex-team.ru>
+ <edd2bb15ad817a12e6aa88b962bed769dd9dbcd5.1599211479.git.dimastep@yandex-team.ru>
+In-Reply-To: <edd2bb15ad817a12e6aa88b962bed769dd9dbcd5.1599211479.git.dimastep@yandex-team.ru>
+From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+Date: Tue, 8 Sep 2020 23:00:08 -0400
+Message-ID: <CAFubqFsRn_+cWqB3TgVqmoQh7qLRMOrSv4SUGoA3=fKDTB5grg@mail.gmail.com>
+Subject: Re: [PATCH v4 3/7] tests/qtest/vhost-user-test: prepare the tests for
+ adding new dev class
+To: Dima Stepanov <dimastep@yandex-team.ru>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=zltjiangshi@gmail.com; helo=mail-lj1-x242.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=raphael.s.norwitz@gmail.com; helo=mail-oi1-x243.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,177 +94,275 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- qemu-level <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>,
- Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, qemu-block@nongnu.org,
+ "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
+ QEMU <qemu-devel@nongnu.org>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Raphael Norwitz <raphael.norwitz@nutanix.com>, fengli@smartx.com,
+ yc-core@yandex-team.ru, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, all,
+On Fri, Sep 4, 2020 at 5:32 AM Dima Stepanov <dimastep@yandex-team.ru> wrote:
+>
+> For now only vhost-user-net device is supported by the test. Other
+> vhost-user devices are not tested. As a first step make source code
+> refactoring so new devices can reuse the same test routines. To make
+> this provide a new vhost_user_ops structure with the methods to
+> initialize device, its command line or make a proper vhost-user
+> responses.
+>
+> Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
 
-On Wed, Sep 9, 2020 at 1:25 AM Thomas Huth <thuth@redhat.com> wrote:
->
-> On 24/08/2020 10.11, Huacai Chen wrote:
-> > MIPS has two types of KVM: TE & VZ, and TE is the default type. Now,
-> > libvirt uses a null-machine to detect the kvm capability. In the MIPS
-> > case, it will return "KVM not supported" on a VZ platform by default.
-> > So, add the kvm_type() hook to the null-machine.
-> >
-> > This seems not a very good solution, but I cannot do it better now.
->
-> This is still ugly. Why do the other architectures do not have the
-> same problem? Let's see... in kvm-all.c, we have:
->
->     int type = 0;
->     [...]
->     kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
->     if (mc->kvm_type) {
->         type = mc->kvm_type(ms, kvm_type);
->     } else if (kvm_type) {
->         ret = -EINVAL;
->         fprintf(stderr, "Invalid argument kvm-type=%s\n", kvm_type);
->         goto err;
->     }
->
->     do {
->         ret = kvm_ioctl(s, KVM_CREATE_VM, type);
->     } while (ret == -EINTR);
->
-> Thus the KVM_CREATE_VM ioctl is likely called with type = 0 in this
-> case (i.e. when libvirt probes with the "null"-machine).
->
-> Now let's have a look at the kernel. The "type" parameter is passed
-> there to the architecture specific function kvm_arch_init_vm().
-> For powerpc, this looks like:
->
->         if (type == 0) {
->                 if (kvmppc_hv_ops)
->                         kvm_ops = kvmppc_hv_ops;
->                 else
->                         kvm_ops = kvmppc_pr_ops;
->                 if (!kvm_ops)
->                         goto err_out;
->         } else  if (type == KVM_VM_PPC_HV) {
->                 if (!kvmppc_hv_ops)
->                         goto err_out;
->                 kvm_ops = kvmppc_hv_ops;
->         } else if (type == KVM_VM_PPC_PR) {
->                 if (!kvmppc_pr_ops)
->                         goto err_out;
->                 kvm_ops = kvmppc_pr_ops;
->         } else
->                 goto err_out;
->
-> That means for type == 0, it automatically detects the best
-> kvm-type.
->
-> For mips, this function looks like this:
->
->         switch (type) {
-> #ifdef CONFIG_KVM_MIPS_VZ
->         case KVM_VM_MIPS_VZ:
-> #else
->         case KVM_VM_MIPS_TE:
-> #endif
->                 break;
->         default:
->                 /* Unsupported KVM type */
->                 return -EINVAL;
->         };
->
-> That means, for type == 0, it returns -EINVAL here!
->
-> Looking at the API docu in Documentation/virt/kvm/api.rst
-> the description of the type parameter is quite sparse, but it
-> says:
->
->  "You probably want to use 0 as machine type."
->
-> So I think this is a bug in the implementation of KVM in the
-> mips kernel code. The kvm_arch_init_vm() in the mips code should
-> do the same as on powerpc, and use the best available KVM type
-> there instead of returning EINVAL. Once that is fixed there,
-> you don't need this patch here for QEMU anymore.
-Yes, PPC use a good method, because it can use 0 as "automatic"
-#define KVM_VM_PPC_HV 1
-#define KVM_VM_PPC_PR 2
+Reviewed-by: Raphael Norwitz <raphael.norwitz@nutanix.com>
 
-Unfortunately, MIPS cannot do like this because it define 0 as "TE":
-#define KVM_VM_MIPS_TE          0
-#define KVM_VM_MIPS_VZ          1
-
-So, it cannot be solved in kernel side, unless changing the definition
-of TE/VZ, but I think changing their definition is also unacceptable.
-
-Huacai
-
+> ---
+>  tests/qtest/vhost-user-test.c | 105 ++++++++++++++++++++++++++++++------------
+>  1 file changed, 76 insertions(+), 29 deletions(-)
 >
->  HTH,
->   Thomas
+> diff --git a/tests/qtest/vhost-user-test.c b/tests/qtest/vhost-user-test.c
+> index 9ee0f1e..3df5322 100644
+> --- a/tests/qtest/vhost-user-test.c
+> +++ b/tests/qtest/vhost-user-test.c
+> @@ -135,6 +135,10 @@ enum {
+>      TEST_FLAGS_END,
+>  };
+>
+> +enum {
+> +    VHOST_USER_NET,
+> +};
+> +
+>  typedef struct TestServer {
+>      gchar *socket_path;
+>      gchar *mig_path;
+> @@ -154,10 +158,25 @@ typedef struct TestServer {
+>      bool test_fail;
+>      int test_flags;
+>      int queues;
+> +    struct vhost_user_ops *vu_ops;
+>  } TestServer;
+>
+> +struct vhost_user_ops {
+> +    /* Device types. */
+> +    int type;
+> +    void (*append_opts)(TestServer *s, GString *cmd_line,
+> +            const char *chr_opts);
+> +
+> +    /* VHOST-USER commands. */
+> +    void (*set_features)(TestServer *s, CharBackend *chr,
+> +            VhostUserMsg *msg);
+> +    void (*get_protocol_features)(TestServer *s,
+> +            CharBackend *chr, VhostUserMsg *msg);
+> +};
+> +
+>  static const char *init_hugepagefs(void);
+> -static TestServer *test_server_new(const gchar *name);
+> +static TestServer *test_server_new(const gchar *name,
+> +        struct vhost_user_ops *ops);
+>  static void test_server_free(TestServer *server);
+>  static void test_server_listen(TestServer *server);
+>
+> @@ -167,7 +186,7 @@ enum test_memfd {
+>      TEST_MEMFD_NO,
+>  };
+>
+> -static void append_vhost_opts(TestServer *s, GString *cmd_line,
+> +static void append_vhost_net_opts(TestServer *s, GString *cmd_line,
+>                               const char *chr_opts)
+>  {
+>      g_string_append_printf(cmd_line, QEMU_CMD_CHR QEMU_CMD_NETDEV,
+> @@ -332,25 +351,15 @@ static void chr_read(void *opaque, const uint8_t *buf, int size)
+>          break;
+>
+>      case VHOST_USER_SET_FEATURES:
+> -        g_assert_cmpint(msg.payload.u64 & (0x1ULL << VHOST_USER_F_PROTOCOL_FEATURES),
+> -                        !=, 0ULL);
+> -        if (s->test_flags == TEST_FLAGS_DISCONNECT) {
+> -            qemu_chr_fe_disconnect(chr);
+> -            s->test_flags = TEST_FLAGS_BAD;
+> +        if (s->vu_ops->set_features) {
+> +            s->vu_ops->set_features(s, chr, &msg);
+>          }
+>          break;
+>
+>      case VHOST_USER_GET_PROTOCOL_FEATURES:
+> -        /* send back features to qemu */
+> -        msg.flags |= VHOST_USER_REPLY_MASK;
+> -        msg.size = sizeof(m.payload.u64);
+> -        msg.payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
+> -        msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
+> -        if (s->queues > 1) {
+> -            msg.payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
+> +        if (s->vu_ops->get_protocol_features) {
+> +            s->vu_ops->get_protocol_features(s, chr, &msg);
+>          }
+> -        p = (uint8_t *) &msg;
+> -        qemu_chr_fe_write_all(chr, p, VHOST_USER_HDR_SIZE + msg.size);
+>          break;
+>
+>      case VHOST_USER_GET_VRING_BASE:
+> @@ -467,7 +476,8 @@ static const char *init_hugepagefs(void)
+>  #endif
+>  }
+>
+> -static TestServer *test_server_new(const gchar *name)
+> +static TestServer *test_server_new(const gchar *name,
+> +        struct vhost_user_ops *ops)
+>  {
+>      TestServer *server = g_new0(TestServer, 1);
+>      char template[] = "/tmp/vhost-test-XXXXXX";
+> @@ -495,6 +505,7 @@ static TestServer *test_server_new(const gchar *name)
+>
+>      server->log_fd = -1;
+>      server->queues = 1;
+> +    server->vu_ops = ops;
+>
+>      return server;
+>  }
+> @@ -669,11 +680,11 @@ static void vhost_user_test_cleanup(void *s)
+>
+>  static void *vhost_user_test_setup(GString *cmd_line, void *arg)
+>  {
+> -    TestServer *server = test_server_new("vhost-user-test");
+> +    TestServer *server = test_server_new("vhost-user-test", arg);
+>      test_server_listen(server);
+>
+>      append_mem_opts(server, cmd_line, 256, TEST_MEMFD_AUTO);
+> -    append_vhost_opts(server, cmd_line, "");
+> +    server->vu_ops->append_opts(server, cmd_line, "");
+>
+>      g_test_queue_destroy(vhost_user_test_cleanup, server);
+>
+> @@ -682,11 +693,11 @@ static void *vhost_user_test_setup(GString *cmd_line, void *arg)
+>
+>  static void *vhost_user_test_setup_memfd(GString *cmd_line, void *arg)
+>  {
+> -    TestServer *server = test_server_new("vhost-user-test");
+> +    TestServer *server = test_server_new("vhost-user-test", arg);
+>      test_server_listen(server);
+>
+>      append_mem_opts(server, cmd_line, 256, TEST_MEMFD_YES);
+> -    append_vhost_opts(server, cmd_line, "");
+> +    server->vu_ops->append_opts(server, cmd_line, "");
+>
+>      g_test_queue_destroy(vhost_user_test_cleanup, server);
+>
+> @@ -720,7 +731,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
+>          return;
+>      }
+>
+> -    dest = test_server_new("dest");
+> +    dest = test_server_new("dest", s->vu_ops);
+>      dest_cmdline = g_string_new(qos_get_current_command_line());
+>      uri = g_strdup_printf("%s%s", "unix:", dest->mig_path);
+>
+> @@ -730,7 +741,7 @@ static void test_migrate(void *obj, void *arg, QGuestAllocator *alloc)
+>      test_server_listen(dest);
+>      g_string_append_printf(dest_cmdline, " -incoming %s", uri);
+>      append_mem_opts(dest, dest_cmdline, 256, TEST_MEMFD_AUTO);
+> -    append_vhost_opts(dest, dest_cmdline, "");
+> +    dest->vu_ops->append_opts(dest, dest_cmdline, "");
+>      to = qtest_init(dest_cmdline->str);
+>
+>      /* This would be where you call qos_allocate_objects(to, NULL), if you want
+> @@ -831,11 +842,11 @@ connect_thread(gpointer data)
+>
+>  static void *vhost_user_test_setup_reconnect(GString *cmd_line, void *arg)
+>  {
+> -    TestServer *s = test_server_new("reconnect");
+> +    TestServer *s = test_server_new("reconnect", arg);
+>
+>      g_thread_new("connect", connect_thread, s);
+>      append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+> -    append_vhost_opts(s, cmd_line, ",server");
+> +    s->vu_ops->append_opts(s, cmd_line, ",server");
+>
+>      g_test_queue_destroy(vhost_user_test_cleanup, s);
+>
+> @@ -866,13 +877,13 @@ static void test_reconnect(void *obj, void *arg, QGuestAllocator *alloc)
+>
+>  static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
+>  {
+> -    TestServer *s = test_server_new("connect-fail");
+> +    TestServer *s = test_server_new("connect-fail", arg);
+>
+>      s->test_fail = true;
+>
+>      g_thread_new("connect", connect_thread, s);
+>      append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+> -    append_vhost_opts(s, cmd_line, ",server");
+> +    s->vu_ops->append_opts(s, cmd_line, ",server");
+>
+>      g_test_queue_destroy(vhost_user_test_cleanup, s);
+>
+> @@ -881,13 +892,13 @@ static void *vhost_user_test_setup_connect_fail(GString *cmd_line, void *arg)
+>
+>  static void *vhost_user_test_setup_flags_mismatch(GString *cmd_line, void *arg)
+>  {
+> -    TestServer *s = test_server_new("flags-mismatch");
+> +    TestServer *s = test_server_new("flags-mismatch", arg);
+>
+>      s->test_flags = TEST_FLAGS_DISCONNECT;
+>
+>      g_thread_new("connect", connect_thread, s);
+>      append_mem_opts(s, cmd_line, 256, TEST_MEMFD_AUTO);
+> -    append_vhost_opts(s, cmd_line, ",server");
+> +    s->vu_ops->append_opts(s, cmd_line, ",server");
+>
+>      g_test_queue_destroy(vhost_user_test_cleanup, s);
+>
+> @@ -924,11 +935,47 @@ static void test_multiqueue(void *obj, void *arg, QGuestAllocator *alloc)
+>      wait_for_rings_started(s, s->queues * 2);
+>  }
+>
+> +static void vu_net_set_features(TestServer *s, CharBackend *chr,
+> +        VhostUserMsg *msg)
+> +{
+> +    g_assert_cmpint(msg->payload.u64 &
+> +            (0x1ULL << VHOST_USER_F_PROTOCOL_FEATURES), !=, 0ULL);
+> +    if (s->test_flags == TEST_FLAGS_DISCONNECT) {
+> +        qemu_chr_fe_disconnect(chr);
+> +        s->test_flags = TEST_FLAGS_BAD;
+> +    }
+> +}
+> +
+> +static void vu_net_get_protocol_features(TestServer *s, CharBackend *chr,
+> +        VhostUserMsg *msg)
+> +{
+> +    /* send back features to qemu */
+> +    msg->flags |= VHOST_USER_REPLY_MASK;
+> +    msg->size = sizeof(m.payload.u64);
+> +    msg->payload.u64 = 1 << VHOST_USER_PROTOCOL_F_LOG_SHMFD;
+> +    msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_CROSS_ENDIAN;
+> +    if (s->queues > 1) {
+> +        msg->payload.u64 |= 1 << VHOST_USER_PROTOCOL_F_MQ;
+> +    }
+> +    qemu_chr_fe_write_all(chr, (uint8_t *)msg, VHOST_USER_HDR_SIZE + msg->size);
+> +}
+> +
+> +/* Each VHOST-USER device should have its ops structure defined. */
+> +static struct vhost_user_ops g_vu_net_ops = {
+> +    .type = VHOST_USER_NET,
+> +
+> +    .append_opts = append_vhost_net_opts,
+> +
+> +    .set_features = vu_net_set_features,
+> +    .get_protocol_features = vu_net_get_protocol_features,
+> +};
+> +
+>  static void register_vhost_user_test(void)
+>  {
+>      QOSGraphTestOptions opts = {
+>          .before = vhost_user_test_setup,
+>          .subprocess = true,
+> +        .arg = &g_vu_net_ops,
+>      };
+>
+>      qemu_add_opts(&qemu_chardev_opts);
+> --
+> 2.7.4
 >
 >
-> > Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > ---
-> >  hw/core/meson.build    | 2 +-
-> >  hw/core/null-machine.c | 6 ++++++
-> >  2 files changed, 7 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/hw/core/meson.build b/hw/core/meson.build
-> > index fc91f98..b6591b9 100644
-> > --- a/hw/core/meson.build
-> > +++ b/hw/core/meson.build
-> > @@ -35,7 +35,6 @@ softmmu_ss.add(files(
-> >    'machine-hmp-cmds.c',
-> >    'machine.c',
-> >    'nmi.c',
-> > -  'null-machine.c',
-> >    'qdev-fw.c',
-> >    'qdev-properties-system.c',
-> >    'sysbus.c',
-> > @@ -45,5 +44,6 @@ softmmu_ss.add(files(
-> >
-> >  specific_ss.add(when: 'CONFIG_SOFTMMU', if_true: files(
-> >    'machine-qmp-cmds.c',
-> > +  'null-machine.c',
-> >    'numa.c',
-> >  ))
-> > diff --git a/hw/core/null-machine.c b/hw/core/null-machine.c
-> > index 7e69352..4b4ab76 100644
-> > --- a/hw/core/null-machine.c
-> > +++ b/hw/core/null-machine.c
-> > @@ -17,6 +17,9 @@
-> >  #include "sysemu/sysemu.h"
-> >  #include "exec/address-spaces.h"
-> >  #include "hw/core/cpu.h"
-> > +#ifdef TARGET_MIPS
-> > +#include "kvm_mips.h"
-> > +#endif
-> >
-> >  static void machine_none_init(MachineState *mch)
-> >  {
-> > @@ -55,6 +58,9 @@ static void machine_none_machine_init(MachineClass *mc)
-> >      mc->no_floppy = 1;
-> >      mc->no_cdrom = 1;
-> >      mc->no_sdcard = 1;
-> > +#ifdef TARGET_MIPS
-> > +    mc->kvm_type = mips_kvm_type;
-> > +#endif
-> >  }
-> >
-> >  DEFINE_MACHINE("none", machine_none_machine_init)
-> >
->
-
-
--- 
-Huacai Chen
 
