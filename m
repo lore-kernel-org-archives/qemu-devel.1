@@ -5,78 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DC8C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA88C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:54:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67A7F21D79
+	by mail.kernel.org (Postfix) with ESMTPS id AE52C21D7A
 	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:54:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WmYvQCJj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67A7F21D79
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G4LOm3jB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE52C21D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFwo1-0000tR-7d
+	id 1kFwo1-0000tT-LP
 	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57122)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwgo-0006Z5-Kp; Wed, 09 Sep 2020 05:46:54 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:42611)
+ id 1kFwhe-0007PI-Te; Wed, 09 Sep 2020 05:47:46 -0400
+Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54694)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwgm-0007fs-Sm; Wed, 09 Sep 2020 05:46:54 -0400
-Received: by mail-pg1-x543.google.com with SMTP id m5so1668030pgj.9;
- Wed, 09 Sep 2020 02:46:52 -0700 (PDT)
+ id 1kFwhc-0007ms-Vy; Wed, 09 Sep 2020 05:47:46 -0400
+Received: by mail-pj1-x1042.google.com with SMTP id mm21so1062114pjb.4;
+ Wed, 09 Sep 2020 02:47:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=s4O1f6yoxMsnnDNuUCRmwCFjeJefj3nbZpXkl1R+kT0=;
- b=WmYvQCJjJknqB9ryBg6cUmmTxm2CTRJJ2zcW8fehdFKIaaeYt4R24aCAPdI40W8tga
- w5aEDs5p/Q9Swv1de2MM3H2YlefyOeOyROGkAw+FrSNsKh1ZiD4HOtwOHNja8yvAFTpf
- yeeFPc5bCcDafnr/mU4q594hY732hbtrzZwmIzZEZjSMSXaFybXz1Cs2TgKWuQcB3Adn
- WPM9MXC3b4q7dInfiawewRgK7f0JSRXW59ui07K0s5YR2CIUOex/EtSfC96DdYJvENWY
- iHHDncAdx9tcYyk+HnRL5cAuxPDWWHDgKHKMkhXSBj7KLPFh9ZF/TamoenChWf3IE3P9
- dWwQ==
+ bh=faIdeALUAvLzj2kx9mbA5+e0PxUK1yXyWPv+NWO3/qo=;
+ b=G4LOm3jBbJ1twzr17e/NtytI0gmonbXYgPwwv6iMltAQhv7FdVgulOLV1gqahG4xrG
+ R2MtLQLDfhXHfQclUDcuacQezz0wlcHl9Jw+lypTB5mPaDU4CJvjmZqW2OmoIojogJ6L
+ zgeBLX7FDK/R+x2PNSsC7P9gCyQS2rNEjLI2LIlibJdtx/uM3oVX4pbsGfhfbbnINhJM
+ PRywuAl0QHg4kYt05G5nUTGziZ7uI+1D1ZTzsgGnIk1vHPSdFxFZaAufBApyjlLKDwez
+ nxpovOA/wIqw8UIQwnLez0iBanReo06r4vmDNFNtBbzYX7GfFFkffJfOSLQrFBYN5PQk
+ 7sOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=s4O1f6yoxMsnnDNuUCRmwCFjeJefj3nbZpXkl1R+kT0=;
- b=OIFFKOpw5HZYRs/j5by9UuC30cuSFKT0YWgVuLn1dG1thAvkE5qzrCVNgLC1cgUA58
- drOR4eR5pDIgulcW59I9QD3bdOamHHCXLCfrsrWyo4BDwqh3Yt+B3/CNzq98oNw41Vmv
- Kro6pSSoq2UDwt60MGFHzZedQn3U3cVo1fvrMsmAcoWKNbN/7nF9UPpOpznBl6/5K1et
- 25XeAJsQUxYuo2SSzWck1gzQaCyMQK1CeeNAbTzUHGwoBC4Vt08k4g5qsh7faAzcyMUz
- FB5wbxp6U+4kPBy9vs2+OntGyu2zMtUn6kFpyJ6dM5SYejJAsx/toKFDBpCjGFk8klpU
- 06lw==
-X-Gm-Message-State: AOAM5307988cXyEkC9PBUSeiqXXg9RVMnorqBR3HhdhyR7tYgu/2RPmR
- eI3MFV3lL7ArDGDwdI6+7lBC5vWuEgK/X22s
-X-Google-Smtp-Source: ABdhPJxUMaMkSlfxP6+Ei5eMHskD8j2Y/CBkOG71TWLUilUCQYg/x0AZCunq9jIz4eRhgE6XyDaOtA==
-X-Received: by 2002:a62:7616:: with SMTP id r22mr116663pfc.48.1599644810807;
- Wed, 09 Sep 2020 02:46:50 -0700 (PDT)
+ bh=faIdeALUAvLzj2kx9mbA5+e0PxUK1yXyWPv+NWO3/qo=;
+ b=uJDMKWlhX7T4tqiCtI84wEfA6PYZNdIvEmYzvs1tMDkAoETNB0Czr1KrL1K/ekaxyT
+ +zXrn7GlqDas3Ax6nJy0EbNt64tgA/i9ktD5VU2cCl3WUINaiCyKUTsgM9zwcKA0KO6M
+ XKFvMLTu0X0b7qyH+KH2arxMynd+AwTPY94qBEJAufYL4ELB4MOOD0VQmTkETgJdatdF
+ huNrwif4D4Ag2gPA/JHbiXhgWjCRE7Q60cmQ337bwAAs69WXYPmA2kvryoUUyJL1Xg+I
+ eSUlZeGC0FcKF4oHt/4UeGza2nzLGYNWCcu5zac5XLDC9qgwuNnI7ruGWryVGrsrD8W7
+ +SxQ==
+X-Gm-Message-State: AOAM531RH2Ix+8lkdUIX5yMFcoQIzFGbejh+cm1J6x1/Tg42kKb030qE
+ zfqTUL5PgdbwV08KOObE4KioVzLeYeHfFVQi
+X-Google-Smtp-Source: ABdhPJzLPE/Mchrbh0iTFyjsCW7aPQ5RuuyT6Gz85HoER/Lvym9aSfIa6A4Vqr4qK3SNQO+xc3+HyA==
+X-Received: by 2002:a17:90b:289:: with SMTP id az9mr107979pjb.31.1599644861563; 
+ Wed, 09 Sep 2020 02:47:41 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.46.46
+ by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 02:46:49 -0700 (PDT)
+ Wed, 09 Sep 2020 02:47:40 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 04/21] curses: Fixes curses compiling errors.
-Date: Wed,  9 Sep 2020 17:46:00 +0800
-Message-Id: <20200909094617.1582-5-luoyonggang@gmail.com>
+Subject: [PATCH v2 16/21] rcu: add uninit destructor for rcu
+Date: Wed,  9 Sep 2020 17:46:12 +0800
+Message-Id: <20200909094617.1582-17-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200909094617.1582-1-luoyonggang@gmail.com>
 References: <20200909094617.1582-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1042.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -98,66 +98,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
- Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
+ Peter Lieven <pl@kamp.de>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is the compiling error:
-../ui/curses.c: In function 'curses_refresh':
-../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
-  302 |             enum maybe_keycode next_maybe_keycode;
-      |                                ^~~~~~~~~~~~~~~~~~
-../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized in this function [-Werror=maybe-uninitialized]
-  256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr, maybe_keycode)
-      |     ^~~~~~~~~~
-../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
-  265 |     enum maybe_keycode maybe_keycode;
-      |                        ^~~~~~~~~~~~~
-cc1.exe: all warnings being treated as errors
-
-gcc version 10.2.0 (Rev1, Built by MSYS2 project)
+This is necessary if the pending  rcu calls are closing and removing
+temp files. This also provide a function
+void rcu_wait_finished(void);
+to fixes test-logging.c test failure on msys2/mingw.
+On windows if the file doesn't closed, you can not remove it.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/curses.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/qemu/rcu.h   |  5 +++++
+ tests/test-logging.c |  2 ++
+ util/rcu.c           | 37 ++++++++++++++++++++++++++++++++++++-
+ 3 files changed, 43 insertions(+), 1 deletion(-)
 
-diff --git a/ui/curses.c b/ui/curses.c
-index 12bc682cf9..e4f9588c3e 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -262,7 +262,7 @@ static int curses2foo(const int _curses2foo[], const int _curseskey2foo[],
- static void curses_refresh(DisplayChangeListener *dcl)
+diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
+index 570aa603eb..dd0a92c1d0 100644
+--- a/include/qemu/rcu.h
++++ b/include/qemu/rcu.h
+@@ -124,6 +124,11 @@ extern void rcu_unregister_thread(void);
+ extern void rcu_enable_atfork(void);
+ extern void rcu_disable_atfork(void);
+ 
++/*
++ * Wait all rcu call executed and exit the rcu thread.
++ */
++extern void rcu_wait_finished(void);
++
+ struct rcu_head;
+ typedef void RCUCBFunc(struct rcu_head *head);
+ 
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index 783fe09a27..1fac9250aa 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -210,6 +210,8 @@ int main(int argc, char **argv)
+                          tmp_path, test_logfile_lock);
+ 
+     rc = g_test_run();
++    qemu_log_close();
++    rcu_wait_finished();
+ 
+     rmdir_full(tmp_path);
+     return rc;
+diff --git a/util/rcu.c b/util/rcu.c
+index 60a37f72c3..43367988b9 100644
+--- a/util/rcu.c
++++ b/util/rcu.c
+@@ -308,10 +308,20 @@ void rcu_unregister_thread(void)
+     qemu_mutex_unlock(&rcu_registry_lock);
+ }
+ 
++typedef struct QemuRcuMessage {
++    struct rcu_head rcu;
++    void *message;
++} QemuRcuMessage;
++
++static int rcu_thread_exit_called = 0;
++static int rcu_thread_exited = 0;
++static QemuRcuMessage rcu_thread_message;
++
+ static void rcu_init_complete(void)
  {
-     int chr, keysym, keycode, keycode_alt;
--    enum maybe_keycode maybe_keycode;
-+    enum maybe_keycode maybe_keycode = CURSES_KEYCODE;
+     QemuThread thread;
+-
++    atomic_mb_set(&rcu_thread_exit_called, 0);
++    atomic_mb_set(&rcu_thread_exited, 0);
+     qemu_mutex_init(&rcu_registry_lock);
+     qemu_mutex_init(&rcu_sync_lock);
+     qemu_event_init(&rcu_gp_event, true);
+@@ -327,6 +337,26 @@ static void rcu_init_complete(void)
+     rcu_register_thread();
+ }
  
-     curses_winch_check();
++static void rcu_thread_exit(QemuRcuMessage *param)
++{
++    atomic_mb_set((int*)param->message, 1);
++    qemu_thread_exit(NULL);
++}
++
++void rcu_wait_finished(void)
++{
++    if (atomic_xchg(&rcu_thread_exit_called, 1) == 0)
++    {
++        rcu_thread_message.message = &rcu_thread_exited;
++        call_rcu(&rcu_thread_message, rcu_thread_exit, rcu);
++    }
++
++    while (atomic_mb_read(&rcu_thread_exited) == 0)
++    {
++        g_usleep(10000);
++    }
++}
++
+ static int atfork_depth = 1;
  
-@@ -299,7 +299,7 @@ static void curses_refresh(DisplayChangeListener *dcl)
- 
-         /* alt or esc key */
-         if (keycode == 1) {
--            enum maybe_keycode next_maybe_keycode;
-+            enum maybe_keycode next_maybe_keycode = CURSES_KEYCODE;
-             int nextchr = console_getch(&next_maybe_keycode);
- 
-             if (nextchr != -1) {
+ void rcu_enable_atfork(void)
+@@ -379,3 +409,8 @@ static void __attribute__((__constructor__)) rcu_init(void)
+ #endif
+     rcu_init_complete();
+ }
++
++static void __attribute__((__destructor__)) rcu_uninit(void)
++{
++    rcu_wait_finished();
++}
 -- 
 2.28.0.windows.1
 
