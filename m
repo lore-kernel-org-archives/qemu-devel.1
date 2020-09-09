@@ -2,104 +2,90 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D23A1C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5313DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:24:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38F032087C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:22:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9CCCD21D7D
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:24:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QkeRH6YF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38F032087C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R2mfQvkF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CCCD21D7D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG03e-0000jy-Ul
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:22:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60510)
+	id 1kG05L-0002ra-Fv
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:24:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kG030-0008IX-CZ
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 09:22:02 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:43371
- helo=us-smtp-delivery-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kG03b-0000pO-6N
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 09:22:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59624)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kG02y-0004Ln-8A
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 09:22:02 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kG03Z-0004PC-3U
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 09:22:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599657719;
+ s=mimecast20190719; t=1599657755;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=FZ5gC2tzhmIVznbaQefEBQyD9pQOnxQiQ/r3+LKlsoI=;
- b=QkeRH6YFQVQOu/HdCtQXsBzO+Ky3kg3os8f/HwFVSM99tfb53d/39vMs9dkLYcer0h12Lh
- w/mBYVnTcMyJqSm/uXb+e2ZkmZEp2cjmesbvzc3D54+KOPKuB357akkuPvCk2BWVZj05HK
- /L/+2glu4n49JbmGaPUqdCPBKuzpFNE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-450-odlj5pnfP0SSq_DEtBjnqA-1; Wed, 09 Sep 2020 09:21:57 -0400
-X-MC-Unique: odlj5pnfP0SSq_DEtBjnqA-1
-Received: by mail-ed1-f69.google.com with SMTP id x23so1014700eds.5
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 06:21:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=FZ5gC2tzhmIVznbaQefEBQyD9pQOnxQiQ/r3+LKlsoI=;
- b=MaduwitHfg3+0nl5U6ZKnpwHS3kl7DOMMNVEGSVxS6dDqnmUP1ZKIyb8q0R1GIFtvx
- 49vpty8YJnlh5DC9SZe5szc5TeQIbXt0OQdV7kr5sinYozlTIn/w+eC35nCd6S7dnK/C
- 6D7nizpYkgsYkq1Soxe1ZWUKpLDWUiSJv9lTn2OCq76f/fjocKckGj0SPCU6j1D8iDV1
- ceJFbq45Ujftrgqg4Pvio9X4uS5XqNRMUrufZWOYjA8R7D3l5R6OVLWjsPfmUcBy+hVg
- 4pLzB4vHd1w8NiMq36VHm6Pz4WaYXLA2+5S9l9H+8stGvWHjFxr5wUnrKoDXJ7xIAFQw
- 0Zng==
-X-Gm-Message-State: AOAM5307eO64jrakO4jP5oHylb/aifWLH4o2dZOq5rAZLaHlS8Wd/LFc
- YY1+2X7GRtF+yZVmxUgo0vTjTFptig5MAh55vZHkpV02x0MZvgcrMo0MJ6zf2NWI9nhP7HbN2bL
- /3KAil8dN/AWq9Z8DAbBHdZJWfHQOO60=
-X-Received: by 2002:a17:906:3495:: with SMTP id
- g21mr3463272ejb.121.1599657715847; 
- Wed, 09 Sep 2020 06:21:55 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzpKYqNkcQAAg+Qo533kJD2+Jc+6R1bzyzI876ZC2UtKMHw0eZKpYfSdZycj7LZBhPPXKmpuGOoXXcsdq97iwU=
-X-Received: by 2002:a17:906:3495:: with SMTP id
- g21mr3463253ejb.121.1599657715654; 
- Wed, 09 Sep 2020 06:21:55 -0700 (PDT)
+ bh=759snmECYdh/5c2jhvEO1JM0ehZnfkh+l/ubVOXmNrM=;
+ b=R2mfQvkFOV7uRBR5lk+UY+wLhrT0toPX7ELlyO9b7x2Y+KT4/Iv013MMJZbVb2zCB3sbeo
+ vdij3esOmcpDwjHqaRsczBuEPZzv3K5N4w7Ikc1ULnFN3/jxIzi5MnYsru4CWfC6OOfl98
+ GCDN4JUDVkQBq59ZNbgLVvsXW6QaRCM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-333-ENIODjybPYa7uwyfjj1AGQ-1; Wed, 09 Sep 2020 09:22:33 -0400
+X-MC-Unique: ENIODjybPYa7uwyfjj1AGQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73E02800462;
+ Wed,  9 Sep 2020 13:22:32 +0000 (UTC)
+Received: from linux.fritz.box (ovpn-113-221.ams2.redhat.com [10.36.113.221])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CFBC83560;
+ Wed,  9 Sep 2020 13:22:27 +0000 (UTC)
+Date: Wed, 9 Sep 2020 15:22:25 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Subject: Re: [PATCH 1/4] docs: lift block-core.json rST header into parents
+Message-ID: <20200909132225.GE5219@linux.fritz.box>
+References: <20200908093113.47564-1-stefanha@redhat.com>
+ <20200908093113.47564-2-stefanha@redhat.com>
+ <f5de1038-5bf3-8bd4-d664-45d6f201ae9b@redhat.com>
+ <20200908142308.GD8175@linux.fritz.box>
+ <87h7s7z9g4.fsf@dusky.pond.sub.org>
+ <20200909075222.GA5219@linux.fritz.box>
+ <87v9gnw3q2.fsf@dusky.pond.sub.org>
 MIME-Version: 1.0
-References: <20200826110419.528931-1-marcandre.lureau@redhat.com>
- <20200826110419.528931-6-marcandre.lureau@redhat.com>
- <20200909095147.p6ywqn5ze7mbmvm6@lws.brq.redhat.com>
- <CAMxuvax6mfV2zX9tz7xJ5qMb5EaX6oLs6piqqAnGY6_dAyFNEQ@mail.gmail.com>
- <20200909124622.nsekxztqfrg6mijs@lws.brq.redhat.com>
- <CAMxuvay2_3nkdfb7=+0t1OKtAdJJ6Zw4KCp4+3NV3p-sssY2VA@mail.gmail.com>
-In-Reply-To: <CAMxuvay2_3nkdfb7=+0t1OKtAdJJ6Zw4KCp4+3NV3p-sssY2VA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 9 Sep 2020 15:21:43 +0200
-Message-ID: <CABgObfbrzOJzGBhz=zc5+4COvdjqfLxJ7wM-t=xRQyzLnfXFew@mail.gmail.com>
-Subject: Re: [PATCH v3 5/8] meson: use meson datadir instead of qemu_datadir
-To: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
+In-Reply-To: <87v9gnw3q2.fsf@dusky.pond.sub.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.0
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0.002
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="000000000000e7768605aee155ec"
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:20:45
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 07:20:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,53 +98,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, Miroslav Rezanina <mrezanin@redhat.com>,
- "P. Berrange, Daniel" <berrange@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>,
+ afrosi@redhat.com, Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e7768605aee155ec
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Am 09.09.2020 um 14:10 hat Markus Armbruster geschrieben:
+> Kevin Wolf <kwolf@redhat.com> writes:
+> 
+> > Am 09.09.2020 um 09:38 hat Markus Armbruster geschrieben:
+> >> Kevin Wolf <kwolf@redhat.com> writes:
+> >> 
+> >> > Am 08.09.2020 um 14:03 hat Laszlo Ersek geschrieben:
+> >> >> Hi Stefan,
+> >> >> 
+> >> >> On 09/08/20 11:31, Stefan Hajnoczi wrote:
+> >> >> > block-core.json is included from several places. It has no way of
+> >> >> > knowing what header level (h1, h2, ...) is appropriate. Sphinx reports
+> >> >> > errors when it encounters an h2 header where it expects an h1 header.
+> >> >> > This issue prevents the next patch from generating documentation for
+> >> >> > qemu-storage-daemon QMP commands.
+> >> >> > 
+> >> >> > Move the header into parents so that the correct header level can be
+> >> >> > used. Note that transaction.json is not updated since it doesn't seem to
+> >> >> > need a header.
+> >> >> > 
+> >> >> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> >> >> > ---
+> >> >> >  docs/interop/firmware.json | 4 ++++
+> >> >> >  qapi/block-core.json       | 4 ----
+> >> >> >  qapi/block.json            | 1 +
+> >> >> >  3 files changed, 5 insertions(+), 4 deletions(-)
+> >> >> > 
+> >> >> > diff --git a/docs/interop/firmware.json b/docs/interop/firmware.json
+> >> >> > index 989f10b626..48af327f98 100644
+> >> >> > --- a/docs/interop/firmware.json
+> >> >> > +++ b/docs/interop/firmware.json
+> >> >> > @@ -15,6 +15,10 @@
+> >> >> >  ##
+> >> >> >  
+> >> >> >  { 'include' : 'machine.json' }
+> >> >> > +
+> >> >> > +##
+> >> >> > +# == Block devices
+> >> >> > +##
+> >> >> >  { 'include' : 'block-core.json' }
+> >> >> >  
+> >> >> >  ##
+> >> >> 
+> >> >> I think "docs/interop/firmware.json" deserves the same treatment as
+> >> >> "transaction.json".
+> >> >> 
+> >> >> It's been a long time since I last looked at a rendered view of
+> >> >> "docs/interop/firmware.json", but it only includes "block-core.json" so
+> >> >> it can refer to some block-related types (@BlockdevDriver seems like the
+> >> >> main, or only, one).
+> >> >> 
+> >> >> I wouldn't expect the rendered view of "firmware.json" to have a section
+> >> >> header saying "Block devices".
+> >> >> 
+> >> >> I think it should be fine to drop this hunk (and my CC along with it ;))
+> >> >
+> >> > I think this is actually a more general problem with the way we generate
+> >> > the documentation. For example, the "Background jobs" documentation ends
+> >> > up under "Block Devices" just because qapi-schema.json includes
+> >> > block-core.json before job.json and block-core.json includes job.json to
+> >> > be able to access some types.
+> >> 
+> >> The doc generator is stupid and greedy (which also makes it
+> >> predictable): a module's documentation is emitted where it is first
+> >> included.
+> >> 
+> >> For full control of the order, have the main module include all
+> >> sub-modules in the order you want.
+> >
+> > This works as long as the order that we want is consistent with the
+> > requirement that every file must be included by qapi-schea.json before
+> > it is included by any other file (essentially making the additional
+> > includes in other files useless).
+> 
+> These other includes are not useless: they are essential for generating
+> self-contained headers.
+> 
+> When MOD.json includes SUBMOD.json, then the generated qapi-FOO-MOD.h
+> include qapi-FOO-SUBMOD.h.  When every module pulls in the modules it
+> requires, so do the generated headers.  When a module doesn't, its
+> generated headers won't compile unless you manually include the missing
+> generated headers it requires.
 
-Il mer 9 set 2020, 15:18 Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.co=
-m> ha
-scritto:
+Hm, right. So we're using includes for two different purposes, but just
+from looking at the include line, you can't know which one it is.
 
-> I propose to silently remove the leading '/' in --with-suffix
-> argument, or warn/error about its presence.
->
+> > Is this the order that we want?
+> >
+> > If so, we could support following the rule consistently by making double
+> > include of a file an error.
+> 
+> Breaks our simple & stupid way to generate self-contained headers.
+> 
+> >> Alternatively, add just enough includes to get the order you want.
+> >
+> > There are orders that I can't get this way.
+> 
+> You're right, ordering by first include is not completely general.
+> 
+> >                                             For example, if I want to
+> > have "Block devices" documented before "Background jobs", there is no
+> > way to add includes to actually get this order without having
+> > "Background jobs" as a subsection in "Block devices".
+> 
+> "Background jobs" is job.json.
+> 
+> "Block devices" is block.json, which includes block-core.json, which
+> includes job.json.
+> 
+> To be able to put "Block devices" first, you'd have to break the chain
+> from block.json to job.json.  Which might even be an improvement:
+> 
+> $ wc -l qapi/*.json | awk '$1 >= 1000 { print }'
+>   5527 qapi/block-core.json
+>   1722 qapi/migration.json
+>   1617 qapi/misc.json
+>   1180 qapi/ui.json
+>  17407 total
+> 
+> Could we split block-core.json into several cohesive parts?
 
-Sounds good to just remove it; recent meson has a substring method so we
-can do that in meson.build too.
+Possibly. However, while it would be an improvement generally speaking,
+how does this change the specific problem? All of the smaller files will
+be included by block.json (or whatever file provides the "Block devices"
+chapter in the documentation) and at least one of them will still have
+to include job.json.
 
-Paolo
+(As it happens, the block export series splits off a block-export QAPI
+module, but it's probably small enough to be barely noticable in this
+comparison.)
 
-
->
-
---000000000000e7768605aee155ec
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il mer 9 set 2020, 15:18 Marc-Andr=C3=A9 Lureau &lt;<a=
- href=3D"mailto:marcandre.lureau@redhat.com">marcandre.lureau@redhat.com</a=
->&gt; ha scritto:<br></div><blockquote class=3D"gmail_quote" style=3D"margi=
-n:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">I propose to sile=
-ntly remove the leading &#39;/&#39; in --with-suffix<br>
-argument, or warn/error about its presence.<br></blockquote></div></div><di=
-v dir=3D"auto"><br></div><div dir=3D"auto">Sounds good to just remove it; r=
-ecent meson has a substring method so we can do that in meson.build too.</d=
-iv><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=3D"aut=
-o"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=
-=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padd=
-ing-left:1ex">
-<br>
-</blockquote></div></div></div>
-
---000000000000e7768605aee155ec--
+Kevin
 
 
