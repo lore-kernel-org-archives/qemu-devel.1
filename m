@@ -2,117 +2,83 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA6D9C2D0A8
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 331FCC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:39:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D37D3207DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:39:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCAB0215A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:39:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ZWgB0zUI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D37D3207DE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=euphon.net header.i=fam@euphon.net header.b="M2Ucm8Xi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCAB0215A4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=euphon.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFvdy-00028J-MO
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:39:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40214)
+	id 1kFve1-0002Fe-Qe
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:39:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40886)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
- id 1kFvb6-0006PJ-1s
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:36:56 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62214)
+ (Exim 4.90_1) (envelope-from <fam@euphon.net>)
+ id 1kFvcx-0000v3-1D; Wed, 09 Sep 2020 04:38:51 -0400
+Received: from sender2-op-o12.zoho.com.cn ([163.53.93.243]:17639)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dovmurik@linux.vnet.ibm.com>)
- id 1kFvb4-0006oo-1S
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:36:55 -0400
-Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 0898WAcB127410
- for <qemu-devel@nongnu.org>; Wed, 9 Sep 2020 04:36:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=3Ynz+pnyvYzTN+xw2lWfQw6lWn1cSFqzPVUU0qUqbHk=;
- b=ZWgB0zUIfi8qZIMUywwDZG8vdwM0BhJ4SH6aw0mV10Wzt2o2x/AJ0mL+x5hBXxeA6aQT
- imTt8wGmJX5VeLNEouvVEXuNHN7AaBujcoBjWGXK39n3vkVJLljMwhctbtvJTLpwU3QE
- SlD+zke996FXIik+Rvx0kMUWdebsRkFZphfDcZmwzlGu4EBrT6bRciDDKBeXsd9875Sh
- zolQ4E5PXXOYdDcFUIyy+elY4NrmSErxljyh1CvD0DwvYkwgo93z9refj247ikkS0AXy
- NesUd85OjpmDuiO7mVc4G/sloEZqN2qYOZFU9ytou4WZ0qYUqPWgX/mzBFFuWMsbZN6A fQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33eu11s9xr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 04:36:53 -0400
-Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0898WgIO128616
- for <qemu-devel@nongnu.org>; Wed, 9 Sep 2020 04:36:52 -0400
-Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.10])
- by mx0a-001b2d01.pphosted.com with ESMTP id 33eu11s9xd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 09 Sep 2020 04:36:52 -0400
-Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
- by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 0898SPpK016498;
- Wed, 9 Sep 2020 08:36:52 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
- [9.57.198.25]) by ppma02dal.us.ibm.com with ESMTP id 33c2a9d9gf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 09 Sep 2020 08:36:52 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com
- [9.57.199.110])
- by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 0898ap3E53608860
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 9 Sep 2020 08:36:51 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 61E57AE05C;
- Wed,  9 Sep 2020 08:36:51 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 47B2AAE060;
- Wed,  9 Sep 2020 08:36:51 +0000 (GMT)
-Received: from amdrome1.watson.ibm.com (unknown [9.2.130.16])
- by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
- Wed,  9 Sep 2020 08:36:51 +0000 (GMT)
-From: Dov Murik <dovmurik@linux.vnet.ibm.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] hw/timer/hpet: Fix debug format strings
-Date: Wed,  9 Sep 2020 08:36:50 +0000
-Message-Id: <20200909083650.46771-3-dovmurik@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200909083650.46771-1-dovmurik@linux.vnet.ibm.com>
-References: <20200909083650.46771-1-dovmurik@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <fam@euphon.net>)
+ id 1kFvcs-0006zo-9w; Wed, 09 Sep 2020 04:38:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1599640702; cv=none; d=zoho.com.cn; s=zohoarc; 
+ b=E+/lTKReqydzSUpPehSDgHWj/V/qrfs8w79G5SUYOVKBCAeaLuvyVhbN01cqQBCcQMeZJ85pIPL0MRBzeaGy/fbtTAYPyjUWXOut9lg1sI6TU8GXcsxiqX6SV7FAMi87qvMdtOK4XRwUBbCZukrLQae+n2oYpRu1W74MW6RjSkU=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zoho.com.cn;
+ s=zohoarc; t=1599640702;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To;
+ bh=A+s6JKOwBlT3nIqqBlTNnSv8zmpSGkgPgR0d2cB6f7Y=; 
+ b=V3ga9GPs4f3ctmG/l3Z1RN4FDoP1ms6StFpmDD6fm3cTiik8trAB0boDF1g5d6fQ1P9TLtkqZUnYYXbjfRunu/n0+EtLWK4AvDYDNTf/Bl8DAh8y4UKXTsPzlpFClh+gAaAcBFEtD+bNf4FdITY5nlSqVf++DWNaViJ5yrnue7k=
+ARC-Authentication-Results: i=1; mx.zoho.com.cn;
+ dkim=pass  header.i=euphon.net;
+ spf=pass  smtp.mailfrom=fam@euphon.net;
+ dmarc=pass header.from=<fam@euphon.net> header.from=<fam@euphon.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1599640702; 
+ s=zoho; d=euphon.net; i=fam@euphon.net;
+ h=Date:From:To:Cc:Message-ID:Subject:References:MIME-Version:Content-Type:Content-Transfer-Encoding:In-Reply-To;
+ bh=A+s6JKOwBlT3nIqqBlTNnSv8zmpSGkgPgR0d2cB6f7Y=;
+ b=M2Ucm8XiBE4QxHGoaUY5fVumTOxid/PRlxIgVnLGkVJgNoUaKvvEY3GJn05mcie7
+ RqKGB3pqwYWw8xgBudZZ9cMDGAjv3AxZZb0BOtMqS450Qhdzbg1DaYP31raFk4BbzwL
+ 4iWIdg+nVNPO16pINvVqlHk5Mg/pdtCMj7FjjnVA=
+Received: from localhost (ec2-52-56-101-76.eu-west-2.compute.amazonaws.com
+ [52.56.101.76]) by mx.zoho.com.cn
+ with SMTPS id 1599640700750107.10460783921292;
+ Wed, 9 Sep 2020 16:38:20 +0800 (CST)
+Date: Wed, 9 Sep 2020 08:38:15 +0000
+From: Fam Zheng <fam@euphon.net>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Message-ID: <20200909083815.wp2f3kmc2xxgjukm@dev>
+Subject: Re: [RFC PATCH v5 2/4] util/vfio-helpers: Report error when IOMMU
+ page size is not supported
+References: <20200908180342.280749-1-philmd@redhat.com>
+ <20200908180342.280749-3-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-09_03:2020-09-08,
- 2020-09-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 phishscore=0
- suspectscore=1 mlxlogscore=999 mlxscore=0 priorityscore=1501 clxscore=1015
- lowpriorityscore=0 adultscore=0 spamscore=0 impostorscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009090073
-Received-SPF: none client-ip=148.163.158.5;
- envelope-from=dovmurik@linux.vnet.ibm.com; helo=mx0b-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 02:27:07
-X-ACL-Warn: Detected OS   = Linux 3.x [generic]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20200908180342.280749-3-philmd@redhat.com>
+X-ZohoCNMailClient: External
+Received-SPF: pass client-ip=163.53.93.243; envelope-from=fam@euphon.net;
+ helo=sender2-op-o12.zoho.com.cn
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 04:38:34
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,68 +91,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Dov Murik <dovmurik@linux.vnet.ibm.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fix compiler errors when compiling with -DHPET_DEBUG due to mismatch
-between format string token "%x" and the argument type uint64_t.
+On 2020-09-08 20:03, Philippe Mathieu-Daud=E9 wrote:
+> This driver uses the host page size to align its memory regions,
+> but this size is not always compatible with the IOMMU. Add a
+> check if the size matches, and bails out with listing the sizes
+> the IOMMU supports.
+>=20
+> Example on Aarch64:
+>=20
+>  $ qemu-system-aarch64 -M virt -drive if=3Dnone,id=3Dnvme0,file=3Dnvme://=
+0006:90:00.0/1,format=3Draw
+>  qemu-system-aarch64: -drive if=3Dnone,id=3Dnvme0,file=3Dnvme://0006:90:0=
+0.0/1,format=3Draw: Unsupported IOMMU page size: 4 KiB
+>  Available page size:
+>   64 KiB
+>   512 MiB
+>=20
+> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  util/vfio-helpers.c | 20 ++++++++++++++++++++
+>  1 file changed, 20 insertions(+)
+>=20
+> diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
+> index 55b4107ce69..6d9ec7d365c 100644
+> --- a/util/vfio-helpers.c
+> +++ b/util/vfio-helpers.c
+> @@ -11,6 +11,7 @@
+>   */
+> =20
+>  #include "qemu/osdep.h"
+> +#include "qemu/cutils.h"
+>  #include <sys/ioctl.h>
+>  #include <linux/vfio.h>
+>  #include "qapi/error.h"
+> @@ -316,6 +317,25 @@ static int qemu_vfio_init_pci(QEMUVFIOState *s, cons=
+t char *device,
+>          ret =3D -errno;
+>          goto fail;
+>      }
+> +    if (!(iommu_info.flags & VFIO_IOMMU_INFO_PGSIZES)) {
+> +        error_setg(errp, "Failed to get IOMMU page size info");
+> +        ret =3D -errno;
 
-Also "%#x" is replaced by "0x%" PRIx64 according to the coding style.
+We don't have errno here, do we?
 
-Signed-off-by: Dov Murik <dovmurik@linux.vnet.ibm.com>
----
- hw/timer/hpet.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+> +        goto fail;
+> +    }
+> +    if (!extract64(iommu_info.iova_pgsizes,
+> +                   ctz64(qemu_real_host_page_size), 1)) {
+> +        g_autofree char *host_page_size =3D size_to_str(qemu_real_host_p=
+age_size);
+> +        error_setg(errp, "Unsupported IOMMU page size: %s", host_page_si=
+ze);
+> +        error_append_hint(errp, "Available page size:\n");
+> +        for (int i =3D 0; i < 64; i++) {
+> +            if (extract64(iommu_info.iova_pgsizes, i, 1)) {
+> +                g_autofree char *iova_pgsizes =3D size_to_str(1UL << i);
+> +                error_append_hint(errp, " %s\n", iova_pgsizes);
 
-diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-index b683f64f1d..73d2168c32 100644
---- a/hw/timer/hpet.c
-+++ b/hw/timer/hpet.c
-@@ -495,7 +495,8 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
-     HPETState *s = opaque;
-     uint64_t old_val, new_val, val, index;
- 
--    DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n", addr, value);
-+    DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = 0x%" PRIx64 "\n",
-+            addr, value);
-     index = addr;
-     old_val = hpet_ram_read(opaque, addr, 4);
-     new_val = value;
-@@ -505,7 +506,7 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
-         uint8_t timer_id = (addr - 0x100) / 0x20;
-         HPETTimer *timer = &s->timer[timer_id];
- 
--        DPRINTF("qemu: hpet_ram_writel timer_id = %#x\n", timer_id);
-+        DPRINTF("qemu: hpet_ram_writel timer_id = 0x%x\n", timer_id);
-         if (timer_id > s->num_timers) {
-             DPRINTF("qemu: timer id out of range\n");
-             return;
-@@ -637,8 +638,8 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
-             }
-             s->hpet_counter =
-                 (s->hpet_counter & 0xffffffff00000000ULL) | value;
--            DPRINTF("qemu: HPET counter written. ctr = %#x -> %" PRIx64 "\n",
--                    value, s->hpet_counter);
-+            DPRINTF("qemu: HPET counter written. ctr = 0x%" PRIx64 " -> "
-+                    "%" PRIx64 "\n", value, s->hpet_counter);
-             break;
-         case HPET_COUNTER + 4:
-             if (hpet_enabled(s)) {
-@@ -646,8 +647,8 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
-             }
-             s->hpet_counter =
-                 (s->hpet_counter & 0xffffffffULL) | (((uint64_t)value) << 32);
--            DPRINTF("qemu: HPET counter + 4 written. ctr = %#x -> %" PRIx64 "\n",
--                    value, s->hpet_counter);
-+            DPRINTF("qemu: HPET counter + 4 written. ctr = 0x%" PRIx64 " -> "
-+                    "%" PRIx64 "\n", value, s->hpet_counter);
-             break;
-         default:
-             DPRINTF("qemu: invalid hpet_ram_writel\n");
--- 
-2.20.1
+Interesting... Since it's printing page size which is fairly low level,
+why not just plain (hex) numbers?
+
+Fam
+
+> +            }
+> +        }
+> +        ret =3D -EINVAL;
+> +        goto fail;
+> +    }
+> =20
+>      s->device =3D ioctl(s->group, VFIO_GROUP_GET_DEVICE_FD, device);
+> =20
+> --=20
+> 2.26.2
+>=20
+>=20
 
 
