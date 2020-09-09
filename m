@@ -8,75 +8,78 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C64C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:56:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C8CC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:56:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 819AA207DE
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:56:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6927215A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:56:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jxt/VXbK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 819AA207DE
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QHVFHbfk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6927215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFwpx-00057I-E6
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:56:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57388)
+	id 1kFwqT-0006c8-87
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:56:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwhM-0007GN-74; Wed, 09 Sep 2020 05:47:32 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:32845)
+ id 1kFwhd-0007LQ-52; Wed, 09 Sep 2020 05:47:45 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:35436)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwhH-0007jr-Mt; Wed, 09 Sep 2020 05:47:27 -0400
-Received: by mail-pg1-x544.google.com with SMTP id s65so621320pgb.0;
- Wed, 09 Sep 2020 02:47:21 -0700 (PDT)
+ id 1kFwhX-0007mP-Gw; Wed, 09 Sep 2020 05:47:44 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id jw11so1086484pjb.0;
+ Wed, 09 Sep 2020 02:47:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=xBOHLIgzzS+cZLXuoOhLEV5Djuhr7s8VvLqqjTlGHNI=;
- b=jxt/VXbKXcB+OjQ8v70XeIXG4aTVqQYrSDG3sZW+CYjblVC/Es9a2PSay0tDBlt1FE
- byKua9WlGu0y3UfltY2syZZk1zI1GdFilgmF5WePl9QUHARfxOmXpuJWA4SlhWYZxLNF
- xdyxkoUpSDFG4ebw3s4SpLZ1+2iQ3nj8wvrDdmCzs6YwmCYvcfbAI9IgDT8+hadnveSt
- BpGRbNMkOaDTO8G69Qk8jkSQpLnJY8gWqr6zugSwLN9NwJWUShfpBYpZYezRuNmvAYAe
- ku8gQ3hWu+xi09jc5tcd14/iOJGKlfawYJUkV4sfp4o+tPEATAZr+7k0uKLyweRmgzB7
- qeew==
+ bh=8S8LCq0vzh09WirR5+SRleiM+m06nOYh6OfHaB3TjgI=;
+ b=QHVFHbfkRsdPSv37curnQ32C7mlhImkKmvTfHTLHkBBWdOkcU35r0/sKAAR+gfhiKK
+ ePU6Lsb6kElFW2aUmR0eEBZDEDYAmQDwOJ8Skyonjahw6T4WX4vE12JEEzVvIyb50xFO
+ o8g6cUFqKkziCTBeN+MBh0mrR1FtpQWE6L86lFYM8QTT8Zcy4MMyvHHEXXOFft8uyaXT
+ IQNTFFCddE/NTDpuYsicX7t+/WPLm6MG8hR8oMHTt8nLhAfVlhPUQyI0RHig4Iol0Opu
+ NiG4hSSDVCRQCqKv0PqtWWx9SWqd7EhUFTeiWhplrlFhsOSd51cJbiGo93s/ErY9RMf5
+ 3f/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=xBOHLIgzzS+cZLXuoOhLEV5Djuhr7s8VvLqqjTlGHNI=;
- b=Ore9D/31/++1tfdQot9/hFSCfv12AiIaexe4qZdFeENJg/I+GZvw/rzIxCN0f2EuZv
- iBVhc7d81bR9gRWHoOe95iDY+dC5OavPFb864k9TWZiRvjEfw9oPmLbOUaOzJNKvxIDr
- 4LBc3ZVcu4Zsv9+WQ6ipMeSLIPfPOR3SKctMgpTVpr4Chqf7OMOVENDaBPx/o0JceBaC
- hg1ihAKoX9WNSa/9Up6C/H2GfOD54tiA1U1hdh8IwU3uZMTmeJ3wUZ9eGgk4O0i61/eh
- 4xwVAYEh8tFYfyOk/ZS8TN70vAUE0p61d+sl/GXNu2U/hyasS4HrLzuS7P0Uaw2bw4t1
- +Wfg==
-X-Gm-Message-State: AOAM533jDv+GCxt0AtPwoE3T737Zyu9LWo4Y3Y8wZ0OtZE8qtD+Zuje/
- OkTuMMFCuOUOWTapxoa411DI+TKGyYH2arhf
-X-Google-Smtp-Source: ABdhPJx0An2o17UGp72a+1OQ9mCUVSV/KLSwc5LpdLJfM5hFi/7vsVHpWr9CTHjduc+70VF6EN+3pg==
-X-Received: by 2002:a62:5212:: with SMTP id g18mr124535pfb.8.1599644840472;
- Wed, 09 Sep 2020 02:47:20 -0700 (PDT)
+ bh=8S8LCq0vzh09WirR5+SRleiM+m06nOYh6OfHaB3TjgI=;
+ b=anBfq/PrLr2p8HYGIaKDp7ITkqaIgniYPvLEjUIApOnotSPqiPi2ZizYtnT79l+UtX
+ JWi/ZWB9T8UvNHjpUbfgIpH3cT6mzWyWfHvbWe9k9wgR1IPK/SANbj63b8c8bloygvE5
+ VTuqnRKCm6d/A9lblkAO4ktEYYuWMvNkxy7rLA/rRv7sOSteGoc2RF98IYj3Nl7nif9O
+ AJhrYuQszRe2R6IpIW7DINz1AK0pSHt5lTBbfrR7lQMYmJXPIWRLcz+dFLwBJTV4MO67
+ IWdTQmRV/FelQcBmr/Kc2rUb9jTY0bex/iNCFGu/j+fiBdKrgJYBpp34DOWgegKCSMNw
+ kQtw==
+X-Gm-Message-State: AOAM531D5kWWBoW8nPp+ctNk5sy00rVzjcU5We923tS+6ZyCSTaeeLsn
+ 5mdps9kkgFozXS1NXU5M7NEy1zt12yZ7KR+q
+X-Google-Smtp-Source: ABdhPJwKxtD3JKLpSULe5IyfuMvqgMWxvb+kppkNNSOX7stOty4L6jYiB1/K9IHnlhq6BNI6rG5n4g==
+X-Received: by 2002:a17:90a:7f8a:: with SMTP id
+ m10mr108458pjl.47.1599644857477; 
+ Wed, 09 Sep 2020 02:47:37 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.16
+ by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.33
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 02:47:19 -0700 (PDT)
+ Wed, 09 Sep 2020 02:47:36 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 11/21] meson: disable crypto tests are empty under win32
-Date: Wed,  9 Sep 2020 17:46:07 +0800
-Message-Id: <20200909094617.1582-12-luoyonggang@gmail.com>
+Subject: [PATCH v2 15/21] tests: Convert g_free to g_autofree macro in
+ test-logging.c
+Date: Wed,  9 Sep 2020 17:46:11 +0800
+Message-Id: <20200909094617.1582-16-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200909094617.1582-1-luoyonggang@gmail.com>
 References: <20200909094617.1582-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,44 +108,40 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
  Max Reitz <mreitz@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
  Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
  Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Disable following tests on msys2/mingw
-      'test-crypto-tlscredsx509': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
-                                   tasn1, crypto],
-      'test-crypto-tlssession': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c', 'crypto-tls-psk-helpers.c',
-                                 tasn1, crypto],
-      'test-io-channel-tls': ['io-channel-helpers.c', 'crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
-                              tasn1, io, crypto]}
-These tests are failure with:
-ERROR test-crypto-tlscredsx509 - missing test plan
-ERROR test-crypto-tlssession - missing test plan
-ERROR test-io-channel-tls - missing test plan
-
-Because on win32 those test case are all disabled.
+g_autofree are prefer than g_free when possible.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/meson.build | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tests/test-logging.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/tests/meson.build b/tests/meson.build
-index 998e4c48f9..b470a90e3a 100644
---- a/tests/meson.build
-+++ b/tests/meson.build
-@@ -145,7 +145,8 @@ if have_block
-     'test-crypto-block': [io],
-   }
-   if 'CONFIG_GNUTLS' in config_host and \
--     'CONFIG_TASN1' in config_host
-+     'CONFIG_TASN1' in config_host and \
-+     'CONFIG_POSIX' in config_host
-     tests += {
-       'test-crypto-tlscredsx509': ['crypto-tls-x509-helpers.c', 'pkix_asn1_tab.c',
-                                    tasn1, crypto],
+diff --git a/tests/test-logging.c b/tests/test-logging.c
+index 8a1161de1d..783fe09a27 100644
+--- a/tests/test-logging.c
++++ b/tests/test-logging.c
+@@ -196,7 +196,7 @@ static void rmdir_full(gchar const *root)
+ 
+ int main(int argc, char **argv)
+ {
+-    gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
++    g_autofree gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
+     int rc;
+ 
+     g_test_init(&argc, &argv, NULL);
+@@ -212,6 +212,5 @@ int main(int argc, char **argv)
+     rc = g_test_run();
+ 
+     rmdir_full(tmp_path);
+-    g_free(tmp_path);
+     return rc;
+ }
 -- 
 2.28.0.windows.1
 
