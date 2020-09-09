@@ -2,120 +2,89 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_FONT_LOW_CONTRAST,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FD45C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E70FC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:11:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D74DB21D46
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:03:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B928B2065E
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:11:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xwun+t2/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D74DB21D46
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r5aNYZOC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B928B2065E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG4RG-0005hk-Vs
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:03:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45468)
+	id 1kG4Yk-0007qr-9b
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:11:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kG4P3-0004VM-3L; Wed, 09 Sep 2020 14:01:05 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42791)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kG4Y5-0007LY-SP; Wed, 09 Sep 2020 14:10:25 -0400
+Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44017)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kG4Oy-0001ie-Vt; Wed, 09 Sep 2020 14:01:04 -0400
-Received: by mail-wr1-x442.google.com with SMTP id c18so3916701wrm.9;
- Wed, 09 Sep 2020 11:00:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kG4Y3-00033b-Hr; Wed, 09 Sep 2020 14:10:25 -0400
+Received: by mail-lj1-x241.google.com with SMTP id u4so4738865ljd.10;
+ Wed, 09 Sep 2020 11:10:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=FWr/YwTt4WUSL01JYpZATKxD1oyh2WODIXz1W4tUS0I=;
- b=Xwun+t2/TnZ8tbpHsVvmuNeokhwgG60cqzfojguisHiRATD+KZ9zzpN6CtXzb6P0SP
- GE5gZjhi6zestCZ/MtTY6yYYAj28fRMvP8w+kxM5nWLAst3CR7NT7m6Z1dorSfZcySXL
- JcclSoI76SMoD3FIT/oXXJCxUBGo+h04fk7Li7od95+70ywInGCvT0C3xMtBUE8D8MZk
- bcUVgKFg217bDYws+N6T/B2KSOyZhEm8N/cigXPdXw3SWc8al7c5f6Us7oEOnmABUpMi
- 8D474h4eNr/0JtKwLMKhwmOQlnDgkS8tikG+8xLWw5gWqFFb4hdCkbaevWCvAGdcxhaW
- pq0A==
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=CHYOyXn6QbOn3nSMQE6dsSz+4OMMF/TLy4WVRXEF14U=;
+ b=r5aNYZOCq0RrXiekuCANFcK23KgRPtJBHloW3hWK36vpKxce0e0vF4b3KQgqtmnsrq
+ hJbyQdgnncDdt5OsAQA8sBXcnS+x80tffO7VsxpnWdS7/pr8eZYESXZVWwa/Dp0+1lUB
+ fhVW2ADERt0UimdpwzvI1mI4y8/kP7ztWYjT/hE1iZo07Fa8+enkiYjqDB/0PKIhAy8Z
+ QxlqTRXJP8O9blZOC2dDi7wxays4qXqi3/Ne/j8spPQHsKCIQU95bXAEDaBooM56b1b8
+ QnfMLm6qBx4qBonFKAjNbyrc8s1pHGGabGLErG+00D/Vbv1WkmY/ES8d5DeB7CvMbpVQ
+ +f9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=FWr/YwTt4WUSL01JYpZATKxD1oyh2WODIXz1W4tUS0I=;
- b=YQZKyb2z7l1Jl4c9fauIgHOVb3qpuf/PHEaxJC3bQoTyTr0ZytrD3/Hp7zPupGgt4R
- kDFxwRgfdOTnfcXlNCvTy6hZ8/fVRz0/VE1wszsPerZVzwMTFhrucrRXpl0eoVe18JP0
- Hag6k+V1CT1gP8GYZ30Wy/8oNbu2uMWLZAT6IHcB2MLbOIIFR1JDGEiGeVXkEytg0/cx
- 62cIEnmMO3Bg3M8APWEK6h1izgw/N2m02k88iEziKNDmEMFDpB1WEji7/2o79hAhqDN9
- MLOEwhwVzaE0/mmZkbE0rOQ87XG0mLzx6O5bQDU/apZODCiXsUMU5y81J+eYG/liDQdk
- G2Vw==
-X-Gm-Message-State: AOAM531KfNk4E+zJOwSP7FjJIIEcLcuqhbzggDx1HfP9t9Tdivb5dggX
- etU28iuA7HQGR2ivhg7YiN8=
-X-Google-Smtp-Source: ABdhPJzy4CGnUowK8rBbHuVJD46qg3NdtRedveYVeIteDRAsfu7UAYvQ34k7K6i4Ost+4wF8UeMBJQ==
-X-Received: by 2002:a5d:46c5:: with SMTP id g5mr5279217wrs.416.1599674457940; 
- Wed, 09 Sep 2020 11:00:57 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id n4sm4987232wmd.26.2020.09.09.11.00.56
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Sep 2020 11:00:56 -0700 (PDT)
-Subject: Re: [PATCH 0/2] hw/net/opencores_eth: Trivial patches
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-References: <20200608091508.19838-1-f4bug@amsat.org>
- <e472244f-d764-6cd6-70cd-86d71358b999@amsat.org>
-Autocrypt: addr=f4bug@amsat.org; keydata=
- mQINBDU8rLoBEADb5b5dyglKgWF9uDbIjFXU4gDtcwiga9wJ/wX6xdhBqU8tlQ4BroH7AeRl
- u4zXP0QnBDAG7EetxlQzcfYbPmxFISWjckDBFvDbFsojrZmwF2/LkFSzlvKiN5KLghzzJhLO
- HhjGlF8deEZz/d/G8qzO9mIw8GIBS8uuWh6SIcG/qq7+y+2+aifaj92EdwU79apZepT/U3vN
- YrfcAuo1Ycy7/u0hJ7rlaFUn2Fu5KIgV2O++hHYtCCQfdPBg/+ujTL+U+sCDawCyq+9M5+LJ
- ojCzP9rViLZDd/gS6jX8T48hhidtbtsFRj/e9QpdZgDZfowRMVsRx+TB9yzjFdMO0YaYybXp
- dg/wCUepX5xmDBrle6cZ8VEe00+UQCAU1TY5Hs7QFfBbjgR3k9pgJzVXNUKcJ9DYQP0OBH9P
- ZbZvM0Ut2Bk6bLBO5iCVDOco0alrPkX7iJul2QWBy3Iy9j02GnA5jZ1Xtjr9kpCqQT+sRXso
- Vpm5TPGWaWljIeLWy/qL8drX1eyJzwTB3A36Ck4r3YmjMjfmvltSZB1uAdo1elHTlFEULpU/
- HiwvvqXQ9koB15U154VCuguvx/Qnboz8GFb9Uw8VyawzVxYVNME7xw7CQF8FYxzj6eI7rBf2
- Dj/II6wxWPgDEy3oUzuNOxTB7sT3b/Ym76yOJzWX5BylXQIJ5wARAQABtDFQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoRjRCVUcpIDxmNGJ1Z0BhbXNhdC5vcmc+iQJVBBMBCAA/AhsPBgsJ
- CAcDAgYVCAIJCgsEFgIDAQIeAQIXgBYhBPqr514SkXIh3P1rsuPjLCzercDeBQJd660aBQks
- klzgAAoJEOPjLCzercDe2iMP+gMG2dUf+qHz2uG8nTBGMjgK0aEJrKVPodFA+iedQ5Kp3BMo
- jrTg3/DG1HMYdcvQu/NFLYwamUfUasyor1k+3dB23hY09O4xOsYJBWdilkBGsJTKErUmkUO2
- 3J/kawosvYtJJSHUpw3N6mwz/iWnjkT8BPp7fFXSujV63aZWZINueTbK7Y8skFHI0zpype9s
- loU8xc4JBrieGccy3n4E/kogGrTG5jcMTNHZ106DsQkhFnjhWETp6g9xOKrzZQbETeRBOe4P
- sRsY9YSG2Sj+ZqmZePvO8LyzGRjYU7T6Z80S1xV0lH6KTMvq7vvz5rd92f3pL4YrXq+e//HZ
- JsiLen8LH/FRhTsWRgBtNYkOsd5F9NvfJtSM0qbX32cSXMAStDVnS4U+H2vCVCWnfNug2TdY
- 7v4NtdpaCi4CBBa3ZtqYVOU05IoLnlx0miKTBMqmI05kpgX98pi2QUPJBYi/+yNu3fjjcuS9
- K5WmpNFTNi6yiBbNjJA5E2qUKbIT/RwQFQvhrxBUcRCuK4x/5uOZrysjFvhtR8YGm08h+8vS
- n0JCnJD5aBhiVdkohEFAz7e5YNrAg6kOA5IVRHB44lTBOatLqz7ntwdGD0rteKuHaUuXpTYy
- CRqCVAKqFJtxhvJvaX0vLS1Z2dwtDwhjfIdgPiKEGOgCNGH7R8l+aaM4OPOd
-Message-ID: <9836f385-ccb8-981f-4677-95d22b2c0a90@amsat.org>
-Date: Wed, 9 Sep 2020 20:00:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=CHYOyXn6QbOn3nSMQE6dsSz+4OMMF/TLy4WVRXEF14U=;
+ b=lZpMarWR10G3OBFYoF+BSDAL0YE+ZXbmwzIU+F7Q2I1LCrOCaPlsDwcRNLVn5DSx79
+ vyEHvJOrgqSZZaKmmiVuPtArWnxcQp14rJpxWfT0ZmSRiEoh5sEMfAfF9CFFwkwonlDX
+ DmzOOiUQDgRDzczQynCq7NMgGex25ywPhz5vhPonbljp5VQ/I3K5FEDkyOn3+eGIkvaB
+ hKgxMl5L4Nj1nEXbAPnYyIRT9kgP80bXAEyk42YsOmuz+RANqsa2YJqIfENsFEPBWREa
+ 7thICsU+m8izFsrHQVq1Mzj7tZRHgLAmhXj4nOXAcg4GgZNUW+VRShzOmYL8VUwyKX2y
+ fX+A==
+X-Gm-Message-State: AOAM532OhEsMDhc52QmM5HP2F2+eIlbaKbvr029n+XDbiuq8pDIIVUQw
+ R9wzFEA2DywLFEITaPPT2YMypFV4wTYnEg32DAg=
+X-Google-Smtp-Source: ABdhPJwJ26yAuwAjv6vU/4lFTyY/ty/NRHOAvKISFvToIb582rv6zwuTNldUdgP1iy1GtAz4+girxRU5PSEIrrihIpI=
+X-Received: by 2002:a05:651c:1119:: with SMTP id
+ d25mr2280695ljo.300.1599675020943; 
+ Wed, 09 Sep 2020 11:10:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <e472244f-d764-6cd6-70cd-86d71358b999@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+References: <20200909094617.1582-1-luoyonggang@gmail.com>
+ <20200909094617.1582-6-luoyonggang@gmail.com>
+ <20200909125233.GW1011023@redhat.com>
+In-Reply-To: <20200909125233.GW1011023@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 10 Sep 2020 02:10:09 +0800
+Message-ID: <CAE2XoE9cFN55UFNq0DzWKypkfM9EY=ZSLf1dqwo_68QoU9cv=A@mail.gmail.com>
+Subject: Re: [PATCH v2 05/21] tests: disable /char/stdio/* tests in
+ test-char.c on win32
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000061270c05aee55def"
+Received-SPF: pass client-ip=2a00:1450:4864:20::241;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x241.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-3.576,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,26 +97,153 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>,
- Jason Wang <jasowang@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/2/20 2:26 PM, Philippe Mathieu-Daudé wrote:
-> On 6/8/20 11:15 AM, Philippe Mathieu-Daudé wrote:
->> Remove unnecessary mask, use #define instead of magic.
->>
->> Philippe Mathieu-Daudé (2):
->>   hw/net/opencores_eth: Use definitions instead of magic values
->>   hw/net/opencores_eth: Remove unnecessary address masking
->>
->>  hw/net/opencores_eth.c | 6 ++----
->>  1 file changed, 2 insertions(+), 4 deletions(-)
->>
-> 
-> Ping to Jason as the series is reviewed :)
+--00000000000061270c05aee55def
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Ping^2
+On Wed, Sep 9, 2020 at 8:52 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
+>
+wrote:
+
+> On Wed, Sep 09, 2020 at 05:46:01PM +0800, Yonggang Luo wrote:
+> > These tests are blocking test-char to be finished.
+> > Merge three #ifndef _WIN32
+> >
+> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> > ---
+> >  tests/test-char.c | 8 ++++----
+> >  1 file changed, 4 insertions(+), 4 deletions(-)
+>
+> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
+>
+>
+> Regards,
+> Daniel
+>
+
+https://cirrus-ci.com/task/6266195793936384?command=3Dmain#L433
+
+test-char still failing randomly.
+I'd like to disable more to make sure it's not failing
+
+ERROR:../tests/test-char.c:103:char_console_test: stdout of child process
+(/char/console/subprocess) failed to match: CONSOLE
+stdout was:
+ERROR test-char - Bail out!
+ERROR:../tests/test-char.c:103:char_console_test: stdout of child process
+(/char/console/subprocess) failed to match: CONSOLE
+make: *** [Makefile.mtest:576: run-test-80] Error 1
+C:\Users\ContainerAdministrator\AppData\Local\Temp\cirrus-ci-build>if 2 NEQ
+0 exit /b 2
+
+> --
+> |: https://berrange.com      -o-
+> https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-
+> https://www.instagram.com/dberrange :|
+>
+>
+
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--00000000000061270c05aee55def
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Sep 9, 2020 at 8:52 PM Daniel=
+ P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@redha=
+t.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
+1ex">On Wed, Sep 09, 2020 at 05:46:01PM +0800, Yonggang Luo wrote:<br>
+&gt; These tests are blocking test-char to be finished.<br>
+&gt; Merge three #ifndef _WIN32<br>
+&gt; <br>
+&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
+m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 tests/test-char.c | 8 ++++----<br>
+&gt;=C2=A0 1 file changed, 4 insertions(+), 4 deletions(-)<br>
+<br>
+Reviewed-by: Daniel P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.=
+com" target=3D"_blank">berrange@redhat.com</a>&gt;<br>
+<br>
+<br>
+Regards,<br>
+Daniel<br></blockquote><div><br></div><div><a href=3D"https://cirrus-ci.com=
+/task/6266195793936384?command=3Dmain#L433">https://cirrus-ci.com/task/6266=
+195793936384?command=3Dmain#L433</a><br></div><div><br></div><div>test-char=
+ still failing randomly.</div><div>I&#39;d like to disable more to make sur=
+e it&#39;s not failing</div><div><br></div><div id=3D"gmail-L425" tabindex=
+=3D"0" class=3D"gmail-log-line gmail-jss43" style=3D"box-sizing:border-box;=
+font-family:Monaco,monospace;font-size:12px;white-space:pre-wrap;color:rgb(=
+250,250,250);width:1094.03px;margin:0px;display:flex">ERROR:../tests/test-c=
+har.c:103:char_console_test: stdout of child process (/char/console/subproc=
+ess) failed to match: CONSOLE
+</div><div id=3D"gmail-L426" tabindex=3D"0" class=3D"gmail-log-line gmail-j=
+ss43" style=3D"box-sizing:border-box;font-family:Monaco,monospace;font-size=
+:12px;white-space:pre-wrap;color:rgb(250,250,250);width:1094.03px;margin:0p=
+x;display:flex">stdout was:
+</div><div id=3D"gmail-L427" tabindex=3D"0" class=3D"gmail-log-line gmail-j=
+ss43" style=3D"box-sizing:border-box;font-family:Monaco,monospace;font-size=
+:12px;white-space:pre-wrap;color:rgb(250,250,250);width:1094.03px;margin:0p=
+x;display:flex"></div><div id=3D"gmail-L428" tabindex=3D"0" class=3D"gmail-=
+log-line gmail-jss43" style=3D"box-sizing:border-box;font-family:Monaco,mon=
+ospace;font-size:12px;white-space:pre-wrap;color:rgb(250,250,250);width:109=
+4.03px;margin:0px;display:flex">ERROR test-char - Bail out! ERROR:../tests/=
+test-char.c:103:char_console_test: stdout of child process (/char/console/s=
+ubprocess) failed to match: CONSOLE</div><div id=3D"gmail-L429" tabindex=3D=
+"0" class=3D"gmail-log-line gmail-jss43" style=3D"box-sizing:border-box;fon=
+t-family:Monaco,monospace;font-size:12px;white-space:pre-wrap;color:rgb(250=
+,250,250);width:1094.03px;margin:0px;display:flex">make: *** [Makefile.mtes=
+t:576: run-test-80] Error 1</div><div id=3D"gmail-L430" tabindex=3D"0" clas=
+s=3D"gmail-log-line gmail-jss43" style=3D"box-sizing:border-box;font-family=
+:Monaco,monospace;font-size:12px;white-space:pre-wrap;color:rgb(250,250,250=
+);width:1094.03px;margin:0px;display:flex"></div><div><span style=3D"color:=
+rgb(250,250,250);font-family:Monaco,monospace;font-size:12px;white-space:pr=
+e-wrap">C:\Users\ContainerAdministrator\AppData\Local\Temp\cirrus-ci-build&=
+gt;if 2 NEQ 0 exit /b 2 </span>=C2=A0</div><blockquote class=3D"gmail_quote=
+" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
+padding-left:1ex">
+-- <br>
+|: <a href=3D"https://berrange.com" rel=3D"noreferrer" target=3D"_blank">ht=
+tps://berrange.com</a>=C2=A0 =C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D"http=
+s://www.flickr.com/photos/dberrange" rel=3D"noreferrer" target=3D"_blank">h=
+ttps://www.flickr.com/photos/dberrange</a> :|<br>
+|: <a href=3D"https://libvirt.org" rel=3D"noreferrer" target=3D"_blank">htt=
+ps://libvirt.org</a>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-o-=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://fstop138.berrange.com" rel=3D"n=
+oreferrer" target=3D"_blank">https://fstop138.berrange.com</a> :|<br>
+|: <a href=3D"https://entangle-photo.org" rel=3D"noreferrer" target=3D"_bla=
+nk">https://entangle-photo.org</a>=C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D=
+"https://www.instagram.com/dberrange" rel=3D"noreferrer" target=3D"_blank">=
+https://www.instagram.com/dberrange</a> :|<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
+
+--00000000000061270c05aee55def--
 
