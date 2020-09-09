@@ -7,67 +7,67 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AB71C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 19:03:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE1BEC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 19:04:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B669D20C09
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 19:03:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 80658215A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 19:04:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="RZZI/2cX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B669D20C09
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="KQWFzame"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 80658215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45398 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG5NJ-0004S5-TY
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 15:03:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60800)
+	id 1kG5OJ-00075A-Ir
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 15:04:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kG5KF-0007Cl-4c; Wed, 09 Sep 2020 15:00:11 -0400
+ id 1kG5KB-00073x-3g; Wed, 09 Sep 2020 15:00:07 -0400
 Received: from mail-eopbgr70118.outbound.protection.outlook.com
  ([40.107.7.118]:32002 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kG5KB-0001MM-TA; Wed, 09 Sep 2020 15:00:10 -0400
+ id 1kG5K8-0001MM-5Y; Wed, 09 Sep 2020 15:00:06 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Hp9h+oEgliJhLurVV00m/StoflWHzBEoRjJ1eO6qO/9rPfm0A6U9osD71ge/85K2e/uqrt8l2Z5eVrHfxZo7unZbL3GQ+3t7DThQsoBoJX3MKzy9vGbsjI/AoBL92NCGLUGeqICDT9Zy9Vi+13VahLPa81Q0IRRoD37xd/ZtX+oaXfsTyrW+P+54wp85utU3S2Lnp78zP1HiFVkBKUfuc6Em1nbqgM+0GWwYYUurQZZqSD/O2ORPJqmOy4JFx/PTA8Ubb+oMlsbpbDxAwfvVB/HxXuoAnjX6pjCaD/DvazQ435G0t2dRsWU6pnIJXN4b92rW4o2qAh83VgeUfOqPJA==
+ b=JBj1Rhfnynl2CjuvPgco6IxPIGXKi3YDki1Lv97B4D79FNnhDVLGmf+FwT4ufEa3leWa9tRokCbBxPfrFIYzpbf7nsZMVuR1D/01p4WsTt/S8AXsFqKUvk8Cymq6AgNIwPtt+zAMkpFDmll+yo0IomqP9q/Oq4tA81DJM9Pg4pVpjTli5mFJkByiOftbM2QUZE79lD5MHHeUCPu/F03yVUtKq5AANQQ9PUQdjz3vbFQXiyq2y5xPqsCSio4asI3fJmNtXw5u1vbj1y+1mMeCQyQMa0VdCKwsHOs4m4unrMO2Qw+qehOf3N5FbvElJ1S7anzF2dOrdN21Wr21prrbfg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KH0vRgmj6WybSN3XtnRy+D0LLUR0cMqfBa7zT7UKwdo=;
- b=CEtuxksfP+dCLj8ixQGQCRtTew7I962Z4N6BuqjZF+yNUoHhuHIXyOlmFncKGyfCrFjQaZxSvnoEd8OjUdTHNlCpG/6+kvTc4aQzkNmuCMYrrQsQfZC2sXK38cR5OejlrLqpXklNw6Q84JQ8+QNhcfvCiQkvJ2vO9kXUUzxvAJTvop22Hw5PKskOOlNW1quIo5EmjBxFOceaFO7NVSrsR3GNDrrh9u7bRdjrYetheCRIoIhPW44w+3+KSEpN0Iy/aNIg+gRbmSCdqJcU9OsObUG7k+Dx54+vA3c4e85+dHPZ+o9ZFha42Gs5rcqC/fMKLRnLrVQLGitgC+PPwQuZTg==
+ bh=8mW4I7KHBzeDfVLQKA/gOyV4J2sqOW69KTqoEJ378qM=;
+ b=NPRe64kF2n/1wSgxDYbolDQXPlEN+drvxLdYC0oqce5bdULhYT4clWjYlF6AIZ9w562oVvHh2a/5BIKcdWb7VE1/UwzCDsTj/dJp+fI4pPfnkr+qLejMUlOX7u6/zkRHYZ49CX387SmtFypuVyvk8ncTsBAONPdICuWe8L6PwagDe9kl9fKwkacBocWQgXvnwZgv8oACdMzq+wtYav1hUzXoMj+t+GmUfR5QEPSHMSv+M8D63S9NlXTHg/Qx+mWv1iinLwITennGFZA8T22sXORQhStP8hXlYaZQ+uNSfDmkweNeVbZNIoEEv97Urd2ng3obzOvcvpbFr4pg4la61w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KH0vRgmj6WybSN3XtnRy+D0LLUR0cMqfBa7zT7UKwdo=;
- b=RZZI/2cX+sjsrqkMOdeNughd++6QsnqG6vWbp3rHmB52L6IJO02FPKTkNajl89IgKxnJyETXaIl3MM7ROfCyczA1z+a3U/EqdOOPk8hs6yqOtr4PPT7vHCa/enw9N72bIjnQkfyvz11dkTMxdw5gBooEaipfDMNPWOkwLJS0Dew=
+ bh=8mW4I7KHBzeDfVLQKA/gOyV4J2sqOW69KTqoEJ378qM=;
+ b=KQWFzameV4i/c7UlWIfxU7lHA1toQwByM45iZgBqG684bu2hZJj+VqORZOv3YQe0oG1BFtI8j7CChZGiVlNuGX48Co7yp1RikFOp6iuFTGI1rnMWvuYeHoRt5VyCiZSiA70Rnb5kQ7qtlDQUEASRy7m9NMlSOLoENznTOe9EDu4=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM6PR08MB3445.eurprd08.prod.outlook.com (2603:10a6:20b:43::21)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Wed, 9 Sep
- 2020 18:59:58 +0000
+ 2020 18:59:55 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::b179:9641:7589:d692]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::b179:9641:7589:d692%7]) with mapi id 15.20.3348.019; Wed, 9 Sep 2020
- 18:59:58 +0000
+ 18:59:55 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, armbru@redhat.com, berto@igalia.com,
  vsementsov@virtuozzo.com, eblake@redhat.com, jsnow@redhat.com,
  stefanha@redhat.com, pbonzini@redhat.com, pavel.dovgaluk@ispras.ru,
  ari@tuxera.com, mreitz@redhat.com, kwolf@redhat.com, groug@kaod.org
-Subject: [PATCH 07/14] block/blklogwrites: drop error propagation
-Date: Wed,  9 Sep 2020 21:59:23 +0300
-Message-Id: <20200909185930.26524-8-vsementsov@virtuozzo.com>
+Subject: [PATCH 04/14] blockdev: fix drive_backup_prepare() missed error
+Date: Wed,  9 Sep 2020 21:59:20 +0300
+Message-Id: <20200909185930.26524-5-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20200909185930.26524-1-vsementsov@virtuozzo.com>
 References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
@@ -81,32 +81,32 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.136) by
  AM3PR07CA0054.eurprd07.prod.outlook.com (2603:10a6:207:4::12) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3391.5 via Frontend Transport; Wed, 9 Sep 2020 18:59:57 +0000
+ 15.20.3391.5 via Frontend Transport; Wed, 9 Sep 2020 18:59:54 +0000
 X-Mailer: git-send-email 2.21.3
 X-Originating-IP: [185.215.60.136]
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d3821a18-bada-4a3c-46b7-08d854f28c18
+X-MS-Office365-Filtering-Correlation-Id: 62c5c997-4e19-417d-a59f-08d854f28a27
 X-MS-TrafficTypeDiagnostic: AM6PR08MB3445:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3445627CFE7CDD279E9DBF37C1260@AM6PR08MB3445.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:608;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB34451CB3B2EF63E78C27314FC1260@AM6PR08MB3445.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: s+qmynvTWu4LmLvOcNDjED+AEVFJlWhB2InNLEScBiw7xoCuXJjjHjk2zibxiYnDrJvfruD8n1nz46sDmJgpgWCXvEgD05TSDennnkKts3XOxVXC6+CFPbTclSt3w170aikdJRL4zl+16WKdQ63sVm6lXy6X5EJKXB2NfdpV4JvlIRqZPpAihoeP/o/jvgOTuvBaqKCQ6kKBHoF7x5W7aBpIKREez5lZtX34ljqvSS4bACQbxW5gdOIDtSyJ9pcn5Oh0DI2Np57srMF3jSNtIsol1J37MdrduQidV0NXVQ1/wMexYzOoUCUw/JG8NsgHrTEeOvaeCLNMa5g0iiqQiA==
+X-Microsoft-Antispam-Message-Info: AGdSdcdLiuKvO7N83ngmBAMFelUl9PTMgSoT+aH6+iTM6t/4foyBqkAE+YC/+iU1KUDEGyFDcV12WaL3H813O45Zgb99DR505shGseLUxVckoa4xHObpVgahI3xE/MUrdCHcNDqXscfbTm+CkXbrOg4VbW2zlBn7zIve/exBcIIojDWZKG9+gXZrvNVHYlW7CDrI5cBDi27FrPWBO5cawozGdIFuGlSNJafFGl+nl6R5bQJrekPHlZ+DGI6AXAzTmTctb2WYX42LPEUmKE41sK0hDrGR1s5n6CcrWWutVpSdvVJVdniOmcNR4BOoFJMK
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(396003)(136003)(39840400004)(376002)(346002)(66946007)(52116002)(83380400001)(2616005)(956004)(2906002)(6666004)(8676002)(6512007)(1076003)(86362001)(5660300002)(26005)(36756003)(6916009)(478600001)(6506007)(8936002)(316002)(16526019)(66556008)(186003)(66476007)(7416002)(6486002)(4326008);
+ SFS:(4636009)(366004)(396003)(136003)(39840400004)(376002)(346002)(66946007)(52116002)(83380400001)(4744005)(2616005)(956004)(2906002)(6666004)(8676002)(6512007)(1076003)(86362001)(5660300002)(26005)(36756003)(6916009)(478600001)(6506007)(8936002)(316002)(16526019)(66556008)(186003)(66476007)(7416002)(6486002)(4326008);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: ndWOkFmi+OiCWBSoCnqh/suVRxuu+f364sb/Jj4+wp1UZy9N7rbf53dgo/6ownqHKZcIKTEzA0blxayh2tW9/+xgvXVsgCbH73aC5OkAvFtbWGEWwNfmlOiPrAgvPuUFsvixBA5bQoWUsfnr9aaiToqEL8KU1YZ8rqaV4BP7Sn6j9vJ53WgX4PfG8RGsIQO3hNj2oh2CAB0TpfU8j1NVwl2rgJm6e9Z4hDK/R3QoMsZByLhNK9ekY284p2Ts/sGypcaJ2d+PwUV3Uq/bt15P3xSjqi+at8HI7LvuTbsrbBOEid1OL7G3tRQxP6lPZu5MkWlwB/tmAb6LbVK12AQfOJj8e2PHnoLrKk0svBpv6X1Qz847NSDhKwCXman+tKp5UgySL+6mIZZTDygGFUu8yAvv/gqqUwk1BNvHb2ltFrbzCT/3ZQraBg9j/MrhNXLsfYZtHoucmmKHG2I5hUrmt9ckOL4LPHPrL1FyrkvskyZlk0NdWtOC/viMYNwcjCjXz1MgONps8E0wEyV4YWBH1cEP//1ElC9FTKntq7Uqsq36KqrQglI9XpNT3iH0lzwbrwZ7i8Y+Etp7dw0U0sF4qYgdB9f4VbtkHdrw9tlVUSUhF6P/fbZ1+hZ98sn1v+nMij8wAvyM+cdjNDhs9jH23w==
+X-MS-Exchange-AntiSpam-MessageData: Tzxqfh8tAMe6qi89BSBUHT7vSOITk0kBFi32xcJYpOG70Wh71lO4TcrDi/47bqDprrVamebBUPvEHOR7xGg2vlbYA4idbOesXRvRgWT3UmwvfSQ2+d02QvRbWbmQuMhyhd0SpGoa8V/d2X/CTVpdtzeC+eQMLIEpGU/2xx/l2FZAgYQMh1phNAh5mIeTN5VRPPOWdTTkMMqyY7zJKqtOI1YeufC8DPZhXqdyvCqHoI8Gvg3mk/3ZRu/iHI4Djo/ca2NQ7T7KM6QZeMhC4RqLeikUW7EvFjrAI2tRWp4coIeb65bxfGayK94wdhva2xlZVfZ7581QK/Bf4sqeTQdhW+GUvyqEszGtlO9W6q8nA5GVClRcrnFd+96MmOcqUqohJybEETtch6e9RS9Es4lD8GfuXl7unKrCHW6XjEZADqly9N4j+LEAv6WHZ5AQ6Tj7tQjoW5FIudh7LtOzrPjwJOWx4p7ijKQhWE41eGozOidaVAThqGC8xptHxPVtzggmidbJ5XooUYHCPApnPq4aHfZzn5GlHcVv5dEAidqZay4URtZ72Stl6ZcNDTqbY/ixgVDuDTgfopGOU9nHVcvaZEacHxzgpMKpw3TmstWE0K2g8VaeEqd9CvRuUGLYUV/N4V49nazvzvt5dgnnmvHTyQ==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d3821a18-bada-4a3c-46b7-08d854f28c18
+X-MS-Exchange-CrossTenant-Network-Message-Id: 62c5c997-4e19-417d-a59f-08d854f28a27
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2020 18:59:58.3867 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Sep 2020 18:59:55.1350 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: gb+93sz8mSgky8axzvXmNOGkOesaF/OsgvjC6Z6hIr/avIJ/zY8LPSvKy1Fj/Zb6joKa2SqL18AA5t5eR1Pifx6/zUWPs0a5omJbXeJUcAA=
+X-MS-Exchange-CrossTenant-UserPrincipalName: 83P0+c+LkfFQ8FdlQjJ33BC4J97sDDlLdKpPrZp8NexiTH4pi/cDbOvXL00A0CRfYTxkIF+fMgIJSeWpyaoucvTLNQ2WvWQZ4LpMnVZf3Cw=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3445
 Received-SPF: pass client-ip=40.107.7.118;
  envelope-from=vsementsov@virtuozzo.com;
@@ -137,78 +137,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's simple to avoid error propagation in blk_log_writes_open(), we
-just need to refactor blk_log_writes_find_cur_log_sector() a bit.
+We leak local_err and don't report failure to the caller. It's
+definitely wrong, let's fix.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/blklogwrites.c | 23 +++++++++++------------
- 1 file changed, 11 insertions(+), 12 deletions(-)
+ blockdev.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 7ef046cee9..c7da507b2d 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -96,10 +96,10 @@ static inline bool blk_log_writes_sector_size_valid(uint32_t sector_size)
-         sector_size < (1ull << 24);
- }
+diff --git a/blockdev.c b/blockdev.c
+index 36bef6b188..74259527c1 100644
+--- a/blockdev.c
++++ b/blockdev.c
+@@ -1797,8 +1797,7 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
+     aio_context_acquire(aio_context);
  
--static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
--                                                   uint32_t sector_size,
--                                                   uint64_t nr_entries,
--                                                   Error **errp)
-+static int64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
-+                                                  uint32_t sector_size,
-+                                                  uint64_t nr_entries,
-+                                                  Error **errp)
- {
-     uint64_t cur_sector = 1;
-     uint64_t cur_idx = 0;
-@@ -112,13 +112,13 @@ static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
-         if (read_ret < 0) {
-             error_setg_errno(errp, -read_ret,
-                              "Failed to read log entry %"PRIu64, cur_idx);
--            return (uint64_t)-1ull;
-+            return read_ret;
+     if (set_backing_hd) {
+-        bdrv_set_backing_hd(target_bs, source, &local_err);
+-        if (local_err) {
++        if (bdrv_set_backing_hd(target_bs, source, errp) < 0) {
+             goto unref;
          }
- 
-         if (cur_entry.flags & ~cpu_to_le64(LOG_FLAG_MASK)) {
-             error_setg(errp, "Invalid flags 0x%"PRIx64" in log entry %"PRIu64,
-                        le64_to_cpu(cur_entry.flags), cur_idx);
--            return (uint64_t)-1ull;
-+            return -EINVAL;
-         }
- 
-         /* Account for the sector of the entry itself */
-@@ -143,7 +143,6 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
- {
-     BDRVBlkLogWritesState *s = bs->opaque;
-     QemuOpts *opts;
--    Error *local_err = NULL;
-     int ret;
-     uint64_t log_sector_size;
-     bool log_append;
-@@ -215,15 +214,15 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
-         s->nr_entries = 0;
- 
-         if (blk_log_writes_sector_size_valid(log_sector_size)) {
--            s->cur_log_sector =
-+            int64_t cur_log_sector =
-                 blk_log_writes_find_cur_log_sector(s->log_file, log_sector_size,
--                                    le64_to_cpu(log_sb.nr_entries), &local_err);
--            if (local_err) {
--                ret = -EINVAL;
--                error_propagate(errp, local_err);
-+                                    le64_to_cpu(log_sb.nr_entries), errp);
-+            if (cur_log_sector < 0) {
-+                ret = cur_log_sector;
-                 goto fail_log;
-             }
- 
-+            s->cur_log_sector = cur_log_sector;
-             s->nr_entries = le64_to_cpu(log_sb.nr_entries);
-         }
-     } else {
+     }
 -- 
 2.21.3
 
