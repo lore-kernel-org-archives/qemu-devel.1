@@ -2,94 +2,122 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2835EC43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:24:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23003C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:24:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E78921D7D
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:24:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ah83XwJP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E78921D7D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 993BC21D7D
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:24:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 993BC21D7D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50896 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG05b-0003UH-La
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:24:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60778)
+	id 1kG05k-0003pk-Fn
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:24:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kG046-0001Va-5m
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 09:23:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48097)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kG043-0004T3-QX
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 09:23:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599657786;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=4Ihs2GiNXwmDk+H36a/CheHg9sRUsdHhrPfN7+IKkyU=;
- b=ah83XwJPAA+r+u6xw3rCpnPsEohcIu9V7+3Uytk7Sr9BduY2gUvbeQ2izXLXcgJb2fZZlV
- 4IQFgEnTTRWfwxG3EhbPD0U2Az/VnxdgzOo8dx4SXARauuSQbOpDCTdxTlLhuf48sHsBM1
- 3d6SPOQQcuprEo9KwFOLLnTpzkYNVfc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-272-PP4hDRP_MJCW-_lSOpxIpA-1; Wed, 09 Sep 2020 09:23:00 -0400
-X-MC-Unique: PP4hDRP_MJCW-_lSOpxIpA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 197CD80046A;
- Wed,  9 Sep 2020 13:22:58 +0000 (UTC)
-Received: from redhat.com (ovpn-113-81.ams2.redhat.com [10.36.113.81])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 07C3280949;
- Wed,  9 Sep 2020 13:22:50 +0000 (UTC)
-Date: Wed, 9 Sep 2020 14:22:48 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: =?utf-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Subject: Re: [PATCH v2 03/21] configure: Fixes ncursesw detection under
- msys2/mingw and enable curses
-Message-ID: <20200909132248.GL1011023@redhat.com>
-References: <20200909094617.1582-1-luoyonggang@gmail.com>
- <20200909094617.1582-4-luoyonggang@gmail.com>
- <20200909125049.GU1011023@redhat.com>
- <CAE2XoE_02FDvGmwUCAFEOrog4z1iwtqoVYuSiZThBrFRLx0WfA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kG04j-0002OL-TA; Wed, 09 Sep 2020 09:23:49 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:35373)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kG04h-0004Xv-SO; Wed, 09 Sep 2020 09:23:49 -0400
+Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MzkK9-1kTFaY2xjF-00vfPx; Wed, 09 Sep 2020 15:23:11 +0200
+Subject: Re: [PATCH 2/5] hw/mips/fuloong2e: Convert pointless error message to
+ an assert()
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200901104043.91383-1-f4bug@amsat.org>
+ <20200901104043.91383-3-f4bug@amsat.org>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <330cc9c9-6726-39a1-91e3-af563166e5df@vivier.eu>
+Date: Wed, 9 Sep 2020 15:23:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <CAE2XoE_02FDvGmwUCAFEOrog4z1iwtqoVYuSiZThBrFRLx0WfA@mail.gmail.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200901104043.91383-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
+Content-Language: fr
 Content-Transfer-Encoding: 8bit
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:25:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Provags-ID: V03:K1:EJX20WXKnTpl0o6mA+qeWLk6MJRTGTKPrY6ylg5e6DC4Dti/YCB
+ rfVAcUA0i1jzIlhSHZ9cI83px+FpL/7jpd7Q7wd/1jsuIVslnpL1y/SRB8y3yMTFPLF8+zu
+ xwVf5rEJJrqE/LlkwGJA0wUp1E1WLBDzqacyqmFE3dEgxMQqYslmTXFnS3/f4zSdOHsXeGF
+ 34vxthjNfmnvCdh+uvPvA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:UVqxuDkqEqg=:3i9298fTe5zAQnryX43X5z
+ gV7ZiMmzYQry/m575NeWumJCF4Cnde0g/n7ecyYTAMB6+v65RxRRpx/dgkpig4ugWsH0+/ioL
+ WA+BggV04zjDswkdxtnAwMgHNnOQYvKCFGck/cMBySRPXE8WrUGRNLpgdmvMoaPs+tszpRlQc
+ 1HXSqjObRz0X8tZYtAWD5xCeUISL+ANTPHOPcjLQZEqsS9Cq49eIe8JBFQXXY5BPOu1AS2SGo
+ 1JTCzP9VGpw4r/Eh84wK+owf1roDYdEMvQss14A7u+t/Sz/ldjyvJn4U6hKnL+IU1utxrA17u
+ FpxN456AzysyODCfUrlWRTkLDgKU26sQ51ssrDy9b0WqHkXcKxyJbzB1Py72zPKMoMu1myms5
+ NQLiwI2Emf8DOkC4Ebl0jORrUU4lKiC5nyKuG7LhixH/+70oC56dO9nGUDBU6m0Xc4oOpxyfS
+ OUAV6GAsON2qVe2/79B0LkJxIGy3Ej4BsQHBhNbPXhmmAvNZNfreI4xDiQZ3knA0QXo8a5yza
+ y4vY6LpOPfdKuQ+/4thoFPsi06CTndTYpcjdfelKBbJx8nTvYKWlSUUd1B8V7SGhLvncDDA5n
+ JNAUBis3hZmYMnpqbFVWcPiUwHFvcFRWSHhV84qvWGYluLXBS3B0BJO2a0BEBr43556FrmiHm
+ e7KEWKoWmQX3a0b+3dMj7N1KUQt3ml6TX5IlbFsaG8QTnx9q5BqsP1lWDgTcNPUgasjacEveA
+ VV11o4g9ASTD6/nKgKVOULrpt78q5eFMaeappDmsLnVwPlPkRGYkG3Bl01O4hqw316y7i1lHl
+ U7kXWr/Hntlue6R4xdxpK6XcOf0Y4hORIQWxYrNYK3n6xhUUKWydut7AyMJ8zHUeVoRKf02
+Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:23:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -54
+X-Spam_score: -5.5
+X-Spam_bar: -----
+X-Spam_report: (-5.5 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-3.576,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,102 +130,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>, Max Reitz <mreitz@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-trivial@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
+ qemu-ppc@nongnu.org, Huacai Chen <chenhc@lemote.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Aurelien Jarno <aurelien@aurel32.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 09, 2020 at 08:55:15PM +0800, 罗勇刚(Yonggang Luo) wrote:
-> On Wed, Sep 9, 2020 at 8:51 PM Daniel P. Berrangé <berrange@redhat.com>
-> wrote:
+Le 01/09/2020 à 12:40, Philippe Mathieu-Daudé a écrit :
+> Displaying "vt82c686b_init error" doesn't give any hint about why
+> this call failed. As this message targets developers and not users,
+> replace the pointless error message by a call to assert() which
+> will provide more useful information.
 > 
-> > On Wed, Sep 09, 2020 at 05:45:59PM +0800, Yonggang Luo wrote:
-> > > The mingw pkg-config are showing following absolute path and contains :
-> > as the separator,
-> > > so we must handling : properly.
-> > >
-> > > -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L
-> > -IC:/CI-Tools/msys64/mingw64/include/ncursesw:-I/usr/include/ncursesw:
-> > > -DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC
-> > -pipe -lncursesw -lgnurx -ltre -lintl -liconv
-> > > -DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC
-> > -lncursesw
-> > > -DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC
-> > -lcursesw
-> > > -DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -pipe
-> > -lncursesw -lgnurx -ltre -lintl -liconv
-> > > -DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -lncursesw
-> > > -DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -lcursesw
-> > > -DNCURSES_WIDECHAR -I/usr/include/ncursesw -pipe -lncursesw -lgnurx
-> > -ltre -lintl -liconv
-> > > -DNCURSES_WIDECHAR -I/usr/include/ncursesw -lncursesw
-> > > -DNCURSES_WIDECHAR -I/usr/include/ncursesw -lcursesw
-> > >
-> > > msys2/mingw lacks the POSIX-required langinfo.h.
-> > >
-> > > gcc test.c -DNCURSES_WIDECHAR -I/mingw64/include/ncursesw -pipe
-> > -lncursesw -lgnurx -ltre -lintl -liconv
-> > > test.c:4:10: fatal error: langinfo.h: No such file or directory
-> > >     4 | #include <langinfo.h>
-> > >       |          ^~~~~~~~~~~~
-> > > compilation terminated.
-> > >
-> > > So we using g_get_codeset instead of nl_langinfo(CODESET)
-> > >
-> > > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > > Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-> > > ---
-> > >  configure   |  9 +++------
-> > >  ui/curses.c | 10 +++++-----
-> > >  2 files changed, 8 insertions(+), 11 deletions(-)
-> > >
-> > > diff --git a/configure b/configure
-> > > index f4f8bc3756..2e6d54e15b 100755
-> > > --- a/configure
-> > > +++ b/configure
-> > > @@ -3653,8 +3653,8 @@ if test "$iconv" = "no" ; then
-> > >  fi
-> > >  if test "$curses" != "no" ; then
-> > >    if test "$mingw32" = "yes" ; then
-> > > -    curses_inc_list="$($pkg_config --cflags ncurses 2>/dev/null):"
-> > > -    curses_lib_list="$($pkg_config --libs ncurses
-> > 2>/dev/null):-lpdcurses"
-> > > +    curses_inc_list="$($pkg_config --cflags ncursesw
-> > 2>/dev/null):-I/${MSYSTEM,,}/include/ncursesw:"
-> > > +    curses_lib_list="$($pkg_config --libs ncursesw
-> > 2>/dev/null):-lncursesw"
-> >
-> > The original code would try  ncurses via pkg-config and if that failed,
-> > would
-> > falback to pdcurses.
-> >
-> > The new code tries ncursesw via pkg-config and then tries ncursesw again
-> > via manually specified args, and doesn't try  ncurses or pdcurses at all.
-> >
-> Gotcha, Indeed   $pkg_config --cflags ncurses can find curses on mingw32,
-> the problem is onw mingw32 the include path
-> have :, so we can not use : as the path sepaerator, for cross-paltform
-> reason, which is best for path separator?
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  hw/mips/fuloong2e.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+> 
+> diff --git a/hw/mips/fuloong2e.c b/hw/mips/fuloong2e.c
+> index 8ca31e5162c..f28609976bf 100644
+> --- a/hw/mips/fuloong2e.c
+> +++ b/hw/mips/fuloong2e.c
+> @@ -240,10 +240,7 @@ static void vt82c686b_southbridge_init(PCIBus *pci_bus, int slot, qemu_irq intc,
+>      PCIDevice *dev;
+>  
+>      isa_bus = vt82c686b_isa_init(pci_bus, PCI_DEVFN(slot, 0));
+> -    if (!isa_bus) {
+> -        fprintf(stderr, "vt82c686b_init error\n");
+> -        exit(1);
+> -    }
+> +    assert(isa_bus);
+>      *p_isa_bus = isa_bus;
+>      /* Interrupt controller */
+>      /* The 8259 -> IP5  */
+> 
 
-I guess it was using ":" because " " might be valid in the file path.
+Applied to my trivial-patches branch.
 
-How about using "#" or "%" instead as those should be more unlikely to
-clash.
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Thanks,
+Laurent
 
 
