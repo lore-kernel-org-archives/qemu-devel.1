@@ -2,92 +2,61 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4442AC43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 14:41:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F846C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 14:43:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C87E1221F0
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 14:41:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IqYFzUht"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C87E1221F0
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id A2E9422242
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 14:43:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2E9422242
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG1Hp-0001g7-TI
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 10:41:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54934)
+	id 1kG1JQ-0003f6-Nh
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 10:43:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <programmingkidx@gmail.com>)
- id 1kG1Gj-0000g5-QT
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 10:40:18 -0400
-Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:35295)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <programmingkidx@gmail.com>)
- id 1kG1Gg-0006fb-VE
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 10:40:17 -0400
-Received: by mail-qk1-x743.google.com with SMTP id q5so2648760qkc.2
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 07:40:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=29ww3SGKNAPBtw+lpOKTs8Xle8QIiG+DG/Q1ycL357I=;
- b=IqYFzUhtHmQeEwieQzDH8+smVoewUH2wDy8PYNJDK2hHJCM7cIFlHM+L5GK/KXINsl
- ontP8i3CP3LfqNfYuA7/x0738owJif39b6y6I/+YHesexC/LpWrljnbERmvxZ0fx0lHe
- PKNZ1Wo9aaNEgiMCbtq7H0tUJzJPXd0mwJvOa2IhsnrH9spjGR/9iWaSia/6fwR4aZVP
- 5ogBiY+kxSXgcSGABo0oX8sVkT+mVZre3IkdJQtMCt1ayGhs7enKOAfuwF5uruiogfNc
- CeHYUmYFp9YJy4LPpL1XIm29ZNHh1+s7RAFy7kvKmiCldovqJbmixFuM24X/m7fiH1LS
- IBzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
- :content-transfer-encoding:message-id:references:to;
- bh=29ww3SGKNAPBtw+lpOKTs8Xle8QIiG+DG/Q1ycL357I=;
- b=LolofNym3mCwbEeTKkeAMaKPgLpShXrWBa1jLVTwXg3k8rhEM1x7C25xhgyoswu1G/
- KOWSKqdaP4s8TNuqEV0Iu92OCk2Ogc6TuQroCU+y1NHxQw3uWiu7BRRiKcn19BBqkz+B
- R86HTNSo871gQ0wdD41XGuNr5KSLOod/omCVmC8WGej3OYCrWla5jXmJaGaVr5rDDB+E
- GDYMx/hNm8LSZMq73YMeo8ClxhnmhoXwOqncrY9z7mspc8Og535AwdjcivageT4/kbK7
- hZ/6UYSJAk2MWA/IfJQQ2ovNwYCibO7gBbzMmrG+Q+ygebX7eSrECWz8Hmc3+GysuHba
- 7spg==
-X-Gm-Message-State: AOAM5317t3EsnqKTgcfZWwcasK7hNdvHPhUusniP+lmlG1pL4vUY+UMG
- qr0P0wAoHTzNKhjfz8t/yHyaEjJwPco=
-X-Google-Smtp-Source: ABdhPJwf9HFNA3QCYzWHiB2FISTD/4yWNL+rOrx1G/OtcKGsRgY/4RVb44f3gbY7nC8QoerCROFveQ==
-X-Received: by 2002:a37:ed5:: with SMTP id 204mr3271478qko.405.1599662413407; 
- Wed, 09 Sep 2020 07:40:13 -0700 (PDT)
-Received: from [192.168.0.10] (d149-67-30-58.try.wideopenwest.com.
- [67.149.58.30])
- by smtp.gmail.com with ESMTPSA id r42sm3278612qtk.29.2020.09.09.07.40.11
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Wed, 09 Sep 2020 07:40:12 -0700 (PDT)
-Content-Type: text/plain; charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 10.3 \(3273\))
-Subject: Re: [RFC] QEMU as Xcode project on macOS
-From: Programmingkid <programmingkidx@gmail.com>
-In-Reply-To: <2764135.D4k31Gy3CM@silver>
-Date: Wed, 9 Sep 2020 10:40:10 -0400
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <74E8EC93-53B3-4A72-B3BD-6C1702B4DB5B@gmail.com>
-References: <2764135.D4k31Gy3CM@silver>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-X-Mailer: Apple Mail (2.3273)
-Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
- envelope-from=programmingkidx@gmail.com; helo=mail-qk1-x743.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kG1Ia-0002BX-PU
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 10:42:12 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:45802 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kG1IY-0006zN-Ow
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 10:42:12 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 8F502D2FE3841BC48FB9;
+ Wed,  9 Sep 2020 22:42:02 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Wed, 9 Sep 2020
+ 22:41:57 +0800
+From: Chuan Zheng <zhengchuan@huawei.com>
+To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
+ <berrange@redhat.com>
+Subject: [RFC][PATCH v1 0/7] *** Add Multifd support for TLS migration ***
+Date: Wed, 9 Sep 2020 22:52:50 +0800
+Message-ID: <1599663177-53993-1-git-send-email-zhengchuan@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=zhengchuan@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 10:42:03
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,73 +70,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: zhengchuan@huawei.com, zhang.zhanghailiang@huawei.com, yuxiating@huawei.com,
+ qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
+ jinyan12@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+TLS migration could easily reach bottleneck of cpu because of encryption
+and decryption in migration thread.
+In our test, the tls migration could only reach 300MB/s under bandwidth
+of 500MB/s.
 
-> On Sep 9, 2020, at 8:56 AM, Christian Schoenebeck =
-<qemu_oss@crudebyte.com> wrote:
->=20
-> I've recently been thinking about how feasible a stripped down Xcode =
-project=20
-> for QEMU would be, i.e. you just get the QEMU sources, click on=20
-> qemu.xcodeproj, Cmd + B, done. No extra installation, no configure, =
-nothing.
->=20
-> I've done this before for gtk(mm), which you might know, depends on =
-approx. 24=20
-> individual libraries (glib, jpeg, png, pixman, atk, gdk, cairo, =
-pixman,=20
-> graphene, sigcpp, ... gtk, gtkmm) that you would usually all need to =
-download=20
-> and
->=20
-> 	./configure && make & make install
->=20
-> each individually on macOS. Or right, you could alternatively "just =
-install"=20
-> them from Homebrew, MacPorts, Fink. But no matter which solution you =
-choose,=20
-> it easily ends up in a mess (conflicts, misbehaviours) on macOS to =
-install=20
-> libs and apps globally. And I think that's the problem why there are =
-currently=20
-> relatively little contribution for QEMU coming from devs on macOS. =
-Because you=20
-> don't want to install things globally on a macOS system, it's simply =
-not=20
-> working well there as it does with Linux distros.
->=20
-> And the other thing is: I've tested the waters with Apple and filed a =
-QEMU=20
-> related macOS bug with them. The response was like expected; they =
-basically=20
-> said 'if there's no Xcode project, then we don't investigate it'.
->=20
-> The question is, and I don't have the big picture of QEMU yet to judge =
-that,=20
-> how much is auto generated for QEMU i.e. with custom scripts that =
-would=20
-> probably destroy this plan? There are these trace calls that are auto=20=
+Inspired by multifd, we add multifd support for tls migration to make fully
+use of given net bandwidth at the cost of multi-cpus and could reduce
+at most of 100% migration time with 4U16G test vm.
 
-> generated, is there more like the TCG part for instance?
->=20
-> What I could imagine: a hand crafted Xcode project as a starting =
-point, and if =20
-> that works out, switching to auto generating that Xcode project from =
-the Meson=20
-> inftrastructure to avoid multiplication of maintenance effort.
->=20
-> Best regards,
-> Christian Schoenebeck
->=20
+Evaluate migration time of migration vm.
+The VM specifications for migration are as follows:
+- VM use 4-K page;
+- the number of VCPU is 4;
+- the total memory is 16Gigabit;
+- use 'mempress' tool to pressurize VM(mempress 4096 100);
+- migration flag is 73755 (8219 + 65536 (TLS)) vs 204827 (8219 + 65536 (TLS) + 131072(Multifd))
 
-I think the solution to this problem is to switch over the CMake =
-(https://en.wikipedia.org/wiki/CMake). It is a build system that lets =
-you specify how you want to build software. There are many targets =
-available including 'make' and an Xcode project file.=
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+|                      |         TLS           |      MultiFD + TLS (2 channel)    |
+--------------------------------------------------------t---------------------------
+| mempress 1024 120    |       25.035s         |           15.067s                 |
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+| mempress 1024 200    |       48.798s         |           25.334s                 |
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+| mempress 1024 300    |   Migration Failed    |           25.617s                 |
+------------------------------------------------------------------------------------
+
+Chuan Zheng (7):
+  migration/tls: save hostname into MigrationState
+  migration/tls: extract migration_tls_client_create for common-use
+  migration/tls: add MigrationState into MultiFDSendParams
+  migration/tls: extract cleanup function for common-use
+  migration/tls: add support for tls check
+  migration/tls: add support for multifd tls-handshake
+  migration/tls: add trace points for multifd-tls
+
+ migration/channel.c    |   5 ++
+ migration/migration.c  |   1 +
+ migration/migration.h  |   5 ++
+ migration/multifd.c    | 121 +++++++++++++++++++++++++++++++++++++++++++------
+ migration/multifd.h    |   2 +
+ migration/tls.c        |  26 +++++++----
+ migration/tls.h        |   6 +++
+ migration/trace-events |   5 ++
+ 8 files changed, 149 insertions(+), 22 deletions(-)
+
+-- 
+1.8.3.1
+
 
