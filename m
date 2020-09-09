@@ -8,78 +8,75 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C8CC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EFDC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:56:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6927215A4
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:56:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 667A9215A4
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:56:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QHVFHbfk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6927215A4
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IFLyt/os"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 667A9215A4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFwqT-0006c8-87
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:56:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57522)
+	id 1kFwqY-0006nO-Bl
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:56:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwhd-0007LQ-52; Wed, 09 Sep 2020 05:47:45 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:35436)
+ id 1kFwhV-0007Jb-Dj; Wed, 09 Sep 2020 05:47:38 -0400
+Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:38504)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwhX-0007mP-Gw; Wed, 09 Sep 2020 05:47:44 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id jw11so1086484pjb.0;
- Wed, 09 Sep 2020 02:47:38 -0700 (PDT)
+ id 1kFwhT-0007lp-Mq; Wed, 09 Sep 2020 05:47:37 -0400
+Received: by mail-pf1-x443.google.com with SMTP id l126so1686336pfd.5;
+ Wed, 09 Sep 2020 02:47:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=8S8LCq0vzh09WirR5+SRleiM+m06nOYh6OfHaB3TjgI=;
- b=QHVFHbfkRsdPSv37curnQ32C7mlhImkKmvTfHTLHkBBWdOkcU35r0/sKAAR+gfhiKK
- ePU6Lsb6kElFW2aUmR0eEBZDEDYAmQDwOJ8Skyonjahw6T4WX4vE12JEEzVvIyb50xFO
- o8g6cUFqKkziCTBeN+MBh0mrR1FtpQWE6L86lFYM8QTT8Zcy4MMyvHHEXXOFft8uyaXT
- IQNTFFCddE/NTDpuYsicX7t+/WPLm6MG8hR8oMHTt8nLhAfVlhPUQyI0RHig4Iol0Opu
- NiG4hSSDVCRQCqKv0PqtWWx9SWqd7EhUFTeiWhplrlFhsOSd51cJbiGo93s/ErY9RMf5
- 3f/g==
+ bh=GCgbOADJo9SgTrFvdP0jEa9PoTonwhtwSH4+oqHE/pQ=;
+ b=IFLyt/os1Kz3umu0InjnND3iJkDSJnunIc7oqtgR5D6XTnTxlybshJxmazKZzXGBLM
+ SE3dCr8JxNamr/ralPMVmprggWXtlx5S+eBZc/Mmghi0p/xQHB44CO8FxNFAAZr7bHYy
+ USMj6gRa2BKbLZigxTlRHuFNnfHtaWfH+0ZykSRTGw/ljHgyXfjjn0r+4sCGbtAvedoU
+ FpFCG1P++3xQQ+aD6agIiwkyR2jCeNzwKAkpcyx3gWDHVbA+vbsfpbriKO+R16Phv5A9
+ o6j9V72EsoV7f2h6zVvJ2WmA3gwv0PG7jlOMcghxNKgwOrVDo+u/BuntpGEZZIvuG6WZ
+ uzcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=8S8LCq0vzh09WirR5+SRleiM+m06nOYh6OfHaB3TjgI=;
- b=anBfq/PrLr2p8HYGIaKDp7ITkqaIgniYPvLEjUIApOnotSPqiPi2ZizYtnT79l+UtX
- JWi/ZWB9T8UvNHjpUbfgIpH3cT6mzWyWfHvbWe9k9wgR1IPK/SANbj63b8c8bloygvE5
- VTuqnRKCm6d/A9lblkAO4ktEYYuWMvNkxy7rLA/rRv7sOSteGoc2RF98IYj3Nl7nif9O
- AJhrYuQszRe2R6IpIW7DINz1AK0pSHt5lTBbfrR7lQMYmJXPIWRLcz+dFLwBJTV4MO67
- IWdTQmRV/FelQcBmr/Kc2rUb9jTY0bex/iNCFGu/j+fiBdKrgJYBpp34DOWgegKCSMNw
- kQtw==
-X-Gm-Message-State: AOAM531D5kWWBoW8nPp+ctNk5sy00rVzjcU5We923tS+6ZyCSTaeeLsn
- 5mdps9kkgFozXS1NXU5M7NEy1zt12yZ7KR+q
-X-Google-Smtp-Source: ABdhPJwKxtD3JKLpSULe5IyfuMvqgMWxvb+kppkNNSOX7stOty4L6jYiB1/K9IHnlhq6BNI6rG5n4g==
-X-Received: by 2002:a17:90a:7f8a:: with SMTP id
- m10mr108458pjl.47.1599644857477; 
- Wed, 09 Sep 2020 02:47:37 -0700 (PDT)
+ bh=GCgbOADJo9SgTrFvdP0jEa9PoTonwhtwSH4+oqHE/pQ=;
+ b=b5zhDcZpBEGKeV/kDHJ7XdHtMBE1NObD88yzJXWrGQEpflZolfDTElllMsyAqAIglr
+ N8x5vUGRS7hGRpf/F5Dx3Bhz/pGp9hnnv3gIGUd6FlTci8Q1mvZgnbCyUM7/6IzGoQBo
+ kappz5R8s9GyFQtmL9mHTqZyexf3YL/q2lrOlBH6Cc3Y7ddxDtL2FybJ5cantXVTltx9
+ V6mFnVKLp3/m4H7Nfh/DFX3hSoCUblp7Eopwplf7YiXAUALcK88r8luTs12sfX1KUXTc
+ /u4z7SCwrgBHcoqzyOiPR7zd7+K9wk4HgWMs9vFdnKNMoggN3xGReWxAwiHVMxJZ/p8l
+ utmA==
+X-Gm-Message-State: AOAM530sIMDT67e6YSNMRWPzzSIRR+fgKpafIWpzyOdnjvycBg+KxuVn
+ dCQoXJu1Rf5mnn5/IhIqmVXr2jJgGu4TfzIF
+X-Google-Smtp-Source: ABdhPJwWDmJdZI/C5MM7W+4kpQne+qrZISEznPbN7+/4X1Ft4eEy+mpGr8V0ojSTfGrHLYjjb2+yUA==
+X-Received: by 2002:a17:902:74c8:: with SMTP id f8mr40743plt.78.1599644853193; 
+ Wed, 09 Sep 2020 02:47:33 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.33
+ by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.29
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 02:47:36 -0700 (PDT)
+ Wed, 09 Sep 2020 02:47:32 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 15/21] tests: Convert g_free to g_autofree macro in
- test-logging.c
-Date: Wed,  9 Sep 2020 17:46:11 +0800
-Message-Id: <20200909094617.1582-16-luoyonggang@gmail.com>
+Subject: [PATCH v2 14/21] cirrus: Building freebsd in a single short
+Date: Wed,  9 Sep 2020 17:46:10 +0800
+Message-Id: <20200909094617.1582-15-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200909094617.1582-1-luoyonggang@gmail.com>
 References: <20200909094617.1582-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,40 +105,69 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
  Max Reitz <mreitz@redhat.com>, Yonggang Luo <luoyonggang@gmail.com>,
  Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-g_autofree are prefer than g_free when possible.
+freebsd 1 hour limit not hit anymore
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- tests/test-logging.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ .cirrus.yml | 35 ++++++++---------------------------
+ 1 file changed, 8 insertions(+), 27 deletions(-)
 
-diff --git a/tests/test-logging.c b/tests/test-logging.c
-index 8a1161de1d..783fe09a27 100644
---- a/tests/test-logging.c
-+++ b/tests/test-logging.c
-@@ -196,7 +196,7 @@ static void rmdir_full(gchar const *root)
+diff --git a/.cirrus.yml b/.cirrus.yml
+index 49335e68c9..b0004273bb 100644
+--- a/.cirrus.yml
++++ b/.cirrus.yml
+@@ -1,38 +1,19 @@
+ env:
+   CIRRUS_CLONE_DEPTH: 1
  
- int main(int argc, char **argv)
- {
--    gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
-+    g_autofree gchar *tmp_path = g_dir_make_tmp("qemu-test-logging.XXXXXX", NULL);
-     int rc;
+-freebsd_1st_task:
++freebsd_12_task:
+   freebsd_instance:
+     image_family: freebsd-12-1
+-    cpu: 4
+-    memory: 4G
+-  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
+-    bash curl cyrus-sasl git glib gmake gnutls gsed
+-    nettle perl5 pixman pkgconf png usbredir
++    cpu: 8
++    memory: 8G
++  install_script:
++    - ASSUME_ALWAYS_YES=yes pkg bootstrap -f ;
++    - pkg install -y bash curl cyrus-sasl git glib gmake gnutls gsed 
++          nettle perl5 pixman pkgconf png usbredir
+   script:
+     - mkdir build
+     - cd build
+-    - ../configure --disable-user --target-list-exclude='alpha-softmmu
+-        ppc64-softmmu ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
+-        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu'
+-        --enable-werror || { cat config.log; exit 1; }
+-    - gmake -j$(sysctl -n hw.ncpu)
+-    - gmake -j$(sysctl -n hw.ncpu) check
+-
+-freebsd_2nd_task:
+-  freebsd_instance:
+-    image_family: freebsd-12-1
+-    cpu: 4
+-    memory: 4G
+-  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
+-    bash curl cyrus-sasl git glib gmake gnutls gtk3 gsed libepoxy mesa-libs
+-    nettle perl5 pixman pkgconf png SDL2 usbredir
+-  script:
+-    - ./configure --enable-werror --target-list='alpha-softmmu ppc64-softmmu
+-        ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
+-        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu
+-        sparc-bsd-user sparc64-bsd-user x86_64-bsd-user i386-bsd-user'
+-        || { cat config.log; exit 1; }
++    - ../configure --enable-werror || { cat config.log; exit 1; }
+     - gmake -j$(sysctl -n hw.ncpu)
+     - gmake -j$(sysctl -n hw.ncpu) check
  
-     g_test_init(&argc, &argv, NULL);
-@@ -212,6 +212,5 @@ int main(int argc, char **argv)
-     rc = g_test_run();
- 
-     rmdir_full(tmp_path);
--    g_free(tmp_path);
-     return rc;
- }
 -- 
 2.28.0.windows.1
 
