@@ -2,85 +2,65 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C10B6C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 14:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC16DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 14:08:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4CA2820936
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 14:01:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SW2eR2t/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CA2820936
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 837F721D7D
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 14:08:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 837F721D7D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58730 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG0f9-0004qN-DM
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 10:01:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42068)
+	id 1kG0mL-00020Y-I8
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 10:08:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44320)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kG0e8-0003iv-5a
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 10:00:24 -0400
-Received: from mail-ej1-x62a.google.com ([2a00:1450:4864:20::62a]:45686)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kG0e4-0000ii-UP
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 10:00:23 -0400
-Received: by mail-ej1-x62a.google.com with SMTP id i26so3667527ejb.12
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 07:00:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=6DwJ9J8YqZUXNrEY2yeRuXNOcrGN45BT7n5oddIV2+Y=;
- b=SW2eR2t/LyzhAg/WRYT+JOGNoY5S1OrN+BOE+7/dgkPQyXYYRs6DLLXUTAy52tRQbr
- JJJlqh0Gn5sgGNe9VyJw8MaZtWKCo7AHj/SlAp+ZnHb4PhU1uxv1ZVNLjHAB8yMyxOw0
- 64nxZbdl7qkHHIjQJkKRGPIlN8ZXuk77AEAuf0+ckZIqMOly5Jlh419N0EVEdqYVTw83
- WH5GpB5BO/PAduKRMeutXPbijlvjadvxpsdhqU+l0IWk+T4QceUljZgMWyV6ZAKt8xmK
- 5JHQ1gQt4X3ZF8XfWYJOPmtqIhAysOvEUDksjUV1FNM1PA3ZpfDyodx1F3rgPSuTkRHA
- E2TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=6DwJ9J8YqZUXNrEY2yeRuXNOcrGN45BT7n5oddIV2+Y=;
- b=euUcXZi/eJ1BVXRUsutg3YbZHMrdt/hkNn2BCxCUiwsQ6IuUMuI7P84QclKoBQlT3y
- MqiIGb8++q76rJqfEt1g0UEx/gE4o9/LzPC01GuuNVtKaNeI6aw/0oeMsIBsOqcJxz+W
- UAN75l1AtCs2yghKHpR7DAkWpnIyUjV6B8LFH6PE9Q3PiCUTZcNECNTaBmLtt2NxBCSr
- kUzjPaKBWhRQHfUPM4Zl0G+qT6H1WVqfSO0f4ifwHS+wSB2mACqH4hcYEoV+l5DNthI/
- h60YbrYH1ixneztBD9Fkl5bo3+p8r7+NzxLv8wK9RQlX+Fc8YNeHOnI0LE4TMVOFC6GE
- tw+Q==
-X-Gm-Message-State: AOAM533j3NoslhsLcCJMA7xCW6N7bra/l9dCJQcZeDk2cicltTRompIa
- N0exCzS6EGkFqZPgqWFTWw2O6d5w179tyLa0okk=
-X-Google-Smtp-Source: ABdhPJw0FpxqdCzSXliwQC/j+0U0GLxB0PpIdRUcwHReUgit1PwkvwsrH026x7WfSG9ItFJDOTclkwSXJACBStkYIS4=
-X-Received: by 2002:a17:906:4a51:: with SMTP id
- a17mr3673382ejv.381.1599660019019; 
- Wed, 09 Sep 2020 07:00:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kG0lH-0000Rz-Dc
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 10:07:47 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:4724 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kG0lF-0001hh-68
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 10:07:47 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 7E52E8F57BFA2ED71157;
+ Wed,  9 Sep 2020 22:07:32 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Wed, 9 Sep 2020
+ 22:07:25 +0800
+From: Chuan Zheng <zhengchuan@huawei.com>
+To: <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
+ <berrange@redhat.com>, <dme@dme.org>
+Subject: [PATCH v7 02/12] migration/dirtyrate: add DirtyRateStatus to denote
+ calculation status
+Date: Wed, 9 Sep 2020 22:18:06 +0800
+Message-ID: <1599661096-127913-3-git-send-email-zhengchuan@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1599661096-127913-1-git-send-email-zhengchuan@huawei.com>
+References: <1599661096-127913-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-References: <87pn6vw2he.fsf@dusky.pond.sub.org>
-In-Reply-To: <87pn6vw2he.fsf@dusky.pond.sub.org>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 9 Sep 2020 18:00:06 +0400
-Message-ID: <CAJ+F1C+Ro0rVsxfdMXa-0gn=LGdc8XRm9NNzjvv0ArvRZBq7-w@mail.gmail.com>
-Subject: Re: Meson can't recover from deletion of generated QAPI file(s)
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000031f3e505aee1dfc7"
-Received-SPF: pass client-ip=2a00:1450:4864:20::62a;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x62a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191;
+ envelope-from=zhengchuan@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 10:07:33
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,90 +74,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>
+Cc: alex.chen@huawei.com, ann.zhuangyanying@huawei.com,
+ zhang.zhanghailiang@huawei.com, xiexiangyou@huawei.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000031f3e505aee1dfc7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+add DirtyRateStatus to denote calculating status.
 
-Hi
+Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+---
+ migration/dirtyrate.c | 22 ++++++++++++++++++++++
+ qapi/migration.json   | 17 +++++++++++++++++
+ 2 files changed, 39 insertions(+)
 
-On Wed, Sep 9, 2020 at 4:37 PM Markus Armbruster <armbru@redhat.com> wrote:
+diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+index bf7fd24..0a3350a 100644
+--- a/migration/dirtyrate.c
++++ b/migration/dirtyrate.c
+@@ -22,6 +22,19 @@
+ #include "migration.h"
+ #include "dirtyrate.h"
+ 
++static int CalculatingState = DIRTY_RATE_STATUS_UNSTARTED;
++
++static int dirtyrate_set_state(int *state, int old_state, int new_state)
++{
++    assert(new_state < DIRTY_RATE_STATUS__MAX);
++    if (atomic_cmpxchg(state, old_state, new_state) == old_state) {
++        return 0;
++    } else {
++        return -1;
++    }
++}
++
++
+ static void calculate_dirtyrate(struct DirtyRateConfig config)
+ {
+     /* todo */
+@@ -31,8 +44,17 @@ static void calculate_dirtyrate(struct DirtyRateConfig config)
+ void *get_dirtyrate_thread(void *arg)
+ {
+     struct DirtyRateConfig config = *(struct DirtyRateConfig *)arg;
++    int ret;
++
++    ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_UNSTARTED,
++                              DIRTY_RATE_STATUS_MEASURING);
++    if (ret == -1) {
++        return NULL;
++    }
+ 
+     calculate_dirtyrate(config);
+ 
++    ret = dirtyrate_set_state(&CalculatingState, DIRTY_RATE_STATUS_MEASURING,
++                              DIRTY_RATE_STATUS_MEASURED);
+     return NULL;
+ }
+diff --git a/qapi/migration.json b/qapi/migration.json
+index 5f6b061..061ff25 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -1720,3 +1720,20 @@
+ ##
+ { 'event': 'UNPLUG_PRIMARY',
+   'data': { 'device-id': 'str' } }
++
++##
++# @DirtyRateStatus:
++#
++# An enumeration of dirtyrate status.
++#
++# @unstarted: the dirtyrate thread has not been started.
++#
++# @measuring: the dirtyrate thread is measuring.
++#
++# @measured: the dirtyrate thread has measured and results are available.
++#
++# Since: 5.2
++#
++##
++{ 'enum': 'DirtyRateStatus',
++  'data': [ 'unstarted', 'measuring', 'measured'] }
+-- 
+1.8.3.1
 
-> Watch this:
->
->     $ rm qapi/qapi-types-error.h
->     $ make
->     Generating qemu-version.h with a meson_exe.py custom command
->     Compiling C object qom/libqom.fa.p/object_interfaces.c.o
->     In file included from ../qom/object_interfaces.c:4:
->     /work/armbru/qemu/include/qapi/error.h:275:10: fatal error:
-> qapi/qapi-types-error.h: No such file or directory
->       275 | #include "qapi/qapi-types-error.h"
->           |          ^~~~~~~~~~~~~~~~~~~~~~~~~
->     compilation terminated.
->     make: *** [Makefile.ninja:348: qom/libqom.fa.p/object_interfaces.c.o]
-> Error 1
->
-> To recover, I have to run qapi-gen.py manually and exactly right, or
-> blow away the build tree and start over.
->
-> The old build system did what a build system should: it remade the files
-> that are missing or out of date.
->
-> I'm still too clueless about Meson to debug this, but I hope I can learn
-> from watching you fix it.
->
-
-It looks like the ninja build handles that fine, so this is most likely a
-ninja2make conversion issue.
-
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---00000000000031f3e505aee1dfc7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Wed, Sep 9, 2020 at 4:37 PM Mark=
-us Armbruster &lt;<a href=3D"mailto:armbru@redhat.com">armbru@redhat.com</a=
->&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Wat=
-ch this:<br>
-<br>
-=C2=A0 =C2=A0 $ rm qapi/qapi-types-error.h <br>
-=C2=A0 =C2=A0 $ make<br>
-=C2=A0 =C2=A0 Generating qemu-version.h with a meson_exe.py custom command<=
-br>
-=C2=A0 =C2=A0 Compiling C object qom/libqom.fa.p/object_interfaces.c.o<br>
-=C2=A0 =C2=A0 In file included from ../qom/object_interfaces.c:4:<br>
-=C2=A0 =C2=A0 /work/armbru/qemu/include/qapi/error.h:275:10: fatal error: q=
-api/qapi-types-error.h: No such file or directory<br>
-=C2=A0 =C2=A0 =C2=A0 275 | #include &quot;qapi/qapi-types-error.h&quot;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~~~=
-~~~~~~~~~~~~~~~~~~~~~<br>
-=C2=A0 =C2=A0 compilation terminated.<br>
-=C2=A0 =C2=A0 make: *** [Makefile.ninja:348: qom/libqom.fa.p/object_interfa=
-ces.c.o] Error 1<br>
-<br>
-To recover, I have to run qapi-gen.py manually and exactly right, or<br>
-blow away the build tree and start over.<br>
-<br>
-The old build system did what a build system should: it remade the files<br=
->
-that are missing or out of date.<br>
-<br>
-I&#39;m still too clueless about Meson to debug this, but I hope I can lear=
-n<br>
-from watching you fix it.<br></blockquote><div><br></div><div>It looks like=
- the ninja build handles that fine, so this is most likely a ninja2make con=
-version issue. <br></div></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr=
-" class=3D"gmail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---00000000000031f3e505aee1dfc7--
 
