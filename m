@@ -2,85 +2,66 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C748C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 12:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B1FAC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 12:39:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BFD6421941
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 12:38:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BCADB21941
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 12:39:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3H4x5f9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFD6421941
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="Sg8jX52M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BCADB21941
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFzMW-0007Qf-T1
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 08:38:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49898)
+	id 1kFzNd-0000JP-Vw
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 08:39:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50016)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kFzLg-0006tm-Mp
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 08:37:16 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:58804
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kFzLd-0007Eu-TH
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 08:37:16 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599655030;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=9Wugqb+Pkhckxv/g9pk2JnXVTZZJmsx64zWhb4s5UEw=;
- b=S3H4x5f9taB9m65JsxXByhJBCoar3KZHsJomkwc/xnlFQs5E+XkDlN4xClsv4PCqrX15VI
- ZqLsgBRr6VfJIcT3b+4XHPjQ79GlvA1vvQo/4MxFU3gocf3EtzEGw9ZaJ7zUbn32riU4AB
- So/CjtT748zz5YCsf6XPQnSm/kJZCAA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-237-GmcKuA6DOaq1eGewjKgjnQ-1; Wed, 09 Sep 2020 08:37:07 -0400
-X-MC-Unique: GmcKuA6DOaq1eGewjKgjnQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECF4C1007466
- for <qemu-devel@nongnu.org>; Wed,  9 Sep 2020 12:37:06 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
- [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AF9AC7D4FA;
- Wed,  9 Sep 2020 12:37:03 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id A2D7F113865F; Wed,  9 Sep 2020 14:37:01 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
- =?utf-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>
-Subject: Meson can't recover from deletion of generated QAPI file(s)
-Date: Wed, 09 Sep 2020 14:37:01 +0200
-Message-ID: <87pn6vw2he.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kFzMV-0007iF-6n; Wed, 09 Sep 2020 08:38:07 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:56547)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kFzMP-0007GS-Lq; Wed, 09 Sep 2020 08:38:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From;
+ bh=AMJwvzwGTK3YNIl1yUoumDn66puxG6HRQDDcDamtgDY=; 
+ b=Sg8jX52M3dP7kl6jdoY2uqdZ2ShUwYJB5ItMnRcBhtLkELbHoA4SNIvJlO9CgpOwtg9mStJylQ3g/PjQcGCcyVyrZeccbjl//ulJddWvuCz90ethNQrZUeisP4vZdAZHgQ9+rA8vxtEVr3lw+d7CwlLGapyu4oxqylkDvX1dssZJRU77xsdowFk74xHItGoI1MD8ud/mpQLbcT8kb+8we5m3fTpLLvxgYsy11AyRPVqySRqvNJ/YRjze9SIT3YbSHNpfv3muOHeUZMoly0KPxtXVkd08VXXs8blqF/hOV8LV093JECGsLHy6ZTed5sQhU0zyw7o0U5ctApb64M5meQ==;
+Received: from [81.0.34.67] (helo=perseus.local)
+ by fanzine.igalia.com with esmtpsa 
+ (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
+ id 1kFzMK-0000N3-ET; Wed, 09 Sep 2020 14:37:56 +0200
+Received: from berto by perseus.local with local (Exim 4.92)
+ (envelope-from <berto@igalia.com>)
+ id 1kFzM7-0000CT-Ft; Wed, 09 Sep 2020 14:37:43 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] qcow2: Return the original error code in
+ qcow2_co_pwrite_zeroes()
+Date: Wed,  9 Sep 2020 14:37:39 +0200
+Message-Id: <20200909123739.719-1-berto@igalia.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=armbru@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:05:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 08:37:57
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,31 +75,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Watch this:
+This function checks the current status of a (sub)cluster in order to
+see if an unaligned 'write zeroes' request can be done efficiently by
+simply updating the L2 metadata and without having to write actual
+zeroes to disk.
 
-    $ rm qapi/qapi-types-error.h 
-    $ make
-    Generating qemu-version.h with a meson_exe.py custom command
-    Compiling C object qom/libqom.fa.p/object_interfaces.c.o
-    In file included from ../qom/object_interfaces.c:4:
-    /work/armbru/qemu/include/qapi/error.h:275:10: fatal error: qapi/qapi-types-error.h: No such file or directory
-      275 | #include "qapi/qapi-types-error.h"
-          |          ^~~~~~~~~~~~~~~~~~~~~~~~~
-    compilation terminated.
-    make: *** [Makefile.ninja:348: qom/libqom.fa.p/object_interfaces.c.o] Error 1
+If the situation does not allow using the fast path then the function
+returns -ENOTSUP and the caller falls back to writing zeroes.
 
-To recover, I have to run qapi-gen.py manually and exactly right, or
-blow away the build tree and start over.
+If can happen however that the aforementioned check returns an actual
+error code so in this case we should pass it to the caller.
 
-The old build system did what a build system should: it remade the files
-that are missing or out of date.
+Signed-off-by: Alberto Garcia <berto@igalia.com>
+---
+ block/qcow2.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I'm still too clueless about Meson to debug this, but I hope I can learn
-from watching you fix it.
+diff --git a/block/qcow2.c b/block/qcow2.c
+index da56b1a4df..ca46cbd795 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -3916,7 +3916,7 @@ static coroutine_fn int qcow2_co_pwrite_zeroes(BlockDriverState *bs,
+              type != QCOW2_SUBCLUSTER_ZERO_PLAIN &&
+              type != QCOW2_SUBCLUSTER_ZERO_ALLOC)) {
+             qemu_co_mutex_unlock(&s->lock);
+-            return -ENOTSUP;
++            return ret < 0 ? ret : -ENOTSUP;
+         }
+     } else {
+         qemu_co_mutex_lock(&s->lock);
+-- 
+2.20.1
 
 
