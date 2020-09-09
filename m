@@ -2,82 +2,88 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E94DC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4086BC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:28:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F1C6322272
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:26:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49B59218AC
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:28:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYkMbvbj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1C6322272
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K0mw0gX/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49B59218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37214 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG1zp-0003aJ-V3
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:26:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40280)
+	id 1kG21X-0006Ow-3m
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:28:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kG1yx-00038q-3L
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 11:25:59 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:45134
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kG1yu-0005mK-Cc
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 11:25:58 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599665153;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=S0HGwn08RTZDvSiMKGm+kokg7Mfm7dvHTLJh8SzogJA=;
- b=JYkMbvbjTbFY/6all5du3qwzJl50c//GzGBJap5dPAm+u0y6JywBF0+/CC01MoHZ8syYVJ
- CWUgoxQGX4W5NeA8mbCCLDARzcxDTwJ35jShI8AZKD7g6QOluvcJstQWVMhPCo17j54+2U
- ucDBU8L+t4BjAkr4QvOpk7kNw5Jlzwc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-174-8uZ_4VOWNSiimj2WvWYA1w-1; Wed, 09 Sep 2020 11:25:50 -0400
-X-MC-Unique: 8uZ_4VOWNSiimj2WvWYA1w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E9E011017DC3;
- Wed,  9 Sep 2020 15:25:47 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.171])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 457655C1C2;
- Wed,  9 Sep 2020 15:25:44 +0000 (UTC)
-Date: Wed, 9 Sep 2020 17:25:40 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
-Message-ID: <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kG20H-0004bd-CZ; Wed, 09 Sep 2020 11:27:21 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42212)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kG20F-0005yb-7A; Wed, 09 Sep 2020 11:27:21 -0400
+Received: by mail-lj1-x243.google.com with SMTP id k25so4065010ljg.9;
+ Wed, 09 Sep 2020 08:27:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=/orM2YQHOAKYTAFTJn4+vg2bhJBYDzxo1r6i3k0QpWE=;
+ b=K0mw0gX/D3gf/YVZNgYOqApxZr1FlHfz9GYUMgxWEqmEYygyhRXeR60DdqH0PMDXNr
+ a2E5NYp6TVqBgaEw/7/Qe3rzEg6sRuqLqdcIlytykuqp382/5fBCB86e70ZBFdH6OCdv
+ MAsPXt7kQExvThFqdrb6MiYJoBFzo3XeKjXmHa0w1qDbSPyfP7N+vtrtqtq1HTX00QBQ
+ 640Tomt++D9yLTtWs+KFnwHLH4urbAUeC6exZjLg3dZgSqmNZDQ4vfg70SvYSD6S2zDN
+ L+nP+wj1y/VHBHUsNlj23sf614b3jJsv/eP29VrZ+vtXqA/cNi3CXrouMhftY49cXjLX
+ ouAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=/orM2YQHOAKYTAFTJn4+vg2bhJBYDzxo1r6i3k0QpWE=;
+ b=Qi3mO6gliHZZsSrqi0UOZgaFc4wiiHvWwY9xjqnb9Li6fr8R8NWHGqgP75+S+DWjOa
+ gx8+9HGHsn1fYrz/beNQ4wShqBkSQ1Wua4x2Yu3N7vmYSmCwxcxj9aR8XCiGhixpCFCl
+ iSgfNLHKQ7L549++HLKRA08RsxMrNO62qVVcwATEjOR2mzttWWb/0jUSBuhBx4egk68g
+ wnz+Di6Lf0IRkXol2u7W+3u2RyPbuGLtfFUYyxx5N2FzAiYHtQpCty3ngHaXtFYPnx1I
+ CMVtnXcKRmwNULPF9SP+LCaAi3EplVHCUzkChuwOgwdVuj9TIVXB3WjsKdLU+xdGbcYG
+ NQMA==
+X-Gm-Message-State: AOAM5301Y/z4TdYaNK9L1yiUj4T0rnQp5ORuSOil4RYg/+B9jE2YzK/s
+ jZtOweqmhLSUq4q+t8QJOq0w/2DVZuwL9iC2byc=
+X-Google-Smtp-Source: ABdhPJxc9cO3058j9bFTfUM7ycqczFEKQCNLla0Y4fOOREf7g7/SIrTPH3jSQ7u/58FE4hcY9ATes13VZ65LbNMdqbw=
+X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr2337818ljj.447.1599665236793; 
+ Wed, 09 Sep 2020 08:27:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200904160018.29481-1-steven.price@arm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=205.139.110.120; envelope-from=drjones@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:13:17
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20200909094617.1582-1-luoyonggang@gmail.com>
+ <20200909094617.1582-3-luoyonggang@gmail.com>
+ <20200909122658.GT1011023@redhat.com>
+In-Reply-To: <20200909122658.GT1011023@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Wed, 9 Sep 2020 23:27:06 +0800
+Message-ID: <CAE2XoE9tf01jZYt-BJBS4tdJWaJPOROJ0TCXGibQ_q1kkrL3RA@mail.gmail.com>
+Subject: Re: [PATCH v2 02/21] ci: fixes msys2 build by upgrading capstone to
+ 4.0.2
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Content-Type: multipart/alternative; boundary="00000000000032deac05aee316db"
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, URI_DOTEDU=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,138 +96,229 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvmarm@lists.cs.columbia.edu,
- linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
- Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Sep 04, 2020 at 05:00:16PM +0100, Steven Price wrote:
-> Arm's Memory Tagging Extension (MTE) adds 4 bits of tag data to every 16
-> bytes of memory in the system. This along with stashing a tag within the
-> high bit of virtual addresses allows runtime checking of memory
-> accesses.
-> 
-> These patches add support to KVM to enable MTE within a guest. They are
-> based on Catalin's v9 MTE user-space support series[1].
-> 
-> I'd welcome feedback on the proposed user-kernel ABI. Specifically this
-> series currently:
+--00000000000032deac05aee316db
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Sep 9, 2020 at 8:27 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
 >
-   0. Feature probing
+wrote:
 
-Probably a KVM cap, rather than requiring userspace to attempt VCPU
-features one at a time with a scratch VCPU.
- 
->  1. Requires the VMM to enable MTE per-VCPU.
+> On Wed, Sep 09, 2020 at 05:45:58PM +0800, Yonggang Luo wrote:
+> > The currently random version capstone have the following compiling issu=
+e:
+> >   CC      /c/work/xemu/qemu/build/slirp/src/arp_table.o
+> > make[1]: *** No rule to make target
+> =E2=80=9C/c/work/xemu/qemu/build/capstone/capstone.lib=E2=80=9D=E3=80=82 =
+Stop.
+> >
+> > Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the
+> tagged version 4.0.2
+> > when upgrading to this version, the folder structure of include are
+> changed to
+> > qemu\capstone\include
+> > =E2=94=82  platform.h
+> > =E2=94=82
+> > =E2=94=9C=E2=94=80capstone
+> > =E2=94=82      arm.h
+> > =E2=94=82      arm64.h
+> > =E2=94=82      capstone.h
+> > =E2=94=82      evm.h
+> > =E2=94=82      m680x.h
+> > =E2=94=82      m68k.h
+> > =E2=94=82      mips.h
+> > =E2=94=82      platform.h
+> > =E2=94=82      ppc.h
+> > =E2=94=82      sparc.h
+> > =E2=94=82      systemz.h
+> > =E2=94=82      tms320c64x.h
+> > =E2=94=82      x86.h
+> > =E2=94=82      xcore.h
+> > =E2=94=82
+> > =E2=94=94=E2=94=80windowsce
+> >         intrin.h
+> >         stdint.h
+> >
+> > in capstone. so we need add extra include path
+> -I${source_path}/capstone/include/capstone
+> > for directly #include <capstone.h>, and the exist include path should
+> preserve, because
+> > in capstone code there something like #include "capstone/capstone.h"
+> >
+> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> > ---
+> >  capstone  | 2 +-
+> >  configure | 2 +-
+> >  2 files changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/capstone b/capstone
+> > index 22ead3e0bf..1d23053284 160000
+> > --- a/capstone
+> > +++ b/capstone
+> > @@ -1 +1 @@
+> > -Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
+> > +Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1
+> > diff --git a/configure b/configure
+> > index 4231d56bcc..f4f8bc3756 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -5156,7 +5156,7 @@ case "$capstone" in
+> >        LIBCAPSTONE=3Dlibcapstone.a
+> >      fi
+> >      capstone_libs=3D"-Lcapstone -lcapstone"
+> > -    capstone_cflags=3D"-I${source_path}/capstone/include"
+> > +    capstone_cflags=3D"-I${source_path}/capstone/include
+> -I${source_path}/capstone/include/capstone"
+>
+> IIUC, the original -I arg can be removed - we just need the new one.
+>
+That's not correct, doing that will cause compiling failure
+Please take a look at
+https://cirrus-ci.com/task/6709042959613952?command=3Dmain#L384
 
-I suppose. We're collecting many features that are enabling CPU features,
-so they map nicely to VCPU features, yet they're effectively VM features
-due to a shared resource such as an irq or memory.
+>
+>
+> Regards,
+> Daniel
+> --
+> |: https://berrange.com      -o-
+> https://www.flickr.com/photos/dberrange :|
+> |: https://libvirt.org         -o-
+> https://fstop138.berrange.com :|
+> |: https://entangle-photo.org    -o-
+> https://www.instagram.com/dberrange :|
+>
+>
 
->  2. Automatically promotes (normal host) memory given to the guest to be
->     tag enabled (sets PG_mte_tagged), if any VCPU has MTE enabled. The
->     tags are cleared if the memory wasn't previously MTE enabled.
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-Shouldn't this be up to the guest? Or, is this required in order for the
-guest to use tagging at all. Something like making the guest IPAs memtag
-capable, but if the guest doesn't enable tagging then there is no guest
-impact? In any case, shouldn't userspace be the one that adds PROT_MTE
-to the memory regions it wants the guest to be able to use tagging with,
-rather than KVM adding the attribute page by page?
+--00000000000032deac05aee316db
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->  3. Doesn't provide any new methods for the VMM to access the tags on
->     memory.
-> 
-> (2) and (3) are particularly interesting from the aspect of VM migration.
-> The guest is able to store/retrieve data in the tags (presumably for the
-> purpose of tag checking, but architecturally it could be used as just
-> storage). This means that when migrating a guest the data needs to be
-> transferred (or saved/restored).
-> 
-> MTE tags are controlled by the same permission model as normal pages
-> (i.e. a read-only page has read-only tags), so the normal methods of
-> detecting guest changes to pages can be used. But this would also
-> require the tags within a page to be migrated at the same time as the
-> data (since the access control for tags is the same as the normal data
-> within a page).
-> 
-> (3) may be problematic and I'd welcome input from those familiar with
-> VMMs. User space cannot access tags unless the memory is mapped with the
-> PROT_MTE flag. However enabling PROT_MTE will also enable tag checking
-> for the user space process (assuming the VMM enables tag checking for
-> the process) and since the tags in memory are controlled by the guest
-> it's unlikely the VMM would have an appropriately tagged pointer for its
-> access. This means the VMM would either need to maintain two mappings of
-> memory (one to access tags, the other to access data) or disable tag
-> checking during the accesses to data.
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Sep 9, 2020 at 8:27 PM Daniel=
+ P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@redha=
+t.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
+1ex">On Wed, Sep 09, 2020 at 05:45:58PM +0800, Yonggang Luo wrote:<br>
+&gt; The currently random version capstone have the following compiling iss=
+ue:<br>
+&gt;=C2=A0 =C2=A0CC=C2=A0 =C2=A0 =C2=A0 /c/work/xemu/qemu/build/slirp/src/a=
+rp_table.o<br>
+&gt; make[1]: *** No rule to make target =E2=80=9C/c/work/xemu/qemu/build/c=
+apstone/capstone.lib=E2=80=9D=E3=80=82 Stop.<br>
+&gt; <br>
+&gt; Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the tag=
+ged version 4.0.2<br>
+&gt; when upgrading to this version, the folder structure of include are ch=
+anged to<br>
+&gt; qemu\capstone\include<br>
+&gt; =E2=94=82=C2=A0 platform.h<br>
+&gt; =E2=94=82<br>
+&gt; =E2=94=9C=E2=94=80capstone<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 arm.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 arm64.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 capstone.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 evm.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 m680x.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 m68k.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 mips.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 platform.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 ppc.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 sparc.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 systemz.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 tms320c64x.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 x86.h<br>
+&gt; =E2=94=82=C2=A0 =C2=A0 =C2=A0 xcore.h<br>
+&gt; =E2=94=82<br>
+&gt; =E2=94=94=E2=94=80windowsce<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0intrin.h<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stdint.h<br>
+&gt; <br>
+&gt; in capstone. so we need add extra include path -I${source_path}/capsto=
+ne/include/capstone<br>
+&gt; for directly #include &lt;capstone.h&gt;, and the exist include path s=
+hould preserve, because<br>
+&gt; in capstone code there something like #include &quot;capstone/capstone=
+.h&quot;<br>
+&gt; <br>
+&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
+m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 capstone=C2=A0 | 2 +-<br>
+&gt;=C2=A0 configure | 2 +-<br>
+&gt;=C2=A0 2 files changed, 2 insertions(+), 2 deletions(-)<br>
+&gt; <br>
+&gt; diff --git a/capstone b/capstone<br>
+&gt; index 22ead3e0bf..1d23053284 160000<br>
+&gt; --- a/capstone<br>
+&gt; +++ b/capstone<br>
+&gt; @@ -1 +1 @@<br>
+&gt; -Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf<br>
+&gt; +Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1<br>
+&gt; diff --git a/configure b/configure<br>
+&gt; index 4231d56bcc..f4f8bc3756 100755<br>
+&gt; --- a/configure<br>
+&gt; +++ b/configure<br>
+&gt; @@ -5156,7 +5156,7 @@ case &quot;$capstone&quot; in<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 LIBCAPSTONE=3Dlibcapstone.a<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 fi<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 capstone_libs=3D&quot;-Lcapstone -lcapstone&quot;<=
+br>
+&gt; -=C2=A0 =C2=A0 capstone_cflags=3D&quot;-I${source_path}/capstone/inclu=
+de&quot;<br>
+&gt; +=C2=A0 =C2=A0 capstone_cflags=3D&quot;-I${source_path}/capstone/inclu=
+de -I${source_path}/capstone/include/capstone&quot;<br>
+<br>
+IIUC, the original -I arg can be removed - we just need the new one.<br></b=
+lockquote><div>That&#39;s not correct, doing that will cause compiling fail=
+ure</div><div>Please take a look at</div><div><a href=3D"https://cirrus-ci.=
+com/task/6709042959613952?command=3Dmain#L384">https://cirrus-ci.com/task/6=
+709042959613952?command=3Dmain#L384</a>=C2=A0<br></div><blockquote class=3D=
+"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(2=
+04,204,204);padding-left:1ex">
+<br>
+<br>
+Regards,<br>
+Daniel<br>
+-- <br>
+|: <a href=3D"https://berrange.com" rel=3D"noreferrer" target=3D"_blank">ht=
+tps://berrange.com</a>=C2=A0 =C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D"http=
+s://www.flickr.com/photos/dberrange" rel=3D"noreferrer" target=3D"_blank">h=
+ttps://www.flickr.com/photos/dberrange</a> :|<br>
+|: <a href=3D"https://libvirt.org" rel=3D"noreferrer" target=3D"_blank">htt=
+ps://libvirt.org</a>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-o-=C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://fstop138.berrange.com" rel=3D"n=
+oreferrer" target=3D"_blank">https://fstop138.berrange.com</a> :|<br>
+|: <a href=3D"https://entangle-photo.org" rel=3D"noreferrer" target=3D"_bla=
+nk">https://entangle-photo.org</a>=C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D=
+"https://www.instagram.com/dberrange" rel=3D"noreferrer" target=3D"_blank">=
+https://www.instagram.com/dberrange</a> :|<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
 
-If userspace needs to write to guest memory then it should be due to
-a device DMA or other specific hardware emulation. Those accesses can
-be done with tag checking disabled.
-
-> 
-> If it's not practical to either disable tag checking in the VMM or
-> maintain multiple mappings then the alternatives I'm aware of are:
-> 
->  * Provide a KVM-specific method to extract the tags from guest memory.
->    This might also have benefits in terms of providing an easy way to
->    read bulk tag data from guest memory (since the LDGM instruction
->    isn't available at EL0).
-
-Maybe we need a new version of KVM_GET_DIRTY_LOG that also provides
-the tags for all addresses of each dirty page.
-
->  * Provide support for user space setting the TCMA0 or TCMA1 bits in
->    TCR_EL1. These would allow the VMM to generate pointers which are not
->    tag checked.
-
-So this is necessary to allow the VMM to keep tag checking enabled for
-itself, plus map guest memory as PROT_MTE, and write to that memory when
-needed? 
-
-Thanks,
-drew
-
-> 
-> Feedback is welcome, and feel free to ask questions if anything in the
-> above doesn't make sense.
-> 
-> Changes since the previous v1 posting[2]:
-> 
->  * Rebasing clean-ups
->  * sysreg visibility is now controlled based on whether the VCPU has MTE
->    enabled or not
-> 
-> [1] https://lore.kernel.org/r/20200904103029.32083-1-catalin.marinas@arm.com
-> [2] https://lore.kernel.org/r/20200713100102.53664-1-steven.price%40arm.com
-> 
-> Steven Price (2):
->   arm64: kvm: Save/restore MTE registers
->   arm64: kvm: Introduce MTE VCPU feature
-> 
->  arch/arm64/include/asm/kvm_emulate.h       |  3 +++
->  arch/arm64/include/asm/kvm_host.h          |  9 ++++++++-
->  arch/arm64/include/asm/sysreg.h            |  3 ++-
->  arch/arm64/include/uapi/asm/kvm.h          |  1 +
->  arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 14 ++++++++++++++
->  arch/arm64/kvm/mmu.c                       | 15 +++++++++++++++
->  arch/arm64/kvm/reset.c                     |  8 ++++++++
->  arch/arm64/kvm/sys_regs.c                  | 20 +++++++++++++++-----
->  8 files changed, 66 insertions(+), 7 deletions(-)
-> 
-> -- 
-> 2.20.1
-> 
-> _______________________________________________
-> kvmarm mailing list
-> kvmarm@lists.cs.columbia.edu
-> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
-> 
-
+--00000000000032deac05aee316db--
 
