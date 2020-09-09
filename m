@@ -2,89 +2,126 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_FONT_LOW_CONTRAST,HTML_MESSAGE,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E70FC43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4751C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:15:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B928B2065E
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:11:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 24D2C2065E
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:15:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="r5aNYZOC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B928B2065E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S/5B/8ue"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24D2C2065E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG4Yk-0007qr-9b
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:11:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48720)
+	id 1kG4ck-0001DN-J2
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:15:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG4Y5-0007LY-SP; Wed, 09 Sep 2020 14:10:25 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:44017)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG4Y3-00033b-Hr; Wed, 09 Sep 2020 14:10:25 -0400
-Received: by mail-lj1-x241.google.com with SMTP id u4so4738865ljd.10;
- Wed, 09 Sep 2020 11:10:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=CHYOyXn6QbOn3nSMQE6dsSz+4OMMF/TLy4WVRXEF14U=;
- b=r5aNYZOCq0RrXiekuCANFcK23KgRPtJBHloW3hWK36vpKxce0e0vF4b3KQgqtmnsrq
- hJbyQdgnncDdt5OsAQA8sBXcnS+x80tffO7VsxpnWdS7/pr8eZYESXZVWwa/Dp0+1lUB
- fhVW2ADERt0UimdpwzvI1mI4y8/kP7ztWYjT/hE1iZo07Fa8+enkiYjqDB/0PKIhAy8Z
- QxlqTRXJP8O9blZOC2dDi7wxays4qXqi3/Ne/j8spPQHsKCIQU95bXAEDaBooM56b1b8
- QnfMLm6qBx4qBonFKAjNbyrc8s1pHGGabGLErG+00D/Vbv1WkmY/ES8d5DeB7CvMbpVQ
- +f9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=CHYOyXn6QbOn3nSMQE6dsSz+4OMMF/TLy4WVRXEF14U=;
- b=lZpMarWR10G3OBFYoF+BSDAL0YE+ZXbmwzIU+F7Q2I1LCrOCaPlsDwcRNLVn5DSx79
- vyEHvJOrgqSZZaKmmiVuPtArWnxcQp14rJpxWfT0ZmSRiEoh5sEMfAfF9CFFwkwonlDX
- DmzOOiUQDgRDzczQynCq7NMgGex25ywPhz5vhPonbljp5VQ/I3K5FEDkyOn3+eGIkvaB
- hKgxMl5L4Nj1nEXbAPnYyIRT9kgP80bXAEyk42YsOmuz+RANqsa2YJqIfENsFEPBWREa
- 7thICsU+m8izFsrHQVq1Mzj7tZRHgLAmhXj4nOXAcg4GgZNUW+VRShzOmYL8VUwyKX2y
- fX+A==
-X-Gm-Message-State: AOAM532OhEsMDhc52QmM5HP2F2+eIlbaKbvr029n+XDbiuq8pDIIVUQw
- R9wzFEA2DywLFEITaPPT2YMypFV4wTYnEg32DAg=
-X-Google-Smtp-Source: ABdhPJwJ26yAuwAjv6vU/4lFTyY/ty/NRHOAvKISFvToIb582rv6zwuTNldUdgP1iy1GtAz4+girxRU5PSEIrrihIpI=
-X-Received: by 2002:a05:651c:1119:: with SMTP id
- d25mr2280695ljo.300.1599675020943; 
- Wed, 09 Sep 2020 11:10:20 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kG4bh-0000IA-GR; Wed, 09 Sep 2020 14:14:09 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63888)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kG4bc-0003hY-4S; Wed, 09 Sep 2020 14:14:09 -0400
+Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 089I34FU067244; Wed, 9 Sep 2020 14:14:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=wra71wmueWDeQSVxlGcBU+rZ35hwogg49QKdFEzB+9M=;
+ b=S/5B/8ueM0ErCXZ4W48n3L9O+niCFvDgyO4eE9T01M/GMa4InHzO8PqR2DJcd4qEM9iC
+ j+F8y3S98qF3oEv9ww1m+wGIqfJ42smcqmVJFTsY4JVs5IuNGbx6WDmr3dR4Wu8MtG/j
+ kmX6Aq+QT3mZ217XPwkwhnrzGzsL0FLWp0MMKolTRKERNrL8wYN9rKY9YmCUcHJOemMo
+ Mn2JAuPzPcq9DKykWdZnc2wYSVWF0LYDArr2RAb2Mmm0Nt3Ymet5T64txPD/Mos5tILO
+ kYpKL0bHSBnhSkPoVCVVLQI0w+hgsl736UjQEmTxO60Ydl3VRrYED+hKRdYmp5DUwfL7 pg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33f2x5u3cy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 09 Sep 2020 14:14:00 -0400
+Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 089I3MsN069057;
+ Wed, 9 Sep 2020 14:14:00 -0400
+Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com
+ [169.63.121.186])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33f2x5u3c4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 09 Sep 2020 14:14:00 -0400
+Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
+ by ppma03wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 089ID9Ct023996;
+ Wed, 9 Sep 2020 18:13:59 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma03wdc.us.ibm.com with ESMTP id 33cebuws78-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 09 Sep 2020 18:13:59 +0000
+Received: from b03ledav001.gho.boulder.ibm.com
+ (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 089IDq8N40239466
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 9 Sep 2020 18:13:52 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A764B6E052;
+ Wed,  9 Sep 2020 18:13:57 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 389A76E04C;
+ Wed,  9 Sep 2020 18:13:56 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.156.134])
+ by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTPS;
+ Wed,  9 Sep 2020 18:13:56 +0000 (GMT)
+Subject: Re: [PATCH v4 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
+To: Cornelia Huck <cohuck@redhat.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>
+References: <20200624202312.28349-1-walling@linux.ibm.com>
+ <b1d68acf-881f-be0f-c1ac-d32b8bfc859d@linux.ibm.com>
+ <20200715180409.451d217e.cohuck@redhat.com>
+ <d59bd0a5-0660-0c22-09dd-018be6dfe74f@linux.ibm.com>
+ <20200716140214.3fdc7590.cohuck@redhat.com>
+ <42dde86f-2f12-3b89-0c35-74d69fa3d449@de.ibm.com>
+ <20200909104623.57664738.cohuck@redhat.com>
+ <20200909114351.1f91f330.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Message-ID: <22005476-9a22-f3b1-4c92-fff9fbb2e11d@linux.ibm.com>
+Date: Wed, 9 Sep 2020 14:13:55 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200909094617.1582-1-luoyonggang@gmail.com>
- <20200909094617.1582-6-luoyonggang@gmail.com>
- <20200909125233.GW1011023@redhat.com>
-In-Reply-To: <20200909125233.GW1011023@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Thu, 10 Sep 2020 02:10:09 +0800
-Message-ID: <CAE2XoE9cFN55UFNq0DzWKypkfM9EY=ZSLf1dqwo_68QoU9cv=A@mail.gmail.com>
-Subject: Re: [PATCH v2 05/21] tests: disable /char/stdio/* tests in
- test-char.c on win32
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000061270c05aee55def"
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_FONT_LOW_CONTRAST=0.001, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200909114351.1f91f330.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-09_12:2020-09-09,
+ 2020-09-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ mlxscore=0 bulkscore=0
+ mlxlogscore=999 clxscore=1011 adultscore=0 suspectscore=0 phishscore=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009090160
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 14:14:01
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -62
+X-Spam_score: -6.3
+X-Spam_bar: ------
+X-Spam_report: (-6.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-3.576,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,153 +134,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
- Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
- Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
- qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
- Max Reitz <mreitz@redhat.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: thuth@redhat.com, frankja@linux.ibm.com, david@redhat.com, mst@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, qemu-s390x@nongnu.org,
+ svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000061270c05aee55def
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 9/9/20 5:43 AM, Cornelia Huck wrote:
+> On Wed, 9 Sep 2020 10:46:23 +0200
+> Cornelia Huck <cohuck@redhat.com> wrote:
+> 
+>> On Wed, 9 Sep 2020 09:54:40 +0200
+>> Christian Borntraeger <borntraeger@de.ibm.com> wrote:
+>>
+>>> On 16.07.20 14:02, Cornelia Huck wrote:  
+>>>> On Wed, 15 Jul 2020 12:26:20 -0400
+>>>> Collin Walling <walling@linux.ibm.com> wrote:
+>>>>     
+>>>>> On 7/15/20 12:04 PM, Cornelia Huck wrote:    
+>>>>>> On Wed, 15 Jul 2020 11:36:35 -0400
+>>>>>> Collin Walling <walling@linux.ibm.com> wrote:
+>>>>>>       
+>>>>>>> Polite ping. Patches have been sitting on the list for a few weeks now,
+>>>>>>> and it doesn't look like any further changes are requested (hopefully I
+>>>>>>> didn't miss something).      
+>>>>>>
+>>>>>> The only thing I had was (I think) the logging of the length you just
+>>>>>> replied to. We can still tweak things like that later, of course.
+>>>>>>
+>>>>>> As these patches depend on a headers sync, I could not yet queue them.
+>>>>>> I can keep a preliminary version on a branch. I assume that the header
+>>>>>> changes will go in during the next kernel merge window? (If I missed
+>>>>>> something, apologies for that.)
+>>>>>>       
+>>>>>
+>>>>> Gotcha. Thanks for the update :)
+>>>>>
+>>>>> There was an email on the KVM list a couple of days that made one change
+>>>>> to the Linux header. Just changed the integer used for the DIAG cap,
+>>>>> which should be reflected in QEMU as well.
+>>>>>
+>>>>> https://www.spinics.net/lists/kvm/msg220548.html
+>>>>>
+>>>>> Should I respin this patch series to include the new ack's and account
+>>>>> for the header sync?    
+>>>>
+>>>> No need for that, my tooling picks up acks and the headers update needs
+>>>> to be replaced with a sync against a proper Linux version anyway.
+>>>>
+>>>> I've queued the patches on a local branch, and the only patch that did
+>>>> not apply cleanly was the headers patch, which will get replaced later
+>>>> anyway :) Just ping me when the kernel patches hit upstream, then I'll
+>>>> do a header sync against the next -rc and queue the patches on
+>>>> s390-next.    
+>>>
+>>> What is the status of this patchset? The kernel part has been merged in 5.9-rc1.
+>>>   
+>>
+>> Thanks for letting me know, I'll go and process this now. (Had some
+>> busy weeks + PTO.)
+> 
+> There were some minor conflicts, please double check that everything
+> looks sane.
+> 
+> Thanks, applied.
+> 
+> 
 
-On Wed, Sep 9, 2020 at 8:52 PM Daniel P. Berrang=C3=A9 <berrange@redhat.com=
->
-wrote:
+Has this been merged yet? There is one patch that I neglected to include
+in this series (I didn't realize it until now) that properly sets the
+SCCB size in QEMU based on the length provided by the kernel (right now,
+these patches allocate a static 4K size for the SCCB struct, which
+causes a segfault).
 
-> On Wed, Sep 09, 2020 at 05:46:01PM +0800, Yonggang Luo wrote:
-> > These tests are blocking test-char to be finished.
-> > Merge three #ifndef _WIN32
-> >
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >  tests/test-char.c | 8 ++++----
-> >  1 file changed, 4 insertions(+), 4 deletions(-)
->
-> Reviewed-by: Daniel P. Berrang=C3=A9 <berrange@redhat.com>
->
->
-> Regards,
-> Daniel
->
+I can post my set with the fix as v5, or I can wait and post the fix as
+a bandaid if the patches are already in.
 
-https://cirrus-ci.com/task/6266195793936384?command=3Dmain#L433
+-- 
+Regards,
+Collin
 
-test-char still failing randomly.
-I'd like to disable more to make sure it's not failing
-
-ERROR:../tests/test-char.c:103:char_console_test: stdout of child process
-(/char/console/subprocess) failed to match: CONSOLE
-stdout was:
-ERROR test-char - Bail out!
-ERROR:../tests/test-char.c:103:char_console_test: stdout of child process
-(/char/console/subprocess) failed to match: CONSOLE
-make: *** [Makefile.mtest:576: run-test-80] Error 1
-C:\Users\ContainerAdministrator\AppData\Local\Temp\cirrus-ci-build>if 2 NEQ
-0 exit /b 2
-
-> --
-> |: https://berrange.com      -o-
-> https://www.flickr.com/photos/dberrange :|
-> |: https://libvirt.org         -o-
-> https://fstop138.berrange.com :|
-> |: https://entangle-photo.org    -o-
-> https://www.instagram.com/dberrange :|
->
->
-
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---00000000000061270c05aee55def
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Sep 9, 2020 at 8:52 PM Daniel=
- P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.com">berrange@redha=
-t.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
-rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
-1ex">On Wed, Sep 09, 2020 at 05:46:01PM +0800, Yonggang Luo wrote:<br>
-&gt; These tests are blocking test-char to be finished.<br>
-&gt; Merge three #ifndef _WIN32<br>
-&gt; <br>
-&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
-m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
-&gt; ---<br>
-&gt;=C2=A0 tests/test-char.c | 8 ++++----<br>
-&gt;=C2=A0 1 file changed, 4 insertions(+), 4 deletions(-)<br>
-<br>
-Reviewed-by: Daniel P. Berrang=C3=A9 &lt;<a href=3D"mailto:berrange@redhat.=
-com" target=3D"_blank">berrange@redhat.com</a>&gt;<br>
-<br>
-<br>
-Regards,<br>
-Daniel<br></blockquote><div><br></div><div><a href=3D"https://cirrus-ci.com=
-/task/6266195793936384?command=3Dmain#L433">https://cirrus-ci.com/task/6266=
-195793936384?command=3Dmain#L433</a><br></div><div><br></div><div>test-char=
- still failing randomly.</div><div>I&#39;d like to disable more to make sur=
-e it&#39;s not failing</div><div><br></div><div id=3D"gmail-L425" tabindex=
-=3D"0" class=3D"gmail-log-line gmail-jss43" style=3D"box-sizing:border-box;=
-font-family:Monaco,monospace;font-size:12px;white-space:pre-wrap;color:rgb(=
-250,250,250);width:1094.03px;margin:0px;display:flex">ERROR:../tests/test-c=
-har.c:103:char_console_test: stdout of child process (/char/console/subproc=
-ess) failed to match: CONSOLE
-</div><div id=3D"gmail-L426" tabindex=3D"0" class=3D"gmail-log-line gmail-j=
-ss43" style=3D"box-sizing:border-box;font-family:Monaco,monospace;font-size=
-:12px;white-space:pre-wrap;color:rgb(250,250,250);width:1094.03px;margin:0p=
-x;display:flex">stdout was:
-</div><div id=3D"gmail-L427" tabindex=3D"0" class=3D"gmail-log-line gmail-j=
-ss43" style=3D"box-sizing:border-box;font-family:Monaco,monospace;font-size=
-:12px;white-space:pre-wrap;color:rgb(250,250,250);width:1094.03px;margin:0p=
-x;display:flex"></div><div id=3D"gmail-L428" tabindex=3D"0" class=3D"gmail-=
-log-line gmail-jss43" style=3D"box-sizing:border-box;font-family:Monaco,mon=
-ospace;font-size:12px;white-space:pre-wrap;color:rgb(250,250,250);width:109=
-4.03px;margin:0px;display:flex">ERROR test-char - Bail out! ERROR:../tests/=
-test-char.c:103:char_console_test: stdout of child process (/char/console/s=
-ubprocess) failed to match: CONSOLE</div><div id=3D"gmail-L429" tabindex=3D=
-"0" class=3D"gmail-log-line gmail-jss43" style=3D"box-sizing:border-box;fon=
-t-family:Monaco,monospace;font-size:12px;white-space:pre-wrap;color:rgb(250=
-,250,250);width:1094.03px;margin:0px;display:flex">make: *** [Makefile.mtes=
-t:576: run-test-80] Error 1</div><div id=3D"gmail-L430" tabindex=3D"0" clas=
-s=3D"gmail-log-line gmail-jss43" style=3D"box-sizing:border-box;font-family=
-:Monaco,monospace;font-size:12px;white-space:pre-wrap;color:rgb(250,250,250=
-);width:1094.03px;margin:0px;display:flex"></div><div><span style=3D"color:=
-rgb(250,250,250);font-family:Monaco,monospace;font-size:12px;white-space:pr=
-e-wrap">C:\Users\ContainerAdministrator\AppData\Local\Temp\cirrus-ci-build&=
-gt;if 2 NEQ 0 exit /b 2 </span>=C2=A0</div><blockquote class=3D"gmail_quote=
-" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);=
-padding-left:1ex">
--- <br>
-|: <a href=3D"https://berrange.com" rel=3D"noreferrer" target=3D"_blank">ht=
-tps://berrange.com</a>=C2=A0 =C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D"http=
-s://www.flickr.com/photos/dberrange" rel=3D"noreferrer" target=3D"_blank">h=
-ttps://www.flickr.com/photos/dberrange</a> :|<br>
-|: <a href=3D"https://libvirt.org" rel=3D"noreferrer" target=3D"_blank">htt=
-ps://libvirt.org</a>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-o-=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 <a href=3D"https://fstop138.berrange.com" rel=3D"n=
-oreferrer" target=3D"_blank">https://fstop138.berrange.com</a> :|<br>
-|: <a href=3D"https://entangle-photo.org" rel=3D"noreferrer" target=3D"_bla=
-nk">https://entangle-photo.org</a>=C2=A0 =C2=A0 -o-=C2=A0 =C2=A0 <a href=3D=
-"https://www.instagram.com/dberrange" rel=3D"noreferrer" target=3D"_blank">=
-https://www.instagram.com/dberrange</a> :|<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
-
---00000000000061270c05aee55def--
+Stay safe and stay healthy
 
