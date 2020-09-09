@@ -2,96 +2,120 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10B57C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:29:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB757C43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:32:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAA50218AC
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:29:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NuKmfNh0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAA50218AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 42E4C218AC
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:32:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 42E4C218AC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG221-0007Ev-QG
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:29:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40904)
+	id 1kG25H-0000d5-Oq
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:32:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kG217-00060x-Hx
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 11:28:13 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:60956
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kG215-00066D-2Q
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 11:28:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599665289;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=05t5Kh5HCrReDIfcQZBEBkCKCxSWM5T5nE40Engpe7U=;
- b=NuKmfNh05CGVLru+PgnZAeq+LeeEk2LNHM0PCNY8L2sKFOCNGmt18ReMS8QVMCMGN1X3+V
- DxGnBd8kv+zvEX0x4LzRkRNcOr0PqvMxZp6R6oUV+73QHGkkFtmFN74zBYCca1lK/kYlmn
- naMytI9x45N99BQd9f7v+ePXrfa24Uo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-223-cMeCPzmDMc6gsvWmt_35Ww-1; Wed, 09 Sep 2020 11:28:07 -0400
-X-MC-Unique: cMeCPzmDMc6gsvWmt_35Ww-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9B55B10BBEC5;
- Wed,  9 Sep 2020 15:28:06 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-113-68.ams2.redhat.com
- [10.36.113.68])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E5DFF10013D0;
- Wed,  9 Sep 2020 15:28:02 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6C22D113865F; Wed,  9 Sep 2020 17:28:01 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH 1/4] docs: lift block-core.json rST header into parents
-References: <20200908093113.47564-1-stefanha@redhat.com>
- <20200908093113.47564-2-stefanha@redhat.com>
- <f5de1038-5bf3-8bd4-d664-45d6f201ae9b@redhat.com>
- <20200908142308.GD8175@linux.fritz.box>
- <87h7s7z9g4.fsf@dusky.pond.sub.org>
- <20200909075222.GA5219@linux.fritz.box>
- <87v9gnw3q2.fsf@dusky.pond.sub.org>
- <20200909132225.GE5219@linux.fritz.box>
-Date: Wed, 09 Sep 2020 17:28:01 +0200
-In-Reply-To: <20200909132225.GE5219@linux.fritz.box> (Kevin Wolf's message of
- "Wed, 9 Sep 2020 15:22:25 +0200")
-Message-ID: <87y2ljt1fi.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kG24Q-00009v-7x; Wed, 09 Sep 2020 11:31:38 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:45595)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kG24O-0006r7-1J; Wed, 09 Sep 2020 11:31:37 -0400
+Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
+ (mreue108 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N6KQZ-1kZr9I2kYL-016dEi; Wed, 09 Sep 2020 17:31:17 +0200
+Subject: Re: [PATCH] meson.build: tweak sdl-image error message
+To: Paolo Bonzini <pbonzini@redhat.com>, Sergei Trofimovich <slyfox@gentoo.org>
+References: <20200908074016.2593596-1-slyfox@gentoo.org>
+ <CABgObfaqxdOuH93OB=_ioiHR3np00hwNuzvpOXD=Wte4ErkUqQ@mail.gmail.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Message-ID: <51084888-77f4-f3ca-4eee-fbfd765c13ef@vivier.eu>
+Date: Wed, 9 Sep 2020 17:31:16 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 02:43:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+In-Reply-To: <CABgObfaqxdOuH93OB=_ioiHR3np00hwNuzvpOXD=Wte4ErkUqQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:odvXJiwPXaCt4vG0eRonaM41wSzzkaA7Uej6z26t+hWeiTOLiS2
+ z3qvKjMetYNdVdCrjmR2hR6S9McX4ZK+Zo7pUM71RToltw8K04FrKQoNFqraKfHu8LC0+DU
+ WXhPv0+xF3wbr40sbvMmk57Vws4yOmAsLsSebJlGTicgzV8LasepX/vFO6GhzyK3IspCwLS
+ m4bCFDkulfjudogqvng1w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:jeu/XPcCtiI=:FfbTAUhch2gU/qpQLhl1SU
+ bP0RA0+h++G6pDWcjmlRW2b4ZNux/0XJR3zx/R6BqUarB0FTeLcXFP/ithPrte0mOz6Bx/3oe
+ tsl0zxWj6vj9EJEWlfb1QEzOT27GM6Nm4PZcO7flR7Hb4oCjdpJ4fibgKaw8fc/H4kL0sSS6Y
+ 7ByIMek5NKwOJY0HpZAUoxtnnwCLGcxlGX45FHR0Gzga/VQuNfRqZOs/FdPPiYKuyGRm3QZlI
+ qp05l5EEpEeMdzlJK8D6qFNcD1eJPoSUV0vmAKZ2a/XtWM3BBL6T9F/y9M0jwF7iHk3FmciFV
+ 9qZSQD1QqLzD2n1b4vtqLZvSfrXCz3xIPFm6ef3sS9ziY343XjO4nmim6e8DxYSRUZs3M90cC
+ OTA6qJytB91G98YOC0UaS8YLf6T9BpsxIqNYg+J+4Vsl7kc5VIqV+GagcnCQRLHZ6K7ZzGZra
+ 6wvmL5GeK5IJrrX6oEUveIVGWBs1/tnpwMPIIYPnMyHSUSbe/IdcSpqKE528W8LXXo3V222tb
+ Z5ZNZ5Gsu78GiaYyfTPlvwkGRinaeFRvMzrk6SLAJsHQ7gG0HaS91LD7ut2JBMy8dtMNQosU+
+ aNh8fcOmDBtvf31VTakHjWJSQSxCIwE4ZsDXCk80GXTK8sIIIS+y+RfS3lFBuDg1kWCE0wH4u
+ mthHJ6naWcgvJnrSjRWozbxUkIneFHacO2G783tM0n44A5NtYskjytGxEqky+DCvrqVkDALD4
+ +/iZxiE8TzyqhVot+R6Hz26BXkiKt8j2/FZdUm4nDz3aYXkpppsQDVL5YbOtFxSs5fqNtS2te
+ 9ltGx/pcIM5ocOkGQpMY5WjS8CYxN9VFkV7df0MT74LFXShMB+R0WXhW6peWFxPsLvejRpN
+Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 11:31:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -54
+X-Spam_score: -5.5
+X-Spam_bar: -----
+X-Spam_report: (-5.5 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-3.576,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,156 +128,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P. =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>,
- afrosi@redhat.com, Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Stefan Hajnoczi <stefanha@redhat.com>, Laszlo Ersek <lersek@redhat.com>
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>, Rafael Kitover <rkitover@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+Le 08/09/2020 à 10:24, Paolo Bonzini a écrit :
+> Cc: qemu-trivial@nongnu.org <mailto:qemu-trivial@nongnu.org>
+> 
+> Il mar 8 set 2020, 09:50 Sergei Trofimovich <slyfox@gentoo.org
+> <mailto:slyfox@gentoo.org>> ha scritto:
+> 
+>     Before the change missing SDL was reported as:
+> 
+>         ../meson.build:253:4: ERROR: Expected 1 arguments, got 2.
+> 
+>     After the error as:
+> 
+>         ../meson.build:258:4: ERROR: Problem encountered: sdl-image
+>     required, but SDL was not found
+> 
+>     CC: Paolo Bonzini <pbonzini@redhat.com <mailto:pbonzini@redhat.com>>
+>     CC: "Marc-André Lureau" <marcandre.lureau@redhat.com
+>     <mailto:marcandre.lureau@redhat.com>>
+>     CC: "Philippe Mathieu-Daudé" <philmd@redhat.com
+>     <mailto:philmd@redhat.com>>
+>     CC: Rafael Kitover <rkitover@gmail.com <mailto:rkitover@gmail.com>>
+>     Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org
+>     <mailto:slyfox@gentoo.org>>
+>     ---
+>      meson.build | 4 ++--
+>      1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+>     diff --git a/meson.build b/meson.build
+>     index 04e070bb3b..7fd2a903c5 100644
+>     --- a/meson.build
+>     +++ b/meson.build
+>     @@ -255,8 +255,8 @@ if sdl.found()
+>                               method: 'pkg-config', static: enable_static)
+>      else
+>        if get_option('sdl_image').enabled()
+>     -    error('sdl-image required, but SDL was @0@',
+>     -          get_option('sdl').disabled() ? 'disabled' : 'not found')
+>     +    error('sdl-image required, but SDL was @0@'.format(
+>     +          get_option('sdl').disabled() ? 'disabled' : 'not found'))
+>        endif
+>        sdl_image = not_found
+>      endif
+>     -- 
+>     2.28.0
+> 
 
-> Am 09.09.2020 um 14:10 hat Markus Armbruster geschrieben:
->> Kevin Wolf <kwolf@redhat.com> writes:
->> 
->> > Am 09.09.2020 um 09:38 hat Markus Armbruster geschrieben:
->> >> Kevin Wolf <kwolf@redhat.com> writes:
->> >> 
->> >> > Am 08.09.2020 um 14:03 hat Laszlo Ersek geschrieben:
->> >> >> Hi Stefan,
->> >> >> 
->> >> >> On 09/08/20 11:31, Stefan Hajnoczi wrote:
->> >> >> > block-core.json is included from several places. It has no way of
->> >> >> > knowing what header level (h1, h2, ...) is appropriate. Sphinx reports
->> >> >> > errors when it encounters an h2 header where it expects an h1 header.
->> >> >> > This issue prevents the next patch from generating documentation for
->> >> >> > qemu-storage-daemon QMP commands.
->> >> >> > 
->> >> >> > Move the header into parents so that the correct header level can be
->> >> >> > used. Note that transaction.json is not updated since it doesn't seem to
->> >> >> > need a header.
->> >> >> > 
->> >> >> > Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
->> >> >> > ---
->> >> >> >  docs/interop/firmware.json | 4 ++++
->> >> >> >  qapi/block-core.json       | 4 ----
->> >> >> >  qapi/block.json            | 1 +
->> >> >> >  3 files changed, 5 insertions(+), 4 deletions(-)
->> >> >> > 
->> >> >> > diff --git a/docs/interop/firmware.json b/docs/interop/firmware.json
->> >> >> > index 989f10b626..48af327f98 100644
->> >> >> > --- a/docs/interop/firmware.json
->> >> >> > +++ b/docs/interop/firmware.json
->> >> >> > @@ -15,6 +15,10 @@
->> >> >> >  ##
->> >> >> >  
->> >> >> >  { 'include' : 'machine.json' }
->> >> >> > +
->> >> >> > +##
->> >> >> > +# == Block devices
->> >> >> > +##
->> >> >> >  { 'include' : 'block-core.json' }
->> >> >> >  
->> >> >> >  ##
->> >> >> 
->> >> >> I think "docs/interop/firmware.json" deserves the same treatment as
->> >> >> "transaction.json".
->> >> >> 
->> >> >> It's been a long time since I last looked at a rendered view of
->> >> >> "docs/interop/firmware.json", but it only includes "block-core.json" so
->> >> >> it can refer to some block-related types (@BlockdevDriver seems like the
->> >> >> main, or only, one).
->> >> >> 
->> >> >> I wouldn't expect the rendered view of "firmware.json" to have a section
->> >> >> header saying "Block devices".
->> >> >> 
->> >> >> I think it should be fine to drop this hunk (and my CC along with it ;))
->> >> >
->> >> > I think this is actually a more general problem with the way we generate
->> >> > the documentation. For example, the "Background jobs" documentation ends
->> >> > up under "Block Devices" just because qapi-schema.json includes
->> >> > block-core.json before job.json and block-core.json includes job.json to
->> >> > be able to access some types.
->> >> 
->> >> The doc generator is stupid and greedy (which also makes it
->> >> predictable): a module's documentation is emitted where it is first
->> >> included.
->> >> 
->> >> For full control of the order, have the main module include all
->> >> sub-modules in the order you want.
->> >
->> > This works as long as the order that we want is consistent with the
->> > requirement that every file must be included by qapi-schea.json before
->> > it is included by any other file (essentially making the additional
->> > includes in other files useless).
->> 
->> These other includes are not useless: they are essential for generating
->> self-contained headers.
->> 
->> When MOD.json includes SUBMOD.json, then the generated qapi-FOO-MOD.h
->> include qapi-FOO-SUBMOD.h.  When every module pulls in the modules it
->> requires, so do the generated headers.  When a module doesn't, its
->> generated headers won't compile unless you manually include the missing
->> generated headers it requires.
->
-> Hm, right. So we're using includes for two different purposes, but just
-> from looking at the include line, you can't know which one it is.
+Applied to my trivial-patches branch.
 
-Correct.  The use for controlling doc order is a bit of a hack.
-
->> > Is this the order that we want?
->> >
->> > If so, we could support following the rule consistently by making double
->> > include of a file an error.
->> 
->> Breaks our simple & stupid way to generate self-contained headers.
->> 
->> >> Alternatively, add just enough includes to get the order you want.
->> >
->> > There are orders that I can't get this way.
->> 
->> You're right, ordering by first include is not completely general.
->> 
->> >                                             For example, if I want to
->> > have "Block devices" documented before "Background jobs", there is no
->> > way to add includes to actually get this order without having
->> > "Background jobs" as a subsection in "Block devices".
->> 
->> "Background jobs" is job.json.
->> 
->> "Block devices" is block.json, which includes block-core.json, which
->> includes job.json.
->> 
->> To be able to put "Block devices" first, you'd have to break the chain
->> from block.json to job.json.  Which might even be an improvement:
->> 
->> $ wc -l qapi/*.json | awk '$1 >= 1000 { print }'
->>   5527 qapi/block-core.json
->>   1722 qapi/migration.json
->>   1617 qapi/misc.json
->>   1180 qapi/ui.json
->>  17407 total
->> 
->> Could we split block-core.json into several cohesive parts?
->
-> Possibly. However, while it would be an improvement generally speaking,
-> how does this change the specific problem? All of the smaller files will
-> be included by block.json (or whatever file provides the "Block devices"
-> chapter in the documentation) and at least one of them will still have
-> to include job.json.
-
-Splitting block-core.json can help only if other modules then use less
-than all the parts.  In particular, as long as block.json includes the
-same stuff, it'll surely still include jobs.json.  Could it include
-less?
-
-> (As it happens, the block export series splits off a block-export QAPI
-> module, but it's probably small enough to be barely noticable in this
-> comparison.)
->
-> Kevin
+Thanks,
+Laurent
 
 
