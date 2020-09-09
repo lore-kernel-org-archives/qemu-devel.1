@@ -2,64 +2,90 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 352C2C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 10:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0716C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 10:59:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94E3A21582
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 10:57:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94E3A21582
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 5C37C21D7A
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 10:59:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U5wAbdW+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C37C21D7A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFxmj-0002CB-HK
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 06:57:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49760)
+	id 1kFxon-0003If-DJ
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 06:59:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50040)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kFxmF-0001nN-F2
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 06:56:35 -0400
-Received: from mx2.suse.de ([195.135.220.15]:58556)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kFxmD-0001MZ-Bs
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 06:56:35 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 959E1AEF8;
- Wed,  9 Sep 2020 10:56:32 +0000 (UTC)
-Subject: Re: meson build failure, configure without tcg, fixed by running make
- again
-From: Claudio Fontana <cfontana@suse.de>
-To: Paolo Bonzini <pbonzini@redhat.com>
-References: <c9971e27-fded-3e5d-d489-b1fb539b8ec1@suse.de>
- <41c09bb2-1704-47c0-9638-9f1eff010e8c@redhat.com>
- <462d6cfa-f4ba-d001-200b-9fc017f7e2fc@suse.de>
-Message-ID: <3981cd71-deaf-b939-d6fa-09b9b3b94521@suse.de>
-Date: Wed, 9 Sep 2020 12:56:31 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFxnz-0002jz-53
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 06:58:23 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:24527
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lersek@redhat.com>) id 1kFxnw-0001XR-69
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 06:58:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599649098;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9Eg1QqiLFgyGWwSYeg8eXa3YZksOtDe2TIFRYiTs9tQ=;
+ b=U5wAbdW+lyCXpzQ/1H+M85t77dlE154NWXq33QmbwJ8MA8BbDunY9npi81GomZGaYT6Uh9
+ 2RxP+PZ/x2n1HPETFfJp6V887Tyva4I3bb5LMGna15yux92qpKvfDGuxeYW3mQ9UYsXhy3
+ iamBstelDGPdHmzaN0SSWLmKd5e29gQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-228-PJSzgWLRN4u29i4PgS8XKw-1; Wed, 09 Sep 2020 06:58:15 -0400
+X-MC-Unique: PJSzgWLRN4u29i4PgS8XKw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 36FCC1006705;
+ Wed,  9 Sep 2020 10:58:14 +0000 (UTC)
+Received: from lacos-laptop-7.usersys.redhat.com (ovpn-114-82.ams2.redhat.com
+ [10.36.114.82])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DB8DD838C2;
+ Wed,  9 Sep 2020 10:58:08 +0000 (UTC)
+Subject: Re: [PATCH 0/5] Add support for loading SMBIOS OEM strings from a file
+To: =?UTF-8?Q?Daniel_P._Berrang=c3=a9?= <berrange@redhat.com>
+References: <20200908165438.1008942-1-berrange@redhat.com>
+ <d3c345b6-c2db-ef61-2ac0-afc0f9f737c2@redhat.com>
+ <20200909095035.GO1011023@redhat.com>
+From: Laszlo Ersek <lersek@redhat.com>
+Message-ID: <adff2db5-1345-0c05-4c22-f9f8223c8614@redhat.com>
+Date: Wed, 9 Sep 2020 12:58:07 +0200
 MIME-Version: 1.0
-In-Reply-To: <462d6cfa-f4ba-d001-200b-9fc017f7e2fc@suse.de>
+In-Reply-To: <20200909095035.GO1011023@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lersek@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/08 00:22:31
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -57
-X-Spam_score: -5.8
-X-Spam_bar: -----
-X-Spam_report: (-5.8 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.626,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=lersek@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:13:17
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,152 +98,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/2/20 3:02 PM, Claudio Fontana wrote:
-> On 9/2/20 12:27 PM, Paolo Bonzini wrote:
->> On 02/09/20 12:03, Claudio Fontana wrote:
->>> Hi Paolo,
+On 09/09/20 11:50, Daniel P. Berrangé wrote:
+> On Wed, Sep 09, 2020 at 11:44:40AM +0200, Laszlo Ersek wrote:
+>> On 09/08/20 18:54, Daniel P. Berrangé wrote:
+>>> I previously added support for SMBIOS OEM strings tables but only
+>>> allowed for data to be passed inline. Potential users indicated they
+>>> wanted to pass some quite large data blobs which is inconvenient todo
+>>> inline. Thus I'm adding support for passing the data from a file.
 >>>
->>> there seems to be some parallelism or race condition somewhere?
+>>> In testing this I discovered the hard way that on x86 we're limited to
+>>> using the SMBIOS 2.1 entry point currently. This has a maximum size of
+>>> 0xffff, and if you exceed this all sorts of wierd behaviour happens.
 >>>
->>> with master, commit 8d90bfc5c31ad60f6049dd39be636b06bc00b652
->>> I am doing:
+>>> QEMU forces SMBIOS 2.1 on x86 because the default SeaBIOS firmware
+>>> does not support SMBIOS 3.0. The EDK2 firmware supports SMBIOS 3.0 and
+>>> QEMU defaults to this on the ARM virt machine type.
 >>>
->>> mkdir build-nontcg
->>> cd build-nontcg
->>> ../configure --disable-tcg --enable-kvm --enable-hax
->>> make -j120
->>> make -j120 check
+>>> This series adds support for checking the SMBIOS 2.1 limits to protect
+>>> users from impossible to diagnose problems.
 >>>
->>> I am getting:
+>>> There is also a fix needed to SeaBIOS which fails to check for
+>>> integer overflow when it appends the type 0 table.
+>>>
+>>>   https://mail.coreboot.org/hyperkitty/list/seabios@seabios.org/thread/3EMIOY6YS6MG5UQN3JJJS2A3DJZOVFR6/
+>>>
+>>> IIUC, SMBIOS 3.0 should onlky be limited by what you can fit into RAM,
+>>> but in testing, EDK2 appears to hang shortly after the SMBIOS 3.0 data
+>>> size exceeds 128 KB. I've not spotted an obvious flaw in EDK2 or QEMU,
+>>> nor do I attempt to enforce a limit in QEMU for SMBIOS 3.0.
+> 
+> snip
+> 
+>> So we're exceeding "__brk_limit".
 >>
->> Yes:
+>> ... I'm quite getting out of my league here, but "__brk_limit" seems to
+>> be controlled by "brk_reservation" in "arch/x86/kernel/vmlinux.lds.S"...
+>> and ultimately through the RESERVE_BRK() macro:
 >>
->> diff --git a/tests/qtest/libqos/meson.build b/tests/qtest/libqos/meson.build
->> index 19931b9248..268ea23803 100644
->> --- a/tests/qtest/libqos/meson.build
->> +++ b/tests/qtest/libqos/meson.build
->> @@ -52,6 +52,6 @@ libqos = static_library('qos',
->>          'arm-xilinx-zynq-a9-machine.c',
->>          'ppc64_pseries-machine.c',
->>          'x86_64_pc-machine.c',
->> -), build_by_default: false)
->> +) + genh, build_by_default: false)
->>  
->>  qos = declare_dependency(link_whole: libqos)
+>> [arch/x86/include/asm/setup.h]
 >>
->> Paolo
+>>> /*
+>>>  * Reserve space in the brk section.  The name must be unique within
+>>>  * the file, and somewhat descriptive.  The size is in bytes.  Must be
+>>>  * used at file scope.
+>>>  *
+>>>  * (This uses a temp function to wrap the asm so we can pass it the
+>>>  * size parameter; otherwise we wouldn't be able to.  We can't use a
+>>>  * "section" attribute on a normal variable because it always ends up
+>>>  * being @progbits, which ends up allocating space in the vmlinux
+>>>  * executable.)
+>>>  */
+>>> #define RESERVE_BRK(name,sz)                                            \
 >>
+>> OK, so let's see RESERVE_BRK() invocations... The relevant match is
+>> likely the one below:
+>>
+>>> arch/x86/kernel/setup.c:RESERVE_BRK(dmi_alloc, 65536);
+>>
+>> ... Then see kernel commits:
+>>
+>> - 6de6cb442e76 ("x86: use brk allocation for DMI", 2009-03-14)
+>>
+>> - 796216a57fe4 ("x86: allow extend_brk users to reserve brk space",
+>> 2009-03-14)
+>>
+>> - e808bae2407a ("x86: Do not reserve brk for DMI if it's not going to be
+>> used", 2010-02-25)
+>>
+>> Commit 796216a57fe4 is helpful:
+>>
+>>>     Add RESERVE_BRK(name, size) macro to reserve space in the brk
+>>>     area.  This should be a conservative (ie, larger) estimate of
+>>>     how much space might possibly be required from the brk area.
+>>>     Any unused space will be freed, so there's no real downside
+>>>     on making the reservation too large (within limits).
+>>
+>> So it seems like the 64K limit could be increased, but still
+>> - it requires guest kernels to be rebuilt,
+>> - it doesn't seem suitable for passing MBs of data (on x86 anyway).
 > 
-> Hi Paolo,
-> 
-> this one worked for me just fine, I did not try your latest patch which is a bit different.
-> 
-> Ciao,
-> 
-> Claudio
-> 
+> Yeah, this feels like we're just venturing into a bad part of town.
+> Simplest is probably to just document that applications should never
+> expect more than 64kb of total SMBIOS data to be viable regardless
+> of the SMBIOS entry point.
 
-Hi Paolo,
+Sounds OK to me personally.
 
-a heads-up on this: while the diff above worked for me just fine, your latest patch committed to master does _not_ solve the issue for me.
-Same errors as before during parallel builds with large number of cpus.
+In your experience, would that limit satisfy (for example) the CoreOS /
+Ignition use case?
 
-I replaced the solution currently in master with the meson.build as per the diff above, but still I got problems:
+> Given this, I'm thinking it might be overkill to even both with
+> supporting SMBIOS 3.0 for x86, unless it offers some other compelling
+> benefit over SMBIOS 2.1 that you know of ?
 
-In file included from tests/test-qapi-events-sub-sub-module.c:16:0:
-tests/test-qapi-visit-sub-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-In file included from tests/include/test-qapi-events-sub-module.c:16:0:
-tests/include/test-qapi-visit-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-compilation terminated.
-In file included from tests/test-qapi-visit-sub-sub-module.c:16:0:
-tests/test-qapi-visit-sub-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-In file included from tests/include/test-qapi-visit-sub-module.c:16:0:
-tests/include/test-qapi-visit-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-tests/qapi-builtin-visit.c:15:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-In file included from tests/test-qapi-commands-sub-sub-module.c:20:0:
-tests/test-qapi-visit-sub-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-In file included from tests/include/test-qapi-types-sub-module.c:16:0:
-tests/include/test-qapi-visit-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-tests/qapi-builtin-types.c:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-In file included from tests/test-qapi-events.c:16:0:
-tests/test-qapi-visit.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-In file included from tests/test-qapi-types-sub-sub-module.c:16:0:
-tests/test-qapi-visit-sub-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make: *** [Makefile.ninja:1760: tests/libtestqapi.a.p/meson-generated_.._qapi-builtin-types.c.o] Error 1
-make: *** Waiting for unfinished jobs....
-make: *** [Makefile.ninja:1761: tests/libtestqapi.a.p/meson-generated_.._qapi-builtin-visit.c.o] Error 1
-make: *** [Makefile.ninja:1762: tests/libtestqapi.a.p/meson-generated_.._test-qapi-commands-sub-sub-module.c.o] Error 1
-make: *** [Makefile.ninja:1765: tests/libtestqapi.a.p/meson-generated_.._test-qapi-events-sub-sub-module.c.o] Error 1
-make: *** [Makefile.ninja:1766: tests/libtestqapi.a.p/meson-generated_.._test-qapi-events.c.o] Error 1
-make: *** [Makefile.ninja:1771: tests/libtestqapi.a.p/meson-generated_.._test-qapi-visit-sub-sub-module.c.o] Error 1
-make: *** [Makefile.ninja:1774: tests/libtestqapi.a.p/meson-generated_.._include_test-qapi-events-sub-module.c.o] Error 1
-make: *** [Makefile.ninja:1775: tests/libtestqapi.a.p/meson-generated_.._include_test-qapi-types-sub-module.c.o] Error 1
-make: *** [Makefile.ninja:1776: tests/libtestqapi.a.p/meson-generated_.._include_test-qapi-visit-sub-module.c.o] Error 1
-make: *** [Makefile.ninja:1769: tests/libtestqapi.a.p/meson-generated_.._test-qapi-types-sub-sub-module.c.o] Error 1
-In file included from tests/test-qapi-types.c:16:0:
-tests/test-qapi-visit.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-In file included from tests/test-qapi-visit.c:16:0:
-tests/test-qapi-visit.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-In file included from tests/test-qapi-commands.c:20:0:
-tests/test-qapi-visit.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make: *** [Makefile.ninja:1772: tests/libtestqapi.a.p/meson-generated_.._test-qapi-visit.c.o] Error 1
-make: *** [Makefile.ninja:1770: tests/libtestqapi.a.p/meson-generated_.._test-qapi-types.c.o] Error 1
-In file included from tests/include/test-qapi-commands-sub-module.c:20:0:
-tests/include/test-qapi-visit-sub-module.h:16:10: fatal error: qapi/qapi-builtin-visit.h: No such file or directory
- #include "qapi/qapi-builtin-visit.h"
-          ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-compilation terminated.
-make: *** [Makefile.ninja:1763: tests/libtestqapi.a.p/meson-generated_.._test-qapi-commands.c.o] Error 1
-make: *** [Makefile.ninja:1773: tests/libtestqapi.a.p/meson-generated_.._include_test-qapi-commands-sub-module.c.o] Error 1
+I think the 32-bit entry point is sufficient for x86.
 
+If memory serves, we only started to care about the 64-bit entry point
+for aarch64. See for example
 
-Thanks!
+https://github.com/tianocore/edk2/commit/ca6d61b22658
 
-Claudio
+x86 always has RAM under 4GB though.
 
+Thanks
+Laszlo
 
+Thanks
+Laszlo
 
 
