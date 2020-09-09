@@ -2,86 +2,86 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0589C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:20:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 251FBC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:21:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D365F2076C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:20:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B50F62087C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 08:20:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EizrwYT6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D365F2076C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PYLuXWdW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B50F62087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFvLV-0005is-VQ
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:20:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33704)
+	id 1kFvLe-0005zM-29
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 04:20:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFvKU-0004NA-Oi
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:19:46 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:41439
- helo=us-smtp-1.mimecast.com)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kFvIZ-0001p7-Qh
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:17:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33985)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kFvKS-000415-Gs
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:19:46 -0400
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kFvIY-0003ls-52
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 04:17:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599639583;
+ s=mimecast20190719; t=1599639465;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=vqLk/FkfUmIm9HIoVhcuks3zAexmcT1A9IdA6PdQqiQ=;
- b=EizrwYT6WN0oGnaUvQjQW+u5bgL95jBaPuUMqA6N0zrdPdjMAJ5qQq30zBH2CmJfJKE3tz
- 5/4EsOn6iNcNrqcNUtClaFCcapdqjy0wqwikCflcXRz8WP9H6Ea0zgiSBdoA8lcpujoTFs
- dl3p71yGQC02NUufessMSahlK2cq1zI=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=O9KyATISiZGeakA/smiHhII0pXyg7vLMCyRzJUo4cZU=;
+ b=PYLuXWdWBid9N2hB+YtihcAUy7PQfVgpeWuOK2D57gFFAyhyybPZycJuekkE6QdlIHPR0l
+ Eepkl8XaIsxzxvNuya/zggRr83dQemBxPhPCEclS34AleSp6eaC8vIrg6bWq13rnwH56ry
+ psaHjJ97O8D/rjQKXWEoOkh1mnVXXx4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-9-Nh3-lI8VMBqzgzhc_o2L3A-1; Wed, 09 Sep 2020 04:19:40 -0400
-X-MC-Unique: Nh3-lI8VMBqzgzhc_o2L3A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-12-7wv1Re7-OM-6mmDmAqSFvw-1; Wed, 09 Sep 2020 04:17:43 -0400
+X-MC-Unique: 7wv1Re7-OM-6mmDmAqSFvw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72F24107464A;
- Wed,  9 Sep 2020 08:19:38 +0000 (UTC)
-Received: from linux.fritz.box (ovpn-113-221.ams2.redhat.com [10.36.113.221])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2FBCF60C47;
- Wed,  9 Sep 2020 08:19:33 +0000 (UTC)
-Date: Wed, 9 Sep 2020 10:19:31 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Yonggang Luo <luoyonggang@gmail.com>
-Subject: Re: [PATCH 08/16] block: get file-win32.c handle locking option
- consistence with file-posix.c
-Message-ID: <20200909081931.GC5219@linux.fritz.box>
-References: <20200908194820.702-1-luoyonggang@gmail.com>
- <20200908194820.702-9-luoyonggang@gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B12E0800400;
+ Wed,  9 Sep 2020 08:17:42 +0000 (UTC)
+Received: from jason-ThinkPad-X1-Carbon-6th.redhat.com
+ (ovpn-12-24.pek2.redhat.com [10.72.12.24])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4F5981002D54;
+ Wed,  9 Sep 2020 08:17:33 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [PATCH] pci: advertise a page aligned ATS
+Date: Wed,  9 Sep 2020 16:17:31 +0800
+Message-Id: <20200909081731.24688-1-jasowang@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200908194820.702-9-luoyonggang@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=207.211.31.120; envelope-from=kwolf@redhat.com;
- helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:05:47
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 03:25:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,36 +94,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Lieven <pl@kamp.de>, Ed Maste <emaste@freebsd.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: eperezma@redhat.com, Jason Wang <jasowang@redhat.com>,
+ qemu-stable@nongnu.org, peterx@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 08.09.2020 um 21:48 hat Yonggang Luo geschrieben:
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> ---
->  block/file-win32.c | 23 +++++++++++++++++++++--
->  1 file changed, 21 insertions(+), 2 deletions(-)
+After Linux kernel commit 61363c1474b1 ("iommu/vt-d: Enable ATS only
+if the device uses page aligned address."), ATS will be only enabled
+if device advertises a page aligned request.
 
-This is almost the same as my separately posted 'file-win32: Fix
-"locking" option', except that you changed the order of variable
-definitions which will cause a merge conflict.
+Unfortunately, vhost-net is the only user and we don't advertise the
+aligned request capability in the past since both vhost IOTLB and
+address_space_get_iotlb_entry() can support non page aligned request.
 
-When you take patches from other people, you should correctly attribute
-them and not make them look as if they were your own.
+Though it's not clear that if the above kernel commit makes
+sense. Let's advertise a page aligned ATS here to make vhost device
+IOTLB work with Intel IOMMU again.
 
-Commit messages should not be empty, but explain the motivation for the
-change.
+Note that in the future we may extend pcie_ats_init() to accept
+parameters like queue depth and page alignment.
 
-In this case, dropping the patch is easiest because my patch is already
-in a pull request and will probably be merged soon.
+Cc: qemu-stable@nongnu.org
+Signed-off-by: Jason Wang <jasowang@redhat.com>
+---
+ hw/pci/pcie.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Kevin
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 5b48bae0f6..d4010cf8f3 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -971,8 +971,9 @@ void pcie_ats_init(PCIDevice *dev, uint16_t offset)
+ 
+     dev->exp.ats_cap = offset;
+ 
+-    /* Invalidate Queue Depth 0, Page Aligned Request 0 */
+-    pci_set_word(dev->config + offset + PCI_ATS_CAP, 0);
++    /* Invalidate Queue Depth 0, Page Aligned Request 1 */
++    pci_set_word(dev->config + offset + PCI_ATS_CAP,
++                 PCI_ATS_CAP_PAGE_ALIGNED);
+     /* STU 0, Disabled by default */
+     pci_set_word(dev->config + offset + PCI_ATS_CTRL, 0);
+ 
+-- 
+2.20.1
 
 
