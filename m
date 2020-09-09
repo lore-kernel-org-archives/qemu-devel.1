@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 571B2C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7EDBC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:51:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E64432078E
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:50:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 654B521D79
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:51:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rvl7gmCX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E64432078E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D1WD9oKH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 654B521D79
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44360 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45342 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFwkV-0003hi-OL
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:50:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57108)
+	id 1kFwkn-00049d-CH
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:51:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwgk-0006Ow-Fs; Wed, 09 Sep 2020 05:46:50 -0400
-Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:43094)
+ id 1kFwh6-00071s-FF; Wed, 09 Sep 2020 05:47:12 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:39506)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwgi-0007ff-Nv; Wed, 09 Sep 2020 05:46:50 -0400
-Received: by mail-pg1-x544.google.com with SMTP id t14so1664254pgl.10;
- Wed, 09 Sep 2020 02:46:48 -0700 (PDT)
+ id 1kFwh3-0007iZ-Vx; Wed, 09 Sep 2020 05:47:12 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id s2so1072946pjr.4;
+ Wed, 09 Sep 2020 02:47:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Oe6b7vQEMWi61d/j8MH3WghB3lqxs27bPNlw+G8pAq8=;
- b=Rvl7gmCXbHqcU+ww4RnoqwwpztyCJkGLah3EHmhvdUaJO0E3sDszV4j+KS7edUP78q
- S5HzAQJPK8QV13y0Jiwqp12LsROMIWM+0VN9Hb9MapErDEFtZsGRuJ9jCSVf/Hrmuh0k
- HAvtk4KqubYpRcnGbUHxEtiRvEhc1ktmQZXT74VBPAxvD/x2tZj6CDvi6owe4a0qWFr4
- EG8Dm2emY/JWPE6H9OOV7UVtPhjzNW/KVho5MJjFp3cU26UUltmCIUVUGD8M/DnbM1cl
- S0ynqawGw4FI/Pbj+MDcThbHSJ7/yGpw5Lo3s2nlqN6FO4UKsRPgAAChjF9QHL9Ev7Ub
- EdkQ==
+ bh=tUjxHhiaHU9hEAJ1XQZ8uS7Hz0JekKVDba8C4SdQqRg=;
+ b=D1WD9oKHPDt5fEFr7qqlZtzuRS3FOLxPJQ1HpaUZU82BZ/oo7GsAO3do/fF7aXzb9w
+ 4/N7+DHBglSPhDASLaUaJr1xjrWRtI+szdTNEflWVPn0H8zaRwx364vUedCjUV2ZmTrG
+ 8S+CtUY8ZDQx/qANKzm2sOgzOANbEHzmiIl8y+tIv1WT4P75AJJt3DXHyUrVQGUkCFy7
+ TzOff4ZVHG3JmQE3AjPmeDpw8eEarA3zqJlmLFRCv1jr8gWO9k+5RSY1b/cR3hFEe0nA
+ crgsDnHQ8lhLLHPkXbPKZIj8swcbfTau8uvS3dUO2yBkv955ruYB+JCB+lVuehoRfLSL
+ fATg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Oe6b7vQEMWi61d/j8MH3WghB3lqxs27bPNlw+G8pAq8=;
- b=pWor/mnj+9XT2v17GnZ5LkomxvgkD345X+zQSHJnW67Y0/oDAPKTzQFC0OlCtsqQZF
- /pWUwCIA20TRrItN2PLjDyaw62CNkVtYUAoU+4x3bl0gCSdqKw8RxC79LuTo9iRAlhIc
- SuTzb4nRHGRpcPXks+FNmIapzsgg9AFtTQe7wezDo3eu1GZYV7opO5OA9+T+35ncmSCA
- K05I3V3Eu1WPQ+0nNNkdImRbm5J0BkK4YnFp412Pqo9lzVbpJH0VnPnEDmSYVuKCNk6X
- rtyVHEuIHM4pV1SEyubOwi1CcS3FOG4hn3ApPicmz4M2R7IqJuen4UFCq541JYS29ixQ
- zw3Q==
-X-Gm-Message-State: AOAM530NCM/Y9oTAWsIpShU66zbp5i1VAt95HMJV8uJLTIDXTkqt3RfJ
- a6RqV5xh89Z/7OZky1xdOG1zO8PEdQxATfMZ
-X-Google-Smtp-Source: ABdhPJyRfYuxAeotsc+/pRRS2a2nKKgHsqbL4Idu0FsV3ZHgqxwZgjJrKmwL8ID6LZNrPpK8fos8YQ==
-X-Received: by 2002:a63:1d4c:: with SMTP id d12mr2419173pgm.365.1599644806449; 
- Wed, 09 Sep 2020 02:46:46 -0700 (PDT)
+ bh=tUjxHhiaHU9hEAJ1XQZ8uS7Hz0JekKVDba8C4SdQqRg=;
+ b=KzEOENvAR+AU9t6p8QaY+g/uSfmdHD3URBmv76o495ZP3ivgNtImnS0/sTSTe7dMy8
+ 9N6ZAu3dUuo6vU6TvZzeGNl3tK3sAvqp6kOShYBz5N3PdSYdtd1lTbhM8c0d4P+i9QU3
+ lyG2VJRM7IvI3mPaCCSg+BY+UwtxSNjXvwqn0255w6OCtwnpM/pe/kjKPq8pWv1sshKa
+ Dn9/mBlscD7Rt5GrY+RYTslXdTKX3yMBebb3XRlsCp+8IwjUvJLLSbz/3dfXHO7+6E/R
+ RCuydx1LR9kO9HZCCK7dndvgQHZO6HB5pyzdix+Nqs5fez0rjIaxkdCasm1UM7IUQHpg
+ Bm3A==
+X-Gm-Message-State: AOAM532L/PjjF0uDb0SsLji4ikpw5TbYdBLD5Bfbt+Kj7/S9QwlrUe25
+ XBfvrRIAvzRL9KHZE5gpNDOFZB84xFoPqa56
+X-Google-Smtp-Source: ABdhPJx6RjhzTIUeQOwzAOnamw+FkD0CxZJ06NvkuE+a9TW8g3a57osbIqajFjG48TtH+035BGQ0mw==
+X-Received: by 2002:a17:90a:aa94:: with SMTP id l20mr92561pjq.95.1599644827751; 
+ Wed, 09 Sep 2020 02:47:07 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.46.42
+ by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 02:46:45 -0700 (PDT)
+ Wed, 09 Sep 2020 02:47:07 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 03/21] configure: Fixes ncursesw detection under
- msys2/mingw and enable curses
-Date: Wed,  9 Sep 2020 17:45:59 +0800
-Message-Id: <20200909094617.1582-4-luoyonggang@gmail.com>
+Subject: [PATCH v2 08/21] tests: test-replication disable
+ /replication/secondary/* on msys2/mingw.
+Date: Wed,  9 Sep 2020 17:46:04 +0800
+Message-Id: <20200909094617.1582-9-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200909094617.1582-1-luoyonggang@gmail.com>
 References: <20200909094617.1582-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x544.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,126 +111,87 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The mingw pkg-config are showing following absolute path and contains : as the separator,
-so we must handling : properly.
+They cause failure on msys2/mingw, that's because file-win32.c not implement
+.bdrv_reopen_prepare/commit/abort yet.
 
--D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC:/CI-Tools/msys64/mingw64/include/ncursesw:-I/usr/include/ncursesw:
--DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -pipe -lncursesw -lgnurx -ltre -lintl -liconv
--DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -lncursesw
--DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -lcursesw
--DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
--DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -lncursesw
--DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -lcursesw
--DNCURSES_WIDECHAR -I/usr/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
--DNCURSES_WIDECHAR -I/usr/include/ncursesw -lncursesw
--DNCURSES_WIDECHAR -I/usr/include/ncursesw -lcursesw
+> $ ./tests/test-replication.exe
+> # random seed: R02S3f4d1c01af2b0a046990e0235c481faf
+> 1..13
+> # Start of replication tests
+> # Start of primary tests
+> ok 1 /replication/primary/read
+> ok 2 /replication/primary/write
+> ok 3 /replication/primary/start
+> ok 4 /replication/primary/stop
+> ok 5 /replication/primary/do_checkpoint
+> ok 6 /replication/primary/get_error_all
+> # End of primary tests
+> # Start of secondary tests
+> ok 7 /replication/secondary/read
+> ok 8 /replication/secondary/write
+> Unexpected error in bdrv_reopen_prepare() at ../block.c:4191:
+> Block format 'file' used by node '#block4287' does not support reopening
+> files
 
-msys2/mingw lacks the POSIX-required langinfo.h.
+Can you try to find out what reopen this is?
 
-gcc test.c -DNCURSES_WIDECHAR -I/mingw64/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
-test.c:4:10: fatal error: langinfo.h: No such file or directory
-    4 | #include <langinfo.h>
-      |          ^~~~~~~~~~~~
-compilation terminated.
+I assume it's for switching between read-write and read-only. In this
+case an implementation of .bdrv_reopen_prepare/commit/abort that can do
+this switch is required.
 
-So we using g_get_codeset instead of nl_langinfo(CODESET)
+This is more serious development work, so I can't propose a quick fix.
+
+Alternatively, we could just declare replication unsupported on Windows
+and let configure make sure that CONFIG_REPLICATION is never set for it.
+
+<stefanha> luoyonggang: That might be missing functionality in block/file-win32.c.
+* davidgiluk yawns and looks up
+<stefanha> luoyonggang: The block/file-posix.c block driver supports .bdrv_reopen_*()
+while block/file-win32.c does not. It's probably because no one has tried to implement it.
+<luoyonggang> OK, I got the direction,
+<luoyonggang> Just need implement .bdrv_reopen_*() functions in file-win32.c
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- configure   |  9 +++------
- ui/curses.c | 10 +++++-----
- 2 files changed, 8 insertions(+), 11 deletions(-)
+ tests/test-replication.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/configure b/configure
-index f4f8bc3756..2e6d54e15b 100755
---- a/configure
-+++ b/configure
-@@ -3653,8 +3653,8 @@ if test "$iconv" = "no" ; then
- fi
- if test "$curses" != "no" ; then
-   if test "$mingw32" = "yes" ; then
--    curses_inc_list="$($pkg_config --cflags ncurses 2>/dev/null):"
--    curses_lib_list="$($pkg_config --libs ncurses 2>/dev/null):-lpdcurses"
-+    curses_inc_list="$($pkg_config --cflags ncursesw 2>/dev/null):-I/${MSYSTEM,,}/include/ncursesw:"
-+    curses_lib_list="$($pkg_config --libs ncursesw 2>/dev/null):-lncursesw"
-   else
-     curses_inc_list="$($pkg_config --cflags ncursesw 2>/dev/null):-I/usr/include/ncursesw:"
-     curses_lib_list="$($pkg_config --libs ncursesw 2>/dev/null):-lncursesw:-lcursesw"
-@@ -3664,17 +3664,14 @@ if test "$curses" != "no" ; then
- #include <locale.h>
- #include <curses.h>
- #include <wchar.h>
--#include <langinfo.h>
- int main(void) {
--  const char *codeset;
-   wchar_t wch = L'w';
-   setlocale(LC_ALL, "");
-   resize_term(0, 0);
-   addwstr(L"wide chars\n");
-   addnwstr(&wch, 1);
-   add_wch(WACS_DEGREE);
--  codeset = nl_langinfo(CODESET);
--  return codeset != 0;
-+  return 0;
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index e7cbd6b144..b067240add 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -392,6 +392,7 @@ static void test_secondary_write(void)
+     teardown_secondary();
  }
- EOF
-   IFS=:
-diff --git a/ui/curses.c b/ui/curses.c
-index a59b23a9cf..12bc682cf9 100644
---- a/ui/curses.c
-+++ b/ui/curses.c
-@@ -30,7 +30,6 @@
- #endif
- #include <locale.h>
- #include <wchar.h>
--#include <langinfo.h>
- #include <iconv.h>
  
- #include "qapi/error.h"
-@@ -526,6 +525,7 @@ static void font_setup(void)
-     iconv_t nativecharset_to_ucs2;
-     iconv_t font_conv;
-     int i;
-+    g_autofree gchar *local_codeset = g_get_codeset();
++#ifndef _WIN32
+ static void test_secondary_start(void)
+ {
+     BlockBackend *top_blk, *local_blk;
+@@ -546,6 +547,7 @@ static void test_secondary_get_error_all(void)
  
-     /*
-      * Control characters are normally non-printable, but VGA does have
-@@ -566,14 +566,14 @@ static void font_setup(void)
-       0x25bc
-     };
+     teardown_secondary();
+ }
++#endif
  
--    ucs2_to_nativecharset = iconv_open(nl_langinfo(CODESET), "UCS-2");
-+    ucs2_to_nativecharset = iconv_open(local_codeset, "UCS-2");
-     if (ucs2_to_nativecharset == (iconv_t) -1) {
-         fprintf(stderr, "Could not convert font glyphs from UCS-2: '%s'\n",
-                         strerror(errno));
-         exit(1);
-     }
+ static void sigabrt_handler(int signo)
+ {
+@@ -597,6 +599,7 @@ int main(int argc, char **argv)
+     /* Secondary */
+     g_test_add_func("/replication/secondary/read",  test_secondary_read);
+     g_test_add_func("/replication/secondary/write", test_secondary_write);
++#ifndef _WIN32
+     g_test_add_func("/replication/secondary/start", test_secondary_start);
+     g_test_add_func("/replication/secondary/stop",  test_secondary_stop);
+     g_test_add_func("/replication/secondary/continuous_replication",
+@@ -605,6 +608,7 @@ int main(int argc, char **argv)
+                     test_secondary_do_checkpoint);
+     g_test_add_func("/replication/secondary/get_error_all",
+                     test_secondary_get_error_all);
++#endif
  
--    nativecharset_to_ucs2 = iconv_open("UCS-2", nl_langinfo(CODESET));
-+    nativecharset_to_ucs2 = iconv_open("UCS-2", local_codeset);
-     if (nativecharset_to_ucs2 == (iconv_t) -1) {
-         iconv_close(ucs2_to_nativecharset);
-         fprintf(stderr, "Could not convert font glyphs to UCS-2: '%s'\n",
-@@ -581,7 +581,7 @@ static void font_setup(void)
-         exit(1);
-     }
+     ret = g_test_run();
  
--    font_conv = iconv_open(nl_langinfo(CODESET), font_charset);
-+    font_conv = iconv_open(local_codeset, font_charset);
-     if (font_conv == (iconv_t) -1) {
-         iconv_close(ucs2_to_nativecharset);
-         iconv_close(nativecharset_to_ucs2);
-@@ -602,7 +602,7 @@ static void font_setup(void)
-     /* DEL */
-     convert_ucs(0x7F, 0x2302, ucs2_to_nativecharset);
- 
--    if (strcmp(nl_langinfo(CODESET), "UTF-8")) {
-+    if (strcmp(local_codeset, "UTF-8")) {
-         /* Non-Unicode capable, use termcap equivalents for those available */
-         for (i = 0; i <= 0xFF; i++) {
-             wchar_t wch[CCHARW_MAX];
 -- 
 2.28.0.windows.1
 
