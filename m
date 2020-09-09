@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC31C10DAA
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC4D8C43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:36:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13FC52087C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:35:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13FC52087C
+	by mail.kernel.org (Postfix) with ESMTPS id 0A7542087C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:36:04 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A7542087C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48180 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG0Fx-0006Yy-SO
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:35:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35390)
+	id 1kG0GZ-0007WF-RL
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:36:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35456)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG0F4-0005kC-L3; Wed, 09 Sep 2020 09:34:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:40521)
+ id 1kG0FQ-0006Gf-Nc; Wed, 09 Sep 2020 09:34:52 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:43539)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG0F2-0005wn-SF; Wed, 09 Sep 2020 09:34:30 -0400
+ id 1kG0FP-0005y3-0H; Wed, 09 Sep 2020 09:34:52 -0400
 Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
  (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MJVU0-1jw7uB0KrY-00Jp9e; Wed, 09 Sep 2020 15:34:23 +0200
-Subject: Re: [PATCH 2/2] hw/timer/hpet: Fix DPRINTF format string
+ 1MrQ2R-1kvPSV1rrL-00oZHK; Wed, 09 Sep 2020 15:34:44 +0200
+Subject: Re: [PATCH 1/2] hw/timer/hpet: Remove dead code
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  qemu-devel@nongnu.org
 References: <20200903134506.440082-1-philmd@redhat.com>
- <20200903134506.440082-3-philmd@redhat.com>
+ <20200903134506.440082-2-philmd@redhat.com>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,36 +81,36 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <dde28c3d-d3a4-eaae-9839-a65307e4336c@vivier.eu>
-Date: Wed, 9 Sep 2020 15:34:21 +0200
+Message-ID: <8d77229e-daf3-6bb3-ae07-55007fe22fed@vivier.eu>
+Date: Wed, 9 Sep 2020 15:34:43 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200903134506.440082-3-philmd@redhat.com>
+In-Reply-To: <20200903134506.440082-2-philmd@redhat.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:0bdvnudVIuZgHzpA3SVgIVes0ATvCY/PolJIy4Nktp4PadoP0Ex
- KD+lYGSQB6/HLLEipBD0gHvJz7ej3855IIgTeqBtmAE5seJCXSTk8C7UNRdLYwpjElY6srk
- Fv90lSAzfjCIsvr7lvhMD01k3/6NvRydet7jhBA68SHZ2x7VW7XWlJYEqFsgzNURfTfZg5Z
- 4ktdDCRKWu2Wmz5MgTPbQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zz6/YvUu01g=:lJvocgt9zAIUKvROQcntK4
- PDoRZYrTHK1Lknlu8mnAeKnmGG70b1xHprtz72QUov3xETONKwU4fnt0i9LnmO62CIDP2XJtd
- O5Aw3V9/QN9ezLS+SIr6q8K+rF/U1JrfkB5GMNUNzCn051YOerWMK5epk+SmrRubnNdPXnx+l
- 3rPAJtKXdCdXDUA19Ndjh99tVr2NturdFH2ugpPVl7I7fa1i7kFeOVTUedDwUn9BKXHu95o4e
- 4kbZtCC5Kqv+vgO715OvqA9hAIfPEYVj8cF1sicxhIAHeNvMzLCCBOugviWk2FDPHgdfpYjVV
- 8tHfuHH6Ri4UDwDeonLVp0dPVrDeqM7wKU1JjS85ACR0PdjRHcXaUCOyPwATrSim00RyMi6Zf
- x6EmIOqB3ZA2A8oML0lcwGH5E4JiejKxq1iWaIHFTmxnyzlkIZ1GPTAhB+FZLY6POnvWC8U0L
- yZLGuDIciCGdBkG/5n2gLD0aJQRk68cMnqqyXcVgMxVpV49zEE/H0gr3XgOI7bol2Wp6JVT2l
- +lZA0aWdy7X535sbxswTvzpl8BLsmnir5tySTtuX5qkpwkwp+zgKe2ySRpUA26KbfL2Ec2NNx
- fwUz0rDMPPGq5KD2gRZXf8FSbyOtjcwatE0wgV9U0AE8nlWcgPXj4QtS/ijYI12hVXHwLCZij
- 2SpNIf/6kF1YFe28O1Ww/5TiDGswxsET64Dd9jBqXWLsqACTzpW/UciVWf8f5JzzPe9Z+Sgun
- +lnGJCLj9q4UBQ1fK2efPSjAXZOZwY+J2cIO1OFxAVpSshUf+IAAsJmH6wchBorl3qUaWia58
- 5Mgb+Ot6P2WZNEGMLC5ptRWkNQ0Z+rTpWvOCD1dA6tDS7U2imE3QLSj3Q1AO1gC68Kc1JgR
-Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:sTgtevp/Dm89Wy8Xykaclg374XEndO9G3NXktvQK3e4GBPRDb45
+ yaqIWsuv6nx6Qx+RaPp1poWHp5oUwC40l4iz0omjpfzUjQE8Ec0yy6oxvxd84uCjSpntS3U
+ QSR0aLDfiZx9LHEJtWk/YktoGJWRRV441ukZ4PcIV5NR3e2aHVXI1SEnpgq+HF6YD08IKnz
+ IDs8O4WdXXX5P74JLRX3A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:16uBbLUXElM=:FOF9eIaHntPvoMYkfXxR8J
+ 1Tw3xR0UnyYZpnq/iWoAOgHC0CEUhDp8jPSBzUVi2FBldFcw69KSdGL45O3sZVF1kDG/xle0J
+ auxJi/zK6tDfrRe8YJZ8u/OlNDB+kjWWqWHE9ddqKrSm7LEk2QfCTDTZTmC8+JERR5jvt/2YF
+ 41F7WRR+SsZMsu+fLyOva1yhI4FCDuCF94FRL/yO4Jt+Yi+12qjl4mk4JQMa9TjezucNUYbQu
+ a15ndAKp+5TgdDpTdryKdjOPzqz5ccpWJ+JLAuJADBSytRAjcyeSTH+lcyVesdCuVbxevUzj+
+ u5puiXfjBdswdWZ2iaxlt/1GI6y/Ctx76lJNh2AsxvbEfegjZwEBY3QTTGV42KtKxm3wmh6TB
+ vfHx8ZgNSabEKNqnHBfSXF3jOBlfxaXR1e5h35pXu5HgXE2JlIIuAkkS7FS9Iz+L3I4uM8nX9
+ 0P+UqvNuL72MW1A3yHBzsaCPVsoTSOob1vbfClIWTX82IWbpM9O2jjST+Bo9a2STx9t0EcuKe
+ OS6J4URfEWgQTGhN26AXmY7WN8IeFdIR77ZeX94687qf9tewuRNH+i5R0eEFjBwl95bRm+ayk
+ Or5V9/oUPgVXGISljl7Z54Tms5JekoA6gykEsup44UJDim0nDjv4xUbe/hbtwL7So84UqeeuL
+ q2ieWT+T++q4/d+IQC8JDrpiUg/OjiJZoSvGKe/Ee61lSNJo9lEmHWPqwAzuCYsRZ1hzwEqTh
+ M7+9C6KhrPbJ64mj2Cla9AQ86J5/LCYVURmEL5ctRxUsSR4JRl1AAVNrT9S4GSvxgrL+zXewN
+ 0srEPXlAAyE/m21IiRYdK/xv+9nca9/Yy3uWGrPu/63ms2YMmkChZRxQ7m/qQFaEcRrZw3o
+Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:34:27
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:23:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -54
 X-Spam_score: -5.5
 X-Spam_bar: -----
@@ -136,54 +136,38 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 03/09/2020 à 15:45, Philippe Mathieu-Daudé a écrit :
-> Fix building with HPET_DEBUG enabled:
-> 
->   hw/timer/hpet.c:512:73: error: format specifies type 'unsigned int' but the argument has type 'uint64_t' (aka 'unsigned long') [-Werror,-Wformat]
->       DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n", addr, value);
->                                                             ~~~           ^~~~~
->                                                             %#lx
->   hw/timer/hpet.c:655:21: error: format specifies type 'unsigned int' but the argument has type 'uint64_t' (aka 'unsigned long') [-Werror,-Wformat]
->                       value, s->hpet_counter);
->                       ^~~~~
+> This code was never compiled/used, remove it.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 > ---
-> Keep trace-events conversion as ByteSizeTask.
-> ---
->  hw/timer/hpet.c | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  hw/timer/hpet.c | 14 --------------
+>  1 file changed, 14 deletions(-)
 > 
 > diff --git a/hw/timer/hpet.c b/hw/timer/hpet.c
-> index b683f64f1d3..8115e42cff3 100644
+> index 380acfa7c8a..b683f64f1d3 100644
 > --- a/hw/timer/hpet.c
 > +++ b/hw/timer/hpet.c
-> @@ -495,7 +495,7 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
->      HPETState *s = opaque;
->      uint64_t old_val, new_val, val, index;
+> @@ -416,20 +416,6 @@ static void hpet_del_timer(HPETTimer *t)
+>      update_irq(t, 0);
+>  }
 >  
-> -    DPRINTF("qemu: Enter hpet_ram_writel at %" PRIx64 " = %#x\n", addr, value);
-> +    DPRINTF("qemu: Enter hpet_ram_writel at 0x%" HWADDR_PRIx " = 0x%#"PRIx64"\n", addr, value);
->      index = addr;
->      old_val = hpet_ram_read(opaque, addr, 4);
->      new_val = value;
-> @@ -637,7 +637,7 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
->              }
->              s->hpet_counter =
->                  (s->hpet_counter & 0xffffffff00000000ULL) | value;
-> -            DPRINTF("qemu: HPET counter written. ctr = %#x -> %" PRIx64 "\n",
-> +            DPRINTF("qemu: HPET counter written. ctr = %#" PRIx64 " -> %" PRIx64 "\n",
->                      value, s->hpet_counter);
->              break;
->          case HPET_COUNTER + 4:
-> @@ -646,7 +646,7 @@ static void hpet_ram_write(void *opaque, hwaddr addr,
->              }
->              s->hpet_counter =
->                  (s->hpet_counter & 0xffffffffULL) | (((uint64_t)value) << 32);
-> -            DPRINTF("qemu: HPET counter + 4 written. ctr = %#x -> %" PRIx64 "\n",
-> +            DPRINTF("qemu: HPET counter + 4 written. ctr = %#" PRIx64 " -> %" PRIx64 "\n",
->                      value, s->hpet_counter);
->              break;
->          default:
+> -#ifdef HPET_DEBUG
+> -static uint32_t hpet_ram_readb(void *opaque, hwaddr addr)
+> -{
+> -    printf("qemu: hpet_read b at %" PRIx64 "\n", addr);
+> -    return 0;
+> -}
+> -
+> -static uint32_t hpet_ram_readw(void *opaque, hwaddr addr)
+> -{
+> -    printf("qemu: hpet_read w at %" PRIx64 "\n", addr);
+> -    return 0;
+> -}
+> -#endif
+> -
+>  static uint64_t hpet_ram_read(void *opaque, hwaddr addr,
+>                                unsigned size)
+>  {
 > 
 
 Applied to my trivial-patches branch.
