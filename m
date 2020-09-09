@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6D7C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:50:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D593AC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:57:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 821F520639
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:50:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 821F520639
+	by mail.kernel.org (Postfix) with ESMTPS id 36B72206A2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:57:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36B72206A2
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG0UJ-0005fq-Gw
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:50:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39094)
+	id 1kG0bJ-0001je-1n
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:57:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG0Ta-0004w4-IZ; Wed, 09 Sep 2020 09:49:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.134]:57493)
+ id 1kG0ac-00010J-Nm; Wed, 09 Sep 2020 09:56:46 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:44993)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG0TY-0007mM-Rk; Wed, 09 Sep 2020 09:49:30 -0400
+ id 1kG0aa-0000LA-2q; Wed, 09 Sep 2020 09:56:46 -0400
 Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
- (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MV2Sk-1k8oui2lug-00S3UY; Wed, 09 Sep 2020 15:49:23 +0200
-Subject: Re: [PATCH 2/2] hw/net/e1000e: Remove duplicated write handler for
- FLSWDATA register
+ (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MjjSt-1kwW4y1K9r-00lGba; Wed, 09 Sep 2020 15:56:31 +0200
+Subject: Re: [PATCH v5 2/2] hw: hyperv: vmbus: Fix 32bit compilation
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20200904131402.590055-1-f4bug@amsat.org>
- <20200904131402.590055-3-f4bug@amsat.org>
+ Jon Doron <arilou@gmail.com>, qemu-devel@nongnu.org
+References: <20200715084326.678715-1-arilou@gmail.com>
+ <20200715084326.678715-3-arilou@gmail.com>
+ <87028ae2-f31e-a6ee-a4ba-c147837fc52d@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <215e53f9-de99-2545-d397-f7dd7caf8bc5@vivier.eu>
-Date: Wed, 9 Sep 2020 15:49:19 +0200
+Message-ID: <fb8f1744-4c28-4171-2ffb-61d3ad39be88@vivier.eu>
+Date: Wed, 9 Sep 2020 15:56:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200904131402.590055-3-f4bug@amsat.org>
+In-Reply-To: <87028ae2-f31e-a6ee-a4ba-c147837fc52d@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:TkNHT8hgctF0c55QPcuEEXneIP4VRHip4rD7TfDEirdWmH2GdGu
- GXcWxGppuYNiHSMMYKtqvC1J428KNcU16jttwImgcgzoHK7392tt8YpmkeqotUHNXrGe/3H
- RX+fLj+r9jbKpXp+DA/aj2NNkHXcNgnMPJgOrz+IbhM5smtMguufhzMq85OKUzFNI3LlwaY
- AWD8DodmHeIGVdOnGo1EQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:/EEaSxsNyGw=:4iMzA3BIKr9JoHvlkG3WSL
- 3LFl2J0NtRKPTVkBgAR63VtdCaxj8ZvdTxM0sbwWjkvlh34itCMyxm/Vt4yeEnk36HVHdAKfy
- SJDQoyeiJ1C+YgrrB1d7X1UHg2FiQfU9vFoJwNoVe0A+d4sCNIPMD+2kQIcx59PNOQpnEi1p2
- +Wew1YBMFw4+HfPlTNCBV9FVKgcTHZZ/2bC+UNyktauhsnA5JryvwJ1rjIbBHTDIx+QBmCxuR
- HK06zpuTVsD8kBER2+l0yCCJr7JjHCw//RkOoOPdY7MGVaxqNaQG7/9qBDtMPz4zjnRuWkZeb
- tXGuFIClSy3C/D0th3eNRyfRtvb0dpjYwRy7WDcd8FQGF/CrTppTp5FFeEr07LYOUoU3nYM+I
- h/cYyT1ka+Sgy00vTzydSsol3fNtbZP7wHRujsIjZtTsaf5qQPNHQxnc3n91ikrIaWy4It6RQ
- QbZJi18u4YreYbSBVoT/nmK32I8Ap/T0utYmAGltOdFAaJAS/sfTSlXnMxb9SaDtgq8WMOOde
- m5IUppCFzFgTVTUGEPH04ATizmtm4BrTaXA5/I4WO/cu9A+r5KixJ/g9Vav9lPtz74Ft6gJ0q
- tvUPGcHNxb69dM1b+S/3RWolzIAfVnT7gA9BEyohSkLItawwa8u6LWZbUeAu1sN2Sh1rtL4Nt
- miaV8wPCnNQ8OhF0PSJ0p9nUyTrlHpxo7Oh/9nih+Zorb9sJJ8K5d9ezyjcn9WAZ/5d2zWjQt
- JiQ8VE9kSKnM7LUKdMoqUxpxRlrTj5XOBY/5eLCQYfLWeC1AqSSKqjGISibGrLSds/bjHP+XL
- TBh00rO+pId8L2JoF7t6CQ/zirsAxe9OCzj8Yy/Ik5Dz6H723AoscSyZB7JTvAQUSCZdaR9
-Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:9hfcNGCiuqVLR+Vz1zSgEILpVA71l5CRtNKbh7x8htpH9UrrxhP
+ wre3eEc2EXYSjq4/z+lS3eU0a+Jm+mNjF9lT3Gkrlnxhi8E83p/Q5z1E9NnatUkqehKgqoK
+ hwnPXXmIjJeZNebiSyTqsxRFeDL81En2JOIXVA2JiG+X/7f/iV4HkEP/qu7ztYLl1Hou2YG
+ +rakC6Y5HpcyJ5T4WgDYA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:up7XA78dkvs=:ZhSv6r9g4AsjgnXoskRri2
+ APeXmna1ZdWlFom3Ql7iTTh9ZpgxwxwZnSmj+MVLchJFBghahAURKw3wH33m9uJ6J6SqqsyfF
+ OWXTRqq1vjZxyfb6q+JEqHicfqWxd1zG8KFalgn0zWoXqmGtigo4xDCKWO6EhVQLoFS/ouG10
+ 9KqHYVn5HcCjGfBxuMWZSDE3r/R21nAtWdgk7OaVXoDK/ON1jXRSKi0FWH8UYhDd2Xagt8hvJ
+ Eku9O5I5RHIefEpw3+KC0unhniJ0kBjuwx9uk0VJF/GJvTlvt/N5WkLON2xKPt1+qWgY+UmGp
+ nuzMXCDm3x9FXjww6IeU/EAkmrqqrdaw4Qh1IrvcPdhpSCq5e6z7aNNIt7b/kGX3OWNjv6T3h
+ g5FGqdd03sMXXNIeV6C7Ts1mVxjonYIPKtl3FbzKDJZnLs4jI6uP3mjhXQcANSHuOVLdG8JZ4
+ C0h7JeHm4Vivewix+fFrRGP011v3lSrFb1Qi4cD2WZiuUl1mNj5Wz6G/SoQbtQvVFt015QpVN
+ fsGfnk7JQLq54c2qDl9gabLlKVzgOUWIbQ0MFFmCxoFrBljrfMDrD5yLH/U6nlfiKFuqo8fA5
+ vsi+7FP6f/ojFSVz93oiXQYFSdDUl3PjHBMeDfh6LegOQ3yoEyybnGFgIX8XHkD4gvI6BLdfO
+ F1CW095zq9o7ZGOUlNhaa0n+/jvvTzhJGQNG4nn8CEde9avpCAKze/lrCAPrfDNr5lXknriKF
+ F4jI7MHot4CWN7nKdf0e6ZQIK/1Vh60YJxsM7U5LKo+ZGMO2UBaXRVuXkVkhX714EyElQ+W/S
+ GTM+Z3z/lE4MTb7eDWgYULYcoaGNslm2NeMTxYhEjVOLL5G/AETwJFnrhtK3x7KWvcRjvJn
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:23:43
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:56:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -54
 X-Spam_score: -5.5
@@ -130,50 +130,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Jason Wang <jasowang@redhat.com>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>
+Cc: mail@maciej.szmigiero.name, QEMU Trivial <qemu-trivial@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>, rvkagan@yandex-team.ru,
+ pbonzini@redhat.com, imammedo@redhat.com, vkuznets@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 04/09/2020 à 15:14, Philippe Mathieu-Daudé a écrit :
-> The FLSWDATA register writeop handler is initialized twice:
+Le 06/09/2020 à 12:14, Philippe Mathieu-Daudé a écrit :
+> Cc'ing qemu-trivial@
 > 
->   3067 #define e1000e_putreg(x)    [x] = e1000e_mac_writereg
->   3068 typedef void (*writeops)(E1000ECore *, int, uint32_t);
->   3069 static const writeops e1000e_macreg_writeops[] = {
->   ....
->   3102     e1000e_putreg(FLSWDATA),
->   ....
->   3145     e1000e_putreg(FLSWDATA),
-> 
-> To avoid confusion, remove the duplicated initialization.
-> 
-> Fixes: 6f3fbe4ed0 ("net: Introduce e1000e device emulation")
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
-> Noticed after looking for other cases of the previous patch.
-> ---
->  hw/net/e1000e_core.c | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index 5170e6a4563..bcfd46696ff 100644
-> --- a/hw/net/e1000e_core.c
-> +++ b/hw/net/e1000e_core.c
-> @@ -3141,7 +3141,6 @@ static const writeops e1000e_macreg_writeops[] = {
->      e1000e_putreg(RXCFGL),
->      e1000e_putreg(TSYNCRXCTL),
->      e1000e_putreg(TSYNCTXCTL),
-> -    e1000e_putreg(FLSWDATA),
->      e1000e_putreg(EXTCNF_SIZE),
->      e1000e_putreg(EEMNGCTL),
->      e1000e_putreg(RA),
-> 
+> Can we add the commit description Richard wrote?
 
-Applied to my trivial-patches branch.
+I have no message from Richard regarding this patch.
 
 Thanks,
 Laurent
+> 
+> ---
+> Fix 32-bit build error for vmbus:
+> 
+>   hw/hyperv/vmbus.c: In function ‘gpadl_iter_io’:
+>   hw/hyperv/vmbus.c:383:13: error: cast to pointer from integer of
+> different size [-Werror=int-to-pointer-cast]
+>   383 |         p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) |
+> off_in_page);
+>       |             ^
+>   cc1: all warnings being treated as errors
+> 
+> Fixes: 0d71f7082d7 ("vmbus: vmbus implementation")
+> ---
+> 
+> On 7/15/20 10:43 AM, Jon Doron wrote:
+>> Signed-off-by: Jon Doron <arilou@gmail.com>
+>> ---
+>>  hw/hyperv/vmbus.c | 3 ++-
+>>  1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/hw/hyperv/vmbus.c b/hw/hyperv/vmbus.c
+>> index 34392e892a..c28bb4201b 100644
+>> --- a/hw/hyperv/vmbus.c
+>> +++ b/hw/hyperv/vmbus.c
+>> @@ -383,7 +383,8 @@ static ssize_t gpadl_iter_io(GpadlIter *iter, void *buf, uint32_t len)
+>>              }
+>>          }
+>>  
+>> -        p = (void *)(((uintptr_t)iter->map & TARGET_PAGE_MASK) | off_in_page);
+>> +        p = (void *)(uintptr_t)(((uintptr_t)iter->map & TARGET_PAGE_MASK) |
+>> +                off_in_page);
+>>          if (iter->dir == DMA_DIRECTION_FROM_DEVICE) {
+>>              memcpy(p, buf, cplen);
+>>          } else {
+>>
+> 
+> 
 
 
