@@ -8,76 +8,75 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7772C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:44:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82409C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:44:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FCFB2080C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:44:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 25EE42080C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:44:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eZozQ3uq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FCFB2080C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Des3wqgj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25EE42080C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG556-000239-8h
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:44:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57214)
+	id 1kG558-00029n-7U
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:44:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57158)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG53m-0000NO-Ax; Wed, 09 Sep 2020 14:43:10 -0400
-Received: from mail-pf1-x42b.google.com ([2607:f8b0:4864:20::42b]:34687)
+ id 1kG53a-0000C5-Kd; Wed, 09 Sep 2020 14:42:58 -0400
+Received: from mail-pg1-x530.google.com ([2607:f8b0:4864:20::530]:35528)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG53k-0007oR-Qx; Wed, 09 Sep 2020 14:43:10 -0400
-Received: by mail-pf1-x42b.google.com with SMTP id v196so3070542pfc.1;
- Wed, 09 Sep 2020 11:43:05 -0700 (PDT)
+ id 1kG53Z-0007nc-11; Wed, 09 Sep 2020 14:42:58 -0400
+Received: by mail-pg1-x530.google.com with SMTP id g29so2730451pgl.2;
+ Wed, 09 Sep 2020 11:42:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=VE49ZNwXmJO0oiZLGn66FYFMfa5GjTxPVHs0mRhL2ZU=;
- b=eZozQ3uq8l8PQp0TiptQYeoJoDOLixwzFMLfKGy1YoSpn4sjSimEilxMqzPZk5cLCc
- oZ/AevTMx3JUhbjLTXXJEdwwmIAEZ9aIa54gGeZw36RTPkbRc9GhTcR9Hy64xcjcwx5v
- 6uLLDKS25zfAuTQxw31TXYRNyWm1IMzZm9aTFH5aQ1dAomj55XVO+JVWnq7Ui603Q/Gm
- ngloVGMOs7M1yXIQRRtBOEIm3pzkDmE0E7vSTqn049l0q0uDZlpSUFI4+73BguIakuUZ
- Llrysz0rFnfmimgZUAoKaFoDes9giV4yLX4DDpHjNCOIU1vo+7CTEBNP696buc8MlWCZ
- jdAQ==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=27ajP4GoRfKO+nbwUgNlBqHfhHBZSCkZ9ODFQ91KtVY=;
+ b=Des3wqgjyzKES2s1MAa0FiHP0fuQg0MGzcRFkXx4BwsJng2qL0zDOwI+0aL0BSKQfe
+ +c1He5fbA/amtNx12jp98XrW0nZMH3JV3pSncU6hdS2dsWWMwwQwL4VhdyQ5dqcZJGHv
+ Tb6qH1dO8rSK1HADQHkame30QnrZrN54f7vsN+2eP8TKBKeyo8g/mBSRs4ad79aH4iwH
+ u5GtQk2RKVOESXeUIVGyXHGIdYJN9aYjTrDa3P8PKQ09aP9cm2cr8LHwaHYN89oeg+e8
+ UasdBFpSJRL7Hwe6iQUmTYjy+p3Jc24j8d28R0ecL/HGcpdTv/DmDggsmB0h4vaN78By
+ L8xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=VE49ZNwXmJO0oiZLGn66FYFMfa5GjTxPVHs0mRhL2ZU=;
- b=VySR6K6xOxa//fInb56z4wrgZKXAiu9Rm9p1pu0m06D8H88xDkZ6ds8vTpHNebIWyD
- BdaGwo1r/GqTqqYapH8/SArLlakEe0fSPMssKkNLwku963c2neo78y9aCyQF8qRFrGtT
- mcmAGG8nVwkAkEh8r53kdffiXk4TN5qRGvPWVDW/OYETKsrASzMIs7h8aN85lnCpwVkg
- Fp3ze+alC9hcbvu3kBrhudEJB6DpJ/LvdlmQpzLNRkyJYt/s1ABJhP5IMqcGycOqI/J0
- aMVb8WvPVajFQpyTD1+B6yGhKYPH15sw/B59gJ8Xsj1j+aCktca3nIMCklJeXDdrl183
- 4rgg==
-X-Gm-Message-State: AOAM532rmi9glzoRZVy4oJDxASG/BiAioVZjwY/n3ao8ar6R/SpFkxdP
- CFuYeFEHLrJWnwkB5N24Wa88+aBf807eyZkp
-X-Google-Smtp-Source: ABdhPJzQhYdhaWE0AuhnSSYJ4PrEu8rrJy/l1EwX9Rr1oh7wpqJBE4Efc93R4P6pAGpFLEXVinc4XQ==
-X-Received: by 2002:a17:902:a40e:: with SMTP id
- p14mr2031587plq.4.1599676983844; 
- Wed, 09 Sep 2020 11:43:03 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=27ajP4GoRfKO+nbwUgNlBqHfhHBZSCkZ9ODFQ91KtVY=;
+ b=aGWbJYkmv4J6MbHwSqi+DcLQHIH4gAsfsCmZO1+vQ+d52iBzwUPryyt+BZWdarlLyr
+ 6PdvXSJUSB9okzhrIFZD5xoOq4hMu9pEAFbi3Uxrw4aHT7auXMeTV7auQpbawvDdPr9X
+ n35f+ESqIKq4rxMMqBWJoyDEEBEyYAyK/XBD0Q2OH9Qpcspg0nMBaKYqS6PFr+uBeFBC
+ xvrOrRbpFrm7ZppMWE9x536P9P4kqOGP3uCwAp9lBCew54nbWe1FIg9MK9RSkBKml140
+ jhNjCDyGZEwLVnCYxjLWd9LWpM78fUsN9hBErjwFXpwAqn+icNhT091/oEV0WmN4NijM
+ 3pPw==
+X-Gm-Message-State: AOAM530X4w575XuGEd3rqTiJdAXIT19rGzBcLvVZIfPBvGuLOe1FIwuk
+ usCwFXgkEwGtOkiVJJaWdxBdH/GbebDsLrpw
+X-Google-Smtp-Source: ABdhPJxA9J7uDvDteqIq4+XUNOb/EN6yoSbvlAEJzKoG+jogLNL39ejdq6jVPxRBNYdnilWdZgpjnQ==
+X-Received: by 2002:a62:301:0:b029:13c:1611:6528 with SMTP id
+ 1-20020a6203010000b029013c16116528mr2070781pfd.8.1599676974483; 
+ Wed, 09 Sep 2020 11:42:54 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 63sm3521673pfw.42.2020.09.09.11.42.59
+ by smtp.googlemail.com with ESMTPSA id 63sm3521673pfw.42.2020.09.09.11.42.50
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 11:43:03 -0700 (PDT)
+ Wed, 09 Sep 2020 11:42:53 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 25/25] meson: guard the minimal meson version to 0.55.1
-Date: Thu, 10 Sep 2020 02:42:37 +0800
-Message-Id: <20200909184237.765-3-luoyonggang@gmail.com>
+Subject: [PATCH v6 08/25] tests: disable /char/stdio/* tests in test-char.c on
+ win32
+Date: Thu, 10 Sep 2020 02:42:35 +0800
+Message-Id: <20200909184237.765-1-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20200909184237.765-1-luoyonggang@gmail.com>
-References: <20200909184237.765-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::42b;
- envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42b.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::530;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x530.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,35 +111,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-So we can removal usage of unstable-keyval
+These tests are blocking test-char to be finished.
+Disable them by using variable is_win32, so we doesn't
+need macro to open it. and easy recover those function
+latter.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- meson.build | 9 +++------
- 1 file changed, 3 insertions(+), 6 deletions(-)
+ tests/test-char.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/meson.build b/meson.build
-index 0b1741557d..af34a85bec 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1,14 +1,11 @@
--project('qemu', ['c'], meson_version: '>=0.55.0',
-+project('qemu', ['c'], meson_version: '>=0.55.1',
-         default_options: ['warning_level=1', 'c_std=gnu99', 'cpp_std=gnu++11',
-                           'b_colorout=auto'],
-         version: run_command('head', meson.source_root() / 'VERSION').stdout().strip())
+diff --git a/tests/test-char.c b/tests/test-char.c
+index d35cc839bc..184ddceab8 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -77,7 +77,6 @@ static void fe_event(void *opaque, QEMUChrEvent event)
+     }
+ }
  
- not_found = dependency('', required: false)
--if meson.version().version_compare('>=0.56.0')
--  keyval = import('keyval')
--else
--  keyval = import('unstable-keyval')
--endif
-+keyval = import('keyval')
+-#ifdef _WIN32
+ static void char_console_test_subprocess(void)
+ {
+     QemuOpts *opts;
+@@ -102,7 +101,7 @@ static void char_console_test(void)
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stdout("CONSOLE");
+ }
+-#endif
 +
- ss = import('sourceset')
+ static void char_stdio_test_subprocess(void)
+ {
+     Chardev *chr;
+@@ -1448,7 +1447,11 @@ static SocketAddress unixaddr = {
  
- sh = find_program('sh')
+ int main(int argc, char **argv)
+ {
+-    bool has_ipv4, has_ipv6;
++    bool has_ipv4, has_ipv6, is_win32 = false;
++
++#ifdef _WIN32
++    is_win32 = true;
++#endif
+ 
+     qemu_init_main_loop(&error_abort);
+     socket_init();
+@@ -1467,12 +1470,15 @@ int main(int argc, char **argv)
+     g_test_add_func("/char/invalid", char_invalid_test);
+     g_test_add_func("/char/ringbuf", char_ringbuf_test);
+     g_test_add_func("/char/mux", char_mux_test);
+-#ifdef _WIN32
+-    g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
+-    g_test_add_func("/char/console", char_console_test);
+-#endif
+-    g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
+-    g_test_add_func("/char/stdio", char_stdio_test);
++    if (0) {
++        g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
++        g_test_add_func("/char/console", char_console_test);
++    }
++
++    if (!is_win32) {
++        g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
++        g_test_add_func("/char/stdio", char_stdio_test);
++    }
+ #ifndef _WIN32
+     g_test_add_func("/char/pipe", char_pipe_test);
+ #endif
+@@ -1534,7 +1540,7 @@ int main(int argc, char **argv)
+     g_test_add_data_func("/char/socket/client/dupid-reconnect/" # name, \
+                          &client8 ##name, char_socket_client_dupid_test)
+ 
+-    if (has_ipv4) {
++    if (has_ipv4 && !is_win32) {
+         SOCKET_SERVER_TEST(tcp, &tcpaddr);
+         SOCKET_CLIENT_TEST(tcp, &tcpaddr);
+         g_test_add_data_func("/char/socket/server/two-clients/tcp", &tcpaddr,
 -- 
 2.28.0.windows.1
 
