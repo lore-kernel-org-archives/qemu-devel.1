@@ -2,97 +2,85 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A06DC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B659FC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:01:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F048121D46
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:56:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1351F21D7D
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:01:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4nCYdxs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F048121D46
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gomWyIAb"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1351F21D7D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60006 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG4L4-0003A3-V0
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 13:56:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43952)
+	id 1kG4Pj-0004mK-5s
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:01:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kG4KW-0002hu-52
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:56:24 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:34905)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kG4OP-00044t-7b; Wed, 09 Sep 2020 14:00:25 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:36839)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kG4KU-00015K-8Z
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:56:23 -0400
-Received: by mail-wm1-x343.google.com with SMTP id y15so3292850wmi.0
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 10:56:21 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kG4OM-0001YT-Pe; Wed, 09 Sep 2020 14:00:24 -0400
+Received: by mail-il1-x144.google.com with SMTP id p13so3206325ils.3;
+ Wed, 09 Sep 2020 11:00:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=kklDda8xcwHHYE1R2nI3fwUc62PSqJ5jSx8FygF1khw=;
- b=W4nCYdxsCEacs8JOi05dqejBSivm90U/Ita/stJ0Dch20M0FDz4o+6JOvblOiSaZO1
- U/iE2cjdC46oXp0+ThLIknPu7sFBLdTwAm5i6A1uhJuiaYW+FQ4iAndzcZMisoEspDkv
- xwf+xBPP1L6NIngDaDkYo62thkJzplx9hAnBPP0iD5Pt5qQgxbqIQWBVqqEgmRidXqbR
- wIJysniaSgnwXkG5xVsQDiNVw9JAibE/GsYaH02T+TeiDiKCcn3ANamGSgkX4xubT6To
- sCI+oCrgCuntHvTDs8Y7n8LIiERNo5EdkHvUB2xxtNob7nuloEGm9La0vQVKxDnEQWQl
- Lf2A==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=CX+wa3Cw6K12KtlfLiQRHHsZ0quSOvcZN3FfrH23N+Y=;
+ b=gomWyIAbQhN0XgcsfPXyYmUh9FAib1iXf7ynvlRy1cNQJ8T6sHJyTDdj5hvn3+smqE
+ RyNQ9ZnxR0DrroUDkIiB2EU2z4KsgW4X0xoFk4lcEqot5+DtFp06DXfqjhpv9jyFflAV
+ 7G2FM3zE+h4R2zlBFCod6Kov4iyJCGCPoeexFJdFwGYS6qH0alQofqeWdZRBzPCLTdfh
+ caHnZ2+UZezyvxZWPS0v2iM5AAmUO6DUg6vJfGbciRIrWRHsbD4ZA9Nk+W6P2llbh5E/
+ EuuSWCqBu8LTeo0hukeT5HMKExUlHpxAPODff4mj43xiX8nc6iVl57Cb9PWR1iEKrPfY
+ 9QWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kklDda8xcwHHYE1R2nI3fwUc62PSqJ5jSx8FygF1khw=;
- b=EcsCnnYaB+iJxH+maTXD5D1GBQwbxUUwyGILvPoGfSXyhqYB1iRsCbunG343ftbyNW
- 0viBO5h9t1tvfpPfiDsi5L7vQdlN9MskWA7Z6co5jytz5h+KiYsOz7JPPkSSyWtqMeCA
- zfQ0D9Z2JIwCgJC8VU+kU2iSxOXw60nPjc1CI0bbkzoLduWXcqvvfRkOYWk3aNkj9lcA
- wJho0h5Q7LKMezdHldHjEbFlbkVl3Nl1LtDwvClYpG+kCXuC9XINXCw0muwDHvWmntcT
- fJ0xRxTnttJkNWkd6rS7NpuyqBFogRPvE33qpMCV0XjzruhCdRGfSBEEuiKZjpxwx4KX
- Iojw==
-X-Gm-Message-State: AOAM533QAvp6xbEBYXY6Wqsx9ndLJSPEEdRuC13XnkEjHcymQLVTh24V
- 59jJrloDD4unehx00Us4OA4=
-X-Google-Smtp-Source: ABdhPJxgwuhewb9esxTejWhvC40uyc+pGk8uJBJCw5pHEUDRXArVDgWW2kNPw14KBg0dRfz9Hc1IUg==
-X-Received: by 2002:a1c:f612:: with SMTP id w18mr4511419wmc.47.1599674180548; 
- Wed, 09 Sep 2020 10:56:20 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id z13sm5234781wro.97.2020.09.09.10.56.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 09 Sep 2020 10:56:19 -0700 (PDT)
-Subject: Re: [PULL v2 13/15] hw/rx: Add RX GDB simulator
-To: Peter Maydell <peter.maydell@linaro.org>
-References: <20200622191746.18031-1-f4bug@amsat.org>
- <20200622191746.18031-2-f4bug@amsat.org>
- <CAFEAcA9SK1BmrY9_LO6ERy-e22rXOVUP1+vSmUYSTEwWywuzuA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <24fc5d34-8af3-53cb-3257-62b3b07defcb@amsat.org>
-Date: Wed, 9 Sep 2020 19:56:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=CX+wa3Cw6K12KtlfLiQRHHsZ0quSOvcZN3FfrH23N+Y=;
+ b=lOBH9/mPhVJLdcQ0klIh5+N0TxnjNoKZxcEhJbewtYkusrtqxHJHsjEUXabInmzFc6
+ Dw/DDTwXtj9Sr8uvzfsAh4giHRDqXbHY8bpvtC/GrR+5wJcTaWbV5VYfUVzmNB5n+76M
+ CTV9/iyNykvOTj6B0DxSQ3z9ggm9eJ4trDWNuS5LXI+PRFDEsRdCFKcTIuJtGVCm7wWN
+ KvM9NuPe3irAin5D7W002jmbe5OnMeAVYamwTrjEzDCrmCOSBLiRnymN4HTijwkyYwAb
+ z22xC5vYpzqTUtFWTb+g1ESbNOGcif1IfW08UU8i6XuMG+bRNnOrjbcbLA5Gqztf9hqi
+ gCNw==
+X-Gm-Message-State: AOAM5321JmgrrwQHm0FV1ohhd/0iXyw4h6lIuDOOINeUpnUQ5mR0lP/b
+ hmX1Xo8/YhGhzXjECE98fdnFgRyRQUPiHyzxMuc=
+X-Google-Smtp-Source: ABdhPJzsg3B0ctEMLtGUh3SfgRVIZ4Lj6H1GEjOxjR/gP/0iEE5zP/rcaZqpVEuSnwycaWOte1GCa8ZpvO9VWpu3eQs=
+X-Received: by 2002:a92:d94b:: with SMTP id l11mr5000880ilq.131.1599674420340; 
+ Wed, 09 Sep 2020 11:00:20 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA9SK1BmrY9_LO6ERy-e22rXOVUP1+vSmUYSTEwWywuzuA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+References: <cover.1590704015.git.alistair.francis@wdc.com>
+ <0ab3cecbe801f9e14ad1a5447d02483b9008fdbb.1590704015.git.alistair.francis@wdc.com>
+ <CAFEAcA83=4=EhtQLmGJn5Z_PVZaDyo7pMwdX-9fTVUkVKe7Acw@mail.gmail.com>
+In-Reply-To: <CAFEAcA83=4=EhtQLmGJn5Z_PVZaDyo7pMwdX-9fTVUkVKe7Acw@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 9 Sep 2020 10:49:20 -0700
+Message-ID: <CAKmqyKPryJP5g4RXq1uCbYKQX3C+9yzjjqEH4i88L6Vf2gW7Zg@mail.gmail.com>
+Subject: Re: [PATCH v5 06/11] riscv: Initial commit of OpenTitan machine
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -50
-X-Spam_score: -5.1
-X-Spam_bar: -----
-X-Spam_report: (-5.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-3.576,
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -107,68 +95,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>,
- Magnus Damm <magnus.damm@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Bin Meng <bmeng.cn@gmail.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Yoshinori,
+On Tue, Sep 8, 2020 at 7:52 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Thu, 28 May 2020 at 23:31, Alistair Francis <alistair.francis@wdc.com> wrote:
+> >
+> > This adds a barebone OpenTitan machine to QEMU.
+> >
+> > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> > Reviewed-by: Bin Meng <bin.meng@windriver.com>
+> > ---
+> >  default-configs/riscv32-softmmu.mak |   1 +
+> >  default-configs/riscv64-softmmu.mak |  11 +-
+>
+> Just noticed this, but:
+>
+> > diff --git a/default-configs/riscv32-softmmu.mak b/default-configs/riscv32-softmmu.mak
+> > index 1ae077ed87..94a236c9c2 100644
+> > --- a/default-configs/riscv32-softmmu.mak
+> > +++ b/default-configs/riscv32-softmmu.mak
+> > @@ -10,3 +10,4 @@ CONFIG_SPIKE=y
+> >  CONFIG_SIFIVE_E=y
+> >  CONFIG_SIFIVE_U=y
+> >  CONFIG_RISCV_VIRT=y
+> > +CONFIG_OPENTITAN=y
+> > diff --git a/default-configs/riscv64-softmmu.mak b/default-configs/riscv64-softmmu.mak
+> > index 235c6f473f..aaf6d735bb 100644
+> > --- a/default-configs/riscv64-softmmu.mak
+> > +++ b/default-configs/riscv64-softmmu.mak
+> > @@ -1,3 +1,12 @@
+> >  # Default configuration for riscv64-softmmu
+> >
+> > -include riscv32-softmmu.mak
+> > +# Uncomment the following lines to disable these optional devices:
+> > +#
+> > +#CONFIG_PCI_DEVICES=n
+> > +
+> > +# Boards:
+> > +#
+> > +CONFIG_SPIKE=y
+> > +CONFIG_SIFIVE_E=y
+> > +CONFIG_SIFIVE_U=y
+> > +CONFIG_RISCV_VIRT=y
+>
+> ...shouldn't the riscv64-softmmu config have CONFIG_OPENTITAN too?
+> The usual principle is that the 64-bit executable can run the
+> 32-bit boards too.
 
-On 9/7/20 3:13 PM, Peter Maydell wrote:
-> On Mon, 22 Jun 2020 at 20:20, Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>
->> From: Yoshinori Sato <ysato@users.sourceforge.jp>
->>
->> Add the RX machine internally simulated in GDB.
-> 
-> Hi; Coverity points out a memory leak (CID 1432307) in this function:
-> 
->> +static void rx_gdbsim_init(MachineState *machine)
->> +{
-> 
->> +        if (dtb_filename) {
->> +            ram_addr_t dtb_offset;
->> +            int dtb_size;
->> +            void *dtb;
->> +
->> +            dtb = load_device_tree(dtb_filename, &dtb_size);
-> 
-> This allocates memory...
-> 
->> +            if (dtb == NULL) {
->> +                error_report("Couldn't open dtb file %s", dtb_filename);
->> +                exit(1);
->> +            }
->> +            if (machine->kernel_cmdline &&
->> +                qemu_fdt_setprop_string(dtb, "/chosen", "bootargs",
->> +                                        machine->kernel_cmdline) < 0) {
->> +                error_report("Couldn't set /chosen/bootargs");
->> +                exit(1);
->> +            }
->> +            /* DTB is located at the end of SDRAM space. */
->> +            dtb_offset = machine->ram_size - dtb_size;
->> +            rom_add_blob_fixed("dtb", dtb, dtb_size,
->> +                               SDRAM_BASE + dtb_offset);
-> 
-> ...and rom_add_blob_fixed() copies that memory, it doesn't take
-> ownership of it, so after we've called it we need to
->     g_free(fdt);
+I didn't know that was the general case. I'll send a patch to enable this.
 
-Can you send a patch to fix this please?
+Alistair
 
-> 
->> +            /* Set dtb address to R1 */
->> +            RXCPU(first_cpu)->env.regs[1] = SDRAM_BASE + dtb_offset;
->> +        }
->> +    }
-> 
+>
 > thanks
 > -- PMM
-> 
 
