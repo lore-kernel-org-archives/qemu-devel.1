@@ -2,87 +2,73 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB65EC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8B2AC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:33:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25C6921556
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:28:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7269121532
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 17:33:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jvKIa7Q4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25C6921556
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="EZ6RM4Db"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7269121532
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG3tu-0004nY-Pn
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 13:28:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49550)
+	id 1kG3yD-0001B1-Dv
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 13:33:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG3t6-0003ma-MW; Wed, 09 Sep 2020 13:28:04 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:46249)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG3t4-0001Q2-QC; Wed, 09 Sep 2020 13:28:04 -0400
-Received: by mail-lj1-x243.google.com with SMTP id a22so4565501ljp.13;
- Wed, 09 Sep 2020 10:28:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=RwgBRnPlh/MQohEyO0yaWpWbyXHSUxrPm0nMPESEb8o=;
- b=jvKIa7Q4lvRx46LQNjxHmMZAC6IyD0nTHYKJkyv95IKLsmHeplurt4+M4knG4c2RX3
- lp/hD+S/jssEMmYw+dRFuR5YHurFIsRHoDra3CEy7UhzahgUY9ZAbpkk8fbGv6e63Vpe
- PmiyGfIhbu6WEe4G0nQa2vhzhGiNrk8v0/QAlxC6HUQw762DyXJDUhPMsw6UbA6eO5TK
- j9utjpbIT0rLjzViywsQEZsgvJ15Ns7xhoEwA1cS4HqNQlpKVzjtVc3G5Zzy6ROGKeNy
- BYa3ghLOUUqVuiNdE253oxPN8qyCxw9p+eDLTbauscZiagcaYt8lr/dGtHC1dduKCJz/
- ipKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=RwgBRnPlh/MQohEyO0yaWpWbyXHSUxrPm0nMPESEb8o=;
- b=JzAiGZC+PgkrXoYTNgfyulmPOSIYwHJKfrhR+yQGZZndz2Ldtjy5bxhWH3i1+ZQoFb
- AS8s8pub4rdGfbEZ4HM4QoA/V/6USVziGGQqfk6VbBdrM1nzeqE/5jFBJuZZ/OAyaomX
- /SZ4EJJnhFXhRKERh2ZBGly8biFjjMHVijGBeN0tvJmPcjIhaElqt9r1tt0OzyrDSOXU
- xhHkKYu6X42/7HzR6y1A8NZudm2U/uEQQXmt3Rs/UoTjYkD0k5zpWLo121eax0J+28ZX
- 02PRF0WOBQaduzCb/q/pbvzb+TPHXqo08tUF00boQzcAlo4eQmZcfD8kE/4/xPvVV7p3
- /OfA==
-X-Gm-Message-State: AOAM530N1NsmKAWubcOm6AHPzVuufyftMoyx7fmY9ZAYUgFNrK2yYpGu
- mRaulEouWLFU3XKKLdJa9F2MRE0MKc8PzniuwOg=
-X-Google-Smtp-Source: ABdhPJz+AI8teYrnhrmP5/1oxxQgctEVZUW4Vz86vFld7a8xQiYnlMkKRZ9jnk3V7Ac2LAqbwqhGUwxQVSQzEjUNdbY=
-X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr2600141ljj.447.1599672480136; 
- Wed, 09 Sep 2020 10:28:00 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kG3xO-0008OM-DG
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:32:30 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:43471)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kG3xL-0003CM-HP
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 13:32:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=1/QgqKFp/jCdNUqku7CFaofwtuN6ZuTQA/r4wJj4m24=; b=EZ6RM4DbuvNYBjZOIjN5nL5Hwq
+ saccp/m+3Mk6ZRJfRdG8ILn7F0pZ0VFg2xWN4j3WENMpl0ClLMvtg0S1B5wXvkvKc1W4aY5SHGrkV
+ MCTseiZwJe22hmZvf1UiIl/isYhJ4IWmVJRldbtTSnqWE8CehNmtjaGbUUS6j1ZU5B2qKnyeJPEWA
+ 3tmUJYadynj1dkaWYjoBmnHC4+ziS8YE16TgraVaiXY1UVHkab2tw+eo6qsSPPIK0xQ4IqLSZ1YNW
+ ABeNdpQBMlg2Wg9bRr2sFYxLAORMWckmSeUn/DbsnzJaDZUNQinAsGgLu5XrQL6gr0+zMEa8nwn5S
+ 2xQvqiVw==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ G 3 <programmingkidx@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>,
+ Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Liviu Ionescu <ilg@livius.net>
+Subject: Re: [RFC] QEMU as Xcode project on macOS
+Date: Wed, 09 Sep 2020 19:32:21 +0200
+Message-ID: <13443969.F0S6BcH2UH@silver>
+In-Reply-To: <CAFEAcA8Wgbqm15DB1YLXBzQJwNeZjKGcdLFHe8G4FS6YT5Tcmw@mail.gmail.com>
+References: <2764135.D4k31Gy3CM@silver>
+ <CAFEAcA8Wgbqm15DB1YLXBzQJwNeZjKGcdLFHe8G4FS6YT5Tcmw@mail.gmail.com>
 MIME-Version: 1.0
-References: <20200908151052.713-1-luoyonggang@gmail.com>
- <20200908151052.713-3-luoyonggang@gmail.com>
- <20200909084107.GE12090@stefanha-x1.localdomain>
- <ef674b21-cdad-9aea-662e-315006438ed4@redhat.com>
-In-Reply-To: <ef674b21-cdad-9aea-662e-315006438ed4@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Thu, 10 Sep 2020 01:27:47 +0800
-Message-ID: <CAE2XoE8K6OHBm2DnRQEGjrMFhKU-BngSzh2vjYH5c+Q-2eo9kg@mail.gmail.com>
-Subject: Re: [PATCH v4 2/2] rcu: add uninit destructor for rcu
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000ef82de05aee4c5af"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 13:32:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,135 +82,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Juan Quintela <quintela@redhat.com>, QEMU Trivial <qemu-trivial@nongnu.org>,
- qemu-level <qemu-devel@nongnu.org>, Maxim Levitsky <mlevitsk@redhat.com>,
- Daniel Brodsky <dnbrdsky@gmail.com>, Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000ef82de05aee4c5af
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Mittwoch, 9. September 2020 15:30:09 CEST Peter Maydell wrote:
+> On Wed, 9 Sep 2020 at 13:56, Christian Schoenebeck
+>=20
+> <qemu_oss@crudebyte.com> wrote:
+> > I've recently been thinking about how feasible a stripped down Xcode
+> > project for QEMU would be, i.e. you just get the QEMU sources, click on
+> > qemu.xcodeproj, Cmd + B, done. No extra installation, no configure,
+> > nothing.
+> How would this work? Can you have an XCode project that just
+> says "to build this program we will run configure and make" ?
 
-On Thu, Sep 10, 2020 at 1:23 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+You can run shell scripts. There are two main mechanisms in Xcode for that,=
+=20
+one is "Build phases" where you can define shell code being executed for an=
+=20
+individual "target" (e.g. a lib/app being built), which shell to be used (e=
+=2Eg.=20
+sh, zsh, bash, python), the actual shell code to be executed, and optionall=
+y a=20
+list of output files (e.g. .c files) said to be generated by the shell code=
+=20
+which then in turn are compiled by Xcode according to their file type:
 
-> On 09/09/20 10:41, Stefan Hajnoczi wrote:
-> > On Tue, Sep 08, 2020 at 11:10:52PM +0800, Yonggang Luo wrote:
-> >> This is necessary if the pending  rcu calls are closing and removing
-> >> temp files. This also provide a function
-> >> void rcu_wait_finished(void);
-> >> to fixes test-logging.c test failure on msys2/mingw.
-> >> On windows if the file doesn't closed, you can not remove it.
-> >>
-> >> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> >> ---
-> >>  include/qemu/rcu.h   |  5 +++++
-> >>  tests/test-logging.c |  2 ++
-> >>  util/rcu.c           | 37 ++++++++++++++++++++++++++++++++++++-
-> >>  3 files changed, 43 insertions(+), 1 deletion(-)
-> > Can the new drain_call_rcu() function be used? Maxim recently posted th=
-e
-> > following patch:
-> >
-> https://patchew.org/QEMU/20200831150124.206267-1-mlevitsk@redhat.com/2020=
-0831150124.206267-3-mlevitsk@redhat.com/
-> >
-> > Whether drain_call_rcu() or rcu_wait_finished() is used, please include
-> > a comment in the code that documents why the wait is necessary. For
-> > example, "qemu_log_close() uses RCU for its FILE pointer but Windows
-> > cannot remove open files, so we need to wait for RCU here".
-> >
-> > Another option is to wait for RCU inside qemu_log_close() so that
-> > callers don't need to worry about this implementation detail:
-> >
-> >   #ifdef _WIN32
-> >   /* Windows cannot remove open files so we need to wait for RCU here *=
-/
-> >   drain_call_rcu();
-> >   #endif
-> >
->
-> In this case even synchronize_rcu() should be okay.
->
-> Tried and not working.
+https://www.mokacoding.com/blog/better-build-phase-scripts/
 
-> Paolo
->
->
+Limitation: the precise list of generated output files needs to be specifie=
+d=20
+to the Xcode project if they need to be compiled. So you cannot let the she=
+ll=20
+script dynamically tell Xcode "here are the source files I generated: [...]=
+=20
+compile them please".
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+=46or that reason there is a 2nd mechanism in Xcode called "Build Rules", w=
+hich=20
+basically allow you defining custom source file types, so e.g. Xcode would =
+run=20
+a shell script for every source file that ends with "*.foo", the shell scri=
+pt=20
+would then generate for each one of them e.g. a .c file, which then would i=
+n=20
+turn be compiled by Xcode with clang.
 
---000000000000ef82de05aee4c5af
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In this example somebody auto generates .c files from .css files (sorry, du=
+sty=20
+screenshots, but it's still the same thing):
 
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Sep 10, 2020 at 1:23 AM Paolo=
- Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>=
-&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
-0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 0=
-9/09/20 10:41, Stefan Hajnoczi wrote:<br>
-&gt; On Tue, Sep 08, 2020 at 11:10:52PM +0800, Yonggang Luo wrote:<br>
-&gt;&gt; This is necessary if the pending=C2=A0 rcu calls are closing and r=
-emoving<br>
-&gt;&gt; temp files. This also provide a function<br>
-&gt;&gt; void rcu_wait_finished(void);<br>
-&gt;&gt; to fixes test-logging.c test failure on msys2/mingw.<br>
-&gt;&gt; On windows if the file doesn&#39;t closed, you can not remove it.<=
-br>
-&gt;&gt;<br>
-&gt;&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmai=
-l.com" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
-&gt;&gt; ---<br>
-&gt;&gt;=C2=A0 include/qemu/rcu.h=C2=A0 =C2=A0|=C2=A0 5 +++++<br>
-&gt;&gt;=C2=A0 tests/test-logging.c |=C2=A0 2 ++<br>
-&gt;&gt;=C2=A0 util/rcu.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0| 37 ++++=
-++++++++++++++++++++++++++++++++-<br>
-&gt;&gt;=C2=A0 3 files changed, 43 insertions(+), 1 deletion(-)<br>
-&gt; Can the new drain_call_rcu() function be used? Maxim recently posted t=
-he<br>
-&gt; following patch:<br>
-&gt; <a href=3D"https://patchew.org/QEMU/20200831150124.206267-1-mlevitsk@r=
-edhat.com/20200831150124.206267-3-mlevitsk@redhat.com/" rel=3D"noreferrer" =
-target=3D"_blank">https://patchew.org/QEMU/20200831150124.206267-1-mlevitsk=
-@redhat.com/20200831150124.206267-3-mlevitsk@redhat.com/</a><br>
-&gt; <br>
-&gt; Whether drain_call_rcu() or rcu_wait_finished() is used, please includ=
-e<br>
-&gt; a comment in the code that documents why the wait is necessary. For<br=
->
-&gt; example, &quot;qemu_log_close() uses RCU for its FILE pointer but Wind=
-ows<br>
-&gt; cannot remove open files, so we need to wait for RCU here&quot;.<br>
-&gt; <br>
-&gt; Another option is to wait for RCU inside qemu_log_close() so that<br>
-&gt; callers don&#39;t need to worry about this implementation detail:<br>
-&gt; <br>
-&gt;=C2=A0 =C2=A0#ifdef _WIN32<br>
-&gt;=C2=A0 =C2=A0/* Windows cannot remove open files so we need to wait for=
- RCU here */<br>
-&gt;=C2=A0 =C2=A0drain_call_rcu();<br>
-&gt;=C2=A0 =C2=A0#endif<br>
-&gt; <br>
-<br>
-In this case even synchronize_rcu() should be okay.<br>
-<br></blockquote><div>Tried and not working.=C2=A0</div><blockquote class=
-=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
-b(204,204,204);padding-left:1ex">
-Paolo<br>
-<br>
-</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
- class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div>
+https://www.cocoanetics.com/2012/02/xcode-build-rules/
 
---000000000000ef82de05aee4c5af--
+> We definitely don't want to have two parallel mechanisms for
+> specifying how to build QEMU, because they'll just get out of sync.
+
+Sure, the Xcode project file should be auto generated for that reason,=20
+otherwise it's DOA.
+
+> > each individually on macOS. Or right, you could alternatively "just
+> > install" them from Homebrew, MacPorts, Fink. But no matter which soluti=
+on
+> > you choose, it easily ends up in a mess (conflicts, misbehaviours) on
+> > macOS to install libs and apps globally. And I think that's the problem
+> > why there are currently relatively little contribution for QEMU coming
+> > from devs on macOS. Because you don't want to install things globally on
+> > a macOS system, it's simply not working well there as it does with Linux
+> > distros.
+>=20
+> My experience with homebrew has been pretty good overall.
+> If there's a better way to handle OSX hosts that doesn't
+> require us to carry around all our dependencies (which is
+> impractical) that would be interesting to investigate.
+
+It probably depends on how many and which FOSS projects you compiled on Mac.
+I no longer install from Homebrew and co, nor do I "pip install" things for=
+=20
+the same reasons. And AFAICS other devs on Mac made similar experiences.
+
+Plus I am used to FOSS projects having more issues on Mac then on Linux. If=
+=20
+it's an Xcode generated app that crashes, then Xcode automatically opens th=
+e=20
+precise crashed lib's source file in the editor, along with the stacktrace,=
+=20
+you fix the bug, click on "Run" and that's it. Without Xcode that would be=
+=20
+like 45 mins just for recompiling the relevant dependencies.
+
+On Mittwoch, 9. September 2020 15:40:05 CEST Daniel P. Berrang=E9 wrote:
+> Ideally any xcode setup would just invoke whatever our standard
+> build tools are IMHO, so it has zero possibility of introducing
+> new build problems.
+
+Then you would not win anything on Mac. The problematic on macOS is that Ap=
+ple=20
+froze many standard FOSS tools that switched to GPL3. So by default you jus=
+t=20
+have e.g. GNU make 3.81 (2006), Bash 3.2.57 (2007), ...  unless you start t=
+o=20
+manually install them (e.g. from Homebrew & Co). And being forced to use Me=
+son=20
+on Mac with all its Python dependencies does not make it easier.
+
+IMO the Xcode project file would ideally be auto generated from the existin=
+g=20
+build infrastructure (e.g. Meson) and the scripts that are still required t=
+o=20
+be run by Xcode should be able to work with the old versions of build tools=
+=20
+installed on a standard macOS system.
+
+On Mittwoch, 9. September 2020 15:41:02 CEST Thomas Huth wrote:
+> On 09/09/2020 14.56, Christian Schoenebeck wrote:
+> > I've recently been thinking about how feasible a stripped down Xcode
+> > project for QEMU would be, i.e. you just get the QEMU sources, click on
+> > qemu.xcodeproj, Cmd + B, done. No extra installation, no configure,
+> > nothing.
+> Meson seems to have some exporter for Xcode according to
+> https://mesonbuild.com/IDE-integration.html ... maybe you can harness
+> that feature somehow?
+
+Good to know, thanks! I'll give it a try.
+
+> > The question is, and I don't have the big picture of QEMU yet to judge
+> > that, how much is auto generated for QEMU i.e. with custom scripts that
+> > would probably destroy this plan? There are these trace calls that are
+> > auto generated, is there more like the TCG part for instance?
+>=20
+> Yes, I think we generate code in a couple of places, e.g. the code in
+> target/s390x/ uses a "gen-features" helper to generate some code. So
+> implementing a separate Xcode project that does not use the main build
+> files does not sound very appealing.
+
+It's probably not that relevant how many files are generated, but more how=
+=20
+many scripts approximately are generating these. If you just need to instal=
+l=20
+like two dozens of shell hooks into the Xcode project, then Ok, that's=20
+manageable, if it's rather like hundreds or even thousands of script hooks,=
+=20
+that would make the whole thing probably unrealistic, unless Meson's allege=
+dly=20
+built-in Xcode feature already does a very great job. ;-)
+
+On Mittwoch, 9. September 2020 16:40:10 CEST Programmingkid wrote:
+> I think the solution to this problem is to switch over the CMake
+> (https://en.wikipedia.org/wiki/CMake). It is a build system that lets you
+> specify how you want to build software. There are many targets available
+> including 'make' and an Xcode project file.
+
+Well, the project just switched to Meson. It's probably not likely that the=
+re=20
+will be another build system switch any time soon I guess. But who knows,=20
+maybe Meson already does a good job on Xcode, or if not, maybe Meson could =
+be=20
+fixed. We'll see.
+
+Best regards,
+Christian Schoenebeck
+
+
 
