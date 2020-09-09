@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4323FC43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 00:21:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2AEE6C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 00:21:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C696B2145D
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 00:21:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9EC7D21556
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 00:21:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dxnUxTlk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C696B2145D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="y6XGhVWU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9EC7D21556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFnrU-00006J-Rw
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 20:21:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37502)
+	id 1kFnrh-0000hu-GI
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 20:21:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFnnY-0008Na-3i
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 20:17:16 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:36730)
+ id 1kFnnQ-00082M-4M
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 20:17:08 -0400
+Received: from mail-pj1-x1029.google.com ([2607:f8b0:4864:20::1029]:33171)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFnnV-0002FG-Na
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 20:17:15 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id b17so435192pji.1
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 17:17:13 -0700 (PDT)
+ id 1kFnnO-0002Db-0v
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 20:17:07 -0400
+Received: by mail-pj1-x1029.google.com with SMTP id md22so473180pjb.0
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 17:17:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=KhE58qswq9YQaCuua4OczfbEB+B23TFmcdxq1bqWWp8=;
- b=dxnUxTlkhhj8f7eDl3RsFRUa2lksKybesVw7ZDebC+5q2jrBGPFFfJmbu+GjNexWIy
- 24glk4TZk1Odi15HPznhCyxZn55n0fX1pSXWxPHxJ1Eu2NNBSUXVSehMEEEcfa5/MHBj
- kKgUXm5doxSlZHXg+rC8Q0SB2nKSFhqXatR9KDcjlm6MRyuTmrSI8njcZCayRqK0nX/b
- GAf9672oq6WPXvcOoL2n9x3LCd8NHgJTAlvVsfUGd1vrrRvKKfFIYDWc+GMwApJmpNIC
- Rq0Ig83zwkNx7ZETgvEnO6IZ5A/B8r9iClfzDiotjwj6Ts/kZj4l2prw+ekMRx8RhAhA
- 7yxg==
+ bh=W2Y3ZHQJCdZHuqmnkSlt2vnfygEUmtT0oY/lhiXUYbI=;
+ b=y6XGhVWUJhO/ZRRjICQprkVRKJksalYNbdPWalE+iW94gKTVGlTSwbsGfQEw/HznCM
+ b3oMYBgDiiHgc8gWi0BBAMXTxrYrkUFpmWkUfCqE6Q8tdpd9hMKFw5nmFaUfC0cJLSm4
+ nE/bkCb61wzh/r6nUnYANAq9nQHSdj3WCNLlkFrvg8s2UNnlSkr6mhnTu1aX4vYj2CVz
+ YXiipk1mMgigOBAnaG4B14r3U9Ozd1lj7LJ98QoZ0lzTic+XYiNVn6gVvYwyAsyad0Cn
+ WFScv0OghMmVFs2TjJQn0GxkdpLkOUQ/pyR3lu22jR4ajkxOjvGuXG7AVodOMdu8M5bu
+ kycA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=KhE58qswq9YQaCuua4OczfbEB+B23TFmcdxq1bqWWp8=;
- b=U45wT99zHQD/sjaB9Fh0dphaDXRomF3vyVIRPphajczQKBO94fNh97XHse3YvFXdEl
- LPLSeWoixa4jS8PvItucibJ8lcb/DCQucnAvhmmBs/164PEN4Gj7ZTelz/0DG97tYayz
- VxIAFwNjX1UU85V2Vv61WIp3p9gA4QQ4uA6yi8vhAPo+SfKdC5LjCP/ZFjSyqx1sAdS3
- 0A3wUGyA7MOzEQpMCo3l3OVS3nD15F7Rh5EjCEZBLNGQnZ0lwIFYvFXnZwpOHHt9JOpm
- 6AyjxRKuK2mc+nVUhLGI9aqWUeZ7Tgn+EbheGUbBepqjDUbueEgKyU4Q8nAcVw3J1Lz2
- ui9g==
-X-Gm-Message-State: AOAM531OjjXdj0YDzwbfvWjBKc8IUkBnKk2oZx8445Ds5WYQip2QDdsS
- maBsgHfhfesqtTd1q+vC19GrIwZJAAiTxA==
-X-Google-Smtp-Source: ABdhPJzqJYriTDR2fvXbFDPnFrfRpDWTx1Vt9xZ7A1SqAxapFxR3EV1YeloTTZGioXD+YXtVCu4NUA==
-X-Received: by 2002:a17:90a:9103:: with SMTP id k3mr1220342pjo.4.1599610631745; 
- Tue, 08 Sep 2020 17:17:11 -0700 (PDT)
+ bh=W2Y3ZHQJCdZHuqmnkSlt2vnfygEUmtT0oY/lhiXUYbI=;
+ b=fKN4KoiXvlS1/5awRvFYG++SaMhhOu4yxDuRvzpEb3naXltZzP0ravzEc3WgITywbQ
+ a5neh2FIpAdZW78tN9en3NAwOQdaTddeMLKrG6mMp0+nP/lBzOMJMqtqXa6Fd4YNdkw+
+ 9nfaYcHQ1vZfQEk8oP4JeX3K32YgtnjKD07fasoi3coLSN/ozYFg8cxaDKxCnfbMZR6K
+ +m5SVf1MnlJGnmbL391GusuAazCowE3dEGkT3zWrSAngZb68bIvoPAzC8kYMGRmBcgjL
+ mfQ3BWa8IhRpsr0W8BGa7nOLOs9romhnEs20BhPEMOpmLyYZN8NQnx13fOYQ9l4qLMO2
+ pddA==
+X-Gm-Message-State: AOAM5311HG4vOo0xNekwiuv4+ynO5ATSMfQkuXJkrjj9dkYuAna3xAkD
+ GwZDbtNkc+Sd3bMFMFuxPgnn2vkkJW95vw==
+X-Google-Smtp-Source: ABdhPJw9MGTq7d/3bPkOt7+1aArNkbAAqS/J/Yb1X37rFVFdNMCRcjZOLERl/rpx5RRwgiDs7geBKA==
+X-Received: by 2002:a17:90a:af84:: with SMTP id
+ w4mr1185258pjq.94.1599610624125; 
+ Tue, 08 Sep 2020 17:17:04 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 137sm505437pfu.149.2020.09.08.17.17.10
+ by smtp.gmail.com with ESMTPSA id 137sm505437pfu.149.2020.09.08.17.17.03
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 17:17:11 -0700 (PDT)
+ Tue, 08 Sep 2020 17:17:03 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 18/43] tcg: Introduce TYPE_CONST temporaries
-Date: Tue,  8 Sep 2020 17:16:22 -0700
-Message-Id: <20200909001647.532249-19-richard.henderson@linaro.org>
+Subject: [PATCH 12/43] tcg: Increase tcg_out_dupi_vec immediate to int64_t
+Date: Tue,  8 Sep 2020 17:16:16 -0700
+Message-Id: <20200909001647.532249-13-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200909001647.532249-1-richard.henderson@linaro.org>
 References: <20200909001647.532249-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1029;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1029.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,405 +105,251 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-These will hold a single constant for the duration of the TB.
-They are hashed, so that each value has one temp across the TB.
+While we don't store more than tcg_target_long in TCGTemp,
+we shouldn't be limited to that for code generation.  We will
+be able to use this for INDEX_op_dup2_vec with 2 constants.
 
-Not used yet, this is all infrastructure.
+Also pass along the minimal vece that may be said to apply
+to the constant.  This allows some simplification in the
+various backends.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/tcg/tcg.h |  24 +++++-
- tcg/optimize.c    |  13 +++-
- tcg/tcg.c         | 195 ++++++++++++++++++++++++++++++++++++----------
- 3 files changed, 188 insertions(+), 44 deletions(-)
+ tcg/tcg.c                    | 31 +++++++++++++++++++++++++-----
+ tcg/aarch64/tcg-target.c.inc | 12 ++++++------
+ tcg/i386/tcg-target.c.inc    | 22 ++++++++++++---------
+ tcg/ppc/tcg-target.c.inc     | 37 +++++++++++++++++++++++-------------
+ 4 files changed, 69 insertions(+), 33 deletions(-)
 
-diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-index f3eca6feb0..aa7b0ba163 100644
---- a/include/tcg/tcg.h
-+++ b/include/tcg/tcg.h
-@@ -492,6 +492,8 @@ typedef enum TCGTempKind {
-     TEMP_GLOBAL,
-     /* Temp is in a fixed register. */
-     TEMP_FIXED,
-+    /* Temp is a fixed constant. */
-+    TEMP_CONST,
- } TCGTempKind;
- 
- typedef struct TCGTemp {
-@@ -667,6 +669,7 @@ struct TCGContext {
-     QSIMPLEQ_HEAD(, TCGOp) plugin_ops;
- #endif
- 
-+    GHashTable *const_table[TCG_TYPE_COUNT];
-     TCGTempSet free_temps[TCG_TYPE_COUNT * 2];
-     TCGTemp temps[TCG_MAX_TEMPS]; /* globals first, temps after */
- 
-@@ -683,7 +686,7 @@ struct TCGContext {
- 
- static inline bool temp_readonly(TCGTemp *ts)
- {
--    return ts->kind == TEMP_FIXED;
-+    return ts->kind >= TEMP_FIXED;
- }
- 
- extern TCGContext tcg_init_ctx;
-@@ -1051,6 +1054,7 @@ TCGOp *tcg_op_insert_after(TCGContext *s, TCGOp *op, TCGOpcode opc);
- 
- void tcg_optimize(TCGContext *s);
- 
-+/* Allocate a new temporary and initialize it with a constant. */
- TCGv_i32 tcg_const_i32(int32_t val);
- TCGv_i64 tcg_const_i64(int64_t val);
- TCGv_i32 tcg_const_local_i32(int32_t val);
-@@ -1060,6 +1064,24 @@ TCGv_vec tcg_const_ones_vec(TCGType);
- TCGv_vec tcg_const_zeros_vec_matching(TCGv_vec);
- TCGv_vec tcg_const_ones_vec_matching(TCGv_vec);
- 
-+/*
-+ * Locate or create a read-only temporary that is a constant.
-+ * This kind of temporary need not and should not be freed.
-+ */
-+TCGTemp *tcg_constant_internal(TCGType type, int64_t val);
-+
-+static inline TCGv_i32 tcg_constant_i32(int32_t val)
-+{
-+    return temp_tcgv_i32(tcg_constant_internal(TCG_TYPE_I32, val));
-+}
-+
-+static inline TCGv_i64 tcg_constant_i64(int64_t val)
-+{
-+    return temp_tcgv_i64(tcg_constant_internal(TCG_TYPE_I64, val));
-+}
-+
-+TCGv_vec tcg_constant_vec(TCGType type, unsigned vece, int64_t val);
-+
- #if UINTPTR_MAX == UINT32_MAX
- # define tcg_const_ptr(x)        ((TCGv_ptr)tcg_const_i32((intptr_t)(x)))
- # define tcg_const_local_ptr(x)  ((TCGv_ptr)tcg_const_local_i32((intptr_t)(x)))
-diff --git a/tcg/optimize.c b/tcg/optimize.c
-index 33d1fc8f87..c0fd65d2e4 100644
---- a/tcg/optimize.c
-+++ b/tcg/optimize.c
-@@ -99,8 +99,17 @@ static void init_ts_info(TempOptInfo *infos,
-         ts->state_ptr = ti;
-         ti->next_copy = ts;
-         ti->prev_copy = ts;
--        ti->is_const = false;
--        ti->mask = -1;
-+        if (ts->kind == TEMP_CONST) {
-+            ti->is_const = true;
-+            ti->val = ti->mask = ts->val;
-+            if (TCG_TARGET_REG_BITS > 32 && ts->type == TCG_TYPE_I32) {
-+                /* High bits of a 32-bit quantity are garbage.  */
-+                ti->mask |= ~0xffffffffull;
-+            }
-+        } else {
-+            ti->is_const = false;
-+            ti->mask = -1;
-+        }
-         set_bit(idx, temps_used->l);
-     }
- }
 diff --git a/tcg/tcg.c b/tcg/tcg.c
-index 1650c5a9db..e413bf70d4 100644
+index 84bdcc6537..6474a695f2 100644
 --- a/tcg/tcg.c
 +++ b/tcg/tcg.c
-@@ -1204,13 +1204,19 @@ TCGTemp *tcg_global_mem_new_internal(TCGType type, TCGv_ptr base,
-     bigendian = 1;
- #endif
- 
--    if (base_ts->kind != TEMP_FIXED) {
-+    switch (base_ts->kind) {
-+    case TEMP_FIXED:
-+        break;
-+    case TEMP_GLOBAL:
-         /* We do not support double-indirect registers.  */
-         tcg_debug_assert(!base_ts->indirect_reg);
-         base_ts->indirect_base = 1;
-         s->nb_indirects += (TCG_TARGET_REG_BITS == 32 && type == TCG_TYPE_I64
-                             ? 2 : 1);
-         indirect_reg = 1;
-+        break;
-+    default:
-+        g_assert_not_reached();
-     }
- 
-     if (TCG_TARGET_REG_BITS == 32 && type == TCG_TYPE_I64) {
-@@ -1335,6 +1341,11 @@ void tcg_temp_free_internal(TCGTemp *ts)
-     TCGContext *s = tcg_ctx;
-     int k, idx;
- 
-+    /* In order to simplify users of tcg_constant_*, silently ignore free. */
-+    if (ts->kind == TEMP_CONST) {
-+        return;
-+    }
-+
- #if defined(CONFIG_DEBUG_TCG)
-     s->temps_in_use--;
-     if (s->temps_in_use < 0) {
-@@ -1351,6 +1362,60 @@ void tcg_temp_free_internal(TCGTemp *ts)
-     set_bit(idx, s->free_temps[k].l);
+@@ -116,8 +116,8 @@ static bool tcg_out_dup_vec(TCGContext *s, TCGType type, unsigned vece,
+                             TCGReg dst, TCGReg src);
+ static bool tcg_out_dupm_vec(TCGContext *s, TCGType type, unsigned vece,
+                              TCGReg dst, TCGReg base, intptr_t offset);
+-static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+-                             TCGReg dst, tcg_target_long arg);
++static void tcg_out_dupi_vec(TCGContext *s, TCGType type, unsigned vece,
++                             TCGReg dst, int64_t arg);
+ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc, unsigned vecl,
+                            unsigned vece, const TCGArg *args,
+                            const int *const_args);
+@@ -132,8 +132,8 @@ static inline bool tcg_out_dupm_vec(TCGContext *s, TCGType type, unsigned vece,
+ {
+     g_assert_not_reached();
  }
- 
-+TCGTemp *tcg_constant_internal(TCGType type, int64_t val)
-+{
-+    TCGContext *s = tcg_ctx;
-+    GHashTable *h = s->const_table[type];
-+    TCGTemp *ts;
+-static inline void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+-                                    TCGReg dst, tcg_target_long arg)
++static inline void tcg_out_dupi_vec(TCGContext *s, TCGType type, unsigned vece,
++                                    TCGReg dst, int64_t arg)
+ {
+     g_assert_not_reached();
+ }
+@@ -3308,7 +3308,28 @@ static void temp_load(TCGContext *s, TCGTemp *ts, TCGRegSet desired_regs,
+         if (ts->type <= TCG_TYPE_I64) {
+             tcg_out_movi(s, ts->type, reg, ts->val);
+         } else {
+-            tcg_out_dupi_vec(s, ts->type, reg, ts->val);
++            uint64_t val = ts->val;
++            MemOp vece = MO_64;
 +
-+    if (h == NULL) {
-+        h = g_hash_table_new(g_int64_hash, g_int64_equal);
-+        s->const_table[type] = h;
-+    }
-+
-+    ts = g_hash_table_lookup(h, &val);
-+    if (ts == NULL) {
-+        ts = tcg_temp_alloc(s);
-+
-+        if (TCG_TARGET_REG_BITS == 32 && type == TCG_TYPE_I64) {
-+            TCGTemp *ts2 = tcg_temp_alloc(s);
-+
-+            ts->base_type = TCG_TYPE_I64;
-+            ts->type = TCG_TYPE_I32;
-+            ts->kind = TEMP_CONST;
-+            ts->temp_allocated = 1;
 +            /*
-+             * Retain the full value of the 64-bit constant in the low
-+             * part, so that the hash table works.  Actual uses will
-+             * truncate the value to the low part.
++             * Find the minimal vector element that matches the constant.
++             * The targets will, in general, have to do this search anyway,
++             * do this generically.
 +             */
-+            ts->val = val;
-+
-+            tcg_debug_assert(ts2 == ts + 1);
-+            ts2->base_type = TCG_TYPE_I64;
-+            ts2->type = TCG_TYPE_I32;
-+            ts2->kind = TEMP_CONST;
-+            ts2->temp_allocated = 1;
-+            ts2->val = val >> 32;
-+        } else {
-+            ts->base_type = type;
-+            ts->type = type;
-+            ts->kind = TEMP_CONST;
-+            ts->temp_allocated = 1;
-+            ts->val = val;
-+        }
-+        g_hash_table_insert(h, &ts->val, ts);
-+    }
-+
-+    return ts;
-+}
-+
-+TCGv_vec tcg_constant_vec(TCGType type, unsigned vece, int64_t val)
-+{
-+    val = dup_const(vece, val);
-+    return temp_tcgv_vec(tcg_constant_internal(type, val));
-+}
-+
- TCGv_i32 tcg_const_i32(int32_t val)
- {
-     TCGv_i32 t0;
-@@ -1883,6 +1948,9 @@ static void tcg_reg_alloc_start(TCGContext *s)
-         TCGTempVal val = TEMP_VAL_MEM;
- 
-         switch (ts->kind) {
-+        case TEMP_CONST:
-+            val = TEMP_VAL_CONST;
-+            break;
-         case TEMP_FIXED:
-             val = TEMP_VAL_REG;
-             break;
-@@ -1919,6 +1987,26 @@ static char *tcg_get_arg_str_ptr(TCGContext *s, char *buf, int buf_size,
-     case TEMP_NORMAL:
-         snprintf(buf, buf_size, "tmp%d", idx - s->nb_globals);
-         break;
-+    case TEMP_CONST:
-+        switch (ts->type) {
-+        case TCG_TYPE_I32:
-+            snprintf(buf, buf_size, "$0x%x", (int32_t)ts->val);
-+            break;
-+#if TCG_TARGET_REG_BITS > 32
-+        case TCG_TYPE_I64:
-+            snprintf(buf, buf_size, "$0x%" PRIx64, ts->val);
-+            break;
-+#endif
-+        case TCG_TYPE_V64:
-+        case TCG_TYPE_V128:
-+        case TCG_TYPE_V256:
-+            snprintf(buf, buf_size, "v%d$0x%" PRIx64,
-+                     64 << (ts->type - TCG_TYPE_V64), ts->val);
-+            break;
-+        default:
-+            g_assert_not_reached();
-+        }
-+        break;
-     }
-     return buf;
- }
-@@ -2519,6 +2607,7 @@ static void la_bb_end(TCGContext *s, int ng, int nt)
-             state = TS_DEAD | TS_MEM;
-             break;
-         case TEMP_NORMAL:
-+        case TEMP_CONST:
-             state = TS_DEAD;
-             break;
-         default:
-@@ -3172,15 +3261,28 @@ static void temp_load(TCGContext *, TCGTemp *, TCGRegSet, TCGRegSet, TCGRegSet);
-    mark it free; otherwise mark it dead.  */
- static void temp_free_or_dead(TCGContext *s, TCGTemp *ts, int free_or_dead)
- {
--    if (temp_readonly(ts)) {
-+    TCGTempVal new_type;
-+
-+    switch (ts->kind) {
-+    case TEMP_FIXED:
-         return;
-+    case TEMP_GLOBAL:
-+    case TEMP_LOCAL:
-+        new_type = TEMP_VAL_MEM;
-+        break;
-+    case TEMP_NORMAL:
-+        new_type = free_or_dead < 0 ? TEMP_VAL_MEM : TEMP_VAL_DEAD;
-+        break;
-+    case TEMP_CONST:
-+        new_type = TEMP_VAL_CONST;
-+        break;
-+    default:
-+        g_assert_not_reached();
-     }
-     if (ts->val_type == TEMP_VAL_REG) {
-         s->reg_to_temp[ts->reg] = NULL;
-     }
--    ts->val_type = (free_or_dead < 0
--                    || ts->kind != TEMP_NORMAL
--                    ? TEMP_VAL_MEM : TEMP_VAL_DEAD);
-+    ts->val_type = new_type;
- }
- 
- /* Mark a temporary as dead.  */
-@@ -3196,10 +3298,7 @@ static inline void temp_dead(TCGContext *s, TCGTemp *ts)
- static void temp_sync(TCGContext *s, TCGTemp *ts, TCGRegSet allocated_regs,
-                       TCGRegSet preferred_regs, int free_or_dead)
- {
--    if (temp_readonly(ts)) {
--        return;
--    }
--    if (!ts->mem_coherent) {
-+    if (!temp_readonly(ts) && !ts->mem_coherent) {
-         if (!ts->mem_allocated) {
-             temp_allocate_frame(s, ts);
-         }
-@@ -3417,12 +3516,22 @@ static void tcg_reg_alloc_bb_end(TCGContext *s, TCGRegSet allocated_regs)
- 
-     for (i = s->nb_globals; i < s->nb_temps; i++) {
-         TCGTemp *ts = &s->temps[i];
--        if (ts->kind == TEMP_LOCAL) {
-+
-+        switch (ts->kind) {
-+        case TEMP_LOCAL:
-             temp_save(s, ts, allocated_regs);
--        } else {
-+            break;
-+        case TEMP_NORMAL:
-             /* The liveness analysis already ensures that temps are dead.
-                Keep an tcg_debug_assert for safety. */
-             tcg_debug_assert(ts->val_type == TEMP_VAL_DEAD);
-+            break;
-+        case TEMP_CONST:
-+            /* Similarly, we should have freed any allocated register. */
-+            tcg_debug_assert(ts->val_type == TEMP_VAL_CONST);
-+            break;
-+        default:
-+            g_assert_not_reached();
-         }
-     }
- 
-@@ -3715,45 +3824,42 @@ static void tcg_reg_alloc_op(TCGContext *s, const TCGOp *op)
-         i_preferred_regs = o_preferred_regs = 0;
-         if (arg_ct->ialias) {
-             o_preferred_regs = op->output_pref[arg_ct->alias_index];
--            if (ts->kind == TEMP_FIXED) {
--                /* if fixed register, we must allocate a new register
--                   if the alias is not the same register */
--                if (arg != op->args[arg_ct->alias_index]) {
--                    goto allocate_in_reg;
--                }
--            } else {
--                /* if the input is aliased to an output and if it is
--                   not dead after the instruction, we must allocate
--                   a new register and move it */
--                if (!IS_DEAD_ARG(i)) {
--                    goto allocate_in_reg;
--                }
- 
--                /* check if the current register has already been allocated
--                   for another input aliased to an output */
--                if (ts->val_type == TEMP_VAL_REG) {
--                    int k2, i2;
--                    reg = ts->reg;
--                    for (k2 = 0 ; k2 < k ; k2++) {
--                        i2 = def->args_ct[nb_oargs + k2].sort_index;
--                        if (def->args_ct[i2].ialias && reg == new_args[i2]) {
--                            goto allocate_in_reg;
--                        }
-+            /*
-+             * If the input is readonly, then it cannot also be an
-+             * output and aliased to itself.  If the input is not
-+             * dead after the instruction, we must allocate a new
-+             * register and move it.
-+             */
-+            if (temp_readonly(ts) || !IS_DEAD_ARG(i)) {
-+                goto allocate_in_reg;
++            if (TCG_TARGET_REG_BITS == 32) {
++                val = dup_const(MO_32, val);
++                vece = MO_32;
++            }
++            if (val == dup_const(MO_8, val)) {
++                vece = MO_8;
++            } else if (val == dup_const(MO_16, val)) {
++                vece = MO_16;
++            } else if (TCG_TARGET_REG_BITS == 64 &&
++                       val == dup_const(MO_32, val)) {
++                vece = MO_32;
 +            }
 +
-+            /*
-+             * Check if the current register has already been allocated
-+             * for another input aliased to an output.
-+             */
-+            if (ts->val_type == TEMP_VAL_REG) {
-+                reg = ts->reg;
-+                for (int k2 = 0; k2 < k; k2++) {
-+                    int i2 = def->args_ct[nb_oargs + k2].sort_index;
-+                    if (def->args_ct[i2].ialias && reg == new_args[i2]) {
-+                        goto allocate_in_reg;
-                     }
-                 }
--                i_preferred_regs = o_preferred_regs;
-             }
-+            i_preferred_regs = o_preferred_regs;
++            tcg_out_dupi_vec(s, ts->type, vece, reg, ts->val);
          }
+         ts->mem_coherent = 0;
+         break;
+diff --git a/tcg/aarch64/tcg-target.c.inc b/tcg/aarch64/tcg-target.c.inc
+index 72c4d25fdb..5692607087 100644
+--- a/tcg/aarch64/tcg-target.c.inc
++++ b/tcg/aarch64/tcg-target.c.inc
+@@ -853,14 +853,14 @@ static void tcg_out_logicali(TCGContext *s, AArch64Insn insn, TCGType ext,
+     tcg_out_insn_3404(s, insn, ext, rd, rn, ext, r, c);
+ }
  
-         temp_load(s, ts, arg_ct->regs, i_allocated_regs, i_preferred_regs);
-         reg = ts->reg;
+-static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+-                             TCGReg rd, tcg_target_long v64)
++static void tcg_out_dupi_vec(TCGContext *s, TCGType type, unsigned vece,
++                             TCGReg rd, int64_t v64)
+ {
+     bool q = type == TCG_TYPE_V128;
+     int cmode, imm8, i;
  
--        if (tcg_regset_test_reg(arg_ct->regs, reg)) {
--            /* nothing to do : the constraint is satisfied */
--        } else {
--        allocate_in_reg:
--            /* allocate a new register matching the constraint 
--               and move the temporary register into it */
-+        if (!tcg_regset_test_reg(arg_ct->regs, reg)) {
-+ allocate_in_reg:
-+            /*
-+             * Allocate a new register matching the constraint
-+             * and move the temporary register into it.
-+             */
-             temp_load(s, ts, tcg_target_available_regs[ts->type],
-                       i_allocated_regs, 0);
-             reg = tcg_reg_alloc(s, arg_ct->regs, i_allocated_regs,
-@@ -4211,6 +4317,13 @@ int tcg_gen_code(TCGContext *s, TranslationBlock *tb)
+     /* Test all bytes equal first.  */
+-    if (v64 == dup_const(MO_8, v64)) {
++    if (vece == MO_8) {
+         imm8 = (uint8_t)v64;
+         tcg_out_insn(s, 3606, MOVI, q, rd, 0, 0xe, imm8);
+         return;
+@@ -887,7 +887,7 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+      * cannot find an expansion there's no point checking a larger
+      * width because we already know by replication it cannot match.
+      */
+-    if (v64 == dup_const(MO_16, v64)) {
++    if (vece == MO_16) {
+         uint16_t v16 = v64;
+ 
+         if (is_shimm16(v16, &cmode, &imm8)) {
+@@ -906,7 +906,7 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+         tcg_out_insn(s, 3606, MOVI, q, rd, 0, 0x8, v16 & 0xff);
+         tcg_out_insn(s, 3606, ORR, q, rd, 0, 0xa, v16 >> 8);
+         return;
+-    } else if (v64 == dup_const(MO_32, v64)) {
++    } else if (vece == MO_32) {
+         uint32_t v32 = v64;
+         uint32_t n32 = ~v32;
+ 
+@@ -2430,7 +2430,7 @@ static void tcg_out_vec_op(TCGContext *s, TCGOpcode opc,
+                         tcg_out_insn_3617(s, insn, is_q, vece, a0, a1);
+                         break;
+                     }
+-                    tcg_out_dupi_vec(s, type, TCG_VEC_TMP, 0);
++                    tcg_out_dupi_vec(s, type, MO_8, TCG_VEC_TMP, 0);
+                     a2 = TCG_VEC_TMP;
+                 }
+                 insn = cmp_insn[cond];
+diff --git a/tcg/i386/tcg-target.c.inc b/tcg/i386/tcg-target.c.inc
+index e2852cbb09..6b7cbaa47a 100644
+--- a/tcg/i386/tcg-target.c.inc
++++ b/tcg/i386/tcg-target.c.inc
+@@ -933,8 +933,8 @@ static bool tcg_out_dupm_vec(TCGContext *s, TCGType type, unsigned vece,
+     return true;
+ }
+ 
+-static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+-                             TCGReg ret, tcg_target_long arg)
++static void tcg_out_dupi_vec(TCGContext *s, TCGType type, unsigned vece,
++                             TCGReg ret, int64_t arg)
+ {
+     int vex_l = (type == TCG_TYPE_V256 ? P_VEXL : 0);
+ 
+@@ -947,7 +947,14 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+         return;
      }
- #endif
  
-+    for (i = 0; i < TCG_TYPE_COUNT; ++i) {
-+        if (s->const_table[i]) {
-+            g_hash_table_destroy(s->const_table[i]);
-+            s->const_table[i] = NULL;
+-    if (TCG_TARGET_REG_BITS == 64) {
++    if (TCG_TARGET_REG_BITS == 32 && vece < MO_64) {
++        if (have_avx2) {
++            tcg_out_vex_modrm_pool(s, OPC_VPBROADCASTD + vex_l, ret);
++        } else {
++            tcg_out_vex_modrm_pool(s, OPC_VBROADCASTSS, ret);
 +        }
-+    }
-+
-     tcg_reg_alloc_start(s);
++        new_pool_label(s, arg, R_386_32, s->code_ptr - 4, 0);
++    } else {
+         if (type == TCG_TYPE_V64) {
+             tcg_out_vex_modrm_pool(s, OPC_MOVQ_VqWq, ret);
+         } else if (have_avx2) {
+@@ -955,14 +962,11 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type,
+         } else {
+             tcg_out_vex_modrm_pool(s, OPC_MOVDDUP, ret);
+         }
+-        new_pool_label(s, arg, R_386_PC32, s->code_ptr - 4, -4);
+-    } else {
+-        if (have_avx2) {
+-            tcg_out_vex_modrm_pool(s, OPC_VPBROADCASTD + vex_l, ret);
++        if (TCG_TARGET_REG_BITS == 64) {
++            new_pool_label(s, arg, R_386_PC32, s->code_ptr - 4, -4);
+         } else {
+-            tcg_out_vex_modrm_pool(s, OPC_VBROADCASTSS, ret);
++            new_pool_l2(s, R_386_32, s->code_ptr - 4, 0, arg, arg >> 32);
+         }
+-        new_pool_label(s, arg, R_386_32, s->code_ptr - 4, 0);
+     }
+ }
  
-     s->code_buf = tb->tc.ptr;
+diff --git a/tcg/ppc/tcg-target.c.inc b/tcg/ppc/tcg-target.c.inc
+index bc6fb09adb..ff56f1971f 100644
+--- a/tcg/ppc/tcg-target.c.inc
++++ b/tcg/ppc/tcg-target.c.inc
+@@ -908,31 +908,41 @@ static void tcg_out_movi_int(TCGContext *s, TCGType type, TCGReg ret,
+     }
+ }
+ 
+-static void tcg_out_dupi_vec(TCGContext *s, TCGType type, TCGReg ret,
+-                             tcg_target_long val)
++static void tcg_out_dupi_vec(TCGContext *s, TCGType type, unsigned vece,
++                             TCGReg ret, int64_t val)
+ {
+     uint32_t load_insn;
+     int rel, low;
+     intptr_t add;
+ 
+-    low = (int8_t)val;
+-    if (low >= -16 && low < 16) {
+-        if (val == (tcg_target_long)dup_const(MO_8, low)) {
++    switch (vece) {
++    case MO_8:
++        low = (int8_t)val;
++        if (low >= -16 && low < 16) {
+             tcg_out32(s, VSPLTISB | VRT(ret) | ((val & 31) << 16));
+             return;
+         }
+-        if (val == (tcg_target_long)dup_const(MO_16, low)) {
++        if (have_isa_3_00) {
++            tcg_out32(s, XXSPLTIB | VRT(ret) | ((val & 0xff) << 11));
++            return;
++        }
++        break;
++
++    case MO_16:
++        low = (int16_t)val;
++        if (low >= -16 && low < 16) {
+             tcg_out32(s, VSPLTISH | VRT(ret) | ((val & 31) << 16));
+             return;
+         }
+-        if (val == (tcg_target_long)dup_const(MO_32, low)) {
++        break;
++
++    case MO_32:
++        low = (int32_t)val;
++        if (low >= -16 && low < 16) {
+             tcg_out32(s, VSPLTISW | VRT(ret) | ((val & 31) << 16));
+             return;
+         }
+-    }
+-    if (have_isa_3_00 && val == (tcg_target_long)dup_const(MO_8, val)) {
+-        tcg_out32(s, XXSPLTIB | VRT(ret) | ((val & 0xff) << 11));
+-        return;
++        break;
+     }
+ 
+     /*
+@@ -952,14 +962,15 @@ static void tcg_out_dupi_vec(TCGContext *s, TCGType type, TCGReg ret,
+         if (TCG_TARGET_REG_BITS == 64) {
+             new_pool_label(s, val, rel, s->code_ptr, add);
+         } else {
+-            new_pool_l2(s, rel, s->code_ptr, add, val, val);
++            new_pool_l2(s, rel, s->code_ptr, add, val >> 32, val);
+         }
+     } else {
+         load_insn = LVX | VRT(ret) | RB(TCG_REG_TMP1);
+         if (TCG_TARGET_REG_BITS == 64) {
+             new_pool_l2(s, rel, s->code_ptr, add, val, val);
+         } else {
+-            new_pool_l4(s, rel, s->code_ptr, add, val, val, val, val);
++            new_pool_l4(s, rel, s->code_ptr, add,
++                        val >> 32, val, val >> 32, val);
+         }
+     }
+ 
 -- 
 2.25.1
 
