@@ -2,90 +2,65 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 777A3C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:15:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D20DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:19:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09DF8206A2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:15:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h3zeFddq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09DF8206A2
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7136C20708
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:19:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7136C20708
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFwCZ-0002jW-3m
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:15:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50096)
+	id 1kFwGA-0003nE-2m
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:19:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kFw9R-0006fs-ET; Wed, 09 Sep 2020 05:12:25 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:33471)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <stefanha@gmail.com>)
- id 1kFw9P-0003Sk-Vw; Wed, 09 Sep 2020 05:12:25 -0400
-Received: by mail-wm1-x343.google.com with SMTP id e11so1379507wme.0;
- Wed, 09 Sep 2020 02:12:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Ft3F3PRm3THMqbpuiEV3MHtv0PAFRe8qhKl/kQomtjA=;
- b=h3zeFddq371Ur2seXtQphd0iafKVILvB3iVrppVPQFjuqhR+gZrZPIKph2GQiiylUH
- XIwHFC3tDkrb/BKSKOduH7vcowMLG+fxUFiCgabxinuwGNhjLYfRScxlZryyE7qX4qYL
- kSNmPi+piEHJX+JeWpMZlfw3YRzkf5T0n92y7xmOp7x6/X1VpYry9+84ZPJDR4QQH/jQ
- 7qFpRJnyAGwB70ViIoOL4z95TMsKL+zFcc3a+TjcHBBQxXM5QNb2J4+85z2vv+9ayM8W
- LqQYEB43PJ9VVBsDQVXi0b/ZZZGlDTyzM8iaEbNW3bz0gl/WzyFSnlG/AEg3peAhEmUB
- pejw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Ft3F3PRm3THMqbpuiEV3MHtv0PAFRe8qhKl/kQomtjA=;
- b=fVwPaOGK0cQVUVWh97eeYB4RSw8O+5jP2wRxBxRr5VrAe7pBEh0NEP1lZHWnLv5twn
- h50F77H21VZo2TfBv1szkdznf+BGyLRmT/FQNHk6GjNOCMMwnog/jKrQCAPM4jajkavt
- jeO1sIKwMs0g2WYr8hTpKc5LxyTaTWV7nxUxa+QlcRIo3PnnUqfS6o6ascNtOliNTpQ9
- wK/w3GQfhOM2isWcB2Aodl1jX/UcALG5SIoQnoXdV9NwgJQ4U5Xl900H2fpsrmZRpV5d
- eD/Ecuskxy9c3R4HISxWQSfd4OKstS0l3blft3wNVVldYeb1BDfe+0HkNazbJ9OFupN2
- A+jA==
-X-Gm-Message-State: AOAM533FiuffcAsFKU0OwigYEfCYmNjJAEXepLNpuLYAlZXH9RPZdit3
- trtYGq7+dEqkgUPbqHgqNho=
-X-Google-Smtp-Source: ABdhPJw7GHIBcmzcRzBLvaFfxRB+WImHEQSmMIJtu+jqoTMJpkQTihkC/B/UEkf1XJlwXkWZtJRaiQ==
-X-Received: by 2002:a1c:6a08:: with SMTP id f8mr2641445wmc.151.1599642741284; 
- Wed, 09 Sep 2020 02:12:21 -0700 (PDT)
-Received: from localhost ([51.15.41.238])
- by smtp.gmail.com with ESMTPSA id m3sm3490439wme.31.2020.09.09.02.12.19
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 02:12:20 -0700 (PDT)
-Date: Tue, 8 Sep 2020 15:37:25 +0100
-From: Stefan Hajnoczi <stefanha@gmail.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [RFC PATCH 00/12] hw: Forbid DMA write accesses to MMIO regions
-Message-ID: <20200908143725.GD7154@stefanha-x1.localdomain>
-References: <20200903110831.353476-1-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <steven.price@arm.com>)
+ id 1kFwCi-0002zZ-H2
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 05:15:48 -0400
+Received: from foss.arm.com ([217.140.110.172]:32990)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <steven.price@arm.com>) id 1kFwCf-0003lN-Gy
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 05:15:47 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B5BE61FB;
+ Wed,  9 Sep 2020 02:15:42 -0700 (PDT)
+Received: from [192.168.1.179] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4AD523F66E;
+ Wed,  9 Sep 2020 02:15:40 -0700 (PDT)
+Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>, eric.auger@redhat.com
+References: <20200904160018.29481-1-steven.price@arm.com>
+ <20200907152812.GJ2682@work-vm>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <b457fdd2-785b-8692-c3a0-95ae73fec746@arm.com>
+Date: Wed, 9 Sep 2020 10:15:39 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="u65IjBhB3TIa72Vp"
-Content-Disposition: inline
-In-Reply-To: <20200903110831.353476-1-philmd@redhat.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=stefanha@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -10
-X-Spam_score: -1.1
-X-Spam_bar: -
-X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_12_24=1.049,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200907152812.GJ2682@work-vm>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=217.140.110.172;
+ envelope-from=steven.price@arm.com; helo=foss.arm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 05:15:42
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -57
+X-Spam_score: -5.8
+X-Spam_bar: -----
+X-Spam_report: (-5.8 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.626,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,64 +73,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- Peter Xu <peterx@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>, qemu-block@nongnu.org,
- Li Qiang <liq3ea@163.com>, "Emilio G . Cota" <cota@braap.org>,
- Joel Stanley <joel@jms.id.au>, David Gibson <david@gibson.dropbear.id.au>,
- Laszlo Ersek <lersek@redhat.com>, Robert Foley <robert.foley@linaro.org>,
- Alistair Francis <alistair@alistair23.me>,
- Richard Henderson <richard.henderson@linaro.org>,
- Beniamino Galvani <b.galvani@gmail.com>, Eric Auger <eric.auger@redhat.com>,
- qemu-arm@nongnu.org, Peter Chubb <peter.chubb@nicta.com.au>,
- =?iso-8859-1?Q?C=E9dric?= Le Goater <clg@kaod.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>, Tony Nguyen <tony.nguyen@bt.com>,
- Prasad J Pandit <pjp@fedoraproject.org>, Alexander Bulekov <alxndr@bu.edu>,
- Andrew Jeffery <andrew@aj.id.au>, Klaus Jensen <k.jensen@samsung.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>, qemu-ppc@nongnu.org,
- Jan Kiszka <jan.kiszka@web.de>
+Cc: Mark Rutland <mark.rutland@arm.com>, Peter Maydell <Peter.Maydell@arm.com>,
+ Haibo Xu <Haibo.Xu@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+ qemu-devel@nongnu.org, Catalin Marinas <catalin.marinas@arm.com>,
+ Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ kvmarm@lists.cs.columbia.edu, Julien Thierry <julien.thierry.kdev@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 07/09/2020 16:28, Dr. David Alan Gilbert wrote:
+> (cc'ing in Eric Auger)
+> 
+> * Steven Price (steven.price@arm.com) wrote:
+>> Arm's Memory Tagging Extension (MTE) adds 4 bits of tag data to every 16
+>> bytes of memory in the system. This along with stashing a tag within the
+>> high bit of virtual addresses allows runtime checking of memory
+>> accesses.
+>>
+>> These patches add support to KVM to enable MTE within a guest. They are
+>> based on Catalin's v9 MTE user-space support series[1].
+>>
+>> I'd welcome feedback on the proposed user-kernel ABI. Specifically this
+>> series currently:
+>>
+>>   1. Requires the VMM to enable MTE per-VCPU.
+>>   2. Automatically promotes (normal host) memory given to the guest to be
+>>      tag enabled (sets PG_mte_tagged), if any VCPU has MTE enabled. The
+>>      tags are cleared if the memory wasn't previously MTE enabled.
+>>   3. Doesn't provide any new methods for the VMM to access the tags on
+>>      memory.
+>>
+>> (2) and (3) are particularly interesting from the aspect of VM migration.
+>> The guest is able to store/retrieve data in the tags (presumably for the
+>> purpose of tag checking, but architecturally it could be used as just
+>> storage). This means that when migrating a guest the data needs to be
+>> transferred (or saved/restored).
+>>
+>> MTE tags are controlled by the same permission model as normal pages
+>> (i.e. a read-only page has read-only tags), so the normal methods of
+>> detecting guest changes to pages can be used. But this would also
+>> require the tags within a page to be migrated at the same time as the
+>> data (since the access control for tags is the same as the normal data
+>> within a page).
+> 
+> (Without understanding anything about your tag system...)
+> 
+> Note that during (normal, non-postcopy) migration the consistency can
+> be a little loose - until the guest starts running; i.e. you can send
+> a page that's in themiddle of being modified as long as you make sure
+> you send it again later so that what the guest sees on the destination
+> when it runs is consistent; i.e. it would be fine to send your tags
+> separately to your data and allow them to get a little out of sync, as
+> long as they caught up before the guest ran.
 
---u65IjBhB3TIa72Vp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, you can obviously pro-actively send data early as you as you 
+appropriately deal with any potential changes that the guest might make. 
+I'm not very familiar with exactly how QEMU handles this, so it might 
+not be a problem - I just wanted to point out that we don't have 
+separate access permissions.
 
-On Thu, Sep 03, 2020 at 01:08:19PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> The main patch is:
-> "exec/memattrs: Introduce MemTxAttrs::direct_access field".
-> This way we can restrict accesses to ROM/RAM by setting the
-> 'direct_access' field. Illegal accesses return MEMTX_BUS_ERROR.
+>> (3) may be problematic and I'd welcome input from those familiar with
+>> VMMs. User space cannot access tags unless the memory is mapped with the
+>> PROT_MTE flag. However enabling PROT_MTE will also enable tag checking
+>> for the user space process (assuming the VMM enables tag checking for
+>> the process) and since the tags in memory are controlled by the guest
+>> it's unlikely the VMM would have an appropriately tagged pointer for its
+>> access. This means the VMM would either need to maintain two mappings of
+>> memory (one to access tags, the other to access data) or disable tag
+>> checking during the accesses to data.
+> 
+> Imagine I had a second mapping; what would it look like; how would I get
+> and restore the tags?
 
-QEMU needs to simulate the behavior of real hardware. What is the
-behavior of real hardware?
+At a very simple level you could do something like:
 
-Stefan
+  normal_mapping = mmap(..., PROT_READ | PROT_WRITE, ..., fd, 0);
+  mte_mapping = mmap(..., PROT_READ | PROT_WRITE | PROT_MTE, ..., fd, 0);
 
---u65IjBhB3TIa72Vp
-Content-Type: application/pgp-signature; name="signature.asc"
+  /* access normal mapping as normal */
+  normal_mapping[offset] = 0xf00 + normal_mapping[offset + 1];
 
------BEGIN PGP SIGNATURE-----
+  /* read tag from mte_mapping */
+  uint64_t tag = ldg(&mte_mapping[offset]);
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl9XlyUACgkQnKSrs4Gr
-c8hm+Af/bAR/vQDQ3YPrHCBH7S0Tk3kYVaMaPicOdDQpuULJ+vJ7QQs8+Uh3GEDJ
-QS3tNNfDKibYG1mUY4+nKUz6cU/9YbfFVIhTSIlLS8Rpt5lT3dFNkGYTTWvBkey/
-qLiYGeniyVMR3WLVAMXvrlmhsdqdvvE6avkPob5ZHQDs6f5b64n1r409PEoGWsoo
-Wr+UPifHdPC4XSLx59BFcj9lYRKx+QqARj1VDK3GJ6451xZ6FnGwJJyGgtc1I5HS
-8mv08mKnGeHyCGIGKIN9tRSZgbkgHJxWTohHRNZMEz8GxI/o0uxlL/0sk4a5cJAL
-sres8UZegMhMOj6NL3FiQ3XWrkkTOw==
-=Pxw8
------END PGP SIGNATURE-----
+  /* write a new tag value (8)
+   * NOTE: tags are stored in the top byte, hence the shift
+   */
+  stg(0x8ULL << 56, &mte_mapping[offset]);
 
---u65IjBhB3TIa72Vp--
+Where stg() and ldg() are simple wrappers around the new instructions:
+
+  stg:
+         STG x0, [x1]
+         RET
+
+  ldg:
+         LDG x0, [x0]
+         RET
+
+> In terms of migration stream, I guess we have two ways to do this,
+> either it rides shotgun on the main RAM section pages, transmitting
+> those few extra bytes whenever we transmit a page, or you have a
+> separate iteratable device for RAMtags, and it just transmits those.
+> How you keep the two together is an interesting question.
+> The shotgun method sounds nasty to avoid putting special cases in the,
+> already hairy, RAM code.
+
+As you say above it may be possible to simply let the normal RAM and 
+tags get out of sync. E.g. if you send all the normal RAM (marking 
+read-only as you go), then all the tags (not changing the permissions) 
+you will end up with all the pages that have remained read-only (i.e. 
+the guest hasn't modified) being consistent on the destination. Pages 
+that have been written by the guest will be inconsistent, but you were 
+going to have to resend those anyway.
+
+However for post-migration copy you need to copy *both* normal RAM and 
+tags before resuming the guest. You might need special cases for this.
+
+>> If it's not practical to either disable tag checking in the VMM or
+>> maintain multiple mappings then the alternatives I'm aware of are:
+>>
+>>   * Provide a KVM-specific method to extract the tags from guest memory.
+>>     This might also have benefits in terms of providing an easy way to
+>>     read bulk tag data from guest memory (since the LDGM instruction
+>>     isn't available at EL0).
+>>   * Provide support for user space setting the TCMA0 or TCMA1 bits in
+>>     TCR_EL1. These would allow the VMM to generate pointers which are not
+>>     tag checked.
+> 
+> I guess you want the VMM to do as much tagged checked access as possible
+> on it's own data structures?
+
+Ideally yes, you would want the VMM to have checked accesses for all 
+it's internal data structures because that gives the maximum benefit 
+from MTE.
+
+> How do things like virtio work where the qemu or kernel is accessing
+> guest memory for IO?
+
+Since virtio is effectively emulating a device it should be treated like 
+a device - no tag checking and no tag storage used. This would be the 
+obvious situation where you would use "normal_mapping" as above so tags 
+wouldn't be visible or checked.
+
+Really the VMM is only interested in guest tags for the migration case 
+where it simply needs to preserve them. I don't expect the guest and VMM 
+(or hypervisor) to communicate using tagged memory.
+
+Steve
 
