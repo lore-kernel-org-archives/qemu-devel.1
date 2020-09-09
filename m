@@ -8,76 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 854A7C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AED9C43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:59:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3F5A21973
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:58:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 996D921973
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:59:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sg4bKp3C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3F5A21973
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8ZoRTok"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 996D921973
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48356 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52300 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFwrp-0000T0-Rt
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:58:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57656)
+	id 1kFwsf-00024L-PF
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:59:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwhy-0008AM-Aj; Wed, 09 Sep 2020 05:48:06 -0400
-Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:36311)
+ id 1kFwhl-0007f9-Ni; Wed, 09 Sep 2020 05:47:53 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:32853)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwhw-0007or-4G; Wed, 09 Sep 2020 05:48:05 -0400
-Received: by mail-pg1-x541.google.com with SMTP id m8so1696368pgi.3;
- Wed, 09 Sep 2020 02:48:03 -0700 (PDT)
+ id 1kFwhj-0007nj-US; Wed, 09 Sep 2020 05:47:53 -0400
+Received: by mail-pg1-x543.google.com with SMTP id s65so622113pgb.0;
+ Wed, 09 Sep 2020 02:47:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=XHC/DSYKKw+7p0nzLLzEY49FP0TKj5MM1g4o4UmgUFI=;
- b=Sg4bKp3CFxGJlzZIXfxAAM39pI/MzEaTDyM8QBgaT0iug3BwwlCc7001KBVGuW9tPp
- D3S5giFj/PeMa3H4pQT2yOAKkwn6+MyzC1qnK2hO8sZUYvYyH0dDQetLLz4ehsGi0zID
- AWRjXfSIgjhw/v9kZ+ZcgJrXNgltykXbQAV1g67cd5xEclqMx1Yu2iubYBwDzDx21kDB
- EdEsaqaYOroLV5oAgAdyS3Il7QbEs4mviAwfityDpM2X/CElvwtiH84oOZ+L4Rekpu3n
- mGUmjjVg/SZw9Ym6RA7ekqktKdW+4y2LT6qEb7EQIyYn9JMclI68ZNp9wBxvpRHeyo2n
- Xkzw==
+ bh=eTowCOmFGkug/aztHy6I04JZoGONhdCbvgRzQeqIV9w=;
+ b=K8ZoRToknBhwy0LNMcAhBC1cEnYNfdYq96viBxRBKirtjwmhEzHf+AEr8UKIswdGKx
+ KbOahrPAzn3L+TI6sr6uiYNXbTyW1O2PxlrbnJ2WW9DuSivF1XoiW5rA1yfwfrke9bCT
+ 7eyshGsY5zuTLmC3OiJoNqb0W1tUmHWjGe0D20Vn0M03wIQ9jNx5aiK2dT76IzpxoYQf
+ M2H1jVnUYKPEj8LUz4b+9UP8HqAyq7Lhjsw7AT4SigRnyZk3fBs6q91jFDe2SCCZtAWx
+ AbYtTOkN/of44gKqts7SwyDYgWkz+Gqb2pjXJhGvScE13iBrHW2KmrmZSgtF2EhupdpM
+ 5B1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=XHC/DSYKKw+7p0nzLLzEY49FP0TKj5MM1g4o4UmgUFI=;
- b=TXqL10FD5JmyesMkzCNVsJqV5w/vyTJiiioDlZgR2rYYtjXs8yBP8iMDoQgU1LQER1
- DYgikoG/X1PWh3cH7Yrtz8/2FfrgVHH3Y537ZdF4922pTJLn2cJ7Eu7r3l0gyvnm+iTW
- 4faMkR+H1/jl4ZYNcgq2/PtBhAEhjj8kA9DfLOeGjP2OlCIY6GCCOdOy2a/g3P62SBHq
- P5UfIfodGnVMVV06Kf3whDRP9V5Rg5cTB8/3F0A9PxfcRJquypAXL4s7XOhminxSrc9g
- SPPXF7n93ykf7SkwCtmkYYV9yt2+6nuG/JDN+d/ONB6SwILvVbEgdy11BOQp7TwadpKb
- yCGA==
-X-Gm-Message-State: AOAM533ylxzfytClNsW/3zLKkC9Ml7/3EcA6ekl5U+6xodFLZZ5BcSGy
- yamPZZgfU5Qe/BMTQXM8mLQsljf+Zlwccywg
-X-Google-Smtp-Source: ABdhPJw0+7KTm5sB03H1oOUzN/kXT+MqytcUIB/JkbJjCE/hj4VOqPZXN+1GCRzfir6KLyLSWs+aqA==
-X-Received: by 2002:a17:902:b908:b029:d0:cbe1:e7ab with SMTP id
- bf8-20020a170902b908b02900d0cbe1e7abmr197516plb.28.1599644881994; 
- Wed, 09 Sep 2020 02:48:01 -0700 (PDT)
+ bh=eTowCOmFGkug/aztHy6I04JZoGONhdCbvgRzQeqIV9w=;
+ b=jePXxqurQI8jBHgVoTu/sXSY4yVJ+Ru2sd0jjaxW/aWg0u75fCoOpv+cgiNZm7r4bd
+ 5WF4s6hjood9wwxYAtVj1ZVgyoiwu8Psyozk2nu3/2m/iiVI27aKjgdzS/VZs6sGMWVJ
+ negGTySmrvlz+Oqk0gl+TY3Ixm6jZ74vU/3eNaUiLKOAt8e7TVCJQ5xBbqyFWuH1CScX
+ Vc+asyCW+0A89GcZ1fMaWMygPNdK7ss1yGsHDAE31ozjGN9XEbYXSJ+TSB3Ij0Q67qZs
+ lUpwkqSAfexwpzTQrCjlQ+k3AQkE6n9QZLoPeDD0xoxQ2Lsvo+3RcmiYTV1OhOkwGZNW
+ np2A==
+X-Gm-Message-State: AOAM533m+uAdA04QqMoS9nuIiH5g3K88Wy86owWzLt2w+ZgqkGCEvzTq
+ kZKbjef5M5ENv+TE9midfUb3lRfjyeLOVLle
+X-Google-Smtp-Source: ABdhPJz/EmY8mi/fgXvn4htiS42BvHvRaIcGP0iCQSSB7G9thmwCDB9zkaS6qCEoOaFOPLpO3fEg8A==
+X-Received: by 2002:a62:7f13:0:b029:13e:d13d:a087 with SMTP id
+ a19-20020a627f130000b029013ed13da087mr171278pfd.30.1599644869715; 
+ Wed, 09 Sep 2020 02:47:49 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.58
+ by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.45
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 02:48:01 -0700 (PDT)
+ Wed, 09 Sep 2020 02:47:48 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 21/21] tests: Fixes test-qdev-global-props.c
-Date: Wed,  9 Sep 2020 17:46:17 +0800
-Message-Id: <20200909094617.1582-22-luoyonggang@gmail.com>
+Subject: [PATCH v2 18/21] tests: fixes aio-win32 about aio_remove_fd_handler,
+ get it consistence with aio-posix.c
+Date: Wed,  9 Sep 2020 17:46:14 +0800
+Message-Id: <20200909094617.1582-19-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200909094617.1582-1-luoyonggang@gmail.com>
 References: <20200909094617.1582-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x541.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x543.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -111,31 +112,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On win32 the line ending are \r\n, so we skip the \n in function test_dynamic_globalprop
+This is a fixes for
+(C:\work\xemu\qemu\build\tests\test-aio-multithread.exe:19100): GLib-CRITICAL **: 23:03:24.965: g_source_remove_poll: assertion '!SOURCE_DESTROYED (source)' failed
+ERROR test-aio-multithread - Bail out! GLib-FATAL-CRITICAL: g_source_remove_poll: assertion '!SOURCE_DESTROYED (source)' failed
+
+(C:\work\xemu\qemu\build\tests\test-bdrv-drain.exe:21036): GLib-CRITICAL **: 23:03:29.861: g_source_remove_poll: assertion '!SOURCE_DESTROYED (source)' failed
+ERROR test-bdrv-drain - Bail out! GLib-FATAL-CRITICAL: g_source_remove_poll: assertion '!SOURCE_DESTROYED (source)' failed
+
+And the idea comes from https://patchwork.kernel.org/patch/9975239/
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- tests/test-qdev-global-props.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ util/aio-win32.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-diff --git a/tests/test-qdev-global-props.c b/tests/test-qdev-global-props.c
-index 1e6b0f33ff..d8762a9756 100644
---- a/tests/test-qdev-global-props.c
-+++ b/tests/test-qdev-global-props.c
-@@ -250,10 +250,10 @@ static void test_dynamic_globalprop(void)
-     g_test_trap_assert_passed();
-     g_test_trap_assert_stderr_unmatched("*prop1*");
-     g_test_trap_assert_stderr_unmatched("*prop2*");
--    g_test_trap_assert_stderr("*warning: global dynamic-prop-type-bad.prop3 has invalid class name\n*");
-+    g_test_trap_assert_stderr("*warning: global dynamic-prop-type-bad.prop3 has invalid class name*");
-     g_test_trap_assert_stderr_unmatched("*prop4*");
--    g_test_trap_assert_stderr("*warning: global nohotplug-type.prop5=105 not used\n*");
--    g_test_trap_assert_stderr("*warning: global nondevice-type.prop6 has invalid class name\n*");
-+    g_test_trap_assert_stderr("*warning: global nohotplug-type.prop5=105 not used*");
-+    g_test_trap_assert_stderr("*warning: global nondevice-type.prop6 has invalid class name*");
-     g_test_trap_assert_stdout("");
- }
+diff --git a/util/aio-win32.c b/util/aio-win32.c
+index 953c56ab48..9899546a8a 100644
+--- a/util/aio-win32.c
++++ b/util/aio-win32.c
+@@ -37,6 +37,15 @@ struct AioHandler {
  
+ static void aio_remove_fd_handler(AioContext *ctx, AioHandler *node)
+ {
++    /* If the GSource is in the process of being destroyed then
++     * g_source_remove_poll() causes an assertion failure.  Skip
++     * removal in that case, because glib cleans up its state during
++     * destruction anyway.
++     */
++    if (!g_source_is_destroyed(&ctx->source)) {
++        g_source_remove_poll(&ctx->source, &node->pfd);
++    }
++
+     /* If aio_poll is in progress, just mark the node as deleted */
+     if (qemu_lockcnt_count(&ctx->list_lock)) {
+         node->deleted = 1;
+@@ -139,8 +148,6 @@ void aio_set_event_notifier(AioContext *ctx,
+     /* Are we deleting the fd handler? */
+     if (!io_notify) {
+         if (node) {
+-            g_source_remove_poll(&ctx->source, &node->pfd);
+-
+             aio_remove_fd_handler(ctx, node);
+         }
+     } else {
 -- 
 2.28.0.windows.1
 
