@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46BF1C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 00:25:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51101C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 00:25:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D26532145D
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 00:25:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E87882145D
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 00:25:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zFHxOBUA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26532145D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LWrer79b"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E87882145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFnvI-0001Bp-0H
-	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 20:25:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37272)
+	id 1kFnvN-0001Nr-0e
+	for qemu-devel@archiver.kernel.org; Tue, 08 Sep 2020 20:25:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFnnL-0007qE-TS
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 20:17:03 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:33741)
+ id 1kFnnY-0008ON-AY
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 20:17:16 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:37377)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kFnnK-0002Cg-7f
- for qemu-devel@nongnu.org; Tue, 08 Sep 2020 20:17:03 -0400
-Received: by mail-pg1-x542.google.com with SMTP id e33so752995pgm.0
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 17:17:01 -0700 (PDT)
+ id 1kFnnW-0002FW-MK
+ for qemu-devel@nongnu.org; Tue, 08 Sep 2020 20:17:15 -0400
+Received: by mail-pf1-x441.google.com with SMTP id w7so565013pfi.4
+ for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 17:17:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=WANLQRCpycKiqrfSXuwWnjHW6iUlbU2o8NExmAhiBGo=;
- b=zFHxOBUA4THZW2VM6gUFeAzETtdF+vMSsfacwfh/LzcRiMNc29ttwk42Zr6h8l5NdI
- 6ZcpPAd//DiOvCVR9KFR9P0A1i1kBNykb6sEDJrifpKPLUPx5SPkKCqFjyplQJkENL8Y
- hG0qp1MQRpynDkWfFTG0NlFEYiwkFwjtrplx/e7x6PArWQxvUSASrETx9UxGVkXtfrAO
- OY+0yFQYN7eQE/p3/Ft0lBkQgxu2fP7H5JCoWRLakpacRlgmbuSmBmW2TKwRWfWojZ4+
- Va5mJRnyjeOu4SJU6aInmE1QfiGF5WddstnhLdRLdWQKR+U2p40JYJ2YoFi6tvDZCATb
- x3KQ==
+ bh=x+s9W4S8X9df0AJnC/pFDE7SPPgT3/tOf2XSzgDEzSo=;
+ b=LWrer79bKyuhjmzyncNJWLXkxJGTeDtW71v/dXDkZejqc3re+JH+4+kTrvE4k5vHgs
+ K0Ze/HspxaLKlK9o5Miz/ba11e1YHZQxy6+Fs0p0Row87q9Zuq7Gw/sTVCCPC+yFSZiK
+ UYeBsgdzspNa21PpUTz6Edu6y9ZuR5Jpl8bOosxV3+eNfvRd+pqdOewlW9WXOZ+EWkPU
+ cnfT9tVDZQeqLaMbLbB3Sn9CVS86Wrd1ja6YeU63VJrNoGpKySdiF9bgXDeTWtw6PkWr
+ F7YFWLmtsvfog8NB61c7G48vLCzyihC9bonQ9145xeuaE1GlcJ/6QQGlNDdy62w9+OvH
+ bbQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=WANLQRCpycKiqrfSXuwWnjHW6iUlbU2o8NExmAhiBGo=;
- b=W4M1wugTtiKWhI/+jefe/epPat92dL3h8/WeQW/FEFBby5+zbYoUNd368nUw4zKpaB
- vebzxAsjoB54FHttU5tGfOwbMEIL/oYEs5Hygc+Vfy0UofDCAuQfjRHmBkpQkqCu6u2f
- Jc5tqxLNOea7SRcYzMMu9kh3tRGPQgaUkyWbOsI3lrdEEHWG8U1wToGWKJNTKDvnloGJ
- DKJcbhhbn3ZCntel5+Uk1dOdUrTSQsQmQ1grR5oFpJb027x/R/960eDqC9HG8rUpuRaH
- Pk9I45J9gMWg8EyVH2mVIx+Nz+0qsYAQvL2b7YuZelMqvQUwiCo2sXrn9u3PkhbRVitL
- svQA==
-X-Gm-Message-State: AOAM533baiw65+ZKGJLCJ1eQzIOQlanNLwjTrUgLViyGQFOg4E+NkJ+k
- NVxDmnlnMPSKF2CUSdEEZt+rTzVgwH5m/w==
-X-Google-Smtp-Source: ABdhPJwK6A/3aVSma696pWx4caAugaJxh5ee27IH6YTssqRh0bMfzbC2ciUmpGvxu9BG9y5pm+aQog==
-X-Received: by 2002:a63:5d66:: with SMTP id o38mr949965pgm.366.1599610620688; 
- Tue, 08 Sep 2020 17:17:00 -0700 (PDT)
+ bh=x+s9W4S8X9df0AJnC/pFDE7SPPgT3/tOf2XSzgDEzSo=;
+ b=QSndHHKjonAZUOXCwWzd4GAF782xgi4y5vpJgFMOQa+C7oFQct3/JJdbib1x6NO/Nk
+ PrduiQLVuP8o6YlKYs9iYI1Onq28ytpdXEjr/CZUeTEzP5mZPjpQ5WFr89pcxvujjiQT
+ PxiKoyRLxpHqzRIhBDzMz6fy0GM7OTIHaNO/5QvGInHuZdQRcaFfog4U5gB1dS3wocTx
+ K3XovagLSrx6/aXgfMSQmVxeSfErbHF8wazrgLzvI+nw0N5BnDSSTyA5PML+TJ0APh+G
+ kKEaEZhOc2smgkqyjqWSWIERwYClJqUtEt8ytO5jig9BhRpQinEvBXOMD9yUABCBYMAE
+ 56rA==
+X-Gm-Message-State: AOAM530M1BMpZT0i28kBrKYfgacIN2TUje6MYnfgddaeoFAgqvsMh/l5
+ Wn9ErujL3pb7fzCD5980ePTx4keQJJ1JxQ==
+X-Google-Smtp-Source: ABdhPJxM+MyHhH8f/z8ITkxXIvN41S1+HKioz3FjRpjfTEGdG7WxRtIjsz1zs8Lyz+sJa1F9EUy7RQ==
+X-Received: by 2002:a17:902:788e:: with SMTP id
+ q14mr1097753pll.140.1599610633108; 
+ Tue, 08 Sep 2020 17:17:13 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id 137sm505437pfu.149.2020.09.08.17.16.59
+ by smtp.gmail.com with ESMTPSA id 137sm505437pfu.149.2020.09.08.17.17.11
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 08 Sep 2020 17:17:00 -0700 (PDT)
+ Tue, 08 Sep 2020 17:17:12 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 09/43] tcg/optimize: Fold dup2_vec
-Date: Tue,  8 Sep 2020 17:16:13 -0700
-Message-Id: <20200909001647.532249-10-richard.henderson@linaro.org>
+Subject: [PATCH 19/43] tcg/optimize: Improve find_better_copy
+Date: Tue,  8 Sep 2020 17:16:23 -0700
+Message-Id: <20200909001647.532249-20-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200909001647.532249-1-richard.henderson@linaro.org>
 References: <20200909001647.532249-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,40 +105,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When the two arguments are identical, this can be reduced to
-dup_vec or to mov_vec from a tcg_constant_vec.
+Prefer TEMP_CONST over anything else.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- tcg/optimize.c | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ tcg/optimize.c | 27 ++++++++++++---------------
+ 1 file changed, 12 insertions(+), 15 deletions(-)
 
 diff --git a/tcg/optimize.c b/tcg/optimize.c
-index 53aa8e5329..220f4601d5 100644
+index c0fd65d2e4..bf2c2a3ce5 100644
 --- a/tcg/optimize.c
 +++ b/tcg/optimize.c
-@@ -1109,6 +1109,21 @@ void tcg_optimize(TCGContext *s)
-             }
-             goto do_default;
+@@ -122,31 +122,28 @@ static void init_arg_info(TempOptInfo *infos,
  
-+        case INDEX_op_dup2_vec:
-+            assert(TCG_TARGET_REG_BITS == 32);
-+            if (arg_is_const(op->args[1]) && arg_is_const(op->args[2])) {
-+                tmp = arg_info(op->args[1])->val;
-+                if (tmp == arg_info(op->args[2])->val) {
-+                    tcg_opt_gen_movi(s, op, op->args[0], tmp);
-+                    break;
-+                }
-+            } else if (args_are_copies(op->args[1], op->args[2])) {
-+                op->opc = INDEX_op_dup_vec;
-+                TCGOP_VECE(op) = MO_32;
-+                nb_iargs = 1;
-+            }
-+            goto do_default;
-+
-         CASE_OP_32_64(not):
-         CASE_OP_32_64(neg):
-         CASE_OP_32_64(ext8s):
+ static TCGTemp *find_better_copy(TCGContext *s, TCGTemp *ts)
+ {
+-    TCGTemp *i;
++    TCGTemp *i, *g, *l;
+ 
+-    /* If this is already a global, we can't do better. */
+-    if (ts->kind >= TEMP_GLOBAL) {
++    /* If this is already readonly, we can't do better. */
++    if (temp_readonly(ts)) {
+         return ts;
+     }
+ 
+-    /* Search for a global first. */
++    g = l = NULL;
+     for (i = ts_info(ts)->next_copy; i != ts; i = ts_info(i)->next_copy) {
+-        if (i->kind >= TEMP_GLOBAL) {
++        if (temp_readonly(i)) {
+             return i;
+-        }
+-    }
+-
+-    /* If it is a temp, search for a temp local. */
+-    if (ts->kind == TEMP_NORMAL) {
+-        for (i = ts_info(ts)->next_copy; i != ts; i = ts_info(i)->next_copy) {
+-            if (i->kind >= TEMP_LOCAL) {
+-                return i;
++        } else if (i->kind > ts->kind) {
++            if (i->kind == TEMP_GLOBAL) {
++                g = i;
++            } else if (i->kind == TEMP_LOCAL) {
++                l = i;
+             }
+         }
+     }
+ 
+-    /* Failure to find a better representation, return the same temp. */
+-    return ts;
++    /* If we didn't find a better representation, return the same temp. */
++    return g ? g : l ? l : ts;
+ }
+ 
+ static bool ts_are_copies(TCGTemp *ts1, TCGTemp *ts2)
 -- 
 2.25.1
 
