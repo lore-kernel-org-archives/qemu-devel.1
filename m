@@ -8,75 +8,76 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EA88C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D939C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:54:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE52C21D7A
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:54:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A319521D7A
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 09:54:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G4LOm3jB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE52C21D7A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jjmMiQQ7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A319521D7A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57874 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFwo1-0000tT-LP
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:54:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57534)
+	id 1kFwoY-0002Iv-KL
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 05:54:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwhe-0007PI-Te; Wed, 09 Sep 2020 05:47:46 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:54694)
+ id 1kFwh2-0006sD-1G; Wed, 09 Sep 2020 05:47:08 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:34382)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kFwhc-0007ms-Vy; Wed, 09 Sep 2020 05:47:46 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id mm21so1062114pjb.4;
- Wed, 09 Sep 2020 02:47:42 -0700 (PDT)
+ id 1kFwh0-0007iF-Da; Wed, 09 Sep 2020 05:47:07 -0400
+Received: by mail-pf1-x444.google.com with SMTP id v196so1811280pfc.1;
+ Wed, 09 Sep 2020 02:47:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=faIdeALUAvLzj2kx9mbA5+e0PxUK1yXyWPv+NWO3/qo=;
- b=G4LOm3jBbJ1twzr17e/NtytI0gmonbXYgPwwv6iMltAQhv7FdVgulOLV1gqahG4xrG
- R2MtLQLDfhXHfQclUDcuacQezz0wlcHl9Jw+lypTB5mPaDU4CJvjmZqW2OmoIojogJ6L
- zgeBLX7FDK/R+x2PNSsC7P9gCyQS2rNEjLI2LIlibJdtx/uM3oVX4pbsGfhfbbnINhJM
- PRywuAl0QHg4kYt05G5nUTGziZ7uI+1D1ZTzsgGnIk1vHPSdFxFZaAufBApyjlLKDwez
- nxpovOA/wIqw8UIQwnLez0iBanReo06r4vmDNFNtBbzYX7GfFFkffJfOSLQrFBYN5PQk
- 7sOQ==
+ bh=476E7aHWp8h1cxEJLePHYcg3LlpMgvhjzr9aOxTQys8=;
+ b=jjmMiQQ7W/4RWaYy1KkssJhtbXe15QiGy+7y102kLhzCuvViBIgEubZ60ipPk0yjCo
+ x80sX+rrlUeSw3CK22ZGGBKxPs33HbTpfcozJJnpnt+/zMy+aV7+foPWmf4ekONpMb8d
+ Z/bYbVc0LRoB6TwdJlMwtwpreRSnmM5L3Kf07IZy899XCVBD9oEN5b21hvYcrYplkBhQ
+ UuIZ0hf6tzT5X6pzU8IiR4hC84whwRC0tJTQYyPHC21F9aT5ncJXRX3KFAxjE/QJzwlh
+ Aj4EUS36elfCTrjI/csCR1FGKl8pV3sWYmW65cjWaic+OeEAySAaZdjSXP29CsTj/x1G
+ wTMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=faIdeALUAvLzj2kx9mbA5+e0PxUK1yXyWPv+NWO3/qo=;
- b=uJDMKWlhX7T4tqiCtI84wEfA6PYZNdIvEmYzvs1tMDkAoETNB0Czr1KrL1K/ekaxyT
- +zXrn7GlqDas3Ax6nJy0EbNt64tgA/i9ktD5VU2cCl3WUINaiCyKUTsgM9zwcKA0KO6M
- XKFvMLTu0X0b7qyH+KH2arxMynd+AwTPY94qBEJAufYL4ELB4MOOD0VQmTkETgJdatdF
- huNrwif4D4Ag2gPA/JHbiXhgWjCRE7Q60cmQ337bwAAs69WXYPmA2kvryoUUyJL1Xg+I
- eSUlZeGC0FcKF4oHt/4UeGza2nzLGYNWCcu5zac5XLDC9qgwuNnI7ruGWryVGrsrD8W7
- +SxQ==
-X-Gm-Message-State: AOAM531RH2Ix+8lkdUIX5yMFcoQIzFGbejh+cm1J6x1/Tg42kKb030qE
- zfqTUL5PgdbwV08KOObE4KioVzLeYeHfFVQi
-X-Google-Smtp-Source: ABdhPJzLPE/Mchrbh0iTFyjsCW7aPQ5RuuyT6Gz85HoER/Lvym9aSfIa6A4Vqr4qK3SNQO+xc3+HyA==
-X-Received: by 2002:a17:90b:289:: with SMTP id az9mr107979pjb.31.1599644861563; 
- Wed, 09 Sep 2020 02:47:41 -0700 (PDT)
+ bh=476E7aHWp8h1cxEJLePHYcg3LlpMgvhjzr9aOxTQys8=;
+ b=BS4Kue7seI+ja9HLR/i64WjPRp3gba6gSvG4+SFqAhaX+b0QQGkQcBKcqGreDyfUDG
+ LVc0/lq7eiQpfyIBiAGmCgiFXkEk5AhfJSwV6mSgen5F70tp+Bo5kXSqUFXSzBTKwiyn
+ DfEcXw69Ht7iy0AZo0cGI17x7VrHofTqn0z0xrQyUo6KpNxgiq5wcKR63NaMRXLiufgZ
+ J/oWGURcpuken/elhoX7iUjdABeyEASc4hr6wzqiPvXF4ihPm4SXZ+eGnPdKjJg1fViO
+ ePpr7/GO72iXZ3RO1NaYskzytBm1TtnB0RGFPi48bhNAEt/rYvsc25lFmqhONm+n6aYe
+ chAw==
+X-Gm-Message-State: AOAM533+mabF4w89HyhbCU+MZzPAzC2I5a1YFadAIIFJnMAUHRD1a4b3
+ vzpL/k+5weMUX7+6zlAEL2O47lmOvrsP4G8W
+X-Google-Smtp-Source: ABdhPJxgIU/Udq43HufOMq8LZMsm5nt4aKP/degqjunGtfDAngD6mMRWOcyjFrEDc6YjdWWAUYzyqg==
+X-Received: by 2002:a17:902:ac85:: with SMTP id h5mr43006plr.50.1599644823417; 
+ Wed, 09 Sep 2020 02:47:03 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.47.37
+ by smtp.googlemail.com with ESMTPSA id 64sm1708312pgi.90.2020.09.09.02.46.59
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 02:47:40 -0700 (PDT)
+ Wed, 09 Sep 2020 02:47:02 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 16/21] rcu: add uninit destructor for rcu
-Date: Wed,  9 Sep 2020 17:46:12 +0800
-Message-Id: <20200909094617.1582-17-luoyonggang@gmail.com>
+Subject: [PATCH v2 07/21] tests: Trying fixes test-replication.c on
+ msys2/mingw.
+Date: Wed,  9 Sep 2020 17:46:03 +0800
+Message-Id: <20200909094617.1582-8-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200909094617.1582-1-luoyonggang@gmail.com>
 References: <20200909094617.1582-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1042.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -110,110 +111,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is necessary if the pending  rcu calls are closing and removing
-temp files. This also provide a function
-void rcu_wait_finished(void);
-to fixes test-logging.c test failure on msys2/mingw.
-On windows if the file doesn't closed, you can not remove it.
+On Windows there is no path like /tmp/s_local_disk.XXXXXX
+Use g_get_tmp_dir instead of /tmp.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- include/qemu/rcu.h   |  5 +++++
- tests/test-logging.c |  2 ++
- util/rcu.c           | 37 ++++++++++++++++++++++++++++++++++++-
- 3 files changed, 43 insertions(+), 1 deletion(-)
+ tests/test-replication.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-diff --git a/include/qemu/rcu.h b/include/qemu/rcu.h
-index 570aa603eb..dd0a92c1d0 100644
---- a/include/qemu/rcu.h
-+++ b/include/qemu/rcu.h
-@@ -124,6 +124,11 @@ extern void rcu_unregister_thread(void);
- extern void rcu_enable_atfork(void);
- extern void rcu_disable_atfork(void);
+diff --git a/tests/test-replication.c b/tests/test-replication.c
+index 9ab3666a90..e7cbd6b144 100644
+--- a/tests/test-replication.c
++++ b/tests/test-replication.c
+@@ -23,14 +23,14 @@
  
-+/*
-+ * Wait all rcu call executed and exit the rcu thread.
-+ */
-+extern void rcu_wait_finished(void);
-+
- struct rcu_head;
- typedef void RCUCBFunc(struct rcu_head *head);
+ /* primary */
+ #define P_ID "primary-id"
+-static char p_local_disk[] = "/tmp/p_local_disk.XXXXXX";
++static char *p_local_disk;
  
-diff --git a/tests/test-logging.c b/tests/test-logging.c
-index 783fe09a27..1fac9250aa 100644
---- a/tests/test-logging.c
-+++ b/tests/test-logging.c
-@@ -210,6 +210,8 @@ int main(int argc, char **argv)
-                          tmp_path, test_logfile_lock);
+ /* secondary */
+ #define S_ID "secondary-id"
+ #define S_LOCAL_DISK_ID "secondary-local-disk-id"
+-static char s_local_disk[] = "/tmp/s_local_disk.XXXXXX";
+-static char s_active_disk[] = "/tmp/s_active_disk.XXXXXX";
+-static char s_hidden_disk[] = "/tmp/s_hidden_disk.XXXXXX";
++static char *s_local_disk;
++static char *s_active_disk;
++static char *s_hidden_disk;
  
-     rc = g_test_run();
-+    qemu_log_close();
-+    rcu_wait_finished();
- 
-     rmdir_full(tmp_path);
-     return rc;
-diff --git a/util/rcu.c b/util/rcu.c
-index 60a37f72c3..43367988b9 100644
---- a/util/rcu.c
-+++ b/util/rcu.c
-@@ -308,10 +308,20 @@ void rcu_unregister_thread(void)
-     qemu_mutex_unlock(&rcu_registry_lock);
- }
- 
-+typedef struct QemuRcuMessage {
-+    struct rcu_head rcu;
-+    void *message;
-+} QemuRcuMessage;
-+
-+static int rcu_thread_exit_called = 0;
-+static int rcu_thread_exited = 0;
-+static QemuRcuMessage rcu_thread_message;
-+
- static void rcu_init_complete(void)
+ /* FIXME: steal from blockdev.c */
+ QemuOptsList qemu_drive_opts = {
+@@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)
+ int main(int argc, char **argv)
  {
-     QemuThread thread;
--
-+    atomic_mb_set(&rcu_thread_exit_called, 0);
-+    atomic_mb_set(&rcu_thread_exited, 0);
-     qemu_mutex_init(&rcu_registry_lock);
-     qemu_mutex_init(&rcu_sync_lock);
-     qemu_event_init(&rcu_gp_event, true);
-@@ -327,6 +337,26 @@ static void rcu_init_complete(void)
-     rcu_register_thread();
- }
+     int ret;
++    const char *tmpdir = g_get_tmp_dir();
++    p_local_disk = g_strdup_printf("%s/p_local_disk.XXXXXX", tmpdir);
++    s_local_disk = g_strdup_printf("%s/s_local_disk.XXXXXX", tmpdir);
++    s_active_disk = g_strdup_printf("%s/s_active_disk.XXXXXX", tmpdir);
++    s_hidden_disk = g_strdup_printf("%s/s_hidden_disk.XXXXXX", tmpdir);
+     qemu_init_main_loop(&error_fatal);
+     bdrv_init();
  
-+static void rcu_thread_exit(QemuRcuMessage *param)
-+{
-+    atomic_mb_set((int*)param->message, 1);
-+    qemu_thread_exit(NULL);
-+}
-+
-+void rcu_wait_finished(void)
-+{
-+    if (atomic_xchg(&rcu_thread_exit_called, 1) == 0)
-+    {
-+        rcu_thread_message.message = &rcu_thread_exited;
-+        call_rcu(&rcu_thread_message, rcu_thread_exit, rcu);
-+    }
-+
-+    while (atomic_mb_read(&rcu_thread_exited) == 0)
-+    {
-+        g_usleep(10000);
-+    }
-+}
-+
- static int atfork_depth = 1;
+@@ -605,5 +610,10 @@ int main(int argc, char **argv)
  
- void rcu_enable_atfork(void)
-@@ -379,3 +409,8 @@ static void __attribute__((__constructor__)) rcu_init(void)
- #endif
-     rcu_init_complete();
- }
+     cleanup_imgs();
+ 
++    g_free(p_local_disk);
++    g_free(s_local_disk);
++    g_free(s_active_disk);
++    g_free(s_hidden_disk);
 +
-+static void __attribute__((__destructor__)) rcu_uninit(void)
-+{
-+    rcu_wait_finished();
-+}
+     return ret;
+ }
 -- 
 2.28.0.windows.1
 
