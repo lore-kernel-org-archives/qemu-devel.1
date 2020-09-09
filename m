@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D53C43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:48:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB6D7C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:50:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C703220639
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:48:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C703220639
+	by mail.kernel.org (Postfix) with ESMTPS id 821F520639
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:50:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 821F520639
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54696 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58292 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG0So-0004Ak-RM
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:48:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38686)
+	id 1kG0UJ-0005fq-Gw
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:50:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG0S7-0003D4-1S; Wed, 09 Sep 2020 09:47:59 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:58273)
+ id 1kG0Ta-0004w4-IZ; Wed, 09 Sep 2020 09:49:30 -0400
+Received: from mout.kundenserver.de ([212.227.126.134]:57493)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG0S4-0007d8-Ag; Wed, 09 Sep 2020 09:47:58 -0400
+ id 1kG0TY-0007mM-Rk; Wed, 09 Sep 2020 09:49:30 -0400
 Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MWixU-1k0Y0t0FY0-00X0RU; Wed, 09 Sep 2020 15:47:51 +0200
-Subject: Re: [PATCH 1/2] hw/net/e1000e: Remove overwritten read handler for
- STATUS register
+ (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MV2Sk-1k8oui2lug-00S3UY; Wed, 09 Sep 2020 15:49:23 +0200
+Subject: Re: [PATCH 2/2] hw/net/e1000e: Remove duplicated write handler for
+ FLSWDATA register
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20200904131402.590055-1-f4bug@amsat.org>
- <20200904131402.590055-2-f4bug@amsat.org>
+ <20200904131402.590055-3-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -82,35 +82,35 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <f754d7d4-f731-85a4-efa0-7736b1df2883@vivier.eu>
-Date: Wed, 9 Sep 2020 15:47:49 +0200
+Message-ID: <215e53f9-de99-2545-d397-f7dd7caf8bc5@vivier.eu>
+Date: Wed, 9 Sep 2020 15:49:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200904131402.590055-2-f4bug@amsat.org>
+In-Reply-To: <20200904131402.590055-3-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:mQ+TFq2K0qrj1BrFMvsZaQVHOT2PWJYWhOUqlojaLEW+UFM2MyJ
- Vnz8M9X0lTN+AXqIMBoQ9w02mr+eaBgBVu/+CBf7HgrQRAMQVZlcWRCFKeoyXuS9KxKlWDt
- fFnI6D9uOE3BUHMYM9bAJasCx0r4juUzleeXmQMR9xYDYuJj4hvKxsMvHGrjBnt9wmSUYbf
- 6IHh7vJFCx580tZtBrRlg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:OnjoOjcIg4U=:g4hUlhIwiz/Z5J25Gx961g
- 18+U1r0pd0qrKMR/d/AGq91RpRrL/X6ABkvAILpEyhJK2P0iRUJDybcJSoOE080djKL5OZVJI
- lD6SgyM4LL43543iqHItqz8Hvqpl0a0SJ80+g608Rb4KcpXR6rI5O9JqPel2pX1jPryvLxOoi
- qIjs2CYpmYEQdGm/MMUa9UFerB2/LFpqFrZVnGEQ3YFcPY9iMwGn4PLeQfSmX85dxZhwfmlNv
- hdHqU/MQR6oKyC2ln7nEzopDh0pzkrA2OXTi463edZeszxz64A9RYTQbAsMuoc+1j4Iwoj5kv
- 5Py0hWa2OCpv5krGcz4BUGsjfJCPEHURtzsq08/p+RyGF1M3wRH6uHP3PXTfgECbKoHjNz2od
- 2iQSPKiLaBeiO46qh/z+1+wR4dUMJKMaLvwAPg/JB/yNiJYzdSJhpzP6bODN9LMZVcoB3l2Aq
- b4PgGcB8NSNaEe9h7RQTpjcr8sw684m4k0GB3tACXL5+bRUB5i4rdrzguPdjS/4Rie8OppxEa
- p+jeAgRiHEZGT6PVcRH+myTRKzFmwo6apqExGcnZ5Kk6d1QuKLoIeHOb/gduRBzB2irRW3hTw
- kl5kc2eC1TOAhjwhGvxjXkDqxdsaSF7bn+xyZ/2vlDYyQneX6N0ixfdB8FJzxU7H1oIE5cWT8
- CZvTEF7zlBMmizBzjZK2OH9Z8I5l0dBz5zcgx+3omuf9oKfjHG91cCeQ6fYVEggt/2z8Uuwuv
- rQQKtuQ1Hl+yFOgWbJuKlWCUuVImK7ccbPMMTflDjBW3VdcHEOBSK+5dzDSZgXAhfuz5GZmVv
- bdZatrX+u/l5x/RMiMRBAvxpdvgXTcCEzP0wK5ZEYNwfnCGS9aB9Ob8rDfStRo4J0NUvBW0
-Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:TkNHT8hgctF0c55QPcuEEXneIP4VRHip4rD7TfDEirdWmH2GdGu
+ GXcWxGppuYNiHSMMYKtqvC1J428KNcU16jttwImgcgzoHK7392tt8YpmkeqotUHNXrGe/3H
+ RX+fLj+r9jbKpXp+DA/aj2NNkHXcNgnMPJgOrz+IbhM5smtMguufhzMq85OKUzFNI3LlwaY
+ AWD8DodmHeIGVdOnGo1EQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/EEaSxsNyGw=:4iMzA3BIKr9JoHvlkG3WSL
+ 3LFl2J0NtRKPTVkBgAR63VtdCaxj8ZvdTxM0sbwWjkvlh34itCMyxm/Vt4yeEnk36HVHdAKfy
+ SJDQoyeiJ1C+YgrrB1d7X1UHg2FiQfU9vFoJwNoVe0A+d4sCNIPMD+2kQIcx59PNOQpnEi1p2
+ +Wew1YBMFw4+HfPlTNCBV9FVKgcTHZZ/2bC+UNyktauhsnA5JryvwJ1rjIbBHTDIx+QBmCxuR
+ HK06zpuTVsD8kBER2+l0yCCJr7JjHCw//RkOoOPdY7MGVaxqNaQG7/9qBDtMPz4zjnRuWkZeb
+ tXGuFIClSy3C/D0th3eNRyfRtvb0dpjYwRy7WDcd8FQGF/CrTppTp5FFeEr07LYOUoU3nYM+I
+ h/cYyT1ka+Sgy00vTzydSsol3fNtbZP7wHRujsIjZtTsaf5qQPNHQxnc3n91ikrIaWy4It6RQ
+ QbZJi18u4YreYbSBVoT/nmK32I8Ap/T0utYmAGltOdFAaJAS/sfTSlXnMxb9SaDtgq8WMOOde
+ m5IUppCFzFgTVTUGEPH04ATizmtm4BrTaXA5/I4WO/cu9A+r5KixJ/g9Vav9lPtz74Ft6gJ0q
+ tvUPGcHNxb69dM1b+S/3RWolzIAfVnT7gA9BEyohSkLItawwa8u6LWZbUeAu1sN2Sh1rtL4Nt
+ miaV8wPCnNQ8OhF0PSJ0p9nUyTrlHpxo7Oh/9nih+Zorb9sJJ8K5d9ezyjcn9WAZ/5d2zWjQt
+ JiQ8VE9kSKnM7LUKdMoqUxpxRlrTj5XOBY/5eLCQYfLWeC1AqSSKqjGISibGrLSds/bjHP+XL
+ TBh00rO+pId8L2JoF7t6CQ/zirsAxe9OCzj8Yy/Ik5Dz6H723AoscSyZB7JTvAQUSCZdaR9
+Received-SPF: none client-ip=212.227.126.134; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:26:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:23:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -54
 X-Spam_score: -5.5
@@ -137,39 +137,38 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 Le 04/09/2020 à 15:14, Philippe Mathieu-Daudé a écrit :
-> The STATUS register readop handler is initialized first with
-> the generic e1000e_mac_readreg() handler:
+> The FLSWDATA register writeop handler is initialized twice:
 > 
->   2861 #define e1000e_getreg(x)    [x] = e1000e_mac_readreg
->   2862 typedef uint32_t (*readops)(E1000ECore *, int);
->   2863 static const readops e1000e_macreg_readops[] = {
+>   3067 #define e1000e_putreg(x)    [x] = e1000e_mac_writereg
+>   3068 typedef void (*writeops)(E1000ECore *, int, uint32_t);
+>   3069 static const writeops e1000e_macreg_writeops[] = {
 >   ....
->   2919     e1000e_getreg(STATUS),
+>   3102     e1000e_putreg(FLSWDATA),
+>   ....
+>   3145     e1000e_putreg(FLSWDATA),
 > 
-> Then overwritten with the specific e1000e_get_status handler:
+> To avoid confusion, remove the duplicated initialization.
 > 
->   3018     [STATUS]  = e1000e_get_status,
-> 
-> To avoid confusion, remove the overwritten initialization.
-> 
-> 6f3fbe4ed0 ("net: Introduce e1000e device emulation")
+> Fixes: 6f3fbe4ed0 ("net: Introduce e1000e device emulation")
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> Noticed after looking for other cases of the previous patch.
 > ---
 >  hw/net/e1000e_core.c | 1 -
 >  1 file changed, 1 deletion(-)
 > 
 > diff --git a/hw/net/e1000e_core.c b/hw/net/e1000e_core.c
-> index bcd186cac52..5170e6a4563 100644
+> index 5170e6a4563..bcfd46696ff 100644
 > --- a/hw/net/e1000e_core.c
 > +++ b/hw/net/e1000e_core.c
-> @@ -2916,7 +2916,6 @@ static const readops e1000e_macreg_readops[] = {
->      e1000e_getreg(TSYNCRXCTL),
->      e1000e_getreg(TDH),
->      e1000e_getreg(LEDCTL),
-> -    e1000e_getreg(STATUS),
->      e1000e_getreg(TCTL),
->      e1000e_getreg(TDBAL),
->      e1000e_getreg(TDLEN),
+> @@ -3141,7 +3141,6 @@ static const writeops e1000e_macreg_writeops[] = {
+>      e1000e_putreg(RXCFGL),
+>      e1000e_putreg(TSYNCRXCTL),
+>      e1000e_putreg(TSYNCTXCTL),
+> -    e1000e_putreg(FLSWDATA),
+>      e1000e_putreg(EXTCNF_SIZE),
+>      e1000e_putreg(EEMNGCTL),
+>      e1000e_putreg(RA),
 > 
 
 Applied to my trivial-patches branch.
