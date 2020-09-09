@@ -2,88 +2,82 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69766C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 04:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43A7DC433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 05:40:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CE4021D40
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 04:59:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PHJ02nvt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CE4021D40
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9DC6421582
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 05:40:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DC6421582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50536 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFsCm-0002J8-7z
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 00:59:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53818)
+	id 1kFsq0-0008MS-7i
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 01:40:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kFsCG-0001t5-O0
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 00:59:04 -0400
-Received: from mail-oo1-xc44.google.com ([2607:f8b0:4864:20::c44]:41522)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kFsCB-0006Zr-S6
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 00:59:04 -0400
-Received: by mail-oo1-xc44.google.com with SMTP id t3so284179ook.8
- for <qemu-devel@nongnu.org>; Tue, 08 Sep 2020 21:58:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=Ay1yzYJscZJKqYcNJ4Izgg3OKWHIzVyyihkmOz7aWzo=;
- b=PHJ02nvtJyL3wSX4Yc8W0jcE/oRFwFJp+8Rxzr3bBnB4Gs2R8bN4VkcgaHMOO2CCyx
- XW0QU1REhVTu01emuC2cqr/Hj+NVNvo4iLQNZljKgZzH3DSkOgIXZ+DdiAnAiD80Cvxz
- dyowFFFF4wUMNno4gkx+9+M2A1/vHa73ftCkU3X18t55qN1pjczv481Ve8iGgt3oZMy6
- xCjWEHw4VfxY7LlxyJtzbRwb0FMkOUHyNgmL3CmZvUhXoayo0XwOmuGMOku67x/0c9B7
- jL6Kv4G2/XNnbDzJe7qJOpTdFpJP4DaP7MQkQmWr8rxpJacET86bDbDJWsClpqseo6om
- PAtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=Ay1yzYJscZJKqYcNJ4Izgg3OKWHIzVyyihkmOz7aWzo=;
- b=nLBkfaYt9PY27xQYyjbNr+/xasUPuGIpBIl7kDaHxrj5wnULjqp3E+M3caSdwTnkZu
- k1fzIc2XDpH58VT6Q8XGgLcwyVoDfgI0UZ5nROG7GcXCXSVbDhOexG7DYRoxqegM6j1F
- dtBoxljNXdpp3YLocMMsljzUeCsaUtEnzygb9zBJm3125ljl+0rk2K05+dp17tL4DRM2
- IaQaIwVMwPDfTf/evGuD1/dQ7WhIo6afSa3yD/bWLQR+NnS806+yheyruEiTiz1uZapy
- 3//NY5WBFAFp4V6rB8xxBgIByNhfoxeaoR16jtBSQsVQvnZ2VrFUAMB8NaP0HhVaqXTg
- 0vfg==
-X-Gm-Message-State: AOAM530czM2vuyQ4cSIY+G1UTDEBvFPbsmXh9WqAK+4sYCIs1Og3cx1E
- sGzwuWYnYQkrA0s0HcK3YuLD4uGSohmJhR9azsA=
-X-Google-Smtp-Source: ABdhPJyQ0jSzrRgLd2T05F70ygR4IvJsxG2NUyoOn0JyMnrbUab+WB/qWLsZ/3bUVlNiG2kQ1kfyEnXxPesNa8BNKUs=
-X-Received: by 2002:a4a:ae4c:: with SMTP id a12mr1533145oon.60.1599627538583; 
- Tue, 08 Sep 2020 21:58:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1kFsp6-0007W2-Hy
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 01:39:12 -0400
+Received: from mga17.intel.com ([192.55.52.151]:15863)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1kFsp3-0002Eq-6d
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 01:39:12 -0400
+IronPort-SDR: 2jKy0VwRnDXW4n29X1aT+azzKW5GFpFAhbsUTD8tGvEFDv5M2JYobjB1ser47ZRMToreBjBGPW
+ 8KHnTpdTSVLw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9738"; a="138316902"
+X-IronPort-AV: E=Sophos;i="5.76,408,1592895600"; d="scan'208";a="138316902"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 08 Sep 2020 22:39:02 -0700
+IronPort-SDR: whcmFigUgqLBadZ88oSuQUtx0F6IibdTMz/wnMKxzlk8/zn/jTBg4htIm5EhINSeN1YTLfMt/h
+ Rf+LDUhf4P1Q==
+X-IronPort-AV: E=Sophos;i="5.76,408,1592895600"; d="scan'208";a="480331663"
+Received: from joy-optiplex-7040.sh.intel.com (HELO joy-OptiPlex-7040)
+ ([10.239.13.16])
+ by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 08 Sep 2020 22:38:56 -0700
+Date: Wed, 9 Sep 2020 13:37:56 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ openstack-discuss@lists.openstack.org, intel-gvt-dev@lists.freedesktop.org
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200909053755.GA721@joy-OptiPlex-7040>
+References: <20200818091628.GC20215@redhat.com>
+ <20200818113652.5d81a392.cohuck@redhat.com>
+ <20200820003922.GE21172@joy-OptiPlex-7040>
+ <20200819212234.223667b3@x1.home>
+ <20200820031621.GA24997@joy-OptiPlex-7040>
+ <20200825163925.1c19b0f0.cohuck@redhat.com>
+ <20200826064117.GA22243@joy-OptiPlex-7040>
+ <20200828154741.30cfc1a3.cohuck@redhat.com>
+ <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
+ <20200831044344.GB13784@joy-OptiPlex-7040>
 MIME-Version: 1.0
-References: <20200908164157.47108-1-liq3ea@163.com>
- <20200908164157.47108-2-liq3ea@163.com>
- <48a99ece-d808-f860-2551-0fec05ec5b01@redhat.com>
- <20200909044856.lvk77pcfvt567ub6@sirius.home.kraxel.org>
-In-Reply-To: <20200909044856.lvk77pcfvt567ub6@sirius.home.kraxel.org>
-From: Li Qiang <liq3ea@gmail.com>
-Date: Wed, 9 Sep 2020 12:58:22 +0800
-Message-ID: <CAKXe6S+s-hV2dcK=xVd4jrfNEYH0DvwkAkj5ooyrutA-vGJsdw@mail.gmail.com>
-Subject: Re: [RFC 1/4] memory: add memory_region_init_io_with_dev interface
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c44;
- envelope-from=liq3ea@gmail.com; helo=mail-oo1-xc44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200831044344.GB13784@joy-OptiPlex-7040>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=192.55.52.151; envelope-from=yan.y.zhao@intel.com;
+ helo=mga17.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 01:39:03
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,50 +90,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Dmitry Fleytman <dmitry.fleytman@gmail.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Li Qiang <liq3ea@163.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- Qemu Developers <qemu-devel@nongnu.org>, Alexander Bulekov <alxndr@bu.edu>,
- Paolo Bonzini <pbonzini@redhat.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: shaohe.feng@intel.com, kevin.tian@intel.com,
+ Daniel =?iso-8859-1?Q?P=2EBerrang=E9?= <berrange@redhat.com>,
+ Parav Pandit <parav@mellanox.com>, corbet@lwn.net,
+ Jason Wang <jasowang@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
+ jian-feng.ding@intel.com, kwankhede@nvidia.com, zhenyuw@linux.intel.com,
+ dgilbert@redhat.com, Jiri Pirko <jiri@mellanox.com>, bao.yumeng@zte.com.cn,
+ Alex Williamson <alex.williamson@redhat.com>, eskultet@redhat.com,
+ smooney@redhat.com, xin-ran.wang@intel.com, dinechin@redhat.com,
+ hejie.xu@intel.com, intel-gvt-dev@lists.freedesktop.org, eauger@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Gerd Hoffmann <kraxel@redhat.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=889=E6=97=
-=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8812:49=E5=86=99=E9=81=93=EF=BC=9A
->
-> On Wed, Sep 09, 2020 at 10:15:47AM +0800, Jason Wang wrote:
-> >
-> > On 2020/9/9 =E4=B8=8A=E5=8D=8812:41, Li Qiang wrote:
-> > > Currently the MR is not explicitly connecting with its device instead=
- of
-> > > a opaque. In most situation this opaque is the deivce but it is not a=
-n
-> > > enforcement. This patch adds a DeviceState member of to MemoryRegion
-> > > we will use it in later patch.
-> >
-> >
-> > I don't have a deep investigation. But I wonder whether we could make s=
-ure
-> > of owner instead of adding a new field here.
->
-> Should be possible.  There is object_dynamic_cast() which can be used to
-> figure whenever a given owner object is a device.
->
+hi All,
+Per our previous discussion, there are two main concerns to the previous
+proposal:
+(1) it's currently hard for openstack to match mdev types.
+(2) complicated.
 
-I found most caller of 'memory_region_init_io' will set the owner to
-the device object.
-But some of them will just set it to NULL. Do will have a clear rule
-that the device's MR
-'owner' should be the device object? If yes, we can use this field.
+so, we further propose below changes:
+(1) requiring two compatible mdevs to have the same mdev type for now.
+    (though kernel still exposes compatible_type attributes for future use)  
+(2) requiring 1:1 match for other attributes under sysfs type node for now
+    (those attributes are specified via compatible_<attribute name> but
+    with only 1 value in it.)
+(3) do not match attributes under device instance node.
+    rather, they are regarded as part of resource claiming process.
+    so src and dest values are ensured to be 1:1.
+    A dynamic_resources attribute under sysfs <type-id> node is added to
+    list the attributes under device instance that mgt tools need to
+    ensure 1:1 from src and dest.
+    the "aggregator" attribute under device instance node is such one that
+    needs to be listed.
+    Those listed attributes can actually be treated as device state set by
+    vendor driver during live migration. but we still want to ask for them to
+    be set by mgt tools before live migration starts, in oder to reduce the
+    chance of live migration failure.
 
-Thanks,
-Li Qiang
+do you like those changes?
 
-> take care,
->   Gerd
->
+after the changes, the sysfs interface would look like blow:
+
+  |- [parent physical device]
+  |--- Vendor-specific-attributes [optional]
+  |--- [mdev_supported_types]
+  |     |--- [<type-id>]
+  |     |   |--- create
+  |     |   |--- name
+  |     |   |--- available_instances
+  |     |   |--- device_api
+  |     |   |--- software_version
+  |     |   |--- compatible_type
+  |     |   |--- compatible_<device_api_specific_field>
+  |     |   |--- compatible_<type_specific_field>
+  |     |   |--- dynamic_resources
+  |     |   |--- description
+  |     |   |--- [devices]
+
+- device_api : exact match between src and dest is required.
+               its value can be one of 
+               "vfio-pci", "vfio-platform", "vfio-amba", "vfio-ccw", "vfio-ap"
+- software_version: version of vendor driver.
+                    in major.minor.bugfix scheme. 
+                    dest major should be equal to src major,
+	            dest minor should be no less than src minor.
+		    once migration stream related code changed, vendor
+		    drivers need to bump the version.
+- compatible_type: not used by mgt tools currently.
+                   vendor drivers can provide this attribute, but need to
+		   know that mgt apps would ignore it.
+		   when in future mgt tools support this attribute, it
+		   would allow migration across different mdev types,
+		   so that devices of older generation may be able to
+		   migrate to newer generations.
+
+- compatible_<device_api_specific_field>: for device api specific attributes,
+                  e.g. compatible_subchannel_type,
+                  dest values should be superset of arc values.
+		  vendor drivers can specify only one value in this attribute,
+		  in order to do exact match between src and dest.
+		  It's ok for mgt tools to only read one value in the
+		  attribute so that src:dest values are 1:1.
+
+- compatible_<type_specific_field>: for mdev type specific attributes,
+                  e.g. compatible_pci_ids, compatible_chpid_type
+                  dest values should be superset of arc values.
+		  vendor drivers can specify only one value in the attribute
+		  in order to do exact match between src and dest.
+		  It's ok for mgt tools to only read one value in the
+		  attribute so that src:dest values are 1:1.
+
+- dynamic_resources: though defined statically under <type-id>,
+                  this attribute lists attributes under device instance that
+		  need to be set as part of claiming dest resources.
+		  e.g. $cat dynamic_resources: aggregator, fps,...
+		  then after dest device is created, values of its device
+		  attributes need to be set to that of src device attributes.
+		  Failure in syncing src device values to dest device
+		  values is treated the same as failing to claiming
+		  dest resources.
+		  attributes under device instance that are not listed
+		  in this attribute would not be part of resource checking in
+		  mgt tools.
+
+
+
+Thanks
+Yan
 
