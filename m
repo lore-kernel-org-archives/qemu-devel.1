@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDDCC43461
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C571C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:29:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D61B921D80
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:28:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5C8A21D81
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:29:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lQ87BerI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D61B921D80
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q6SDgx/I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C8A21D81
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFyHP-0001ZJ-Ow
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 07:28:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60324)
+	id 1kFyHl-0001no-PG
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 07:29:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFyGU-0008Q6-EH
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:50 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:55743)
+ id 1kFyGX-0008V8-O0
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:53 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45431)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kFyGS-0006Wg-LI
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:50 -0400
-Received: by mail-wm1-x343.google.com with SMTP id a65so1910806wme.5
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 04:27:48 -0700 (PDT)
+ id 1kFyGV-0006X0-FA
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:53 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x14so2500908wrl.12
+ for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 04:27:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=BRPNz1a1sR08C7hdTMgMEJxgHmTXfMUSkTnilwnfZ1E=;
- b=lQ87BerI/6IInv7C4UVMyrr/koYsPu7o6IJ/xepOPuhg6JsgkiQusgnYfIyKJOI81s
- UEWXUeXrTCDhIYWQQW4XhO/NyLub0eiAgHJ/UmLmsvuog9jtTqVcN8OS9E11GVL4mJHc
- Krj8HQip/EW7yTtor6oVQZcHu8eKtoH1oOLLN5r725Y2fL3HjD3V7MY3PjcgYi804PBo
- 31ba175OH+a81gI2v8VG9shuW9TKV4jjg3uP3fRWYVuoercIia7TnvLk1JdV9B8gGvOW
- hk86M+iSgYVjhYrXZh44wIjVbGBp4dBNzZDaUlg+LcZduc4aIGYwzr4FL99VsTD3Y1If
- N1vw==
+ bh=ZzCEYnGWgPjxCaNwaNwG2qZVWCUrnK8YFhM61o4jjX0=;
+ b=q6SDgx/IzGemaVDszgLVWJnrqv0FYZvGFWsd1ElvbftzFZs0gUsjt7cNcM6vwBVYVx
+ 81WuF0Zuu5mFlxkvJH9lFa2eDX7+LhHshtn0wBFQUIMK0xH/G6JJ/AyM7cWbaibCJQZt
+ ktyM56QS+pmpMdJZ1CQcKvENIpX4X7CwbyNzsWDiUX1qfyqo4aUUTk8vj/jlzoseNrpH
+ uf8VZQ+hbsVN66nsos4fAdUy0P7Vm1z9iqWbtMFjRDkkIVtJHjpknEO+82te3Ad/7BZ7
+ t+UUkUHQx3O1MafFtpDlRmIqe0J6LqAqvjoui8/5uC8lGHsabg1IdhnfMspCOl26q+zD
+ ROAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=BRPNz1a1sR08C7hdTMgMEJxgHmTXfMUSkTnilwnfZ1E=;
- b=uINBK+LaNoAr6LhxO8ziaZJOHq31HpH8GYxdob6ZqKDAMr8cmCJPVGXBG+zZpwZtKh
- QeQ5LMO5P8pFiFy/ExfD0g/atksjijMb5KGvJe0KiXn6Mp6Sh7bx3YvDt/Tf7rbzcdoY
- YrCibJlEo4/OzcP/6wnESCWYVkxzVbOrS+CTqQOHv5EnYafM/YTQ93d1MDfi7FyYCgLr
- dXom69MFwOPce1J/5VbnHgyAxI6Sm89l86LtdhB5Jx32UHqqxVThp3F++J4TcPiisam1
- pEtOFXeY0/N4ndDPeH7ZjnWomS8XkFKcpFPtm5bLnraEj5IP+2RWzqJjmBDzqCb0nSXc
- Ipsg==
-X-Gm-Message-State: AOAM533JNtfXWoVU/iFm/efhtNwIyNvbI/ce7fel1lLz4aTxSBK4TaWa
- jUtmrupsUaioqp3ycJkRssqKog==
-X-Google-Smtp-Source: ABdhPJyijx1br409kH0UsPZnqg1VVv+oB7z7qVREWnV9G8hKjh3Dgc/KhTrfCc7bRHYQFY1yn7D8Wg==
-X-Received: by 2002:a1c:9697:: with SMTP id y145mr3052305wmd.174.1599650867099; 
- Wed, 09 Sep 2020 04:27:47 -0700 (PDT)
+ bh=ZzCEYnGWgPjxCaNwaNwG2qZVWCUrnK8YFhM61o4jjX0=;
+ b=WL9Qdufj2ljtEVj68Nu4PtZv4osQvXGAq7s5GCgMdU34/TbKgO7t+L+kwV78ajuiI7
+ JgmRH6tgPpL73g9UKd6LIl6J74esUvDNYjFym29QQems+u/nf1Htc+Jks4qoxTUobjBX
+ NY6jqNRBtjlMvqqMSSQ5m5u/BXUp21ab6y359SLZ62n1523DQCpo/DWca3pC+DVHXnVq
+ paaPun9g3T7dGkD8Sqvtj+HJtNZuJb6rPPKaAsTzYoe6G3NV9loXYOdTHyWPVklo1P1h
+ 3AW5E47Q5HLvY/n+rBRz69kehXpJazZpjdV3lcI6c1n72y6hlfNM9QgIAGKDCepkkZm6
+ lYEQ==
+X-Gm-Message-State: AOAM531qfpeDQr8zYWu7EggIh5aeOCkJinkX4HD9qr0VxRqqR55puZTl
+ ZH7cCSrAjkWjEIsLswjAPxmr/g==
+X-Google-Smtp-Source: ABdhPJxfRuuOh9VnRzF7JLLxkQZP1rryjmdhbhMIMqQbTUklsK/3h82Jwwlv//HTbO4IQxxzC69wNQ==
+X-Received: by 2002:a5d:574e:: with SMTP id q14mr3213769wrw.281.1599650870093; 
+ Wed, 09 Sep 2020 04:27:50 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id d6sm3780191wrq.67.2020.09.09.04.27.42
+ by smtp.gmail.com with ESMTPSA id y1sm3882603wru.87.2020.09.09.04.27.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 04:27:42 -0700 (PDT)
+ Wed, 09 Sep 2020 04:27:47 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 3CF3F1FF8C;
+ by zen.linaroharston (Postfix) with ESMTP id 6B3AC1FF90;
  Wed,  9 Sep 2020 12:27:42 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 02/10] usb-host: restrict workaround to new libusb versions
-Date: Wed,  9 Sep 2020 12:27:33 +0100
-Message-Id: <20200909112742.25730-3-alex.bennee@linaro.org>
+Subject: [PATCH  v2 04/10] target/mips: simplify gen_compute_imm_branch logic
+Date: Wed,  9 Sep 2020 12:27:35 +0100
+Message-Id: <20200909112742.25730-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200909112742.25730-1-alex.bennee@linaro.org>
 References: <20200909112742.25730-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,43 +103,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: fam@euphon.net, berrange@redhat.com,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+Cc: fam@euphon.net, Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ berrange@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  richard.henderson@linaro.org, f4bug@amsat.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>, cota@braap.org,
- Gerd Hoffmann <kraxel@redhat.com>, aurelien@aurel32.net
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, cota@braap.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gerd Hoffmann <kraxel@redhat.com>
+One of the Travis builds was complaining about:
 
-Fixes build failures with old kernels (USBDEVFS_GET_SPEED missing),
-on the assumtion that distros with old kernels also have old libusb.
+  qemu/include/tcg/tcg.h:437:12: error: ‘cond’ may be used uninitialized in this function [-Werror=maybe-uninitialized]
+       return (TCGCond)(c ^ 1);
+  ../target/mips/translate.c:20031:13: note: ‘cond’ was declared here
+       TCGCond cond;
 
-Reported-by: Alex Bennée <alex.bennee@linaro.org>
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Rather than figure out exactly which one was causing the complaint I
+just defaulted to TCG_COND_ALWAYS and allowed that state to double up
+for the now defunct bcond_compute variable.
+
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200902081445.3291-1-kraxel@redhat.com>
-Message-Id: <20200903112107.27367-5-alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200903112107.27367-8-alex.bennee@linaro.org>
 ---
- hw/usb/host-libusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ target/mips/translate.c | 12 ++----------
+ 1 file changed, 2 insertions(+), 10 deletions(-)
 
-diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
-index 08604f787fd..c5d38cb09c0 100644
---- a/hw/usb/host-libusb.c
-+++ b/hw/usb/host-libusb.c
-@@ -942,7 +942,7 @@ static int usb_host_open(USBHostDevice *s, libusb_device *dev, int hostfd)
-     usb_host_ep_update(s);
+diff --git a/target/mips/translate.c b/target/mips/translate.c
+index 899b90ae0ff..398edf72898 100644
+--- a/target/mips/translate.c
++++ b/target/mips/translate.c
+@@ -20028,8 +20028,7 @@ static void gen_pool32axf_nanomips_insn(CPUMIPSState *env, DisasContext *ctx)
+ static void gen_compute_imm_branch(DisasContext *ctx, uint32_t opc,
+                                    int rt, int32_t imm, int32_t offset)
+ {
+-    TCGCond cond;
+-    int bcond_compute = 0;
++    TCGCond cond = TCG_COND_ALWAYS;
+     TCGv t0 = tcg_temp_new();
+     TCGv t1 = tcg_temp_new();
  
-     libusb_speed = libusb_get_device_speed(dev);
--#ifdef CONFIG_LINUX
-+#if LIBUSB_API_VERSION >= 0x01000107 && defined(CONFIG_LINUX)
-     if (hostfd && libusb_speed == 0) {
-         /*
-          * Workaround libusb bug: libusb_get_device_speed() does not
+@@ -20046,7 +20045,6 @@ static void gen_compute_imm_branch(DisasContext *ctx, uint32_t opc,
+             /* Treat as NOP */
+             goto out;
+         } else {
+-            bcond_compute = 1;
+             cond = TCG_COND_EQ;
+         }
+         break;
+@@ -20065,7 +20063,6 @@ static void gen_compute_imm_branch(DisasContext *ctx, uint32_t opc,
+             tcg_gen_shri_tl(t0, t0, imm);
+             tcg_gen_andi_tl(t0, t0, 1);
+             tcg_gen_movi_tl(t1, 0);
+-            bcond_compute = 1;
+             if (opc == NM_BBEQZC) {
+                 cond = TCG_COND_EQ;
+             } else {
+@@ -20080,7 +20077,6 @@ static void gen_compute_imm_branch(DisasContext *ctx, uint32_t opc,
+         } else if (rt == 0 && imm != 0) {
+             /* Unconditional branch */
+         } else {
+-            bcond_compute = 1;
+             cond = TCG_COND_NE;
+         }
+         break;
+@@ -20088,24 +20084,20 @@ static void gen_compute_imm_branch(DisasContext *ctx, uint32_t opc,
+         if (rt == 0 && imm == 0) {
+             /* Unconditional branch */
+         } else  {
+-            bcond_compute = 1;
+             cond = TCG_COND_GE;
+         }
+         break;
+     case NM_BLTIC:
+-        bcond_compute = 1;
+         cond = TCG_COND_LT;
+         break;
+     case NM_BGEIUC:
+         if (rt == 0 && imm == 0) {
+             /* Unconditional branch */
+         } else  {
+-            bcond_compute = 1;
+             cond = TCG_COND_GEU;
+         }
+         break;
+     case NM_BLTIUC:
+-        bcond_compute = 1;
+         cond = TCG_COND_LTU;
+         break;
+     default:
+@@ -20118,7 +20110,7 @@ static void gen_compute_imm_branch(DisasContext *ctx, uint32_t opc,
+     clear_branch_hflags(ctx);
+     ctx->base.is_jmp = DISAS_NORETURN;
+ 
+-    if (bcond_compute == 0) {
++    if (cond == TCG_COND_ALWAYS) {
+         /* Uncoditional compact branch */
+         gen_goto_tb(ctx, 0, ctx->btarget);
+     } else {
 -- 
 2.20.1
 
