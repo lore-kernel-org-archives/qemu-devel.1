@@ -2,85 +2,86 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 709E4C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDB83C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:59:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA06A20639
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:53:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 09DED206D4
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 15:59:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RfcRjoln"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA06A20639
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFl1xdup"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09DED206D4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54846 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG2Q2-00049n-Cp
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:53:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47716)
+	id 1kG2VI-00085D-3q
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 11:59:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49126)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kG2PN-0003SQ-I5
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 11:53:17 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:42838)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kG2UX-00079v-Lk; Wed, 09 Sep 2020 11:58:38 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:39593)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kG2PL-0001vz-8Y
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 11:53:17 -0400
-Received: by mail-ed1-x542.google.com with SMTP id l63so3154791edl.9
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 08:53:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=tYTAx4l6f2u8KbHrEy5Rn6tgANLlely6K9NrAKkKaD4=;
- b=RfcRjolnslna7osjOO1TXCoghzNi2fKgyFZPEMSQax8YEU8v4535p5x6dM2zbOIX8K
- aGJX4vT0l4XB4cYXiNDKH+3JzRNjm3eijcTc7SfI9q1BpSt79VwY8JZjA17Leq2ZJjYD
- tOpHiKVDtUz2jt2C6HN0AItE24CYkZLmi72A1fJlHm2sL3JbaocWOehxQ156RbPQE4DY
- LBdCPb63BwhCd9tiQqsumCNyOc414IoPmrhnv6Dx6RngxPr4gNNW9DYbjhlC3gMkccSL
- 0WNDOoOdeaTUr5BMaP0jEDoAul/y2Yq5eI7X8LXVuiR4Tsj+mAF5IlR5CJZySYjOgH/B
- gTbg==
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kG2UU-0002eA-Ik; Wed, 09 Sep 2020 11:58:37 -0400
+Received: by mail-lf1-x142.google.com with SMTP id q8so1873423lfb.6;
+ Wed, 09 Sep 2020 08:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=bDmj7UqRL3mVWtg09Ag9cQhUFGbfpb2Ld0WhRUjKye4=;
+ b=UFl1xdupbw+ABcmy3PmXHtP5jfOJOALEcu8fgGYeOfYkJrCE0XZtde79KdHpbIkgC0
+ bghNEcrXztHelVtY/LlEV+VSjk/g0dS4kjpUntqizoQVtGY378Yx9C6MQROg9FssrKhZ
+ VGre+DqRZ4s9g0oSyBfhB2nyoFtYOzEYGJ/VtjmSpK1XYEDUOF2GbqKYFl7R/TiLk/Nh
+ 4TjJGmLy2SUFc5ZPf2b66GheagPsMJ4CfGQ1HOGYe4MjO8QRp7LQ2fnJam1HFAaiTp1c
+ VKR4ZH7pyW+YwkF8qhdmisrmTxR4duAgctWlWwm2EGqSWst6LGX/jIknGQnmdlkALRjc
+ 9dGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=tYTAx4l6f2u8KbHrEy5Rn6tgANLlely6K9NrAKkKaD4=;
- b=Ky0puWFKTvnPV8NKAMS8gvnNTN/UozHAhLvPrpUFjB69e8+3Fm6u6N1y1aWnRlKmxO
- iwWhNGfrfhWIQCKLXHKfY+/b7JRJaUJ18ypHkHNwZGrcqYgG48zU8vOEPWxl2dFBi/tC
- ASou08z22NFQFkMs1bBm2bgOClYen8r+sq0u8idF2soPVfiWfFeem28kR8UfNW2PRgo/
- 9eNMQ6w/51supsuI23/WqkW1ZPWxX+GJTV0bwD+MDCoDqtTIEvq9BQYhj5IJ9vlXRt8i
- tPT4Oxs2s7zAkw1yWA2LGd13EZinCnHttev6vsjzxSBN2c5BgmG/2BdYy7qMFSJADPQm
- pAZg==
-X-Gm-Message-State: AOAM531ZnwRGIa5eHoMJLl1vdt9TwDMEjc0asZ/wDufGj+wyRPo86uZ0
- OgHdxem7TI30kDNoIF2pDAkjiXPChfkOgHlrVLkIWA==
-X-Google-Smtp-Source: ABdhPJw/klL8m+jTWg8TN2b2YPUs5PNhV2M3PAJmM/yRQZlC76+0uLWD3k61ammc5irNXocl1b/iC7V5ejqeyp86R9g=
-X-Received: by 2002:aa7:dd4b:: with SMTP id o11mr4647541edw.251.1599666793751; 
- Wed, 09 Sep 2020 08:53:13 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=bDmj7UqRL3mVWtg09Ag9cQhUFGbfpb2Ld0WhRUjKye4=;
+ b=AdBQiZedpF53sKjlNGdfhjKPezxWUK4T+l7HWhTy/88ptAPYNUSuMiEju3WIz6IJjA
+ ZMyqHeCtmyFgoWSl9rahT67Prnfk47LF21vpt7qzTEcSgT+MzY2RZIx4yKAgXx+SQneb
+ lzK7vm5uVdAqWjiijnZSBfatkwr6dsK0D1Bj75fAF3sJ7pnKpC4fzveh0hHoO2YVWxMW
+ nA65Gj7Hghv+a8H+oJ0xtd17Ag9QOe5v6LJ+VEKaTcXgrVKmhUwrRVnTmFf9QS0rto+s
+ IQIyDaEx8hB/HKwGlGC7MpLlVUnLWulMylsZJf/MgRVtk4PF4kVAAlVxwF7VkHwedyZZ
+ Csdw==
+X-Gm-Message-State: AOAM533F5QBOFRrfpXQyZLo8Nrn/BwKYDzpjKYuE2wb5YPvrz6J+0Cii
+ 6dtbPDqIbbDq+YTdHBaosB94aKvUH93FWcUEbSw=
+X-Google-Smtp-Source: ABdhPJyN9j69UDT0alM44YtgNsHaJIRCLB3Ig2znbYPiYxjbvz2YH7kPpkRBzMlqoz3TV0hbXYyPrD75KvRZwmPA37g=
+X-Received: by 2002:a19:41c8:: with SMTP id o191mr2244627lfa.176.1599667112498; 
+ Wed, 09 Sep 2020 08:58:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200904160018.29481-1-steven.price@arm.com>
- <20200904160018.29481-3-steven.price@arm.com>
- <20200909154804.mide6szbzgdy7jju@kamzik.brq.redhat.com>
-In-Reply-To: <20200909154804.mide6szbzgdy7jju@kamzik.brq.redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 9 Sep 2020 16:53:02 +0100
-Message-ID: <CAFEAcA_1YnBg3HVmtrSMP8u7GqHY8mtDAJwVcZuNUhwA+q9q=w@mail.gmail.com>
-Subject: Re: [PATCH v2 2/2] arm64: kvm: Introduce MTE VCPU feature
-To: Andrew Jones <drjones@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+References: <20200909094617.1582-1-luoyonggang@gmail.com>
+ <20200909094617.1582-5-luoyonggang@gmail.com>
+ <CAFEAcA8hGNTM+Mxp27tW+v=AvCFppiEiFoKKdB7PEXMKixH5fg@mail.gmail.com>
+In-Reply-To: <CAFEAcA8hGNTM+Mxp27tW+v=AvCFppiEiFoKKdB7PEXMKixH5fg@mail.gmail.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Wed, 9 Sep 2020 23:58:21 +0800
+Message-ID: <CAE2XoE-34P-g_MfMFzH609tJVuRQSjM7k=_N8pUgxNV_Dpi=aQ@mail.gmail.com>
+Subject: Re: [PATCH v2 04/21] curses: Fixes curses compiling errors.
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000ffddc805aee38512"
+Received-SPF: pass client-ip=2a00:1450:4864:20::142;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x142.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,35 +95,133 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <Peter.Maydell@arm.com>,
- lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Juan Quintela <quintela@redhat.com>, Catalin Marinas <catalin.marinas@arm.com>,
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Qemu-block <qemu-block@nongnu.org>,
+ Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
+ Peter Lieven <pl@kamp.de>, QEMU Developers <qemu-devel@nongnu.org>,
+ Max Reitz <mreitz@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Wen Congyang <wencongyang2@huawei.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Steven Price <steven.price@arm.com>,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>,
- Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Dave Martin <Dave.Martin@arm.com>
+ Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 9 Sep 2020 at 16:48, Andrew Jones <drjones@redhat.com> wrote:
-> We either need a KVM cap or a new CPU feature probing interface to avoid
-> making userspace try features one at a time. It's too bad that VCPU_INIT
-> doesn't clear all offending features from the feature set when returning
-> EINVAL, because then userspace could create a scratch VCPU with everything
-> it supports in order to see what KVM also supports in one go.
+--000000000000ffddc805aee38512
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-You could add one if you wanted -- add a new feature bit
-TELL_ME_WHAT_YOU_HAVE. If the kernel sees that then on filure
-it clears out feature bits it doesn't support and also clears
-TELL_ME_WHAT_YOU_HAVE. If QEMU sees EINVAL and TELL_ME_WHAT_YOU_HAVE
-is still set, then it knows it's dealing with an old kernel
-and has to do one-at-a-time probing. If it sees EINVAL but not
-TELL_ME_WHAT_YOU_HAVE then it knows it has a new kernel and
-has just got all the info.
+On Wed, Sep 9, 2020 at 9:26 PM Peter Maydell <peter.maydell@linaro.org>
+wrote:
 
--- PMM
+> On Wed, 9 Sep 2020 at 10:46, Yonggang Luo <luoyonggang@gmail.com> wrote:
+> >
+> > This is the compiling error:
+> > ../ui/curses.c: In function 'curses_refresh':
+> > ../ui/curses.c:256:5: error: 'next_maybe_keycode' may be used
+> uninitialized in this function [-Werror=3Dmaybe-uninitialized]
+> >   256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr,
+> maybe_keycode)
+> >       |     ^~~~~~~~~~
+> > ../ui/curses.c:302:32: note: 'next_maybe_keycode' was declared here
+> >   302 |             enum maybe_keycode next_maybe_keycode;
+> >       |                                ^~~~~~~~~~~~~~~~~~
+> > ../ui/curses.c:256:5: error: 'maybe_keycode' may be used uninitialized
+> in this function [-Werror=3Dmaybe-uninitialized]
+> >   256 |     curses2foo(_curses2keycode, _curseskey2keycode, chr,
+> maybe_keycode)
+> >       |     ^~~~~~~~~~
+> > ../ui/curses.c:265:24: note: 'maybe_keycode' was declared here
+> >   265 |     enum maybe_keycode maybe_keycode;
+> >       |                        ^~~~~~~~~~~~~
+> > cc1.exe: all warnings being treated as errors
+> >
+> > gcc version 10.2.0 (Rev1, Built by MSYS2 project)
+> >
+> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> > Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+> > Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+>
+> I never gave this a reviewed-by tag -- can you be more careful
+> with your tag handling, please?
+>
+Sorry, I see you replied the patch, and misunderstand as a review by
+
+>
+> thanks
+> -- PMM
+>
+
+
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--000000000000ffddc805aee38512
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Sep 9, 2020 at 9:26 PM Peter =
+Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@linar=
+o.org</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"ma=
+rgin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:=
+1ex">On Wed, 9 Sep 2020 at 10:46, Yonggang Luo &lt;<a href=3D"mailto:luoyon=
+ggang@gmail.com" target=3D"_blank">luoyonggang@gmail.com</a>&gt; wrote:<br>
+&gt;<br>
+&gt; This is the compiling error:<br>
+&gt; ../ui/curses.c: In function &#39;curses_refresh&#39;:<br>
+&gt; ../ui/curses.c:256:5: error: &#39;next_maybe_keycode&#39; may be used =
+uninitialized in this function [-Werror=3Dmaybe-uninitialized]<br>
+&gt;=C2=A0 =C2=A0256 |=C2=A0 =C2=A0 =C2=A0curses2foo(_curses2keycode, _curs=
+eskey2keycode, chr, maybe_keycode)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 =C2=A0^~~~~~~~~~<br>
+&gt; ../ui/curses.c:302:32: note: &#39;next_maybe_keycode&#39; was declared=
+ here<br>
+&gt;=C2=A0 =C2=A0302 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0enum =
+maybe_keycode next_maybe_keycode;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~~~~=
+~~~~~~~~~~~~~<br>
+&gt; ../ui/curses.c:256:5: error: &#39;maybe_keycode&#39; may be used unini=
+tialized in this function [-Werror=3Dmaybe-uninitialized]<br>
+&gt;=C2=A0 =C2=A0256 |=C2=A0 =C2=A0 =C2=A0curses2foo(_curses2keycode, _curs=
+eskey2keycode, chr, maybe_keycode)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 =C2=A0^~~~~~~~~~<br>
+&gt; ../ui/curses.c:265:24: note: &#39;maybe_keycode&#39; was declared here=
+<br>
+&gt;=C2=A0 =C2=A0265 |=C2=A0 =C2=A0 =C2=A0enum maybe_keycode maybe_keycode;=
+<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~~~~~~~~~~~~<br>
+&gt; cc1.exe: all warnings being treated as errors<br>
+&gt;<br>
+&gt; gcc version 10.2.0 (Rev1, Built by MSYS2 project)<br>
+&gt;<br>
+&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
+m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+&gt; Reviewed-by: Peter Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.=
+org" target=3D"_blank">peter.maydell@linaro.org</a>&gt;<br>
+&gt; Reviewed-by: Gerd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.com" ta=
+rget=3D"_blank">kraxel@redhat.com</a>&gt;<br>
+<br>
+I never gave this a reviewed-by tag -- can you be more careful<br>
+with your tag handling, please?<br></blockquote><div>Sorry, I see you repli=
+ed the patch, and misunderstand as a review by=C2=A0</div><blockquote class=
+=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rg=
+b(204,204,204);padding-left:1ex">
+<br>
+thanks<br>
+-- PMM<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
+
+--000000000000ffddc805aee38512--
 
