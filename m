@@ -2,86 +2,92 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BD5C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5637DC43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:28:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5F87C206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:21:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D914421D80
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 11:28:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JulM9WaX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5F87C206B8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iDdlMdSy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D914421D80
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kFyAK-0005xi-A7
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 07:21:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58088)
+	id 1kFyHM-0001SQ-Pp
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 07:28:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jtomko@redhat.com>) id 1kFy9M-0005Qp-Fp
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:20:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39545)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jtomko@redhat.com>) id 1kFy9J-0005fn-VG
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:20:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599650424;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=d1vxC8HOW8BTtV2K9h458OpZbcikKwdHEuZxxQyxtlY=;
- b=JulM9WaXfAunmZf495TbhCtqht+LXiYEagBTUB9u1YgglFljnQDhDxsHKKqgOnmvCI+XfF
- kHerUgiHDlCZ/aZeMaFCz7LTHVBqHHh4nGFvkLXbnlot5BmcTOf+5612137FVEeG+V4dh3
- G+1+BJnqnfe43KwXe7kDyVZMYYxZT2g=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-jo17jsGbPI2LN74CoQNyqg-1; Wed, 09 Sep 2020 07:20:22 -0400
-X-MC-Unique: jo17jsGbPI2LN74CoQNyqg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9084D802B62
- for <qemu-devel@nongnu.org>; Wed,  9 Sep 2020 11:20:21 +0000 (UTC)
-Received: from lpt (unknown [10.43.2.94])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 85B63838C4;
- Wed,  9 Sep 2020 11:20:14 +0000 (UTC)
-Date: Wed, 9 Sep 2020 13:20:12 +0200
-From: =?iso-8859-1?B?SuFu?= Tomko <jtomko@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH v2 3/6] tools/virtiofsd: xattr name mappings: Add option
-Message-ID: <20200909112012.GD1377607@lpt>
-References: <20200827153657.111098-1-dgilbert@redhat.com>
- <20200827153657.111098-4-dgilbert@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFyGR-0008OO-E7
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:47 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:46593)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kFyGP-0006WO-LI
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 07:27:47 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id o5so2491743wrn.13
+ for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 04:27:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rG94hKRoVshdQh3a7521VAVuAxq1uMswWmYZISRE+co=;
+ b=iDdlMdSyBBl3RO0Zs7hMFUPbfoskXgITg+xhIicZTYU/iF2PWLoxMLHJX1evlyKoib
+ eMwr90forIJXHp70alyLQapLdTRXHUhTQAulGBrgzhYzwpRBfDQQRHQMtuR07rVbM0O6
+ j+GctnDbOwS7BmFaKX7qi+TEYXdLwo7xW+4/4WoqjRWCE27NQWb40ZnTxm0bCMDDyPb2
+ 71ZgYD5tJ6jtMTozopsmC0HP7qYZlGFkYRSlRIhVY8Cdd+E+eUTqGH9d+KNvIS+qqo5d
+ +Oc9+AuHSc+4iYxOSiPOgKRr1k6fRwjby8daZsYyWBcZiXhmjH6m0HL1VQI0n2mZ6WAl
+ ykjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=rG94hKRoVshdQh3a7521VAVuAxq1uMswWmYZISRE+co=;
+ b=rLF2mtCo/FhAGaqC8VcvXT1iU4qH5pXa4cJd2uU8c7aVey67EocUbIGl2d+3hCoiYa
+ a9siDClW1uTyH48Rq+aYq2wYEvo1a43LTRKstSigZVDASPX++sCiKMvw8AmkG7dCqjAN
+ yHM+/o1nGwoC6/2ueMVDvwrLL3/sfNIU/Xb+NoNdbDur8eozAb9CdJK70JZphCP/Lcju
+ 8x+GcUEnX8Pus3ntWxe+zUpxGGgUtK1RjtBop9irQ3yeKL7V769RG0Z9p33pARaOV5i4
+ jMubY1i/wuybob1VN6xIH7t2M+S2+PabbVcNBU7fct5nUjQ2Yg+LjzBxywEsvC6YfxzA
+ U3OQ==
+X-Gm-Message-State: AOAM531JkUWZdme35GXX7AWdMlX0XAYpmR/p9t4FBr8BRs1EIilyykkn
+ CIL9ebp7zoHv1G5M1uLUaKr7ug==
+X-Google-Smtp-Source: ABdhPJzuSXVHrHL9v9QxjgZujwTMJssamfW20dgKHJJF1h3WdZw86nIf6XMqZwX7P9eJXgLIjBvgsQ==
+X-Received: by 2002:adf:eb86:: with SMTP id t6mr3346635wrn.411.1599650863889; 
+ Wed, 09 Sep 2020 04:27:43 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id m1sm3580427wmc.28.2020.09.09.04.27.42
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 09 Sep 2020 04:27:42 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 0C0E21FF7E;
+ Wed,  9 Sep 2020 12:27:42 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH  v2 00/10] testing and misc updates
+Date: Wed,  9 Sep 2020 12:27:31 +0100
+Message-Id: <20200909112742.25730-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20200827153657.111098-4-dgilbert@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jtomko@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="UfEAyuTBtIjiZzX6"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jtomko@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 07:20:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42b.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,139 +100,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: virtio-fs@redhat.com, stefanha@redhat.com, qemu-devel@nongnu.org,
- vgoyal@redhat.com
+Cc: fam@euphon.net, berrange@redhat.com,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ richard.henderson@linaro.org, f4bug@amsat.org, cota@braap.org,
+ aurelien@aurel32.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---UfEAyuTBtIjiZzX6
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+This should form the basis for my next PR. I've brought one patch from
+my plugins tree (split between tests and contrib) which avoids the
+overly long test times. There is a new patch to squash a compiler
+warning and also Phillipe's tweaks to the acceptance tests while we
+decide what to do about the larger problem of disappearing binaries.
 
-On a Thursday in 2020, Dr. David Alan Gilbert (git) wrote:
->From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
->
->Add an option to define mappings of xattr names so that
->the client and server filesystems see different views.
->This can be used to have different SELinux mappings as
->seen by the guest, to run the virtiofsd with less privileges
->(e.g. in a case where it can't set trusted/system/security
->xattrs but you want the guest to be able to), or to isolate
->multiple users of the same name; e.g. trusted attributes
->used by stacking overlayfs.
->
->A mapping engine is used wit 3 simple rules; the rules can
->be combined to allow most useful mapping scenarios.
->The ruleset is defined by -o xattrmap='rules...'.
->
->This patch doesn't use the rule maps yet.
->
->Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->---
-> docs/tools/virtiofsd.rst         |  55 ++++++++++++
-> tools/virtiofsd/passthrough_ll.c | 148 +++++++++++++++++++++++++++++++
-> 2 files changed, 203 insertions(+)
->
->diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
->index 824e713491..2efa16d3c5 100644
->--- a/docs/tools/virtiofsd.rst
->+++ b/docs/tools/virtiofsd.rst
->@@ -107,6 +107,60 @@ Options
->   performance.  ``auto`` acts similar to NFS with a 1 second metadata cache
->   timeout.  ``always`` sets a long cache lifetime at the expense of coherency.
->
->+xattr-mapping
->+-------------
->+
->+By default the name of xattr's used by the client are passed through to the server
->+file system.  This can be a problem where either those xattr names are used
->+by something on the server (e.g. selinux client/server confusion) or if the
->+virtiofsd is running in a container with restricted priviliges where it cannot
+The following still need review:
 
-privileges
+ - plugins: move the more involved plugins to contrib
+ - hw/i386: make explicit clearing of pch_rev_id
+ - configure: don't enable ppc64abi32-linux-user by default
+ - tests/meson.build: fp tests don't need CONFIG_TCG
+ - CODING_STYLE.rst: flesh out our naming conventions.
 
->+access some attributes.
->+
->+A mapping of xattr names can be made using -o xattrmap=mapping where the ``mapping``
->+string consists of a series of rules.
->+
->+The first matching rule terminates the mapping.
->+
->+Each rule consists of a number of fields separated with a separator that is the
->+first non-white space character in the rule.  This separator must then be used
->+for the whole rule.
->+White space may be added before and after each rule.
->+Using ':' as the separator a rule is of the form:
->+
->+``:scope:type:key:prepend:``
->+
->+**scope** is:
->+
->+- 'client' - match 'key' against a xattr name from the client for
->+             setxattr/getxattr/removexattr
->+- 'server' - match 'prepend' against a xattr name from the server
->+             for listxattr
->+- 'all' - can be used to match both cases.
->+
->+**type** is one of:
->+
->+- 'prefix' - If 'key' matches the client then the 'prepend'
->+  is added before the name is passed to the server.
->+  For a server case, the prepend is tested and stripped
->+  if matching.
->+
->+- 'ok' - The attribute name is OK and passed through to
->+  the server unchanged.
->+
->+- 'bad' - If a client tries to use this name it's
->+  denied using EPERM; when the server passes an attribute
->+  name matching it's hidden.
->+
->+**key** is a string tested as a prefix on an attribute name originating
->+on the client.  It maybe empty in which case a 'client' rule
->+will always match on client names.
->+
->+**prepend** is a string tested as a prefix on an attribute name originiating
+Alex Bennée (7):
+  CODING_STYLE.rst: flesh out our naming conventions.
+  tests/meson.build: fp tests don't need CONFIG_TCG
+  target/mips: simplify gen_compute_imm_branch logic
+  docs/system/deprecated: mark ppc64abi32-linux-user for deprecation
+  configure: don't enable ppc64abi32-linux-user by default
+  hw/i386: make explicit clearing of pch_rev_id
+  plugins: move the more involved plugins to contrib
 
-originating
+Gerd Hoffmann (1):
+  usb-host: restrict workaround to new libusb versions
 
->+on the server, and used as a new prefix.  It maybe empty
+Pavel Dovgaluk (1):
+  tests: bump avocado version
 
-may be
+Philippe Mathieu-Daudé (1):
+  tests/acceptance: Add Test.fetch_asset(cancel_on_missing=True)
 
->+in which case a 'server' rule will always match on all names from
->+the server.
->+
->+
-> Examples
-> --------
->
->@@ -123,3 +177,4 @@ Export ``/var/lib/fs/vm001/`` on vhost-user UNIX domain socket
->       -numa node,memdev=mem \
->       ...
->   guest# mount -t virtiofs myfs /mnt
->+
+ docs/devel/tcg-plugins.rst                    | 142 ++++++++++++++++++
+ docs/system/deprecated.rst                    |   7 +
+ CODING_STYLE.rst                              |  37 ++++-
+ configure                                     |  48 +++---
+ Makefile                                      |  11 ++
+ {tests/plugin => contrib/plugins}/hotblocks.c |   0
+ {tests/plugin => contrib/plugins}/hotpages.c  |   0
+ {tests/plugin => contrib/plugins}/howvec.c    |   0
+ {tests/plugin => contrib/plugins}/lockstep.c  |   0
+ hw/i386/pc_piix.c                             |   2 +-
+ hw/usb/host-libusb.c                          |   2 +-
+ target/mips/translate.c                       |  12 +-
+ .travis.yml                                   |   2 +-
+ MAINTAINERS                                   |   3 +-
+ contrib/plugins/Makefile                      |  42 ++++++
+ tests/Makefile.include                        |   4 +-
+ tests/acceptance/avocado_qemu/__init__.py     |  12 ++
+ tests/meson.build                             |   3 +-
+ tests/plugin/meson.build                      |   4 +-
+ tests/requirements.txt                        |   2 +-
+ tests/tcg/Makefile.target                     |   3 +-
+ 21 files changed, 293 insertions(+), 43 deletions(-)
+ rename {tests/plugin => contrib/plugins}/hotblocks.c (100%)
+ rename {tests/plugin => contrib/plugins}/hotpages.c (100%)
+ rename {tests/plugin => contrib/plugins}/howvec.c (100%)
+ rename {tests/plugin => contrib/plugins}/lockstep.c (100%)
+ create mode 100644 contrib/plugins/Makefile
 
-git complains about trailing whitespace at EOF
-
-Jano
-
---UfEAyuTBtIjiZzX6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEE7DTm0WabvfIr7YZ4Ak1z5KIMl5QFAl9YumsACgkQAk1z5KIM
-l5Ry0Af/Zjbvzw4apmipGfIqkDHTdj3ujBEvABtzHkR/E3gnyB1kpVHQX2WI/kCv
-DkMGNF1GjV3B7Tn1TGv/32Sel9xU0V2pIZNCjUNRGlJ9V2ct4kFDjfeVNyUKX9SS
-mE/OxS3aJ2whyS0kZvWBbQAqZXf8h52ffgaiSBFM3wdB5SW7KdT8SOh0IVQl4Smc
-A7uwojQfYI2JE3rxqJcu2Uq+dOzVCak8ZIcG5D0Vlq9upf3dSVB5+uKw8cPs0A0F
-F4fZCFVFCp53j4YudCPk+PDIrgjiUA0ize0pTpkriU+HUyl9yM1X1y9NNfvebonx
-DKIA+QxHdcS2AgtRcxcHrLm7ExRY/w==
-=fIpH
------END PGP SIGNATURE-----
-
---UfEAyuTBtIjiZzX6--
+-- 
+2.20.1
 
 
