@@ -7,37 +7,38 @@ X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C749AC433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD701C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:28:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 67B532087C
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:27:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 67B532087C
+	by mail.kernel.org (Postfix) with ESMTPS id 4CC262087C
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 13:28:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CC262087C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG08V-00089Y-GI
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:27:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33506)
+	id 1kG09e-0001td-AG
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 09:28:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG07N-0006jZ-OJ; Wed, 09 Sep 2020 09:26:33 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:37899)
+ id 1kG08q-0000T1-5Y; Wed, 09 Sep 2020 09:28:04 -0400
+Received: from mout.kundenserver.de ([212.227.126.187]:60355)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kG07K-00051N-Pd; Wed, 09 Sep 2020 09:26:33 -0400
+ id 1kG08l-0005B3-Lc; Wed, 09 Sep 2020 09:28:03 -0400
 Received: from [192.168.100.1] ([82.252.148.206]) by mrelayeu.kundenserver.de
- (mreue010 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1MkHhB-1kvycc0ozR-00kjvB; Wed, 09 Sep 2020 15:26:03 +0200
-Subject: Re: [PATCH 5/5] hw/isa/isa-bus: Replace hw_error() by assert()
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1N4z2a-1khKfP1ynU-010vsV; Wed, 09 Sep 2020 15:27:55 +0200
+Subject: Re: [PATCH 1/2] hw/gpio/omap_gpio: Replace fprintf() by
+ qemu_log_mask(GUEST_ERROR)
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
-References: <20200901104043.91383-1-f4bug@amsat.org>
- <20200901104043.91383-6-f4bug@amsat.org>
+References: <20200901104234.92159-1-f4bug@amsat.org>
+ <20200901104234.92159-2-f4bug@amsat.org>
 From: Laurent Vivier <laurent@vivier.eu>
 Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  mQINBFYFJhkBEAC2me7w2+RizYOKZM+vZCx69GTewOwqzHrrHSG07MUAxJ6AY29/+HYf6EY2
@@ -81,32 +82,32 @@ Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
  OpKgu3nD0ahBDqANU/ZmNNarBJEwvM2vfusmNnWm3QMIwxNuJghRyuFfx694Im1js0ZY3LEU
  JGSHFG4ZynA+ZFUPA6Xf0wHeJOxGKCGIyeKORsteIqgnkINW9fnKJw2pgk8qHkwVc3Vu+wGS
  ZiJK0xFusPQehjWTHn9WjMG1zvQ5TQQHxau/2FkP45+nRPco6vVFQe8JmgtRF8WFJA==
-Message-ID: <acb7e804-6244-1db1-4332-42e538cc6051@vivier.eu>
-Date: Wed, 9 Sep 2020 15:25:57 +0200
+Message-ID: <3bbc47c7-168a-317f-60d4-cb6a74db1d22@vivier.eu>
+Date: Wed, 9 Sep 2020 15:27:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20200901104043.91383-6-f4bug@amsat.org>
+In-Reply-To: <20200901104234.92159-2-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: fr
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:BSwa64N3/5Uk2GR3Mbn0uw61aITbdeMocYtHtOCdi3+8WrkW8g0
- f3OqN5t312lRq9vv8RAMCbRKbZfr9+Ha9GfDimyqS/Oa/MPpbyWwXFfykYLAkL0BUBfq4Zh
- fiGpTIAQ/2uJRdsgfp1yEGjoX89Hlve8ELje+72/dLyDBMHLBufBJuAEUMwflvE1YKuDmcH
- n3HyLRrwnVxTxZzelikAg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:ZLAkdfIqjXk=:lpRNIzXz/meXfjMHtN1e4i
- UP9RIxFumtsCxxrRxMPeDLqYPwrXCXJrKtswiIxWP15a+g/xXS7BAZePsmL2PVdPRNbdUd0JP
- 41wThlRLal1xqT5Pv56M6Mq6vKn3qX4tJBa3p+sGfZARCr0SK4Dyr9ghZiydT8U5Kn5xIazwB
- Zs1fPMqz3LowVNDRajedfyFILHSNdVQFk5RshKR0GvfrjhJc5M1tsKULLp2NSLMnUJyTPP+xx
- DaeAk9s2/fMlsNcvq9pd87XidVNVoPlOia2QY3OYvgGSmThozITJWSPPNJq0Q35QzFf/XfOdR
- VA4GDCLSkaK+p7IfoQAnnzdrPZ/AY73QcjiFoyRwOWTMbhZGZ49nRg73gJG0vvaZnLap22Eow
- hKl30BbC1OkRwWQKYpfrH5d5MZ999sRsIuVEdlLQ2rBO8T1iZvJ4bP7+N/hueSSWyripSbiNs
- 7bryAJ5S3svi6gOYjQlaDxvSxsQ4x4vbTP4QvMSXTlm09OZfzf4fHgWpUdd3PI0gJZ+AUAsjE
- RcvqXOHvGBTjVn+UMPN8j96F5Ir84VLoAMZXsoKc7qgZYsT1wqkKhC3e8c1hO1JhWJeYzktv/
- EVkAcjCZ5TGLKixKi4Gkfd/DobnfrVY3v5t0r3uqBYG5lJCWiK0F8HzkjpuuH0hqYq45JHuy/
- oBhc4gsNoEOrRUrs12jKu4EOuVKXBYtbfwU3nCZxuqy6wgt+FZmFWMumnuKIQiW2lry5yMjeL
- 9mAjtNrFH+6WR4o+aElAJf5jVLfsVeMuz5l4I3+Vk132i0k2MXi9+Bm6SXUpCoZf61o0K6N2Z
- 5RRFT4I/GKcp6H1xIjM02+zzqmt7f+Wt/W4WG86McvW/kQLnr81fY8MBaemUPLjgifIIugG
+X-Provags-ID: V03:K1:24XJ9qIlRo8xVggyzfpbikZIyXTmtuzcpwr3EepvMqEhiqChwDO
+ aBRYxJh8xooT1RFERvnyw1I8lQ090CcJMU84z2E1K2qKDRMzshvGseVI8mhtDsnulYq9mtW
+ kUEC9CUJfM0nSBqEFAqcjHyPDs2mFvwdTooHi8g/0psnAjk9KGsCccjvRyxyClM8dr1uDHP
+ Z29WlYQR4pLJxMm8yCh2Q==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gLXtg0/hDg4=:AMYN7fWLayPDPUcAcXm3lf
+ kkM+JIsMzRP2iRXYPVKWj3PsZz7yyzv906UNsG5kC1+5GIk8FiAsYNlQhNPaOTSVmHP6LPpDd
+ V1sVI8UK3OXR4O1b3nIRrCcFlMJ9to7pdS6eNhzoS6bHEFAClQq1DH68SbryPHpTHTCMZ4541
+ GuBp1xqBH4GxCOP6jHYewfwqrq7t6Gh1VIsHD1wXOWqDBcrrkqCvus4MjjSWe2L4F11MfVD4C
+ Ig6czPBHoGAxyUyEwEy0gKBHv53GA8884gc8irEQfDQeoQ+ZPtAgZokEmok4H6ofQbUv50l39
+ eaGhjAf7U4VKtxOxI3wDwB95JN8E9v3OSWCkMbXgEtxs6Sm/kvrb+5P6J4mimbQeh9pzwMMMb
+ YLtgdNgdWetLRO7VX6AQrMNr81Mhs4PxVanxz0TyOke5aZm8tDrXWnBX90LumyM522jVlbtZJ
+ j26AD07gWzkmjbG2Ce0vw4/jVcEH8JspPXroMUIHD+n/YIhsiC0P0xPW6gePnObreM6f0jl1i
+ aAzsim0ewdGQaCa4lxXywBUFRDmW+QdPqVqoR2cyYa8aEwZ/0glsB+/893hGWVf2vhTPf9aqx
+ nvrwsjZHGNKqAzBVLGhrElXwMRnFe8DjSd9RQTTplvFJw4CPxMP6CRW8d0DViYyxGRaXGt7HA
+ CtPX6AtPQ5TyshgeeQUxvVfkGKUYB/BowLZ1eEnkIge/ODh7uF6Kcckpb9K7KxVgnkksiBaaW
+ 4dvr5ik5MwSOFt3Ao+Rywy8VolPZQrKiPP6F1KFHZxvFQQCpPgnnomQLMIBV0sEKaOM2sC59M
+ /viKnJGlAVPg7yQnDlJO427Fe8udn3zqjLijVRU0317FZa9THYzdZ7G8YMkgpUfLAUrsqVe
 Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 09:26:28
@@ -129,62 +130,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-trivial@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>, qemu-arm@nongnu.org,
- qemu-ppc@nongnu.org, Huacai Chen <chenhc@lemote.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Le 01/09/2020 à 12:40, Philippe Mathieu-Daudé a écrit :
-> As we can never have more than ISA_NUM_IRQS (16) ISA IRQs,
-> replace the not very interesting hw_error() call by an
-> assert() which is more useful to debug condition that can
-> not happen.
+Le 01/09/2020 à 12:42, Philippe Mathieu-Daudé a écrit :
+> Replace fprintf() by qemu_log_mask(LOG_GUEST_ERROR).
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  hw/isa/isa-bus.c | 9 ++-------
->  1 file changed, 2 insertions(+), 7 deletions(-)
+>  hw/gpio/omap_gpio.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> diff --git a/hw/isa/isa-bus.c b/hw/isa/isa-bus.c
-> index 58fde178f92..10bb7ffa43a 100644
-> --- a/hw/isa/isa-bus.c
-> +++ b/hw/isa/isa-bus.c
-> @@ -21,7 +21,6 @@
->  #include "qemu/error-report.h"
->  #include "qemu/module.h"
->  #include "qapi/error.h"
-> -#include "hw/hw.h"
->  #include "monitor/monitor.h"
->  #include "hw/sysbus.h"
->  #include "sysemu/sysemu.h"
-> @@ -85,18 +84,14 @@ void isa_bus_irqs(ISABus *bus, qemu_irq *irqs)
->  qemu_irq isa_get_irq(ISADevice *dev, unsigned isairq)
->  {
->      assert(!dev || ISA_BUS(qdev_get_parent_bus(DEVICE(dev))) == isabus);
-> -    if (isairq >= ISA_NUM_IRQS) {
-> -        hw_error("isa irq %d invalid", isairq);
-> -    }
-> +    assert(isairq < ISA_NUM_IRQS);
->      return isabus->irqs[isairq];
->  }
+> diff --git a/hw/gpio/omap_gpio.c b/hw/gpio/omap_gpio.c
+> index f662c4cb958..e25084b40c9 100644
+> --- a/hw/gpio/omap_gpio.c
+> +++ b/hw/gpio/omap_gpio.c
+> @@ -392,8 +392,10 @@ static void omap2_gpio_module_write(void *opaque, hwaddr addr,
+>          break;
 >  
->  void isa_init_irq(ISADevice *dev, qemu_irq *p, unsigned isairq)
->  {
->      assert(dev->nirqs < ARRAY_SIZE(dev->isairq));
-> -    if (isairq >= ISA_NUM_IRQS) {
-> -        hw_error("isa irq %d invalid", isairq);
-> -    }
-> +    assert(isairq < ISA_NUM_IRQS);
->      dev->isairq[dev->nirqs] = isairq;
->      *p = isa_get_irq(dev, isairq);
->      dev->nirqs++;
+>      case 0x10:	/* GPIO_SYSCONFIG */
+> -        if (((value >> 3) & 3) == 3)
+> -            fprintf(stderr, "%s: bad IDLEMODE value\n", __func__);
+> +        if (((value >> 3) & 3) == 3) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "%s: Illegal IDLEMODE value: 3\n", __func__);
+> +        }
+>          if (value & 2)
+>              omap2_gpio_module_reset(s);
+>          s->config[0] = value & 0x1d;
 > 
 
 Applied to my trivial-patches branch.
