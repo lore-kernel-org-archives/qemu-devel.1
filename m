@@ -5,80 +5,80 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5AD7C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 16:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 266E3C433E2
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 16:27:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15D4D206B8
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 16:25:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 943D0206B8
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 16:26:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gzDKsv96"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15D4D206B8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sbRbtlaC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 943D0206B8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41524 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47610 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG2ui-000718-4s
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 12:25:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54922)
+	id 1kG2vy-00017g-Jr
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 12:26:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG2kn-0000ts-5h; Wed, 09 Sep 2020 12:15:25 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:36273)
+ id 1kG2ko-0000x9-Kk; Wed, 09 Sep 2020 12:15:26 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:45998)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kG2ki-0006Z3-TP; Wed, 09 Sep 2020 12:15:24 -0400
-Received: by mail-pg1-x543.google.com with SMTP id f2so391579pgd.3;
- Wed, 09 Sep 2020 09:15:20 -0700 (PDT)
+ id 1kG2km-0006Zh-W1; Wed, 09 Sep 2020 12:15:26 -0400
+Received: by mail-pg1-x542.google.com with SMTP id 67so2396115pgd.12;
+ Wed, 09 Sep 2020 09:15:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=70Ma0bsMS+N8kUAgscN+dsueAkfzxvTL6r3jLhB2wcc=;
- b=gzDKsv96W98DCLHiTa8wexBvyAf5dt8uIgT51iunKVNjFjhF0iN9tYEgEMe1WBwS6r
- Wrw7OqIW2cmL6miMqmOgC+I3Xo6Tqjo99J6CTw/PzBiAAtaN3yS1KkoquLXOGEbXKWtT
- xpu9wAoH3no+xQPQrE20PdSj32dogp1Q3VDN7knHiYVM5FsM5F58Ld5BKUTK1zo6ldgl
- zKzvxBn28KSsx9KVo8Yo6ZUn0L5ez5uVHP9GeA4ZLhuImTjI5RG8uawY45ZRPW8WIVbX
- YNvq5EkbH8x4lRrH5Z807n2fePs6juozBUsrw2HwjHTfVYnKvCQ8Jaby+ntIDxUMPtVN
- D/1A==
+ bh=raGFyZs6MR9nEefX4kmRsgZPLq8a4zwcDe8/ve9JX8Y=;
+ b=sbRbtlaC8V+J7gkP7RD1yBChXlM3bVCRP4BKOOluninVSoO+cU4/samT5d+oNdkNZ4
+ Ul3t8S4ZQn7gKdXKZiaIasaafH2LWziicdD6qx+nDSSfj9RyTak5T8HLCIMujL6IM/G1
+ /TAqLLeylIQJ06Qklt38B7w8em8U4sp6q5LGkYZftqCov0hVz/SjXo82kQQ9gmNv+0Nc
+ R2WhykrC353sAADOAawL8PBhqiXvBUHDJVrO7PkJ3DEiET1t54L1HJ63WFWzdtBPff7B
+ Ix5X783fPo2iiqL5zewlYVsjxL7AZdXelS6OF+SZTY8hMkCjsVVgiAYBYhWzeBd2vFcS
+ J6Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=70Ma0bsMS+N8kUAgscN+dsueAkfzxvTL6r3jLhB2wcc=;
- b=BaoJbHnHhUa/jM0qqwFcPffVmKEiGqpYapEUt70sg8yqqNWBBmMbNotevfuSwO+2eI
- aufdmpdYFihwmKMribkWm90jBC64+3JlknXs7sxvYIq8fuK2mFgfaiI4jKnSdByG2Zgi
- GoYiIchHbab+10yZ9UwDlZdkEygvP8O2qsQdVMUWa9ANrFSsXBnIc94qDf2pe6F55oSC
- 9KgjOjM9UfFuVSrTJvAsj+0JJRqnzwEr5JWS9xYR2B3OfZPodQ+Rf8u1wmZM88AxlXTb
- MnYdxXGCCaOv8H6lc7Ek6qKMqiFGoUddfCudfKg9+rJV8xlXDlbNTV4dvr89p1lRaojM
- FdRg==
-X-Gm-Message-State: AOAM532LXvMOA+VZaYYa3FHQlyjKNDtXEeuDVJO9N/EqkDuJBU4kvAT4
- QcmQQeX2d2WJ9n384L/5v7+iFkCBlwkVtKre
-X-Google-Smtp-Source: ABdhPJznUgOE0uOHj1YLR9RiZSgjzZnZfdG3Jcr2+ZdRoALr5r2xd0uLsP6C7aQCEWd1ZFEUWsTYGQ==
-X-Received: by 2002:a62:1ec1:0:b029:13e:d13d:a102 with SMTP id
- e184-20020a621ec10000b029013ed13da102mr1546854pfe.30.1599668118699; 
- Wed, 09 Sep 2020 09:15:18 -0700 (PDT)
+ bh=raGFyZs6MR9nEefX4kmRsgZPLq8a4zwcDe8/ve9JX8Y=;
+ b=axDolAPB4DGKWBWTUpZrQhE7nVAv9IBQbbX0p1s+dFtrnZ8VnxAv0IsjFfADPmGfB8
+ zxR6bZy/yss6KwudcEu0goz9PObFDeVkkjsSdY1DB2S8lbCB3B5wMTyaJTEp8dRKnZ5k
+ UpxW+pQ+tXQ+SUg4y012o3hcTtv2DGeI0kwigWuTJORGlnVnkoCv+xCHF33AfW74PPw2
+ bhcOExuguqw0NPzs4KkFZBmZBu7lhpMoVSU/SWBcTzzKY2VAyoUhyMmQCZaLVzO5VQtV
+ ihirithZEh66v7tvZDUPR+0kLXtFRMnftT09mwYEcr4IjcCd85yL+z89ykwlGaezgZtI
+ hD6A==
+X-Gm-Message-State: AOAM530gRE7qeBuTmXmv4l/Bb8zPskFNmBhJwmKHJKDNs45qmybXvaE1
+ 2GMcWW68MKCrUom2LNb/Ba2gbdbPuXimFMt9
+X-Google-Smtp-Source: ABdhPJwNlnJLY1KwcVC1MfOp5lnoLVVC+0oYUlZVJkHxCELpSwAc1w/RtTvL7m9Va6zZHsAESiJGHw==
+X-Received: by 2002:a17:902:fe08:: with SMTP id
+ g8mr1540271plj.122.1599668122859; 
+ Wed, 09 Sep 2020 09:15:22 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id l123sm2506987pgl.24.2020.09.09.09.15.14
+ by smtp.googlemail.com with ESMTPSA id l123sm2506987pgl.24.2020.09.09.09.15.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 09 Sep 2020 09:15:17 -0700 (PDT)
+ Wed, 09 Sep 2020 09:15:22 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 16/24] cirrus: Building freebsd in a single short
-Date: Thu, 10 Sep 2020 00:14:27 +0800
-Message-Id: <20200909161430.1789-8-luoyonggang@gmail.com>
+Subject: [PATCH v4 20/24] tests: Fixes test-io-channel-file by mask only owner
+ file state mask bits
+Date: Thu, 10 Sep 2020 00:14:28 +0800
+Message-Id: <20200909161430.1789-9-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200909161430.1789-1-luoyonggang@gmail.com>
 References: <20200909161430.1789-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,90 +106,51 @@ Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
  Richard Henderson <richard.henderson@linaro.org>,
  Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Wen Congyang <wencongyang2@huawei.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Li-Wen Hsu <lwhsu@freebsd.org>, Peter Lieven <pl@kamp.de>
+ Wen Congyang <wencongyang2@huawei.com>, Li-Wen Hsu <lwhsu@freebsd.org>,
+ Peter Lieven <pl@kamp.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This reverts commit 45f7b7b9f38f5c4d1529a37c93dedfc26a231bba
-("cirrus.yml: Split FreeBSD job into two parts").
-
-freebsd 1 hour limit not hit anymore
-
-I think we going to a wrong direction, I think there is some tests a stall the test runner,
-please look at
-https://cirrus-ci.com/task/5110577531977728
-When its running properly, the consumed time are little, but when tests running too long,
-look at the cpu usage, the cpu usage are nearly zero. doesn't consuming time.
-
-And look at
-https://cirrus-ci.com/task/6119341601062912
-
-If the tests running properly, the time consuming are little
-We should not hide the error by split them
+This is the error on msys2/mingw
+Running test test-io-channel-file
+**
+ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
+ERROR test-io-channel-file - Bail out! ERROR:../tests/test-io-channel-file.c:59:test_io_channel_file_helper: assertion failed (TEST_MASK & ~mask == st.st_mode & 0777): (384 == 438)
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- .cirrus.yml | 37 +++++++++----------------------------
- 1 file changed, 9 insertions(+), 28 deletions(-)
+ tests/test-io-channel-file.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index 3dd9fcff7f..a18971aac4 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -1,40 +1,21 @@
- env:
-   CIRRUS_CLONE_DEPTH: 1
+diff --git a/tests/test-io-channel-file.c b/tests/test-io-channel-file.c
+index bac2b07562..1b0e8d7c1b 100644
+--- a/tests/test-io-channel-file.c
++++ b/tests/test-io-channel-file.c
+@@ -28,6 +28,12 @@
+ #define TEST_FILE "tests/test-io-channel-file.txt"
+ #define TEST_MASK 0600
  
--freebsd_1st_task:
-+freebsd_12_task:
-   freebsd_instance:
-     image_family: freebsd-12-1
--    cpu: 4
--    memory: 4G
--  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
--    bash curl cyrus-sasl git glib gmake gnutls gsed
--    nettle perl5 pixman pkgconf png usbredir
-+    cpu: 8
-+    memory: 8G
-+  install_script:
-+    - ASSUME_ALWAYS_YES=yes pkg bootstrap -f ;
-+    - pkg install -y bash curl cyrus-sasl git glib gmake gnutls gsed 
-+          nettle perl5 pixman pkgconf png usbredir
-   script:
-     - mkdir build
-     - cd build
--    - ../configure --disable-user --target-list-exclude='alpha-softmmu
--        ppc64-softmmu ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
--        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu'
--        --enable-werror || { cat config.log; exit 1; }
-+    - ../configure --enable-werror || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
--    - gmake -j$(sysctl -n hw.ncpu) check
--
--freebsd_2nd_task:
--  freebsd_instance:
--    image_family: freebsd-12-1
--    cpu: 4
--    memory: 4G
--  install_script: ASSUME_ALWAYS_YES=yes pkg bootstrap -f ; pkg install -y
--    bash curl cyrus-sasl git glib gmake gnutls gtk3 gsed libepoxy mesa-libs
--    nettle perl5 pixman pkgconf png SDL2 usbredir
--  script:
--    - ./configure --enable-werror --target-list='alpha-softmmu ppc64-softmmu
--        ppc-softmmu riscv32-softmmu riscv64-softmmu s390x-softmmu
--        sparc64-softmmu sparc-softmmu x86_64-softmmu i386-softmmu
--        sparc-bsd-user sparc64-bsd-user x86_64-bsd-user i386-bsd-user'
--        || { cat config.log; exit 1; }
--    - gmake -j$(sysctl -n hw.ncpu)
--    - gmake -j$(sysctl -n hw.ncpu) check
-+    - gmake check
++#ifdef _WIN32
++#define TEST_MASK_EXPECT 0700
++#else
++#define TEST_MASK_EXPECT 0777
++#endif
++
+ static void test_io_channel_file_helper(int flags)
+ {
+     QIOChannel *src, *dst;
+@@ -56,7 +62,9 @@ static void test_io_channel_file_helper(int flags)
+     umask(mask);
+     ret = stat(TEST_FILE, &st);
+     g_assert_cmpint(ret, >, -1);
+-    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & 0777);
++    /* On Windows the stat() function in the C library checks only
++     the FAT-style READONLY attribute and does not look at the ACL at all. */
++    g_assert_cmpuint(TEST_MASK & ~mask, ==, st.st_mode & TEST_MASK_EXPECT);
  
- macos_task:
-   osx_instance:
+     unlink(TEST_FILE);
+     object_unref(OBJECT(src));
 -- 
 2.28.0.windows.1
 
