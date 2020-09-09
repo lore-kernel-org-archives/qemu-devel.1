@@ -2,115 +2,87 @@ Return-Path: <SRS0=UKTp=CS=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6312C433E2
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 771B5C43461
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:55:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08B0C2078B
-	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:54:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08B0C2078B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=weilnetz.de
+	by mail.kernel.org (Postfix) with ESMTPS id C72432080A
+	for <qemu-devel@archiver.kernel.org>; Wed,  9 Sep 2020 18:55:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IbPentXc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C72432080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kG5Es-0003Xp-23
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:54:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59632)
+	id 1kG5G1-0004m4-TW
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 14:55:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1kG5EJ-0002yo-QC
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 14:54:03 -0400
-Received: from mail.weilnetz.de ([37.120.169.71]:53894
- helo=v2201612906741603.powersrv.de)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <sw@weilnetz.de>) id 1kG5EH-0000cV-DM
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 14:54:03 -0400
-Received: from localhost (localhost [127.0.0.1])
- by v2201612906741603.powersrv.de (Postfix) with ESMTP id 72A5CDAEA57;
- Wed,  9 Sep 2020 20:53:58 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at v2201612906741603.powersrv.de
-Received: from v2201612906741603.powersrv.de ([127.0.0.1])
- by localhost (v2201612906741603.powersrv.de [127.0.0.1]) (amavisd-new,
- port 10024)
- with ESMTP id vEj_xNQqry8f; Wed,  9 Sep 2020 20:53:56 +0200 (CEST)
-Received: from macbook02.fritz.box (pd9ec31d2.dip0.t-ipconnect.de
- [217.236.49.210])
- (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
- key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
- (No client certificate requested)
- by v2201612906741603.powersrv.de (Postfix) with ESMTPSA id 9F34EDA0600;
- Wed,  9 Sep 2020 20:53:56 +0200 (CEST)
-Subject: Re: [PATCH] configure: Do not intent to build WHPX on 32-bit host
-To: Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?=
- <f4bug@amsat.org>, qemu-devel@nongnu.org
-References: <20200909182449.360472-1-f4bug@amsat.org>
- <357d7fe2-558f-4c3d-d178-742cb9eb6e21@redhat.com>
-From: Stefan Weil <sw@weilnetz.de>
-Autocrypt: addr=sw@weilnetz.de; keydata=
- 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
-Message-ID: <0e6dc9fb-6262-926a-f730-98ac352bb789@weilnetz.de>
-Date: Wed, 9 Sep 2020 20:53:55 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kG5FG-00046g-0y; Wed, 09 Sep 2020 14:55:02 -0400
+Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:45198)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kG5FD-0000sA-SW; Wed, 09 Sep 2020 14:55:01 -0400
+Received: by mail-lf1-x142.google.com with SMTP id z17so2147824lfi.12;
+ Wed, 09 Sep 2020 11:54:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=A2UEKaO2bmOfPugexAM0jINg04jfhDXT34YfvBVks5A=;
+ b=IbPentXcd97nAo53CednuWE1LMlLiiPF57b/FK1WGWovh9SvdwVJVbSLZY7dc0/aam
+ /WSSbb3BDdpSnZZ9kBtRK0ZB4N5VcGtQkPfmOMDXpkydJWvThQHpaebLRNJC2hsnSgeu
+ 6+P0ixjWTEmPPT6PthxSBA84oQu9W895zqgr7LRFVAFCJhPZJueO7gEXk/vDHViSxJ6i
+ jIYLwDpkBdoZHpI3ASJeI1AQERgKrEfBjUlSDBMSSO839pGLnItCfmtkowRk653sR5Ib
+ u9zYS+/5v+TtUj31Ki7nfZanhVWBo1toXYMLyakR/onTSFVMEbRko38fj0TSSM73i8xo
+ 8fbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=A2UEKaO2bmOfPugexAM0jINg04jfhDXT34YfvBVks5A=;
+ b=rQvrh354gptCCPQ/YU6/WY69oHAUlOvqkhVwq2JHw/N4dc/BJ/btPPjykdBilbcDGE
+ tskh35yU9scYuP9ilfhzeoEGVQ2u5JT9DONidRdcGuZzcQkVDM8pIG+fc+KeBaSRrzY7
+ pN5yFFvf68XEhx7JRJ2LJMiiEU+KeJ6mBeO9Pkn/RxneW7CzsZf1c6IzQi9USat2jfw9
+ Bguazgr6f2QuisUV5HusCmSdXyc/7WrLpWDdyAMJdQ49Gj+FOpYzp8mc2tlqehogYK08
+ 2+5XotD7RUtE2eJ7XZqbIa2Dele8NDC9CFE90lNv7J0X0bbOpPhzEV1PPo9+2ShNcftH
+ 0p2g==
+X-Gm-Message-State: AOAM532E2yxb6p7md1AeGRONGzKOUEPCetUesqmORYou7uJgZG2xGpwo
+ skAsc8ytasMJ3STWGiazRrt2FUlU2SwSnKlsrqw=
+X-Google-Smtp-Source: ABdhPJxK5SHAKCQMee7ArgGyLi0Wh5QszxKbOqgMBV/d/z+4TmSI7KhrXzwibj3LcD7q/J/fByk3Wi4NqxhN1SnTP0s=
+X-Received: by 2002:a19:41c8:: with SMTP id o191mr2553719lfa.176.1599677697267; 
+ Wed, 09 Sep 2020 11:54:57 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <357d7fe2-558f-4c3d-d178-742cb9eb6e21@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=37.120.169.71; envelope-from=sw@weilnetz.de;
- helo=v2201612906741603.powersrv.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 14:53:58
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -54
-X-Spam_score: -5.5
-X-Spam_bar: -----
-X-Spam_report: (-5.5 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-3.576,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200909184237.765-1-luoyonggang@gmail.com>
+ <70cdfb53-b1d3-0029-923b-ec33a170eedb@redhat.com>
+In-Reply-To: <70cdfb53-b1d3-0029-923b-ec33a170eedb@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 10 Sep 2020 02:54:46 +0800
+Message-ID: <CAE2XoE8nGYOV5QV5EQzBX+LqOOMze28p3g-HxH1x7gndS10FdQ@mail.gmail.com>
+Subject: Re: [PATCH v6 08/25] tests: disable /char/stdio/* tests in
+ test-char.c on win32
+To: Thomas Huth <thuth@redhat.com>
+Content-Type: multipart/alternative; boundary="000000000000e69d1f05aee5fc28"
+Received-SPF: pass client-ip=2a00:1450:4864:20::142;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x142.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -123,47 +95,274 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Sunil Muthuswamy <sunilmut@microsoft.com>
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Qemu-block <qemu-block@nongnu.org>, Stefan Weil <sw@weilnetz.de>,
+ Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
+ qemu-level <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 09.09.20 um 20:40 schrieb Thomas Huth:
+--000000000000e69d1f05aee5fc28
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> On 09/09/2020 20.24, Philippe Mathieu-Daudé wrote:
->> Hyper-V is available on 64-bit versions of Windows,
->> do not try to build its support on 32-bit versions.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>  configure | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/configure b/configure
->> index 4231d56bcc0..4bd08f5469b 100755
->> --- a/configure
->> +++ b/configure
->> @@ -2989,6 +2989,9 @@ if test "$whpx" != "no" ; then
->>          fi
->>          whpx="no"
->>      fi
->> +    if test "$whpx" = "yes" && test "$ARCH" = "i386"; then
->> +      error_exit "WHPX requires 64-bit host"
->> +    fi
->>  fi
-> I think you should also add a check to the MINGW32 case (see commit
-> e7a222aeb813a) to prevent that the automatic detection kicks in (so that
-> you would end up with this error message even if you did not specify
-> --enable-whpx)
+On Thu, Sep 10, 2020 at 2:48 AM Thomas Huth <thuth@redhat.com> wrote:
+
+> On 09/09/2020 20.42, Yonggang Luo wrote:
+> > These tests are blocking test-char to be finished.
+> > Disable them by using variable is_win32, so we doesn't
+> > need macro to open it. and easy recover those function
+> > latter.
+> >
+> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> > ---
+> >  tests/test-char.c | 26 ++++++++++++++++----------
+> >  1 file changed, 16 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/tests/test-char.c b/tests/test-char.c
+> > index d35cc839bc..184ddceab8 100644
+> > --- a/tests/test-char.c
+> > +++ b/tests/test-char.c
+> > @@ -77,7 +77,6 @@ static void fe_event(void *opaque, QEMUChrEvent event=
+)
+> >      }
+> >  }
+> >
+> > -#ifdef _WIN32
+> >  static void char_console_test_subprocess(void)
+> >  {
+> >      QemuOpts *opts;
+> > @@ -102,7 +101,7 @@ static void char_console_test(void)
+> >      g_test_trap_assert_passed();
+> >      g_test_trap_assert_stdout("CONSOLE");
+> >  }
+> > -#endif
+> > +
+> >  static void char_stdio_test_subprocess(void)
+> >  {
+> >      Chardev *chr;
+> > @@ -1448,7 +1447,11 @@ static SocketAddress unixaddr =3D {
+> >
+> >  int main(int argc, char **argv)
+> >  {
+> > -    bool has_ipv4, has_ipv6;
+> > +    bool has_ipv4, has_ipv6, is_win32 =3D false;
+> > +
+> > +#ifdef _WIN32
+> > +    is_win32 =3D true;
+> > +#endif
+> >
+> >      qemu_init_main_loop(&error_abort);
+> >      socket_init();
+> > @@ -1467,12 +1470,15 @@ int main(int argc, char **argv)
+> >      g_test_add_func("/char/invalid", char_invalid_test);
+> >      g_test_add_func("/char/ringbuf", char_ringbuf_test);
+> >      g_test_add_func("/char/mux", char_mux_test);
+> > -#ifdef _WIN32
+> > -    g_test_add_func("/char/console/subprocess",
+> char_console_test_subprocess);
+> > -    g_test_add_func("/char/console", char_console_test);
+> > -#endif
+> > -    g_test_add_func("/char/stdio/subprocess",
+> char_stdio_test_subprocess);
+> > -    g_test_add_func("/char/stdio", char_stdio_test);
+> > +    if (0) {
+> > +        g_test_add_func("/char/console/subprocess",
+> char_console_test_subprocess);
+> > +        g_test_add_func("/char/console", char_console_test);
+> > +    }
 >
+> Sorry, but this looks pretty much like a work-in-progress debugging
+> patch. Please avoid sending such stuff to the mailing list, and if so,
+> clearly mark it as an RFC and describe it in the patch description.
+>
+> It also does not help much if you send your series three times a day to
+> the list - nobody has that much reviewing band width. So please take
+> some time, finish your patches first, and when you're sure that they are
+> really finished, then post a new series to the mailing list.
+>
+Sorry for that, test-char is hard to fix and I can not fixes in my own, so
+I need help from community,
+For all other patches I am confident, but for this, I am asking for help,
+I'd like to know who is familiar with
+char and I'd like to talk with them privately if possible.
+
+>
+> Thanks,
 >  Thomas
 >
+>
+> > +    if (!is_win32) {
+> > +        g_test_add_func("/char/stdio/subprocess",
+> char_stdio_test_subprocess);
+> > +        g_test_add_func("/char/stdio", char_stdio_test);
+> > +    }
+> >  #ifndef _WIN32
+> >      g_test_add_func("/char/pipe", char_pipe_test);
+> >  #endif
+> > @@ -1534,7 +1540,7 @@ int main(int argc, char **argv)
+> >      g_test_add_data_func("/char/socket/client/dupid-reconnect/" # name=
+,
+> \
+> >                           &client8 ##name, char_socket_client_dupid_tes=
+t)
+> >
+> > -    if (has_ipv4) {
+> > +    if (has_ipv4 && !is_win32) {
+> >          SOCKET_SERVER_TEST(tcp, &tcpaddr);
+> >          SOCKET_CLIENT_TEST(tcp, &tcpaddr);
+> >          g_test_add_data_func("/char/socket/server/two-clients/tcp",
+> &tcpaddr,
+> >
+>
+>
 
-Yes, that's definitely required. The automatic detection currently
-enables WHPX for 32 bit builds, too.
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
-Stefan
+--000000000000e69d1f05aee5fc28
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Sep 10, 2020 at 2:48 AM Thoma=
+s Huth &lt;<a href=3D"mailto:thuth@redhat.com">thuth@redhat.com</a>&gt; wro=
+te:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px =
+0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On 09/09/202=
+0 20.42, Yonggang Luo wrote:<br>
+&gt; These tests are blocking test-char to be finished.<br>
+&gt; Disable them by using variable is_win32, so we doesn&#39;t<br>
+&gt; need macro to open it. and easy recover those function<br>
+&gt; latter.<br>
+&gt; <br>
+&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.co=
+m" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+&gt; ---<br>
+&gt;=C2=A0 tests/test-char.c | 26 ++++++++++++++++----------<br>
+&gt;=C2=A0 1 file changed, 16 insertions(+), 10 deletions(-)<br>
+&gt; <br>
+&gt; diff --git a/tests/test-char.c b/tests/test-char.c<br>
+&gt; index d35cc839bc..184ddceab8 100644<br>
+&gt; --- a/tests/test-char.c<br>
+&gt; +++ b/tests/test-char.c<br>
+&gt; @@ -77,7 +77,6 @@ static void fe_event(void *opaque, QEMUChrEvent even=
+t)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt; -#ifdef _WIN32<br>
+&gt;=C2=A0 static void char_console_test_subprocess(void)<br>
+&gt;=C2=A0 {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 QemuOpts *opts;<br>
+&gt; @@ -102,7 +101,7 @@ static void char_console_test(void)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_trap_assert_passed();<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_trap_assert_stdout(&quot;CONSOLE&quot;);<br=
+>
+&gt;=C2=A0 }<br>
+&gt; -#endif<br>
+&gt; +<br>
+&gt;=C2=A0 static void char_stdio_test_subprocess(void)<br>
+&gt;=C2=A0 {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 Chardev *chr;<br>
+&gt; @@ -1448,7 +1447,11 @@ static SocketAddress unixaddr =3D {<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 int main(int argc, char **argv)<br>
+&gt;=C2=A0 {<br>
+&gt; -=C2=A0 =C2=A0 bool has_ipv4, has_ipv6;<br>
+&gt; +=C2=A0 =C2=A0 bool has_ipv4, has_ipv6, is_win32 =3D false;<br>
+&gt; +<br>
+&gt; +#ifdef _WIN32<br>
+&gt; +=C2=A0 =C2=A0 is_win32 =3D true;<br>
+&gt; +#endif<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qemu_init_main_loop(&amp;error_abort);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 socket_init();<br>
+&gt; @@ -1467,12 +1470,15 @@ int main(int argc, char **argv)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_func(&quot;/char/invalid&quot;, char_in=
+valid_test);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_func(&quot;/char/ringbuf&quot;, char_ri=
+ngbuf_test);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_func(&quot;/char/mux&quot;, char_mux_te=
+st);<br>
+&gt; -#ifdef _WIN32<br>
+&gt; -=C2=A0 =C2=A0 g_test_add_func(&quot;/char/console/subprocess&quot;, c=
+har_console_test_subprocess);<br>
+&gt; -=C2=A0 =C2=A0 g_test_add_func(&quot;/char/console&quot;, char_console=
+_test);<br>
+&gt; -#endif<br>
+&gt; -=C2=A0 =C2=A0 g_test_add_func(&quot;/char/stdio/subprocess&quot;, cha=
+r_stdio_test_subprocess);<br>
+&gt; -=C2=A0 =C2=A0 g_test_add_func(&quot;/char/stdio&quot;, char_stdio_tes=
+t);<br>
+&gt; +=C2=A0 =C2=A0 if (0) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_test_add_func(&quot;/char/console/subpr=
+ocess&quot;, char_console_test_subprocess);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_test_add_func(&quot;/char/console&quot;=
+, char_console_test);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+<br>
+Sorry, but this looks pretty much like a work-in-progress debugging<br>
+patch. Please avoid sending such stuff to the mailing list, and if so,<br>
+clearly mark it as an RFC and describe it in the patch description.<br>
+<br>
+It also does not help much if you send your series three times a day to<br>
+the list - nobody has that much reviewing band width. So please take<br>
+some time, finish your patches first, and when you&#39;re sure that they ar=
+e<br>
+really finished, then post a new series to the mailing list.<br></blockquot=
+e><div>Sorry for that, test-char is hard to fix and I can not fixes in my o=
+wn, so I need help from community,</div><div>For all other patches I am con=
+fident, but for this, I am asking for help, I&#39;d like to know who is fam=
+iliar with</div><div>char and I&#39;d like to talk with them privately if p=
+ossible.</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px=
+ 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+Thanks,<br>
+=C2=A0Thomas<br>
+<br>
+<br>
+&gt; +=C2=A0 =C2=A0 if (!is_win32) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_test_add_func(&quot;/char/stdio/subproc=
+ess&quot;, char_stdio_test_subprocess);<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 g_test_add_func(&quot;/char/stdio&quot;, =
+char_stdio_test);<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt;=C2=A0 #ifndef _WIN32<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_func(&quot;/char/pipe&quot;, char_pipe_=
+test);<br>
+&gt;=C2=A0 #endif<br>
+&gt; @@ -1534,7 +1540,7 @@ int main(int argc, char **argv)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 g_test_add_data_func(&quot;/char/socket/client/dup=
+id-reconnect/&quot; # name, \<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;client8 ##name, char_socket_client_dupid_te=
+st)<br>
+&gt;=C2=A0 <br>
+&gt; -=C2=A0 =C2=A0 if (has_ipv4) {<br>
+&gt; +=C2=A0 =C2=A0 if (has_ipv4 &amp;&amp; !is_win32) {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 SOCKET_SERVER_TEST(tcp, &amp;tcpaddr=
+);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 SOCKET_CLIENT_TEST(tcp, &amp;tcpaddr=
+);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 g_test_add_data_func(&quot;/char/soc=
+ket/server/two-clients/tcp&quot;, &amp;tcpaddr,<br>
+&gt; <br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
 
+--000000000000e69d1f05aee5fc28--
 
