@@ -2,68 +2,87 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84210C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:20:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36FA3C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:28:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0F8C20708
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:20:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0F8C20708
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9BBC82076C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:28:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kEua+2bv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BBC82076C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGNQj-0004Kr-Ni
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 10:20:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49240)
+	id 1kGNYh-0007h0-Jm
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 10:28:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <steven.price@arm.com>)
- id 1kGNMh-000252-4j
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:15:56 -0400
-Received: from foss.arm.com ([217.140.110.172]:58066)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <steven.price@arm.com>) id 1kGNMd-0005vt-Ti
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:15:53 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 747EB113E;
- Thu, 10 Sep 2020 07:15:50 -0700 (PDT)
-Received: from [192.168.1.179] (unknown [172.31.20.19])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 92E7F3F66E;
- Thu, 10 Sep 2020 07:15:48 -0700 (PDT)
-Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
-To: Andrew Jones <drjones@redhat.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
- <20200909152540.ylnrljd6aelxoxrf@kamzik.brq.redhat.com>
- <857566df-1b98-84f7-9268-d092722dc749@arm.com>
- <20200910062958.o55apuvdxmf3uiqb@kamzik.brq.redhat.com>
- <37663bb6-d3a7-6f53-d0cd-88777633a2b2@arm.com>
- <20200910135618.cvnlrgvhuy3amv6s@kamzik.brq.redhat.com>
-From: Steven Price <steven.price@arm.com>
-Message-ID: <17efa848-9bda-26b2-b70f-040c9fa3f2da@arm.com>
-Date: Thu, 10 Sep 2020 15:14:47 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kGNY9-0007EA-RQ
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:27:45 -0400
+Received: from mail-oi1-x243.google.com ([2607:f8b0:4864:20::243]:40519)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <liq3ea@gmail.com>) id 1kGNY7-0007e5-MC
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:27:45 -0400
+Received: by mail-oi1-x243.google.com with SMTP id t76so6072302oif.7
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 07:27:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Yo6FoeJ8JgGmOCuTEbOd1fN1DhEY7OyYBQ45lu4dhfE=;
+ b=kEua+2bvRz10D6KkOYpJhAPyJWVmUXrRfdtpMzgzXB+8LAxqTt47z99S+aD7TjkUEb
+ ocr+O8XAiVr2dmSmU3uHDcu++HZdbVaKteSNpk4BXF7A++Jp+eBAhbMrBwiDeeq3CD30
+ y289boeFX3QiLW15p6D0vGTWF+a+oaDcLktn9IXZFQlrcV9QdOffHOuICF8qCaylvc7r
+ Fyo755Xcw5jRKJCEAUG7gtX2F6aPrLZzSyfrWv6soJbNPIRw8XP3uAv+CdbXau32i0bu
+ T4qgMvv7sBSm++u329TckM8nyY1oWq8RzT+cQw2qpRkJoTuUXWTonKAhhzhc8L2THflc
+ wlzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Yo6FoeJ8JgGmOCuTEbOd1fN1DhEY7OyYBQ45lu4dhfE=;
+ b=EbtpzLHFKUC4TQrm0/hLkLoxrv+8rANps6sp1xohNh+A4+PjVfg/qH1rvooPa1V7zg
+ xIeWiaoKv6B+7cst/mdyATNY+dCbSEbULZe3A6jBBIhs90MGhHB+iC835j4bsSOBiqn/
+ Q/jXRcDMR8vrQ7fSuu/JnFJDq1/MsnjQhirLGLKzFV/krOkSJOaLEFuX79YTl+wYZWxB
+ PxZ+WO/t8Wlfc9BbetSdgZEX97ESyWUFhD1zZo1I6PqrEBON9dccs2z9p2+1doKnxTcf
+ ZRA3rbp4OIb4heRrBgd3czn+16pqNDfglWIHm40cksMfM2pYZGQyBBy2p365cQkm0ila
+ TTHQ==
+X-Gm-Message-State: AOAM531FhWN6mQldjCjD+XS9FXnYwlr5vK0orDsOs0vPH0vBbFPpaq9Y
+ +Q/kQ5S8T3hpSPT91xdegITxJGzrMAPyhY4dk7U=
+X-Google-Smtp-Source: ABdhPJwlSm+xeaPPFx3VGmCj/e3H2Qnq1DZG/sKwkdVhLOxxZccA8HloiFWRqQR6EsiHu3PbFTyMXf0d4uuesoZI78A=
+X-Received: by 2002:aca:b454:: with SMTP id d81mr178468oif.150.1599748062287; 
+ Thu, 10 Sep 2020 07:27:42 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200910135618.cvnlrgvhuy3amv6s@kamzik.brq.redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=217.140.110.172;
- envelope-from=steven.price@arm.com; helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 10:15:50
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -77
-X-Spam_score: -7.8
-X-Spam_bar: -------
-X-Spam_report: (-7.8 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-3.576,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+References: <1599661096-127913-1-git-send-email-zhengchuan@huawei.com>
+ <1599661096-127913-12-git-send-email-zhengchuan@huawei.com>
+In-Reply-To: <1599661096-127913-12-git-send-email-zhengchuan@huawei.com>
+From: Li Qiang <liq3ea@gmail.com>
+Date: Thu, 10 Sep 2020 22:27:06 +0800
+Message-ID: <CAKXe6SLGySEt+S_c8311nXkeUjkBnKcwzCyXrovoR2xmk=nQ3g@mail.gmail.com>
+Subject: Re: [PATCH v7 11/12] migration/dirtyrate: Implement
+ qmp_cal_dirty_rate()/qmp_get_dirty_rate() function
+To: Chuan Zheng <zhengchuan@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::243;
+ envelope-from=liq3ea@gmail.com; helo=mail-oi1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,87 +96,186 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- Marc Zyngier <maz@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Dave Martin <Dave.Martin@arm.com>
+Cc: "Daniel P. Berrange" <berrange@redhat.com>,
+ zhanghailiang <zhang.zhanghailiang@huawei.com>, dme@dme.org,
+ Juan Quintela <quintela@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, xiexiangyou@huawei.com,
+ Qemu Developers <qemu-devel@nongnu.org>, AlexChen <alex.chen@huawei.com>,
+ ann.zhuangyanying@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/09/2020 14:56, Andrew Jones wrote:
-> On Thu, Sep 10, 2020 at 10:21:04AM +0100, Steven Price wrote:
->> On 10/09/2020 07:29, Andrew Jones wrote:
->>> But if userspace created the memslots with memory already set with
->>> PROT_MTE, then this wouldn't be necessary, right? And, as long as
->>> there's still a way to access the memory with tag checking disabled,
->>> then it shouldn't be a problem.
->>
->> Yes, so one option would be to attempt to validate that the VMM has provided
->> memory pages with the PG_mte_tagged bit set (e.g. by mapping with PROT_MTE).
->> The tricky part here is that we support KVM_CAP_SYNC_MMU which means that
->> the VMM can change the memory backing at any time - so we could end up in
->> user_mem_abort() discovering that a page doesn't have PG_mte_tagged set - at
->> that point there's no nice way of handling it (other than silently upgrading
->> the page) so the VM is dead.
->>
->> So since enforcing that PG_mte_tagged is set isn't easy and provides a
->> hard-to-debug foot gun to the VMM I decided the better option was to let the
->> kernel set the bit automatically.
->>
-> 
-> The foot gun still exists when migration is considered, no? If userspace
-> is telling a guest it can use MTE on its normal memory, but then doesn't
-> prepare that memory correctly, or remember to migrate the tags correctly
-> (which requires knowing the memory has tags and knowing how to get them),
-> then I guess the VM is in trouble one way or another.
+Chuan Zheng <zhengchuan@huawei.com> =E4=BA=8E2020=E5=B9=B49=E6=9C=889=E6=97=
+=A5=E5=91=A8=E4=B8=89 =E4=B8=8B=E5=8D=8810:14=E5=86=99=E9=81=93=EF=BC=9A
+>
+> Implement qmp_cal_dirty_rate()/qmp_get_dirty_rate() function which could =
+be called
+>
+> Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+> ---
+>  migration/dirtyrate.c | 62 +++++++++++++++++++++++++++++++++++++++++++++=
+++++++
+>  qapi/migration.json   | 50 +++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 112 insertions(+)
+>
+> diff --git a/migration/dirtyrate.c b/migration/dirtyrate.c
+> index 2f9ac34..e9e9e35 100644
+> --- a/migration/dirtyrate.c
+> +++ b/migration/dirtyrate.c
+> @@ -61,6 +61,24 @@ static int dirtyrate_set_state(int *state, int old_sta=
+te, int new_state)
+>      }
+>  }
+>
+> +static struct DirtyRateInfo *query_dirty_rate_info(void)
+> +{
+> +    int64_t dirty_rate =3D DirtyStat.dirty_rate;
+> +    struct DirtyRateInfo *info =3D g_malloc0(sizeof(DirtyRateInfo));
+> +
+> +    if (CalculatingState =3D=3D DIRTY_RATE_STATUS_MEASURED) {
 
-Well not all VMMs support migration, and it's only migration that is 
-affected by this for a simple VMM (e.g. the changes to kvmtool are 
-minimal for MTE). But yes fundamentally if a VMM enables MTE it needs to 
-know how to deal with the extra tags everywhere.
+Should we use atomic read 'CalculatingState'? The qmp thread maybe run
+with the sampled thread.
 
-> I feel like we should trust the VMM to ensure MTE will work on any memory
-> the guest could use it on, and change the action in user_mem_abort() to
-> abort the guest with a big error message if it sees the flag is missing.
+> +        info->dirty_rate =3D dirty_rate;
+> +    } else {
+> +        info->dirty_rate =3D -1;
+> +    }
+> +
+> +    info->status =3D CalculatingState;
+> +    info->start_time =3D DirtyStat.start_time;
+> +    info->calc_time =3D DirtyStat.calc_time;
+> +
+> +    return info;
+> +}
+> +
 
-I'm happy to change it, if you feel this is easier to debug.
 
->>>>>
->>>>> If userspace needs to write to guest memory then it should be due to
->>>>> a device DMA or other specific hardware emulation. Those accesses can
->>>>> be done with tag checking disabled.
->>>>
->>>> Yes, the question is can the VMM (sensibly) wrap the accesses with a
->>>> disable/renable tag checking for the process sequence. The alternative at
->>>> the moment is to maintain a separate (untagged) mapping for the purpose
->>>> which might present it's own problems.
->>>
->>> Hmm, so there's no easy way to disable tag checking when necessary? If we
->>> don't map the guest ram with PROT_MTE and continue setting the attribute
->>> in KVM, as this series does, then we don't need to worry about it tag
->>> checking when accessing the memory, but then we can't access the tags for
->>> migration.
->>
->> There's a "TCO" (Tag Check Override) bit in PSTATE which allows disabling
->> tag checking, so if it's reasonable to wrap accesses to the memory you can
->> simply set the TCO bit, perform the memory access and then unset TCO. That
->> would mean a single mapping with MTE enabled would work fine. What I don't
->> have a clue about is whether it's practical in the VMM to wrap guest
->> accesses like this.
->>
-> 
-> At least QEMU goes through many abstractions to get to memory already.
-> There may already be a hook we could use, if not, it probably wouldn't
-> be too hard to add one (famous last words).
+>  static void reset_dirtyrate_stat(void)
+>  {
+>      DirtyStat.total_dirty_samples =3D 0;
+> @@ -331,6 +349,8 @@ static void calculate_dirtyrate(struct DirtyRateConfi=
+g config)
+>
+>      msec =3D config.sample_period_seconds * 1000;
+>      msec =3D set_sample_page_period(msec, initial_time);
+> +    DirtyStat.start_time =3D initial_time / 1000;
+> +    DirtyStat.calc_time =3D msec / 1000;
+>
+>      rcu_read_lock();
+>      if (compare_page_hash_info(block_dinfo, block_index) < 0) {
+> @@ -362,3 +382,45 @@ void *get_dirtyrate_thread(void *arg)
+>                                DIRTY_RATE_STATUS_MEASURED);
+>      return NULL;
+>  }
+> +
+> +void qmp_calc_dirty_rate(int64_t calc_time, Error **errp)
+> +{
+> +    static struct DirtyRateConfig config;
+> +    QemuThread thread;
+> +    int ret;
+> +
+> +    /*
+> +     * If the dirty rate is already being measured, don't attempt to sta=
+rt.
+> +     */
+> +    if (CalculatingState =3D=3D DIRTY_RATE_STATUS_MEASURING) {
 
-Sounds good. My hope was that the abstractions were already in there.
+atomic read?
 
-Thanks,
-
-Steve
+> +        error_setg(errp, "the dirty rate is already being measured.");
+> +        return;
+> +    }
+> +
+> +    if (!get_sample_page_period(calc_time)) {
+> +        error_setg(errp, "calc-time is out of range[%d, %d].",
+> +                         MIN_FETCH_DIRTYRATE_TIME_SEC,
+> +                         MAX_FETCH_DIRTYRATE_TIME_SEC);
+> +        return;
+> +    }
+> +
+> +    /*
+> +     * Init calculation state as unstarted.
+> +     */
+> +    ret =3D dirtyrate_set_state(&CalculatingState, CalculatingState,
+> +                              DIRTY_RATE_STATUS_UNSTARTED);
+> +    if (ret =3D=3D -1) {
+> +        error_setg(errp, "init dirty rate calculation state failed.");
+> +        return;
+> +    }
+> +
+> +    config.sample_period_seconds =3D calc_time;
+> +    config.sample_pages_per_gigabytes =3D DIRTYRATE_DEFAULT_SAMPLE_PAGES=
+;
+> +    qemu_thread_create(&thread, "get_dirtyrate", get_dirtyrate_thread,
+> +                       (void *)&config, QEMU_THREAD_DETACHED);
+> +}
+> +
+> +struct DirtyRateInfo *qmp_query_dirty_rate(Error **errp)
+> +{
+> +    return query_dirty_rate_info();
+> +}
+> diff --git a/qapi/migration.json b/qapi/migration.json
+> index 061ff25..4b980a0 100644
+> --- a/qapi/migration.json
+> +++ b/qapi/migration.json
+> @@ -1737,3 +1737,53 @@
+>  ##
+>  { 'enum': 'DirtyRateStatus',
+>    'data': [ 'unstarted', 'measuring', 'measured'] }
+> +
+> +##
+> +# @DirtyRateInfo:
+> +#
+> +# Information about current dirty page rate of vm.
+> +#
+> +# @dirty-rate: @dirtyrate describing the dirty page rate of vm
+> +#          in units of MB/s.
+> +#          If this field return '-1', it means querying is not
+> +#          start or not complete.
+> +#
+> +# @status: status containing dirtyrate query status includes
+> +#          'unstarted' or 'measuring' or 'measured'
+> +#
+> +# @start-time: start time in units of second for calculation
+> +#
+> +# @calc-time: time in units of second for sample dirty pages
+> +#
+> +# Since: 5.2
+> +#
+> +##
+> +{ 'struct': 'DirtyRateInfo',
+> +  'data': {'dirty-rate': 'int64',
+> +           'status': 'DirtyRateStatus',
+> +           'start-time': 'int64',
+> +           'calc-time': 'int64'} }
+> +
+> +##
+> +# @calc-dirty-rate:
+> +#
+> +# start calculating dirty page rate for vm
+> +#
+> +# @calc-time: time in units of second for sample dirty pages
+> +#
+> +# Since: 5.2
+> +#
+> +# Example:
+> +#   {"command": "calc-dirty-rate", "data": {"calc-time": 1} }
+> +#
+> +##
+> +{ 'command': 'calc-dirty-rate', 'data': {'calc-time': 'int64'} }
+> +
+> +##
+> +# @query-dirty-rate:
+> +#
+> +# query dirty page rate in units of MB/s for vm
+> +#
+> +# Since: 5.2
+> +##
+> +{ 'command': 'query-dirty-rate', 'returns': 'DirtyRateInfo' }
+> --
+> 1.8.3.1
+>
+>
 
