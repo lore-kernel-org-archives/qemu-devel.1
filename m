@@ -2,114 +2,105 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FD0C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87630C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:47:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EA9E12087C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:46:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2EB1A2087C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:47:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sz7QaRm5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA9E12087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="O+UcpnvJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EB1A2087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGOmO-0000Yg-S7
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:46:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45830)
+	id 1kGOnV-0001YF-9p
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:47:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOlD-0007vS-Rg
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:45:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52074)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOlC-0002mB-4d
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:45:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599752716;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=FU8kNfbiHhZqDHscFptLY7BzZVluEEh+JNkERSsvjoo=;
- b=Sz7QaRm5ZBFOokWqaB5XKCBKhoOZX0/zKIuEbmxbnoPMUkJemizWdotZ4GLFZCyRSmvMXi
- 01BuNc/Pm3zUyZ8iCzDRZ3qHo3CXF7wb2x2cu61vRHGGfevhRsRPkqw/bELwJ2olvuxNgU
- 2LTdDUptNVl8FY4+5VmS5Cgi0u0ribQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-290-duJY6d3lOnqsZl5moXtkYQ-1; Thu, 10 Sep 2020 11:45:12 -0400
-X-MC-Unique: duJY6d3lOnqsZl5moXtkYQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F91210BBEF6;
- Thu, 10 Sep 2020 15:45:12 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
- [10.36.112.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 309E719C4F;
- Thu, 10 Sep 2020 15:45:08 +0000 (UTC)
-Subject: Re: [PATCH 28/29] iotests: Factor out qemu_tool_pipe_and_status()
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200907182011.521007-1-kwolf@redhat.com>
- <20200907182011.521007-29-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <923d2f06-36dc-9c97-af4c-e624f8bcb8ea@redhat.com>
-Date: Thu, 10 Sep 2020 17:45:05 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
+ id 1kGOls-0000BY-7h
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:46:01 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:44582)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
+ id 1kGOlo-0002wJ-80
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:45:58 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08AFi2mC170565;
+ Thu, 10 Sep 2020 15:45:50 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
+ h=from : to : cc :
+ subject : in-reply-to : references : date : message-id : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=Lt7kstWgBm+pxKlSKx+vKoa7fUNFw1W/H4hLQSjJULU=;
+ b=O+UcpnvJiP+IY7f+rjNuvZVh4ePXtZdtitDZnnN7ky4pBKUqIqicb8ZB0P7U9d+J+MQJ
+ E/7sX57WKQHoJIMMbxSsInglAZh8JoKP+PobB2NmDBcT1kWqxz6yqg5r+ysoSHz/dDRv
+ khKcUaZzKLwfpPrQZcr1uLcA1y5B0vemGcKMpgA3qB8etFhsZq9/qpatLGMpN3DWfmJz
+ MRKYcXbZ5qhS1aPKVJpMRLipIAyG2e0XH6ziD65bNsCjGuhXbDoEgZQ/C4raLERXcbb6
+ nq63AW+3TQ+KjskH9VxH5DxVSDZBCh4T/kLi7whYfyNeap1d9I3o8RWkq/GJEke+MErM oQ== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 33c3an8vpg-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+ Thu, 10 Sep 2020 15:45:50 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 08AFjX0X194089;
+ Thu, 10 Sep 2020 15:45:50 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+ by userp3020.oracle.com with ESMTP id 33cmev65pj-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 10 Sep 2020 15:45:50 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 08AFjl4j032346;
+ Thu, 10 Sep 2020 15:45:48 GMT
+Received: from starbug-mbp.localdomain (/79.97.215.145)
+ by default (Oracle Beehive Gateway v4.0)
+ with ESMTP ; Thu, 10 Sep 2020 08:45:47 -0700
+Received: by starbug-mbp.localdomain (Postfix, from userid 501)
+ id A36AF1463194; Thu, 10 Sep 2020 16:45:45 +0100 (IST)
+From: Darren Kenny <darren.kenny@oracle.com>
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+Subject: Re: [PATCH] oss-fuzz: move linker arg to fix coverage-build
+In-Reply-To: <20200909220516.614222-1-alxndr@bu.edu>
+References: <20200909220516.614222-1-alxndr@bu.edu>
+Date: Thu, 10 Sep 2020 16:45:45 +0100
+Message-ID: <m2a6xx4ouu.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20200907182011.521007-29-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="PaNVFNhECbAAiMruWoE9Prqwj2bPSkPFO"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:16:38
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ suspectscore=0 adultscore=0
+ bulkscore=0 phishscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009100145
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9739
+ signatures=668679
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
+ priorityscore=1501
+ clxscore=1015 bulkscore=0 malwarescore=0 lowpriorityscore=0
+ mlxlogscore=999 suspectscore=0 adultscore=0 mlxscore=0 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2006250000 definitions=main-2009100145
+Received-SPF: pass client-ip=156.151.31.85;
+ envelope-from=darren.kenny@oracle.com; helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 11:33:14
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,88 +113,119 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, bsd@redhat.com, stefanha@redhat.com,
+ Alexander Bulekov <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---PaNVFNhECbAAiMruWoE9Prqwj2bPSkPFO
-Content-Type: multipart/mixed; boundary="rwKpWj2vDN5Z9dfPo8YPYIZZkrz6LhcKP"
+Hi Alex,
 
---rwKpWj2vDN5Z9dfPo8YPYIZZkrz6LhcKP
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+I'm certainly not an expert in meson, but have some questions below...
 
-On 07.09.20 20:20, Kevin Wolf wrote:
-> We have three almost identical functions that call an external process
-> and return its output and return code. Refactor them into small wrappers
-> around a common function.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+On Wednesday, 2020-09-09 at 18:05:16 -04, Alexander Bulekov wrote:
+> The order of the add_project_link_arguments calls impacts which
+> arguments are placed between --start-group and --end-group.
+> OSS-Fuzz coverage builds seem to just add these to CFLAGS:
+> -fprofile-instr-generate -fcoverage-mapping pthread -Wl,--no-as-needed
+> --Wl,-ldl -Wl,-lm Wno-unused-command-line-argument
+>
+> for some reason that is enough to shift the fork_fuzz.ld linker-script
+> back into the linker group. Move the linker-script meson call before the
+> other calls to mitigate this.
+>
+> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 > ---
->  tests/qemu-iotests/iotests.py | 50 +++++++++++++++++------------------
->  1 file changed, 24 insertions(+), 26 deletions(-)
->=20
-> diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.p=
-y
-> index 64ccaf9061..6fed77487e 100644
-> --- a/tests/qemu-iotests/iotests.py
-> +++ b/tests/qemu-iotests/iotests.py
-> @@ -90,21 +90,30 @@ luks_default_secret_object =3D 'secret,id=3Dkeysec0,d=
-ata=3D' + \
->  luks_default_key_secret_opt =3D 'key-secret=3Dkeysec0'
-> =20
-> =20
-> -def qemu_img_pipe_and_status(*args: str) -> Tuple[str, int]:
-> +def qemu_tool_pipe_and_status(tool: str, *args: str,
+>  meson.build | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
+>
+> Good news! Standard oss-fuzz builds are working again:
+> https://oss-fuzz-build-logs.storage.googleapis.com/log-2fa5122f-c98c-4e46-b3ff-e6835d9ecda6.txt
+>
+> Bad news: Coverage builds are still-broken:
+> https://oss-fuzz-build-logs.storage.googleapis.com/log-dafece55-81f2-4d1d-a686-c5197cdd15c1.txt
+>
+> For some reason, just switching around the order of the
+> add_project_arguments fixes this (i.e. the order of the calls impacts
+> which arguments are placed between --start-group --end-group). I don't
+> really like this because it makes this linker-script block even more
+> visible in meson.build, by placing it directly beneath the "Compiler
+> flags" heading. Paolo, do you have a better suggestion?
+>
+> diff --git a/meson.build b/meson.build
+> index 5421eca66a..2ba1823ca3 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -49,6 +49,14 @@ configure_file(input: files('scripts/ninjatool.py'),
+>  # Compiler flags #
+>  ##################
+>  
+> +# Specify linker-script with add_project_link_arguments so that it is not placed
+> +# within a linker --start-group/--end-group pair
+> +if 'CONFIG_FUZZ' in config_host
+> +   add_project_link_arguments(['-Wl,-T,',
+> +                               (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
 
-If this is just an internal function not to be used outside of
-iotests.py, I wonder if =E2=80=9Cargs: Sequence[str]=E2=80=9D wouldn=E2=80=
-=99t be cleaner.
+Why do you use an array here rather than a string concatenation? Looking
+at the documentation, it suggests that each arg to
+add_project_link_arguments() should be specified separately - and
+doesn't mention anything about an argument being a list and what would
+happen here.
 
-(Just because I feel like the *args notation is useful to provide a
-nicer-looking external interface, but is somehow unclean, so I
-personally avoid it unless it actually does make things look nicer.
-Just a very personal feeling, though, of course.)
+What I'm wondering is how the array might be handled, as in would it be
+like the Python equivalent of:
 
-> +                              connect_stderr: bool =3D True) -> Tuple[st=
-r, int]:
->      """
-> -    Run qemu-img and return both its output and its exit code
-> +    Run a tool and return both its output and its exit code
->      """
-> -    subp =3D subprocess.Popen(qemu_img_args + list(args),
-> +    stderr =3D subprocess.STDOUT if connect_stderr else None
+  "".join(['a', b'])   => 'ab'
 
-I really despise this notation.  It=E2=80=99s like ternary operators in C
-weren=E2=80=99t bad enough.
+or
 
-(Again with the personal feelings.  Sorry.)
+  " ".join(['a', b'])   => 'a b'
 
-Reviewed-by: Max Reitz <mreitz@redhat.com>
+It's not honestly clear, or at least I couldn't find anything that says
+clearly what the result would be.
 
+So, would it be more correct as either:
 
---rwKpWj2vDN5Z9dfPo8YPYIZZkrz6LhcKP--
+  add_project_link_arguments('-Wl,-T,' + (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld'),
 
---PaNVFNhECbAAiMruWoE9Prqwj2bPSkPFO
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+or
 
------BEGIN PGP SIGNATURE-----
+  add_project_link_arguments('-Wl,-T,', (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld'),
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aSgIACgkQ9AfbAGHV
-z0DD4QgAgRH9lpqde3NLhb6gw6t2v4jzZ28GCcKEPrX8Vv+hUBg9yxoGwfxAnlSP
-xKyj68bo7upyVHDjbMR1vphr67q7koHFqxshJnr9NTmYVNG3BuEGDvCusodFyJlj
-ASdFVeLFTTJdgUKHtWLcjPB0TtXVjydpjP1NIrtslEYVWqE6hgEL+8GbKzgvuuOD
-E0Xf9XfTJbCM9l4cWiwp0vo8KnaUk/hnevO8cyHTh3GSQhoGPtvdXDODoQHBp7oJ
-oI9RrqEVffGojSPGTeo2W3UaSqFo5qKEwt1Fr4pKYTP3Q6sbJKlNM2aqcATo+y8q
-cRhecH+NB3NaOLzjJxrc4Xy8iuCwTA==
-=wOhQ
------END PGP SIGNATURE-----
+I'm also wondering if this in any way would affect how meson moves the
+linker arguments around later.
 
---PaNVFNhECbAAiMruWoE9Prqwj2bPSkPFO--
+Alternatively, there is a link_args argument to the executable()
+function, which is being used for adding @qemu.syms and @block.syms
+around line 1017.
 
+Would it work to add this linker-script at this point, in a conditional
+block for CONFIG_FUZZ here instead?
+
+Thanks,
+
+Darren.
+
+> +                              native: false, language: ['c', 'cpp', 'objc'])
+> +endif
+> +
+>  add_project_arguments(config_host['QEMU_CFLAGS'].split(),
+>                        native: false, language: ['c', 'objc'])
+>  add_project_arguments(config_host['QEMU_CXXFLAGS'].split(),
+> @@ -58,13 +66,6 @@ add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
+>  add_project_arguments(config_host['QEMU_INCLUDES'].split(),
+>                        language: ['c', 'cpp', 'objc'])
+>  
+> -# Specify linker-script with add_project_link_arguments so that it is not placed
+> -# within a linker --start-group/--end-group pair
+> -if 'CONFIG_FUZZ' in config_host
+> -   add_project_link_arguments(['-Wl,-T,',
+> -                               (meson.current_source_dir() / 'tests/qtest/fuzz/fork_fuzz.ld')],
+> -                              native: false, language: ['c', 'cpp', 'objc'])
+> -endif
+>  
+>  link_language = meson.get_external_property('link_language', 'cpp')
+>  if link_language == 'cpp'
+> -- 
+> 2.28.0
 
