@@ -2,114 +2,100 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6A9C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:35:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17FEBC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 326A8208E4
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:35:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AC8E22087C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:37:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="foORUNUi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326A8208E4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GKVS6dK7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC8E22087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38834 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGOba-0004hy-Vl
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:35:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43296)
+	id 1kGOdh-0005uu-Oj
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:37:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOaw-0003yE-Iq
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:34:42 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58307
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOau-0001Gk-WC
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:34:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599752080;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=q0T4hjpwuJFcxtUyucPnag7eRyre2EF8riyfm10Fzwg=;
- b=foORUNUiRkC9EghdjQv3B5H+wQ3kiAqFR5DGgWz8Zxl41H6+OkHl+7Iw7bn71bMGa1m1us
- Hrp9h152ERFBmWRQ5QgVQJnnC0L12CZreIMOBks7+2kiF97v5GQ7pSsYQdDaRFMPJ809ae
- uaFLYOJ0GWsY2VfjZkyeS1aFfyG3PxM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-587-cwWEiBHuN96oP4OplmnaKA-1; Thu, 10 Sep 2020 11:34:37 -0400
-X-MC-Unique: cwWEiBHuN96oP4OplmnaKA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF8ADAF20F;
- Thu, 10 Sep 2020 15:34:36 +0000 (UTC)
-Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
- [10.36.112.197])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CA1DD1002D5A;
- Thu, 10 Sep 2020 15:34:35 +0000 (UTC)
-Subject: Re: [PATCH 27/29] nbd: Deprecate nbd-server-add/remove
-To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
-References: <20200907182011.521007-1-kwolf@redhat.com>
- <20200907182011.521007-28-kwolf@redhat.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <0b20d22d-7c68-a4af-e0c5-471d5ba61cd4@redhat.com>
-Date: Thu, 10 Sep 2020 17:34:34 +0200
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kGOd1-0005Un-04
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:36:51 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:42556)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kGOcz-0001j9-0g
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:36:50 -0400
+Received: by mail-pg1-x544.google.com with SMTP id m5so4421056pgj.9
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 08:36:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=+NphFAz+bbbGOLPoViKWvapYAGN08JtmjYnLzZIKOxo=;
+ b=GKVS6dK77bx/0jZLujlXrhsPEnEfKJjffubPbjyONPpDBt8aKV+/WikhO98lFUcqBg
+ fknNlKQUgg0UcuMI4rvH6oQicx7azui4MD9+lZC8HzP87Vi4TbpnL5wsy+KtaRvsh2LC
+ 56er56VCnPG1cwnDpL+FZu4sdinoEO6m0lag595MpAp4J3HgJxKTp/ftgfAClZ5xpG9e
+ IGh4od5fDmnNKVRLqhekiwgA0ji4hW/l6rP7Ub0rdSacgB+QsToPnSt5fJEOro/bh0y5
+ tfWDEo6mZ+GCGnCsbnFxd4FHFyfq+MjpuaQe3PdZTqbmYXIk7DHpN7njMs/8y0p1rs/E
+ iOwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=+NphFAz+bbbGOLPoViKWvapYAGN08JtmjYnLzZIKOxo=;
+ b=ZzFt6290lsEhjrd7hevjaVUgS4rzkUbH5BAgnfmFQ/5ES5psbBkjh95DX3ONjg2WXg
+ X+Bv6NU2ITHfEm4iAkaQ/uP96kmL1nL6djynxrKNF2QxIY+vqcDaPAiOS9mBzMBtMWLo
+ S+Pe3zK3PZvBfQ+A+nzotTtOlXEt4l5CjwKkHhFun9/rUJTNLih1Cm1IrwRZchmq0+hU
+ i4xBEOQR7lx/p2C71hPM4B1YVbU2Z+jEBxT/yVIKIGOrumYmDPDklsu9EfeKk2obRlqI
+ lkKmNUoomuUakacQBW1e9CwZdStQR/P7+pBmFW6YyCkdamuBnsuZLBd7Q/pnwUyQe+VW
+ O+Tw==
+X-Gm-Message-State: AOAM532tlNHQ53LCkyLbURudCKezM0/J+/2FWy6YgNTNsDuUEG20/AHg
+ J7w5s6s4vpwK18upbLBHBpWQoQ==
+X-Google-Smtp-Source: ABdhPJxIZ4y5XTc4IrXUnrqP73HVFyQx7PSmSplY3yEEr1jJKnjEfVZhyGyxvSD2g5MX5wlOI8kPiA==
+X-Received: by 2002:aa7:8bd4:0:b029:13c:1611:6538 with SMTP id
+ s20-20020aa78bd40000b029013c16116538mr6137309pfd.10.1599752207202; 
+ Thu, 10 Sep 2020 08:36:47 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id s187sm6690150pfc.134.2020.09.10.08.36.45
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 10 Sep 2020 08:36:46 -0700 (PDT)
+Subject: Re: [PATCH v2 0/2] MTE support for KVM guest
+To: Steven Price <steven.price@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>
+References: <20200904160018.29481-1-steven.price@arm.com>
+ <8e661984-70bc-790c-8636-39dcd8b00131@linaro.org>
+ <842807ac-562a-36ce-8061-aa323341b605@arm.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <c6043c5c-4bf1-e42c-1337-a892e6fd7402@linaro.org>
+Date: Thu, 10 Sep 2020 08:36:44 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200907182011.521007-28-kwolf@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0.0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="YQhz6wQjvXiVOip6lOA8kIq9I0Y54PTGw"
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+In-Reply-To: <842807ac-562a-36ce-8061-aa323341b605@arm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -56
 X-Spam_score: -5.7
 X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-3.576,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -122,73 +108,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Peter Maydell <Peter.Maydell@arm.com>, Haibo Xu <Haibo.Xu@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, qemu-devel@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, linux-kernel@vger.kernel.org,
+ Dave Martin <Dave.Martin@arm.com>, James Morse <james.morse@arm.com>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---YQhz6wQjvXiVOip6lOA8kIq9I0Y54PTGw
-Content-Type: multipart/mixed; boundary="MBBnN0CX0Dab0vHH8SSqg68qaXGS79DC1"
+On 9/10/20 3:24 AM, Steven Price wrote:
+> It is a shame, however I suspect this is because to use those instructions you
+> need to know the block size held in GMID_EL1. And at least in theory that could
+> vary between CPUs.
 
---MBBnN0CX0Dab0vHH8SSqg68qaXGS79DC1
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 07.09.20 20:20, Kevin Wolf wrote:
-> These QMP commands are replaced by block-export-add/del.
->=20
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  qapi/block-export.json     | 11 +++++++++--
->  docs/system/deprecated.rst |  8 ++++++++
->  2 files changed, 17 insertions(+), 2 deletions(-)
-
-OK, but:
-
-> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-> index 851dbdeb8a..9a2e083f00 100644
-> --- a/docs/system/deprecated.rst
-> +++ b/docs/system/deprecated.rst
-> @@ -303,6 +303,14 @@ chardev client socket with ``wait`` option (since 4.=
-0)
->  Character devices creating sockets in client mode should not specify
->  the 'wait' field, which is only applicable to sockets in server mode
-> =20
-> +``nbd-server-add`` and ``nbd-server-remove`` (since 5.2)
-> +''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-> +
-> +Use the more generic commands ``block-export-add`` and ``block-export-de=
-l``
-> +instead.
-> +
-> +Use argument value ``null`` instead.
-
-I don=E2=80=99t understand this sentence.
-
-Max
+Which is no different from having to read DCZID_EL0 in order to implement
+memset, in my opinion.  But, whatever.
 
 
---MBBnN0CX0Dab0vHH8SSqg68qaXGS79DC1--
+> When we have some real hardware it would be worth profiling this. At the moment
+> I've no idea whether the kernel entry overhead would make such an interface
+> useful from a performance perspective or not.
 
---YQhz6wQjvXiVOip6lOA8kIq9I0Y54PTGw
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+Yep.
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aR4oACgkQ9AfbAGHV
-z0BPtAf+MOuRaTVNXlUPjGqwP4j4TXBJC2/P58O/sJ8H+Xg6vIbcMUMOxC2NMm0f
-5s1jo2y/E1IAdLYLgAr4dvYAOen+Rfj57WCuFTCrM0/6vCqZZWiM4zocXL1qIhhb
-CCxa7LPF43A65dZgt3HomUuQ/4bpAhSZue88Yy9KDguIZ1rZECBC5ci/cOrjUQzt
-5uyzrne/AACpD7EtTcVldJgzpaez11F9Dl7wCHPthSc3w2PoQodjFQoH8M8LUGwd
-hPSwF9fovlQe4LhVxn59j5nubjpNF+80ka/SbLuzmH7SFRt0/tcgZlGdVNoImQFI
-rp2ZCtbrnMyy7FFtRhalWXSMvU+q2g==
-=6rdY
------END PGP SIGNATURE-----
-
---YQhz6wQjvXiVOip6lOA8kIq9I0Y54PTGw--
-
+r~
 
