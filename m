@@ -8,77 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EE5EC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1792DC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:38:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01DC320BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:37:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0CF520BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:38:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dS5bQc7X"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01DC320BED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WBIi3akh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0CF520BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34980 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGJxm-0001do-QU
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:37:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50824)
+	id 1kGJyh-00034g-Pr
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:38:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51108)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJsD-0007gt-Ns; Thu, 10 Sep 2020 06:32:14 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:54987)
+ id 1kGJsx-0000r4-Mo; Thu, 10 Sep 2020 06:33:01 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38749)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJsC-000397-3N; Thu, 10 Sep 2020 06:32:13 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id mm21so2805965pjb.4;
- Thu, 10 Sep 2020 03:32:11 -0700 (PDT)
+ id 1kGJsu-0003FM-MN; Thu, 10 Sep 2020 06:32:59 -0400
+Received: by mail-pl1-x641.google.com with SMTP id c3so702584plz.5;
+ Thu, 10 Sep 2020 03:32:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=7zvfu2AU8jmrgTOs2oC3Qnm1T8TZc9G/7u0+CpqNJic=;
- b=dS5bQc7X5RByKsqQdDo5kni3rKaRgoV8t3QhcDZqDlBWtElMizDvQwxfc1uCArxO4S
- kbX3PrNTXP4U2eAPZbv/gS+l0IiZx5QdIRZbXOMl25WIfDdCO5dhr2sbUDL1PpiDuBDv
- zXkre9Ga1bpugETwZthNm2z0xbLmY5sdT8RcW5NGpFiQqCCzthPhi2VlpKTZVkKPho9j
- xTTBa0+8ca38D8rX4hzOkPZWfs3CuFPw9SkglO9FUNz3GB1Es8Wv6XBHBhZvguyvZQBg
- U7yFhZuOw2u0SuUFiFm30QZ7I+ADEL6b2qYlSU0IDW00aBUJUWOY/uI7+IQCXBHHHhMM
- vL/g==
+ bh=d4V5+f7th16w4eXVSrbBNtRXwx9t+794yZg73jLRtbY=;
+ b=WBIi3akhold3nnkwriOk8R8ZZv7EoXy+jLRoDuFgjEnpOQROSaEsTJFLbeNqYKrSXR
+ KaENTz6L5fMdZZdR2WbxJ0+VBvuHLpUuWqPmgfKSy8BQP7nu7m0ArJNN+zX+pFMXQpzt
+ Eym0JMXgcOpGLFr8CPpof8nl5a77oCh6xUgNk7EWaLLDubVaQN0ysfGXKJGLW25SzEpG
+ 3L5uEBANq+mRVTn6AWkabybue8WCH0fCmhx7LBYviA5XS3QJCYvDim/HTEsIpekAZ/tv
+ QG+5YaH9FA0ySfDpciF0l7OoSGDnYadjOYYHOfVUZJfez4rdJFPsad2KP+T8MJx/ykRU
+ +SBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=7zvfu2AU8jmrgTOs2oC3Qnm1T8TZc9G/7u0+CpqNJic=;
- b=HGFejR8A13n6gXeGHTYdMscA3AJKK6dSiy61B1aJHLDbQDkkR/C+7dxQW8R/0n7158
- HmUYuosJ+Hb6yQS5PTxD5tFXXI+K/Zz2wofUnpenh1/dPCOBtdzGI9vTrEfe3G+s5cwJ
- RdKw05PftNxGw7cpNer6OebIfrCIQcJJ8/vCUcMiIQlR4oFmGfH88l+zDEN48c3eUwV0
- pQzPe+q7ucxLfNpJyEPxUYACFZv4ipP2L3YiEk9/cHm0HKKZ3sZz3jqDKyBu1f5i6OGB
- FW2RsmO7BoGrKxPTJU1JBAF/t2ihzoGAOhZT5Wg8WCBpx3HtXzfnnVzvPwPAcsByXuD1
- ydkA==
-X-Gm-Message-State: AOAM53187TYUqsVY6lFQpxw9urSMIAcfZaIWGomdYQBRqCf6IIrnlSHG
- J4LCqg7BLMiceQzM5muXD9xSjj4psmMI6Q2uT0I=
-X-Google-Smtp-Source: ABdhPJxjscedJ89HNy27BZZKAWcgrtV40RPxHT5W1A+nDLhxCC1uCdrcpHtajvAIt9eqe4FrSya10w==
-X-Received: by 2002:a17:902:8544:: with SMTP id
- d4mr4764711plo.142.1599733929922; 
- Thu, 10 Sep 2020 03:32:09 -0700 (PDT)
+ bh=d4V5+f7th16w4eXVSrbBNtRXwx9t+794yZg73jLRtbY=;
+ b=glQTFXsLQesDyNGu8xnCx9jyQ8ALIJJoxWlIL+dpI60kTgiRISB0EqHB1c7PvPsoG1
+ DIu7x/x9eTzdTlRfbjudI7S3ZHwNO29AZF6xB9csWpBF1nQlTEPLiRD1jECiLhet3bdN
+ z/MTRg4G4yXWMpMNK2uWP1Aj1OJYomuzEE4eBhqVMM7XG2VMW8i1u7fYczQApT5GnaGG
+ Q+7n1WscHv4vztcsppFYDIHXsQxorqOrOgug6QhSW/UT76+uP1En1jUhTxkJqK/kVGU+
+ tFJi5mWcCn4SUBkdvOi5lVESV1eDqYcim6QGJqFvfUI7g6vmtv+fnelwIA+9XN9NHQHy
+ RD5Q==
+X-Gm-Message-State: AOAM530k6wzTgpBecr/Ogc5IHx53xkjZV0UiKozLArkfS96rtAvFLTvO
+ JBd0rkvRc3AnXwiu3fl7jGSdb5N8+x5299vG7wo=
+X-Google-Smtp-Source: ABdhPJykQI3wCt8tiD4L6nfxaL5wigKHjpAonOrdnBqzblGKbxe281ggWSTM8t1GZvLdoS3uxTxFng==
+X-Received: by 2002:a17:90a:ea0c:: with SMTP id
+ w12mr4646656pjy.65.1599733974580; 
+ Thu, 10 Sep 2020 03:32:54 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id g21sm2000203pfh.30.2020.09.10.03.32.03
+ by smtp.googlemail.com with ESMTPSA id g21sm2000203pfh.30.2020.09.10.03.32.47
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 03:32:09 -0700 (PDT)
+ Thu, 10 Sep 2020 03:32:53 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 09/25] tests: Fixes test-replication.c on msys2/mingw.
-Date: Thu, 10 Sep 2020 18:30:43 +0800
-Message-Id: <20200910103059.987-10-luoyonggang@gmail.com>
+Subject: [PATCH v7 16/25] vmstate: Fixes test-vmstate.c on msys2/mingw
+Date: Thu, 10 Sep 2020 18:30:50 +0800
+Message-Id: <20200910103059.987-17-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200910103059.987-1-luoyonggang@gmail.com>
 References: <20200910103059.987-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,75 +100,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+Cc: Kevin Wolf <kwolf@redhat.com>, Thomas Huth <thuth@redhat.com>,
  Ed Maste <emaste@freebsd.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
  qemu-block@nongnu.org, Stefan Weil <sw@weilnetz.de>,
  Xie Changlong <xiechanglong.d@gmail.com>, Peter Lieven <pl@kamp.de>,
  Markus Armbruster <armbru@redhat.com>, Max Reitz <mreitz@redhat.com>,
  Yonggang Luo <luoyonggang@gmail.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Wen Congyang <wencongyang2@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Li-Wen Hsu <lwhsu@freebsd.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Windows there is no path like /tmp/s_local_disk.XXXXXX
-Use g_get_tmp_dir instead of /tmp.
+The vmstate are valid on win32, just need generate tmp path properly
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- tests/test-replication.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ tests/test-vmstate.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/tests/test-replication.c b/tests/test-replication.c
-index 9ab3666a90..e7cbd6b144 100644
---- a/tests/test-replication.c
-+++ b/tests/test-replication.c
-@@ -23,14 +23,14 @@
+diff --git a/tests/test-vmstate.c b/tests/test-vmstate.c
+index f8de709a0b..fc38e93d29 100644
+--- a/tests/test-vmstate.c
++++ b/tests/test-vmstate.c
+@@ -34,7 +34,6 @@
+ #include "qemu/module.h"
+ #include "io/channel-file.h"
  
- /* primary */
- #define P_ID "primary-id"
--static char p_local_disk[] = "/tmp/p_local_disk.XXXXXX";
-+static char *p_local_disk;
+-static char temp_file[] = "/tmp/vmst.test.XXXXXX";
+ static int temp_fd;
  
- /* secondary */
- #define S_ID "secondary-id"
- #define S_LOCAL_DISK_ID "secondary-local-disk-id"
--static char s_local_disk[] = "/tmp/s_local_disk.XXXXXX";
--static char s_active_disk[] = "/tmp/s_active_disk.XXXXXX";
--static char s_hidden_disk[] = "/tmp/s_hidden_disk.XXXXXX";
-+static char *s_local_disk;
-+static char *s_active_disk;
-+static char *s_hidden_disk;
  
- /* FIXME: steal from blockdev.c */
- QemuOptsList qemu_drive_opts = {
-@@ -571,6 +571,11 @@ static void setup_sigabrt_handler(void)
+@@ -1487,6 +1486,8 @@ static void test_tmp_struct(void)
+ 
  int main(int argc, char **argv)
  {
-     int ret;
-+    const char *tmpdir = g_get_tmp_dir();
-+    p_local_disk = g_strdup_printf("%s/p_local_disk.XXXXXX", tmpdir);
-+    s_local_disk = g_strdup_printf("%s/s_local_disk.XXXXXX", tmpdir);
-+    s_active_disk = g_strdup_printf("%s/s_active_disk.XXXXXX", tmpdir);
-+    s_hidden_disk = g_strdup_printf("%s/s_hidden_disk.XXXXXX", tmpdir);
-     qemu_init_main_loop(&error_fatal);
-     bdrv_init();
++    g_autofree char *temp_file = g_strdup_printf(
++        "%s/vmst.test.XXXXXX", g_get_tmp_dir());
+     temp_fd = mkstemp(temp_file);
  
-@@ -605,5 +610,10 @@ int main(int argc, char **argv)
- 
-     cleanup_imgs();
- 
-+    g_free(p_local_disk);
-+    g_free(s_local_disk);
-+    g_free(s_active_disk);
-+    g_free(s_hidden_disk);
-+
-     return ret;
- }
+     module_call_init(MODULE_INIT_QOM);
 -- 
 2.28.0.windows.1
 
