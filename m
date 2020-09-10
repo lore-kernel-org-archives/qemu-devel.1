@@ -2,89 +2,94 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30087C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 01:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8980AC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 01:45:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 860062223C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 01:32:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D973420BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 01:45:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pEITa1WV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 860062223C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fufuac3p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D973420BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48800 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGBRt-0007Lo-HE
-	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 21:32:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57252)
+	id 1kGBeD-0000tN-RB
+	for qemu-devel@archiver.kernel.org; Wed, 09 Sep 2020 21:45:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1kGBR1-0006uh-C1
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 21:31:35 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:42582)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1kGBQz-0004e6-Li
- for qemu-devel@nongnu.org; Wed, 09 Sep 2020 21:31:35 -0400
-Received: by mail-io1-xd42.google.com with SMTP id u6so5320626iow.9
- for <qemu-devel@nongnu.org>; Wed, 09 Sep 2020 18:31:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=yyFeP2mu1m5EwFOImA/VQ+H/aID62eJ3G/P8GqJBJ4I=;
- b=pEITa1WV8W5ZORXpCTYz+Iy+OCoOtkEBEAI/I4F0g6YHjfmMSVOHSCsbGeZoxmHZ7h
- 84F8NtEHZKYvgTlQWeHwe3989ra5LoTIYBT0IWxlvYj+ErfV2OhQ7IzDwb32LWDFGaCq
- QlGO+cz1yfyY+7rEWR619HECS1aLzFjP8o96LXvCsslTyaWB7r5YS84K/x0VQwmx1aqM
- S3PzXbCjzDi4i1tF4Jr3qTtDNApfvWomlE9VpFaoVxagDGDL32e51z5KYxolmuwfifBH
- 10YiJrYKcciWN/SSAaAYB7l9pIvA4423HXs5LwI16jZVgfWMcI2v82KJbR3YPVSNMBTo
- W0Sg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=yyFeP2mu1m5EwFOImA/VQ+H/aID62eJ3G/P8GqJBJ4I=;
- b=OAekirJfRJRJZTp2ys3+RsiE+0FYgOjyWf0Hw5dTXg77wC4f2GovMPDy/qlWVAmpgD
- pOUStyja4q0rienLjE2GJYJy3N1T2yZy+JFk6RektQj3cSLuF3EleIH0Q1RPD6BdAkdx
- iSskTl/sPT8jIEJPW9nnrAJbDG5QpIaIV9TlBh96rItI0UnseUq9tkd21a27mrQS7SfS
- 7LEDGh/MPmrDs9JvAE9U6a8cJjG0jf26evMTNI9edd06MBoe0/5CK2PESYu6rCahiskn
- wvXFQyS1Lg3sLyLB9lW+d4dXu6MEHjCEPebGXv3v2Y03QW+RL11Kt6gsKaR+hOyR9T8i
- 9sGA==
-X-Gm-Message-State: AOAM531ionZ89MubDZqMIqMUIxRKz5NDHDGAlWwnouwq/RgMBGn4TOsx
- HCc/SaH0lhdlrujwRJp4tagUiBxd+3DP8+g0ck4=
-X-Google-Smtp-Source: ABdhPJzbPY0iC60eK8v2Z0ViwM5aeljKFNEkgjJW/p4vUkKCZH4cHTylSzGk2GY66pv6iN3yrOvuD5m45dD209gvPWg=
-X-Received: by 2002:a02:950e:: with SMTP id y14mr6781323jah.106.1599701491975; 
- Wed, 09 Sep 2020 18:31:31 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kGBdf-0000KV-7D
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 21:44:39 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:47893
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kGBdd-0005xR-0N
+ for qemu-devel@nongnu.org; Wed, 09 Sep 2020 21:44:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599702275;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=5RPj9Qp0z36BonbrcDYUwQZd9deZsAjgza1p42Kqf4w=;
+ b=fufuac3pNbb8udxfbbtTZ4ZxRXkF5sBFRKxTPBnCG/QIZi9taVCPTkqgon4neKRulj4L//
+ Umt1m5uvztkAJ9WDGJzarEyNSRjwB8GA4grhzHMzFqMgZFSHBRFK4k527cX1Xjlmw6Uzyj
+ fAgfCDNjQaLES6917L77KdMQe6K2plA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-355-xaOzj8VGPXK5bIGMKuoVww-1; Wed, 09 Sep 2020 21:44:33 -0400
+X-MC-Unique: xaOzj8VGPXK5bIGMKuoVww-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 29FDC425D8;
+ Thu, 10 Sep 2020 01:44:32 +0000 (UTC)
+Received: from [10.72.13.124] (ovpn-13-124.pek2.redhat.com [10.72.13.124])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 12E797E175;
+ Thu, 10 Sep 2020 01:44:29 +0000 (UTC)
+Subject: Re: [PATCH 0/2] hw/net/opencores_eth: Trivial patches
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20200608091508.19838-1-f4bug@amsat.org>
+ <e472244f-d764-6cd6-70cd-86d71358b999@amsat.org>
+ <9836f385-ccb8-981f-4677-95d22b2c0a90@amsat.org>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <c7f34876-7939-b27f-b00b-01cac2955086@redhat.com>
+Date: Thu, 10 Sep 2020 09:44:28 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <1598256668-12131-1-git-send-email-chenhc@lemote.com>
- <caa3c014-ba68-0875-4dd5-faed9282ca95@redhat.com>
- <CABDp7VoRCMsW6b17XEek3-EJLHgY=bCXnx5B1ZWCOkHq0aasxw@mail.gmail.com>
- <e3c09cb0-1cc5-2fb3-8dc7-d2a1aed74c04@redhat.com>
-In-Reply-To: <e3c09cb0-1cc5-2fb3-8dc7-d2a1aed74c04@redhat.com>
-From: Huacai Chen <chenhuacai@gmail.com>
-Date: Thu, 10 Sep 2020 09:31:20 +0800
-Message-ID: <CAAhV-H5W-YbooF5W0KgEFGe-qkCstt4_PKjR2JNkh3sZXRxRdg@mail.gmail.com>
-Subject: Re: [PATCH V2 for-5.2] hw/null-machine: Add the kvm_type() hook for
- MIPS
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=chenhuacai@gmail.com; helo=mail-io1-xd42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <9836f385-ccb8-981f-4677-95d22b2c0a90@amsat.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=207.211.31.120; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/09 19:45:11
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,139 +102,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, chen huacai <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- qemu-level <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>, David Gibson <dgibson@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-trivial@nongnu.org, Max Filippov <jcmvbkbc@gmail.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Thomas,
 
-On Wed, Sep 9, 2020 at 3:20 PM Thomas Huth <thuth@redhat.com> wrote:
+On 2020/9/10 上午2:00, Philippe Mathieu-Daudé wrote:
+> On 9/2/20 2:26 PM, Philippe Mathieu-Daudé wrote:
+>> On 6/8/20 11:15 AM, Philippe Mathieu-Daudé wrote:
+>>> Remove unnecessary mask, use #define instead of magic.
+>>>
+>>> Philippe Mathieu-Daudé (2):
+>>>    hw/net/opencores_eth: Use definitions instead of magic values
+>>>    hw/net/opencores_eth: Remove unnecessary address masking
+>>>
+>>>   hw/net/opencores_eth.c | 6 ++----
+>>>   1 file changed, 2 insertions(+), 4 deletions(-)
+>>>
+>> Ping to Jason as the series is reviewed :)
+> Ping^2
 >
-> On 09/09/2020 04.57, chen huacai wrote:
-> > Hi, all,
-> >
-> > On Wed, Sep 9, 2020 at 1:25 AM Thomas Huth <thuth@redhat.com> wrote:
-> >>
-> >> On 24/08/2020 10.11, Huacai Chen wrote:
-> >>> MIPS has two types of KVM: TE & VZ, and TE is the default type. Now,
-> >>> libvirt uses a null-machine to detect the kvm capability. In the MIPS
-> >>> case, it will return "KVM not supported" on a VZ platform by default.
-> >>> So, add the kvm_type() hook to the null-machine.
-> >>>
-> >>> This seems not a very good solution, but I cannot do it better now.
-> >>
-> >> This is still ugly. Why do the other architectures do not have the
-> >> same problem? Let's see... in kvm-all.c, we have:
-> >>
-> >>     int type = 0;
-> >>     [...]
-> >>     kvm_type = qemu_opt_get(qemu_get_machine_opts(), "kvm-type");
-> >>     if (mc->kvm_type) {
-> >>         type = mc->kvm_type(ms, kvm_type);
-> >>     } else if (kvm_type) {
-> >>         ret = -EINVAL;
-> >>         fprintf(stderr, "Invalid argument kvm-type=%s\n", kvm_type);
-> >>         goto err;
-> >>     }
-> >>
-> >>     do {
-> >>         ret = kvm_ioctl(s, KVM_CREATE_VM, type);
-> >>     } while (ret == -EINTR);
-> >>
-> >> Thus the KVM_CREATE_VM ioctl is likely called with type = 0 in this
-> >> case (i.e. when libvirt probes with the "null"-machine).
-> >>
-> >> Now let's have a look at the kernel. The "type" parameter is passed
-> >> there to the architecture specific function kvm_arch_init_vm().
-> >> For powerpc, this looks like:
-> >>
-> >>         if (type == 0) {
-> >>                 if (kvmppc_hv_ops)
-> >>                         kvm_ops = kvmppc_hv_ops;
-> >>                 else
-> >>                         kvm_ops = kvmppc_pr_ops;
-> >>                 if (!kvm_ops)
-> >>                         goto err_out;
-> >>         } else  if (type == KVM_VM_PPC_HV) {
-> >>                 if (!kvmppc_hv_ops)
-> >>                         goto err_out;
-> >>                 kvm_ops = kvmppc_hv_ops;
-> >>         } else if (type == KVM_VM_PPC_PR) {
-> >>                 if (!kvmppc_pr_ops)
-> >>                         goto err_out;
-> >>                 kvm_ops = kvmppc_pr_ops;
-> >>         } else
-> >>                 goto err_out;
-> >>
-> >> That means for type == 0, it automatically detects the best
-> >> kvm-type.
-> >>
-> >> For mips, this function looks like this:
-> >>
-> >>         switch (type) {
-> >> #ifdef CONFIG_KVM_MIPS_VZ
-> >>         case KVM_VM_MIPS_VZ:
-> >> #else
-> >>         case KVM_VM_MIPS_TE:
-> >> #endif
-> >>                 break;
-> >>         default:
-> >>                 /* Unsupported KVM type */
-> >>                 return -EINVAL;
-> >>         };
-> >>
-> >> That means, for type == 0, it returns -EINVAL here!
-> >>
-> >> Looking at the API docu in Documentation/virt/kvm/api.rst
-> >> the description of the type parameter is quite sparse, but it
-> >> says:
-> >>
-> >>  "You probably want to use 0 as machine type."
-> >>
-> >> So I think this is a bug in the implementation of KVM in the
-> >> mips kernel code. The kvm_arch_init_vm() in the mips code should
-> >> do the same as on powerpc, and use the best available KVM type
-> >> there instead of returning EINVAL. Once that is fixed there,
-> >> you don't need this patch here for QEMU anymore.
-> > Yes, PPC use a good method, because it can use 0 as "automatic"
-> > #define KVM_VM_PPC_HV 1
-> > #define KVM_VM_PPC_PR 2
-> >
-> > Unfortunately, MIPS cannot do like this because it define 0 as "TE":
-> > #define KVM_VM_MIPS_TE          0
-> > #define KVM_VM_MIPS_VZ          1
-> >
-> > So, it cannot be solved in kernel side, unless changing the definition
-> > of TE/VZ, but I think changing their definition is also unacceptable.
->
-> Ouch, ok, now I understood the problem. That sounds like a really bad
-> decision on the kernel side.
->
-> But I think you could at least try to get it fixed on the kernel side:
-> Propose a patch to rename KVM_VM_MIPS_TE to KVM_VM_MIPS_DEFAULT and use
-> 2 as new value for TE. The code that handles the default 0 case should
-> then prefer TE over VZ, so that old userspace applications that provide
-> 0 will continue to work as they did before, so I hope that the change is
-> acceptable by the kernel folks. You should add a remark to the patch
-> description that 0 is the established default value for probing in the
-> QEMU/libvirt stack and that your patch is required on the kernel side to
-> avoid ugly hacks in QEMU userspace code.
->
-> If they still reject your patch, I guess we have to bite the bullet and
-> add your patch here...
-OK, let me try.
 
-Huacai
->
-> Thanks,
->  Thomas
->
+Applied.
+
+Thanks
+
 
