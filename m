@@ -2,111 +2,66 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FEA1C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:21:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE5EC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:25:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B3E4E207EA
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:21:09 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PRH/D+Gc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B3E4E207EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4C43D21582
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:25:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4C43D21582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44888 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGIlQ-0004zN-Ju
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:21:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51852)
+	id 1kGIpH-0000QL-Sx
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:25:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kGIkn-0004VW-6T
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:20:29 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:31182
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kGIkl-0007gX-Le
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:20:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599729626;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=SO4bWm/cPcTUGLfCpzWg/uVQUUhYZlQj1nC54fzA/M8=;
- b=PRH/D+GcB45A24JF1ZRfJcxhiDIR3n4HdIZHy6GuGydV5Hf9q9Zq1abb8kMjzvIpsSFmXp
- C5WHtJbn5Y3AZ/N2JXlPBlY8bJKWFN1H/i95RCWhN99+W3EcZFk3V0b3ImJ6Ewwl8FMyc9
- waB04Jd8DddutFE3fthrvM0JG8qs1X4=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221--Ztar0i2M1ya5yNEqwL7eQ-1; Thu, 10 Sep 2020 05:20:25 -0400
-X-MC-Unique: -Ztar0i2M1ya5yNEqwL7eQ-1
-Received: by mail-ej1-f69.google.com with SMTP id m24so2479813ejr.9
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 02:20:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=SO4bWm/cPcTUGLfCpzWg/uVQUUhYZlQj1nC54fzA/M8=;
- b=DWmeUXFWXzmZdFg4JhNzs3nWneJeS6JMGFd4SVpZxtM+OQftiwe4x/cdpS497/O4bw
- peIzlZiKE+mLr3LTIyR5ls6jbkp8ECZHNwaTuzAZsW3IDYn9YMpenNkec3v1GhwGW08l
- VRvnecafTce+4TeHXARsQZIUgr/832QdhmagXgZ0qSJ8i6RdUvtK5YCEyq1a8iEoiqmi
- aviZlMnb6p5+uUBCbHu3mQp4Z//0DFZl3L6mEosZ+jjNhjmDpgrzdiCGMI+bGM8d74X8
- VeRhjz2R0LXN6VVvVWfvtOFXij/cMBUeI6BUMUlNuc3NgGduKu7pIzpcNTg2n1qYkm57
- QELQ==
-X-Gm-Message-State: AOAM5304XLJ4i5SA9z8SehClxPkA9C+XnjQ4f80otvyNo1JSw5nMNmQK
- BX5P4EAXeiI2oesgJ4zDTpu6g1fdhwxM2KHEpgpJFMqF6djbB4JYt+0dnpyi6BmZt0dzbq+E7qk
- zN2kDwoAVtAUw+6s=
-X-Received: by 2002:aa7:c70a:: with SMTP id i10mr8369056edq.218.1599729624075; 
- Thu, 10 Sep 2020 02:20:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyCXnWymC2DNmEis24kgZHf6f5Sw5QjpIfxT5XybcN5+ahR5wB4HShZF0uwqxcBzgzPTxQZjQ==
-X-Received: by 2002:aa7:c70a:: with SMTP id i10mr8369031edq.218.1599729623894; 
- Thu, 10 Sep 2020 02:20:23 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:2744:1c91:fa55:fa01?
- ([2001:b07:6468:f312:2744:1c91:fa55:fa01])
- by smtp.gmail.com with ESMTPSA id d13sm6406624edl.68.2020.09.10.02.20.22
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 10 Sep 2020 02:20:23 -0700 (PDT)
-Subject: Re: [RFC] QEMU as Xcode project on macOS
-To: Liviu Ionescu <ilg@livius.net>, Peter Maydell <peter.maydell@linaro.org>
-References: <2764135.D4k31Gy3CM@silver> <13443969.F0S6BcH2UH@silver>
- <20200909181355.GV1011023@redhat.com> <1695914.5EixHECA2G@silver>
- <CAFEAcA9m6Qd1C2EXHKBfVrq_bd_AJo8ggf0t02bLufkmT5jZ=w@mail.gmail.com>
- <F0F8F9BF-0B9F-430E-8381-87AD6B3077C8@livius.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8640871f-366c-e7a9-549a-8403c36c5a0b@redhat.com>
-Date: Thu, 10 Sep 2020 11:20:28 +0200
+ (Exim 4.90_1) (envelope-from <steven.price@arm.com>)
+ id 1kGIla-0005Pi-9Z
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:21:18 -0400
+Received: from foss.arm.com ([217.140.110.172]:51364)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <steven.price@arm.com>) id 1kGIlX-0007zF-LE
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 05:21:17 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4612A1045;
+ Thu, 10 Sep 2020 02:21:14 -0700 (PDT)
+Received: from [192.168.1.79] (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4BD033F68F;
+ Thu, 10 Sep 2020 02:21:12 -0700 (PDT)
+Subject: Re: [PATCH v2 2/2] arm64: kvm: Introduce MTE VCPU feature
+To: Andrew Jones <drjones@redhat.com>
+References: <20200904160018.29481-1-steven.price@arm.com>
+ <20200904160018.29481-3-steven.price@arm.com>
+ <20200909154804.mide6szbzgdy7jju@kamzik.brq.redhat.com>
+From: Steven Price <steven.price@arm.com>
+Message-ID: <3a7e18af-84bd-cee3-d68f-e08f225fc166@arm.com>
+Date: Thu, 10 Sep 2020 10:21:07 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <F0F8F9BF-0B9F-430E-8381-87AD6B3077C8@livius.net>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0.001
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20200909154804.mide6szbzgdy7jju@kamzik.brq.redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 00:49:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=217.140.110.172;
+ envelope-from=steven.price@arm.com; helo=foss.arm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 05:21:11
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -77
+X-Spam_score: -7.8
+X-Spam_bar: -------
+X-Spam_report: (-7.8 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-3.576,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -119,33 +74,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Christian Schoenebeck <qemu_oss@crudebyte.com>,
- QEMU Developers <qemu-devel@nongnu.org>, G 3 <programmingkidx@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org, Marc Zyngier <maz@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ Dave Martin <Dave.Martin@arm.com>, linux-kernel@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 09/09/20 22:13, Liviu Ionescu wrote:
->> ... You still need a Python 3.5 or better for the other scripts 
->> QEMU has as part of its build process, so you will still need a
->> python other than the Apple /usr/bin/python to build even if you
->> have a standalone meson with its own python.
->
-> Ah, sure, if the build script uses Python for other purposes you'll
-> need one, but the embedded Python will allow the standalone meson to
-> run properly regardless of what Python you install.
+On 09/09/2020 16:48, Andrew Jones wrote:
+> On Fri, Sep 04, 2020 at 05:00:18PM +0100, Steven Price wrote:
+>> Add a new VCPU features 'KVM_ARM_VCPU_MTE' which enables memory tagging
+>> on a VCPU. When enabled on any VCPU in the virtual machine this causes
+>> all pages that are faulted into the VM to have the PG_mte_tagged flag
+>> set (and the tag storage cleared if this is the first use).
+>>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>>   arch/arm64/include/asm/kvm_emulate.h |  3 +++
+>>   arch/arm64/include/asm/kvm_host.h    |  5 ++++-
+>>   arch/arm64/include/uapi/asm/kvm.h    |  1 +
+>>   arch/arm64/kvm/mmu.c                 | 15 +++++++++++++++
+>>   arch/arm64/kvm/reset.c               |  8 ++++++++
+>>   arch/arm64/kvm/sys_regs.c            |  6 +++++-
+>>   6 files changed, 36 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+>> index 49a55be2b9a2..0042323a4b7f 100644
+>> --- a/arch/arm64/include/asm/kvm_emulate.h
+>> +++ b/arch/arm64/include/asm/kvm_emulate.h
+>> @@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+>>   	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+>>   	    vcpu_el1_is_32bit(vcpu))
+>>   		vcpu->arch.hcr_el2 |= HCR_TID2;
+>> +
+>> +	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
+>> +		vcpu->arch.hcr_el2 |= HCR_ATA;
+>>   }
+>>   
+>>   static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+>> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+>> index 4f4360dd149e..b1190366242b 100644
+>> --- a/arch/arm64/include/asm/kvm_host.h
+>> +++ b/arch/arm64/include/asm/kvm_host.h
+>> @@ -37,7 +37,7 @@
+>>   
+>>   #define KVM_MAX_VCPUS VGIC_V3_MAX_CPUS
+>>   
+>> -#define KVM_VCPU_MAX_FEATURES 7
+>> +#define KVM_VCPU_MAX_FEATURES 8
+>>   
+>>   #define KVM_REQ_SLEEP \
+>>   	KVM_ARCH_REQ_FLAGS(0, KVM_REQUEST_WAIT | KVM_REQUEST_NO_WAKEUP)
+>> @@ -110,6 +110,9 @@ struct kvm_arch {
+>>   	 * supported.
+>>   	 */
+>>   	bool return_nisv_io_abort_to_user;
+>> +
+>> +	/* If any VCPU has MTE enabled then all memory must be MTE enabled */
+>> +	bool vcpu_has_mte;
+> 
+> It looks like this is unnecessary as it's only used once, where a feature
+> check could be used.
 
-Note that if you use the version of Meson that is bundled with QEMU, you
-can use
+It's used in user_mem_abort(), so every time we fault a page into the VM 
+- so having to iterate over all VCPUs to check if any have the feature 
+bit set seems too expensive.
 
-  --python=/path/to/python3 --meson=internal
+Although perhaps I should just accept that this is realistically a VM 
+setting and move it out of the VCPU.
 
-and the build will automatically use that same Python executable to run
-the scripts.
+>>   };
+>>   
+>>   struct kvm_vcpu_fault_info {
+>> diff --git a/arch/arm64/include/uapi/asm/kvm.h b/arch/arm64/include/uapi/asm/kvm.h
+>> index ba85bb23f060..2677e1ab8c16 100644
+>> --- a/arch/arm64/include/uapi/asm/kvm.h
+>> +++ b/arch/arm64/include/uapi/asm/kvm.h
+>> @@ -106,6 +106,7 @@ struct kvm_regs {
+>>   #define KVM_ARM_VCPU_SVE		4 /* enable SVE for this CPU */
+>>   #define KVM_ARM_VCPU_PTRAUTH_ADDRESS	5 /* VCPU uses address authentication */
+>>   #define KVM_ARM_VCPU_PTRAUTH_GENERIC	6 /* VCPU uses generic authentication */
+>> +#define KVM_ARM_VCPU_MTE		7 /* VCPU supports Memory Tagging */
+>>   
+>>   struct kvm_vcpu_init {
+>>   	__u32 target;
+>> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+>> index ba00bcc0c884..e8891bacd76f 100644
+>> --- a/arch/arm64/kvm/mmu.c
+>> +++ b/arch/arm64/kvm/mmu.c
+>> @@ -1949,6 +1949,21 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+>>   	if (vma_pagesize == PAGE_SIZE && !force_pte)
+>>   		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+>>   							   &pfn, &fault_ipa);
+>> +	if (system_supports_mte() && kvm->arch.vcpu_has_mte && pfn_valid(pfn)) {
+>> +		/*
+>> +		 * VM will be able to see the page's tags, so we must ensure
+>> +		 * they have been initialised.
+>> +		 */
+>> +		struct page *page = pfn_to_page(pfn);
+>> +		long i, nr_pages = compound_nr(page);
+>> +
+>> +		/* if PG_mte_tagged is set, tags have already been initialised */
+>> +		for (i = 0; i < nr_pages; i++, page++) {
+>> +			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
+>> +				mte_clear_page_tags(page_address(page));
+>> +		}
+>> +	}
+>> +
+>>   	if (writable)
+>>   		kvm_set_pfn_dirty(pfn);
+>>   
+>> diff --git a/arch/arm64/kvm/reset.c b/arch/arm64/kvm/reset.c
+>> index ee33875c5c2a..82f3883d717f 100644
+>> --- a/arch/arm64/kvm/reset.c
+>> +++ b/arch/arm64/kvm/reset.c
+>> @@ -274,6 +274,14 @@ int kvm_reset_vcpu(struct kvm_vcpu *vcpu)
+>>   		}
+>>   	}
+>>   
+>> +	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features)) {
+>> +		if (!system_supports_mte()) {
+>> +			ret = -EINVAL;
+>> +			goto out;
+>> +		}
+>> +		vcpu->kvm->arch.vcpu_has_mte = true;
+>> +	}
+> 
+> We either need a KVM cap or a new CPU feature probing interface to avoid
+> making userspace try features one at a time. It's too bad that VCPU_INIT
+> doesn't clear all offending features from the feature set when returning
+> EINVAL, because then userspace could create a scratch VCPU with everything
+> it supports in order to see what KVM also supports in one go.
 
-Paolo
+If Peter's TELL_ME_WHAT_YOU_HAVE idea works out then perhaps we don't 
+need the cap? Or would it still be useful?
+
+Thanks,
+
+Steve
+
+>> +
+>>   	switch (vcpu->arch.target) {
+>>   	default:
+>>   		if (test_bit(KVM_ARM_VCPU_EL1_32BIT, vcpu->arch.features)) {
+>> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+>> index a655f172b5ad..6a971b201e81 100644
+>> --- a/arch/arm64/kvm/sys_regs.c
+>> +++ b/arch/arm64/kvm/sys_regs.c
+>> @@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+>>   			val &= ~(0xfUL << ID_AA64PFR0_SVE_SHIFT);
+>>   		val &= ~(0xfUL << ID_AA64PFR0_AMU_SHIFT);
+>>   	} else if (id == SYS_ID_AA64PFR1_EL1) {
+>> -		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+>> +		if (!test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
+>> +			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+>>   	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+>>   		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+>>   			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+>> @@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+>>   static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+>>   				   const struct sys_reg_desc *rd)
+>>   {
+>> +	if (test_bit(KVM_ARM_VCPU_MTE, vcpu->arch.features))
+>> +		return 0;
+>> +
+>>   	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
+>>   }
+>>   
+>> -- 
+>> 2.20.1
+>>
+>> _______________________________________________
+>> kvmarm mailing list
+>> kvmarm@lists.cs.columbia.edu
+>> https://lists.cs.columbia.edu/mailman/listinfo/kvmarm
+>>
+> 
+> Thanks,
+> drew
+> 
 
 
