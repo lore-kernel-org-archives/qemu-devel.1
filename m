@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFFBC07548
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CA75C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:04:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46E0020BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:04:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46E0020BED
+	by mail.kernel.org (Postfix) with ESMTPS id AD70A20C09
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:04:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD70A20C09
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGKNC-0002Fq-Q1
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:04:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56178)
+	id 1kGKNR-0002oK-Ln
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:04:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55966)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKF7-0004kq-D4
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:53 -0400
+ id 1kGKER-0003wl-6X
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:11 -0400
 Received: from mga03.intel.com ([134.134.136.65]:26657)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKF5-0005wd-92
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:53 -0400
-IronPort-SDR: l9mImM40qJSbcdv1bttgUuKw9zFBF/GTFgeAOTdWmfMWncQn93hu5xE6rTI02FehjVW360/DXY
- zWRSaZ58DtYg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545514"
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545514"
+ id 1kGKEN-0005wd-L5
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:10 -0400
+IronPort-SDR: 9DtGryvZPIL8AKbaffq7mOMXmfr9vxbGlTSrkfcDiOwiMUCLd/Nt41zbh4De+93CWqiGlgOUDR
+ LBKJijCPO58A==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545482"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545482"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  10 Sep 2020 03:54:40 -0700
-IronPort-SDR: IrmRRykn86c7wdhllt5PynxDey062DxlBY1cBjwXZDap++lNULp6ZOh1nzgs/gjSPwqKlpHCLD
- ctBoJBKUvmBw==
+IronPort-SDR: +7U6P3wxXumwv3NXvJyLC/60aFJ20BSsqjAHJmlIqrCJCVm+nyKeM7DvD8n++efJcM7kolDTjf
+ p/W1NWC4xExg==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140096"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140060"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
- by orsmga008.jf.intel.com with ESMTP; 10 Sep 2020 03:54:40 -0700
+ by orsmga008.jf.intel.com with ESMTP; 10 Sep 2020 03:54:39 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com,
  jasowang@redhat.com
-Subject: [RFC v10 21/25] vfio: add support for flush iommu stage-1 cache
-Date: Thu, 10 Sep 2020 03:56:34 -0700
-Message-Id: <1599735398-6829-22-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v10 09/25] hw/pci: introduce pci_device_set/unset_iommu_context()
+Date: Thu, 10 Sep 2020 03:56:22 -0700
+Message-Id: <1599735398-6829-10-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
 References: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
@@ -86,10 +86,18 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds flush_stage1_cache() definition in HostIOMUContextClass.
-And adds corresponding implementation in VFIO. This is to expose a way
-for vIOMMU to flush stage-1 cache in host side since guest owns stage-1
-translation structures in dual stage DMA translation configuration.
+For nesting IOMMU translation capable platforms, vIOMMUs running on
+such system could be implemented upon physical IOMMU nested paging
+(VFIO case). vIOMMU advertises such implementation by "want_nested"
+attribute to PCIe devices (e.g. VFIO PCI). Once "want_nested" is
+satisfied, device (VFIO case) should set HostIOMMUContext to vIOMMU,
+thus vIOMMU could manage stage-1 translation. DMAs out from such
+devices would be protected through the stage-1 page tables owned by
+guest together with stage-2 page tables owned by host.
+
+This patch adds pci_device_set/unset_iommu_context() to set/unset
+HostIOMMUContext for a given PCIe device (VFIO case). Caller of set
+should fail if set operation failed.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
@@ -97,113 +105,88 @@ Cc: Peter Xu <peterx@redhat.com>
 Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
 Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>
-Acked-by: Peter Xu <peterx@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- hw/iommu/host_iommu_context.c         | 19 +++++++++++++++++++
- hw/vfio/common.c                      | 24 ++++++++++++++++++++++++
- include/hw/iommu/host_iommu_context.h |  8 ++++++++
- 3 files changed, 51 insertions(+)
+rfcv5 (v2) -> rfcv6:
+*) pci_device_set_iommu_context() returns 0 if callback is not implemented.
+---
+ hw/pci/pci.c         | 28 ++++++++++++++++++++++++++++
+ include/hw/pci/pci.h | 10 ++++++++++
+ 2 files changed, 38 insertions(+)
 
-diff --git a/hw/iommu/host_iommu_context.c b/hw/iommu/host_iommu_context.c
-index c43965c..a3f7706 100644
---- a/hw/iommu/host_iommu_context.c
-+++ b/hw/iommu/host_iommu_context.c
-@@ -113,6 +113,25 @@ int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-     return hicxc->unbind_stage1_pgtbl(iommu_ctx, unbind);
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 1886f8e..e1b2f05 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -2743,6 +2743,34 @@ int pci_device_get_iommu_attr(PCIDevice *dev, IOMMUAttr attr, void *data)
+     return -ENOENT;
  }
  
-+int host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
-+                                 struct iommu_cache_invalidate_info *cache)
++int pci_device_set_iommu_context(PCIDevice *dev,
++                                 HostIOMMUContext *iommu_ctx)
 +{
-+    HostIOMMUContextClass *hicxc;
++    PCIBus *bus;
++    uint8_t devfn;
 +
-+    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-+
-+    if (!hicxc) {
-+        return -EINVAL;
++    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
++    if (bus && bus->iommu_ops &&
++        bus->iommu_ops->set_iommu_context) {
++        return bus->iommu_ops->set_iommu_context(bus,
++                              bus->iommu_opaque, devfn, iommu_ctx);
 +    }
-+
-+    if (!(iommu_ctx->flags & HOST_IOMMU_NESTING) ||
-+        !hicxc->flush_stage1_cache) {
-+        return -EINVAL;
-+    }
-+
-+    return hicxc->flush_stage1_cache(iommu_ctx, cache);
++    return 0;
 +}
 +
- void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-                          const char *mrtypename,
-                          uint64_t flags,
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 74dbeaf..77f88e5 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1275,6 +1275,29 @@ static int vfio_host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-     return ret;
- }
- 
-+static int vfio_host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
-+                                    struct iommu_cache_invalidate_info *cache)
++void pci_device_unset_iommu_context(PCIDevice *dev)
 +{
-+    VFIOContainer *container = container_of(iommu_ctx,
-+                                            VFIOContainer, iommu_ctx);
-+    struct vfio_iommu_type1_nesting_op *op;
-+    unsigned long argsz;
-+    int ret = 0;
++    PCIBus *bus;
++    uint8_t devfn;
 +
-+    argsz = sizeof(*op) + sizeof(*cache);
-+    op = g_malloc0(argsz);
-+    op->argsz = argsz;
-+    op->flags = VFIO_IOMMU_NESTING_OP_CACHE_INVLD;
-+    memcpy(&op->data, cache, sizeof(*cache));
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_NESTING_OP, op)) {
-+        ret = -errno;
-+        error_report("%s: iommu cache flush failed: %m", __func__);
++    pci_device_get_iommu_bus_devfn(dev, &bus, &devfn);
++    if (bus && bus->iommu_ops &&
++        bus->iommu_ops->unset_iommu_context) {
++        bus->iommu_ops->unset_iommu_context(bus,
++                                 bus->iommu_opaque, devfn);
 +    }
-+    g_free(op);
-+    return ret;
 +}
 +
- /**
-  * Get iommu info from host. Caller of this funcion should free
-  * the memory pointed by the returned pointer stored in @info
-@@ -2023,6 +2046,7 @@ static void vfio_host_iommu_context_class_init(ObjectClass *klass,
-     hicxc->pasid_free = vfio_host_iommu_ctx_pasid_free;
-     hicxc->bind_stage1_pgtbl = vfio_host_iommu_ctx_bind_stage1_pgtbl;
-     hicxc->unbind_stage1_pgtbl = vfio_host_iommu_ctx_unbind_stage1_pgtbl;
-+    hicxc->flush_stage1_cache = vfio_host_iommu_ctx_flush_stage1_cache;
- }
+ void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *ops, void *opaque)
+ {
+     bus->iommu_ops = ops;
+diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
+index 18b51dd..9348560 100644
+--- a/include/hw/pci/pci.h
++++ b/include/hw/pci/pci.h
+@@ -9,6 +9,8 @@
  
- static const TypeInfo vfio_host_iommu_context_info = {
-diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
-index 2883ed8..40e860a 100644
---- a/include/hw/iommu/host_iommu_context.h
-+++ b/include/hw/iommu/host_iommu_context.h
-@@ -64,6 +64,12 @@ typedef struct HostIOMMUContextClass {
-     /* Undo a previous bind. @unbind specifies the unbind info. */
-     int (*unbind_stage1_pgtbl)(HostIOMMUContext *iommu_ctx,
-                                struct iommu_gpasid_bind_data *unbind);
-+    /*
-+     * Propagate stage-1 cache flush to host IOMMU, cache
-+     * info specifid in @cache
-+     */
-+    int (*flush_stage1_cache)(HostIOMMUContext *iommu_ctx,
-+                              struct iommu_cache_invalidate_info *cache);
- } HostIOMMUContextClass;
+ #include "hw/pci/pcie.h"
  
- /*
-@@ -85,6 +91,8 @@ int host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-                                      struct iommu_gpasid_bind_data *bind);
- int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-                                  struct iommu_gpasid_bind_data *unbind);
-+int host_iommu_ctx_flush_stage1_cache(HostIOMMUContext *iommu_ctx,
-+                               struct iommu_cache_invalidate_info *cache);
++#include "hw/iommu/host_iommu_context.h"
++
+ extern bool pci_available;
  
- void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-                          const char *mrtypename,
+ /* PCI bus */
+@@ -497,10 +499,18 @@ struct PCIIOMMUOps {
+                                 void *opaque, int32_t devfn);
+     int (*get_iommu_attr)(PCIBus *bus, void *opaque, int32_t devfn,
+                            IOMMUAttr attr, void *data);
++    int (*set_iommu_context)(PCIBus *bus, void *opaque,
++                             int32_t devfn,
++                             HostIOMMUContext *iommu_ctx);
++    void (*unset_iommu_context)(PCIBus *bus, void *opaque,
++                                int32_t devfn);
+ };
+ 
+ AddressSpace *pci_device_iommu_address_space(PCIDevice *dev);
+ int pci_device_get_iommu_attr(PCIDevice *dev, IOMMUAttr attr, void *data);
++int pci_device_set_iommu_context(PCIDevice *dev,
++                                 HostIOMMUContext *iommu_ctx);
++void pci_device_unset_iommu_context(PCIDevice *dev);
+ void pci_setup_iommu(PCIBus *bus, const PCIIOMMUOps *iommu_ops, void *opaque);
+ 
+ static inline void
 -- 
 2.7.4
 
