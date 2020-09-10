@@ -2,133 +2,64 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3D92C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:04:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFD2C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:07:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E65B20BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:04:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I45KGw5Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E65B20BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id DA9BE20BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 16:07:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA9BE20BED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=users.sourceforge.jp
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGP45-0002JM-NQ
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 12:04:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49834)
+	id 1kGP6b-0003yn-Lo
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 12:07:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50768)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGP34-0001IY-NA
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:03:46 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:38492
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGP32-0005H0-Sv
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:03:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599753823;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=WS6VZ+NhBy1u11QgqVNe2lgo08RiA/LnWkVoRs37DhM=;
- b=I45KGw5Qaw2hGRhcOa3hNbLp9UbN6H+tFGm1Ma791OyLCqxVQgHDD8b9OdexBjIGanzmDF
- /tqdbmOHt9xRq6Z3xJfQATELe/9h3nC2W1HjHZA8e9I5ZvCq/lAvTc7KiHNzNimMxDNfPW
- pXXnKUw8fJE8kDPVGs0j3P0+OKqJbAI=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-224-nMcvoLEnNW2CqLu7s93xRA-1; Thu, 10 Sep 2020 12:03:39 -0400
-X-MC-Unique: nMcvoLEnNW2CqLu7s93xRA-1
-Received: by mail-wm1-f69.google.com with SMTP id m125so152321wmm.7
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 09:03:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=WS6VZ+NhBy1u11QgqVNe2lgo08RiA/LnWkVoRs37DhM=;
- b=bHF7XCIH1C5hvuMWdDdUvxl94nW31wan/LYtZLx1eddeLQ+VRgMN2eolXbAMSt9uVn
- tpvNBhq2xhST38YqJ9kUMi0BGntrMvJw+53CanAejF+9kliev7QkrPu6agO3fGixCDxF
- 6ku/kuOuetmaLv/Hq+lP6kQds2KOmwm2ewkEjY7XkZKyDCF7m0rK9eGi35wywfmSep9G
- 9ZTc0Vmms4X41r1bZ8kaIxHIACO5AG7er1jlEX2tHOaASiKnQSFiT/u092xPlqB4BSiV
- 6AJ19mC9x9JncPOny1CkgS+bfEkJ5eTHk7imZ6Pm59Clska0hr2UibrAiWUXgj6Y5pxv
- zY8w==
-X-Gm-Message-State: AOAM531w/GKdZwycuArevm6iRrgPp33rp/RwEKaLg5fhCfSLkR8f57fU
- 4RhLpqC0snnFuCQEtBDDYmiuvqWtA7gLIcuGEN3RbTCY5qUTyoaaZCsOxxaYIQ3JpPixZvh56n2
- qwua9T5t6Za350GA=
-X-Received: by 2002:a1c:6254:: with SMTP id w81mr706961wmb.94.1599753817687;
- Thu, 10 Sep 2020 09:03:37 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwxLQ9eUkXf49/qvvfquTNG44X8NOWIUkhYVvnCsvJO1oD4QzQCbcKIErhVoIftWTQh3q+F6w==
-X-Received: by 2002:a1c:6254:: with SMTP id w81mr706939wmb.94.1599753817485;
- Thu, 10 Sep 2020 09:03:37 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id k84sm4192824wmf.6.2020.09.10.09.03.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 10 Sep 2020 09:03:36 -0700 (PDT)
-Subject: Re: [PATCH 09/10] pc-bios: update the README file with
- edk2-stable202008 information
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-References: <20200908072939.30178-1-lersek@redhat.com>
- <20200908072939.30178-10-lersek@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <e967b4d5-bcc2-3846-0ad6-9e8f4d2f9115@redhat.com>
-Date: Thu, 10 Sep 2020 18:03:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <20200908072939.30178-10-lersek@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:44
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <ysato@users.sourceforge.jp>)
+ id 1kGP63-0003Xj-7g
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:06:51 -0400
+Received: from mail03.asahi-net.or.jp ([202.224.55.15]:43705)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <ysato@users.sourceforge.jp>) id 1kGP61-0005lK-2w
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 12:06:50 -0400
+Received: from sakura.ysato.name (ik1-413-38519.vs.sakura.ne.jp
+ [153.127.30.23]) (Authenticated sender: PQ4Y-STU)
+ by mail03.asahi-net.or.jp (Postfix) with ESMTPA id 669AC2E985;
+ Fri, 11 Sep 2020 01:06:44 +0900 (JST)
+Received: from yo-satoh-debian.ysato.ml (ZM005235.ppp.dion.ne.jp [222.8.5.235])
+ by sakura.ysato.name (Postfix) with ESMTPSA id B1FAD1C0187;
+ Fri, 11 Sep 2020 01:06:43 +0900 (JST)
+Date: Fri, 11 Sep 2020 01:06:40 +0900
+Message-ID: <87blidy5tb.wl-ysato@users.sourceforge.jp>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
+To: Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH 00/20] RX target update
+In-Reply-To: <CAAdtpL4tyCfa-vEnYVP1i_3ksjBkAaDVx1wwMfBVHfA+BhS_wA@mail.gmail.com>
+References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
+ <CAAdtpL4tyCfa-vEnYVP1i_3ksjBkAaDVx1wwMfBVHfA+BhS_wA@mail.gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM/1.14.9 (=?ISO-8859-4?Q?Goj=F2?=) APEL/10.8 EasyPG/1.0.0 Emacs/26
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: softfail client-ip=202.224.55.15;
+ envelope-from=ysato@users.sourceforge.jp; helo=mail03.asahi-net.or.jp
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 12:06:45
+X-ACL-Warn: Detected OS   = ???
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_LOW=-0.7,
+ SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,39 +72,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/8/20 9:29 AM, Laszlo Ersek wrote:
-> Refresh the "pc-bios/README" file with edk2 and OpenSSL release info,
-> matching the edk2-stable202008 firmware images added in the previous
-> patch.
-> 
-> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-> Ref: https://bugs.launchpad.net/qemu/+bug/1852196
-> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
-> ---
->  pc-bios/README | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/pc-bios/README b/pc-bios/README
-> index fa8b58b7972a..2e49be607e02 100644
-> --- a/pc-bios/README
-> +++ b/pc-bios/README
-> @@ -52,8 +52,8 @@
->    variable store templates built from the TianoCore community's EFI Development
->    Kit II project
->    <https://github.com/tianocore/tianocore.github.io/wiki/EDK-II>. The images
-> -  were built at git tag "edk2-stable201905". The firmware binaries bundle parts
-> -  of the OpenSSL project, at git tag "OpenSSL_1_1_1b" (the OpenSSL tag is a
-> +  were built at git tag "edk2-stable202008". The firmware binaries bundle parts
-> +  of the OpenSSL project, at git tag "OpenSSL_1_1_1g" (the OpenSSL tag is a
->    function of the edk2 tag). Parts of the Berkeley SoftFloat library are
->    bundled as well, at Release 3e plus a subsequent typo fix (commit
->    b64af41c3276f97f0e181920400ee056b9c88037), as an OpenSSL dependency on 32-bit
-> 
+On Tue, 01 Sep 2020 05:38:37 +0900,
+Philippe Mathieu-Daud=E9 wrote:
+>=20
+> [1  <text/plain; UTF-8 (quoted-printable)>]
+> [2  <text/html; UTF-8 (quoted-printable)>]
+> Hello Yoshinori,
+>=20
+> Le jeu. 27 ao=FBt 2020 14:43, Yoshinori Sato <ysato@users.sourceforge.jp>=
+ a
+> =E9crit=A0:
+>=20
+>     Hello.
+>     This series Renesas RX updates.
+>   =20
+>     It consists of the following contents.
+>     * Update firmware loader.
+>     * Rewrite peripheal modules (Timer and SCI).
+>     =A0 - Unified SH4 module.
+>     =A0 - Using clock API
+>     * New peripheal modules.
+>     =A0 - On-chip clock generator.
+>     =A0 - Multi-function timer.
+>     =A0 - Ethernet MAC.
+>     * New real hardware target.
+>     =A0 - TokushudenshiKairo TKDN-RX62N-BRD.
+>     =A0 - CQ publishing CQ-FRK-RX62N
+>=20
+> How can we test them?=A0
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Sorry too late reply.
+TKDN-RX62N-BRD can work u-boot and linux.
+The configuration is different from gdbsim.
+I'll upload what I'm using for testing later.
 
+CQ-FRK-RX62N can work micropython.
+I will upload this later as well.
+
+>     Yoshinori Sato (20):
+>     =A0 loader.c: Add support Motrola S-record format.
+>     =A0 include/elf.h: Add EM_RX.
+>     =A0 hw/rx: Firmware and kernel loader.
+>     =A0 hw/rx: New firmware loader.
+>     =A0 hw/rx: Add RX62N Clock generator
+>     =A0 hw/timer: Renesas 8bit timer emulation.
+>     =A0 hw/rx: RX62N convert new 8bit timer.
+>     =A0 hw/timer: Renesas TMU/CMT module.
+>     =A0 hw/timer: Remove renesas_cmt.
+>     =A0 hw/rx: Convert to renesas_timer
+>     =A0 hw/char: Renesas SCI module.
+>     =A0 hw/rx/rx62n: Use New SCI module.
+>     =A0 hw/timer: Add Renesas MTU2
+>     =A0 hw/rx/rx62n: RX62N Add MTU module
+>     =A0 hw/net: Add generic Bit-bang MDIO PHY.
+>     =A0 hw/net: Add Renesas On-chip Ethernet MAC
+>     =A0 hw/rx/rx62n: Add Ethernet support.
+>     =A0 hw/rx: Add Tokudenkairo TKDN-RX62N-BRD
+>     =A0 hw/rx: Add CQ-FRK-RX62N target
+>     =A0 MAINTAINERS: Update RX entry
+>   =20
+>     =A0default-configs/rx-softmmu.mak=A0 =A0|=A0 =A0 2 +
+>     =A0include/elf.h=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 =A0 2 +
+>     =A0include/hw/char/renesas_sci.h=A0 =A0 |=A0 129 ++-
+>     =A0include/hw/loader.h=A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 =A014 +
+>     =A0include/hw/net/mdio.h=A0 =A0 =A0 =A0 =A0 =A0 |=A0 126 +++
+>     =A0include/hw/net/renesas_eth.h=A0 =A0 =A0|=A0 =A057 ++
+>     =A0include/hw/rx/loader.h=A0 =A0 =A0 =A0 =A0 =A0|=A0 =A035 +
+>     =A0include/hw/rx/rx62n-cpg.h=A0 =A0 =A0 =A0 |=A0 =A072 ++
+>     =A0include/hw/rx/rx62n.h=A0 =A0 =A0 =A0 =A0 =A0 |=A0 =A036 +-
+>     =A0include/hw/timer/renesas_cmt.h=A0 =A0|=A0 =A040 -
+>     =A0include/hw/timer/renesas_mtu.h=A0 =A0|=A0 =A090 ++
+>     =A0include/hw/timer/renesas_timer.h |=A0 103 +++
+>     =A0include/hw/timer/renesas_tmr.h=A0 =A0|=A0 =A055 --
+>     =A0include/hw/timer/renesas_tmr8.h=A0 |=A0 =A067 ++
+>     =A0hw/char/renesas_sci.c=A0 =A0 =A0 =A0 =A0 =A0 | 1040 ++++++++++++++=
+++++-----
+>     =A0hw/core/loader.c=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 208 +++++
+>     =A0hw/net/mdio.c=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 264 ++++=
+++
+>     =A0hw/net/renesas_eth.c=A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 875 ++++++++++=
+++++++++++
+>     =A0hw/rx/cq-frk-rx62n.c=A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 =A094 +++
+>     =A0hw/rx/loader.c=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 182 +++++
+>     =A0hw/rx/rx-gdbsim.c=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 =A098 +--
+>     =A0hw/rx/rx62n-cpg.c=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 344 ++++++++
+>     =A0hw/rx/rx62n.c=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 140 ++--
+>     =A0hw/rx/tkdn-rx62n.c=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 192 +++++
+>     =A0hw/timer/renesas_cmt.c=A0 =A0 =A0 =A0 =A0 =A0|=A0 283 -------
+>     =A0hw/timer/renesas_mtu.c=A0 =A0 =A0 =A0 =A0 =A0| 1312 ++++++++++++++=
+++++++++++++++++
+>     =A0hw/timer/renesas_timer.c=A0 =A0 =A0 =A0 =A0|=A0 639 +++++++++++++++
+>     =A0hw/timer/renesas_tmr.c=A0 =A0 =A0 =A0 =A0 =A0|=A0 477 -----------
+>     =A0hw/timer/renesas_tmr8.c=A0 =A0 =A0 =A0 =A0 |=A0 540 ++++++++++++
+>     =A0MAINTAINERS=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 =A0 2 +
+>     =A0hw/net/Kconfig=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 =A0 8 +
+>     =A0hw/net/meson.build=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 =A0 3 +
+>     =A0hw/rx/Kconfig=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 =A016 +-
+>     =A0hw/rx/meson.build=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 |=A0 =A0 5 +-
+>     =A0hw/timer/Kconfig=A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 =A0 9 +-
+>     =A0hw/timer/meson.build=A0 =A0 =A0 =A0 =A0 =A0 =A0|=A0 =A0 5 +-
+>     =A036 files changed, 6391 insertions(+), 1173 deletions(-)
+>     =A0create mode 100644 include/hw/net/mdio.h
+>     =A0create mode 100644 include/hw/net/renesas_eth.h
+>     =A0create mode 100644 include/hw/rx/loader.h
+>     =A0create mode 100644 include/hw/rx/rx62n-cpg.h
+>     =A0delete mode 100644 include/hw/timer/renesas_cmt.h
+>     =A0create mode 100644 include/hw/timer/renesas_mtu.h
+>     =A0create mode 100644 include/hw/timer/renesas_timer.h
+>     =A0delete mode 100644 include/hw/timer/renesas_tmr.h
+>     =A0create mode 100644 include/hw/timer/renesas_tmr8.h
+>     =A0create mode 100644 hw/net/mdio.c
+>     =A0create mode 100644 hw/net/renesas_eth.c
+>     =A0create mode 100644 hw/rx/cq-frk-rx62n.c
+>     =A0create mode 100644 hw/rx/loader.c
+>     =A0create mode 100644 hw/rx/rx62n-cpg.c
+>     =A0create mode 100644 hw/rx/tkdn-rx62n.c
+>     =A0delete mode 100644 hw/timer/renesas_cmt.c
+>     =A0create mode 100644 hw/timer/renesas_mtu.c
+>     =A0create mode 100644 hw/timer/renesas_timer.c
+>     =A0delete mode 100644 hw/timer/renesas_tmr.c
+>     =A0create mode 100644 hw/timer/renesas_tmr8.c
+>   =20
+>     --
+>     2.20.1
+>=20
+>=20
+
+--=20
+Yosinori Sato
 
