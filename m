@@ -2,79 +2,87 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B77C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 21:03:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2DDC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 22:16:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DC6BD20829
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 21:03:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DC6BD20829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=tuxera.com
+	by mail.kernel.org (Postfix) with ESMTPS id 403E7208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 22:16:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R4h1BbHn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 403E7208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33654 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGTjB-00077T-UP
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 17:03:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42940)
+	id 1kGUry-0002kO-40
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 18:16:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58606)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ari@tuxera.com>)
- id 1kGThp-0005fB-8A; Thu, 10 Sep 2020 17:02:09 -0400
-Received: from mgw-02.mpynet.fi ([82.197.21.91]:41234)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ari@tuxera.com>)
- id 1kGThk-0001Ki-Pn; Thu, 10 Sep 2020 17:02:07 -0400
-Received: from pps.filterd (mgw-02.mpynet.fi [127.0.0.1])
- by mgw-02.mpynet.fi (8.16.0.42/8.16.0.42) with SMTP id 08AKrBlF058142;
- Fri, 11 Sep 2020 00:01:23 +0300
-Received: from ex13.tuxera.com (ex13.tuxera.com [178.16.184.72])
- by mgw-02.mpynet.fi with ESMTP id 33bxbvp0j9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
- Fri, 11 Sep 2020 00:01:23 +0300
-Received: from [192.168.0.79] (62.78.240.173) by tuxera-exch.ad.tuxera.com
- (10.20.48.11) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Fri, 11 Sep
- 2020 00:01:22 +0300
-Subject: Re: [PATCH 07/14] block/blklogwrites: drop error propagation
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- <qemu-block@nongnu.org>
-References: <20200909185930.26524-1-vsementsov@virtuozzo.com>
- <20200909185930.26524-8-vsementsov@virtuozzo.com>
-From: Ari Sundholm <ari@tuxera.com>
-Message-ID: <8856cf15-4092-55b7-6537-a6beb4ce8a18@tuxera.com>
-Date: Fri, 11 Sep 2020 00:01:21 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kGUqu-0001Pe-43
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 18:15:36 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:59447
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kGUqs-0002YF-G0
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 18:15:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599776133;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Trsx+5dgEASnNuR5fwYeUcB1oxxfhTXSWD+sGULyDps=;
+ b=R4h1BbHnGTpETs1LSHpIRCxjupPteTJ7urOh758kShcbojV3ace07HYMsOV0MTYybB54vN
+ c29On1OQClOjv+ZT6SF7kVQTeUW+5sA7xsqOTi3KTYC2hMOXy7JkIP3zRNAekhGQjXegsm
+ mTFai08e0+AlfXJoSVfV1Pt6jIH8F08=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-576-IGM-7aSlPgGR6bLcMF2y-Q-1; Thu, 10 Sep 2020 18:15:30 -0400
+X-MC-Unique: IGM-7aSlPgGR6bLcMF2y-Q-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D55FD1084C92;
+ Thu, 10 Sep 2020 22:15:29 +0000 (UTC)
+Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F19C7E8F8;
+ Thu, 10 Sep 2020 22:15:29 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/9] qom: Use kernel-doc private/public tags in structs
+Date: Thu, 10 Sep 2020 18:15:19 -0400
+Message-Id: <20200910221526.10041-3-ehabkost@redhat.com>
+In-Reply-To: <20200910221526.10041-1-ehabkost@redhat.com>
+References: <20200910221526.10041-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200909185930.26524-8-vsementsov@virtuozzo.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [62.78.240.173]
-X-ClientProxiedBy: tuxera-exch.ad.tuxera.com (10.20.48.11) To
- tuxera-exch.ad.tuxera.com (10.20.48.11)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-09-10_09:2020-09-10,
- 2020-09-10 signatures=0
-X-Proofpoint-Spam-Details: rule=mpy_notspam policy=mpy score=0 bulkscore=0
- malwarescore=0 mlxscore=0
- suspectscore=0 spamscore=0 phishscore=0 adultscore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
- definitions=main-2009100185
-Received-SPF: pass client-ip=82.197.21.91; envelope-from=ari@tuxera.com;
- helo=mgw-02.mpynet.fi
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 17:01:57
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -77
-X-Spam_score: -7.8
-X-Spam_bar: -------
-X-Spam_report: (-7.8 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-3.576,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_NONE=0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0.0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 18:15:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,125 +96,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, berto@igalia.com, pavel.dovgaluk@ispras.ru,
- qemu-devel@nongnu.org, armbru@redhat.com, groug@kaod.org, stefanha@redhat.com,
- pbonzini@redhat.com, mreitz@redhat.com, jsnow@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Vladimir!
+Use kernel-doc syntax for indicating private and public struct
+fields.
 
-Thank you for working on this. My comments below.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/qom/object.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-On 9/9/20 9:59 PM, Vladimir Sementsov-Ogievskiy wrote:
-> It's simple to avoid error propagation in blk_log_writes_open(), we
-> just need to refactor blk_log_writes_find_cur_log_sector() a bit.
-> 
-> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-> ---
->   block/blklogwrites.c | 23 +++++++++++------------
->   1 file changed, 11 insertions(+), 12 deletions(-)
-> 
-> diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-> index 7ef046cee9..c7da507b2d 100644
-> --- a/block/blklogwrites.c
-> +++ b/block/blklogwrites.c
-> @@ -96,10 +96,10 @@ static inline bool blk_log_writes_sector_size_valid(uint32_t sector_size)
->           sector_size < (1ull << 24);
->   }
->   
-> -static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
-> -                                                   uint32_t sector_size,
-> -                                                   uint64_t nr_entries,
-> -                                                   Error **errp)
-> +static int64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
+diff --git a/include/qom/object.h b/include/qom/object.h
+index ad2b91ec6c..f85718380d 100644
+--- a/include/qom/object.h
++++ b/include/qom/object.h
+@@ -520,7 +520,7 @@ typedef void (ObjectFree)(void *obj);
+  */
+ struct ObjectClass
+ {
+-    /*< private >*/
++    /* private: */
+     Type type;
+     GSList *interfaces;
+ 
+@@ -546,7 +546,7 @@ struct ObjectClass
+  */
+ struct Object
+ {
+-    /*< private >*/
++    /* private: */
+     ObjectClass *class;
+     ObjectFree *free;
+     GHashTable *properties;
+@@ -905,7 +905,7 @@ struct InterfaceInfo {
+ struct InterfaceClass
+ {
+     ObjectClass parent_class;
+-    /*< private >*/
++    /* private: */
+     ObjectClass *concrete_class;
+     Type interface_type;
+ };
+-- 
+2.26.2
 
-I'd rather not change the return type for reasons detailed below.
-
-> +                                                  uint32_t sector_size,
-> +                                                  uint64_t nr_entries,
-> +                                                  Error **errp)
->   {
->       uint64_t cur_sector = 1;
->       uint64_t cur_idx = 0;
-> @@ -112,13 +112,13 @@ static uint64_t blk_log_writes_find_cur_log_sector(BdrvChild *log,
->           if (read_ret < 0) {
->               error_setg_errno(errp, -read_ret,
->                                "Failed to read log entry %"PRIu64, cur_idx);
-> -            return (uint64_t)-1ull;
-> +            return read_ret;
-
-This is OK, provided the change in return type signedness is necessary 
-in the first place.
-
->           }
->   
->           if (cur_entry.flags & ~cpu_to_le64(LOG_FLAG_MASK)) {
->               error_setg(errp, "Invalid flags 0x%"PRIx64" in log entry %"PRIu64,
->                          le64_to_cpu(cur_entry.flags), cur_idx);
-> -            return (uint64_t)-1ull;
-> +            return -EINVAL;
-
-This is OK, provided the return type signedness change is necessary, 
-although we already do have errp to indicate any errors.
-
->           }
->   
->           /* Account for the sector of the entry itself */
-> @@ -143,7 +143,6 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
->   {
->       BDRVBlkLogWritesState *s = bs->opaque;
->       QemuOpts *opts;
-> -    Error *local_err = NULL;
->       int ret;
->       uint64_t log_sector_size;
->       bool log_append;
-> @@ -215,15 +214,15 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
->           s->nr_entries = 0;
->   
->           if (blk_log_writes_sector_size_valid(log_sector_size)) {
-> -            s->cur_log_sector =
-> +            int64_t cur_log_sector =
->                   blk_log_writes_find_cur_log_sector(s->log_file, log_sector_size,
-> -                                    le64_to_cpu(log_sb.nr_entries), &local_err);
-> -            if (local_err) {
-> -                ret = -EINVAL;
-> -                error_propagate(errp, local_err);
-> +                                    le64_to_cpu(log_sb.nr_entries), errp);
-> +            if (cur_log_sector < 0) {
-> +                ret = cur_log_sector;
-
-This changes the semantics slightly. Changing the return type to int64 
-may theoretically cause valid return values to be interpreted as errors. 
-Since we already do have a dedicated out pointer for the error value 
-(errp), why not use it?
-
-Assigning cur_log_sector to ret looks a bit odd to me. Why not use the 
-original -EINVAL - or maybe some more appropriate errno value than -EINVAL?
-
-I think the desired effect of this change could be achieved with less 
-churn. How about just making just the following change in addition to 
-adding ERRP_GUARD() to the beginning of the function and getting rid of 
-local_err:
-
--                                    le64_to_cpu(log_sb.nr_entries), 
-&local_err);
-+                                    le64_to_cpu(log_sb.nr_entries), errp);
--            if (local_err) {
-+            if (*errp) {
-                  ret = -EINVAL;
--                error_propagate(errp, local_err);
->                   goto fail_log;
->               }
->   
-> +            s->cur_log_sector = cur_log_sector;
->               s->nr_entries = le64_to_cpu(log_sb.nr_entries);
->           }
->       } else {
-> 
-
-Best regards,
-Ari Sundholm
-ari@tuxera.com
 
