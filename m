@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B126C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAF4C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3793320720
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3793320720
+	by mail.kernel.org (Postfix) with ESMTPS id 613F720C09
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:01:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 613F720C09
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGKKD-00059C-TF
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:01:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55826)
+	id 1kGKKL-0005Om-DA
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:01:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKED-0003aN-Dd
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:54:57 -0400
+ id 1kGKEN-0003n8-Uv
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:07 -0400
 Received: from mga03.intel.com ([134.134.136.65]:26671)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKEA-0005xE-F4
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:54:57 -0400
-IronPort-SDR: 584lHQY74tvxDobLFlqyeI0CFJycdC8LG88aPZ7s/xJAGO5I4thRh4bXphFTizEtYxtoW/UHtx
- qG6GRVHCyWPw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545466"
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545466"
+ id 1kGKEJ-0005xE-25
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:07 -0400
+IronPort-SDR: hTYortnHM4jzdojp/Z/zqWC2/nyl7XlE6uG1jSDLqsqp7EmymJ8eV5tkq5Ee1o06DO2T7prFs8
+ x0BnU38S1Fpw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545475"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545475"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  10 Sep 2020 03:54:39 -0700
-IronPort-SDR: KYL+DBA7/CqRG61xGOcwFf2KrovP/8NEtBv7A9NJBAUou9bME+cOo+X8tBNE+nCSpQHT7S4X/h
- 1/Khj93vKeuw==
+IronPort-SDR: BAP8G9TiDLMSt9cFgWAHVWLIfy3bchSksLmPjHoKJo9Z3KCXgVGRCkm2ayt7+uNIQVA6acwWy0
+ UE2OR7TLWOZA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140036"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140051"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
  by orsmga008.jf.intel.com with ESMTP; 10 Sep 2020 03:54:39 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com,
  jasowang@redhat.com
-Subject: [RFC v10 01/25] scripts/update-linux-headers: Import iommu.h
-Date: Thu, 10 Sep 2020 03:56:14 -0700
-Message-Id: <1599735398-6829-2-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v10 06/25] vfio: pass nesting requirement into vfio_get_group()
+Date: Thu, 10 Sep 2020 03:56:19 -0700
+Message-Id: <1599735398-6829-7-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
 References: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
@@ -79,43 +79,127 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
  Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, Cornelia Huck <cohuck@redhat.com>, eric.auger@redhat.com,
- yi.y.sun@intel.com, Jacob Pan <jacob.jun.pan@linux.intel.com>,
- pbonzini@redhat.com, hao.wu@intel.com, david@gibson.dropbear.id.au
+ jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
+ Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
+ hao.wu@intel.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Eric Auger <eric.auger@redhat.com>
-
-Update the script to import the new iommu.h uapi header.
+This patch passes the nesting requirement into vfio_get_group() to
+indicate whether VFIO_TYPE1_NESTING_IOMMU is required.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
+Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: Michael S. Tsirkin <mst@redhat.com>
-Cc: Cornelia Huck <cohuck@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Acked-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Eric Auger <eric.auger@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
 ---
- scripts/update-linux-headers.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/vfio/ap.c                  | 2 +-
+ hw/vfio/ccw.c                 | 2 +-
+ hw/vfio/common.c              | 3 ++-
+ hw/vfio/pci.c                 | 9 ++++++++-
+ hw/vfio/platform.c            | 2 +-
+ include/hw/vfio/vfio-common.h | 3 ++-
+ 6 files changed, 15 insertions(+), 6 deletions(-)
 
-diff --git a/scripts/update-linux-headers.sh b/scripts/update-linux-headers.sh
-index 29c27f4..5b64ee3 100755
---- a/scripts/update-linux-headers.sh
-+++ b/scripts/update-linux-headers.sh
-@@ -141,7 +141,7 @@ done
+diff --git a/hw/vfio/ap.c b/hw/vfio/ap.c
+index cec6fe1..b5f3159 100644
+--- a/hw/vfio/ap.c
++++ b/hw/vfio/ap.c
+@@ -83,7 +83,7 @@ static VFIOGroup *vfio_ap_get_group(VFIOAPDevice *vapdev, Error **errp)
  
- rm -rf "$output/linux-headers/linux"
- mkdir -p "$output/linux-headers/linux"
--for header in kvm.h vfio.h vfio_ccw.h vhost.h \
-+for header in kvm.h vfio.h vfio_ccw.h vhost.h iommu.h \
-               psci.h psp-sev.h userfaultfd.h mman.h; do
-     cp "$tmpdir/include/linux/$header" "$output/linux-headers/linux"
- done
+     g_free(group_path);
+ 
+-    return vfio_get_group(groupid, &address_space_memory, errp);
++    return vfio_get_group(groupid, &address_space_memory, false, errp);
+ }
+ 
+ static void vfio_ap_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/vfio/ccw.c b/hw/vfio/ccw.c
+index ff7f369..30d00a7 100644
+--- a/hw/vfio/ccw.c
++++ b/hw/vfio/ccw.c
+@@ -621,7 +621,7 @@ static VFIOGroup *vfio_ccw_get_group(S390CCWDevice *cdev, Error **errp)
+         return NULL;
+     }
+ 
+-    return vfio_get_group(groupid, &address_space_memory, errp);
++    return vfio_get_group(groupid, &address_space_memory, false, errp);
+ }
+ 
+ static void vfio_ccw_realize(DeviceState *dev, Error **errp)
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 3335714..80d7a00 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1457,7 +1457,8 @@ static void vfio_disconnect_container(VFIOGroup *group)
+     }
+ }
+ 
+-VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp)
++VFIOGroup *vfio_get_group(int groupid, AddressSpace *as,
++                          bool want_nested, Error **errp)
+ {
+     VFIOGroup *group;
+     char path[32];
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 3611dcd..d33fb89 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2711,6 +2711,7 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+     int groupid;
+     int i, ret;
+     bool is_mdev;
++    bool want_nested;
+ 
+     if (!vdev->vbasedev.sysfsdev) {
+         if (!(~vdev->host.domain || ~vdev->host.bus ||
+@@ -2768,7 +2769,13 @@ static void vfio_realize(PCIDevice *pdev, Error **errp)
+ 
+     trace_vfio_realize(vdev->vbasedev.name, groupid);
+ 
+-    group = vfio_get_group(groupid, pci_device_iommu_address_space(pdev), errp);
++    if (pci_device_get_iommu_attr(pdev,
++                         IOMMU_WANT_NESTING, &want_nested)) {
++        want_nested = false;
++    }
++
++    group = vfio_get_group(groupid, pci_device_iommu_address_space(pdev),
++                           want_nested, errp);
+     if (!group) {
+         goto error;
+     }
+diff --git a/hw/vfio/platform.c b/hw/vfio/platform.c
+index 869ed2c..5eac6a2 100644
+--- a/hw/vfio/platform.c
++++ b/hw/vfio/platform.c
+@@ -580,7 +580,7 @@ static int vfio_base_device_init(VFIODevice *vbasedev, Error **errp)
+ 
+     trace_vfio_platform_base_device_init(vbasedev->name, groupid);
+ 
+-    group = vfio_get_group(groupid, &address_space_memory, errp);
++    group = vfio_get_group(groupid, &address_space_memory, false, errp);
+     if (!group) {
+         return -ENOENT;
+     }
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index c78f3ff..bdb09f4 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -174,7 +174,8 @@ void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled);
+ void vfio_region_exit(VFIORegion *region);
+ void vfio_region_finalize(VFIORegion *region);
+ void vfio_reset_handler(void *opaque);
+-VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
++VFIOGroup *vfio_get_group(int groupid, AddressSpace *as,
++                          bool want_nested, Error **errp);
+ void vfio_put_group(VFIOGroup *group);
+ int vfio_get_device(VFIOGroup *group, const char *name,
+                     VFIODevice *vbasedev, Error **errp);
 -- 
 2.7.4
 
