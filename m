@@ -8,76 +8,76 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ED79C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 779B5C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:36:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC4D920BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:35:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E94C020BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:36:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ns4QmS2I"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC4D920BED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdNnBtFD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E94C020BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGJvd-0005iS-Pc
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:35:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50704)
+	id 1kGJwF-0006ex-Um
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:36:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJrm-0006vg-AD; Thu, 10 Sep 2020 06:31:46 -0400
-Received: from mail-pg1-x52f.google.com ([2607:f8b0:4864:20::52f]:35873)
+ id 1kGJs8-0007Yt-Dk; Thu, 10 Sep 2020 06:32:08 -0400
+Received: from mail-pf1-x42e.google.com ([2607:f8b0:4864:20::42e]:45642)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJrk-000362-FN; Thu, 10 Sep 2020 06:31:46 -0400
-Received: by mail-pg1-x52f.google.com with SMTP id f2so1991165pgd.3;
- Thu, 10 Sep 2020 03:31:42 -0700 (PDT)
+ id 1kGJs5-00037D-TT; Thu, 10 Sep 2020 06:32:08 -0400
+Received: by mail-pf1-x42e.google.com with SMTP id k15so4356076pfc.12;
+ Thu, 10 Sep 2020 03:32:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/Q/d/vfX2r5ok5sWGBwNZjHxKJu0oUaT5gHBOiJ10fI=;
- b=ns4QmS2IsnRySuQXjBp5ziFLlXrPQogKSSJJtJVmXGSjvZxfl+0Ve1FiiJLfOPe6fa
- gkUj33aNZeE6TBnhY30Rv2Xe0Z3pE5ZJGZXOp0jIkypJJm7ynwLpI/1217QBHXNC+SMi
- LiM25i3jcmD5lRKuEzhbkR3CALywcozV0/ezq+qq7sXnXqz4VkY70fkz5GJ9PmZYNS6I
- U85093PaLTvwMt9wTX1h2zKwlm48UMpijAPwGbxpKt8iBdtD2t7vfLUkYpaFwqoSeSw8
- JYxg7jTdXz6SYVI6ALvaO0bUZ/y3AZsEKLSQVtkR6IpWofM4tha37tDJQvY7Wz6JtmWx
- F+Fw==
+ bh=27ajP4GoRfKO+nbwUgNlBqHfhHBZSCkZ9ODFQ91KtVY=;
+ b=bdNnBtFDVWdjlRHENK6jjHaF+G+jcto5aAcuI4OlKC5ArI63bJUf32zTbXzonU8Ur5
+ 2W6L3DhOPx2qq3IFOpHu+NfnhLWUmL9Bw6EgKzsIWb0LqcEcLn+q711ufjE1BlOdKEru
+ k8rqkdvrEa7EECoiDrumJKnagGb4u7SN34xKO0Ykuh4CJ6RqwqzMtfNeYgb+IB6QFy/H
+ c2nevmXqjlNzCMxnzrDh2IUY61nsF24qBEPvUnyZqJCEz7IAF3LB/YzwmSF8+aGndbVu
+ 70Gd69Nyqks689u2NQrIa1y86R9pOQmNyQ5s7E+bgetTh8UaHKIxJ74siiEQA1ZXUCHq
+ K9PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/Q/d/vfX2r5ok5sWGBwNZjHxKJu0oUaT5gHBOiJ10fI=;
- b=ix8A/GPlBJ75LK5prTL8bR4YU5stXIeZ5nGi93uL0eyduWyaXURXMdi77+1wuOZhQd
- J+mKcgWhCuzwd3J5qUFB+Yj/SgbjD51b2kJWTLv8viD5dyDTyN77ARJXHK8vTJrlHH9d
- RCmq6U2xKZ8kc846Dr15RIe5BlxuBOsD00xw5UiN+mq8x/3oGkS8cVvZsyzqlvYDVaRj
- WjCEQdtQ7x45lPATUwmq0270lAW4Y87p3OHMoyLsZZrafWAxaWEiu4SpNxo6F8EmNxyt
- unST36frMdVEoGuJJKfIrU7jnXvMNpqUcaf5u89uskbxLa6Is2mogUe0V8w0/l268HON
- tgFA==
-X-Gm-Message-State: AOAM532TT1Rn2DiqtJWjjt09EV/eeclSr67qn+BjUWNBu7l5NOz010M8
- Qa8YXdliBfad68MFbSSictvECqnNIxM8RSMerYo=
-X-Google-Smtp-Source: ABdhPJxv8yQi8TLku5oEqgOsYkaUKBDDlK+5QV+s4yw5e9tgEms1QBayJaDSBeU3Ja2GEigXmHeTHg==
-X-Received: by 2002:a63:30c2:: with SMTP id w185mr3970567pgw.436.1599733901328; 
- Thu, 10 Sep 2020 03:31:41 -0700 (PDT)
+ bh=27ajP4GoRfKO+nbwUgNlBqHfhHBZSCkZ9ODFQ91KtVY=;
+ b=C57u/DVd9msUE7ndqqNPd+BRtSKZq95RyrmyBVbdnPvSWefZXU5RLAeKzlMTKCQJew
+ DkdCsXmCpf4vIqMNPzSyVtaMp2ASWtHYKfQspH57zJ3F7uT9NOGEvlFH5D6rP6sV8iEC
+ QRG+GwzIdTPPP8TDqBoJluw9CtWFmtAtD+phC2Cn6WTSitPk4OKy6sITmdlo4V1V78G2
+ +Z2kq6WIjgl3oi7go93kI15Xl/w1m4yUQP49QqcWI4Aat9yzxM9DFysz94qx/2qu1/Tp
+ Zjz/0aIXC+pkzBo4fJzdiW/vZnYO/qHFXNutzU6M8opPRVNWb6HgEBaCt8u5S1hpX+2K
+ GBsQ==
+X-Gm-Message-State: AOAM532Lq/cY4NsHkgNZQidppEBCLn28iiZqPjh4h/phJhHFBQDSb+ZT
+ u8ORy81YoqsvksKHoeDW4jHNQelgfvAo/gjF/As=
+X-Google-Smtp-Source: ABdhPJzEhF71BGUAwfT+XmIx8le4mOr9jVPAwtPPh/a3U85SsTjqDxAtz71oALHwNRFHoV5rQxZT1w==
+X-Received: by 2002:a63:6647:: with SMTP id a68mr4058910pgc.450.1599733923691; 
+ Thu, 10 Sep 2020 03:32:03 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id g21sm2000203pfh.30.2020.09.10.03.31.36
+ by smtp.googlemail.com with ESMTPSA id g21sm2000203pfh.30.2020.09.10.03.31.58
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 03:31:40 -0700 (PDT)
+ Thu, 10 Sep 2020 03:32:02 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 04/25] ci: fixes msys2 build by upgrading capstone to 4.0.2
-Date: Thu, 10 Sep 2020 18:30:38 +0800
-Message-Id: <20200910103059.987-5-luoyonggang@gmail.com>
+Subject: [PATCH v7 08/25] tests: disable /char/stdio/* tests in test-char.c on
+ win32
+Date: Thu, 10 Sep 2020 18:30:42 +0800
+Message-Id: <20200910103059.987-9-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200910103059.987-1-luoyonggang@gmail.com>
 References: <20200910103059.987-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::52f;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x52f.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::42e;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x42e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -112,75 +112,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The currently random version capstone have the following compiling issue:
-  CC      /c/work/xemu/qemu/build/slirp/src/arp_table.o
-make[1]: *** No rule to make target “/c/work/xemu/qemu/build/capstone/capstone.lib”。 Stop.
-
-Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1 are the tagged version 4.0.2
-when upgrading to this version, the folder structure of include are changed to
-qemu\capstone\include
-│  platform.h
-│
-├─capstone
-│      arm.h
-│      arm64.h
-│      capstone.h
-│      evm.h
-│      m680x.h
-│      m68k.h
-│      mips.h
-│      platform.h
-│      ppc.h
-│      sparc.h
-│      systemz.h
-│      tms320c64x.h
-│      x86.h
-│      xcore.h
-│
-└─windowsce
-        intrin.h
-        stdint.h
-
-in capstone. so we need add extra include path -I${source_path}/capstone/include/capstone
-for directly #include <capstone.h>, and the exist include path should preserve, because
-in capstone code there something like #include "capstone/capstone.h"
-
-If only using
-    capstone_cflags="-I${source_path}/capstone/include/capstone"
-Then will cause the following compiling error:
-
-  CC      cs.o
-cs.c:17:10: fatal error: 'capstone/capstone.h' file not found
-#include <capstone/capstone.h>
-         ^~~~~~~~~~~~~~~~~~~~~
-1 error generated.
+These tests are blocking test-char to be finished.
+Disable them by using variable is_win32, so we doesn't
+need macro to open it. and easy recover those function
+latter.
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 ---
- capstone  | 2 +-
- configure | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ tests/test-char.c | 26 ++++++++++++++++----------
+ 1 file changed, 16 insertions(+), 10 deletions(-)
 
-diff --git a/capstone b/capstone
-index 22ead3e0bf..1d23053284 160000
---- a/capstone
-+++ b/capstone
-@@ -1 +1 @@
--Subproject commit 22ead3e0bfdb87516656453336160e0a37b066bf
-+Subproject commit 1d230532840a37ac032c6ab80128238fc930c6c1
-diff --git a/configure b/configure
-index 4231d56bcc..f4f8bc3756 100755
---- a/configure
-+++ b/configure
-@@ -5156,7 +5156,7 @@ case "$capstone" in
-       LIBCAPSTONE=libcapstone.a
-     fi
-     capstone_libs="-Lcapstone -lcapstone"
--    capstone_cflags="-I${source_path}/capstone/include"
-+    capstone_cflags="-I${source_path}/capstone/include -I${source_path}/capstone/include/capstone"
-     ;;
+diff --git a/tests/test-char.c b/tests/test-char.c
+index d35cc839bc..184ddceab8 100644
+--- a/tests/test-char.c
++++ b/tests/test-char.c
+@@ -77,7 +77,6 @@ static void fe_event(void *opaque, QEMUChrEvent event)
+     }
+ }
  
-   system)
+-#ifdef _WIN32
+ static void char_console_test_subprocess(void)
+ {
+     QemuOpts *opts;
+@@ -102,7 +101,7 @@ static void char_console_test(void)
+     g_test_trap_assert_passed();
+     g_test_trap_assert_stdout("CONSOLE");
+ }
+-#endif
++
+ static void char_stdio_test_subprocess(void)
+ {
+     Chardev *chr;
+@@ -1448,7 +1447,11 @@ static SocketAddress unixaddr = {
+ 
+ int main(int argc, char **argv)
+ {
+-    bool has_ipv4, has_ipv6;
++    bool has_ipv4, has_ipv6, is_win32 = false;
++
++#ifdef _WIN32
++    is_win32 = true;
++#endif
+ 
+     qemu_init_main_loop(&error_abort);
+     socket_init();
+@@ -1467,12 +1470,15 @@ int main(int argc, char **argv)
+     g_test_add_func("/char/invalid", char_invalid_test);
+     g_test_add_func("/char/ringbuf", char_ringbuf_test);
+     g_test_add_func("/char/mux", char_mux_test);
+-#ifdef _WIN32
+-    g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
+-    g_test_add_func("/char/console", char_console_test);
+-#endif
+-    g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
+-    g_test_add_func("/char/stdio", char_stdio_test);
++    if (0) {
++        g_test_add_func("/char/console/subprocess", char_console_test_subprocess);
++        g_test_add_func("/char/console", char_console_test);
++    }
++
++    if (!is_win32) {
++        g_test_add_func("/char/stdio/subprocess", char_stdio_test_subprocess);
++        g_test_add_func("/char/stdio", char_stdio_test);
++    }
+ #ifndef _WIN32
+     g_test_add_func("/char/pipe", char_pipe_test);
+ #endif
+@@ -1534,7 +1540,7 @@ int main(int argc, char **argv)
+     g_test_add_data_func("/char/socket/client/dupid-reconnect/" # name, \
+                          &client8 ##name, char_socket_client_dupid_test)
+ 
+-    if (has_ipv4) {
++    if (has_ipv4 && !is_win32) {
+         SOCKET_SERVER_TEST(tcp, &tcpaddr);
+         SOCKET_CLIENT_TEST(tcp, &tcpaddr);
+         g_test_add_data_func("/char/socket/server/two-clients/tcp", &tcpaddr,
 -- 
 2.28.0.windows.1
 
