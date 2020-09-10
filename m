@@ -7,52 +7,53 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6DBAC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:09:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC4EEC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:10:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50A2E20BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:09:03 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50A2E20BED
+	by mail.kernel.org (Postfix) with ESMTPS id 2DA3720BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:10:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DA3720BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39388 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGKRq-0001EN-8s
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:09:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56086)
+	id 1kGKSm-0002C3-7Q
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:10:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56310)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKEs-0004L6-EI
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:38 -0400
-Received: from mga03.intel.com ([134.134.136.65]:26671)
+ id 1kGKFU-0005nV-Ef
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:56:16 -0400
+Received: from mga03.intel.com ([134.134.136.65]:26688)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yi.l.liu@intel.com>)
- id 1kGKEp-0005xE-8W
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:55:38 -0400
-IronPort-SDR: yYRapqU4GYP+bVM5osELFLkDlQIrCxc4u4nvfjG0zXn4RXEVq0ezi4za6ZxC0+ywgE3NVYXGbN
- W5XcvBE+7YLw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545504"
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545504"
+ id 1kGKFR-0005xR-Uf
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:56:16 -0400
+IronPort-SDR: 3O07h3uE9uDc0/MbFVgBwLY3oofKGS7LIw7o+o3TF6hakrWsqlfeTABivZC4UdY1jgqJTKJVMZ
+ GTzlCAztHTbA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9739"; a="158545518"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="158545518"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga008.jf.intel.com ([10.7.209.65])
  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
  10 Sep 2020 03:54:40 -0700
-IronPort-SDR: 7hvIrgrGnxw8CTd+Mee4bnG82zdBDf73syyEouKcS7uzgKaNmeM1/UJhxMK/q9YPpwihu3GBZn
- 1/TzD9uNXk9g==
+IronPort-SDR: 6lQCFRgiZbizOl2qMz20I6mWGJjl28N2f9P80ruZ6BSjXM4gMMHF6teKC3RGDuwyDjVVRXzelb
+ Q+s4qoPh774g==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140082"
+X-IronPort-AV: E=Sophos;i="5.76,412,1592895600"; d="scan'208";a="334140109"
 Received: from jacob-builder.jf.intel.com ([10.7.199.155])
  by orsmga008.jf.intel.com with ESMTP; 10 Sep 2020 03:54:40 -0700
 From: Liu Yi L <yi.l.liu@intel.com>
 To: qemu-devel@nongnu.org, alex.williamson@redhat.com, peterx@redhat.com,
  jasowang@redhat.com
-Subject: [RFC v10 16/25] vfio: add bind stage-1 page table support
-Date: Thu, 10 Sep 2020 03:56:29 -0700
-Message-Id: <1599735398-6829-17-git-send-email-yi.l.liu@intel.com>
+Subject: [RFC v10 25/25] intel_iommu: modify x-scalable-mode to be string
+ option
+Date: Thu, 10 Sep 2020 03:56:38 -0700
+Message-Id: <1599735398-6829-26-git-send-email-yi.l.liu@intel.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
 References: <1599735398-6829-1-git-send-email-yi.l.liu@intel.com>
@@ -78,250 +79,181 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: jean-philippe@linaro.org, kevin.tian@intel.com, yi.l.liu@intel.com,
- Yi Sun <yi.y.sun@linux.intel.com>, kvm@vger.kernel.org, mst@redhat.com,
- jun.j.tian@intel.com, eric.auger@redhat.com, yi.y.sun@intel.com,
+ Yi Sun <yi.y.sun@linux.intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, mst@redhat.com, jun.j.tian@intel.com,
+ eric.auger@redhat.com, yi.y.sun@intel.com,
  Jacob Pan <jacob.jun.pan@linux.intel.com>, pbonzini@redhat.com,
- hao.wu@intel.com, david@gibson.dropbear.id.au
+ hao.wu@intel.com, Richard Henderson <rth@twiddle.net>,
+ david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds bind_stage1_pgtbl() definition in HostIOMMUContextClass,
-also adds corresponding implementation in VFIO. This is to expose a way
-for vIOMMU to setup dual stage DMA translation for passthru devices on
-hardware.
+Intel VT-d 3.0 introduces scalable mode, and it has a bunch of capabilities
+related to scalable mode translation, thus there are multiple combinations.
+While this vIOMMU implementation wants simplify it for user by providing
+typical combinations. User could config it by "x-scalable-mode" option. The
+usage is as below:
+
+"-device intel-iommu,x-scalable-mode=["legacy"|"modern"|"off"]"
+
+ - "legacy": gives support for SL page table
+ - "modern": gives support for FL page table, pasid, virtual command
+ - "off": no scalable mode support
+ -  if not configured, means no scalable mode support, if not proper
+    configured, will throw error
+
+Note: this patch is supposed to be merged when the whole vSVA patch series
+were merged.
 
 Cc: Kevin Tian <kevin.tian@intel.com>
 Cc: Jacob Pan <jacob.jun.pan@linux.intel.com>
 Cc: Peter Xu <peterx@redhat.com>
-Cc: Eric Auger <eric.auger@redhat.com>
 Cc: Yi Sun <yi.y.sun@linux.intel.com>
-Cc: David Gibson <david@gibson.dropbear.id.au>
-Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>
+Reviewed-by: Peter Xu <peterx@redhat.com>
 Signed-off-by: Liu Yi L <yi.l.liu@intel.com>
+Signed-off-by: Yi Sun <yi.y.sun@linux.intel.com>
 ---
- hw/iommu/host_iommu_context.c         | 57 +++++++++++++++++++++++++++++++++-
- hw/vfio/common.c                      | 58 ++++++++++++++++++++++++++++++++++-
- include/hw/iommu/host_iommu_context.h | 19 +++++++++++-
- 3 files changed, 131 insertions(+), 3 deletions(-)
+rfcv5 (v2) -> rfcv6:
+*) reports want_nested to VFIO;
+*) assert iommu_set/unset_iommu_context() if vIOMMU is not scalable modern.
+---
+ hw/i386/intel_iommu.c          | 39 +++++++++++++++++++++++++++++++++++----
+ hw/i386/intel_iommu_internal.h |  3 +++
+ include/hw/i386/intel_iommu.h  |  2 ++
+ 3 files changed, 40 insertions(+), 4 deletions(-)
 
-diff --git a/hw/iommu/host_iommu_context.c b/hw/iommu/host_iommu_context.c
-index 5fb2223..c43965c 100644
---- a/hw/iommu/host_iommu_context.c
-+++ b/hw/iommu/host_iommu_context.c
-@@ -69,23 +69,78 @@ int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t pasid)
-     return hicxc->pasid_free(iommu_ctx, pasid);
- }
- 
-+int host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                     struct iommu_gpasid_bind_data *bind)
-+{
-+    HostIOMMUContextClass *hicxc;
-+
-+    if (!iommu_ctx) {
-+        return -EINVAL;
-+    }
-+
-+    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-+    if (!hicxc) {
-+        return -EINVAL;
-+    }
-+
-+    if (!(iommu_ctx->flags & HOST_IOMMU_NESTING) ||
-+        !hicxc->bind_stage1_pgtbl) {
-+        return -EINVAL;
-+    }
-+
-+    return hicxc->bind_stage1_pgtbl(iommu_ctx, bind);
-+}
-+
-+int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                 struct iommu_gpasid_bind_data *unbind)
-+{
-+    HostIOMMUContextClass *hicxc;
-+
-+    if (!iommu_ctx) {
-+        return -EINVAL;
-+    }
-+
-+    hicxc = HOST_IOMMU_CONTEXT_GET_CLASS(iommu_ctx);
-+    if (!hicxc) {
-+        return -EINVAL;
-+    }
-+
-+    if (!(iommu_ctx->flags & HOST_IOMMU_NESTING) ||
-+        !hicxc->unbind_stage1_pgtbl) {
-+        return -EINVAL;
-+    }
-+
-+    return hicxc->unbind_stage1_pgtbl(iommu_ctx, unbind);
-+}
-+
- void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-                          const char *mrtypename,
--                         uint64_t flags)
-+                         uint64_t flags,
-+                         struct iommu_nesting_info *info)
- {
-     HostIOMMUContext *iommu_ctx;
- 
-     object_initialize(_iommu_ctx, instance_size, mrtypename);
-     iommu_ctx = HOST_IOMMU_CONTEXT(_iommu_ctx);
-     iommu_ctx->flags = flags;
-+    iommu_ctx->info = g_malloc0(info->argsz);
-+    memcpy(iommu_ctx->info, info, info->argsz);
-     iommu_ctx->initialized = true;
- }
- 
-+static void host_iommu_ctx_finalize_fn(Object *obj)
-+{
-+    HostIOMMUContext *iommu_ctx = HOST_IOMMU_CONTEXT(obj);
-+
-+    g_free(iommu_ctx->info);
-+}
-+
- static const TypeInfo host_iommu_context_info = {
-     .parent             = TYPE_OBJECT,
-     .name               = TYPE_HOST_IOMMU_CONTEXT,
-     .class_size         = sizeof(HostIOMMUContextClass),
-     .instance_size      = sizeof(HostIOMMUContext),
-+    .instance_finalize  = host_iommu_ctx_finalize_fn,
-     .abstract           = true,
+diff --git a/hw/i386/intel_iommu.c b/hw/i386/intel_iommu.c
+index 2010c33..9781a18 100644
+--- a/hw/i386/intel_iommu.c
++++ b/hw/i386/intel_iommu.c
+@@ -4050,7 +4050,7 @@ static Property vtd_properties[] = {
+     DEFINE_PROP_UINT8("aw-bits", IntelIOMMUState, aw_bits,
+                       VTD_HOST_ADDRESS_WIDTH),
+     DEFINE_PROP_BOOL("caching-mode", IntelIOMMUState, caching_mode, FALSE),
+-    DEFINE_PROP_BOOL("x-scalable-mode", IntelIOMMUState, scalable_mode, FALSE),
++    DEFINE_PROP_STRING("x-scalable-mode", IntelIOMMUState, scalable_mode_str),
+     DEFINE_PROP_BOOL("dma-drain", IntelIOMMUState, dma_drain, true),
+     DEFINE_PROP_END_OF_LIST(),
  };
+@@ -4419,6 +4419,7 @@ VTDAddressSpace *vtd_find_add_as(IntelIOMMUState *s, PCIBus *bus, int devfn)
+ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
+                                    IOMMUAttr attr, void *data)
+ {
++    IntelIOMMUState *s = opaque;
+     int ret = 0;
  
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index f41deeb..74dbeaf 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1227,6 +1227,54 @@ static int vfio_host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx,
-     return ret;
- }
+     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
+@@ -4428,8 +4429,7 @@ static int vtd_dev_get_iommu_attr(PCIBus *bus, void *opaque, int32_t devfn,
+     {
+         bool *pdata = data;
  
-+static int vfio_host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                         struct iommu_gpasid_bind_data *bind)
-+{
-+    VFIOContainer *container = container_of(iommu_ctx,
-+                                            VFIOContainer, iommu_ctx);
-+    struct vfio_iommu_type1_nesting_op *op;
-+    unsigned long argsz;
-+    int ret = 0;
-+
-+    argsz = sizeof(*op) + sizeof(*bind);
-+    op = g_malloc0(argsz);
-+    op->argsz = argsz;
-+    op->flags = VFIO_IOMMU_NESTING_OP_BIND_PGTBL;
-+    memcpy(&op->data, bind, sizeof(*bind));
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_NESTING_OP, op)) {
-+        ret = -errno;
-+        error_report("%s: pasid (%llu) bind failed: %m",
-+                      __func__, bind->hpasid);
-+    }
-+    g_free(op);
-+    return ret;
-+}
-+
-+static int vfio_host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                         struct iommu_gpasid_bind_data *unbind)
-+{
-+    VFIOContainer *container = container_of(iommu_ctx,
-+                                            VFIOContainer, iommu_ctx);
-+    struct vfio_iommu_type1_nesting_op *op;
-+    unsigned long argsz;
-+    int ret = 0;
-+
-+    argsz = sizeof(*op) + sizeof(*unbind);
-+    op = g_malloc0(argsz);
-+    op->argsz = argsz;
-+    op->flags = VFIO_IOMMU_NESTING_OP_UNBIND_PGTBL;
-+    memcpy(&op->data, unbind, sizeof(*unbind));
-+
-+    if (ioctl(container->fd, VFIO_IOMMU_NESTING_OP, op)) {
-+        ret = -errno;
-+        error_report("%s: pasid (%llu) unbind failed: %m",
-+                      __func__, unbind->hpasid);
-+    }
-+    g_free(op);
-+    return ret;
-+}
-+
- /**
-  * Get iommu info from host. Caller of this funcion should free
-  * the memory pointed by the returned pointer stored in @info
-@@ -1364,10 +1412,16 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
-         nest_info = (struct iommu_nesting_info *) &nesting->info;
-         flags |= (nest_info->features & IOMMU_NESTING_FEAT_SYSWIDE_PASID) ?
-                  HOST_IOMMU_PASID_REQUEST : 0;
-+        if ((nest_info->features & IOMMU_NESTING_FEAT_BIND_PGTBL) &&
-+            (nest_info->features & IOMMU_NESTING_FEAT_CACHE_INVLD)) {
-+            flags |= HOST_IOMMU_NESTING;
-+        }
-+
-         host_iommu_ctx_init(&container->iommu_ctx,
-                             sizeof(container->iommu_ctx),
-                             TYPE_VFIO_HOST_IOMMU_CONTEXT,
--                            flags);
-+                            flags,
-+                            nest_info);
-         g_free(nesting);
+-        /* return false until vSVA is ready */
+-        *pdata = false;
++        *pdata = s->scalable_modern ? true : false;
+         break;
+     }
+     default:
+@@ -4523,6 +4523,8 @@ static int vtd_dev_set_iommu_context(PCIBus *bus, void *opaque,
+     VTDHostIOMMUContext *vtd_dev_icx;
+ 
+     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++    /* only modern scalable supports set_ioimmu_context */
++    assert(s->scalable_modern);
+ 
+     vtd_bus = vtd_find_add_bus(s, bus);
+ 
+@@ -4557,6 +4559,8 @@ static void vtd_dev_unset_iommu_context(PCIBus *bus, void *opaque, int devfn)
+     VTDHostIOMMUContext *vtd_dev_icx;
+ 
+     assert(0 <= devfn && devfn < PCI_DEVFN_MAX);
++    /* only modern scalable supports unset_ioimmu_context */
++    assert(s->scalable_modern);
+ 
+     vtd_bus = vtd_find_add_bus(s, bus);
+ 
+@@ -4784,8 +4788,13 @@ static void vtd_init(IntelIOMMUState *s)
      }
  
-@@ -1967,6 +2021,8 @@ static void vfio_host_iommu_context_class_init(ObjectClass *klass,
+     /* TODO: read cap/ecap from host to decide which cap to be exposed. */
+-    if (s->scalable_mode) {
++    if (s->scalable_mode && !s->scalable_modern) {
+         s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_SLTS;
++    } else if (s->scalable_mode && s->scalable_modern) {
++        s->ecap |= VTD_ECAP_SMTS | VTD_ECAP_SRS | VTD_ECAP_PASID |
++                   VTD_ECAP_FLTS | VTD_ECAP_PSS(VTD_PASID_SS) |
++                   VTD_ECAP_VCS;
++        s->vccap |= VTD_VCCAP_PAS;
+     }
  
-     hicxc->pasid_alloc = vfio_host_iommu_ctx_pasid_alloc;
-     hicxc->pasid_free = vfio_host_iommu_ctx_pasid_free;
-+    hicxc->bind_stage1_pgtbl = vfio_host_iommu_ctx_bind_stage1_pgtbl;
-+    hicxc->unbind_stage1_pgtbl = vfio_host_iommu_ctx_unbind_stage1_pgtbl;
+     if (!s->cap_finalized) {
+@@ -4926,6 +4935,28 @@ static bool vtd_decide_config(IntelIOMMUState *s, Error **errp)
+         return false;
+     }
+ 
++    if (s->scalable_mode_str &&
++        (strcmp(s->scalable_mode_str, "off") &&
++         strcmp(s->scalable_mode_str, "modern") &&
++         strcmp(s->scalable_mode_str, "legacy"))) {
++        error_setg(errp, "Invalid x-scalable-mode config,"
++                         "Please use \"modern\", \"legacy\" or \"off\"");
++        return false;
++    }
++
++    if (s->scalable_mode_str &&
++        !strcmp(s->scalable_mode_str, "legacy")) {
++        s->scalable_mode = true;
++        s->scalable_modern = false;
++    } else if (s->scalable_mode_str &&
++        !strcmp(s->scalable_mode_str, "modern")) {
++        s->scalable_mode = true;
++        s->scalable_modern = true;
++    } else {
++        s->scalable_mode = false;
++        s->scalable_modern = false;
++    }
++
+     return true;
  }
  
- static const TypeInfo vfio_host_iommu_context_info = {
-diff --git a/include/hw/iommu/host_iommu_context.h b/include/hw/iommu/host_iommu_context.h
-index 227c433..2883ed8 100644
---- a/include/hw/iommu/host_iommu_context.h
-+++ b/include/hw/iommu/host_iommu_context.h
-@@ -54,6 +54,16 @@ typedef struct HostIOMMUContextClass {
-     /* Reclaim pasid from HostIOMMUContext (a.k.a. host software) */
-     int (*pasid_free)(HostIOMMUContext *iommu_ctx,
-                       uint32_t pasid);
-+    /*
-+     * Bind stage-1 page table to a hostIOMMU w/ dual stage
-+     * DMA translation capability.
-+     * @bind specifies the bind configurations.
-+     */
-+    int (*bind_stage1_pgtbl)(HostIOMMUContext *iommu_ctx,
-+                             struct iommu_gpasid_bind_data *bind);
-+    /* Undo a previous bind. @unbind specifies the unbind info. */
-+    int (*unbind_stage1_pgtbl)(HostIOMMUContext *iommu_ctx,
-+                               struct iommu_gpasid_bind_data *unbind);
- } HostIOMMUContextClass;
+diff --git a/hw/i386/intel_iommu_internal.h b/hw/i386/intel_iommu_internal.h
+index 9b4fc67..afb4c6a 100644
+--- a/hw/i386/intel_iommu_internal.h
++++ b/hw/i386/intel_iommu_internal.h
+@@ -197,7 +197,9 @@
+ #define VTD_ECAP_MHMV               (15ULL << 20)
+ #define VTD_ECAP_SRS                (1ULL << 31)
+ #define VTD_ECAP_SMTS               (1ULL << 43)
++#define VTD_ECAP_VCS                (1ULL << 44)
+ #define VTD_ECAP_SLTS               (1ULL << 46)
++#define VTD_ECAP_FLTS               (1ULL << 47)
  
- /*
-@@ -62,17 +72,24 @@ typedef struct HostIOMMUContextClass {
- struct HostIOMMUContext {
-     Object parent_obj;
- #define HOST_IOMMU_PASID_REQUEST (1ULL << 0)
-+#define HOST_IOMMU_NESTING       (1ULL << 1)
-     uint64_t flags;
-+    struct iommu_nesting_info *info;
-     bool initialized;
- };
+ /* 1st level related caps */
+ #define VTD_CAP_FL1GP               (1ULL << 56)
+@@ -209,6 +211,7 @@
+ #define VTD_ECAP_PSS(val)           (((val) & 0x1fULL) << 35)
+ #define VTD_ECAP_PASID              (1ULL << 40)
  
- int host_iommu_ctx_pasid_alloc(HostIOMMUContext *iommu_ctx, uint32_t min,
-                                uint32_t max, uint32_t *pasid);
- int host_iommu_ctx_pasid_free(HostIOMMUContext *iommu_ctx, uint32_t pasid);
-+int host_iommu_ctx_bind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                     struct iommu_gpasid_bind_data *bind);
-+int host_iommu_ctx_unbind_stage1_pgtbl(HostIOMMUContext *iommu_ctx,
-+                                 struct iommu_gpasid_bind_data *unbind);
++#define VTD_PASID_SS                (19)
+ #define VTD_GET_PSS(val)            (((val) >> 35) & 0x1f)
+ #define VTD_ECAP_PSS_MASK           (0x1fULL << 35)
  
- void host_iommu_ctx_init(void *_iommu_ctx, size_t instance_size,
-                          const char *mrtypename,
--                         uint64_t flags);
-+                         uint64_t flags,
-+                         struct iommu_nesting_info *info);
- void host_iommu_ctx_destroy(HostIOMMUContext *iommu_ctx);
+diff --git a/include/hw/i386/intel_iommu.h b/include/hw/i386/intel_iommu.h
+index 1aab882..fd64364 100644
+--- a/include/hw/i386/intel_iommu.h
++++ b/include/hw/i386/intel_iommu.h
+@@ -263,6 +263,8 @@ struct IntelIOMMUState {
  
- #endif
+     bool caching_mode;              /* RO - is cap CM enabled? */
+     bool scalable_mode;             /* RO - is Scalable Mode supported? */
++    char *scalable_mode_str;        /* RO - admin's Scalable Mode config */
++    bool scalable_modern;           /* RO - is modern SM supported? */
+ 
+     dma_addr_t root;                /* Current root table pointer */
+     bool root_scalable;             /* Type of root table (scalable or not) */
 -- 
 2.7.4
 
