@@ -2,81 +2,100 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1217C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:04:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD1A1C43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:04:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AFE320C09
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:04:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFE320C09
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0A64021941
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:04:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SX8KvQCv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0A64021941
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGQwE-0002pP-QZ
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:04:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50756)
+	id 1kGQwG-0002sK-1B
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:04:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGQsZ-0000kj-0s
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:01:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53124)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGQsT-0007YL-Sn
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:01:02 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGQsR-00069k-P1
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 18:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id BA7F62E80DC
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 18:00:55 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kGQuY-0001s1-IW
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:03:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:45925)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kGQuW-0007o0-4a
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:03:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599760979;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=GyLY1qBSSLZ2NwdnD/asgsR1UoCWd7zqQIA95zJd7so=;
+ b=SX8KvQCvaF1QmKH9vFTyeCTDTMbO2HIB2EuXSqVWLYglFVKgpI/mpopKCdmDJ9BNDbELqg
+ lDuCSG/Ox192k7MPPbaBLCS+9vKcCCgwS4B4lLvHGiDpM5BAA6Ap5BUhpl05CE7eFYvVpt
+ 8EPAIXwVgyNduvMjyKvLIEcgLIigJoI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-315-9fbs-v3AOQqeBVWK8T0KiQ-1; Thu, 10 Sep 2020 14:02:56 -0400
+X-MC-Unique: 9fbs-v3AOQqeBVWK8T0KiQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8D74410930DB;
+ Thu, 10 Sep 2020 18:02:52 +0000 (UTC)
+Received: from w520.home (ovpn-112-71.phx2.redhat.com [10.3.112.71])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 097C981C40;
+ Thu, 10 Sep 2020 18:02:44 +0000 (UTC)
+Date: Thu, 10 Sep 2020 12:02:44 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Sean Mooney <smooney@redhat.com>
+Subject: Re: device compatibility interface for live migration with assigned
+ devices
+Message-ID: <20200910120244.71e7b630@w520.home>
+In-Reply-To: <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
+References: <20200818113652.5d81a392.cohuck@redhat.com>
+ <20200820003922.GE21172@joy-OptiPlex-7040>
+ <20200819212234.223667b3@x1.home>
+ <20200820031621.GA24997@joy-OptiPlex-7040>
+ <20200825163925.1c19b0f0.cohuck@redhat.com>
+ <20200826064117.GA22243@joy-OptiPlex-7040>
+ <20200828154741.30cfc1a3.cohuck@redhat.com>
+ <8f5345be73ebf4f8f7f51d6cdc9c2a0d8e0aa45e.camel@redhat.com>
+ <20200831044344.GB13784@joy-OptiPlex-7040>
+ <20200908164130.2fe0d106.cohuck@redhat.com>
+ <20200909021308.GA1277@joy-OptiPlex-7040>
+ <20200910143822.2071eca4.cohuck@redhat.com>
+ <7cebcb6c8d1a1452b43e8358ee6ee18a150a0238.camel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 10 Sep 2020 17:51:06 -0000
-From: Laurent Vivier <1895053@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier petunia2000
-X-Launchpad-Bug-Reporter: Petunia (petunia2000)
-X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
-References: <159968542073.11462.1191604929312152807.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159976026657.21444.17630831327155273919.malone@wampee.canonical.com>
-Subject: [Bug 1895053] Re: Cannot nspawn raspbian 10 [FAILED] Failed to start
- Journal Service.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: 1fe667896513e9b2ae0e4d400a06b5db516b7fd6
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 12:30:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,67 +104,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895053 <1895053@bugs.launchpad.net>
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com,
+ Jason Wang <jasowang@redhat.com>, qemu-devel@nongnu.org, kwankhede@nvidia.com,
+ eauger@redhat.com, xin-ran.wang@intel.com, corbet@lwn.net,
+ openstack-discuss@lists.openstack.org, shaohe.feng@intel.com,
+ kevin.tian@intel.com, Yan Zhao <yan.y.zhao@intel.com>,
+ Parav Pandit <parav@mellanox.com>, jian-feng.ding@intel.com,
+ dgilbert@redhat.com, zhenyuw@linux.intel.com, hejie.xu@intel.com,
+ bao.yumeng@zte.com.cn, Jiri Pirko <jiri@mellanox.com>, eskultet@redhat.com,
+ intel-gvt-dev@lists.freedesktop.org,
+ Daniel =?UTF-8?B?UC5CZXJyYW5nw6k=?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>, dinechin@redhat.com, devel@ovirt.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Perhaps the problem is triggered by the host systemd version as I have:
+On Thu, 10 Sep 2020 13:50:11 +0100
+Sean Mooney <smooney@redhat.com> wrote:
 
-$ systemd-nspawn --version
-systemd 245 (v245.7-1.fc32)
-+PAM +AUDIT +SELINUX +IMA -APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +=
-GCRYPT +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2 -IDN +PC=
-RE2 default-hierarchy=3Dunified
+> On Thu, 2020-09-10 at 14:38 +0200, Cornelia Huck wrote:
+> > On Wed, 9 Sep 2020 10:13:09 +0800
+> > Yan Zhao <yan.y.zhao@intel.com> wrote:
+> >   
+> > > > > still, I'd like to put it more explicitly to make ensure it's not missed:
+> > > > > the reason we want to specify compatible_type as a trait and check
+> > > > > whether target compatible_type is the superset of source
+> > > > > compatible_type is for the consideration of backward compatibility.
+> > > > > e.g.
+> > > > > an old generation device may have a mdev type xxx-v4-yyy, while a newer
+> > > > > generation  device may be of mdev type xxx-v5-yyy.
+> > > > > with the compatible_type traits, the old generation device is still
+> > > > > able to be regarded as compatible to newer generation device even their
+> > > > > mdev types are not equal.    
+> > > > 
+> > > > If you want to support migration from v4 to v5, can't the (presumably
+> > > > newer) driver that supports v5 simply register the v4 type as well, so
+> > > > that the mdev can be created as v4? (Just like QEMU versioned machine
+> > > > types work.)    
+> > > 
+> > > yes, it should work in some conditions.
+> > > but it may not be that good in some cases when v5 and v4 in the name string
+> > > of mdev type identify hardware generation (e.g. v4 for gen8, and v5 for
+> > > gen9)
+> > > 
+> > > e.g.
+> > > (1). when src mdev type is v4 and target mdev type is v5 as
+> > > software does not support it initially, and v4 and v5 identify hardware
+> > > differences.  
+> > 
+> > My first hunch here is: Don't introduce types that may be compatible
+> > later. Either make them compatible, or make them distinct by design,
+> > and possibly add a different, compatible type later.
+> >   
+> > > then after software upgrade, v5 is now compatible to v4, should the
+> > > software now downgrade mdev type from v5 to v4?
+> > > not sure if moving hardware generation info into a separate attribute
+> > > from mdev type name is better. e.g. remove v4, v5 in mdev type, while use
+> > > compatible_pci_ids to identify compatibility.  
+> > 
+> > If the generations are compatible, don't mention it in the mdev type.
+> > If they aren't, use distinct types, so that management software doesn't
+> > have to guess. At least that would be my naive approach here.  
+> yep that is what i would prefer to see too.
+> >   
+> > > 
+> > > (2) name string of mdev type is composed by "driver_name + type_name".
+> > > in some devices, e.g. qat, different generations of devices are binding to
+> > > drivers of different names, e.g. "qat-v4", "qat-v5".
+> > > then though type_name is equal, mdev type is not equal. e.g.
+> > > "qat-v4-type1", "qat-v5-type1".  
+> > 
+> > I guess that shows a shortcoming of that "driver_name + type_name"
+> > approach? Or maybe I'm just confused.  
+> yes i really dont like haveing the version in the mdev-type name 
+> i would stongly perfger just qat-type-1 wehere qat is just there as a way of namespacing.
+> although symmetric-cryto, asymmetric-cryto and compression woudl be a better name then type-1, type-2, type-3 if
+> that is what they would end up mapping too. e.g. qat-compression or qat-aes is a much better name then type-1
+> higher layers of software are unlikely to parse the mdev names but as a human looking at them its much eaiser to
+> understand if the names are meaningful. the qat prefix i think is important however to make sure that your mdev-types
+> dont colide with other vendeors mdev types. so i woudl encurage all vendors to prefix there mdev types with etiher the
+> device name or the vendor.
 
--- =
++1 to all this, the mdev type is meant to indicate a software
+compatible interface, if different hardware versions can be software
+compatible, then don't make the job of finding a compatible device
+harder.  The full type is a combination of the vendor driver name plus
+the vendor provided type name specifically in order to provide a type
+namespace per vendor driver.  That's done at the mdev core level.
+Thanks,
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895053
+Alex
 
-Title:
-  Cannot nspawn raspbian 10 [FAILED] Failed to start Journal Service.
-
-Status in QEMU:
-  New
-
-Bug description:
-  Hi, I'm using nspawn and asked the question @systemd-devel. They redirect=
-ed me to you, guessing that nspawn calls a syscall or ioctl qemu isnt aware=
- of and can't implement properly?
-  They were like: "Sorry, that's not my department." ^^
-
-  Maybe you can reproduce the issue or help me investigating whats wrong
-  or put the ball right back into their court? :D
-
-  Testscript:
-  wget https://downloads.raspberrypi.org/raspios_lite_armhf_latest -o r.zip
-  unzip r.zip
-  LOOP=3D$(losetup --show -Pf *raspios-buster-armhf-lite.img)
-  mount ${LOOP}p2 /mnt
-  mount ${LOOP}p1 /mnt/boot
-  systemd-nspawn --bind /usr/bin/qemu-arm-static --boot --directory=3D/mnt =
--- systemd.log_level=3Ddebug
-
-  Output:
-  see attachment
-
-  System:
-  uname -a
-  Linux MArch 5.8.7-arch1-1 #1 SMP PREEMPT Sat, 05 Sep 2020 12:31:32 +0000
-  x86_64 GNU/Linux
-
-  qemu-arm-static --version
-  qemu-arm version 5.1.0
-
-  systemd-nspawn --version
-  systemd 246 (246.4-1-arch)
-  +PAM +AUDIT -SELINUX -IMA -APPARMOR +SMACK -SYSVINIT +UTMP +LIBCRYPTSETUP
-  +GCRYPT +GNUTLS +ACL +XZ +LZ4 +ZSTD +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2=
- -IDN
-  +PCRE2 default-hierarchy=3Dhybrid
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895053/+subscriptions
 
