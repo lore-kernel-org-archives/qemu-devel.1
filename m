@@ -2,72 +2,83 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9108EC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:41:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10D22C07548
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:45:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B6362076D
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:41:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 30F9921D6C
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 14:45:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="hgiewjl4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B6362076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZeCvxTI2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 30F9921D6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56518 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGNld-0008O5-6E
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 10:41:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56836)
+	id 1kGNoq-00038s-Ub
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 10:45:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kGNl5-0007xR-93
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:41:07 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:50353)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kGNkz-00018A-Bf
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:41:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=vw/kQvH+Re3zF90WdxY9u/UpUmvXm33AydzgH4O5D/A=; b=hgiewjl4bieU4qkWUJ5ILA+cZ4
- +nra/oI7G5jpbu5d5fDKWSvUfoupNFm4EhJ7UdF4n9H69jtHa6Ne6xirNwSn3sbtppBc6WNv8e8R5
- e4FOjqXAI7/kUPp1+UNbu+9KcBfRxFcqi0UP8P3a/n2gBZW3CtD0gL/LgykUUrnQz/uwgPjwKBrqC
- 9TZTBr1UvUzRukMtSnkSdoiNQql1jGuX+FdbUyM4c7MARbV+1kUx2R04DSN5F6/+CZ+1YvWkT6Ez4
- FaV1u+BRe9Y4yRFyKpmE/27CBam6d1pQmn54dgUWNh60jUKoKOdD2bKztJgWNo2ShkibffDmOBPpD
- z7A2TMDg==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kGNo5-0002LB-QU
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:44:13 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:48199
+ helo=us-smtp-delivery-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kGNo3-0001Vr-6K
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 10:44:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599749049;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=XGZNL9awis3P0yxQOl6hZwwUDTWbx0lpYTO5S2kTtmU=;
+ b=ZeCvxTI2BMl/KzAOmjc2f4FD5PHFTzYo+hAgHK8oWn2qLZKixBhUXd3doIKvVwD/0cstQB
+ tSkt9p3HATksrynaEJQsHYZbboFsYQ+HOCpXE+ivp8Znv27GJU+yMAmCJfQbG0UGieq7GZ
+ J1UXg3bbJfAZCUHxj0er3/yQ8IZI4YY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-6XCKIbG-NJ26JQfVu2J4WA-1; Thu, 10 Sep 2020 10:44:05 -0400
+X-MC-Unique: 6XCKIbG-NJ26JQfVu2J4WA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE110100945B;
+ Thu, 10 Sep 2020 14:44:04 +0000 (UTC)
+Received: from localhost (ovpn-113-198.ams2.redhat.com [10.36.113.198])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 479C91A914;
+ Thu, 10 Sep 2020 14:44:01 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Liviu Ionescu <ilg@livius.net>, G 3 <programmingkidx@gmail.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
-Subject: Re: [RFC] QEMU as Xcode project on macOS
-Date: Thu, 10 Sep 2020 16:40:55 +0200
-Message-ID: <5694401.8H58FrkmUv@silver>
-In-Reply-To: <CAFEAcA_CPNppKwwJSu4O6U6qF-rfHR2NtG=hWBFatZmD4aiMdg@mail.gmail.com>
-References: <2764135.D4k31Gy3CM@silver> <4878996.4JzhbN1UZ4@silver>
- <CAFEAcA_CPNppKwwJSu4O6U6qF-rfHR2NtG=hWBFatZmD4aiMdg@mail.gmail.com>
+Subject: [PATCH v2 0/3] docs: add qemu-storage-daemon documentation
+Date: Thu, 10 Sep 2020 15:43:57 +0100
+Message-Id: <20200910144400.69615-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 10:40:57
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,70 +92,125 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ qemu-block@nongnu.org, Kashyap Chamarthy <kchamart@redhat.com>,
+ afrosi@redhat.com, Laszlo Ersek <lersek@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 10. September 2020 12:35:46 CEST Peter Maydell wrote:
-> Does Apple (or anybody else) provide a framework for doing this
-> so that developers of individual applications can just say "my
-> app needs libs X, Y, Z" and they don't have to mess around
-> finding, figuring out how to compile, and shipping the sources of
-> libs X, Y, Z? If there's a better mechanism than Homebrew for this
-> that's great, but at the moment what you seem to be saying is
-> "you should do a lot more work to manually set something up where
-> you ship the sources to all your dependencies and then build them
-> all". There's no way we're ever going to do that, it is just
-> way too much work for very little gain.
-
-On Mac I have 'framework'ed & Xcoded the FOSS libs I need. And when I need to 
-compile a new FOSS lib/app that requires libs x,y,z then I just drag those 
-already existing Xcode projects as referenced subprojects into that new Xcode 
-project:
-
-https://developer.apple.com/library/archive/documentation/ToolsLanguages/
-Conceptual/Xcode_Overview/WorkingonRelatedProjects.html
-
-For instance if I have to compile some new app that needs gtk(mm), all I need 
-to do is pulling in gtkmm.xcodeproj (e.g. per drag & drop) which in turn 
-already references all its own dependencies (subsubsub..projects) like glib, 
-cairo, etc. So I just click 'Run' and that's it.
-
-And if the app triggers a crash in some of the subprojects, Xcode stops at the 
-precise lib's source location, you fix it, click 'Run' and you're done in 
-seconds. With the regular 'make' approach you would spend hours for that.
-
-So that's a highly modular end-to-end-from-source approach. The precise 
-location of the individual xcode projects does not matter BTW as Xcode 
-references subprojects by UDID. You can move them around as you want and it 
-still works. No need to install them at global space, predefined structures, 
-or even hard coded locations, and no duplication of sources either.
-
-I know, all this sounds very unorthodox what I am doing at first glance. But 
-if you think about it, all it would take is if individual FOSS projects would 
-start maintaining an .xcodeproj file, which in turn could then be referenced 
-by UUID from other FOSS project's .xcodeproj file as dependency and you would 
-get a low cost end-to-end-by-source solution, already on upstream level, i.e. 
-without the need of having dedicated projects managing "distributions".
-
-On Donnerstag, 10. September 2020 12:41:45 CEST Paolo Bonzini wrote:
-> You're very welcome to do this, but what you're doing is effectively a
-> *distribution of QEMU* that targets the "macOS build from source" scenario,
-> for people that don't want to use Homebrew. It is *not* going to be used by
-> QEMU developers, because QEMU developers have conflicting requirements:
-
-Okay, no problem. I will see where to go from here. I am not even sure yet 
-whether all those source generating scripts of QEMU would be a show stopper 
-for what I have planned. I mean (counting): ... yes, still just 2 hands here.
-
-If it turns out to work fine, then maybe I just push a branch of QEMU for Mac 
-developers somewhere for a while, as I think it would lower the entry level 
-for new developers on Mac tremendously. Apparently there is still more changes 
-with Meson ahead anyway (getting rid of the Makefiles or whatever else is 
-planned). So we'll see ...
-
-Best regards,
-Christian Schoenebeck
-
+djI6CiAqIERyb3AgYmxvY2stY29yZS5qc29uIGgyIGhlYWRlciByZW1vdmFsLCBhZGQgYW4gaDEg
+aGVhZGVyIHRvCiAgIHN0b3JhZ2UtZGFlbW9uL3FhcGkvcWFwaS1zY2hlbWEuanNvbiBpbnN0ZWFk
+IFtLZXZpbl0KICogQWRkIEV4YW1wbGVzIHNlY3Rpb24gdG8gbWFuIHBhZ2UgW0tldmluXQoKQWRk
+IGRvY3VtZW50YXRpb24gZm9yIHRoZSBxZW11LXN0b3JhZ2UtZGFlbW9uIHByb2dyYW0gYW5kIGl0
+cyBRTVAgY29tbWFuZHMuCgpUaGUgbWFuIHBhZ2UgbG9va3MgbGlrZSB0aGlzOgoKUUVNVS1TVE9S
+QUdFLURBRU1PTigxKSAgICAgICAgICAgICAgUUVNVSAgICAgICAgICAgICAgICBRRU1VLVNUT1JB
+R0UtREFFTU9OKDEpCgpOQU1FCiAgICAgICBxZW11LXN0b3JhZ2UtZGFlbW9uIC0gUUVNVSBzdG9y
+YWdlIGRhZW1vbgoKU1lOT1BTSVMKICAgICAgIHFlbXUtc3RvcmFnZS1kYWVtb24gW29wdGlvbnNd
+CgpERVNDUklQVElPTgogICAgICAgcWVtdS1zdG9yYWdlLWRhZW1vbiAgcHJvdmlkZXMgIGRpc2sg
+aW1hZ2UgZnVuY3Rpb25hbGl0eSBmcm9tIFFFTVUsCiAgICAgICBxZW11LWltZywgYW5kIHFlbXUt
+bmJkIGluIGEgbG9uZy1ydW5uaW5nIHByb2Nlc3MgY29udHJvbGxlZCB2aWEgUU1QCiAgICAgICBj
+b21tYW5kcyB3aXRob3V0IHJ1bm5pbmcgYSB2aXJ0dWFsIG1hY2hpbmUuIEl0IGNhbiBleHBvcnQg
+ZGlzayBpbWFnZXMKICAgICAgIG92ZXIgTkJELCBydW4gYmxvY2sgam9iIG9wZXJhdGlvbnMsIGFu
+ZCBwZXJmb3JtIG90aGVyIGRpc2stcmVsYXRlZAogICAgICAgb3BlcmF0aW9ucy4gVGhlIGRhZW1v
+biBpcyBjb250cm9sbGVkIHZpYSBhIFFNUCBtb25pdG9yIHNvY2tldCBhbmQKICAgICAgIGluaXRp
+YWwgIGNvbmZpZ3VyYXRpb24gZnJvbSB0aGUgY29tbWFuZC1saW5lLgoKICAgICAgIFRoZSBkYWVt
+b24gb2ZmZXJzIHRoZSBmb2xsb3dpbmcgc3Vic2V0IG9mIFFFTVUgZmVhdHVyZXM6CiAgICAgICDC
+tyBCbG9ja2RldiBub2RlcwogICAgICAgwrcgQmxvY2sgam9icwogICAgICAgwrcgTkJEIHNlcnZl
+cgogICAgICAgwrcgQ2hhcmFjdGVyIGRldmljZXMKICAgICAgIMK3IENyeXB0byBhbmQgc2VjcmV0
+cwogICAgICAgwrcgUU1QCgogICAgICAgQ29tbWFuZHMgY2FuIGJlIHNlbnQgb3ZlciBhIFFFTVUg
+TW9uaXRvciBQcm90b2NvbCAoUU1QKSBjb25uZWN0aW9uLiBTZWUKICAgICAgIHRoZSBxZW11LXN0
+b3JhZ2UtZGFlbW9uLXFtcC1yZWYoNykgbWFudWFsIHBhZ2UgZm9yIGEgZGVzY3JpcHRpb24gb2Yg
+dGhlCiAgICAgICBjb21tYW5kcy4KCiAgICAgICBUaGUgZGFlbW9uIHJ1bnMgdW50aWwgaXQgaXMg
+c3RvcHBlZCB1c2luZyB0aGUgcXVpdCBRTVAgY29tbWFuZCBvcgogICAgICAgU0lHSU5UL1NJR0hV
+UC9TSUdURVJNLgoKICAgICAgIFdhcm5pbmc6IE5ldmVyIG1vZGlmeSBpbWFnZXMgaW4gdXNlIGJ5
+IGEgcnVubmluZyB2aXJ0dWFsIG1hY2hpbmUgb3IgYW55CiAgICAgICBvdGhlciBwcm9jZXNzOyB0
+aGlzIG1heSBkZXN0cm95IHRoZSBpbWFnZS4gQWxzbywgYmUgYXdhcmUgdGhhdCBxdWVyeWluZwog
+ICAgICAgYW4gaW1hZ2UgdGhhdCBpcyBiZWluZyBtb2RpZmllZCBieSBhbm90aGVyIHByb2Nlc3Mg
+bWF5IGVuY291bnRlcgogICAgICAgaW5jb25zaXN0ZW50IHN0YXRlLgoKT1BUSU9OUwogICAgICAg
+U3RhbmRhcmQgb3B0aW9uczoKCiAgICAgICAtaCwgLS1oZWxwCiAgICAgICAgICAgICAgRGlzcGxh
+eSB0aGlzIGhlbHAgYW5kIGV4aXQKCiAgICAgICAtViwgLS12ZXJzaW9uCiAgICAgICAgICAgICAg
+RGlzcGxheSB2ZXJzaW9uIGluZm9ybWF0aW9uIGFuZCBleGl0CgogICAgICAgLVQsIC0tdHJhY2Ug
+W1tlbmFibGU9XVBBVFRFUk5dWyxldmVudHM9RklMRV1bLGZpbGU9RklMRV0KICAgICAgICAgICAg
+ICBTcGVjaWZ5IHRyYWNpbmcgb3B0aW9ucy4KCiAgICAgICAgICAgICAgW2VuYWJsZT1dUEFUVEVS
+TgogICAgICAgICAgICAgICAgICAgICBJbW1lZGlhdGVseSBlbmFibGUgZXZlbnRzIG1hdGNoaW5n
+IFBBVFRFUk4gKGVpdGhlciBldmVudCBuYW1lIG9yIGEgZ2xvYmJpbmcgcGF0dGVybikuICBUaGlz
+IG9wdGlvbiBpcyBvbmx5IGF2YWlsYWJsZSBpZiBRRU1VIGhhcyBiZWVuIGNvbXBpbGVkIHdpdGgg
+dGhlIHNpbXBsZSwgIGxvZwogICAgICAgICAgICAgICAgICAgICBvciBmdHJhY2UgdHJhY2luZyBi
+YWNrZW5kLiAgVG8gc3BlY2lmeSBtdWx0aXBsZSBldmVudHMgb3IgcGF0dGVybnMsIHNwZWNpZnkg
+dGhlIC10cmFjZSBvcHRpb24gbXVsdGlwbGUgdGltZXMuCgogICAgICAgICAgICAgICAgICAgICBV
+c2UgLXRyYWNlIGhlbHAgdG8gcHJpbnQgYSBsaXN0IG9mIG5hbWVzIG9mIHRyYWNlIHBvaW50cy4K
+CiAgICAgICAgICAgICAgZXZlbnRzPUZJTEUKICAgICAgICAgICAgICAgICAgICAgSW1tZWRpYXRl
+bHkgIGVuYWJsZSAgZXZlbnRzICBsaXN0ZWQgaW4gRklMRS4gIFRoZSBmaWxlIG11c3QgY29udGFp
+biBvbmUgZXZlbnQgbmFtZSAoYXMgbGlzdGVkIGluIHRoZSB0cmFjZS1ldmVudHMtYWxsIGZpbGUp
+IHBlciBsaW5lOyBnbG9iYmluZyBwYXR0ZXJucyBhcmUgYWNjZXB0ZWQKICAgICAgICAgICAgICAg
+ICAgICAgdG9vLiAgVGhpcyBvcHRpb24gaXMgb25seSBhdmFpbGFibGUgaWYgUUVNVSBoYXMgYmVl
+biBjb21waWxlZCB3aXRoIHRoZSBzaW1wbGUsIGxvZyBvciBmdHJhY2UgdHJhY2luZyBiYWNrZW5k
+LgoKICAgICAgICAgICAgICBmaWxlPUZJTEUKICAgICAgICAgICAgICAgICAgICAgTG9nIG91dHB1
+dCB0cmFjZXMgdG8gRklMRS4gIFRoaXMgb3B0aW9uIGlzIG9ubHkgYXZhaWxhYmxlIGlmIFFFTVUg
+aGFzIGJlZW4gY29tcGlsZWQgd2l0aCB0aGUgc2ltcGxlIHRyYWNpbmcgYmFja2VuZC4KCiAgICAg
+ICAtLWJsb2NrZGV2IEJMT0NLREVWREVGCiAgICAgICAgICAgICAgaXMgYSBibG9ja2RldiBub2Rl
+IGRlZmluaXRpb24uIFNlZSB0aGUgcWVtdSgxKSBtYW51YWwgcGFnZSBmb3IgYSBkZXNjcmlwdGlv
+biBvZiBibG9ja2RldiBub2RlIHByb3BlcnRpZXMgYW5kIHRoZSBxZW11LWJsb2NrLWRyaXZlcnMo
+NykgbWFudWFsIHBhZ2UgIGZvciAgYSAgZGVzY3JpcHRpb24gIG9mCiAgICAgICAgICAgICAgZHJp
+dmVyLXNwZWNpZmljIHBhcmFtZXRlcnMuCgogICAgICAgLS1jaGFyZGV2IENIQVJERVZERUYKICAg
+ICAgICAgICAgICBpcyAgYSAgY2hhcmFjdGVyICBkZXZpY2UgIGRlZmluaXRpb24uICBTZWUgdGhl
+IHFlbXUoMSkgbWFudWFsIHBhZ2UgZm9yIGEgZGVzY3JpcHRpb24gb2YgY2hhcmFjdGVyIGRldmlj
+ZSBwcm9wZXJ0aWVzLiBBIGNvbW1vbiBjaGFyYWN0ZXIgZGV2aWNlIGRlZmluaXRpb24gY29uZmln
+dXJlcyBhIFVOSVgKICAgICAgICAgICAgICBkb21haW4gc29ja2V0OgoKICAgICAgICAgICAgICAg
+ICAtLWNoYXJkZXYgc29ja2V0LGlkPWNoYXIxLHBhdGg9L3RtcC9xbXAuc29jayxzZXJ2ZXIsbm93
+YWl0CgogICAgICAgLS1tb25pdG9yIE1PTklUT1JERUYKICAgICAgICAgICAgICBpcyBhIFFNUCBt
+b25pdG9yIGRlZmluaXRpb24uIFNlZSB0aGUgcWVtdSgxKSBtYW51YWwgcGFnZSBmb3IgYSBkZXNj
+cmlwdGlvbiBvZiBRTVAgbW9uaXRvciBwcm9wZXJ0aWVzLiBBIGNvbW1vbiBRTVAgbW9uaXRvciBk
+ZWZpbml0aW9uIGNvbmZpZ3VyZXMgIGEgIG1vbml0b3IgIG9uICBjaGFyYWN0ZXIKICAgICAgICAg
+ICAgICBkZXZpY2UgY2hhcjE6CgogICAgICAgICAgICAgICAgIC0tbW9uaXRvciBjaGFyZGV2PWNo
+YXIxCgogICAgICAgLS1uYmQtc2VydmVyIGFkZHIudHlwZT1pbmV0LGFkZHIuaG9zdD08aG9zdD4s
+YWRkci5wb3J0PTxwb3J0PlssdGxzLWNyZWRzPTxpZD5dWyx0bHMtYXV0aHo9PGlkPl0KCiAgICAg
+ICAtLW5iZC1zZXJ2ZXIgYWRkci50eXBlPXVuaXgsYWRkci5wYXRoPTxwYXRoPlssdGxzLWNyZWRz
+PTxpZD5dWyx0bHMtYXV0aHo9PGlkPl0KICAgICAgICAgICAgICBpcyBhIE5CRCBzZXJ2ZXIgZGVm
+aW5pdGlvbi4gQm90aCBUQ1AgYW5kIFVOSVggZG9tYWluIHNvY2tldHMgYXJlIHN1cHBvcnRlZC4g
+IFRMUyBlbmNyeXB0aW9uIGNhbiBiZSBjb25maWd1cmVkIHVzaW5nIC0tb2JqZWN0IHRscy1jcmVk
+cy0qIGFuZCBhdXRoei0qIHNlY3JldHMgKHNlZSBiZWxvdykuCgogICAgICAgICAgICAgIFRvIGNv
+bmZpZ3VyZSBhbiBOQkQgc2VydmVyIG9uIFVOSVggZG9tYWluIHNvY2tldCBwYXRoIC90bXAvbmJk
+LnNvY2s6CgogICAgICAgICAgICAgICAgIC0tbmJkLXNlcnZlciBhZGRyLnR5cGU9dW5peCxhZGRy
+LnBhdGg9L3RtcC9uYmQuc29jawoKICAgICAgIC0tb2JqZWN0IGhlbHAKCiAgICAgICAtLW9iamVj
+dCA8dHlwZT4saGVscAoKICAgICAgIC0tb2JqZWN0IDx0eXBlPlssPHByb3BlcnR5Pj08dmFsdWU+
+Li4uXQogICAgICAgICAgICAgIGlzICBhICBRRU1VICB1c2VyICBjcmVhdGFibGUgb2JqZWN0IGRl
+ZmluaXRpb24uIExpc3Qgb2JqZWN0IHR5cGVzIHdpdGggaGVscC4gIExpc3Qgb2JqZWN0IHByb3Bl
+cnRpZXMgd2l0aCA8dHlwZT4saGVscC4gU2VlIHRoZSBxZW11KDEpIG1hbnVhbCBwYWdlIGZvciBh
+IGRlc2NyaXB0aW9uIG9mIHRoZQogICAgICAgICAgICAgIG9iamVjdCBwcm9wZXJ0aWVzLiBUaGUg
+bW9zdCBjb21tb24gb2JqZWN0IHR5cGUgaXMgYSBzZWNyZXQsIHdoaWNoIGlzIHVzZWQgdG8gc3Vw
+cGx5IHBhc3N3b3JkcyBhbmQvb3IgZW5jcnlwdGlvbiBrZXlzLgoKRVhBTVBMRVMKICAgICAgIExh
+dW5jaCB0aGUgZGFlbW9uIHdpdGggUU1QIG1vbml0b3Igc29ja2V0IHFtcC5zb2NrIHNvIGNsaWVu
+dHMgY2FuCiAgICAgICBleGVjdXRlIFFNUCBjb21tYW5kczoKCiAgICAgICAgICAkIHFlbXUtc3Rv
+cmFnZS1kYWVtb24gXAogICAgICAgICAgICAgIC0tY2hhcmRldiBzb2NrZXQscGF0aD1xbXAuc29j
+ayxzZXJ2ZXIsbm93YWl0LGlkPWNoYXIxIFwKICAgICAgICAgICAgICAtLW1vbml0b3IgY2hhcmRl
+dj1jaGFyMQoKICAgICAgIEV4cG9ydCByYXcgaW1hZ2UgZmlsZSBkaXNrLmltZyBvdmVyIE5CRCBV
+TklYIGRvbWFpbiBzb2NrZXQgbmJkLnNvY2s6CgogICAgICAgICAgJCBxZW11LXN0b3JhZ2UtZGFl
+bW9uIFwKICAgICAgICAgICAgICAtLWJsb2NrZGV2IGRyaXZlcj1maWxlLG5vZGUtbmFtZT1kaXNr
+LGZpbGVuYW1lPWRpc2suaW1nIFwKICAgICAgICAgICAgICAtLW5iZC1zZXJ2ZXIgYWRkci50eXBl
+PXVuaXgsYWRkci5wYXRoPW5iZC5zb2NrIFwKICAgICAgICAgICAgICAtLWV4cG9ydCB0eXBlPW5i
+ZCxkZXZpY2U9ZGlzayx3cml0YWJsZT1vbgoKU0VFIEFMU08KICAgICAgIHFlbXUoMSksIHFlbXUt
+YmxvY2stZHJpdmVycyg3KSwgcWVtdS1zdG9yYWdlLWRhZW1vbi1xbXAtcmVmKDcpCgpDT1BZUklH
+SFQKICAgICAgIDIwMjAsIFRoZSBRRU1VIFByb2plY3QgRGV2ZWxvcGVycwoKNS4xLjUwICAgICAg
+ICAgICAgICAgICAgICAgU2VwIDEwLCAyMDIwICAgICAgICAgICAgICBRRU1VLVNUT1JBR0UtREFF
+TU9OKDEpCgpTdGVmYW4gSGFqbm9jemkgKDMpOgogIGRvY3M6IGdlbmVyYXRlIHFlbXUtc3RvcmFn
+ZS1kYWVtb24tcW1wLXJlZig3KSBtYW4gcGFnZQogIGRvY3M6IGFkZCBxZW11LXN0b3JhZ2UtZGFl
+bW9uKDEpIG1hbiBwYWdlCiAgTUFJTlRBSU5FUlM6IGFkZCBLZXZpbiBXb2xmIGFzIHN0b3JhZ2Ug
+ZGFlbW9uIG1haW50YWluZXIKCiBNQUlOVEFJTkVSUyAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgfCAgIDkgKysKIHN0b3JhZ2UtZGFlbW9uL3FhcGkvcWFwaS1zY2hlbWEuanNvbiAg
+ICAgICAgICB8ICAgNCArCiBkb2NzL2ludGVyb3AvcWVtdS1zdG9yYWdlLWRhZW1vbi1xbXAtcmVm
+LnRleGkgfCAgODAgKysrKysrKysrKysrCiBkb2NzL3Rvb2xzL2NvbmYucHkgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgfCAgIDIgKwogZG9jcy90b29scy9pbmRleC5yc3QgICAgICAgICAgICAg
+ICAgICAgICAgICAgIHwgICAxICsKIGRvY3MvdG9vbHMvcWVtdS1zdG9yYWdlLWRhZW1vbi5yc3Qg
+ICAgICAgICAgICB8IDEyMSArKysrKysrKysrKysrKysrKysKIG1lc29uLmJ1aWxkICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICB8ICAgOSArKwogc3RvcmFnZS1kYWVtb24vcWFwaS9t
+ZXNvbi5idWlsZCAgICAgICAgICAgICAgIHwgICAyICsKIDggZmlsZXMgY2hhbmdlZCwgMjI4IGlu
+c2VydGlvbnMoKykKIGNyZWF0ZSBtb2RlIDEwMDY0NCBkb2NzL2ludGVyb3AvcWVtdS1zdG9yYWdl
+LWRhZW1vbi1xbXAtcmVmLnRleGkKIGNyZWF0ZSBtb2RlIDEwMDY0NCBkb2NzL3Rvb2xzL3FlbXUt
+c3RvcmFnZS1kYWVtb24ucnN0CgotLSAKMi4yNi4yCgo=
 
 
