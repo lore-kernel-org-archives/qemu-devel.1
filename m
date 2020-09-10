@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5585BC43461
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1BDC433E2
 	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:56:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01D4A21D92
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:56:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A23B20882
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 19:56:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qh8de0zi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01D4A21D92
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I07P92NJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A23B20882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGSfu-0007mo-4q
+	id 1kGSfu-0007oJ-FT
 	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 15:56:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54238)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGSZu-0004ML-G7
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:49:54 -0400
-Received: from us-smtp-1.mimecast.com ([207.211.31.81]:50139
+ id 1kGSaa-0006CV-QY
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:50:36 -0400
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:55839
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kGSZs-0000bm-Lj
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:49:54 -0400
+ id 1kGSaY-0000l9-Sk
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 15:50:36 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599767392;
+ s=mimecast20190719; t=1599767434;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=rX4kafdmfGZKxi2RxomZg4CDzZ1oTRFgvM+T8+rbqIs=;
- b=Qh8de0zikLcfdZTck9pojH36uvMwL7gIChAjUy2KQ296n00A5DXG/mJNrtC4NpuBlI3ioP
- euEB+D6IQM0LrGF7LCABVhqKuaAdbezL0Ie9Fbxa+MUfqOE6tKV+xqAZIXvHIG9hHF87JE
- vygpu9ktWEliNldVBRgtA6bfxeH9Kf0=
+ bh=c2fYi56w25yKX3HrO4TcH8qU2ViT59jrGukaF3OOs3o=;
+ b=I07P92NJuECMZv3tuPlVOXR+PIDofFj1mgW+RDCQR2wtvUFqOA+pDowQwqcvcPrU4lm2Cc
+ c1hOGLdQU41ungAi02pj+aQZj+qNILJP+ueFJdprt74Lw0JvqYuhRzhtOOoQWjEotIke0F
+ 1zuaLvrnonzj0B44Sch1PKr4e6jh9Nc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-513-NXE0ar2EMg6j0XI-tD_zpQ-1; Thu, 10 Sep 2020 15:49:50 -0400
-X-MC-Unique: NXE0ar2EMg6j0XI-tD_zpQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-396-e7dMc9PcPuu8fwxKoiCH8A-1; Thu, 10 Sep 2020 15:50:32 -0400
+X-MC-Unique: e7dMc9PcPuu8fwxKoiCH8A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A49E107465B;
- Thu, 10 Sep 2020 19:49:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 44403800683;
+ Thu, 10 Sep 2020 19:50:31 +0000 (UTC)
 Received: from localhost (ovpn-66-226.rdu2.redhat.com [10.10.66.226])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A2A017EB7A;
- Thu, 10 Sep 2020 19:49:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 95D7319C4F;
+ Thu, 10 Sep 2020 19:50:25 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 07/18] chardev: Rename MUX_CHARDEV to CHARDEV_MUX
-Date: Thu, 10 Sep 2020 15:48:52 -0400
-Message-Id: <20200910194903.4104696-8-ehabkost@redhat.com>
+Subject: [PATCH 15/18] chardev: Rename VC_CHARDEV to CHARDEV_VC
+Date: Thu, 10 Sep 2020 15:49:00 -0400
+Message-Id: <20200910194903.4104696-16-ehabkost@redhat.com>
 In-Reply-To: <20200910194903.4104696-1-ehabkost@redhat.com>
 References: <20200910194903.4104696-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0.001
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=ehabkost@redhat.com;
+Received-SPF: pass client-ip=205.139.110.61; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 09:07:44
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,163 +111,110 @@ TYPE_CHARDEV_* constant names and the QOM type name strings
 
 Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- chardev/chardev-internal.h |  2 +-
- chardev/char-fe.c          |  4 ++--
- chardev/char-mux.c         | 22 +++++++++++-----------
- chardev/char.c             |  2 +-
- 4 files changed, 15 insertions(+), 15 deletions(-)
+ ui/console.c   | 10 +++++-----
+ ui/gtk.c       |  8 ++++----
+ ui/spice-app.c |  2 +-
+ 3 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/chardev/chardev-internal.h b/chardev/chardev-internal.h
-index aba0240759..740d56bf94 100644
---- a/chardev/chardev-internal.h
-+++ b/chardev/chardev-internal.h
-@@ -54,7 +54,7 @@ struct MuxChardev {
- };
- typedef struct MuxChardev MuxChardev;
+diff --git a/ui/console.c b/ui/console.c
+index f8d7643fe4..37a7c4a713 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -1090,12 +1090,12 @@ struct VCChardev {
+ typedef struct VCChardev VCChardev;
  
--DECLARE_INSTANCE_CHECKER(MuxChardev, MUX_CHARDEV,
-+DECLARE_INSTANCE_CHECKER(MuxChardev, CHARDEV_MUX,
-                          TYPE_CHARDEV_MUX)
- #define CHARDEV_IS_MUX(chr)                             \
-     object_dynamic_cast(OBJECT(chr), TYPE_CHARDEV_MUX)
-diff --git a/chardev/char-fe.c b/chardev/char-fe.c
-index 474715c5a9..419835c340 100644
---- a/chardev/char-fe.c
-+++ b/chardev/char-fe.c
-@@ -196,7 +196,7 @@ bool qemu_chr_fe_init(CharBackend *b, Chardev *s, Error **errp)
+ #define TYPE_CHARDEV_VC "chardev-vc"
+-DECLARE_INSTANCE_CHECKER(VCChardev, VC_CHARDEV,
++DECLARE_INSTANCE_CHECKER(VCChardev, CHARDEV_VC,
+                          TYPE_CHARDEV_VC)
  
-     if (s) {
-         if (CHARDEV_IS_MUX(s)) {
--            MuxChardev *d = MUX_CHARDEV(s);
-+            MuxChardev *d = CHARDEV_MUX(s);
- 
-             if (d->mux_cnt >= MAX_MUX) {
-                 goto unavailable;
-@@ -231,7 +231,7 @@ void qemu_chr_fe_deinit(CharBackend *b, bool del)
-             b->chr->be = NULL;
-         }
-         if (CHARDEV_IS_MUX(b->chr)) {
--            MuxChardev *d = MUX_CHARDEV(b->chr);
-+            MuxChardev *d = CHARDEV_MUX(b->chr);
-             d->backends[b->tag] = NULL;
-         }
-         if (del) {
-diff --git a/chardev/char-mux.c b/chardev/char-mux.c
-index 6f980bb836..a9dcbf2cc0 100644
---- a/chardev/char-mux.c
-+++ b/chardev/char-mux.c
-@@ -36,7 +36,7 @@
- /* Called with chr_write_lock held.  */
- static int mux_chr_write(Chardev *chr, const uint8_t *buf, int len)
+ static int vc_chr_write(Chardev *chr, const uint8_t *buf, int len)
  {
--    MuxChardev *d = MUX_CHARDEV(chr);
-+    MuxChardev *d = CHARDEV_MUX(chr);
-     int ret;
-     if (!d->timestamps) {
-         ret = qemu_chr_fe_write(&d->chr, buf, len);
-@@ -128,7 +128,7 @@ static void mux_chr_send_event(MuxChardev *d, int mux_nr, QEMUChrEvent event)
- 
- static void mux_chr_be_event(Chardev *chr, QEMUChrEvent event)
- {
--    MuxChardev *d = MUX_CHARDEV(chr);
-+    MuxChardev *d = CHARDEV_MUX(chr);
- 
-     if (d->focus != -1) {
-         mux_chr_send_event(d, d->focus, event);
-@@ -182,7 +182,7 @@ static int mux_proc_byte(Chardev *chr, MuxChardev *d, int ch)
- 
- static void mux_chr_accept_input(Chardev *chr)
- {
--    MuxChardev *d = MUX_CHARDEV(chr);
-+    MuxChardev *d = CHARDEV_MUX(chr);
-     int m = d->focus;
-     CharBackend *be = d->backends[m];
- 
-@@ -195,7 +195,7 @@ static void mux_chr_accept_input(Chardev *chr)
- 
- static int mux_chr_can_read(void *opaque)
- {
--    MuxChardev *d = MUX_CHARDEV(opaque);
-+    MuxChardev *d = CHARDEV_MUX(opaque);
-     int m = d->focus;
-     CharBackend *be = d->backends[m];
- 
-@@ -213,7 +213,7 @@ static int mux_chr_can_read(void *opaque)
- static void mux_chr_read(void *opaque, const uint8_t *buf, int size)
- {
-     Chardev *chr = CHARDEV(opaque);
--    MuxChardev *d = MUX_CHARDEV(opaque);
-+    MuxChardev *d = CHARDEV_MUX(opaque);
-     int m = d->focus;
-     CharBackend *be = d->backends[m];
-     int i;
-@@ -234,7 +234,7 @@ static void mux_chr_read(void *opaque, const uint8_t *buf, int size)
- 
- void mux_chr_send_all_event(Chardev *chr, QEMUChrEvent event)
- {
--    MuxChardev *d = MUX_CHARDEV(chr);
-+    MuxChardev *d = CHARDEV_MUX(chr);
+-    VCChardev *drv = VC_CHARDEV(chr);
++    VCChardev *drv = CHARDEV_VC(chr);
+     QemuConsole *s = drv->console;
      int i;
  
-     if (!machine_init_done) {
-@@ -254,7 +254,7 @@ static void mux_chr_event(void *opaque, QEMUChrEvent event)
+@@ -2108,7 +2108,7 @@ int qemu_console_get_height(QemuConsole *con, int fallback)
  
- static GSource *mux_chr_add_watch(Chardev *s, GIOCondition cond)
+ static void vc_chr_set_echo(Chardev *chr, bool echo)
  {
--    MuxChardev *d = MUX_CHARDEV(s);
-+    MuxChardev *d = CHARDEV_MUX(s);
-     Chardev *chr = qemu_chr_fe_get_driver(&d->chr);
-     ChardevClass *cc = CHARDEV_GET_CLASS(chr);
+-    VCChardev *drv = VC_CHARDEV(chr);
++    VCChardev *drv = CHARDEV_VC(chr);
+     QemuConsole *s = drv->console;
  
-@@ -267,7 +267,7 @@ static GSource *mux_chr_add_watch(Chardev *s, GIOCondition cond)
+     s->echo = echo;
+@@ -2148,7 +2148,7 @@ static const GraphicHwOps text_console_ops = {
  
- static void char_mux_finalize(Object *obj)
+ static void text_console_do_init(Chardev *chr, DisplayState *ds)
  {
--    MuxChardev *d = MUX_CHARDEV(obj);
-+    MuxChardev *d = CHARDEV_MUX(obj);
-     int i;
- 
-     for (i = 0; i < d->mux_cnt; i++) {
-@@ -281,7 +281,7 @@ static void char_mux_finalize(Object *obj)
- 
- static void mux_chr_update_read_handlers(Chardev *chr)
+-    VCChardev *drv = VC_CHARDEV(chr);
++    VCChardev *drv = CHARDEV_VC(chr);
+     QemuConsole *s = drv->console;
+     int g_width = 80 * FONT_WIDTH;
+     int g_height = 24 * FONT_HEIGHT;
+@@ -2205,7 +2205,7 @@ static void vc_chr_open(Chardev *chr,
+                         Error **errp)
  {
--    MuxChardev *d = MUX_CHARDEV(chr);
-+    MuxChardev *d = CHARDEV_MUX(chr);
+     ChardevVC *vc = backend->u.vc.data;
+-    VCChardev *drv = VC_CHARDEV(chr);
++    VCChardev *drv = CHARDEV_VC(chr);
+     QemuConsole *s;
+     unsigned width = 0;
+     unsigned height = 0;
+diff --git a/ui/gtk.c b/ui/gtk.c
+index 1c59de2af4..30c607a412 100644
+--- a/ui/gtk.c
++++ b/ui/gtk.c
+@@ -179,7 +179,7 @@ struct VCChardev {
+ typedef struct VCChardev VCChardev;
  
-     /* Fix up the real driver with mux routines */
-     qemu_chr_fe_set_handlers_full(&d->chr,
-@@ -295,7 +295,7 @@ static void mux_chr_update_read_handlers(Chardev *chr)
+ #define TYPE_CHARDEV_VC "chardev-vc"
+-DECLARE_INSTANCE_CHECKER(VCChardev, VC_CHARDEV,
++DECLARE_INSTANCE_CHECKER(VCChardev, CHARDEV_VC,
+                          TYPE_CHARDEV_VC)
  
- void mux_set_focus(Chardev *chr, int focus)
+ bool gtk_use_gl_area;
+@@ -1693,7 +1693,7 @@ static void gd_vc_adjustment_changed(GtkAdjustment *adjustment, void *opaque)
+ 
+ static int gd_vc_chr_write(Chardev *chr, const uint8_t *buf, int len)
  {
--    MuxChardev *d = MUX_CHARDEV(chr);
-+    MuxChardev *d = CHARDEV_MUX(chr);
+-    VCChardev *vcd = VC_CHARDEV(chr);
++    VCChardev *vcd = CHARDEV_VC(chr);
+     VirtualConsole *vc = vcd->console;
  
-     assert(focus >= 0);
-     assert(focus < d->mux_cnt);
-@@ -316,7 +316,7 @@ static void qemu_chr_open_mux(Chardev *chr,
- {
-     ChardevMux *mux = backend->u.mux.data;
-     Chardev *drv;
--    MuxChardev *d = MUX_CHARDEV(chr);
-+    MuxChardev *d = CHARDEV_MUX(chr);
+     vte_terminal_feed(VTE_TERMINAL(vc->vte.terminal), (const char *)buf, len);
+@@ -1702,7 +1702,7 @@ static int gd_vc_chr_write(Chardev *chr, const uint8_t *buf, int len)
  
-     drv = qemu_chr_find(mux->chardev);
-     if (drv == NULL) {
-diff --git a/chardev/char.c b/chardev/char.c
-index 77e7ec814f..43fb8bd50e 100644
---- a/chardev/char.c
-+++ b/chardev/char.c
-@@ -308,7 +308,7 @@ static const TypeInfo char_type_info = {
- static bool qemu_chr_is_busy(Chardev *s)
+ static void gd_vc_chr_set_echo(Chardev *chr, bool echo)
  {
-     if (CHARDEV_IS_MUX(s)) {
--        MuxChardev *d = MUX_CHARDEV(s);
-+        MuxChardev *d = CHARDEV_MUX(s);
-         return d->mux_cnt >= 0;
-     } else {
-         return s->be != NULL;
+-    VCChardev *vcd = VC_CHARDEV(chr);
++    VCChardev *vcd = CHARDEV_VC(chr);
+     VirtualConsole *vc = vcd->console;
+ 
+     if (vc) {
+@@ -1784,7 +1784,7 @@ static GSList *gd_vc_vte_init(GtkDisplayState *s, VirtualConsole *vc,
+     GtkWidget *box;
+     GtkWidget *scrollbar;
+     GtkAdjustment *vadjustment;
+-    VCChardev *vcd = VC_CHARDEV(chr);
++    VCChardev *vcd = CHARDEV_VC(chr);
+ 
+     vc->s = s;
+     vc->vte.echo = vcd->echo;
+diff --git a/ui/spice-app.c b/ui/spice-app.c
+index 93e105c6ee..e66c422e02 100644
+--- a/ui/spice-app.c
++++ b/ui/spice-app.c
+@@ -47,7 +47,7 @@ struct VCChardev {
+ typedef struct VCChardev VCChardev;
+ 
+ #define TYPE_CHARDEV_VC "chardev-vc"
+-DECLARE_INSTANCE_CHECKER(VCChardev, VC_CHARDEV,
++DECLARE_INSTANCE_CHECKER(VCChardev, CHARDEV_VC,
+                          TYPE_CHARDEV_VC)
+ 
+ static ChardevBackend *
 -- 
 2.26.2
 
