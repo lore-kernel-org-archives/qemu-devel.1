@@ -2,133 +2,89 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7466C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 08:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94505C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:03:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C900F2078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 08:57:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90832206A1
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 09:03:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qn6YV/Uo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C900F2078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CK/kXkgz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90832206A1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60504 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGIOj-0003zL-Hw
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 04:57:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60524)
+	id 1kGIUE-0005xW-9t
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 05:03:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33390)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maxime.coquelin@redhat.com>)
- id 1kGIOA-0003Z0-8f
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 04:57:06 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:39386
- helo=us-smtp-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <maxime.coquelin@redhat.com>)
- id 1kGIO6-0000UE-Ki
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 04:57:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599728221;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=JjRrKYcaDycoy/FoZTa25it6Q19Y35T52byryqz7A4c=;
- b=Qn6YV/UolppYoYl+qH0CCU44SXPlf6m+MX0ebhxma+f2tKRFzGOCCbfRZI7yB7PxrdIRGo
- bx2meK8/KD9vRV0D408qMXGbqpajVHK6f+LAzTYYgFooPFIaTjLPViJn13NCVa5ze9LCq2
- zF1OK4wZpgxCQmow2BnIQT5EvtS9hOE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-294-5kmlPwg2ORiKMYbjcM8UHg-1; Thu, 10 Sep 2020 04:55:19 -0400
-X-MC-Unique: 5kmlPwg2ORiKMYbjcM8UHg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69929801AB9;
- Thu, 10 Sep 2020 08:55:11 +0000 (UTC)
-Received: from [10.36.110.16] (unknown [10.36.110.16])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0AFA960BF1;
- Thu, 10 Sep 2020 08:55:08 +0000 (UTC)
-Subject: Re: VHOST_USER_PROTOCOL_F_VDPA
-To: Stefan Hajnoczi <stefanha@redhat.com>
-References: <20200821110822.GA205318@stefanha-x1.localdomain>
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-Autocrypt: addr=maxime.coquelin@redhat.com; keydata=
- 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
- Mwqu3GQ=
-Message-ID: <ea150955-fc89-147f-0fdc-1ff60b35a6e6@redhat.com>
-Date: Thu, 10 Sep 2020 10:55:00 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kGITe-0005LP-M3; Thu, 10 Sep 2020 05:02:46 -0400
+Received: from mail-lj1-x22a.google.com ([2a00:1450:4864:20::22a]:37112)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kGITc-0001E2-0s; Thu, 10 Sep 2020 05:02:46 -0400
+Received: by mail-lj1-x22a.google.com with SMTP id n25so7169174ljj.4;
+ Thu, 10 Sep 2020 02:02:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=FcsMQ46kCIe7+4wZHUZndbbbfznADKftu+fFYdX59AE=;
+ b=CK/kXkgzu/xHGUFcBLoqal91GOe/fbWOw2s4Z+mOIPWA0L0AV6H1mF+7tWaVvnSStJ
+ E7hAx3aYiPd20DkmJ+kOO+IgD1KJi/h6g9KFzGr7BecCCje1LpJ/h60d/7OV05vaywE9
+ NUcduP2w2wjMGY3MBWGuZapv4wCZBAVd+zsCzztemN0ie9hpzOwV03X85EWqnu48nfkH
+ DALCuRG/+balZTR9EOR3lAFPbGQYRVbkQgQJfclIU1Hl7kL+gmIIRXDAEWOa55wbVaLk
+ eexXqq3Qjnhtk39CZUTNJqDGDiN7ZLcZkFoetY6ND7rA919xrL3RuBipgsFuYv6COreu
+ f0RA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=FcsMQ46kCIe7+4wZHUZndbbbfznADKftu+fFYdX59AE=;
+ b=DndFaq0wDv9MBc7BOwBRqMNeILzKYrHV5HbxHGNthDoh81k8yHUmdawSVeejoM4t8t
+ ka8Lm1HKtgiy9N4cOz0ESQPpgPIU4E/7rFGZkEYKxLxXVWx6Dtw35C1U73J2LjWJYmV5
+ 69vod9aURjqvzgHoJ07YuuvU6TXnTs9FT60Onx4hztJWoR5fqege6CWvpREo5T/5dYna
+ 16sSpzH0c4wVDZOsw1Kry+sKuef/ymxxU+lMkza7xzA+6UYrPsNsDV0t4cbm+FBJb0Vu
+ gY4vzDXRPxlVnUuxXrWq0ZWvSt73pXS9Qi6Ka1OmEF2HpdOi0r7tVEpsjnVRKIzxRu9f
+ +sCw==
+X-Gm-Message-State: AOAM532P2FXJkzQGBEGlqSpMroJ7EgislLufn1UaXj4xVsOcwwurIFWa
+ opE+0kXIG6WIFl0Qem02zFi1Hk90f8cDWC3IlY4=
+X-Google-Smtp-Source: ABdhPJwRnMFDoxr9bkPdT2Tou8K2XYw7XVbur4goW2tNvI2/HUFf5GH6Cvll8ld5xmy0PoKdyl77D8QIRP5qJYkOryQ=
+X-Received: by 2002:a2e:9dc7:: with SMTP id x7mr4213332ljj.447.1599728560247; 
+ Thu, 10 Sep 2020 02:02:40 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200821110822.GA205318@stefanha-x1.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=maxime.coquelin@redhat.com
-X-Mimecast-Spam-Score: 0.326
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9HUv2wN3GCvIAPg2lMY8RjaJtAVT7IFbV"
-Received-SPF: pass client-ip=205.139.110.120;
- envelope-from=maxime.coquelin@redhat.com; helo=us-smtp-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 01:23:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -56
-X-Spam_score: -5.7
-X-Spam_bar: -----
-X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20200909094617.1582-1-luoyonggang@gmail.com>
+ <20200909094617.1582-2-luoyonggang@gmail.com>
+ <D8F68C97-16F7-48DA-A003-275A7C0D08F3@kamp.de>
+ <CAE2XoE-bTGqfVe-5cCuZGBrsG9FVz6pomRU0-omCF9JiGNcSCA@mail.gmail.com>
+ <F3949E8A-E95E-4C14-A5F4-039381CA30CD@kamp.de>
+In-Reply-To: <F3949E8A-E95E-4C14-A5F4-039381CA30CD@kamp.de>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 10 Sep 2020 17:02:29 +0800
+Message-ID: <CAE2XoE8B4nGpVMmKW9K1k-e7Yc=c=-w2_1S3S2c2u1Tq2X0WZg@mail.gmail.com>
+Subject: Re: [PATCH v2 01/21] block: Fixes nfs compiling error on msys2/mingw
+To: Peter Lieven <pl@kamp.de>
+Content-Type: multipart/alternative; boundary="000000000000921bb205aef1d42f"
+Received-SPF: pass client-ip=2a00:1450:4864:20::22a;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x22a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -141,123 +97,481 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chenbo Xia <chenbo.xia@intel.com>, Cindy Lu <lulu@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
- qemu-devel@nongnu.org, Raphael Norwitz <raphael.norwitz@nutanix.com>,
- kraxel@redhat.com,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- Changpeng Liu <changpeng.liu@intel.com>
+Reply-To: luoyonggang@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Ed Maste <emaste@freebsd.org>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu block <qemu-block@nongnu.org>,
+ Stefan Weil <sw@weilnetz.de>, Xie Changlong <xiechanglong.d@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel <qemu-devel@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Wen Congyang <wencongyang2@huawei.com>,
+ Li-Wen Hsu <lwhsu@freebsd.org>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9HUv2wN3GCvIAPg2lMY8RjaJtAVT7IFbV
-Content-Type: multipart/mixed; boundary="bpL1qVBHI2ZbOkeBHl3G9X6Bq8VUyLK6j";
- protected-headers="v1"
-From: Maxime Coquelin <maxime.coquelin@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: Chenbo Xia <chenbo.xia@intel.com>, Cindy Lu <lulu@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
- qemu-devel@nongnu.org, Raphael Norwitz <raphael.norwitz@nutanix.com>,
- kraxel@redhat.com, =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?=
- <marcandre.lureau@redhat.com>, Changpeng Liu <changpeng.liu@intel.com>
-Message-ID: <ea150955-fc89-147f-0fdc-1ff60b35a6e6@redhat.com>
-Subject: Re: VHOST_USER_PROTOCOL_F_VDPA
-References: <20200821110822.GA205318@stefanha-x1.localdomain>
-In-Reply-To: <20200821110822.GA205318@stefanha-x1.localdomain>
-
---bpL1qVBHI2ZbOkeBHl3G9X6Bq8VUyLK6j
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
+--000000000000921bb205aef1d42f
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Stefan,
+On Thu, Sep 10, 2020 at 3:29 PM Peter Lieven <pl@kamp.de> wrote:
 
-On 8/21/20 1:08 PM, Stefan Hajnoczi wrote:
-> The first vDPA ioctls have been added to the vhost-user protocol and I
-> wonder if it's time to fully change the vhost-user protocol's focus to
-> providing a full VIRTIO device model like vDPA does.
->=20
-> Initially vhost-user was just used for vhost-net. As a result it didn't
-> need the full VIRTIO device model including the configuration space and
-> device status register.
->=20
-> Over the years device-specific messages were added to extend vhost-user
-> to cover more of the VIRTIO device model. vhost-user-blk needed
-> configuration space support, for example.
->=20
-> The problem for VMMs and device backend implementors is that the
-> protocol is currently positioned halfway between the original vhost-net
-> approach and the full VIRTIO device model. Even if a VMM implements
-> VHOST_USER_GET_CONFIG, it can only expect it to work with
-> vhost-user-blk, not vhost-user-net. Similarly, a vhost-user-net device
-> backend cannot implement VHOST_USER_GET_CONFIG and expect all VMMs to
-> allow it to participate in configuration space emulation because
-> existing VMMs won't send that message.
->=20
-> The current approach where each device type uses a undocumented subset
-> of vhost-user messages is really messy. VMM and device backend
-> implementors have to look at existing implementations to know what is
-> expected for a given device type. It would be nice to switch to the
-> VIRTIO device model so that the VIRTIO specification can be used as the
-> reference for how device types work.
->=20
-> Now that vDPA is here and extends the kernel vhost ioctls with a full
-> VIRTIO device model, it might be a good time to revise the vhost-user
-> protocol.
->=20
-> A vdpa-user protocol (or vhost-user 2.0) would replace the current mess
-> with a full VIRTIO device model. Both VMMs and device backends would
-> require changes to support this, but it would be a cleaner path forward
-> for the vhost-user protocol.
->=20
-> One way of doing this would be a new VHOST_USER_PROTOCOL_F_VDPA feature
-> bit that indicates all the currently existing Linux vDPA ioctl messages
-> are available. Legacy vhost-user messages with overlapping functionality
-> must not be used when this bit is set. Most importantly, device backends
-> need to implement the full VIRTIO device model, regardless of device
-> type (net, blk, scsi, etc).
->=20
-> The device type most affected by this change would be virtio-net. The
-> other device types are already closer to the full VIRTIO device model.
->=20
-> I wanted to share this idea in case someone is currently trying to
-> figure out how to add more VIRTIO device model functionality to
-> vhost-user.
->=20
-> Stefan
->=20
+>
+>
+> > Am 10.09.2020 um 09:14 schrieb =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo=
+) <luoyonggang@gmail.com
+> >:
+> >
+> >
+> >
+> > On Thu, Sep 10, 2020 at 3:01 PM Peter Lieven <pl@kamp.de> wrote:
+> >
+> >
+> > > Am 09.09.2020 um 11:45 schrieb Yonggang Luo <luoyonggang@gmail.com>:
+> > >
+> > > These compiling errors are fixed:
+> > > ../block/nfs.c:27:10: fatal error: poll.h: No such file or directory
+> > >   27 | #include <poll.h>
+> > >      |          ^~~~~~~~
+> > > compilation terminated.
+> > >
+> > > ../block/nfs.c:63:5: error: unknown type name 'blkcnt_t'
+> > >   63 |     blkcnt_t st_blocks;
+> > >      |     ^~~~~~~~
+> > > ../block/nfs.c: In function 'nfs_client_open':
+> > > ../block/nfs.c:550:27: error: 'struct _stat64' has no member named
+> 'st_blocks'
+> > >  550 |     client->st_blocks =3D st.st_blocks;
+> > >      |                           ^
+> > > ../block/nfs.c: In function 'nfs_get_allocated_file_size':
+> > > ../block/nfs.c:751:41: error: 'struct _stat64' has no member named
+> 'st_blocks'
+> > >  751 |     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
+> > >      |                                         ^
+> > > ../block/nfs.c: In function 'nfs_reopen_prepare':
+> > > ../block/nfs.c:805:31: error: 'struct _stat64' has no member named
+> 'st_blocks'
+> > >  805 |         client->st_blocks =3D st.st_blocks;
+> > >      |                               ^
+> > > ../block/nfs.c: In function 'nfs_get_allocated_file_size':
+> > > ../block/nfs.c:752:1: error: control reaches end of non-void function
+> [-Werror=3Dreturn-type]
+> > >  752 | }
+> > >      | ^
+> > >
+> > > On msys2/mingw, there is no st_blocks in struct _stat64, so we use
+> consistence st_size instead.
+> > >
+> > > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> > > ---
+> > > block/nfs.c | 26 +++++++++++++++++---------
+> > > 1 file changed, 17 insertions(+), 9 deletions(-)
+> > >
+> > > diff --git a/block/nfs.c b/block/nfs.c
+> > > index 61a249a9fc..34b2cd5708 100644
+> > > --- a/block/nfs.c
+> > > +++ b/block/nfs.c
+> > > @@ -24,7 +24,9 @@
+> > >
+> > > #include "qemu/osdep.h"
+> > >
+> > > +#if !defined(_WIN32)
+> > > #include <poll.h>
+> > > +#endif
+> > > #include "qemu/config-file.h"
+> > > #include "qemu/error-report.h"
+> > > #include "qapi/error.h"
+> > > @@ -51,6 +53,12 @@
+> > > #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
+> > > #define QEMU_NFS_MAX_DEBUG_LEVEL 2
+> > >
+> > > +#if defined (_WIN32)
+> > > +#define nfs_stat __stat64
+> > > +#else
+> > > +#define nfs_stat stat
+> > > +#endif
+> > > +
+> > > typedef struct NFSClient {
+> > >     struct nfs_context *context;
+> > >     struct nfsfh *fh;
+> > > @@ -58,7 +66,7 @@ typedef struct NFSClient {
+> > >     bool has_zero_init;
+> > >     AioContext *aio_context;
+> > >     QemuMutex mutex;
+> > > -    blkcnt_t st_blocks;
+> > > +    int64_t st_size;
+> > >     bool cache_used;
+> > >     NFSServer *server;
+> > >     char *path;
+> > > @@ -70,7 +78,7 @@ typedef struct NFSRPC {
+> > >     int ret;
+> > >     int complete;
+> > >     QEMUIOVector *iov;
+> > > -    struct stat *st;
+> > > +    struct nfs_stat *st;
+> > >     Coroutine *co;
+> > >     NFSClient *client;
+> > > } NFSRPC;
+> > > @@ -419,7 +427,7 @@ static int64_t nfs_client_open(NFSClient *client,
+> BlockdevOptionsNfs *opts,
+> > >                                int flags, int open_flags, Error **err=
+p)
+> > > {
+> > >     int64_t ret =3D -EINVAL;
+> > > -    struct stat st;
+> > > +    struct nfs_stat st;
+> > >     char *file =3D NULL, *strp =3D NULL;
+> > >
+> > >     qemu_mutex_init(&client->mutex);
+> > > @@ -545,7 +553,7 @@ static int64_t nfs_client_open(NFSClient *client,
+> BlockdevOptionsNfs *opts,
+> > >     }
+> > >
+> > >     ret =3D DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
+> > > -    client->st_blocks =3D st.st_blocks;
+> > > +    client->st_size =3D st.st_size;
+> > >     client->has_zero_init =3D S_ISREG(st.st_mode);
+> > >     *strp =3D '/';
+> > >     goto out;
+> > > @@ -729,11 +737,11 @@ static int64_t
+> nfs_get_allocated_file_size(BlockDriverState *bs)
+> > > {
+> > >     NFSClient *client =3D bs->opaque;
+> > >     NFSRPC task =3D {0};
+> > > -    struct stat st;
+> > > +    struct nfs_stat st;
+> > >
+> > >     if (bdrv_is_read_only(bs) &&
+> > >         !(bs->open_flags & BDRV_O_NOCACHE)) {
+> > > -        return client->st_blocks * 512;
+> > > +        return client->st_size;
+> > I am using   client->st_size instead client->st_blocks * 512, anything
+> wrong with this?
+> > >     }
+> > >
+> > >     task.bs =3D bs;
+> > > @@ -746,7 +754,7 @@ static int64_t
+> nfs_get_allocated_file_size(BlockDriverState *bs)
+> > >     nfs_set_events(client);
+> > >     BDRV_POLL_WHILE(bs, !task.complete);
+> > >
+> > > -    return (task.ret < 0 ? task.ret : st.st_blocks * 512);
+> > > +    return (task.ret < 0 ? task.ret : st.st_size);
+> > > }
+> > >
+> > > static int coroutine_fn
+> > > @@ -778,7 +786,7 @@ static int nfs_reopen_prepare(BDRVReopenState
+> *state,
+> > >                               BlockReopenQueue *queue, Error **errp)
+> > > {
+> > >     NFSClient *client =3D state->bs->opaque;
+> > > -    struct stat st;
+> > > +    struct nfs_stat st;
+> > >     int ret =3D 0;
+> > >
+> > >     if (state->flags & BDRV_O_RDWR && bdrv_is_read_only(state->bs)) {
+> > > @@ -800,7 +808,7 @@ static int nfs_reopen_prepare(BDRVReopenState
+> *state,
+> > >                        nfs_get_error(client->context));
+> > >             return ret;
+> > >         }
+> > > -        client->st_blocks =3D st.st_blocks;
+> > > +        client->st_size =3D st.st_size;
+> > >     }
+> > >
+> > >     return 0;
+> > > --
+> > > 2.28.0.windows.1
+> > >
+> >
+> >
+> > NACK. st_blocks and st_size is not the same. st_blocks is the number of
+> allocated blocks on disk. st_size is the virtual size of a file as it may
+> contain holes.
+> > I think the appropriate fix is to not implement
+> nfs_get_allocated_file_size on WIN32. Its not mandatory.
+> >
+> > Please look at the   st_size, it's equivalant to  st_blocks * 512;
+>
+> It is definitely not. Where do you have this info from?
+>
+> Please have a look at libnfs/lib/nfs_v3.c in function nfs3_stat_1_cb.
+>
+>
+>         st.st_size    =3D res->GETATTR3res_u.resok.obj_attributes.size;
+> #ifndef WIN32
+>         st.st_blksize =3D NFS_BLKSIZE;
+>         st.st_blocks  =3D (res->GETATTR3res_u.resok.obj_attributes.used +
+> 512 - 1) / 512;
+> #endif//WIN32
+>
+>
+> Your patch will eliminate this difference for non WIN32 systems. Please
+> change your patch to not implement nfs_get_allocated_file_size and qemu
+> will handle this case properly.
+> Put everything that involves st_blocks and nfs_get_allocated_file_size in
+> #ifndef _WIN32 conditions.
+>
+You are right, I'll fix it latter
 
-I understand the need and like the idea.
+>
+>
+> Peter
+>
 
-Maxime
 
+--=20
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
 
---bpL1qVBHI2ZbOkeBHl3G9X6Bq8VUyLK6j--
+--000000000000921bb205aef1d42f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
---9HUv2wN3GCvIAPg2lMY8RjaJtAVT7IFbV
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Sep 10, 2020 at 3:29 PM Peter=
+ Lieven &lt;<a href=3D"mailto:pl@kamp.de">pl@kamp.de</a>&gt; wrote:<br></di=
+v><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;borde=
+r-left:1px solid rgb(204,204,204);padding-left:1ex"><br>
+<br>
+&gt; Am 10.09.2020 um 09:14 schrieb =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Lu=
+o) &lt;<a href=3D"mailto:luoyonggang@gmail.com" target=3D"_blank">luoyongga=
+ng@gmail.com</a>&gt;:<br>
+&gt; <br>
+&gt; <br>
+&gt; <br>
+&gt; On Thu, Sep 10, 2020 at 3:01 PM Peter Lieven &lt;<a href=3D"mailto:pl@=
+kamp.de" target=3D"_blank">pl@kamp.de</a>&gt; wrote:<br>
+&gt; <br>
+&gt; <br>
+&gt; &gt; Am 09.09.2020 um 11:45 schrieb Yonggang Luo &lt;<a href=3D"mailto=
+:luoyonggang@gmail.com" target=3D"_blank">luoyonggang@gmail.com</a>&gt;:<br=
+>
+&gt; &gt; <br>
+&gt; &gt; These compiling errors are fixed:<br>
+&gt; &gt; ../block/nfs.c:27:10: fatal error: poll.h: No such file or direct=
+ory<br>
+&gt; &gt;=C2=A0 =C2=A027 | #include &lt;poll.h&gt;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~~~~~~~<=
+br>
+&gt; &gt; compilation terminated.<br>
+&gt; &gt; <br>
+&gt; &gt; ../block/nfs.c:63:5: error: unknown type name &#39;blkcnt_t&#39;<=
+br>
+&gt; &gt;=C2=A0 =C2=A063 |=C2=A0 =C2=A0 =C2=A0blkcnt_t st_blocks;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0^~~~~~~~<br>
+&gt; &gt; ../block/nfs.c: In function &#39;nfs_client_open&#39;:<br>
+&gt; &gt; ../block/nfs.c:550:27: error: &#39;struct _stat64&#39; has no mem=
+ber named &#39;st_blocks&#39;<br>
+&gt; &gt;=C2=A0 550 |=C2=A0 =C2=A0 =C2=A0client-&gt;st_blocks =3D st.st_blo=
+cks;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^<br>
+&gt; &gt; ../block/nfs.c: In function &#39;nfs_get_allocated_file_size&#39;=
+:<br>
+&gt; &gt; ../block/nfs.c:751:41: error: &#39;struct _stat64&#39; has no mem=
+ber named &#39;st_blocks&#39;<br>
+&gt; &gt;=C2=A0 751 |=C2=A0 =C2=A0 =C2=A0return (task.ret &lt; 0 ? task.ret=
+ : st.st_blocks * 512);<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^<br>
+&gt; &gt; ../block/nfs.c: In function &#39;nfs_reopen_prepare&#39;:<br>
+&gt; &gt; ../block/nfs.c:805:31: error: &#39;struct _stat64&#39; has no mem=
+ber named &#39;st_blocks&#39;<br>
+&gt; &gt;=C2=A0 805 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0client-&gt;st_blocks=
+ =3D st.st_blocks;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 |=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0^<br>
+&gt; &gt; ../block/nfs.c: In function &#39;nfs_get_allocated_file_size&#39;=
+:<br>
+&gt; &gt; ../block/nfs.c:752:1: error: control reaches end of non-void func=
+tion [-Werror=3Dreturn-type]<br>
+&gt; &gt;=C2=A0 752 | }<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 | ^<br>
+&gt; &gt; <br>
+&gt; &gt; On msys2/mingw, there is no st_blocks in struct _stat64, so we us=
+e consistence st_size instead.<br>
+&gt; &gt; <br>
+&gt; &gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gma=
+il.com" target=3D"_blank">luoyonggang@gmail.com</a>&gt;<br>
+&gt; &gt; ---<br>
+&gt; &gt; block/nfs.c | 26 +++++++++++++++++---------<br>
+&gt; &gt; 1 file changed, 17 insertions(+), 9 deletions(-)<br>
+&gt; &gt; <br>
+&gt; &gt; diff --git a/block/nfs.c b/block/nfs.c<br>
+&gt; &gt; index 61a249a9fc..34b2cd5708 100644<br>
+&gt; &gt; --- a/block/nfs.c<br>
+&gt; &gt; +++ b/block/nfs.c<br>
+&gt; &gt; @@ -24,7 +24,9 @@<br>
+&gt; &gt; <br>
+&gt; &gt; #include &quot;qemu/osdep.h&quot;<br>
+&gt; &gt; <br>
+&gt; &gt; +#if !defined(_WIN32)<br>
+&gt; &gt; #include &lt;poll.h&gt;<br>
+&gt; &gt; +#endif<br>
+&gt; &gt; #include &quot;qemu/config-file.h&quot;<br>
+&gt; &gt; #include &quot;qemu/error-report.h&quot;<br>
+&gt; &gt; #include &quot;qapi/error.h&quot;<br>
+&gt; &gt; @@ -51,6 +53,12 @@<br>
+&gt; &gt; #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)<br>
+&gt; &gt; #define QEMU_NFS_MAX_DEBUG_LEVEL 2<br>
+&gt; &gt; <br>
+&gt; &gt; +#if defined (_WIN32)<br>
+&gt; &gt; +#define nfs_stat __stat64<br>
+&gt; &gt; +#else<br>
+&gt; &gt; +#define nfs_stat stat<br>
+&gt; &gt; +#endif<br>
+&gt; &gt; +<br>
+&gt; &gt; typedef struct NFSClient {<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0struct nfs_context *context;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0struct nfsfh *fh;<br>
+&gt; &gt; @@ -58,7 +66,7 @@ typedef struct NFSClient {<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0bool has_zero_init;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0AioContext *aio_context;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0QemuMutex mutex;<br>
+&gt; &gt; -=C2=A0 =C2=A0 blkcnt_t st_blocks;<br>
+&gt; &gt; +=C2=A0 =C2=A0 int64_t st_size;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0bool cache_used;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0NFSServer *server;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0char *path;<br>
+&gt; &gt; @@ -70,7 +78,7 @@ typedef struct NFSRPC {<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0int ret;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0int complete;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0QEMUIOVector *iov;<br>
+&gt; &gt; -=C2=A0 =C2=A0 struct stat *st;<br>
+&gt; &gt; +=C2=A0 =C2=A0 struct nfs_stat *st;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0Coroutine *co;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0NFSClient *client;<br>
+&gt; &gt; } NFSRPC;<br>
+&gt; &gt; @@ -419,7 +427,7 @@ static int64_t nfs_client_open(NFSClient *cli=
+ent, BlockdevOptionsNfs *opts,<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 int flags, int open_flags, Er=
+ror **errp)<br>
+&gt; &gt; {<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0int64_t ret =3D -EINVAL;<br>
+&gt; &gt; -=C2=A0 =C2=A0 struct stat st;<br>
+&gt; &gt; +=C2=A0 =C2=A0 struct nfs_stat st;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0char *file =3D NULL, *strp =3D NULL;<br>
+&gt; &gt; <br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0qemu_mutex_init(&amp;client-&gt;mutex);<br>
+&gt; &gt; @@ -545,7 +553,7 @@ static int64_t nfs_client_open(NFSClient *cli=
+ent, BlockdevOptionsNfs *opts,<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0}<br>
+&gt; &gt; <br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0ret =3D DIV_ROUND_UP(st.st_size, BDRV_SECTOR_S=
+IZE);<br>
+&gt; &gt; -=C2=A0 =C2=A0 client-&gt;st_blocks =3D st.st_blocks;<br>
+&gt; &gt; +=C2=A0 =C2=A0 client-&gt;st_size =3D st.st_size;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0client-&gt;has_zero_init =3D S_ISREG(st.st_mod=
+e);<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0*strp =3D &#39;/&#39;;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0goto out;<br>
+&gt; &gt; @@ -729,11 +737,11 @@ static int64_t nfs_get_allocated_file_size(=
+BlockDriverState *bs)<br>
+&gt; &gt; {<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0NFSClient *client =3D bs-&gt;opaque;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0NFSRPC task =3D {0};<br>
+&gt; &gt; -=C2=A0 =C2=A0 struct stat st;<br>
+&gt; &gt; +=C2=A0 =C2=A0 struct nfs_stat st;<br>
+&gt; &gt; <br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0if (bdrv_is_read_only(bs) &amp;&amp;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0!(bs-&gt;open_flags &amp; BDRV_O=
+_NOCACHE)) {<br>
+&gt; &gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 return client-&gt;st_blocks * 512;<b=
+r>
+&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 return client-&gt;st_size;<br>
+&gt; I am using=C2=A0 =C2=A0client-&gt;st_size instead client-&gt;st_blocks=
+ * 512, anything wrong with this?<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0}<br>
+&gt; &gt; <br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0<a href=3D"http://task.bs" rel=3D"noreferrer" =
+target=3D"_blank">task.bs</a> =3D bs;<br>
+&gt; &gt; @@ -746,7 +754,7 @@ static int64_t nfs_get_allocated_file_size(Bl=
+ockDriverState *bs)<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0nfs_set_events(client);<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0BDRV_POLL_WHILE(bs, !task.complete);<br>
+&gt; &gt; <br>
+&gt; &gt; -=C2=A0 =C2=A0 return (task.ret &lt; 0 ? task.ret : st.st_blocks =
+* 512);<br>
+&gt; &gt; +=C2=A0 =C2=A0 return (task.ret &lt; 0 ? task.ret : st.st_size);<=
+br>
+&gt; &gt; }<br>
+&gt; &gt; <br>
+&gt; &gt; static int coroutine_fn<br>
+&gt; &gt; @@ -778,7 +786,7 @@ static int nfs_reopen_prepare(BDRVReopenState=
+ *state,<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0BlockReopenQueue *queue, Error=
+ **errp)<br>
+&gt; &gt; {<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0NFSClient *client =3D state-&gt;bs-&gt;opaque;=
+<br>
+&gt; &gt; -=C2=A0 =C2=A0 struct stat st;<br>
+&gt; &gt; +=C2=A0 =C2=A0 struct nfs_stat st;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0int ret =3D 0;<br>
+&gt; &gt; <br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0if (state-&gt;flags &amp; BDRV_O_RDWR &amp;&am=
+p; bdrv_is_read_only(state-&gt;bs)) {<br>
+&gt; &gt; @@ -800,7 +808,7 @@ static int nfs_reopen_prepare(BDRVReopenState=
+ *state,<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 nfs_get_error(client-&gt;context));<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0return ret;<br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
+&gt; &gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 client-&gt;st_blocks =3D st.st_block=
+s;<br>
+&gt; &gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 client-&gt;st_size =3D st.st_size;<b=
+r>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0}<br>
+&gt; &gt; <br>
+&gt; &gt;=C2=A0 =C2=A0 =C2=A0return 0;<br>
+&gt; &gt; -- <br>
+&gt; &gt; 2.28.0.windows.1<br>
+&gt; &gt; <br>
+&gt; <br>
+&gt; <br>
+&gt; NACK. st_blocks and st_size is not the same. st_blocks is the number o=
+f allocated blocks on disk. st_size is the virtual size of a file as it may=
+ contain holes.<br>
+&gt; I think the appropriate fix is to not implement nfs_get_allocated_file=
+_size on WIN32. Its not mandatory.<br>
+&gt; <br>
+&gt; Please look at the=C2=A0 =C2=A0st_size, it&#39;s equivalant to=C2=A0 s=
+t_blocks * 512;<br>
+<br>
+It is definitely not. Where do you have this info from?<br>
+<br>
+Please have a look at libnfs/lib/nfs_v3.c in function nfs3_stat_1_cb.<br>
+<br>
+<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 st.st_size=C2=A0 =C2=A0 =3D res-&gt;GETATTR3res=
+_u.resok.obj_attributes.size;<br>
+#ifndef WIN32<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 st.st_blksize =3D NFS_BLKSIZE;<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 st.st_blocks=C2=A0 =3D (res-&gt;GETATTR3res_u.r=
+esok.obj_attributes.used + 512 - 1) / 512;<br>
+#endif//WIN32<br>
+<br>
+<br>
+Your patch will eliminate this difference for non WIN32 systems. Please cha=
+nge your patch to not implement nfs_get_allocated_file_size and qemu will h=
+andle this case properly.<br>
+Put everything that involves st_blocks and nfs_get_allocated_file_size in #=
+ifndef _WIN32 conditions.<br></blockquote><div>You are right, I&#39;ll fix =
+it latter=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+<br>
+<br>
+Peter<br>
+</blockquote></div><br clear=3D"all"><div><br></div>-- <br><div dir=3D"ltr"=
+ class=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
+=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
+=A0 sincerely,<br>Yonggang Luo<br></div></div>
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEE3P4B0hLzOlwaL+KyjiNKEaHD4kFAl9Z6eoACgkQyjiNKEaH
-D4lPwRAAkqeHcgVoj9qZ34KWw8UhRoOfkPhNO9B5cqFI0J2lqeKzgnOvkm5aTa8C
-luQg+tag3Sz9IMEGTtONOoGhu5B+2uuEyS22ibYjmWZK386rzBkRk31r192BbSHe
-bXlAXiRGcfZC0sNTtWfn18pAL+wdDYRllLbNEztPJA+fkHlo3Dl8sv0Jc6HwJXUh
-dtsJ1JB1kz6cUdzNziHk9pu3d9Ul8BvTPfvgL2WiDPEhGwga6vsHmWF7ZKQ++pRn
-VA9NY8tcmIbfWR6uxQWQiEMoRsW4yTYWrAlOmz+8lVQj5ia6QwQhfnt25jYs+Atp
-FibHjWeAAxj/4akoRGagkqSEjwA143jOoSkOjJqWL8VIJUTxphS+HCHkgB+As6/q
-vYFd3qtuzAIGmHUWiPWXeuoV9QEE0KAokwyBU3uLl28xoBhfoaQI404GYHuS8uGx
-rfpXQWK5VO7muHGbgkCxxnk/mRj7XsP5IUP2SVB5VLuCtzD9UaEEKMhPjDBgTIbR
-8jKEmkKRqhb6XIiQPGFMvVwb+6VUchfqJB4Fezks83/Oic0I2FFNa8txMCqnC7Zz
-lL1lS7TTvR6pguu+3D/oliYMl8dDF3SJ+/NqWo+StiYvWwBbsT+Utf2373nl86uX
-VRmPSRc3dmIzxgqN3YAAklSq2/z89KPzU5W2bXMfkrq/dgJ+APw=
-=srOi
------END PGP SIGNATURE-----
-
---9HUv2wN3GCvIAPg2lMY8RjaJtAVT7IFbV--
-
+--000000000000921bb205aef1d42f--
 
