@@ -2,85 +2,126 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B6A6C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 06:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A137C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 06:50:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A243720829
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 06:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1498420720
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 06:50:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UClrmcxL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A243720829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ssxf637F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1498420720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGGGZ-0007df-NH
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 02:41:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55504)
+	id 1kGGPQ-0000pk-Nk
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 02:50:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57258)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kGGEd-0006JI-Tj
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 02:39:07 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:54279
- helo=us-smtp-delivery-1.mimecast.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kGGEc-0007MH-9s
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 02:39:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599719944;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=Y34zvoWXduiwibYbLiLWQREvNmCTcUaZJN7i3Ky+UIU=;
- b=UClrmcxLM538oeI9eDPd4QEA/7GmpuXRZlD75hvSv/TQj1SXJptGsk/arK60CbwW2CydtG
- u62BWpGCDEQYQkpH6BSAeC6u7ssZDMZ8UVSC8dD3RPcZg1uLp5dB0vee4ep68e0LNTb4Ut
- 6oQiDObXLjVCVUjB6/02Zbfvcu8Qh8w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-324--LsA0AtMOamTxiuSwHlPFw-1; Thu, 10 Sep 2020 02:39:03 -0400
-X-MC-Unique: -LsA0AtMOamTxiuSwHlPFw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7147F1091061;
- Thu, 10 Sep 2020 06:39:01 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.124])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B7CCB5C1CF;
- Thu, 10 Sep 2020 06:38:57 +0000 (UTC)
-Date: Thu, 10 Sep 2020 08:38:54 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH v2 2/2] arm64: kvm: Introduce MTE VCPU feature
-Message-ID: <20200910063854.vwhtn3lc5tei72fh@kamzik.brq.redhat.com>
-References: <20200904160018.29481-1-steven.price@arm.com>
- <20200904160018.29481-3-steven.price@arm.com>
- <20200909154804.mide6szbzgdy7jju@kamzik.brq.redhat.com>
- <CAFEAcA_1YnBg3HVmtrSMP8u7GqHY8mtDAJwVcZuNUhwA+q9q=w@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kGGOp-0000NS-7q; Thu, 10 Sep 2020 02:49:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35042)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
+ id 1kGGOn-0008Um-9r; Thu, 10 Sep 2020 02:49:38 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 08A6WDU8136888; Thu, 10 Sep 2020 02:49:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=4flH+59B9rXswW007sUV3hJucoOMSr4fU7+pzF533S8=;
+ b=Ssxf637FMZlt9932t8aGCg9O8rgNfOn9hfo19iklvBC93+zFs1/jU2Mp20lRN4qBJpYO
+ vhSKdinbHSIWuM8L6yIgRZg5SPFiVPLKlN49Q1diSZ0irpvSSHuueslwWUgPVDlreJ+h
+ HDpHkxRMktv8Pb/mivu1TcookeZn1UP+j8AZqPrzK+Vt34A+hir/dJtBHEdcBFzoNkW0
+ 0YDmZ93xYgYc6HYztSks0r+Z2wQIRm84Gu7cIccJdJMI5V2MAIpYPkDyky75ivBAAVfH
+ cakONQ5HlkKnZay5W3QgnD6VZeUfWZnb2Gn1XyiQoVlTiLpeQybBi63N6SmWYGrmOcQ0 8w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33fesv8q0j-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 10 Sep 2020 02:49:35 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 08A6cd7P155870;
+ Thu, 10 Sep 2020 02:49:34 -0400
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
+ [169.55.85.253])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 33fesv8q0a-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 10 Sep 2020 02:49:34 -0400
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+ by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 08A6lhbb023224;
+ Thu, 10 Sep 2020 06:49:34 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
+ [9.57.198.26]) by ppma01wdc.us.ibm.com with ESMTP id 33c2a95b1g-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 10 Sep 2020 06:49:34 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 08A6nXU313828676
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 10 Sep 2020 06:49:33 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B6023112063;
+ Thu, 10 Sep 2020 06:49:33 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 66270112061;
+ Thu, 10 Sep 2020 06:49:33 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.156.134])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTPS;
+ Thu, 10 Sep 2020 06:49:33 +0000 (GMT)
+Subject: Re: [PATCH v4 0/8] s390: Extended-Length SCCB & DIAGNOSE 0x318
+To: Cornelia Huck <cohuck@redhat.com>
+References: <20200624202312.28349-1-walling@linux.ibm.com>
+ <b1d68acf-881f-be0f-c1ac-d32b8bfc859d@linux.ibm.com>
+ <20200715180409.451d217e.cohuck@redhat.com>
+ <d59bd0a5-0660-0c22-09dd-018be6dfe74f@linux.ibm.com>
+ <20200716140214.3fdc7590.cohuck@redhat.com>
+ <42dde86f-2f12-3b89-0c35-74d69fa3d449@de.ibm.com>
+ <20200909104623.57664738.cohuck@redhat.com>
+ <20200909114351.1f91f330.cohuck@redhat.com>
+ <22005476-9a22-f3b1-4c92-fff9fbb2e11d@linux.ibm.com>
+ <20200910083842.4eed4821.cohuck@redhat.com>
+From: Collin Walling <walling@linux.ibm.com>
+Message-ID: <6d8656a1-b68b-1858-a460-0262c4e0ba35@linux.ibm.com>
+Date: Thu, 10 Sep 2020 02:49:33 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA_1YnBg3HVmtrSMP8u7GqHY8mtDAJwVcZuNUhwA+q9q=w@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Received-SPF: pass client-ip=205.139.110.61; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-1.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 01:44:54
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200910083842.4eed4821.cohuck@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-09-10_01:2020-09-10,
+ 2020-09-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ malwarescore=0 mlxscore=0
+ priorityscore=1501 phishscore=0 bulkscore=0 spamscore=0 lowpriorityscore=0
+ suspectscore=0 clxscore=1015 mlxlogscore=999 impostorscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2006250000
+ definitions=main-2009100056
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=walling@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 02:49:36
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -62
+X-Spam_score: -6.3
+X-Spam_bar: ------
+X-Spam_report: (-6.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-3.576,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,41 +134,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <Peter.Maydell@arm.com>, Juan Quintela <quintela@redhat.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>,
- lkml - Kernel Mailing List <linux-kernel@vger.kernel.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Steven Price <steven.price@arm.com>,
- Will Deacon <will@kernel.org>, kvmarm@lists.cs.columbia.edu,
- arm-mail-list <linux-arm-kernel@lists.infradead.org>,
- Dave Martin <Dave.Martin@arm.com>
+Cc: thuth@redhat.com, frankja@linux.ibm.com, mst@redhat.com, david@redhat.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com,
+ Christian Borntraeger <borntraeger@de.ibm.com>, qemu-s390x@nongnu.org,
+ svens@linux.ibm.com, pbonzini@redhat.com, mihajlov@linux.ibm.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 09, 2020 at 04:53:02PM +0100, Peter Maydell wrote:
-> On Wed, 9 Sep 2020 at 16:48, Andrew Jones <drjones@redhat.com> wrote:
-> > We either need a KVM cap or a new CPU feature probing interface to avoid
-> > making userspace try features one at a time. It's too bad that VCPU_INIT
-> > doesn't clear all offending features from the feature set when returning
-> > EINVAL, because then userspace could create a scratch VCPU with everything
-> > it supports in order to see what KVM also supports in one go.
+On 9/10/20 2:38 AM, Cornelia Huck wrote:
+> On Wed, 9 Sep 2020 14:13:55 -0400
+> Collin Walling <walling@linux.ibm.com> wrote:
 > 
-> You could add one if you wanted -- add a new feature bit
-> TELL_ME_WHAT_YOU_HAVE. If the kernel sees that then on filure
-> it clears out feature bits it doesn't support and also clears
-> TELL_ME_WHAT_YOU_HAVE. If QEMU sees EINVAL and TELL_ME_WHAT_YOU_HAVE
-> is still set, then it knows it's dealing with an old kernel
-> and has to do one-at-a-time probing. If it sees EINVAL but not
-> TELL_ME_WHAT_YOU_HAVE then it knows it has a new kernel and
-> has just got all the info.
->
+>> Has this been merged yet? There is one patch that I neglected to include
+>> in this series (I didn't realize it until now) that properly sets the
+>> SCCB size in QEMU based on the length provided by the kernel (right now,
+>> these patches allocate a static 4K size for the SCCB struct, which
+>> causes a segfault).
+>>
+>> I can post my set with the fix as v5, or I can wait and post the fix as
+>> a bandaid if the patches are already in.
+>>
+> 
+> It's queued on s390-next right now, I can still update it.
+> 
+> Is that really an extra patch, or something that can be merged into the
+> series? If the latter, I'd prefer a v5, if the former, I'd just queue
+> that patch on top.
+> 
+> 
 
-That's a great proposal. I'll try to find time to send the patches.
+I'll post a v5. Thanks!
 
-Thanks,
-drew
+-- 
+Regards,
+Collin
 
+Stay safe and stay healthy
 
