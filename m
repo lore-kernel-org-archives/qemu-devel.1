@@ -2,84 +2,86 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4552C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F24EAC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6CA7C207FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 817F9207FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 13:16:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lxZlN8kX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CA7C207FB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hqaQz8ME"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 817F9207FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGMRM-0005hH-Ai
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:16:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33164)
+	id 1kGMRV-0005vC-EM
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 09:16:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33176)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kGMPw-0003yf-1I
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:12 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:39271)
+ id 1kGMPx-00040M-19
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:13 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:44137)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kGMPu-00066N-1Q
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:11 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id a17so6661706wrn.6
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 06:15:09 -0700 (PDT)
+ id 1kGMPv-00066x-BA
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 09:15:12 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id s12so6632211wrw.11
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 06:15:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=etTkHB81m+vBMnLfUu95h/Yo/Aq1YAWNfTkFHGN6F6s=;
- b=lxZlN8kXoduwhzouTpqnXzP3uYEdI8Ay+pigbL4Re5qXcM9wGFTRzCY5tjgB81Tkmg
- bJBIHP2qpbJCLwsIKMVe70F/6/iL7qIOVp1WMDK03rpqBJQCMUiX3PiJfn/7YcSKKWLd
- 6d6gGOrkaRNhzIhrBizC+M0+v98IFCIELXd2ys0d4jm6iDuRMbJCJqgDWYKOhoe/YAZ9
- nFvWDmMXpG0me9b9mgoDkYzsM+BRKoBUUYvYPQWOcGWHqLvjIShhH1LHB16FeIyuawoh
- T1n4U1dFobXbdiDTrUdK2pYm2b7sSmkdz1oXnGnAYLF2B2aoytf7cCCZrju7wmgoj2OX
- rqJQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=2cx8jHS3LDXcAjC1Gi1p55lLhOOKCtECYIqvv44WK10=;
+ b=hqaQz8MEie1GF6oYswJDmywE8n12EtaZ4paup5LTS7qqWM++rSPPcSXwJvcG3Ub3q2
+ Ze2LoN+xyT+FA5ITATgl9MrCxjg6cmbL6PsYKwKvMFoHoguDZkQsM7sRXcQ2qWE9VeHT
+ MuL/CQoDO10jZX8hJN98uFnfv0Tvc4Oafcir6J9RU0NDloXo9iiwkivJZ0dETjJ09lbC
+ MEDaZtXrpxCVB0hNCCEJ0d8o/hwoDRlWsOeWbExa52fgPSYh+gEz85xDz9wu3UnnsKlV
+ 250AREmaUjcynCdAlhNGIl33wKYV0OJgq0r29ZKudcbs0MYjJlQHM++FZ0dwcLfiXwkb
+ q9dA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=etTkHB81m+vBMnLfUu95h/Yo/Aq1YAWNfTkFHGN6F6s=;
- b=bvdAec6p6kPPBi/UmYfeMtuB+sjbpPcMryZRJ6HvylTxvsv9+ITA9Wk2smVhg3v++d
- YF8s4wnkodoHqOU42+Pv/31Cjj5wKd6NKfGBQ7gMF3+iwT/mU5SryAmu/GrvCG32ACww
- DOzLlkmFGrwy1CkyCFFDXJ35lbd/EwbP9/sYZA8Av/VTDP9jZPKLKn3+WPBFZZGIfB6g
- 35+h7Hh7yJBE6lQzQt5+/do6ssBbQ/NrNuusnM0KHnRg8TjC5CLA6Kfq5qQrRm1vWMDY
- qz7RC25coNZSt3x170so359LLLbCwWeAFD2L60jMCpDrjHSZqvlTv3PvisFTI7XNqaCR
- D0XQ==
-X-Gm-Message-State: AOAM5326gUHSE9TL+G3IbTNgqaJFbJnS2wJJo9OhHlQ3PK+x64CrrLo9
- p8UyUb7RVf9Rf466C1ErGNv/KQ==
-X-Google-Smtp-Source: ABdhPJwvtAhKTCXTrREzXZfch+ZC20uDwHUyBQkPPj/p9l/7vhRWNeks/7QjCDENo7wKckPQkQNS6Q==
-X-Received: by 2002:adf:f3c4:: with SMTP id g4mr9181956wrp.168.1599743707471; 
- Thu, 10 Sep 2020 06:15:07 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=2cx8jHS3LDXcAjC1Gi1p55lLhOOKCtECYIqvv44WK10=;
+ b=E+NAZV5pEUjUXwL27Q8LqkpU8lFlPLkVvPbqJoAfdXe+jAjg6Ou5gKdIMHZPlWr1t6
+ +evVPd/sm1E0VMW2mPVAc+jADt1vd9jAx/uLynRWiAp/lXIy2kRkxaDH4+RNfjI4MwTd
+ Tl3aatXPFe4uePVYImNnrEbLmlK4ljZCS3CpyKjV8x05y2z7mnzUBjY1O4UHhmY+isBK
+ sEmrINpinsVywibhi7Mje/XYM5And8K2aP69U1dbkNlmSbdZR3lhBCTdDIiMQQuYGxxH
+ sYAC7d+lF15+IXTi4NCSO3GU7JA3rNZyhyO1uirXeQdm89VYim7mpsbS6rluxkvqKq08
+ R/qg==
+X-Gm-Message-State: AOAM530fI9+mGQ7X3GGlr6p+0dZVb4CZfat35ubDjjlFDDnavTeEbEGa
+ AUtxM4oUJEU/yQKU9Pb9pppbew==
+X-Google-Smtp-Source: ABdhPJwKvxg4pb/T0NM2vcuAnrhbJ29Uf/o/3XpFNVmxwr2pPIcS8WlkrTehU6ecUo4O0wIrjqg+9w==
+X-Received: by 2002:a5d:458e:: with SMTP id p14mr9053965wrq.61.1599743709923; 
+ Thu, 10 Sep 2020 06:15:09 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id r15sm3652440wmn.24.2020.09.10.06.15.04
+ by smtp.gmail.com with ESMTPSA id i1sm11364022wrc.49.2020.09.10.06.15.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 06:15:04 -0700 (PDT)
+ Thu, 10 Sep 2020 06:15:05 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 621091FF7E;
+ by zen.linaroharston (Postfix) with ESMTP id 8F60A1FF8C;
  Thu, 10 Sep 2020 14:15:04 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 00/10] testing and other mix fixes
-Date: Thu, 10 Sep 2020 14:14:54 +0100
-Message-Id: <20200910131504.11341-1-alex.bennee@linaro.org>
+Subject: [PULL 02/10] usb-host: restrict workaround to new libusb versions
+Date: Thu, 10 Sep 2020 14:14:56 +0100
+Message-Id: <20200910131504.11341-3-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200910131504.11341-1-alex.bennee@linaro.org>
+References: <20200910131504.11341-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,83 +103,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 9435a8b3dd35f1f926f1b9127e8a906217a5518a:
+From: Gerd Hoffmann <kraxel@redhat.com>
 
-  Merge remote-tracking branch 'remotes/kraxel/tags/sirius/ipxe-20200908-pull-request' into staging (2020-09-08 21:21:13 +0100)
+Fixes build failures with old kernels (USBDEVFS_GET_SPEED missing),
+on the assumtion that distros with old kernels also have old libusb.
 
-are available in the Git repository at:
+Reported-by: Alex Bennée <alex.bennee@linaro.org>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200902081445.3291-1-kraxel@redhat.com>
+Message-Id: <20200909112742.25730-3-alex.bennee@linaro.org>
 
-  https://github.com/stsquad/qemu.git tags/pull-testing-fixes-100920-1
-
-for you to fetch changes up to c17a386b6afe608086aa4d260e29662865680b7f:
-
-  plugins: move the more involved plugins to contrib (2020-09-10 10:47:03 +0100)
-
-----------------------------------------------------------------
-Various misc and testing fixes:
-
-  - Expand CODING_STYLE.rst a little more
-  - usb-host build fix
-  - allow check-softfloat unit tests without TCG
-  - simplify mips imm_branch so compiler isn't confused
-  - mark ppc64abi32 for deprecation
-  - more compiler soothing in pch_rev_id
-  - allow acceptance to skip missing binaries
-  - more a bunch of plugins to contrib
-
-----------------------------------------------------------------
-Alex Bennée (7):
-      CODING_STYLE.rst: flesh out our naming conventions.
-      tests/meson.build: fp tests don't need CONFIG_TCG
-      target/mips: simplify gen_compute_imm_branch logic
-      docs/system/deprecated: mark ppc64abi32-linux-user for deprecation
-      configure: don't enable ppc64abi32-linux-user by default
-      hw/i386: make explicit clearing of pch_rev_id
-      plugins: move the more involved plugins to contrib
-
-Gerd Hoffmann (1):
-      usb-host: restrict workaround to new libusb versions
-
-Pavel Dovgaluk (1):
-      tests: bump avocado version
-
-Philippe Mathieu-Daudé (1):
-      tests/acceptance: Add Test.fetch_asset(cancel_on_missing=True)
-
- docs/devel/tcg-plugins.rst                    | 146 ++++++++++++++++++++++++++
- docs/system/deprecated.rst                    |   7 ++
- CODING_STYLE.rst                              |  37 ++++++-
- configure                                     |  48 +++++----
- Makefile                                      |  11 ++
- {tests/plugin => contrib/plugins}/hotblocks.c |   0
- {tests/plugin => contrib/plugins}/hotpages.c  |   0
- {tests/plugin => contrib/plugins}/howvec.c    |   0
- {tests/plugin => contrib/plugins}/lockstep.c  |   0
- hw/i386/pc_piix.c                             |   2 +-
- hw/usb/host-libusb.c                          |   2 +-
- target/mips/translate.c                       |  12 +--
- .travis.yml                                   |   2 +-
- MAINTAINERS                                   |   3 +-
- contrib/plugins/Makefile                      |  42 ++++++++
- tests/Makefile.include                        |   4 +-
- tests/acceptance/avocado_qemu/__init__.py     |  12 +++
- tests/meson.build                             |   3 +-
- tests/plugin/meson.build                      |   4 +-
- tests/requirements.txt                        |   2 +-
- tests/tcg/Makefile.target                     |   3 +-
- 21 files changed, 297 insertions(+), 43 deletions(-)
- rename {tests/plugin => contrib/plugins}/hotblocks.c (100%)
- rename {tests/plugin => contrib/plugins}/hotpages.c (100%)
- rename {tests/plugin => contrib/plugins}/howvec.c (100%)
- rename {tests/plugin => contrib/plugins}/lockstep.c (100%)
- create mode 100644 contrib/plugins/Makefile
-
+diff --git a/hw/usb/host-libusb.c b/hw/usb/host-libusb.c
+index 08604f787fd..c5d38cb09c0 100644
+--- a/hw/usb/host-libusb.c
++++ b/hw/usb/host-libusb.c
+@@ -942,7 +942,7 @@ static int usb_host_open(USBHostDevice *s, libusb_device *dev, int hostfd)
+     usb_host_ep_update(s);
+ 
+     libusb_speed = libusb_get_device_speed(dev);
+-#ifdef CONFIG_LINUX
++#if LIBUSB_API_VERSION >= 0x01000107 && defined(CONFIG_LINUX)
+     if (hostfd && libusb_speed == 0) {
+         /*
+          * Workaround libusb bug: libusb_get_device_speed() does not
 -- 
 2.20.1
 
