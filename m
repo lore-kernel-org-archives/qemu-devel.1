@@ -2,82 +2,83 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C82BC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:45:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5BBC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:45:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA28220708
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:45:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33FA420708
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:45:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhPZt7rT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA28220708
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8ikx+co"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33FA420708
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGK5L-0007fM-V8
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:45:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52030)
+	id 1kGK5R-0007nM-3h
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:45:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJyD-000325-3f; Thu, 10 Sep 2020 06:38:25 -0400
-Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:38486)
+ id 1kGJxz-0002Ze-De; Thu, 10 Sep 2020 06:38:11 -0400
+Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:40561)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJy8-0003mg-Eq; Thu, 10 Sep 2020 06:38:24 -0400
-Received: by mail-pg1-x542.google.com with SMTP id l191so4023202pgd.5;
- Thu, 10 Sep 2020 03:38:19 -0700 (PDT)
+ id 1kGJxw-0003kA-T0; Thu, 10 Sep 2020 06:38:11 -0400
+Received: by mail-pl1-x643.google.com with SMTP id bd2so709550plb.7;
+ Thu, 10 Sep 2020 03:38:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=/hY+yQHTuO6c65IcDhojIGm+XDaALdXHmil6ThkS0qk=;
- b=hhPZt7rTjodD4Lsudf4N/87a26tspSvD0m+lFCyb7Det22uMsIp6IVjo5SmXqS5uBj
- V5NrrKMF4q0RAXHZ4oWyuJdqot/O/AhLeZ5v5XVv8RCnakQgstgR/K5WIB9AAFk2FadY
- aWf7oP9gNxTTJgJSoW65qLVsS1L03wFbkY2Fzp4cee4GZPLR/5NsfUQFP5tmGni2W8u4
- f8TjywOXqpkJ6E/7gHQ8FOI5UQoVmx5V0C9Deo7fuhmv86NcqCM/hb8Z/5wFCd15eBfW
- jkmql2c3yJDDEO4jN+cVhnQQB+0318cjDoJXVYcrJGrI3FGfyrCEl7sxiovJKXD/VP/o
- 7Yng==
+ bh=BErOzaIvgNGZoOo8yO9vO+FZKR44ZCkaFrgaQmO82bU=;
+ b=K8ikx+coiSbHYV1ZcqqhpM9vbYjQR/Cy5tXF2F/eNVG/2tmszb+K3TZbye9SOZgfCh
+ YGNby6K12+osUGBo0zlf0rWYGzQw5jTrO+UM01EoIPz11LTIweU9nY45MS3V1F7JVwAU
+ aE5/XOZgg0VLIp5eR12PYgrU7RSG61J+HBbxHT91/+zdz2lMGHP3Hf6JUOOKfy9CBUP6
+ B2xh5+BwNFp8Dloh2PnftWogGRlxXdUJlV0+67f0N8xS5Z7DiOuHzgxyTT08KH12O+z0
+ foK2XNFw0CvIMKF7tXPBy0URNwjPAry3uOmFw9nrwa703nMHieiuetynS6r2/U4HKY3f
+ VeRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=/hY+yQHTuO6c65IcDhojIGm+XDaALdXHmil6ThkS0qk=;
- b=pzHJUmCPase2h09/BBPAEh+mQm6cCeIeow9s7dCCBUq9gEIseCnVs0pInyRk92GY6C
- bwNDGPG1SoI2Qsu5UvlSzczsZpQDl05J7m5si8DZTiENq6RTf9kWFSZ/6rwRu3U81H3h
- biwxz0g9W0C2wSedB+OJVBciVTJddYr9+kiHLOiRtNtGjHy1LAMBFZitrOX6QA/plyV5
- a49OMs5jl9iYA15sP5VhNovKs5LbWIEeu0oV80TeQ6r5Aiu2KxooU42Yio6Mgl6NLUWS
- seoxn3ea7fU/Q7v9Nl//TX1eg88m1jrefQqApluucFIVFdu5JFthg0TELgdQn5XH0Vio
- S/Kw==
-X-Gm-Message-State: AOAM530QNPuACCIZBsMgxofSe4l6zMOCBMQQff+1u6u2biA0hlWfxDLy
- TPXseC+PHb+GmLEgm3rs+WuMlRgIwJ+yK0TaWHY=
-X-Google-Smtp-Source: ABdhPJxJkK1H4E/NTQbGIIUUr8QUvgXPjKyW+bR+25c536iA9RQIig4aKfMTzJa4ep6Ibj998t+ugQ==
-X-Received: by 2002:a63:4902:: with SMTP id w2mr4025870pga.311.1599734298413; 
- Thu, 10 Sep 2020 03:38:18 -0700 (PDT)
+ bh=BErOzaIvgNGZoOo8yO9vO+FZKR44ZCkaFrgaQmO82bU=;
+ b=jFFkmUJdIofDM2bwl+Lg4h6kLso78JjRH46cxng0Z7SEwn+S5d0boLWTodtCkuASgQ
+ fibCvZbeimumsryYsLdm0k8N/b66Fv/LWe13uYhtrAkTSYUMiiZcNUENUx1Lh6FaVtzO
+ jvcb8s1dexzz8q//iIbdPm0PBSPrQayAzBEsx11TofPjoWlfoY+JVXE89yeFJIO/goUY
+ NdYx3thgJ0ZGvcprIuOJn84Xqtoe9ks78+tYa7+NJitbVfIOXeZlRxNSw1Tcj8dxyJOV
+ Zup+6LJSS2bJfZ+NV3alLPpWoaMGDVvLKItKvmU8N1W0APGelt2STtgu4hwlXqg1AhWC
+ CnRg==
+X-Gm-Message-State: AOAM531JSxNIF9Kib5MavmEWHWZtSJ1MAh5eeJUmaWZ7hTI/Nhu9PrGX
+ TzkrPBAbBtMmEIXuQGdO2Vx7K6HKp57eFRBEGvQ=
+X-Google-Smtp-Source: ABdhPJw+jhH+wIL1BRlnr7dVVvD33ZVdi6KYLtyk2C+h5e8dAHqujTiPO5Oo8Gh2khZp+1ySp/4vmw==
+X-Received: by 2002:a17:902:ea82:b029:d1:7ed9:5470 with SMTP id
+ x2-20020a170902ea82b02900d17ed95470mr5161041plb.26.1599734285391; 
+ Thu, 10 Sep 2020 03:38:05 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id 99sm1781191pjo.40.2020.09.10.03.38.14
+ by smtp.googlemail.com with ESMTPSA id 99sm1781191pjo.40.2020.09.10.03.38.01
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 03:38:17 -0700 (PDT)
+ Thu, 10 Sep 2020 03:38:04 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 25/25] ci: Enable msys2 ci in cirrus
-Date: Thu, 10 Sep 2020 18:37:25 +0800
-Message-Id: <20200910103725.1439-9-luoyonggang@gmail.com>
+Subject: [PATCH v7 22/25] tests: fix test-util-sockets.c
+Date: Thu, 10 Sep 2020 18:37:22 +0800
+Message-Id: <20200910103725.1439-6-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20200910103725.1439-1-luoyonggang@gmail.com>
 References: <20200910103725.1439-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
- envelope-from=luoyonggang@gmail.com; helo=mail-pg1-x542.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -113,90 +114,69 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Install msys2 in a proper way refer to https://github.com/cirruslabs/cirrus-ci-docs/issues/699
-The https://wiki.qemu.org/Hosts/W32#Native_builds_with_MSYS2 need to be updated.
-There is no need of --cross-prefix, open mingw64.exe instead of msys2.exe then we don't
-need the --cross-prefix, besides we using environment variable settings:
-    MSYS: winsymlinks:nativestrict
-    MSYSTEM: MINGW64
-    CHERE_INVOKING: 1
-to opening mingw64 native shell.
-We now running tests with make -i check to skip tests errors.
+Fixes following errors:
+Running test test-util-sockets
+ERROR test-util-sockets - missing test plan
+
+# Start of name tests
+**
+ERROR:../tests/test-util-sockets.c:93:test_socket_fd_pass_name_good: assertion failed (fd != -1): (-1 != -1)
+Bail out! ERROR:../tests/test-util-sockets.c:93:test_socket_fd_pass_name_good: assertion failed (fd != -1): (-1 != -1)
+
+First should call to qemu_init_main_loop before socket_init,
+then on win32 doesn't support for SOCKET_ADDRESS_TYPE_FD socket type
 
 Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 ---
- .cirrus.yml | 60 +++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ tests/test-util-sockets.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index 690c6882e8..1ff9f0a72f 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -44,3 +44,63 @@ macos_xcode_task:
-                    --enable-werror --cc=clang || { cat config.log; exit 1; }
-     - gmake -j$(sysctl -n hw.ncpu)
-     - gmake check
-+
-+windows_msys2_task:
-+  windows_container:
-+    image: cirrusci/windowsservercore:cmake
-+    os_version: 2019
-+    cpu: 8
-+    memory: 8G
-+  env:
-+    MSYS: winsymlinks:nativestrict
-+    MSYSTEM: MINGW64
-+    CHERE_INVOKING: 1
-+  printenv_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc 'printenv'
-+  install_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && curl -O http://repo.msys2.org/msys/x86_64/msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz.sig"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd /c/tools && pacman -U --noconfirm msys2-keyring-r21.b39fb11-1-any.pkg.tar.xz"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman -Sy --noconfirm"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --needed --noconfirm -S bash pacman pacman-mirrors msys2-runtime"
-+    - taskkill /F /IM gpg-agent.exe
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -Su"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "pacman --noconfirm -S --needed
-+        base-devel
-+        git
-+        mingw-w64-x86_64-python
-+        mingw-w64-x86_64-python-setuptools
-+        mingw-w64-x86_64-toolchain
-+        mingw-w64-x86_64-SDL2
-+        mingw-w64-x86_64-SDL2_image
-+        mingw-w64-x86_64-gtk3
-+        mingw-w64-x86_64-glib2
-+        mingw-w64-x86_64-ninja
-+        mingw-w64-x86_64-make
-+        mingw-w64-x86_64-jemalloc
-+        mingw-w64-x86_64-lzo2
-+        mingw-w64-x86_64-zstd
-+        mingw-w64-x86_64-libjpeg-turbo
-+        mingw-w64-x86_64-pixman
-+        mingw-w64-x86_64-libgcrypt
-+        mingw-w64-x86_64-capstone
-+        mingw-w64-x86_64-libpng
-+        mingw-w64-x86_64-libssh
-+        mingw-w64-x86_64-libxml2
-+        mingw-w64-x86_64-snappy
-+        mingw-w64-x86_64-libusb
-+        mingw-w64-x86_64-usbredir
-+        mingw-w64-x86_64-libtasn1
-+        mingw-w64-x86_64-libnfs
-+        mingw-w64-x86_64-nettle
-+        mingw-w64-x86_64-cyrus-sasl
-+        mingw-w64-x86_64-curl
-+        mingw-w64-x86_64-gnutls
-+        mingw-w64-x86_64-zstd"
-+  script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "mkdir build"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && ../configure --python=python3 --ninja=ninja"
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make -j$NUMBER_OF_PROCESSORS"
-+  test_script:
-+    - C:\tools\msys64\usr\bin\bash.exe -lc "cd build && make V=1 check"
-+
+diff --git a/tests/test-util-sockets.c b/tests/test-util-sockets.c
+index af9f5c0c70..1bbb16d9b1 100644
+--- a/tests/test-util-sockets.c
++++ b/tests/test-util-sockets.c
+@@ -75,7 +75,7 @@ int monitor_vprintf(Monitor *mon, const char *fmt, va_list ap) { abort(); }
+ void monitor_init_qmp(Chardev *chr, bool pretty, Error **errp) {}
+ void monitor_init_hmp(Chardev *chr, bool use_readline, Error **errp) {}
+ 
+-
++#ifndef _WIN32
+ static void test_socket_fd_pass_name_good(void)
+ {
+     SocketAddress addr;
+@@ -227,6 +227,7 @@ static void test_socket_fd_pass_num_nocli(void)
+ 
+     g_free(addr.u.fd.str);
+ }
++#endif
+ 
+ #ifdef __linux__
+ static gchar *abstract_sock_name;
+@@ -321,6 +322,7 @@ int main(int argc, char **argv)
+ {
+     bool has_ipv4, has_ipv6;
+ 
++    qemu_init_main_loop(&error_abort);
+     socket_init();
+ 
+     g_test_init(&argc, &argv, NULL);
+@@ -340,6 +342,7 @@ int main(int argc, char **argv)
+                         test_fd_is_socket_bad);
+         g_test_add_func("/util/socket/is-socket/good",
+                         test_fd_is_socket_good);
++#ifndef _WIN32
+         g_test_add_func("/socket/fd-pass/name/good",
+                         test_socket_fd_pass_name_good);
+         g_test_add_func("/socket/fd-pass/name/bad",
+@@ -352,6 +355,7 @@ int main(int argc, char **argv)
+                         test_socket_fd_pass_num_bad);
+         g_test_add_func("/socket/fd-pass/num/nocli",
+                         test_socket_fd_pass_num_nocli);
++#endif
+     }
+ 
+ #ifdef __linux__
 -- 
 2.28.0.windows.1
 
