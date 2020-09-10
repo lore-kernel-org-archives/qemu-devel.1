@@ -2,126 +2,104 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25246C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E6A9C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C0E382087C
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:33:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 326A8208E4
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 15:35:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KS7PdaaN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0E382087C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="foORUNUi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 326A8208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGOa7-0002A8-QW
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:33:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42818)
+	id 1kGOba-0004hy-Vl
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 11:35:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGOZD-0000iR-8t
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:32:55 -0400
-Received: from us-smtp-2.mimecast.com ([207.211.31.81]:37251
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOaw-0003yE-Iq
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:34:42 -0400
+Received: from us-smtp-2.mimecast.com ([207.211.31.81]:58307
  helo=us-smtp-delivery-1.mimecast.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kGOZB-0000vm-Cw
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:32:54 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kGOau-0001Gk-WC
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 11:34:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1599751972;
+ s=mimecast20190719; t=1599752080;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=ovMzkSZ8GYa2UjSWvOJcwGaJYgGSbpWePFzCLZ1yo7I=;
- b=KS7PdaaNHqEr3OB6ARQNylH5Vi1Qnzir41rw8lBtoPGOAD9/CJPquxL/3ut/OTV9dEIzAq
- zio1QDHRv4Z+9ZTBD+8kH6Jrsqb3nUgyIB+fHf2IQo56eUVd2mwAZrU9aQBJ4JvmZGn9QR
- bwvjwg5m2j8I/ga6V3u78Tn7t19Dyjc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-qjvGd9rEMw2HnqBd36IvVg-1; Thu, 10 Sep 2020 11:32:47 -0400
-X-MC-Unique: qjvGd9rEMw2HnqBd36IvVg-1
-Received: by mail-wr1-f70.google.com with SMTP id y3so2381032wrl.21
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 08:32:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:autocrypt:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=ovMzkSZ8GYa2UjSWvOJcwGaJYgGSbpWePFzCLZ1yo7I=;
- b=YgYAdHHjYVJwGRLG1q9ago32f+yofQ7oKz/WZyQi4tqzuMcViIhGOluv6GNhje2kjR
- Stq3lW7MGzJ1JalTngymu/TvAsxVvJde2eFitr829NK3t2sR5wRlVox5Z4UAQ7jOBMAO
- xNwFv6UAzBo4J5uFOhglWFzMyyGAzlSgVdyaovDOZQQkdZWtmB5U9QxJ+iizIt9VdIJ5
- UxgrsRaOgfPp8U54wgxmfkvHdn5L5NvvIgDyb+A8aFNwjZx9LdfgEMbnILS6XaRH7D24
- glOe8AwUHrzCoFzgVzzgKT3b+P7KWiylG25BsYAvI0U9douXziAzh0WS74btEy+aDhVr
- 2yBw==
-X-Gm-Message-State: AOAM530n2cZN6YeooAFCgi/5wtC6zdLNf+Y1VbjsFQx9CNUPLApuxJkf
- Aj4/xsnBMSrmU+h/5lyU68iDKYyS8SghIV3RKndKqH9Z7JXpdULQndBWCBEjzRA/DQNfHR2aKFT
- qcD/gVgnwNt2KHQY=
-X-Received: by 2002:a05:600c:2183:: with SMTP id
- e3mr585980wme.49.1599751966509; 
- Thu, 10 Sep 2020 08:32:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyneyhrdyYYHtVGQQb1CnEcFMmRPbwRuMGrjs8tfT1hZDAF/cfPaUfsEQGOhh7uZ8HESb0EPQ==
-X-Received: by 2002:a05:600c:2183:: with SMTP id
- e3mr585948wme.49.1599751966228; 
- Thu, 10 Sep 2020 08:32:46 -0700 (PDT)
-Received: from [192.168.1.36] (65.red-83-57-170.dynamicip.rima-tde.net.
- [83.57.170.65])
- by smtp.gmail.com with ESMTPSA id q192sm4130289wme.13.2020.09.10.08.32.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 10 Sep 2020 08:32:45 -0700 (PDT)
-Subject: Re: [PATCH 05/10] roms/edk2: update submodule from edk2-stable201905
- to edk2-stable202008
-To: Laszlo Ersek <lersek@redhat.com>, qemu devel list <qemu-devel@nongnu.org>
-References: <20200908072939.30178-1-lersek@redhat.com>
- <20200908072939.30178-6-lersek@redhat.com>
- <1356c404-517c-cf5c-bc04-04237c03f572@redhat.com>
- <2e0b207b-d902-f56c-18d7-50998c7de991@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Autocrypt: addr=philmd@redhat.com; keydata=
- mQINBDXML8YBEADXCtUkDBKQvNsQA7sDpw6YLE/1tKHwm24A1au9Hfy/OFmkpzo+MD+dYc+7
- bvnqWAeGweq2SDq8zbzFZ1gJBd6+e5v1a/UrTxvwBk51yEkadrpRbi+r2bDpTJwXc/uEtYAB
- GvsTZMtiQVA4kRID1KCdgLa3zztPLCj5H1VZhqZsiGvXa/nMIlhvacRXdbgllPPJ72cLUkXf
- z1Zu4AkEKpccZaJspmLWGSzGu6UTZ7UfVeR2Hcc2KI9oZB1qthmZ1+PZyGZ/Dy+z+zklC0xl
- XIpQPmnfy9+/1hj1LzJ+pe3HzEodtlVA+rdttSvA6nmHKIt8Ul6b/h1DFTmUT1lN1WbAGxmg
- CH1O26cz5nTrzdjoqC/b8PpZiT0kO5MKKgiu5S4PRIxW2+RA4H9nq7nztNZ1Y39bDpzwE5Sp
- bDHzd5owmLxMLZAINtCtQuRbSOcMjZlg4zohA9TQP9krGIk+qTR+H4CV22sWldSkVtsoTaA2
- qNeSJhfHQY0TyQvFbqRsSNIe2gTDzzEQ8itsmdHHE/yzhcCVvlUzXhAT6pIN0OT+cdsTTfif
- MIcDboys92auTuJ7U+4jWF1+WUaJ8gDL69ThAsu7mGDBbm80P3vvUZ4fQM14NkxOnuGRrJxO
- qjWNJ2ZUxgyHAh5TCxMLKWZoL5hpnvx3dF3Ti9HW2dsUUWICSQARAQABtDJQaGlsaXBwZSBN
- YXRoaWV1LURhdWTDqSAoUGhpbCkgPHBoaWxtZEByZWRoYXQuY29tPokCVQQTAQgAPwIbDwYL
- CQgHAwIGFQgCCQoLBBYCAwECHgECF4AWIQSJweePYB7obIZ0lcuio/1u3q3A3gUCXsfWwAUJ
- KtymWgAKCRCio/1u3q3A3ircD/9Vjh3aFNJ3uF3hddeoFg1H038wZr/xi8/rX27M1Vj2j9VH
- 0B8Olp4KUQw/hyO6kUxqkoojmzRpmzvlpZ0cUiZJo2bQIWnvScyHxFCv33kHe+YEIqoJlaQc
- JfKYlbCoubz+02E2A6bFD9+BvCY0LBbEj5POwyKGiDMjHKCGuzSuDRbCn0Mz4kCa7nFMF5Jv
- piC+JemRdiBd6102ThqgIsyGEBXuf1sy0QIVyXgaqr9O2b/0VoXpQId7yY7OJuYYxs7kQoXI
- 6WzSMpmuXGkmfxOgbc/L6YbzB0JOriX0iRClxu4dEUg8Bs2pNnr6huY2Ft+qb41RzCJvvMyu
- gS32LfN0bTZ6Qm2A8ayMtUQgnwZDSO23OKgQWZVglGliY3ezHZ6lVwC24Vjkmq/2yBSLakZE
- 6DZUjZzCW1nvtRK05ebyK6tofRsx8xB8pL/kcBb9nCuh70aLR+5cmE41X4O+MVJbwfP5s/RW
- 9BFSL3qgXuXso/3XuWTQjJJGgKhB6xXjMmb1J4q/h5IuVV4juv1Fem9sfmyrh+Wi5V1IzKI7
- RPJ3KVb937eBgSENk53P0gUorwzUcO+ASEo3Z1cBKkJSPigDbeEjVfXQMzNt0oDRzpQqH2vp
- apo2jHnidWt8BsckuWZpxcZ9+/9obQ55DyVQHGiTN39hkETy3Emdnz1JVHTU0Q==
-Message-ID: <0309f104-854a-840b-8ec3-fb50960d7821@redhat.com>
-Date: Thu, 10 Sep 2020 17:32:44 +0200
+ bh=q0T4hjpwuJFcxtUyucPnag7eRyre2EF8riyfm10Fzwg=;
+ b=foORUNUiRkC9EghdjQv3B5H+wQ3kiAqFR5DGgWz8Zxl41H6+OkHl+7Iw7bn71bMGa1m1us
+ Hrp9h152ERFBmWRQ5QgVQJnnC0L12CZreIMOBks7+2kiF97v5GQ7pSsYQdDaRFMPJ809ae
+ uaFLYOJ0GWsY2VfjZkyeS1aFfyG3PxM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-587-cwWEiBHuN96oP4OplmnaKA-1; Thu, 10 Sep 2020 11:34:37 -0400
+X-MC-Unique: cwWEiBHuN96oP4OplmnaKA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF8ADAF20F;
+ Thu, 10 Sep 2020 15:34:36 +0000 (UTC)
+Received: from dresden.str.redhat.com (ovpn-112-197.ams2.redhat.com
+ [10.36.112.197])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id CA1DD1002D5A;
+ Thu, 10 Sep 2020 15:34:35 +0000 (UTC)
+Subject: Re: [PATCH 27/29] nbd: Deprecate nbd-server-add/remove
+To: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org
+References: <20200907182011.521007-1-kwolf@redhat.com>
+ <20200907182011.521007-28-kwolf@redhat.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <0b20d22d-7c68-a4af-e0c5-471d5ba61cd4@redhat.com>
+Date: Thu, 10 Sep 2020 17:34:34 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <2e0b207b-d902-f56c-18d7-50998c7de991@redhat.com>
+In-Reply-To: <20200907182011.521007-28-kwolf@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0.002
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0.0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=207.211.31.81; envelope-from=philmd@redhat.com;
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="YQhz6wQjvXiVOip6lOA8kIq9I0Y54PTGw"
+Received-SPF: pass client-ip=207.211.31.81; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-1.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 08:38:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -144,72 +122,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 9/8/20 2:08 PM, Laszlo Ersek wrote:
-> On 09/08/20 10:22, Philippe Mathieu-Daudé wrote:
->> Hi Laszlo,
->>
->> On 9/8/20 9:29 AM, Laszlo Ersek wrote:
->>> Update the edk2 submodule from release edk2-stable201905 to
->>> edk2-stable202008. The release notes can be read at
->> [...]
->>>
->>> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
->>> Ref: https://bugs.launchpad.net/qemu/+bug/1852196
->>> Signed-off-by: Laszlo Ersek <lersek@redhat.com>
->>> ---
->>>  roms/edk2 | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/roms/edk2 b/roms/edk2
->>> index 20d2e5a125e3..06dc822d045c 160000
->>> --- a/roms/edk2
->>> +++ b/roms/edk2
->>> @@ -1 +1 @@
->>> -Subproject commit 20d2e5a125e34fc8501026613a71549b2a1a3e54
->>> +Subproject commit 06dc822d045c2bb42e497487935485302486e151
->>
->> FYI applying this I got:
->>
->> Fetching submodule roms/edk2
->> Fetching submodule roms/edk2/CryptoPkg/Library/OpensslLib/openssl
->> From https://github.com/openssl/openssl
->> Could not access submodule 'krb5'
->> Errors during submodule fetch:
->>         CryptoPkg/Library/OpensslLib/openssl
->> Errors during submodule fetch:
->>         roms/edk2
->>
->> Probably harmless, as if one care about this submodule,
->> will run "make edk2-basetools" which runs 'git submodule
->> update --init --force' and silently fixes the submodules.
->>
-> 
-> Did you pass the "--recursive" option to the "git submodule" perhaps?
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--YQhz6wQjvXiVOip6lOA8kIq9I0Y54PTGw
+Content-Type: multipart/mixed; boundary="MBBnN0CX0Dab0vHH8SSqg68qaXGS79DC1"
 
-No I didn't used it.
+--MBBnN0CX0Dab0vHH8SSqg68qaXGS79DC1
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> (Because, krb5 is a submodule of edk2's openssl submodule.)
-> 
-> "--recursive" should not be used. See "ReadMe.rst" in edk2:
-> 
-> """
-> Note: When cloning submodule repos, '--recursive' option is not
-> recommended. EDK II itself will not use any code/feature from
-> submodules in above submodules. So using '--recursive' adds a
-> dependency on being able to reach servers we do not actually want
-> any code from, as well as needlessly downloading code we will not
-> use.
-> """
-> 
-> QEMU's current submodules do not require the usage of "--recursive".
-> 
-> Thanks
-> Laszlo
-> 
+On 07.09.20 20:20, Kevin Wolf wrote:
+> These QMP commands are replaced by block-export-add/del.
+>=20
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  qapi/block-export.json     | 11 +++++++++--
+>  docs/system/deprecated.rst |  8 ++++++++
+>  2 files changed, 17 insertions(+), 2 deletions(-)
+
+OK, but:
+
+> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+> index 851dbdeb8a..9a2e083f00 100644
+> --- a/docs/system/deprecated.rst
+> +++ b/docs/system/deprecated.rst
+> @@ -303,6 +303,14 @@ chardev client socket with ``wait`` option (since 4.=
+0)
+>  Character devices creating sockets in client mode should not specify
+>  the 'wait' field, which is only applicable to sockets in server mode
+> =20
+> +``nbd-server-add`` and ``nbd-server-remove`` (since 5.2)
+> +''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+> +
+> +Use the more generic commands ``block-export-add`` and ``block-export-de=
+l``
+> +instead.
+> +
+> +Use argument value ``null`` instead.
+
+I don=E2=80=99t understand this sentence.
+
+Max
+
+
+--MBBnN0CX0Dab0vHH8SSqg68qaXGS79DC1--
+
+--YQhz6wQjvXiVOip6lOA8kIq9I0Y54PTGw
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl9aR4oACgkQ9AfbAGHV
+z0BPtAf+MOuRaTVNXlUPjGqwP4j4TXBJC2/P58O/sJ8H+Xg6vIbcMUMOxC2NMm0f
+5s1jo2y/E1IAdLYLgAr4dvYAOen+Rfj57WCuFTCrM0/6vCqZZWiM4zocXL1qIhhb
+CCxa7LPF43A65dZgt3HomUuQ/4bpAhSZue88Yy9KDguIZ1rZECBC5ci/cOrjUQzt
+5uyzrne/AACpD7EtTcVldJgzpaez11F9Dl7wCHPthSc3w2PoQodjFQoH8M8LUGwd
+hPSwF9fovlQe4LhVxn59j5nubjpNF+80ka/SbLuzmH7SFRt0/tcgZlGdVNoImQFI
+rp2ZCtbrnMyy7FFtRhalWXSMvU+q2g==
+=6rdY
+-----END PGP SIGNATURE-----
+
+--YQhz6wQjvXiVOip6lOA8kIq9I0Y54PTGw--
 
 
