@@ -2,119 +2,115 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A36EC433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:33:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D35BC433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82FAF2078B
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:33:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82FAF2078B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=outlook.com
+	by mail.kernel.org (Postfix) with ESMTPS id 95CA52078E
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 11:36:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FyylzW2a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95CA52078E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGKpd-0007MC-HD
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:33:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36330)
+	id 1kGKsj-0000MK-HC
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 07:36:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <atmgnd@outlook.com>)
- id 1kGKov-0006Sb-Ip
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 07:32:53 -0400
-Received: from mail-pu1apc01olkn0818.outbound.protection.outlook.com
- ([2a01:111:f400:febe::818]:11472
- helo=APC01-PU1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <atmgnd@outlook.com>)
- id 1kGKoo-0002TV-OJ
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 07:32:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e/jLdJzBK0nYJdDSKyIPFfxAPUSTHRBUAncR7aX9HJwbzoAwMpnM/Pax5BeXLdykx2be5taNqZbCK93o09J2qqPtxaWDliRSNINO6PWNb92U1inYZuyvXgOAjsPuObm12p+EHG2GR8E8+Ii+1PQVNwMShTdERa+ew1H5zrXmO90QCnH9ko3F9r7592cT/WxLslyGiOPWDLv1rNBw32VZGxL567x3dFdaoc48G7DUi4RcsNL9HKci/Ir3D5Iaipheh0YchkKCFoo/b566l//VxuN3tSNeAw/rWpiWGRdNGbdNGMxzRKOZWKXE8oKBN50siv1EhQS7Ixi6jCeuUDgKDQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VlKf6BG7Qzx4AT7bOHmMIV+IK0OOBh+ESj2ZF+qgnzw=;
- b=X6pcOs+Iy2eC0EuNFG6HkPtsz1iQqYGlswBbvGWSBiU9j1cA0e9kZd5XFk1p9YBeNCT4A7qFz8SrnQ4m3PXUs/7OvPhxjOkZE/uN90+RxA2z8n8/QtHoq6QyRzeoksBpMFuzbQimOw0V9Q/WGXCzvvrhxgA/7PJkWrATqtYrR80cWiS5ioiD8oG5lg+9AfvEdx6FQIYSzuDUGBiDC39RdwsI9j4NryZW+ngLfGVkKrh+WBsuIcvU6o92HC1+uQ8+eiNicArVC159WN4LHhYSMBbG47jpX8HrgXQpEi6rJbCETxwEwANABaxq31vZGKrR6hEPEDxJQWPQ1J9IYgeFRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VlKf6BG7Qzx4AT7bOHmMIV+IK0OOBh+ESj2ZF+qgnzw=;
- b=Ig/hEC1FAELObJFtzx4N6iKbQcDQhDzOsI8iDih6t4k6V3vCP+eihqv8kEq+P38TbKm8FQ0wKY+O8qd/dQxZIPB1qYadK9yYaDyPRYH1EG5NKG+qh/YIu+oNQ1B4JUiWDyHWvW0rbwIdT4xAfU6GGz2iR4m7NlQmCWaVGwlExJhzMdlMcIZS5VUCyVtNuzKzT0VYQHY4Tk/w6EBRgwGs3RjJjhtcsCsDDXRmwAY+4f2eo3ah8xha3TH+gsFYWcsPejoILMZoJpH9q0pEZl/sboKTHRZFhz6dDBzafAEV/ghjxLG/7nfnJsmT79xSIuyY69yBfour/5V5CB82z4JHDA==
-Received: from HK2APC01FT046.eop-APC01.prod.protection.outlook.com
- (2a01:111:e400:7ebc::48) by
- HK2APC01HT004.eop-APC01.prod.protection.outlook.com (2a01:111:e400:7ebc::104)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16; Thu, 10 Sep
- 2020 11:17:13 +0000
-Received: from SYBP282MB0012.AUSP282.PROD.OUTLOOK.COM (2a01:111:e400:7ebc::44)
- by HK2APC01FT046.mail.protection.outlook.com
- (2a01:111:e400:7ebc::436) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3370.16 via Frontend
- Transport; Thu, 10 Sep 2020 11:17:13 +0000
-Received: from SYBP282MB0012.AUSP282.PROD.OUTLOOK.COM
- ([fe80::69c8:4a0a:9647:972f]) by SYBP282MB0012.AUSP282.PROD.OUTLOOK.COM
- ([fe80::69c8:4a0a:9647:972f%6]) with mapi id 15.20.3370.016; Thu, 10 Sep 2020
- 11:17:13 +0000
-From: zhou qi <atmgnd@outlook.com>
-To: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: [PATCH] Fix video playback slowdown when spice client no audio enabled
-Thread-Topic: [PATCH] Fix video playback slowdown when spice client no audio
- enabled
-Thread-Index: AQHWh2Nf15JHbfwDZk+Tob2Rs7FGzg==
-Date: Thu, 10 Sep 2020 11:17:13 +0000
-Message-ID: <SYBP282MB00121EE06C845D33A07413BAC9270@SYBP282MB0012.AUSP282.PROD.OUTLOOK.COM>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-incomingtopheadermarker: OriginalChecksum:F78DDCB0A3110535127208E5DD5097CA3D3A16BF170C09260D7EAC1117AC52AA;
- UpperCasedChecksum:3BD75A9721F56501F5AF8B6D820E5FDA41DCD47036F74B732CE9A992986A5E8B;
- SizeAsReceived:2664; Count:41
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tmn: [i2it4URTABpDE3Uf86g11Wds7+QWJE5rs1sw0GEEss4=]
-x-ms-publictraffictype: Email
-x-incomingheadercount: 41
-x-eopattributedmessage: 0
-x-ms-office365-filtering-correlation-id: 050c830c-9800-4e94-411e-08d8557b1193
-x-ms-traffictypediagnostic: HK2APC01HT004:
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: j72pMZB9j4FjN8h/MjeIHJzCp7cVDh9hScs53WpOCJtFKJxjqOS3csf7NwWIPqESGhw6i6gVR0Q/FVzHxB7uY71xNhgwnFlA+qi3ZYoS1VUAtbz2k2G1cc8SHoRjk6Q/HFGwdijiyAnwUOKR8We36NGuCZDZyHRYz2qd1sgmq9FhGhOnn705DaHBY1bPi7ZAgy7skfwmszEtkanEp+fJOGGso/W4bSPi+MwXKzTkzvY=
-x-ms-exchange-antispam-messagedata: 8cetmqkl5+CPg//1WOPDbzh7eKhuuTncDZ9Efs1fnc//kDVsWP1W3FitmgWgKSSlmP0OKDvC9R0UZ980WXRQLglEuaTBH2HYOunolSd4h19th+++LcEqskn+vqp5Mq3LJwmJ2v+GoiOIx7kCKe2CfA==
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kGKs8-00089y-8j
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 07:36:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35676)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kGKs5-0002vj-JL
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 07:36:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599737768;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=g68Ln2Ykm0AsGzDT36RNb3rZ1ltN22ArPGT5SDWCbBk=;
+ b=FyylzW2a/0FEqR8XPPuTFe8qeFouGuOmfnOnN3t8EXZcLU+DaTGW5+7JY1J08QaVAGIesF
+ qcgU7NkYZcnr1PLGh08YAiAkP/4S4m3p5b7i5otJeA/9kXtDCshou1gNqSId1rHgGJhvc7
+ 4JTuS+6BX96oODOImJB7WxXd5vXBcUc=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-147-kfjTWmUkPLGxBiEoYzf5mg-1; Thu, 10 Sep 2020 07:36:06 -0400
+X-MC-Unique: kfjTWmUkPLGxBiEoYzf5mg-1
+Received: by mail-ej1-f72.google.com with SMTP id md9so2581792ejb.8
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 04:36:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=g68Ln2Ykm0AsGzDT36RNb3rZ1ltN22ArPGT5SDWCbBk=;
+ b=dcp/GKpkLyFwSCSjEq2o1M2zuk2KdBj1tadn63Q3BGJWBGr2X5Cb1VJBmLkPH5yAGr
+ X8bYnrUcIphv0F9kFrofHqdZ8hzrNIg7/CcoKahyz1Mg2AoWVV3DuimslRlryk/OkkAf
+ GdXd328DEd9Wj4KwBka7M9jPwjkHqnZ14hFq1SJ1GXzloRUqwPrj0HBnpSv20s1aIn60
+ Gh2M+8biQIXsVCQdTwQxHLzSw902t0PokdDm6OWvGY6Jhp5IatpRSYY5pBjGs5QUqfUr
+ QLuT9KTEQx9dyUuKMZ8T5QDdZ5Knmu37k+yv9SjX2h1z3oTjbHDvCxmWzGl2YuxytBXF
+ W8bQ==
+X-Gm-Message-State: AOAM530sj0BAXik8MJTLk88RyfPPD1a0xrJuA3H4iZbiWfG1MedPMpr7
+ FtPOo86fCmJCccFT1wMlA8sdq+DcBl75/rIRZPZqe4247hrXqapzLU1mcfc6gpi6pRgmnHo5mVs
+ HMewBiroib+k967o=
+X-Received: by 2002:a05:6402:70f:: with SMTP id
+ w15mr9029434edx.202.1599737765683; 
+ Thu, 10 Sep 2020 04:36:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz9MRcEWHvXnnWCE/19WdyGtANc2GFua6jmtkInHUN59/gDC3dQTZo6HFVJY56Lsok1NEcSrw==
+X-Received: by 2002:a05:6402:70f:: with SMTP id
+ w15mr9029399edx.202.1599737765385; 
+ Thu, 10 Sep 2020 04:36:05 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:68f6:5b4d:4ee8:10c7?
+ ([2001:b07:6468:f312:68f6:5b4d:4ee8:10c7])
+ by smtp.gmail.com with ESMTPSA id m6sm6450319ejb.85.2020.09.10.04.36.04
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 10 Sep 2020 04:36:04 -0700 (PDT)
+Subject: Re: [PATCH 5/6] hw/pci-host/q35: Rename PCI 'black hole as '(memory)
+ hole'
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Thomas Huth <thuth@redhat.com>
+References: <20200910070131.435543-1-philmd@redhat.com>
+ <20200910070131.435543-6-philmd@redhat.com>
+ <7dbdef90-1ca6-bf27-7084-af0c716d01d9@redhat.com>
+ <20200910091454.GE1083348@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <b6af444a-fb0b-ed98-60df-28ea67d6abe4@redhat.com>
+Date: Thu, 10 Sep 2020 13:36:10 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-AuthSource: HK2APC01FT046.eop-APC01.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 050c830c-9800-4e94-411e-08d8557b1193
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Sep 2020 11:17:13.4288 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Internet
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HK2APC01HT004
-Received-SPF: pass client-ip=2a01:111:f400:febe::818;
- envelope-from=atmgnd@outlook.com;
- helo=APC01-PU1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -12
-X-Spam_score: -1.3
-X-Spam_bar: -
-X-Spam_report: (-1.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.768, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+In-Reply-To: <20200910091454.GE1083348@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0.002
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 00:49:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -56
+X-Spam_score: -5.7
+X-Spam_bar: -----
+X-Spam_report: (-5.7 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-3.576, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,30 +123,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ Marcelo Tosatti <mtosatti@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
+ Andrew Jeffery <andrew@aj.id.au>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Jason Wang <jasowang@redhat.com>, Alistair Francis <alistair@alistair23.me>,
+ qemu-devel@nongnu.org, qemu-trivial@nongnu.org, qemu-arm@nongnu.org,
+ Joel Stanley <joel@jms.id.au>, "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Richard Henderson <rth@twiddle.net>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-RnJvbSBlOGMyZTI4M2YwOTU0ZGUyNTVhMzJlYTcwZDU3N2Q1ZTYxOTkyMzk5IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBRaSBaaG91IDxhdG1nbmRAb3V0bG9vay5jb20+CkRhdGU6IFRo
-dSwgMTAgU2VwIDIwMjAgMTk6MDk6MjkgKzA4MDAKU3ViamVjdDogW1BBVENIXSBGaXggdmlkZW8g
-cGxheWJhY2sgc2xvd2Rvd24gd2hlbiBzcGljZSBjbGllbnQgbm8gYXVkaW8gZW5hYmxlZAoKWW91
-IHdpbGwgZ2V0IHZpZGVvIHBsYXliYWNrIHNsb3dkb3duIG9uIHRoZSBmb2xsb3dpbmcgY2FzZXMK
-CjEuIHVzZSBvZmZpY2lhbCBzcGljZSBjbGllbnQgd2l0aCBhdWRpbyBjaGFubmVsIGRpc2FibGVk
-LCB1c2UgLS1zcGljZS1kaXNhYmxlLWF1ZGlvCiAgIG9wdGlvbgoyLiB0aGlydHBhcnQgY2xpZW50
-IGRvZXNuJ3QgaW1wbGVtZW50IGF1ZGlvIGNoYW5uZWwKCnJlZjogaHR0cHM6Ly9naXRodWIuY29t
-L3FlbXUvcWVtdS9jb21taXQvZmIzNWMyY2VjNTg5ODVmMGI4ZDI3MzNmMWI5MTkyNzU0MmVlYjNm
-ZApTaWduZWQtb2ZmLWJ5OiBRaSBaaG91IDxhdG1nbmRAb3V0bG9vay5jb20+Ci0tLQogYXVkaW8v
-YXVkaW8uYyB8IDYgKysrKystCiAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspLCAxIGRl
-bGV0aW9uKC0pCgpkaWZmIC0tZ2l0IGEvYXVkaW8vYXVkaW8uYyBiL2F1ZGlvL2F1ZGlvLmMKaW5k
-ZXggY2U4YzZkZWM1Zi4uNTBmZWJlMTkwZiAxMDA2NDQKLS0tIGEvYXVkaW8vYXVkaW8uYworKysg
-Yi9hdWRpby9hdWRpby5jCkBAIC0xMDkxLDcgKzEwOTEsMTEgQEAgc3RhdGljIHNpemVfdCBhdWRp
-b19wY21faHdfcnVuX291dChIV1ZvaWNlT3V0ICpodywgc2l6ZV90IGxpdmUpCiAgICAgd2hpbGUg
-KGxpdmUpIHsKICAgICAgICAgc2l6ZV90IHNpemUsIGRlY3IsIHByb2M7CiAgICAgICAgIHZvaWQg
-KmJ1ZiA9IGh3LT5wY21fb3BzLT5nZXRfYnVmZmVyX291dChodywgJnNpemUpOwotICAgICAgICBp
-ZiAoIWJ1ZiB8fCBzaXplID09IDApIHsKKworICAgICAgICBpZiAoIWJ1ZikgeworICAgICAgICAg
-ICAgaHctPm1peF9idWYtPnBvcyA9IChody0+bWl4X2J1Zi0+cG9zICsgbGl2ZSkgJSBody0+bWl4
-X2J1Zi0+c2l6ZTsKKyAgICAgICAgICAgIHJldHVybiBjbGlwcGVkICsgbGl2ZTsKKyAgICAgICAg
-fSBlbHNlIGlmICggc2l6ZSA9PSAwKSB7CiAgICAgICAgICAgICBicmVhazsKICAgICAgICAgfQog
-Ci0tIAoyLjE3LjE=
+On 10/09/20 11:14, Daniel P. Berrangé wrote:
+> On Thu, Sep 10, 2020 at 09:15:02AM +0200, Thomas Huth wrote:
+>> On 10/09/2020 09.01, Philippe Mathieu-Daudé wrote:
+>>> In order to use inclusive terminology, rename "blackhole"
+>>> as "(memory)hole".
+>>
+>> A black hole is a well-known astronomical term, which is simply named
+>> that way since it absorbes all light. I doubt that anybody could get
+>> upset by this term?
+> 
+> In this particular case I think the change is the right thing to do
+> simply because the astronomical analogy is not adding any value in
+> understanding. Calling it a "memoryhole" is more descriptive in what
+> is actually is.
+
+Absolutely not.  A memory hole ("memoryhole" is not an English word)
+would be easily confused with a hole in the memory map, which this is
+not.  For example on x86 systems the "PCI hole" is a hole between the
+end of low RAM and the bottom of the ROM that is reserved for memory
+mapped devices.  The "PCI hole" is explicitly left free by board code so
+that the OS can put PCI BARs in there.
+
+These black hole MemoryRegions, instead, are present in the memory map
+and their purpose is to absorbs all writes and only sends back zeros,
+hiding the contents of SMRAM and TSEG from the guest.  Just like a black
+hole they are "something that exists".
+
+Therefore, both "memory hole" and "hole" as in Philippe's patch are
+worse than the astronomical metaphor.
+
+Paolo
+
+>>
+>>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> ---
+>>>  include/hw/pci-host/q35.h |  4 ++--
+>>>  hw/pci-host/q35.c         | 38 +++++++++++++++++++-------------------
+>>>  tests/qtest/q35-test.c    |  2 +-
+>>>  3 files changed, 22 insertions(+), 22 deletions(-)
+>>>
+>>> diff --git a/include/hw/pci-host/q35.h b/include/hw/pci-host/q35.h
+>>> index 070305f83df..0fb90aca18b 100644
+>>> --- a/include/hw/pci-host/q35.h
+>>> +++ b/include/hw/pci-host/q35.h
+>>> @@ -48,8 +48,8 @@ typedef struct MCHPCIState {
+>>>      PAMMemoryRegion pam_regions[13];
+>>>      MemoryRegion smram_region, open_high_smram;
+>>>      MemoryRegion smram, low_smram, high_smram;
+>>> -    MemoryRegion tseg_blackhole, tseg_window;
+>>> -    MemoryRegion smbase_blackhole, smbase_window;
+>>> +    MemoryRegion tseg_hole, tseg_window;
+>>> +    MemoryRegion smbase_hole, smbase_window;
+>>
+>> Maybe rather use smbase_memhole and tseg_memhole?
+>>
+>>  Thomas
+>>
+>>
+> 
+> Regards,
+> Daniel
+> 
+
 
