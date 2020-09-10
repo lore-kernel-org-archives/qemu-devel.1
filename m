@@ -2,87 +2,89 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06EE1C43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:48:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D2FC43461
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:48:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9843520872
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:48:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2BEED20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:48:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=qnap.com header.i=@qnap.com header.b="DoyjAtpP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9843520872
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=qnap.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LZ251r1R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2BEED20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGK7T-0003Q2-P5
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:47:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53802)
+	id 1kGK7h-0003lN-1Q
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:48:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1kGK6k-0002GU-Fi
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:47:14 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:39868)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <dereksu@qnap.com>) id 1kGK6h-0004xj-Vr
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:47:14 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id s2so2836795pjr.4
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 03:47:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qnap.com; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=UZ3usPZQMy5X6Hme0WfoonfrWOf+pic6zqR1s5SrtwE=;
- b=DoyjAtpPHQ1XTzjMrbnIBTknbpQh78XNnLTz54LixlHXhpzyUwgIzGYn3u8R9iMmBF
- siqiK8FLgnzbwkzMjwhEJr9ocP/0A5cd7HVjqFwBghYXq4yffGL3FYi31klBf4pTaKS1
- 2np/xlVGbZRshbbCadygQkyAG0Jz+tZitE5d4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=UZ3usPZQMy5X6Hme0WfoonfrWOf+pic6zqR1s5SrtwE=;
- b=Z8cTKOqDYFYt/A35dAGEHwyOH5RuBMG4HvVWTP4h3d2uO3GYfBYGX59VGQIhwNMDUc
- sODf9Xqtu6AS91ox1nrm5+uBPXi/XJIIlqvPpGpjFjfiM/6EjOtADqF28g3d6V/80KqN
- sWYfp2OqJ4EwjDGbWLGWFm3A0BALTMur85NMqAT70JsOTnGpTuNmEQ4z7GohuI+z0dZ+
- Roj2jLAsvAZd+EjY1C9hflusxOtPW0kcecwWuTmVnEcyXXoLa/dvTKh4Llm3elOjxsPU
- rNRpC+RzlupiO1E3F2DmSS4Lhj+foqi2FfKxWOgD2bZ+P+e+H9xBRaAFX+BLaBQMY1eD
- ZJYA==
-X-Gm-Message-State: AOAM532RnzEUQ0irMpGj/VPJIEnlXINcBUeIZnfvDl22s+W8gv/bzbXD
- 4cumOkfFN2+4VN3CZRca8Vm8oVqcBteiFaKf
-X-Google-Smtp-Source: ABdhPJx6Poo5lFTmOURBD7yj7GgBQC7S5BbQ5geZNvLkbAEVeGJeAZ3gT6SMJ6pPSRWFAXrI6xW3vQ==
-X-Received: by 2002:a17:90b:93:: with SMTP id
- bb19mr4780966pjb.162.1599734829820; 
- Thu, 10 Sep 2020 03:47:09 -0700 (PDT)
-Received: from localhost.localdomain (125-227-154-100.HINET-IP.hinet.net.
- [125.227.154.100])
- by smtp.googlemail.com with ESMTPSA id 31sm4783840pgs.59.2020.09.10.03.47.08
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 03:47:09 -0700 (PDT)
-From: Derek Su <dereksu@qnap.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v1 1/1] COLO: only flush dirty ram pages from colo cache
-Date: Thu, 10 Sep 2020 10:46:50 +0000
-Message-Id: <20200910104650.1182807-2-dereksu@qnap.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200910104650.1182807-1-dereksu@qnap.com>
-References: <20200910104650.1182807-1-dereksu@qnap.com>
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGK5w-0000wC-MF
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:46:24 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:30990
+ helo=us-smtp-1.mimecast.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kGK5u-0004tf-M4
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 06:46:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1599734781;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=R8nLgHAtUi7CnmeK9vZpeK82RZ0UN/eACJxN1MaJp8k=;
+ b=LZ251r1Raum0RqkAWMc9ahcyqp1IpQt1ul5YNoBEPeKV9vOBhbeG3FDfavkfN+I+JojdSW
+ S0ZjrF0cku9/UEUJR471Sz4L74mRD+p8DJI4JUcwf0ZcLupgE1D8lymOYCaZT6vjPUugKn
+ oVs+6DZXSLr6MDOdio+zGo1oKbFs3yA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-486-HgnpihNHNfSQRxYxoTQj9g-1; Thu, 10 Sep 2020 06:46:00 -0400
+X-MC-Unique: HgnpihNHNfSQRxYxoTQj9g-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C3AF18B9F01;
+ Thu, 10 Sep 2020 10:45:59 +0000 (UTC)
+Received: from redhat.com (ovpn-112-4.ams2.redhat.com [10.36.112.4])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D1D08357B;
+ Thu, 10 Sep 2020 10:45:54 +0000 (UTC)
+Date: Thu, 10 Sep 2020 11:45:52 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [RFC] QEMU as Xcode project on macOS
+Message-ID: <20200910104552.GH1083348@redhat.com>
+References: <2764135.D4k31Gy3CM@silver> <2421928.3WNMogbLRJ@silver>
+ <20200910093910.GG1083348@redhat.com> <4878996.4JzhbN1UZ4@silver>
+ <CAFEAcA_CPNppKwwJSu4O6U6qF-rfHR2NtG=hWBFatZmD4aiMdg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=dereksu@qnap.com; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <CAFEAcA_CPNppKwwJSu4O6U6qF-rfHR2NtG=hWBFatZmD4aiMdg@mail.gmail.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0.001
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=205.139.110.120; envelope-from=berrange@redhat.com;
+ helo=us-smtp-1.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 01:23:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,94 +98,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Derek Su <dereksu@qnap.com>, zhang.zhanghailiang@huawei.com,
- dgilbert@redhat.com, quintela@redhat.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, Liviu Ionescu <ilg@livius.net>,
+ Christian Schoenebeck <qemu_oss@crudebyte.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, G 3 <programmingkidx@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In secondary side, the colo_flush_ram_cache() calls
-migration_bitmap_find_dirty() to finding the dirty pages and
-flush them to host. But ram_state's ram_bulk_stage flag is always
-enabled in secondary side, it leads to the whole ram pages copy
-instead of only dirty pages.
+On Thu, Sep 10, 2020 at 11:35:46AM +0100, Peter Maydell wrote:
+> On Thu, 10 Sep 2020 at 11:14, Christian Schoenebeck
+> <qemu_oss@crudebyte.com> wrote:
+> > For developers it is actually the complete opposite on Mac: you start to
+> > install things from somewhere, then you need to install something from
+> > somewhere else, manually build & install stuff, and you end up in conflicts
+> > and misbehaviours all over the place.
+> 
+> This has not been my experience -- homebrew has everything, and
+> it doesn't have problems like this.
+> 
+> > The way to go for devs on Mac is: 3rd party libs should not be installed into
+> > global space, rather be built & linked either as dynamic frameworks (including
+> > assets) or as static libs. Then apps always run with the precise version and
+> > flags of libs they were tested with and never conflict with another app's
+> > version/config of libs.
+> 
+> Does Apple (or anybody else) provide a framework for doing this
+> so that developers of individual applications can just say "my
+> app needs libs X, Y, Z" and they don't have to mess around
+> finding, figuring out how to compile, and shipping the sources of
+> libs X, Y, Z? If there's a better mechanism than Homebrew for this
+> that's great, but at the moment what you seem to be saying is
+> "you should do a lot more work to manually set something up where
+> you ship the sources to all your dependencies and then build them
+> all". There's no way we're ever going to do that, it is just
+> way too much work for very little gain.
 
-Here, the ram_bulk_stage in secondary side is disabled in the
-preparation of COLO incoming process to avoid the whole dirty
-ram pages flush.
+AFAICT both MacPorts and HomeBrew can be installed into custom locations,
+at least if you do a "from source" install of them, rather than using the
+pre-built packages.
 
-Signed-off-by: Derek Su <dereksu@qnap.com>
----
- migration/colo.c |  6 +++++-
- migration/ram.c  | 10 ++++++++++
- migration/ram.h  |  3 +++
- 3 files changed, 18 insertions(+), 1 deletion(-)
-
-diff --git a/migration/colo.c b/migration/colo.c
-index ea7d1e9d4e..6e644db306 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -844,6 +844,8 @@ void *colo_process_incoming_thread(void *opaque)
-         return NULL;
-     }
- 
-+    colo_disable_ram_bulk_stage();
-+
-     failover_init_state();
- 
-     mis->to_src_file = qemu_file_get_return_path(mis->from_src_file);
-@@ -873,7 +875,7 @@ void *colo_process_incoming_thread(void *opaque)
-         goto out;
-     }
- #else
--        abort();
-+    abort();
- #endif
-     vm_start();
-     trace_colo_vm_state_change("stop", "run");
-@@ -924,6 +926,8 @@ out:
-         qemu_fclose(fb);
-     }
- 
-+    colo_enable_ram_bulk_stage();
-+
-     /* Hope this not to be too long to loop here */
-     qemu_sem_wait(&mis->colo_incoming_sem);
-     qemu_sem_destroy(&mis->colo_incoming_sem);
-diff --git a/migration/ram.c b/migration/ram.c
-index 76d4fee5d5..65e9b12058 100644
---- a/migration/ram.c
-+++ b/migration/ram.c
-@@ -3357,6 +3357,16 @@ static bool postcopy_is_running(void)
-     return ps >= POSTCOPY_INCOMING_LISTENING && ps < POSTCOPY_INCOMING_END;
- }
- 
-+void colo_enable_ram_bulk_stage(void)
-+{
-+    ram_state->ram_bulk_stage = true;
-+}
-+
-+void colo_disable_ram_bulk_stage(void)
-+{
-+    ram_state->ram_bulk_stage = false;
-+}
-+
- /*
-  * Flush content of RAM cache into SVM's memory.
-  * Only flush the pages that be dirtied by PVM or SVM or both.
-diff --git a/migration/ram.h b/migration/ram.h
-index 2eeaacfa13..c1c0ebbe0f 100644
---- a/migration/ram.h
-+++ b/migration/ram.h
-@@ -69,4 +69,7 @@ void colo_flush_ram_cache(void);
- void colo_release_ram_cache(void);
- void colo_incoming_start_dirty_log(void);
- 
-+void colo_enable_ram_bulk_stage(void);
-+void colo_disable_ram_bulk_stage(void);
-+
- #endif
+Regards,
+Daniel
 -- 
-2.25.1
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
