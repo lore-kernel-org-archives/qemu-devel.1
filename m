@@ -6,42 +6,42 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE2C0C433E2
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:02:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1217C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:04:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0068E20C09
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:02:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0068E20C09
+	by mail.kernel.org (Postfix) with ESMTPS id 0AFE320C09
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 18:04:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFE320C09
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGQtt-0001M4-TX
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:02:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50762)
+	id 1kGQwE-0002pP-QZ
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 14:04:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGQsZ-0000ks-ET
+ id 1kGQsZ-0000kj-0s
  for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:01:03 -0400
-Received: from indium.canonical.com ([91.189.90.7]:53110)
+Received: from indium.canonical.com ([91.189.90.7]:53124)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kGQsT-0007YG-NW
- for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:01:03 -0400
+ id 1kGQsT-0007YL-Sn
+ for qemu-devel@nongnu.org; Thu, 10 Sep 2020 14:01:02 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kGQsQ-00069h-Si
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 18:00:54 +0000
+ id 1kGQsR-00069k-P1
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 18:00:55 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id D83292E8053
- for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 18:00:54 +0000 (UTC)
+ by loganberry.canonical.com (Postfix) with ESMTP id BA7F62E80DC
+ for <qemu-devel@nongnu.org>; Thu, 10 Sep 2020 18:00:55 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 10 Sep 2020 17:47:52 -0000
+Date: Thu, 10 Sep 2020 17:51:06 -0000
 From: Laurent Vivier <1895053@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
@@ -54,7 +54,7 @@ X-Launchpad-Bug-Commenters: laurent-vivier petunia2000
 X-Launchpad-Bug-Reporter: Petunia (petunia2000)
 X-Launchpad-Bug-Modifier: Laurent Vivier (laurent-vivier)
 References: <159968542073.11462.1191604929312152807.malonedeb@chaenomeles.canonical.com>
-Message-Id: <159976007303.21135.6648450208051221407.malone@wampee.canonical.com>
+Message-Id: <159976026657.21444.17630831327155273919.malone@wampee.canonical.com>
 Subject: [Bug 1895053] Re: Cannot nspawn raspbian 10 [FAILED] Failed to start
  Journal Service.
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
@@ -62,7 +62,7 @@ X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="83bdf6c8a3a5f87722c8927e54838522f3e57504"; Instance="production"
-X-Launchpad-Hash: d4f07abff467964f64872aba3d76f4a58f7f5d89
+X-Launchpad-Hash: 1fe667896513e9b2ae0e4d400a06b5db516b7fd6
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/09/10 12:30:55
@@ -90,50 +90,13 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-I'm sorry, it works fine for me on Fedora 32 with qemu built from GIT
-v5.1.0.
+Perhaps the problem is triggered by the host systemd version as I have:
 
-$ uname -r
-5.8.4-200.fc32.x86_64
-
-wget https://downloads.raspberrypi.org/raspios_lite_armhf_latest
-mv raspios_lite_armhf_latest raspios_lite_armhf_latest.zip
-unzip raspios_lite_armhf_latest.zip
-modprobe loop max_part=3D8
-mkdir root
-sudo losetup -f 2020-08-20-raspios-buster-armhf-lite.img
-sudo mount /dev/loop0p2 root
-sudo mount /dev/loop0p1 root/boot
-sudo systemd-nspawn -D root --boot --bind $HOME/Objects/qemu/linux-user/qem=
-u-arm:/qemu-arm
-Spawning container root on /raspios/root.
-Press ^] three times within 1s to kill container.
-systemd 241 running in system mode. (+PAM +AUDIT +SELINUX +IMA +APPARMOR +S=
-MACK +SYSVINIT +UTMP +LIBCRYPTSETUP +GCRYPT +GNUTLS +ACL +XZ +LZ4 +SECCOMP =
-+BLKID +ELFUTILS +KMOD -IDN2 +IDN -PCRE2 default-hierarchy=3Dhybrid)
-Detected virtualization systemd-nspawn.
-Detected architecture arm.
-
-Welcome to Raspbian GNU/Linux 10 (buster)!
-....
-Raspbian GNU/Linux 10 raspberrypi console
-raspberrypi login: pi
-Password: =
-
-Last login: Thu Sep 10 19:40:15 CEST 2020 on pts/0
-Linux raspberrypi 5.8.4-200.fc32.x86_64 #1 SMP Wed Aug 26 22:28:08 UTC 2020=
- armv7l
-
-The programs included with the Debian GNU/Linux system are free software;
-the exact distribution terms for each program are described in the
-individual files in /usr/share/doc/*/copyright.
-
-Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
-permitted by applicable law.
-pi@raspberrypi:~ $ /qemu-arm -version
-qemu-arm version 5.1.0 (v5.1.0)
-Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
-pi@raspberrypi:~ $
+$ systemd-nspawn --version
+systemd 245 (v245.7-1.fc32)
++PAM +AUDIT +SELINUX +IMA -APPARMOR +SMACK +SYSVINIT +UTMP +LIBCRYPTSETUP +=
+GCRYPT +GNUTLS +ACL +XZ +LZ4 +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2 -IDN +PC=
+RE2 default-hierarchy=3Dunified
 
 -- =
 
