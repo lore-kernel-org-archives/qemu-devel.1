@@ -2,78 +2,81 @@ Return-Path: <SRS0=7f1Q=CT=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F80CC43461
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27AA2C433E2
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:32:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E4BDE20BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:32:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A00420BED
+	for <qemu-devel@archiver.kernel.org>; Thu, 10 Sep 2020 10:32:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5/EbFaR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4BDE20BED
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/JoH76u"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A00420BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35314 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kGJsM-0007SL-Im
-	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:32:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50592)
+	id 1kGJsm-0008OQ-Ct
+	for qemu-devel@archiver.kernel.org; Thu, 10 Sep 2020 06:32:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJrO-0006VA-8E; Thu, 10 Sep 2020 06:31:22 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:42291)
+ id 1kGJrr-0006xz-3m; Thu, 10 Sep 2020 06:31:51 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:37298)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kGJrM-000342-HV; Thu, 10 Sep 2020 06:31:21 -0400
-Received: by mail-pl1-x642.google.com with SMTP id y6so703166plt.9;
- Thu, 10 Sep 2020 03:31:19 -0700 (PDT)
+ id 1kGJro-00036T-TX; Thu, 10 Sep 2020 06:31:50 -0400
+Received: by mail-pl1-x642.google.com with SMTP id u9so703289plk.4;
+ Thu, 10 Sep 2020 03:31:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=xNA58CMYg3J4BDUUZZNyKBJkTAFEv3p0kfY/snZM+Qs=;
- b=E5/EbFaR1dccCm6cc964KQO+y1nwMyx1EyY4PmhN7PEjQOdX7ScO3w63MbNKCsu//6
- AGC2EZI8wMOgmhY1MT67I+L4qWYJDUPvrgmBXTTXmCJjZNecaUoDmW64Xm0bW0NtLv0Q
- 2sgk8G6ePBAu/uBo1mkel+KqSfsK1NWojUN8oMCkpV0u21tOZ0F8T9eto+KMOynQjaRd
- TdkMOpdBet+F13HjLfKAdDyPxmzM7BtNpTBbqPdZ/BNiWS97G/xV2sR2wjZwe6cbidhi
- GFnBqR8rKwEtTd1Qp+Rm8FKKrc3LBqO9ZmALottKFU+xzrRT59S9PEjnbglXHpl1KIay
- 1sHw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=TsNOy56cT/aZuPzlGfi9G8/JBTKitoxne2lgskAEKvc=;
+ b=L/JoH76ucAfhyt0NZTIJS+d7QRNEC1YNyzAAGaRRgJ0bufgboeXQaIOGrV4bFYRqAN
+ k91j4BN1EIOYHKjRUtwe7btFmyZG1Fu6T9I2RIQLxS0rk6dNDjYEZjRyGWn14tbVR1n3
+ FhhB1hYoH0Z+o5l21vlFeWAGO1J5zOyfRZoTciiIWVLjPNqk607XBwWcVt8x60bD2j3P
+ ohfff3MEt29OxxIMdcc9XQ0VIc6laOWWg7phre0jygd8XiHHFb2tklCI4jF5JHtuKHr0
+ iopVtGtb/6tpuD4e0oBUa+ThpJmLWxopwI+sCEMk2d2JrR3qvZJoTWFv1WCoyqVqUHAg
+ hvrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=xNA58CMYg3J4BDUUZZNyKBJkTAFEv3p0kfY/snZM+Qs=;
- b=aof85ISRP8skEk2biTBHhl/z+7uPespoDtGrS50/e+yrYH0D01BHtt8lcYcN994wjM
- 4PINX0W6qUXpGDhTjtU95aYF+Ec7VIVuH7uEyHRsFZytVa4Fwz5fpV9jOJopo5vlFZhk
- /yP1vY+sBbrOXrYDhvPl7430bnA4sFdocxFEvGCvI0tWhwMQaz6TlKHhA98/BA4oY6OJ
- xT9PqfF/nZiGwhtL0jafAcLsg5YG4kyZZZ2qQByXM/z4cR2CMyN8SmR9BrPw9VnB6IK8
- PO2mSqm7p18RFvcD5Fx6+9ibA92AvCqRZ3I/oyrch1tOIxVTJ6CCi/K0kRqKP6sWaB88
- 4GDA==
-X-Gm-Message-State: AOAM532HrLSaSDKxnUbb87IAgOV4AG+i7CtLd9FCiriI+N7zpaIh15UW
- 72HsIjM9ykUj+nvjHY++jzqkJb7vL5m/HY1KN4w=
-X-Google-Smtp-Source: ABdhPJxNoT6H+qFQU/ttLBonV4Wr8XuQXu+fb2NpriVwuRHZo+jEKLunfkEPY4srQ05WPA33P5uxRw==
-X-Received: by 2002:a17:90a:a60e:: with SMTP id
- c14mr4832203pjq.31.1599733878216; 
- Thu, 10 Sep 2020 03:31:18 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=TsNOy56cT/aZuPzlGfi9G8/JBTKitoxne2lgskAEKvc=;
+ b=sl9jASxfhgma/hbZoyD1lm2+nldolLODxNYtWRXY96aJajwV3Mquy5cEyfNGKtJvHp
+ 5uQH0cYmJ3winQG2Fy4RVReVTHIpYgvb3iseEHhAtM8k6dwd2Sb35HQSAjHtqP6Peyy9
+ t39yrZhGeyrMpz2qBXr7dAQXlryUnlm42/8tMUQkaZWUnQ8qeYXvmdULPEPUT6ROb9sG
+ mfxmY51YUUFpoSMntURo5kjZWz06OHNssyfCb6EF7d3vuCgSc7U1GXMEr+aG/zvZKAMO
+ xAesCxzbqW2wqskXtWSYbhoZ7FHwvOEtH+s/pxtyvkUtjg7lU1TiPokOO/GJrAhEn/7c
+ 8ScA==
+X-Gm-Message-State: AOAM533WdLEuZEnC8AE1mBWRIspDZ+F+Rmo26RuruoUa8YDrLDwx0aeg
+ wqDo0pqdqcWpTTiey90FPaR4d9ddozss61UXTHE=
+X-Google-Smtp-Source: ABdhPJxUkdEsyqNC/h03NHTrS4qSY0nojxkfIqNTRla14UJkJI0eApIGA+D5VAfU6Hlnxl7sIOJ1Ng==
+X-Received: by 2002:a17:90a:d90f:: with SMTP id
+ c15mr4801891pjv.160.1599733906710; 
+ Thu, 10 Sep 2020 03:31:46 -0700 (PDT)
 Received: from localhost.localdomain ([222.95.248.6])
- by smtp.googlemail.com with ESMTPSA id g21sm2000203pfh.30.2020.09.10.03.31.12
+ by smtp.googlemail.com with ESMTPSA id g21sm2000203pfh.30.2020.09.10.03.31.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 10 Sep 2020 03:31:17 -0700 (PDT)
+ Thu, 10 Sep 2020 03:31:45 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v7 00/25] W32, W64 msys2/mingw patches
-Date: Thu, 10 Sep 2020 18:30:34 +0800
-Message-Id: <20200910103059.987-1-luoyonggang@gmail.com>
+Subject: [PATCH v7 05/25] configure: Fixes ncursesw detection under
+ msys2/mingw and enable curses
+Date: Thu, 10 Sep 2020 18:30:39 +0800
+Message-Id: <20200910103059.987-6-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20200910103059.987-1-luoyonggang@gmail.com>
+References: <20200910103059.987-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
  envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -110,78 +113,155 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It first introduce msys2 CI on cirrus by fixes nfs, capstone, curses and=0D
-disable partial test-char tests.=0D
-And then fixes all unit tests failure on msys2/mingw=0D
-This fixes the reviews suggested in the mailling list=0D
-=0D
-Kevin Wolf (1):=0D
-  file-win32: Fix "locking" option=0D
-=0D
-Maxim Levitsky (1):=0D
-  rcu: Implement drain_call_rcu=0D
-=0D
-Yonggang Luo (23):=0D
-  block: Fixes nfs compiling error on msys2/mingw=0D
-  ci: fixes msys2 build by upgrading capstone to 4.0.2=0D
-  configure: Fixes ncursesw detection under msys2/mingw and enable=0D
-    curses=0D
-  win32: Simplify gmtime_r detection direct base on=0D
-    _POSIX_THREAD_SAFE_FUNCTIONS.=0D
-  curses: Fixes curses compiling errors.=0D
-  tests: disable /char/stdio/* tests in test-char.c on win32=0D
-  tests: Fixes test-replication.c on msys2/mingw.=0D
-  tests: test-replication disable /replication/secondary/* on=0D
-    msys2/mingw.=0D
-  osdep: file locking functions are not available on Win32=0D
-  meson: Use -b to ignore CR vs. CR-LF issues on Windows=0D
-  gcrypt: test_tls_psk_init should write binary file instead text file.=0D
-  tests: Enable crypto tests under msys2/mingw=0D
-  meson: remove empty else and duplicated gio deps=0D
-  vmstate: Fixes test-vmstate.c on msys2/mingw=0D
-  cirrus: Building freebsd in a single short=0D
-  tests: Convert g_free to g_autofree macro in test-logging.c=0D
-  tests: Fixes test-io-channel-socket.c tests under msys2/mingw=0D
-  tests: fixes aio-win32 about aio_remove_fd_handler, get it consistence=0D
-    with aio-posix.c=0D
-  tests: Fixes test-io-channel-file by mask only owner file state mask=0D
-    bits=0D
-  tests: fix test-util-sockets.c=0D
-  tests: Fixes test-qdev-global-props.c=0D
-  rcu: fixes test-logging.c by call drain_call_rcu before rmdir_full=0D
-  ci: Enable msys2 ci in cirrus=0D
-=0D
- .cirrus.yml                      |  95 ++++++++++++-----=0D
- block/file-win32.c               |  22 +++-=0D
- block/nfs.c                      |  32 ++++--=0D
- capstone                         |   2 +-=0D
- configure                        |  61 +++--------=0D
- include/qemu/osdep.h             |   2 +-=0D
- include/qemu/rcu.h               |   1 +=0D
- include/sysemu/os-win32.h        |   4 +-=0D
- meson.build                      |   6 --=0D
- tests/crypto-tls-psk-helpers.c   |   6 +-=0D
- tests/crypto-tls-x509-helpers.c  | 169 ++++++++++++++++++++++++++++++-=0D
- tests/crypto-tls-x509-helpers.h  |   9 +-=0D
- tests/qapi-schema/meson.build    |   2 +-=0D
- tests/test-char.c                |  26 +++--=0D
- tests/test-crypto-tlscredsx509.c |  47 +++++----=0D
- tests/test-crypto-tlssession.c   |  68 +++++++------=0D
- tests/test-io-channel-file.c     |  10 +-=0D
- tests/test-io-channel-socket.c   |   2 +=0D
- tests/test-io-channel-tls.c      |  51 ++++++----=0D
- tests/test-logging.c             |   5 +-=0D
- tests/test-qdev-global-props.c   |   6 +-=0D
- tests/test-replication.c         |  22 +++-=0D
- tests/test-util-sockets.c        |   6 +-=0D
- tests/test-vmstate.c             |   3 +-=0D
- ui/curses.c                      |  14 +--=0D
- util/aio-win32.c                 |  11 +-=0D
- util/oslib-win32.c               |   2 +-=0D
- util/rcu.c                       |  55 ++++++++++=0D
- 28 files changed, 536 insertions(+), 203 deletions(-)=0D
-=0D
--- =0D
-2.28.0.windows.1=0D
-=0D
+The mingw pkg-config are showing following absolute path and contains : as the separator,
+so we must not use : as path separator. and we know the command line parameter are not likely
+contains newline, we could use newline as path command line parameter separator
+
+-D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC:/CI-Tools/msys64/mingw64/include/ncursesw:-I/usr/include/ncursesw:
+-DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+-DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -lncursesw
+-DNCURSES_WIDECHAR -D_XOPEN_SOURCE=600 -D_POSIX_C_SOURCE=199506L -IC -lcursesw
+-DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+-DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -lncursesw
+-DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -lcursesw
+-DNCURSES_WIDECHAR -I/usr/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+-DNCURSES_WIDECHAR -I/usr/include/ncursesw -lncursesw
+-DNCURSES_WIDECHAR -I/usr/include/ncursesw -lcursesw
+
+Refer to https://unix.stackexchange.com/a/103011/218958
+
+If your file names are guaranteed not to contain newlines, you can use newlines as the separator. W
+hen you expand the variable, first turn off globbing with set -f and set the list of field splitting characters
+IFS to contain only a newline.
+
+msys2/mingw lacks the POSIX-required langinfo.h.
+
+gcc test.c -DNCURSES_WIDECHAR -I/mingw64/include/ncursesw -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+test.c:4:10: fatal error: langinfo.h: No such file or directory
+    4 | #include <langinfo.h>
+      |          ^~~~~~~~~~~~
+compilation terminated.
+
+So we using g_get_codeset instead of nl_langinfo(CODESET)
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ configure   | 25 +++++++++++++++----------
+ ui/curses.c | 10 +++++-----
+ 2 files changed, 20 insertions(+), 15 deletions(-)
+
+diff --git a/configure b/configure
+index f4f8bc3756..b21843fdb9 100755
+--- a/configure
++++ b/configure
+@@ -3653,35 +3653,40 @@ if test "$iconv" = "no" ; then
+ fi
+ if test "$curses" != "no" ; then
+   if test "$mingw32" = "yes" ; then
+-    curses_inc_list="$($pkg_config --cflags ncurses 2>/dev/null):"
+-    curses_lib_list="$($pkg_config --libs ncurses 2>/dev/null):-lpdcurses"
++    curses_inc_list="$($pkg_config --cflags ncurses 2>/dev/null)
++      $($pkg_config --cflags ncursesw 2>/dev/null)"
++    curses_lib_list="$($pkg_config --libs ncurses 2>/dev/null)
++      $($pkg_config --libs ncursesw 2>/dev/null)
++      -lpdcurses"
+   else
+-    curses_inc_list="$($pkg_config --cflags ncursesw 2>/dev/null):-I/usr/include/ncursesw:"
+-    curses_lib_list="$($pkg_config --libs ncursesw 2>/dev/null):-lncursesw:-lcursesw"
++    curses_inc_list="$($pkg_config --cflags ncursesw 2>/dev/null)
++      -I/usr/include/ncursesw:"
++    curses_lib_list="$($pkg_config --libs ncursesw 2>/dev/null)
++      -lncursesw
++      -lcursesw"
+   fi
+   curses_found=no
+   cat > $TMPC << EOF
+ #include <locale.h>
+ #include <curses.h>
+ #include <wchar.h>
+-#include <langinfo.h>
+ int main(void) {
+-  const char *codeset;
+   wchar_t wch = L'w';
+   setlocale(LC_ALL, "");
+   resize_term(0, 0);
+   addwstr(L"wide chars\n");
+   addnwstr(&wch, 1);
+   add_wch(WACS_DEGREE);
+-  codeset = nl_langinfo(CODESET);
+-  return codeset != 0;
++  return 0;
+ }
+ EOF
+-  IFS=:
++  IFS='
++'                           # turn off variable value expansion except for splitting at newlines
+   for curses_inc in $curses_inc_list; do
+     # Make sure we get the wide character prototypes
+     curses_inc="-DNCURSES_WIDECHAR $curses_inc"
+-    IFS=:
++    IFS='
++'                           # turn off variable value expansion except for splitting at newlines
+     for curses_lib in $curses_lib_list; do
+       unset IFS
+       if compile_prog "$curses_inc" "$curses_lib" ; then
+diff --git a/ui/curses.c b/ui/curses.c
+index a59b23a9cf..12bc682cf9 100644
+--- a/ui/curses.c
++++ b/ui/curses.c
+@@ -30,7 +30,6 @@
+ #endif
+ #include <locale.h>
+ #include <wchar.h>
+-#include <langinfo.h>
+ #include <iconv.h>
+ 
+ #include "qapi/error.h"
+@@ -526,6 +525,7 @@ static void font_setup(void)
+     iconv_t nativecharset_to_ucs2;
+     iconv_t font_conv;
+     int i;
++    g_autofree gchar *local_codeset = g_get_codeset();
+ 
+     /*
+      * Control characters are normally non-printable, but VGA does have
+@@ -566,14 +566,14 @@ static void font_setup(void)
+       0x25bc
+     };
+ 
+-    ucs2_to_nativecharset = iconv_open(nl_langinfo(CODESET), "UCS-2");
++    ucs2_to_nativecharset = iconv_open(local_codeset, "UCS-2");
+     if (ucs2_to_nativecharset == (iconv_t) -1) {
+         fprintf(stderr, "Could not convert font glyphs from UCS-2: '%s'\n",
+                         strerror(errno));
+         exit(1);
+     }
+ 
+-    nativecharset_to_ucs2 = iconv_open("UCS-2", nl_langinfo(CODESET));
++    nativecharset_to_ucs2 = iconv_open("UCS-2", local_codeset);
+     if (nativecharset_to_ucs2 == (iconv_t) -1) {
+         iconv_close(ucs2_to_nativecharset);
+         fprintf(stderr, "Could not convert font glyphs to UCS-2: '%s'\n",
+@@ -581,7 +581,7 @@ static void font_setup(void)
+         exit(1);
+     }
+ 
+-    font_conv = iconv_open(nl_langinfo(CODESET), font_charset);
++    font_conv = iconv_open(local_codeset, font_charset);
+     if (font_conv == (iconv_t) -1) {
+         iconv_close(ucs2_to_nativecharset);
+         iconv_close(nativecharset_to_ucs2);
+@@ -602,7 +602,7 @@ static void font_setup(void)
+     /* DEL */
+     convert_ucs(0x7F, 0x2302, ucs2_to_nativecharset);
+ 
+-    if (strcmp(nl_langinfo(CODESET), "UTF-8")) {
++    if (strcmp(local_codeset, "UTF-8")) {
+         /* Non-Unicode capable, use termcap equivalents for those available */
+         for (i = 0; i <= 0xFF; i++) {
+             wchar_t wch[CCHARW_MAX];
+-- 
+2.28.0.windows.1
+
 
